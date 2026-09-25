@@ -106,33 +106,25 @@ describe('InstanceDetailDrawer', () => {
   });
 
   it('renders instance hostname as title', async () => {
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
   });
 
   it('renders status badge', async () => {
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Online');
   });
 
   it('renders active sources count', async () => {
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText(/Active Sources.*1/i);
   });
 
   it('renders Messages link pointing to agent_id filter', async () => {
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     const link = await screen.findByRole('link', { name: /^received messages$/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('agent_id'));
@@ -142,9 +134,7 @@ describe('InstanceDetailDrawer', () => {
   it('renders pending changes as the effects the collector will apply', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Synchronization');
     await screen.findByText('Sync pending');
@@ -165,14 +155,7 @@ describe('InstanceDetailDrawer', () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
     const pendingInstance = { ...mockInstance, has_pending_changes: true };
 
-    render(
-      <InstanceDetailDrawer
-        instance={pendingInstance}
-        sources={mockSources}
-       
-        onClose={jest.fn()}
-      />,
-    );
+    render(<InstanceDetailDrawer instance={pendingInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Synchronization');
     await screen.findByText(/loading/i);
@@ -185,14 +168,7 @@ describe('InstanceDetailDrawer', () => {
     // Table row reports in-sync, but the detail hasn't loaded yet; the section must not commit to it.
     const staleInstance = { ...mockInstance, has_pending_changes: false };
 
-    render(
-      <InstanceDetailDrawer
-        instance={staleInstance}
-        sources={mockSources}
-       
-        onClose={jest.fn()}
-      />,
-    );
+    render(<InstanceDetailDrawer instance={staleInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Synchronization');
     await screen.findByText(/loading/i);
@@ -216,9 +192,7 @@ describe('InstanceDetailDrawer', () => {
       isError: false,
     });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
     // "In sync" appears in the top detail row and in the Synchronization section
@@ -245,9 +219,7 @@ describe('InstanceDetailDrawer', () => {
       isError: false,
     });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Synchronization');
     // Consistent with the table: pending, not "In sync", with a graceful message rather than an empty list.
@@ -261,14 +233,7 @@ describe('InstanceDetailDrawer', () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: false, isError: true });
     const pendingInstance = { ...mockInstance, has_pending_changes: true };
 
-    render(
-      <InstanceDetailDrawer
-        instance={pendingInstance}
-        sources={mockSources}
-       
-        onClose={jest.fn()}
-      />,
-    );
+    render(<InstanceDetailDrawer instance={pendingInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText(/could not load pending changes/i);
     expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
@@ -278,9 +243,7 @@ describe('InstanceDetailDrawer', () => {
     // react-query retains the last good data on a failed refetch but flips isError to true.
     asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: true });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Synchronization');
     await screen.findByText(/reload configuration/i); // cached actions still rendered…
@@ -317,9 +280,7 @@ describe('InstanceDetailDrawer', () => {
       isError: false,
     });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));
     // The viewed instance leads the entry; the other batch member is folded into the count.
@@ -337,9 +298,7 @@ describe('InstanceDetailDrawer', () => {
       },
     };
 
-    render(
-      <InstanceDetailDrawer instance={unhealthy} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={unhealthy} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Health');
     await screen.findByText('Unhealthy');
@@ -362,9 +321,7 @@ describe('InstanceDetailDrawer', () => {
     });
 
     // The stale snapshot says online/no health; the polled data must win.
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Offline');
     await screen.findByText('Last known: Unhealthy');
@@ -374,9 +331,7 @@ describe('InstanceDetailDrawer', () => {
   it('falls back to the row snapshot while the instance query has no data', async () => {
     asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null, isError: false });
 
-    render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
-    );
+    render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
     await screen.findByText('Online');
     // Guards the polling wiring: the hook itself handles cadence, session, and error reporting.
@@ -392,14 +347,7 @@ describe('InstanceDetailDrawer', () => {
     });
 
     it('reports opening the fleet from the drawer', async () => {
-      render(
-        <InstanceDetailDrawer
-          instance={mockInstance}
-          sources={mockSources}
-         
-          onClose={jest.fn()}
-        />,
-      );
+      render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
       await userEvent.click(await screen.findByRole('link', { name: 'production' }));
 
@@ -418,14 +366,7 @@ describe('InstanceDetailDrawer', () => {
       [/view system logs/i, 'Collector Instance View Logs Clicked', 'instance-drawer-view-logs'],
       [/^received messages$/i, 'Collector Instance Received Messages Clicked', 'instance-drawer-received-messages'],
     ])('reports %s from the drawer surface', async (name, eventType, appActionValue) => {
-      render(
-        <InstanceDetailDrawer
-          instance={mockInstance}
-          sources={mockSources}
-         
-          onClose={jest.fn()}
-        />,
-      );
+      render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
       await userEvent.click(await screen.findByRole('link', { name }));
 
@@ -442,14 +383,7 @@ describe('InstanceDetailDrawer', () => {
     it('reports expanding and collapsing the queued transactions', async () => {
       asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
 
-      render(
-        <InstanceDetailDrawer
-          instance={mockInstance}
-          sources={mockSources}
-         
-          onClose={jest.fn()}
-        />,
-      );
+      render(<InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />);
 
       await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));
 

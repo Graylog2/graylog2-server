@@ -75,8 +75,8 @@ const FleetActions = ({ fleet }: Props) => {
               Delete
               {assignedInstances > 0 && (
                 <HoverForHelp displayLeftMargin>
-                  This fleet has {assignedInstances} assigned instance{assignedInstances === 1 ? '' : 's'}. Reassign
-                  or delete them before deleting the fleet.
+                  This fleet has {assignedInstances} assigned instance{assignedInstances === 1 ? '' : 's'}. Reassign or
+                  delete them before deleting the fleet.
                 </HoverForHelp>
               )}
             </DeleteMenuItem>
