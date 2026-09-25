@@ -27,6 +27,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -146,7 +147,11 @@ const Visualization = ({
     );
   }
 
-  return <LoadingWidget />;
+  return (
+    <LoadingWidget
+      visualization={widget.config instanceof AggregationWidgetConfig ? widget.config.visualization : undefined}
+    />
+  );
 };
 
 type EditWrapperProps = {

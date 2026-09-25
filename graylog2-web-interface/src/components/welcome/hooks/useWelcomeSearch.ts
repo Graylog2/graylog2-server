@@ -112,15 +112,18 @@ const buildView = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: Relative
 };
 
 /**
- * Turns an arbitrary list of welcome-page widgets into a created search, ready to hand to `SearchPage`.
+ * Turns an arbitrary list of welcome-page widgets into a created search, ready to hand to `WelcomeSearch`.
  * Shared by the general tab (`useWelcomeMetricsSearch`) and any other welcome-page widget area (e.g. the
  * Security tab's search-backed widgets) that needs its own view/search built from a small widget set.
  */
-const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) =>
-  useCreateSearch(
+const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) => {
+  const view = useCreateSearch(
     // `useCreateSearch` creates a new search on the server for every new promise it receives, so the promise
     // must only be recreated when the widgets or the time range actually change.
     useMemo(() => buildView(entries, timeRange), [entries, timeRange]),
   );
+
+  return { view, entries };
+};
 
 export default useWelcomeSearch;
