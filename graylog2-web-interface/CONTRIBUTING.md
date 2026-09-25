@@ -67,7 +67,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 ### Test Typing
 
-- In tests, never cast to `jest.Mock` (`foo as jest.Mock`), use the `asMock` helper function
+- In tests, never cast to `jest.Mock` (`foo as jest.Mock`), use the `asMock` helper function instead (enforced by the `graylog/no-jest-mock-cast` ESLint rule)
 
 ## Imports
 
