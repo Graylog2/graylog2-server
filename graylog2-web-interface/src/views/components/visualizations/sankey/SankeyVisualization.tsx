@@ -27,6 +27,7 @@ import type { LeafPath } from 'views/components/visualizations/utils/extractLeaf
 import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyOnClickPopover';
+import { defaultChartColors } from 'views/components/visualizations/Colors';
 
 import { SANKEY_VISUALIZATION_TYPE } from './Constants';
 
@@ -77,17 +78,13 @@ export type SankeyTrace = {
 
 const STAGE_SEPARATOR = ' ';
 
-// Plotly's default colorway, which it would otherwise apply to sankey nodes implicitly.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { defaults: NODE_PALETTE }: { defaults: Array<string> } = require('plotly.js/src/components/color/attributes');
-
 const NODE_ALPHA = 1;
 const LINK_ALPHA = 0.3;
 const LINK_HOVER_ALPHA = 0.6;
 
 // Hex notation, because plotly's color parser drops the alpha of the `rgb(r g b / a)` syntax chroma emits by default.
 const paletteColor = (index: number, alpha: number) =>
-  chroma(NODE_PALETTE[index % NODE_PALETTE.length])
+  chroma(defaultChartColors[index % defaultChartColors.length])
     .alpha(alpha)
     .hex('rgba');
 
