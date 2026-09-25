@@ -25,11 +25,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public abstract class GeoIpFileService {
     @VisibleForTesting
@@ -37,9 +42,19 @@ public abstract class GeoIpFileService {
     @VisibleForTesting
     static final String ACTIVE_CITY_FILE = "standard_location-from-cloud.mmdb";
     @VisibleForTesting
-    static final String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
-    @VisibleForTesting
-    static final String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
+    static final String TEMP_FILE_PREFIX = "temp-";
+
+    /**
+     * Guards the whole download/validate/promote sequence. It has to be static because
+     * {@link GeoIpFileServiceFactory} hands out a new instance per call, so every caller would otherwise lock a
+     * different object while operating on the same download directory.
+     */
+    private static final ReentrantLock REFRESH_LOCK = new ReentrantLock();
+
+    /**
+     * Temporary files older than this are assumed to be leftovers from a killed process and get swept.
+     */
+    private static final Duration ORPHAN_TEMP_FILE_AGE = Duration.ofHours(1);
 
     private static final String BUCKET_GROUP = "bucket";
     private static final String OBJECT_GROUP = "object";
@@ -61,8 +76,11 @@ public abstract class GeoIpFileService {
         this.downloadDir = config.getS3DownloadLocation();
         this.asnPath = downloadDir.resolve(GeoIpFileService.ACTIVE_ASN_FILE);
         this.cityPath = downloadDir.resolve(GeoIpFileService.ACTIVE_CITY_FILE);
-        this.tempAsnPath = downloadDir.resolve(GeoIpFileService.TEMP_ASN_FILE);
-        this.tempCityPath = downloadDir.resolve(GeoIpFileService.TEMP_CITY_FILE);
+        // Temp names are unique per instance so that a concurrent refresh attempt, or another node sharing the
+        // download directory, cannot clobber or delete an in-flight download.
+        final String tempDiscriminator = TEMP_FILE_PREFIX + UUID.randomUUID() + "-";
+        this.tempAsnPath = downloadDir.resolve(tempDiscriminator + GeoIpFileService.ACTIVE_ASN_FILE);
+        this.tempCityPath = downloadDir.resolve(tempDiscriminator + GeoIpFileService.ACTIVE_CITY_FILE);
         if (Files.exists(cityPath)) {
             cityFileLastModified = Instant.ofEpochMilli(cityPath.toFile().lastModified());
         }
@@ -98,12 +116,113 @@ public abstract class GeoIpFileService {
     public abstract void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException;
 
     /**
+     * Downloads the city and ASN database files, validates them, and only promotes them to the active location once
+     * validation passed. The whole sequence is serialized against every other refresh attempt in this JVM, because all
+     * attempts share one download directory.
+     *
+     * <p>
+     * Re-checking {@link #fileRefreshRequired(GeoIpResolverConfig)} while holding the lock is what keeps a cold start
+     * cheap: the first caller downloads, and every caller queued behind it finds the files already in place and
+     * returns without touching the network.
+     * </p>
+     *
+     * @param config    current Geo Location Processor configuration
+     * @param force     download even if the files on disk look up to date, e.g. when the configured buckets changed
+     * @param validator validates the downloaded files; it is handed a config pointing at the temporary files and is
+     *                  expected to throw {@link IllegalArgumentException} or {@link IllegalStateException} if they are
+     *                  not usable
+     * @return true if new files were promoted to the active location
+     * @throws CloudDownloadException if the files fail to be downloaded
+     * @throws IOException            if the validated files fail to be moved to the active location
+     */
+    public boolean refreshFiles(GeoIpResolverConfig config, boolean force, Consumer<GeoIpResolverConfig> validator)
+            throws CloudDownloadException, IOException {
+        if (!isConnected()) {
+            getLogger().debug("Not connected to {}. Skipping Geo-Location Processor database file refresh.", getType());
+            return false;
+        }
+        REFRESH_LOCK.lock();
+        try {
+            if (!force && !fileRefreshRequired(config)) {
+                getLogger().debug("Geo-Location Processor database files are up to date. Skipping refresh.");
+                return false;
+            }
+            sweepOrphanedTempFiles();
+            downloadFilesToTempLocation(config);
+            if (!Files.exists(tempCityPath)) {
+                // The download can silently no-op, e.g. when the configured path does not parse into a
+                // bucket and object. Fail here rather than letting moveTempFilesToActive() trip over it.
+                throw new CloudDownloadException("City database file was not downloaded from " + getType() + ".");
+            }
+            try {
+                validator.accept(toTempConfig(config));
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                cleanupTempFiles();
+                throw e;
+            }
+            moveTempFilesToActive();
+            getLogger().info("Refreshed Geo-Location Processor database files from {}.", getType());
+            return true;
+        } finally {
+            REFRESH_LOCK.unlock();
+        }
+    }
+
+    /**
+     * Returns a copy of the given config pointing at this instance's temporary files, for validating a download before
+     * it is promoted.
+     */
+    private GeoIpResolverConfig toTempConfig(GeoIpResolverConfig config) {
+        return config.toBuilder()
+                .cityDbPath(getTempCityFile())
+                .asnDbPath(config.asnDbPath().isBlank() ? "" : getTempAsnFile())
+                .build();
+    }
+
+    /**
+     * Returns a copy of the given config pointing at the active files, which is what the Geo Location Processor reads
+     * when the files come from the cloud.
+     */
+    public GeoIpResolverConfig toActiveConfig(GeoIpResolverConfig config) {
+        return config.toBuilder()
+                .cityDbPath(getActiveCityFile())
+                .asnDbPath(config.asnDbPath().isBlank() ? "" : getActiveAsnFile())
+                .build();
+    }
+
+    /**
+     * Deletes temporary files left behind by a process that died mid-download. Only files older than
+     * {@link #ORPHAN_TEMP_FILE_AGE} are removed, so a download running concurrently in another process is left alone.
+     */
+    private void sweepOrphanedTempFiles() {
+        if (!Files.exists(downloadDir)) {
+            return;
+        }
+        final Instant cutoff = Instant.now().minus(ORPHAN_TEMP_FILE_AGE);
+        try (Stream<Path> files = Files.list(downloadDir)) {
+            files.filter(path -> path.getFileName().toString().startsWith(TEMP_FILE_PREFIX))
+                    .filter(path -> Instant.ofEpochMilli(path.toFile().lastModified()).isBefore(cutoff))
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                            getLogger().info("Removed orphaned Geo-Location Processor temporary file '{}'.", path);
+                        } catch (IOException e) {
+                            getLogger().warn("Failed to remove orphaned Geo-Location Processor temporary file '{}'.", path);
+                        }
+                    });
+        } catch (IOException e) {
+            getLogger().warn("Unable to scan '{}' for orphaned Geo-Location Processor temporary files.", downloadDir);
+        }
+    }
+
+    /**
      * Downloads the Geo Processor city and ASN database files to a temporary location so that they can be validated
      *
      * @param config current Geo Location Processor configuration
      * @throws CloudDownloadException if the files fail to be downloaded
      */
-    public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws CloudDownloadException {
+    @VisibleForTesting
+    void downloadFilesToTempLocation(GeoIpResolverConfig config) throws CloudDownloadException {
         if (!isConnected() || !ensureDownloadDirectory()) {
             return;
         }
@@ -164,7 +283,8 @@ public abstract class GeoIpFileService {
      * @param config current Geo Location Processor configuration
      * @return true if the files in the cloud have been modified since they were last synced
      */
-    public boolean fileRefreshRequired(GeoIpResolverConfig config) {
+    @VisibleForTesting
+    boolean fileRefreshRequired(GeoIpResolverConfig config) {
         if (!isConnected()) {
             return false;
         }
@@ -173,13 +293,13 @@ public abstract class GeoIpFileService {
             return true;
         }
 
-        boolean cityFileNeedsUpdate = getCityFileServerTimestamp(config).map(ts -> ts.isAfter(cityFileLastModified))
+        boolean cityFileNeedsUpdate = getCityFileServerTimestamp(config).map(ts -> isNewerThanSynced(ts, cityPath, cityFileLastModified))
                 .orElseGet(() -> {
                     getLogger().warn("City database file on server does not exist. Aborting refresh.");
                     return false;
                 });
         //Only check for update if the path to the ASN file exists:
-        boolean asnFileNeedsUpdate = !config.asnDbPath().isBlank() && getAsnFileServerTimestamp(config).map(ts -> ts.isAfter(asnFileLastModified))
+        boolean asnFileNeedsUpdate = !config.asnDbPath().isBlank() && getAsnFileServerTimestamp(config).map(ts -> isNewerThanSynced(ts, asnPath, asnFileLastModified))
                 .orElseGet(() -> {
                     getLogger().warn("ASN database file on server does not exist. Aborting refresh.");
                     return false;
@@ -198,7 +318,8 @@ public abstract class GeoIpFileService {
      *
      * @throws IOException if the files fail to be moved to the active location
      */
-    public void moveTempFilesToActive() throws IOException {
+    @VisibleForTesting
+    void moveTempFilesToActive() throws IOException {
         Files.move(tempCityPath, cityPath, StandardCopyOption.REPLACE_EXISTING);
         cityFileLastModified = tempCityFileLastModified;
         if (Files.exists(tempAsnPath)) {
@@ -210,11 +331,28 @@ public abstract class GeoIpFileService {
     }
 
     /**
+     * Whether the file on the server has been modified since this node last wrote it to disk.
+     *
+     * <p>
+     * The active file's modification time is the moment this node wrote it, so it answers the question on its own and,
+     * unlike this instance's field, it is shared between concurrent refresh attempts. The factory hands out a new
+     * instance per call, so the attempt queued behind a download was constructed before the file existed and has
+     * recorded nothing; consulting the file system is what stops it downloading the same files again.
+     * </p>
+     */
+    private boolean isNewerThanSynced(Instant serverTimestamp, Path path, Instant recordedSync) {
+        final long syncedAt = Math.max(path.toFile().lastModified(),
+                recordedSync == null ? 0L : recordedSync.toEpochMilli());
+        return serverTimestamp.toEpochMilli() > syncedAt;
+    }
+
+    /**
      * Get the path to where the temporary ASN database file will be stored on disk
      *
      * @return temporary ASN database file path
      */
-    public String getTempAsnFile() {
+    @VisibleForTesting
+    String getTempAsnFile() {
         return tempAsnPath.toString();
     }
 
@@ -223,7 +361,8 @@ public abstract class GeoIpFileService {
      *
      * @return temporary city database file path
      */
-    public String getTempCityFile() {
+    @VisibleForTesting
+    String getTempCityFile() {
         return tempCityPath.toString();
     }
 
@@ -250,7 +389,8 @@ public abstract class GeoIpFileService {
     /**
      * Delete the temporary files if they exist and reset their last modified times
      */
-    public void cleanupTempFiles() {
+    @VisibleForTesting
+    void cleanupTempFiles() {
         try {
             if (Files.exists(tempAsnPath)) {
                 Files.delete(tempAsnPath);
