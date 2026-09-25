@@ -60,7 +60,10 @@ import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +74,7 @@ import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -79,6 +83,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private static final long MEMORY_RATIO_THRESHOLD = 2;
     private static final int CLUSTER_REQUEST_TIMEOUT = 30;
+    private static final long CGROUP_V1_UNLIMITED_THRESHOLD = 1L << 60;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
@@ -216,22 +221,108 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
-        final GlobalMemory memory = getGlobalMemory();
+        final MemoryValues memoryValues = getContainerMemory().orElseGet(() -> {
+            final GlobalMemory memory = getGlobalMemory();
+            return new MemoryValues(memory.getTotal(), memory.getAvailable());
+        });
         long buffer = 2 * 1024 * 1024 * 1024L;
-        long freeMemory = memory.getAvailable() - buffer;
+        long freeMemory = memoryValues.available() - buffer;
         float memoryRatio = (float) freeMemory / heapBytes;
         if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
-            final String recommendedMemory = FileUtils.byteCountToDisplaySize(memory.getTotal() / 2);
+            final String recommendedMemory = FileUtils.byteCountToDisplaySize(memoryValues.total() / 2);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
                     Map.of("hostname", configuration.getHostname(),
                             "memoryRatio", f("%.1f", memoryRatio),
-                            "totalMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()),
-                            "availableMemory", FileUtils.byteCountToDisplaySize(memory.getAvailable()),
+                            "totalMemory", FileUtils.byteCountToDisplaySize(memoryValues.total()),
+                            "availableMemory", FileUtils.byteCountToDisplaySize(memoryValues.available()),
                             "recommendedMemory", recommendedMemory,
                             "recommendedMemorySetting", recommendedMemorySetting(recommendedMemory),
                             "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
+    }
+
+    @VisibleForTesting
+    Optional<MemoryValues> getContainerMemory() {
+        return readCgroupV2Memory().or(this::readCgroupV1Memory);
+    }
+
+    private Optional<MemoryValues> readCgroupV2Memory() {
+        final Optional<String> rawLimit = readFirstLine(cgroupV2MemoryMaxPath());
+        final Optional<String> rawUsed = readFirstLine(cgroupV2MemoryCurrentPath());
+        if (rawLimit.isEmpty() || rawUsed.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if ("max".equalsIgnoreCase(rawLimit.get().trim())) {
+            return Optional.empty();
+        }
+
+        final Optional<Long> limit = parseLong(rawLimit.get());
+        final Optional<Long> used = parseLong(rawUsed.get());
+        if (limit.isEmpty() || used.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return memoryValues(limit.get(), used.get());
+    }
+
+    private Optional<MemoryValues> readCgroupV1Memory() {
+        final Optional<Long> limit = readFirstLine(cgroupV1MemoryLimitPath()).flatMap(this::parseLong);
+        final Optional<Long> used = readFirstLine(cgroupV1MemoryUsagePath()).flatMap(this::parseLong);
+        if (limit.isEmpty() || used.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (limit.get() >= CGROUP_V1_UNLIMITED_THRESHOLD) {
+            return Optional.empty();
+        }
+
+        return memoryValues(limit.get(), used.get());
+    }
+
+    private Optional<MemoryValues> memoryValues(long total, long used) {
+        if (total <= 0 || used < 0) {
+            return Optional.empty();
+        }
+        return Optional.of(new MemoryValues(total, Math.max(0, total - used)));
+    }
+
+    private Optional<Long> parseLong(String value) {
+        try {
+            return Optional.of(Long.parseLong(value.trim()));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    @VisibleForTesting
+    Optional<String> readFirstLine(Path path) {
+        try (Stream<String> lines = Files.lines(path)) {
+            return lines.findFirst();
+        } catch (IOException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    @VisibleForTesting
+    Path cgroupV2MemoryMaxPath() {
+        return Path.of("/sys/fs/cgroup/memory.max");
+    }
+
+    @VisibleForTesting
+    Path cgroupV2MemoryCurrentPath() {
+        return Path.of("/sys/fs/cgroup/memory.current");
+    }
+
+    @VisibleForTesting
+    Path cgroupV1MemoryLimitPath() {
+        return Path.of("/sys/fs/cgroup/memory/memory.limit_in_bytes");
+    }
+
+    @VisibleForTesting
+    Path cgroupV1MemoryUsagePath() {
+        return Path.of("/sys/fs/cgroup/memory/memory.usage_in_bytes");
     }
 
     protected static String recommendedMemorySetting(String recommendedMemory) {
@@ -244,6 +335,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         GlobalMemory memory = systemInfo.getHardware().getMemory();
         return memory;
     }
+
+    @VisibleForTesting
+    record MemoryValues(long total, long available) {}
 
     @Subscribe
     public void onNotificationEvent(DataNodeNotficationEvent event) {
