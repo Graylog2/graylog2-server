@@ -17,13 +17,18 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
+import { StreamsMetrics } from '@graylog/server-api';
+
 import { asMock } from 'helpers/mocking';
-import fetch from 'logic/rest/FetchProvider';
 import suppressConsole from 'helpers/suppressConsole';
 
 import useStreamMetrics from './useStreamMetrics';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({
+  StreamsMetrics: {
+    getMetrics: jest.fn(),
+  },
+}));
 
 describe('useStreamMetrics', () => {
   beforeEach(() => {
@@ -31,7 +36,7 @@ describe('useStreamMetrics', () => {
   });
 
   it('returns metrics keyed by stream id', async () => {
-    asMock(fetch).mockResolvedValue({
+    asMock(StreamsMetrics.getMetrics).mockResolvedValue({
       metrics: {
         'stream-1': {
           message_count: 126648,
@@ -60,33 +65,33 @@ describe('useStreamMetrics', () => {
     });
   });
 
-  it('targets the streams metrics endpoint with sorted, repeated query params', async () => {
-    asMock(fetch).mockResolvedValue({ metrics: {} });
+  it('requests sorted stream ids and fields from the streams metrics API', async () => {
+    asMock(StreamsMetrics.getMetrics).mockResolvedValue({ metrics: {} });
 
     renderHook(() => useStreamMetrics(['b', 'a'], ['pipelines', 'message_count']));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalled());
+    await waitFor(() => expect(StreamsMetrics.getMetrics).toHaveBeenCalled());
 
-    const url = asMock(fetch).mock.calls[0][1] as string;
-    expect(url).toContain('/streams/metrics');
-    expect(url).toContain('stream_ids=a&stream_ids=b');
-    expect(url).toContain('fields=message_count&fields=pipelines');
+    expect(StreamsMetrics.getMetrics).toHaveBeenCalledWith({
+      stream_ids: ['a', 'b'],
+      fields: ['message_count', 'pipelines'],
+    });
   });
 
   it('does not fetch when stream ids are empty', () => {
     renderHook(() => useStreamMetrics([], ['message_count']));
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(StreamsMetrics.getMetrics).not.toHaveBeenCalled();
   });
 
   it('does not fetch when fields are empty', () => {
     renderHook(() => useStreamMetrics(['stream-1'], []));
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(StreamsMetrics.getMetrics).not.toHaveBeenCalled();
   });
 
   it('returns an empty map and isError when the request fails', async () => {
-    asMock(fetch).mockRejectedValue(new Error('boom'));
+    asMock(StreamsMetrics.getMetrics).mockRejectedValue(new Error('boom'));
 
     await suppressConsole(async () => {
       const { result } = renderHook(() => useStreamMetrics(['stream-1'], ['message_count']));
