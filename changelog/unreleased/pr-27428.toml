@@ -1,0 +1,25 @@
+type = "f"
+message = "The OpenSearch 3 storage client now serializes documents with Graylog's own object mapper. Date values in message fields are written as dates again instead of numeric timestamps, matching what Graylog wrote before the OpenSearch 3 client was introduced."
+
+pulls = ["27428"]
+
+details.user = """
+The OpenSearch 3 storage client built its documents with a default Jackson mapper instead of Graylog's, so any field
+value that is not a plain string, number or boolean was written differently than by the previous storage engine. The
+visible effect was on dates: a field holding a date value - for example one set by a pipeline rule using `now()` or
+`parse_date()`, or extracted by a grok `;date;` conversion - was written as a numeric timestamp instead of a date.
+Fields with a `null` value were dropped from the document instead of being stored.
+
+This affects all 7.1 versions of Graylog before 7.1.10, where the OpenSearch 3 client is enabled by default. Graylog 7.0
+and earlier do not contain that client and are unaffected.
+
+Two consequences are worth knowing about when upgrading from 7.1.x:
+
+- Messages indexed by 7.1 versions before 7.1.10 show such fields as numbers rather than dates, and those values stay that way in the
+  indices that already hold them. Only reindexing corrects them.
+- In an index that a 7.1 version before 7.1.10 wrote, such a field was mapped to a numeric type. Now that Graylog writes date values for it
+  again, that mapping no longer matches. Graylog detects this, keeps the affected messages indexed by writing the
+  value in the shape the existing mapping expects, and raises a *Field type conflict in index ...* notification that
+  names the index and fields. Follow that notification to change the field type to **Date** or to rotate the index
+  set; see the entry for #27278 for the details.
+"""

@@ -1,0 +1,33 @@
+type = "f"
+message = "Messages are no longer discarded when a date value is written into a field that an index maps to a numeric type. Graylog now indexes the value in the shape the existing mapping expects and raises a notification naming the affected index and fields."
+
+pulls = ["27478"]
+
+details.user = """
+A field's type cannot be changed in an existing index. If a field was first indexed while Graylog wrote its date values
+as numbers, the index mapped it as `long` (for epoch milliseconds) or `float` (for the fractional epoch seconds that
+`java.time` values produce, such as those from a grok `;date;` conversion). Every later message that writes a date
+string into that field was rejected with a `mapper_parsing_exception` and dropped.
+
+Graylog now retries such a message once, writing the value the way the existing mapping expects, so the message is
+indexed instead of discarded. The message is only retried when the value really is a date and the mapped type can hold
+it; anything else takes the regular failure-handling path as before.
+
+This keeps ingestion going, but it does not resolve the conflict: the field keeps its numeric type, and the values
+Graylog writes into it stay numeric timestamps rather than dates, so they do not display or aggregate as dates. A new
+*Field type conflict in index ...* system notification reports the affected index and fields so that the conflict does
+not go unnoticed.
+
+To resolve it for new data, do either of the following in *System -> Indices*:
+
+- Use *Change field type* to set the affected fields to type **Date**, and let Graylog rotate the index set so the
+  change takes effect. A custom field mapping creates the field without a format restriction, so the indexer accepts
+  both the numeric timestamps already written and the date values Graylog writes now, and the field behaves as a real
+  date field. Setting the field to **String** also ends the conflict, but keeps the values as text, so they do not
+  sort or aggregate as dates.
+- Or select the index set and use *Maintenance -> Rotate active write index*. The next index derives the field type
+  from the first message written to it, so the conflict disappears for new indices.
+
+Indices that already exist keep their current mapping and their numeric values until they age out of retention.
+Correcting them in place requires reindexing them with the corrected mapping.
+"""
