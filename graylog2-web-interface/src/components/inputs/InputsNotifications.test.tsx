@@ -35,7 +35,7 @@ jest.mock('routing/QueryParams', () => ({
   useQueryParams: jest.fn(),
 }));
 
-const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP') => ({
+const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP' | 'STOPPED') => ({
   state,
   id: 'state-id',
   detailed_message: null,
@@ -57,6 +57,7 @@ describe('<InputsNotifications />', () => {
         'input-1': {
           node1: buildInputState('FAILED'),
           node2: buildInputState('SETUP'),
+          node3: buildInputState('STOPPED'),
         },
       },
     });
@@ -80,6 +81,7 @@ describe('<InputsNotifications />', () => {
         'input-1': {
           node1: buildInputState('FAILED'),
           node2: buildInputState('SETUP'),
+          node3: buildInputState('STOPPED'),
         },
       },
     });
