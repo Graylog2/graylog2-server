@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
@@ -58,6 +59,7 @@ const SavedSearchForm = ({
   selectedStreamGRN = null,
 }: Props) => {
   const { dirty: formDirty } = useFormikContext();
+  const { t } = useTranslation('search');
 
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
@@ -68,8 +70,8 @@ const SavedSearchForm = ({
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
-  const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
-  const createNewButtonTitle = isCreateNew ? 'Create new search' : 'Save as new search';
+  const createNewTitle = isCreateNew ? t('save_form.create_new') : t('save_form.save_as');
+  const createNewButtonTitle = isCreateNew ? t('save_form.create_new_title') : t('save_form.save_as_title');
   const pluggableSaveViewControls = useSaveViewFormControls();
   const _saveSearch = useCallback(() => saveSearch(title, sharePayload), [saveSearch, title, sharePayload]);
   const _saveAsSearch = useCallback(() => saveAsSearch(title, sharePayload), [saveAsSearch, title, sharePayload]);
@@ -77,24 +79,23 @@ const SavedSearchForm = ({
   return (
     <Popover position="left" width={500} opened={show} withArrow withinPortal>
       <Popover.Target>{children}</Popover.Target>
-      <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
+      <StyledPopoverDropdown title={t('save_form.popover_title')} id="saved-search-popover">
         <form onSubmit={stopEvent}>
           {formDirty && (
             <Alert compact noIcon bsStyle="warning">
-              There are unconfirmed changes to the search parameters (time range, streams, or query). Saving now will
-              discard them. If this is not intentional, execute the search to apply your changes before saving.{' '}
+              {t('save_form.dirty_warning')}
             </Alert>
           )}
           <FormGroup>
-            <ControlLabel htmlFor="title">Title</ControlLabel>
-            <FormControl type="text" value={title} id="title" placeholder="Enter title" onChange={onChangeTitle} />
+            <ControlLabel htmlFor="title">{t('save_form.title_label')}</ControlLabel>
+            <FormControl type="text" value={title} id="title" placeholder={t('save_form.title_placeholder')} onChange={onChangeTitle} />
           </FormGroup>
           {pluggableSaveViewControls?.map(
             ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,
           )}
           {!disableSaveAs && (
             <EntityCreateShareFormGroup
-              description="Search for a User or Team to add as collaborator on this search."
+              description={t('save_form.share_description')}
               entityType="search"
               entityTitle=""
               entityId={isCreateNew ? null : viewId}
@@ -109,9 +110,9 @@ const SavedSearchForm = ({
                 className={styles.button}
                 type="submit"
                 bsSize="sm"
-                title="Save search"
+                title={t('save_form.save_title')}
                 onClick={_saveSearch}>
-                Save
+                {t('save_form.save')}
               </Button>
             )}
             <Button
@@ -125,7 +126,7 @@ const SavedSearchForm = ({
               {createNewTitle}
             </Button>
             <Button className={styles.button} onClick={toggleModal} bsSize="sm">
-              Cancel
+              {t('save_form.cancel')}
             </Button>
           </ButtonToolbar>
         </form>

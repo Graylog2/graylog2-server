@@ -16,6 +16,7 @@
  */
 // We need to set the app prefix before doing anything else, so it applies to styles too.
 import 'webpack-entry';
+import 'i18n';
 
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';

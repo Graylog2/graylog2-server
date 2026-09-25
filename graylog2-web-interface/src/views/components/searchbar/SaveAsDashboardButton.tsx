@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Button from 'components/bootstrap/Button';
 import { Icon } from 'components/common';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
+  const { t } = useTranslation('search');
   const hasUndeclaredParameters = useHasUndeclaredParameters();
 
   useHotkey({
@@ -38,8 +40,8 @@ const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
   });
 
   return (
-    <Button onClick={onClick} disabled={hasUndeclaredParameters} title="Save as new dashboard">
-      <Icon name="content_copy" /> Save as
+    <Button onClick={onClick} disabled={hasUndeclaredParameters} title={t('save_view.save_as_new_dashboard_title')}>
+      <Icon name="content_copy" /> {t('save_view.save_as')}
     </Button>
   );
 };

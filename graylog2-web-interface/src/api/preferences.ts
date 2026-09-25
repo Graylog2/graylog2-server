@@ -30,6 +30,7 @@ export type PreferencesUpdateMap = {
   dashboardSidebarIsPinned?: boolean | BooleanString;
   searchSidebarIsPinned?: boolean | BooleanString;
   [PREFERENCES_THEME_MODE]?: ColorScheme;
+  language?: string;
 };
 
 export type PreferencesMap = {
@@ -38,6 +39,7 @@ export type PreferencesMap = {
   dashboardSidebarIsPinned?: boolean;
   searchSidebarIsPinned?: boolean;
   [PREFERENCES_THEME_MODE]: ColorScheme;
+  language?: string;
 };
 
 const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap => {

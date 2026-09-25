@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 
 import type QueryResult from 'views/logic/QueryResult';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const ViewDescription = ({ results }: Props) => {
+  const { t } = useTranslation('search');
   const viewMetadata = useViewMetadata();
   const isAdHocSearch = !viewMetadata.id;
   const viewType = useViewType();
@@ -39,7 +41,7 @@ const ViewDescription = ({ results }: Props) => {
 
   const resultsSection = (
     <>
-      <SectionSubheadline>Execution</SectionSubheadline>
+      <SectionSubheadline>{t('sidebar_description.execution')}</SectionSubheadline>
 
       <SearchResultOverview results={results} />
     </>
@@ -48,7 +50,7 @@ const ViewDescription = ({ results }: Props) => {
   if (isAdHocSearch) {
     return (
       <>
-        <SectionInfo>Save the search or export it to a dashboard to add a custom summary and description.</SectionInfo>
+        <SectionInfo>{t('sidebar_description.ad_hoc_info')}</SectionInfo>
         {resultsSection}
       </>
     );
@@ -58,14 +60,18 @@ const ViewDescription = ({ results }: Props) => {
     <>
       {(!viewMetadata.summary || !viewMetadata.description) && (
         <SectionInfo>
-          To add a description and summary for this {viewTypeLabel} click on the <MoreActionsIcon /> icon in the search
-          bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+          <Trans
+            i18nKey="sidebar_description.edit_metadata_hint"
+            ns="search"
+            values={{ viewType: viewTypeLabel }}
+            components={{ icon: <MoreActionsIcon /> }}
+          />
         </SectionInfo>
       )}
       {resultsSection}
-      <SectionSubheadline>Search</SectionSubheadline>
-      <p>{viewMetadata.summary || <i>This {viewTypeLabel} has no summary.</i>}</p>
-      <p>{viewMetadata.description || <i>This {viewTypeLabel} has no description.</i>}</p>
+      <SectionSubheadline>{t('sidebar_description.search_section')}</SectionSubheadline>
+      <p>{viewMetadata.summary || <i>{t('sidebar_description.no_summary', { viewType: viewTypeLabel })}</i>}</p>
+      <p>{viewMetadata.description || <i>{t('sidebar_description.no_description', { viewType: viewTypeLabel })}</i>}</p>
     </>
   );
 };

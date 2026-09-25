@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   updateHighlightingRules,
@@ -31,6 +32,7 @@ import useProductName from 'brand-customization/useProductName';
 const ViewsHighlightingRules = () => {
   const dispatch = useViewsDispatch();
   const productName = useProductName();
+  const { t } = useTranslation('search');
   const onUpdateRules = useCallback(
     (newRules: Array<HighlightingRule>) => dispatch(updateHighlightingRules(newRules)).then(() => {}),
     [dispatch],
@@ -52,10 +54,7 @@ const ViewsHighlightingRules = () => {
     [dispatch],
   );
 
-  const description =
-    `Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the ${productName} server config.` +
-    'Any field value can be highlighted by clicking on the value and selecting "Highlight this value".\n' +
-    'If a term or a value has more than one rule, the first matching rule is used.';
+  const description = t('sidebar_highlighting.description', { productName });
 
   return (
     <HighlightingRules

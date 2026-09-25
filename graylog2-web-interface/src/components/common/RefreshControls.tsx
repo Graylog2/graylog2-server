@@ -16,6 +16,7 @@
  */
 import React, { useCallback } from 'react';
 import { styled } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ProgressAnimation, Icon, Spinner, HoverForHelp } from 'components/common/index';
 import { Button, DropdownButton, MenuItem, ButtonGroup } from 'components/bootstrap';
@@ -36,15 +37,16 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
 `;
 
 const ButtonLabel = ({ children }: React.PropsWithChildren) => {
+  const { t } = useTranslation('search');
   const { refreshConfig } = useAutoRefresh();
 
   if (!refreshConfig?.enabled) {
-    return <>Not updating{children}</>;
+    return <>{t('refresh.not_updating')}{children}</>;
   }
 
   return (
     <>
-      Every <ReadableDuration duration={refreshConfig.interval} />
+      {t('refresh.every')} <ReadableDuration duration={refreshConfig.interval} />
       {children}
     </>
   );
@@ -76,6 +78,7 @@ const RefreshControls = ({
   minimumRefreshInterval,
   defaultInterval,
 }: Props) => {
+  const { t } = useTranslation('search');
   const { refreshConfig, startAutoRefresh, stopAutoRefresh, animationId } = useAutoRefresh();
 
   const selectInterval = useCallback(
@@ -134,7 +137,7 @@ const RefreshControls = ({
 
       <Button
         onClick={toggleEnable}
-        title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'}
+        title={refreshConfig?.enabled ? t('refresh.pause') : t('refresh.start')}
         disabled={disable || isLoadingMinimumInterval || !defaultInterval}>
         <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
@@ -80,7 +81,8 @@ const SearchButton = ({
   onClick = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry('search-bar');
-  const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
+  const { t } = useTranslation('search');
+  const title = dirty ? t('button.perform_search_dirty') : t('button.perform_search');
 
   const triggerTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {

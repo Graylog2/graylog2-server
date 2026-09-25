@@ -31,6 +31,7 @@ const defaultPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
+  language: 'en',
 };
 
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
@@ -42,10 +43,10 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
       dashboardSidebarIsPinned: Store.get<boolean>('dashboardSidebarIsPinned'),
       [PREFERENCES_THEME_MODE]: Store.get<string>(PREFERENCES_THEME_MODE),
     };
-    preferences = { ...preferences, ...localStoragePreferences };
+    preferences = { ...preferences, ...localStoragePreferences } as typeof preferences;
   }
 
-  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned } = preferences;
+  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned, language } = preferences;
 
   return (
     <SectionComponent title="Preferences">
@@ -54,6 +55,7 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
       <ReadOnlyFormGroup label="Pin search sidebar" value={searchSidebarIsPinned ?? false} />
       <ReadOnlyFormGroup label="Pin dashboard sidebar" value={dashboardSidebarIsPinned ?? false} />
       <ReadOnlyFormGroup label="Theme mode" value={preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'} />
+      <ReadOnlyFormGroup label="Language" value={language ?? 'en'} />
     </SectionComponent>
   );
 };

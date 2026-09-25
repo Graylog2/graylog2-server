@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { availableTimeRangeTypes } from 'views/Constants';
 import { Tabs } from 'components/bootstrap';
@@ -48,6 +49,7 @@ type TimeRangeTabsArguments = {
   activeTab: SupportedTimeRangeType;
   limitDuration: number;
   tabs: Array<SupportedTimeRangeType>;
+  tabNames: Record<string, string>;
 };
 
 type TabDefinition = {
@@ -61,15 +63,15 @@ const StyledTabs = styled(Tabs)`
   margin-bottom: 9px;
 `;
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration, tabs }: TimeRangeTabsArguments): TabDefinition[] =>
+const timeRangeTypeTabs = ({ activeTab, limitDuration, tabs, tabNames }: TimeRangeTabsArguments): TabDefinition[] =>
   availableTimeRangeTypes
     .filter(({ type }) => tabs.includes(type))
-    .map(({ type, name }) => {
+    .map(({ type }) => {
       const TimeRangeTypeTab = timeRangePickerTabs[type];
 
       return {
         type,
-        name,
+        name: tabNames[type] ?? type,
         content: type === activeTab ? <TimeRangeTypeTab disabled={false} limitDuration={limitDuration} /> : null,
       };
     });
@@ -133,6 +135,7 @@ const newTabTimeRange = ({
 };
 
 const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
+  const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime, userTimezone } = useUserDateTime();
   const {
@@ -170,14 +173,24 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
     [activeTab, defaultRanges, formatTime, sendTelemetry, setValues, timeRangeTabs, userTimezone],
   );
 
+  const tabNames = useMemo(
+    () => ({
+      relative: t('time_range.tab_relative'),
+      absolute: t('time_range.tab_absolute'),
+      keyword: t('time_range.tab_keyword'),
+    }),
+    [t],
+  );
+
   const tabDefs = useMemo(
     () =>
       timeRangeTypeTabs({
         activeTab,
         limitDuration,
         tabs: validTypes,
+        tabNames,
       }),
-    [activeTab, limitDuration, validTypes],
+    [activeTab, limitDuration, validTypes, tabNames],
   );
 
   return (

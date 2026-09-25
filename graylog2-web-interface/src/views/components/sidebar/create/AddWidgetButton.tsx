@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
 import groupBy from 'lodash/groupBy';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -186,6 +187,7 @@ type Props = {
 };
 
 const AddWidgetButton = ({ onClick }: Props) => {
+  const { t } = useTranslation('search');
   const [overflowingComponents, setOverflowingComponents] = useState<OverflowingComponents>({});
   const creators = usePluginEntities('creators');
   const {
@@ -198,12 +200,9 @@ const AddWidgetButton = ({ onClick }: Props) => {
 
   return (
     <>
-      <SectionInfo>
-        Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise
-        feature) to your search.
-      </SectionInfo>
+      <SectionInfo>{t('sidebar_create.info')}</SectionInfo>
       <Group>
-        <SectionSubheadline>Generic</SectionSubheadline>
+        <SectionSubheadline>{t('sidebar_create.generic')}</SectionSubheadline>
         <GroupCreateMenuItems
           creators={generic}
           onClick={onClick}
@@ -211,7 +210,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
         />
       </Group>
       <Group>
-        <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
+        <SectionSubheadline>{t('sidebar_create.predefined_aggregation')}</SectionSubheadline>
         <GroupCreateMenuItems
           creators={presets}
           onClick={onClick}
@@ -220,7 +219,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
       </Group>
       {!!investigationsCreator?.length && (
         <Group>
-          <SectionSubheadline>Investigations</SectionSubheadline>
+          <SectionSubheadline>{t('sidebar_create.investigations')}</SectionSubheadline>
           <GroupCreateMenuItems
             creators={investigationsCreator}
             onClick={onClick}
@@ -230,7 +229,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
       )}
       {!!eventsCreator?.length && (
         <Group>
-          <SectionSubheadline>Events</SectionSubheadline>
+          <SectionSubheadline>{t('sidebar_create.events')}</SectionSubheadline>
           <GroupCreateMenuItems
             creators={eventsCreator}
             onClick={onClick}

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Field, useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
@@ -58,10 +59,6 @@ const Ago = styled.span(
   ({ theme }) => css`
     grid-area: 2 / 7 / 3 / 8;
     font-size: ${theme.fonts.size.large};
-
-    &::after {
-      content: 'ago';
-    }
   `,
 );
 
@@ -136,6 +133,7 @@ const RelativeRangeSelectInner = ({
   name: string;
   onChange: (changeEvent: { target: { name: string; value: RangeClassified } }) => void;
 }) => {
+  const { t } = useTranslation('search');
   const { initialValues } = useFormikContext<TimeRangePickerFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
@@ -219,11 +217,11 @@ const RelativeRangeSelectInner = ({
         name={`relative-timerange-${fieldName}-unit`}
         onChange={_onChangeUnit}
         options={availableRangeTypes}
-        placeholder="Select a range length"
+        placeholder={t('time_range.range_length_placeholder')}
         value={unit}
       />
 
-      <Ago />
+      <Ago>{t('time_range.ago')}</Ago>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </RangeWrapper>

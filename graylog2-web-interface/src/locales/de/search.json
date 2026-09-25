@@ -1,0 +1,154 @@
+{
+  "button": {
+    "perform_search": "Suche ausführen",
+    "perform_search_dirty": "Suche ausführen (Änderungen seit letzter Ausführung)"
+  },
+  "sidebar": {
+    "description": "Beschreibung",
+    "create": "Erstellen",
+    "highlighting": "Hervorhebung",
+    "fields": "Felder"
+  },
+  "empty_state": {
+    "no_widgets_search": "Es sind keine Widgets zur Visualisierung der Suchergebnisse definiert",
+    "no_widgets_dashboard": "Dieses Dashboard hat noch keine Widgets",
+    "create_widget_hint": "Erstellen Sie ein neues Widget, indem Sie im linken Seitenbereich \"Erstellen\" einen Widget-Typ auswählen.",
+    "tips_title": "Einige Tipps zum Erstellen von Suchen und Dashboards",
+    "tip_1": "Beginnen Sie mit einer <bold>Frage</bold>, die Sie beantworten möchten. Definieren Sie das Problem, das Sie lösen möchten.",
+    "tip_2": "<bold>Beschränken</bold> Sie die Daten auf die Datenpunkte, die Sie sehen möchten.",
+    "tip_3": "<bold>Visualisieren</bold> Sie die Daten. Beantwortet es Ihre Frage?",
+    "tip_4": "<bold>Teilen</bold> Sie das Dashboard mit Ihren Kollegen. Bereiten Sie es für die <bold>Wiederverwendung</bold> mit Parametern vor"
+  },
+  "search_bar": {
+    "streams_placeholder": "Streams für die Suche auswählen. Sucht in allen Streams, wenn leer.",
+    "refresh_human_name": "Suche",
+    "query_history_title": "Suchanfrageverlauf öffnen",
+    "filters_label": "Filter",
+    "filters_tooltip_title": "Suchfilter",
+    "filters_enterprise_hint": "Suchfilter und Parameter sind in der Enterprise-Version verfügbar.",
+    "filters_hide_controls": "Steuerelemente ausblenden",
+    "scroll_hint": "Zur Suchleiste scrollen",
+    "query_placeholder": "Suchanfrage hier eingeben und Enter drücken. Z.B.: (\"nicht gefunden\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Gespeicherte Suche",
+    "save_search": "Suche speichern",
+    "unsaved_changes": "Ungespeicherte Änderungen",
+    "load_title": "Eine zuvor gespeicherte Suche laden",
+    "load": "Laden",
+    "share_disabled": "Nur gespeicherte Suchen können geteilt werden.",
+    "dropdown_aria_label": "Suchaktionen-Dropdown öffnen",
+    "edit_metadata": "Metadaten bearbeiten",
+    "export_to_dashboard": "Als Dashboard exportieren",
+    "export": "Exportieren",
+    "reset_search": "Suche zurücksetzen",
+    "editing_modal_title": "Gespeicherte Suche bearbeiten",
+    "update_search": "Suche aktualisieren",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um ihn/es als Mitarbeiter für diese gespeicherte Suche hinzuzufügen.",
+    "save_success": "Ansicht \"{{title}}\" wurde erfolgreich gespeichert!",
+    "save_error": "Speichern der Ansicht fehlgeschlagen: {{error}}",
+    "delete_success": "Gespeicherte Suche \"{{title}}\" wurde erfolgreich gelöscht!",
+    "delete_error": "Löschen der gespeicherten Suche fehlgeschlagen: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Name der Suche",
+    "dirty_warning": "Es gibt unbestätigte Änderungen an den Suchparametern (Zeitbereich, Streams oder Abfrage). Das Speichern verwirft diese Änderungen. Falls nicht beabsichtigt, führen Sie die Suche zuerst aus, um die Änderungen zu übernehmen.",
+    "title_label": "Titel",
+    "title_placeholder": "Titel eingeben",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um ihn/es als Mitarbeiter für diese Suche hinzuzufügen.",
+    "create_new": "Neu erstellen",
+    "save_as": "Speichern als",
+    "create_new_title": "Neue Suche erstellen",
+    "save_as_title": "Als neue Suche speichern",
+    "save": "Speichern",
+    "save_title": "Suche speichern",
+    "cancel": "Abbrechen"
+  },
+  "results": {
+    "loading": "Suchergebnisse werden aktualisiert..."
+  },
+  "sidebar_description": {
+    "execution": "Ausführung",
+    "ad_hoc_info": "Speichern Sie die Suche oder exportieren Sie sie in ein Dashboard, um eine eigene Zusammenfassung und Beschreibung hinzuzufügen.",
+    "edit_metadata_hint": "Um eine Beschreibung und Zusammenfassung für diese(n) {{viewType}} hinzuzufügen, klicken Sie auf das <icon/>-Symbol in der Suchleiste, um das Aktionsmenü zu öffnen. Das Aktionsmenü enthält die Option \"Metadaten bearbeiten\".",
+    "search_section": "Suche",
+    "no_summary": "Diese(r) {{viewType}} hat keine Zusammenfassung.",
+    "no_description": "Diese(r) {{viewType}} hat keine Beschreibung.",
+    "no_query": "Noch keine Abfrage ausgeführt.",
+    "query_executed_in": "Abfrage ausgeführt in",
+    "effective_time_range": "Effektiver Zeitbereich",
+    "varies_per_widget": "Variiert je nach Widget",
+    "time_from": "Von",
+    "time_to": "Bis",
+    "total_results": "Gesamte Ergebnisse"
+  },
+  "sidebar_create": {
+    "info": "Verwenden Sie die folgenden Optionen, um Ihrer Suche eine Aggregation, eine Log-Ansicht (Enterprise-Funktion) oder Parameter (Enterprise-Funktion) hinzuzufügen.",
+    "generic": "Generisch",
+    "predefined_aggregation": "Vordefinierte Aggregation",
+    "investigations": "Untersuchungen",
+    "events": "Ereignisse"
+  },
+  "sidebar_highlighting": {
+    "description": "Suchbegriffe und Feldwerte können hervorgehoben werden. Das Hervorheben Ihrer Suchanfrage in den Ergebnissen kann in der {{productName}}-Serverkonfiguration aktiviert/deaktiviert werden. Jeder Feldwert kann durch Klicken auf den Wert und Auswählen von \"Diesen Wert hervorheben\" hervorgehoben werden.\nWenn ein Begriff oder Wert mehr als eine Regel hat, wird die erste übereinstimmende Regel verwendet.",
+    "active_highlights": "Aktive Hervorhebungen",
+    "add_rule_title": "Hervorhebungsregel hinzufügen",
+    "search_terms": "Suchbegriffe"
+  },
+  "save_view": {
+    "save": "Speichern",
+    "save_as": "Speichern als",
+    "save_as_new_dashboard_title": "Als neues Dashboard speichern",
+    "save_dashboard_title": "Dashboard speichern"
+  },
+  "undo_redo": {
+    "undo": "Rückgängig",
+    "redo": "Wiederholen"
+  },
+  "time_range": {
+    "tab_relative": "Relativ",
+    "tab_absolute": "Absolut",
+    "tab_keyword": "Schlüsselwort",
+    "from_label": "Von:",
+    "until_label": "Bis:",
+    "keyword_label": "Schlüsselwort:",
+    "no_override": "Keine Überschreibung",
+    "now": "Jetzt",
+    "all_time": "Gesamte Zeit",
+    "range_ago": "vor {{time}}",
+    "range_length_placeholder": "Zeitraum auswählen",
+    "load_preset": "Voreinstellung laden",
+    "no_available_presets": "Keine Voreinstellungen verfügbar",
+    "loading": "Laden...",
+    "configure_presets": "Voreinstellungen konfigurieren"
+  },
+  "refresh": {
+    "not_updating": "Keine Aktualisierung",
+    "every": "Alle",
+    "pause": "Aktualisierung pausieren",
+    "start": "Aktualisierung starten"
+  },
+  "bulk_actions": {
+    "title": "Massenaktionen",
+    "cancel": "Auswahl aufheben"
+  },
+  "execution_info": {
+    "query_executed": "Abfrage ausgeführt in {{duration}}ms um",
+    "total_results": "Gesamte Ergebnisse: {{total}}",
+    "no_query": "Noch keine Abfrage ausgeführt."
+  },
+  "highlight_form": {
+    "edit_title": "Hervorhebungsregel bearbeiten",
+    "create_title": "Hervorhebungsregel erstellen",
+    "field_label": "Feld",
+    "field_placeholder": "Feldname auswählen oder eingeben",
+    "field_required": "Feld ist erforderlich",
+    "condition_label": "Bedingung",
+    "condition_placeholder": "Bedingung auswählen",
+    "condition_required": "Bedingung ist erforderlich",
+    "value_label": "Wert",
+    "value_required": "Wert ist erforderlich",
+    "update_rule": "Regel aktualisieren",
+    "create_rule": "Regel erstellen"
+  }
+}

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ButtonGroup, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
@@ -126,11 +127,12 @@ const SearchActionsMenu = () => {
   const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
   const { selectedStreamsGRN } = useSelectedStreamsGRN();
+  const { t } = useTranslation('search');
 
   const loaded = isNew === false;
   const disableReset = !(dirty || loaded);
-  const savedViewTitle = loaded ? 'Saved search' : 'Save search';
-  const title = dirty ? 'Unsaved changes' : savedViewTitle;
+  const savedViewTitle = loaded ? t('actions_menu.saved_search') : t('actions_menu.save_search');
+  const title = dirty ? t('actions_menu.unsaved_changes') : savedViewTitle;
   const pluggableSaveViewControls = useSaveViewFormControls();
   const history = useHistory();
 
@@ -180,8 +182,8 @@ const SearchActionsMenu = () => {
         .then((createdView) => {
           viewLoaderFunc(createdView.id);
         })
-        .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-        .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
+        .then(() => UserNotification.success(t('actions_menu.save_success', { title: newView.title }), 'Success!'))
+        .catch((error) => UserNotification.error(t('actions_menu.save_error', { error: _extractErrorMessage(error) }), 'Error!'));
     },
     [isPermitted, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc],
   );
@@ -190,7 +192,7 @@ const SearchActionsMenu = () => {
     (deletedView: View) =>
       deleteView(deletedView)
         .then(() =>
-          UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'),
+          UserNotification.success(t('actions_menu.delete_success', { title: deletedView.title }), 'Success!'),
         )
         .then(() => {
           if (deletedView.id === view.id) {
@@ -200,7 +202,7 @@ const SearchActionsMenu = () => {
           return Promise.resolve();
         })
         .catch((error) =>
-          UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!'),
+          UserNotification.error(t('actions_menu.delete_error', { error: _extractErrorMessage(error) }), 'Error!'),
         ),
     [history, view.id],
   );
@@ -236,8 +238,8 @@ const SearchActionsMenu = () => {
         viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
-      <Button title="Load a previously saved search" onClick={toggleListModal}>
-        <Icon name="folder" type="regular" /> Load
+      <Button title={t('actions_menu.load_title')} onClick={toggleListModal}>
+        <Icon name="folder" type="regular" /> {t('actions_menu.load')}
       </Button>
       {showList && (
         <SavedSearchesModal
@@ -251,22 +253,22 @@ const SearchActionsMenu = () => {
         entityId={view.id}
         bsSize="md"
         onClick={toggleShareSearch}
-        disabledInfo={isNew && 'Only saved searches can be shared.'}
+        disabledInfo={isNew && t('actions_menu.share_disabled')}
       />
-      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
+      <MoreActionsMenu aria-label={t('actions_menu.dropdown_aria_label')} id="search-actions-dropdown" pullRight solid>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
-          Edit metadata
+          {t('actions_menu.edit_metadata')}
         </MenuItem>
         <IfPermitted permissions="dashboards:create">
           <MenuItem onSelect={_loadAsDashboard} icon="dashboard">
-            Export to dashboard
+            {t('actions_menu.export_to_dashboard')}
           </MenuItem>
         </IfPermitted>
         <MenuItem onSelect={toggleExport} icon="download">
-          Export
+          {t('actions_menu.export')}
         </MenuItem>
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="restart_alt">
-          Reset search
+          {t('actions_menu.reset_search')}
         </MenuItem>
         {pluggableActions.length ? (
           <>
@@ -280,8 +282,8 @@ const SearchActionsMenu = () => {
         <ViewPropertiesModal
           show
           view={view}
-          title="Editing saved search"
-          submitButtonText="Update search"
+          title={t('actions_menu.editing_modal_title')}
+          submitButtonText={t('actions_menu.update_search')}
           onClose={toggleMetadataEdit}
           onSave={onUpdateView}
         />
@@ -291,7 +293,7 @@ const SearchActionsMenu = () => {
           entityId={view.id}
           entityType="search"
           entityTitle={view.title}
-          description="Search for a User or Team to add as collaborator on this saved search."
+          description={t('actions_menu.share_description')}
           onClose={toggleShareSearch}
         />
       )}

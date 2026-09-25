@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NavItem from 'views/components/sidebar/NavItem';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
@@ -27,9 +28,8 @@ import useHotkey from 'hooks/useHotkey';
 import useViewType from 'views/hooks/useViewType';
 import type { ViewType } from 'views/logic/views/View';
 
-const TITLE = 'Redo';
-
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const { t } = useTranslation('search');
   const viewType = useViewType();
   const dispatch = useViewsDispatch();
   const { isRedoAvailable } = useViewsSelector(selectUndoRedoAvailability);
@@ -54,8 +54,8 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
       disabled={!isRedoAvailable}
       onClick={onClick}
       icon="redo"
-      title={TITLE}
-      ariaLabel={TITLE}
+      title={t('undo_redo.redo')}
+      ariaLabel={t('undo_redo.redo')}
       sidebarIsPinned={sidebarIsPinned}
     />
   );

@@ -15,14 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, useFormikContext } from 'formik';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { Button, Row, Col, Input } from 'components/bootstrap';
-import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
+import { FormikFormGroup, ReadOnlyFormGroup, Select } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
+
+const LANGUAGE_OPTIONS = [
+  { value: 'en', label: 'English' },
+  { value: 'de', label: 'Deutsch' },
+];
+
+const LanguageSelect = () => {
+  const { values, setFieldValue } = useFormikContext<PreferencesUpdateMap>();
+
+  return (
+    <Input
+      id="language-controls"
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+      label="Language">
+      <Select
+        inputId="language"
+        options={LANGUAGE_OPTIONS}
+        value={values.language ?? 'en'}
+        onChange={(value) => setFieldValue('language', value)}
+        clearable={false}
+      />
+    </Input>
+  );
+};
 
 type Props = {
   user: User;
@@ -95,6 +120,8 @@ const PreferencesSection = ({ user }: Props) => {
               value={user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'}
               help="Can be changed by using the toggle in the user dropdown"
             />
+
+            <LanguageSelect />
 
             <Row className="no-bm">
               <Col xs={12}>

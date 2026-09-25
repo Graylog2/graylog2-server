@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -47,7 +48,8 @@ const StreamsFilter = ({
   clearable = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry('search-bar');
-  const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
+  const { t } = useTranslation('search');
+  const placeholder = t('search_bar.streams_placeholder');
 
   const handleChange = (selected: StreamsAndCategoriesSelection) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_STREAM_INPUT_CHANGED, {

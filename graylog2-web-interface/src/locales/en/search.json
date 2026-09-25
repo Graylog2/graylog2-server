@@ -1,0 +1,154 @@
+{
+  "button": {
+    "perform_search": "Perform Search",
+    "perform_search_dirty": "Perform search (changes were made after last search execution)"
+  },
+  "sidebar": {
+    "description": "Description",
+    "create": "Create",
+    "highlighting": "Highlighting",
+    "fields": "Fields"
+  },
+  "empty_state": {
+    "no_widgets_search": "There are no widgets defined to visualize the search result",
+    "no_widgets_dashboard": "This dashboard has no widgets yet",
+    "create_widget_hint": "Create a new widget by selecting a widget type in the left sidebar section \"Create\".",
+    "tips_title": "A few tips for creating searches and dashboards",
+    "tip_1": "Start with a <bold>question</bold> you want to answer. Define the problem you want to solve.",
+    "tip_2": "<bold>Limit</bold> the data to only the data points you want to see.",
+    "tip_3": "<bold>Visualize</bold> the data. Does it answer your question?",
+    "tip_4": "<bold>Share</bold> the dashboard with your colleagues. Prepare it for <bold>reuse</bold> by using parameters"
+  },
+  "search_bar": {
+    "streams_placeholder": "Select streams the search should include. Searches in all streams if empty.",
+    "refresh_human_name": "Search",
+    "query_history_title": "Open query history",
+    "filters_label": "Filters",
+    "filters_tooltip_title": "Search Filters",
+    "filters_enterprise_hint": "Search filters and parameters are available for the enterprise version.",
+    "filters_hide_controls": "Hide controls",
+    "scroll_hint": "Scroll to search bar",
+    "query_placeholder": "Type your search query here and press enter. E.g.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Saved search",
+    "save_search": "Save search",
+    "unsaved_changes": "Unsaved changes",
+    "load_title": "Load a previously saved search",
+    "load": "Load",
+    "share_disabled": "Only saved searches can be shared.",
+    "dropdown_aria_label": "Open search actions dropdown",
+    "edit_metadata": "Edit metadata",
+    "export_to_dashboard": "Export to dashboard",
+    "export": "Export",
+    "reset_search": "Reset search",
+    "editing_modal_title": "Editing saved search",
+    "update_search": "Update search",
+    "share_description": "Search for a User or Team to add as collaborator on this saved search.",
+    "save_success": "Saving view \"{{title}}\" was successful!",
+    "save_error": "Saving view failed: {{error}}",
+    "delete_success": "Deleting saved search \"{{title}}\" was successful!",
+    "delete_error": "Deleting saved search failed: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Name of search",
+    "dirty_warning": "There are unconfirmed changes to the search parameters (time range, streams, or query). Saving now will discard them. If this is not intentional, execute the search to apply your changes before saving.",
+    "title_label": "Title",
+    "title_placeholder": "Enter title",
+    "share_description": "Search for a User or Team to add as collaborator on this search.",
+    "create_new": "Create new",
+    "save_as": "Save as",
+    "create_new_title": "Create new search",
+    "save_as_title": "Save as new search",
+    "save": "Save",
+    "save_title": "Save search",
+    "cancel": "Cancel"
+  },
+  "results": {
+    "loading": "Updating search results..."
+  },
+  "sidebar_description": {
+    "execution": "Execution",
+    "ad_hoc_info": "Save the search or export it to a dashboard to add a custom summary and description.",
+    "edit_metadata_hint": "To add a description and summary for this {{viewType}} click on the <icon/> icon in the search bar to open its action menu. The action menu includes the option \"Edit metadata\".",
+    "search_section": "Search",
+    "no_summary": "This {{viewType}} has no summary.",
+    "no_description": "This {{viewType}} has no description.",
+    "no_query": "No query executed yet.",
+    "query_executed_in": "Query executed in",
+    "effective_time_range": "Effective time range",
+    "varies_per_widget": "Varies per widget",
+    "time_from": "From",
+    "time_to": "To",
+    "total_results": "Total results"
+  },
+  "sidebar_create": {
+    "info": "Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise feature) to your search.",
+    "generic": "Generic",
+    "predefined_aggregation": "Predefined Aggregation",
+    "investigations": "Investigations",
+    "events": "Events"
+  },
+  "sidebar_highlighting": {
+    "description": "Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the {{productName}} server config. Any field value can be highlighted by clicking on the value and selecting \"Highlight this value\".\nIf a term or a value has more than one rule, the first matching rule is used.",
+    "active_highlights": "Active highlights",
+    "add_rule_title": "Add highlighting rule",
+    "search_terms": "Search terms"
+  },
+  "save_view": {
+    "save": "Save",
+    "save_as": "Save as",
+    "save_as_new_dashboard_title": "Save as new dashboard",
+    "save_dashboard_title": "Save dashboard"
+  },
+  "undo_redo": {
+    "undo": "Undo",
+    "redo": "Redo"
+  },
+  "time_range": {
+    "tab_relative": "Relative",
+    "tab_absolute": "Absolute",
+    "tab_keyword": "Keyword",
+    "from_label": "From:",
+    "until_label": "Until:",
+    "keyword_label": "Keyword:",
+    "no_override": "No Override",
+    "now": "Now",
+    "all_time": "All Time",
+    "range_ago": "{{time}} ago",
+    "range_length_placeholder": "Select a range length",
+    "load_preset": "Load Preset",
+    "no_available_presets": "No available presets",
+    "loading": "Loading...",
+    "configure_presets": "Configure presets"
+  },
+  "refresh": {
+    "not_updating": "Not updating",
+    "every": "Every",
+    "pause": "Pause Refresh",
+    "start": "Start Refresh"
+  },
+  "bulk_actions": {
+    "title": "Bulk actions",
+    "cancel": "Cancel selection"
+  },
+  "execution_info": {
+    "query_executed": "Query executed in {{duration}}ms at",
+    "total_results": "Total results: {{total}}",
+    "no_query": "No query executed yet."
+  },
+  "highlight_form": {
+    "edit_title": "Edit Highlighting Rule",
+    "create_title": "Create Highlighting Rule",
+    "field_label": "Field",
+    "field_placeholder": "Select or type field name",
+    "field_required": "Field is required",
+    "condition_label": "Condition",
+    "condition_placeholder": "Choose a condition",
+    "condition_required": "Condition is required",
+    "value_label": "Value",
+    "value_required": "Value is required",
+    "update_rule": "Update rule",
+    "create_rule": "Create rule"
+  }
+}

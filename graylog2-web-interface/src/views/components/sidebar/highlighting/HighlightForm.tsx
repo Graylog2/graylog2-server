@@ -19,6 +19,7 @@ import { useCallback, useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
 import isNil from 'lodash/isNil';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input, BootstrapModalWrapper, Modal } from 'components/bootstrap';
@@ -48,9 +49,9 @@ type Props = {
   onSubmit: (field: string, value: Value, condition: Condition, color: Color) => Promise<void>;
 };
 
-const _isRequired = (field: string) => (value: string) => {
+const _isRequired = (message: string) => (value: string) => {
   if (['', null, undefined].includes(value)) {
-    return `${field} is required`;
+    return message;
   }
 
   return undefined;
@@ -105,6 +106,7 @@ const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
 };
 
 const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Props) => {
+  const { t } = useTranslation('search');
   const fieldTypes = useContext(FieldTypesContext);
   const sendTelemetry = useSendTelemetry();
   const fields = fieldTypes?.all ? fieldTypes.all : Immutable.List<FieldTypeMapping>();
@@ -130,8 +132,8 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
     [onClose, onSubmitProp, rule, sendTelemetry],
   );
 
-  const headerPrefix = rule ? 'Edit' : 'Create';
-  const submitButtonPrefix = rule ? 'Update' : 'Create';
+  const modalTitle = rule ? t('highlight_form.edit_title') : t('highlight_form.create_title');
+  const submitButtonText = rule ? t('highlight_form.update_rule') : t('highlight_form.create_rule');
 
   return (
     <Formik
@@ -149,39 +151,39 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
 
         return (
           <BootstrapModalWrapper showModal onHide={onClose}>
-            <Form className="form" data-testid={`${headerPrefix}-highlighting-rule-dialog`}>
+            <Form className="form" data-testid={`${rule ? 'Edit' : 'Create'}-highlighting-rule-dialog`}>
               <Modal.Header>
-                <Modal.Title>{headerPrefix} Highlighting Rule</Modal.Title>
+                <Modal.Title>{modalTitle}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <Field name="field" validate={_isRequired('Field')}>
+                <Field name="field" validate={_isRequired(t('highlight_form.field_required'))}>
                   {({ field: { name, value, onChange }, meta }) => (
-                    <Input id="field_type_controls" error={meta?.error} label="Field">
+                    <Input id="field_type_controls" error={meta?.error} label={t('highlight_form.field_label')}>
                       <Select
                         inputId="field-select"
                         onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                         options={fieldOptions}
                         allowCreate
                         value={value}
-                        placeholder="Select or type field name"
+                        placeholder={t('highlight_form.field_placeholder')}
                       />
                     </Input>
                   )}
                 </Field>
-                <Field name="condition" validate={_isRequired('Condition')}>
+                <Field name="condition" validate={_isRequired(t('highlight_form.condition_required'))}>
                   {({ field: { name, value, onChange }, meta }) => (
-                    <Input id="condition-controls" error={meta?.error} label="Condition">
+                    <Input id="condition-controls" error={meta?.error} label={t('highlight_form.condition_label')}>
                       <Select
                         inputId="condition-select"
                         onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                         options={isNumeric ? numberConditionOptions : otherConditionOptions}
                         value={value}
-                        placeholder="Choose a condition"
+                        placeholder={t('highlight_form.condition_placeholder')}
                       />
                     </Input>
                   )}
                 </Field>
-                <Field name="value" validate={_isRequired('Value')}>
+                <Field name="value" validate={_isRequired(t('highlight_form.value_required'))}>
                   {({ field: { name, value, onChange }, meta }) => (
                     <Input
                       id={name}
@@ -189,7 +191,7 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
                       error={meta?.error}
                       onChange={onChange}
                       value={value ?? ''}
-                      label="Value"
+                      label={t('highlight_form.value_label')}
                     />
                   )}
                 </Field>
@@ -199,7 +201,7 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
                 <ModalSubmit
                   onCancel={onClose}
                   disabledSubmit={!isValid}
-                  submitButtonText={`${submitButtonPrefix} rule`}
+                  submitButtonText={submitButtonText}
                 />
               </Modal.Footer>
             </Form>

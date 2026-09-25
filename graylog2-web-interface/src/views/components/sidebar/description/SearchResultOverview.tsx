@@ -18,6 +18,7 @@ import React from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
@@ -42,11 +43,12 @@ type Props = {
 };
 
 const SearchResultOverview = ({ results }: Props) => {
+  const { t } = useTranslation('search');
   const { timerange: globalOverrideTimeRange } = useGlobalOverride() ?? {};
   const viewType = useViewType();
 
   if (isEmpty(results)) {
-    return <i>No query executed yet.</i>;
+    return <i>{t('sidebar_description.no_query')}</i>;
   }
 
   const { timestamp, duration, effectiveTimerange, searchTypes } = results;
@@ -56,25 +58,25 @@ const SearchResultOverview = ({ results }: Props) => {
   return (
     <>
       <p>
-        Query executed in <br />
+        {t('sidebar_description.query_executed_in')} <br />
         {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
       </p>
       <EffectiveTimeRange>
-        Effective time range
+        {t('sidebar_description.effective_time_range')}
         <br />
         {isVariesPerWidget ? (
-          <i>Varies per widget</i>
+          <i>{t('sidebar_description.varies_per_widget')}</i>
         ) : (
           <EffectiveTimeRangeTable>
             <tbody>
               <tr>
-                <td>From</td>
+                <td>{t('sidebar_description.time_from')}</td>
                 <td aria-label="Effective time range from">
                   <Timestamp dateTime={effectiveTimerange.from} format="complete" />
                 </td>
               </tr>
               <tr>
-                <td>To</td>
+                <td>{t('sidebar_description.time_to')}</td>
                 <td aria-label="Effective time range to">
                   <Timestamp dateTime={effectiveTimerange.to} format="complete" />
                 </td>
@@ -84,9 +86,9 @@ const SearchResultOverview = ({ results }: Props) => {
         )}
       </EffectiveTimeRange>
       <p>
-        Total results
+        {t('sidebar_description.total_results')}
         <br />
-        {isVariesPerWidget ? <i>Varies per widget</i> : numeral(total).format('0,0')}
+        {isVariesPerWidget ? <i>{t('sidebar_description.varies_per_widget')}</i> : numeral(total).format('0,0')}
       </p>
     </>
   );
