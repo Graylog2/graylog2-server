@@ -34,5 +34,14 @@ public interface PipelineStreamConnectionsService {
 
     void delete(String streamId);
 
+    /**
+     * Removes the given pipeline ID from all stream connection documents.
+     * Deletes a connection document when its {@code pipeline_ids} list becomes empty.
+     * <p>
+     * Note: the default routing pipeline ("Default Routing") is not deletable, so its
+     * connection to the default stream is never removed via this method.
+     */
+    void deleteConnectionsForPipeline(String pipelineId);
+
     Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds);
 }
