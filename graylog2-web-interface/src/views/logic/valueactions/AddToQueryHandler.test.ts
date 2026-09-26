@@ -97,6 +97,27 @@ describe('AddToQueryHandler', () => {
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
   });
 
+  it('combines array field values with OR', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'associated_assets',
+        value: ['id1', 'id2', 'id3'],
+        type: new FieldType('associated-assets', [], []),
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND (associated_assets:id1 OR associated_assets:id2 OR associated_assets:id3)',
+    );
+  });
+
   it('updates query string for multiple values from context', async () => {
     const query = createQuery('anotherQueryId', 'foo:23');
     const view = createViewWithQuery(query);
