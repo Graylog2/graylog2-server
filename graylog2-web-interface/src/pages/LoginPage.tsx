@@ -28,7 +28,7 @@ import LoginForm from 'components/login/LoginForm';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
-import { SessionActions } from 'stores/sessions/SessionStore';
+import { validate } from 'logic/session/SessionApi';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useProductName from 'brand-customization/useProductName';
 
@@ -95,7 +95,7 @@ const useValidateSession = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
 
   useEffect(() => {
-    const sessionPromise = SessionActions.validate().then((response) => {
+    const sessionPromise = validate().then((response) => {
       setDidValidateSession(true);
 
       return response;
