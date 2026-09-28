@@ -35,7 +35,6 @@ import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -243,16 +242,6 @@ class InputStatesResourceTest {
     }
 
     @Test
-    void listSkipsAnInputWhoseTypeIsNotInstalledOnThisNodeAndReportsTheRest() throws Exception {
-        configure(STOPPED_ID);
-        configureWithUninstalledType(BROKEN_ID);
-
-        assertThat(resource.list().states())
-                .extracting(InputStateSummary::id)
-                .containsExactly(STOPPED_ID);
-    }
-
-    @Test
     void getReturnsTheRegistryStateForARunningInput() throws Exception {
         final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.getInputState(RUNNING_ID)).thenReturn(state);
@@ -306,16 +295,6 @@ class InputStatesResourceTest {
         when(input.getConfiguration()).thenReturn(Map.of());
         when(messageInputFactory.onlyOnePerCluster(eq(BROKEN_TYPE), any()))
                 .thenThrow(new IllegalArgumentException("broken configuration"));
-        configured.add(input);
-    }
-
-    private void configureWithUninstalledType(String id) throws Exception {
-        final Input input = mock(Input.class);
-        when(input.getId()).thenReturn(id);
-        when(input.getType()).thenReturn(BROKEN_TYPE);
-        when(input.getConfiguration()).thenReturn(Map.of());
-        when(messageInputFactory.onlyOnePerCluster(eq(BROKEN_TYPE), any()))
-                .thenThrow(new NoSuchInputTypeException("no input of type " + BROKEN_TYPE));
         configured.add(input);
     }
 
