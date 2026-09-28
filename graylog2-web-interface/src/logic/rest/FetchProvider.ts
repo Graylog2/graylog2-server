@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import memoize from 'lodash/memoize';
-
 import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -23,9 +21,7 @@ import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
-
-// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
-const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
+import Session from 'logic/session/Session';
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -36,15 +32,15 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const response = await (contentType?.startsWith('application/json')
     ? error.json().then((body) => body)
     : error?.text?.());
-  const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
-  if (SessionStore.isLoggedIn() && error.status === 401) {
-    SessionActions.logout();
+  if (Session.isLoggedIn() && error.status === 401) {
+    Session.setUsername(undefined);
+    Session.notify('logout');
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-  if (SessionStore.isLoggedIn() && error.status === 403) {
+  if (Session.isLoggedIn() && error.status === 403) {
     onUnauthorized(fetchError);
   }
 
@@ -249,17 +245,8 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<T> {
-  const { SessionStore, SessionActions } = importSessionStore();
-
-  if (!SessionStore.isLoggedIn()) {
-    return () =>
-      CancellablePromise.of(
-        new Promise((resolve, reject) => {
-          SessionActions.login.completed.listen(() => {
-            promise().then(resolve, reject);
-          });
-        }),
-      );
+  if (!Session.isLoggedIn()) {
+    return () => CancellablePromise.of(Session.waitForLogin().then(promise));
   }
 
   return promise;

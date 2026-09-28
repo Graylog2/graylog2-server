@@ -22,21 +22,11 @@ import FormData from 'form-data';
 import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
+import Session from 'logic/session/Session';
 
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
-const mockLogout = jest.fn();
-
-jest.mock('stores/sessions/SessionStore', () => ({
-  SessionStore: {
-    isLoggedIn: jest.fn(() => true),
-  },
-  SessionActions: {
-    logout: mockLogout,
-  },
-}));
-
 jest.mock('api/server-availability', () => ({
   reportSuccess: jest.fn(),
   reportError: jest.fn(),
@@ -128,6 +118,7 @@ describe('FetchProvider', () => {
 
   beforeEach(() => {
     asMock(ErrorsActions.report).mockClear();
+    Session.setUsername('alice');
   });
 
   afterAll(() => {
@@ -154,6 +145,8 @@ describe('FetchProvider', () => {
   });
 
   it('removes local session if 401 is returned', async () => {
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
     const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
 
     expect(error.name).toEqual('FetchError');
@@ -161,7 +154,30 @@ describe('FetchProvider', () => {
       'There was an error fetching a resource: Unauthorized. Additional information: Not available',
     );
 
-    expect(mockLogout).toHaveBeenCalled();
+    expect(Session.isLoggedIn()).toBe(false);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+  });
+
+  it('sends a request queued until login only once', async () => {
+    Session.setUsername(undefined);
+    const fetchSpy = jest.spyOn(window, 'fetch');
+
+    const response = fetch('GET', `${baseUrl}/test1`);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    Session.setUsername('alice');
+
+    await expect(response).resolves.toEqual({ text: 'test' });
+
+    Session.setUsername(undefined);
+    Session.setUsername('alice');
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    fetchSpy.mockRestore();
   });
 
   it('supports uploading form data without content type', async () => {
