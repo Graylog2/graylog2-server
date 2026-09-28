@@ -72,10 +72,13 @@ describe('useStreamMetrics', () => {
 
     await waitFor(() => expect(StreamsMetrics.getMetrics).toHaveBeenCalled());
 
-    expect(StreamsMetrics.getMetrics).toHaveBeenCalledWith({
-      stream_ids: ['a', 'b'],
-      fields: ['message_count', 'pipelines'],
-    });
+    expect(StreamsMetrics.getMetrics).toHaveBeenCalledWith(
+      {
+        stream_ids: ['a', 'b'],
+        fields: ['message_count', 'pipelines'],
+      },
+      { requestShouldExtendSession: false },
+    );
   });
 
   it('does not fetch when stream ids are empty', () => {
