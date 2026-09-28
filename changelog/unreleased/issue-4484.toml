@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Include inputs that are configured on a node but not running in the input state API responses."
+
+issues = ["4484"]
