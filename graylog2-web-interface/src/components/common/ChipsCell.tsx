@@ -55,30 +55,18 @@ const HoverableLabel = styled(Label)(
       display: block;
     }
 
-    button:hover > & {
-      background-color: ${theme.colors.gray[60]};
-    }
-  `,
-);
-
-const ChipButton = styled.button(
-  ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-
-    /* Shrink as a flex item so the chip inside can truncate instead of leaking past the cell. */
+    /* Shrink as a flex item so the chip can truncate instead of leaking past the cell. */
     min-width: 0;
     max-width: 100%;
 
-    /* Inner Label/Badge components set their own cursor; force pointer everywhere
-       inside the button so the hover affordance is consistent. */
-    & * {
+    /* Only clickable chips render as a <button> (via Label's own onClick prop) — restrict the
+       hover/focus affordance to those so plain, non-clickable chips don't look interactive. */
+    &:where(button):hover {
+      background-color: ${theme.colors.gray[60]};
       cursor: pointer;
     }
 
-    &:focus-visible {
+    &:where(button):focus-visible {
       outline: 2px solid ${theme.colors.input.borderFocus};
       outline-offset: 2px;
       border-radius: 2px;
@@ -152,17 +140,17 @@ const ChipsCell = ({
     }
 
     return (
-      <ChipButton
+      <HoverableLabel
         key={item}
-        type="button"
+        bsStyle="default"
         onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
           onItemClick(item);
         }}
         aria-label={`Filter by ${itemLabel} "${item}"`}
         title={`Filter by ${itemLabel} "${item}"`}>
-        <HoverableLabel bsStyle="default">{item}</HoverableLabel>
-      </ChipButton>
+        {item}
+      </HoverableLabel>
     );
   };
 

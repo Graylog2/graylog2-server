@@ -22,10 +22,15 @@ import org.graylog.schema.EventFields;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
+
 public class FilelogRecordProcessor implements LogRecordProcessor {
     @Override
     public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
+
+        Long recordNumber = null;
+        Long recordOffset = null;
 
         for (final var attr : log.getLogRecord().getAttributesList()) {
             switch (attr.getKey()) {
@@ -41,9 +46,18 @@ public class FilelogRecordProcessor implements LogRecordProcessor {
                     result.put(EventFields.EVENT_LOG_PATH, path);
                 }
 //                case "log.file.path_resolved" -> result.put(attr.getKey(), attr.getValue());
-//                case "log.file.record_number" -> result.put(attr.getKey(), attr.getValue());
-//                case "log.file.record_offset" -> result.put(attr.getKey(), attr.getValue());
+                case "log.file.record_number" -> recordNumber = asLong(attr.getValue());
+                case "log.file.record_offset" -> recordOffset = asLong(attr.getValue());
             }
+        }
+
+        // Both values increase monotonically while a file is being read, so either one orders records
+        // that share a timestamp. Log lines often carry a coarser timestamp than the message field can
+        // represent, which makes this the only usable tiebreaker for files. The record number is the
+        // more meaningful of the two, so it wins when the receiver sends both.
+        final var sequence = recordNumber != null ? recordNumber : recordOffset;
+        if (sequence != null) {
+            result.put(EventFields.EVENT_SEQUENCE, sequence);
         }
 
         return result;
