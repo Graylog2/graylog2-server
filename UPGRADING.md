@@ -76,10 +76,40 @@ versions:
   }
 }
 ```
+### CEF inputs no longer prefix the `source` field with a slash
+
+When a CEF message carries no `deviceAddress`/`dvc` extension and no syslog hostname, the CEF input
+falls back to the sender's socket address for the `source` field. That fallback formatted the address
+with `InetAddress.toString()`, which renders `hostname/1.2.3.4`. Because the CEF input never resolves
+the hostname, the hostname half was always empty and `source` was left with a leading slash
+(`/128.66.23.42`). IPv6 senders were additionally recorded in fully expanded form
+(`0:0:0:0:0:0:0:1`).
+
+`source` now holds the bare address, compressed for IPv6 (`128.66.23.42`, `::1`), which is what every
+other input already does.
+
+This is worth checking if you built anything around the old value. Pipeline rules that strip the
+leading slash off `source`, saved searches or lookup tables keyed on the slash-prefixed form, and
+stream rules matching it will no longer match and should be updated. Messages ingested before the
+upgrade keep their original `source`, so both forms can coexist in existing indices.
+
 ### Scripting API default fields on message export
 Per default, we now export all fields in a message on export. Prior to this change, we defaulted to a limited list of 
 fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
 Now you can export with all fields and limit the results by specifying the fields wanted.
+
+### System CPU and Memory Metrics Now Reflect Container Limits When Containerized
+
+When Graylog Server or Data Node runs in a container with cgroup CPU/memory limits configured (e.g. Docker 
+`--memory`/`--cpus`, Kubernetes `resources.limits`), the `org.graylog2.system.cpu.percent` metric and the Data Node 
+metrics `mem_total`, `mem_free`, `mem_total_used_bytes`, and `mem_total_used` now reflect the container's 
+cgroup-scoped limits and usage instead of the underlying host's.
+
+Previously, these metrics always reported host-level values, so a container with a memory limit well below the host's 
+total RAM would show a low, misleadingly small "used" percentage. After upgrading, the same metrics scale to the 
+container's actual limit, so used-percentage values can jump significantly even though nothing about the node's real 
+memory or CPU pressure has changed. Review and, if necessary, adjust any dashboards or alert thresholds built against 
+the old host-scaled values.
 
 ## Web Interface Changes
 

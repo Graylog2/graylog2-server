@@ -133,7 +133,9 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(OpensearchState.AVAILABLE)) {
             process.openSearchClient().ifPresent(client -> {
-                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
+                if (this.nodeStatMetricsCollector == null || this.nodeStatMetricsCollector.getClient() != client) {
+                    this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
+                }
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client);
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
