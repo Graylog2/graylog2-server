@@ -33,6 +33,8 @@ export const mockCollectorPermissions = (
   canDeleteToken: () => true,
   canReadActivities: true,
   canEditConfig: true,
+  canCreateIngestInput: true,
+  canEditIngestInput: () => true,
   canDeployCollectors: true,
   canViewEnrollmentTokens: true,
   canReadSystemLogs: true,

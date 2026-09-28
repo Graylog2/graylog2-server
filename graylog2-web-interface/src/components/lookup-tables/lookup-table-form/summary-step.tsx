@@ -108,14 +108,14 @@ function AdapterSummary({ adapter }: { adapter: LookupTableAdapter }) {
 }
 
 function SummaryStep() {
-  const { values } = useFormikContext<LookupTable>();
+  const { values, initialValues } = useFormikContext<LookupTable>();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
 
   return (
     <ErrorsProvider>
       <ErrorsConsumer
-        lutNames={values.name ? [values.name] : undefined}
+        lutNames={initialValues.id && initialValues.name ? [initialValues.name] : undefined}
         cacheNames={cache?.name ? [cache.name] : undefined}
         adapterNames={dataAdapter?.name ? [dataAdapter.name] : undefined}
       />

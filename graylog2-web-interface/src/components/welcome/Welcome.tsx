@@ -17,16 +17,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Link } from 'components/common';
-import Routes from 'routing/Routes';
-import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
-import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
 import SectionHeader from 'components/welcome/SectionHeader';
+import VisuallyHidden from 'components/common/VisuallyHidden';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -42,41 +38,17 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-type HelperProps = { readOnly: boolean; userId: string; startpage: StartPage };
-
-const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => {
-  const defaultPageIsDefined = startpage !== null;
-
-  if (defaultPageIsDefined || readOnly) {
-    return <span>This is your personal page, allowing easy access to the content most relevant for you.</span>;
-  }
-
-  return (
-    <>
-      <span>This is your personal start page, allowing easy access to the content most relevant for you.</span>
-      <span>
-        {' '}
-        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>
-          edit profile
-        </Link>{' '}
-        page.
-      </span>
-    </>
-  );
-};
-
 const Welcome = () => {
-  const productName = useProductName();
-  const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
+  const { permissions } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
 
   return (
     <>
-      <PageHeader title={`Welcome to ${productName}!`}>
-        <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
-      </PageHeader>
+      <VisuallyHidden>
+        <h1>Welcome to Graylog!</h1>
+      </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
       <SectionHeader>

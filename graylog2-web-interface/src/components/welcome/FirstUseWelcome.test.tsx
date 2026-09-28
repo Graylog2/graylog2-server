@@ -33,6 +33,7 @@ beforeEach(() => {
     typeof useDismissOnboarding
   >);
   asMock(AppConfig.isCloud).mockReturnValue(false);
+  asMock(AppConfig.branding).mockReturnValue(undefined);
 });
 
 describe('FirstUseWelcome', () => {
@@ -71,7 +72,8 @@ describe('FirstUseWelcome', () => {
 
     const links = screen.getAllByRole('link', { name: /continue/i });
 
-    expect(links[0]).toHaveAttribute('href', 'https://community.graylog.org/');
+    expect(links[0]).toHaveAttribute('href', 'https://go2docs.graylog.org/current/getting_in_log_data/collectors.htm');
+    expect(links[1]).toHaveAttribute('href', 'https://community.graylog.org/');
     expect(links[0]).toHaveAttribute('target', '_blank');
   });
 
@@ -104,5 +106,21 @@ describe('FirstUseWelcome', () => {
     render(<FirstUseWelcome />);
 
     expect(screen.queryByRole('heading', { name: /set up input/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the resources section when enabled in branding', () => {
+    asMock(AppConfig.branding).mockReturnValue({ onboarding: { resources: { enabled: true } } });
+    render(<FirstUseWelcome />);
+
+    expect(screen.getByRole('heading', { name: /^resources$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /collector documentation/i })).toBeInTheDocument();
+  });
+
+  it('hides the resources section when disabled in branding', () => {
+    asMock(AppConfig.branding).mockReturnValue({ onboarding: { resources: { enabled: false } } });
+    render(<FirstUseWelcome />);
+
+    expect(screen.queryByRole('heading', { name: /^resources$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /collector documentation/i })).not.toBeInTheDocument();
   });
 });

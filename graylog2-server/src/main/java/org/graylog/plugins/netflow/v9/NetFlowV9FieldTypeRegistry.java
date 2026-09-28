@@ -82,7 +82,8 @@ public class NetFlowV9FieldTypeRegistry {
             }
 
             if (value.size() == 1 && ":skip".equals(value.get(0).asText())) {
-                LOG.debug("Skipping record: {}", field);
+                LOG.debug("Registering field {} as SKIP", id);
+                mapBuilder.put(id, NetFlowV9FieldType.create(id, NetFlowV9FieldType.ValueType.SKIP, "skip_" + id));
                 continue;
             }
 

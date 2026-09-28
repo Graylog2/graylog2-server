@@ -48,6 +48,7 @@ import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.PendingChangesLookup;
+import org.graylog.collectors.PendingReassignments;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -252,6 +253,7 @@ public class CollectorInstancesResource extends RestResource {
         final Duration offlineThreshold = getOfflineThreshold();
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final var pendingChangesLookup = txnLogService.pendingChangesLookup();
+        final var pendingReassignments = txnLogService.pendingReassignments();
         final var attributes = attributes(pendingChangesLookup);
         final var dbQueryCreator = new DbQueryCreator("hostname", attributes, computedFieldRegistry);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
@@ -269,7 +271,7 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto))).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto), pendingReassignments)).toList(),
                 attributes,
                 DEFAULTS);
     }
@@ -294,7 +296,7 @@ public class CollectorInstancesResource extends RestResource {
         final var hasPendingChanges = txnLogService.hasPendingChanges(dto.fleetId(), dto.instanceUid(),
                 dto.lastProcessedTxnSeq());
 
-        return toResponse(dto, offlineCutoff, hasPendingChanges);
+        return toResponse(dto, offlineCutoff, hasPendingChanges, txnLogService.pendingReassignments());
     }
 
     @DELETE
@@ -391,7 +393,8 @@ public class CollectorInstancesResource extends RestResource {
     }
 
     private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff,
-                                                                 boolean hasPendingChanges) {
+                                                                 boolean hasPendingChanges,
+                                                                 PendingReassignments pendingReassignments) {
         return new CollectorInstanceResponse(
                 dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
                 dto.instanceUid(),
@@ -406,6 +409,7 @@ public class CollectorInstancesResource extends RestResource {
                 attributesToMap(dto.identifyingAttributes()),
                 attributesToMap(dto.nonIdentifyingAttributes()),
                 hasPendingChanges,
+                pendingReassignments.targetFleetId(dto.instanceUid(), dto.fleetId(), dto.lastProcessedTxnSeq()).orElse(null),
                 dto.health().orElse(null)
         );
     }

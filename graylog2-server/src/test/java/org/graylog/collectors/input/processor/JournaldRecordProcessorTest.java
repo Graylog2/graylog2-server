@@ -62,7 +62,7 @@ class JournaldRecordProcessorTest {
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "pam_unix(cron:session): session opened for user root(uid=0) by root(uid=0)",
                 "vendor_event_severity_level", 6L,
-                //"event_id", "12219287",
+                "event_sequence", 12219287L,
                 "service_name", "cron.service"
         ));
     }
@@ -234,6 +234,26 @@ class JournaldRecordProcessorTest {
     }
 
     @Test
+    void skipsSequenceNumberAboveSignedLongRange() {
+        // __SEQNUM is unsigned 64-bit at the source and always arrives as a decimal string, so a
+        // value above 2^63 cannot be represented. The codec's default sequence number then stays.
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder()
+                        .setKvlistValue(KeyValueList.newBuilder()
+                                .addValues(stringField("MESSAGE", "hello"))
+                                .addValues(stringField("__SEQNUM", "18446744073709551614"))
+                                .build())
+                        .build())
+                .build();
+
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
+                "message", "hello"
+        ));
+    }
+
+    @Test
     void mapsFieldsFromSyslogFixture() throws IOException {
         final var log = wrapLogRecord(parseFixture("journald-syslog-cron-record.json"));
 
@@ -255,7 +275,7 @@ class JournaldRecordProcessorTest {
                 Map.entry("vendor_event_severity_level", 6L),
                 Map.entry("associated_session_id", "dcae62f433304b8290b9372b7bdcde6c"),
                 Map.entry("process_id", "1072719"),
-                //Map.entry("event_id", "12219237"),
+                Map.entry("event_sequence", 12219237L),
                 Map.entry("process_command_line", "/usr/sbin/CRON -f -P"),
                 Map.entry("message", "pam_unix(cron:session): session closed for user root"),
                 Map.entry("event_uid", "s=544611aab98d4df8bd045f3b0ab794bf;i=ba7365;b=dcae62f433304b8290b9372b7bdcde6c;m=254aa15ad9;t=64bbd42c80329;x=e335c65713149877"),
@@ -276,7 +296,7 @@ class JournaldRecordProcessorTest {
                 Map.entry("vendor_event_category", "0"),
                 Map.entry("host_id", "3d758250c1e84341a6d2037786a25bdf"),
                 //Map.entry("vendor_subtype", "pci"),
-                //Map.entry("event_id", "12219226"),
+                Map.entry("event_sequence", 12219226L),
                 Map.entry("host_device", "0000:00:08.1"),
                 Map.entry("host_hostname", "h2"),
                 Map.entry("message", "pcieport 0000:00:08.1: PME: Spurious native interrupt!"),

@@ -35,7 +35,7 @@ const primaryTypeBadge = (index: IncompatibleIndex): Badge => {
     return { text: 'System', style: 'info' };
   }
 
-  return index.managed_index ? { text: 'Graylog', style: 'success' } : { text: 'Foreign', style: 'warning' };
+  return index.managed_index ? { text: 'Managed', style: 'success' } : { text: 'Foreign', style: 'warning' };
 };
 
 const typeBadges = (index: IncompatibleIndex): Array<Badge> => [

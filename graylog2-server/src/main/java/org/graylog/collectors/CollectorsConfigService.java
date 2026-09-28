@@ -16,35 +16,50 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.base.Suppliers;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * Provides access to the collector configuration.
  */
 @Singleton
 public class CollectorsConfigService {
-    private static final CollectorsConfig DEFAULT_CONFIG = CollectorsConfig.createDefault("localhost");
-
     private final ClusterConfigService clusterConfigService;
-    private final ClusterEventBus clusterEventBus;
     private final URI httpExternalUri;
+    private final EventBus eventBus;
+
+    private final AtomicReference<Supplier<Optional<CollectorsConfig>>> config;
 
     @Inject
     public CollectorsConfigService(ClusterConfigService clusterConfigService,
-                                   ClusterEventBus clusterEventBus,
-                                   HttpConfiguration httpConfiguration) {
+                                   HttpConfiguration httpConfiguration,
+                                   EventBus eventBus) {
         this.clusterConfigService = clusterConfigService;
-        this.clusterEventBus = clusterEventBus;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
+        this.config = new AtomicReference<>(Suppliers.memoize(this::loadConfig));
+        this.eventBus = eventBus;
+
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public void handleClusterConfigChangedEvent(ClusterConfigChangedEvent event) {
+        if (CollectorsConfig.class.getCanonicalName().equals(event.type())) {
+            invalidate();
+            eventBus.post(new CollectorsConfigUpdatedEvent());
+        }
     }
 
     /**
@@ -53,7 +68,7 @@ public class CollectorsConfigService {
      * @return the current config or an empty optional
      */
     public Optional<CollectorsConfig> get() {
-        return Optional.ofNullable(clusterConfigService.get(CollectorsConfig.class));
+        return config.get().get();
     }
 
     /**
@@ -66,32 +81,20 @@ public class CollectorsConfigService {
     }
 
     /**
-     * Get the OpAMP max request body size in bytes.
-     *
-     * @return the max request body size
-     */
-    public int getOpampMaxRequestBodySizeBytes() {
-        // TODO: Switch to getting the actual database value once we have caching and cache invalidation in place.
-        return DEFAULT_CONFIG.opampMaxRequestBodySizeBytes();
-    }
-
-    /**
      * Save collectors config to the database.
      *
      * @param config the config object
      */
     public void save(CollectorsConfig config) {
-        final var existing = get();
-
         clusterConfigService.write(config);
+        invalidate(); // prevent reading a stale cache entry immediately after saving
+    }
 
-        // On first-time save (no existing config), there's nothing cached to invalidate, so we skip the event.
-        existing.ifPresent(c -> {
-            if (!Objects.equals(c.caCertId(), config.caCertId())
-                    || !Objects.equals(c.signingCertId(), config.signingCertId())
-                    || !Objects.equals(c.otlpServerCertId(), config.otlpServerCertId())) {
-                clusterEventBus.post(new CollectorCaConfigUpdated());
-            }
-        });
+    private Optional<CollectorsConfig> loadConfig() {
+        return Optional.ofNullable(clusterConfigService.get(CollectorsConfig.class));
+    }
+
+    private void invalidate() {
+        config.set(Suppliers.memoize(this::loadConfig));
     }
 }
