@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.inputs;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -85,7 +86,8 @@ class MessageInputFactoryTest {
         });
         final MessageInputFactory messageInputFactory = messageInputFactory(Map.of(TYPE, factory));
 
-        final ExecutorService pool = Executors.newFixedThreadPool(threads);
+        final ExecutorService pool = Executors.newFixedThreadPool(threads,
+                new ThreadFactoryBuilder().setNameFormat("only-one-per-cluster-test-%d").build());
         try {
             final List<Future<Boolean>> results = new ArrayList<>();
             for (int i = 0; i < threads; i++) {
