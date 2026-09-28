@@ -1,0 +1,12 @@
+type = "fixed"
+message = "Fix error notifications after deleting a Collector fleet, and prevent deleting fleets that still have assigned instances."
+
+details.user = """
+Fleets are now deleted from the fleets list instead of the fleet's settings. A fleet can only be
+deleted once it has no assigned instances, including instances that are about to be moved into it.
+Instances that are still waiting to move to another fleet show their target fleet, and references to
+a deleted fleet no longer render as a broken link.
+"""
+
+issues = ["Graylog2/graylog-plugin-enterprise#15427", "26641"]
+pulls = ["27510"]

@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
 import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
 
 /**
@@ -74,7 +75,16 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
                 // macOS-specific identifiers preserved under a macos_* prefix.
                 case "macos.threadID" -> putStr(result, "macos_thread_id", unsignedAsString(value));
                 case "macos.bootUUID" -> putStr(result, "macos_boot_uuid", value.getStringValue());
-                case "macos.machTimestamp" -> putStr(result, "macos_mach_timestamp", unsignedAsString(value));
+                case "macos.machTimestamp" -> {
+                    putStr(result, "macos_mach_timestamp", unsignedAsString(value));
+                    // The mach absolute time counter increases monotonically within a boot session
+                    // (see macos_boot_uuid), so it orders records that share a timestamp. Values that
+                    // don't fit a signed long are skipped, leaving the codec's default in place.
+                    final var sequence = asLong(value);
+                    if (sequence != null && sequence > 0) {
+                        result.put(EventFields.EVENT_SEQUENCE, sequence);
+                    }
+                }
                 case "macos.traceID" -> putStr(result, "macos_trace_id", unsignedAsString(value));
                 case "macos.activityIdentifier" -> putStr(result, "macos_activity_id", unsignedAsString(value));
                 case "macos.parentActivityIdentifier" -> putStr(result, "macos_parent_activity_id", unsignedAsString(value));
