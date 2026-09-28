@@ -33,16 +33,34 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeMetricsCollector {
 
+    private static final long CGROUP_UNLIMITED_THRESHOLD = 1L << 60;
+
     private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
+    private final Map<String, CpuSample> lastCpuSamples = new ConcurrentHashMap<>();
     Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
+
+    private static class CpuSample {
+        final long timestampMillis;
+        final long usageNanos;
+
+        CpuSample(long timestampMillis, long usageNanos) {
+            this.timestampMillis = timestampMillis;
+            this.usageNanos = usageNanos;
+        }
+    }
 
     public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
+    }
+
+    public OfficialOpensearchClient getClient() {
+        return client;
     }
 
     /**
@@ -71,9 +89,99 @@ public class NodeMetricsCollector {
                             log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
                         }
                     });
+            applyCgroupMemoryMetrics(nodeContext, metrics);
+            applyCgroupCpuMetrics(nodeContext, metrics, node);
         }
 
         return metrics;
+    }
+
+    private void applyCgroupMemoryMetrics(DocumentContext nodeContext, Map<String, Object> metrics) {
+        try {
+            final Object rawLimit = nodeContext.read("$.os.cgroup.memory.limit_in_bytes");
+            final Object rawUsage = nodeContext.read("$.os.cgroup.memory.usage_in_bytes");
+            final long limitBytes = parseCgroupLong(rawLimit);
+            final long usedBytes = parseCgroupLong(rawUsage);
+            if (limitBytes > 0 && limitBytes < CGROUP_UNLIMITED_THRESHOLD && usedBytes >= 0) {
+                final long freeBytes = Math.max(0L, limitBytes - usedBytes);
+                final int usedPercent = (int) Math.min(100L, Math.max(0L, Math.round((double) usedBytes / limitBytes * 100.0)));
+                metrics.put(NodeStatMetrics.MEM_TOTAL.getFieldName(), limitBytes);
+                metrics.put(NodeStatMetrics.MEM_TOTAL_USED_BYTES.getFieldName(), usedBytes);
+                metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
+                metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
+            }
+        } catch (Exception e) {
+            log.debug("Cgroup memory metrics not available: {}", e.getMessage());
+        }
+    }
+
+    private void applyCgroupCpuMetrics(DocumentContext nodeContext, Map<String, Object> metrics, String node) {
+        try {
+            final Object rawUsageNanos = nodeContext.read("$.os.cgroup.cpuacct.usage_nanos");
+            final Object rawTimestamp = nodeContext.read("$.os.timestamp");
+            if (rawUsageNanos == null || rawTimestamp == null) {
+                return;
+            }
+            final long usageNanos = parseCgroupLong(rawUsageNanos);
+            final long timestampMillis = parseCgroupLong(rawTimestamp);
+            if (usageNanos <= 0 || timestampMillis <= 0) {
+                return;
+            }
+
+            final CpuSample prev = lastCpuSamples.get(node);
+            lastCpuSamples.put(node, new CpuSample(timestampMillis, usageNanos));
+
+            if (prev == null) {
+                return;
+            }
+
+            final long deltaUsageNanos = usageNanos - prev.usageNanos;
+            final long deltaTimeNanos = (timestampMillis - prev.timestampMillis) * 1_000_000L;
+
+            if (deltaUsageNanos >= 0 && deltaTimeNanos > 0) {
+                final double effectiveCpus = determineEffectiveCpus(nodeContext);
+                if (effectiveCpus > 0) {
+                    final double cpuPercent = (double) deltaUsageNanos / (deltaTimeNanos * effectiveCpus) * 100.0;
+                    final int roundedCpuPercent = (int) Math.min(100L, Math.max(0L, Math.round(cpuPercent)));
+                    metrics.put(NodeStatMetrics.CPU_PERCENT.getFieldName(), roundedCpuPercent);
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Cgroup CPU metrics not available for node {}: {}", node, e.getMessage());
+        }
+    }
+
+    private double determineEffectiveCpus(DocumentContext nodeContext) {
+        try {
+            final Object rawQuota = nodeContext.read("$.os.cgroup.cpu.cfs_quota_micros");
+            final Object rawPeriod = nodeContext.read("$.os.cgroup.cpu.cfs_period_micros");
+            if (rawQuota != null && rawPeriod != null) {
+                final long quota = parseCgroupLong(rawQuota);
+                final long period = parseCgroupLong(rawPeriod);
+                if (quota > 0 && period > 0) {
+                    return (double) quota / period;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return Runtime.getRuntime().availableProcessors();
+    }
+
+    private long parseCgroupLong(Object value) {
+        if (value == null) {
+            return -1L;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Long.parseLong(((String) value).trim());
+            } catch (NumberFormatException e) {
+                return -1L;
+            }
+        }
+        return -1L;
     }
 
     private DocumentContext getNodeContextFromRequest(String node, Request nodeStatRequest) {

@@ -41,7 +41,7 @@ import AggregationConditionSummary from './AggregationConditionSummary';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
-import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from '../replay-search/EventDefinitionReplaySearchLink';
 
 const StyledDataWell = styled(DataWell)`
   line-height: 1.8;
@@ -266,7 +266,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch id={definitionId} />
+        <EventDefinitionReplaySearchLink eventDefinitionId={definitionId} />
       </dd>
     </dl>
   );

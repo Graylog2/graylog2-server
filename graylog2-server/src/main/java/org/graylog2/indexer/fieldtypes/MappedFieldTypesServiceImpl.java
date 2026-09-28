@@ -67,7 +67,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                 .flatMap(fieldTypes -> fieldTypes.fields().stream())
                 .filter(fieldTypeDTO -> !streamAwareFieldTypes || !Collections.disjoint(fieldTypeDTO.streams(), streamIds));
 
-        return mergeCompoundFieldTypes(fieldTypeDTOs.map(this::mapPhysicalFieldType));
+        return mergeCompoundFieldTypes(fieldTypeDTOs.map(fieldTypeDTO -> mapPhysicalFieldType(fieldTypeDTO, streamIds)));
     }
 
     @Override
@@ -77,11 +77,11 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                 .stream()
                 .filter(fieldTypeDTO -> !streamAwareFieldTypes || !Collections.disjoint(fieldTypeDTO.streams(), streamIds));
 
-        return mergeCompoundFieldTypes(fieldTypeDTOs.map(this::mapPhysicalFieldType));
+        return mergeCompoundFieldTypes(fieldTypeDTOs.map(fieldTypeDTO -> mapPhysicalFieldType(fieldTypeDTO, streamIds)));
     }
 
-    private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
-        final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType).orElse(UNKNOWN_TYPE);
+    private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType, Collection<String> queryStreamIds) {
+        final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType, queryStreamIds).orElse(UNKNOWN_TYPE);
         return new MappedFieldTypeDTO(fieldType.fieldName(),
                 mappedFieldType,
                 fieldUnitObtainer.obtainUnit(fieldType.fieldName())

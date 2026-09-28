@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import jakarta.annotation.Nullable;
+import org.graylog.events.fields.EventFieldNames;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -139,6 +140,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionEntity.Builder()
+                    .fieldSpec(ImmutableMap.of())
                     .isScheduled(ValueReference.of(true))
                     .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of());
@@ -198,7 +200,15 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_TACTICS_TECHNIQUES)
         public abstract Builder tacticsTechniques(ImmutableList<String> tacticsTechniques);
 
-        public abstract EventDefinitionEntity build();
+        abstract ImmutableMap<String, EventFieldSpec> fieldSpec();
+
+        abstract EventDefinitionEntity autoBuild();
+
+        public EventDefinitionEntity build() {
+            fieldSpec(EventFieldNames.sorted(fieldSpec()));
+
+            return autoBuild();
+        }
     }
 
     @Override
