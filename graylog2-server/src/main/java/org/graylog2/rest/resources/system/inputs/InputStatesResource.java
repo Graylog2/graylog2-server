@@ -151,8 +151,8 @@ public class InputStatesResource extends AbstractInputsResource {
 
     private Optional<Input> findOnThisNode(String inputId) {
         try {
-            return Optional.of(inputService.findForThisNodeOrGlobal(nodeId.getNodeId(), inputId));
-        } catch (org.graylog2.database.NotFoundException e) {
+            return Optional.ofNullable(inputService.findForThisNodeOrGlobal(nodeId.getNodeId(), inputId));
+        } catch (org.graylog2.database.NotFoundException | IllegalArgumentException e) {
             return Optional.empty();
         }
     }

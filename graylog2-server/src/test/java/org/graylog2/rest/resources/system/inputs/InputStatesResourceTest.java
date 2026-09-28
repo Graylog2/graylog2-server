@@ -152,6 +152,21 @@ class InputStatesResourceTest {
         assertThatThrownBy(() -> resource.get(STOPPED_ID)).isInstanceOf(NotFoundException.class);
     }
 
+    @Test
+    void getFailsForAnUnknownInputIdThatTheLookupReportsAsNull() throws Exception {
+        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), STOPPED_ID)).thenReturn(null);
+
+        assertThatThrownBy(() -> resource.get(STOPPED_ID)).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void getFailsForAMalformedInputId() throws Exception {
+        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), "not-an-object-id"))
+                .thenThrow(new IllegalArgumentException("invalid ObjectId"));
+
+        assertThatThrownBy(() -> resource.get("not-an-object-id")).isInstanceOf(NotFoundException.class);
+    }
+
     private IOState<MessageInput> runningState(MessageInput input) {
         @SuppressWarnings("unchecked")
         final IOState<MessageInput> state = mock(IOState.class);
