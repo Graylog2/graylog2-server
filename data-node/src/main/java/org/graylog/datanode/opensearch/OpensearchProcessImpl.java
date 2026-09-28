@@ -456,19 +456,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     @Override
-    public void reset() {
-        stop();
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
-        start();
-    }
-
-    @Override
     public void reloadCertificates() {
         if(commandLineProcess != null) {
             commandLineProcess.hotReload();
