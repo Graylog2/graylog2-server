@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
+import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
@@ -76,6 +77,12 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         triggerConfigurationChangedEvent();
     }
 
+    @Subscribe
+    public void onStartRequested(OpensearchStartRequestedEvent event) {
+        // opensearch is being (re)started. Rebuild the configuration from scratch instead of starting the process
+        // with whatever configuration was resolved and cached from before, which may be stale by now.
+        triggerConfigurationChangedEvent();
+    }
 
     @Subscribe
     public void onOpensearchVersionChange(OpensearchUpdateEvent event) {

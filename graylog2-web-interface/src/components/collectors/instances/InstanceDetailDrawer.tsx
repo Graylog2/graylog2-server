@@ -22,7 +22,6 @@ import { Button, Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
 import { Icon, Link, RelativeTime, Spinner } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
-import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -30,6 +29,7 @@ import InstanceHealthSection from './InstanceHealthSection';
 
 import ActivityEntryList from '../common/ActivityEntryList';
 import { DetailRow, DetailLabel } from '../common/DetailRow';
+import FleetReference from '../common/FleetReference';
 import { IconRow, IconRowList } from '../common/IconRowList';
 import InstanceStatusLabel from '../common/InstanceStatusLabel';
 import collectorOsName from '../common/collectorOsName';
@@ -45,7 +45,6 @@ import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from
 type Props = {
   instance: CollectorInstanceView;
   sources: Source[];
-  fleetName: string;
   onClose: () => void;
 };
 
@@ -124,7 +123,7 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
   return actions;
 };
 
-const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onClose }: Props) => {
+const InstanceDetailDrawer = ({ instance: instanceProp, sources, onClose }: Props) => {
   // The prop is a row snapshot frozen at drawer-open; poll the instance itself so
   // Status, Last Seen, and Health stay live (same pattern as the sync section below).
   // Errors here are non-fatal — we keep rendering the last known instance.
@@ -179,16 +178,16 @@ const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onCl
 
         <DetailRow>
           <DetailLabel>Fleet:</DetailLabel>
-          <Link
-            to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}
+          <FleetReference
+            fleetId={instance.fleet_id}
+            pendingFleetId={instance.pending_fleet_id}
             onClick={() =>
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.FLEET_OPENED, {
                 app_action_value: 'instance-drawer-open-fleet',
                 ...instanceTelemetryProps(instance),
               })
-            }>
-            {fleetName}
-          </Link>
+            }
+          />
         </DetailRow>
 
         <DetailRow>
