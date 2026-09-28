@@ -54,6 +54,7 @@ public class InputLauncher {
     private final LeaderElectionService leaderElectionService;
     private final FeatureFlags featureFlags;
     private final MetricRegistry metricRegistry;
+    private volatile boolean allPersistedLaunched = false;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
@@ -164,8 +165,13 @@ public class InputLauncher {
                         input.toIdentifier(), input.getDesiredState());
             }
         }
+        allPersistedLaunched = true;
     }
 
+    // Until this turns true the InputRegistry does not yet reflect which inputs this node runs.
+    public boolean allPersistedLaunched() {
+        return allPersistedLaunched;
+    }
 
     public boolean shouldStartAutomatically(MessageInput input) {
         return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);

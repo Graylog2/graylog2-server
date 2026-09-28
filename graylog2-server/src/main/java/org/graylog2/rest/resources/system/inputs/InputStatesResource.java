@@ -110,16 +110,8 @@ public class InputStatesResource extends AbstractInputsResource {
                     result.add(getInputStateSummary(inputState));
                 });
 
-        final Set<String> notRegistered = inputService.findIdsForThisNodeOrGlobal(nodeId.getNodeId()).stream()
-                .filter(inputId -> !registered.contains(inputId))
-                .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
-                .collect(Collectors.toSet());
-
-        if (!notRegistered.isEmpty()) {
-            for (Input input : inputService.findByIds(notRegistered)) {
-                notRunningOnThisNode(input)
-                        .ifPresent(messageInput -> result.add(getNotRunningStateSummary(messageInput)));
-            }
+        if (inputLauncher.allPersistedLaunched()) {
+            result.addAll(notRunningOnThisNode(registered));
         }
 
         return InputStatesList.create(result);
@@ -145,33 +137,49 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputStateSummary get(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final IOState<MessageInput> inputState = this.inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            return getInputStateSummary(inputState);
+        if (inputState == null) {
+            throw new NotFoundException("No input state for input id <" + inputId + "> on this node.");
         }
-        return findOnThisNode(inputId)
-                .flatMap(this::notRunningOnThisNode)
-                .map(this::getNotRunningStateSummary)
-                .orElseThrow(() -> new NotFoundException(
-                        "No input state for input id <" + inputId + "> on this node."));
+        return getInputStateSummary(inputState);
     }
 
-    private Optional<Input> findOnThisNode(String inputId) {
+    private Set<InputStateSummary> notRunningOnThisNode(Set<String> registered) {
         try {
-            return Optional.ofNullable(inputService.findForThisNodeOrGlobal(nodeId.getNodeId(), inputId));
-        } catch (org.graylog2.database.NotFoundException | IllegalArgumentException e) {
-            return Optional.empty();
+            final Set<String> notRegistered = inputService.findIdsForThisNodeOrGlobal(nodeId.getNodeId()).stream()
+                    .filter(inputId -> !registered.contains(inputId))
+                    .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
+                    .collect(Collectors.toSet());
+
+            if (notRegistered.isEmpty()) {
+                return Set.of();
+            }
+
+            final Set<InputStateSummary> result = new HashSet<>();
+            for (Input input : inputService.findByIds(notRegistered)) {
+                notRunningStateSummary(input).ifPresent(result::add);
+            }
+            return result;
+        } catch (Exception e) {
+            LOG.warn("Could not determine which inputs are configured but not running on this node. Reporting only " +
+                    "the inputs this node has taken responsibility for.", e);
+            return Set.of();
         }
     }
 
-    private Optional<MessageInput> notRunningOnThisNode(Input input) {
-        final MessageInput messageInput;
+    private Optional<InputStateSummary> notRunningStateSummary(Input input) {
         try {
-            messageInput = inputService.getMessageInput(input);
+            final MessageInput messageInput = inputService.getMessageInput(input);
+            if (inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
+                return Optional.empty();
+            }
+            return Optional.of(getNotRunningStateSummary(messageInput));
         } catch (NoSuchInputTypeException e) {
             LOG.debug("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
             return Optional.empty();
+        } catch (Exception e) {
+            LOG.warn("Cannot instantiate configured input {}. Not reporting its state.", input.toIdentifier(), e);
+            return Optional.empty();
         }
-        return inputLauncher.leaderStatusInhibitsLaunch(messageInput) ? Optional.empty() : Optional.of(messageInput);
     }
 
     @PUT

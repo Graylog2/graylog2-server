@@ -46,12 +46,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -65,6 +68,7 @@ class InputStatesResourceTest {
     private static final NodeId NODE_ID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     private static final String RUNNING_ID = "000000000000000000000001";
     private static final String STOPPED_ID = "000000000000000000000002";
+    private static final String BROKEN_ID = "000000000000000000000003";
     private static final DateTime CREATED_AT = new DateTime(2026, 1, 1, 0, 0, DateTimeZone.UTC);
 
     @Mock
@@ -89,7 +93,8 @@ class InputStatesResourceTest {
     @BeforeEach
     void setUp() {
         when(messageInputFactory.getAvailableInputs()).thenReturn(Map.of());
-        when(inputRegistry.stream()).thenReturn(Stream.empty());
+        when(inputLauncher.allPersistedLaunched()).thenReturn(true);
+        when(inputRegistry.stream()).thenAnswer(i -> Stream.empty());
         when(inputService.findIdsForThisNodeOrGlobal(NODE_ID.getNodeId()))
                 .thenAnswer(i -> configured.stream().map(Input::getId).collect(Collectors.toSet()));
         when(inputService.findByIds(anySet()))
@@ -115,24 +120,26 @@ class InputStatesResourceTest {
     }
 
     @Test
-    void listReportsRegistryStateOnlyOnceForARunningInput() throws Exception {
-        final MessageInput messageInput = configure(RUNNING_ID);
-        final IOState<MessageInput> state = runningState(messageInput);
-        when(inputRegistry.stream()).thenReturn(Stream.of(state));
+    void listFetchesOnlyTheInputsMissingFromTheRegistry() throws Exception {
+        final MessageInput running = configure(RUNNING_ID);
+        configure(STOPPED_ID);
+        final IOState<MessageInput> state = runningState(running);
+        when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
 
         assertThat(resource.list().states())
-                .singleElement()
-                .satisfies(summary -> {
-                    assertThat(summary.id()).isEqualTo(RUNNING_ID);
-                    assertThat(summary.state()).isEqualTo(IOState.Type.RUNNING.toString());
-                });
+                .extracting(InputStateSummary::id, InputStateSummary::state)
+                .containsExactlyInAnyOrder(
+                        tuple(RUNNING_ID, IOState.Type.RUNNING.toString()),
+                        tuple(STOPPED_ID, IOState.Type.STOPPED.toString()));
+
+        verify(inputService).findByIds(Set.of(STOPPED_ID));
     }
 
     @Test
     void listDoesNotFetchDocumentsWhenEveryConfiguredInputIsRegistered() throws Exception {
         final MessageInput messageInput = configure(RUNNING_ID);
         final IOState<MessageInput> state = runningState(messageInput);
-        when(inputRegistry.stream()).thenReturn(Stream.of(state));
+        when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
 
         resource.list();
 
@@ -145,47 +152,62 @@ class InputStatesResourceTest {
         when(inputLauncher.leaderStatusInhibitsLaunch(messageInput)).thenReturn(true);
 
         assertThat(resource.list().states()).isEmpty();
+
+        verify(inputLauncher).leaderStatusInhibitsLaunch(messageInput);
     }
 
     @Test
-    void getReportsConfiguredInputWithoutRegistryStateAsStopped() throws Exception {
+    void listOmitsConfiguredInputsWhileTheNodeIsStillLaunchingThem() throws Exception {
+        configure(STOPPED_ID);
+        when(inputLauncher.allPersistedLaunched()).thenReturn(false);
+
+        assertThat(resource.list().states()).isEmpty();
+
+        verify(inputService, never()).findIdsForThisNodeOrGlobal(anyString());
+    }
+
+    @Test
+    void listFallsBackToRegistryStateWhenTheInputLookupFails() throws Exception {
+        final MessageInput running = configure(RUNNING_ID);
+        configure(STOPPED_ID);
+        final IOState<MessageInput> state = runningState(running);
+        when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
+        when(inputService.findIdsForThisNodeOrGlobal(NODE_ID.getNodeId()))
+                .thenThrow(new IllegalStateException("MongoDB is unreachable"));
+
+        assertThat(resource.list().states())
+                .extracting(InputStateSummary::id)
+                .containsExactly(RUNNING_ID);
+    }
+
+    @Test
+    void listSkipsAnInputThatCannotBeInstantiatedAndReportsTheRest() throws Exception {
+        configure(STOPPED_ID);
+        configureUninstantiable(BROKEN_ID);
+
+        assertThat(resource.list().states())
+                .extracting(InputStateSummary::id)
+                .containsExactly(STOPPED_ID);
+    }
+
+    @Test
+    void getReturnsTheRegistryStateForARunningInput() throws Exception {
+        final MessageInput messageInput = configure(RUNNING_ID);
+        final IOState<MessageInput> state = runningState(messageInput);
+        when(inputRegistry.getInputState(RUNNING_ID)).thenReturn(state);
+
+        final InputStateSummary summary = resource.get(RUNNING_ID);
+
+        assertThat(summary.id()).isEqualTo(RUNNING_ID);
+        assertThat(summary.state()).isEqualTo(IOState.Type.RUNNING.toString());
+        assertThat(summary.startedAt()).isEqualTo(CREATED_AT);
+    }
+
+    @Test
+    void getFailsForAnInputWithoutRegistryStateOnThisNode() throws Exception {
         configure(STOPPED_ID);
 
-        final InputStateSummary summary = resource.get(STOPPED_ID);
-
-        assertThat(summary.id()).isEqualTo(STOPPED_ID);
-        assertThat(summary.state()).isEqualTo(IOState.Type.STOPPED.toString());
-    }
-
-    @Test
-    void getOmitsLeaderOnlyInputsOnNodesThatMustNotRunThem() throws Exception {
-        final MessageInput messageInput = configure(STOPPED_ID);
-        when(inputLauncher.leaderStatusInhibitsLaunch(messageInput)).thenReturn(true);
-
         assertThatThrownBy(() -> resource.get(STOPPED_ID)).isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void getFailsForAnInputThatIsNotConfiguredOnThisNode() throws Exception {
-        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), STOPPED_ID))
-                .thenThrow(new org.graylog2.database.NotFoundException("nope"));
-
-        assertThatThrownBy(() -> resource.get(STOPPED_ID)).isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void getFailsForAnUnknownInputIdThatTheLookupReportsAsNull() throws Exception {
-        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), STOPPED_ID)).thenReturn(null);
-
-        assertThatThrownBy(() -> resource.get(STOPPED_ID)).isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void getFailsForAMalformedInputId() throws Exception {
-        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), "not-an-object-id"))
-                .thenThrow(new IllegalArgumentException("invalid ObjectId"));
-
-        assertThatThrownBy(() -> resource.get("not-an-object-id")).isInstanceOf(NotFoundException.class);
     }
 
     private IOState<MessageInput> runningState(MessageInput input) {
@@ -212,9 +234,15 @@ class InputStatesResourceTest {
         when(messageInput.getStaticFields()).thenReturn(Map.of());
 
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
-        when(inputService.findForThisNodeOrGlobal(NODE_ID.getNodeId(), id)).thenReturn(input);
         configured.add(input);
 
         return messageInput;
+    }
+
+    private void configureUninstantiable(String id) throws Exception {
+        final Input input = mock(Input.class);
+        when(input.getId()).thenReturn(id);
+        when(inputService.getMessageInput(input)).thenThrow(new IllegalArgumentException("broken configuration"));
+        configured.add(input);
     }
 }

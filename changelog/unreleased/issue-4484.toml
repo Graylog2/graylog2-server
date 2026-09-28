@@ -1,4 +1,5 @@
 type = "fixed"
-message = "Include inputs that are configured on a node but not running in the input state API responses."
+message = "Report inputs that are configured on a node but not running in `/system/inputstates` and `/cluster/inputstates`. Such inputs are now shown as stopped on the Inputs page instead of having no state at all."
 
 issues = ["4484"]
+pulls = ["27539"]
