@@ -242,6 +242,17 @@ class InputStatesResourceTest {
     }
 
     @Test
+    void listSkipsAnInputWhoseSummaryCannotBeBuiltAndReportsTheRest() throws Exception {
+        configure(STOPPED_ID);
+        final Input broken = configure(BROKEN_ID);
+        when(broken.getCreatedAt()).thenThrow(new IllegalStateException("corrupt input document"));
+
+        assertThat(resource.list().states())
+                .extracting(InputStateSummary::id)
+                .containsExactly(STOPPED_ID);
+    }
+
+    @Test
     void getReturnsTheRegistryStateForARunningInput() throws Exception {
         final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.getInputState(RUNNING_ID)).thenReturn(state);

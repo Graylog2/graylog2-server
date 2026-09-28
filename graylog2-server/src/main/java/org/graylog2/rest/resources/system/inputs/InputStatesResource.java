@@ -161,7 +161,12 @@ public class InputStatesResource extends AbstractInputsResource {
 
             final Set<InputStateSummary> result = new HashSet<>();
             for (Input input : inputService.findByIds(notRegistered)) {
-                notRunningStateSummary(input).ifPresent(result::add);
+                try {
+                    notRunningStateSummary(input).ifPresent(result::add);
+                } catch (Exception e) {
+                    RATE_LIMITED_LOG.warn("Cannot determine the state of input {}. Not reporting it.",
+                            input.toIdentifier(), e);
+                }
             }
             return result;
         } catch (Exception e) {
@@ -179,10 +184,6 @@ public class InputStatesResource extends AbstractInputsResource {
         } catch (NoSuchInputTypeException e) {
             // Already reported at WARN per input by PersistedInputsImpl and InputEventListener.
             LOG.debug("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
-            return Optional.empty();
-        } catch (Exception e) {
-            RATE_LIMITED_LOG.warn("Cannot determine whether input {} may run on this node. Not reporting its state.",
-                    input.toIdentifier(), e);
             return Optional.empty();
         }
 
