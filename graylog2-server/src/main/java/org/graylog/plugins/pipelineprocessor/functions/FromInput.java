@@ -61,7 +61,6 @@ public class FromInput extends AbstractFunction<Boolean> {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
                     inputs.add(messageInput);
-                    break;
                 }
             }
             if (inputs.isEmpty() && "".equals(name)) {
