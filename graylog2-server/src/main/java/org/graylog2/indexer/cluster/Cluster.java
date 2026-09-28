@@ -73,6 +73,10 @@ public class Cluster {
         return clusterAdapter.health();
     }
 
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterAdapter.health(timeout);
+    }
+
     /**
      * Requests the cluster health for the current write index. (deflector)
      *

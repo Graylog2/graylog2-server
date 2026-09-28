@@ -1,0 +1,4 @@
+type = "a"
+message = "Add an `Exclude empty fields` option to templated event definition fields."
+
+issues = ["25150"]

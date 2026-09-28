@@ -74,10 +74,10 @@ public class GrokExists extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(patternParam, doLog))
-                .description("Checks if the given Grok pattern exists in Graylog.")
+                .description("Checks if the given Grok pattern exists.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Check for grok pattern")
-                .ruleBuilderTitle("Check if grok pattern named '${pattern}' exists in Graylog")
+                .ruleBuilderTitle("Check if grok pattern named '${pattern}' exists")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.PATTERN)
                 .build();
     }

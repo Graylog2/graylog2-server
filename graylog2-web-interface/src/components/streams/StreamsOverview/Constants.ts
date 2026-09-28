@@ -59,6 +59,8 @@ const getStreamTableElements = (
     'throughput',
   ];
 
+  const defaultColsWithoutDescription = defaultCols.filter((id) => id !== 'description');
+
   const routingCols = [
     METRIC_COLUMN_IDS.associatedInputs,
     ...(isPipelineColumnPermitted ? [METRIC_COLUMN_IDS.routingPipelines] : []),
@@ -86,14 +88,14 @@ const getStreamTableElements = (
     ...SHARED_LAYOUT,
     layoutVariant: STREAM_VIEW_VARIANTS.routing,
     defaultColumnOrder,
-    defaultDisplayedAttributes: [...defaultCols, ...routingCols],
+    defaultDisplayedAttributes: [...defaultColsWithoutDescription, ...routingCols],
   };
 
   const performanceVariantLayout = {
     ...SHARED_LAYOUT,
     layoutVariant: STREAM_VIEW_VARIANTS.performance,
     defaultColumnOrder,
-    defaultDisplayedAttributes: [...defaultCols, ...performanceCols],
+    defaultDisplayedAttributes: [...defaultColsWithoutDescription, ...performanceCols],
   };
 
   const additionalAttributes: Array<Attribute> = [
