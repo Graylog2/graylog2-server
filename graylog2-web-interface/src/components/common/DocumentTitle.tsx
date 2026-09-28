@@ -24,9 +24,13 @@ type Props = {
   children: React.ReactNode;
 };
 
+let titleOwner: symbol | null = null;
+
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
- * resets the title to the default (`Graylog`).
+ * resets the title to the default (`Graylog`), unless another instance has taken over the title in the
+ * meantime. During a route change React may mount the incoming page before unmounting the outgoing one, so
+ * the outgoing cleanup must not clobber a title it no longer owns.
  *
  * Example:
  *
@@ -40,10 +44,15 @@ const DocumentTitle = ({ children, title }: Props) => {
   const productName = useProductName();
 
   useEffect(() => {
-    document.title = `${document.title} - ${title}`;
+    const owner = Symbol('document-title');
+    titleOwner = owner;
+    document.title = `${productName} - ${title}`;
 
     return () => {
-      document.title = productName;
+      if (titleOwner === owner) {
+        titleOwner = null;
+        document.title = productName;
+      }
     };
   }, [productName, title]);
 
