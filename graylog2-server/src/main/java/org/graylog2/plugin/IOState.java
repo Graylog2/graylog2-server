@@ -42,7 +42,7 @@ public class IOState<T extends Stoppable> {
      * <p>
      * Not to be confused with the <em>desired</em> state of an input ({@code MessageInput#getDesiredState()}), which
      * is persisted with the input definition and can only be {@link #RUNNING}, {@link #STOPPED} or {@link #SETUP}. The
-     * desired state expresses what the user wants; this type describes what the node actually does.
+     * desired state expresses what the user wants; this type describes what the input actually does.
      * <p>
      * Typical lifecycle:
      * <pre>
@@ -65,8 +65,8 @@ public class IOState<T extends Stoppable> {
      *     {@link #FAILED}.</li>
      *     <li>While running, the input itself can report recoverable problems via {@code InputFailureRecorder},
      *     toggling between {@link #RUNNING} and {@link #FAILING}.</li>
-     *     <li>Stopping moves through {@link #STOPPING} to {@link #STOPPED}; a stopped input stays in the registry so it
-     *     remains visible. Removing the input (deletion, update, or switching to setup mode) ends in
+     *     <li>Stopping moves through {@link #STOPPING} to {@link #STOPPED}; Removing the input (stopping, deletion, update,
+     *     or switching to setup mode) ends in
      *     {@link #TERMINATED}, after which the {@code IOState} is dropped from the registry and its persisted runtime
      *     state is deleted.</li>
      * </ol>
@@ -100,8 +100,7 @@ public class IOState<T extends Stoppable> {
         /** The input is being stopped ({@code MessageInput#stop} is in progress). */
         STOPPING,
         /**
-         * The input has been stopped and does not accept messages, but is still registered so it remains visible and
-         * can be restarted. Also a valid desired state, for inputs deliberately stopped by the user.
+         * The input has been stopped and does not accept messages.
          */
         STOPPED,
         /**
