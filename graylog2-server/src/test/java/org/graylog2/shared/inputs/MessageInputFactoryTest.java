@@ -25,10 +25,16 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -51,7 +57,7 @@ class MessageInputFactoryTest {
     }
 
     @Test
-    void answersEachTypeFromItsOwnInput() throws Exception {
+    void cachesEachTypeSeparately() throws Exception {
         final MessageInput.Factory<MessageInput> factory = factoryFor(true);
         final MessageInput.Factory<MessageInput> otherFactory = factoryFor(false);
         final MessageInputFactory messageInputFactory =
@@ -59,16 +65,44 @@ class MessageInputFactoryTest {
 
         assertThat(messageInputFactory.onlyOnePerCluster(TYPE, new Configuration(Map.of()))).isTrue();
         assertThat(messageInputFactory.onlyOnePerCluster(OTHER_TYPE, new Configuration(Map.of()))).isFalse();
+        assertThat(messageInputFactory.onlyOnePerCluster(TYPE, new Configuration(Map.of()))).isTrue();
+
+        verify(factory, times(1)).create(any());
+        verify(otherFactory, times(1)).create(any());
     }
 
     @Test
-    void doesNotCacheAnAnswerForAnUnknownType() {
-        final MessageInputFactory messageInputFactory = messageInputFactory(Map.of());
+    void instantiatesOnceWhenSeveralThreadsAskForTheSameTypeAtOnce() throws Exception {
+        final int threads = 8;
+        final CountDownLatch start = new CountDownLatch(1);
+        final MessageInput messageInput = mock(MessageInput.class);
+        when(messageInput.onlyOnePerCluster()).thenReturn(true);
+        @SuppressWarnings("unchecked")
+        final MessageInput.Factory<MessageInput> factory = mock(MessageInput.Factory.class);
+        when(factory.create(any())).thenAnswer(i -> {
+            Thread.sleep(50);
+            return messageInput;
+        });
+        final MessageInputFactory messageInputFactory = messageInputFactory(Map.of(TYPE, factory));
 
-        assertThatThrownBy(() -> messageInputFactory.onlyOnePerCluster(TYPE, new Configuration(Map.of())))
-                .isInstanceOf(NoSuchInputTypeException.class);
-        assertThatThrownBy(() -> messageInputFactory.onlyOnePerCluster(TYPE, new Configuration(Map.of())))
-                .isInstanceOf(NoSuchInputTypeException.class);
+        final ExecutorService pool = Executors.newFixedThreadPool(threads);
+        try {
+            final List<Future<Boolean>> results = new ArrayList<>();
+            for (int i = 0; i < threads; i++) {
+                results.add(pool.submit(() -> {
+                    start.await();
+                    return messageInputFactory.onlyOnePerCluster(TYPE, new Configuration(Map.of()));
+                }));
+            }
+            start.countDown();
+            for (Future<Boolean> result : results) {
+                assertThat(result.get(10, TimeUnit.SECONDS)).isTrue();
+            }
+        } finally {
+            pool.shutdownNow();
+        }
+
+        verify(factory, times(1)).create(any());
     }
 
     /**

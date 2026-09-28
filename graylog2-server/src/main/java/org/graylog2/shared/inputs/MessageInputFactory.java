@@ -103,9 +103,17 @@ public class MessageInputFactory {
         if (known != null) {
             return known;
         }
-        final boolean value = create(type, configuration).onlyOnePerCluster();
-        onlyOnePerClusterByType.put(type, value);
-        return value;
+        // Serialised because create() is not free: it builds the transport, which for Netty inputs schedules a
+        // throughput counter that nothing releases.
+        synchronized (onlyOnePerClusterByType) {
+            final Boolean cached = onlyOnePerClusterByType.get(type);
+            if (cached != null) {
+                return cached;
+            }
+            final boolean value = create(type, configuration).onlyOnePerCluster();
+            onlyOnePerClusterByType.put(type, value);
+            return value;
+        }
     }
 
     public Optional<MessageInput.Config> getConfig(String type) {
