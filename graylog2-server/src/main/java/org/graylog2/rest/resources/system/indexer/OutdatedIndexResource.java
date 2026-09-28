@@ -97,7 +97,7 @@ public class OutdatedIndexResource extends RestResource {
 
     private static Set<FilterOption> categoryFilterOptions() {
         return Set.of(
-                FilterOption.create(OutdatedIndex.CATEGORY_GRAYLOG, "Graylog"),
+                FilterOption.create(OutdatedIndex.CATEGORY_GRAYLOG, "Managed"),
                 FilterOption.create(OutdatedIndex.CATEGORY_SYSTEM, "System"),
                 FilterOption.create(OutdatedIndex.CATEGORY_FOREIGN, "Foreign"),
                 FilterOption.create(OutdatedIndex.CATEGORY_WARM, "Warm")
@@ -221,7 +221,7 @@ public class OutdatedIndexResource extends RestResource {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(i -> !i.managedIndex())
                 .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is a managed index"));
         outdatedIndexService.delete(outdatedIndex.indexName());
     }
 

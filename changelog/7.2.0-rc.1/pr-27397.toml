@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Rename the Event Definitions type filter to \"Event Definition Type\" and include the System Event Definition type as a filter option."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14755"]
+pulls = ["27397"]

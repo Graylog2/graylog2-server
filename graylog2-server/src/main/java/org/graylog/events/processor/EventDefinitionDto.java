@@ -31,6 +31,7 @@ import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.context.EventDefinitionContextService;
+import org.graylog.events.fields.EventFieldNames;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -334,11 +335,14 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
         abstract ImmutableList<String> tacticsTechniques();
 
+        abstract ImmutableMap<String, EventFieldSpec> fieldSpec();
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
             tags(TagNormalizer.normalize(tags()));
             tacticsTechniques(TacticsTechniquesNormalizer.normalize(tacticsTechniques()));
+            fieldSpec(EventFieldNames.sorted(fieldSpec()));
             final EventDefinitionDto dto = autoBuild();
             final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
             if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
