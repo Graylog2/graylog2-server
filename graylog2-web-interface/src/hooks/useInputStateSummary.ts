@@ -18,13 +18,15 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemInputStates } from '@graylog/server-api';
 
+import type { RequestOptions } from 'routing/request';
 import { defaultOnError } from 'util/conditional/onError';
 
 type StateSummary = { [inputId: string]: Array<string> };
 
 const PROBLEMATIC_STATES = new Set(['FAILED', 'FAILING', 'SETUP']);
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 
-const fetchStateSummary = (): Promise<StateSummary> => SystemInputStates.summary();
+const fetchStateSummary = (): Promise<StateSummary> => SystemInputStates.summary(NO_SESSION_EXT);
 
 const useInputStateSummary = (): { hasProblematicInputs: boolean; isLoading: boolean } => {
   const { data, isLoading } = useQuery<StateSummary>({
