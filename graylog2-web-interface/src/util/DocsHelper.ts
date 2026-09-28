@@ -29,6 +29,7 @@ const defaultPages = {
   CHANGELOG: 'changelogs/changelog.html',
   CLUSTER_STATUS_EXPLAINED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
   COLLECTOR: 'getting_in_log_data/graylog_sidecar.html',
+  COLLECTORS: 'getting_in_log_data/collectors.htm',
   COLLECTOR_SIDECAR: 'getting_in_log_data/graylog_sidecar.html',
   COLLECTOR_STATUS: 'getting_in_log_data/getting_started_with_graylog_sidecar.htm#ViewSidecarStatus',
   CONFIGURING_ES: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
@@ -75,9 +76,12 @@ const defaultPages = {
   USERS_ROLES: 'setting_up_graylog/users_teams.htm',
   DATA_LAKE: 'setting_up_graylog/data_lake.htm',
   DATA_LAKE_PREVIEW: 'setting_up_graylog/data_lake_preview.htm',
+  DATA_NODE_MIGRATION: 'planning_your_deployment/data_node_in-place_migration.htm',
   WELCOME: '', // Welcome page to the documentation
   DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
   DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
+  DATA_TIERING_WARM_TIER_OPENSEARCH: 'setting_up_graylog/create_warm_tier_on_self-managed_opensearch.htm',
+  DATA_TIERING_WARM_TIER_DATA_NODE: 'setting_up_graylog/create_warm_tier_on_data_node.htm',
   SERVER_UNAVAILABLE: 'https://www.graylog.org/community-support',
   MCP_SERVER: 'setting_up_graylog/model_context_protocol__mcp__tools.htm',
 } as const;

@@ -1,0 +1,5 @@
+type = "f"
+message = "Display a 404 page instead of loading indefinitely when the event definition edit page is opened by a user without edit permission."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15406"]
+pulls = ["27360"]

@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.events;
 
-public record CollectorCaConfigUpdated() {
-}
+import AppConfig from 'util/AppConfig';
+
+const useOnboardingCustomization = () => ({
+  isResourceSectionEnabledForBrand: AppConfig?.branding?.()?.onboarding?.resources?.enabled !== false,
+});
+
+export default useOnboardingCustomization;

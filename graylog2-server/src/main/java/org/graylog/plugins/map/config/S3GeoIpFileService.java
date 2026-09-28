@@ -36,8 +36,9 @@ import java.util.Optional;
  * The files will initially be downloaded to a temporary location on disk, then they will be validated by the
  * {@link org.graylog2.rest.resources.system.GeoIpResolverConfigValidator}, and after successful validation they will
  * be moved to the active location so that the Geo Location Processor can read them. The on-disk directory location
- * for downloaded files is S3_DOWNLOAD_LOCATION in {@link GeoIpProcessorConfig}. The file names are hardcoded to ensure
- * that the proper files are always left active.
+ * for downloaded files is S3_DOWNLOAD_LOCATION in {@link GeoIpProcessorConfig}. The active file names are hardcoded to
+ * ensure that the proper files are always left active; the temporary names are unique per download attempt so that
+ * concurrent attempts cannot clobber each other.
  *
  * This service is called from two places:
  * - {@link org.graylog2.rest.resources.system.GeoIpResolverConfigValidator} will download new files when the Geo

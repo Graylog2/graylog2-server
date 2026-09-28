@@ -39,7 +39,6 @@ import org.slf4j.event.Level;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Supplier;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -49,15 +48,15 @@ public class OpAmpHttpHandler extends HttpHandler {
     private static final String CONTENT_TYPE_PROTOBUF = "application/x-protobuf";
 
     private final OpAmpService opAmpService;
+    private final CollectorsConfigService collectorsConfigService;
     private final ExecutorService executor;
-    private final Supplier<Integer> maxMessageSizeSupplier;
 
     @Inject
     public OpAmpHttpHandler(OpAmpService opAmpService,
                             CollectorsConfigService collectorsConfigService,
                             @OpAmpExecutor ExecutorService executor) {
         this.opAmpService = opAmpService;
-        this.maxMessageSizeSupplier = collectorsConfigService::getOpampMaxRequestBodySizeBytes;
+        this.collectorsConfigService = collectorsConfigService;
         this.executor = executor;
     }
 
@@ -88,7 +87,7 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
-        final int maxMessageSize = maxMessageSizeSupplier.get();
+        final int maxMessageSize = collectorsConfigService.getOrDefault().opampMaxRequestBodySizeBytes();
         final int contentLength = request.getContentLength();
         if (contentLength > maxMessageSize) {
             LOG.warn("OpAMP request Content-Length {} exceeds maximum {}", contentLength, maxMessageSize);

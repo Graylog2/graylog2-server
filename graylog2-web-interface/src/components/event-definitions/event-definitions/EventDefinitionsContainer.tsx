@@ -27,6 +27,7 @@ import BulkActions from 'components/event-definitions/event-definitions/BulkActi
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
+import PriorityName from 'components/events/events/PriorityName';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
@@ -72,6 +73,7 @@ const getCustomColumnRenderers = (
       minWidth: 150,
     },
     priority: {
+      renderCell: (priority: number) => <PriorityName priority={priority} />,
       staticWidth: 'matchHeader' as const,
     },
     notifications: {

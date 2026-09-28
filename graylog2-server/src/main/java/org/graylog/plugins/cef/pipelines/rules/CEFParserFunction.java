@@ -18,9 +18,8 @@ package org.graylog.plugins.cef.pipelines.rules;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.github.jcustenborder.cef.CEFParser;
-import com.github.jcustenborder.cef.CEFParserFactory;
 import com.google.common.annotations.VisibleForTesting;
+import org.graylog.plugins.cef.parser.CEFParser;
 import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -61,7 +60,7 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
         final String cef = valueParam.required(args, context);
         final boolean useFullNames = useFullNamesParam.optional(args, context).orElse(false);
 
-        final CEFParser parser = CEFParserFactory.create();
+        final CEFParser parser = new CEFParser();
         if (cef == null || cef.isEmpty()) {
             LOG.debug("NULL or empty parameter passed to CEF parser function. Not evaluating.");
             return null;
