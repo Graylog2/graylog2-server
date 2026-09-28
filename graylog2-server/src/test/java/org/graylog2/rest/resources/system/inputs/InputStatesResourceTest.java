@@ -43,13 +43,18 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,7 +90,12 @@ class InputStatesResourceTest {
     void setUp() {
         when(messageInputFactory.getAvailableInputs()).thenReturn(Map.of());
         when(inputRegistry.stream()).thenReturn(Stream.empty());
-        when(inputService.allOfThisNode(NODE_ID.getNodeId())).thenReturn(configured);
+        when(inputService.findIdsForThisNodeOrGlobal(NODE_ID.getNodeId()))
+                .thenAnswer(i -> configured.stream().map(Input::getId).collect(Collectors.toSet()));
+        when(inputService.findByIds(anySet()))
+                .thenAnswer(i -> configured.stream()
+                        .filter(in -> ((Collection<String>) i.getArgument(0)).contains(in.getId()))
+                        .collect(Collectors.toSet()));
 
         resource = new InputStatesResource(inputRegistry, mock(EventBus.class), inputService, messageInputFactory,
                 inputStateService, inputLauncher, NODE_ID);
@@ -116,6 +126,17 @@ class InputStatesResourceTest {
                     assertThat(summary.id()).isEqualTo(RUNNING_ID);
                     assertThat(summary.state()).isEqualTo(IOState.Type.RUNNING.toString());
                 });
+    }
+
+    @Test
+    void listDoesNotFetchDocumentsWhenEveryConfiguredInputIsRegistered() throws Exception {
+        final MessageInput messageInput = configure(RUNNING_ID);
+        final IOState<MessageInput> state = runningState(messageInput);
+        when(inputRegistry.stream()).thenReturn(Stream.of(state));
+
+        resource.list();
+
+        verify(inputService, never()).findByIds(anySet());
     }
 
     @Test

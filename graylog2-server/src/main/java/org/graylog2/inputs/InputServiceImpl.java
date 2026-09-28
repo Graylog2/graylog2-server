@@ -752,6 +752,17 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
+    public Set<String> findIdsForThisNodeOrGlobal(String nodeId) {
+        final Set<String> result = new HashSet<>();
+        documentCollection.find(or(
+                        eq(MessageInput.FIELD_NODE_ID, nodeId),
+                        eq(MessageInput.FIELD_GLOBAL, true)))
+                .projection(Projections.include("_id"))
+                .forEach(doc -> result.add(doc.getObjectId("_id").toHexString()));
+        return result;
+    }
+
+    @Override
     public Set<String> findIdsByDesiredState(IOState.Type desiredState) {
         final Set<String> result = new HashSet<>();
         documentCollection.find(eq(InputImpl.FIELD_DESIRED_STATE, desiredState.toString()))

@@ -64,6 +64,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Tag(name = "System/InputStates", description = "Message input states of this node")
@@ -109,11 +110,16 @@ public class InputStatesResource extends AbstractInputsResource {
                     result.add(getInputStateSummary(inputState));
                 });
 
-        for (Input input : inputService.allOfThisNode(nodeId.getNodeId())) {
-            if (registered.contains(input.getId()) || !isPermitted(RestPermissions.INPUTS_READ, input.getId())) {
-                continue;
+        final Set<String> notRegistered = inputService.findIdsForThisNodeOrGlobal(nodeId.getNodeId()).stream()
+                .filter(inputId -> !registered.contains(inputId))
+                .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
+                .collect(Collectors.toSet());
+
+        if (!notRegistered.isEmpty()) {
+            for (Input input : inputService.findByIds(notRegistered)) {
+                notRunningOnThisNode(input)
+                        .ifPresent(messageInput -> result.add(getNotRunningStateSummary(messageInput)));
             }
-            notRunningOnThisNode(input).ifPresent(messageInput -> result.add(getNotRunningStateSummary(messageInput)));
         }
 
         return InputStatesList.create(result);
