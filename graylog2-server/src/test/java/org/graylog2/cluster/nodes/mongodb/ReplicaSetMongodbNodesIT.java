@@ -21,19 +21,19 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.mongodb.MongoDBKernelWorkaround;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.DockerClientFactory;
-import org.testcontainers.mongodb.MongoDBContainer;
+import org.testcontainers.containers.Network;
 
 import java.util.List;
 
 class ReplicaSetMongodbNodesIT {
 
+    private Network network;
     private MongoDBContainer mongoDBContainer;
     private ReplicaSetMongodbNodes replicaSetNodes;
 
@@ -41,9 +41,8 @@ class ReplicaSetMongodbNodesIT {
 
     @BeforeEach
     void setUp() {
-        final var image = "mongo:" + MongoDBVersion.DEFAULT.version();
-        mongoDBContainer = MongoDBKernelWorkaround.applyIfNeeded(
-                new MongoDBContainer(image).withReplicaSet(), image);
+        network = Network.newNetwork();
+        mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, network).withReplicaSet();
         mongoDBContainer.start();
         final MongoConnection mongoConnection = createMongoConnection();
         this.dockerMongodbConnectionResolver = new DockerMongodbConnectionResolver(mongoDBContainer);
@@ -54,6 +53,7 @@ class ReplicaSetMongodbNodesIT {
     void tearDown() {
         dockerMongodbConnectionResolver.close();
         mongoDBContainer.stop();
+        network.close();
     }
 
 

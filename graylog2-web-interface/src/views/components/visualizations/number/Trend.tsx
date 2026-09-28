@@ -24,15 +24,37 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
 import { formatTrend } from 'util/NumberFormatting';
 
-import { diff } from './trendDirection';
+import { diff, trendBackground } from './trendDirection';
+import type { TrendDirection } from './trendDirection';
 
-const TextContainer = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.xxs};
+const Background = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
+
+  return css`
+    width: 100%;
+    ${$trend &&
+    css`
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
+
+const TextContainer = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
+
+  return css`
+    padding: ${theme.spacings.xxs};
     text-align: right;
     font-family: ${theme.fonts.family.body};
-  `,
-);
+    ${$trend &&
+    css`
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
 
 const _trendIcon = (delta: number) =>
   // eslint-disable-next-line no-nested-ternary
@@ -77,9 +99,13 @@ type Props = {
   current: number;
   previous: number | undefined | null;
   unit?: FieldUnit;
+  trend?: TrendDirection;
 };
 
-const Trend = ({ current, previous, unit = undefined }: Props, ref: React.ForwardedRef<HTMLDivElement>) => {
+const Trend = (
+  { current, previous, unit = undefined, trend = undefined }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
   const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(
     current,
     previous,
@@ -96,15 +122,17 @@ const Trend = ({ current, previous, unit = undefined }: Props, ref: React.Forwar
     : '--';
 
   return (
-    <TextContainer ref={ref}>
-      <Icon name={trendIcon} data-testid="trend-icon" />{' '}
-      <span
-        data-testid="trend-value"
-        aria-label={`Trend: ${absoluteDifference} (${relativeDifference}) compared to previous value of ${previousConverted}`}
-        title={`Previous value: ${previousConverted}`}>
-        {absoluteDifference} / {relativeDifference}
-      </span>
-    </TextContainer>
+    <Background $trend={trend} data-testid="trend-info-background">
+      <TextContainer $trend={trend} ref={ref}>
+        <Icon name={trendIcon} data-testid="trend-icon" />{' '}
+        <span
+          data-testid="trend-value"
+          aria-label={`Trend: ${absoluteDifference} (${relativeDifference}) compared to previous value of ${previousConverted}`}
+          title={`Previous value: ${previousConverted}`}>
+          {absoluteDifference} / {relativeDifference}
+        </span>
+      </TextContainer>
+    </Background>
   );
 };
 
