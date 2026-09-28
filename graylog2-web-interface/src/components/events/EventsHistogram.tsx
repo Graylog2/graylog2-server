@@ -38,7 +38,7 @@ import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
-  .visualization('line')
+  .visualization('area')
   .rowPivots([Pivot.create(['timestamp'], DateType)])
   .columnPivots([Pivot.createValues(['type'])])
   .series([Series.forFunction('count()')])
@@ -69,6 +69,7 @@ const generateChart = (
     name: type,
     x,
     y,
+    fill: 'tozeroy',
     originalName: type,
     line: {
       shape: 'linear',

@@ -1,0 +1,5 @@
+type = "f"
+message = "Add OpenSearch upgrade warning for incompatible indices"
+
+issues = ["Graylog2/graylog-plugin-enterprise#15735"]
+pulls = ["27496"]

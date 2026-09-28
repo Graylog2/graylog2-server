@@ -60,11 +60,13 @@ public class FleetService {
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
     private final EnrollmentTokenService enrollmentTokenService;
+    private final CollectorInstanceService instanceService;
     private final com.mongodb.client.MongoCollection<Document> nonEntityCollection;
 
     @Inject
     public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService,
-                        SourceService sourceService, EnrollmentTokenService enrollmentTokenService) {
+                        SourceService sourceService, EnrollmentTokenService enrollmentTokenService,
+                        CollectorInstanceService instanceService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, FleetDTO.class);
         this.nonEntityCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
@@ -72,6 +74,7 @@ public class FleetService {
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
         this.enrollmentTokenService = enrollmentTokenService;
+        this.instanceService = instanceService;
     }
 
     public SearchQuery parseSearchQuery(String query) {
@@ -125,6 +128,19 @@ public class FleetService {
             collection.replaceOne(idEq(fleetId), updated);
             return updated;
         });
+    }
+
+    /**
+     * The number of instances assigned to each fleet, including pending reassignments into it and
+     * excluding pending reassignments away from it. A fleet with assigned instances must not be
+     * deleted, since those instances would be left pointing to a fleet that no longer exists.
+     */
+    public Map<String, Long> countAssignedInstancesByFleet() {
+        return instanceService.countAssignedByFleet(txnLogService.pendingReassignments());
+    }
+
+    public long countAssignedInstances(String fleetId) {
+        return countAssignedInstancesByFleet().getOrDefault(fleetId, 0L);
     }
 
     public boolean delete(String fleetId) {

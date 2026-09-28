@@ -41,12 +41,20 @@ const EditEventDefinitionPage = () => {
   const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
 
+  const canEdit = isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`);
+
   const goToOverview = useCallback(() => {
     history.push(Routes.ALERTS.DEFINITIONS.LIST);
   }, [history]);
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
+    if (!canEdit) {
+      history.push(Routes.NOTFOUND);
+    }
+  }, [canEdit, history]);
+
+  useEffect(() => {
+    if (canEdit) {
       getEventDefinition(params.definitionId).then(
         (response) => {
           const eventDefinitionResponse = response.eventDefinition;
@@ -63,17 +71,13 @@ const EditEventDefinitionPage = () => {
         },
       );
     }
-  }, [params, currentUser, history]);
+  }, [canEdit, params.definitionId, history]);
 
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
     return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
   };
-
-  if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-    history.push(Routes.NOTFOUND);
-  }
 
   const missingStreams = streamsWithMissingPermissions();
 

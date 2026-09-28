@@ -19,10 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import TagsDetailRow from 'components/events/TagsDetailRow';
 
-jest.mock('components/common/EntityFilters/hooks/useUrlQueryFilters', () => () => [
-  { get: () => [] },
-  jest.fn(),
-]);
+jest.mock('components/common/EntityFilters/hooks/useUrlQueryFilters', () => () => [{ get: () => [] }, jest.fn()]);
 
 describe('TagsDetailRow', () => {
   it('renders nothing when there are no tags', () => {
