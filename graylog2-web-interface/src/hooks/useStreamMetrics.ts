@@ -55,7 +55,7 @@ export const fetchStreamMetrics = (
   streamIds: Array<string>,
   fields: Array<StreamMetricField | string>,
 ): Promise<StreamMetricsResponse> =>
-  StreamsMetrics.getMetrics({ stream_ids: streamIds, fields }) as Promise<StreamMetricsResponse>;
+  StreamsMetrics.getMetrics({ stream_ids: streamIds, fields }, { requestShouldExtendSession: false });
 
 const sortedUnique = <T extends string>(values: Array<T>): Array<T> => Array.from(new Set(values)).sort();
 

@@ -35,6 +35,9 @@ import org.graylog2.metrics.entity.EntityMetricsResponse;
 import org.graylog2.metrics.entity.EntityMetricsService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Set;
@@ -54,15 +57,15 @@ public class StreamMetricsResource extends RestResource {
         this.metricsService = metricsService;
     }
 
-    public record GetMetricsRequest(@JsonProperty("stream_ids") List<String> streamIds,
-                                    @JsonProperty("fields") List<String> fields) {}
+    public record GetMetricsRequest(@JsonProperty("stream_ids") @NotNull List<@NotBlank String> streamIds,
+                                    @JsonProperty("fields") @NotNull List<@NotBlank String> fields) {}
 
     @POST
     @Operation(summary = "Get metrics for multiple streams")
     @NoAuditEvent("No data is changed.")
     @Consumes(MediaType.APPLICATION_JSON)
     public EntityMetricsResponse getMetrics(
-            @RequestBody(required = true) GetMetricsRequest request,
+            @RequestBody(required = true) @Valid @NotNull GetMetricsRequest request,
             @Context SearchUser searchUser) {
 
         request.streamIds().forEach(streamId -> checkPermission(RestPermissions.STREAMS_READ, streamId));
