@@ -312,7 +312,7 @@ public class InputServiceImpl implements InputService {
         final Bson forThisNodeOrGlobal = or(eq(MessageInput.FIELD_NODE_ID, nodeId), eq(MessageInput.FIELD_GLOBAL, true));
         final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal);
 
-        return collection.find(query).first();
+        return withEncryptedFields(collection.find(query).first());
     }
 
     @Override
