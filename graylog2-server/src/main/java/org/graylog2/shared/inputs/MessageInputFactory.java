@@ -18,6 +18,7 @@ package org.graylog2.shared.inputs;
 
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
@@ -30,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Singleton
 public class MessageInputFactory {
     private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
