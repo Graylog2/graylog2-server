@@ -35,6 +35,7 @@ import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -150,8 +151,22 @@ class InputStatesResourceTest {
                     assertThat(summary.messageInput().name()).isEqualTo("Fake Input");
                     assertThat(summary.messageInput().type()).isEqualTo(TYPE);
                     assertThat(summary.messageInput().global()).isTrue();
-                    assertThat(summary.messageInput().node()).isEqualTo(NODE_ID.getNodeId());
+                    assertThat(summary.messageInput().node()).isNull();
                     assertThat(summary.messageInput().attributes()).containsEntry("password", "<password set>");
+                });
+    }
+
+    @Test
+    void listReportsTheOwningNodeForAnInputThatIsNotGlobal() throws Exception {
+        final Input input = configure(STOPPED_ID);
+        when(input.isGlobal()).thenReturn(false);
+        when(input.getNodeId()).thenReturn(NODE_ID.getNodeId());
+
+        assertThat(resource.list().states())
+                .singleElement()
+                .satisfies(summary -> {
+                    assertThat(summary.messageInput().global()).isFalse();
+                    assertThat(summary.messageInput().node()).isEqualTo(NODE_ID.getNodeId());
                 });
     }
 
@@ -228,6 +243,16 @@ class InputStatesResourceTest {
     }
 
     @Test
+    void listSkipsAnInputWhoseTypeIsNotInstalledOnThisNodeAndReportsTheRest() throws Exception {
+        configure(STOPPED_ID);
+        configureWithUninstalledType(BROKEN_ID);
+
+        assertThat(resource.list().states())
+                .extracting(InputStateSummary::id)
+                .containsExactly(STOPPED_ID);
+    }
+
+    @Test
     void getReturnsTheRegistryStateForARunningInput() throws Exception {
         final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.getInputState(RUNNING_ID)).thenReturn(state);
@@ -263,7 +288,8 @@ class InputStatesResourceTest {
         when(input.getCreatorUserId()).thenReturn("admin");
         when(input.getCreatedAt()).thenReturn(CREATED_AT);
         when(input.isGlobal()).thenReturn(true);
-        when(input.getNodeId()).thenReturn(NODE_ID.getNodeId());
+        // A global input carries no node id; it is stored without the field.
+        when(input.getNodeId()).thenReturn(null);
         when(input.getConfiguration()).thenReturn(Map.of("password", "hunter2"));
         when(input.getStaticFields()).thenReturn(Map.of());
 
@@ -280,6 +306,16 @@ class InputStatesResourceTest {
         when(input.getConfiguration()).thenReturn(Map.of());
         when(messageInputFactory.onlyOnePerCluster(eq(BROKEN_TYPE), any()))
                 .thenThrow(new IllegalArgumentException("broken configuration"));
+        configured.add(input);
+    }
+
+    private void configureWithUninstalledType(String id) throws Exception {
+        final Input input = mock(Input.class);
+        when(input.getId()).thenReturn(id);
+        when(input.getType()).thenReturn(BROKEN_TYPE);
+        when(input.getConfiguration()).thenReturn(Map.of());
+        when(messageInputFactory.onlyOnePerCluster(eq(BROKEN_TYPE), any()))
+                .thenThrow(new NoSuchInputTypeException("no input of type " + BROKEN_TYPE));
         configured.add(input);
     }
 

@@ -45,6 +45,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStopped;
@@ -57,7 +58,6 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -70,7 +70,9 @@ import java.util.stream.Collectors;
 @Path("/system/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputStatesResource extends AbstractInputsResource {
-    private static final Logger LOG = LoggerFactory.getLogger(InputStatesResource.class);
+    // list() is polled every couple of seconds, so a persistent fault here would repeat at that rate.
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createQuietDefaultRateLimitedLog(
+            InputStatesResource.class);
     private final InputRegistry inputRegistry;
     private final EventBus serverEventBus;
     private final InputService inputService;
@@ -161,8 +163,8 @@ public class InputStatesResource extends AbstractInputsResource {
             }
             return result;
         } catch (Exception e) {
-            LOG.warn("Could not determine which inputs are configured but not running on this node. Reporting only " +
-                    "the inputs this node has taken responsibility for.", e);
+            RATE_LIMITED_LOG.warn("Could not determine which inputs are configured but not running on this node. " +
+                    "Reporting only the inputs this node has taken responsibility for.", e);
             return Set.of();
         }
     }
@@ -173,10 +175,12 @@ public class InputStatesResource extends AbstractInputsResource {
             onlyOnePerCluster = messageInputFactory.onlyOnePerCluster(input.getType(),
                     new Configuration(input.getConfiguration()));
         } catch (NoSuchInputTypeException e) {
-            LOG.debug("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
+            RATE_LIMITED_LOG.warn("Not reporting the state of input {}: no input of type {} is installed on this " +
+                    "node, so it can neither run nor be reported as stopped here.", input.toIdentifier(),
+                    input.getType());
             return Optional.empty();
         } catch (Exception e) {
-            LOG.warn("Cannot determine whether input {} may run on this node. Not reporting its state.",
+            RATE_LIMITED_LOG.warn("Cannot determine whether input {} may run on this node. Not reporting its state.",
                     input.toIdentifier(), e);
             return Optional.empty();
         }

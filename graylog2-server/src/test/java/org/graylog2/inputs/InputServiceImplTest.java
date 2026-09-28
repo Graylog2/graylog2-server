@@ -249,6 +249,30 @@ public class InputServiceImplTest {
     }
 
     @Test
+    public void findForThisNodeOrGlobalConvertsEncryptedValues() throws ValidationException {
+        final MessageInput.Config inputConfig = mock(MessageInput.Config.class);
+        when(inputConfig.combinedRequestedConfiguration()).thenReturn(ConfigurationRequest.createWithFields(
+                new TextField("encrypted", "", "", "", ConfigurationField.Optional.OPTIONAL, true)));
+        when(messageInputFactory.getConfig("test type")).thenReturn(Optional.of(inputConfig));
+
+        final EncryptedValue secret = encryptedValueService.encrypt("secret");
+        final String id = inputService.save(InputImpl.builder()
+                .setTitle("test title")
+                .setType("test type")
+                .setCreatorUserId("test creator")
+                .setCreatedAt(new DateTime(DateTimeZone.UTC))
+                .setGlobal(true)
+                .setConfiguration(Map.of("encrypted", secret))
+                .build());
+
+        assertThat(inputService.findForThisNodeOrGlobal("any-node", id)).satisfies(input ->
+                assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+                    assertThat(value).isInstanceOf(EncryptedValue.class);
+                    assertThat(value).isEqualTo(secret);
+                }));
+    }
+
+    @Test
     @MongoDBFixtures("InputServiceImplTest.json")
     public void findByTitle() {
         String rawTcp = "Raw TCP";
