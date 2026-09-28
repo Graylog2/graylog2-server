@@ -50,6 +50,9 @@ export type Branding = {
     news?: { enabled: boolean; feed?: string };
     releases?: { enabled: boolean };
   };
+  onboarding?: {
+    resources?: { enabled: boolean };
+  };
   navigation?: {
     home?: { icon: string };
     user_menu?: { icon: string };

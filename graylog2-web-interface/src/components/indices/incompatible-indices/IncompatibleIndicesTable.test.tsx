@@ -119,10 +119,11 @@ describe('IncompatibleIndicesTable', () => {
     render(<IncompatibleIndicesTable />);
 
     expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /migrate to Data Nodes/i })).toHaveAttribute(
-      'href',
-      '/system/cluster/datanode-migration',
-    );
+    const migrationLink = screen.getByRole('link', { name: /migrate to Data Nodes.*opens in a new tab/i });
+
+    expect(migrationLink).toHaveAttribute('href', '/system/cluster/datanode-migration');
+    expect(migrationLink).toHaveAttribute('target', '_blank');
+    expect(migrationLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('does not link to the migration page when it is not routed', () => {
@@ -211,7 +212,7 @@ describe('createColumnRenderers', () => {
 
   it('renders the primary type as a single badge in the category column', () => {
     const cases: Array<[Partial<IncompatibleIndexRow>, string]> = [
-      [{ managed_index: true }, 'Graylog'],
+      [{ managed_index: true }, 'Managed'],
       [{ system_index: true }, 'System'],
       [{}, 'Foreign'],
     ];
@@ -231,7 +232,7 @@ describe('createColumnRenderers', () => {
 
     render(<div>{renderers.attributes.category.renderCell(undefined, index, undefined)}</div>);
 
-    expect(screen.getByText('Graylog')).toBeInTheDocument();
+    expect(screen.getByText('Managed')).toBeInTheDocument();
     expect(screen.getByText('Warm')).toBeInTheDocument();
   });
 

@@ -42,6 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -152,6 +153,31 @@ class OutdatedIndicesResourceTest {
     void bulkDeleteOutdatedRejectsEmptyRequest() {
         Assertions.assertThatThrownBy(() -> outdatedIndexResource.bulkDeleteOutdated(new BulkOperationRequest(List.of())))
                 .isInstanceOf(jakarta.ws.rs.BadRequestException.class);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"something:else"})
+    void bulkDeleteOutdatedRejectsCallerWithNoRelevantPermissionBeforeDoingAnyWork() {
+        Assertions.assertThatThrownBy(() -> outdatedIndexResource.bulkDeleteOutdated(
+                        new BulkOperationRequest(List.of("foreign1", "managed1"))))
+                .isInstanceOf(ForbiddenException.class);
+
+        // The upfront guard must reject before the cluster is enumerated or any index is touched.
+        verify(outdatedIndexService, never()).getOutdatedIndices();
+        verify(outdatedIndexService, never()).delete(anyString());
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"indices:read", "indices:delete:managed1"})
+    void bulkDeleteOutdatedAllowsCallerWithOnlyPerIndexPermissionForARequestedIndex() {
+        when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(
+                new OutdatedIndex("managed1", "1.3.0", false, true, null)));
+
+        final BulkOperationResponse response = outdatedIndexResource.bulkDeleteOutdated(
+                new BulkOperationRequest(List.of("managed1")));
+
+        verify(outdatedIndexService).delete("managed1");
+        assertThat(response.successfullyPerformed()).isEqualTo(1);
     }
 
 }

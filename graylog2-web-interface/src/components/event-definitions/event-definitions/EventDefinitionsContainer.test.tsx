@@ -205,6 +205,35 @@ describe('EventDefinitionsContainer', () => {
     expect(screen.queryByRole('link', { name: 'secret-id' })).not.toBeInTheDocument();
   });
 
+  it('shows the priority name instead of its numeric value', async () => {
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        ...layoutPreferences,
+        attributes: {
+          title: { status: 'show' },
+          priority: { status: 'show' },
+        },
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+    const definition: EventDefinition = { ...simpleEventDefinition, priority: 3 };
+    const fetchedEntities = paginatedEventDefinitions(definition);
+    asMock(useFetchEntities).mockReturnValue({
+      ...fetchedEntities,
+      data: {
+        ...fetchedEntities.data,
+        attributes: [...attributes, { id: 'priority', title: 'Priority', sortable: true }],
+      },
+    });
+
+    render(<EventDefinitionsContainer />);
+
+    const row = await screen.findByTestId(`table-row-${definition.id}`);
+
+    await within(row).findByText('High');
+  });
+
   it('lists notifications among the default visible columns', async () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {

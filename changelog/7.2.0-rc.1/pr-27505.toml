@@ -1,0 +1,4 @@
+type = "c"
+message = "Changed the default time range of the alerts and events overview from 30 days to 7 days."
+
+pulls = ["27505"]

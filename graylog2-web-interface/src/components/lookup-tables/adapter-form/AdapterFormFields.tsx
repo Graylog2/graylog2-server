@@ -34,14 +34,9 @@ function AdapterFormFields() {
 
   const _runValidations = useCallback(() => {
     validateDataAdapter(values).then((resp: { errors: validationErrorsType }) => {
-      const auxErrors = Object.keys(resp.errors).reduce((acc, key) => {
-        // eslint-disable-next-line no-param-reassign
-        if (errors[key]) acc[key] = errors[key];
-        // eslint-disable-next-line no-param-reassign
-        else acc[key] = resp.errors[key][0];
-
-        return acc;
-      }, {});
+      const auxErrors = Object.fromEntries(
+        Object.keys(resp.errors).map((key) => [key, errors[key] || resp.errors[key][0]]),
+      );
 
       const configErrors = configRef?.current?.validate?.() || {};
       setErrors({ ...auxErrors, ...configErrors });
