@@ -22,9 +22,13 @@ import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
+import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
+import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 import type View from 'views/logic/views/View';
 
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
+import WelcomeSearchSkeleton from './WelcomeSearchSkeleton';
+import type { WelcomeSearchWidgetEntry } from './hooks/useWelcomeSearch';
 
 const WIDGET_ACTIONS = [replayLinkWidgetAction];
 
@@ -40,19 +44,24 @@ const SEARCH_PAGE_LAYOUT_CONTEXT_VALUE = {
 
 type Props = {
   view: Promise<View>;
+  entries: Array<WelcomeSearchWidgetEntry>;
 };
 
 /**
  * Renders a search-backed view as a non-interactive, sidebar-less widget area, e.g. for the welcome
  * page's metrics tiles and charts. Shared by any welcome-page area that builds its own view/search with
  * `useWelcomeSearch` (see components/welcome/hooks/useWelcomeSearch.ts) and just needs it rendered.
+ * While loading, the widgets are shown as content skeletons.
  */
-const WelcomeSearch = ({ view }: Props) => (
+const WelcomeSearch = ({ view, entries }: Props) => (
   <InteractiveContext.Provider value="read-only">
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
-      <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
-        <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-      </SearchPageLayoutProvider>
+      <LoadingPlaceholderContext.Provider
+        value={{ search: <WelcomeSearchSkeleton entries={entries} />, widget: WidgetContentSkeleton }}>
+        <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
+          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+        </SearchPageLayoutProvider>
+      </LoadingPlaceholderContext.Provider>
     </WidgetActionsContext.Provider>
   </InteractiveContext.Provider>
 );

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import merge from 'lodash/merge';
@@ -36,6 +36,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('area')
@@ -193,6 +194,7 @@ const EventsHistogram = ({
   onEffectiveTimeRangeChange = undefined,
 }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
+  const { widget: LoadingPlaceholder } = useContext(LoadingPlaceholderContext);
   const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
     queryFn: () => eventsHistogramFetcher(searchParams),
@@ -218,7 +220,13 @@ const EventsHistogram = ({
   );
 
   if (isLoading) {
-    return <Spinner />;
+    return LoadingPlaceholder ? (
+      <GraphContainer $height={height}>
+        <LoadingPlaceholder visualization="area" />
+      </GraphContainer>
+    ) : (
+      <Spinner />
+    );
   }
 
   if (isError || !data) {

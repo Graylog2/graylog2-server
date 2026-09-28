@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -34,6 +34,7 @@ import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
+import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean;
@@ -69,9 +70,10 @@ const SearchPage = ({
   const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
   const loadView = useCallback((viewId: string) => _loadView(history, viewId), [_loadView, history]);
   const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
+  const { search: loadingPlaceholder = <Spinner /> } = useContext(LoadingPlaceholderContext);
 
   if (result.status === 'loading') {
-    return <Spinner />;
+    return loadingPlaceholder;
   }
 
   if (result.status === 'interrupted') {
@@ -103,7 +105,7 @@ const SearchPage = ({
       </SearchPageTitle>
     </ViewsStoreProvider>
   ) : (
-    <Spinner />
+    loadingPlaceholder
   );
 };
 
