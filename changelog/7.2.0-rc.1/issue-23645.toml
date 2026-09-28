@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix ability to add multiple parameters to content packs and properly add them to all entities."
+
+issues = ["23645"]
+pulls = ["27499"]

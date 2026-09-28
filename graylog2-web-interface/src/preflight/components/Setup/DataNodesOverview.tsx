@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Space } from '@mantine/core';
 import styled from 'styled-components';
 
+import ProductName from 'brand-customization/ProductName';
 import { Badge, List } from 'preflight/components/common';
 import Spinner from 'components/common/Spinner';
 import Alert from 'components/bootstrap/Alert';
@@ -47,8 +48,8 @@ const DataNodesOverview = () => {
   return (
     <>
       <P>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. Once a Graylog data node
-        is running and you configured the certificate authority, you can resume startup.
+        <ProductName /> data nodes offer a better integration with <ProductName /> and simplify future updates. Once a{' '}
+        <ProductName /> data node is running and you configured the certificate authority, you can resume startup.
       </P>
       <P>
         These are the data nodes which are currently registered. The list is constantly updated.{' '}
