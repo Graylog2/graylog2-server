@@ -19,7 +19,9 @@ package org.graylog.storage.opensearch3;
 import org.assertj.core.api.Assertions;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.search.MoreSearchAdapter;
- import org.graylog2.indexer.searches.Sorting;
+import org.graylog.events.search.SourceStreamFilter;
+import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.json.JsonData;
@@ -28,6 +30,11 @@ import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -146,6 +153,29 @@ class MoreSearchAdapterOSTest {
         // Then
         assertThat(sortOptions).hasSize(1);
         assertThat(sortOptions.get(0).field().missing()).isNull();
+    }
+
+    /** Excluded IDs must become a must_not terms clause, not query-string text subject to the 32000 cap. */
+    @Test
+    void excludedEventIdsBecomeAMustNotTermsClauseInsteadOfQueryStringText() throws Exception {
+        final Set<String> excludedEventIds = IntStream.range(0, 1000)
+                .mapToObj(i -> String.format(Locale.ROOT, "01M1V421FJJYEJRMH4MGRPJ%03d", i))
+                .collect(Collectors.toSet());
+
+        final Query query = adapter.createQuery("", RelativeRange.create(300), Set.of("stream-1"), "",
+                SourceStreamFilter.allAllowed(), Map.of(), excludedEventIds);
+
+        assertThat(query.bool().mustNot()).hasSize(1);
+        assertThat(query.bool().mustNot().get(0).terms().field()).isEqualTo(EventDto.FIELD_ID);
+        assertThat(query.bool().mustNot().get(0).terms().terms().value()).hasSize(1000);
+    }
+
+    @Test
+    void noExcludedEventIdsProducesNoMustNotClause() throws Exception {
+        final Query query = adapter.createQuery("", RelativeRange.create(300), Set.of("stream-1"), "",
+                SourceStreamFilter.allAllowed(), Map.of(), Set.of());
+
+        assertThat(query.bool().mustNot()).isEmpty();
     }
 
     private static void verifyFilter(String value, Query expected) {

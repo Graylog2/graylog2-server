@@ -1,0 +1,15 @@
+type = "f"
+message = "Preserve macOS Unified Logging identifiers that exceed the signed 64-bit range."
+
+details.user = """
+The macOS identifiers `macos_mach_timestamp`, `macos_thread_id`, `macos_trace_id`,
+`macos_activity_id`, `macos_parent_activity_id`, `macos_creator_activity_id` and
+`macos_sender_program_counter` are unsigned 64-bit values. OTLP attributes carry only signed 64-bit
+integers, so the Collector sends values above 2^63-1 as decimal strings, following OpenTelemetry's
+`Mapping Arbitrary Data to OTLP AnyValue`. Those records were previously recorded as `0`. All seven
+fields are now stored as strings, which covers the full unsigned range and keeps the field type
+stable regardless of a record's magnitude.
+"""
+
+issues = ["Graylog2/collector#94"]
+pulls = ["27442"]

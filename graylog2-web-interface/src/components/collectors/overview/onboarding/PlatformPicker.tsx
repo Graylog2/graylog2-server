@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import useProductName from 'brand-customization/useProductName';
 import { AccessibleCard, BrandIcon, Icon } from 'components/common';
 
 import PLATFORMS from './platforms';
@@ -120,28 +121,32 @@ const renderPlatformIcon = (icon: PlatformIcon) => {
   return <MaterialIcon name={icon.name} />;
 };
 
-const PlatformPicker = ({ onSelect, selectedPlatform, disabled }: Props) => (
-  <Container>
-    <Heading>Get Started with Collectors</Heading>
-    <Subtitle>Deploy lightweight collectors across your infrastructure to forward logs into Graylog.</Subtitle>
-    <Grid>
-      {PLATFORMS.map((platform) => (
-        <PlatformCard
-          key={platform.id}
-          title={platform.label}
-          isActive={selectedPlatform === platform.id}
-          onClick={disabled ? undefined : () => onSelect(platform.id)}>
-          {selectedPlatform === platform.id && (
-            <CheckMark>
-              <Icon name="check_circle" bsStyle="success" />
-            </CheckMark>
-          )}
-          <PlatformIconContainer>{renderPlatformIcon(platform.icon)}</PlatformIconContainer>
-          <PlatformLabel>{platform.label}</PlatformLabel>
-        </PlatformCard>
-      ))}
-    </Grid>
-  </Container>
-);
+const PlatformPicker = ({ onSelect, selectedPlatform, disabled }: Props) => {
+  const productName = useProductName();
+
+  return (
+    <Container>
+      <Heading>Get Started with Collectors</Heading>
+      <Subtitle>Deploy lightweight collectors across your infrastructure to forward logs into {productName}.</Subtitle>
+      <Grid>
+        {PLATFORMS.map((platform) => (
+          <PlatformCard
+            key={platform.id}
+            title={platform.label}
+            isActive={selectedPlatform === platform.id}
+            onClick={disabled ? undefined : () => onSelect(platform.id)}>
+            {selectedPlatform === platform.id && (
+              <CheckMark>
+                <Icon name="check_circle" bsStyle="success" />
+              </CheckMark>
+            )}
+            <PlatformIconContainer>{renderPlatformIcon(platform.icon)}</PlatformIconContainer>
+            <PlatformLabel>{platform.label}</PlatformLabel>
+          </PlatformCard>
+        ))}
+      </Grid>
+    </Container>
+  );
+};
 
 export default PlatformPicker;
