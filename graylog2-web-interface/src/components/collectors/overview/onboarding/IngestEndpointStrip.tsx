@@ -271,7 +271,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   // Only reached by a user who may create the input (FirstOnboarding gates the wizard on it), so no "ask an
   // administrator" fallback here. One step instead of "Change" plus "Create input": the address is edited right
   // here and saving creates the input.
-if (!hasInputs) {
+  if (!hasInputs) {
     return (
       <Alert bsStyle="warning" title="No ingest input exists">
         <Formik<FormValues> {...formikProps}>

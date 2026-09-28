@@ -84,6 +84,7 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     version: '1.2.3',
     status: 'online' as const,
     has_pending_changes: false,
+    pending_fleet_id: null,
     health: null,
   };
 
@@ -102,7 +103,6 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     );
   };
 });
-
 
 const mockFleets = [
   { id: 'fleet-1', name: 'Default Fleet', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },

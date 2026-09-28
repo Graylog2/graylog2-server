@@ -51,11 +51,13 @@ jest.mock('hooks/useInputMutations', () => () => ({
   deleteInput: jest.fn(),
 }));
 jest.mock('stores/nodes/NodesStore', () => ({
-  NodesStore: MockStore(['getInitialState', () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } })]),
+  NodesStore: MockStore([
+    'getInitialState',
+    () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } }),
+  ]),
 }));
 
 const updateConfig = jest.fn();
-
 
 describe('CollectorsSettings', () => {
   beforeEach(() => {
