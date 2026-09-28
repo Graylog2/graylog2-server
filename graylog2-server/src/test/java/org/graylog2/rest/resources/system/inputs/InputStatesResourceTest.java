@@ -23,12 +23,15 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
+import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -44,7 +47,9 @@ import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,8 +58,10 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -69,6 +76,8 @@ class InputStatesResourceTest {
     private static final String RUNNING_ID = "000000000000000000000001";
     private static final String STOPPED_ID = "000000000000000000000002";
     private static final String BROKEN_ID = "000000000000000000000003";
+    private static final String TYPE = "org.graylog2.inputs.FakeInput";
+    private static final String BROKEN_TYPE = "org.graylog2.inputs.BrokenInput";
     private static final DateTime CREATED_AT = new DateTime(2026, 1, 1, 0, 0, DateTimeZone.UTC);
 
     @Mock
@@ -87,12 +96,13 @@ class InputStatesResourceTest {
     private MessageInputFactory messageInputFactory;
 
     private final List<Input> configured = new ArrayList<>();
+    private final Map<String, InputDescription> availableInputs = new HashMap<>();
 
     private InputStatesResource resource;
 
     @BeforeEach
     void setUp() {
-        when(messageInputFactory.getAvailableInputs()).thenReturn(Map.of());
+        when(messageInputFactory.getAvailableInputs()).thenReturn(availableInputs);
         when(inputLauncher.allPersistedLaunched()).thenReturn(true);
         when(inputRegistry.stream()).thenAnswer(i -> Stream.empty());
         when(inputService.findIdsForThisNodeOrGlobal(NODE_ID.getNodeId()))
@@ -120,10 +130,36 @@ class InputStatesResourceTest {
     }
 
     @Test
-    void listFetchesOnlyTheInputsMissingFromTheRegistry() throws Exception {
-        final MessageInput running = configure(RUNNING_ID);
+    void listMasksPasswordsInTheSynthesizedSummary() throws Exception {
+        final TextField password = mock(TextField.class);
+        when(password.getName()).thenReturn("password");
+        when(password.getAttributes())
+                .thenReturn(List.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH)));
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(password);
+        final InputDescription description = mock(InputDescription.class);
+        when(description.getName()).thenReturn("Fake Input");
+        when(description.getConfigurationRequest()).thenReturn(configurationRequest);
+        availableInputs.put(TYPE, description);
+
         configure(STOPPED_ID);
-        final IOState<MessageInput> state = runningState(running);
+
+        assertThat(resource.list().states())
+                .singleElement()
+                .satisfies(summary -> {
+                    assertThat(summary.messageInput().title()).isEqualTo("title-" + STOPPED_ID);
+                    assertThat(summary.messageInput().name()).isEqualTo("Fake Input");
+                    assertThat(summary.messageInput().type()).isEqualTo(TYPE);
+                    assertThat(summary.messageInput().global()).isTrue();
+                    assertThat(summary.messageInput().node()).isEqualTo(NODE_ID.getNodeId());
+                    assertThat(summary.messageInput().attributes()).containsEntry("password", "<password set>");
+                });
+    }
+
+    @Test
+    void listFetchesOnlyTheInputsMissingFromTheRegistry() throws Exception {
+        configure(RUNNING_ID);
+        configure(STOPPED_ID);
+        final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
 
         assertThat(resource.list().states())
@@ -137,8 +173,8 @@ class InputStatesResourceTest {
 
     @Test
     void listDoesNotFetchDocumentsWhenEveryConfiguredInputIsRegistered() throws Exception {
-        final MessageInput messageInput = configure(RUNNING_ID);
-        final IOState<MessageInput> state = runningState(messageInput);
+        configure(RUNNING_ID);
+        final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
 
         resource.list();
@@ -148,12 +184,13 @@ class InputStatesResourceTest {
 
     @Test
     void listOmitsLeaderOnlyInputsOnNodesThatMustNotRunThem() throws Exception {
-        final MessageInput messageInput = configure(STOPPED_ID);
-        when(inputLauncher.leaderStatusInhibitsLaunch(messageInput)).thenReturn(true);
+        configure(STOPPED_ID);
+        when(messageInputFactory.onlyOnePerCluster(eq(TYPE), any())).thenReturn(true);
+        when(inputLauncher.leaderStatusInhibitsLaunch(true, true)).thenReturn(true);
 
         assertThat(resource.list().states()).isEmpty();
 
-        verify(inputLauncher).leaderStatusInhibitsLaunch(messageInput);
+        verify(inputLauncher).leaderStatusInhibitsLaunch(true, true);
     }
 
     @Test
@@ -168,9 +205,9 @@ class InputStatesResourceTest {
 
     @Test
     void listFallsBackToRegistryStateWhenTheInputLookupFails() throws Exception {
-        final MessageInput running = configure(RUNNING_ID);
+        configure(RUNNING_ID);
         configure(STOPPED_ID);
-        final IOState<MessageInput> state = runningState(running);
+        final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.stream()).thenAnswer(i -> Stream.of(state));
         when(inputService.findIdsForThisNodeOrGlobal(NODE_ID.getNodeId()))
                 .thenThrow(new IllegalStateException("MongoDB is unreachable"));
@@ -192,8 +229,7 @@ class InputStatesResourceTest {
 
     @Test
     void getReturnsTheRegistryStateForARunningInput() throws Exception {
-        final MessageInput messageInput = configure(RUNNING_ID);
-        final IOState<MessageInput> state = runningState(messageInput);
+        final IOState<MessageInput> state = runningState(messageInput(RUNNING_ID));
         when(inputRegistry.getInputState(RUNNING_ID)).thenReturn(state);
 
         final InputStateSummary summary = resource.get(RUNNING_ID);
@@ -219,30 +255,44 @@ class InputStatesResourceTest {
         return state;
     }
 
-    private MessageInput configure(String id) throws Exception {
+    private Input configure(String id) throws Exception {
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn(id);
+        when(input.getTitle()).thenReturn("title-" + id);
+        when(input.getType()).thenReturn(TYPE);
+        when(input.getCreatorUserId()).thenReturn("admin");
+        when(input.getCreatedAt()).thenReturn(CREATED_AT);
+        when(input.isGlobal()).thenReturn(true);
+        when(input.getNodeId()).thenReturn(NODE_ID.getNodeId());
+        when(input.getConfiguration()).thenReturn(Map.of("password", "hunter2"));
+        when(input.getStaticFields()).thenReturn(Map.of());
 
-        final MessageInput messageInput = mock(MessageInput.class);
-        when(messageInput.getId()).thenReturn(id);
-        when(messageInput.getTitle()).thenReturn("title-" + id);
-        when(messageInput.getName()).thenReturn("Fake Input");
-        when(messageInput.getType()).thenReturn("org.graylog2.inputs.FakeInput");
-        when(messageInput.getCreatorUserId()).thenReturn("admin");
-        when(messageInput.getCreatedAt()).thenReturn(CREATED_AT);
-        when(messageInput.getConfiguration()).thenReturn(new Configuration(Map.of()));
-        when(messageInput.getStaticFields()).thenReturn(Map.of());
-
-        when(inputService.getMessageInput(input)).thenReturn(messageInput);
+        when(messageInputFactory.onlyOnePerCluster(eq(TYPE), any())).thenReturn(false);
         configured.add(input);
 
-        return messageInput;
+        return input;
     }
 
     private void configureUninstantiable(String id) throws Exception {
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn(id);
-        when(inputService.getMessageInput(input)).thenThrow(new IllegalArgumentException("broken configuration"));
+        when(input.getType()).thenReturn(BROKEN_TYPE);
+        when(input.getConfiguration()).thenReturn(Map.of());
+        when(messageInputFactory.onlyOnePerCluster(eq(BROKEN_TYPE), any()))
+                .thenThrow(new IllegalArgumentException("broken configuration"));
         configured.add(input);
+    }
+
+    private MessageInput messageInput(String id) {
+        final MessageInput messageInput = mock(MessageInput.class);
+        when(messageInput.getId()).thenReturn(id);
+        when(messageInput.getTitle()).thenReturn("title-" + id);
+        when(messageInput.getName()).thenReturn("Fake Input");
+        when(messageInput.getType()).thenReturn(TYPE);
+        when(messageInput.getCreatorUserId()).thenReturn("admin");
+        when(messageInput.getCreatedAt()).thenReturn(CREATED_AT);
+        when(messageInput.getConfiguration()).thenReturn(new Configuration(Map.of()));
+        when(messageInput.getStaticFields()).thenReturn(Map.of());
+        return messageInput;
     }
 }

@@ -27,11 +27,15 @@ import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class MessageInputFactory {
     private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
     private final FeatureFlags featureFlags;
+
+    private final ConcurrentMap<String, Boolean> onlyOnePerClusterByType = new ConcurrentHashMap<>();
 
     @Inject
     public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories,
@@ -86,6 +90,20 @@ public class MessageInputFactory {
         }
 
         return result;
+    }
+
+    /**
+     * {@link MessageInput#onlyOnePerCluster()} is an instance method, but every implementation returns a constant, so
+     * the answer only needs one instance per type rather than one per call.
+     */
+    public boolean onlyOnePerCluster(String type, Configuration configuration) throws NoSuchInputTypeException {
+        final Boolean known = onlyOnePerClusterByType.get(type);
+        if (known != null) {
+            return known;
+        }
+        final boolean value = create(type, configuration).onlyOnePerCluster();
+        onlyOnePerClusterByType.put(type, value);
+        return value;
     }
 
     public Optional<MessageInput.Config> getConfig(String type) {

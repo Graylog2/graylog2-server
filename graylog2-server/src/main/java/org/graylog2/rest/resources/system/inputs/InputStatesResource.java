@@ -41,6 +41,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
@@ -55,11 +56,9 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -76,6 +75,7 @@ public class InputStatesResource extends AbstractInputsResource {
     private final EventBus serverEventBus;
     private final InputService inputService;
     private final InputStateService inputStateService;
+    private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final NodeId nodeId;
 
@@ -92,6 +92,7 @@ public class InputStatesResource extends AbstractInputsResource {
         this.serverEventBus = serverEventBus;
         this.inputService = inputService;
         this.inputStateService = inputStateService;
+        this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.nodeId = nodeId;
     }
@@ -167,19 +168,30 @@ public class InputStatesResource extends AbstractInputsResource {
     }
 
     private Optional<InputStateSummary> notRunningStateSummary(Input input) {
+        final boolean onlyOnePerCluster;
         try {
-            final MessageInput messageInput = inputService.getMessageInput(input);
-            if (inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
-                return Optional.empty();
-            }
-            return Optional.of(getNotRunningStateSummary(messageInput));
+            onlyOnePerCluster = messageInputFactory.onlyOnePerCluster(input.getType(),
+                    new Configuration(input.getConfiguration()));
         } catch (NoSuchInputTypeException e) {
             LOG.debug("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
             return Optional.empty();
         } catch (Exception e) {
-            LOG.warn("Cannot instantiate configured input {}. Not reporting its state.", input.toIdentifier(), e);
+            LOG.warn("Cannot determine whether input {} may run on this node. Not reporting its state.",
+                    input.toIdentifier(), e);
             return Optional.empty();
         }
+
+        if (inputLauncher.leaderStatusInhibitsLaunch(onlyOnePerCluster, input.isGlobal())) {
+            return Optional.empty();
+        }
+        return Optional.of(InputStateSummary.create(
+                input.getId(),
+                IOState.Type.STOPPED.toString(),
+                input.getCreatedAt(),
+                null,
+                null,
+                getMaskedInputSummary(input),
+                onlyOnePerCluster));
     }
 
     @PUT
@@ -258,25 +270,13 @@ public class InputStatesResource extends AbstractInputsResource {
     }
 
     private InputStateSummary getInputStateSummary(IOState<MessageInput> inputState) {
-        return getInputStateSummary(inputState.getStoppable(), inputState.getState(), inputState.getStartedAt(),
-                inputState.getLastFailedAt(), inputState.getDetailedMessage());
-    }
-
-    private InputStateSummary getNotRunningStateSummary(MessageInput messageInput) {
-        return getInputStateSummary(messageInput, IOState.Type.STOPPED, messageInput.getCreatedAt(), null, null);
-    }
-
-    private InputStateSummary getInputStateSummary(MessageInput messageInput,
-                                                   IOState.Type state,
-                                                   DateTime startedAt,
-                                                   @Nullable DateTime lastFailedAt,
-                                                   @Nullable String detailedMessage) {
+        final MessageInput messageInput = inputState.getStoppable();
         return InputStateSummary.create(
                 messageInput.getId(),
-                state.toString(),
-                startedAt,
-                lastFailedAt,
-                detailedMessage,
+                inputState.getState().toString(),
+                inputState.getStartedAt(),
+                inputState.getLastFailedAt(),
+                inputState.getDetailedMessage(),
                 InputSummary.create(
                         messageInput.getTitle(),
                         messageInput.isGlobal(),

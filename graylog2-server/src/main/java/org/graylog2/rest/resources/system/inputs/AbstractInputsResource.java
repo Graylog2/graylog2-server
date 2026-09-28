@@ -50,6 +50,21 @@ public class AbstractInputsResource extends RestResource {
         // remove after sharing inputs implemented (input types check)
         final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) && isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType()) ?
                 input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
+        return inputSummary(input, inputDescription, configuration);
+    }
+
+    /**
+     * @return A {@link InputSummary} JSON value object for the input entity, always masking passwords regardless of
+     * the caller's permissions.
+     */
+    protected InputSummary getMaskedInputSummary(Input input) {
+        final InputDescription inputDescription = this.availableInputs.get(input.getType());
+        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
+        return inputSummary(input, inputDescription,
+                maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest));
+    }
+
+    private InputSummary inputSummary(Input input, InputDescription inputDescription, Map<String, Object> configuration) {
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
                 InputDescription.getInputDescriptionName(inputDescription, input.getType()),

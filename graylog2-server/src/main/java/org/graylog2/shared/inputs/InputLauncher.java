@@ -178,6 +178,10 @@ public class InputLauncher {
     }
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {
-        return input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader();
+        return leaderStatusInhibitsLaunch(input.onlyOnePerCluster(), input.isGlobal());
+    }
+
+    public boolean leaderStatusInhibitsLaunch(boolean onlyOnePerCluster, boolean global) {
+        return onlyOnePerCluster && global && !leaderElectionService.isLeader();
     }
 }
