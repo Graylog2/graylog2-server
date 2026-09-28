@@ -131,6 +131,21 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
+    public void findIdsForThisNodeOrGlobalReturnsLocalAndGlobalInputIds() {
+        assertThat(inputService.findIdsForThisNodeOrGlobal("cd03ee44-b2a7-cafe-babe-0000deadbeef"))
+                .containsExactlyInAnyOrder("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002",
+                        "54e3deadbeefdeadbeef0003");
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void findIdsForThisNodeOrGlobalReturnsGlobalInputIdsIfNodeIDDoesNotExist() {
+        assertThat(inputService.findIdsForThisNodeOrGlobal("cd03ee44-b2a7-0000-0000-000000000000"))
+                .containsExactly("54e3deadbeefdeadbeef0003");
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void findByIdsReturnsRequestedInputs() {
         assertThat(inputService.findByIds(ImmutableSet.of())).isEmpty();
         assertThat(inputService.findByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
