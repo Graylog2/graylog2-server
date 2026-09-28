@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix rejoined Data Node getting stuck in UNCONFIGURED instead of becoming AVAILABLE."
+
+issues = ["27444"]
+pulls = ["27472"]
