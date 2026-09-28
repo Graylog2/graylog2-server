@@ -30,6 +30,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,8 +40,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -169,7 +172,7 @@ class MongoDbIndexToolsTest {
 
         MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(3600), "updated_at");
 
-        verify(db).dropIndex(Indexes.ascending("updated_at"));
+        verify(db).dropIndex("updated_at_1");
         verify(db).createIndex(eq(Indexes.ascending("updated_at")),
                 argThat(indexOptions -> Objects.equals(indexOptions.getExpireAfter(TimeUnit.SECONDS), 3600L)));
     }
@@ -182,8 +185,62 @@ class MongoDbIndexToolsTest {
 
         MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
 
-        verify(db).dropIndex(Indexes.ascending("updated_at"));
+        verify(db).dropIndex("updated_at_1");
         verify(db).createIndex(eq(Indexes.ascending("updated_at")),
                 argThat(indexOptions -> Objects.equals(indexOptions.getExpireAfter(TimeUnit.SECONDS), 72L)));
+    }
+
+    @Test
+    void ignoresCompoundIndexesContainingTheTtlField() {
+        // A compound index that merely happens to include the field is not the TTL index: it must be left
+        // alone, and it must not be mistaken for an existing TTL index on the field.
+        rawdb.createIndex(new Document("type", 1).append("updated_at", -1));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        assertThat(indexNames()).contains("type_1_updated_at_-1");
+        assertThat(ttlSecondsOf("updated_at_1")).isEqualTo(72L);
+    }
+
+    @Test
+    void replacesDescendingPlainIndexWithTTLIndex() {
+        // The field may already carry a descending index, which is a different key spec than the ascending
+        // one a TTL index is created with. It still has to be recognized and replaced.
+        rawdb.createIndex(Indexes.descending("updated_at"));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        assertThat(indexNames()).doesNotContain("updated_at_-1");
+        assertThat(ttlSecondsOf("updated_at_1")).isEqualTo(72L);
+    }
+
+    @Test
+    void keepsDescendingTTLIndexWithMatchingExpiry() {
+        // Direction is irrelevant for a single-field index, so a matching TTL is left in place rather than
+        // rebuilt on every boot.
+        rawdb.createIndex(Indexes.descending("updated_at"), new IndexOptions().expireAfter(72L, TimeUnit.SECONDS));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        verify(db, never()).dropIndex(anyString());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
+        assertThat(ttlSecondsOf("updated_at_-1")).isEqualTo(72L);
+    }
+
+    private List<String> indexNames() {
+        try (final var stream = MongoUtils.stream(rawdb.listIndexes())) {
+            return stream.map(index -> index.getString("name")).toList();
+        }
+    }
+
+    private Long ttlSecondsOf(String indexName) {
+        try (final var stream = MongoUtils.stream(rawdb.listIndexes())) {
+            return stream
+                    .filter(index -> indexName.equals(index.getString("name")))
+                    .map(index -> index.get("expireAfterSeconds", Number.class))
+                    .map(expireAfterSeconds -> expireAfterSeconds == null ? null : expireAfterSeconds.longValue())
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 }

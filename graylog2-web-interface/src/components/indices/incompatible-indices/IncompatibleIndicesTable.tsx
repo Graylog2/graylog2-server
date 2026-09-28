@@ -16,12 +16,11 @@
  */
 import React from 'react';
 
+import ProductName from 'brand-customization/ProductName';
 import { Alert } from 'components/bootstrap';
 import { PaginatedEntityTable } from 'components/common';
-import Routes from 'routing/Routes';
-import Link from 'components/common/Link';
-import AppConfig from 'util/AppConfig';
 
+import DataNodeMigrationLink from './DataNodeMigrationLink';
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 import { createColumnRenderers, DEFAULT_DISPLAYED_COLUMNS } from './IncompatibleIndicesColumnRenderers';
@@ -39,16 +38,6 @@ const TABLE_LAYOUT = {
   defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
-const DataNodeMigrationHint = () => {
-  const migrationRouteAvailable = !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
-
-  return migrationRouteAvailable ? (
-    <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link>
-  ) : (
-    <>Migrate to Data Nodes</>
-  );
-};
-
 type Props = {
   withoutURLParams?: boolean;
 };
@@ -64,8 +53,9 @@ const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
     <IncompatibleIndicesContext.Provider value={contextValue}>
       {!contextValue.reindexActionsAvailable && (
         <Alert bsStyle="info">
-          System indices can only be reindexed when Graylog runs against a Data Node search backend.{' '}
-          <DataNodeMigrationHint /> to reindex them before upgrading to the next OpenSearch major version.
+          System indices can only be reindexed when <ProductName /> runs against a Data Node search backend.{' '}
+          <DataNodeMigrationLink text="Migrate to Data Nodes" /> to reindex them before upgrading to the next OpenSearch
+          major version.
         </Alert>
       )}
       <PaginatedEntityTable<IncompatibleIndexRow>

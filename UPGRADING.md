@@ -98,6 +98,19 @@ Per default, we now export all fields in a message on export. Prior to this chan
 fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
 Now you can export with all fields and limit the results by specifying the fields wanted.
 
+### System CPU and Memory Metrics Now Reflect Container Limits When Containerized
+
+When Graylog Server or Data Node runs in a container with cgroup CPU/memory limits configured (e.g. Docker 
+`--memory`/`--cpus`, Kubernetes `resources.limits`), the `org.graylog2.system.cpu.percent` metric and the Data Node 
+metrics `mem_total`, `mem_free`, `mem_total_used_bytes`, and `mem_total_used` now reflect the container's 
+cgroup-scoped limits and usage instead of the underlying host's.
+
+Previously, these metrics always reported host-level values, so a container with a memory limit well below the host's 
+total RAM would show a low, misleadingly small "used" percentage. After upgrading, the same metrics scale to the 
+container's actual limit, so used-percentage values can jump significantly even though nothing about the node's real 
+memory or CPU pressure has changed. Review and, if necessary, adjust any dashboards or alert thresholds built against 
+the old host-scaled values.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
