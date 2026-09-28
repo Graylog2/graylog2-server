@@ -18,19 +18,19 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { adminUser } from 'fixtures/users';
 import type { PreferencesMap } from 'api/preferences';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 
 import type { UserPreferences } from './UserPreferencesContext';
 import UserPreferencesContext, { defaultUserPreferences } from './UserPreferencesContext';
 import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]),
+jest.mock('logic/users/CurrentUser', () => ({
+  __esModule: true,
+  default: { getState: jest.fn(() => ({})), subscribe: jest.fn(() => () => {}) },
 }));
 
 describe('CurrentUserPreferencesProvider', () => {
@@ -57,7 +57,7 @@ describe('CurrentUserPreferencesProvider', () => {
   };
 
   beforeEach(() => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: defaultUser.toJSON() });
+    asMock(CurrentUser.getState).mockReturnValue({ currentUser: defaultUser.toJSON() });
   });
 
   it('provides default user preferences when CurrentUserContext is not provided', () => {
@@ -69,7 +69,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides default user preferences if the user has none', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
+    asMock(CurrentUser.getState).mockReturnValue({
       currentUser: adminUser
         .toBuilder()
         .preferences(undefined as PreferencesMap)
@@ -83,7 +83,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides empty user preferences of current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
+    asMock(CurrentUser.getState).mockReturnValue({
       currentUser: adminUser
         .toBuilder()
         .preferences({} as PreferencesMap)
@@ -97,7 +97,7 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides user preferences of current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
+    asMock(CurrentUser.getState).mockReturnValue({
       currentUser: adminUser
         .toBuilder()
         .preferences({ enableSmartSearch: false, updateUnfocussed: true } as PreferencesMap)

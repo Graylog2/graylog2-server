@@ -19,7 +19,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type { Attributes } from 'stores/PaginationTypes';
 import type { Stream, MatchData } from 'logic/streams/types';
 
@@ -116,9 +116,7 @@ export const updateStream = (streamId: string, data: Partial<Stream>): Promise<S
   });
 
 export const removeStream = (streamId: string): Promise<unknown> =>
-  fetch('DELETE', qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url)).then(() =>
-    CurrentUserStore.reload(),
-  );
+  fetch('DELETE', qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url)).then(() => CurrentUser.reload());
 
 export const pauseStream = (streamId: string): Promise<unknown> =>
   fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url)).catch((errorThrown): never => {
@@ -141,7 +139,7 @@ export const cloneStream = (streamId: string, data: CloneStreamRequest): Promise
 
       throw errorThrown;
     })
-    .then(() => CurrentUserStore.reload());
+    .then(() => CurrentUser.reload());
 
 export const testMatch = (streamId: string, message: TestMatchMessage): Promise<MatchData> =>
   fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.testMatch(streamId).url), message).catch(

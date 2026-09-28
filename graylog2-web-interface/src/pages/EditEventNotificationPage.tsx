@@ -20,13 +20,13 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
+import useExternalStore from 'hooks/useExternalStore';
 import { getEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
@@ -111,10 +111,10 @@ class EditEventDefinitionPage extends React.Component<
   }
 }
 
-export default connect(
-  withParams(withHistory<EditEventDefinitionPageProps>(EditEventDefinitionPage)),
-  {
-    currentUser: CurrentUserStore,
-  },
-  ({ currentUser }) => ({ currentUser: currentUser.currentUser }),
-);
+const EditEventDefinitionPageWithCurrentUser = (props: ParamsContext & HistoryContext) => {
+  const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
+
+  return <EditEventDefinitionPage {...props} currentUser={currentUser} />;
+};
+
+export default withParams(withHistory(EditEventDefinitionPageWithCurrentUser));
