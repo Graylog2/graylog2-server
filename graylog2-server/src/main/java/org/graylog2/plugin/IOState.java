@@ -100,7 +100,7 @@ public class IOState<T extends Stoppable> {
         /** The input is being stopped ({@code MessageInput#stop} is in progress). */
         STOPPING,
         /**
-         * The input has been stopped and does not accept messages.
+         * The input has been stopped and does not accept messages. Transitory state that resolves into {@link #TERMINATED}
          */
         STOPPED,
         /**
