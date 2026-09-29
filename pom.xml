@@ -111,9 +111,9 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.53.1</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.54.13</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.1</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.3.8</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.85.2</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.85</bouncycastle-pkix.version>
         <caffeine.version>3.2.4</caffeine.version>
@@ -137,12 +137,12 @@
         <google-api-common.version>2.66.0</google-api-common.version>
         <google-auth-library.version>1.50.0</google-auth-library.version>
         <google-cloud-core.version>2.73.0</google-cloud-core.version>
-        <google-conscrypt.version>2.6.3</google-conscrypt.version>
+        <google-conscrypt.version>2.7.0</google-conscrypt.version>
         <google-gax.version>2.83.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.83.1</grpc.version>
+        <grpc.version>1.84.0</grpc.version>
         <gson.version>2.14.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.7.1-jre</guava.version>
@@ -172,7 +172,7 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20260814</json-org.version>
         <json-path.version>3.0.0</json-path.version>
-        <jsoup.version>1.23.1</jsoup.version>
+        <jsoup.version>1.23.2</jsoup.version>
         <jspecify.version>1.0.1</jspecify.version>
         <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.3.1</kafka.version>
@@ -185,7 +185,7 @@
         <lucene.version>10.5.1</lucene.version>
         <lz4.version>1.11.2</lz4.version>
         <metrics.version>4.2.40</metrics.version>
-        <mongodb-driver.version>5.10.0</mongodb-driver.version>
+        <mongodb-driver.version>5.12.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.17.Final</netty.version>
@@ -206,21 +206,21 @@
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>3.0.1</shiro.version>
-        <snakeyaml.version>2.6</snakeyaml.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.6.0</oshi.version>
+        <oshi.version>7.6.1</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
-        <swagger.version>2.2.53</swagger.version>
-        <swagger-parser.version>2.1.46</swagger-parser.version>
+        <swagger.version>2.2.55</swagger.version>
+        <swagger-parser.version>2.1.48</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.10.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-15</zstd.version>
+        <zstd.version>1.5.7-16</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -867,7 +867,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.15.0</version>
+                    <version>3.16.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -922,12 +922,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -942,7 +942,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.10.4.0</version>
+                    <version>4.10.4.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
