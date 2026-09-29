@@ -382,8 +382,10 @@ class GeoIpFileServiceTest {
         final int attempts = 8;
         final AtomicInteger cityDownloads = new AtomicInteger();
         final CountDownLatch allThreadsStarted = new CountDownLatch(attempts);
-        cityFileInstant = Optional.of(Instant.now());
-        asnFileInstant = Optional.of(Instant.now());
+        //Ensure bucket objects predate the downloaded files.
+        final Instant uploadedAt = Instant.now().minus(1, ChronoUnit.HOURS);
+        cityFileInstant = Optional.of(uploadedAt);
+        asnFileInstant = Optional.of(uploadedAt);
         cityServerInstant = cityFileInstant;
         asnServerInstant = asnFileInstant;
 
