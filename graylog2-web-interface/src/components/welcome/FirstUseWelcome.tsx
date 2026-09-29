@@ -19,6 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
+import useOnboardingCustomization from 'brand-customization/useOnboardingCustomization';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import LinkContainer from 'components/common/LinkContainer';
@@ -29,6 +30,7 @@ import { SectionCol } from 'components/common/Section/SectionComponent';
 import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 import PreviewBadge from 'components/common/PreviewBadge';
 import PageHeader from 'components/common/PageHeader';
@@ -87,20 +89,14 @@ type Resource = {
 
 const resources: Resource[] = [
   {
-    title: 'Quickstart Guide',
-    description: 'End-to-end walkthrough to your first search in 10 minutes.',
-    link: 'https://community.graylog.org/',
-    iconName: 'acute',
-  },
-  {
-    title: 'Video: Collector',
-    description: 'Enroll and configure your first collector agent.',
-    link: 'https://community.graylog.org/',
-    iconName: 'arrow_or_edge',
+    title: 'Collector Documentation',
+    description: 'Information on how to install and use Graylog Collectors.',
+    link: DocsHelper.PAGES.COLLECTORS,
+    iconName: 'menu_book',
   },
   {
     title: 'Community Forum',
-    description: 'Ask questions and browse solutions from other Graylog users.',
+    description: 'Ask questions and browse solutions from other users.',
     link: 'https://community.graylog.org/',
     iconName: 'chat',
   },
@@ -164,9 +160,10 @@ const SourcesBoxActions = styled(BoxActions)(
 
 const FirstUseWelcome = () => {
   const productName = useProductName();
+  const { isResourceSectionEnabledForBrand } = useOnboardingCustomization();
   const { mutate: dismiss } = useDismissOnboarding();
   const [showDismissConfirm, setShowDismissConfirm] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('welcome');
 
   return (
     <>
@@ -189,7 +186,6 @@ const FirstUseWelcome = () => {
             bsStyle="transparent"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.DISMISS_CLICKED, {
-                app_section: 'welcome',
                 app_action_value: 'dismiss-onboarding-button',
               });
               setShowDismissConfirm(true);
@@ -223,7 +219,6 @@ const FirstUseWelcome = () => {
                     bsStyle="primary"
                     onClick={() =>
                       sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.SETUP_COLLECTOR_CLICKED, {
-                        app_section: 'welcome',
                         app_action_value: 'setup-collector-button',
                       })
                     }>
@@ -245,7 +240,6 @@ const FirstUseWelcome = () => {
                       bsStyle="default"
                       onClick={() =>
                         sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.CONFIGURE_INPUT_CLICKED, {
-                          app_section: 'welcome',
                           app_action_value: 'configure-input-button',
                         })
                       }>
@@ -259,38 +253,41 @@ const FirstUseWelcome = () => {
         </Col>
       </Row>
 
-      <SecondaryHeadline>Resources</SecondaryHeadline>
+      {isResourceSectionEnabledForBrand && (
+        <>
+          <SecondaryHeadline>Resources</SecondaryHeadline>
 
-      <Container>
-        {resources.map((resource) => (
-          <ResourceTile className="content" key={resource.title}>
-            <StyledResourceCol>
-              <ResourceTileContent>
-                <IconCard>
-                  <Icon name={resource.iconName} />
-                </IconCard>
-                <ResourceTileBody>
-                  <ResourceTitle>{resource.title}</ResourceTitle>
-                  <ResourceDescription>{resource.description}</ResourceDescription>
-                  <BoxActions>
-                    <ExternalLinkButton
-                      href={resource.link}
-                      bsSize="xs"
-                      onClick={() =>
-                        sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
-                          app_section: 'welcome',
-                          app_action_value: resource.title,
-                        })
-                      }>
-                      Continue
-                    </ExternalLinkButton>
-                  </BoxActions>
-                </ResourceTileBody>
-              </ResourceTileContent>
-            </StyledResourceCol>
-          </ResourceTile>
-        ))}
-      </Container>
+          <Container>
+            {resources.map((resource) => (
+              <ResourceTile className="content" key={resource.title}>
+                <StyledResourceCol>
+                  <ResourceTileContent>
+                    <IconCard>
+                      <Icon name={resource.iconName} />
+                    </IconCard>
+                    <ResourceTileBody>
+                      <ResourceTitle>{resource.title}</ResourceTitle>
+                      <ResourceDescription>{resource.description}</ResourceDescription>
+                      <BoxActions>
+                        <ExternalLinkButton
+                          href={DocsHelper.toString(resource.link)}
+                          bsSize="xs"
+                          onClick={() =>
+                            sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
+                              app_action_value: resource.title,
+                            })
+                          }>
+                          Continue
+                        </ExternalLinkButton>
+                      </BoxActions>
+                    </ResourceTileBody>
+                  </ResourceTileContent>
+                </StyledResourceCol>
+              </ResourceTile>
+            ))}
+          </Container>
+        </>
+      )}
     </>
   );
 };

@@ -24,10 +24,8 @@ import { InputForm } from 'components/inputs';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import useInputMutations from 'hooks/useInputMutations';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 
 const StyledButton = styled(Button)(
   ({ theme }) => css`
@@ -44,7 +42,6 @@ const EditInputButton = ({ input }: Props) => {
   const { data: inputTypeDescriptions } = useInputTypesDescriptions();
   const { updateInput } = useInputMutations();
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
 
   const definition = inputTypeDescriptions?.[input.type];
 
@@ -52,14 +49,12 @@ const EditInputButton = ({ input }: Props) => {
     setShowConfigurationForm(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_EDIT_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'edit-input',
     });
   };
 
   const handleInputUpdate = async (inputData: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
 

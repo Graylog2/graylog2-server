@@ -46,8 +46,11 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
   );
 
   useOnSearchExecution(() => {
-    refreshCurrentTypes();
-    refreshAllTypes();
+    // Both queries share the same key when the current query is not filtered by streams. Not cancelling an
+    // already running refetch makes the second call join the first one, instead of sending a second identical
+    // request.
+    refreshCurrentTypes({ cancelRefetch: false });
+    refreshAllTypes({ cancelRefetch: false });
   });
 
   return <FieldTypesContext.Provider value={fieldTypes}>{children}</FieldTypesContext.Provider>;

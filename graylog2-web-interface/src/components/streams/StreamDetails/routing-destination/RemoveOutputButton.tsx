@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Button } from 'components/bootstrap';
-import { ConfirmDialog, Icon } from 'components/common';
+import { ConfirmDialog, IconButton } from 'components/common';
 import type { Output } from 'hooks/useOutputs';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import { keyFn } from 'hooks/useStreamOutputs';
@@ -42,9 +41,13 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
 
   return (
     <>
-      <Button bsStyle="link" bsSize="xsmall" onClick={() => setShowConfirmRemove(true)} title="Edit Output">
-        <Icon name="delete" type="regular" />
-      </Button>
+      <IconButton
+        name="delete"
+        iconType="regular"
+        title="Remove Output"
+        bsStyle="danger"
+        onClick={() => setShowConfirmRemove(true)}
+      />
       <ConfirmDialog
         show={showConfirmRemove}
         onConfirm={onConfirmRemoveOutput}

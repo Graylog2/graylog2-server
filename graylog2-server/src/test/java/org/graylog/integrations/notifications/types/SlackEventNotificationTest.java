@@ -36,7 +36,6 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
@@ -90,9 +89,6 @@ public class SlackEventNotificationTest {
     @Mock
     EventProcedureProvider mockEventProcedureProvider;
 
-    @Mock
-    UrlAllowlistValidator mockUrlAllowlistValidator;
-
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -117,8 +113,7 @@ public class SlackEventNotificationTest {
                 nodeId,
                 mockSlackClient,
                 new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()),
-                mockEventProcedureProvider,
-                mockUrlAllowlistValidator);
+                mockEventProcedureProvider);
     }
 
     private void getDummySlackNotificationConfig() {

@@ -20,12 +20,12 @@
  * These mirror the backend definitions in `CollectorIngestCodec` and
  * `CollectorLogRecordProcessor` — keep them in sync.
  */
-export const COLLECTOR_INSTANCE_UID_FIELD = 'collector_instance_uid';
-export const COLLECTOR_FLEET_ID_FIELD = 'collector_fleet_id';
-export const COLLECTOR_SOURCE_ID_FIELD = 'collector_source_id';
-export const COLLECTOR_RECEIVER_TYPE_FIELD = 'collector_receiver_type';
+export const AGENT_ID_FIELD = 'agent_id';
+export const AGENT_FLEET_ID_FIELD = 'agent_fleet_id';
+export const AGENT_SOURCE_ID_FIELD = 'agent_source_id';
+export const AGENT_RECEIVER_TYPE_FIELD = 'agent_receiver_type';
 
-/** `collector_receiver_type` value identifying collector self-logs (supervisor + OTel process). */
+/** `agent_receiver_type` value identifying collector self-logs (supervisor + OTel process). */
 export const COLLECTOR_LOG_RECEIVER_TYPE = 'collector_log';
 
 /** Built-in stream collector self-logs are routed to (`Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID`). */

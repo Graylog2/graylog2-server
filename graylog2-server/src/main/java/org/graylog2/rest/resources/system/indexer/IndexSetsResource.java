@@ -46,6 +46,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
@@ -104,6 +106,7 @@ public class IndexSetsResource extends RestResource {
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
     private final EventBus eventBus;
+    private final RefreshingLockService.Factory lockServiceFactory;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -116,7 +119,8 @@ public class IndexSetsResource extends RestResource {
                              final LegacySystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
                              final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
-                             final EventBus eventBus) {
+                             final EventBus eventBus,
+                             final RefreshingLockService.Factory lockServiceFactory) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -129,6 +133,7 @@ public class IndexSetsResource extends RestResource {
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
         this.indexSetRestrictionsService = indexSetRestrictionsService;
         this.eventBus = eventBus;
+        this.lockServiceFactory = lockServiceFactory;
     }
 
     @GET
@@ -269,6 +274,7 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns created index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock"),
     })
     public IndexSetResponse save(@Parameter(name = "Index set configuration", required = true)
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
@@ -276,12 +282,7 @@ public class IndexSetsResource extends RestResource {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
             final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
 
-            final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
-            if (violation.isPresent()) {
-                throw new BadRequestException(violation.get().message());
-            }
-
-            final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
+            final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig);
             final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
             return IndexSetResponse.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet), null);
         } catch (MongoException e) {
@@ -300,7 +301,7 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns updated index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
-            @ApiResponse(responseCode = "409", description = "Mismatch of IDs in URI path and payload"),
+            @ApiResponse(responseCode = "409", description = "The default index set would become non-writable, or a concurrent operation holds the selected repository's lock"),
     })
     public IndexSetResponse update(@Parameter(name = "id", required = true)
                                    @PathParam("id") String id,
@@ -323,14 +324,34 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig indexSetConfig = indexSetRestrictionsService.updateIndexSetConfig(updateRequest, oldConfig,
                 isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
 
+        final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig);
+
+        return IndexSetResponse.fromIndexSetConfig(savedObject, isDefaultSet, null);
+    }
+
+    // Keeps a concurrent repository delete from missing the reference this save adds. Covers operator
+    // edits only, internally created index sets inherit their repository from the default template,
+    // which is itself a reference that blocks the delete.
+    private IndexSetConfig validateAndSaveWithRepositoryLock(IndexSetConfig indexSetConfig) {
+        final Optional<String> repositoryLockId = Optional.ofNullable(indexSetConfig.dataTieringConfig())
+                .flatMap(DataTieringConfig::repositoryLockId);
+        if (repositoryLockId.isEmpty()) {
+            return validateAndSave(indexSetConfig);
+        }
+        try (RefreshingLockService lockService = lockServiceFactory.create()) {
+            lockService.acquireAndKeepLock(repositoryLockId.get(), 1);
+            return validateAndSave(indexSetConfig);
+        } catch (AlreadyLockedException e) {
+            throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
+        }
+    }
+
+    private IndexSetConfig validateAndSave(IndexSetConfig indexSetConfig) {
         final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new BadRequestException(violation.get().message());
         }
-
-        final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
-
-        return IndexSetResponse.fromIndexSetConfig(savedObject, isDefaultSet, null);
+        return indexSetService.save(indexSetConfig);
     }
 
     private void checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {

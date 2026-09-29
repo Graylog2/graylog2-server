@@ -87,7 +87,7 @@ const _multiplierForElement = (element, targetWidth, targetHeight) => {
 
 const isValidFontSize = (fontSize) => fontSize !== 0 && Number.isFinite(fontSize);
 
-const useAutoFontSize = (target, _container, height, width) => {
+const useAutoFontSize = (target, _container, height, width, children) => {
   const [fontSize, setFontSize] = useState(20);
 
   useLayoutEffect(() => {
@@ -120,14 +120,14 @@ const useAutoFontSize = (target, _container, height, width) => {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFontSize(newFontSize);
     }
-  }, [target, _container, fontSize, height, width]);
+  }, [target, _container, fontSize, height, width, children]);
 
   return fontSize;
 };
 
 const AutoFontSizer = ({ children, target = null, height, width, alignment = undefined }: Props) => {
   const _container = useRef<HTMLElement | undefined>();
-  const fontSize = useAutoFontSize(target, _container, height, width);
+  const fontSize = useAutoFontSize(target, _container, height, width, children);
   const _mixedContainer: { current } = _container;
 
   return (

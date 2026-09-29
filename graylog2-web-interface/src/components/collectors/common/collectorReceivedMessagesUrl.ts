@@ -18,7 +18,7 @@ import Routes from 'routing/Routes';
 
 /**
  * Builds a Graylog search URL filtered on a collector message field
- * (e.g. `collector_instance_uid`, `collector_fleet_id`, `collector_source_id`).
+ * (e.g. `agent_id`, `agent_fleet_id`, `agent_source_id`).
  * Uses a 1h relative time range and no stream scoping — the Collector System
  * Logs stream is system-scoped and is not included in unscoped searches.
  */

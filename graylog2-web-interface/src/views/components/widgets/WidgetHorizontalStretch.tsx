@@ -46,7 +46,7 @@ type Props = {
 };
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
 
   const onClick = useCallback(() => {
     const { col, row, height, width } = position;
@@ -61,7 +61,6 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     });
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_HORIZONTAL_STRETCH, {
-      app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',
     });
   }, [onStretch, position, sendTelemetry, widgetId, widgetType]);

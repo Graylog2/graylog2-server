@@ -39,6 +39,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.graylog.security.UserContext;
@@ -58,6 +59,7 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -188,17 +190,25 @@ public class EntityListPreferencesResource {
                 .getPredefinedForEntityList(entityListId)
                 .stream()
                 .sorted(Comparator.nullsFirst(Comparator.comparing(pref -> pref.preferences().priority())))
-                .map(pref -> new PredefinedLayoutVariant(
-                        pref.preferencesId().layoutVariant(),
-                        pref.preferencesId().entityListId(),
-                        pref.preferences().displayName(),
-                        pref.preferences().metrics()
+                .map(pref -> {
+                            try {
+                                final List<MetricValue> metrics = pref.preferences().metrics()
                                 .stream()
                                 .map(metricName -> metricProviders
                                         .getOrDefault(metricName, (tr, sub) -> new MetricValue(0L, "", metricName))
                                         .compute(timeRange, subject))
-                                .toList())
+                                        .toList();
+                                return new PredefinedLayoutVariant(
+                                        pref.preferencesId().layoutVariant(),
+                                        pref.preferencesId().entityListId(),
+                                        pref.preferences().displayName(),
+                                        metrics);
+                            } catch (AuthorizationException aux) {
+                                return null;
+                            }
+                        }
                 )
+                .filter(Objects::nonNull)
                 .toList();
 
     }

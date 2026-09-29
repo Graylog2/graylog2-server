@@ -136,6 +136,29 @@ class OpensearchDataDirCompatibilityCheckTest {
     }
 
     /**
+     * Elasticsearch 7.x wrote the Lucene 8 index format that opensearch 1.x kept writing, so it has to count as that
+     * generation instead of as a major version six generations away.
+     */
+    @Test
+    void testIsCompatibleTreatsElasticsearch7AsTheOpensearch1Generation() {
+        // same generation as opensearch 1.x
+        Assertions.assertThat(isCompatible("1.3.0", "7.10.2")).isTrue();
+        Assertions.assertThat(isCompatible("7.17.0", "1.0.0")).isTrue();
+        Assertions.assertThat(isCompatible("7.0.0", "7.17.9")).isTrue();
+
+        // one generation apart, which is what an in-place migration to a 2.x datanode runs into
+        Assertions.assertThat(isCompatible("2.19.0", "7.10.2")).isTrue();
+        Assertions.assertThat(isCompatible("7.10.2", "2.19.0")).isTrue();
+
+        // two generations apart: opensearch 3.x cannot read Lucene 8
+        Assertions.assertThat(isCompatible("3.5.0", "7.10.2")).isFalse();
+
+        // elasticsearch 6.x wrote Lucene 7 and has no opensearch counterpart
+        Assertions.assertThat(isCompatible("2.19.0", "6.8.23")).isFalse();
+        Assertions.assertThat(isCompatible("1.3.0", "6.8.23")).isFalse();
+    }
+
+    /**
      * There is one error per incompatible index, so a real cluster can produce thousands. The abort message has to
      * stay a readable size while the log keeps the complete list.
      */
