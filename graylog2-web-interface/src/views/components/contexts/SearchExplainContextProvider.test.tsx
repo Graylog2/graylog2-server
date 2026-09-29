@@ -28,19 +28,11 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
-let mockCurrentUserState: { currentUser: unknown };
-
 jest.mock('logic/users/CurrentUser', () => ({
   __esModule: true,
-  default: {
-    subscribe: () => () => {},
-    getState: () => {
-      mockCurrentUserState ??= { currentUser: mockDefaultUser.toJSON() };
-
-      return mockCurrentUserState;
-    },
-    reload: jest.fn(() => Promise.resolve()),
-  },
+  default: jest
+    .requireActual('helpers/mocking')
+    .ExternalStoreMock(() => ({ currentUser: mockDefaultUser.toJSON() }), { reload: jest.fn(() => Promise.resolve()) }),
 }));
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

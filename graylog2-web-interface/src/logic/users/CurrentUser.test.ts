@@ -59,15 +59,41 @@ describe('CurrentUser', () => {
     expect(mockGetUser).toHaveBeenCalledTimes(1);
   });
 
-  it('loads current user again after a failed attempt', async () => {
+  it('retries loading current user after a failed attempt', async () => {
+    jest.useFakeTimers();
     mockGetUser.mockRejectedValueOnce(new Error('Server unavailable')).mockResolvedValueOnce(alice.toJSON());
 
     Session.setUsername('alice');
     await waitFor(() => expect(mockGetUser).toHaveBeenCalledTimes(1));
 
-    Session.setUsername('alice');
+    jest.advanceTimersByTime(1000);
 
     await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
+
+    jest.useRealTimers();
+  });
+
+  it('ignores outdated response of an earlier reload', async () => {
+    mockGetUser.mockResolvedValueOnce(alice.toJSON());
+    Session.setUsername('alice');
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
+
+    const updatedAlice = { ...alice.toJSON(), full_name: 'Alice Updated' };
+    let resolveFirstReload: (user: UserJSON) => void;
+    mockGetUser
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFirstReload = resolve;
+        }),
+      )
+      .mockResolvedValueOnce(updatedAlice);
+
+    const firstReload = CurrentUser.reload();
+    await CurrentUser.reload();
+    resolveFirstReload(alice.toJSON());
+    await firstReload;
+
+    expect(CurrentUser.getState().currentUser).toEqual(updatedAlice);
   });
 
   it('ignores response for previous session', async () => {

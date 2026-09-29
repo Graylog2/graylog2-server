@@ -23,13 +23,10 @@ import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
 import Session from 'logic/session/Session';
-import { logout } from 'logic/session/SessionApi';
 
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
-
-jest.mock('logic/session/SessionApi', () => ({ logout: jest.fn() }));
 jest.mock('api/server-availability', () => ({
   reportSuccess: jest.fn(),
   reportError: jest.fn(),
@@ -148,6 +145,8 @@ describe('FetchProvider', () => {
   });
 
   it('removes local session if 401 is returned', async () => {
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
     const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
 
     expect(error.name).toEqual('FetchError');
@@ -155,7 +154,10 @@ describe('FetchProvider', () => {
       'There was an error fetching a resource: Unauthorized. Additional information: Not available',
     );
 
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(Session.isLoggedIn()).toBe(false);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
   });
 
   it('sends a request queued until login only once', async () => {

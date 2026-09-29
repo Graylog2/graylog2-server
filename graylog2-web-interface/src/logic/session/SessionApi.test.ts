@@ -66,7 +66,7 @@ describe('SessionApi', () => {
     const onLogout = jest.fn();
     const unsubscribe = Session.on('logout', onLogout);
 
-    await logout();
+    await expect(logout()).rejects.toThrow('Terminating session failed with status 500.');
 
     expect(Session.isLoggedIn()).toBe(true);
     expect(onLogout).not.toHaveBeenCalled();

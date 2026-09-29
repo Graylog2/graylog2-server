@@ -21,6 +21,7 @@ import { logout } from 'logic/session/SessionApi';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
+import UserNotification from 'util/UserNotification';
 
 const wrapHooks = (hooks: Array<() => void | Promise<unknown>>) => () =>
   Promise.allSettled(
@@ -47,7 +48,8 @@ const useLogout = () => {
         .then(() => {
           queryClient.removeQueries({ queryKey: ['streams'] });
         })
-        .then(() => history.push(Routes.STARTPAGE)),
+        .then(() => history.push(Routes.STARTPAGE))
+        .catch((error) => UserNotification.error(`Logging out failed: ${error}`, 'Could not log out')),
     [history, logoutHook, queryClient],
   );
 };

@@ -27,29 +27,22 @@ export const login = (username: string, password: string, host: string) =>
     return { username: response.username };
   });
 
-let pendingLogout: Promise<void> | undefined;
-
 // Plain request without error handler, as a 401 for it would otherwise trigger another logout.
 const terminateSession = () =>
-  new Builder('DELETE', qualifyUrl('/system/sessions/'))
-    .build()
-    .then(
-      (response: Response) => {
-        if (response.ok || response.status === 401) {
-          Session.endSession();
-        }
-      },
-      () => Session.endSession(),
-    )
-    .finally(() => {
-      pendingLogout = undefined;
-    });
+  new Builder('DELETE', qualifyUrl('/system/sessions/')).build().then(
+    (response: Response) => {
+      if (!response.ok && response.status !== 401) {
+        throw new Error(`Terminating session failed with status ${response.status}.`);
+      }
 
-export const logout = (): Promise<void> => {
-  pendingLogout ??= terminateSession();
+      Session.endSession();
+    },
+    () => Session.endSession(),
+  );
 
-  return pendingLogout;
-};
+Session.setLogoutHandler(terminateSession);
+
+export const logout = () => Session.logout();
 
 export const validate = () => {
   const storedUsername = Session.storedUsername();

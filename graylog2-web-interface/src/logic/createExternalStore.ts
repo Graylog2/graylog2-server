@@ -30,6 +30,10 @@ const createExternalStore = <S extends object>(initialState: S): ExternalStore<S
   return {
     getState: () => state,
     setState: (next: Partial<S>) => {
+      if (Object.entries(next).every(([key, value]) => Object.is(state[key], value))) {
+        return;
+      }
+
       state = { ...state, ...next };
       listeners.forEach((listener) => listener());
     },

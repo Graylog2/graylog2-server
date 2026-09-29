@@ -97,11 +97,13 @@ const useValidateSession = () => {
   useEffect(() => {
     let ignore = false;
 
-    validate().then(() => {
+    const onValidated = () => {
       if (!ignore) {
         setDidValidateSession(true);
       }
-    });
+    };
+
+    validate().then(onValidated, onValidated);
 
     return () => {
       ignore = true;

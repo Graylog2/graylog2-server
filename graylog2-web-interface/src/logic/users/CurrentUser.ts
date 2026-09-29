@@ -19,42 +19,51 @@ import { Users } from '@graylog/server-api';
 import type { UserJSON } from 'logic/users/User';
 import { singleton } from 'logic/singleton';
 import createExternalStore from 'logic/createExternalStore';
+import isDeepEqual from 'stores/isDeepEqual';
 import Session from 'logic/session/Session';
 
 export type CurrentUserState = { currentUser: UserJSON | undefined };
 
+const RETRY_DELAYS_MS = [1000, 2000, 5000, 10000, 30000];
+
 const createCurrentUser = () => {
   const store = createExternalStore<CurrentUserState>({ currentUser: undefined });
+  let latestRequest = 0;
 
-  const load = (username: string): Promise<UserJSON> =>
-    Users.get(encodeURIComponent(username)).then((user) => {
+  const load = (username: string) => {
+    latestRequest += 1;
+    const request = latestRequest;
+
+    return Users.get(encodeURIComponent(username)).then((user) => {
       const currentUser = user as UserJSON;
 
-      if (Session.getState().username === username) {
+      if (request === latestRequest && !isDeepEqual(store.getState().currentUser, currentUser)) {
         store.setState({ currentUser });
       }
 
       return currentUser;
     });
+  };
 
-  let sessionUsername: string | undefined;
+  const loadWithRetry = (username: string, attempt = 0) =>
+    load(username).catch(() => {
+      const delay = RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)];
+
+      setTimeout(() => {
+        if (Session.getState().username === username && !store.getState().currentUser) {
+          loadWithRetry(username, attempt + 1);
+        }
+      }, delay);
+    });
+
   const onSessionChange = () => {
     const { username } = Session.getState();
 
-    if (username === sessionUsername) {
-      return;
-    }
-
-    sessionUsername = username;
+    latestRequest += 1;
+    store.setState({ currentUser: undefined });
 
     if (username) {
-      load(username).catch(() => {
-        if (sessionUsername === username) {
-          sessionUsername = undefined;
-        }
-      });
-    } else {
-      store.setState({ currentUser: undefined });
+      loadWithRetry(username);
     }
   };
 
@@ -64,10 +73,10 @@ const createCurrentUser = () => {
   return {
     getState: store.getState,
     subscribe: store.subscribe,
-    reload: (): Promise<UserJSON | void> => {
+    reload: () => {
       const { username } = Session.getState();
 
-      return username ? load(username) : Promise.resolve();
+      return username ? load(username) : Promise.resolve(undefined);
     },
   };
 };

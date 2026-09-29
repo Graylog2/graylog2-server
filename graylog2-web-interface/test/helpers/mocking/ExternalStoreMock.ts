@@ -14,7 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as StoreMock } from './StoreMock';
-export { default as MockStore } from './StoreMock';
-export { default as asMock } from './AsMock';
-export { default as ExternalStoreMock } from './ExternalStoreMock';
+const ExternalStoreMock = <S extends object, M extends object>(initialState: () => S, methods?: M) => {
+  let state: S | undefined;
+
+  return {
+    getState: () => {
+      state ??= initialState();
+
+      return state;
+    },
+    subscribe: () => () => {},
+    ...methods,
+  };
+};
+
+export default ExternalStoreMock;

@@ -37,6 +37,14 @@ const createSession = () => {
 
     store.setState({ username });
   };
+  const endSession = () => {
+    if (isLoggedIn()) {
+      setUsername(undefined);
+      notify('logout');
+    }
+  };
+  let logoutHandler = async () => endSession();
+  let pendingLogout: Promise<void> | undefined;
 
   return {
     getState: store.getState,
@@ -44,11 +52,16 @@ const createSession = () => {
     isLoggedIn,
     storedUsername: (): string | undefined => Store.get(USERNAME_KEY),
     setUsername,
-    endSession: () => {
-      if (isLoggedIn()) {
-        setUsername(undefined);
-        notify('logout');
-      }
+    endSession,
+    setLogoutHandler: (handler: () => Promise<void>) => {
+      logoutHandler = handler;
+    },
+    logout: () => {
+      pendingLogout ??= logoutHandler().finally(() => {
+        pendingLogout = undefined;
+      });
+
+      return pendingLogout;
     },
     waitForLogin: () =>
       isLoggedIn()

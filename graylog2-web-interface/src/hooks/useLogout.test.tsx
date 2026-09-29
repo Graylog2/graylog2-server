@@ -16,7 +16,7 @@
  */
 import 'whatwg-fetch';
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DefaultProviders from 'DefaultProviders';
@@ -27,8 +27,13 @@ import { dataRouterFuture, routerProviderFuture } from 'reactRouterFutureFlags';
 import Routes from 'routing/Routes';
 import { usePluginExports } from 'views/test/testPlugins';
 import suppressConsole from 'helpers/suppressConsole';
+import { logout as sessionLogout } from 'logic/session/SessionApi';
+import { asMock } from 'helpers/mocking';
+import UserNotification from 'util/UserNotification';
 
 import useLogout from './useLogout';
+
+jest.mock('logic/session/SessionApi', () => ({ logout: jest.fn(() => Promise.resolve()) }));
 
 const TestComponent = () => {
   const logout = useLogout();
@@ -74,6 +79,22 @@ describe('useLogout', () => {
       await userEvent.click(logoutButton);
 
       await screen.findByText('Logged out');
+    });
+
+    it('shows error and stays on page if logging out fails', async () => {
+      asMock(sessionLogout).mockRejectedValueOnce(new Error('Terminating session failed with status 500.'));
+      const notifyError = jest.spyOn(UserNotification, 'error').mockImplementation(() => {});
+      render(<Wrapper />, { wrapper: Providers });
+
+      await userEvent.click(await screen.findByRole('button', { name: 'logout' }));
+
+      await waitFor(() =>
+        expect(notifyError).toHaveBeenCalledWith(
+          'Logging out failed: Error: Terminating session failed with status 500.',
+          'Could not log out',
+        ),
+      );
+      expect(screen.getByText('Logged in')).toBeInTheDocument();
     });
   });
 

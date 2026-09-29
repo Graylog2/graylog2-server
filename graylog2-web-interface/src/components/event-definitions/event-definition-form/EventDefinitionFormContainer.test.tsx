@@ -180,19 +180,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-let mockCurrentUserState: { currentUser: unknown };
-
 jest.mock('logic/users/CurrentUser', () => ({
   __esModule: true,
-  default: {
-    subscribe: () => () => {},
-    getState: () => {
-      mockCurrentUserState ??= { currentUser: mockDefaultUser.toJSON() };
-
-      return mockCurrentUserState;
-    },
-    reload: jest.fn(() => Promise.resolve()),
-  },
+  default: jest
+    .requireActual('helpers/mocking')
+    .ExternalStoreMock(() => ({ currentUser: mockDefaultUser.toJSON() }), { reload: jest.fn(() => Promise.resolve()) }),
 }));
 
 jest.mock('logic/telemetry/withTelemetry', () => ({
