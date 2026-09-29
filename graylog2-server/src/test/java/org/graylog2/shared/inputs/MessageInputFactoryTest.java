@@ -107,6 +107,18 @@ class MessageInputFactoryTest {
         verify(factory, times(1)).create(any());
     }
 
+    @Test
+    void buildsTheAvailableInputDescriptionsOnlyOnce() {
+        final MessageInput.Factory<MessageInput> factory = factoryFor(true);
+        final MessageInputFactory messageInputFactory = messageInputFactory(Map.of(TYPE, factory));
+
+        final Map<String, InputDescription> first = messageInputFactory.getAvailableInputs();
+
+        assertThat(messageInputFactory.getAvailableInputs()).isSameAs(first);
+        verify(factory, times(1)).getDescriptor();
+        verify(factory, times(1)).getConfig();
+    }
+
     /**
      * The type answer is cached on the instance, so a per-injection instance would answer from an empty cache and
      * instantiate an input on every REST request. Resources are built per request, hence this test.

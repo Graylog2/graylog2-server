@@ -16,7 +16,9 @@
  */
 package org.graylog2.shared.inputs;
 
-import com.google.common.collect.Maps;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.featureflag.FeatureFlags;
@@ -38,6 +40,9 @@ public class MessageInputFactory {
     private final FeatureFlags featureFlags;
 
     private final ConcurrentMap<String, Boolean> onlyOnePerClusterByType = new ConcurrentHashMap<>();
+
+    private final Supplier<Map<String, InputDescription>> availableInputs =
+            Suppliers.memoize(this::buildAvailableInputs);
 
     @Inject
     public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories,
@@ -81,17 +86,22 @@ public class MessageInputFactory {
         return input;
     }
 
+    /**
+     * Built once: the descriptions come from the Guice map binding, which is fixed once the injector exists, and
+     * several resources ask for this in their constructor, which runs per request.
+     */
     public Map<String, InputDescription> getAvailableInputs() {
-        final Map<String, InputDescription> result = Maps.newHashMap();
+        return availableInputs.get();
+    }
+
+    private Map<String, InputDescription> buildAvailableInputs() {
+        final ImmutableMap.Builder<String, InputDescription> result = ImmutableMap.builder();
         for (final Map.Entry<String, MessageInput.Factory<? extends MessageInput>> factories : inputFactories.entrySet()) {
             final MessageInput.Factory<? extends MessageInput> factory = factories.getValue();
-            final MessageInput.Descriptor descriptor = factory.getDescriptor();
-            final MessageInput.Config config = factory.getConfig();
-            final InputDescription inputDescription = new InputDescription(descriptor, config);
-            result.put(factories.getKey(), inputDescription);
+            result.put(factories.getKey(), new InputDescription(factory.getDescriptor(), factory.getConfig()));
         }
 
-        return result;
+        return result.build();
     }
 
     /**
