@@ -130,8 +130,10 @@
         <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.73.0</gcs.version>
-        <azure-blob-storage.version>12.35.0</azure-blob-storage.version>
+        <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
+        <azure-core.version>1.59.0</azure-core.version>
         <azure-json.version>1.5.1</azure-json.version>
+        <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
         <google-api-common.version>2.68.0</google-api-common.version>
@@ -356,6 +358,18 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-storage-blob</artifactId>
                 <version>${azure-blob-storage.version}</version>
+            </dependency>
+            <!-- Keep azure-core aligned with the version azure-storage-blob and azure-messaging-eventhubs require -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core</artifactId>
+                <version>${azure-core.version}</version>
+            </dependency>
+            <!-- Used by the enterprise plugin. Managed here so it is bumped together with azure-storage-blob -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-messaging-eventhubs</artifactId>
+                <version>${azure-messaging-eventhubs.version}</version>
             </dependency>
             <!-- msal4j pulls in an older azure-json than azure-core requires -->
             <dependency>
