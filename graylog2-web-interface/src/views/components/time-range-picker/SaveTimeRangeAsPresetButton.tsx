@@ -149,7 +149,7 @@ const SaveTimeRangeAsPresetButton = () => {
 
   const { config, refresh } = useSearchConfiguration();
   const [showForm, setShowForm] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
 
   const isValidTimeRange = !errors.timeRangeTabs?.[activeTab];
 
@@ -181,7 +181,6 @@ const SaveTimeRangeAsPresetButton = () => {
       if (timeRangePreset) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS, {
           app_pathname: 'search',
-          app_section: 'search-bar',
           event_details: {
             timerange: timeRangePreset.timerange,
             id: timeRangePreset.id,

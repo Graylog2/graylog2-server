@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -41,9 +42,17 @@ public interface MoreSearchAdapter {
                                           int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter) {
         return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, Map.of());
     }
+
+    default MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
+                                          int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                          Map<String, Set<String>> extraFilters) {
+        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, extraFilters, Set.of());
+    }
+
+    /** @param excludedEventIds event IDs to exclude, applied as a {@code must_not} terms filter. */
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
                                   int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                  Map<String, Set<String>> extraFilters);
+                                  Map<String, Set<String>> extraFilters, Set<String> excludedEventIds);
 
     MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                         Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
@@ -133,7 +142,42 @@ public interface MoreSearchAdapter {
                 .build();
     }
 
+    /**
+     * Comparison prefix an {@code extraFilters} value may carry. Declared longest-first so {@code <=}
+     * is matched before {@code <}.
+     */
+    enum RangeOperator {
+        LTE("<="), GTE(">="), LT("<"), GT(">");
+
+        private final String prefix;
+
+        RangeOperator(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String prefix() {
+            return prefix;
+        }
+    }
+
+    record RangeValue(RangeOperator operator, String value) {}
+
+    /**
+     * Splits a range-style {@code extraFilters} value (e.g. {@code >=5.0}) into its operator and bare
+     * value, or empty if it carries no comparison prefix. Storage adapters share this so the prefix
+     * parsing lives in one place and only the mapping to each backend's query builder is duplicated —
+     * that part cannot be shared, since the query types differ per backend.
+     */
+    static Optional<RangeValue> parseRangeValue(String value) {
+        for (final RangeOperator operator : RangeOperator.values()) {
+            if (value.startsWith(operator.prefix())) {
+                return Optional.of(new RangeValue(operator, value.substring(operator.prefix().length())));
+            }
+        }
+        return Optional.empty();
+    }
+
     static boolean isRangeValue(String value) {
-        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
+        return parseRangeValue(value).isPresent();
     }
 }

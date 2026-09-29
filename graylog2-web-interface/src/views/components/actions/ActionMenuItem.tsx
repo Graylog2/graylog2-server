@@ -137,7 +137,7 @@ const ActionHandlerItem = ({
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const { executeThunkAction } = useFieldActions();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-field-value');
 
   const setActionComponents: SetActionComponents = useCallback(
     (fn) => {
@@ -155,7 +155,6 @@ const ActionHandlerItem = ({
     const { resetFocus = false, title } = action;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION[upperCase(title).replace(/\s|\//g, '_')], {
-      app_section: 'search-field-value',
       event_details: {},
     });
 

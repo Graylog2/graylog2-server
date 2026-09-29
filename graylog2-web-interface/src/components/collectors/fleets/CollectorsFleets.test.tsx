@@ -30,6 +30,7 @@ jest.mock('components/collectors/hooks', () => ({
   __esModule: true,
   ...jest.requireActual('components/collectors/hooks'),
   useCollectorsMutations: jest.fn(),
+  useFleetsBulkStats: jest.fn(() => ({ data: undefined })),
 }));
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn(), goBack: jest.fn() }));
 jest.mock('routing/useLocation', () => () => ({ pathname: '/system/collectors/fleets' }));
@@ -73,12 +74,12 @@ describe('CollectorsFleets telemetry', () => {
     });
   });
 
-  it('points the row action at the collector_fleet_id filter', async () => {
+  it('points the row action at the agent_fleet_id filter', async () => {
     render(<CollectorsFleets />);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
 
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_fleet_id'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_fleet_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('f-1'));
   });
 });

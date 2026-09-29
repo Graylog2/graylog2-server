@@ -137,7 +137,7 @@ const TimeRangePresetDropdown = ({
   bsSize = 'small',
   header = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime } = useUserDateTime();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
 
@@ -148,7 +148,6 @@ const TimeRangePresetDropdown = ({
       }
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
-        app_section: 'search-bar',
         app_action_value: 'timerange-preset-selector',
         event_details: { timerange },
       });

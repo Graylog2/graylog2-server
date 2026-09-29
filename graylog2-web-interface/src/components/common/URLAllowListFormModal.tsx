@@ -40,11 +40,7 @@ type Props = {
 
 const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
-  const [config, setConfig] = useState<AllowListConfig>({
-    entries: [],
-    disabled: false,
-    enforce_for_notifications: false,
-  });
+  const [config, setConfig] = useState<AllowListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
@@ -53,7 +49,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   const urlAllowListConfig = configuration[URL_ALLOWLIST_CONFIG];
 
   const currentUser = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, ['urlallowlist:read'])) {
@@ -75,7 +71,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
           },
         ],
         disabled: defaultUrlAllowListConfig.disabled,
-        enforce_for_notifications: defaultUrlAllowListConfig.enforce_for_notifications ?? false,
       };
       setNewUrlEntryId(id);
       setConfig(defaultConfig);
@@ -116,7 +111,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
     }
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.URLALLOWLIST_CONFIGURATION_UPDATED, {
-      app_section: 'urlallowlist',
       app_action_value: 'configuration-update',
     });
 
@@ -129,7 +123,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   };
 
   if (urlAllowListConfig) {
-    const { entries, disabled, enforce_for_notifications: enforceForNotifications } = config;
+    const { entries, disabled } = config;
 
     return (
       <>
@@ -151,7 +145,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
             key={newUrlEntryId}
             urls={entries}
             disabled={disabled}
-            enforceForNotifications={enforceForNotifications}
             onUpdate={handleUpdate}
             newEntryId={newUrlEntryId}
           />

@@ -24,9 +24,7 @@ import useHistory from 'routing/useHistory';
 import copyToClipboard from 'util/copyToClipboard';
 import UserNotification from 'util/UserNotification';
 import { saveRuleSourceCode } from 'hooks/useRuleBuilder';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { ModalButtonToolbar } from 'components/common';
 
@@ -48,8 +46,7 @@ type Props = {
 
 const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props) => {
   const history = useHistory();
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('convert-rule-builder-to-source-code-modal');
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large">
@@ -68,8 +65,6 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
             bsStyle="primary"
             onClick={async () => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_NEW_RULE_FROM_CODE_CLICKED, {
-                app_pathname: getPathnameWithoutId(pathname),
-                app_section: 'convert-rule-builder-to-source-code-modal',
                 app_action_value: 'create-new-rule-from-code-button',
               });
 
@@ -84,8 +79,6 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
             bsStyle="info"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.COPY_CODE_AND_CLOSE_CLICKED, {
-                app_pathname: getPathnameWithoutId(pathname),
-                app_section: 'convert-rule-builder-to-source-code-modal',
                 app_action_value: 'copy-rule-code-and-close-button',
               });
 

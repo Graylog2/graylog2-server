@@ -23,9 +23,32 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 
 import ReassignFleetModal from './ReassignFleetModal';
 
+import { useFleets, useCollectorPermissions } from '../hooks';
+
+/**
+ * Whether this component has any action to offer the current user.
+ *
+ * Exported so a table can decide whether to render the bulk-select column at all -- an
+ * `EntityDataTable` shows that column whenever `bulkSelection.actions` is set, and cannot tell
+ * that the element it was handed renders nothing. Callers get a boolean and stay unaware of which
+ * actions exist or which permissions they need.
+ *
+ * Reassigning needs a fleet to move *to*, so the answer is "is there any fleet the user may assign
+ * into"; `isEntitySelectable` separately gates which instances may be moved *from*. While the
+ * fleet list is still loading we assume yes, so the column does not pop in for the common,
+ * permitted case.
+ */
+export const useHasBulkActions = () => {
+  const { data: fleets } = useFleets();
+  const { canAssignToFleet } = useCollectorPermissions();
+
+  return fleets === undefined || fleets.some((fleet) => canAssignToFleet(fleet.id));
+};
+
 const BulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const canReassignAnywhere = useHasBulkActions();
 
   const toggleReassignModal = useCallback(() => {
     setShowReassignModal((cur) => !cur);
@@ -37,9 +60,11 @@ const BulkActions = () => {
 
   return (
     <>
-      <BulkActionsDropdown>
-        <MenuItem onSelect={toggleReassignModal}>Reassign to fleet</MenuItem>
-      </BulkActionsDropdown>
+      {canReassignAnywhere && (
+        <BulkActionsDropdown>
+          <MenuItem onSelect={toggleReassignModal}>Reassign to fleet</MenuItem>
+        </BulkActionsDropdown>
+      )}
       {showReassignModal && (
         <ReassignFleetModal
           origin="bulk-selection"

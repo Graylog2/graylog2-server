@@ -21,6 +21,7 @@ import { useEffect, useRef } from 'react';
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
@@ -29,6 +30,7 @@ import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
+import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
@@ -48,12 +50,15 @@ const CollectorsOnboardingInstancePage = () => {
   // are actually arriving.
   const finishedFor = useRef<string | null>(null);
 
+  const { data: onboarding } = useOnboardingEligibility();
+  const onboardingInProgress = onboarding?.status === 'setup';
+
   useEffect(() => {
-    if (!instance || finishedFor.current === instance.instance_uid) return;
+    if (!onboardingInProgress || !instance || finishedFor.current === instance.instance_uid) return;
 
     finishedFor.current = instance.instance_uid;
     finish();
-  }, [instance, finish]);
+  }, [onboardingInProgress, instance, finish]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
@@ -82,7 +87,11 @@ const CollectorsOnboardingInstancePage = () => {
           <>
             Collector Onboarding <PreviewBadge />
           </>
-        }>
+        }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
         <span>Status of your newly connected collector.</span>
       </PageHeader>
       <Row className="content">

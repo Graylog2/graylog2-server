@@ -33,7 +33,6 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -60,7 +59,6 @@ public class TeamsEventNotification implements EventNotification {
     private final RequestClient requestClient;
     private final TemplateModelProvider templateModelProvider;
     private final CustomizationConfig customizationConfig;
-    private final UrlAllowlistValidator urlAllowlistValidator;
 
     @Inject
     public TeamsEventNotification(EventNotificationService notificationCallbackService,
@@ -69,8 +67,7 @@ public class TeamsEventNotification implements EventNotification {
                                   NotificationService notificationService,
                                   NodeId nodeId, RequestClient requestClient,
                                   TemplateModelProvider templateModelProvider,
-                                  CustomizationConfig customizationConfig,
-                                  UrlAllowlistValidator urlAllowlistValidator) {
+                                  CustomizationConfig customizationConfig) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
@@ -79,7 +76,6 @@ public class TeamsEventNotification implements EventNotification {
         this.requestClient = requireNonNull(requestClient);
         this.templateModelProvider = templateModelProvider;
         this.customizationConfig = customizationConfig;
-        this.urlAllowlistValidator = requireNonNull(urlAllowlistValidator);
     }
 
     /**
@@ -92,7 +88,6 @@ public class TeamsEventNotification implements EventNotification {
         LOG.debug("TeamsEventNotification backlog size in method execute is [{}]", config.backlogSize());
 
         try {
-            urlAllowlistValidator.validateUrl(config.webhookUrl(), ctx);
             TeamsMessage teamsMessage = createTeamsMessage(ctx, config);
             requestClient.send(objectMapperProvider.getForTimeZone(config.timeZone()).writeValueAsString(teamsMessage), config.webhookUrl());
         } catch (TemporaryEventNotificationException exp) {

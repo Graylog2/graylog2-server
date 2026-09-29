@@ -42,7 +42,8 @@ import SourceStatusSection from './SourceStatusSection';
 import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import { AGENT_ID_FIELD } from '../../common/fields';
+import { useCollectorPermissions } from '../../hooks';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -68,10 +69,7 @@ const ColContainer = styled.div`
 type OnboardingOutcome = 'offline' | 'online-silent' | 'online-receiving';
 
 // One event per onboarding state, so entering a state always reports the same way.
-const ONBOARDING_STATE_EVENTS: Record<
-  OnboardingOutcome,
-  { eventType: TelemetryEventType; appActionValue: string }
-> = {
+const ONBOARDING_STATE_EVENTS: Record<OnboardingOutcome, { eventType: TelemetryEventType; appActionValue: string }> = {
   offline: {
     eventType: TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CONNECTION_LOST,
     appActionValue: 'onboarding-connection-lost',
@@ -92,12 +90,13 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
     instance.instance_uid,
   );
   const { data: sources } = useSources(instance.fleet_id);
+  const { canReadSystemLogs } = useCollectorPermissions();
   const queryClient = useQueryClient();
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const online = instance.status === 'online';
   const receiving = (sourceLogs?.total ?? 0) > 0;
-  const sourceLogsUrl = collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid);
+  const sourceLogsUrl = collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid);
 
   // Which of the page's three states the user is looking at; attached to every click event so
   // interactions can be segmented by how the onboarding actually went.
@@ -250,7 +249,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
       ) : (
         <LogPreviewSection
           title="Log Preview"
-          searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
+          searchUrl={canReadSystemLogs ? collectorSystemLogsUrl(instance.instance_uid) : undefined}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}

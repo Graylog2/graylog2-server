@@ -66,12 +66,11 @@ const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) =>
   Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url;
 
 const ContentStreamNewsItem = ({ feed }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('content-stream');
 
   const handleSendTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.ARTICLE_CLICKED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         title: feed?.title,
         link: feed?.link,

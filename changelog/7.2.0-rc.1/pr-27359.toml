@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix a false error toast when renaming a lookup table, cache, or data adapter and saving."
+
+pulls = ["27359"]

@@ -23,7 +23,7 @@ import { Select, Spinner } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useFleets, useCollectorsMutations } from '../hooks';
+import { useFleets, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
@@ -64,9 +64,13 @@ const ReassignFleetModal = ({
 }: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
+  const { canAssignToFleet } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
 
-  const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
+  // Kept separate so the empty state can tell "there is nowhere else to move to" apart from
+  // "you may not move it there" — they are different problems with different remedies.
+  const otherFleets = (fleets ?? []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
+  const availableFleets = otherFleets.filter((fleet: Fleet) => canAssignToFleet(fleet.id));
 
   const fleetOptions = availableFleets.map((fleet: Fleet) => ({
     label: fleet.name,
@@ -121,13 +125,23 @@ const ReassignFleetModal = ({
               {fleetsLoading ? (
                 <Spinner />
               ) : (
-                <Select
-                  placeholder="Select a fleet..."
-                  options={fleetOptions}
-                  value={values.fleetId}
-                  onChange={(value: string) => setFieldValue('fleetId', value)}
-                  clearable={false}
-                />
+                <>
+                  {fleetOptions.length === 0 ? (
+                    <p>
+                      {otherFleets.length === 0
+                        ? `There is no other fleet to assign ${instanceCount === 1 ? 'this Collector' : 'these Collectors'} to.`
+                        : 'You do not have permission to assign Collectors to any other fleet.'}
+                    </p>
+                  ) : (
+                    <Select
+                      placeholder="Select a fleet..."
+                      options={fleetOptions}
+                      value={values.fleetId}
+                      onChange={(value: string) => setFieldValue('fleetId', value)}
+                      clearable={false}
+                    />
+                  )}
+                </>
               )}
             </Modal.Body>
             <Modal.Footer>

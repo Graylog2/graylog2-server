@@ -29,8 +29,6 @@ import {
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -48,16 +46,13 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('event-notification');
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
     usePluggableEntitySharedActions<EventNotification>(notification, 'notification');
   const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const onDelete = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_DELETE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-notification',
       app_action_value: 'notification-delete',
     });
 

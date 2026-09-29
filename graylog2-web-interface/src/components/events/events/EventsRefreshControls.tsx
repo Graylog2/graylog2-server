@@ -21,8 +21,6 @@ import { HoverForHelp } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
@@ -45,8 +43,7 @@ const useDisableRefreshWhileSlicing = () => {
 };
 
 const EventsRefreshControls = () => {
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('alerts-page');
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
@@ -55,20 +52,17 @@ const EventsRefreshControls = () => {
   const onSelectInterval = useCallback(
     (interval: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_PRESET_SELECTED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
-        app_section: 'alerts-page',
         app_action_value: 'refresh-alerts-control-dropdown',
         event_details: { interval: interval },
       });
     },
-    [location.pathname, sendTelemetry],
+    [sendTelemetry],
   );
 
   const onToggle = useCallback(
     (enabled: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_TOGGLED, {
         app_pathname: 'alerts',
-        app_section: 'alerts-page',
         app_action_value: 'refresh-alerts-control-enable',
         event_details: { enabled },
       });

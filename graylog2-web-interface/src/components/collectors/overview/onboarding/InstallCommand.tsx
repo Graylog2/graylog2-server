@@ -80,7 +80,13 @@ const HeaderActions = styled.div(
   `,
 );
 
-const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undefined, onCopySuccess = undefined }: Props) => (
+const InstallCommand = ({
+  command,
+  platformLabel,
+  tokenDuration,
+  actions = undefined,
+  onCopySuccess = undefined,
+}: Props) => (
   <Container>
     <Header>
       <Title>Run This on {platformLabel}</Title>
@@ -91,7 +97,8 @@ const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undef
     </Header>
     <CommandBlock>{command}</CommandBlock>
     <Note>
-      Runs the collector, enrolls it in the selected fleet, and starts collecting immediately.{' '}
+      Downloads and installs the collector, enrolls it in the selected fleet, and starts the service. Requires
+      administrator privileges.{' '}
       {tokenDuration ? <>Token expires in {formatDuration(tokenDuration, () => true)}.</> : 'This token never expires.'}
     </Note>
   </Container>

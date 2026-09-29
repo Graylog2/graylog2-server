@@ -25,7 +25,7 @@ import type { CollectorInstanceView } from 'components/collectors/types';
 
 import { IconRow, IconRowList } from '../../common/IconRowList';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import { AGENT_ID_FIELD } from '../../common/fields';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -66,7 +66,7 @@ const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
     icon: 'search',
     title: 'Explore your data',
     description: 'Open search filtered to this collector',
-    to: collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid),
+    to: collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid),
   },
   {
     key: 'configure-sources',

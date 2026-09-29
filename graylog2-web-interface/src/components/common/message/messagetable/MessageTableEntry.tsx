@@ -176,7 +176,7 @@ const MessageTableEntry = ({
   const streamsList = useContext(StreamsContext);
   const highlightMessageId = useContext(HighlightMessageContext);
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('widget');
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const streams = useMemo(
     () => Immutable.Map<string, Stream>((streamsList ?? []).map((stream) => [stream.id, stream])),
@@ -196,7 +196,6 @@ const MessageTableEntry = ({
 
     if (!isSelectingText) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED, {
-        app_section: 'widget',
         app_action_value: 'widget-message-table-toggle-details',
       });
 
