@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import chroma from 'chroma-js';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -223,7 +224,7 @@ describe('SankeyVisualization', () => {
     expect(trace.link.value).toEqual([1, 1, 1]);
   });
 
-  it('themes the link color for visibility while leaving node colors to the default palette', () => {
+  it('colors each link with the color of its destination node', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
       .series([Series.forFunction('count()')])
@@ -233,13 +234,15 @@ describe('SankeyVisualization', () => {
     render(<WrappedSankey {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
     const trace = lastTrace();
+    const hue = (color: string) => chroma(color).alpha(1).hex();
 
-    expect(typeof trace.link.color).toBe('string');
-    expect(trace.link.color).not.toHaveLength(0);
-    expect(trace.node.color).toBeUndefined();
+    expect(trace.node.color).toHaveLength(trace.node.label.length);
+    expect(new Set(trace.node.color).size).toBe(trace.node.label.length);
+    expect(trace.link.color.map(hue)).toEqual(trace.link.target.map((t) => hue(trace.node.color[t])));
+    expect(trace.link.hovercolor.map(hue)).toEqual(trace.link.target.map((t) => hue(trace.node.color[t])));
   });
 
-  it('uses a distinct, more prominent hover color so hovered links stand out', () => {
+  it('makes hovered links more prominent than resting links', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
       .series([Series.forFunction('count()')])
@@ -250,10 +253,30 @@ describe('SankeyVisualization', () => {
 
     const trace = lastTrace();
 
-    expect(typeof trace.link.hovercolor).toBe('string');
-    expect(trace.link.hovercolor).not.toHaveLength(0);
-    // The hover color differs from the resting color, so hovering changes the appearance.
-    expect(trace.link.hovercolor).not.toEqual(trace.link.color);
+    trace.link.color.forEach((color, i) => {
+      expect(chroma(trace.link.hovercolor[i]).alpha()).toBeGreaterThan(chroma(color).alpha());
+    });
+  });
+
+  it('renders links at most half as opaque as nodes, in a notation plotly parses the alpha of', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
+      .series([Series.forFunction('count()')])
+      .visualization('sankey')
+      .build();
+
+    render(<WrappedSankey {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const trace = lastTrace();
+    const hexWithAlpha = /^#[0-9a-f]{6}([0-9a-f]{2})?$/i;
+
+    [...trace.node.color, ...trace.link.color, ...trace.link.hovercolor].forEach((color) => {
+      expect(color).toMatch(hexWithAlpha);
+    });
+
+    trace.link.color.forEach((color, i) => {
+      expect(chroma(color).alpha()).toBeLessThanOrEqual(chroma(trace.node.color[trace.link.target[i]]).alpha() / 2);
+    });
   });
 
   it('renders an empty-state message when there are no rows', () => {

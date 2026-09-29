@@ -29,6 +29,7 @@ const defaultPages = {
   CHANGELOG: 'changelogs/changelog.html',
   CLUSTER_STATUS_EXPLAINED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
   COLLECTOR: 'getting_in_log_data/graylog_sidecar.html',
+  COLLECTORS: 'getting_in_log_data/collectors.htm',
   COLLECTOR_SIDECAR: 'getting_in_log_data/graylog_sidecar.html',
   COLLECTOR_STATUS: 'getting_in_log_data/getting_started_with_graylog_sidecar.htm#ViewSidecarStatus',
   CONFIGURING_ES: 'setting_up_graylog/opensearch.htm#GraylogConfigurationSettings',
