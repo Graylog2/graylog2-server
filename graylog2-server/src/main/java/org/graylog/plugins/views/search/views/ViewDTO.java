@@ -279,6 +279,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         }
 
         final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
+                .scope(ValueReference.of(this.scope()))
                 .type(this.type())
                 .title(ValueReference.of(this.title()))
                 .summary(ValueReference.of(this.summary()))
