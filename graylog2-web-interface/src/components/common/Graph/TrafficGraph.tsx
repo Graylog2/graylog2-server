@@ -19,7 +19,6 @@ import styled, { css, useTheme } from 'styled-components';
 
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
-import AppConfig from 'util/AppConfig';
 import {
   getHoverTemplateSettings,
   getFormatSettingsByData,
@@ -30,6 +29,10 @@ type Props = {
   traffic: { [key: string]: number };
   width: number;
   trafficLimit?: number;
+  zoomedToData?: boolean;
+  uiRevision?: number;
+  onUserZoom?: () => void;
+  onUserZoomReset?: () => void;
 };
 
 const GraphWrapper = styled.div<{
@@ -47,11 +50,18 @@ type GeneratedLayout = {
   ticktext: Array<string>;
 };
 
-const getMaxDailyValue = (arr: Array<number>) => arr.reduce((a, b) => Math.max(a, b), 0);
+const PLOT_CONFIG = { doubleClick: 'reset' as const };
 
-const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
+const TrafficGraph = ({
+  width,
+  traffic,
+  trafficLimit = undefined,
+  zoomedToData = false,
+  uiRevision = 1,
+  onUserZoom = undefined,
+  onUserZoomReset = undefined,
+}: Props) => {
   const theme = useTheme();
-  const isCloud = AppConfig.isCloud();
 
   const yValues = useMemo(() => Object.values(traffic), [traffic]);
 
@@ -61,16 +71,15 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
         type: 'bar',
         x: Object.keys(traffic),
         y: yValues,
+        outsidetextfont: { color: theme.colors.text.primary },
         ...getHoverTemplateSettings({
           convertedValues: yValues,
           unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'binary_size' }),
         }),
       },
     ],
-    [traffic, yValues],
+    [theme.colors.text.primary, traffic, yValues],
   );
-
-  const maxDailyValue = useMemo(() => getMaxDailyValue(yValues), [yValues]);
 
   const trafficLimitAnnotation: Partial<PlotLayout> = useMemo(
     () => ({
@@ -139,6 +148,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       showlegend: false,
       margin: {
         l: 60,
+        t: 28,
       },
       xaxis: {
         type: 'date',
@@ -152,57 +162,10 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       hoverlabel: {
         namelength: -1,
       },
-      yaxis: notZoomedLayout,
-      updatemenus: [
-        {
-          buttons: [
-            {
-              // args: ['yaxis.range', [0, isCloud ? trafficLimit : range]],
-              args: [
-                {
-                  'yaxis.range': zoomedLayout.range,
-                  'yaxis.tickvals': zoomedLayout.tickvals,
-                  'yaxis.ticktext': zoomedLayout.ticktext,
-                },
-              ],
-              args2: [
-                {
-                  'yaxis.range': notZoomedLayout.range,
-                  'yaxis.tickvals': notZoomedLayout.tickvals,
-                  'yaxis.ticktext': notZoomedLayout.ticktext,
-                },
-              ],
-              label: 'Zoom/Reset',
-              method: 'relayout',
-            },
-          ],
-          direction: 'right',
-          showactive: false,
-          bordercolor: theme.colors.global.contentBackground,
-          font: {
-            color: theme.colors.global.link,
-          },
-          active: 1,
-          type: 'buttons',
-          visible: trafficLimit && maxDailyValue < trafficLimit && !isCloud,
-          xanchor: 'right',
-          yanchor: 'top',
-          x: 1,
-          y: 1.3,
-        },
-      ],
+      yaxis: { ...(zoomedToData ? zoomedLayout : notZoomedLayout), fixedrange: true },
+      uirevision: uiRevision,
     }),
-    [
-      isCloud,
-      notZoomedLayout,
-      maxDailyValue,
-      theme.colors.global.contentBackground,
-      theme.colors.global.link,
-      trafficLimit,
-      zoomedLayout.range,
-      zoomedLayout.ticktext,
-      zoomedLayout.tickvals,
-    ],
+    [notZoomedLayout, uiRevision, zoomedLayout, zoomedToData],
   );
 
   const trafficLayout = useMemo(() => {
@@ -213,7 +176,13 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
 
   return (
     <GraphWrapper $width={width}>
-      <GenericPlot chartData={chartData} layout={trafficLayout} />
+      <GenericPlot
+        chartData={chartData}
+        layout={trafficLayout}
+        config={PLOT_CONFIG}
+        onZoom={onUserZoom}
+        onZoomReset={onUserZoomReset}
+      />
     </GraphWrapper>
   );
 };

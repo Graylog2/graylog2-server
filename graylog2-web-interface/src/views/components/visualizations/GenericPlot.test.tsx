@@ -53,3 +53,39 @@ describe('GenericPlot datarevision', () => {
     expect(lastLayout().datarevision).not.toBe(firstRevision);
   });
 });
+
+describe('GenericPlot relayout', () => {
+  beforeEach(() => {
+    asMock(Plot).mockClear();
+  });
+
+  const lastPlotProps = () => {
+    const { calls } = asMock(Plot).mock;
+
+    return calls[calls.length - 1][0];
+  };
+
+  it('classifies a ranged relayout as a zoom, not a reset', () => {
+    const onZoom = jest.fn();
+    const onZoomReset = jest.fn();
+
+    render(<GenericPlot chartData={[{ type: 'bar' }]} onZoom={onZoom} onZoomReset={onZoomReset} />);
+
+    lastPlotProps().onRelayout({ 'xaxis.range[0]': 23, 'xaxis.range[1]': 42 });
+
+    expect(onZoom).toHaveBeenCalledTimes(1);
+    expect(onZoomReset).not.toHaveBeenCalled();
+  });
+
+  it('reports a zoom reset when the plot relayouts to autorange (e.g. double-click reset)', () => {
+    const onZoom = jest.fn();
+    const onZoomReset = jest.fn();
+
+    render(<GenericPlot chartData={[{ type: 'bar' }]} onZoom={onZoom} onZoomReset={onZoomReset} />);
+
+    lastPlotProps().onRelayout({ 'xaxis.autorange': true });
+
+    expect(onZoomReset).toHaveBeenCalled();
+    expect(onZoom).not.toHaveBeenCalled();
+  });
+});
