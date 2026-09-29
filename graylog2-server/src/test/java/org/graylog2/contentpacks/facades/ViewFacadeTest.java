@@ -71,6 +71,8 @@ import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
@@ -111,7 +113,7 @@ public class ViewFacadeTest {
         protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new IgnoreSearchFilters());
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new EntityScopeService(Set.of(new DefaultEntityScope())), new IgnoreSearchFilters());
         }
     }
 
