@@ -27,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.graylog2.utilities.ProxyConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -289,14 +290,15 @@ public class OkHttpClientProviderTest {
         final String TEST_PROXY = "http://proxy.dummy.org";
         final InetSocketAddress testProxyAddress = new InetSocketAddress(TEST_PROXY, 59001);
         final Proxy testProxy = new Proxy(Proxy.Type.HTTP, testProxyAddress);
-        final ProxySelectorProvider proxyProvider = new ProxySelectorProvider(server.url("/").uri(), null);
+        final ProxyConfig testProxyConfig = Mockito.spy(new ProxyConfig(server.url("/").uri()));
+        final ProxySelectorProvider proxyProvider = new ProxySelectorProvider(testProxyConfig, null);
         ProxySelectorProvider spyProxyProvider = Mockito.spy(proxyProvider);
         final OkHttpClientProvider provider = new OkHttpClientProvider(
                 "GraylogTest",
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
-                server.url("/").uri(), null, spyProxyProvider);
+                testProxyConfig, null, spyProxyProvider);
 
         OkHttpClientProvider spyClientProvider = Mockito.spy(provider);
 
@@ -306,7 +308,7 @@ public class OkHttpClientProviderTest {
                 .first()
                 .matches(proxy -> proxy.equals(server.getProxyAddress()));
 
-        Mockito.doReturn(testProxyAddress).when(spyProxyProvider).getProxyAddress();
+        Mockito.doReturn(testProxyAddress).when(testProxyConfig).getProxyAddress();
         assertThat(client.proxySelector().select(URI.create("http://www.example.com/")))
                 .hasSize(1)
                 .first()
@@ -351,12 +353,13 @@ public class OkHttpClientProviderTest {
     }
 
     private OkHttpClient client(URI proxyURI) {
+        final ProxyConfig proxyConfig = proxyURI == null ? null : new ProxyConfig(proxyURI);
         final OkHttpClientProvider provider = new OkHttpClientProvider(
                 "GraylogTest",
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
-                proxyURI, null, new ProxySelectorProvider(proxyURI, null));
+                proxyConfig, null, new ProxySelectorProvider(proxyConfig, null));
 
         return provider.get();
     }

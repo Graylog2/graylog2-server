@@ -16,9 +16,20 @@
  */
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react';
 import { renderPreflight, screen } from 'wrappedTestingLibrary';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
+
+// Floating UI positions the dropdown asynchronously. Waiting for that update keeps the assertions
+// below independent of whether it lands before or after the dropdown mounts.
+const settleDropdownPosition = () =>
+  act(
+    () =>
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, 0);
+      }),
+  );
 
 describe('HelpMenu', () => {
   it('shows external help links when the menu is opened', async () => {
@@ -31,5 +42,16 @@ describe('HelpMenu', () => {
     expect(documentationLink).toHaveAttribute('href', 'https://go2docs.graylog.org/current');
     expect(documentationLink).toHaveAttribute('target', '_blank');
     expect(documentationLink).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('keeps the help links visible once the dropdown has been positioned', async () => {
+    renderPreflight(<HelpMenu />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /get help/i }));
+    await screen.findByRole('menuitem', { name: /documentation/i });
+
+    await settleDropdownPosition();
+
+    expect(screen.getByRole('menuitem', { name: /documentation/i })).toBeVisible();
   });
 });

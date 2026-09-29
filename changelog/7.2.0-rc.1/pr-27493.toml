@@ -1,0 +1,5 @@
+type = "a"
+message = "Add buttons to select the latest installed or older content pack versions when creating a new content pack revision."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15738"]
+pulls = ["27493"]

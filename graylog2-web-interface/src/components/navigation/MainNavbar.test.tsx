@@ -82,6 +82,19 @@ describe('MainNavbar', () => {
             path: '/',
             children: [{ path: '/just-another-route', description: 'Dropdown menu item 2' }],
           },
+          {
+            description: 'Conditional dropdown test',
+            path: '/',
+            children: [
+              { path: '/visible-route', description: 'Visible item', useCondition: () => true },
+              { path: '/hidden-route', description: 'Hidden item', useCondition: () => false },
+            ],
+          },
+          {
+            description: 'Hidden dropdown test',
+            path: '/',
+            children: [{ path: '/hidden-route', description: 'Hidden item', useCondition: () => false }],
+          },
         ],
       } as PluginExports,
     };
@@ -200,6 +213,24 @@ describe('MainNavbar', () => {
 
       await screen.findByRole('menuitem', { name: /Dropdown menu item 1/i });
       await screen.findByRole('menuitem', { name: /Dropdown menu item 2/i });
+    });
+
+    it('hides dropdown items whose condition is not met', async () => {
+      render(<SUT />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /conditional dropdown test/i }));
+
+      await screen.findByRole('menuitem', { name: /visible item/i });
+
+      expect(screen.queryByRole('menuitem', { name: /hidden item/i })).not.toBeInTheDocument();
+    });
+
+    it('does not render dropdown if conditions for all elements are not met', async () => {
+      render(<SUT />);
+
+      await screen.findByRole('button', { name: /conditional dropdown test/i });
+
+      expect(screen.queryByRole('button', { name: /hidden dropdown test/i })).not.toBeInTheDocument();
     });
 
     describe('uses correct position', () => {

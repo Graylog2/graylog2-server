@@ -33,8 +33,7 @@ const useShowDatanodeMigration = (): {
   const { currentStep } = useMigrationState({ enabled: canStartDataNode });
   const migrationNeedsFinalization = currentStep?.state === MIGRATION_STATE.RESTART_GRAYLOG.key;
   const shouldShowDatanodeMigration =
-    isDatanodeConfiguredAndUsed === false ||
-    (isDatanodeConfiguredAndUsed === true && migrationNeedsFinalization);
+    isDatanodeConfiguredAndUsed === false || (isDatanodeConfiguredAndUsed === true && migrationNeedsFinalization);
 
   return {
     isDatanodeConfiguredAndUsed: canStartDataNode && isDatanodeConfiguredAndUsed === true,

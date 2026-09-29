@@ -30,8 +30,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.inputs.ReservedInputIds;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.InputFailureRecorder;
@@ -82,13 +82,11 @@ public class CloudCollectorIngestService extends AbstractIdleService {
     }
 
     @Subscribe
-    public void handleClusterConfigChanged(ClusterConfigChangedEvent event) {
+    public void handleCollectorsConfigUpdated(CollectorsConfigUpdatedEvent event) {
         // At the moment we only care about the initial config being present, which means the collectors features
         // was enabled. If we need to react to actual changes, the code below needs to be adjusted.
-        if (CollectorsConfig.class.getCanonicalName().equals(event.type())) {
-            if (!shuttingDown) {
-                launch();
-            }
+        if (!shuttingDown) {
+            launch();
         }
     }
 
