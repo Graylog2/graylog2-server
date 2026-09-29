@@ -121,6 +121,10 @@ describe('FetchProvider', () => {
     Session.setUsername('alice');
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(() => {
     server.close();
   });
@@ -176,8 +180,6 @@ describe('FetchProvider', () => {
     Session.setUsername('alice');
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    fetchSpy.mockRestore();
   });
 
   it('supports uploading form data without content type', async () => {

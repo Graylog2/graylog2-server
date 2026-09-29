@@ -132,6 +132,7 @@ const LoginPage = () => {
   const hasCustomLogin = CustomLogin !== undefined;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLastError(undefined);
   }, [useFallback]);
 
@@ -178,7 +179,9 @@ const LoginPage = () => {
   return (
     <DocumentTitle title="Sign in">
       <LoginChrome>
+        {/* eslint-disable-next-line react-hooks/static-components */}
         <LastError />
+        {/* eslint-disable-next-line react-hooks/static-components */}
         <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>

@@ -31,11 +31,9 @@ export const login = (username: string, password: string, host: string) =>
 const terminateSession = () =>
   new Builder('DELETE', qualifyUrl('/system/sessions/')).build().then(
     (response: Response) => {
-      if (!response.ok && response.status !== 401) {
-        throw new Error(`Terminating session failed with status ${response.status}.`);
+      if (response.ok || response.status === 401) {
+        Session.endSession();
       }
-
-      Session.endSession();
     },
     () => Session.endSession(),
   );
@@ -44,18 +42,30 @@ Session.setLogoutHandler(terminateSession);
 
 export const logout = () => Session.logout();
 
-export const validate = () => {
+let pendingValidation: ReturnType<typeof SystemSessions.validateSession> | undefined;
+
+const validateSession = () => {
   const storedUsername = Session.storedUsername();
 
-  return SystemSessions.validateSession().then((response) => {
-    if (response.is_valid) {
-      Session.setUsername(response.username ?? storedUsername);
-    } else if (storedUsername) {
-      Session.setUsername(undefined);
-    }
+  return SystemSessions.validateSession()
+    .then((response) => {
+      if (response.is_valid) {
+        Session.setUsername(response.username ?? storedUsername);
+      } else if (storedUsername) {
+        Session.setUsername(undefined);
+      }
 
-    Session.notifyValidated();
+      Session.notifyValidated();
 
-    return response;
-  });
+      return response;
+    })
+    .finally(() => {
+      pendingValidation = undefined;
+    });
+};
+
+export const validate = () => {
+  pendingValidation ??= validateSession();
+
+  return pendingValidation;
 };

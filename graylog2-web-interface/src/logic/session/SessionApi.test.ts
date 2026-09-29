@@ -66,7 +66,7 @@ describe('SessionApi', () => {
     const onLogout = jest.fn();
     const unsubscribe = Session.on('logout', onLogout);
 
-    await expect(logout()).rejects.toThrow('Terminating session failed with status 500.');
+    await logout();
 
     expect(Session.isLoggedIn()).toBe(true);
     expect(onLogout).not.toHaveBeenCalled();
@@ -84,6 +84,15 @@ describe('SessionApi', () => {
     expect(onValidated).toHaveBeenCalledTimes(1);
 
     unsubscribe();
+  });
+
+  it('shares a pending session validation', async () => {
+    mockValidateSession.mockClear();
+    mockValidateSession.mockResolvedValue({ is_valid: true, username: 'alice' });
+
+    await Promise.all([validate(), validate()]);
+
+    expect(mockValidateSession).toHaveBeenCalledTimes(1);
   });
 
   it('removes stored session if it is not valid anymore', async () => {

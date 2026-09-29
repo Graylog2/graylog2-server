@@ -24,8 +24,6 @@ import Session from 'logic/session/Session';
 
 export type CurrentUserState = { currentUser: UserJSON | undefined };
 
-const RETRY_DELAYS_MS = [1000, 2000, 5000, 10000, 30000];
-
 const createCurrentUser = () => {
   const store = createExternalStore<CurrentUserState>({ currentUser: undefined });
   let latestRequest = 0;
@@ -45,17 +43,6 @@ const createCurrentUser = () => {
     });
   };
 
-  const loadWithRetry = (username: string, attempt = 0) =>
-    load(username).catch(() => {
-      const delay = RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)];
-
-      setTimeout(() => {
-        if (Session.getState().username === username && !store.getState().currentUser) {
-          loadWithRetry(username, attempt + 1);
-        }
-      }, delay);
-    });
-
   const onSessionChange = () => {
     const { username } = Session.getState();
 
@@ -63,7 +50,7 @@ const createCurrentUser = () => {
     store.setState({ currentUser: undefined });
 
     if (username) {
-      loadWithRetry(username);
+      load(username).catch(() => {});
     }
   };
 

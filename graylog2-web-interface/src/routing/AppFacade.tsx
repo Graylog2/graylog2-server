@@ -22,6 +22,7 @@ import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import 'bootstrap/less/bootstrap.less';
 import CurrentUser from 'logic/users/CurrentUser';
 import Session from 'logic/session/Session';
+import { validate } from 'logic/session/SessionApi';
 import useExternalStore from 'hooks/useExternalStore';
 import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
@@ -46,6 +47,10 @@ const AppFacade = () => {
   const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
   const { server, ping } = useContext(ServerAvailabilityContext);
   const username = useExternalStore(Session, (state) => state.username ?? '');
+
+  useEffect(() => {
+    validate().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(ping, SERVER_PING_TIMEOUT);
