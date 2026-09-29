@@ -44,7 +44,4 @@ const TableItem = styled.td<{ $label?: boolean; $paragraph?: boolean; $width?: s
   text-align: ${({ $alignText }) => $alignText || 'inherit'};
 `;
 
-DataTable.Row = TableRow;
-DataTable.Item = TableItem;
-
-export default DataTable;
+export default Object.assign(DataTable, { Row: TableRow, Item: TableItem });
