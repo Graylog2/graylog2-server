@@ -30,6 +30,12 @@ updates:
           - "com.google.auth:*"
           - "com.google.cloud:*"
           - "com.google.http-client:*"
+      # The Azure SDK libraries are released as a train and each release requires
+      # the newest azure-core, so bumping them individually trips the
+      # requireUpperBoundDeps enforcer rule.
+      azure-sdk:
+        patterns:
+          - "com.azure:*"
       openrewrite:
         patterns:
           - "org.openrewrite:*"
