@@ -19,6 +19,6 @@ import { useSyncExternalStore } from 'react';
 import type { Subscribable } from 'logic/createExternalStore';
 
 const useExternalStore = <S, T>(store: Subscribable<S>, selector: (state: S) => T): T =>
-  useSyncExternalStore(store.subscribe, () => selector(store.getState()));
+  selector(useSyncExternalStore(store.subscribe, store.getState));
 
 export default useExternalStore;

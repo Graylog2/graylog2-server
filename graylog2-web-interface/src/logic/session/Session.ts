@@ -18,31 +18,38 @@ import Store from 'logic/local-storage/Store';
 import { singleton } from 'logic/singleton';
 import createExternalStore from 'logic/createExternalStore';
 
-export type SessionState = { username: string | undefined; validatingSession: boolean };
+export type SessionState = { username: string | undefined };
 export type SessionEvent = 'logout' | 'validated';
 
 const USERNAME_KEY = 'username';
 
 const createSession = () => {
-  const store = createExternalStore<SessionState>({ username: undefined, validatingSession: false });
+  const store = createExternalStore<SessionState>({ username: undefined });
   const eventListeners: Record<SessionEvent, Set<() => void>> = { logout: new Set(), validated: new Set() };
   const isLoggedIn = () => !!store.getState().username;
+  const notify = (event: SessionEvent) => eventListeners[event].forEach((listener) => listener());
+  const setUsername = (username: string | undefined) => {
+    if (username) {
+      Store.set(USERNAME_KEY, username);
+    } else {
+      Store.delete(USERNAME_KEY);
+    }
+
+    store.setState({ username });
+  };
 
   return {
     getState: store.getState,
     subscribe: store.subscribe,
     isLoggedIn,
     storedUsername: (): string | undefined => Store.get(USERNAME_KEY),
-    setUsername: (username: string | undefined) => {
-      if (username) {
-        Store.set(USERNAME_KEY, username);
-      } else {
-        Store.delete(USERNAME_KEY);
+    setUsername,
+    endSession: () => {
+      if (isLoggedIn()) {
+        setUsername(undefined);
+        notify('logout');
       }
-
-      store.setState({ username });
     },
-    setValidating: (validatingSession: boolean) => store.setState({ validatingSession }),
     waitForLogin: () =>
       isLoggedIn()
         ? Promise.resolve()
@@ -61,7 +68,7 @@ const createSession = () => {
         eventListeners[event].delete(listener);
       };
     },
-    notify: (event: SessionEvent) => eventListeners[event].forEach((listener) => listener()),
+    notifyValidated: () => notify('validated'),
   };
 };
 

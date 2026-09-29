@@ -48,7 +48,11 @@ const createCurrentUser = () => {
     sessionUsername = username;
 
     if (username) {
-      load(username);
+      load(username).catch(() => {
+        if (sessionUsername === username) {
+          sessionUsername = undefined;
+        }
+      });
     } else {
       store.setState({ currentUser: undefined });
     }
@@ -60,11 +64,10 @@ const createCurrentUser = () => {
   return {
     getState: store.getState,
     subscribe: store.subscribe,
-    get: () => store.getState().currentUser,
     reload: (): Promise<UserJSON | void> => {
-      const { currentUser } = store.getState();
+      const { username } = Session.getState();
 
-      return currentUser ? load(currentUser.username) : Promise.resolve();
+      return username ? load(username) : Promise.resolve();
     },
   };
 };

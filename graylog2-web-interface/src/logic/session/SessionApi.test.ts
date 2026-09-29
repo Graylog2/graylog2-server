@@ -18,23 +18,20 @@ import Session from 'logic/session/Session';
 
 import { login, logout, validate } from './SessionApi';
 
-let mockResponse: unknown;
+const mockNewSession = jest.fn<Promise<{ username: string }>, [unknown]>();
+const mockValidateSession = jest.fn<Promise<{ is_valid: boolean; username?: string }>, []>();
+let mockLogoutResponse: Promise<unknown>;
 
-jest.mock('logic/rest/FetchProvider', () => ({
-  Builder: jest.fn(() => {
-    const builder = {
-      json: () => builder,
-      setHeaders: () => builder,
-      build: () => Promise.resolve(mockResponse),
-    };
-
-    return builder;
-  }),
+jest.mock('@graylog/server-api', () => ({
+  SystemSessions: {
+    newSession: (request: unknown) => mockNewSession(request),
+    validateSession: () => mockValidateSession(),
+  },
 }));
 
-const respondWith = (response: unknown) => {
-  mockResponse = response;
-};
+jest.mock('logic/rest/FetchProvider', () => ({
+  Builder: jest.fn(() => ({ build: () => mockLogoutResponse })),
+}));
 
 describe('SessionApi', () => {
   beforeEach(() => {
@@ -42,20 +39,20 @@ describe('SessionApi', () => {
   });
 
   it('stores username after login', async () => {
-    respondWith({ username: 'alice' });
+    mockNewSession.mockResolvedValue({ username: 'alice' });
 
     await login('alice', 'secret', 'localhost');
 
     expect(Session.getState().username).toBe('alice');
   });
 
-  it('clears session and notifies listeners after logout', async () => {
+  it('ends session and notifies listeners once after logout', async () => {
     Session.setUsername('alice');
-    respondWith({ ok: true, status: 204 });
+    mockLogoutResponse = Promise.resolve({ ok: true, status: 204 });
     const onLogout = jest.fn();
     const unsubscribe = Session.on('logout', onLogout);
 
-    await logout();
+    await Promise.all([logout(), logout()]);
 
     expect(Session.isLoggedIn()).toBe(false);
     expect(onLogout).toHaveBeenCalledTimes(1);
@@ -63,18 +60,26 @@ describe('SessionApi', () => {
     unsubscribe();
   });
 
+  it('keeps session if logout fails', async () => {
+    Session.setUsername('alice');
+    mockLogoutResponse = Promise.resolve({ ok: false, status: 500 });
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
+
+    await logout();
+
+    expect(Session.isLoggedIn()).toBe(true);
+    expect(onLogout).not.toHaveBeenCalled();
+
+    unsubscribe();
+  });
+
   it('logs in after validating a valid session', async () => {
-    respondWith({ is_valid: true, username: 'alice' });
-    const onValidated = jest.fn(() =>
-      expect(Session.getState()).toEqual({ username: 'alice', validatingSession: false }),
-    );
+    mockValidateSession.mockResolvedValue({ is_valid: true, username: 'alice' });
+    const onValidated = jest.fn(() => expect(Session.getState().username).toBe('alice'));
     const unsubscribe = Session.on('validated', onValidated);
 
-    const result = validate();
-
-    expect(Session.getState().validatingSession).toBe(true);
-
-    await result;
+    await validate();
 
     expect(onValidated).toHaveBeenCalledTimes(1);
 
@@ -83,7 +88,7 @@ describe('SessionApi', () => {
 
   it('removes stored session if it is not valid anymore', async () => {
     Session.setUsername('alice');
-    respondWith({ is_valid: false });
+    mockValidateSession.mockResolvedValue({ is_valid: false });
 
     await validate();
 

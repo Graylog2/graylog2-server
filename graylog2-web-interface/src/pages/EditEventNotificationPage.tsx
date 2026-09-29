@@ -25,8 +25,8 @@ import EventNotificationFormContainer from 'components/event-notifications/event
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
-import CurrentUser from 'logic/users/CurrentUser';
-import useExternalStore from 'hooks/useExternalStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import type User from 'logic/users/User';
 import { getEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
@@ -35,7 +35,7 @@ import PageDescription from 'components/event-notifications/PageDescription';
 
 type EditEventDefinitionPageProps = ParamsContext &
   HistoryContext & {
-    currentUser: any;
+    currentUser: User;
   };
 
 class EditEventDefinitionPage extends React.Component<
@@ -112,7 +112,7 @@ class EditEventDefinitionPage extends React.Component<
 }
 
 const EditEventDefinitionPageWithCurrentUser = (props: ParamsContext & HistoryContext) => {
-  const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
+  const currentUser = useCurrentUser();
 
   return <EditEventDefinitionPage {...props} currentUser={currentUser} />;
 };

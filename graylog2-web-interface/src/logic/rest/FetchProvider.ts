@@ -22,6 +22,7 @@ import CancellablePromise from 'logic/rest/CancellablePromise';
 import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
 import Session from 'logic/session/Session';
+import { logout } from 'logic/session/SessionApi';
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -35,8 +36,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (Session.isLoggedIn() && error.status === 401) {
-    Session.setUsername(undefined);
-    Session.notify('logout');
+    logout();
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.

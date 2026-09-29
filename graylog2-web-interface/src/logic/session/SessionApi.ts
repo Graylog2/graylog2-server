@@ -20,49 +20,49 @@ import { qualifyUrl } from 'util/URLUtils';
 import { Builder } from 'logic/rest/FetchProvider';
 import Session from 'logic/session/Session';
 
-const SESSIONS_URL = '/system/sessions';
-
 export const login = (username: string, password: string, host: string) =>
-  new Builder('POST', qualifyUrl(SESSIONS_URL))
-    .json({ username, password, host })
-    .build()
-    .then((response: { username?: string }) => {
-      Session.setUsername(response?.username);
+  SystemSessions.newSession({ username, password, host }).then((response) => {
+    Session.setUsername(response.username);
 
-      return { username: response?.username };
-    });
+    return { username: response.username };
+  });
 
-export const logout = () =>
-  new Builder('DELETE', qualifyUrl(`${SESSIONS_URL}/`))
+let pendingLogout: Promise<void> | undefined;
+
+// Plain request without error handler, as a 401 for it would otherwise trigger another logout.
+const terminateSession = () =>
+  new Builder('DELETE', qualifyUrl('/system/sessions/'))
     .build()
     .then(
       (response: Response) => {
         if (response.ok || response.status === 401) {
-          Session.setUsername(undefined);
+          Session.endSession();
         }
       },
-      () => Session.setUsername(undefined),
+      () => Session.endSession(),
     )
-    .then(() => Session.notify('logout'));
+    .finally(() => {
+      pendingLogout = undefined;
+    });
+
+export const logout = (): Promise<void> => {
+  pendingLogout ??= terminateSession();
+
+  return pendingLogout;
+};
 
 export const validate = () => {
   const storedUsername = Session.storedUsername();
-  Session.setValidating(true);
 
-  return SystemSessions.validateSession()
-    .then((response) => {
-      if (response.is_valid) {
-        Session.setUsername(response.username ?? storedUsername);
-      } else if (storedUsername) {
-        Session.setUsername(undefined);
-      }
+  return SystemSessions.validateSession().then((response) => {
+    if (response.is_valid) {
+      Session.setUsername(response.username ?? storedUsername);
+    } else if (storedUsername) {
+      Session.setUsername(undefined);
+    }
 
-      return response;
-    })
-    .finally(() => Session.setValidating(false))
-    .then((response) => {
-      Session.notify('validated');
+    Session.notifyValidated();
 
-      return response;
-    });
+    return response;
+  });
 };

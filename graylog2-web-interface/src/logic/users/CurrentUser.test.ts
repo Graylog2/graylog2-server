@@ -41,23 +41,33 @@ describe('CurrentUser', () => {
 
     Session.setUsername('alice');
 
-    await waitFor(() => expect(CurrentUser.get()).toEqual(alice.toJSON()));
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
 
     Session.setUsername(undefined);
 
-    expect(CurrentUser.get()).toBeUndefined();
+    expect(CurrentUser.getState().currentUser).toBeUndefined();
   });
 
   it('does not reload current user if username does not change', async () => {
     mockGetUser.mockResolvedValue(alice.toJSON());
 
     Session.setUsername('alice');
-    Session.setValidating(true);
     Session.setUsername('alice');
 
-    await waitFor(() => expect(CurrentUser.get()).toEqual(alice.toJSON()));
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
 
     expect(mockGetUser).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads current user again after a failed attempt', async () => {
+    mockGetUser.mockRejectedValueOnce(new Error('Server unavailable')).mockResolvedValueOnce(alice.toJSON());
+
+    Session.setUsername('alice');
+    await waitFor(() => expect(mockGetUser).toHaveBeenCalledTimes(1));
+
+    Session.setUsername('alice');
+
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
   });
 
   it('ignores response for previous session', async () => {
@@ -73,18 +83,18 @@ describe('CurrentUser', () => {
     Session.setUsername('alice');
     Session.setUsername('bob');
 
-    await waitFor(() => expect(CurrentUser.get()).toEqual(bob.toJSON()));
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(bob.toJSON()));
 
     resolveAlice(alice.toJSON());
     await Promise.resolve();
 
-    expect(CurrentUser.get()).toEqual(bob.toJSON());
+    expect(CurrentUser.getState().currentUser).toEqual(bob.toJSON());
   });
 
   it('reloads current user', async () => {
     mockGetUser.mockResolvedValue(alice.toJSON());
     Session.setUsername('alice');
-    await waitFor(() => expect(CurrentUser.get()).toEqual(alice.toJSON()));
+    await waitFor(() => expect(CurrentUser.getState().currentUser).toEqual(alice.toJSON()));
 
     await CurrentUser.reload();
 

@@ -28,9 +28,11 @@ import UserPreferencesContext, { defaultUserPreferences } from './UserPreference
 import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
+const mockEmptyState = {};
+
 jest.mock('logic/users/CurrentUser', () => ({
   __esModule: true,
-  default: { getState: jest.fn(() => ({})), subscribe: jest.fn(() => () => {}) },
+  default: { getState: jest.fn(() => mockEmptyState), subscribe: jest.fn(() => () => {}) },
 }));
 
 describe('CurrentUserPreferencesProvider', () => {
