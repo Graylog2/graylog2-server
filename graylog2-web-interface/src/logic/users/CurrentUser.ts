@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { Users } from '@graylog/server-api';
+
 import type { UserJSON } from 'logic/users/User';
 import { singleton } from 'logic/singleton';
 import createExternalStore from 'logic/createExternalStore';
@@ -28,10 +27,9 @@ const createCurrentUser = () => {
   const store = createExternalStore<CurrentUserState>({ currentUser: undefined });
 
   const load = (username: string): Promise<UserJSON> =>
-    fetch<UserJSON>(
-      'GET',
-      qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url),
-    ).then((currentUser) => {
+    Users.get(encodeURIComponent(username)).then((user) => {
+      const currentUser = user as UserJSON;
+
       if (Session.getState().username === username) {
         store.setState({ currentUser });
       }
