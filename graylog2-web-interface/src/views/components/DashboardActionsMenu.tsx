@@ -29,6 +29,7 @@ import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
@@ -71,7 +72,8 @@ const DashboardActionsMenu = () => {
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const sendTelemetry = useSendTelemetry('dashboard');
-  const allowedToEdit = _isAllowedToEdit(view, currentUser);
+  const { scopePermissions } = useGetPermissionsByScope({ _scope: view.scope });
+  const allowedToEdit = _isAllowedToEdit(view, currentUser) && !!scopePermissions?.is_mutable;
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
       <MenuItem divider />

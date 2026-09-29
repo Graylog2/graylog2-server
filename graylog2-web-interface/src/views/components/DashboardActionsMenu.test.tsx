@@ -28,6 +28,7 @@ import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
@@ -40,6 +41,7 @@ import DashboardActionsMenu from './DashboardActionsMenu';
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/api/views', () => ({
@@ -121,6 +123,11 @@ describe('DashboardActionsMenu', () => {
     );
 
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   it('should save a new dashboard', async () => {
@@ -221,5 +228,43 @@ describe('DashboardActionsMenu', () => {
     render(<SUT />);
     await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
+  });
+
+  describe('with an immutable scope', () => {
+    const immutableView = mockView.toBuilder().scope('ILLUMINATE').build();
+
+    beforeEach(() => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useScopePermissions).mockReturnValue({
+        loadingScopePermissions: false,
+        scopePermissions: { is_mutable: false, is_deletable: false },
+        checkPermissions: () => false,
+      });
+    });
+
+    it('disables saving and editing metadata', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByTitle(/Save dashboard/)).toBeDisabled();
+
+      await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+      expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+    });
+
+    it('still allows saving as a new dashboard', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByTitle(/Save as new dashboard/)).toBeEnabled();
+    });
+
+    it('does not save view when pressing related keyboard shortcut', async () => {
+      render(<SUT view={immutableView} />);
+
+      await screen.findByTitle(/Save dashboard/);
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
   });
 });

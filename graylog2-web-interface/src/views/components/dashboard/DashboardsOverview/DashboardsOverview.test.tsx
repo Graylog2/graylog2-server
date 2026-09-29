@@ -27,6 +27,11 @@ import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+jest.mock('hooks/useScopePermissions', () => () => ({
+  loadingScopePermissions: false,
+  scopePermissions: { is_mutable: true, is_deletable: true },
+  checkPermissions: () => true,
+}));
 
 jest.mock('views/api/views', () => ({
   deleteView: jest.fn(),
