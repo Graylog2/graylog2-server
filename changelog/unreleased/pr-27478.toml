@@ -1,5 +1,5 @@
 type = "f"
-message = "Messages are no longer discarded when a date value is written into a field that an index maps to a numeric type. Graylog now indexes the value in the shape the existing mapping expects and raises a notification naming the affected index and fields."
+message = "Messages are no longer discarded when a date value is written into a field that an index maps to a numeric type. Graylog now indexes the value in the shape the existing mapping expects and raises a notification naming the affected index and field."
 
 pulls = ["27478"]
 
@@ -9,14 +9,15 @@ as numbers, the index mapped it as `long` (for epoch milliseconds) or `float` (f
 `java.time` values produce, such as those from a grok `;date;` conversion). Every later message that writes a date
 string into that field was rejected with a `mapper_parsing_exception` and dropped.
 
-Graylog now retries such a message once, writing the value the way the existing mapping expects, so the message is
-indexed instead of discarded. The message is only retried when the value really is a date and the mapped type can hold
-it; anything else takes the regular failure-handling path as before.
+Graylog now retries such a message, writing the value the way the existing mapping expects, so the message is indexed
+instead of discarded. A message with several conflicting fields is repaired field by field, because the indexer only
+ever reports the first one it could not parse. Only values that really are dates are rewritten, and only for mapped
+types that can hold them; anything else takes the regular failure-handling path as before.
 
 This keeps ingestion going, but it does not resolve the conflict: the field keeps its numeric type, and the values
 Graylog writes into it stay numeric timestamps rather than dates, so they do not display or aggregate as dates. A new
-*Field type conflict in index ...* system notification reports the affected index and fields so that the conflict does
-not go unnoticed.
+*Field type conflict in index ...* system notification is raised for each affected field so that the conflict does not
+go unnoticed.
 
 To resolve it for new data, do either of the following in *System -> Indices*:
 

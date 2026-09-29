@@ -20,6 +20,6 @@ Two consequences are worth knowing about when upgrading from 7.1.x:
 - In an index that a 7.1 version before 7.1.10 wrote, such a field was mapped to a numeric type. Now that Graylog writes date values for it
   again, that mapping no longer matches. Graylog detects this, keeps the affected messages indexed by writing the
   value in the shape the existing mapping expects, and raises a *Field type conflict in index ...* notification that
-  names the index and fields. Follow that notification to change the field type to **Date** or to rotate the index
-  set; see the entry for #27278 for the details.
+  names the index and field. Follow that notification to change the field type to **Date** or to rotate the index
+  set; see the entry for #27478 for the details.
 """

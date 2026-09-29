@@ -154,6 +154,58 @@ class MappingErrorCoercionTest {
                 .containsEntry("event_start", BigDecimal.valueOf(TIMESTAMP.getMillis(), 3));
     }
 
+
+    @Test
+    void reportsOnlyTheFieldsThatWereReallyRewritten() {
+        final Indexable message = new StubIndexable(Map.of("event_start", TIMESTAMP, "took_ms", "fourty-two"));
+
+        final Indexable coerced = coerce(message, "event_start");
+        sourceOf(coerced);
+
+        assertThat(MappingErrorCoercion.rewrittenFields(coerced)).containsExactly("event_start");
+    }
+
+    @Test
+    void reportsNothingRewrittenWhenTheValueIsNotADate() {
+        final Indexable coerced = coerce(messageWith("took_ms", "fourty-two"), "took_ms");
+        sourceOf(coerced);
+
+        assertThat(MappingErrorCoercion.rewrittenFields(coerced)).isEmpty();
+    }
+
+    @Test
+    void reportsNothingRewrittenBeforeTheMessageIsSerialized() {
+        assertThat(MappingErrorCoercion.rewrittenFields(coerce(messageWith("event_start", TIMESTAMP), "event_start")))
+                .isEmpty();
+    }
+
+    @Test
+    void reportsNothingRewrittenForAMessageThatWasNeverCoerced() {
+        assertThat(MappingErrorCoercion.rewrittenFields(messageWith("event_start", TIMESTAMP))).isEmpty();
+    }
+
+    @Test
+    void repairsAFurtherFieldWithoutLosingTheEarlierOne() {
+        // the indexer only ever names the first field it could not parse, so the second one arrives in a later error
+        final Indexable message = new StubIndexable(Map.of("event_start", TIMESTAMP, "event_end", TIMESTAMP));
+
+        final Indexable first = coerce(message, "event_start");
+        final Indexable both = coerce(first, "event_end");
+
+        assertThat(sourceOf(both))
+                .containsEntry("event_start", TIMESTAMP.getMillis())
+                .containsEntry("event_end", TIMESTAMP.getMillis());
+        assertThat(MappingErrorCoercion.rewrittenFields(both)).containsExactlyInAnyOrder("event_start", "event_end");
+    }
+
+    @Test
+    void doesNotCoerceAFieldThatIsAlreadyBeingRewritten() {
+        final Indexable coerced = coerce(messageWith("event_start", TIMESTAMP), "event_start");
+
+        // retrying the same field again would not help, so there is nothing left to try
+        assertThat(MappingErrorCoercion.coerce(coerced, mappingError("event_start", "long"))).isEmpty();
+    }
+
     private static Indexable coerce(Indexable message, String field) {
         return coerce(message, field, "long");
     }

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer.messages;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.Configuration;
@@ -24,11 +26,16 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -177,11 +184,9 @@ class MessagesBulkIndexRetryingTest {
 
     @Test
     public void mappingErrorsForNumericFieldsAreRetriedWithACoercedValue() throws IOException {
-        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
-
         when(messagesAdapter.bulkIndex(any()))
-                .thenReturn(errorResult)
-                .thenReturn(IndexingResults.empty());
+                .thenAnswer(mappingErrorFor("event_start"))
+                .thenAnswer(indexedSuccessfully());
 
         var result = messages.bulkIndex(messagesWithIds("coercible-id"));
 
@@ -190,29 +195,40 @@ class MessagesBulkIndexRetryingTest {
     }
 
     @Test
-    public void coercedMessagesAreRetriedOnlyOnce() throws IOException {
-        // the coerced retry fails the same way, so the message must not be retried again
-        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
-
-        when(messagesAdapter.bulkIndex(any())).thenReturn(errorResult);
+    public void repairsAFurtherFieldReportedByTheRetry() throws IOException {
+        // the indexer names only the first field it could not parse, so the second one shows up in the retry's error
+        when(messagesAdapter.bulkIndex(any()))
+                .thenAnswer(mappingErrorFor("event_start"))
+                .thenAnswer(mappingErrorFor("event_end"))
+                .thenAnswer(indexedSuccessfully());
 
         var result = messages.bulkIndex(messagesWithIds("coercible-id"));
 
+        verify(messagesAdapter, times(3)).bulkIndex(any());
+        assertThat(result.errors()).isEmpty();
+    }
+
+    @Test
+    public void stopsRetryingWhenTheSameFieldKeepsFailing() throws IOException {
+        when(messagesAdapter.bulkIndex(any())).thenAnswer(mappingErrorFor("event_start"));
+
+        var result = messages.bulkIndex(messagesWithIds("coercible-id"));
+
+        // the initial attempt plus one coerced retry: repeating the same field would not help
         verify(messagesAdapter, times(2)).bulkIndex(any());
         assertThat(result.errors()).map(IndexingError::message).map(Indexable::getId).containsOnly("coercible-id");
     }
 
     @Test
     public void coercibleMappingErrorsAreReportedForNotification() throws IOException {
-        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
-
         when(messagesAdapter.bulkIndex(any()))
-                .thenReturn(errorResult)
-                .thenReturn(IndexingResults.empty());
+                .thenAnswer(mappingErrorFor("event_start"))
+                .thenAnswer(indexedSuccessfully());
 
         messages.bulkIndex(messagesWithIds("coercible-id"));
 
-        verify(failureSubmissionService, times(1)).notifyAboutIndexMappingConflicts(any());
+        verify(failureSubmissionService, times(1))
+                .notifyAboutIndexMappingConflicts(Map.of("randomIndex", Set.of("event_start")));
     }
 
     @Test
@@ -227,9 +243,47 @@ class MessagesBulkIndexRetryingTest {
         verify(failureSubmissionService, never()).notifyAboutIndexMappingConflicts(any());
     }
 
-    private IndexingError numericFieldMappingError() {
-        return errorResultItem("coercible-id", MappingError,
-                "failed to parse field [event_start] of type [long] in document with id 'coercible-id'");
+    @Test
+    public void valuesThatAreNotDatesAreNotReportedAsAMappingConflict() throws IOException {
+        // a plain malformed number also fails with a mapper error naming a numeric field, but nothing gets rewritten
+        when(messagesAdapter.bulkIndex(any())).thenAnswer(mappingErrorFor("not_a_date_field"));
+
+        var result = messages.bulkIndex(messagesWithIds("coercible-id"));
+
+        verify(failureSubmissionService, never()).notifyAboutIndexMappingConflicts(any());
+        assertThat(result.errors()).hasSize(1);
+    }
+
+    /**
+     * Mirrors what the storage adapters do: every message is serialized, and the failure is reported for the message
+     * that was sent, so a retried message carries whatever rewriting the previous pass applied to it.
+     */
+    private Answer<IndexingResults> mappingErrorFor(String field) {
+        return serializing(request -> IndexingError.create(request.message(), request.writeIndex(), MappingError,
+                "failed to parse field [" + field + "] of type [long] in document with id '"
+                        + request.message().getId() + "'"));
+    }
+
+    private Answer<IndexingResults> indexedSuccessfully() {
+        return serializing(request -> IndexingSuccess.create(request.message(), request.writeIndex()));
+    }
+
+    private Answer<IndexingResults> serializing(Function<IndexingRequest, IndexingResult> outcome) {
+        return invocation -> {
+            final List<IndexingRequest> requests = invocation.getArgument(0);
+            final IndexingResults.Builder results = IndexingResults.Builder.create();
+            for (IndexingRequest request : requests) {
+                // the adapter always builds the document, which is when a coerced message rewrites its fields
+                request.message().toElasticSearchObject(new ObjectMapper(), new Meter());
+                final IndexingResult result = outcome.apply(request);
+                if (result instanceof IndexingSuccess success) {
+                    results.addSuccesses(List.of(success));
+                } else {
+                    results.addErrors(List.of((IndexingError) result));
+                }
+            }
+            return results.build();
+        };
     }
 
     private List<MessageWithIndex> messagesWithIds(String... ids) {
@@ -243,6 +297,10 @@ class MessagesBulkIndexRetryingTest {
         final Message mockedMessage = mock(Message.class);
         when(mockedMessage.getId()).thenReturn(id);
         when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
+        when(mockedMessage.toElasticSearchObject(any(), any())).thenAnswer(invocation -> new HashMap<>(Map.of(
+                "event_start", DateTime.now(DateTimeZone.UTC),
+                "event_end", DateTime.now(DateTimeZone.UTC),
+                "not_a_date_field", "fourty-two")));
         return mockedMessage;
     }
 

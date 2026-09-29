@@ -25,6 +25,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -36,9 +38,10 @@ import java.util.regex.Pattern;
  * Recovers messages that the indexer rejected with a {@code mapper_parsing_exception} because a date value was
  * written into a numerically mapped field.
  * <p>
- * This happens when an index mapped the field from an epoch-milliseconds value but the message now carries a date
- * string (or vice versa). Since a field's type cannot be changed in an existing index, the only way to get the
- * message indexed is to write the value in the shape the existing mapping expects — epoch milliseconds.
+ * This happens when an index mapped the field from a numeric timestamp but the message now carries a date string
+ * (or vice versa). Since a field's type cannot be changed in an existing index, the only way to get the message
+ * indexed is to write the value in the numeric shape the existing mapping expects. Which shape that is depends on
+ * the mapped type, see {@link EpochFormat}.
  * <p>
  * The coercion is deliberately narrow: it only applies when the indexer named a field of a numeric type, and only
  * when that field's value can be understood as a date. Everything else is left untouched so the message takes the
@@ -74,23 +77,44 @@ public final class MappingErrorCoercion {
     }
 
     /**
-     * Returns a view of the given message that writes the field named in the error as epoch milliseconds, or an
-     * empty {@link Optional} if the error does not describe a numerically mapped field.
+     * Returns a view of the given message that writes the field named in the error in the numeric shape its mapping
+     * expects, or an empty {@link Optional} if the error does not describe a numerically mapped field that is not
+     * already being rewritten.
      * <p>
-     * Whether the value can actually be coerced is only decided when the message is serialized: a value that is not
-     * date-like is passed through unchanged, and the retry then fails the same way the first attempt did.
+     * The indexer only ever reports the first field it could not parse, so a message with several conflicting fields
+     * needs one call per field. Passing an already coerced message adds the new field to it, which is why a field
+     * that is already being rewritten yields an empty result: it means the rewrite did not help, and retrying it
+     * again would not either.
+     * <p>
+     * Whether a value can actually be rewritten is only known once the message is serialized, because that is when
+     * the document is built. {@link #rewrittenFields(Indexable)} reports what really happened.
      *
      * @param message      the message the indexer rejected
      * @param errorMessage the error the indexer reported for it
      */
     public static Optional<Indexable> coerce(Indexable message, @Nullable String errorMessage) {
-        return numericField(errorMessage).map(target -> new CoercingIndexable(message, target.field(), target.format()));
+        return numericField(errorMessage)
+                .filter(target -> !targets(message, target.field()))
+                .map(target -> CoercingIndexable.combine(message, target));
+    }
+
+    /**
+     * Returns the fields of the given message that were really rewritten while it was serialized, which is only
+     * those whose value could be read as a date. Empty for a message that was never coerced, or one whose value
+     * turned out not to be a date after all.
+     */
+    public static Set<String> rewrittenFields(Indexable message) {
+        return message instanceof CoercingIndexable coercing ? coercing.rewrittenFields() : Set.of();
+    }
+
+    private static boolean targets(Indexable message, String field) {
+        return message instanceof CoercingIndexable coercing && coercing.targets(field);
     }
 
     /**
      * Extracts the name of the offending field, but only if the indexer mapped it to a numeric type.
      */
-    public static Optional<String> numericFieldFrom(@Nullable String errorMessage) {
+    static Optional<String> numericFieldFrom(@Nullable String errorMessage) {
         return numericField(errorMessage).map(NumericField::field);
     }
 
@@ -139,27 +163,67 @@ public final class MappingErrorCoercion {
     }
 
     /**
-     * Delegates everything to the wrapped message, except that it rewrites one date field to epoch milliseconds on
-     * the way to the indexer. {@link Indexable#serialize(SerializationContext)} is intentionally not overridden, so
-     * the default implementation picks up the rewritten document.
+     * Delegates everything to the wrapped message, except that it rewrites its target fields into the numeric shape
+     * their mapping expects on the way to the indexer. {@link Indexable#serialize(SerializationContext)} is
+     * intentionally not overridden, so the default implementation picks up the rewritten document.
+     * <p>
+     * A value that cannot be read as a date is passed through untouched and is not reported as rewritten.
      */
-    private record CoercingIndexable(Indexable delegate, String field, EpochFormat format) implements Indexable {
+    private static final class CoercingIndexable implements Indexable {
+        private final Indexable delegate;
+        private final Map<String, EpochFormat> targets;
+        private volatile Set<String> rewrittenFields = Set.of();
+
+        private CoercingIndexable(Indexable delegate, Map<String, EpochFormat> targets) {
+            this.delegate = delegate;
+            this.targets = Map.copyOf(targets);
+        }
+
+        /**
+         * Adds the given field to an already coerced message, or starts a new one.
+         */
+        private static Indexable combine(Indexable message, NumericField target) {
+            if (message instanceof CoercingIndexable coercing) {
+                final Map<String, EpochFormat> combined = new LinkedHashMap<>(coercing.targets);
+                combined.put(target.field(), target.format());
+                return new CoercingIndexable(coercing.delegate, combined);
+            }
+            return new CoercingIndexable(message, Map.of(target.field(), target.format()));
+        }
+
+        private boolean targets(String field) {
+            return targets.containsKey(field);
+        }
+
+        private Set<String> rewrittenFields() {
+            return rewrittenFields;
+        }
 
         @Override
         public Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter) {
             final Map<String, Object> source = delegate.toElasticSearchObject(objectMapper, invalidTimestampMeter);
-            final Object value = source.get(field);
-            if (value == null) {
-                return source;
+
+            Map<String, Object> coerced = null;
+            final Set<String> rewritten = new LinkedHashSet<>();
+            for (Map.Entry<String, EpochFormat> target : targets.entrySet()) {
+                final Object value = source.get(target.getKey());
+                if (value == null) {
+                    continue;
+                }
+                try {
+                    final Object converted = target.getValue().convert(DateTimeConverter.convertToDateTime(value));
+                    if (coerced == null) {
+                        coerced = new HashMap<>(source);
+                    }
+                    coerced.put(target.getKey(), converted);
+                    rewritten.add(target.getKey());
+                } catch (IllegalArgumentException e) {
+                    // Not a date, so the mapping conflict is not the one we know how to repair.
+                }
             }
-            try {
-                final Map<String, Object> coerced = new HashMap<>(source);
-                coerced.put(field, format.convert(DateTimeConverter.convertToDateTime(value)));
-                return coerced;
-            } catch (IllegalArgumentException e) {
-                // Not a date, so the mapping conflict is not the one we know how to repair.
-                return source;
-            }
+
+            this.rewrittenFields = Set.copyOf(rewritten);
+            return coerced == null ? source : coerced;
         }
 
         @Override

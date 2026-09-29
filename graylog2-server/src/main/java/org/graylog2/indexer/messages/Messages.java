@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +67,12 @@ public class Messages {
     private static final int retrySecondsMultiplier = 500;
 
     static final RetryWait retryWait = new RetryWait(retrySecondsMultiplier);
+
+    /**
+     * Upper bound for the coerced retries of a single batch. Each pass has to repair a field that no earlier pass
+     * repaired, so this only caps documents with an unusual number of conflicting date fields.
+     */
+    private static final int MAX_COERCION_PASSES = 5;
 
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<IndexingResults> createBulkRequestRetryerBuilder() {
@@ -197,48 +204,64 @@ public class Messages {
      * rewriting the value the way the existing mapping expects. See {@link MappingErrorCoercion} for why this is
      * the only way to get such a message indexed: a field's type cannot be changed in an existing index.
      * <p>
-     * This is deliberately a single pass rather than a loop: every message gets at most one coerced retry, and
-     * anything still failing afterwards takes the regular failure-handling path.
+     * The indexer reports only the first field it could not parse, so a message with several conflicting fields
+     * needs one pass per field. Every pass has to rewrite a field that is not already being rewritten, which bounds
+     * the loop by the number of fields in the document; {@link #MAX_COERCION_PASSES} bounds it further.
      */
     private IndexingResults retryCoercibleMappingErrors(IndexingResults results, IndexingListener indexingListener) {
-        final Map<IndexingError, Indexable> coercions = new LinkedHashMap<>();
-        for (IndexingError error : results.errors()) {
-            MappingErrorCoercion.coerce(error.message(), error.error().errorMessage())
-                    .ifPresent(coerced -> coercions.put(error, coerced));
+        final List<IndexingSuccess> successes = new ArrayList<>(results.successes());
+        List<IndexingError> errors = new ArrayList<>(results.errors());
+        final Map<String, Set<String>> conflictingFieldsByIndex = new LinkedHashMap<>();
+
+        for (int pass = 0; pass < MAX_COERCION_PASSES; pass++) {
+            final Map<IndexingError, Indexable> coercions = new LinkedHashMap<>();
+            for (IndexingError error : errors) {
+                MappingErrorCoercion.coerce(error.message(), error.error().errorMessage())
+                        .ifPresent(coerced -> coercions.put(error, coerced));
+            }
+            if (coercions.isEmpty()) {
+                break;
+            }
+
+            final List<IndexingRequest> retries = coercions.entrySet().stream()
+                    .map(entry -> IndexingRequest.create(entry.getKey().index(), entry.getValue()))
+                    .toList();
+
+            LOG.warn("Retrying {} messages that were rejected because of a field type conflict, writing the "
+                    + "conflicting field the way the existing index mapping expects.", retries.size());
+
+            final IndexingResults retryResults = runBulkRequest(retries, retries.size(), indexingListener);
+
+            // Serialization has happened by now, so we know which values really were dates.
+            coercions.forEach((error, coerced) -> MappingErrorCoercion.rewrittenFields(coerced)
+                    .forEach(field -> conflictingFieldsByIndex
+                            .computeIfAbsent(error.index(), index -> new TreeSet<>())
+                            .add(field)));
+
+            if (!retryResults.successes().isEmpty()) {
+                LOG.info("Indexed {} of {} messages after adapting them to the existing index mapping.",
+                        retryResults.successes().size(), retries.size());
+            }
+
+            successes.addAll(retryResults.successes());
+            final List<IndexingError> remaining = new ArrayList<>(
+                    errors.stream().filter(error -> !coercions.containsKey(error)).toList());
+            remaining.addAll(retryResults.errors());
+            errors = remaining;
         }
-        if (coercions.isEmpty()) {
-            return results;
-        }
 
-        failureSubmissionService.notifyAboutIndexMappingConflicts(coercions.keySet());
-
-        final List<IndexingRequest> retries = coercions.entrySet().stream()
-                .map(entry -> IndexingRequest.create(entry.getKey().index(), entry.getValue()))
-                .toList();
-
-        LOG.warn("Retrying {} messages that were rejected because of a field type conflict, writing the conflicting "
-                + "field the way the existing index mapping expects.", retries.size());
-
-        final IndexingResults retryResults = runBulkRequest(retries, retries.size(), indexingListener);
-
-        if (!retryResults.successes().isEmpty()) {
-            LOG.info("Indexed {} of {} messages after adapting them to the existing index mapping.",
-                    retryResults.successes().size(), retries.size());
+        if (!conflictingFieldsByIndex.isEmpty()) {
+            failureSubmissionService.notifyAboutIndexMappingConflicts(conflictingFieldsByIndex);
         }
 
         // Report the original messages rather than the rewritten ones, so failure handling shows what was received.
-        final Map<String, Indexable> originalMessages = coercions.keySet().stream()
+        final Map<String, Indexable> originalMessages = results.errors().stream()
                 .map(IndexingError::message)
                 .filter(message -> message.getId() != null)
                 .collect(Collectors.toMap(Indexable::getId, message -> message, (first, second) -> first));
 
-        final List<IndexingError> remainingErrors = new ArrayList<>(
-                results.errors().stream().filter(error -> !coercions.containsKey(error)).toList());
-        retryResults.errors().stream().map(error -> withOriginalMessage(error, originalMessages)).forEach(remainingErrors::add);
-
-        return IndexingResults.create(
-                Stream.concat(results.successes().stream(), retryResults.successes().stream()).toList(),
-                remainingErrors);
+        return IndexingResults.create(successes,
+                errors.stream().map(error -> withOriginalMessage(error, originalMessages)).toList());
     }
 
     private IndexingError withOriginalMessage(IndexingError error, Map<String, Indexable> originalMessages) {

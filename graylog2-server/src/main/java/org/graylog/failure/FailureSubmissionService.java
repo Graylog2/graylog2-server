@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
-import org.graylog2.indexer.messages.MappingErrorCoercion;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -41,10 +40,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
@@ -238,29 +233,25 @@ public class FailureSubmissionService {
     }
 
     /**
-     * Tells the administrator that an index rejects values Graylog writes for a field, because
-     * {@link MappingErrorCoercion} only keeps ingestion going - it does not resolve the underlying conflict, and a
+     * Tells the administrator that an index rejects the values Graylog writes for a field, because
+     * {@code MappingErrorCoercion} only keeps ingestion going - it does not resolve the underlying conflict, and a
      * field's type cannot be changed in an existing index.
      * <p>
-     * Deduplicated per index by the notification key. The wording lives in the {@code es_index_mapping_error}
-     * notification templates; this only supplies the details they render.
+     * One notification per index and field: the key has to include the field, otherwise a conflict discovered later
+     * would be suppressed as a duplicate of the first one and never reach the administrator.
+     *
+     * @param conflictingFieldsByIndex the fields Graylog had to rewrite, per index
      */
-    public void notifyAboutIndexMappingConflicts(Collection<IndexingError> mappingErrors) {
-        mappingErrors.stream().collect(Collectors.groupingBy(IndexingError::index)).forEach((index, errors) -> {
-            final Set<String> fields = errors.stream()
-                    .map(error -> MappingErrorCoercion.numericFieldFrom(error.error().errorMessage()))
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toCollection(TreeSet::new));
-
+    public void notifyAboutIndexMappingConflicts(Map<String, ? extends Collection<String>> conflictingFieldsByIndex) {
+        conflictingFieldsByIndex.forEach((index, fields) -> fields.forEach(field -> {
             final Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.ES_INDEX_MAPPING_ERROR)
-                    .addKey(index)
+                    .addKey(index + "/" + field)
                     .addSeverity(Notification.Severity.URGENT)
                     .addDetail("index", index)
-                    .addDetail("fields", String.join(", ", fields))
-                    .addDetail("rejectedMessages", errors.size());
+                    .addDetail("field", field);
             notificationService.publishIfFirst(notification);
-        });
+        }));
     }
 
     private IndexingFailure fromIndexingError(IndexingError indexingError) {
