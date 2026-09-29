@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SystemSessions } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 import Session from 'logic/session/Session';
-import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 const SESSIONS_URL = '/system/sessions';
-
-type ValidationResponse = { is_valid: boolean; username?: string };
 
 export const login = (username: string, password: string, host: string) =>
   new Builder('POST', qualifyUrl(SESSIONS_URL))
@@ -51,11 +49,7 @@ export const validate = () => {
   const storedUsername = Session.storedUsername();
   Session.setValidating(true);
 
-  const request = new Builder('GET', qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
-    .json()
-    .build() as CancellablePromise<ValidationResponse>;
-
-  return request
+  return SystemSessions.validateSession()
     .then((response) => {
       if (response.is_valid) {
         Session.setUsername(response.username ?? storedUsername);

@@ -16,31 +16,28 @@
  */
 import { waitFor } from 'wrappedTestingLibrary';
 
-import { Users } from '@graylog/server-api';
-
-import { asMock } from 'helpers/mocking';
 import { alice, bob } from 'fixtures/users';
-import type User from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 import Session from 'logic/session/Session';
 
 import CurrentUser from './CurrentUser';
 
+const mockGetUser = jest.fn<Promise<UserJSON>, [string]>();
+
 jest.mock('@graylog/server-api', () => ({
   Users: {
-    get: jest.fn(),
+    get: (username: string) => mockGetUser(username),
   },
 }));
-
-const userSummary = (user: User) => user.toJSON() as unknown as Awaited<ReturnType<typeof Users.get>>;
 
 describe('CurrentUser', () => {
   beforeEach(() => {
     Session.setUsername(undefined);
-    asMock(Users.get).mockClear();
+    mockGetUser.mockClear();
   });
 
   it('loads current user when session starts and clears it when session ends', async () => {
-    asMock(Users.get).mockResolvedValue(userSummary(alice));
+    mockGetUser.mockResolvedValue(alice.toJSON());
 
     Session.setUsername('alice');
 
@@ -52,7 +49,7 @@ describe('CurrentUser', () => {
   });
 
   it('does not reload current user if username does not change', async () => {
-    asMock(Users.get).mockResolvedValue(userSummary(alice));
+    mockGetUser.mockResolvedValue(alice.toJSON());
 
     Session.setUsername('alice');
     Session.setValidating(true);
@@ -60,37 +57,37 @@ describe('CurrentUser', () => {
 
     await waitFor(() => expect(CurrentUser.get()).toEqual(alice.toJSON()));
 
-    expect(Users.get).toHaveBeenCalledTimes(1);
+    expect(mockGetUser).toHaveBeenCalledTimes(1);
   });
 
   it('ignores response for previous session', async () => {
     let resolveAlice: (user: unknown) => void;
-    asMock(Users.get)
+    mockGetUser
       .mockReturnValueOnce(
         new Promise((resolve) => {
           resolveAlice = resolve;
         }),
       )
-      .mockResolvedValueOnce(userSummary(bob));
+      .mockResolvedValueOnce(bob.toJSON());
 
     Session.setUsername('alice');
     Session.setUsername('bob');
 
     await waitFor(() => expect(CurrentUser.get()).toEqual(bob.toJSON()));
 
-    resolveAlice(userSummary(alice));
+    resolveAlice(alice.toJSON());
     await Promise.resolve();
 
     expect(CurrentUser.get()).toEqual(bob.toJSON());
   });
 
   it('reloads current user', async () => {
-    asMock(Users.get).mockResolvedValue(userSummary(alice));
+    mockGetUser.mockResolvedValue(alice.toJSON());
     Session.setUsername('alice');
     await waitFor(() => expect(CurrentUser.get()).toEqual(alice.toJSON()));
 
     await CurrentUser.reload();
 
-    expect(Users.get).toHaveBeenCalledTimes(2);
+    expect(mockGetUser).toHaveBeenCalledTimes(2);
   });
 });

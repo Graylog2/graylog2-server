@@ -24,6 +24,7 @@ jest.mock('logic/rest/FetchProvider', () => ({
   Builder: jest.fn(() => {
     const builder = {
       json: () => builder,
+      setHeaders: () => builder,
       build: () => Promise.resolve(mockResponse),
     };
 
