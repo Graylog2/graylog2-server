@@ -196,7 +196,7 @@ public class InputStatesResource extends AbstractInputsResource {
                 input.getCreatedAt(),
                 null,
                 null,
-                getMaskedInputSummary(input),
+                getInputSummary(input, true),
                 onlyOnePerCluster));
     }
 

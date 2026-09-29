@@ -45,26 +45,24 @@ public class AbstractInputsResource extends RestResource {
      * @return A {@link InputSummary} JSON value object for the input entity.
      */
     protected InputSummary getInputSummary(Input input) {
-        final InputDescription inputDescription = this.availableInputs.get(input.getType());
-        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
-        // remove after sharing inputs implemented (input types check)
-        final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) && isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType()) ?
-                input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
-        return inputSummary(input, inputDescription, configuration);
+        return getInputSummary(input, false);
     }
 
     /**
-     * @return A {@link InputSummary} JSON value object for the input entity, always masking passwords regardless of
-     * the caller's permissions.
+     * @param forceMask Mask passwords even for a caller permitted to see them. Masking needs the input's type to be
+     *                  installed on this node, so it cannot be relied on for an input whose plugin is missing.
+     * @return A {@link InputSummary} JSON value object for the input entity.
      */
-    protected InputSummary getMaskedInputSummary(Input input) {
+    protected InputSummary getInputSummary(Input input, boolean forceMask) {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
         final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
-        return inputSummary(input, inputDescription,
-                maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest));
-    }
-
-    private InputSummary inputSummary(Input input, InputDescription inputDescription, Map<String, Object> configuration) {
+        // remove after sharing inputs implemented (input types check)
+        final boolean showConfiguration = !forceMask
+                && isPermitted(RestPermissions.INPUTS_EDIT, input.getId())
+                && isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.getType());
+        final Map<String, Object> configuration = showConfiguration
+                ? input.getConfiguration()
+                : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
                 InputDescription.getInputDescriptionName(inputDescription, input.getType()),
