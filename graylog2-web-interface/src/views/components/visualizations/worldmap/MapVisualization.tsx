@@ -25,7 +25,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 
 import style from './MapVisualization.css';
 
-import InteractiveContext from '../../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../../contexts/InteractiveContext';
 
 const DEFAULT_VIEWPORT = Viewport.create([0, 0], 1);
 
@@ -222,38 +222,36 @@ const MapVisualization = ({
     ));
   });
 
+  const interactive = useIsInteractiveMode();
+
   return (
-    <InteractiveContext.Consumer>
-      {(interactive) => (
-        <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
-          {locked && <div className={style.overlay} style={{ height, width }} />}
-          <MapContainer
-            ref={_map}
-            boundsOptions={{ maxZoom: 19, animate: interactive }}
-            center={viewport.center}
-            className={style.map}
-            closePopupOnClick={interactive}
-            doubleClickZoom={interactive}
-            dragging={interactive}
-            fadeAnimation={interactive}
-            id={`visualization-${id}`}
-            key={`visualization-${id}-${width}-${height}`}
-            markerZoomAnimation={interactive}
-            scrollWheelZoom={interactive}
-            style={{ height, width }}
-            touchZoom={interactive}
-            trackResize={interactive}
-            whenReady={_handleMapReady}
-            zoom={viewport.zoom}
-            zoomAnimation={interactive}
-            zoomControl={interactive}>
-            <MapEvents onViewportChanged={_onChange} />
-            <TileLayer url={url} attribution={attribution} eventHandlers={{ load: _handleTilesReady }} />
-            {markers}
-          </MapContainer>
-        </div>
-      )}
-    </InteractiveContext.Consumer>
+    <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
+      {locked && <div className={style.overlay} style={{ height, width }} />}
+      <MapContainer
+        ref={_map}
+        boundsOptions={{ maxZoom: 19, animate: interactive }}
+        center={viewport.center}
+        className={style.map}
+        closePopupOnClick={interactive}
+        doubleClickZoom={interactive}
+        dragging={interactive}
+        fadeAnimation={interactive}
+        id={`visualization-${id}`}
+        key={`visualization-${id}-${width}-${height}`}
+        markerZoomAnimation={interactive}
+        scrollWheelZoom={interactive}
+        style={{ height, width }}
+        touchZoom={interactive}
+        trackResize={interactive}
+        whenReady={_handleMapReady}
+        zoom={viewport.zoom}
+        zoomAnimation={interactive}
+        zoomControl={interactive}>
+        <MapEvents onViewportChanged={_onChange} />
+        <TileLayer url={url} attribution={attribution} eventHandlers={{ load: _handleTilesReady }} />
+        {markers}
+      </MapContainer>
+    </div>
   );
 };
 

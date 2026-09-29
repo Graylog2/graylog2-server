@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Row, Col, Modal, Input, SegmentedControl } from 'components/bootstrap';
 import { ModalSubmit, Spinner, Select } from 'components/common';
@@ -57,8 +55,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const [selectedTemplateCategory, setSelectedTemplateCategory] =
     useState<TemplateCategorySegment>(initialTemplateCategory);
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const dataTieringPlugin = PluginStore.exports('dataTiering').find(
     (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
   );
@@ -92,7 +88,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     }
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECTED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'select-index-set-template-submitted',
       template_name,
     });
@@ -123,7 +118,6 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
 
   const handleClose = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_CLOSED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'select-index-set-template-cancelled',
     });
 

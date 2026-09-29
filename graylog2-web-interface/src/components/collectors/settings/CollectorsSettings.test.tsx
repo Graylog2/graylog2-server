@@ -15,12 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
-import { asMock } from 'helpers/mocking';
+import { asMock, MockStore } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
 import useInputsStates from 'hooks/useInputsStates';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 import CollectorsSettings from './CollectorsSettings';
@@ -31,62 +35,36 @@ import {
   useCollectorsMutations,
   useCollectorInputDetails,
   useCollectorInputMutations,
+  useCollectorPermissions,
 } from '../hooks';
-import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
+import { configuredCollectorsConfig, mockCollectorInput } from '../testing/fixtures';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInputsStates');
+jest.mock('hooks/useCurrentUser');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
-const mockInput = (port: number) => ({
-  id: 'input-1',
-  creator_user_id: 'admin',
-  node: 'node-1',
-  name: 'CollectorIngestHttpInput',
-  created_at: '2026-01-01T00:00:00Z',
-  global: true,
-  attributes: { port, bind_address: '0.0.0.0' },
-  title: 'Collector Ingest (HTTP)',
-  type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
-  content_pack: '',
-  static_fields: {},
-});
 jest.mock('hooks/useInputMutations', () => () => ({
   createInput: jest.fn(),
   updateInput: jest.fn(),
   deleteInput: jest.fn(),
 }));
-jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>);
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore([
+    'getInitialState',
+    () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } }),
+  ]),
+}));
 
 const updateConfig = jest.fn();
-
-const config: CollectorsConfig = {
-  ca_cert_id: 'ca-id',
-  signing_cert_id: 'signing-id',
-  token_signing_key: {
-    public_key: 'pub-key',
-    private_key: 'priv-key',
-    fingerprint: 'fp',
-    created_at: '2026-01-01T00:00:00Z',
-  },
-  otlp_server_cert_id: 'otlp-id',
-  http: {
-    hostname: 'otlp.example.com',
-    port: 14401,
-  },
-  collector_heartbeat_interval: 'PT30S',
-  collector_offline_threshold: 'PT5M',
-  collector_default_visibility_threshold: 'P1D',
-  collector_expiration_threshold: 'P7D',
-};
 
 describe('CollectorsSettings', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
     asMock(useCollectorsConfig).mockReturnValue({
-      data: config,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
     asMock(useCollectorsMutations).mockReturnValue(
@@ -114,7 +92,13 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputMutations).mockReturnValue({
       createCollectorInput: jest.fn(),
       isCreatingCollectorInput: false,
+      updateCollectorInputPort: jest.fn(),
+      isUpdatingCollectorInputPort: false,
     });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     updateConfig.mockResolvedValue(undefined);
   });
 
@@ -166,7 +150,7 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14402)],
+      loadedInputs: [mockCollectorInput(14402)],
       unreadableCount: 0,
       isLoading: false,
     });
@@ -181,7 +165,7 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14401)],
+      loadedInputs: [mockCollectorInput(14401)],
       unreadableCount: 0,
       isLoading: false,
     });
@@ -223,7 +207,7 @@ describe('CollectorsSettings', () => {
       const hostname = await screen.findByLabelText('External hostname');
       const port = screen.getByLabelText('External port');
       expect(hostname).toBeDisabled();
-      expect(hostname).toHaveValue('otlp.example.com');
+      expect(hostname).toHaveValue('graylog.example.com');
       expect(port).toBeDisabled();
       expect(port).toHaveValue(14401);
 
@@ -237,7 +221,7 @@ describe('CollectorsSettings', () => {
 
     it('shows cloud-appropriate getting-started copy before configuration', async () => {
       asMock(useCollectorsConfig).mockReturnValue({
-        data: { ...config, signing_cert_id: null },
+        data: { ...configuredCollectorsConfig, signing_cert_id: null },
         isLoading: false,
       });
 
@@ -249,6 +233,22 @@ describe('CollectorsSettings', () => {
       expect(screen.getByText(/managed ingest endpoint/i)).toBeInTheDocument();
     });
   });
+
+  it('hides the settings submit without collectors_config:edit', () => {
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['collectors_config:read'] as Array<Permission>))
+        .build(),
+    );
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: false } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+
+    render(<CollectorsSettings />);
+
+    expect(screen.queryByRole('button', { name: /confirm settings/i })).not.toBeInTheDocument();
+  });
 });
 
 describe('CollectorsSettings telemetry', () => {
@@ -258,7 +258,7 @@ describe('CollectorsSettings telemetry', () => {
     jest.clearAllMocks();
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCollectorsConfig).mockReturnValue({
-      data: config,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
     asMock(useCollectorsMutations).mockReturnValue(
@@ -288,10 +288,14 @@ describe('CollectorsSettings telemetry', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14401)],
+      loadedInputs: [mockCollectorInput(14401)],
       unreadableCount: 0,
       isLoading: false,
     });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   it('emits SETTINGS.UPDATED on submit with resulting state and diff flags', async () => {
@@ -326,6 +330,28 @@ describe('CollectorsSettings telemetry', () => {
           input_count: 1,
         }),
       );
+    });
+  });
+
+  it('emits ADVANCED_TOGGLED when the advanced options section is opened and closed', async () => {
+    const user = userEvent.setup();
+
+    render(<CollectorsSettings />);
+
+    const toggle = await screen.findByRole('button', { name: /advanced options/i });
+
+    await user.click(toggle);
+
+    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
+      app_action_value: 'settings-advanced-toggle',
+      opened: true,
+    });
+
+    await user.click(toggle);
+
+    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
+      app_action_value: 'settings-advanced-toggle',
+      opened: false,
     });
   });
 });

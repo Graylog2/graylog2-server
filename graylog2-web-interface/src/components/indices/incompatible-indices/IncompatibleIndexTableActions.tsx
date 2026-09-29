@@ -69,7 +69,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
     refetch,
   } = useIncompatibleIndicesContext();
   const actionDefinitions = useIncompatibleIndexActionDefinitions();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('opensearch-upgrade');
   const { deselectEntity } = useSelectedEntities();
   const [confirmedAction, setConfirmedAction] = useState<IndexAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
 import URI from 'urijs';
 
 import generateId from 'logic/generateId';
@@ -116,6 +117,10 @@ const buildView = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: Relative
  * Security tab's search-backed widgets) that needs its own view/search built from a small widget set.
  */
 const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) =>
-  useCreateSearch(buildView(entries, timeRange));
+  useCreateSearch(
+    // `useCreateSearch` creates a new search on the server for every new promise it receives, so the promise
+    // must only be recreated when the widgets or the time range actually change.
+    useMemo(() => buildView(entries, timeRange), [entries, timeRange]),
+  );
 
 export default useWelcomeSearch;

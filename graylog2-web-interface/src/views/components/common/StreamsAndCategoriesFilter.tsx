@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import { Select, Icon, InputDescription } from 'components/common';
 import { FormGroup, ControlLabel } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
+import streamCategoryName from 'logic/streams/streamCategoryName';
 
 type StreamsAndCategoriesOption = {
   label: string;
@@ -31,6 +32,10 @@ export type StreamsAndCategoriesSelection = {
   streams: string[];
   categories: string[];
 };
+
+const StyledFormGroup = styled(FormGroup)`
+  margin-bottom: 0;
+`;
 
 const StyledIcon = styled(Icon)`
   width: 24px;
@@ -81,7 +86,7 @@ const StreamsAndCategoriesFilter = ({
       showCategories && multi
         ? [...new Set<string>(streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []))]
             .map((category) => ({
-              label: category,
+              label: streamCategoryName(category),
               value: { id: category, type: 'category' as const },
             }))
             .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
@@ -120,7 +125,7 @@ const StreamsAndCategoriesFilter = ({
   };
 
   return (
-    <FormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
+    <StyledFormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <Select
         {...rest}
@@ -136,7 +141,7 @@ const StreamsAndCategoriesFilter = ({
         multi={multi}
       />
       <InputDescription error={error} help={help} />
-    </FormGroup>
+    </StyledFormGroup>
   );
 };
 

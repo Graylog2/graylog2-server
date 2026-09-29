@@ -15,26 +15,47 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
+import { styled } from 'styled-components';
 
-import { Alert } from 'components/bootstrap';
+import { Alert, Row, Col } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import { REQUIRED_PERMISSIONS } from 'components/welcome/Constants';
+import Store from 'logic/local-storage/Store';
 
 import useOnboardingEligibility from './hooks/useOnboardingEligibility';
+
+const ONBOARDING_BANNER_DISMISSED_KEY = 'welcome-onboarding-banner-dismissed';
+
+const StyledAlert = styled(Alert)`
+  margin: 0;
+`;
 
 const OnboardingBanner = () => {
   const productName = useProductName();
   const { permissions } = useCurrentUser();
   const { data } = useOnboardingEligibility();
+  const [onboardingBannerDismissed, setOnboardingBannerDismissed] = useState(
+    !!Store.get(ONBOARDING_BANNER_DISMISSED_KEY),
+  );
 
-  if (!isAnyPermitted(permissions, REQUIRED_PERMISSIONS) && data?.status === 'setup') {
+  const onDismiss = () => {
+    Store.set(ONBOARDING_BANNER_DISMISSED_KEY, true);
+    setOnboardingBannerDismissed(true);
+  };
+
+  if (!onboardingBannerDismissed && !isAnyPermitted(permissions, REQUIRED_PERMISSIONS) && data?.status === 'setup') {
     return (
-      <Alert bsStyle="info">
-        {productName} is not currently receiving any log data - please contact an administrator so they can begin
-        setting up ingestion.
-      </Alert>
+      <Row className="content">
+        <Col xs={12}>
+          <StyledAlert bsStyle="info" onDismiss={onDismiss}>
+            {productName} is not currently receiving any log data - please contact an administrator so they can begin
+            setting up ingestion.
+          </StyledAlert>
+        </Col>
+      </Row>
     );
   }
 

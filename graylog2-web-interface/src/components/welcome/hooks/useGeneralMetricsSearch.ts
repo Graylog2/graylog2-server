@@ -110,7 +110,14 @@ const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
   const permittedAlertsEventsStreams = usePermittedAlertsEventsStreams();
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
 
-  return useWelcomeSearch(buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly), timeRange);
+  // Building the entries assigns new widget ids, so the result has to be stable to avoid recreating the view
+  // (and the search on the server) on every render.
+  const entries = useMemo(
+    () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
+    [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
+  );
+
+  return useWelcomeSearch(entries, timeRange);
 };
 
 export default useGeneralMetricsSearch;

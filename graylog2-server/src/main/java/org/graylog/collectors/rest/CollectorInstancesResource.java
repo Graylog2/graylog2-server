@@ -42,11 +42,13 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorInstanceService.InstanceCount;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.PendingChangesLookup;
+import org.graylog.collectors.PendingReassignments;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -210,17 +212,26 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Get global collector statistics")
     public CollectorStatsResponse stats() {
-        // TODO for a permission check we would need to know which fleets are granted to the user
-        // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
-        // the counts would be wrong in case someone had explicit grants
-        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
-                Instant.now().minus(getOfflineThreshold()));
-        return new CollectorStatsResponse(
-                instanceCount.total(),
-                instanceCount.online(),
-                instanceCount.offline(),
-                fleetService.count(),
-                sourceService.count());
+        final var threshold = Instant.now().minus(getOfflineThreshold());
+        final List<String> grantedFleetIds = fleetService.getAllFleets().stream()
+                .map(FleetDTO::id)
+                .filter(id -> isPermitted(CollectorsPermissions.FLEET_READ, id))
+                .toList();
+
+        final var instanceCounts = collectorInstanceService.countByFleetGrouped(threshold);
+        final var sourceCounts = sourceService.countByFleetGrouped();
+
+        long total = 0L;
+        long online = 0L;
+        long sources = 0L;
+        for (final String fleetId : grantedFleetIds) {
+            final var counts = instanceCounts.getOrDefault(fleetId, new InstanceCount(0L, 0L));
+            total += counts.total();
+            online += counts.online();
+            sources += sourceCounts.getOrDefault(fleetId, 0L);
+        }
+
+        return new CollectorStatsResponse(total, online, total - online, grantedFleetIds.size(), sources);
     }
 
     @GET
@@ -242,6 +253,7 @@ public class CollectorInstancesResource extends RestResource {
         final Duration offlineThreshold = getOfflineThreshold();
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final var pendingChangesLookup = txnLogService.pendingChangesLookup();
+        final var pendingReassignments = txnLogService.pendingReassignments();
         final var attributes = attributes(pendingChangesLookup);
         final var dbQueryCreator = new DbQueryCreator("hostname", attributes, computedFieldRegistry);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
@@ -259,7 +271,7 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto))).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto), pendingReassignments)).toList(),
                 attributes,
                 DEFAULTS);
     }
@@ -284,7 +296,7 @@ public class CollectorInstancesResource extends RestResource {
         final var hasPendingChanges = txnLogService.hasPendingChanges(dto.fleetId(), dto.instanceUid(),
                 dto.lastProcessedTxnSeq());
 
-        return toResponse(dto, offlineCutoff, hasPendingChanges);
+        return toResponse(dto, offlineCutoff, hasPendingChanges, txnLogService.pendingReassignments());
     }
 
     @DELETE
@@ -381,7 +393,8 @@ public class CollectorInstancesResource extends RestResource {
     }
 
     private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff,
-                                                                 boolean hasPendingChanges) {
+                                                                 boolean hasPendingChanges,
+                                                                 PendingReassignments pendingReassignments) {
         return new CollectorInstanceResponse(
                 dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
                 dto.instanceUid(),
@@ -396,6 +409,7 @@ public class CollectorInstancesResource extends RestResource {
                 attributesToMap(dto.identifyingAttributes()),
                 attributesToMap(dto.nonIdentifyingAttributes()),
                 hasPendingChanges,
+                pendingReassignments.targetFleetId(dto.instanceUid(), dto.fleetId(), dto.lastProcessedTxnSeq()).orElse(null),
                 dto.health().orElse(null)
         );
     }

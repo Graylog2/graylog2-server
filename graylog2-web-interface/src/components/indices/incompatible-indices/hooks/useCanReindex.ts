@@ -14,28 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
-
-import { Datanode } from '@graylog/server-api';
-
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
-
-const STALE_TIME_MS = 300000;
+import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
 
 /**
  * Reindexing a system index needs the admin certificate that only a Data Node search backend accepts.
  * Unless we know for sure that this Graylog does not run against Data Nodes, we keep the action available.
  */
 const useCanReindex = (): boolean => {
-  const { permissions } = useCurrentUser();
-
-  const { data: runsWithDataNode } = useQuery({
-    queryKey: ['datanode', 'configured'],
-    queryFn: () => Datanode.runsWithDataNode({ requestShouldExtendSession: false }),
-    enabled: isPermitted(permissions, 'datanode:read'),
-    staleTime: STALE_TIME_MS,
-  });
+  const { data: runsWithDataNode } = useRunsWithDataNode();
 
   return runsWithDataNode !== false;
 };

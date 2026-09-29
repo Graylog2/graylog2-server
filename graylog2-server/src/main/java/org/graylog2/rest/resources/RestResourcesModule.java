@@ -47,6 +47,7 @@ import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesRes
 import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.mongodb.MongodbClusterResource;
+import org.graylog2.rest.resources.opensearch.OpensearchClusterResource;
 import org.graylog2.rest.resources.roles.RolesResource;
 import org.graylog2.rest.resources.search.AbsoluteSearchResource;
 import org.graylog2.rest.resources.search.DecoratorResource;
@@ -175,6 +176,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(CertificateRenewalResource.class);
         addSystemRestResource(DatanodeResource.class);
         addSystemRestResource(MongodbClusterResource.class);
+        addSystemRestResource(OpensearchClusterResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);

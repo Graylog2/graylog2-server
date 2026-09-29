@@ -38,11 +38,9 @@ import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import Alert from 'components/bootstrap/Alert';
-import useLocation from 'routing/useLocation';
 import ReadableDuration from 'components/common/ReadableDuration';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
@@ -103,8 +101,7 @@ const SearchesConfig = () => {
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
   const [timeRangePresetsUpdated, setTimeRangePresetsUpdated] = useState<Immutable.List<TimeRangePreset>>(undefined);
   const [showCancelAfterSeconds, setShowCancelAfterSeconds] = useState(false);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('search');
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
@@ -198,8 +195,6 @@ const SearchesConfig = () => {
     const update = { ...formConfig };
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.SEARCHES_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search',
       app_action_value: 'configuration-save',
     });
 

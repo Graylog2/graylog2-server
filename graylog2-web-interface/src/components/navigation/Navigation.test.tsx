@@ -70,7 +70,7 @@ describe('Navigation', () => {
     await screen.findByTestId('notification-badge');
   });
 
-  it('does not show notification badge when there are no notifications', async () => {
+  it('shows notification badge without a count when there are no notifications', async () => {
     asMock(useNotificationBadgeCount).mockReturnValue({
       data: 0,
       isLoading: false,
@@ -78,9 +78,7 @@ describe('Navigation', () => {
 
     render(<SUT />);
 
-    await screen.findByRole('button', { name: /help/i });
-
-    expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+    expect(await screen.findByTestId('notification-badge')).toHaveAccessibleName('No unread system notifications');
   });
 
   describe('with a plugin navigation badge', () => {
@@ -104,7 +102,7 @@ describe('Navigation', () => {
       PluginStore.unregister(plugin);
     });
 
-    it('replaces the notification badge when the plugin badge is active', async () => {
+    it('shows the notification badge next to an active plugin badge', async () => {
       plugin = badgePlugin(() => true);
       PluginStore.register(plugin);
 
@@ -112,10 +110,10 @@ describe('Navigation', () => {
 
       await screen.findByTestId('plugin-badge');
 
-      expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+      expect(screen.getByTestId('notification-badge')).toBeInTheDocument();
     });
 
-    it('falls back to the notification badge when the plugin badge is inactive', async () => {
+    it('still shows the notification badge when the plugin badge is inactive', async () => {
       plugin = badgePlugin(() => false);
       PluginStore.register(plugin);
 

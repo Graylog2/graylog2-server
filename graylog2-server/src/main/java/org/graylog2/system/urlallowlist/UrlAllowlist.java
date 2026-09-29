@@ -18,6 +18,7 @@ package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -27,6 +28,9 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
+// "enforce_for_notifications" was a short-lived option that never shipped.
+// This prevents installations with the field from erroring.
+@JsonIgnoreProperties({"enforce_for_notifications"})
 public abstract class UrlAllowlist {
 
     @JsonProperty("entries")
@@ -35,27 +39,18 @@ public abstract class UrlAllowlist {
     @JsonProperty("disabled")
     public abstract boolean disabled();
 
-    // Temporary fix (PR #26814): only used by Slack and Teams notifications via UrlAllowlistValidator.
-    // TODO: Remove in a major release.
-    @JsonProperty("enforce_for_notifications")
-    public abstract boolean enforceForNotifications();
-
     @JsonCreator
     public static UrlAllowlist create(@JsonProperty("entries") List<AllowlistEntry> entries,
-                                      @JsonProperty("disabled") boolean disabled,
-                                      @JsonProperty("enforce_for_notifications") boolean enforceForNotifications) {
+                                      @JsonProperty("disabled") boolean disabled) {
         return builder().entries(entries)
                 .disabled(disabled)
-                .enforceForNotifications(enforceForNotifications)
                 .build();
     }
 
-    public static UrlAllowlist create(List<AllowlistEntry> entries, boolean disabled) {
-        return create(entries, disabled, false);
-    }
-
     public static UrlAllowlist createEnabled(List<AllowlistEntry> entries) {
-        return create(entries, false, false);
+        return builder().entries(entries)
+                .disabled(false)
+                .build();
     }
 
     public abstract Builder toBuilder();
@@ -84,8 +79,6 @@ public abstract class UrlAllowlist {
         public abstract Builder entries(List<AllowlistEntry> entries);
 
         public abstract Builder disabled(boolean disabled);
-
-        public abstract Builder enforceForNotifications(boolean enforceForNotifications);
 
         public abstract UrlAllowlist autoBuild();
 

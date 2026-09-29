@@ -79,13 +79,12 @@ const HeaderActionsDropdown = ({
   anchorPosition = undefined,
   textAlign,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
   const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
 
   const onToggleSlicing = () => {
     if (isSliceActive) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
-        app_section: appSection,
         app_action_value: 'slice-remove',
         event_details: { attribute_id: sliceColumnId },
       });
@@ -93,7 +92,6 @@ const HeaderActionsDropdown = ({
       return onChangeSlicing(undefined, undefined);
     }
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_HEADER, {
-      app_section: appSection,
       app_action_value: 'slice-column-header',
       event_details: { attribute_id: sliceColumnId },
     });

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed the columns dropdown not closing after clicking \"Reset all columns\"."
+
+issues = ["26537"]
+pulls = ["27117"]

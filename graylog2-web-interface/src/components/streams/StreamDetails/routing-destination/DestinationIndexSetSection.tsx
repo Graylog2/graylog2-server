@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
-import { Icon, Section, Spinner, LinkContainer } from 'components/common';
-import { Table, Button, Alert } from 'components/bootstrap';
+import { Section, Spinner, Link } from 'components/common';
+import { Table, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { Stream } from 'logic/streams/types';
 import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import useExcludedArchiveStreams from 'components/streams/hooks/useExcludedArchiveStreams';
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
@@ -43,19 +43,16 @@ type Props = {
   stream: Stream;
 };
 
-const ActionButtonsWrap = styled.span(
-  () => css`
-    float: right;
-  `,
-);
-
 const DestinationIndexSetSection = ({ stream }: Props) => {
   const productName = useProductName();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
-  const archivingEnabled =
+  const excludedStreams = useExcludedArchiveStreams();
+  const indexSetArchivingEnabled =
     indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY ||
     indexSet?.data_tiering?.archive_before_deletion;
+  // A stream is only archived when its index set archives AND the stream is not excluded from archiving.
+  const archivingEnabled = Boolean(indexSetArchivingEnabled) && !excludedStreams.includes(stream.id);
   const {
     data: { indexSets },
   } = useIndexSetsList(false);
@@ -116,13 +113,15 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
             <td>Name</td>
             <td>Total size</td>
             <td>Oldest Message (date)</td>
-            <td colSpan={2}>Archiving</td>
+            <td>Archiving</td>
           </tr>
         </thead>
         <tbody>
           {indexSet && (
             <tr>
-              <td>{indexSet?.title}</td>
+              <td>
+                <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>{indexSet?.title}</Link>
+              </td>
               <td>{isStatsLoaded && indexSetStats?.size ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
               <td>
                 {isLoadingIndexerOverviewSuccess && (
@@ -131,15 +130,6 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
               </td>
               <td>
                 <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
-              </td>
-              <td>
-                <ActionButtonsWrap>
-                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
-                    <Button bsStyle="default" bsSize="xsmall" onClick={() => {}} title="View index set">
-                      <Icon name="pageview" type="regular" />
-                    </Button>
-                  </LinkContainer>
-                </ActionButtonsWrap>
               </td>
             </tr>
           )}

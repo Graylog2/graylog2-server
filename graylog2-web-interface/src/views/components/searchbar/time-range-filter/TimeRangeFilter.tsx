@@ -84,7 +84,7 @@ const TimeRangeFilter = ({
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
@@ -95,7 +95,6 @@ const TimeRangeFilter = ({
     setShow(!show);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TOGGLED, {
-      app_section: 'search-bar',
       app_action_value: 'time-range-picker',
       event_details: {
         showing: !show,
