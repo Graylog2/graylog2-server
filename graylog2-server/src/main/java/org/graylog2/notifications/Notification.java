@@ -110,6 +110,7 @@ public interface Notification extends Persisted {
         GENERIC,
         GENERIC_WITH_LINK,
         ES_INDEX_BLOCKED,
+        ES_INDEX_MAPPING_ERROR,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
