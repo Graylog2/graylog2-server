@@ -255,7 +255,8 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
     return () =>
       CancellablePromise.of(
         new Promise((resolve, reject) => {
-          SessionActions.login.completed.listen(() => {
+          const unsubscribe = SessionActions.login.completed.listen(() => {
+            unsubscribe();
             promise().then(resolve, reject);
           });
         }),
