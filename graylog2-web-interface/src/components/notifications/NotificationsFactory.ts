@@ -33,7 +33,8 @@ class NotificationsFactory {
 
       case 'no_input_running':
       case 'input_failure_shutdown':
-      case 'input_failed_to_start': {
+      case 'input_failed_to_start':
+      case 'kinesis_single_table_migration': {
         return {
           values: {
             SYSTEM_INPUTS: Routes.SYSTEM.INPUTS,

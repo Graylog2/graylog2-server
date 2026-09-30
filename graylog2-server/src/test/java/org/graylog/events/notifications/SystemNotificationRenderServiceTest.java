@@ -27,8 +27,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +41,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SystemNotificationRenderServiceTest {
+    private static final String KINESIS_UPGRADE_NOTES_URL = "https://go2docs.graylog.org/current/upgrading_graylog/upgrade_to_graylog_7.2.htm#aws-kinesis-cloudwatch-input-single-dynamodb-table-state-tracking";
+
     static NotificationService notificationService = mock(NotificationService.class);
     static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
     static SystemNotificationRenderService renderService;
@@ -154,6 +158,39 @@ class SystemNotificationRenderServiceTest {
                         }
                     });
         }
+    }
+
+    @Test
+    void kinesisSingleTableMigrationHtmlRender() {
+        final String inputsUrl = "http://my.system.inputs";
+        notification = new NotificationImpl()
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification,
+                SystemNotificationRenderService.Format.HTML, new HashMap<>(Map.of("SYSTEM_INPUTS", inputsUrl)));
+
+        assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Kinesis input KCL update");
+        assertThat(renderResponse.description)
+                .contains("<br /><br />")
+                .contains("<a href=\"" + inputsUrl + "\"")
+                .contains("<a href=\"" + KINESIS_UPGRADE_NOTES_URL + "\"");
+    }
+
+    @Test
+    void kinesisSingleTableMigrationPlainRender() {
+        notification = new NotificationImpl()
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
+
+        assertThat(renderResponse.description)
+                .contains("Kinesis Client Library (KCL) 3.5")
+                .contains(KINESIS_UPGRADE_NOTES_URL)
+                .doesNotContain("<br");
     }
 
     @Test
