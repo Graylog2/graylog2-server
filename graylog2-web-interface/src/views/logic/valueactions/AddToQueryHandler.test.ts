@@ -114,7 +114,7 @@ describe('AddToQueryHandler', () => {
 
     expect(updateQueryString).toHaveBeenCalledWith(
       'anotherQueryId',
-      'foo:23 AND (associated_assets:id1 OR associated_assets:id2 OR associated_assets:id3)',
+      'foo:23 AND (associated_assets:(id1 OR id2 OR id3))',
     );
   });
 

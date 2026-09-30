@@ -18,23 +18,17 @@ import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
-import {
-  escape,
-  addToQuery,
-  formatTimestamp,
-  predicate,
-  concatQueryStrings,
-  edgeClause,
-} from 'views/logic/queries/QueryHelper';
+import { addToQuery, predicate, concatQueryStrings, edgeClause } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, ActionContexts } from 'views/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import { fieldValueOrClause, formatQueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
 const toPredicate = (field: string, value: string | number, type: FieldType) =>
-  predicate(field, type.type === 'date' ? formatTimestamp(value) : escape(value));
+  predicate(field, formatQueryValue(value, type));
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) =>
   addToQuery(oldQuery, toPredicate(field, value, type));
@@ -62,10 +56,10 @@ const valuesFromPath = (contexts: Partial<ActionContexts>) => contexts.valuePath
   const [pathField, pathValue] = Object.entries(path)[0];
 
   return { field: pathField, value: pathValue, type: fieldTypeFor(pathField, contexts?.fieldTypes) };
-})
+});
 
 const valuesFromArray = (field: string, value: Array<QueryValue>, type: FieldType): Array<ValueToAdd> =>
-  value.map((arrayValue) => ({ field, value: arrayValue, type }))
+  value.map((arrayValue) => ({ field, value: arrayValue, type }));
 
 const AddToQueryHandler =
   ({ queryId, field, value = '', type, contexts }: Arguments) =>
@@ -75,18 +69,18 @@ const AddToQueryHandler =
     const fieldValueIsArray = Array.isArray(value);
 
     const getValues = () => {
-      if(hasMultipleValuesInPath) return valuesFromPath(contexts);
-      if(fieldValueIsArray) return valuesFromArray(field, value, type);
+      if (hasMultipleValuesInPath) return valuesFromPath(contexts);
+      if (fieldValueIsArray) return valuesFromArray(field, value, type);
 
-      return [{ field, value, type }]
-    }
+      return [{ field, value, type }];
+    };
 
     const valuesToAdd: Array<ValueToAdd> = uniq(getValues());
 
     let newQuery: string;
 
-    const shouldAddWithOr = (hasMultipleValuesInPath && contexts?.valuePathOperator === 'OR')
-      || (!hasMultipleValuesInPath && fieldValueIsArray && valuesToAdd.length > 1)
+    const shouldAddValuePathWithOr = hasMultipleValuesInPath && contexts?.valuePathOperator === 'OR';
+    const shouldAddArrayFieldValuesWithOr = !hasMultipleValuesInPath && fieldValueIsArray && valuesToAdd.length > 1;
 
     if (hasMultipleValuesInPath && contexts?.valuePathOperator === 'EDGE') {
       newQuery = addToQuery(
@@ -96,8 +90,10 @@ const AddToQueryHandler =
           { field: valuesToAdd[1].field, value: valuesToAdd[1].value },
         ),
       );
-    } else if (shouldAddWithOr) {
+    } else if (shouldAddValuePathWithOr) {
       newQuery = addToQuery(oldQuery, orClause(valuesToAdd));
+    } else if (shouldAddArrayFieldValuesWithOr) {
+      newQuery = addToQuery(oldQuery, fieldValueOrClause(field, valuesToAdd));
     } else {
       newQuery = valuesToAdd.reduce(
         (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
