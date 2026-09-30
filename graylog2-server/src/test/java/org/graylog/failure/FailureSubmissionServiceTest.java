@@ -18,6 +18,7 @@ package org.graylog.failure;
 
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
@@ -56,6 +57,8 @@ class FailureSubmissionServiceTest {
     private ObjectMapperProvider objectMapperProvider;
     @Mock
     private InputDiagnosisMetrics inputDiagnosisMetrics;
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private FailureSubmissionService underTest;
 
