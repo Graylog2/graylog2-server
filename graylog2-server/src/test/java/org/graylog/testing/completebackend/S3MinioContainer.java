@@ -30,8 +30,12 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
 
+/**
+ * S3-compatible test container. Historically backed by MinIO, which no longer publishes container images,
+ * so this now runs RustFS (Apache-2.0, S3-compatible).
+ */
 public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
-    public static final String MINIO_LATEST = "quay.io/minio/minio:latest";
+    public static final String DEFAULT_IMAGE = "rustfs/rustfs:1.0.0";
     private static final int PORT = 9000;
     private final String accessKey;
     private final String secretKey;
@@ -52,7 +56,7 @@ public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
     }
 
     public S3MinioContainer(Network network, final boolean closeNetwork) {
-        this(MINIO_LATEST, network, closeNetwork);
+        this(DEFAULT_IMAGE, network, closeNetwork);
     }
 
     public S3MinioContainer(String imageName, Network network, final boolean closeNetwork) {
@@ -63,17 +67,15 @@ public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
         accessKey = RandomStringUtils.randomAlphanumeric(10);
         secretKey = RandomStringUtils.randomAlphanumeric(10);
 
-        withCommand("server /data");
         withNetwork(network);
         withNetworkAliases("minio");
         withExposedPorts(PORT);
         // Try to support virtual-host-style requests.
-        withEnv("MINIO_DOMAIN", "localhost," + String.join(",", getNetworkAliases()));
-        withEnv("MINIO_ACCESS_KEY", accessKey);
-        withEnv("MINIO_SECRET_KEY", secretKey);
-        withEnv("MINIO_BROWSER", "off");
+        withEnv("RUSTFS_SERVER_DOMAINS", "localhost," + String.join(",", getNetworkAliases()));
+        withEnv("RUSTFS_ACCESS_KEY", accessKey);
+        withEnv("RUSTFS_SECRET_KEY", secretKey);
 
-        waitingFor(new HttpWaitStrategy().forPath("/minio/health/ready").forPort(PORT).withStartupTimeout(Duration.ofSeconds(10)));
+        waitingFor(new HttpWaitStrategy().forPath("/health/ready").forPort(PORT).withStartupTimeout(Duration.ofSeconds(10)));
     }
 
     public URI getEndpointURI() {

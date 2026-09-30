@@ -133,7 +133,10 @@ describe('Events Bulk Action', () => {
   it('renders replay search for replayable events when user can read their event definition', async () => {
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(useCurrentUser).mockReturnValue(
-      alice.toBuilder().permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1'])).build(),
+      alice
+        .toBuilder()
+        .permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1']))
+        .build(),
     );
 
     renderBulkAction({ event_id_1: getReplayableEvent('event_id_1') });

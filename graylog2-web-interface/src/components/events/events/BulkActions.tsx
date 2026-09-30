@@ -35,7 +35,8 @@ const BulkActions = ({ selectedEntitiesData }: Props) => {
 
   const replayableEvents = events.filter(
     (event) =>
-      !!event.replay_info && isPermitted(currentUser?.permissions, `eventdefinitions:read:${event.event_definition_id}`),
+      !!event.replay_info &&
+      isPermitted(currentUser?.permissions, `eventdefinitions:read:${event.event_definition_id}`),
   );
   const onReplaySearchClick = useReplayBulkAction(replayableEvents);
 
