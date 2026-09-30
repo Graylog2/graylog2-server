@@ -182,7 +182,7 @@
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
         <lucene.version>10.5.1</lucene.version>
-        <lz4.version>1.11.2</lz4.version>
+        <lz4.version>1.12.0</lz4.version>
         <metrics.version>4.2.40</metrics.version>
         <mongodb-driver.version>5.12.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
