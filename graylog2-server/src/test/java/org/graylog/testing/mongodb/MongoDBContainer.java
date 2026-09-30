@@ -18,14 +18,17 @@ package org.graylog.testing.mongodb;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.google.common.primitives.Ints;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
@@ -63,6 +66,8 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         withNetwork(requireNonNull(network, "network cannot be null"));
         withNetworkAliases(NETWORK_ALIAS);
         waitingFor(Wait.forListeningPort());
+        withStartupAttempts(3);
+        withStartupTimeout(Duration.ofSeconds(30));
 
         // Workaround for running MongoDB 8.x (including the "latest" tag, which currently resolves to an 8.x release)
         // on Linux kernel version >= 6.19.
@@ -89,6 +94,12 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         } catch (Exception e) {
             LOG.error("Error applying Linux kernel version workaround for MongoDB 8.x", e);
         }
+    }
+
+    @Override
+    public MongoDBContainer waitingFor(@Nonnull WaitStrategy waitStrategy) {
+        // Reduce the default startup timeout for all wait strategies. The default of 60 seconds is quite high.
+        return super.waitingFor(waitStrategy).withStartupTimeout(Duration.ofSeconds(30));
     }
 
     /**
