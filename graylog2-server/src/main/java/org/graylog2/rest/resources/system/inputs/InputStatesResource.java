@@ -41,21 +41,28 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,32 +72,52 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class InputStatesResource extends AbstractInputsResource {
     private static final Logger LOG = LoggerFactory.getLogger(InputStatesResource.class);
+    // Only for the failure paths of list(), which is polled every couple of seconds.
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createQuietDefaultRateLimitedLog(
+            InputStatesResource.class);
     private final InputRegistry inputRegistry;
     private final EventBus serverEventBus;
     private final InputService inputService;
     private final InputStateService inputStateService;
+    private final MessageInputFactory messageInputFactory;
+    private final InputLauncher inputLauncher;
+    private final NodeId nodeId;
 
     @Inject
     public InputStatesResource(InputRegistry inputRegistry,
                                EventBus serverEventBus,
                                InputService inputService,
                                MessageInputFactory messageInputFactory,
-                               InputStateService inputStateService) {
+                               InputStateService inputStateService,
+                               InputLauncher inputLauncher,
+                               NodeId nodeId) {
         super(messageInputFactory.getAvailableInputs());
         this.inputRegistry = inputRegistry;
         this.serverEventBus = serverEventBus;
         this.inputService = inputService;
         this.inputStateService = inputStateService;
+        this.messageInputFactory = messageInputFactory;
+        this.inputLauncher = inputLauncher;
+        this.nodeId = nodeId;
     }
 
     @GET
     @Timed
     @Operation(summary = "Get all input states of this node")
     public InputStatesList list() {
-        final Set<InputStateSummary> result = this.inputRegistry.stream()
+        final Set<InputStateSummary> result = new HashSet<>();
+        final Set<String> registered = new HashSet<>();
+
+        this.inputRegistry.stream()
                 .filter(inputState -> isPermitted(RestPermissions.INPUTS_READ, inputState.getStoppable().getId()))
-                .map(this::getInputStateSummary)
-                .collect(Collectors.toSet());
+                .forEach(inputState -> {
+                    registered.add(inputState.getStoppable().getId());
+                    result.add(getInputStateSummary(inputState));
+                });
+
+        if (inputLauncher.allPersistedLaunched()) {
+            result.addAll(notRunningOnThisNode(registered));
+        }
 
         return InputStatesList.create(result);
     }
@@ -119,6 +146,58 @@ public class InputStatesResource extends AbstractInputsResource {
             throw new NotFoundException("No input state for input id <" + inputId + "> on this node.");
         }
         return getInputStateSummary(inputState);
+    }
+
+    private Set<InputStateSummary> notRunningOnThisNode(Set<String> registered) {
+        try {
+            final Set<String> notRegistered = inputService.findIdsForThisNodeOrGlobal(nodeId.getNodeId()).stream()
+                    .filter(inputId -> !registered.contains(inputId))
+                    .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
+                    .collect(Collectors.toSet());
+
+            if (notRegistered.isEmpty()) {
+                return Set.of();
+            }
+
+            final Set<InputStateSummary> result = new HashSet<>();
+            for (Input input : inputService.findByIds(notRegistered)) {
+                try {
+                    notRunningStateSummary(input).ifPresent(result::add);
+                } catch (Exception e) {
+                    RATE_LIMITED_LOG.warn("Cannot determine the state of input {}. Not reporting it.",
+                            input.toIdentifier(), e);
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            RATE_LIMITED_LOG.warn("Could not determine which inputs are configured but not running on this node. " +
+                    "Reporting only the inputs this node has taken responsibility for.", e);
+            return Set.of();
+        }
+    }
+
+    private Optional<InputStateSummary> notRunningStateSummary(Input input) {
+        final boolean onlyOnePerCluster;
+        try {
+            onlyOnePerCluster = messageInputFactory.onlyOnePerCluster(input.getType(),
+                    new Configuration(input.getConfiguration()));
+        } catch (NoSuchInputTypeException e) {
+            // Already reported at WARN per input by PersistedInputsImpl and InputEventListener.
+            LOG.debug("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
+            return Optional.empty();
+        }
+
+        if (inputLauncher.leaderStatusInhibitsLaunch(onlyOnePerCluster, input.isGlobal())) {
+            return Optional.empty();
+        }
+        return Optional.of(InputStateSummary.create(
+                input.getId(),
+                IOState.Type.STOPPED.toString(),
+                input.getCreatedAt(),
+                null,
+                null,
+                getInputSummary(input, true),
+                onlyOnePerCluster));
     }
 
     @PUT

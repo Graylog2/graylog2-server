@@ -35,7 +35,7 @@ jest.mock('routing/QueryParams', () => ({
   useQueryParams: jest.fn(),
 }));
 
-const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP') => ({
+const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP' | 'STOPPED') => ({
   state,
   id: 'state-id',
   detailed_message: null,
@@ -65,6 +65,23 @@ describe('<InputsNotifications />', () => {
 
     expect(screen.getByRole('button', { name: 'Show failed inputs' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Show inputs in setup mode' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show stopped inputs' })).toBeInTheDocument();
+  });
+
+  it('shows the stopped warning when an input reports a STOPPED state', () => {
+    asMock(useInputsList).mockReturnValue({ data: [{ id: 'input-1' }] } as any);
+    asMock(useInputsStates).mockReturnValue({
+      isLoading: false,
+      refetch: jest.fn(),
+      data: {
+        'input-1': {
+          node1: buildInputState('STOPPED'),
+        },
+      },
+    });
+
+    render(<InputsNotifications />);
+
     expect(screen.getByRole('button', { name: 'Show stopped inputs' })).toBeInTheDocument();
   });
 

@@ -65,6 +65,11 @@ public interface InputService {
 
     List<String> findIdsByTitle(String title);
 
+    /**
+     * @return the IDs of all inputs configured for the given node, including global inputs.
+     */
+    Set<String> findIdsForThisNodeOrGlobal(String nodeId);
+
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
 
     Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException;

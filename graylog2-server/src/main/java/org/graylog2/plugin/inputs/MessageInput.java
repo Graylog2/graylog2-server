@@ -265,6 +265,9 @@ public abstract class MessageInput implements Stoppable {
      * produce duplicate log messages in Graylog.
      * <p>
      * Returning {@code true} from this method will only really make sense if the input also {@code isGlobal}.
+     * <p>
+     * Implementations must answer the same for every instance of their type: the answer is cached per type and reused
+     * for inputs of that type with a different configuration.
      *
      * @return {@code true} if only a single instance of the input should be launched in the cluster. It will be
      * launched on the <em>leader</em> node.

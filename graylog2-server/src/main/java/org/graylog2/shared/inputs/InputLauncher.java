@@ -54,6 +54,7 @@ public class InputLauncher {
     private final LeaderElectionService leaderElectionService;
     private final FeatureFlags featureFlags;
     private final MetricRegistry metricRegistry;
+    private volatile boolean allPersistedLaunched = false;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
@@ -146,32 +147,46 @@ public class InputLauncher {
     }
 
     public void launchAllPersisted() {
-        for (MessageInput input : persistedInputs) {
-            if (leaderStatusInhibitsLaunch(input)) {
-                LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
-                        input.toIdentifier());
-                continue;
+        try {
+            for (MessageInput input : persistedInputs) {
+                if (leaderStatusInhibitsLaunch(input)) {
+                    LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
+                            input.toIdentifier());
+                    continue;
+                }
+                if (shouldStartAutomatically(input)) {
+                    LOG.info("Launching input {} - desired state is {}",
+                            input.toIdentifier(), input.getDesiredState());
+                    input.initialize();
+                    launch(input);
+                } else if (input.getDesiredState().equals(IOState.Type.SETUP)) {
+                    launch(input);
+                } else {
+                    LOG.info("Not auto-starting input {} - desired state is {}",
+                            input.toIdentifier(), input.getDesiredState());
+                }
             }
-            if (shouldStartAutomatically(input)) {
-                LOG.info("Launching input {} - desired state is {}",
-                        input.toIdentifier(), input.getDesiredState());
-                input.initialize();
-                launch(input);
-            } else if (input.getDesiredState().equals(IOState.Type.SETUP)) {
-                launch(input);
-            } else {
-                LOG.info("Not auto-starting input {} - desired state is {}",
-                        input.toIdentifier(), input.getDesiredState());
-            }
+        } finally {
+            // Also when the pass aborts: the registry then holds the inputs that did launch, and leaving this false
+            // would disable stopped-input reporting for the lifetime of the node.
+            allPersistedLaunched = true;
         }
     }
 
+    // Until this turns true the InputRegistry does not yet reflect which inputs this node runs.
+    public boolean allPersistedLaunched() {
+        return allPersistedLaunched;
+    }
 
     public boolean shouldStartAutomatically(MessageInput input) {
         return configuration.getAutoRestartInputs() || input.getDesiredState().equals(IOState.Type.RUNNING);
     }
 
     public boolean leaderStatusInhibitsLaunch(MessageInput input) {
-        return input.onlyOnePerCluster() && input.isGlobal() && !leaderElectionService.isLeader();
+        return leaderStatusInhibitsLaunch(input.onlyOnePerCluster(), input.isGlobal());
+    }
+
+    public boolean leaderStatusInhibitsLaunch(boolean onlyOnePerCluster, boolean global) {
+        return onlyOnePerCluster && global && !leaderElectionService.isLeader();
     }
 }

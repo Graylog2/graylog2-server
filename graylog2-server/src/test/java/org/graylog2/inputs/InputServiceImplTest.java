@@ -131,6 +131,21 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
+    public void findIdsForThisNodeOrGlobalReturnsLocalAndGlobalInputIds() {
+        assertThat(inputService.findIdsForThisNodeOrGlobal("cd03ee44-b2a7-cafe-babe-0000deadbeef"))
+                .containsExactlyInAnyOrder("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002",
+                        "54e3deadbeefdeadbeef0003");
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void findIdsForThisNodeOrGlobalReturnsGlobalInputIdsIfNodeIDDoesNotExist() {
+        assertThat(inputService.findIdsForThisNodeOrGlobal("cd03ee44-b2a7-0000-0000-000000000000"))
+                .containsExactly("54e3deadbeefdeadbeef0003");
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void findByIdsReturnsRequestedInputs() {
         assertThat(inputService.findByIds(ImmutableSet.of())).isEmpty();
         assertThat(inputService.findByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
@@ -227,6 +242,30 @@ public class InputServiceImplTest {
         });
 
         assertThat(inputService.allByType("test type")).hasSize(1).first().satisfies(input ->
+                assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+                    assertThat(value).isInstanceOf(EncryptedValue.class);
+                    assertThat(value).isEqualTo(secret);
+                }));
+    }
+
+    @Test
+    public void findForThisNodeOrGlobalConvertsEncryptedValues() throws ValidationException {
+        final MessageInput.Config inputConfig = mock(MessageInput.Config.class);
+        when(inputConfig.combinedRequestedConfiguration()).thenReturn(ConfigurationRequest.createWithFields(
+                new TextField("encrypted", "", "", "", ConfigurationField.Optional.OPTIONAL, true)));
+        when(messageInputFactory.getConfig("test type")).thenReturn(Optional.of(inputConfig));
+
+        final EncryptedValue secret = encryptedValueService.encrypt("secret");
+        final String id = inputService.save(InputImpl.builder()
+                .setTitle("test title")
+                .setType("test type")
+                .setCreatorUserId("test creator")
+                .setCreatedAt(new DateTime(DateTimeZone.UTC))
+                .setGlobal(true)
+                .setConfiguration(Map.of("encrypted", secret))
+                .build());
+
+        assertThat(inputService.findForThisNodeOrGlobal("any-node", id)).satisfies(input ->
                 assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
                     assertThat(value).isInstanceOf(EncryptedValue.class);
                     assertThat(value).isEqualTo(secret);

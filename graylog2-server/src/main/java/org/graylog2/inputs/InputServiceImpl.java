@@ -147,10 +147,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public List<Input> allOfThisNode(final String nodeId) {
         final ImmutableList.Builder<Input> result = ImmutableList.builder();
-        collection.find(or(
-                eq(MessageInput.FIELD_NODE_ID, nodeId),
-                eq(MessageInput.FIELD_GLOBAL, true)
-        )).forEach(e -> result.add(withEncryptedFields(e)));
+        collection.find(forThisNodeOrGlobal(nodeId)).forEach(e -> result.add(withEncryptedFields(e)));
 
         return result.build();
     }
@@ -309,10 +306,9 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Input findForThisNodeOrGlobal(String nodeId, String id) {
-        final Bson forThisNodeOrGlobal = or(eq(MessageInput.FIELD_NODE_ID, nodeId), eq(MessageInput.FIELD_GLOBAL, true));
-        final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal);
+        final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal(nodeId));
 
-        return collection.find(query).first();
+        return withEncryptedFields(collection.find(query).first());
     }
 
     @Override
@@ -752,9 +748,22 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
+    public Set<String> findIdsForThisNodeOrGlobal(String nodeId) {
+        return findIds(forThisNodeOrGlobal(nodeId));
+    }
+
+    @Override
     public Set<String> findIdsByDesiredState(IOState.Type desiredState) {
+        return findIds(eq(InputImpl.FIELD_DESIRED_STATE, desiredState.toString()));
+    }
+
+    private static Bson forThisNodeOrGlobal(String nodeId) {
+        return or(eq(MessageInput.FIELD_NODE_ID, nodeId), eq(MessageInput.FIELD_GLOBAL, true));
+    }
+
+    private Set<String> findIds(Bson filter) {
         final Set<String> result = new HashSet<>();
-        documentCollection.find(eq(InputImpl.FIELD_DESIRED_STATE, desiredState.toString()))
+        documentCollection.find(filter)
                 .projection(Projections.include("_id"))
                 .forEach(doc -> result.add(doc.getObjectId("_id").toHexString()));
         return result;
