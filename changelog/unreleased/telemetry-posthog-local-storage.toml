@@ -1,0 +1,2 @@
+type = "fixed"
+message = "Store PostHog telemetry state in localStorage instead of a cookie, to avoid oversized cookies exceeding the HTTP header size limit."
