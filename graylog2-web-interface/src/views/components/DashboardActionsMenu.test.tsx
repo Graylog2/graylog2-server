@@ -245,7 +245,7 @@ describe('DashboardActionsMenu', () => {
     it('disables saving and editing metadata', async () => {
       render(<SUT view={immutableView} />);
 
-      expect(await screen.findByTitle(/Save dashboard/)).toBeDisabled();
+      expect(await screen.findByRole('button', { name: 'Save dashboard' })).toHaveAttribute('aria-disabled', 'true');
 
       await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
 
@@ -258,10 +258,26 @@ describe('DashboardActionsMenu', () => {
       expect(await screen.findByTitle(/Save as new dashboard/)).toBeEnabled();
     });
 
+    it('explains why saving is disabled', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.hover(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(await screen.findByText(/This dashboard is read-only/i)).toBeInTheDocument();
+    });
+
+    it('does not save view when clicking the disabled save button', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
+
     it('does not save view when pressing related keyboard shortcut', async () => {
       render(<SUT view={immutableView} />);
 
-      await screen.findByTitle(/Save dashboard/);
+      await screen.findByRole('button', { name: 'Save dashboard' });
       await userEvent.keyboard('{Meta>}s{/Meta}');
 
       expect(OnSaveViewAction).not.toHaveBeenCalled();

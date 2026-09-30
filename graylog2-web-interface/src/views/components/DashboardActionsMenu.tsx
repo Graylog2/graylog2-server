@@ -30,6 +30,7 @@ import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import useProductName from 'brand-customization/useProductName';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
@@ -52,6 +53,9 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) =>
   isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)]) ||
   (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
+const immutableDashboardInfo = (productName: string) =>
+  `This dashboard is read-only because it is managed by ${productName}. Use "Save as" to create an editable copy.`;
+
 const DashboardActionsMenu = () => {
   const view = useView();
   const isNewView = useIsNew();
@@ -72,8 +76,10 @@ const DashboardActionsMenu = () => {
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const sendTelemetry = useSendTelemetry('dashboard');
-  const { scopePermissions } = useGetPermissionsByScope({ _scope: view.scope });
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope({ _scope: view.scope });
   const allowedToEdit = _isAllowedToEdit(view, currentUser) && !!scopePermissions?.is_mutable;
+  const isImmutable = !isNewView && !loadingScopePermissions && !scopePermissions?.is_mutable;
+  const productName = useProductName();
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
       <MenuItem divider />
@@ -154,6 +160,7 @@ const DashboardActionsMenu = () => {
         <SaveDashboardButton
           userIsAllowedToEdit={allowedToEdit}
           openSaveAsModal={() => setSaveNewDashboardOpen(true)}
+          disabledInfo={isImmutable ? immutableDashboardInfo(productName) : undefined}
         />
       )}
       {showSaveNewButton && (

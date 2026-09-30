@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -110,10 +111,12 @@ public class DashboardsResource extends RestResource {
             .build();
 
     private final DbQueryCreator dbQueryCreator;
+    private final EntityScopeService entityScopeService;
 
     @Inject
-    public DashboardsResource(final ViewService dbService) {
+    public DashboardsResource(final ViewService dbService, final EntityScopeService entityScopeService) {
         this.dbService = dbService;
+        this.entityScopeService = entityScopeService;
         this.dbQueryCreator = new DbQueryCreator(ViewDTO.FIELD_TITLE, attributes);
     }
 
@@ -141,7 +144,7 @@ public class DashboardsResource extends RestResource {
 
         Predicate<ViewSummaryDTO> predicate = switch (scope) {
             case READ -> searchUser::canReadView;
-            case UPDATE -> searchUser::canUpdateView;
+            case UPDATE -> view -> searchUser.canUpdateView(view) && entityScopeService.isMutable(view.scope());
         };
 
         final SourcedMongoEntityUtils.FilterPredicate<ViewSummaryDTO> filterPredicate = SourcedMongoEntityUtils.handleEntitySourceFilter(filters, predicate);

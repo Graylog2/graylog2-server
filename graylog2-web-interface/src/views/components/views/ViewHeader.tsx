@@ -30,6 +30,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { createGRN } from 'logic/permissions/GRN';
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
@@ -177,6 +178,7 @@ const ViewHeader = () => {
   const view = useView();
   const isNew = useIsNew();
   const isSavedView = view?.id && view?.title && !isNew;
+  const { scopePermissions } = useGetPermissionsByScope({ _scope: view?.scope });
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
@@ -255,13 +257,15 @@ const ViewHeader = () => {
                       grn={createGRN(view.type, view.id)}
                       onChange={onChangeFavorite}
                     />
-                    <EditButton
-                      onClick={toggleMetadataEdit}
-                      role="button"
-                      title={`Edit ${typeText} ${view.title} metadata`}
-                      tabIndex={0}>
-                      <Icon name="edit_square" />
-                    </EditButton>
+                    {scopePermissions?.is_mutable && (
+                      <EditButton
+                        onClick={toggleMetadataEdit}
+                        role="button"
+                        title={`Edit ${typeText} ${view.title} metadata`}
+                        tabIndex={0}>
+                        <Icon name="edit_square" />
+                      </EditButton>
+                    )}
                   </>
                 )}
               </TitleWrapper>

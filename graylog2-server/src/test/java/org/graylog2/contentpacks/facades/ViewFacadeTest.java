@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
@@ -64,6 +65,7 @@ import org.graylog2.contentpacks.model.entities.MessageListEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
+import org.graylog2.contentpacks.model.entities.ScopedContentPackEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
@@ -267,6 +269,34 @@ public class ViewFacadeTest {
 
         assertThat(viewService.get(nativeEntity.descriptor().id().id()))
                 .hasValueSatisfying(view -> assertThat(view.scope()).isEqualTo(ImmutableSystemScope.NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldInstallEntitiesWithoutScopeWithDefaultScope() throws Exception {
+        final EntityV1 entity = createViewEntity(ImmutableSystemScope.NAME, "title");
+        final ObjectNode dataWithoutScope = entity.data().deepCopy();
+        dataWithoutScope.remove(ScopedContentPackEntity.FIELD_SCOPE);
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(Set.of()),
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
+
+        final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(entity.toBuilder().data(dataWithoutScope).build(),
+                Collections.emptyMap(), streamNativeEntities(), "testuser");
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id()))
+                .hasValueSatisfying(view -> assertThat(view.scope()).isEqualTo(DefaultEntityScope.NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldExposeScopeInViewSummaries() throws Exception {
+        final NativeEntity<ViewDTO> nativeEntity = createNativeView(ImmutableSystemScope.NAME);
+
+        assertThat(viewSummaryService.get(nativeEntity.descriptor().id().id()))
+                .hasValueSatisfying(summary -> assertThat(summary.scope()).isEqualTo(ImmutableSystemScope.NAME));
+        assertThat(viewSummaryService.get(viewId))
+                .hasValueSatisfying(summary -> assertThat(summary.scope()).isEqualTo(DefaultEntityScope.NAME));
     }
 
     @Test

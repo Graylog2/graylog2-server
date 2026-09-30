@@ -60,13 +60,17 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
+    private EntityRegistrar entityRegistrar;
     private MongoCollection<FavoritesForUserDTO> favoritesCollection;
     private GRNRegistry grnRegistry;
 
@@ -85,10 +89,11 @@ public class ViewServiceTest {
                         new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()
         );
+        this.entityRegistrar = mock(EntityRegistrar.class);
         this.dbService = new ViewService(
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
-                mock(EntityRegistrar.class),
+                entityRegistrar,
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
                 mongoCollections,
@@ -378,6 +383,15 @@ public class ViewServiceTest {
         assertThatThrownBy(() -> dbService.delete(saved.id()))
                 .isInstanceOf(IllegalArgumentException.class);
         assertThat(dbService.get(saved.id())).hasValueSatisfying(view -> assertThat(view.title()).isEqualTo("View"));
+        verify(entityRegistrar, never()).unregisterDashboard(saved.id());
+    }
+
+    @Test
+    public void deletingMissingViewIsNoOp() {
+        dbService.delete("5def958063303ae5f68eccae");
+
+        verify(entityRegistrar, never()).unregisterDashboard(any());
+        verify(entityRegistrar, never()).unregisterSearch(any());
     }
 
     @Test
