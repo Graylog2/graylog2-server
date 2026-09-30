@@ -17,20 +17,25 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.google.common.eventbus.EventBus;
+import com.mongodb.MongoClientSettings;
 import jakarta.inject.Provider;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
+import org.bson.BsonDocument;
+import org.bson.conversions.Bson;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.PaginatedIndexSetService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
@@ -41,7 +46,9 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
@@ -67,6 +74,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
@@ -74,7 +82,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
@@ -110,6 +120,8 @@ public class IndexSetsResourceTest {
     private IndexSetRestrictionsService indexSetRestrictionsService;
     @Mock
     private RefreshingLockService.Factory lockServiceFactory;
+    @Mock
+    private PaginatedIndexSetService paginatedIndexSetService;
     @Mock
     private RefreshingLockService lockService;
 
@@ -725,10 +737,81 @@ public class IndexSetsResourceTest {
         assertThat(secondPage.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig2, false, null));
     }
 
+    @Test
+    public void getPageMapsElementsAndMarksTheDefaultIndexSet() {
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
+        final IndexSetConfig defaultConfig = createIndexSetConfig("id2", "title2");
+        when(indexSetService.getDefault()).thenReturn(defaultConfig);
+        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+                .thenReturn(new PaginatedList<>(List.of(indexSetConfig, defaultConfig), 2, 1, 50));
+
+        final PageListResponse<IndexSetResponse> response = indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+
+        assertThat(response.elements()).containsExactly(
+                IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null),
+                IndexSetResponse.fromIndexSetConfig(defaultConfig, true, null));
+        assertThat(response.total()).isEqualTo(2);
+        assertThat(response.paginationInfo().total()).isEqualTo(2);
+        assertThat(response.sort()).isEqualTo("title");
+        assertThat(response.attributes()).extracting("id")
+                .containsExactly("title", "description", "index_prefix", "shards", "replicas", "creation_date", "index_template_type");
+        assertThat(response.defaults().sort().id()).isEqualTo("title");
+    }
+
+    @Test
+    public void getPagePagesInTheDatabaseForUsersWhoMayReadAllIndexSets() {
+        when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
+        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+                .thenReturn(PaginatedList.emptyList(1, 50));
+
+        indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+
+        verify(paginatedIndexSetService).findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        verify(paginatedIndexSetService, never()).findPaginated(any(), any(), anyInt(), anyInt(), anyString(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getPageUsesAPermissionPredicateForRestrictedUsers() {
+        notPermitted();
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
+        when(indexSetService.getDefault()).thenReturn(indexSetConfig);
+        when(paginatedIndexSetService.findPaginated(any(), any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+                .thenReturn(PaginatedList.emptyList(1, 50));
+        final ArgumentCaptor<Predicate<IndexSetConfig>> predicateCaptor = ArgumentCaptor.forClass(Predicate.class);
+
+        indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+
+        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        assertThat(predicateCaptor.getValue().test(indexSetConfig)).isFalse();
+    }
+
+    @Test
+    public void getPageForwardsQueryAndFiltersToTheDatabaseQuery() {
+        when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
+        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+                .thenReturn(PaginatedList.emptyList(1, 50));
+        final ArgumentCaptor<Bson> queryCaptor = ArgumentCaptor.forClass(Bson.class);
+
+        indexSetsResource.getPage(1, 50, "graylog", List.of("shards:4"), "title", SortOrder.ASCENDING);
+
+        verify(paginatedIndexSetService).findPaginated(queryCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        final String dbQuery = queryCaptor.getValue()
+                .toBsonDocument(BsonDocument.class, MongoClientSettings.getDefaultCodecRegistry())
+                .toJson();
+        assertThat(dbQuery).contains("\"shards\"").contains("\"title\"").contains("graylog");
+    }
+
+    @Test
+    public void getPageRejectsFiltersOnAttributesThatAreNotFilterable() {
+        assertThrows(BadRequestException.class,
+                () -> indexSetsResource.getPage(1, 50, "", List.of("description:foo"), "title", SortOrder.ASCENDING));
+    }
+
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                 indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
-                indexSetRestrictionsService, lockServiceFactory);
+                indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -740,10 +823,11 @@ public class IndexSetsResourceTest {
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
                      LegacySystemJobManager systemJobManager, Provider<Boolean> permitted,
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
-                     RefreshingLockService.Factory lockServiceFactory) {
+                     RefreshingLockService.Factory lockServiceFactory, PaginatedIndexSetService paginatedIndexSetService) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class), lockServiceFactory);
+                    openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class), lockServiceFactory,
+                    paginatedIndexSetService);
             this.permitted = permitted;
         }
 
