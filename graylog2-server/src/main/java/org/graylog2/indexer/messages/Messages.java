@@ -37,11 +37,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog2.indexer.messages.RetryWait.MAX_WAIT_TIME;
 
@@ -62,6 +67,12 @@ public class Messages {
     private static final int retrySecondsMultiplier = 500;
 
     static final RetryWait retryWait = new RetryWait(retrySecondsMultiplier);
+
+    /**
+     * Upper bound for the coerced retries of a single batch. Each pass has to repair a field that no earlier pass
+     * repaired, so this only caps documents with an unusual number of conflicting date fields.
+     */
+    private static final int MAX_COERCION_PASSES = 5;
 
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<IndexingResults> createBulkRequestRetryerBuilder() {
@@ -140,7 +151,9 @@ public class Messages {
 
         final IndexingResults retryBlockResults = retryQualifyingIndividualItems(indexingRequestList, indexingResults.errors(), indexingListener);
 
-        final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
+        final IndexingResults resultsAfterBlockRetries = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
+
+        final IndexingResults finalResults = retryCoercibleMappingErrors(resultsAfterBlockRetries, indexingListener);
 
         recordTimestamp(finalResults.successes());
         accountTotalMessageSizes(finalResults.successes(), isSystemTraffic);
@@ -184,6 +197,78 @@ public class Messages {
 
         builder.addErrors(otherFailures.stream().toList());
         return builder.build();
+    }
+
+    /**
+     * Retries messages the indexer rejected because a date value was written into a numerically mapped field,
+     * rewriting the value the way the existing mapping expects. See {@link MappingErrorCoercion} for why this is
+     * the only way to get such a message indexed: a field's type cannot be changed in an existing index.
+     * <p>
+     * The indexer reports only the first field it could not parse, so a message with several conflicting fields
+     * needs one pass per field. Every pass has to rewrite a field that is not already being rewritten, which bounds
+     * the loop by the number of fields in the document; {@link #MAX_COERCION_PASSES} bounds it further.
+     */
+    private IndexingResults retryCoercibleMappingErrors(IndexingResults results, IndexingListener indexingListener) {
+        final List<IndexingSuccess> successes = new ArrayList<>(results.successes());
+        List<IndexingError> errors = new ArrayList<>(results.errors());
+        final Map<String, Set<String>> conflictingFieldsByIndex = new LinkedHashMap<>();
+
+        for (int pass = 0; pass < MAX_COERCION_PASSES; pass++) {
+            final Map<IndexingError, Indexable> coercions = new LinkedHashMap<>();
+            for (IndexingError error : errors) {
+                MappingErrorCoercion.coerce(error.message(), error.error().errorMessage())
+                        .ifPresent(coerced -> coercions.put(error, coerced));
+            }
+            if (coercions.isEmpty()) {
+                break;
+            }
+
+            final List<IndexingRequest> retries = coercions.entrySet().stream()
+                    .map(entry -> IndexingRequest.create(entry.getKey().index(), entry.getValue()))
+                    .toList();
+
+            LOG.warn("Retrying {} messages that were rejected because of a field type conflict, writing the "
+                    + "conflicting field the way the existing index mapping expects.", retries.size());
+
+            final IndexingResults retryResults = runBulkRequest(retries, retries.size(), indexingListener);
+
+            // Serialization has happened by now, so we know which values really were dates.
+            coercions.forEach((error, coerced) -> MappingErrorCoercion.rewrittenFields(coerced)
+                    .forEach(field -> conflictingFieldsByIndex
+                            .computeIfAbsent(error.index(), index -> new TreeSet<>())
+                            .add(field)));
+
+            if (!retryResults.successes().isEmpty()) {
+                LOG.info("Indexed {} of {} messages after adapting them to the existing index mapping.",
+                        retryResults.successes().size(), retries.size());
+            }
+
+            successes.addAll(retryResults.successes());
+            final List<IndexingError> remaining = new ArrayList<>(
+                    errors.stream().filter(error -> !coercions.containsKey(error)).toList());
+            remaining.addAll(retryResults.errors());
+            errors = remaining;
+        }
+
+        if (!conflictingFieldsByIndex.isEmpty()) {
+            failureSubmissionService.notifyAboutIndexMappingConflicts(conflictingFieldsByIndex);
+        }
+
+        // Report the original messages rather than the rewritten ones, so failure handling shows what was received.
+        final Map<String, Indexable> originalMessages = results.errors().stream()
+                .map(IndexingError::message)
+                .filter(message -> message.getId() != null)
+                .collect(Collectors.toMap(Indexable::getId, message -> message, (first, second) -> first));
+
+        return IndexingResults.create(successes,
+                errors.stream().map(error -> withOriginalMessage(error, originalMessages)).toList());
+    }
+
+    private IndexingError withOriginalMessage(IndexingError error, Map<String, Indexable> originalMessages) {
+        final Indexable original = originalMessages.get(error.message().getId());
+        return original == null
+                ? error
+                : IndexingError.create(original, error.index(), error.error().type(), error.error().errorMessage());
     }
 
     private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<IndexingError> indexBlocks) {

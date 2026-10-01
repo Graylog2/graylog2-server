@@ -213,7 +213,7 @@ type StreamsOverviewTableElement = {
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   // Optional map of column id → backend metric fields. Plugins use this to plug their
-  // columns into the open-source `GET /streams/metrics` request (e.g. enterprise's
+  // columns into the open-source `POST /streams/metrics` request (e.g. enterprise's
   // `failure_count`). When the column is visible, the listed fields are added to the
   // metrics request automatically.
   metricFields?: Record<string, Array<string>>;
@@ -350,7 +350,12 @@ declare module 'graylog-web-plugin/plugin' {
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
     }>;
-    DataLakeStreamDeleteWarning: React.ComponentType;
+    DataLakeStreamDeleteWarning: React.ComponentType<{
+      streamId: string;
+      isEnabled: boolean;
+      hasArchivedData: boolean;
+      hasRetrievals: boolean;
+    }>;
   }
 
   interface PluginArchive {
