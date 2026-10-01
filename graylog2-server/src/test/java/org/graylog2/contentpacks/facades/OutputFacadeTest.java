@@ -37,6 +37,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.LoggingOutput;
+import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
@@ -75,6 +76,8 @@ public class OutputFacadeTest {
 
     @Mock
     private StreamService streamService;
+    @Mock
+    private MessageOutputFactory messageOutputFactory;
     private Set<PluginMetaData> pluginMetaData;
     private OutputService outputService;
     private OutputFacade facade;
@@ -86,7 +89,9 @@ public class OutputFacadeTest {
         outputService = new OutputServiceImpl(
                 mongoCollections,
                 streamService,
-                new ClusterEventBus());
+                new ClusterEventBus(),
+                messageOutputFactory,
+                objectMapper);
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         outputFactories2 = new HashMap<>();

@@ -30,6 +30,7 @@ import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'logic/streams/types';
+import streamCategoryName from 'logic/streams/streamCategoryName';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
@@ -39,7 +40,7 @@ import AggregationConditionSummary from './AggregationConditionSummary';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
-import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from '../replay-search/EventDefinitionReplaySearchLink';
 
 const StyledDataWell = styled(DataWell)`
   line-height: 1.8;
@@ -187,7 +188,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const renderStreamCategories = () => {
     if (!streamCategories || streamCategories?.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={s} />);
+    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={streamCategoryName(s)} />);
 
     return (
       <>
@@ -264,7 +265,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch id={definitionId} />
+        <EventDefinitionReplaySearchLink eventDefinitionId={definitionId} />
       </dd>
     </dl>
   );

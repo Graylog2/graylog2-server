@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.encryption;
 
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.security.encryption.EncryptedValue;
@@ -57,8 +58,14 @@ public class EncryptedInputConfigs {
      * Returns the names of those fields in an input configuration that are expected to hold {@link EncryptedValue}s.
      */
     public static Set<String> getEncryptedFields(@Nonnull MessageInput.Config messageInputConfig) {
-        return messageInputConfig.combinedRequestedConfiguration()
-                .getFields()
+        return getEncryptedFields(messageInputConfig.combinedRequestedConfiguration());
+    }
+
+    /**
+     * Returns the names of those fields in a configuration request that are expected to hold {@link EncryptedValue}s.
+     */
+    public static Set<String> getEncryptedFields(@Nonnull ConfigurationRequest configurationRequest) {
+        return configurationRequest.getFields()
                 .values()
                 .stream()
                 .filter(ConfigurationField::isEncrypted)
