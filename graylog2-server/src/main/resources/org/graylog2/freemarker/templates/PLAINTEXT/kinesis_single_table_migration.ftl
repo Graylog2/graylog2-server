@@ -7,5 +7,5 @@ In Graylog 7.2, the AWS Kinesis/CloudWatch input has been updated to Kinesis Cli
 
 Migrating means fewer tables to manage and, for some customers, a lower risk of hitting AWS account limits. The migration is optional today but may be required by AWS in the future, so you can now migrate on your own schedule.
 
-The migration process requires monitoring and cannot be rolled back once complete. Before starting the migration, please review the Kinesis section of the Graylog upgrade notes: https://go2docs.graylog.org/current/upgrading_graylog/upgrade_to_graylog_7.2.htm#aws-kinesis-cloudwatch-input-single-dynamodb-table-state-tracking
+The migration process requires monitoring and cannot be rolled back once complete. Before starting the migration, please review the Kinesis section of the Graylog upgrade notes: https://github.com/Graylog2/graylog2-server/blob/7.2/UPGRADING.md#aws-kinesiscloudwatch-input-single-dynamodb-table-state-tracking
 </#if>

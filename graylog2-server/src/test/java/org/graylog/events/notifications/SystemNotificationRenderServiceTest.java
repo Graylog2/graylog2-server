@@ -41,7 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SystemNotificationRenderServiceTest {
-    private static final String KINESIS_UPGRADE_NOTES_URL = "https://go2docs.graylog.org/current/upgrading_graylog/upgrade_to_graylog_7.2.htm#aws-kinesis-cloudwatch-input-single-dynamodb-table-state-tracking";
+    private static final String KINESIS_UPGRADE_NOTES_URL = "https://github.com/Graylog2/graylog2-server/blob/7.2/UPGRADING.md#aws-kinesiscloudwatch-input-single-dynamodb-table-state-tracking";
 
     static NotificationService notificationService = mock(NotificationService.class);
     static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);

@@ -223,6 +223,24 @@ describe('SystemNotificationsTable', () => {
       await screen.findByText(/full body content here/i);
     });
 
+    it('keeps links in the expanded body opening in a new tab', async () => {
+      asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
+      asMock(useNotificationBody).mockReturnValue({
+        data: {
+          title: 'Disk full on node1',
+          description: '<a href="https://example.org/docs" target="_blank" rel="noreferrer">upgrade notes</a>',
+        },
+        isLoading: false,
+        isError: false,
+      });
+
+      render(<SystemNotificationsTable />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /show full message for: disk full on node1/i }));
+
+      expect(await screen.findByRole('link', { name: 'upgrade notes' })).toHaveAttribute('target', '_blank');
+    });
+
     it('shows fallback message when body fetch fails', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
       asMock(useNotificationBody).mockReturnValue({
