@@ -19,6 +19,7 @@ package org.graylog.integrations.migrations;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.inject.Inject;
 import org.graylog.integrations.aws.inputs.AWSInput;
+import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.migrations.Migration;
@@ -33,11 +34,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Raises a system notification about the optional KCL 3.5 single-table migration when Kinesis inputs exist at upgrade
- * time. Only those can still use the legacy three-table DynamoDB layout; inputs created later start on a single table.
+ * Raises a system notification about the optional KCL 3.5 single-table migration when not-yet-migrated Kinesis inputs
+ * exist at upgrade time. Only those can still use the legacy three-table DynamoDB layout; inputs created later start
+ * on a single table.
  */
 public class V20260929120000_NotifyKinesisSingleTableMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260929120000_NotifyKinesisSingleTableMigration.class);
+
+    static final String NOTIFICATION_KEY = "kinesis_single_table_migration";
 
     private final ClusterConfigService clusterConfigService;
     private final InputService inputService;
@@ -64,20 +68,28 @@ public class V20260929120000_NotifyKinesisSingleTableMigration extends Migration
             return;
         }
 
-        final Set<String> legacyInputIds = inputService.allByType(AWSInput.TYPE).stream()
+        final Set<String> unmigratedInputIds = inputService.allByType(AWSInput.TYPE).stream()
+                .filter(input -> !usesSingleTable(input))
                 .map(Input::getId)
                 .collect(Collectors.toSet());
 
-        if (!legacyInputIds.isEmpty()) {
+        if (!unmigratedInputIds.isEmpty()) {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
+                    .addKey(NOTIFICATION_KEY)
                     .addSeverity(Notification.Severity.NORMAL));
             LOG.info("Raised the KCL single-table migration notification for {} existing AWS Kinesis/CloudWatch input(s).",
-                    legacyInputIds.size());
+                    unmigratedInputIds.size());
         }
 
-        clusterConfigService.write(new MigrationCompleted(legacyInputIds));
+        clusterConfigService.write(new MigrationCompleted(unmigratedInputIds));
     }
 
-    public record MigrationCompleted(@JsonProperty("legacy_input_ids") Set<String> legacyInputIds) {}
+    // Inputs that already have the migration option enabled have nothing left to migrate.
+    private static boolean usesSingleTable(Input input) {
+        return Boolean.parseBoolean(String.valueOf(
+                input.getConfiguration().get(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING)));
+    }
+
+    public record MigrationCompleted(@JsonProperty("unmigrated_input_ids") Set<String> unmigratedInputIds) {}
 }

@@ -26,8 +26,6 @@ const StyledPre = styled.pre`
 `;
 
 const FALLBACK_MESSAGE = 'Could not load full notification body.';
-// Notification templates open their links in a new tab, which DOMPurify would otherwise strip.
-const SANITIZE_CONFIG = { ADD_ATTR: ['target'] };
 
 const NotificationBody = ({ row }: { row: NotificationType }) => {
   const { data, isLoading, isError } = useNotificationBody(row.id);
@@ -37,7 +35,7 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
 
   return (
     <StyledPre>
-      <Sanitize html={data.description.trim()} config={SANITIZE_CONFIG} />
+      <Sanitize html={data.description.trim()} />
     </StyledPre>
   );
 };

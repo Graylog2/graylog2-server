@@ -27,10 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,19 +160,18 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void kinesisSingleTableMigrationHtmlRender() {
-        final String inputsUrl = "http://my.system.inputs";
         notification = new NotificationImpl()
                 .addSeverity(Notification.Severity.NORMAL)
                 .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
-        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification,
-                SystemNotificationRenderService.Format.HTML, new HashMap<>(Map.of("SYSTEM_INPUTS", inputsUrl)));
+        final SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
 
         assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Kinesis input KCL update");
         assertThat(renderResponse.description)
                 .contains("<br /><br />")
-                .contains("<a href=\"" + inputsUrl + "\"")
+                .contains("<strong>Migrate to single DynamoDB table for state tracking</strong>")
                 .contains("<a href=\"" + KINESIS_UPGRADE_NOTES_URL + "\"");
     }
 
@@ -185,7 +182,7 @@ class SystemNotificationRenderServiceTest {
                 .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
-        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
+        final SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
 
         assertThat(renderResponse.description)
                 .contains("Kinesis Client Library (KCL) 3.5")

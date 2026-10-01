@@ -17,6 +17,8 @@
 package org.graylog.integrations.migrations;
 
 import org.graylog.integrations.aws.inputs.AWSInput;
+import org.graylog.integrations.aws.transports.KinesisTransport;
+import org.graylog.integrations.migrations.V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted;
 import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.inputs.Input;
@@ -33,6 +35,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,8 +66,8 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
     }
 
     @Test
-    void publishesNotificationForExistingKinesisInputs() {
-        final List<Input> inputs = List.of(input("kinesis-1"), input("kinesis-2"));
+    void publishesNotificationForUnmigratedKinesisInputs() {
+        final List<Input> inputs = List.of(input("kinesis-1", false), input("kinesis-2", false));
         when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
 
         migration.upgrade();
@@ -73,11 +76,34 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
         verify(notificationService).publishIfFirst(captor.capture());
         final Notification notification = captor.getValue();
         assertThat(notification.getType()).isEqualTo(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION);
+        assertThat(notification.getKey()).isEqualTo(V20260929120000_NotifyKinesisSingleTableMigration.NOTIFICATION_KEY);
         assertThat(notification.getSeverity()).isEqualTo(Notification.Severity.NORMAL);
 
-        assertThat(clusterConfigService.get(V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted.class))
-                .isEqualTo(new V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted(
-                        Set.of("kinesis-1", "kinesis-2")));
+        assertThat(clusterConfigService.get(MigrationCompleted.class))
+                .isEqualTo(new MigrationCompleted(Set.of("kinesis-1", "kinesis-2")));
+    }
+
+    @Test
+    void ignoresInputsThatAlreadyUseASingleTable() {
+        final List<Input> inputs = List.of(input("kinesis-migrated", true), input("kinesis-legacy", false));
+        when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
+
+        migration.upgrade();
+
+        verify(notificationService).publishIfFirst(any());
+        assertThat(clusterConfigService.get(MigrationCompleted.class))
+                .isEqualTo(new MigrationCompleted(Set.of("kinesis-legacy")));
+    }
+
+    @Test
+    void doesNotNotifyWhenAllInputsAlreadyUseASingleTable() {
+        final List<Input> inputs = List.of(input("kinesis-migrated", true));
+        when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
+
+        migration.upgrade();
+
+        verify(notificationService, never()).publishIfFirst(any());
+        assertThat(clusterConfigService.get(MigrationCompleted.class)).isEqualTo(new MigrationCompleted(Set.of()));
     }
 
     @Test
@@ -87,24 +113,24 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
         migration.upgrade();
 
         verify(notificationService, never()).publishIfFirst(any());
-        assertThat(clusterConfigService.get(V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted.class))
-                .isEqualTo(new V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted(Set.of()));
+        assertThat(clusterConfigService.get(MigrationCompleted.class)).isEqualTo(new MigrationCompleted(Set.of()));
     }
 
     @Test
     void runsOnlyOnce() {
-        clusterConfigService.write(new V20260929120000_NotifyKinesisSingleTableMigration.MigrationCompleted(Set.of()));
-        final List<Input> inputs = List.of(input("kinesis-1"));
-        when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
+        clusterConfigService.write(new MigrationCompleted(Set.of()));
 
         migration.upgrade();
 
+        verify(inputService, never()).allByType(any());
         verify(notificationService, never()).publishIfFirst(any());
     }
 
-    private static Input input(String id) {
+    private static Input input(String id, boolean singleTableEnabled) {
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn(id);
+        when(input.getConfiguration())
+                .thenReturn(Map.of(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, singleTableEnabled));
         return input;
     }
 }
