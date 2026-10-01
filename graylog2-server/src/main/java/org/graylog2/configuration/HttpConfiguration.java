@@ -108,7 +108,7 @@ public class HttpConfiguration {
 
     @Documentation("The maximum size of the HTTP request headers in bytes.")
     @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
+    private int httpMaxHeaderSize = 16384;
 
     @Documentation("The size of the thread pool used exclusively for serving the HTTP interface.")
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
