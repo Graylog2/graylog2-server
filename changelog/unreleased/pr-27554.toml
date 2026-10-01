@@ -1,5 +1,0 @@
-type = "fixed"
-message = "Fix searching event definitions by ID from the event definitions list."
-
-pulls = ["27554"]
-issues = ["Graylog2/graylog-plugin-enterprise#14585"]
