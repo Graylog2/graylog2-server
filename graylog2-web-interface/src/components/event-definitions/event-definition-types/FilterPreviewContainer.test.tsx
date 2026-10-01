@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 
 import FilterPreviewContainer from './FilterPreviewContainer';
 
@@ -80,15 +80,16 @@ const eventDefinition: EventDefinition = {
   },
 };
 
-const SUT = ({ streams = [] }: { streams?: Array<Stream> }) => (
-  <StreamsContext.Provider value={streams}>
-    <FilterPreviewContainer eventDefinition={eventDefinition} />
-  </StreamsContext.Provider>
-);
+const SUT = () => <FilterPreviewContainer eventDefinition={eventDefinition} />;
 
 jest.mock('./FilterPreview', () => () => <span>Filter results</span>);
+jest.mock('components/streams/hooks/useAllStreams');
 
 describe('FilterPreviewContainer', () => {
+  beforeEach(() => {
+    mockUseAllStreams([]);
+  });
+
   it('does not execute search but shows message if user does not has access to any stream', async () => {
     render(<SUT />);
     await screen.findByText(/Unable to preview filter, user does not have access to any streams./i);
@@ -114,7 +115,9 @@ describe('FilterPreviewContainer', () => {
         categories: [],
       },
     ];
-    render(<SUT streams={streams} />);
+    mockUseAllStreams(streams);
+
+    render(<SUT />);
     await screen.findByText(/Filter results/i);
   });
 });

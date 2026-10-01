@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import type { EventDefinitionType } from 'components/event-definitions/types';
 
 import FilterAggregationForm from './FilterAggregationForm';
 
 const FilterAggregationFormContainer: EventDefinitionType['formComponent'] = (props) => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
 
   return (
     <FormWarningsProvider>
-      <FilterAggregationForm streams={streams} {...props} />
+      <FilterAggregationForm streams={streams ?? []} {...props} />
     </FormWarningsProvider>
   );
 };
