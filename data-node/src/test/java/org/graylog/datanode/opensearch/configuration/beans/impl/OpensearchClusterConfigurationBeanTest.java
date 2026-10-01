@@ -23,7 +23,10 @@ import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.OpensearchSeedHostsResolver;
+import org.graylog.datanode.opensearch.configuration.UnicastHostsFile;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.files.TextConfigFile;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
@@ -48,6 +51,7 @@ class OpensearchClusterConfigurationBeanTest {
         testNodeService.registerServer(DataNodeDto.builder()
                 .setId(Tools.generateServerId())
                 .setTransportAddress("https://my_manager_node:9200")
+                .setClusterAddress("my_manager_node:9300")
                 .setHostname("my_manager_node")
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
                 .setOpensearchRoles(List.of(OpensearchNodeRole.CLUSTER_MANAGER, OpensearchNodeRole.DATA))
@@ -56,6 +60,7 @@ class OpensearchClusterConfigurationBeanTest {
         testNodeService.registerServer(DataNodeDto.builder()
                 .setId(Tools.generateServerId())
                 .setTransportAddress("https://my_other_manager_node:9200")
+                .setClusterAddress("my_other_manager_node:9300")
                 .setHostname("my_other_manager_node")
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
                 .setOpensearchRoles(List.of(OpensearchNodeRole.CLUSTER_MANAGER, OpensearchNodeRole.INGEST))
@@ -73,7 +78,7 @@ class OpensearchClusterConfigurationBeanTest {
     @Test
     void testManagerNodes(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_can_be_manager", "node_roles", OpensearchNodeRole.CLUSTER_MANAGER), tempDir), testNodeService);
+                Map.of("hostname", "this_node_can_be_manager", "node_roles", OpensearchNodeRole.CLUSTER_MANAGER), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
 
@@ -89,7 +94,7 @@ class OpensearchClusterConfigurationBeanTest {
     @Test
     void testManagerNodesWithSelfNoManager(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", "search"), tempDir), testNodeService);
+                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", "search"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
 
@@ -105,7 +110,7 @@ class OpensearchClusterConfigurationBeanTest {
     @Test
     void testManagerNodesWithNoRolesSet(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_can_be_manager"), tempDir), testNodeService);
+                Map.of("hostname", "this_node_can_be_manager"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
 
@@ -116,5 +121,23 @@ class OpensearchClusterConfigurationBeanTest {
 
         Assertions.assertThat(managerNodes)
                 .containsOnly("my_manager_node", "my_other_manager_node", "this_node_can_be_manager");
+    }
+
+    @Test
+    void testSeedHostsFile(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
+
+        Assertions.assertThat(configurationPart.properties()).containsEntry("discovery.seed_providers", "file");
+        Assertions.assertThat(configurationPart.properties()).containsEntry("cluster.default_number_of_replicas", "1");
+
+        // nodes without a cluster address are ignored, the rest is sorted
+        Assertions.assertThat(configurationPart.configFiles())
+                .filteredOn(f -> f.relativePath().equals(UnicastHostsFile.FILENAME))
+                .singleElement()
+                .isInstanceOfSatisfying(TextConfigFile.class, f -> Assertions.assertThat(f.text())
+                        .isEqualTo("my_manager_node:9300\nmy_other_manager_node:9300"));
     }
 }
