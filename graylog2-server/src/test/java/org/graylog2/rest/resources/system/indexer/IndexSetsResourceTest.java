@@ -28,9 +28,12 @@ import org.bson.conversions.Bson;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetCategory;
+import org.graylog2.indexer.indexset.IndexSetCategoryCounts;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
@@ -51,10 +54,12 @@ import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetOverviewResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,6 +77,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -751,19 +757,25 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
         final IndexSetConfig defaultConfig = createIndexSetConfig("id2", "title2");
         when(indexSetService.getDefault()).thenReturn(defaultConfig);
-        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+        when(paginatedIndexSetService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(new PaginatedList<>(List.of(indexSetConfig, defaultConfig), 2, 1, 50));
+        when(paginatedIndexSetService.streamCounts(List.of("id1", "id2"))).thenReturn(Map.of("id1", 3L));
 
-        final PageListResponse<IndexSetResponse> response = indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+        final PageListResponse<IndexSetOverviewResponse> response = indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
-        assertThat(response.elements()).containsExactly(
+        assertThat(response.elements()).extracting(IndexSetOverviewResponse::indexSet).containsExactly(
                 IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null),
                 IndexSetResponse.fromIndexSetConfig(defaultConfig, true, null));
+        assertThat(response.elements()).extracting(IndexSetOverviewResponse::streamCount).containsExactly(3L, 0L);
+        assertThat(response.elements()).extracting(IndexSetOverviewResponse::category)
+                .containsOnly(IndexSetCategory.of(indexSetConfig).value());
+        assertThat(response.elements()).extracting(IndexSetOverviewResponse::canHaveProfile).containsOnly(indexSetConfig.canHaveProfile());
         assertThat(response.total()).isEqualTo(2);
         assertThat(response.paginationInfo().total()).isEqualTo(2);
         assertThat(response.sort()).isEqualTo("title");
-        assertThat(response.attributes()).extracting("id")
-                .containsExactly("title", "description", "index_prefix", "shards", "replicas", "creation_date", "index_template_type");
+        assertThat(response.attributes()).extracting("id").containsExactly(
+                "title", "description", "index_prefix", "shards", "replicas", "creation_date", "index_template_type",
+                "category", "field_type_profile", "stream_count", "rotation_model");
         assertThat(response.defaults().sort().id()).isEqualTo("title");
     }
 
@@ -771,13 +783,13 @@ public class IndexSetsResourceTest {
     public void getPagePagesInTheDatabaseForUsersWhoMayReadAllIndexSets() {
         grantReadOnAllIndexSets();
         when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
-        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+        when(paginatedIndexSetService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
 
         indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
-        verify(paginatedIndexSetService).findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
-        verify(paginatedIndexSetService, never()).findPaginated(any(), any(), anyInt(), anyInt(), anyString(), any());
+        verify(paginatedIndexSetService).findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50));
+        verify(paginatedIndexSetService, never()).findPaginated(any(), any(), any(), anyInt(), anyInt());
         verify(entityPermissionsUtils).hasReadPermissionForWholeCollection(any(), eq(MongoIndexSetService.COLLECTION_NAME));
     }
 
@@ -788,13 +800,13 @@ public class IndexSetsResourceTest {
         notPermitted();
         final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
         when(indexSetService.getDefault()).thenReturn(indexSetConfig);
-        when(paginatedIndexSetService.findPaginated(any(), any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+        when(paginatedIndexSetService.findPaginated(any(), any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
         final ArgumentCaptor<Predicate<IndexSetConfig>> predicateCaptor = ArgumentCaptor.forClass(Predicate.class);
 
         indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
-        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50));
         assertThat(predicateCaptor.getValue().test(indexSetConfig)).isFalse();
     }
 
@@ -805,13 +817,13 @@ public class IndexSetsResourceTest {
         final IndexSetConfig readable = createIndexSetConfig("id1", "title1");
         final IndexSetConfig hidden = createIndexSetConfig("id2", "title2");
         when(indexSetService.getDefault()).thenReturn(readable);
-        when(paginatedIndexSetService.findPaginated(any(), any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+        when(paginatedIndexSetService.findPaginated(any(), any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
         final ArgumentCaptor<Predicate<IndexSetConfig>> predicateCaptor = ArgumentCaptor.forClass(Predicate.class);
 
         indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
-        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50));
         assertThat(predicateCaptor.getValue().test(readable)).isTrue();
         assertThat(predicateCaptor.getValue().test(hidden)).isFalse();
     }
@@ -820,23 +832,90 @@ public class IndexSetsResourceTest {
     public void getPageForwardsQueryAndFiltersToTheDatabaseQuery() {
         grantReadOnAllIndexSets();
         when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
-        when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+        when(paginatedIndexSetService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
         final ArgumentCaptor<Bson> queryCaptor = ArgumentCaptor.forClass(Bson.class);
 
-        indexSetsResource.getPage(1, 50, "graylog", List.of("shards:4"), "title", SortOrder.ASCENDING);
+        indexSetsResource.getPage(1, 50, "graylog", List.of("shards:4", "category:system", "rotation_model:legacy"), "title", SortOrder.ASCENDING);
 
-        verify(paginatedIndexSetService).findPaginated(queryCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        verify(paginatedIndexSetService).findPaginated(queryCaptor.capture(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50));
         final String dbQuery = queryCaptor.getValue()
                 .toBsonDocument(BsonDocument.class, MongoClientSettings.getDefaultCodecRegistry())
                 .toJson();
-        assertThat(dbQuery).contains("\"shards\"").contains("\"title\"").contains("graylog");
+        assertThat(dbQuery).contains("\"shards\"").contains("\"title\"").contains("graylog")
+                .contains("\"regular\"").contains("\"writable\"").contains("\"data_tiering\"");
     }
 
     @Test
     public void getPageRejectsFiltersOnAttributesThatAreNotFilterable() {
         assertThrows(BadRequestException.class,
                 () -> indexSetsResource.getPage(1, 50, "", List.of("description:foo"), "title", SortOrder.ASCENDING));
+    }
+
+    @Test
+    public void getPageRejectsUnknownCategoryAndRotationModelValues() {
+        assertThrows(BadRequestException.class,
+                () -> indexSetsResource.getPage(1, 50, "", List.of("category:nope"), "title", SortOrder.ASCENDING));
+        assertThrows(BadRequestException.class,
+                () -> indexSetsResource.getPage(1, 50, "", List.of("rotation_model:nope"), "title", SortOrder.ASCENDING));
+    }
+
+    @Test
+    public void getPageResolvesLookupSortsIntoPipelineStages() {
+        grantReadOnAllIndexSets();
+        when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
+        when(paginatedIndexSetService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
+                .thenReturn(PaginatedList.emptyList(1, 50));
+        final ArgumentCaptor<DbSortResolver.ResolvedSort> sortCaptor = ArgumentCaptor.forClass(DbSortResolver.ResolvedSort.class);
+
+        indexSetsResource.getPage(1, 50, "", List.of(), "stream_count", SortOrder.DESCENDING);
+        indexSetsResource.getPage(1, 50, "", List.of(), "field_type_profile", SortOrder.ASCENDING);
+        indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+
+        verify(paginatedIndexSetService, times(3)).findPaginated(any(), sortCaptor.capture(), eq(1), eq(50));
+        assertThat(sortCaptor.getAllValues()).extracting(DbSortResolver.ResolvedSort::needsPipeline).containsExactly(true, true, false);
+    }
+
+    @Test
+    public void getCategoryCountsCountsTheWholeCollectionForUsersWhoMayReadAllIndexSets() {
+        grantReadOnAllIndexSets();
+        final IndexSetCategoryCounts counts = new IndexSetCategoryCounts(7, 2, 3, 2);
+        when(paginatedIndexSetService.countCategories()).thenReturn(counts);
+
+        assertThat(indexSetsResource.getCategoryCounts()).isEqualTo(counts);
+        verify(paginatedIndexSetService, never()).countCategories(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getCategoryCountsUsesAPermissionPredicateForRestrictedUsers() {
+        permitOnly("indexsets:read:id1");
+        final IndexSetCategoryCounts counts = new IndexSetCategoryCounts(1, 1, 0, 0);
+        when(paginatedIndexSetService.countCategories(any())).thenReturn(counts);
+        final ArgumentCaptor<Predicate<IndexSetConfig>> predicateCaptor = ArgumentCaptor.forClass(Predicate.class);
+
+        assertThat(indexSetsResource.getCategoryCounts()).isEqualTo(counts);
+
+        verify(paginatedIndexSetService).countCategories(predicateCaptor.capture());
+        verify(paginatedIndexSetService, never()).countCategories();
+        assertThat(predicateCaptor.getValue().test(createIndexSetConfig("id1", "title1"))).isTrue();
+        assertThat(predicateCaptor.getValue().test(createIndexSetConfig("id2", "title2"))).isFalse();
+    }
+
+    @Test
+    public void overviewResponseSerializesAsOneFlatObject() throws Exception {
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
+
+        final String json = new ObjectMapperProvider().get()
+                .writeValueAsString(IndexSetOverviewResponse.create(indexSetConfig, true, 2));
+
+        assertThat(json)
+                .contains("\"title\":\"title1\"")
+                .contains("\"default\":true")
+                .contains("\"stream_count\":2")
+                .contains("\"can_have_profile\":")
+                .contains("\"category\":\"" + IndexSetCategory.of(indexSetConfig).value() + "\"")
+                .doesNotContain("\"indexSet\"");
     }
 
     private void grantReadOnAllIndexSets() {
