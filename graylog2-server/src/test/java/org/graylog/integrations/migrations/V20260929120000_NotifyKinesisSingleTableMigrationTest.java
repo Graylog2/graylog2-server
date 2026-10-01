@@ -28,6 +28,8 @@ import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.Config;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +58,7 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
     void setUp(ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
         this.migration = new V20260929120000_NotifyKinesisSingleTableMigration(clusterConfigService, inputService,
-                notificationService);
+                notificationService, new CustomizationConfig(Config.forProductName("Acme Logs")));
         when(notificationService.buildNow()).thenReturn(new NotificationImpl().addTimestamp(Tools.nowUTC()));
     }
 
@@ -78,6 +80,8 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
         assertThat(notification.getType()).isEqualTo(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION);
         assertThat(notification.getKey()).isEqualTo(V20260929120000_NotifyKinesisSingleTableMigration.NOTIFICATION_KEY);
         assertThat(notification.getSeverity()).isEqualTo(Notification.Severity.NORMAL);
+        assertThat(notification.getDetail(V20260929120000_NotifyKinesisSingleTableMigration.PRODUCT_NAME_DETAIL))
+                .isEqualTo("Acme Logs");
 
         assertThat(clusterConfigService.get(MigrationCompleted.class))
                 .isEqualTo(new MigrationCompleted(Set.of("kinesis-1", "kinesis-2")));

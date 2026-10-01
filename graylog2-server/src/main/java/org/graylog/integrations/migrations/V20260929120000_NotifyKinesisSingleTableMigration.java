@@ -26,6 +26,7 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,18 +43,22 @@ public class V20260929120000_NotifyKinesisSingleTableMigration extends Migration
     private static final Logger LOG = LoggerFactory.getLogger(V20260929120000_NotifyKinesisSingleTableMigration.class);
 
     static final String NOTIFICATION_KEY = "kinesis_single_table_migration";
+    static final String PRODUCT_NAME_DETAIL = "product_name";
 
     private final ClusterConfigService clusterConfigService;
     private final InputService inputService;
     private final NotificationService notificationService;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
     public V20260929120000_NotifyKinesisSingleTableMigration(ClusterConfigService clusterConfigService,
                                                              InputService inputService,
-                                                             NotificationService notificationService) {
+                                                             NotificationService notificationService,
+                                                             CustomizationConfig customizationConfig) {
         this.clusterConfigService = clusterConfigService;
         this.inputService = inputService;
         this.notificationService = notificationService;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -77,7 +82,8 @@ public class V20260929120000_NotifyKinesisSingleTableMigration extends Migration
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
                     .addKey(NOTIFICATION_KEY)
-                    .addSeverity(Notification.Severity.NORMAL));
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail(PRODUCT_NAME_DETAIL, customizationConfig.productName()));
             LOG.info("Raised the KCL single-table migration notification for {} existing AWS Kinesis/CloudWatch input(s).",
                     unmigratedInputIds.size());
         }
