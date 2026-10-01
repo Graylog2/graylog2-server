@@ -19,9 +19,11 @@ package org.graylog.datanode.periodicals;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.bootstrap.ClusterBootstrapService;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.plugin.periodical.Periodical;
+import org.opensearch.client.opensearch.core.InfoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +35,12 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodeHeartbeat.class);
     private final OpensearchProcess process;
+    private final ClusterBootstrapService clusterBootstrapService;
 
     @Inject
-    public OpensearchNodeHeartbeat(OpensearchProcess process) {
+    public OpensearchNodeHeartbeat(OpensearchProcess process, ClusterBootstrapService clusterBootstrapService) {
         this.process = process;
+        this.clusterBootstrapService = clusterBootstrapService;
     }
 
     @Override
@@ -47,8 +51,9 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
             process.openSearchClient().ifPresent(client -> {
                 try {
-                    client.syncWithoutErrorMapping().info();
+                    final InfoResponse info = client.syncWithoutErrorMapping().info();
                     onNodeResponse(process);
+                    recordClusterUuid(info);
                 } catch (IOException e) {
                     onRestError(process, e);
                 }
@@ -58,6 +63,14 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private void onNodeResponse(OpensearchProcess process) {
         process.onEvent(OpensearchEvent.HEALTH_CHECK_OK);
+    }
+
+    private void recordClusterUuid(InfoResponse info) {
+        try {
+            clusterBootstrapService.recordClusterUuid(info.clusterUuid());
+        } catch (Exception e) {
+            LOG.warn("Failed to record opensearch cluster UUID {}: {}", info.clusterUuid(), e.getMessage());
+        }
     }
 
     private void onRestError(OpensearchProcess process, Exception e) {

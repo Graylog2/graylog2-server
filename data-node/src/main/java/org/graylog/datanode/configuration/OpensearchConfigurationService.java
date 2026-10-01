@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
+import org.graylog.datanode.opensearch.bootstrap.InitialClusterManagerNodesResolver;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
@@ -31,7 +32,9 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPar
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,18 +48,21 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
     private final EventBus eventBus;
     private final OpensearchUpgradeAction opensearchUpgradeAction;
+    private final InitialClusterManagerNodesResolver initialClusterManagerNodesResolver;
 
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
                                           final DatanodeConfigurationProvider datanodeConfigurationProvider,
                                           final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
                                           final EventBus eventBus,
-                                          OpensearchUpgradeAction  opensearchUpgradeAction) {
+                                          OpensearchUpgradeAction  opensearchUpgradeAction,
+                                          InitialClusterManagerNodesResolver initialClusterManagerNodesResolver) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfigurationProvider = datanodeConfigurationProvider;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         this.opensearchUpgradeAction = opensearchUpgradeAction;
+        this.initialClusterManagerNodesResolver = initialClusterManagerNodesResolver;
         eventBus.register(this);
     }
 
@@ -107,7 +113,19 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
         final List<DatanodeConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
                 .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, targetConfigDir.configurationRoot())))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Claiming the cluster bootstrap only makes sense if opensearch is going to start with this configuration.
+        // A node waiting for its certificates must not block the bootstrap for all other nodes.
+        if (configurationParts.stream().anyMatch(DatanodeConfigurationPart::securityConfigured)) {
+            initialClusterManagerNodesResolver.resolve(datanodeConfiguration.datanodeDirectories().getDataTargetDir())
+                    .ifPresent(nodes -> {
+                        LOG.info("Opensearch initial cluster manager nodes: {}", nodes);
+                        configurationParts.add(DatanodeConfigurationPart.builder()
+                                .properties(Map.of("cluster.initial_cluster_manager_nodes", nodes))
+                                .build());
+                    });
+        }
 
         return new OpensearchConfiguration(
                 datanodeConfiguration.opensearchDistribution(),

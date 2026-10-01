@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.bootstrap.ClusterBootstrapService;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -37,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class NodePingPeriodical extends Periodical {
 
@@ -56,7 +58,7 @@ public class NodePingPeriodical extends Periodical {
 
 
     @Inject
-    public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch, DatanodeKeystore datanodeKeystore) {
+    public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch, DatanodeKeystore datanodeKeystore, ClusterBootstrapService clusterBootstrapService) {
         this(
                 nodeService,
                 nodeId,
@@ -67,7 +69,7 @@ public class NodePingPeriodical extends Periodical {
                 () -> managedOpenSearch.processInfo().state(),
                 datanodeKeystore::getCertificateExpiration,
                 managedOpenSearch::getOpensearchRoles,
-                managedOpenSearch::configurationWarnings
+                () -> Stream.concat(managedOpenSearch.configurationWarnings().stream(), clusterBootstrapService.warnings().stream()).toList()
         );
     }
 

@@ -17,7 +17,6 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableMap;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -25,28 +24,22 @@ import org.graylog.datanode.opensearch.configuration.OpensearchSeedHostsResolver
 import org.graylog.datanode.opensearch.configuration.UnicastHostsFile;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class OpensearchClusterConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchClusterConfigurationBean.class);
 
     private final Configuration localConfiguration;
-    private final NodeService<DataNodeDto> nodeService;
     private final OpensearchSeedHostsResolver seedHostsResolver;
 
     @Inject
-    public OpensearchClusterConfigurationBean(Configuration localConfiguration, NodeService<DataNodeDto> nodeService, OpensearchSeedHostsResolver seedHostsResolver) {
+    public OpensearchClusterConfigurationBean(Configuration localConfiguration, OpensearchSeedHostsResolver seedHostsResolver) {
         this.localConfiguration = localConfiguration;
-        this.nodeService = nodeService;
         this.seedHostsResolver = seedHostsResolver;
     }
 
@@ -76,10 +69,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         final String hostname = localConfiguration.getHostname();
         LOG.info("Opensearch networking: bind host: {}, publish host: {}, node name: {}, hostname: {}", bindHost, publishHost, nodeName, hostname);
 
-        final String initialClusterManagerNodes = getInitialClusterManagerNodes();
-        properties.put("cluster.initial_cluster_manager_nodes", initialClusterManagerNodes);
-        LOG.info("Opensearch initial cluster manager nodes: {}", initialClusterManagerNodes);
-
+        // cluster.initial_cluster_manager_nodes is resolved by the InitialClusterManagerNodesResolver, see OpensearchConfigurationService
 
         final List<String> discoverySeedHosts = localConfiguration.getOpensearchDiscoverySeedHosts();
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
@@ -106,36 +96,5 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
                 .properties(properties.build())
                 .withConfigFile(UnicastHostsFile.configFile(seedHosts))
                 .build();
-    }
-
-    private String getInitialClusterManagerNodes() {
-        if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
-            return localConfiguration.getInitialClusterManagerNodes();
-        } else {
-            return buildInitialManagerNodesList();
-        }
-    }
-
-    @Nonnull
-    private String buildInitialManagerNodesList() {
-        // this node itself might not be registered with the node service yet, therefore we always add it to the list.
-        return nodeService.allActive().values().stream()
-                .filter(this::isManager)
-                .map(Node::getHostname)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toSet(),
-                        hostnames -> {
-                            if (localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty() ||
-                                    localConfiguration.getNodeRoles().contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
-                                hostnames.add(localConfiguration.getHostname());
-                            }
-                            return String.join(",", hostnames);
-                        }
-                ));
-    }
-
-    private boolean isManager(DataNodeDto n) {
-        final List<String> roles = n.getOpensearchRoles();
-        return roles != null && roles.contains(OpensearchNodeRole.CLUSTER_MANAGER);
     }
 }

@@ -20,8 +20,6 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.DatanodeTestUtils;
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchSeedHostsResolver;
 import org.graylog.datanode.opensearch.configuration.UnicastHostsFile;
@@ -31,14 +29,11 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
 import org.graylog2.plugin.Tools;
-import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,62 +71,16 @@ class OpensearchClusterConfigurationBeanTest {
     }
 
     @Test
-    void testManagerNodes(@TempDir Path tempDir) throws ValidationException, RepositoryException {
-        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_can_be_manager", "node_roles", OpensearchNodeRole.CLUSTER_MANAGER), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
-
-        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
-
-        // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
-        final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
-        Assertions.assertThat(initialManagerNodes).isNotEmpty();
-        final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
-
-        Assertions.assertThat(managerNodes)
-                .containsOnly("my_manager_node", "my_other_manager_node", "this_node_can_be_manager");
-    }
-
-    @Test
-    void testManagerNodesWithSelfNoManager(@TempDir Path tempDir) throws ValidationException, RepositoryException {
-        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", "search"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
-
-        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
-
-        // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
-        final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
-        Assertions.assertThat(initialManagerNodes).isNotEmpty();
-        final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
-
-        Assertions.assertThat(managerNodes)
-                .containsOnly("my_manager_node", "my_other_manager_node");
-    }
-
-    @Test
-    void testManagerNodesWithNoRolesSet(@TempDir Path tempDir) throws ValidationException, RepositoryException {
-        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_can_be_manager"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
-
-        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
-
-        // initial cluster manager nodes should only contain nodes that publish cluster_manager role, ignore all other nodes
-        final String initialManagerNodes = configurationPart.properties().get("cluster.initial_cluster_manager_nodes");
-        Assertions.assertThat(initialManagerNodes).isNotEmpty();
-        final List<String> managerNodes = Arrays.asList(initialManagerNodes.split(","));
-
-        Assertions.assertThat(managerNodes)
-                .containsOnly("my_manager_node", "my_other_manager_node", "this_node_can_be_manager");
-    }
-
-    @Test
     void testSeedHostsFile(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node"), tempDir), testNodeService, new OpensearchSeedHostsResolver(testNodeService));
+                Map.of("hostname", "this_node"), tempDir), new OpensearchSeedHostsResolver(testNodeService));
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
 
         Assertions.assertThat(configurationPart.properties()).containsEntry("discovery.seed_providers", "file");
         Assertions.assertThat(configurationPart.properties()).containsEntry("cluster.default_number_of_replicas", "1");
+        // resolved separately, only for the node bootstrapping the cluster
+        Assertions.assertThat(configurationPart.properties()).doesNotContainKey("cluster.initial_cluster_manager_nodes");
 
         // nodes without a cluster address are ignored, the rest is sorted
         Assertions.assertThat(configurationPart.configFiles())
