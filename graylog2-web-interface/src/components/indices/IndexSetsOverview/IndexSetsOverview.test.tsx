@@ -30,6 +30,7 @@ import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/usePr
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 import { setDefaultIndexSet } from 'stores/indices/IndexSetsStore';
+import { recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
 
 import IndexSetsOverview from './IndexSetsOverview';
 import type { IndexSetEntity } from './types';
@@ -38,6 +39,7 @@ jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/indices/helpers/indexSetMaintenanceActions');
 jest.mock('api/streams', () => ({
   ...jest.requireActual('api/streams'),
   fetchStreams: jest.fn(() => Promise.resolve([])),
@@ -177,6 +179,21 @@ describe('IndexSetsOverview', () => {
     await screen.findByRole('menuitem', { name: /recalculate index ranges/i });
 
     expect(screen.queryByRole('menuitem', { name: /rotate active write index/i })).not.toBeInTheDocument();
+  });
+
+  it('recalculates index ranges after confirmation', async () => {
+    render(<IndexSetsOverview />);
+
+    await openMoreActions(exampleIndexSet);
+    await userEvent.click(await screen.findByRole('menuitem', { name: /recalculate index ranges/i }));
+
+    await screen.findByText(/this will recalculate index ranges for this index set/i);
+
+    expect(recalculateIndexRanges).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole('button', { name: /recalculate/i }));
+
+    expect(recalculateIndexRanges).toHaveBeenCalledWith(exampleIndexSet.id);
   });
 
   it('opens the deletion dialog', async () => {

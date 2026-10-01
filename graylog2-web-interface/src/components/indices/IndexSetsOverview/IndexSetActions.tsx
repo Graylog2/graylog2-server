@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton, IfPermitted, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import IndexSetDeletionForm from 'components/indices/IndexSetDeletionForm';
-import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
+import { cycleActiveWriteIndex } from 'components/indices/helpers/indexSetMaintenanceActions';
+import RecalculateIndexRangesDialog from 'components/indices/RecalculateIndexRangesDialog';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -43,6 +44,7 @@ const IndexSetActions = ({ indexSet }: Props) => {
   const sendTelemetry = useSendTelemetry('index-sets');
   const hasMappingPermission = useHasTypeMappingPermission();
   const deletionFormRef = useRef<IndexSetDeletionForm>(null);
+  const [showRecalculateDialog, setShowRecalculateDialog] = useState(false);
 
   const refetchIndexSets = () => queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
@@ -79,7 +81,7 @@ const IndexSetActions = ({ indexSet }: Props) => {
           </MenuItem>
         )}
         <IfPermitted permissions="indexranges:rebuild">
-          <MenuItem onSelect={() => recalculateIndexRanges(indexSet.id)}>Recalculate index ranges</MenuItem>
+          <MenuItem onSelect={() => setShowRecalculateDialog(true)}>Recalculate index ranges</MenuItem>
         </IfPermitted>
         {indexSet.writable && (
           <IfPermitted permissions="deflector:cycle">
@@ -97,6 +99,9 @@ const IndexSetActions = ({ indexSet }: Props) => {
         </IfPermitted>
       </MoreActions>
       <IndexSetDeletionForm ref={deletionFormRef} indexSet={indexSet} onDelete={onDelete} />
+      {showRecalculateDialog && (
+        <RecalculateIndexRangesDialog indexSetId={indexSet.id} onClose={() => setShowRecalculateDialog(false)} />
+      )}
     </ButtonToolbar>
   );
 };

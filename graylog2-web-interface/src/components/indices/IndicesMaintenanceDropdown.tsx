@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
+import { cycleActiveWriteIndex } from 'components/indices/helpers/indexSetMaintenanceActions';
+import RecalculateIndexRangesDialog from 'components/indices/RecalculateIndexRangesDialog';
 
 type Props = {
   indexSet: IndexSet;
@@ -34,7 +35,7 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
   );
 
   const onCycleDeflector = useCallback(() => cycleActiveWriteIndex(indexSetId), [indexSetId]);
-  const onRecalculateIndexRange = useCallback(() => recalculateIndexRanges(indexSetId), [indexSetId]);
+  const [showRecalculateDialog, setShowRecalculateDialog] = useState(false);
   const cycleButton = useMemo(
     () =>
       indexSet?.writable ? (
@@ -46,17 +47,22 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
   );
 
   return (
-    <ButtonGroup>
-      <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-        <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>
-          Recalculate index ranges
-        </MenuItem>
-        {cycleButton}
-        {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
-          <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
-        )}
-      </DropdownButton>
-    </ButtonGroup>
+    <>
+      <ButtonGroup>
+        <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+          <MenuItem eventKey="1" onClick={() => setShowRecalculateDialog(true)}>
+            Recalculate index ranges
+          </MenuItem>
+          {cycleButton}
+          {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
+            <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
+          )}
+        </DropdownButton>
+      </ButtonGroup>
+      {showRecalculateDialog && (
+        <RecalculateIndexRangesDialog indexSetId={indexSetId} onClose={() => setShowRecalculateDialog(false)} />
+      )}
+    </>
   );
 };
 

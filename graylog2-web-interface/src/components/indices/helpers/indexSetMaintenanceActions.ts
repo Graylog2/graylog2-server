@@ -18,20 +18,12 @@ import { ClusterDeflector, SystemDeflector, SystemIndexRanges } from '@graylog/s
 
 import { defaultOnError } from 'util/conditional/onError';
 
-export const recalculateIndexRanges = (indexSetId: string) => {
-  if (
-    // eslint-disable-next-line no-alert
-    window.confirm(
-      'This will recalculate index ranges for this index set using a background system job. Do you want to proceed?',
-    )
-  ) {
-    defaultOnError(
-      SystemIndexRanges.rebuildIndexSet(indexSetId),
-      'Could not create a job to start index ranges recalculation',
-      'Error starting index ranges recalculation',
-    );
-  }
-};
+export const recalculateIndexRanges = (indexSetId: string) =>
+  defaultOnError(
+    SystemIndexRanges.rebuildIndexSet(indexSetId),
+    'Could not create a job to start index ranges recalculation',
+    'Error starting index ranges recalculation',
+  );
 
 export const cycleActiveWriteIndex = (indexSetId: string) => {
   if (
