@@ -118,7 +118,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         // Claiming the cluster bootstrap only makes sense if opensearch is going to start with this configuration.
         // A node waiting for its certificates must not block the bootstrap for all other nodes.
         if (configurationParts.stream().anyMatch(DatanodeConfigurationPart::securityConfigured)) {
-            initialClusterManagerNodesResolver.resolve(datanodeConfiguration.datanodeDirectories().getDataTargetDir())
+            initialClusterManagerNodesResolver.resolve()
                     .ifPresent(nodes -> {
                         LOG.info("Opensearch initial cluster manager nodes: {}", nodes);
                         configurationParts.add(DatanodeConfigurationPart.builder()

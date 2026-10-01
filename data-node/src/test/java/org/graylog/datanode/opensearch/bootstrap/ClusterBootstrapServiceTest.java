@@ -168,6 +168,46 @@ class ClusterBootstrapServiceTest {
     }
 
     @Test
+    void waitingNodeTakesOverExpiredClaim() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        final ClusterBootstrapService node2 = service("node2", GRACE_PERIOD);
+        final ClusterBootstrapService node3 = service("node3", GRACE_PERIOD);
+        assertThat(node1.claimBootstrap()).isTrue();
+        assertThat(node2.claimBootstrap()).isFalse();
+        assertThat(node3.claimBootstrap()).isFalse();
+
+        // node1 is renewing its claim
+        assertThat(node1.takeOverExpiredClaim()).isFalse();
+        assertThat(node2.takeOverExpiredClaim()).isFalse();
+
+        // node1 is gone, only one of the waiting nodes takes over
+        expireClaim();
+        assertThat(node2.takeOverExpiredClaim()).isTrue();
+        assertThat(node3.takeOverExpiredClaim()).isFalse();
+        assertThat(node2.takeOverExpiredClaim()).isFalse();
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node2");
+
+        // the configuration of the restarted node2 bootstraps the cluster, node1 has to join it
+        assertThat(node2.claimBootstrap()).isTrue();
+        node1.renewClaim();
+        assertThat(service("node1", GRACE_PERIOD).claimBootstrap()).isFalse();
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node2");
+    }
+
+    @Test
+    void noTakeoverOfFormedClusterOrExplicitBootstrap() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        node1.registerExplicitBootstrap("node1,node3");
+        expireClaim();
+        assertThat(service("node2", GRACE_PERIOD).takeOverExpiredClaim()).isFalse();
+
+        node1.recordClusterUuid("cluster-a");
+        expireClaim();
+        assertThat(service("node2", GRACE_PERIOD).takeOverExpiredClaim()).isFalse();
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node1");
+    }
+
+    @Test
     void explicitBootstrapIsJoinedAndNeverTakenOver() throws Exception {
         final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
         node1.registerExplicitBootstrap("node1,node2");

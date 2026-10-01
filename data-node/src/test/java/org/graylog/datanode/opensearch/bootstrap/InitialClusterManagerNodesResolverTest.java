@@ -19,14 +19,11 @@ package org.graylog.datanode.opensearch.bootstrap;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchNodeRole;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -39,62 +36,64 @@ class InitialClusterManagerNodesResolverTest {
     private final InitialClusterManagerNodesResolver resolver = new InitialClusterManagerNodesResolver(configuration, bootstrapService);
 
     @Test
-    void bootstrappingNodeIsTheOnlyInitialManager(@TempDir Path dataDir) {
+    void bootstrappingNodeIsTheOnlyInitialManager() {
         when(configuration.getDatanodeNodeName()).thenReturn("node1");
         when(bootstrapService.claimBootstrap()).thenReturn(true);
 
-        assertThat(resolver.resolve(dataDir)).hasValue("node1");
+        assertThat(resolver.resolve()).hasValue("node1");
     }
 
     @Test
-    void joiningNodeHasNoInitialManagers(@TempDir Path dataDir) {
+    void joiningNodeHasNoInitialManagers() {
         when(bootstrapService.claimBootstrap()).thenReturn(false);
 
-        assertThat(resolver.resolve(dataDir)).isEmpty();
+        assertThat(resolver.resolve()).isEmpty();
     }
 
     @Test
-    void explicitConfigurationWins(@TempDir Path dataDir) {
+    void explicitConfigurationWins() {
         when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
 
-        assertThat(resolver.resolve(dataDir)).hasValue("node1,node2");
+        assertThat(resolver.resolve()).hasValue("node1,node2");
         verify(bootstrapService).registerExplicitBootstrap("node1,node2");
         verify(bootstrapService, never()).claimBootstrap();
     }
 
     @Test
-    void explicitConfigurationOfFormedNodeIsNotRegistered(@TempDir Path dataDir) throws IOException {
-        when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
-        Files.createDirectories(dataDir.resolve("nodes").resolve("0").resolve("_state"));
-
-        assertThat(resolver.resolve(dataDir)).hasValue("node1,node2");
-        verify(bootstrapService, never()).registerExplicitBootstrap("node1,node2");
-    }
-
-    @Test
-    void nodeWithoutManagerRoleNeverBootstraps(@TempDir Path dataDir) {
+    void nodeWithoutManagerRoleNeverBootstraps() {
         when(configuration.getNodeRoles()).thenReturn(List.of(OpensearchNodeRole.DATA));
 
-        assertThat(resolver.resolve(dataDir)).isEmpty();
+        assertThat(resolver.resolve()).isEmpty();
         verify(bootstrapService, never()).claimBootstrap();
     }
 
     @Test
-    void nodeWithClusterStateNeverBootstraps(@TempDir Path dataDir) throws IOException {
-        Files.createDirectories(dataDir.resolve("nodes").resolve("0").resolve("_state"));
+    void takesOverExpiredBootstrap() {
+        when(bootstrapService.takeOverExpiredClaim()).thenReturn(true);
 
-        assertThat(resolver.resolve(dataDir)).isEmpty();
-        verify(bootstrapService, never()).claimBootstrap();
+        assertThat(resolver.takeOverExpiredBootstrap()).isTrue();
     }
 
     @Test
-    void detectsClusterState(@TempDir Path dataDir) throws IOException {
-        assertThat(InitialClusterManagerNodesResolver.hasClusterState(dataDir)).isFalse();
+    void neverTakesOverWithoutManagerRoleOrWithExplicitConfiguration() {
+        when(bootstrapService.takeOverExpiredClaim()).thenReturn(true);
 
-        Files.createDirectories(dataDir.resolve("nodes").resolve("0"));
-        assertThat(InitialClusterManagerNodesResolver.hasClusterState(dataDir)).isFalse();
+        when(configuration.getNodeRoles()).thenReturn(List.of(OpensearchNodeRole.DATA));
+        assertThat(resolver.takeOverExpiredBootstrap()).isFalse();
 
-        Files.createDirectories(dataDir.resolve("nodes").resolve("0").resolve("_state"));
-        assertThat(InitialClusterManagerNodesResolver.hasClusterState(dataDir)).isTrue();
+        when(configuration.getNodeRoles()).thenReturn(List.of());
+        when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
+        assertThat(resolver.takeOverExpiredBootstrap()).isFalse();
+
+        verify(bootstrapService, never()).takeOverExpiredClaim();
+    }
+
+    @Test
+    void explicitConfigurationOfNodeWithoutManagerRoleIsNotRegistered() {
+        when(configuration.getNodeRoles()).thenReturn(List.of(OpensearchNodeRole.DATA));
+        when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
+
+        assertThat(resolver.resolve()).hasValue("node1,node2");
+        verify(bootstrapService, never()).registerExplicitBootstrap(any());
     }
 }

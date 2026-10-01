@@ -18,27 +18,21 @@ package org.graylog.datanode.opensearch.bootstrap;
 
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchNodeRole;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Resolves the value of {@code cluster.initial_cluster_manager_nodes}. The setting is used by opensearch only
  * when a new cluster is bootstrapped. Unless configured explicitly, it's set only on the one node that claimed the
  * bootstrap, all other nodes leave it empty and join the cluster via discovery.
+ * <p>
+ * The local opensearch data directory doesn't tell if the node has ever been part of a cluster, opensearch writes
+ * its node metadata there on the very first start. Whether a cluster has been formed is decided by the recorded
+ * cluster UUID instead. A node that has already joined a cluster ignores the setting anyway.
  */
 public class InitialClusterManagerNodesResolver {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InitialClusterManagerNodesResolver.class);
 
     private final Configuration localConfiguration;
     private final ClusterBootstrapService clusterBootstrapService;
@@ -49,23 +43,17 @@ public class InitialClusterManagerNodesResolver {
         this.clusterBootstrapService = clusterBootstrapService;
     }
 
-    public Optional<String> resolve(Path opensearchDataDir) {
-        final String configured = localConfiguration.getInitialClusterManagerNodes();
-        final boolean explicitlyConfigured = configured != null && !configured.isBlank();
+    public Optional<String> resolve() {
+        final Optional<String> configured = explicitConfiguration();
 
-        if (!OpensearchCommonConfigurationBean.getNodeRoles(localConfiguration).contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
-            return explicitlyConfigured ? Optional.of(configured) : Optional.empty();
+        if (!isManagerEligible()) {
+            return configured;
         }
 
-        if (hasClusterState(opensearchDataDir)) {
-            LOG.debug("Opensearch data directory {} contains cluster state, no cluster bootstrap needed", opensearchDataDir);
-            return explicitlyConfigured ? Optional.of(configured) : Optional.empty();
-        }
-
-        if (explicitlyConfigured) {
+        if (configured.isPresent()) {
             // keeps nodes without explicit configuration from bootstrapping a separate cluster
-            clusterBootstrapService.registerExplicitBootstrap(configured);
-            return Optional.of(configured);
+            clusterBootstrapService.registerExplicitBootstrap(configured.get());
+            return configured;
         }
 
         if (clusterBootstrapService.claimBootstrap()) {
@@ -76,17 +64,18 @@ public class InitialClusterManagerNodesResolver {
     }
 
     /**
-     * A node that has been part of a cluster keeps its state in {@code nodes/<n>/_state} and never bootstraps again.
+     * @return true if this node took over the expired bootstrap claim of another node and has to restart opensearch,
+     * so that {@link #resolve()} configures it to bootstrap the cluster
      */
-    static boolean hasClusterState(Path opensearchDataDir) {
-        final Path nodesDir = opensearchDataDir.resolve("nodes");
-        if (!Files.isDirectory(nodesDir)) {
-            return false;
-        }
-        try (Stream<Path> nodeDirs = Files.list(nodesDir)) {
-            return nodeDirs.anyMatch(dir -> Files.isDirectory(dir.resolve(IndicesDirectoryParser.STATE_DIR_NAME)));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    public boolean takeOverExpiredBootstrap() {
+        return isManagerEligible() && explicitConfiguration().isEmpty() && clusterBootstrapService.takeOverExpiredClaim();
+    }
+
+    private Optional<String> explicitConfiguration() {
+        return Optional.ofNullable(localConfiguration.getInitialClusterManagerNodes()).filter(nodes -> !nodes.isBlank());
+    }
+
+    private boolean isManagerEligible() {
+        return OpensearchCommonConfigurationBean.getNodeRoles(localConfiguration).contains(OpensearchNodeRole.CLUSTER_MANAGER);
     }
 }

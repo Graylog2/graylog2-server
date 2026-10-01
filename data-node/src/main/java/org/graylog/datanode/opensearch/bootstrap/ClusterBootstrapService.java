@@ -168,7 +168,29 @@ public class ClusterBootstrapService {
             return tryClaim();
         }
 
-        return takeOverIfClaimantGone(claim);
+        if (takeOverIfExpired(claim)) {
+            return true;
+        }
+        LOG.info("Waiting for data node {} ({}) to bootstrap the opensearch cluster", claim.getString(FIELD_NODE_ID), claim.getString(FIELD_HOSTNAME));
+        return false;
+    }
+
+    /**
+     * Takes over the expired claim of another node while the cluster hasn't been formed yet. Called periodically by nodes
+     * whose opensearch is already running and waiting to join, they wouldn't re-evaluate the claim otherwise.
+     *
+     * @return true if this node took over the bootstrap and has to restart opensearch with the bootstrap configuration
+     */
+    public synchronized boolean takeOverExpiredClaim() {
+        if (claimHeld || verifiedClusterUuid != null) {
+            return false;
+        }
+        final Document claim = collection.find(eq(FIELD_ID, BOOTSTRAP_ID)).first();
+        if (claim == null || claim.getString(FIELD_CLUSTER_UUID) != null || claim.getString(FIELD_INITIAL_CLUSTER_MANAGER_NODES) != null || isClaimedByThisNode(claim)) {
+            return false;
+        }
+        claimHeld = takeOverIfExpired(claim);
+        return claimHeld;
     }
 
     /**
@@ -271,7 +293,7 @@ public class ClusterBootstrapService {
         ).getMatchedCount() > 0;
     }
 
-    private boolean takeOverIfClaimantGone(Document claim) {
+    private boolean takeOverIfExpired(Document claim) {
         final String claimant = claim.getString(FIELD_NODE_ID);
         final Bson claimExpired = expr(new Document("$lt", List.of(
                 "$" + FIELD_CLAIMED_AT,
@@ -282,7 +304,6 @@ public class ClusterBootstrapService {
             LOG.warn("Data node {} claimed the opensearch cluster bootstrap but stopped renewing its claim, taking over the bootstrap", claimant);
             return true;
         }
-        LOG.info("Waiting for data node {} ({}) to bootstrap the opensearch cluster", claimant, claim.getString(FIELD_HOSTNAME));
         return false;
     }
 

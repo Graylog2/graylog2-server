@@ -65,11 +65,9 @@ class OpensearchConfigurationServiceTest {
     private InitialClusterManagerNodesResolver initialClusterManagerNodesResolver;
 
     private OpensearchConfigurationService service;
-    private Path dataDir;
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
-        dataDir = tempDir;
         final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(tempDir, tempDir, null, tempDir);
         final DatanodeConfiguration datanodeConfiguration = new DatanodeConfiguration(opensearchDistribution, datanodeDirectories, 100, null);
         when(datanodeConfigurationProvider.get()).thenReturn(datanodeConfiguration);
@@ -90,7 +88,7 @@ class OpensearchConfigurationServiceTest {
 
     @Test
     void initialClusterManagerNodesResolvedWhenSecurityConfigured() {
-        when(initialClusterManagerNodesResolver.resolve(dataDir)).thenReturn(Optional.of("this_node"));
+        when(initialClusterManagerNodesResolver.resolve()).thenReturn(Optional.of("this_node"));
         service = serviceWithSecurityConfigured(true);
 
         service.onStartRequested(new OpensearchStartRequestedEvent());
@@ -100,7 +98,7 @@ class OpensearchConfigurationServiceTest {
 
     @Test
     void initialClusterManagerNodesOmittedWhenNotBootstrapping() {
-        when(initialClusterManagerNodesResolver.resolve(dataDir)).thenReturn(Optional.empty());
+        when(initialClusterManagerNodesResolver.resolve()).thenReturn(Optional.empty());
         service = serviceWithSecurityConfigured(true);
 
         service.onStartRequested(new OpensearchStartRequestedEvent());
@@ -115,7 +113,7 @@ class OpensearchConfigurationServiceTest {
         service.onStartRequested(new OpensearchStartRequestedEvent());
 
         // a node waiting for its certificates won't start opensearch and must not claim the cluster bootstrap
-        verify(initialClusterManagerNodesResolver, never()).resolve(any());
+        verify(initialClusterManagerNodesResolver, never()).resolve();
         assertThat(opensearchYml()).doesNotContainKey("cluster.initial_cluster_manager_nodes");
     }
 
