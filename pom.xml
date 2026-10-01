@@ -206,7 +206,6 @@
         <protobuf.version>4.36.2</protobuf.version>
         <proto-google-common-protos.version>2.77.0</proto-google-common-protos.version>
         <proto-google-iam-v1.version>1.72.0</proto-google-iam-v1.version>
-        <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -231,8 +230,6 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <!-- mcp-core 2.0.0 pulls in an older reactor-core than azure-core requires. When bumping, check if the
-             explicit reactor-core dependency management can be removed. -->
         <mcp-bom.version>2.0.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
@@ -379,12 +376,6 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-json</artifactId>
                 <version>${azure-json.version}</version>
-            </dependency>
-            <!-- mcp-core pulls in an older reactor-core than azure-core requires -->
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-core</artifactId>
-                <version>${reactor.version}</version>
             </dependency>
             <!-- The guice-bom import pins outdated versions of these annotation
                  libraries. Override them with the versions required by our other

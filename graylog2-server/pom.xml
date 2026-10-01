@@ -431,6 +431,8 @@
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
         </dependency>
+        <!-- azure-core (via azure-storage-blob) also provides reactor-core for mcp-core, see the exclusion on
+             mcp-core below. If this dependency is ever removed, mcp-core needs reactor-core declared explicitly again. -->
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-blob</artifactId>
@@ -836,6 +838,15 @@
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
             <artifactId>mcp-core</artifactId>
+            <exclusions>
+                <!-- mcp-core requests an older reactor-core (3.7.0) than azure-core does.
+                     Excluding it here lets azure-core's newer 3.7.x reactor-core win instead, without
+                     us pinning a version (which Dependabot would then bump independently of azure-core). -->
+                <exclusion>
+                    <groupId>io.projectreactor</groupId>
+                    <artifactId>reactor-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
