@@ -433,4 +433,11 @@ public class MongoIndexSetServiceTest {
         assertThat(indexSetService.searchByTitle("Test .")).isEmpty();
         assertThat(indexSetService.searchByTitle("Test [1-4]")).isEmpty();
     }
+
+    @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
+    public void searchByTitleWithEmptyTermMatchesEverything() {
+        // The search endpoint defaults a missing term to "", which must list every index set rather than fail.
+        assertThat(indexSetService.searchByTitle("")).hasSize(4);
+    }
 }

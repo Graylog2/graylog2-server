@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoClientSettings;
-import jakarta.inject.Provider;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
@@ -35,6 +34,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.PaginatedIndexSetService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
@@ -55,6 +55,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -123,6 +124,8 @@ public class IndexSetsResourceTest {
     @Mock
     private PaginatedIndexSetService paginatedIndexSetService;
     @Mock
+    private EntityPermissionsUtils entityPermissionsUtils;
+    @Mock
     private RefreshingLockService lockService;
 
     public IndexSetsResourceTest() {
@@ -131,11 +134,11 @@ public class IndexSetsResourceTest {
 
     private IndexSetsResource indexSetsResource;
 
-    private Boolean permitted;
+    private Predicate<String> permissionCheck;
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.permitted = true;
+        this.permissionCheck = permission -> true;
         this.indexSetsResource = createIndexSetsResource(Set.of());
         when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
             IndexSetCreationRequest request = invocationOnMock.getArgument(0);
@@ -149,7 +152,12 @@ public class IndexSetsResourceTest {
     }
 
     private void notPermitted() {
-        this.permitted = false;
+        this.permissionCheck = permission -> false;
+    }
+
+    private void permitOnly(final String... permissions) {
+        final Set<String> granted = Set.of(permissions);
+        this.permissionCheck = granted::contains;
     }
 
     @Test
@@ -739,6 +747,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void getPageMapsElementsAndMarksTheDefaultIndexSet() {
+        grantReadOnAllIndexSets();
         final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
         final IndexSetConfig defaultConfig = createIndexSetConfig("id2", "title2");
         when(indexSetService.getDefault()).thenReturn(defaultConfig);
@@ -760,6 +769,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void getPagePagesInTheDatabaseForUsersWhoMayReadAllIndexSets() {
+        grantReadOnAllIndexSets();
         when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
         when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
@@ -768,11 +778,13 @@ public class IndexSetsResourceTest {
 
         verify(paginatedIndexSetService).findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
         verify(paginatedIndexSetService, never()).findPaginated(any(), any(), anyInt(), anyInt(), anyString(), any());
+        verify(entityPermissionsUtils).hasReadPermissionForWholeCollection(any(), eq(MongoIndexSetService.COLLECTION_NAME));
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void getPageUsesAPermissionPredicateForRestrictedUsers() {
+        // The entity-permission mocks answer false by default: no whole-collection read grant.
         notPermitted();
         final IndexSetConfig indexSetConfig = createIndexSetConfig("id1", "title1");
         when(indexSetService.getDefault()).thenReturn(indexSetConfig);
@@ -787,7 +799,26 @@ public class IndexSetsResourceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void getPagePredicateHonoursPerEntityReadGrants() {
+        permitOnly("indexsets:read:id1");
+        final IndexSetConfig readable = createIndexSetConfig("id1", "title1");
+        final IndexSetConfig hidden = createIndexSetConfig("id2", "title2");
+        when(indexSetService.getDefault()).thenReturn(readable);
+        when(paginatedIndexSetService.findPaginated(any(), any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
+                .thenReturn(PaginatedList.emptyList(1, 50));
+        final ArgumentCaptor<Predicate<IndexSetConfig>> predicateCaptor = ArgumentCaptor.forClass(Predicate.class);
+
+        indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+
+        verify(paginatedIndexSetService).findPaginated(any(), predicateCaptor.capture(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING));
+        assertThat(predicateCaptor.getValue().test(readable)).isTrue();
+        assertThat(predicateCaptor.getValue().test(hidden)).isFalse();
+    }
+
+    @Test
     public void getPageForwardsQueryAndFiltersToTheDatabaseQuery() {
+        grantReadOnAllIndexSets();
         when(indexSetService.getDefault()).thenReturn(createIndexSetConfig("id1", "title1"));
         when(paginatedIndexSetService.findPaginated(any(), eq(1), eq(50), eq("title"), eq(SortOrder.ASCENDING)))
                 .thenReturn(PaginatedList.emptyList(1, 50));
@@ -808,33 +839,38 @@ public class IndexSetsResourceTest {
                 () -> indexSetsResource.getPage(1, 50, "", List.of("description:foo"), "title", SortOrder.ASCENDING));
     }
 
+    private void grantReadOnAllIndexSets() {
+        when(entityPermissionsUtils.hasReadPermissionForWholeCollection(any(), eq(MongoIndexSetService.COLLECTION_NAME))).thenReturn(true);
+    }
+
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
-                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
-                indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService);
+                indexSetStatsCreator, clusterConfigService, systemJobManager, permission -> permissionCheck.test(permission), openIndexSetFilterFactories,
+                indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService, entityPermissionsUtils);
     }
 
     private static class TestResource extends IndexSetsResource {
 
-        private final Provider<Boolean> permitted;
+        private final Predicate<String> permissionCheck;
 
         TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry,
                      IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
-                     LegacySystemJobManager systemJobManager, Provider<Boolean> permitted,
+                     LegacySystemJobManager systemJobManager, Predicate<String> permissionCheck,
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
-                     RefreshingLockService.Factory lockServiceFactory, PaginatedIndexSetService paginatedIndexSetService) {
+                     RefreshingLockService.Factory lockServiceFactory, PaginatedIndexSetService paginatedIndexSetService,
+                     EntityPermissionsUtils entityPermissionsUtils) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
                     openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class), lockServiceFactory,
-                    paginatedIndexSetService);
-            this.permitted = permitted;
+                    paginatedIndexSetService, entityPermissionsUtils);
+            this.permissionCheck = permissionCheck;
         }
 
         @Override
         protected Subject getSubject() {
             final Subject mockSubject = mock(Subject.class);
-            when(mockSubject.isPermitted(anyString())).thenReturn(permitted.get());
+            lenient().when(mockSubject.isPermitted(anyString())).thenAnswer(invocation -> permissionCheck.test(invocation.getArgument(0)));
             lenient().when(mockSubject.getPrincipal()).thenReturn("test-user");
             return mockSubject;
         }

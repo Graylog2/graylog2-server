@@ -45,6 +45,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.bson.conversions.Bson;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -59,6 +60,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.PaginatedIndexSetService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
@@ -81,9 +83,10 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.LegacySystemJobManager;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,6 +135,7 @@ public class IndexSetsResource extends RestResource {
     private final EventBus eventBus;
     private final RefreshingLockService.Factory lockServiceFactory;
     private final PaginatedIndexSetService paginatedIndexSetService;
+    private final EntityPermissionsUtils entityPermissionsUtils;
     private final DbQueryCreator dbQueryCreator = new DbQueryCreator(DEFAULT_SORT_FIELD, ATTRIBUTES);
 
     @Inject
@@ -147,7 +151,8 @@ public class IndexSetsResource extends RestResource {
                              final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
                              final EventBus eventBus,
                              final RefreshingLockService.Factory lockServiceFactory,
-                             final PaginatedIndexSetService paginatedIndexSetService) {
+                             final PaginatedIndexSetService paginatedIndexSetService,
+                             final EntityPermissionsUtils entityPermissionsUtils) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -162,6 +167,7 @@ public class IndexSetsResource extends RestResource {
         this.eventBus = eventBus;
         this.lockServiceFactory = lockServiceFactory;
         this.paginatedIndexSetService = requireNonNull(paginatedIndexSetService);
+        this.entityPermissionsUtils = requireNonNull(entityPermissionsUtils);
     }
 
     @GET
@@ -185,7 +191,10 @@ public class IndexSetsResource extends RestResource {
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         // A user who may read every index set gets skip and limit in MongoDB. Anyone else needs the
         // per-entity predicate, which the helper applies after fetching so totals stay consistent.
-        final PaginatedList<IndexSetConfig> result = isPermitted(RestPermissions.INDEXSETS_READ)
+        final Subject subject = getSubject();
+        final boolean canReadAllIndexSets = entityPermissionsUtils.hasAllPermission(subject)
+                || entityPermissionsUtils.hasReadPermissionForWholeCollection(subject, MongoIndexSetService.COLLECTION_NAME);
+        final PaginatedList<IndexSetConfig> result = canReadAllIndexSets
                 ? paginatedIndexSetService.findPaginated(dbQuery, page, perPage, sort, order)
                 : paginatedIndexSetService.findPaginated(dbQuery, this::mayRead, page, perPage, sort, order);
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
@@ -203,10 +212,10 @@ public class IndexSetsResource extends RestResource {
     /**
      * @deprecated Use {@link #getPage} ({@code GET /system/indices/index_sets/paginated}); it sorts, filters, and paginates in the database.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     @GET
     @Timed
-    @Operation(summary = "Get a list of all index sets. Deprecated: use /system/indices/index_sets/paginated instead.", deprecated = true)
+    @Operation(summary = "Get a list of all index sets", deprecated = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
@@ -235,17 +244,17 @@ public class IndexSetsResource extends RestResource {
     /**
      * @deprecated Use {@link #getPage} ({@code GET /system/indices/index_sets/paginated}) with the {@code query} parameter.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     @GET
     @Path("search")
     @Timed
-    @Operation(summary = "Search index sets by title. Deprecated: use /system/indices/index_sets/paginated instead.", deprecated = true)
+    @Operation(summary = "Search index sets by title", deprecated = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetsResponse search(@Parameter(name = "searchTitle", description = "The number of elements to skip (offset).")
-                                    @QueryParam("searchTitle") String searchTitle,
+                                    @QueryParam("searchTitle") @DefaultValue("") String searchTitle,
                                     @Parameter(name = "skip", description = "The number of elements to skip (offset).", required = true)
                                     @QueryParam("skip") @DefaultValue("0") int skip,
                                     @Parameter(name = "limit", description = "The maximum number of elements to return.", required = true)
