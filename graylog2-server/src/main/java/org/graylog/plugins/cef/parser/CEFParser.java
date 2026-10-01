@@ -61,7 +61,6 @@ public class CEFParser {
 
     private static final Pattern PATTERN_CEF_MAIN = Pattern.compile("(?<!\\\\)\\|");
     private static final Pattern PATTERN_EXTENSION = Pattern.compile("(\\w+)=");
-    private static final Pattern PATTERN_HEADER_ESCAPE = Pattern.compile("\\\\([\\\\|])");
     private static final Pattern PATTERN_EXTENSION_ESCAPE = Pattern.compile("\\\\([\\\\rn=])");
     private static final List<String> DATE_FORMATS = Arrays.asList(
             "MMM dd yyyy HH:mm:ss.SSS zzz",
@@ -131,7 +130,7 @@ public class CEFParser {
             }
 
             log.trace("parse() - timestamp = {}, {}", timestamp.getTime(), timestamp);
-            builder.timestamp = timestamp;
+            builder.timestamp(timestamp);
 
             cefstartIndex = ossecPrefixMatcher.start("cs");
         } else if (timestampText != null && !timestampText.isEmpty() && host != null && !host.isEmpty()) {
@@ -179,8 +178,8 @@ public class CEFParser {
                 }
             }
             log.trace("parse() - timestamp = {}, {}", timestamp.getTime(), timestamp);
-            builder.timestamp = timestamp;
-            builder.host = host;
+            builder.timestamp(timestamp);
+            builder.host(host);
 
             cefstartIndex = prefixMatcher.start("cs0");
         } else {
@@ -203,31 +202,33 @@ public class CEFParser {
 
 
         for (String token : parts) {
-            token = unescape(PATTERN_HEADER_ESCAPE, token);
+            token = token
+                    .replace("\\\\", "\\")
+                    .replace("\\|", "|");
             log.trace("parse() - index={}, token='{}'", index, token);
 
             switch (index) {
                 case 0:
                     assert (token.startsWith("CEF:"));
-                    builder.cefVersion = Integer.parseInt(token.substring(4));
+                    builder.cefVersion(Integer.parseInt(token.substring(4)));
                     break;
                 case 1:
-                    builder.deviceVendor = token;
+                    builder.deviceVendor(token);
                     break;
                 case 2:
-                    builder.deviceProduct = token;
+                    builder.deviceProduct(token);
                     break;
                 case 3:
-                    builder.deviceVersion = token;
+                    builder.deviceVersion(token);
                     break;
                 case 4:
-                    builder.deviceEventClassId = token;
+                    builder.deviceEventClassId(token);
                     break;
                 case 5:
-                    builder.name = token;
+                    builder.name(token);
                     break;
                 case 6:
-                    builder.severity = token;
+                    builder.severity(token);
                     break;
                 default:
                     break;
@@ -271,20 +272,16 @@ public class CEFParser {
             log.trace("parse() - key='{}' value='{}'", key, value);
         }
 
-        builder.extensions = extensions;
+        builder.extensions(extensions);
         return builder.build();
-    }
-
-    private String sanitizeValue(String value) {
-        return unescape(PATTERN_EXTENSION_ESCAPE, value.trim());
     }
 
     /**
      * Resolves escape sequences in a single pass. Chained {@link String#replace} calls re-read their own output, so
      * {@code \\r} would first become {@code \r} and then be turned into a carriage return.
      */
-    private static String unescape(Pattern pattern, String value) {
-        final Matcher matcher = pattern.matcher(value);
+    private String sanitizeValue(String value) {
+        final Matcher matcher = PATTERN_EXTENSION_ESCAPE.matcher(value.trim());
         final StringBuilder result = new StringBuilder(value.length());
         while (matcher.find()) {
             final char escaped = matcher.group(1).charAt(0);
@@ -299,16 +296,66 @@ public class CEFParser {
     }
 
     private static class Builder {
-        Date timestamp;
-        String host;
-        int cefVersion;
-        String deviceVendor;
-        String deviceProduct;
-        String deviceVersion;
-        String deviceEventClassId;
-        String name;
-        String severity;
-        Map<String, String> extensions = new HashMap<>();
+        private Date timestamp;
+        private String host;
+        private int cefVersion;
+        private String deviceVendor;
+        private String deviceProduct;
+        private String deviceVersion;
+        private String deviceEventClassId;
+        private String name;
+        private String severity;
+        private Map<String, String> extensions = new HashMap<>();
+
+        Builder timestamp(Date timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        Builder host(String host) {
+            this.host = host;
+            return this;
+        }
+
+        Builder cefVersion(int cefVersion) {
+            this.cefVersion = cefVersion;
+            return this;
+        }
+
+        Builder deviceVendor(String deviceVendor) {
+            this.deviceVendor = deviceVendor;
+            return this;
+        }
+
+        Builder deviceProduct(String deviceProduct) {
+            this.deviceProduct = deviceProduct;
+            return this;
+        }
+
+        Builder deviceVersion(String deviceVersion) {
+            this.deviceVersion = deviceVersion;
+            return this;
+        }
+
+        Builder deviceEventClassId(String deviceEventClassId) {
+            this.deviceEventClassId = deviceEventClassId;
+            return this;
+        }
+
+        Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        Builder severity(String severity) {
+            this.severity = severity;
+            return this;
+        }
+
+        Builder extensions(Map<String, String> extensions) {
+            this.extensions = extensions;
+            return this;
+        }
 
         CEFMessage build() {
             return new CEFMessage(timestamp, host, cefVersion, deviceVendor, deviceProduct, deviceVersion,
