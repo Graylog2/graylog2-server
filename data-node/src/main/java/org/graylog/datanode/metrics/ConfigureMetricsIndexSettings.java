@@ -91,7 +91,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
                         // Reset so the next AVAILABLE health-check reentry (every 10s) retries. Don't rethrow -
                         // a metrics datastream failure shouldn't be treated as an opensearch process health failure.
                         datastreamCreated.set(false);
-                        LOGGER.error("Failed to create metrics datastream, will retry, tracer instance: {}", this, e);
+                        log.error("Failed to create metrics datastream, will retry, tracer instance: {}", this, e);
                     }
                 }
             });
