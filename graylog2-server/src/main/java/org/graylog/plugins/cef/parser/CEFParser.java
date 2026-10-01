@@ -114,11 +114,11 @@ public class CEFParser {
         final int cefstartIndex;
         if (isOssec) {
             final String df = "MMM dd HH:mm:ss";
-            final SimpleDateFormat dateFormat = new SimpleDateFormat(df);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat(df, Locale.getDefault(Locale.Category.FORMAT));
             dateFormat.setTimeZone(timeZone);
             final Date timestamp;
             try {
-                final Calendar calendar = Calendar.getInstance(timeZone);
+                final Calendar calendar = Calendar.getInstance(timeZone, Locale.getDefault(Locale.Category.FORMAT));
                 int thisYear = calendar.get(Calendar.YEAR);
                 calendar.setTime(dateFormat.parse(timestampText));
                 log.trace("parse() - altering year from to {}", thisYear);
@@ -157,7 +157,7 @@ public class CEFParser {
 
                         if (alterYear) {
                             log.trace("parse() - date format '{}' does not specify the year. Might need to alter the year.", df);
-                            Calendar calendar = Calendar.getInstance(timeZone);
+                            Calendar calendar = Calendar.getInstance(timeZone, Locale.getDefault(Locale.Category.FORMAT));
                             int thisYear = calendar.get(Calendar.YEAR);
                             calendar.setTime(timestamp);
                             final int year = calendar.get(Calendar.YEAR);
