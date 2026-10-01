@@ -136,9 +136,14 @@
         <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
+        <google-api-client.version>2.9.1</google-api-client.version>
         <google-api-common.version>2.69.0</google-api-common.version>
+        <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
+        <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
         <google-auth-library.version>1.53.0</google-auth-library.version>
+        <google-cloud-bigquery.version>2.72.0</google-cloud-bigquery.version>
         <google-cloud-core.version>2.76.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.39.0</google-cloud-logging.version>
         <google-conscrypt.version>2.7.0</google-conscrypt.version>
         <google-gax.version>2.86.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
@@ -472,6 +477,34 @@
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-gson</artifactId>
                 <version>${google-http-client.version}</version>
+            </dependency>
+            <!-- Google libraries that are only used by the enterprise plugin. Their versions
+                 are managed here so dependabot can bump them together with the shared
+                 Google libraries above in a single pull request. -->
+            <dependency>
+                <groupId>com.google.api-client</groupId>
+                <artifactId>google-api-client</artifactId>
+                <version>${google-api-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-admin-reports</artifactId>
+                <version>${google-api-services-admin-reports.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-compute</artifactId>
+                <version>${google-api-services-compute.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-bigquery</artifactId>
+                <version>${google-cloud-bigquery.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-logging</artifactId>
+                <version>${google-cloud-logging.version}</version>
             </dependency>
             <!-- io.grpc:grpc-* and google-cloud-* both depend on conscrypt.
                  the grpc libs sometimes lag behind but are the nearest
