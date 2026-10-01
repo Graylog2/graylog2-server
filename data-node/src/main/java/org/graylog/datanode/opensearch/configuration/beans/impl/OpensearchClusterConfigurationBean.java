@@ -17,38 +17,30 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableMap;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.OpensearchSeedHostsResolver;
+import org.graylog.datanode.opensearch.configuration.UnicastHostsFile;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
-import org.graylog.datanode.process.configuration.files.TextConfigFile;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class OpensearchClusterConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchClusterConfigurationBean.class);
 
-    private static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
-
     private final Configuration localConfiguration;
-    private final NodeService<DataNodeDto> nodeService;
+    private final OpensearchSeedHostsResolver seedHostsResolver;
 
     @Inject
-    public OpensearchClusterConfigurationBean(Configuration localConfiguration, NodeService<DataNodeDto> nodeService) {
+    public OpensearchClusterConfigurationBean(Configuration localConfiguration, OpensearchSeedHostsResolver seedHostsResolver) {
         this.localConfiguration = localConfiguration;
-        this.nodeService = nodeService;
+        this.seedHostsResolver = seedHostsResolver;
     }
 
     @Override
@@ -77,10 +69,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         final String hostname = localConfiguration.getHostname();
         LOG.info("Opensearch networking: bind host: {}, publish host: {}, node name: {}, hostname: {}", bindHost, publishHost, nodeName, hostname);
 
-        final String initialClusterManagerNodes = getInitialClusterManagerNodes();
-        properties.put("cluster.initial_cluster_manager_nodes", initialClusterManagerNodes);
-        LOG.info("Opensearch initial cluster manager nodes: {}", initialClusterManagerNodes);
-
+        // cluster.initial_cluster_manager_nodes is resolved by the InitialClusterManagerNodesResolver, see OpensearchConfigurationService
 
         final List<String> discoverySeedHosts = localConfiguration.getOpensearchDiscoverySeedHosts();
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
@@ -88,13 +77,16 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         } else {
             properties.put("discovery.seed_providers", "file");
         }
-        Set<String> seedHosts = resolveDiscoverySeedHosts();
+        final Set<String> seedHosts = seedHostsResolver.resolve();
         LOG.info("Opensearch discovery seeds hosts: {}", seedHosts);
+        if (seedHosts.isEmpty()) {
+            LOG.warn("No active data nodes found, opensearch discovery seed hosts are empty. They will be updated as soon as other data nodes register.");
+        }
 
         // set default number of replicas to 0 if only one node is known.
         // this does not affect replicas for Graylog managed indices, but resolves some problems for system managed indices.
         // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
-        String replicas = (seedHosts == null || seedHosts.isEmpty() || seedHosts.size() == 1) ? "0" : "1";
+        String replicas = seedHosts.size() <= 1 ? "0" : "1";
         properties.put("cluster.default_number_of_replicas", replicas);
 
         // TODO: why do we have this configured?
@@ -102,45 +94,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
 
         return DatanodeConfigurationPart.builder()
                 .properties(properties.build())
-                .withConfigFile(new TextConfigFile(UNICAST_HOSTS_FILE, String.join("\n", seedHosts)))
+                .withConfigFile(UnicastHostsFile.configFile(seedHosts))
                 .build();
-    }
-
-    private String getInitialClusterManagerNodes() {
-        if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
-            return localConfiguration.getInitialClusterManagerNodes();
-        } else {
-            return buildInitialManagerNodesList();
-        }
-    }
-
-    @Nonnull
-    private String buildInitialManagerNodesList() {
-        // this node itself might not be registered with the node service yet, therefore we always add it to the list.
-        return nodeService.allActive().values().stream()
-                .filter(this::isManager)
-                .map(Node::getHostname)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toSet(),
-                        hostnames -> {
-                            if (localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty() ||
-                                    localConfiguration.getNodeRoles().contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
-                                hostnames.add(localConfiguration.getHostname());
-                            }
-                            return String.join(",", hostnames);
-                        }
-                ));
-    }
-
-    private boolean isManager(DataNodeDto n) {
-        final List<String> roles = n.getOpensearchRoles();
-        return roles != null && roles.contains(OpensearchNodeRole.CLUSTER_MANAGER);
-    }
-
-    private Set<String> resolveDiscoverySeedHosts() {
-        return nodeService.allActive().values().stream()
-                .map(DataNodeDto::getClusterAddress)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
     }
 }

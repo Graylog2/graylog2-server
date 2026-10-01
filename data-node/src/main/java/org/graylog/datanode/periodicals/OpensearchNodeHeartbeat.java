@@ -16,39 +16,65 @@
  */
 package org.graylog.datanode.periodicals;
 
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
+import org.graylog.datanode.opensearch.bootstrap.ClusterBootstrapService;
+import org.graylog.datanode.opensearch.bootstrap.InitialClusterManagerNodesResolver;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.plugin.periodical.Periodical;
+import org.opensearch.client.opensearch.core.InfoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.Set;
 
 @Singleton
 public class OpensearchNodeHeartbeat extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodeHeartbeat.class);
+    /**
+     * States in which the opensearch process is running, even if its REST API isn't responding
+     */
+    private static final Set<OpensearchState> PROCESS_RUNNING_STATES = Set.of(
+            OpensearchState.STARTING, OpensearchState.AVAILABLE, OpensearchState.NOT_RESPONDING, OpensearchState.FAILED);
+
+    /**
+     * States from which the opensearch process can be restarted with a new configuration
+     */
+    private static final Set<OpensearchState> RESTARTABLE_STATES = Set.of(
+            OpensearchState.STARTING, OpensearchState.AVAILABLE, OpensearchState.FAILED);
+
     private final OpensearchProcess process;
+    private final ClusterBootstrapService clusterBootstrapService;
+    private final InitialClusterManagerNodesResolver initialClusterManagerNodesResolver;
+    private final EventBus eventBus;
 
     @Inject
-    public OpensearchNodeHeartbeat(OpensearchProcess process) {
+    public OpensearchNodeHeartbeat(OpensearchProcess process, ClusterBootstrapService clusterBootstrapService,
+                                   InitialClusterManagerNodesResolver initialClusterManagerNodesResolver, EventBus eventBus) {
         this.process = process;
+        this.clusterBootstrapService = clusterBootstrapService;
+        this.initialClusterManagerNodesResolver = initialClusterManagerNodesResolver;
+        this.eventBus = eventBus;
     }
 
     @Override
-    // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         if (!process.isInState(OpensearchState.TERMINATED) && !process.isInState(OpensearchState.WAITING_FOR_CONFIGURATION)
                 && !process.isInState(OpensearchState.REMOVED)) {
 
+            coordinateBootstrap();
             process.openSearchClient().ifPresent(client -> {
                 try {
-                    client.syncWithoutErrorMapping().info();
+                    final InfoResponse info = client.syncWithoutErrorMapping().info();
                     onNodeResponse(process);
+                    recordClusterUuid(info);
                 } catch (IOException e) {
                     onRestError(process, e);
                 }
@@ -58,6 +84,34 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private void onNodeResponse(OpensearchProcess process) {
         process.onEvent(OpensearchEvent.HEALTH_CHECK_OK);
+    }
+
+    /**
+     * Runs before the REST call, a slow or unresponsive opensearch may still form the cluster as long as the process runs.
+     * The REST API may also not respond at all until the cluster has been formed, so this doesn't depend on it.
+     */
+    private void coordinateBootstrap() {
+        if (PROCESS_RUNNING_STATES.stream().noneMatch(process::isInState)) {
+            return;
+        }
+        try {
+            clusterBootstrapService.renewClaim();
+            // a node waiting to join a cluster has to take over if the bootstrapping node is gone
+            if (RESTARTABLE_STATES.stream().anyMatch(process::isInState) && initialClusterManagerNodesResolver.takeOverExpiredBootstrap()) {
+                LOG.info("Restarting opensearch to bootstrap the opensearch cluster");
+                eventBus.post(new OpensearchStartRequestedEvent());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to coordinate opensearch cluster bootstrap: {}", e.getMessage());
+        }
+    }
+
+    private void recordClusterUuid(InfoResponse info) {
+        try {
+            clusterBootstrapService.recordClusterUuid(info.clusterUuid());
+        } catch (Exception e) {
+            LOG.warn("Failed to record opensearch cluster UUID {}: {}", info.clusterUuid(), e.getMessage());
+        }
     }
 
     private void onRestError(OpensearchProcess process, Exception e) {
