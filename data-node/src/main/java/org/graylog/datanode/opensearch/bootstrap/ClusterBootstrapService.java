@@ -38,7 +38,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -55,8 +54,9 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * form independent clusters (split brain) that can never be merged.
  * <p>
  * The first node to start opensearch claims the bootstrap by an atomic write into MongoDB and is the only one
- * configuring {@code cluster.initial_cluster_manager_nodes}. All other nodes join it via discovery. As soon as the
- * cluster is formed, its UUID is recorded and no other node will ever bootstrap again.
+ * configuring {@code cluster.initial_cluster_manager_nodes}. All other nodes join it via discovery. The claim is a lease,
+ * renewed while the claiming node's opensearch is running. If it isn't renewed, another node takes over the bootstrap.
+ * As soon as the cluster is formed, its UUID is recorded and no other node will ever bootstrap again.
  */
 @Singleton
 public class ClusterBootstrapService {
@@ -78,12 +78,8 @@ public class ClusterBootstrapService {
     private static final String UNKNOWN_CLUSTER_UUID = "_na_";
 
     /**
-     * Statuses of a claiming node that may still bootstrap the cluster
-     */
-    private static final Set<DataNodeStatus> BOOTSTRAPPING_STATUSES = Set.of(DataNodeStatus.STARTING, DataNodeStatus.AVAILABLE);
-
-    /**
-     * A claim can't be taken over for this time, giving the claiming node enough time to register and start opensearch.
+     * A claim can't be taken over until it hasn't been renewed for this time. The claiming node renews it as long as its
+     * opensearch process is running, see {@link #renewClaim()}.
      */
     private static final Duration DEFAULT_TAKEOVER_GRACE_PERIOD = Duration.ofSeconds(60);
 
@@ -93,6 +89,7 @@ public class ClusterBootstrapService {
     private final Configuration configuration;
     private final Duration takeoverGracePeriod;
 
+    private volatile boolean claimHeld;
     private volatile String verifiedClusterUuid;
     private volatile String clusterUuidMismatchWarning;
 
@@ -114,6 +111,22 @@ public class ClusterBootstrapService {
      * @return true if this node is the one that should bootstrap a new cluster, false if it should join an existing one.
      */
     public synchronized boolean claimBootstrap() {
+        claimHeld = tryClaim();
+        return claimHeld;
+    }
+
+    /**
+     * Keeps the claim of this node alive while its opensearch process is running and may still bootstrap the cluster.
+     * Without renewals, the claim expires and another node takes over the bootstrap.
+     */
+    public synchronized void renewClaim() {
+        if (claimHeld && !refreshClaim(eq(FIELD_NODE_ID, nodeId.getNodeId()))) {
+            LOG.debug("Opensearch cluster has been formed, the bootstrap claim doesn't need renewals anymore");
+            claimHeld = false;
+        }
+    }
+
+    private boolean tryClaim() {
         final Document claim = collection.find(eq(FIELD_ID, BOOTSTRAP_ID)).first();
 
         if (claim == null) {
@@ -127,7 +140,7 @@ public class ClusterBootstrapService {
                 return true;
             }
             // someone else has been faster
-            return claimBootstrap();
+            return tryClaim();
         }
 
         final String clusterUuid = claim.getString(FIELD_CLUSTER_UUID);
@@ -143,7 +156,7 @@ public class ClusterBootstrapService {
                 LOG.info("This data node claimed the bootstrap of a new opensearch cluster");
                 return true;
             }
-            return claimBootstrap();
+            return tryClaim();
         }
 
         return takeOverIfClaimantGone(claim);
@@ -233,19 +246,13 @@ public class ClusterBootstrapService {
 
     private boolean takeOverIfClaimantGone(Document claim) {
         final String claimant = claim.getString(FIELD_NODE_ID);
-        final DataNodeDto claimantNode = nodeService.allActive().get(claimant);
-        if (claimantNode != null && BOOTSTRAPPING_STATUSES.contains(claimantNode.getDataNodeStatus())) {
-            LOG.info("Data node {} ({}) is bootstrapping the opensearch cluster, joining it", claimant, claim.getString(FIELD_HOSTNAME));
-            return false;
-        }
-
         final Bson claimExpired = expr(new Document("$lt", List.of(
                 "$" + FIELD_CLAIMED_AT,
                 new Document("$subtract", List.of("$$NOW", takeoverGracePeriod.toMillis()))
         )));
 
         if (refreshClaim(and(eq(FIELD_NODE_ID, claimant), claimExpired))) {
-            LOG.warn("Data node {} claimed the opensearch cluster bootstrap but never started it, taking over the bootstrap", claimant);
+            LOG.warn("Data node {} claimed the opensearch cluster bootstrap but stopped renewing its claim, taking over the bootstrap", claimant);
             return true;
         }
         LOG.info("Waiting for data node {} ({}) to bootstrap the opensearch cluster", claimant, claim.getString(FIELD_HOSTNAME));

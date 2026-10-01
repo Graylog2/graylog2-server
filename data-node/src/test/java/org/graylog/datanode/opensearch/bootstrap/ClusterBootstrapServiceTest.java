@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -52,6 +53,7 @@ class ClusterBootstrapServiceTest {
     private static final Duration GRACE_PERIOD = Duration.ofMinutes(10);
     // a negative grace period lets every claim expire immediately, without depending on the clock
     private static final Duration EXPIRED_GRACE_PERIOD = Duration.ofMinutes(-1);
+    private static final Date EXPIRED_CLAIM = new Date(0);
 
     @TempDir
     private Path tempDir;
@@ -109,21 +111,53 @@ class ClusterBootstrapServiceTest {
     }
 
     @Test
-    void claimOfStoppedNodeIsTakenOverAfterGracePeriod() throws Exception {
+    void claimNotRenewedIsTakenOverRegardlessOfStatus() throws Exception {
         assertThat(service("node1", EXPIRED_GRACE_PERIOD).claimBootstrap()).isTrue();
 
-        // node1 is still running its opensearch, no takeover
+        // node1 still reports its opensearch as available, but stopped renewing its claim
         register("node1", DataNodeStatus.AVAILABLE);
-        assertThat(service("node2", EXPIRED_GRACE_PERIOD).claimBootstrap()).isFalse();
-
-        // node1 is alive, but its opensearch is not running and won't bootstrap anything
-        register("node1", DataNodeStatus.PREPARED);
         assertThat(service("node2", EXPIRED_GRACE_PERIOD).claimBootstrap()).isTrue();
         assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node2");
 
-        // node1 comes back, it has to join node2 now
-        register("node2", DataNodeStatus.STARTING);
-        assertThat(service("node1", EXPIRED_GRACE_PERIOD).claimBootstrap()).isFalse();
+        // node1 comes back while node2's claim is fresh, it has to join node2 now
+        assertThat(service("node1", GRACE_PERIOD).claimBootstrap()).isFalse();
+    }
+
+    @Test
+    void renewedClaimIsNotTakenOver() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        assertThat(node1.claimBootstrap()).isTrue();
+
+        // node1's opensearch isn't responding, but its process is running and renews the claim
+        register("node1", DataNodeStatus.UNAVAILABLE);
+        expireClaim();
+        node1.renewClaim();
+        assertThat(service("node2", GRACE_PERIOD).claimBootstrap()).isFalse();
+
+        // node1 stopped renewing
+        expireClaim();
+        assertThat(service("node2", GRACE_PERIOD).claimBootstrap()).isTrue();
+
+        // late renewal of node1 doesn't take the claim back
+        node1.renewClaim();
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node2");
+    }
+
+    @Test
+    void onlyClaimantRenewsUntilClusterFormed() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        final ClusterBootstrapService node2 = service("node2", GRACE_PERIOD);
+        assertThat(node1.claimBootstrap()).isTrue();
+        assertThat(node2.claimBootstrap()).isFalse();
+
+        expireClaim();
+        node2.renewClaim();
+        assertThat(bootstrapDocument().getDate(ClusterBootstrapService.FIELD_CLAIMED_AT)).isEqualTo(EXPIRED_CLAIM);
+
+        node1.recordClusterUuid("cluster-a");
+        expireClaim();
+        node1.renewClaim();
+        assertThat(bootstrapDocument().getDate(ClusterBootstrapService.FIELD_CLAIMED_AT)).isEqualTo(EXPIRED_CLAIM);
     }
 
     @Test
@@ -197,6 +231,13 @@ class ClusterBootstrapServiceTest {
                 .setHostname(nodeId + ".example.com")
                 .setDataNodeStatus(status)
                 .build());
+    }
+
+    private void expireClaim() {
+        mongoConnection.getMongoDatabase()
+                .getCollection(ClusterBootstrapService.COLLECTION_NAME)
+                .updateOne(new Document(ClusterBootstrapService.FIELD_ID, ClusterBootstrapService.BOOTSTRAP_ID),
+                        new Document("$set", new Document(ClusterBootstrapService.FIELD_CLAIMED_AT, EXPIRED_CLAIM)));
     }
 
     private Document bootstrapDocument() {

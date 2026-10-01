@@ -29,11 +29,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.Set;
 
 @Singleton
 public class OpensearchNodeHeartbeat extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodeHeartbeat.class);
+    /**
+     * States in which the opensearch process is running, even if its REST API isn't responding
+     */
+    private static final Set<OpensearchState> PROCESS_RUNNING_STATES = Set.of(
+            OpensearchState.STARTING, OpensearchState.AVAILABLE, OpensearchState.NOT_RESPONDING, OpensearchState.FAILED);
+
     private final OpensearchProcess process;
     private final ClusterBootstrapService clusterBootstrapService;
 
@@ -49,6 +56,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
         if (!process.isInState(OpensearchState.TERMINATED) && !process.isInState(OpensearchState.WAITING_FOR_CONFIGURATION)
                 && !process.isInState(OpensearchState.REMOVED)) {
 
+            renewBootstrapClaim();
             process.openSearchClient().ifPresent(client -> {
                 try {
                     final InfoResponse info = client.syncWithoutErrorMapping().info();
@@ -63,6 +71,19 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private void onNodeResponse(OpensearchProcess process) {
         process.onEvent(OpensearchEvent.HEALTH_CHECK_OK);
+    }
+
+    /**
+     * Renewed before the REST call, a slow or unresponsive opensearch may still form the cluster as long as the process runs.
+     */
+    private void renewBootstrapClaim() {
+        if (PROCESS_RUNNING_STATES.stream().anyMatch(process::isInState)) {
+            try {
+                clusterBootstrapService.renewClaim();
+            } catch (Exception e) {
+                LOG.warn("Failed to renew opensearch cluster bootstrap claim: {}", e.getMessage());
+            }
+        }
     }
 
     private void recordClusterUuid(InfoResponse info) {
