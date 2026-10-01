@@ -141,6 +141,7 @@
         <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
         <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
         <google-auth-library.version>1.53.0</google-auth-library.version>
+        <google-oauth-client.version>1.39.0</google-oauth-client.version>
         <google-cloud-bigquery.version>2.72.0</google-cloud-bigquery.version>
         <google-cloud-core.version>2.76.0</google-cloud-core.version>
         <google-cloud-logging.version>3.39.0</google-cloud-logging.version>
@@ -477,6 +478,11 @@
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-gson</artifactId>
                 <version>${google-http-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.oauth-client</groupId>
+                <artifactId>google-oauth-client</artifactId>
+                <version>${google-oauth-client.version}</version>
             </dependency>
             <!-- Google libraries that are only used by the enterprise plugin. Their versions
                  are managed here so dependabot can bump them together with the shared
