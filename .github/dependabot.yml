@@ -19,17 +19,21 @@ updates:
       - dependency-name: "org.opensearch:opensearch-core"
       - dependency-name: "org.opensearch.client:opensearch-java"
     groups:
-      # The Google API client libraries are released in lockstep, so bumping
-      # them individually almost always trips the requireUpperBoundDeps
-      # enforcer rule. Deliberately excludes io.grpc and com.google.protobuf,
-      # which are on separate release trains.
+      # The Google API and Cloud client libraries are released in lockstep,
+      # so bumping them individually almost always trips the
+      # requireUpperBoundDeps enforcer rule.
+      # Deliberately excludes io.grpc and com.google.protobuf, which are on
+      # separate release trains.
       google-api-libraries:
         patterns:
           - "com.google.api:*"
           - "com.google.api.grpc:*"
+          - "com.google.apis:*"
+          - "com.google.api-client:*"
           - "com.google.auth:*"
           - "com.google.cloud:*"
           - "com.google.http-client:*"
+          - "com.google.oauth-client:*"
       # The Azure SDK libraries are released as a train and each release requires
       # the newest azure-core, so bumping them individually trips the
       # requireUpperBoundDeps enforcer rule.
