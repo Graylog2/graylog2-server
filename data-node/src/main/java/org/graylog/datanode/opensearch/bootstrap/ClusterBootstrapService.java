@@ -90,7 +90,6 @@ public class ClusterBootstrapService {
     private final Configuration configuration;
     private final Duration takeoverGracePeriod;
 
-    private volatile boolean claimHeld;
     private volatile String verifiedClusterUuid;
     private volatile String clusterUuidMismatchWarning;
 
@@ -112,18 +111,17 @@ public class ClusterBootstrapService {
      * @return true if this node is the one that should bootstrap a new cluster, false if it should join an existing one.
      */
     public synchronized boolean claimBootstrap() {
-        claimHeld = tryClaim();
-        return claimHeld;
+        return tryClaim();
     }
 
     /**
      * Keeps the claim of this node alive while its opensearch process is running and may still bootstrap the cluster.
-     * Without renewals, the claim expires and another node takes over the bootstrap.
+     * Without renewals, the claim expires and another node takes over the bootstrap. Updates nothing if this node doesn't
+     * hold the claim or the cluster has been formed.
      */
     public synchronized void renewClaim() {
-        if (claimHeld && !refreshClaim(eq(FIELD_NODE_ID, nodeId.getNodeId()))) {
-            LOG.debug("Opensearch cluster has been formed, the bootstrap claim doesn't need renewals anymore");
-            claimHeld = false;
+        if (verifiedClusterUuid == null) {
+            refreshClaim(eq(FIELD_NODE_ID, nodeId.getNodeId()));
         }
     }
 
@@ -182,15 +180,14 @@ public class ClusterBootstrapService {
      * @return true if this node took over the bootstrap and has to restart opensearch with the bootstrap configuration
      */
     public synchronized boolean takeOverExpiredClaim() {
-        if (claimHeld || verifiedClusterUuid != null) {
+        if (verifiedClusterUuid != null) {
             return false;
         }
         final Document claim = collection.find(eq(FIELD_ID, BOOTSTRAP_ID)).first();
         if (claim == null || claim.getString(FIELD_CLUSTER_UUID) != null || claim.getString(FIELD_INITIAL_CLUSTER_MANAGER_NODES) != null || isClaimedByThisNode(claim)) {
             return false;
         }
-        claimHeld = takeOverIfExpired(claim);
-        return claimHeld;
+        return takeOverIfExpired(claim);
     }
 
     /**
