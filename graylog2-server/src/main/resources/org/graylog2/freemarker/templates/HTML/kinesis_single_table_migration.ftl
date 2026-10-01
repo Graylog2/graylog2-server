@@ -4,10 +4,10 @@ Kinesis input KCL update
 
 <#if _description>
 <span>
-In Graylog 7.2, the AWS Kinesis/CloudWatch input has been updated to Kinesis Client Library (KCL) 3.5. Existing
-Kinesis inputs can now migrate to a single DynamoDB table for state tracking using the new
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been updated to Kinesis Client Library (KCL) 3.5. Kinesis
+inputs created before Graylog 7.2 can now migrate to a single DynamoDB table for state tracking using the new
 <strong>Migrate to single DynamoDB table for state tracking</strong> option in the Edit input dialog on the Inputs
-page.
+page. Inputs created on Graylog 7.2 or later already use a single table and don't need to be migrated.
 <br /><br />
 Migrating means fewer tables to manage and, for some customers, a lower risk of hitting AWS account limits. The
 migration is optional today but may be required by AWS in the future, so you can now migrate on your own schedule.

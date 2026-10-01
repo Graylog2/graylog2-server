@@ -107,6 +107,29 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
     }
 
     @Test
+    void countsPre72InputsWithoutTheOption() {
+        final List<Input> inputs = List.of(input("kinesis-pre-7.2", Map.of()));
+        when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
+
+        migration.upgrade();
+
+        verify(notificationService).publishIfFirst(any());
+        assertThat(clusterConfigService.get(MigrationCompleted.class))
+                .isEqualTo(new MigrationCompleted(Set.of("kinesis-pre-7.2")));
+    }
+
+    @Test
+    void treatsStringTrueOptionAsMigrated() {
+        final List<Input> inputs = List.of(
+                input("kinesis-migrated", Map.of(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, "true")));
+        when(inputService.allByType(AWSInput.TYPE)).thenReturn(inputs);
+
+        migration.upgrade();
+
+        verify(notificationService, never()).publishIfFirst(any());
+    }
+
+    @Test
     void doesNotNotifyWithoutKinesisInputs() {
         when(inputService.allByType(AWSInput.TYPE)).thenReturn(List.of());
 
@@ -127,10 +150,13 @@ class V20260929120000_NotifyKinesisSingleTableMigrationTest {
     }
 
     private static Input input(String id, boolean singleTableEnabled) {
+        return input(id, Map.of(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, singleTableEnabled));
+    }
+
+    private static Input input(String id, Map<String, Object> configuration) {
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn(id);
-        when(input.getConfiguration())
-                .thenReturn(Map.of(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, singleTableEnabled));
+        when(input.getConfiguration()).thenReturn(configuration);
         return input;
     }
 }

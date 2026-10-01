@@ -34,9 +34,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Raises a system notification about the optional KCL 3.5 single-table migration when not-yet-migrated Kinesis inputs
- * exist at upgrade time. Only those can still use the legacy three-table DynamoDB layout; inputs created later start
- * on a single table.
+ * Raises a system notification about the optional KCL 3.5 single-table migration when Kinesis inputs without the
+ * migration option enabled exist at upgrade time. Inputs created on 7.2.0 also count, since they don't set the option
+ * even though they already use a single table; the notification text tells users only pre-7.2 inputs need migrating.
  */
 public class V20260929120000_NotifyKinesisSingleTableMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260929120000_NotifyKinesisSingleTableMigration.class);
