@@ -22,8 +22,8 @@ import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton, IfPermitted, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import IndexSetDeletionForm from 'components/indices/IndexSetDeletionForm';
-import { cycleActiveWriteIndex } from 'components/indices/helpers/indexSetMaintenanceActions';
-import RecalculateIndexRangesDialog from 'components/indices/RecalculateIndexRangesDialog';
+import IndexSetMaintenanceDialog from 'components/indices/IndexSetMaintenanceDialog';
+import type { IndexSetMaintenanceAction } from 'components/indices/IndexSetMaintenanceDialog';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -44,7 +44,7 @@ const IndexSetActions = ({ indexSet }: Props) => {
   const sendTelemetry = useSendTelemetry('index-sets');
   const hasMappingPermission = useHasTypeMappingPermission();
   const deletionFormRef = useRef<IndexSetDeletionForm>(null);
-  const [showRecalculateDialog, setShowRecalculateDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<IndexSetMaintenanceAction | null>(null);
 
   const refetchIndexSets = () => queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
@@ -81,11 +81,11 @@ const IndexSetActions = ({ indexSet }: Props) => {
           </MenuItem>
         )}
         <IfPermitted permissions="indexranges:rebuild">
-          <MenuItem onSelect={() => setShowRecalculateDialog(true)}>Recalculate index ranges</MenuItem>
+          <MenuItem onSelect={() => setPendingAction('recalculateIndexRanges')}>Recalculate index ranges</MenuItem>
         </IfPermitted>
         {indexSet.writable && (
           <IfPermitted permissions="deflector:cycle">
-            <MenuItem onSelect={() => cycleActiveWriteIndex(indexSet.id)}>Rotate active write index</MenuItem>
+            <MenuItem onSelect={() => setPendingAction('rotateActiveWriteIndex')}>Rotate active write index</MenuItem>
           </IfPermitted>
         )}
         <IfPermitted permissions={`indexsets:edit:${indexSet.id}`}>
@@ -99,8 +99,12 @@ const IndexSetActions = ({ indexSet }: Props) => {
         </IfPermitted>
       </MoreActions>
       <IndexSetDeletionForm ref={deletionFormRef} indexSet={indexSet} onDelete={onDelete} />
-      {showRecalculateDialog && (
-        <RecalculateIndexRangesDialog indexSetId={indexSet.id} onClose={() => setShowRecalculateDialog(false)} />
+      {pendingAction && (
+        <IndexSetMaintenanceDialog
+          action={pendingAction}
+          indexSetId={indexSet.id}
+          onClose={() => setPendingAction(null)}
+        />
       )}
     </ButtonToolbar>
   );

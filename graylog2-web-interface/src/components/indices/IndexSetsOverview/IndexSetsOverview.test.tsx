@@ -30,7 +30,7 @@ import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/usePr
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 import { setDefaultIndexSet } from 'stores/indices/IndexSetsStore';
-import { recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
+import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
 
 import IndexSetsOverview from './IndexSetsOverview';
 import type { IndexSetEntity } from './types';
@@ -194,6 +194,21 @@ describe('IndexSetsOverview', () => {
     await userEvent.click(screen.getByRole('button', { name: /recalculate/i }));
 
     expect(recalculateIndexRanges).toHaveBeenCalledWith(exampleIndexSet.id);
+  });
+
+  it('rotates the active write index after confirmation', async () => {
+    render(<IndexSetsOverview />);
+
+    await openMoreActions(exampleIndexSet);
+    await userEvent.click(await screen.findByRole('menuitem', { name: /rotate active write index/i }));
+
+    await screen.findByText(/this will manually cycle the current active write index/i);
+
+    expect(cycleActiveWriteIndex).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole('button', { name: /^rotate$/i }));
+
+    expect(cycleActiveWriteIndex).toHaveBeenCalledWith(exampleIndexSet.id);
   });
 
   it('opens the deletion dialog', async () => {

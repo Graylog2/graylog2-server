@@ -25,14 +25,8 @@ export const recalculateIndexRanges = (indexSetId: string) =>
     'Error starting index ranges recalculation',
   );
 
-export const cycleActiveWriteIndex = (indexSetId: string) => {
-  if (
-    // eslint-disable-next-line no-alert
-    window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')
-  ) {
-    defaultOnError(
-      ClusterDeflector.cycleByindexSetId(indexSetId).then(() => SystemDeflector.deflector(indexSetId)),
-      'Cycling deflector failed',
-    );
-  }
-};
+export const cycleActiveWriteIndex = (indexSetId: string) =>
+  defaultOnError(
+    ClusterDeflector.cycleByindexSetId(indexSetId).then(() => SystemDeflector.deflector(indexSetId)),
+    'Cycling deflector failed',
+  );

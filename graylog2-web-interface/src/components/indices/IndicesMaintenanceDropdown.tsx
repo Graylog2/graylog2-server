@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { cycleActiveWriteIndex } from 'components/indices/helpers/indexSetMaintenanceActions';
-import RecalculateIndexRangesDialog from 'components/indices/RecalculateIndexRangesDialog';
+import IndexSetMaintenanceDialog from 'components/indices/IndexSetMaintenanceDialog';
+import type { IndexSetMaintenanceAction } from 'components/indices/IndexSetMaintenanceDialog';
 
 type Props = {
   indexSet: IndexSet;
@@ -34,33 +34,31 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
     (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
   );
 
-  const onCycleDeflector = useCallback(() => cycleActiveWriteIndex(indexSetId), [indexSetId]);
-  const [showRecalculateDialog, setShowRecalculateDialog] = useState(false);
-  const cycleButton = useMemo(
-    () =>
-      indexSet?.writable ? (
-        <MenuItem eventKey="2" onClick={onCycleDeflector}>
-          Rotate active write index
-        </MenuItem>
-      ) : null,
-    [indexSet?.writable, onCycleDeflector],
-  );
+  const [pendingAction, setPendingAction] = useState<IndexSetMaintenanceAction | null>(null);
 
   return (
     <>
       <ButtonGroup>
         <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-          <MenuItem eventKey="1" onClick={() => setShowRecalculateDialog(true)}>
+          <MenuItem eventKey="1" onClick={() => setPendingAction('recalculateIndexRanges')}>
             Recalculate index ranges
           </MenuItem>
-          {cycleButton}
+          {indexSet?.writable && (
+            <MenuItem eventKey="2" onClick={() => setPendingAction('rotateActiveWriteIndex')}>
+              Rotate active write index
+            </MenuItem>
+          )}
           {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
             <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
           )}
         </DropdownButton>
       </ButtonGroup>
-      {showRecalculateDialog && (
-        <RecalculateIndexRangesDialog indexSetId={indexSetId} onClose={() => setShowRecalculateDialog(false)} />
+      {pendingAction && (
+        <IndexSetMaintenanceDialog
+          action={pendingAction}
+          indexSetId={indexSetId}
+          onClose={() => setPendingAction(null)}
+        />
       )}
     </>
   );
