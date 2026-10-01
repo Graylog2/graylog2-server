@@ -18,6 +18,7 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 import AppConfig from 'util/AppConfig';
 
 import type { ExtensionColumnGroups } from './hooks/useIndexSetsOverviewExtensions';
+import type { IndexSetCategory } from './types';
 
 export const INDEX_SET_VIEW_VARIANTS = {
   default: '' as const,
@@ -33,6 +34,14 @@ export const filterCloudHiddenAttributes = <T extends string | { id: string }>(i
     ? items.filter((item) => !CLOUD_HIDDEN_ATTRIBUTES.includes(typeof item === 'string' ? item : item.id))
     : items;
 
+export const CATEGORY_ATTRIBUTE = 'category';
+
+export const INDEX_SET_CATEGORY_TITLES: Record<IndexSetCategory, string> = {
+  user: 'User',
+  illuminate: 'Illuminate',
+  system: 'System',
+};
+
 const SHARED_LAYOUT = {
   entityTableId: 'index-sets',
   defaultPageSize: 20,
@@ -46,7 +55,7 @@ const getIndexSetTableElements = (
   const groupedIds = new Set(extensionColumnGroups.configuration);
   const ungroupedExtensionIds = extensionAttributes.map(({ id }) => id).filter((id) => !groupedIds.has(id));
 
-  const defaultCols = ['title', 'description', 'index_prefix', 'index_template_type', 'creation_date'];
+  const defaultCols = ['title', 'description', 'index_prefix', 'index_template_type', 'stream_count', 'creation_date'];
   const configurationCols = filterCloudHiddenAttributes([
     'title',
     'shards',
@@ -61,6 +70,8 @@ const getIndexSetTableElements = (
     'description',
     'index_prefix',
     'index_template_type',
+    CATEGORY_ATTRIBUTE,
+    'stream_count',
     'shards',
     'replicas',
     'field_type_refresh_interval',
@@ -85,7 +96,6 @@ const getIndexSetTableElements = (
 
   const additionalAttributes: Array<Attribute> = [
     { id: 'field_type_refresh_interval', title: 'Field Type Refresh Interval', sortable: false },
-    { id: 'field_type_profile', title: 'Field Type Profile', sortable: false },
     ...extensionAttributes,
   ];
 

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
-import { render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -30,6 +30,7 @@ import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/usePr
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 import useIndexSetMutations from 'components/indices/IndexSetsOverview/hooks/useIndexSetMutations';
+import useIndexSetCategoryCounts from 'components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts';
 import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
 
 import IndexSetsOverview from './IndexSetsOverview';
@@ -45,12 +46,21 @@ jest.mock('api/streams', () => ({
   fetchStreams: jest.fn(() => Promise.resolve([])),
 }));
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMutations');
+jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts');
 jest.mock('components/indices/IndicesConfiguration', () => ({
   __esModule: true,
   default: ({ indexSet }: { indexSet: IndexSetEntity }) => <span>Rotation and retention of {indexSet.title}</span>,
 }));
 
-const [defaultIndexSet, exampleIndexSet] = indexSets as Array<IndexSetEntity>;
+const [defaultIndexSet, exampleIndexSet] = indexSets.map(
+  (indexSet): IndexSetEntity => ({
+    ...indexSet,
+    id: indexSet.id,
+    category: 'user',
+    can_have_profile: true,
+    stream_count: 0,
+  }),
+);
 const readOnlyIndexSet: IndexSetEntity = {
   ...exampleIndexSet,
   id: 'index-set-id-3',
@@ -59,6 +69,7 @@ const readOnlyIndexSet: IndexSetEntity = {
   writable: false,
   can_be_default: false,
   field_type_profile: 'profile-id-1',
+  stream_count: 12,
 };
 
 const setDefaultIndexSet = jest.fn();
@@ -74,6 +85,19 @@ const attributes = [
   { id: 'index_prefix', title: 'Index prefix', sortable: true },
   { id: 'shards', title: 'Shards', type: 'INT' as const, sortable: true },
   { id: 'replicas', title: 'Replicas', type: 'INT' as const, sortable: true },
+  {
+    id: 'category',
+    title: 'Category',
+    sortable: false,
+    filterable: true,
+    filter_options: [
+      { value: 'user', title: 'User' },
+      { value: 'system', title: 'System' },
+      { value: 'illuminate', title: 'Illuminate' },
+    ],
+  },
+  { id: 'field_type_profile', title: 'Field type profile', sortable: true },
+  { id: 'stream_count', title: 'Streams', type: 'INT' as const, sortable: true },
 ];
 
 const mockIndexSets = (list: Array<IndexSetEntity> = [defaultIndexSet, exampleIndexSet, readOnlyIndexSet]) =>
@@ -83,6 +107,8 @@ const mockIndexSets = (list: Array<IndexSetEntity> = [defaultIndexSet, exampleIn
     isInitialLoading: false,
   });
 
+const lastSearchParams = () => asMock(useFetchEntities).mock.lastCall[0].searchParams;
+
 const findRow = (indexSet: IndexSetEntity) => screen.findByTestId(`table-row-${indexSet.id}`);
 
 const openMoreActions = async (indexSet: IndexSetEntity) =>
@@ -90,6 +116,7 @@ const openMoreActions = async (indexSet: IndexSetEntity) =>
 
 describe('IndexSetsOverview', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { ...layoutPreferences, attributes: undefined },
       isInitialLoading: false,
@@ -103,6 +130,9 @@ describe('IndexSetsOverview', () => {
       isFetching: false,
       refetch: () => {},
     });
+    asMock(useIndexSetCategoryCounts).mockReturnValue({
+      data: { all: 9, user: 5, system: 4, illuminate: 0 },
+    });
     mockIndexSets();
   });
 
@@ -113,6 +143,44 @@ describe('IndexSetsOverview', () => {
     within(await findRow(readOnlyIndexSet)).getByText('Read only');
 
     expect(within(await findRow(exampleIndexSet)).queryByText('Default')).not.toBeInTheDocument();
+  });
+
+  it('shows the number of streams per index set', async () => {
+    render(<IndexSetsOverview />);
+
+    await screen.findByText('Streams');
+    within(await findRow(readOnlyIndexSet)).getByText('12');
+  });
+
+  it('shows the index set count per category', async () => {
+    render(<IndexSetsOverview />);
+
+    await screen.findByRole('button', { name: /^all\s*9/i });
+    await screen.findByRole('button', { name: /^user\s*5/i });
+    await screen.findByRole('button', { name: /^system\s*4/i });
+
+    expect(screen.queryByRole('button', { name: /^illuminate/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the illuminate category when illuminate index sets exist', async () => {
+    asMock(useIndexSetCategoryCounts).mockReturnValue({
+      data: { all: 11, user: 5, system: 4, illuminate: 2 },
+    });
+    render(<IndexSetsOverview />);
+
+    await screen.findByRole('button', { name: /^illuminate\s*2/i });
+  });
+
+  it('filters index sets by category', async () => {
+    render(<IndexSetsOverview />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^user/i }));
+
+    await waitFor(() => expect(lastSearchParams().filters.get('category')).toEqual(['user']));
+
+    await userEvent.click(await screen.findByRole('button', { name: /^all/i }));
+
+    await waitFor(() => expect(lastSearchParams().filters?.get('category')).toBeUndefined());
   });
 
   it('keeps the search placeholder', async () => {
@@ -224,9 +292,23 @@ describe('IndexSetsOverview', () => {
 
     await userEvent.click(await screen.findByRole('radio', { name: 'Configuration' }));
 
-    await screen.findByText('Field Type Profile');
+    expect(await screen.findAllByText('Field type profile')).toHaveLength(1);
     within(await findRow(readOnlyIndexSet)).getByRole('link', { name: 'My Profile' });
     within(await findRow(exampleIndexSet)).getByText('Not set');
+  });
+
+  it('removes configuration columns when switching back to the default view', async () => {
+    render(<IndexSetsOverview />);
+
+    await userEvent.click(await screen.findByRole('radio', { name: 'Configuration' }));
+    await screen.findByText('Field type profile');
+
+    await userEvent.click(await screen.findByRole('radio', { name: 'Default' }));
+
+    await screen.findByText('Description');
+
+    expect(screen.queryByText('Field type profile')).not.toBeInTheDocument();
+    expect(within(await findRow(exampleIndexSet)).queryByText('Not set')).not.toBeInTheDocument();
   });
 
   it('does not load profiles the user may not read', async () => {

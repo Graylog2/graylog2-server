@@ -22,8 +22,8 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import { Timestamp } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 
-import { DETAILS_SECTION } from './Constants';
-import type { IndexSetEntity } from './types';
+import { DETAILS_SECTION, INDEX_SET_CATEGORY_TITLES } from './Constants';
+import type { IndexSetCategory, IndexSetEntity } from './types';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
 
@@ -68,6 +68,21 @@ const customColumnRenderers = (
         <DetailsToggle indexSet={indexSet}>{templateType}</DetailsToggle>
       ),
       width: 0.3,
+    },
+    category: {
+      renderCell: (category: IndexSetCategory, indexSet: IndexSetEntity) => (
+        <DetailsToggle indexSet={indexSet}>{INDEX_SET_CATEGORY_TITLES[category] ?? category}</DetailsToggle>
+      ),
+      staticWidth: 'matchHeader',
+    },
+    stream_count: {
+      renderCell: (streamCount: number, indexSet: IndexSetEntity) => (
+        <DetailsToggle indexSet={indexSet} align="right">
+          {streamCount}
+        </DetailsToggle>
+      ),
+      staticWidth: 'matchHeader',
+      textAlign: 'right',
     },
     shards: {
       renderCell: (shards: number, indexSet: IndexSetEntity) => (
