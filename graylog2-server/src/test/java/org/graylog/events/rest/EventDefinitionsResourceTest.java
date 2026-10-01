@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.model.Filters;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.assertj.core.api.Assertions;
@@ -225,6 +226,23 @@ public class EventDefinitionsResourceTest {
         Assertions.assertThat(predicate.getValue().test(withTags("exfil", "malware"))).isTrue();
         Assertions.assertThat(predicate.getValue().test(withTags("malware"))).isFalse();
         Assertions.assertThat(predicate.getValue().test(withTags())).isFalse();
+    }
+
+    @Test
+    public void getPageSearchesByIdUsingMongoIdField() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        resource.getPage(1, 50, "id:" + definitionId, List.of(), "title", SortOrder.ASCENDING);
+
+        final ArgumentCaptor<Bson> query = ArgumentCaptor.forClass(Bson.class);
+        verify(dbService).searchPaginated(query.capture(), any(), any(), anyInt(), anyInt());
+
+        Assertions.assertThat(query.getValue()).isEqualTo(
+                Filters.and(Filters.and(Filters.or(Filters.eq("_id", new ObjectId(definitionId))))));
     }
 
     static EventDefinitionDto withTags(String... tags) {
