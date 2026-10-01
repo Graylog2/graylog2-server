@@ -29,7 +29,7 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
-import { setDefaultIndexSet } from 'stores/indices/IndexSetsStore';
+import useIndexSetMutations from 'components/indices/IndexSetsOverview/hooks/useIndexSetMutations';
 import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
 
 import IndexSetsOverview from './IndexSetsOverview';
@@ -44,11 +44,7 @@ jest.mock('api/streams', () => ({
   ...jest.requireActual('api/streams'),
   fetchStreams: jest.fn(() => Promise.resolve([])),
 }));
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  ...jest.requireActual('stores/indices/IndexSetsStore'),
-  setDefaultIndexSet: jest.fn(() => Promise.resolve()),
-  deleteIndexSet: jest.fn(() => Promise.resolve()),
-}));
+jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMutations');
 jest.mock('components/indices/IndicesConfiguration', () => ({
   __esModule: true,
   default: ({ indexSet }: { indexSet: IndexSetEntity }) => <span>Rotation and retention of {indexSet.title}</span>,
@@ -64,6 +60,8 @@ const readOnlyIndexSet: IndexSetEntity = {
   can_be_default: false,
   field_type_profile: 'profile-id-1',
 };
+
+const setDefaultIndexSet = jest.fn();
 
 const restrictedUser = adminUser
   .toBuilder()
@@ -98,6 +96,7 @@ describe('IndexSetsOverview', () => {
       refetch: () => {},
     });
     asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useIndexSetMutations).mockReturnValue({ setDefaultIndexSet, deleteIndexSet: jest.fn() });
     asMock(useProfile).mockReturnValue({
       data: { id: 'profile-id-1', name: 'My Profile', description: null, customFieldMappings: [], indexSetIds: [] },
       isFetched: true,

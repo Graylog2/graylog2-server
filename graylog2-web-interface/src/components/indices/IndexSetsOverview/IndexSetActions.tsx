@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton, IfPermitted, LinkContainer } from 'components/common';
@@ -29,31 +28,29 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
-import { deleteIndexSet, setDefaultIndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-import { KEY_PREFIX } from './fetchIndexSets';
+import useIndexSetMutations from './hooks/useIndexSetMutations';
+import type { IndexSetEntity } from './types';
 
 type Props = {
-  indexSet: IndexSet;
+  indexSet: IndexSetEntity;
 };
 
 const IndexSetActions = ({ indexSet }: Props) => {
-  const queryClient = useQueryClient();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry('index-sets');
   const hasMappingPermission = useHasTypeMappingPermission();
+  const { setDefaultIndexSet, deleteIndexSet } = useIndexSetMutations();
   const deletionFormRef = useRef<IndexSetDeletionForm>(null);
   const [pendingAction, setPendingAction] = useState<IndexSetMaintenanceAction | null>(null);
-
-  const refetchIndexSets = () => queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
   const onSetDefault = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DEFAULT_SET, {
       app_action_value: 'set-default-index-set',
     });
 
-    setDefaultIndexSet(indexSet).then(refetchIndexSets, () => {});
+    setDefaultIndexSet(indexSet);
   };
 
   const onDelete = (_indexSet: IndexSet, deleteIndices: boolean) => {
@@ -61,7 +58,7 @@ const IndexSetActions = ({ indexSet }: Props) => {
       app_action_value: 'delete-index-set',
     });
 
-    deleteIndexSet(indexSet, deleteIndices).then(refetchIndexSets, () => {});
+    deleteIndexSet({ indexSet, deleteIndices });
   };
 
   return (

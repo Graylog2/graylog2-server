@@ -143,39 +143,3 @@ export const updateIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
     },
   );
 };
-
-export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
-
-  return fetch('DELETE', url).then(
-    () => {
-      UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
-    },
-    (error) => {
-      UserNotification.error(
-        `Deleting index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
-        'Could not delete index set.',
-      );
-
-      throw error;
-    },
-  );
-};
-
-export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
-
-  return fetch('PUT', url).then(
-    () => {
-      UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
-    },
-    (error) => {
-      UserNotification.error(
-        `Setting index set '${indexSet.title}' as default failed with status: ${_errorMessage(error)}`,
-        'Could not set default index set.',
-      );
-
-      throw error;
-    },
-  );
-};
