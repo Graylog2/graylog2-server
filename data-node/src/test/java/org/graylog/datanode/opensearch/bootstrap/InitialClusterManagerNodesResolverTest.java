@@ -58,7 +58,17 @@ class InitialClusterManagerNodesResolverTest {
         when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
 
         assertThat(resolver.resolve(dataDir)).hasValue("node1,node2");
+        verify(bootstrapService).registerExplicitBootstrap("node1,node2");
         verify(bootstrapService, never()).claimBootstrap();
+    }
+
+    @Test
+    void explicitConfigurationOfFormedNodeIsNotRegistered(@TempDir Path dataDir) throws IOException {
+        when(configuration.getInitialClusterManagerNodes()).thenReturn("node1,node2");
+        Files.createDirectories(dataDir.resolve("nodes").resolve("0").resolve("_state"));
+
+        assertThat(resolver.resolve(dataDir)).hasValue("node1,node2");
+        verify(bootstrapService, never()).registerExplicitBootstrap("node1,node2");
     }
 
     @Test

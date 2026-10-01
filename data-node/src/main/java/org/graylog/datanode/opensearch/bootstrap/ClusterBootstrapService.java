@@ -71,6 +71,7 @@ public class ClusterBootstrapService {
     static final String FIELD_HOSTNAME = "hostname";
     static final String FIELD_CLAIMED_AT = "claimed_at";
     static final String FIELD_CLUSTER_UUID = "cluster_uuid";
+    static final String FIELD_INITIAL_CLUSTER_MANAGER_NODES = "initial_cluster_manager_nodes";
 
     /**
      * Opensearch reports this UUID until a cluster has been formed
@@ -135,7 +136,7 @@ public class ClusterBootstrapService {
                 LOG.info("Other data nodes are already available, joining their cluster instead of bootstrapping a new one");
                 return false;
             }
-            if (insertClaim()) {
+            if (insertClaim(claimUpdate())) {
                 LOG.info("This data node claimed the bootstrap of a new opensearch cluster");
                 return true;
             }
@@ -150,6 +151,14 @@ public class ClusterBootstrapService {
             return false;
         }
 
+        final String explicitManagerNodes = claim.getString(FIELD_INITIAL_CLUSTER_MANAGER_NODES);
+        if (explicitManagerNodes != null) {
+            // explicitly configured bootstraps never expire, opensearch on these nodes bootstraps regardless of any claim
+            LOG.info("Data node {} ({}) bootstraps the opensearch cluster with explicitly configured initial_cluster_manager_nodes {}, joining it",
+                    claim.getString(FIELD_NODE_ID), claim.getString(FIELD_HOSTNAME), explicitManagerNodes);
+            return false;
+        }
+
         if (isClaimedByThisNode(claim)) {
             // restart before the cluster has been formed, refresh the claim unless it has been taken over or the cluster formed meanwhile
             if (refreshClaim(eq(FIELD_NODE_ID, nodeId.getNodeId()))) {
@@ -160,6 +169,24 @@ public class ClusterBootstrapService {
         }
 
         return takeOverIfClaimantGone(claim);
+    }
+
+    /**
+     * Registers the bootstrap of a node with explicitly configured {@code initial_cluster_manager_nodes}. Opensearch on
+     * such a node bootstraps the cluster on its own, the claim only makes sure that no other node bootstraps a separate one.
+     */
+    public synchronized void registerExplicitBootstrap(String initialClusterManagerNodes) {
+        if (insertClaim(combine(claimUpdate(), set(FIELD_INITIAL_CLUSTER_MANAGER_NODES, initialClusterManagerNodes)))) {
+            LOG.info("Registered the opensearch cluster bootstrap with explicitly configured initial_cluster_manager_nodes {}", initialClusterManagerNodes);
+            return;
+        }
+
+        final Document claim = collection.find(eq(FIELD_ID, BOOTSTRAP_ID)).first();
+        if (claim != null && claim.getString(FIELD_CLUSTER_UUID) == null && claim.getString(FIELD_INITIAL_CLUSTER_MANAGER_NODES) == null) {
+            LOG.warn("Data node {} ({}) is bootstrapping the opensearch cluster automatically, but this node bootstraps with explicitly configured " +
+                            "initial_cluster_manager_nodes {}. They may form separate clusters. Configure initial_cluster_manager_nodes on all data nodes or on none of them.",
+                    claim.getString(FIELD_NODE_ID), claim.getString(FIELD_HOSTNAME), initialClusterManagerNodes);
+        }
     }
 
     /**
@@ -214,14 +241,14 @@ public class ClusterBootstrapService {
     }
 
     /**
-     * @return true if the claim has been created, false if another node created it first
+     * @return true if the claim has been created, false if another node created it first or the cluster has been formed
      */
-    private boolean insertClaim() {
+    private boolean insertClaim(Bson update) {
         try {
-            // the node_id condition never matches an existing claim of another node, the upsert fails on the duplicate _id instead
+            // the conditions never match a claim of another node or a formed cluster, the upsert fails on the duplicate _id instead
             collection.updateOne(
-                    and(eq(FIELD_ID, BOOTSTRAP_ID), eq(FIELD_NODE_ID, nodeId.getNodeId())),
-                    claimUpdate(),
+                    and(eq(FIELD_ID, BOOTSTRAP_ID), eq(FIELD_NODE_ID, nodeId.getNodeId()), eq(FIELD_CLUSTER_UUID, null)),
+                    update,
                     new UpdateOptions().upsert(true));
             return true;
         } catch (MongoException e) {

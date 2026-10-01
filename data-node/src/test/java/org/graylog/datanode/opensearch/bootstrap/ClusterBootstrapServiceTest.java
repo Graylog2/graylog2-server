@@ -168,6 +168,44 @@ class ClusterBootstrapServiceTest {
     }
 
     @Test
+    void explicitBootstrapIsJoinedAndNeverTakenOver() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        node1.registerExplicitBootstrap("node1,node2");
+        // nodes with the same explicit configuration don't overwrite the first registration
+        service("node2", GRACE_PERIOD).registerExplicitBootstrap("node1,node2");
+
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node1");
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_INITIAL_CLUSTER_MANAGER_NODES)).isEqualTo("node1,node2");
+
+        // explicit registrations are never renewed, but never expire either
+        assertThat(service("node3", EXPIRED_GRACE_PERIOD).claimBootstrap()).isFalse();
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node1");
+
+        node1.recordClusterUuid("cluster-a");
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_CLUSTER_UUID)).isEqualTo("cluster-a");
+    }
+
+    @Test
+    void explicitBootstrapDoesNotReplaceAutomaticClaim() throws Exception {
+        assertThat(service("node1", GRACE_PERIOD).claimBootstrap()).isTrue();
+
+        // too late, node1 already bootstraps on its own, only a warning is logged
+        service("node2", GRACE_PERIOD).registerExplicitBootstrap("node2,node3");
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_NODE_ID)).isEqualTo("node1");
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_INITIAL_CLUSTER_MANAGER_NODES)).isNull();
+    }
+
+    @Test
+    void explicitBootstrapDoesNotChangeFormedCluster() throws Exception {
+        final ClusterBootstrapService node1 = service("node1", GRACE_PERIOD);
+        assertThat(node1.claimBootstrap()).isTrue();
+        node1.recordClusterUuid("cluster-a");
+
+        node1.registerExplicitBootstrap("node1,node2");
+        assertThat(bootstrapDocument().getString(ClusterBootstrapService.FIELD_INITIAL_CLUSTER_MANAGER_NODES)).isNull();
+    }
+
+    @Test
     void noBootstrapAfterClusterFormed() throws Exception {
         final ClusterBootstrapService node1 = service("node1", EXPIRED_GRACE_PERIOD);
         assertThat(node1.claimBootstrap()).isTrue();

@@ -33,8 +33,8 @@ import java.util.stream.Stream;
 
 /**
  * Resolves the value of {@code cluster.initial_cluster_manager_nodes}. The setting is used by opensearch only
- * when a new cluster is bootstrapped. It's set only on the one node that claimed the bootstrap, all other nodes
- * leave it empty and join the cluster via discovery.
+ * when a new cluster is bootstrapped. Unless configured explicitly, it's set only on the one node that claimed the
+ * bootstrap, all other nodes leave it empty and join the cluster via discovery.
  */
 public class InitialClusterManagerNodesResolver {
 
@@ -51,17 +51,21 @@ public class InitialClusterManagerNodesResolver {
 
     public Optional<String> resolve(Path opensearchDataDir) {
         final String configured = localConfiguration.getInitialClusterManagerNodes();
-        if (configured != null && !configured.isBlank()) {
-            return Optional.of(configured);
-        }
+        final boolean explicitlyConfigured = configured != null && !configured.isBlank();
 
         if (!OpensearchCommonConfigurationBean.getNodeRoles(localConfiguration).contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
-            return Optional.empty();
+            return explicitlyConfigured ? Optional.of(configured) : Optional.empty();
         }
 
         if (hasClusterState(opensearchDataDir)) {
             LOG.debug("Opensearch data directory {} contains cluster state, no cluster bootstrap needed", opensearchDataDir);
-            return Optional.empty();
+            return explicitlyConfigured ? Optional.of(configured) : Optional.empty();
+        }
+
+        if (explicitlyConfigured) {
+            // keeps nodes without explicit configuration from bootstrapping a separate cluster
+            clusterBootstrapService.registerExplicitBootstrap(configured);
+            return Optional.of(configured);
         }
 
         if (clusterBootstrapService.claimBootstrap()) {
