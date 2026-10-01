@@ -117,7 +117,7 @@
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <caffeine.version>3.3.0</caffeine.version>
-        <classgraph.version>4.8.195</classgraph.version>
+        <classgraph.version>4.8.196</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -129,18 +129,24 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <gcs.version>2.73.0</gcs.version>
+        <gcs.version>2.74.0</gcs.version>
         <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
-        <azure-core.version>1.59.0</azure-core.version>
+        <azure-core.version>1.59.1</azure-core.version>
         <azure-json.version>1.5.1</azure-json.version>
         <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
-        <google-api-common.version>2.68.0</google-api-common.version>
-        <google-auth-library.version>1.52.0</google-auth-library.version>
-        <google-cloud-core.version>2.75.0</google-cloud-core.version>
+        <google-api-client.version>2.9.1</google-api-client.version>
+        <google-api-common.version>2.69.0</google-api-common.version>
+        <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
+        <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
+        <google-auth-library.version>1.53.0</google-auth-library.version>
+        <google-oauth-client.version>1.39.0</google-oauth-client.version>
+        <google-cloud-bigquery.version>2.72.0</google-cloud-bigquery.version>
+        <google-cloud-core.version>2.76.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.39.0</google-cloud-logging.version>
         <google-conscrypt.version>2.7.0</google-conscrypt.version>
-        <google-gax.version>2.85.0</google-gax.version>
+        <google-gax.version>2.86.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -182,24 +188,24 @@
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
         <lucene.version>10.5.1</lucene.version>
-        <lz4.version>1.11.2</lz4.version>
+        <lz4.version>1.12.0</lz4.version>
         <metrics.version>4.2.40</metrics.version>
         <mongodb-driver.version>5.12.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.17.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.81.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.2.18.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.84.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.65.0</opentelemetry.version>
+        <opentelemetry.version>1.66.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.31.1</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.44.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <proto-google-common-protos.version>2.76.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.71.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.77.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.72.0</proto-google-iam-v1.version>
         <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
@@ -209,7 +215,7 @@
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>7.6.1</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
-        <slf4j.version>2.0.19</slf4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
         <swagger.version>2.2.55</swagger.version>
         <swagger-parser.version>2.1.48</swagger-parser.version>
@@ -219,7 +225,7 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-18</zstd.version>
+        <zstd.version>1.5.7-19</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -238,11 +244,11 @@
         <equalsverifier.version>4.5.2</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.1.3</junit-jupiter.version>
-        <mockito.version>5.23.0</mockito.version>
+        <mockito.version>5.24.0</mockito.version>
         <restassured.version>6.0.1</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.3.4.1</graalvm.version>
+        <graalvm.version>25.4.4.1.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
@@ -472,6 +478,39 @@
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-gson</artifactId>
                 <version>${google-http-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.oauth-client</groupId>
+                <artifactId>google-oauth-client</artifactId>
+                <version>${google-oauth-client.version}</version>
+            </dependency>
+            <!-- Google libraries that are only used by the enterprise plugin. Their versions
+                 are managed here so dependabot can bump them together with the shared
+                 Google libraries above in a single pull request. -->
+            <dependency>
+                <groupId>com.google.api-client</groupId>
+                <artifactId>google-api-client</artifactId>
+                <version>${google-api-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-admin-reports</artifactId>
+                <version>${google-api-services-admin-reports.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-compute</artifactId>
+                <version>${google-api-services-compute.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-bigquery</artifactId>
+                <version>${google-cloud-bigquery.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-logging</artifactId>
+                <version>${google-cloud-logging.version}</version>
             </dependency>
             <!-- io.grpc:grpc-* and google-cloud-* both depend on conscrypt.
                  the grpc libs sometimes lag behind but are the nearest
@@ -892,7 +931,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -937,7 +976,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.10</version>
+                    <version>3.11</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
