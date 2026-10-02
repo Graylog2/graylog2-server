@@ -42,7 +42,6 @@ import org.graylog2.streams.StreamService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -150,8 +149,8 @@ public class MongoIndexSetService implements IndexSetService {
 
     @Override
     public List<IndexSetConfig> searchByTitle(String searchString) {
-        String formatedSearchString = String.format(Locale.getDefault(), ".*%s.*", searchString);
-        Pattern searchPattern = Pattern.compile(formatedSearchString, Pattern.CASE_INSENSITIVE);
+        // Quote the input: it is a literal search term, not a regular expression.
+        final Pattern searchPattern = Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE);
 
         return ImmutableList.copyOf(collection.find(Filters.regex(FIELD_TITLE, searchPattern))
                 .sort(Sorts.ascending(FIELD_TITLE)));

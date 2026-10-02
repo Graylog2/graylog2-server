@@ -75,6 +75,9 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
 
     private Map<String, String> commonOpensearchConfig(OpensearchConfigurationParams buildParams) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+        // Note: this currently has no effect. OpensearchClusterConfigurationBean is merged after this bean and always
+        // overwrites network.host with bind_address. And even if it survived, network.host is only OpenSearch's fallback
+        // for network.bind_host and network.publish_host, which are both set explicitly.
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", buildParams.datanodeConfiguration().datanodeDirectories().getDataTargetDir().toString());
