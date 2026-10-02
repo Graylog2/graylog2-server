@@ -22,6 +22,7 @@ import { usePluginExports } from 'views/test/testPlugins';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
+import { asMock } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
 import { prefixUrl } from 'routing/Routes';
 
@@ -71,10 +72,6 @@ describe('useNavItems entity creators', () => {
 
   usePluginExports(entityCreators);
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   const creatorTitles = () => {
     const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
 
@@ -82,20 +79,117 @@ describe('useNavItems entity creators', () => {
   };
 
   it('offers entity creators without a required feature flag', () => {
-    jest.spyOn(AppConfig, 'isFeatureEnabled').mockReturnValue(false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
 
     expect(creatorTitles()).toContain('Create widget');
   });
 
   it('offers entity creators whose required feature flag is enabled', () => {
-    jest.spyOn(AppConfig, 'isFeatureEnabled').mockImplementation((feature) => feature === 'gadgets');
+    asMock(AppConfig.isFeatureEnabled).mockImplementation((feature) => feature === 'gadgets');
 
     expect(creatorTitles()).toContain('Create gadget');
   });
 
   it('hides entity creators whose required feature flag is disabled', () => {
-    jest.spyOn(AppConfig, 'isFeatureEnabled').mockReturnValue(false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
 
     expect(creatorTitles()).not.toContain('Create gadget');
+  });
+});
+
+describe('useNavItems main navigation', () => {
+  const navigation: PluginExports = {
+    navigation: [
+      { description: 'Plain link', path: prefixUrl('/plain') },
+      { description: 'Flagged link', path: prefixUrl('/flagged'), requiredFeatureFlag: 'links' },
+      {
+        description: 'Menu',
+        children: [
+          { description: 'Plain child', path: prefixUrl('/menu/plain') },
+          { description: 'Flagged child', path: prefixUrl('/menu/flagged'), requiredFeatureFlag: 'children' },
+        ],
+      },
+      {
+        description: 'Flagged menu',
+        requiredFeatureFlag: 'menus',
+        children: [{ description: 'Child', path: prefixUrl('/flagged-menu/child') }],
+      },
+    ],
+  };
+
+  usePluginExports(navigation);
+
+  const navigationTitles = () => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+    return result.current.map(({ title }) => title);
+  };
+
+  it('offers navigation items without a required feature flag', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+
+    expect(navigationTitles()).toEqual(expect.arrayContaining(['Plain link', 'Menu / Plain child']));
+  });
+
+  it('offers navigation items whose required feature flag is enabled', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
+
+    expect(navigationTitles()).toEqual(
+      expect.arrayContaining(['Flagged link', 'Menu / Flagged child', 'Flagged menu / Child']),
+    );
+  });
+
+  it('hides navigation items whose required feature flag is disabled', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+
+    const titles = navigationTitles();
+
+    expect(titles).not.toContain('Flagged link');
+    expect(titles).not.toContain('Menu / Flagged child');
+  });
+
+  it('hides the children of a dropdown whose required feature flag is disabled', () => {
+    asMock(AppConfig.isFeatureEnabled).mockImplementation((feature) => feature !== 'menus');
+
+    expect(navigationTitles()).not.toContain('Flagged menu / Child');
+  });
+});
+
+describe('useNavItems page navigation', () => {
+  // The first page of a group is the group's own page and is never offered on its own.
+  const pageNavigation: PluginExports = {
+    pageNavigation: [
+      {
+        description: 'Group',
+        children: [
+          { description: 'Overview', path: prefixUrl('/group') },
+          { description: 'Plain page', path: prefixUrl('/group/plain') },
+          { description: 'Flagged page', path: prefixUrl('/group/flagged'), requiredFeatureFlag: 'pages' },
+        ],
+      },
+    ],
+  };
+
+  usePluginExports(pageNavigation);
+
+  const pageTitles = () => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+    return result.current.map(({ title }) => title);
+  };
+
+  it('offers pages whose required feature flag is enabled', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
+
+    expect(pageTitles()).toEqual(expect.arrayContaining(['Group / Plain page', 'Group / Flagged page']));
+  });
+
+  it('hides pages whose required feature flag is disabled', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+
+    const titles = pageTitles();
+
+    expect(titles).toContain('Group / Plain page');
+    expect(titles).not.toContain('Group / Flagged page');
   });
 });

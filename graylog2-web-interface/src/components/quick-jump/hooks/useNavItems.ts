@@ -158,14 +158,19 @@ const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const navigationItems = usePluginEntities('navigation');
 
-  const allNavigationItems = navigationItems.flatMap((item) =>
-    'children' in item
-      ? item.children.map<BaseNavigationItem>((child) => ({
-          ...child,
-          description: `${item.description} / ${child.description}`,
-        }))
-      : [item],
-  );
+  // A dropdown's feature flag also applies to its children.
+  const allNavigationItems = navigationItems
+    .filter((item) => isFeatureEnabled(item.requiredFeatureFlag))
+    .flatMap((item) =>
+      'children' in item
+        ? item.children
+            .filter((child) => isFeatureEnabled(child.requiredFeatureFlag))
+            .map<BaseNavigationItem>((child) => ({
+              ...child,
+              description: `${item.description} / ${child.description}`,
+            }))
+        : [item],
+    );
 
   return allNavigationItems
     .filter((item) => isPermitted(item.permissions))
