@@ -6,7 +6,6 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 
 - ESLint (`eslint-config-graylog`, based on [Airbnb](https://github.com/airbnb/javascript)) and Stylelint (`stylelint-config-graylog`) are authoritative for code style and patterns.
 - Fix visible ESLint warnings in files you touch.
-- Use ES6 modules (`import`/`export`), not CommonJS `require`.
 
 ## Naming
 
@@ -28,7 +27,6 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - Use styled-components, Mantine, and the local component abstractions.
 - Reuse shared components before creating new ones. Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components.
 - Shared components live in `src/components/common`. Wrapped Mantine components live in `src/components/common/bootstrap`.
-- We wrap react-bootstrap components in our own wrappers, importable from `components/graylog`. Always use these wrappers instead of importing react-bootstrap directly.
 - For common UI patterns, prefer existing shared UI components from `components/graylog` and `components/common` over native HTML elements.
 
 ## Type Definitions
@@ -36,7 +34,6 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 ### Component Props
 
 - **No PropTypes** — support was dropped with React 19. Use TypeScript types for props.
-- Use **default parameters** instead of `defaultProps` in functional components. See the [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide).
 - For the main exported component in a file, name the component props type `Props` and place it directly above the component.
 - When typing components with children, prefer `React.PropsWithChildren` over adding a `children` field to the props type directly.
 
@@ -46,7 +43,7 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - Avoid redundant function type annotations when the expected type is already inferred from usage, such as callbacks passed to typed component props.
 - Avoid explicit function return types when TypeScript can infer them clearly.
 - Exception: for exported hooks that wrap `react-query`, prefer explicitly typing the hook's public return shape to the fields our code actually uses instead of exposing the full `useQuery` result type. This makes the contract clearer and keeps tests easier to mock.
-- Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
+- Give unused parameters a meaningful name after the underscore (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
 - Do not leave out types for function arguments (therefore being implicitly `any`), use proper types.
 - Do not use `as unknown as <...>` to opt out of type-checking.
