@@ -27,12 +27,19 @@ import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
+const isFeatureEnabled = (featureFlag?: string) => {
+  if (!featureFlag) return true;
+
+  return AppConfig.isFeatureEnabled(featureFlag);
+};
+
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
   const entityCreators = usePluginEntities('entityCreators');
 
   return entityCreators
     .filter((creator) => (creator.permissions ? isPermitted(creator.permissions) : true))
+    .filter((creator) => isFeatureEnabled(creator.requiredFeatureFlag))
     .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
 };
 
@@ -139,12 +146,6 @@ const useHelpMenuItems = () => {
 
       throw Error('Help menu item must have either external link or action defined');
     });
-};
-
-const isFeatureEnabled = (featureFlag?: string) => {
-  if (!featureFlag) return true;
-
-  return AppConfig.isFeatureEnabled(featureFlag);
 };
 
 type BaseNavigationItem = {

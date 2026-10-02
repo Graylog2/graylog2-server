@@ -238,6 +238,8 @@ declare module 'graylog-web-plugin/plugin' {
     path: QualifiedUrl<string>;
     permissions?: Permissions;
     telemetryEvent?: CreatorTelemetryEvent;
+    /** Only offer the creator while this feature flag is enabled. */
+    requiredFeatureFlag?: string;
   }
 
   interface EntityActions {

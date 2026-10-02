@@ -22,6 +22,8 @@ import { usePluginExports } from 'views/test/testPlugins';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
+import AppConfig from 'util/AppConfig';
+import { prefixUrl } from 'routing/Routes';
 
 import useNavItems from './useNavItems';
 
@@ -51,5 +53,49 @@ describe('useNavItems', () => {
   it('handles help menu items with `path`', () => {
     const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
     expect(result.current).toContainEqual({ 'link': '/path', 'title': 'Test Item', 'type': 'page' });
+  });
+});
+
+describe('useNavItems entity creators', () => {
+  const entityCreators: PluginExports = {
+    entityCreators: [
+      { id: 'Widget', title: 'Create widget', path: prefixUrl('/widgets/new') },
+      {
+        id: 'Gadget',
+        title: 'Create gadget',
+        path: prefixUrl('/gadgets/new'),
+        requiredFeatureFlag: 'gadgets',
+      },
+    ],
+  };
+
+  usePluginExports(entityCreators);
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const creatorTitles = () => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+    return result.current.map(({ title }) => title);
+  };
+
+  it('offers entity creators without a required feature flag', () => {
+    jest.spyOn(AppConfig, 'isFeatureEnabled').mockReturnValue(false);
+
+    expect(creatorTitles()).toContain('Create widget');
+  });
+
+  it('offers entity creators whose required feature flag is enabled', () => {
+    jest.spyOn(AppConfig, 'isFeatureEnabled').mockImplementation((feature) => feature === 'gadgets');
+
+    expect(creatorTitles()).toContain('Create gadget');
+  });
+
+  it('hides entity creators whose required feature flag is disabled', () => {
+    jest.spyOn(AppConfig, 'isFeatureEnabled').mockReturnValue(false);
+
+    expect(creatorTitles()).not.toContain('Create gadget');
   });
 });
