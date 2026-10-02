@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeMetricsCollector {
@@ -41,6 +42,7 @@ public class NodeMetricsCollector {
 
     private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
+    private final CgroupV2Reader cgroupV2Reader;
     private final Map<String, CpuSample> lastCpuSamples = new ConcurrentHashMap<>();
     Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
@@ -55,8 +57,13 @@ public class NodeMetricsCollector {
     }
 
     public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
+        this(client, objectMapper, new CgroupV2Reader());
+    }
+
+    NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper, CgroupV2Reader cgroupV2Reader) {
         this.client = client;
         this.objectMapper = objectMapper;
+        this.cgroupV2Reader = cgroupV2Reader;
     }
 
     public OfficialOpensearchClient getClient() {
@@ -97,66 +104,83 @@ public class NodeMetricsCollector {
     }
 
     private void applyCgroupMemoryMetrics(DocumentContext nodeContext, Map<String, Object> metrics) {
+        // OpenSearch only reports cgroup v1 stats, so cgroup v2 has to be read directly. OpenSearch is running in
+        // the same container as the Data Node, so this is the container's memory.
+        final Optional<CgroupV2Reader.CgroupMemory> cgroupV2Memory = cgroupV2Reader.readMemory();
+        if (cgroupV2Memory.isPresent()) {
+            final CgroupV2Reader.CgroupMemory memory = cgroupV2Memory.get();
+            applyContainerMemory(metrics, memory.usedBytes(), memory.limitBytes().orElse(-1L));
+            return;
+        }
         try {
-            final Object rawLimit = nodeContext.read("$.os.cgroup.memory.limit_in_bytes");
-            final Object rawUsage = nodeContext.read("$.os.cgroup.memory.usage_in_bytes");
-            final long limitBytes = parseCgroupLong(rawLimit);
-            final long usedBytes = parseCgroupLong(rawUsage);
-            if (usedBytes < 0) {
-                return;
-            }
-            // Without a container memory limit (cgroup v2 reports "max"), the host memory is the effective limit,
-            // but the usage still has to be the container's and not the host's.
-            final long totalBytes = (limitBytes > 0 && limitBytes < CGROUP_UNLIMITED_THRESHOLD)
-                    ? limitBytes
-                    : parseCgroupLong(metrics.get(NodeStatMetrics.MEM_TOTAL.getFieldName()));
-            if (totalBytes <= 0) {
-                return;
-            }
-            final long freeBytes = Math.max(0L, totalBytes - usedBytes);
-            final int usedPercent = (int) Math.min(100L, Math.max(0L, Math.round((double) usedBytes / totalBytes * 100.0)));
-            metrics.put(NodeStatMetrics.MEM_TOTAL.getFieldName(), totalBytes);
-            metrics.put(NodeStatMetrics.MEM_TOTAL_USED_BYTES.getFieldName(), usedBytes);
-            metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
-            metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
+            final long limitBytes = parseCgroupLong(nodeContext.read("$.os.cgroup.memory.limit_in_bytes"));
+            final long usedBytes = parseCgroupLong(nodeContext.read("$.os.cgroup.memory.usage_in_bytes"));
+            applyContainerMemory(metrics, usedBytes, limitBytes);
         } catch (Exception e) {
             log.debug("Cgroup memory metrics not available: {}", e.getMessage());
         }
     }
 
+    private void applyContainerMemory(Map<String, Object> metrics, long usedBytes, long limitBytes) {
+        if (usedBytes < 0) {
+            return;
+        }
+        // Without a container memory limit, the host memory is the effective limit, but the usage still has to be
+        // the container's and not the host's.
+        final long totalBytes = (limitBytes > 0 && limitBytes < CGROUP_UNLIMITED_THRESHOLD)
+                ? limitBytes
+                : parseCgroupLong(metrics.get(NodeStatMetrics.MEM_TOTAL.getFieldName()));
+        if (totalBytes <= 0) {
+            return;
+        }
+        final long freeBytes = Math.max(0L, totalBytes - usedBytes);
+        final int usedPercent = (int) Math.min(100L, Math.max(0L, Math.round((double) usedBytes / totalBytes * 100.0)));
+        metrics.put(NodeStatMetrics.MEM_TOTAL.getFieldName(), totalBytes);
+        metrics.put(NodeStatMetrics.MEM_TOTAL_USED_BYTES.getFieldName(), usedBytes);
+        metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
+        metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
+    }
+
     private void applyCgroupCpuMetrics(DocumentContext nodeContext, Map<String, Object> metrics, String node) {
+        // OpenSearch only reports cgroup v1 stats, so cgroup v2 has to be read directly (see applyCgroupMemoryMetrics)
+        final Optional<CgroupV2Reader.CgroupCpu> cgroupV2Cpu = cgroupV2Reader.readCpu();
+        if (cgroupV2Cpu.isPresent()) {
+            final CgroupV2Reader.CgroupCpu cpu = cgroupV2Cpu.get();
+            applyContainerCpu(metrics, node, cpu.usageNanos(), cpu.timestampMillis(),
+                    cpu.cpuLimit().orElseGet(() -> Runtime.getRuntime().availableProcessors()));
+            return;
+        }
         try {
             final Object rawUsageNanos = nodeContext.read("$.os.cgroup.cpuacct.usage_nanos");
             final Object rawTimestamp = nodeContext.read("$.os.timestamp");
             if (rawUsageNanos == null || rawTimestamp == null) {
                 return;
             }
-            final long usageNanos = parseCgroupLong(rawUsageNanos);
-            final long timestampMillis = parseCgroupLong(rawTimestamp);
-            if (usageNanos <= 0 || timestampMillis <= 0) {
-                return;
-            }
-
-            final CpuSample prev = lastCpuSamples.get(node);
-            lastCpuSamples.put(node, new CpuSample(timestampMillis, usageNanos));
-
-            if (prev == null) {
-                return;
-            }
-
-            final long deltaUsageNanos = usageNanos - prev.usageNanos;
-            final long deltaTimeNanos = (timestampMillis - prev.timestampMillis) * 1_000_000L;
-
-            if (deltaUsageNanos >= 0 && deltaTimeNanos > 0) {
-                final double effectiveCpus = determineEffectiveCpus(nodeContext);
-                if (effectiveCpus > 0) {
-                    final double cpuPercent = (double) deltaUsageNanos / (deltaTimeNanos * effectiveCpus) * 100.0;
-                    final int roundedCpuPercent = (int) Math.min(100L, Math.max(0L, Math.round(cpuPercent)));
-                    metrics.put(NodeStatMetrics.CPU_PERCENT.getFieldName(), roundedCpuPercent);
-                }
-            }
+            applyContainerCpu(metrics, node, parseCgroupLong(rawUsageNanos), parseCgroupLong(rawTimestamp), determineEffectiveCpus(nodeContext));
         } catch (Exception e) {
             log.debug("Cgroup CPU metrics not available for node {}: {}", node, e.getMessage());
+        }
+    }
+
+    private void applyContainerCpu(Map<String, Object> metrics, String node, long usageNanos, long timestampMillis, double effectiveCpus) {
+        if (usageNanos <= 0 || timestampMillis <= 0) {
+            return;
+        }
+
+        final CpuSample prev = lastCpuSamples.get(node);
+        lastCpuSamples.put(node, new CpuSample(timestampMillis, usageNanos));
+
+        if (prev == null) {
+            return;
+        }
+
+        final long deltaUsageNanos = usageNanos - prev.usageNanos;
+        final long deltaTimeNanos = (timestampMillis - prev.timestampMillis) * 1_000_000L;
+
+        if (deltaUsageNanos >= 0 && deltaTimeNanos > 0 && effectiveCpus > 0) {
+            final double cpuPercent = (double) deltaUsageNanos / (deltaTimeNanos * effectiveCpus) * 100.0;
+            final int roundedCpuPercent = (int) Math.min(100L, Math.max(0L, Math.round(cpuPercent)));
+            metrics.put(NodeStatMetrics.CPU_PERCENT.getFieldName(), roundedCpuPercent);
         }
     }
 
