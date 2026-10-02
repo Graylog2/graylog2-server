@@ -17,6 +17,8 @@
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
 export type ItemKey =
   | 'searchFromValue'
@@ -47,7 +49,7 @@ export type State = {
 export type MappedData = {
   aggField?: string;
   aggFunction?: string;
-  aggValue?: string | number;
+  aggValue?: QueryValue;
   search?: string;
   searchFromValue?: string;
   rowGroupBy?: Array<string>;
@@ -63,6 +65,7 @@ export type MappedData = {
 export type AggregationHandler = (args: {
   widget?: Widget;
   field: string;
-  value: string | number;
+  value: QueryValue | Array<QueryValue>;
+  type?: FieldType;
   valuePath?: Array<{ [name: string]: string }>;
 }) => MappedData;

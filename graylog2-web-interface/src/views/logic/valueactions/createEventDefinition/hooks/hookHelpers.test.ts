@@ -130,6 +130,20 @@ describe('useMappedData helper function', () => {
     });
   });
 
+  it('aggregationValueHandler formats array values as a field scoped OR clause', async () => {
+    const result = aggregationValueHandler({
+      widget: testAggregationWidget,
+      valuePath: testWidgetValueValuePath,
+      field: 'associated_assets',
+      value: ['id1', 'id2', 'id3'],
+    });
+
+    expect(result).toEqual({
+      searchFromValue: '(associated_assets:(id1 OR id2 OR id3))',
+      rowValuePath: 'field3:value3 AND field4:value4',
+    });
+  });
+
   it('messagesValueHandler return correct data', async () => {
     const result = messagesValueHandler({
       field: 'field4',
@@ -138,6 +152,17 @@ describe('useMappedData helper function', () => {
 
     expect(result).toEqual({
       searchFromValue: 'field4:value4',
+    });
+  });
+
+  it('messagesValueHandler formats array values as a field scoped OR clause', async () => {
+    const result = messagesValueHandler({
+      field: 'associated_assets',
+      value: ['id1', 'id2', 'id3'],
+    });
+
+    expect(result).toEqual({
+      searchFromValue: '(associated_assets:(id1 OR id2 OR id3))',
     });
   });
 
