@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as StoreMock } from './StoreMock';
-export { default as MockStore } from './StoreMock';
-export { default as asMock } from './AsMock';
-export { default as ExternalStoreMock } from './ExternalStoreMock';
+import { useSyncExternalStore } from 'react';
+
+import type { Subscribable } from 'logic/createExternalStore';
+
+const useExternalStore = <S, T>(store: Subscribable<S>, selector: (state: S) => T): T =>
+  selector(useSyncExternalStore(store.subscribe, store.getState));
+
+export default useExternalStore;

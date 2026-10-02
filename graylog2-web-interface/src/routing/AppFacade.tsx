@@ -19,11 +19,12 @@ import { useContext, useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
-import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
+import Session from 'logic/session/Session';
+import { validate } from 'logic/session/SessionApi';
+import useExternalStore from 'hooks/useExternalStore';
 import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
-import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
@@ -43,9 +44,13 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 );
 
 const AppFacade = () => {
-  const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
+  const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
   const { server, ping } = useContext(ServerAvailabilityContext);
-  const username = useStore(SessionStore, (state) => state?.username ?? '');
+  const username = useExternalStore(Session, (state) => state.username ?? '');
+
+  useEffect(() => {
+    validate().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(ping, SERVER_PING_TIMEOUT);

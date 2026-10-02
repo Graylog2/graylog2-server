@@ -27,7 +27,7 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
@@ -70,7 +70,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const activeLayout = variantLayouts[activeLayoutVariant] ?? defaultVariantLayout;
 
   const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {
-    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+    CurrentUser.reload();
 
     return fetchStreams(options);
   };
