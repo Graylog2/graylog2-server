@@ -191,7 +191,7 @@ public class MetricsCollector extends Periodical {
 
             @Override
             public void onFailure(Exception e) {
-                LOG.error("Error indexing metrics", e);
+                LOG.error("Error indexing metrics into datastream {}", indexRequest.index(), e);
             }
         });
     }

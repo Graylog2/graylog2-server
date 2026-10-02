@@ -85,7 +85,14 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
         if (destination == OpensearchState.AVAILABLE && process.isManagerNode()) {
             process.openSearchClient().ifPresent(client -> {
                 if (datastreamCreated.compareAndSet(false, true)) {
-                    createDatastream(client);
+                    try {
+                        createDatastream(client);
+                    } catch (Exception e) {
+                        // Reset so the next AVAILABLE health-check reentry (every 10s) retries. Don't rethrow -
+                        // a metrics datastream failure shouldn't be treated as an opensearch process health failure.
+                        datastreamCreated.set(false);
+                        log.error("Failed to create metrics datastream, will retry, tracer instance: {}", this, e);
+                    }
                 }
             });
         }
