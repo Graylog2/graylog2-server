@@ -135,7 +135,7 @@ public class IndexSetsResource extends RestResource {
                     .relatedProperty(IndexFieldTypeProfile.NAME_FIELD_NAME)
                     .sortSpec(IndexSetAttributeSorts.profileTitle())
                     .build(),
-            EntityAttribute.builder().id("stream_count").title("Streams").type(SearchQueryField.Type.INT)
+            EntityAttribute.builder().id("stream_count").title("Associated streams").type(SearchQueryField.Type.INT)
                     .sortSpec(IndexSetAttributeSorts.streamCount())
                     .build(),
             EntityAttribute.builder().id("rotation_model").title("Rotation model").sortable(false).filterable(true)

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
@@ -114,6 +115,8 @@ public class StreamServiceImpl implements StreamService {
                              EntityScopeService scopeService,
                              StreamCache streamCache) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
+        // The index sets table counts streams per index set on every page.
+        this.collection.createIndex(Indexes.ascending(FIELD_INDEX_SET_ID));
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
         this.streamRuleService = streamRuleService;

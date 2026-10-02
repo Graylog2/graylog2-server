@@ -225,8 +225,8 @@ public class PaginatedIndexSetServiceTest {
     @Test
     @MongoDBFixtures(FIXTURE)
     void rotationModelPredicatesSplitTieredFromLegacyIndexSets() {
-        // No fixture document carries data_tiering: its subtypes register through Guice, which the test mapper
-        // lacks. A raw document exercises the predicates against MongoDB without deserializing into IndexSetConfig.
+        // The test mapper lacks the Guice-registered data_tiering subtypes, so a fixture would load as the fallback
+        // type and lose its subtype. A raw document keeps the stored shape exact for the predicates under test.
         final MongoCollection<Document> raw = mongoCollections.nonEntityCollection(MongoIndexSetService.COLLECTION_NAME, Document.class);
         final ObjectId tieredId = new ObjectId("66a0000000000000000000d1");
         raw.insertOne(new Document("_id", tieredId).append("title", "tiered")
