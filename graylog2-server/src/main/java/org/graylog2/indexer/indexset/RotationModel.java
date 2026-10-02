@@ -31,8 +31,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * legacy rotation and retention strategies. Used by the entity table's filter.
  */
 public enum RotationModel {
-    DATA_TIERING("data_tiering", "Data tiering"),
-    LEGACY("legacy", "Legacy rotation");
+    DATA_TIERING("data_tiering", "Data Tiering"),
+    LEGACY("legacy", "Legacy (Deprecated)");
 
     private final String value;
     private final String title;

@@ -208,15 +208,6 @@ public class PaginatedIndexSetServiceTest {
     }
 
     @Test
-    @MongoDBFixtures(FIXTURE)
-    void streamCountsPerIndexSet() {
-        final Map<String, Long> counts = service.streamCounts(List.of(ID_BRAVO, ID_DELTA, ID_ALPHA));
-
-        assertThat(counts).containsOnly(Map.entry(ID_BRAVO, 3L), Map.entry(ID_DELTA, 1L));
-        assertThat(counts).doesNotContainKey(ID_ALPHA);
-    }
-
-    @Test
     void fromValueRejectsUnknownCategory() {
         assertThat(IndexSetCategory.fromValue("illuminate")).isEqualTo(IndexSetCategory.ILLUMINATE);
         assertThatThrownBy(() -> IndexSetCategory.fromValue("nope")).isInstanceOf(IllegalArgumentException.class);

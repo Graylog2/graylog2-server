@@ -20,6 +20,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.UpdateResult;
@@ -61,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +93,7 @@ import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     public static final String COLLECTION_NAME = "streams";
+    private static final String COUNT = "count";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
     private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
@@ -542,6 +546,19 @@ public class StreamServiceImpl implements StreamService {
         try (var stream = stream(collection.find(eq(FIELD_INDEX_SET_ID, indexSetId)))) {
             return stream.map(StreamDTO::title).toList();
         }
+    }
+
+    @Override
+    public Map<String, Long> countByIndexSet(Collection<String> indexSetIds) {
+        if (indexSetIds.isEmpty()) {
+            return Map.of();
+        }
+        final Map<String, Long> counts = new HashMap<>();
+        collection.aggregate(List.of(
+                Aggregates.match(Filters.in(FIELD_INDEX_SET_ID, indexSetIds)),
+                Aggregates.group("$" + FIELD_INDEX_SET_ID, Accumulators.sum(COUNT, 1))
+        ), Document.class).forEach(group -> counts.put(group.getString("_id"), group.get(COUNT, Number.class).longValue()));
+        return Map.copyOf(counts);
     }
 
     @Override

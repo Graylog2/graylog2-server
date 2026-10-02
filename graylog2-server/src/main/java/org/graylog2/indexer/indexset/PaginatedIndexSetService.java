@@ -17,25 +17,17 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.model.Accumulators;
-import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamServiceImpl;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.graylog2.database.pagination.DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING;
@@ -53,18 +45,14 @@ import static org.graylog2.database.pagination.DefaultMongoPaginationHelper.DEFA
  */
 @Singleton
 public class PaginatedIndexSetService {
-    private static final String STREAM_COUNT = "count";
-
     private final MongoPaginationHelper<IndexSetConfig> paginationHelper;
     private final MongoCollection<IndexSetConfig> indexSets;
-    private final com.mongodb.client.MongoCollection<Document> streams;
 
     @Inject
     public PaginatedIndexSetService(MongoCollections mongoCollections) {
         this.indexSets = mongoCollections.collection(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class);
         this.paginationHelper = mongoCollections.paginationHelper(indexSets)
                 .collation(DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING);
-        this.streams = mongoCollections.nonEntityCollection(StreamServiceImpl.COLLECTION_NAME, Document.class);
     }
 
     /**
@@ -113,23 +101,6 @@ public class PaginatedIndexSetService {
                 count(IndexSetCategory.USER.toBson(), predicate),
                 count(IndexSetCategory.SYSTEM.toBson(), predicate),
                 count(IndexSetCategory.ILLUMINATE.toBson(), predicate));
-    }
-
-    /**
-     * Counts the streams routed to each given index set, in one query.
-     *
-     * @return stream count by index set id; an index set without streams has no entry
-     */
-    public Map<String, Long> streamCounts(Collection<String> indexSetIds) {
-        if (indexSetIds.isEmpty()) {
-            return Map.of();
-        }
-        final Map<String, Long> counts = new HashMap<>();
-        streams.aggregate(List.of(
-                Aggregates.match(Filters.in(StreamImpl.FIELD_INDEX_SET_ID, indexSetIds)),
-                Aggregates.group("$" + StreamImpl.FIELD_INDEX_SET_ID, Accumulators.sum(STREAM_COUNT, 1))
-        )).forEach(group -> counts.put(group.getString("_id"), group.get(STREAM_COUNT, Number.class).longValue()));
-        return Map.copyOf(counts);
     }
 
     private long count(Bson filter, Predicate<IndexSetConfig> predicate) {

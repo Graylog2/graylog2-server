@@ -93,6 +93,7 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
@@ -161,6 +162,7 @@ public class IndexSetsResource extends RestResource {
     private final EventBus eventBus;
     private final RefreshingLockService.Factory lockServiceFactory;
     private final PaginatedIndexSetService paginatedIndexSetService;
+    private final StreamService streamService;
     private final EntityPermissionsUtils entityPermissionsUtils;
     private final DbQueryCreator dbQueryCreator = new DbQueryCreator(DEFAULT_SORT_FIELD, ATTRIBUTES);
 
@@ -178,6 +180,7 @@ public class IndexSetsResource extends RestResource {
                              final EventBus eventBus,
                              final RefreshingLockService.Factory lockServiceFactory,
                              final PaginatedIndexSetService paginatedIndexSetService,
+                             final StreamService streamService,
                              final EntityPermissionsUtils entityPermissionsUtils) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
@@ -193,6 +196,7 @@ public class IndexSetsResource extends RestResource {
         this.eventBus = eventBus;
         this.lockServiceFactory = lockServiceFactory;
         this.paginatedIndexSetService = requireNonNull(paginatedIndexSetService);
+        this.streamService = requireNonNull(streamService);
         this.entityPermissionsUtils = requireNonNull(entityPermissionsUtils);
     }
 
@@ -222,7 +226,7 @@ public class IndexSetsResource extends RestResource {
                 ? paginatedIndexSetService.findPaginated(dbQuery, resolvedSort, page, perPage)
                 : paginatedIndexSetService.findPaginated(dbQuery, this::mayRead, resolvedSort, page, perPage);
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        final Map<String, Long> streamCounts = paginatedIndexSetService.streamCounts(result.stream().map(IndexSetConfig::id).toList());
+        final Map<String, Long> streamCounts = streamService.countByIndexSet(result.stream().map(IndexSetConfig::id).toList());
         final List<IndexSetOverviewResponse> elements = result.stream()
                 .map(config -> IndexSetOverviewResponse.create(config, config.equals(defaultIndexSet), streamCounts.getOrDefault(config.id(), 0L)))
                 .toList();

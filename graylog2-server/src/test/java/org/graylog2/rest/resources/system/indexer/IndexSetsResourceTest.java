@@ -61,6 +61,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.graylog2.streams.StreamService;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -129,6 +130,8 @@ public class IndexSetsResourceTest {
     private RefreshingLockService.Factory lockServiceFactory;
     @Mock
     private PaginatedIndexSetService paginatedIndexSetService;
+    @Mock
+    private StreamService streamService;
     @Mock
     private EntityPermissionsUtils entityPermissionsUtils;
     @Mock
@@ -759,7 +762,7 @@ public class IndexSetsResourceTest {
         when(indexSetService.getDefault()).thenReturn(defaultConfig);
         when(paginatedIndexSetService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), eq(1), eq(50)))
                 .thenReturn(new PaginatedList<>(List.of(indexSetConfig, defaultConfig), 2, 1, 50));
-        when(paginatedIndexSetService.streamCounts(List.of("id1", "id2"))).thenReturn(Map.of("id1", 3L));
+        when(streamService.countByIndexSet(List.of("id1", "id2"))).thenReturn(Map.of("id1", 3L));
 
         final PageListResponse<IndexSetOverviewResponse> response = indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
@@ -925,7 +928,7 @@ public class IndexSetsResourceTest {
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                 indexSetStatsCreator, clusterConfigService, systemJobManager, permission -> permissionCheck.test(permission), openIndexSetFilterFactories,
-                indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService, entityPermissionsUtils);
+                indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService, streamService, entityPermissionsUtils);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -938,11 +941,11 @@ public class IndexSetsResourceTest {
                      LegacySystemJobManager systemJobManager, Predicate<String> permissionCheck,
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
                      RefreshingLockService.Factory lockServiceFactory, PaginatedIndexSetService paginatedIndexSetService,
-                     EntityPermissionsUtils entityPermissionsUtils) {
+                     StreamService streamService, EntityPermissionsUtils entityPermissionsUtils) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
                     openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class), lockServiceFactory,
-                    paginatedIndexSetService, entityPermissionsUtils);
+                    paginatedIndexSetService, streamService, entityPermissionsUtils);
             this.permissionCheck = permissionCheck;
         }
 
