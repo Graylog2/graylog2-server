@@ -48,7 +48,7 @@ public class CEFCodecTest {
 
     @Test
     public void buildMessageSummary() throws Exception {
-        final com.github.jcustenborder.cef.Message cefMessage = mock(com.github.jcustenborder.cef.Message.class);
+        final MappedMessage cefMessage = mock(MappedMessage.class);
         when(cefMessage.deviceProduct()).thenReturn("product");
         when(cefMessage.deviceEventClassId()).thenReturn("event-class-id");
         when(cefMessage.name()).thenReturn("name");
@@ -124,6 +124,17 @@ public class CEFCodecTest {
         assertEquals("Vendor", message.getField("device_vendor"));
         assertEquals("local0", message.getField("facility"));
         assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
+    }
+
+    @Test
+    public void specCompliantDoubleEscapedBackslashIsUnescapedOnce() {
+        // CEF spec: a literal backslash in an extension value is written as "\\".
+        final RawMessage rawMessage = buildRawMessage(
+                "CEF:0|Vendor|Product|1.0|100|AntiMalware|9|filePath=C:\\\\Windows\\\\System32\\\\reg.exe fname=C:\\\\temp\\\\notes.txt");
+        final Message message = codec.decodeSafe(rawMessage).get();
+
+        assertEquals("C:\\Windows\\System32\\reg.exe", message.getField("filePath"));
+        assertEquals("C:\\temp\\notes.txt", message.getField("fname"));
     }
 
     @Test

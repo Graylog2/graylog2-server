@@ -16,12 +16,11 @@
  */
 package org.graylog.plugins.cef.codec;
 
-import com.github.jcustenborder.cef.CEFParser;
-import com.github.jcustenborder.cef.CEFParserFactory;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.parser.CEFMapping;
+import org.graylog.plugins.cef.parser.CEFParser;
 import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogUtils;
 import org.graylog2.plugin.Message;
@@ -82,7 +81,7 @@ public class CEFCodec extends AbstractCodec {
     public CEFCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         super(configuration);
         this.messageFactory = messageFactory;
-        this.parser = CEFParserFactory.create();
+        this.parser = new CEFParser();
 
         DateTimeZone timezone;
         try {
@@ -158,7 +157,7 @@ public class CEFCodec extends AbstractCodec {
         return matcher.find() ? matcher.group(1) : message;
     }
 
-    protected String buildMessageSummary(com.github.jcustenborder.cef.Message cef) {
+    protected String buildMessageSummary(MappedMessage cef) {
         return cef.deviceProduct() + ": [" + cef.deviceEventClassId() + ", " + cef.severity() + "] " + cef.name();
     }
 
