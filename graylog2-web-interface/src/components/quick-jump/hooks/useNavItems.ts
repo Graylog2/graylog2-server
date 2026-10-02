@@ -33,6 +33,11 @@ const isFeatureEnabled = (featureFlag?: string) => {
   return AppConfig.isFeatureEnabled(featureFlag);
 };
 
+// `useCondition` is a hook. Callers evaluate it for every item before filtering anything out, so the hooks run in
+// the same order on every render.
+// eslint-disable-next-line react-hooks/rules-of-hooks
+const isConditionMet = (useCondition?: () => boolean) => (typeof useCondition === 'function' ? useCondition() : true);
+
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
   const entityCreators = usePluginEntities('entityCreators');
@@ -57,8 +62,7 @@ const useConfigurationPages = () => {
     }));
 
   const pluginNavItems = pluginSystemConfigurations
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    .filter(({ useCondition }) => (typeof useCondition === 'function' ? useCondition() : true))
+    .filter(({ useCondition }) => isConditionMet(useCondition))
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
@@ -158,19 +162,29 @@ const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const navigationItems = usePluginEntities('navigation');
 
-  // A dropdown's feature flag also applies to its children.
-  const allNavigationItems = navigationItems
-    .filter((item) => isFeatureEnabled(item.requiredFeatureFlag))
-    .flatMap((item) =>
+  const allNavigationItems = navigationItems.flatMap((item) => {
+    const itemConditionMet = isConditionMet(item.useCondition);
+    const children =
       'children' in item
-        ? item.children
-            .filter((child) => isFeatureEnabled(child.requiredFeatureFlag))
-            .map<BaseNavigationItem>((child) => ({
-              ...child,
-              description: `${item.description} / ${child.description}`,
-            }))
-        : [item],
-    );
+        ? item.children.map((child) => ({ child, conditionMet: isConditionMet(child.useCondition) }))
+        : [];
+
+    // A dropdown's feature flag and condition also apply to its children.
+    if (!itemConditionMet || !isFeatureEnabled(item.requiredFeatureFlag)) {
+      return [];
+    }
+
+    if (!('children' in item)) {
+      return [item];
+    }
+
+    return children
+      .filter(({ child, conditionMet }) => conditionMet && isFeatureEnabled(child.requiredFeatureFlag))
+      .map<BaseNavigationItem>(({ child }) => ({
+        ...child,
+        description: `${item.description} / ${child.description}`,
+      }));
+  });
 
   return allNavigationItems
     .filter((item) => isPermitted(item.permissions))
@@ -183,7 +197,7 @@ const usePageNavigationItems = () => {
 
   return pageNavigationItems.flatMap((group) =>
     [...group.children]
-      .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
+      .filter((page) => isConditionMet(page.useCondition) && isFeatureEnabled(page.requiredFeatureFlag))
       .filter((page) => isPermitted(page.permissions))
       .slice(1)
       .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),

@@ -193,3 +193,61 @@ describe('useNavItems page navigation', () => {
     expect(titles).not.toContain('Group / Flagged page');
   });
 });
+
+describe('useNavItems conditions', () => {
+  const met = () => true;
+  const notMet = () => false;
+
+  const plugins: PluginExports = {
+    navigation: [
+      { description: 'Shown link', path: prefixUrl('/shown'), useCondition: met },
+      { description: 'Hidden link', path: prefixUrl('/hidden'), useCondition: notMet },
+      {
+        description: 'Menu',
+        children: [
+          { description: 'Shown child', path: prefixUrl('/menu/shown'), useCondition: met },
+          { description: 'Hidden child', path: prefixUrl('/menu/hidden'), useCondition: notMet },
+        ],
+      },
+      {
+        description: 'Hidden menu',
+        useCondition: notMet,
+        children: [{ description: 'Child', path: prefixUrl('/hidden-menu/child') }],
+      },
+    ],
+    pageNavigation: [
+      {
+        description: 'Group',
+        children: [
+          { description: 'Overview', path: prefixUrl('/group') },
+          { description: 'Shown page', path: prefixUrl('/group/shown'), useCondition: met },
+          { description: 'Hidden page', path: prefixUrl('/group/hidden'), useCondition: notMet },
+        ],
+      },
+    ],
+  };
+
+  usePluginExports(plugins);
+
+  const titles = () => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+    return result.current.map(({ title }) => title);
+  };
+
+  it('offers navigation items and pages whose condition is met', () => {
+    expect(titles()).toEqual(expect.arrayContaining(['Shown link', 'Menu / Shown child', 'Group / Shown page']));
+  });
+
+  it('hides navigation items and pages whose condition is not met', () => {
+    const result = titles();
+
+    expect(result).not.toContain('Hidden link');
+    expect(result).not.toContain('Menu / Hidden child');
+    expect(result).not.toContain('Group / Hidden page');
+  });
+
+  it('hides the children of a dropdown whose condition is not met', () => {
+    expect(titles()).not.toContain('Hidden menu / Child');
+  });
+});
