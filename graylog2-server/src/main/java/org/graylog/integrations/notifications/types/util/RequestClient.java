@@ -37,7 +37,7 @@ public class RequestClient {
 
     @Inject
     public RequestClient(OkHttpClient httpClient) {
-        this.httpClient = httpClient;
+        this.httpClient = httpClient.newBuilder().followRedirects(false).build();
     }
 
     /**

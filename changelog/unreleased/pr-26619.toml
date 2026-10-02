@@ -1,0 +1,10 @@
+type = "c"
+message = "Slack and Microsoft Teams event notifications now enforce the URL allowlist."
+
+details.user = """
+Existing notifications must have their webhook URL added to the allowlist to continue working.
+See UPGRADING.md for details.
+"""
+
+issues = ["Graylog2/graylog-plugin-enterprise#14748"]
+pulls = ["26619", "27128"]
