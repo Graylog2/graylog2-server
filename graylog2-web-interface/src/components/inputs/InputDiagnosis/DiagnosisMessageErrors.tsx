@@ -98,7 +98,7 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       title="Message Errors">
       <StyledP>
         Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search
-        Cluster. Click on a category to view the associated messages.
+        Cluster.
       </StyledP>
       <StyledListGroup>
         <StyledListGroupItem>

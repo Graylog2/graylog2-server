@@ -417,4 +417,27 @@ public class MongoIndexSetServiceTest {
             return events;
         }
     }
+
+    @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
+    public void searchByTitleMatchesCaseInsensitively() {
+        assertThat(indexSetService.searchByTitle("test 1"))
+                .extracting(IndexSetConfig::title)
+                .containsExactly("Test 1");
+    }
+
+    @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
+    public void searchByTitleTreatsRegexMetacharactersLiterally() {
+        // Interpreted as a regex, "Test ." would match every "Test <digit>" title in the fixture.
+        assertThat(indexSetService.searchByTitle("Test .")).isEmpty();
+        assertThat(indexSetService.searchByTitle("Test [1-4]")).isEmpty();
+    }
+
+    @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
+    public void searchByTitleWithEmptyTermMatchesEverything() {
+        // The search endpoint defaults a missing term to "", which must list every index set rather than fail.
+        assertThat(indexSetService.searchByTitle("")).hasSize(4);
+    }
 }
