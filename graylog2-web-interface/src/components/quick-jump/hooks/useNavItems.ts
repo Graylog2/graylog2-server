@@ -169,8 +169,8 @@ const useMainNavigationItems = () => {
         ? item.children.map((child) => ({ child, conditionMet: isConditionMet(child.useCondition) }))
         : [];
 
-    // A dropdown's feature flag and condition also apply to its children.
-    if (!itemConditionMet || !isFeatureEnabled(item.requiredFeatureFlag)) {
+    // A dropdown's feature flag, condition and permissions also apply to its children.
+    if (!itemConditionMet || !isFeatureEnabled(item.requiredFeatureFlag) || !isPermitted(item.permissions)) {
       return [];
     }
 

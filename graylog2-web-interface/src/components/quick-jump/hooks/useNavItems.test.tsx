@@ -20,7 +20,8 @@ import { renderHookWithDataRouter } from 'wrappedTestingLibrary/hooks';
 
 import { usePluginExports } from 'views/test/testPlugins';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { adminUser } from 'fixtures/users';
+import { adminUser, alice } from 'fixtures/users';
+import type User from 'logic/users/User';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { asMock } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
@@ -37,17 +38,21 @@ const helpMenuItemWithPath: PluginExports = {
   ],
 };
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <ScratchpadContext.Provider
-    value={{
-      isScratchpadVisible: true,
-      localStorageItem: 'gl-scratchpad-jest',
-      setScratchpadVisibility: jest.fn(),
-      toggleScratchpadVisibility: jest.fn(),
-    }}>
-    <CurrentUserContext.Provider value={adminUser}>{children}</CurrentUserContext.Provider>
-  </ScratchpadContext.Provider>
-);
+const wrapperFor =
+  (user: User) =>
+  ({ children }: { children: React.ReactNode }) => (
+    <ScratchpadContext.Provider
+      value={{
+        isScratchpadVisible: true,
+        localStorageItem: 'gl-scratchpad-jest',
+        setScratchpadVisibility: jest.fn(),
+        toggleScratchpadVisibility: jest.fn(),
+      }}>
+      <CurrentUserContext.Provider value={user}>{children}</CurrentUserContext.Provider>
+    </ScratchpadContext.Provider>
+  );
+
+const Wrapper = wrapperFor(adminUser);
 
 describe('useNavItems', () => {
   usePluginExports(helpMenuItemWithPath);
@@ -249,5 +254,33 @@ describe('useNavItems conditions', () => {
 
   it('hides the children of a dropdown whose condition is not met', () => {
     expect(titles()).not.toContain('Hidden menu / Child');
+  });
+});
+
+describe('useNavItems dropdown permissions', () => {
+  const navigation: PluginExports = {
+    navigation: [
+      {
+        description: 'Admin menu',
+        permissions: 'roles:read',
+        children: [{ description: 'Child', path: prefixUrl('/admin-menu/child') }],
+      },
+    ],
+  };
+
+  usePluginExports(navigation);
+
+  const titlesFor = (user: User) => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: wrapperFor(user) });
+
+    return result.current.map(({ title }) => title);
+  };
+
+  it('offers the children of a dropdown the user is permitted to see', () => {
+    expect(titlesFor(adminUser)).toContain('Admin menu / Child');
+  });
+
+  it('hides the children of a dropdown the user is not permitted to see', () => {
+    expect(titlesFor(alice)).not.toContain('Admin menu / Child');
   });
 });
