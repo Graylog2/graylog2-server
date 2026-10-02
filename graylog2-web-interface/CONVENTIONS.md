@@ -26,8 +26,8 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 
 - Use styled-components, Mantine, and the local component abstractions.
 - Reuse shared components before creating new ones. Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components.
-- Shared components live in `src/components/common`. Wrapped Mantine components live in `src/components/common/bootstrap`.
-- For common UI patterns, prefer existing shared UI components from `components/graylog` and `components/common` over native HTML elements.
+- Shared components live in `src/components/common`. Wrapped Mantine components live in `src/components/bootstrap`.
+- For common UI patterns, prefer existing shared UI components from `src/components/bootstrap` and `src/components/common` over native HTML elements.
 
 ## Type Definitions
 
