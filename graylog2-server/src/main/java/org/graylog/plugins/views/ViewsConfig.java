@@ -28,7 +28,7 @@ public class ViewsConfig implements PluginConfigBean {
     private static final String PREFIX = "views_";
     private static final String MAX_SEARCH_AGE = PREFIX + "maximum_search_age";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Maximum age of searches that are not referenced by any saved search or dashboard before they are deleted by the periodic cleanup job.")
     @Parameter(MAX_SEARCH_AGE)
     private Duration maxSearchAge = DEFAULT_MAXIMUM_AGE_FOR_SEARCHES;
 }
