@@ -53,6 +53,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -143,6 +144,7 @@ public class DashboardV1FacadeTest {
     public void viewDOTShouldHaveGeneralInformation() {
         assertThat(viewDTO).isNotNull();
         assertThat(viewDTO.title()).matches("ContentPack Dashboard");
+        assertThat(viewDTO.scope()).isEqualTo(DefaultEntityScope.NAME);
         assertThat(viewDTO.description()).matches("A dashboard for content packs");
         assertThat(viewDTO.summary()).matches("Converted Dashboard");
     }

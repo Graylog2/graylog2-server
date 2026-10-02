@@ -32,9 +32,11 @@ import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
@@ -68,6 +70,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
+    private final ScopedEntityMongoUtils<ViewDTO> scopedEntityMongoUtils;
     private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
@@ -77,6 +80,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
                           ViewSummaryService viewSummaryService,
                           EntitySourceService entitySourceService,
                           MongoCollections mongoCollections,
+                          EntityScopeService entityScopeService,
                           SearchFiltersReFetcher searchFiltersRefetcher) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
@@ -86,6 +90,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
         this.searchFiltersRefetcher = searchFiltersRefetcher;
 
         mongoCollections.indexUtils(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
@@ -245,8 +250,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     public ViewDTO save(ViewDTO viewDTO) {
         try {
-            final var save = collection.insertOne(requirementsForView(viewDTO));
-            return mongoUtils.getById(MongoUtils.insertedId(save)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
+            final String id = scopedEntityMongoUtils.create(requirementsForView(viewDTO));
+            return mongoUtils.getById(id).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
         } catch (MongoException e) {
             if (MongoUtils.isDuplicateKeyError(e)) {
                 throw new IllegalStateException("Unable to save view, it already exists.");
@@ -256,22 +261,48 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public void delete(String id) {
+        delete(id, true);
+    }
+
+    /**
+     * Deletes a view without scope deletability or mutability checks. Only for system-driven deletes such as
+     * content pack uninstalls, never for user API requests.
+     */
+    public void forceDelete(String id) {
+        delete(id, false);
+    }
+
+    private void delete(String id, boolean checkScope) {
         get(id).ifPresent(view -> {
+            if (checkScope) {
+                scopedEntityMongoUtils.ensureDeletability(view);
+                scopedEntityMongoUtils.ensureMutability(view);
+            }
             if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
                 entityRegistrar.unregisterDashboard(id);
             } else {
                 entityRegistrar.unregisterSearch(id);
             }
         });
-        mongoUtils.deleteById(id);
+        scopedEntityMongoUtils.forceDelete(id);
         entitySourceService.deleteByEntityId(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {
+        return scopedEntityMongoUtils.update(prepareForUpdate(viewDTO));
+    }
+
+    /**
+     * Updates a view without the scope mutability check. Only for system-driven updates such as content pack
+     * upgrades or cleanup of deleted references, never for user API requests.
+     */
+    public ViewDTO forceUpdate(ViewDTO viewDTO) {
+        return scopedEntityMongoUtils.forceUpdate(prepareForUpdate(viewDTO));
+    }
+
+    private ViewDTO prepareForUpdate(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
-        final ViewDTO viewWithRequirements = requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
-        collection.replaceOne(MongoUtils.idEq(viewWithRequirements.id()), viewWithRequirements);
-        return viewWithRequirements;
+        return requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
     }
 
     public ViewDTO requirementsForView(ViewDTO view) {
