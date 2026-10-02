@@ -26,6 +26,7 @@ import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
+import { isTelemetryDebugEnabled, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
 
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
@@ -86,6 +87,19 @@ const useQuickJumpActions = (): SearchResultItem[] => {
         toggleScratchpad();
       },
     },
+    // The overlay itself works in any build (localStorage flag); only this discoverable entry
+    // point is limited to development mode.
+    ...(AppConfig.gl2DevMode()
+      ? [
+          {
+            type: ACTION_TYPE,
+            title: `${isTelemetryDebugEnabled() ? 'Disable' : 'Enable'} Telemetry Debug Overlay`,
+            action: () => {
+              setTelemetryDebugEnabled(!isTelemetryDebugEnabled());
+            },
+          },
+        ]
+      : []),
   ];
 };
 
