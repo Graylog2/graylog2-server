@@ -102,14 +102,23 @@ public class NodeMetricsCollector {
             final Object rawUsage = nodeContext.read("$.os.cgroup.memory.usage_in_bytes");
             final long limitBytes = parseCgroupLong(rawLimit);
             final long usedBytes = parseCgroupLong(rawUsage);
-            if (limitBytes > 0 && limitBytes < CGROUP_UNLIMITED_THRESHOLD && usedBytes >= 0) {
-                final long freeBytes = Math.max(0L, limitBytes - usedBytes);
-                final int usedPercent = (int) Math.min(100L, Math.max(0L, Math.round((double) usedBytes / limitBytes * 100.0)));
-                metrics.put(NodeStatMetrics.MEM_TOTAL.getFieldName(), limitBytes);
-                metrics.put(NodeStatMetrics.MEM_TOTAL_USED_BYTES.getFieldName(), usedBytes);
-                metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
-                metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
+            if (usedBytes < 0) {
+                return;
             }
+            // Without a container memory limit (cgroup v2 reports "max"), the host memory is the effective limit,
+            // but the usage still has to be the container's and not the host's.
+            final long totalBytes = (limitBytes > 0 && limitBytes < CGROUP_UNLIMITED_THRESHOLD)
+                    ? limitBytes
+                    : parseCgroupLong(metrics.get(NodeStatMetrics.MEM_TOTAL.getFieldName()));
+            if (totalBytes <= 0) {
+                return;
+            }
+            final long freeBytes = Math.max(0L, totalBytes - usedBytes);
+            final int usedPercent = (int) Math.min(100L, Math.max(0L, Math.round((double) usedBytes / totalBytes * 100.0)));
+            metrics.put(NodeStatMetrics.MEM_TOTAL.getFieldName(), totalBytes);
+            metrics.put(NodeStatMetrics.MEM_TOTAL_USED_BYTES.getFieldName(), usedBytes);
+            metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
+            metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
         } catch (Exception e) {
             log.debug("Cgroup memory metrics not available: {}", e.getMessage());
         }
