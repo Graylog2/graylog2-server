@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Quick Jump no longer offers pages the navigation hides. Entries could show up although their feature flag was disabled or their condition (e.g. a valid license) was not met, and entries in a navigation dropdown were offered without checking the dropdown's own permissions. Each entry's own permissions were already respected."
+
+pulls = ["27639"]
