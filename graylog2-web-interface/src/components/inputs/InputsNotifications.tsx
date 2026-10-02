@@ -32,6 +32,7 @@ const INPUT_STATES = {
   FAILED: 'FAILED',
   FAILING: 'FAILING',
   SETUP: 'SETUP',
+  STOPPED: 'STOPPED',
 } as const;
 
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
@@ -65,7 +66,7 @@ const getNotificationItems = (
     result.push({ severity: 'warning', message: SETUP_MESSAGE });
   }
 
-  if (inputs.some((input) => !inputStates[input.id])) {
+  if (hasInputInState(inputStates, INPUT_STATES.STOPPED) || inputs.some((input) => !inputStates[input.id])) {
     result.push({ severity: 'warning', message: STOPPED_MESSAGE });
   }
 
@@ -83,7 +84,7 @@ const InputsNotifications = () => {
   });
 
   const applyRuntimeStatusFilter = useCallback(
-    (status: 'FAILED' | 'SETUP' | 'NOT_RUNNING') => {
+    (status: 'FAILED' | 'SETUP' | 'NOT_RUNNING' | 'STOPPED') => {
       setQueryParams({
         filters: [`${RUNTIME_STATUS_FILTER}=${status}`],
         page: 1,
