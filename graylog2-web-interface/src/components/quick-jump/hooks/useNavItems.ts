@@ -33,11 +33,6 @@ const isFeatureEnabled = (featureFlag?: string) => {
   return AppConfig.isFeatureEnabled(featureFlag);
 };
 
-// `useCondition` is a hook. Callers evaluate it for every item before filtering anything out, so the hooks run in
-// the same order on every render.
-// eslint-disable-next-line react-hooks/rules-of-hooks
-const isConditionMet = (useCondition?: () => boolean) => (typeof useCondition === 'function' ? useCondition() : true);
-
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
   const entityCreators = usePluginEntities('entityCreators');
@@ -62,7 +57,8 @@ const useConfigurationPages = () => {
     }));
 
   const pluginNavItems = pluginSystemConfigurations
-    .filter(({ useCondition }) => isConditionMet(useCondition))
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ useCondition }) => useCondition?.() ?? true)
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
@@ -163,10 +159,17 @@ const useMainNavigationItems = () => {
   const navigationItems = usePluginEntities('navigation');
 
   const allNavigationItems = navigationItems.flatMap((item) => {
-    const itemConditionMet = isConditionMet(item.useCondition);
+    const { useCondition } = item;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const itemConditionMet = useCondition?.() ?? true;
     const children =
       'children' in item
-        ? item.children.map((child) => ({ child, conditionMet: isConditionMet(child.useCondition) }))
+        ? item.children.map((child) => {
+            const { useCondition: useChildCondition } = child;
+
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            return { child, conditionMet: useChildCondition?.() ?? true };
+          })
         : [];
 
     // A dropdown's feature flag, condition and permissions also apply to its children.
@@ -197,7 +200,11 @@ const usePageNavigationItems = () => {
 
   return pageNavigationItems.flatMap((group) =>
     [...group.children]
-      .filter((page) => isConditionMet(page.useCondition) && isFeatureEnabled(page.requiredFeatureFlag))
+      .filter(
+        ({ useCondition, requiredFeatureFlag }) =>
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          (useCondition?.() ?? true) && isFeatureEnabled(requiredFeatureFlag),
+      )
       .filter((page) => isPermitted(page.permissions))
       .slice(1)
       .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
