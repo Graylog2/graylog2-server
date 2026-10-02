@@ -186,20 +186,9 @@ const ApiRoutes = {
     list: (stats: boolean, only_open: boolean = false) => ({
       url: `/system/indices/index_sets?stats=${stats}&only_open=${only_open}`,
     }),
-    listPaginated: (skip: number, limit: number, stats: boolean) => ({
-      url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
-    }),
     get: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}` }),
     getIndexSetStats: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/stats` }),
     create: () => ({ url: '/system/indices/index_sets' }),
-    delete: (indexSetId: string, deleteIndices: boolean) => ({
-      url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}`,
-    }),
-    searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => ({
-      url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}`,
-    }),
-    setDefault: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/default` }),
-    stats: () => ({ url: '/system/indices/index_sets/stats' }),
   },
   IndicesApiController: {
     close: (indexName: string) => ({ url: `/system/indexer/indices/${indexName}/close` }),
