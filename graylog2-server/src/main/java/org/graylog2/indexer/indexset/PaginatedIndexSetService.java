@@ -16,14 +16,18 @@
  */
 package org.graylog2.indexer.indexset;
 
+import com.google.common.collect.ImmutableList;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.rest.models.SortOrder;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static org.graylog2.database.pagination.DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING;
@@ -31,32 +35,36 @@ import static org.graylog2.database.pagination.DefaultMongoPaginationHelper.DEFA
 /**
  * Paginated, sortable, and filterable access to index set configurations for the entity data table.
  * <p>
- * Filtering and sorting always run in MongoDB. Without a predicate, skip and limit run in MongoDB too.
- * With a predicate, the helper applies it after fetching and pages in memory, and the returned total
- * counts only documents that pass it, so page math stays correct for users with per-entity permissions.
+ * Filtering and sorting run in MongoDB, including sorts that join another collection
+ * ({@link IndexSetAttributeSorts}). Without a predicate, skip and limit run in MongoDB too. With a predicate,
+ * the helper fetches every match, applies the predicate, and pages in memory. The total then counts only
+ * documents that pass the predicate, so page math stays correct for users with per-entity permissions.
+ * <p>
+ * Filters must reference stored fields only. The predicate-free path counts with {@code countDocuments(filter)},
+ * which cannot see fields that a sort's join adds.
  */
 @Singleton
 public class PaginatedIndexSetService {
     private final MongoPaginationHelper<IndexSetConfig> paginationHelper;
+    private final MongoCollection<IndexSetConfig> indexSets;
 
     @Inject
     public PaginatedIndexSetService(MongoCollections mongoCollections) {
-        this.paginationHelper = mongoCollections
-                .paginationHelper(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class)
+        this.indexSets = mongoCollections.collection(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class);
+        this.paginationHelper = mongoCollections.paginationHelper(indexSets)
                 .collation(DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING);
     }
 
     /**
      * Pages entirely in MongoDB. Use this when the caller may read every index set.
      *
-     * @param dbQuery   filter executed in MongoDB
-     * @param page      1-based page number
-     * @param perPage   page size
-     * @param sortField document field to sort on
-     * @param order     sort direction
+     * @param dbQuery filter executed in MongoDB
+     * @param sort    resolved sort, including any join stages the sort key needs
+     * @param page    1-based page number
+     * @param perPage page size; 0 means no limit
      */
-    public PaginatedList<IndexSetConfig> findPaginated(Bson dbQuery, int page, int perPage, String sortField, SortOrder order) {
-        return helper(dbQuery, perPage, sortField, order).page(page);
+    public PaginatedList<IndexSetConfig> findPaginated(Bson dbQuery, DbSortResolver.ResolvedSort sort, int page, int perPage) {
+        return helper(dbQuery, sort, perPage).page(page);
     }
 
     /**
@@ -64,25 +72,47 @@ public class PaginatedIndexSetService {
      *
      * @param dbQuery   filter executed in MongoDB
      * @param predicate filter applied in code after fetching
+     * @param sort      resolved sort, including any join stages the sort key needs
      * @param page      1-based page number
-     * @param perPage   page size
-     * @param sortField document field to sort on
-     * @param order     sort direction
+     * @param perPage   page size; 0 means no limit
      * @return the requested page; {@code pagination().total()} counts only documents that pass the predicate
      */
     public PaginatedList<IndexSetConfig> findPaginated(Bson dbQuery,
                                                        Predicate<IndexSetConfig> predicate,
+                                                       DbSortResolver.ResolvedSort sort,
                                                        int page,
-                                                       int perPage,
-                                                       String sortField,
-                                                       SortOrder order) {
-        return helper(dbQuery, perPage, sortField, order).page(page, predicate);
+                                                       int perPage) {
+        return helper(dbQuery, sort, perPage).page(page, predicate);
     }
 
-    private MongoPaginationHelper<IndexSetConfig> helper(Bson dbQuery, int perPage, String sortField, SortOrder order) {
+    /** Counts per category over the whole collection. Use this when the caller may read every index set. */
+    public IndexSetCategoryCounts countCategories() {
+        return new IndexSetCategoryCounts(
+                indexSets.countDocuments(),
+                indexSets.countDocuments(IndexSetCategory.USER.toBson()),
+                indexSets.countDocuments(IndexSetCategory.SYSTEM.toBson()),
+                indexSets.countDocuments(IndexSetCategory.ILLUMINATE.toBson()));
+    }
+
+    /** Counts per category over the index sets that pass the predicate, typically a per-entity permission check. */
+    public IndexSetCategoryCounts countCategories(Predicate<IndexSetConfig> predicate) {
+        return new IndexSetCategoryCounts(
+                count(Filters.empty(), predicate),
+                count(IndexSetCategory.USER.toBson(), predicate),
+                count(IndexSetCategory.SYSTEM.toBson(), predicate),
+                count(IndexSetCategory.ILLUMINATE.toBson(), predicate));
+    }
+
+    private long count(Bson filter, Predicate<IndexSetConfig> predicate) {
+        return ImmutableList.copyOf(indexSets.find(filter)).stream().filter(predicate).count();
+    }
+
+    private MongoPaginationHelper<IndexSetConfig> helper(Bson dbQuery, DbSortResolver.ResolvedSort sort, int perPage) {
         return paginationHelper
                 .filter(dbQuery)
-                .sort(order.toBsonSort(sortField))
+                .sort(sort.sort())
+                .pipeline(sort.preSortStages())
+                .postSortPipeline(sort.postSortStages())
                 .perPage(perPage);
     }
 }
