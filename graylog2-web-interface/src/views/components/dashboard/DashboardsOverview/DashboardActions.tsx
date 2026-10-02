@@ -126,7 +126,8 @@ const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: 
   const moreActions = [
     pluggableActions.length ? pluggableActions : null,
     pluggableActions.length && !hideDeleteAction ? <MenuItem divider key="divider" /> : null,
-    scopePermissions?.is_mutable && isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit']) ? (
+    scopePermissions?.is_mutable &&
+    isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit']) ? (
       <DashboardDeleteAction
         dashboard={dashboard}
         refetchDashboards={refetch}
