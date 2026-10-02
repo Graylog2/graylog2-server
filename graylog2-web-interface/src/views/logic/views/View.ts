@@ -57,6 +57,7 @@ type InternalState = {
   favorite: boolean;
   lastUpdatedAt: Date;
   entitySource?: EntitySource;
+  scope?: string;
 };
 
 type EntitySource = {
@@ -80,6 +81,7 @@ export type ViewJson = {
   favorite: boolean;
   last_updated_at: string;
   _entity_source?: string;
+  _scope?: string;
 };
 
 export default class View {
@@ -105,6 +107,7 @@ export default class View {
     favorite: boolean,
     lastUpdatedAt: Date,
     entitySource: EntitySource,
+    scope: string,
   ) {
     this._value = {
       id,
@@ -121,6 +124,7 @@ export default class View {
       favorite,
       lastUpdatedAt,
       entitySource,
+      scope,
     };
   }
 
@@ -192,6 +196,10 @@ export default class View {
     return this._value.entitySource;
   }
 
+  get scope(): string | undefined {
+    return this._value.scope;
+  }
+
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
@@ -228,6 +236,7 @@ export default class View {
       favorite,
       lastUpdatedAt,
       entitySource,
+      scope,
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -247,6 +256,7 @@ export default class View {
         favorite,
         lastUpdatedAt,
         entitySource,
+        scope,
       }),
     );
   }
@@ -283,6 +293,7 @@ export default class View {
       favorite,
       last_updated_at,
       _entity_source,
+      _scope,
     } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
@@ -303,6 +314,7 @@ export default class View {
       .favorite(favorite)
       .lastUpdatedAt(lastUpdatedAtDate)
       .entitySource(_entity_source)
+      .scope(_scope)
       .build();
   }
 
@@ -373,6 +385,10 @@ class Builder {
     return new Builder(this.value.set('entitySource', value));
   }
 
+  scope(value: string | undefined): Builder {
+    return new Builder(this.value.set('scope', value));
+  }
+
   owner(value: string): Builder {
     return new Builder(this.value.set('owner', value));
   }
@@ -401,6 +417,7 @@ class Builder {
       favorite,
       lastUpdatedAt,
       entitySource,
+      scope,
     } = this.value.toObject();
 
     return new View(
@@ -418,6 +435,7 @@ class Builder {
       favorite,
       lastUpdatedAt,
       entitySource,
+      scope,
     );
   }
 }

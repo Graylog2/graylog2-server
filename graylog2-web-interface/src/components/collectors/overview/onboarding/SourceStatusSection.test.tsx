@@ -98,13 +98,14 @@ describe('SourceStatusSection', () => {
           source({ id: 's1', type: 'journald', name: 'System Journal' }),
           source({ id: 's2', type: 'windows_event_log', name: 'Windows Event Log' }),
           source({ id: 's3', type: 'file', name: 'Syslog' }),
+          source({ id: 's4', type: 'macos_unified_logging', name: 'macOS Unified Logging' }),
         ]}
         receiving
       />,
     );
 
-    // journald cannot run on Windows, the event log can, and a plain file source runs everywhere.
-    expect(screen.getByText('Not applicable on Windows')).toBeInTheDocument();
+    // journald and macos_unified_logging cannot run on Windows, the event log can, and a plain file source runs everywhere.
+    expect(screen.getAllByText('Not applicable on Windows')).toHaveLength(2);
     expect(screen.getAllByText('Receiving')).toHaveLength(2);
   });
 
