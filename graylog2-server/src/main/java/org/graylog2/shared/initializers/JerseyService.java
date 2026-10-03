@@ -72,6 +72,7 @@ import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonMappingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.MissingStreamPermissionExceptionMapper;
+import org.graylog2.shared.rest.exceptionmappers.ParamExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.WebApplicationExceptionMapper;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContextFilter;
@@ -280,6 +281,7 @@ public class JerseyService extends AbstractIdleService {
                         JsonMappingExceptionMapper.class,
                         AnyExceptionClassMapper.class,
                         MissingStreamPermissionExceptionMapper.class,
+                        ParamExceptionMapper.class,
                         WebApplicationExceptionMapper.class,
                         BadRequestExceptionMapper.class,
                         RestAccessLogFilter.class,
