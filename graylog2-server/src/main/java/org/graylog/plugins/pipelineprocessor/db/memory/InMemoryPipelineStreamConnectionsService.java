@@ -89,6 +89,25 @@ public class InMemoryPipelineStreamConnectionsService implements PipelineStreamC
     }
 
     @Override
+    public void deleteConnectionsForPipeline(String pipelineId) {
+        for (PipelineConnections connections : loadByPipelineId(pipelineId)) {
+            final Set<String> remainingPipelineIds = connections.pipelineIds().stream()
+                    .filter(id -> !id.equals(pipelineId))
+                    .collect(Collectors.toSet());
+
+            if (remainingPipelineIds.isEmpty()) {
+                store.remove(connections.id());
+                clusterBus.post(PipelineConnectionsChangedEvent.create(connections.streamId(), connections.pipelineIds()));
+            } else {
+                final PipelineConnections updated = connections.toBuilder()
+                        .pipelineIds(remainingPipelineIds)
+                        .build();
+                save(updated);
+            }
+        }
+    }
+
+    @Override
     public Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds) {
         return streamIds.stream()
                 .collect(Collectors.toMap(streamId -> streamId, store::get));
