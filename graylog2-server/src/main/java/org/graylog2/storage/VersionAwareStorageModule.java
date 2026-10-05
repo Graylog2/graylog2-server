@@ -18,6 +18,7 @@ package org.graylog2.storage;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
@@ -40,6 +41,7 @@ import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForField
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndexTemplateAdapterProvider;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.management.IndexManagementAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -101,6 +103,9 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(DatanodeClusterAdminAdapter.class).toProvider(DatanodeClusterAdminAdapterProvider.class);
 
         bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);
+
+        // Only the opensearch3 storage module binds it; Index Management answers 503 without it.
+        OptionalBinder.newOptionalBinder(binder(), IndexManagementAdapter.class);
 
         bindQueryBackend();
     }
