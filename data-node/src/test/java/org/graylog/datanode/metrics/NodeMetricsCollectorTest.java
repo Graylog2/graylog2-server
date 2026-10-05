@@ -16,23 +16,19 @@
  */
 package org.graylog.datanode.metrics;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import oshi.software.os.CgroupInfo;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,15 +37,14 @@ public class NodeMetricsCollectorTest {
     private static final String NODENAME = "datanode1";
 
     NodeMetricsCollector collector;
-    CgroupV2Reader noCgroupV2;
+    OfficialOpensearchClient client;
 
     @BeforeEach
-    public void setUp(@TempDir Path emptyCgroupRoot) throws IOException {
-        this.noCgroupV2 = new CgroupV2Reader(emptyCgroupRoot, Clock.systemUTC());
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+    public void setUp() throws IOException {
+        this.client = ServerlessOpenSearchClient.builder()
                 .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
                 .build();
-        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), noCgroupV2);
+        this.collector = collectorWithCgroup(null, Clock.systemUTC());
     }
 
     @Test
@@ -67,17 +62,12 @@ public class NodeMetricsCollectorTest {
     }
 
     @Test
-    public void getNodeMetricsWithCgroupMemory() throws IOException {
-        final String cgroupMemResponse = nodeStatResponse.replace(
-                "\"swap\": {",
-                "\"cgroup\": {\"memory\": {\"limit_in_bytes\": \"4294967296\", \"usage_in_bytes\": \"2147483648\"}}, \"swap\": {"
-        );
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
-                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", cgroupMemResponse)
-                .build();
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), noCgroupV2);
+    public void getNodeMetricsWithCgroupMemory() {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getMemoryLimit()).thenReturn(4294967296L);
+        when(cgroup.getMemoryUsage()).thenReturn(2147483648L);
 
-        final Map<String, Object> nodeMetrics = cgroupCollector.getNodeMetrics(NODENAME);
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, Clock.systemUTC()).getNodeMetrics(NODENAME);
         assertThat(nodeMetrics.get("mem_total")).isEqualTo(4294967296L);
         assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
         assertThat(nodeMetrics.get("mem_free")).isEqualTo(2147483648L);
@@ -85,32 +75,13 @@ public class NodeMetricsCollectorTest {
     }
 
     @Test
-    public void getNodeMetricsWithUnlimitedCgroupMemory() throws IOException {
-        final String cgroupMemMaxResponse = nodeStatResponse.replace(
-                "\"swap\": {",
-                "\"cgroup\": {\"memory\": {\"limit_in_bytes\": \"max\", \"usage_in_bytes\": \"2147483648\"}}, \"swap\": {"
-        );
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
-                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", cgroupMemMaxResponse)
-                .build();
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), noCgroupV2);
+    public void getNodeMetricsWithUnlimitedCgroupMemory() {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getMemoryLimit()).thenReturn(CgroupInfo.UNLIMITED_MEMORY);
+        when(cgroup.getMemoryUsage()).thenReturn(2147483648L);
 
-        final Map<String, Object> nodeMetrics = cgroupCollector.getNodeMetrics(NODENAME);
-        assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
-    }
-
-    @Test
-    public void getNodeMetricsWithCgroupV2Memory(@TempDir Path cgroupRoot) throws IOException {
-        Files.writeString(cgroupRoot.resolve("memory.current"), "3221225472\n");
-        Files.writeString(cgroupRoot.resolve("memory.max"), "max\n");
-        Files.writeString(cgroupRoot.resolve("memory.stat"), "anon 2147483648\nfile 1073741824\nactive_file 0\ninactive_file 1073741824\n");
-        // OpenSearch does not report cgroup v2 stats, so the response contains only host values
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
-                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
-                .build();
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), new CgroupV2Reader(cgroupRoot, Clock.systemUTC()));
-
-        final Map<String, Object> nodeMetrics = cgroupCollector.getNodeMetrics(NODENAME);
+        // Without a limit, the host memory stays the total, but the used memory is the cgroup's
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, Clock.systemUTC()).getNodeMetrics(NODENAME);
         assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
         assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
         assertThat(nodeMetrics.get("mem_free")).isEqualTo(32212254720L);
@@ -118,71 +89,36 @@ public class NodeMetricsCollectorTest {
     }
 
     @Test
-    public void getNodeMetricsWithLimitedCgroupV2Memory(@TempDir Path cgroupRoot) throws IOException {
-        Files.writeString(cgroupRoot.resolve("memory.current"), "2147483648\n");
-        Files.writeString(cgroupRoot.resolve("memory.max"), "4294967296\n");
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
-                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
-                .build();
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), new CgroupV2Reader(cgroupRoot, Clock.systemUTC()));
-
-        final Map<String, Object> nodeMetrics = cgroupCollector.getNodeMetrics(NODENAME);
-        assertThat(nodeMetrics.get("mem_total")).isEqualTo(4294967296L);
-        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
-        assertThat(nodeMetrics.get("mem_free")).isEqualTo(2147483648L);
-        assertThat(nodeMetrics.get("mem_total_used")).isEqualTo(50);
-    }
-
-    @Test
-    public void getNodeMetricsWithCgroupCpu() throws IOException {
-        final String sample1 = nodeStatResponse
-                .replace("\"timestamp\": 1705681973267", "\"timestamp\": 1000")
-                .replace("\"swap\": {",
-                        "\"cgroup\": {\"cpuacct\": {\"usage_nanos\": \"1000000000\"}, \"cpu\": {\"cfs_quota_micros\": \"200000\", \"cfs_period_micros\": \"100000\"}}, \"swap\": {");
-
-        final String sample2 = nodeStatResponse
-                .replace("\"timestamp\": 1705681973267", "\"timestamp\": 2000")
-                .replace("\"swap\": {",
-                        "\"cgroup\": {\"cpuacct\": {\"usage_nanos\": \"2000000000\"}, \"cpu\": {\"cfs_quota_micros\": \"200000\", \"cfs_period_micros\": \"100000\"}}, \"swap\": {");
-
-        final ObjectMapper mapper = new ObjectMapperProvider().get();
-        final OfficialOpensearchClient client = mock(OfficialOpensearchClient.class);
-        when(client.performRequest(any(), any()))
-                .thenReturn(mapper.readTree(sample1))
-                .thenReturn(mapper.readTree(sample2));
-
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, mapper, noCgroupV2);
-
-        // First sample: only 1 data point, falls back to OpenSearch host CPU percent (37)
-        final Map<String, Object> metrics1 = cgroupCollector.getNodeMetrics(NODENAME);
-        assertThat(metrics1.get("cpu_percent")).isEqualTo(37);
-
-        // Second sample: 1s elapsed, 1s cpu used across 2.0 cpus -> 50%
-        final Map<String, Object> metrics2 = cgroupCollector.getNodeMetrics(NODENAME);
-        assertThat(metrics2.get("cpu_percent")).isEqualTo(50);
-    }
-
-
-    @Test
-    public void getNodeMetricsWithCgroupV2Cpu(@TempDir Path cgroupRoot) throws IOException {
-        Files.writeString(cgroupRoot.resolve("cpu.max"), "200000 100000\n");
+    public void getNodeMetricsWithCgroupCpu() {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getCpuUsage()).thenReturn(1_000_000_000L, 2_000_000_000L);
+        when(cgroup.getEffectiveCpus()).thenReturn(2.0);
         final Clock clock = mock(Clock.class);
         when(clock.millis()).thenReturn(1000L, 2000L);
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
-                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
-                .build();
-        final NodeMetricsCollector cgroupCollector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), new CgroupV2Reader(cgroupRoot, clock));
+        final NodeMetricsCollector cgroupCollector = collectorWithCgroup(cgroup, clock);
 
         // First sample: only 1 data point, falls back to OpenSearch host CPU percent (37)
-        Files.writeString(cgroupRoot.resolve("cpu.stat"), "usage_usec 1000000\nuser_usec 800000\nsystem_usec 200000\n");
         assertThat(cgroupCollector.getNodeMetrics(NODENAME).get("cpu_percent")).isEqualTo(37);
 
         // Second sample: 1s elapsed, 1s cpu used across 2.0 cpus -> 50%
-        Files.writeString(cgroupRoot.resolve("cpu.stat"), "usage_usec 2000000\nuser_usec 1600000\nsystem_usec 400000\n");
         assertThat(cgroupCollector.getNodeMetrics(NODENAME).get("cpu_percent")).isEqualTo(50);
     }
 
+    @Test
+    public void getNodeMetricsWithoutCgroupValues() {
+        // e.g. the root cgroup, which has no memory/cpu accounting files
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getMemoryLimit()).thenReturn(CgroupInfo.UNLIMITED_MEMORY);
 
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, Clock.systemUTC()).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(34306146304L);
+        assertThat(nodeMetrics.get("cpu_percent")).isEqualTo(37);
+    }
+
+    private NodeMetricsCollector collectorWithCgroup(CgroupInfo cgroup, Clock clock) {
+        return new NodeMetricsCollector(client, new ObjectMapperProvider().get(), () -> cgroup, clock);
+    }
 
     private final static String nodeStatResponse = """
             {
