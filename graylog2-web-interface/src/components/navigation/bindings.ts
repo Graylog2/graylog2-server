@@ -70,7 +70,12 @@ const navigationBindings: PluginExports = {
               BadgeComponent: InputsAggregatedDotBadge,
             },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
-            { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
+            {
+              path: Routes.SYSTEM.INDICES.MANAGEMENT,
+              activePath: Routes.SYSTEM.INDICES.LIST,
+              description: 'Indices',
+              permissions: ['indices:read'],
+            },
             { path: Routes.SYSTEM.LOGGING, description: 'Logging', permissions: ['loggers:read'] },
             { path: Routes.SYSTEM.USERS.OVERVIEW, description: 'Users and Teams' },
             { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },

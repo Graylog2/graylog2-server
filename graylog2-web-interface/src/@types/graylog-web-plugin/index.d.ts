@@ -396,6 +396,8 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginNavigationDropdownItem {
     description: string;
     path: QualifiedUrl<string>;
+    // Pages under this path mark the item as active; defaults to `path`. For items whose link is one page of a section.
+    activePath?: QualifiedUrl<string>;
     permissions?: Permission | Array<Permission>;
     requiredFeatureFlag?: string;
     useCondition?: () => boolean;

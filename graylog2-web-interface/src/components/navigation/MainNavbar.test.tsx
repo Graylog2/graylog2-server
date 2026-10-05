@@ -91,6 +91,11 @@ describe('MainNavbar', () => {
             ],
           },
           {
+            description: 'Section dropdown test',
+            path: '/',
+            children: [{ path: '/section/landing', activePath: '/section', description: 'Section item' }],
+          },
+          {
             description: 'Hidden dropdown test',
             path: '/',
             children: [{ path: '/hidden-route', description: 'Hidden item', useCondition: () => false }],
@@ -204,6 +209,12 @@ describe('MainNavbar', () => {
       render(<SUT pathname="/somethingelse" />);
 
       await screen.findByRole('button', { name: /neat stuff \/ something else/i });
+    });
+
+    it('marks a dropdown item active on every page under its activePath, not only on the page it links to', async () => {
+      render(<SUT pathname="/section/other-page" />);
+
+      await screen.findByRole('button', { name: /section dropdown test \/ section item/i });
     });
 
     it('should merge navigation dropdowns when their description is equal', async () => {
