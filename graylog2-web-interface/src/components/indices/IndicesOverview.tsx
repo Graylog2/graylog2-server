@@ -18,7 +18,7 @@ import React from 'react';
 
 import type { IndexSummary } from 'hooks/useIndexerOverview';
 import IndexSection from 'components/indices/IndexSection';
-import type { IndexInfo } from 'stores/indices/IndicesStore';
+import type { IndexInfo } from 'hooks/useIndices';
 
 type Props = {
   indexDetails: Array<IndexInfo>;

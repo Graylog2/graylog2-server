@@ -41,7 +41,7 @@ const spinAnimation = keyframes`
   }
 `;
 
-type ColorVariants = 'success' | 'warning';
+type ColorVariants = 'success' | 'warning' | 'info';
 
 const StyledSpan = styled.span<{
   $size: string;

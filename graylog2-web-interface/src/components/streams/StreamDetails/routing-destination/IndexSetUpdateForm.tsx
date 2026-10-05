@@ -18,11 +18,11 @@ import * as React from 'react';
 import type { SyntheticEvent } from 'react';
 import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { Button, Modal } from 'components/bootstrap';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import useStreamMutations from 'hooks/useStreamMutations';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';
@@ -53,7 +53,7 @@ const validate = (values: FormValues) => {
 };
 
 const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
-  const queryClient = useQueryClient();
+  const { updateStream } = useStreamMutations();
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
@@ -73,15 +73,13 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   };
 
   const onSave = (values: FormValues) => {
-    StreamsStore.update(stream.id, values, (response) => {
-      UserNotification.success(`IndexSet of stream'${stream.title}' was updated successfully.`, 'Success');
-      setShowModal(false);
-      queryClient.invalidateQueries({
-        queryKey: ['stream', stream.id],
-      });
-
-      return response;
-    });
+    // The api fn handles the error toast on rejection, so we only run the success path on resolve.
+    updateStream({ streamId: stream.id, data: values })
+      .then(() => {
+        UserNotification.success(`IndexSet of stream'${stream.title}' was updated successfully.`, 'Success');
+        setShowModal(false);
+      })
+      .catch(() => {});
   };
 
   return (

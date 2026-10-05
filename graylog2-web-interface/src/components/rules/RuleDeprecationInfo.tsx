@@ -30,10 +30,8 @@ type Props = {
 
 const DeprecatedLabel = styled(Label)(
   ({ theme }) => css`
-    display: inline-flex;
     margin-left: ${theme.spacings.xs};
     vertical-align: inherit;
-    gap: ${theme.spacings.xxs};
   `,
 );
 

@@ -64,6 +64,22 @@ class ResponseEntityConverterTest {
     }
 
     @Test
+    public void convertsBooleanEntityAsData() {
+        final Map<String, Object> result = toTest.convertValue(Boolean.TRUE, Boolean.class);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(Boolean.TRUE, result.get("data"));
+    }
+
+    @Test
+    public void convertsNumericEntityAsData() {
+        final Map<String, Object> result = toTest.convertValue(42, Integer.class);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(42, result.get("data"));
+    }
+
+    @Test
     public void convertsListOfEntities() {
         final SimpleEntity firstObject = new SimpleEntity("foo", 1);
         final SimpleEntity secondObject = new SimpleEntity("bar", 42);

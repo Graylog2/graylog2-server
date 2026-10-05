@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { Events } from '@graylog/server-api';
 
 import TagsFilter from 'components/events/TagsFilter';
 
 jest.mock('@graylog/server-api', () => ({
-  Events: { slices: jest.fn() },
+  Events: { filterOptions: jest.fn() },
 }));
 
 jest.mock('routing/useQuery', () => ({
@@ -30,7 +31,10 @@ jest.mock('routing/useQuery', () => ({
   default: () => ({}),
 }));
 
-const mockedSlices = Events.slices as jest.MockedFunction<typeof Events.slices>;
+const mockedFilterOptions = Events.filterOptions as jest.MockedFunction<typeof Events.filterOptions>;
+
+const filterOptionsResponse = (tags: Array<string>) =>
+  ({ tags }) as unknown as Awaited<ReturnType<typeof Events.filterOptions>>;
 
 const tagsAttribute = {
   id: 'tags',
@@ -39,72 +43,74 @@ const tagsAttribute = {
   filterable: true,
 } as const;
 
+const renderFilter = () =>
+  render(
+    <TagsFilter
+      attribute={tagsAttribute as never}
+      allActiveFilters={undefined}
+      filter={undefined}
+      filterValueRenderer={(_v, t) => t}
+      onSubmit={jest.fn()}
+    />,
+  );
+
 describe('TagsFilter', () => {
   beforeEach(() => {
-    mockedSlices.mockReset();
+    mockedFilterOptions.mockReset();
   });
 
-  it('queries Events.slices with slice_column=tags and renders returned values', async () => {
-    mockedSlices.mockResolvedValue({
-      slices: [
-        { value: 'phishing', count: 5, title: null, meta: {} },
-        { value: 'exfil', count: 2, title: null, meta: {} },
-      ],
-    } as unknown as Awaited<ReturnType<typeof Events.slices>>);
+  it('requests the tags filter options and renders returned values', async () => {
+    mockedFilterOptions.mockResolvedValue(filterOptionsResponse(['exfil', 'phishing']));
 
-    render(
-      <TagsFilter
-        attribute={tagsAttribute as never}
-        allActiveFilters={undefined}
-        filter={undefined}
-        filterValueRenderer={(_v, t) => t}
-        onSubmit={jest.fn()}
-      />,
-    );
+    renderFilter();
 
     await waitFor(() => {
-      expect(mockedSlices).toHaveBeenCalledWith(expect.objectContaining({ slice_column: 'tags', include_all: true }));
+      expect(mockedFilterOptions).toHaveBeenCalledWith(expect.objectContaining({ fields: ['tags'] }));
     });
 
     expect(await screen.findByText('exfil')).toBeInTheDocument();
     expect(await screen.findByText('phishing')).toBeInTheDocument();
   });
 
-  it('renders an empty list when slices returns nothing', async () => {
-    mockedSlices.mockResolvedValue({ slices: [] } as unknown as Awaited<ReturnType<typeof Events.slices>>);
+  it('renders an empty list when no tags are returned', async () => {
+    mockedFilterOptions.mockResolvedValue(filterOptionsResponse([]));
 
-    render(
-      <TagsFilter
-        attribute={tagsAttribute as never}
-        allActiveFilters={undefined}
-        filter={undefined}
-        filterValueRenderer={(_v, t) => t}
-        onSubmit={jest.fn()}
-      />,
-    );
+    renderFilter();
 
     await waitFor(() => {
-      expect(mockedSlices).toHaveBeenCalled();
+      expect(mockedFilterOptions).toHaveBeenCalled();
     });
 
     expect(screen.queryByText('phishing')).not.toBeInTheDocument();
   });
 
-  it('falls back to empty suggestions when the request fails', async () => {
-    mockedSlices.mockRejectedValue(new Error('boom'));
+  it('forwards the typed search query to the server', async () => {
+    mockedFilterOptions.mockResolvedValue(filterOptionsResponse(['credential-access']));
 
-    render(
-      <TagsFilter
-        attribute={tagsAttribute as never}
-        allActiveFilters={undefined}
-        filter={undefined}
-        filterValueRenderer={(_v, t) => t}
-        onSubmit={jest.fn()}
-      />,
-    );
+    renderFilter();
 
     await waitFor(() => {
-      expect(mockedSlices).toHaveBeenCalled();
+      expect(mockedFilterOptions).toHaveBeenCalledWith(expect.objectContaining({ field_query: '' }));
+    });
+
+    await userEvent.type(await screen.findByPlaceholderText('Search for tags'), 'access');
+
+    // The search box debounces for 1s before the query is forwarded.
+    await waitFor(
+      () => {
+        expect(mockedFilterOptions).toHaveBeenCalledWith(expect.objectContaining({ field_query: 'access' }));
+      },
+      { timeout: 5000 },
+    );
+  }, 10000);
+
+  it('falls back to empty suggestions when the request fails', async () => {
+    mockedFilterOptions.mockRejectedValue(new Error('boom'));
+
+    renderFilter();
+
+    await waitFor(() => {
+      expect(mockedFilterOptions).toHaveBeenCalled();
     });
 
     expect(screen.queryByText('phishing')).not.toBeInTheDocument();

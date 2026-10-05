@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -171,6 +172,42 @@ class DynamicTransportTest {
                 .isInstanceOf(ExecutionException.class)
                 .cause()
                 .isSameAs(originalException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void runsBeforeRequestHookAheadOfEachRequest() throws IOException {
+        final var delegate = mock(OpenSearchTransport.class);
+        final var endpoint = mock(Endpoint.class);
+        final var options = mock(TransportOptions.class);
+        when(delegate.performRequest(any(), any(), any())).thenReturn("result");
+        when(delegate.performRequestAsync(any(), any(), any())).thenReturn(CompletableFuture.completedFuture("result"));
+
+        final var hookCalls = new AtomicInteger();
+        final var transport = new DynamicTransport(delegate, scheduler, hookCalls::incrementAndGet);
+
+        transport.performRequest("req", endpoint, options);
+        transport.performRequestAsync("req", endpoint, options);
+
+        assertThat(hookCalls).hasValue(2);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void asyncReturnsFailedFutureWhenBeforeRequestHookThrows() {
+        final var delegate = mock(OpenSearchTransport.class);
+        final var endpoint = mock(Endpoint.class);
+        final var options = mock(TransportOptions.class);
+        final var hookFailure = new IllegalStateException("cert refresh failed");
+
+        final var transport = new DynamicTransport(delegate, scheduler, () -> {
+            throw hookFailure;
+        });
+
+        final CompletableFuture<?> future = transport.performRequestAsync("req", endpoint, options);
+        assertThat(future).isCompletedExceptionally();
+        assertThatThrownBy(future::get).isInstanceOf(ExecutionException.class).cause().isSameAs(hookFailure);
+        verify(delegate, never()).performRequestAsync(any(), any(), any());
     }
 
     @Test

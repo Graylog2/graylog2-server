@@ -106,6 +106,7 @@ const LifecycleIndicator = ({
 type Props = {
   title: React.ReactNode;
   children?: React.ReactElement | Array<React.ReactElement>;
+  className?: string;
   actions?: React.ReactElement;
   topActions?: React.ReactElement;
   lifecycle?: 'experimental' | 'legacy';
@@ -127,12 +128,13 @@ const PageHeader = ({
   topActions = undefined,
   lifecycle = undefined,
   lifecycleMessage = undefined,
+  className = undefined,
   documentationLink = undefined,
 }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
-    <ContentHeadRow className={topLevelClassNames}>
+    <ContentHeadRow className={`${className ?? ''} ${topLevelClassNames}`}>
       <Col sm={12}>
         <Container>
           <FlexRow>

@@ -29,6 +29,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.search.EventsFilterOptions;
+import org.graylog.events.search.EventsFilterOptionsRequest;
 import org.graylog.events.search.EventsHistogramResult;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
@@ -86,6 +88,14 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Slices slices(@Context SearchUser searchUser, @Parameter(name = "JSON body") final EventsSlicesRequest request) {
         return sliceService.slices(firstNonNull(request, EventsSlicesRequest.empty()), getSubject(), searchUser);
+    }
+
+    @POST
+    @Path("/filter_options")
+    @Operation(summary = "Get the available values for the given event fields")
+    @NoAuditEvent("Doesn't change any data, only collects filter values")
+    public EventsFilterOptions filterOptions(@Parameter(name = "JSON body") final EventsFilterOptionsRequest request) {
+        return searchService.filterOptions(firstNonNull(request, EventsFilterOptionsRequest.empty()), getSubject());
     }
 
     @POST

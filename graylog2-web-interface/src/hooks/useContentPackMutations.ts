@@ -18,7 +18,14 @@ import { SystemContentPacks } from '@graylog/server-api';
 
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-export const createContentPack = (pack: unknown) => SystemContentPacks.createContentPack(pack as any);
+export type CreatedContentPack = {
+  id: string;
+  rev: number;
+  name: string;
+};
+
+export const createContentPack = (pack: unknown) =>
+  SystemContentPacks.createContentPack(pack as any) as Promise<CreatedContentPack>;
 
 export const deleteContentPack = (contentPackId: string) => SystemContentPacks.deleteContentPack(contentPackId);
 

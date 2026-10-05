@@ -18,14 +18,12 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Select } from 'components/common';
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
+import { ClearFloat, Select } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventDefinitionType } from 'components/event-definitions/types';
 
@@ -70,11 +68,15 @@ const EventConditionForm = ({
   onChange,
   canEdit,
 }: Props) => {
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-condition');
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
-  const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition());
+  const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition() && !type.hideFromCreation);
+
+  const currentConditionPlugin = useMemo(
+    () => eventDefinitionTypes.find((edt) => edt.type === eventDefinition.config.type),
+    [eventDefinitionTypes, eventDefinition.config.type],
+  );
 
   const getConditionPlugin = useCallback(
     (type: string) => {
@@ -109,15 +111,18 @@ const EventConditionForm = ({
     [filteredDefinitionTypes],
   );
 
-  const formattedEventDefinitionTypes = useMemo(
-    () => sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
-    [sortedEventDefinitionTypes],
-  );
+  const formattedEventDefinitionTypes = useMemo(() => {
+    const options = sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type }));
+
+    if (currentConditionPlugin && !options.some((o) => o.value === currentConditionPlugin.type)) {
+      options.push({ label: currentConditionPlugin.displayName, value: currentConditionPlugin.type });
+    }
+
+    return options;
+  }, [sortedEventDefinitionTypes, currentConditionPlugin]);
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-condition',
       app_action_value: 'type-select',
       condition_type: nextType,
     });
@@ -136,20 +141,17 @@ const EventConditionForm = ({
     () => eventDefinition._scope === 'ILLUMINATE' && action === 'edit',
     [action, eventDefinition._scope],
   );
-  const isSigma = useMemo(
-    () => eventDefinition.config.type === 'sigma-v1' && action === 'edit',
-    [action, eventDefinition.config.type],
+  // Types hidden from the creation wizard cannot have their condition type changed when being edited.
+  const isNonCreatableType = useMemo(
+    () => action === 'edit' && !!currentConditionPlugin?.hideFromCreation,
+    [action, currentConditionPlugin],
   );
 
-  const eventDefinitionType = useMemo(
-    () => getConditionPlugin(eventDefinition.config.type),
-    [eventDefinition.config.type, getConditionPlugin],
-  );
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
   const canEditCondition = canEdit && !isSystemEventDefinition;
 
-  const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement(eventDefinitionType.formComponent, {
+  const eventDefinitionTypeComponent = currentConditionPlugin?.formComponent
+    ? React.createElement(currentConditionPlugin.formComponent, {
         action,
         entityTypes,
         currentUser,
@@ -182,7 +184,7 @@ const EventConditionForm = ({
                 value={eventDefinition.config.type}
                 onChange={handleEventDefinitionTypeChange}
                 clearable={false}
-                disabled={disabledSelect || onlyFilters || isSigma}
+                disabled={disabledSelect || onlyFilters || isNonCreatableType}
                 required
               />
               <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
@@ -192,20 +194,17 @@ const EventConditionForm = ({
       </Col>
 
       {canEditCondition && !disabledSelect && (
+        <Col md={5} lg={5} lgOffset={1}>
+          <HelpPanel className={styles.conditionTypesInfo} title="Available Conditions">
+            <ConditionTypeDescriptions eventDefinitionTypes={sortedEventDefinitionTypes} />
+          </HelpPanel>
+        </Col>
+      )}
+      <ClearFloat />
+      {canEditCondition && eventDefinitionTypeComponent && (
         <>
-          <Col md={5} lg={5} lgOffset={1}>
-            <HelpPanel className={styles.conditionTypesInfo} title="Available Conditions">
-              <ConditionTypeDescriptions eventDefinitionTypes={sortedEventDefinitionTypes} />
-            </HelpPanel>
-          </Col>
-          <Clearfix />
-
-          {eventDefinitionTypeComponent && (
-            <>
-              <hr className={styles.hr} />
-              <Col md={12}>{eventDefinitionTypeComponent}</Col>
-            </>
-          )}
+          <hr className={styles.hr} />
+          <Col md={12}>{eventDefinitionTypeComponent}</Col>
         </>
       )}
     </Row>

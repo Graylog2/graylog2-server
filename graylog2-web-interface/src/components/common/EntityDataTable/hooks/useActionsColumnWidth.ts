@@ -17,7 +17,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase } from '../types';
 
@@ -42,7 +42,7 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
 
   const colMinWidth = useMemo(() => {
     if (!visibleRowIds.size) {
-      return CELL_PADDING * 2;
+      return CELL_PADDING_HORIZONTAL * 2;
     }
 
     const maxWidth = Math.max(
@@ -52,7 +52,7 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
         .filter((width) => !!width),
     );
 
-    return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
+    return hasRowActions ? maxWidth + CELL_PADDING_HORIZONTAL * 2 : 0;
   }, [hasRowActions, rowWidths, visibleRowIds]);
 
   return { colMinWidth, handleWidthChange };

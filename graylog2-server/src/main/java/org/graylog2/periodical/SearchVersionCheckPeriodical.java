@@ -27,8 +27,8 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
-import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbeLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +44,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
     private final IndexerJwtAuthToken indexerJwtAuthToken;
     private final NotificationService notificationService;
     private final SearchIndexerHostsService indexerHosts;
+    private final boolean runsWithDataNode;
 
     @Inject
     public SearchVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
@@ -51,7 +52,8 @@ public class SearchVersionCheckPeriodical extends Periodical {
                                         VersionProbeFactory versionProbeFactory,
                                         IndexerJwtAuthToken indexerJwtAuthToken,
                                         NotificationService notificationService,
-                                        SearchIndexerHostsService searchIndexerHostsService
+                                        SearchIndexerHostsService searchIndexerHostsService,
+                                        @RunsWithDataNode boolean runsWithDataNode
     ) {
         this.initialSearchVersion = elasticsearchVersion;
         this.versionOverride = Optional.ofNullable(versionOverride);
@@ -59,6 +61,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
         this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.notificationService = notificationService;
         this.indexerHosts = searchIndexerHostsService;
+        this.runsWithDataNode = runsWithDataNode;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return true;
+        return !runsWithDataNode;
     }
 
     @Override

@@ -142,15 +142,13 @@ const SlicesOverview = ({
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
   const preferredSortMode = slicingPreferences?.sortBy;
-  const initialSortMode =
+  const sortMode =
     preferredSortMode && sortOptions.some((option) => option.value === preferredSortMode)
       ? preferredSortMode
       : (defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
-  const [sortMode, setSortMode] = useState<SortMode>(initialSortMode);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(
-    slicingPreferences?.order ?? defaultSortDirectionForMode(initialSortMode, defaultSliceSort),
-  );
-  const sendTelemetry = useSendTelemetry();
+  const sortDirection = slicingPreferences?.order ?? defaultSortDirectionForMode(sortMode, defaultSliceSort);
+
+  const sendTelemetry = useSendTelemetry(appSection);
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
       fetchSlices,
@@ -174,22 +172,29 @@ const SlicesOverview = ({
   const onSortModeUpdate = (mode: SortMode) => {
     const direction = defaultSortDirectionForMode(mode, defaultSliceSort);
 
-    setSortMode(mode);
-    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
 
     if (sliceCol) {
-      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: mode, order: direction });
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: mode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
     }
   };
   const onSortDirectionUpdate = (direction: SortDirection) => {
-    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
 
     if (sliceCol) {
-      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: sortMode, order: direction });
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: sortMode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
     }
   };
 
@@ -198,7 +203,6 @@ const SlicesOverview = ({
       const next = !current;
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_EMPTY_VALUES_TOGGLED, {
-        app_section: appSection,
         event_details: {
           attribute_id: sliceCol,
           show_empty_slices: next,

@@ -21,8 +21,10 @@ import areaChart from './area/bindings';
 import barChart from './bar/bindings';
 import heatmap from './heatmap/bindings';
 import lineChart from './line/bindings';
+import networkGraph from './network/bindings';
 import singleNumber from './number/bindings';
 import pieChart from './pie/bindings';
+import sankey from './sankey/bindings';
 import scatterChart from './scatter/bindings';
 import worldMap from './worldmap/bindings';
 
@@ -32,8 +34,10 @@ const visualizationBindings: Array<VisualizationType<any>> = [
   dataTable,
   heatmap,
   lineChart,
+  networkGraph,
   singleNumber,
   pieChart,
+  sankey,
   scatterChart,
   worldMap,
 ];

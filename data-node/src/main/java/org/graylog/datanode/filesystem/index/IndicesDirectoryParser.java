@@ -24,8 +24,10 @@ import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog.datanode.filesystem.index.dto.ShardInformation;
+import org.graylog.datanode.filesystem.index.indexreader.Lucene9ShardStatsParser;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
+import org.graylog.datanode.filesystem.index.statefile.Lucene9StateFileParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,12 +59,19 @@ public class IndicesDirectoryParser {
 
     private final StateFileParser stateFileParser;
     private final ShardStatsParser shardReader;
+    private final StateFileParser compatibilityStateFileParser;
+    private final ShardStatsParser compatibilityShardReader;
     private final ExecutorService executor;
 
     @Inject
-    public IndicesDirectoryParser(StateFileParser stateFileParser, ShardStatsParser shardReader) {
+    public IndicesDirectoryParser(StateFileParser stateFileParser,
+                                  ShardStatsParser shardReader,
+                                  Lucene9StateFileParser compatibilityStateFileParser,
+                                  Lucene9ShardStatsParser compatibilityShardReader) {
         this.stateFileParser = stateFileParser;
         this.shardReader = shardReader;
+        this.compatibilityStateFileParser = compatibilityStateFileParser;
+        this.compatibilityShardReader = compatibilityShardReader;
         this.executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
@@ -70,7 +80,16 @@ public class IndicesDirectoryParser {
         executor.shutdown();
     }
 
-    public IndexerDirectoryInformation parse(Path path) {
+    public IndicesDirectoryParseResult parse(Path path) {
+        // The parser is a singleton and reads may run concurrently, so the flag has to be per invocation
+        final AtomicBoolean usedCompatibilityReader = new AtomicBoolean(false);
+        final IndexerDirectoryInformation info = parseDirectory(path, usedCompatibilityReader);
+        return new IndicesDirectoryParseResult(info, usedCompatibilityReader.get()
+                ? RequiredOpensearchDistribution.COMPAT
+                : RequiredOpensearchDistribution.CURRENT);
+    }
+
+    private IndexerDirectoryInformation parseDirectory(Path path, AtomicBoolean usedCompatibilityReader) {
         if (!Files.exists(path)) {
             throw new IndexerInformationParserException("Path " + path + " does not exist.");
         }
@@ -92,7 +111,7 @@ public class IndicesDirectoryParser {
         try (final Stream<Path> nodes = Files.list(nodesPath)) {
             final List<NodeInformation> nodeInformation = nodes.filter(Files::isDirectory)
                     .filter(p -> NUMERIC_DIR.matcher(p.getFileName().toString()).matches())
-                    .map(this::parseNode)
+                    .map(nodePath -> parseNode(nodePath, usedCompatibilityReader))
                     .filter(node -> !node.isEmpty())
                     .toList();
             return new IndexerDirectoryInformation(path, nodeInformation);
@@ -101,16 +120,16 @@ public class IndicesDirectoryParser {
         }
     }
 
-    private NodeInformation parseNode(Path nodePath) {
+    private NodeInformation parseNode(Path nodePath, AtomicBoolean usedCompatibilityReader) {
         final Path indicesDir = nodePath.resolve("indices");
         if (!Files.exists(indicesDir)) {
             return NodeInformation.empty(nodePath);
         }
         try (Stream<Path> indicesDirs = Files.list(indicesDir)) {
-            final StateFile state = getState(nodePath, "node");
+            final StateFile state = getState(nodePath, "node", usedCompatibilityReader);
             // Collect paths eagerly: the underlying DirectoryStream is not thread-safe
             final List<CompletableFuture<IndexInformation>> futures = indicesDirs.toList().stream()
-                    .map(p -> CompletableFuture.supplyAsync(() -> parseIndex(p), executor))
+                    .map(p -> CompletableFuture.supplyAsync(() -> parseIndex(p, usedCompatibilityReader), executor))
                     .toList();
             final List<IndexInformation> indices = awaitAll(futures).stream()
                     .sorted(Comparator.comparing(IndexInformation::indexName))
@@ -122,9 +141,9 @@ public class IndicesDirectoryParser {
     }
 
     @Nullable
-    private StateFile getState(Path path, String stateFilePrefix) {
+    private StateFile getState(Path path, String stateFilePrefix, AtomicBoolean usedCompatibilityReader) {
         final Optional<StateFile> stateFile = findStateFile(path, stateFilePrefix)
-                .map(stateFileParser::parse);
+                .map(file -> parseStateFile(file, usedCompatibilityReader));
         if (stateFile.isPresent()) {
             return stateFile.get();
         } else {
@@ -134,9 +153,9 @@ public class IndicesDirectoryParser {
 
     }
 
-    private IndexInformation parseIndex(Path path) {
+    private IndexInformation parseIndex(Path path, AtomicBoolean usedCompatibilityReader) {
         final String indexID = path.getFileName().toString();
-        final StateFile state = getState(path, "state");
+        final StateFile state = getState(path, "state", usedCompatibilityReader);
         try (Stream<Path> shardDirs = Files.list(path)) {
             // Collect paths eagerly: the underlying DirectoryStream is not thread-safe
             final List<CompletableFuture<ShardInformation>> futures = shardDirs
@@ -145,7 +164,7 @@ public class IndicesDirectoryParser {
                     .filter(p -> Files.exists(p.resolve("index")))
                     .toList()
                     .stream()
-                    .map(p -> CompletableFuture.supplyAsync(() -> getShardInformation(p), executor))
+                    .map(p -> CompletableFuture.supplyAsync(() -> getShardInformation(p, usedCompatibilityReader), executor))
                     .toList();
             final List<ShardInformation> shards = awaitAll(futures).stream()
                     .sorted(Comparator.comparing(ShardInformation::name))
@@ -155,13 +174,46 @@ public class IndicesDirectoryParser {
             throw new IndexerInformationParserException("Failed to parse shard information", e);
         }
     }
+    
+    private ShardStats readShardStats(Path path, AtomicBoolean usedCompatibilityReader) {
+        try {
+            return shardReader.read(path);
+        } catch (IncompatibleIndexVersionException e) {
+            LOG.debug("Shard {} can't be read by the current opensearch distribution, retrying with the "
+                    + "compatibility distribution", path, e);
+            final ShardStats stats = compatibilityShardReader.read(path);
+            usedCompatibilityReader.set(true);
+            return stats;
+        }
+    }
 
-    private ShardInformation getShardInformation(Path path) {
+    /**
+     * Same fallback as {@link #readShardStats(Path, AtomicBoolean)}, for the codec frame around state files.
+     */
+    private StateFile parseStateFile(Path file, AtomicBoolean usedCompatibilityReader) {
+        try {
+            return stateFileParser.parse(file);
+        } catch (IndexerInformationParserException e) {
+            LOG.debug("State file {} can't be read by the current opensearch distribution, retrying with the "
+                    + "compatibility distribution", file, e);
+            try {
+                final StateFile stateFile = compatibilityStateFileParser.parse(file);
+                usedCompatibilityReader.set(true);
+                return stateFile;
+            } catch (IndexerInformationParserException compatibilityException) {
+                // Report the original failure, the retry is only extra context
+                e.addSuppressed(compatibilityException);
+                throw e;
+            }
+        }
+    }
+
+    private ShardInformation getShardInformation(Path path, AtomicBoolean usedCompatibilityReader) {
         // shardReader and getState are independent I/O operations — run them concurrently
         final CompletableFuture<ShardStats> statsFuture =
-                CompletableFuture.supplyAsync(() -> shardReader.read(path), executor);
+                CompletableFuture.supplyAsync(() -> readShardStats(path, usedCompatibilityReader), executor);
         final CompletableFuture<StateFile> stateFuture =
-                CompletableFuture.supplyAsync(() -> getState(path, "state"), executor);
+                CompletableFuture.supplyAsync(() -> getState(path, "state", usedCompatibilityReader), executor);
         awaitAllOf(statsFuture, stateFuture);
         final ShardStats shardStats = statsFuture.join();
         final StateFile state = stateFuture.join();

@@ -71,7 +71,7 @@ public class PipelineRuleOutputFilter implements OutputFilter {
         // TODO: We probably want to extract the actual pipeline interpreter out of the PipelineInterpreter which
         //       is actually a MessageProcessor. That would make it more reusable.
         // We can pass a null value for the stateUpdater because we don't use functions that use it.
-        this.pipelineInterpreter = new PipelineInterpreter(new NoopMessageQueueAcknowledger(), new MetricRegistry(), null);
+        this.pipelineInterpreter = new PipelineInterpreter(new NoopMessageQueueAcknowledger(), new MetricRegistry(), null, 1);
 
         this.executionTime = metricRegistry.timer(name(getClass(), "executionTime"));
 

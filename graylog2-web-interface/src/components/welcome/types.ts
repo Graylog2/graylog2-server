@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type * as React from 'react';
 
 export type RecentActivityType = 'create' | 'update' | 'share' | 'delete';
 export type Pagination = {
@@ -88,3 +89,25 @@ export type RequestQuery = {
   page: number;
   per_page?: number;
 };
+
+export type WelcomePageMetricsPluginContext = {
+  isValidSecurityLicense: boolean;
+};
+
+export type WelcomePageMetricsPlugin = {
+  label: string;
+  component: React.ComponentType;
+  isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
+};
+
+export type WelcomeGeneralPageMetricsPlugin = {
+  component: React.ComponentType;
+  isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    welcomePageMetrics?: Array<WelcomePageMetricsPlugin>;
+    'welcomePageMetrics.general'?: Array<WelcomeGeneralPageMetricsPlugin>;
+  }
+}

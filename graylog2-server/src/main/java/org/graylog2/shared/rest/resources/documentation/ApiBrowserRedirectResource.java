@@ -16,39 +16,26 @@
  */
 package org.graylog2.shared.rest.resources.documentation;
 
-import jakarta.inject.Inject;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.rest.RestTools;
-
-import java.net.URI;
-
-import static java.util.Objects.requireNonNull;
+import org.graylog2.rest.URIHelper;
 
 /**
  * Redirects the old API browser URLs (served under the REST API prefix) to the
  * new frontend route at {@code /api-browser}, so that existing bookmarks keep
  * working after the server-side Swagger UI was removed.
  */
+@Hidden
 @Path("/api-browser{route: .*}")
 public class ApiBrowserRedirectResource {
-    private final HttpConfiguration httpConfiguration;
-
-    @Inject
-    public ApiBrowserRedirectResource(HttpConfiguration httpConfiguration) {
-        this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
-    }
 
     @GET
-    public Response redirect(@Context HttpHeaders httpHeaders) {
-        final URI base = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(),
-                httpConfiguration.getHttpExternalUri());
+    public Response redirect(@Context URIHelper uriHelper) {
         return Response.status(Response.Status.MOVED_PERMANENTLY)
-                .location(base.resolve("api-browser"))
+                .location(uriHelper.resolve("api-browser"))
                 .build();
     }
 }

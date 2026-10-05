@@ -92,10 +92,6 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the oldest available version found in the distribution directory is used.")
-    @Parameter(value = "opensearch_version")
-    private String opensearchVersion = null;
-
     @Documentation("""
             Data directory of the embedded opensearch. Contains indices of the opensearch.
             May be pointed to an existing opensearch directory during in-place migration to Datanode
@@ -159,6 +155,13 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             """)
     @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
+
+    @Documentation("""
+            Warn if the configured opensearch heap size appears too small compared to the memory available
+            to this data node. Set to false to suppress the warning.
+            """)
+    @Parameter(value = "opensearch_heap_size_warning_enabled")
+    private boolean opensearchHeapSizeWarningEnabled = true;
 
     @Documentation("HTTP port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
@@ -260,6 +263,19 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "hostname")
     private String hostname = null;
 
+    @Documentation("""
+            The address that OpenSearch advertises to other nodes and clients, set as OpenSearch's network.publish_host.
+            It applies to both the transport (node-to-node) and the HTTP interface, so it is also the address reported
+            by the nodes info API and used by Graylog when elasticsearch_discovery_enabled is set.
+            Set this explicitly when $hostname/$bind_address is not routable from other cluster members, e.g. when
+            this Datanode runs in a Docker bridge network and the container's hostname only resolves to a
+            non-routable internal address from inside the container. Falls back to $hostname if not set.
+            Must be a single hostname or IP address. Write IPv6 addresses without brackets and without a zone ID;
+            wildcard addresses (0.0.0.0, ::) are rejected.
+            """)
+    @Parameter(value = "opensearch_network_publish_host", validators = PublishHostValidator.class)
+    private String opensearchNetworkPublishHost = null;
+
     @Documentation("Name of the cluster that the embedded opensearch will form. Should be the same for all Datanodes in one cluster.")
     @Parameter(value = "clustername")
     private String clustername = "datanode-cluster";
@@ -282,7 +298,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation("The maximum size of the HTTP request headers in bytes")
     @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
+    private int httpMaxHeaderSize = 16384;
 
     @Documentation("The size of the thread pool used exclusively for serving the HTTP interface.")
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
@@ -373,8 +389,23 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_bootstrap_memory_lock")
     private boolean opensearchBootstrapMemoryLock = false;
 
+    /**
+     * Testing aid, deliberately undocumented and unsupported. Normally a datanode keeps running the opensearch version
+     * it has already recorded, and moving to a newer one is an explicit administrator action on the upgrade page.
+     * With this enabled the node instead takes the newest distribution its data allows on every start, which makes it
+     * possible to exercise a generation change without driving the upgrade UI. It never relaxes the compatibility
+     * bound — data that only the compatibility distribution can read still gets the compatibility distribution.
+     */
+    @Documentation(visible = false)
+    @Parameter(value = "auto_update_opensearch")
+    private boolean autoUpdateOpensearch = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
+    }
+
+    public boolean isAutoUpdateOpensearch() {
+        return autoUpdateOpensearch;
     }
 
     @Documentation("""
@@ -408,10 +439,6 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
-    }
-
-    public String getOpensearchVersion() {
-        return opensearchVersion;
     }
 
     /**
@@ -725,6 +752,11 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return bindAddress;
     }
 
+    public String getOpensearchNetworkPublishHost() {
+        return opensearchNetworkPublishHost != null && !opensearchNetworkPublishHost.isBlank()
+                ? opensearchNetworkPublishHost : getHostname();
+    }
+
     public String getNodeSearchCacheSize() {
         return searchCacheSize;
     }
@@ -735,6 +767,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    public boolean isOpensearchHeapSizeWarningEnabled() {
+        return opensearchHeapSizeWarningEnabled;
     }
 
     @Override

@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -38,7 +38,6 @@ import org.graylog2.events.ClusterEventBus;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -51,6 +50,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
+@Singleton
 public class MongoDbPipelineService implements PipelineService {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbPipelineService.class);
 
@@ -119,26 +119,16 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
-        try {
-            return ruleService.loadBySourcePattern(sourcePattern).stream()
-                    .flatMap(rule ->
-                            collection.find(Filters.regex(FIELD_SOURCE, Pattern.quote(rule.title()))).into(new ArrayList<>()).stream())
-                    .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
-                    .collect(Collectors.toSet());
-        } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
-            return Collections.emptySet();
-        }
+        return ruleService.loadBySourcePattern(sourcePattern).stream()
+                .flatMap(rule ->
+                        collection.find(Filters.regex(FIELD_SOURCE, Pattern.quote(rule.title()))).into(new ArrayList<>()).stream())
+                .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Collection<PipelineDao> loadAll() {
-        try {
-            return collection.find().into(new LinkedHashSet<>());
-        } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
-            return Collections.emptySet();
-        }
+        return collection.find().into(new LinkedHashSet<>());
     }
 
     @Override

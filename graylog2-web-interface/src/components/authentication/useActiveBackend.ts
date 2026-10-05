@@ -15,37 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import type { LoadActiveResponse } from 'stores/authentication/AuthenticationStore';
-import type { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { loadActiveAuthBackend, AUTHENTICATION_QUERY_KEY } from 'hooks/useAuthentication';
 
-const useActiveBackend = <T extends PromiseProvider>(listenableActions: Array<ListenableAction<T>> = []) => {
-  const [loadActiveResponse, setLoadActiveResponse] = useState<LoadActiveResponse | undefined>();
-  const [finishedLoading, setFinishedLoading] = useState(false);
-  const _loadActive = () =>
-    AuthenticationDomain.loadActive().then((response) => {
-      setFinishedLoading(true);
-      setLoadActiveResponse(response);
-    });
-
-  useEffect(() => {
-    _loadActive();
-  }, []);
-
-  useEffect(() => {
-    const unlistenActions = listenableActions.map((action) => action.completed.listen(_loadActive));
-
-    return () => {
-      unlistenActions.forEach((unlistenAction) => unlistenAction());
-    };
-  }, [listenableActions]);
+const useActiveBackend = () => {
+  const { data, isSuccess } = useQuery({
+    queryKey: [...AUTHENTICATION_QUERY_KEY, 'active'],
+    queryFn: loadActiveAuthBackend,
+  });
 
   return {
-    finishedLoading,
-    activeBackend: loadActiveResponse?.backend,
-    backendsTotal: loadActiveResponse?.context?.backendsTotal,
+    finishedLoading: isSuccess,
+    activeBackend: data?.backend,
+    backendsTotal: data?.context?.backendsTotal,
   };
 };
 

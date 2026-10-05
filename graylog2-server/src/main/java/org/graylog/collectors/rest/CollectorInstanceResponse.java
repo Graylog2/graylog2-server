@@ -18,6 +18,7 @@ package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.db.CollectorHealthDTO;
 
 import java.time.Instant;
 import java.util.Map;
@@ -34,5 +35,9 @@ public record CollectorInstanceResponse(
         @JsonProperty("next_certificate_fingerprint") @Nullable String nextCertificateFingerprint,
         @JsonProperty("next_certificate_expires_at") @Nullable Instant nextCertificateExpiresAt,
         @JsonProperty("identifying_attributes") Map<String, Object> identifyingAttributes,
-        @JsonProperty("non_identifying_attributes") Map<String, Object> nonIdentifyingAttributes) {
+        @JsonProperty("non_identifying_attributes") Map<String, Object> nonIdentifyingAttributes,
+        @JsonProperty("has_pending_changes") boolean hasPendingChanges,
+        // The fleet the instance is being moved to, until the collector checks in and fleet_id is updated.
+        @JsonProperty("pending_fleet_id") @Nullable String pendingFleetId,
+        @JsonProperty("health") @Nullable CollectorHealthDTO health) {
 }

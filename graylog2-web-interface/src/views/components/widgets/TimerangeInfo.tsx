@@ -42,7 +42,7 @@ const Wrapper = styled.div`
   display: flex;
   gap: 5px;
   align-items: center;
-  margin-right: 10px;
+  color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const StyledIcon = styled(Icon)(

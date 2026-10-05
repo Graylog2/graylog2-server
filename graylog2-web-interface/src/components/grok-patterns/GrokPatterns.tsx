@@ -164,7 +164,6 @@ class GrokPatterns extends React.Component<
       deleteGrokPattern(pattern, () => {
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
           app_pathname: 'grokpatterns',
-          app_section: 'grokpatterns',
         });
 
         this.loadData();
@@ -260,7 +259,6 @@ class GrokPatterns extends React.Component<
                   <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
                     <GrokPatternsList
                       id="grok-pattern-list"
-                      className="table-striped table-hover"
                       headers={headers}
                       headerCellFormatter={_headerCellFormatter}
                       sortByKey="name"
@@ -279,4 +277,4 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withPaginationQueryParameter(GrokPatterns));
+export default withTelemetry(withPaginationQueryParameter(GrokPatterns), 'grokpatterns');

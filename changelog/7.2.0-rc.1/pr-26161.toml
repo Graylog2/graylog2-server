@@ -1,0 +1,5 @@
+type = "a"
+message = "Include pipeline processing-load snapshot in support bundles."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14145"]
+pulls = ["26161"]

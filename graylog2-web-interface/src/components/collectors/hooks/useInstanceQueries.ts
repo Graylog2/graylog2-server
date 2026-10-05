@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { hashKey, useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
@@ -22,11 +22,16 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { RequestOptions } from 'routing/request';
+
+import useCollectorRefetchInterval from './useCollectorRefetchInterval';
 
 import type { CollectorInstanceView } from '../types';
 
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
+export const instanceKeyFn = (instanceUid: string | undefined) => [...INSTANCES_KEY_PREFIX, 'single', instanceUid];
 
 type ApiInstanceResponse = Awaited<ReturnType<typeof Collectors.findInstances>>['elements'][number];
 
@@ -50,7 +55,30 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     hostname: (allAttributes?.['host.name'] as string) ?? null,
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
+    has_pending_changes: dto.has_pending_changes,
+    pending_fleet_id: dto.pending_fleet_id ?? null,
+    health: dto.health ?? null,
   };
+};
+
+// The instances table refetches both on user interaction and on a fixed interval, but react-query
+// doesn't tell the query function what triggered a fetch. We infer it instead: interactions
+// (paging, sorting, filtering, searching) always change the search params, while an interval
+// refresh repeats the previous ones — so a repeated-params fetch is a background refresh and must
+// not keep the session alive, whereas a user actively working with the table extends it as usual.
+//
+// Caveat:
+// - Returning to the page via SPA navigation with unchanged params looks like a background refresh
+//   (this module-level state outlives the component). The page's sibling queries (fleets, config)
+//   don't opt out of session extension, so the navigation still extends the session through them.
+let lastFetchedParamsHash: string | null = null;
+
+const isBackgroundRefresh = (searchParams: SearchParams): boolean => {
+  const paramsHash = hashKey(instancesKeyFn(searchParams));
+  const isRepeatedFetch = paramsHash === lastFetchedParamsHash;
+  lastFetchedParamsHash = paramsHash;
+
+  return isRepeatedFetch;
 };
 
 export const fetchPaginatedInstances = async (
@@ -64,6 +92,7 @@ export const fetchPaginatedInstances = async (
       FiltersForQueryParams(searchParams.filters),
       searchParams.sort?.attributeId as 'instance_uid' | 'last_seen',
       searchParams.sort?.direction,
+      { requestShouldExtendSession: !isBackgroundRefresh(searchParams) },
     ).then((response) => ({
       list: response.elements.map(toView),
       pagination: response.pagination,
@@ -73,16 +102,51 @@ export const fetchPaginatedInstances = async (
     'Could not load instances',
   );
 
-export const useInstances = (fleetId?: string) =>
+export const useInstances = (fleetId?: string, options: { refetchInterval?: number; silent?: boolean } = {}) =>
   useQuery<CollectorInstanceView[]>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-
-      return defaultOnError(
-        Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
-        'Loading Collector instances failed with status',
-        'Could not load Collector instances',
+      const promise = Collectors.findInstances(1, 0, undefined, filters, undefined, undefined, NO_SESSION_EXT).then(
+        (response) => response.elements.map(toView),
       );
+
+      return options.silent
+        ? promise
+        : defaultOnError(
+            promise,
+            'Loading Collector instances failed with status',
+            'Could not load Collector instances',
+          );
     },
+    refetchInterval: options.refetchInterval,
   });
+
+/**
+ * A single instance, polled at the collector heartbeat cadence.
+ *
+ * The status and `last_seen` of a live collector change without any user interaction — a collector
+ * that stops reporting in is marked offline server-side — so a one-shot fetch would leave a page
+ * asserting "online" indefinitely. Polling is tied to the heartbeat interval because the data cannot
+ * become fresher than that: a shorter interval only adds requests.
+ *
+ * Two consequences of polling, both deliberate:
+ * - Requests do not extend the session, per the periodic-request rule. Arriving on a page still
+ *   extends it through the sibling queries (fleet, config), which do not opt out — the same reasoning
+ *   documented for `isBackgroundRefresh` above.
+ * - Errors are not reported through `defaultOnError`. A persistent failure would otherwise raise a
+ *   toast on every poll; callers get `error`/`isError` and render the failure themselves.
+ */
+export const useInstance = (instanceUid: string | undefined) => {
+  const refetchInterval = useCollectorRefetchInterval();
+
+  const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
+    queryKey: instanceKeyFn(instanceUid),
+    queryFn: () => Collectors.getInstance(instanceUid, NO_SESSION_EXT).then((response) => toView(response)),
+    enabled: !!instanceUid,
+    refetchInterval,
+  });
+
+  return { data, isLoading, error, isError };
+};

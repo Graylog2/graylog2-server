@@ -15,101 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { Spinner } from 'components/common';
-import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
+import { useSidecarsListPaginated } from 'hooks/useSidecars';
+import { useCollectorsAll } from 'hooks/useCollectors';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 
-import type { Collector, SidecarListResponse } from '../types';
-
-type SidecarsArgs = {
-  page?: number;
-  pageSize?: number;
-  query?: string;
-  sortField?: string;
-  order?: string;
-  onlyActive?: boolean;
-};
-
 const PAGE_SIZES = [25];
 
-const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
-  page: 1,
-  pageSize: PAGE_SIZES[0],
+const SIDECARS_DEFAULTS = {
   query: '',
   sortField: 'last_seen',
   order: 'desc',
-  onlyActive: false,
-};
-
-const fetchSidecars = (options: SidecarsArgs, callback: (data: SidecarListResponse) => void) => {
-  const {
-    page = SIDECARS_DEFAULT_ARGS.page,
-    pageSize = SIDECARS_DEFAULT_ARGS.pageSize,
-    query = SIDECARS_DEFAULT_ARGS.query,
-    sortField = SIDECARS_DEFAULT_ARGS.sortField,
-    order = SIDECARS_DEFAULT_ARGS.order,
-    onlyActive = SIDECARS_DEFAULT_ARGS.onlyActive,
-  } = options;
-
-  return SidecarsActions.listPaginated({
-    page,
-    pageSize,
-    query,
-    sortField,
-    order,
-    onlyActive,
-  }).then(callback);
+  onlyActive: false as boolean,
 };
 
 const SidecarFailureTrackingListContainer = () => {
-  const { page, pageSize, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
-  const [sidecarData, setSidecarData] = useState<SidecarListResponse | null>(null);
-  const [collectors, setCollectors] = useState<Collector[]>([]);
+  const { page, pageSize, resetPage, setPagination } = usePaginationQueryParameter(PAGE_SIZES);
+  const [query, setQuery] = useState<string>(SIDECARS_DEFAULTS.query);
+  const [sortField, setSortField] = useState<string>(SIDECARS_DEFAULTS.sortField);
+  const [order, setOrder] = useState<string>(SIDECARS_DEFAULTS.order);
+  const [onlyActive, setOnlyActive] = useState<boolean>(SIDECARS_DEFAULTS.onlyActive);
+  const { data: collectors = [] } = useCollectorsAll();
 
-  useEffect(() => {
-    if (sidecarData?.pagination.page !== page || sidecarData?.pagination.per_page !== pageSize) {
-      const { query, sort, order, only_active } = sidecarData || {};
-      fetchSidecars({ query, page, pageSize, order, sortField: sort, onlyActive: only_active }, setSidecarData);
-    }
-  }, [page, pageSize, sidecarData]);
-
-  useEffect(() => {
-    CollectorsActions.all().then((response) => setCollectors(response.collectors));
-  }, []);
-
-  const previousSidecarArgs: SidecarsArgs = {
-    page: 1,
+  const { data: sidecarData } = useSidecarsListPaginated({
+    query,
+    page,
     pageSize,
-    query: sidecarData?.query,
-    sortField: sidecarData?.sort,
-    order: sidecarData?.order,
-    onlyActive: sidecarData?.only_active,
+    sortField,
+    order,
+    onlyActive,
+  });
+
+  const handlePageChange = (newPage: number, newPageSize: number) => {
+    setPagination({ page: newPage, pageSize: newPageSize });
   };
 
-  const handlePageChange = (_page: number, _pageSize: number) => {
-    fetchSidecars({ ...previousSidecarArgs, page: _page, pageSize: _pageSize }, setSidecarData);
+  const handleQueryChange = (_query: string = '', callback: () => void = () => {}) => {
+    setQuery(_query);
+    resetPage();
+    callback();
   };
 
-  const handleQueryChange = (_query: string = '', callback = () => {}) => {
-    fetchSidecars({ ...previousSidecarArgs, query: _query }, setSidecarData)
-      .then(resetPage)
-      .finally(callback);
-  };
-
-  const handleSortChange = (sortField: string) => {
-    fetchSidecars(
-      { ...previousSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' },
-      setSidecarData,
-    ).then(resetPage);
+  const handleSortChange = (newSortField: string) => {
+    setSortField(newSortField);
+    setOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    resetPage();
   };
 
   const toggleShowInactive = () => {
-    fetchSidecars({ ...previousSidecarArgs, onlyActive: !sidecarData.only_active }, setSidecarData).then(resetPage);
+    setOnlyActive((prev) => !prev);
+    resetPage();
   };
 
   const isLoading = !sidecarData;
@@ -122,10 +81,15 @@ const SidecarFailureTrackingListContainer = () => {
     <SidecarFailureTrackingList
       sidecars={sidecarData.sidecars}
       collectors={collectors}
-      pagination={sidecarData.pagination}
+      pagination={{
+        total: sidecarData.pagination.total,
+        count: sidecarData.pagination.count,
+        page: sidecarData.pagination.page,
+        per_page: sidecarData.pagination.pageSize,
+      }}
       query={sidecarData.query}
-      onlyActive={sidecarData.only_active}
-      sort={{ field: sidecarData.sort, order: sidecarData.order }}
+      onlyActive={Boolean(sidecarData.onlyActive)}
+      sort={{ field: sidecarData.sort.field, order: sidecarData.sort.order }}
       onPageChange={handlePageChange}
       onQueryChange={handleQueryChange}
       onSortChange={handleSortChange}

@@ -17,6 +17,7 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { MemoryRouter } from 'react-router-dom';
 import * as React from 'react';
+import { memoryRouterFuture } from 'reactRouterFutureFlags';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
@@ -27,7 +28,11 @@ jest.mock('logic/telemetry/useSendTelemetry');
 
 const wrapper =
   (pathname: string) =>
-  ({ children }: { children: React.ReactNode }) => <MemoryRouter initialEntries={[pathname]}>{children}</MemoryRouter>;
+  ({ children }: { children: React.ReactNode }) => (
+    <MemoryRouter initialEntries={[pathname]} future={memoryRouterFuture}>
+      {children}
+    </MemoryRouter>
+  );
 
 describe('useSendCollectorsTelemetry', () => {
   const sendTelemetry = jest.fn();
@@ -45,26 +50,16 @@ describe('useSendCollectorsTelemetry', () => {
     ['/system/collectors/instances', 'collectors-instances'],
     ['/system/collectors/deployment', 'collectors-deployment'],
     ['/system/collectors/settings', 'collectors-settings'],
+    ['/system/collectors/onboarding/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f', 'collectors-onboarding'],
   ])('derives app_section %s for pathname %s', (pathname, expected) => {
     const { result } = renderHook(() => useSendCollectorsTelemetry(), { wrapper: wrapper(pathname) });
 
     result.current('Fleet Created' as never, { app_action_value: 'x', fleet_id: 'f1' });
 
+    expect(useSendTelemetry).toHaveBeenCalledWith(expected);
     expect(sendTelemetry).toHaveBeenCalledWith('Fleet Created', {
-      app_section: expected,
       app_action_value: 'x',
       fleet_id: 'f1',
     });
-  });
-
-  it('allows the caller to override app_section explicitly', () => {
-    const { result } = renderHook(() => useSendCollectorsTelemetry(), { wrapper: wrapper('/system/collectors') });
-
-    result.current('Fleet Created' as never, { app_section: 'custom-section', fleet_id: 'f1' });
-
-    expect(sendTelemetry).toHaveBeenCalledWith(
-      'Fleet Created',
-      expect.objectContaining({ app_section: 'custom-section' }),
-    );
   });
 });

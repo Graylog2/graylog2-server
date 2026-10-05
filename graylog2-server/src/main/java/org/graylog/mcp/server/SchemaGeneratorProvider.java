@@ -17,6 +17,7 @@
 package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.victools.jsonschema.generator.MemberScope;
 import com.github.victools.jsonschema.generator.Module;
 import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
@@ -30,6 +31,7 @@ import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidatio
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.DefaultValue;
+import org.graylog.jsonschema.DateTimeAsStringModule;
 import org.graylog.jsonschema.EmptyObjectAsObjectModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +87,17 @@ public class SchemaGeneratorProvider {
         var builder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
                 .with(Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS, Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
                 .with(new EmptyObjectAsObjectModule())
+                .with(new DateTimeAsStringModule())
                 .with(new JacksonModule(
                         JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
                         JacksonOption.FLATTENED_ENUMS_FROM_JSONVALUE,
                         JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
                         JacksonOption.RESPECT_JSONPROPERTY_ORDER))
                 .with(new JakartaValidationModule());
+
+        // Fields annotated with @Nullable serialize as null, so their schema must allow it
+        builder.forFields().withNullableCheck(SchemaGeneratorProvider::isNullableAnnotated);
+        builder.forMethods().withNullableCheck(SchemaGeneratorProvider::isNullableAnnotated);
 
         // Configure field default value resolution
         builder.forFields()
@@ -143,5 +150,15 @@ public class SchemaGeneratorProvider {
                 });
 
         return builder;
+    }
+
+    /**
+     * Returns {@code TRUE} for members annotated with {@code @Nullable} (javax or jakarta),
+     * {@code null} (undecided) otherwise so the generator's default applies.
+     */
+    private static Boolean isNullableAnnotated(MemberScope<?, ?> member) {
+        final boolean nullable = member.getAnnotationConsideringFieldAndGetter(javax.annotation.Nullable.class) != null
+                || member.getAnnotationConsideringFieldAndGetter(jakarta.annotation.Nullable.class) != null;
+        return nullable ? Boolean.TRUE : null;
     }
 }

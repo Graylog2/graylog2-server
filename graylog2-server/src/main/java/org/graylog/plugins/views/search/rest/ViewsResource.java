@@ -49,6 +49,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
@@ -59,6 +60,8 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
@@ -68,6 +71,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.rest.RestResourceWithOwnerCheck;
 import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
@@ -75,6 +79,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
@@ -91,11 +96,11 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +113,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class ViewsResource extends RestResource implements PluginRestResource {
+public class ViewsResource extends RestResourceWithOwnerCheck implements PluginRestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -268,8 +273,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         return dto;
     }
 
+    private List<UsedSearchFilter> cleanReferencedSearchFilters(List<UsedSearchFilter> searchFilters) {
+        return searchFilters.stream().map(sf -> sf instanceof ReferencedSearchFilter rsf ? rsf.stripToId() : sf).toList();
+    }
+
     private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
-        final ViewDTO dto = createEntityRequest.entity();
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
+
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
@@ -277,8 +288,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).scope(DefaultEntityScope.NAME).build(), user);
+        recentActivityService.create(result.id(), toGRNType(dto), searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -286,9 +297,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     private void updateViewSharing(CreateEntityRequest<ViewDTO> createEntityRequest, SearchUser searchUser, ViewDTO dto) {
         createEntityRequest.shareRequest().ifPresent(shareRequest -> {
-            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-            entitySharesService.updateEntityShares(grnType, dto.id(), shareRequest, searchUser.getUser());
+            entitySharesService.updateEntityShares(toGRNType(dto), dto.id(), shareRequest, searchUser.getUser());
         });
+    }
+
+    private GRNType toGRNType(ViewDTO dto) {
+        return dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -393,12 +407,27 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public ViewDTO update(@Parameter(name = "id") @PathParam("id") @NotEmpty String id,
                           @RequestBody(required = true) @Valid CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context SearchUser searchUser) {
-        final ViewDTO dto = createEntityRequest.entity();
+        // the ID from the path always has to match the id from the request body for an update.
+        // currently, the FE always uses it like that, so mismatches should only occur when using the API directly
+        if (!id.equals(createEntityRequest.entity().id())) {
+           throw new BadRequestException("Invalid update request");
+        }
+
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
-        var result = dbService.update(updatedDTO);
-        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        final var grnType = toGRNType(dto);
+        createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(updatedDTO.id())));
+
+        final ViewDTO result;
+        try {
+            result = dbService.update(updatedDTO);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
+        recentActivityService.update(result.id(), grnType, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -432,9 +461,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Unable to delete " + summarize(view) + ".");
         }
 
-        dbService.delete(id);
+        try {
+            dbService.delete(id);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
         triggerDeletedEvent(view);
-        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
+        recentActivityService.delete(view.id(), toGRNType(view), view.title(), searchUser);
         return view;
     }
 

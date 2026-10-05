@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -40,11 +42,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -57,6 +62,7 @@ public class RecentActivityServiceTest {
     RecentActivityService recentActivityService;
     TestUserService testUserService;
     GRNRegistry grnRegistry;
+    EventBus eventBus;
 
     PermissionAndRoleResolver permissionAndRoleResolver;
 
@@ -72,6 +78,8 @@ public class RecentActivityServiceTest {
                TestUserService testUserService) {
         admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
+        // TestUser only stubs getName(). Activity rows carry getFullName(), so stub it here to tell the two apart.
+        when(user.getFullName()).thenReturn("Test User");
         searchUser = TestSearchUser.builder().withUser(user).build();
         searchAdmin = TestSearchUser.builder().withUser(admin).build();
 
@@ -94,10 +102,11 @@ public class RecentActivityServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
+        this.eventBus = new EventBus();
         this.recentActivityService = new RecentActivityService(
                 mongoCollections,
                 mongodb.mongoConnection(),
-               null,
+                eventBus,
                 grnRegistry,
                 permissionAndRoleResolver,
                 MAXIMUM,
@@ -186,5 +195,44 @@ public class RecentActivityServiceTest {
 
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "2")).toList().size()).isEqualTo(1);
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "3")).toList().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testCreateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.create("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.CREATE);
+            assertThat(event.grn()).isEqualTo(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"));
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+            assertThat(event.userName()).isEqualTo("Test User");
+        });
+    }
+
+    @Test
+    public void testUpdateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.update("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.UPDATE);
+            assertThat(event.grn()).isEqualTo(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"));
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+            assertThat(event.userName()).isEqualTo("Test User");
+        });
+    }
+
+    static class RecentActivityEventCollector {
+        final List<RecentActivityEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void handle(RecentActivityEvent event) {
+            events.add(event);
+        }
     }
 }

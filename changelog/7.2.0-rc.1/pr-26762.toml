@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed a visual glitch when dragging a column with a dot in its id in the entity data table; the column order still changed correctly, but the drag animation was broken."
+
+pulls = ["26762"]

@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
@@ -31,15 +31,15 @@ import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFie
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const { data: indexSet, isInitialLoading } = useSingleIndexSet(indexSetId);
   const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
     if (!hasMappingPermission) {
-      navigate(Routes.NOTFOUND);
+      push(Routes.NOTFOUND);
     }
-  }, [hasMappingPermission, navigate]);
+  }, [hasMappingPermission, push]);
 
   const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
 

@@ -36,6 +36,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.aws.AWS;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequestImpl;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
@@ -72,6 +73,7 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
     @Path("/check_credentials")
     @Operation(summary = "Validate input credentials")
     @NoAuditEvent("This does not change any data")
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + CloudTrailInput.TYPE})
     public String checkCredentials(@RequestBody(required = true)
                                    @Valid @NotNull CloudTrailRequestImpl request) throws Exception {
         return cloudTrailDriver.checkCredentials(request);
@@ -80,6 +82,7 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
     @GET
     @Path("/getawsregions")
     @Operation(summary = "Get all available AWS regions")
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + CloudTrailInput.TYPE})
     public Map<String, String> getAWSRegions() {
         return AWS.buildRegionChoices();
     }
@@ -89,7 +92,7 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
     @Path("/inputs")
     @Operation(summary = "Create a new CloudTrail input")
     @AuditEvent(type = IntegrationsAuditEventTypes.AWS_CLOUDTRAIL_INPUT_CREATE)
-    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.aws.inputs.cloudtrail.CloudTrailInput"})
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + CloudTrailInput.TYPE})
     public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
                            @RequestBody(required = true)
                            @Valid @NotNull CloudTrailCreateInputRequest request) throws Exception {

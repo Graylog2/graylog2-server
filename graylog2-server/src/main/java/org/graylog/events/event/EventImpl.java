@@ -22,6 +22,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.fields.EventFieldNames;
 import org.graylog.events.fields.FieldValue;
 import org.graylog2.jackson.TypeReferences;
 import org.joda.time.DateTime;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -60,13 +62,14 @@ public class EventImpl implements Event {
     private ImmutableList<String> keyTuple = ImmutableList.of();
     private long priority;
     private boolean alert;
-    private Map<String, FieldValue> fields = new HashMap<>();
-    private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private Map<String, FieldValue> fields = new TreeMap<>(EventFieldNames.COMPARATOR);
+    private Map<String, FieldValue> groupByFields = new TreeMap<>(EventFieldNames.COMPARATOR);
     private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
     private final Set<String> tags = new HashSet<>();
     private EventReplayInfo replayInfo;
+    private List<String> tacticsTechniques = ImmutableList.of();
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -301,7 +304,11 @@ public class EventImpl implements Event {
 
     @Override
     public void setFields(Map<String, String> fields) {
-        this.fields = fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+        this.fields = fields.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> FieldValue.string(entry.getValue()),
+                        (a, b) -> b,
+                        () -> new TreeMap<>(EventFieldNames.COMPARATOR)));
     }
 
     @Override
@@ -316,7 +323,11 @@ public class EventImpl implements Event {
 
     @Override
     public void setGroupByFields(Map<String, String> fields) {
-        this.groupByFields = fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+        this.groupByFields = fields.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> FieldValue.string(entry.getValue()),
+                        (a, b) -> b,
+                        () -> new TreeMap<>(EventFieldNames.COMPARATOR)));
     }
 
     @Override
@@ -337,6 +348,16 @@ public class EventImpl implements Event {
     @Override
     public void setReplayInfo(EventReplayInfo replayInfo) {
         this.replayInfo = replayInfo;
+    }
+
+    @Override
+    public List<String> getTacticsTechniques() {
+        return tacticsTechniques;
+    }
+
+    @Override
+    public void setTacticsTechniques(List<String> tacticsTechniques) {
+        this.tacticsTechniques = tacticsTechniques == null ? ImmutableList.of() : ImmutableList.copyOf(tacticsTechniques);
     }
 
     @Override
@@ -371,10 +392,11 @@ public class EventImpl implements Event {
                 .associatedAssets(ImmutableSet.copyOf(associatedAssets))
                 .tags(ImmutableSet.copyOf(tags))
                 .alert(getAlert())
-                .fields(ImmutableMap.copyOf(fields))
-                .groupByFields(ImmutableMap.copyOf(groupByFields))
+                .fields(EventFieldNames.sorted(fields))
+                .groupByFields(EventFieldNames.sorted(groupByFields))
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
+                .tacticsTechniques(getTacticsTechniques())
                 .build();
     }
 
@@ -431,6 +453,7 @@ public class EventImpl implements Event {
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
                 Objects.equals(tags, event.tags) &&
+                Objects.equals(tacticsTechniques, event.tacticsTechniques) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -439,7 +462,7 @@ public class EventImpl implements Event {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
                 keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores,
-                associatedAssets, tags, replayInfo);
+                associatedAssets, tags, tacticsTechniques, replayInfo);
     }
 
     @Override
@@ -467,6 +490,7 @@ public class EventImpl implements Event {
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)
                 .add("tags", tags)
+                .add("tacticsTechniques", tacticsTechniques)
                 .toString();
     }
 

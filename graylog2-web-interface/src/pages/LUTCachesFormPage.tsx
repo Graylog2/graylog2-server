@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -40,8 +41,8 @@ const FlexCol = styled(Col)`
 function LUTDataAdaptersFormPage() {
   const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
   const { cache, loadingCache } = useFetchCache(cacheIdOrName);
-  const navigate = useNavigate();
-  const navigateBack = () => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
+  const { push } = useHistory();
+  const navigateBack = () => push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 
   return (
     <FlexContainer>

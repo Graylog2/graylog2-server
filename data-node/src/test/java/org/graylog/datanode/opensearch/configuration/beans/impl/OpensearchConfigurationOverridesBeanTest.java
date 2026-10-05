@@ -17,9 +17,12 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.DatanodeTestUtils;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -34,9 +37,6 @@ class OpensearchConfigurationOverridesBeanTest {
 
     @Test
     void testPassThroughConfigurationPart(@TempDir Path tempDir) {
-        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
-
-
         final Path opensearchOverridesFile = tempDir.resolve("opensearch.overrides");
         writePropertiesFile(opensearchOverridesFile,
                 """
@@ -44,9 +44,8 @@ class OpensearchConfigurationOverridesBeanTest {
                         cluster.max_shards_per_node: 500
                         """);
 
-
-        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, Collections::emptyMap);
-        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams(tempDir));
+        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(opensearchOverridesFile, Collections::emptyMap);
+        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(configBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(2)
@@ -57,9 +56,6 @@ class OpensearchConfigurationOverridesBeanTest {
 
     @Test
     void testLegacyEnvProperties(@TempDir Path tempDir) {
-        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
-
-
         final Path opensearchOverridesFile = tempDir.resolve("opensearch.overrides");
         writePropertiesFile(opensearchOverridesFile,
                 """
@@ -69,8 +65,8 @@ class OpensearchConfigurationOverridesBeanTest {
 
         final Supplier<Map<String, String>> env = () -> Map.of("opensearch.cluster.max_shards_per_node", "500");
 
-        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, env);
-        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams(tempDir));
+        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(opensearchOverridesFile, env);
+        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(configBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(2)
@@ -91,7 +87,16 @@ class OpensearchConfigurationOverridesBeanTest {
         }
     }
 
-    private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
-        return new OpensearchConfigurationParams(tempDir);
+    private OpensearchConfigurationParams configBuildParams(Path tempDir) {
+        return new OpensearchConfigurationParams(mockDatanodeConfiguration(tempDir), tempDir);
+    }
+
+    private DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
+        return new DatanodeConfiguration(
+                new OpensearchDistribution(tempDir, "2.19.5"),
+                DatanodeTestUtils.tempDirectories(tempDir),
+                100,
+                IndexerJwtAuthToken.disabled()
+        );
     }
 }

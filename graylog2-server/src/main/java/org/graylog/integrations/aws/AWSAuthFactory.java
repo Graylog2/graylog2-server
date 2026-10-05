@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.base.Preconditions;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,11 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.StsClientBuilder;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.auth.StsCredentialsProvider;
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
+import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.utils.SdkAutoCloseable;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -52,7 +56,16 @@ public class AWSAuthFactory {
                                          @Nullable String accessKey,
                                          @Nullable String secretKey,
                                          @Nullable String assumeRoleArn) {
-        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null);
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null, null);
+    }
+
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn,
+                                         @Nullable String externalId) {
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, externalId, null);
     }
 
     /**
@@ -68,16 +81,61 @@ public class AWSAuthFactory {
                                          @Nullable String secretKey,
                                          @Nullable String assumeRoleArn,
                                          @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null, stsHttpClientBuilder);
+    }
+
+    /**
+     * Resolves the appropriate AWS authorization provider, optionally configuring an External ID
+     * on the STS AssumeRole request to prevent the confused deputy problem, and optionally configuring
+     * an HTTP client builder on the STS client used for assume-role.
+     *
+     * @param externalId           optional external ID to include in the AssumeRole request
+     * @param stsHttpClientBuilder optional Apache HTTP client builder (e.g. with proxy config) for the STS client
+     */
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn,
+                                         @Nullable String externalId,
+                                         @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+        // Discards the STS client handle. Callers on this overload cannot close the STS client backing an
+        // assume-role provider, so its connection pool leaks for the process lifetime; see createCloseable.
+        return createCloseable(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, externalId, stsHttpClientBuilder)
+                .provider();
+    }
+
+    /**
+     * Same resolution as {@link #create(boolean, String, String, String, String, String, ApacheHttpClient.Builder)},
+     * but returns a {@link CredentialsProviderHandle} so the caller can close the STS client backing an assume-role
+     * provider.
+     *
+     * <p>For an assume-role configuration the STS client is created here and handed to
+     * {@link StsAssumeRoleCredentialsProvider}, which never closes it: {@link StsCredentialsProvider#close()} only
+     * clears the session cache. Callers that build a fresh provider per operation must therefore close the handle,
+     * or the STS client's Apache connection pool leaks on every call.
+     */
+    public CredentialsProviderHandle createCloseable(boolean requireKeySecret,
+                                                     @Nullable String stsRegion,
+                                                     @Nullable String accessKey,
+                                                     @Nullable String secretKey,
+                                                     @Nullable String assumeRoleArn,
+                                                     @Nullable String externalId,
+                                                     @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
+
+        if (StringUtils.isNotBlank(externalId) && StringUtils.isBlank(assumeRoleArn)) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {
             LOG.debug("Creating cross account assume role credentials");
-            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, stsHttpClientBuilder);
+            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, externalId, stsHttpClientBuilder);
         }
 
-        return awsCredentials;
+        return new CredentialsProviderHandle(awsCredentials, null);
     }
 
     private static AwsCredentialsProvider getAwsCredentialsProvider(String accessKey, String secretKey) {
@@ -103,9 +161,10 @@ public class AWSAuthFactory {
      * Note: In order to assume a role, a role must be provided to the AWS STS client a role that has the "sts:AssumeRole"
      * permission, which provides authorization for a role to be assumed.
      */
-    private static AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
-                                                                      String assumeRoleArn, @Nullable String accessKey,
-                                                                      @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+    private static CredentialsProviderHandle buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
+                                                                         String assumeRoleArn, @Nullable String accessKey,
+                                                                         @Nullable String externalId,
+                                                                         @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
 
         final StsClientBuilder stsClientBuilder = StsClient.builder()
                 .region(Region.of(stsRegion))
@@ -114,24 +173,65 @@ public class AWSAuthFactory {
             stsClientBuilder.httpClientBuilder(stsHttpClientBuilder);
         }
         final StsClient stsClient = stsClientBuilder.build();
+        // getCallerIdentity() can throw before the handle owns the client; close it here or it leaks.
+        try {
+            // The custom roleSessionName is extra metadata, which will be logged in AWS CloudTrail with each request
+            // to help with auditing and debugging.
+            final String roleSessionName;
+            if (accessKey != null) {
+                roleSessionName = String.format(Locale.ROOT, "ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
+                        stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            } else {
+                roleSessionName = String.format(Locale.ROOT, "ACCOUNT_%s",
+                        stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            }
 
-        // The custom roleSessionName is extra metadata, which will be logged in AWS CloudTrail with each request
-        // to help with auditing and debugging.
-        final String roleSessionName;
-        if (accessKey != null) {
-            roleSessionName = String.format(Locale.ROOT, "ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
-                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
-        } else {
-            roleSessionName = String.format(Locale.ROOT, "ACCOUNT_%s",
-                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            LOG.debug("Cross account role session name: " + roleSessionName);
+            final AssumeRoleRequest.Builder assumeRoleRequestBuilder = AssumeRoleRequest.builder()
+                    .roleSessionName(roleSessionName)
+                    .roleArn(assumeRoleArn);
+            if (!isNullOrEmpty(externalId)) {
+                assumeRoleRequestBuilder.externalId(externalId);
+            }
+            final StsAssumeRoleCredentialsProvider provider = StsAssumeRoleCredentialsProvider.builder()
+                    .refreshRequest(assumeRoleRequestBuilder.build())
+                    .stsClient(stsClient)
+                    .build();
+            return new CredentialsProviderHandle(provider, stsClient);
+        } catch (RuntimeException e) {
+            IoUtils.closeQuietly(stsClient, LOG);
+            throw e;
+        }
+    }
+
+    /**
+     * A resolved {@link AwsCredentialsProvider} paired with the STS client backing an assume-role provider, if any.
+     *
+     * <p>{@link StsCredentialsProvider#close()} only clears the provider's session cache; the {@link StsClient} it
+     * was handed is caller-supplied and {@code final}, so it is never closed and its Apache connection pool leaks.
+     * This handle owns both resources so a caller can release them together. {@link #close()} closes the credentials
+     * provider first -- stopping its background session refresh -- and then the STS client.
+     */
+    public static final class CredentialsProviderHandle implements AutoCloseable {
+        private final AwsCredentialsProvider provider;
+        @Nullable
+        private final SdkAutoCloseable stsClient;
+
+        CredentialsProviderHandle(AwsCredentialsProvider provider, @Nullable SdkAutoCloseable stsClient) {
+            this.provider = provider;
+            this.stsClient = stsClient;
         }
 
-        LOG.debug("Cross account role session name: " + roleSessionName);
-        return StsAssumeRoleCredentialsProvider.builder().refreshRequest(AssumeRoleRequest.builder()
-                        .roleSessionName(roleSessionName)
-                        .roleArn(assumeRoleArn)
-                        .build())
-                .stsClient(stsClient)
-                .build();
+        public AwsCredentialsProvider provider() {
+            return provider;
+        }
+
+        @Override
+        public void close() {
+            if (provider instanceof SdkAutoCloseable closeableProvider) {
+                IoUtils.closeQuietly(closeableProvider, LOG);
+            }
+            IoUtils.closeQuietly(stsClient, LOG);
+        }
     }
 }

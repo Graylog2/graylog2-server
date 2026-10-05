@@ -17,7 +17,7 @@
 import UserNotification from 'util/UserNotification';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
+import { createAuthBackend } from 'hooks/useAuthentication';
 
 import type { WizardFormValues, AuthBackendMeta } from './BackendWizard/BackendWizardContext';
 
@@ -32,7 +32,7 @@ export default (
   const notifyOnError = (error) =>
     UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
 
-  return AuthenticationActions.create(payload)
+  return createAuthBackend(payload)
     .then((result) => {
       if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
         return enterpriseGroupSyncPlugin.actions

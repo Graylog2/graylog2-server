@@ -26,10 +26,14 @@ import java.util.Map;
 import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
 
 public abstract class EventsIndexMapping extends AbstractMapping {
+    private final String indexRefreshInterval;
+
+    protected EventsIndexMapping(String indexRefreshInterval) {
+        this.indexRefreshInterval = indexRefreshInterval;
+    }
+
     @Override
     public Template toTemplate(IndexSetMappingTemplate indexSetConfig, Long order) {
-        final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
-
         var mappings = new Template.Mappings(buildMappings());
         var settings = new Template.Settings(Map.of("index.refresh_interval", indexRefreshInterval));
         return Template.create(indexSetConfig.indexWildcard(), mappings, order, settings);
@@ -198,6 +202,9 @@ public abstract class EventsIndexMapping extends AbstractMapping {
                         .put("dynamic", true)
                         .build())
                 .put(FIELD_ASSOCIATED_ASSETS, map()
+                        .put("type", "keyword")
+                        .build())
+                .put(EventDto.FIELD_TACTICS_TECHNIQUES, map()
                         .put("type", "keyword")
                         .build())
                 .put(EventDto.FIELD_TAGS, map()

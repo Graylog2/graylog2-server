@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @AutoValue
 public abstract class PaloAltoMessageBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PaloAltoParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PaloAltoMessageBase.class);
 
     public abstract String source();
     public abstract DateTime timestamp();

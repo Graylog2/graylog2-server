@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
-import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NodeInfoCache;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -83,6 +83,11 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.INDICES_READ);
     }
 
     @Override

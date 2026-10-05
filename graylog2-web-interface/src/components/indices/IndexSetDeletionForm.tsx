@@ -20,7 +20,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Spinner } from 'components/common';
 import { Alert, Row, Col, Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { StreamsStore } from 'stores/streams/StreamsStore';
+import { fetchStreams } from 'api/streams';
 
 type IndexSetDeletionFormProps = {
   indexSet: any;
@@ -44,7 +44,7 @@ class IndexSetDeletionForm extends React.Component<
   }
 
   _onModalOpen = () => {
-    StreamsStore.load((streams) => {
+    fetchStreams().then((streams) => {
       const assignedStreams = [];
 
       streams.forEach((stream) => {

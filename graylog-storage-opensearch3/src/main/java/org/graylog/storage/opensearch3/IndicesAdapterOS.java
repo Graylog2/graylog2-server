@@ -153,13 +153,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         ReindexResponse result = c.execute(() -> openSearchClient.reindex(
                         org.opensearch.client.opensearch.core.ReindexRequest.builder()
                                 .source(Source.builder().index(source).build())
                                 .dest(Destination.builder().index(target).build())
                                 .build()),
-                "Error moving index " + source + " to " + target);
+                "Error reindexing index " + source + " to " + target);
 
         final IndexMoveResult indexMoveResult = IndexMoveResult.create(
                 Math.toIntExact(getIfNull(result.total(), 0L)),
@@ -628,15 +628,17 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        ForcemergeRequest request = ForcemergeRequest.of(b -> b
+        final ForcemergeRequest request = ForcemergeRequest.of(b -> b
                 .index(index)
                 .maxNumSegments(Integer.toUnsignedLong(maxNumSegments))
                 .flush(true)
         );
 
-        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
-        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
-
+        final String errorMessage = "Force merge of index " + index + " did not complete in " + timeout + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout(
+                (asyncClient) -> asyncClient.indices().forcemerge(request),
+                errorMessage,
+                timeout);
     }
 
     @Override

@@ -189,6 +189,7 @@ To prevent session expiry during user interaction, every API request using `fetc
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central docs for plugin store keys — search the codebase.
+- Merging bindings: always use `mergePluginBindings` from `util/mergePluginBindings` when combining multiple `PluginExports` objects (e.g. building a `bindings.tsx` from sub-plugins, or aggregating bindings for `PluginStore.register`). Never use `lodash/merge`, `Immutable.Map().mergeWith`, object spreads, or manual per-key array concatenation — they overwrite or index-merge array-valued keys (`pageNavigation`, `routes`, …) and drop entries. `mergePluginBindings` concatenates array-valued keys and deep-merges the rest.
 - Test without plugins: `disable_plugins=true yarn start`
 - Example plugin: [graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)
 
@@ -217,7 +218,7 @@ Test thoroughly before submitting a PR:
 Run checks locally before creating a PR:
 
 ```sh
-yarn tsc && yarn lint:changes && yarn test
+yarn tsgo && yarn lint:changes && yarn test
 ```
 
 ## Browser Compatibility
@@ -226,19 +227,12 @@ Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should
 
 ## UI Styling
 
+The [graylog-luma design system](https://graylog2.github.io/design-system) — especially the **Foundation** and **Patterns** sections — documents conventions (spacing/typography tokens, form layout, entity-creation flows, content and writing rules) that go beyond what's summarized below.
+
 ### Styled Components
 
 - In styled components, prefer theme tokens over hard-coded style values when possible. This includes spacing via `theme.spacings`, colors via `theme.colors`, and typography values such as `theme.fonts.family` and `theme.fonts.size`.
 - To style a component, prefer wrapping that component with `styled(...)` instead of targeting it through selectors from a parent component.
-
-### Forms
-
-- Use vertically aligned labels and inputs (no horizontal forms without good reason).
-- Add helper text to inputs.
-- Show validation state only after changes or form submission.
-- Prefer our own `Select` component over the native one.
-- Avoid long forms in modals.
-- Mark optional fields with "(Optional)" in the label.
 
 ### Responsive Styles
 

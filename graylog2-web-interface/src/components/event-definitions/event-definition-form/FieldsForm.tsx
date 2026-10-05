@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
@@ -41,6 +42,7 @@ type Props = {
       field_spec?: string[];
       key_spec?: string[];
       tags?: string[] | string;
+      tactics_techniques?: string[] | string;
     };
   };
   onChange: (name: string, value: unknown) => void;
@@ -92,6 +94,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   };
 
   const canEditCondition = canEdit && !isSystemEventDefinition(eventDefinition);
+  const tacticsTechniquesEditorPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesEditor')[0];
 
   if (showFieldForm) {
     return (
@@ -131,6 +134,19 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
           }
         />
 
+        {tacticsTechniquesEditorPlugin ? (
+          <tacticsTechniquesEditorPlugin.component
+            value={eventDefinition.tactics_techniques ?? []}
+            onChange={(next: string[]) => onChange('tactics_techniques', next)}
+            disabled={!canEditCondition}
+            error={
+              Array.isArray(validation?.errors?.tactics_techniques)
+                ? validation.errors.tactics_techniques.join(' ')
+                : (validation?.errors?.tactics_techniques ?? null)
+            }
+          />
+        ) : null}
+
         <h2 className={commonStyles.title}>
           Event Fields <small>(optional)</small>
         </h2>
@@ -159,7 +175,11 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
               <dl>
                 <dt>
                   Keys
-                  <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+                  <HoverForHelp
+                    title="More about Event Keys"
+                    trigger={['click', 'hover']}
+                    placement="right"
+                    width={400}>
                     <EventKeyHelpPopover />
                   </HoverForHelp>
                 </dt>

@@ -23,12 +23,6 @@ import AppConfig from 'util/AppConfig';
 import type { Config } from './MaxmindAdapterFieldSet';
 import MaxmindAdapterFieldSet from './MaxmindAdapterFieldSet';
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => ''),
-  isCloud: jest.fn(() => false),
-}));
-
 describe('MaxmindAdapterFieldSet', () => {
   describe('in cloud mode', () => {
     beforeEach(() => {

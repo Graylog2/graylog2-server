@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -77,10 +78,10 @@ public class StreamResourceProvider extends ResourceProvider {
         }
         try {
             final Stream stream = streamService.load(grn.entity());
-            return Optional.of(McpSchema.Resource.builder()
-                    .name(stream.getTitle())
+            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+            final String name = Strings.isNullOrEmpty(stream.getTitle()) ? stream.getId() : stream.getTitle();
+            return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                     .description(stream.getDescription())
-                    .uri(grn.toString())
                     .build());
         } catch (NotFoundException e) {
             return Optional.empty();
@@ -93,15 +94,13 @@ public class StreamResourceProvider extends ResourceProvider {
         try (var dtos = streamService.streamAllDTOs()) {
             return dtos
                     .filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                    .map(stream -> new McpSchema.Resource(
-                            GRN_TYPE.toGRN(stream.getId()).toString(),
-                            stream.getTitle(),
-                            stream.getTitle(),
-                            stream.getDescription(),
-                            null,
-                            null,
-                            null,
-                            null))
+                    .map(stream -> McpSchema.Resource.builder(
+                                    GRN_TYPE.toGRN(stream.getId()).toString(),
+                                    // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                                    Strings.isNullOrEmpty(stream.getTitle()) ? stream.getId() : stream.getTitle())
+                            .title(stream.getTitle())
+                            .description(stream.getDescription())
+                            .build())
                     .toList();
         }
     }

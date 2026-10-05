@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { defaultOnError } from 'util/conditional/onError';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { slicesQueryKey } from 'components/common/PaginatedEntityTable/slicing/queryKeys';
@@ -34,7 +33,7 @@ export type FetchSlices = (
 const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderers) => {
   const {
     searchParams: { sliceCol, query, filters },
-  } = useContext(TableFetchContext);
+  } = useTableFilterContext();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: slicesQueryKey(sliceCol, query, filters),

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add reindexing for outdated indices (created in previous major version of OpenSearch)"
+
+issues = ["Graylog2/graylog-plugin-enterprise#14011"]
+pulls = ["25860"]

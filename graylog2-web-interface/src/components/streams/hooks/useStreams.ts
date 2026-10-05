@@ -17,8 +17,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import { searchStreamsPaginated } from 'api/streams';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -32,7 +32,7 @@ export const KEY_PREFIX = ['streams', 'overview'];
 export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
 
 export const fetchStreams = (searchParams: SearchParams) =>
-  StreamsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+  searchStreamsPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
     filters: FiltersForQueryParams(searchParams.filters),

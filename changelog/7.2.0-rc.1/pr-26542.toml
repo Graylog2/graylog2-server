@@ -1,0 +1,5 @@
+type = "a"
+message = "Add macOS Unified Logging Collector source"
+
+pulls = ["26542"]
+

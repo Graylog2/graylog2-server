@@ -22,5 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record SlicingPreferences(@JsonProperty("slice_column") String sliceColumn,
                                  @JsonProperty("sort_by") String sortBy,
-                                 @JsonProperty("order") SortOrder sortOrder) {
+                                 @JsonProperty("order") SortOrder sortOrder,
+                                 @JsonProperty("read_only") boolean readOnly) {
+
+    public SlicingPreferences(final String sliceColumn, final String sortBy, final SortOrder sortOrder) {
+        this(sliceColumn, sortBy, sortOrder, false);
+    }
 }

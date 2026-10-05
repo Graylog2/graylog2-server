@@ -1,0 +1,3 @@
+type = "f"
+message = "Relax shard failure checking in `CustomOpenSearchClient`: only bail out when *all* shards fail, so searches with partial shard failures still return their available results."
+pulls = ["26156"]

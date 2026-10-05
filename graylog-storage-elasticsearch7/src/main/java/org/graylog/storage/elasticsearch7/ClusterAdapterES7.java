@@ -29,6 +29,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
@@ -49,6 +51,7 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
@@ -61,6 +64,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -86,6 +91,11 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(response -> healthStatusFrom(response.getStatus()));
     }
 
     private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
@@ -144,8 +154,11 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterShardAllocation clusterShardAllocation() {
-        // unsupported in Elasticsearch, return empty
-        return new ClusterShardAllocation(Integer.MAX_VALUE, List.of());
+        // maxShardsPerNode stays unbounded on purpose. #22228 scoped its cluster.max_shards_per_node notification to
+        // OpenSearch, and IndexerClusterCheckerThread only notifies above a ratio of the maximum, so an unreachable
+        // maximum keeps that notification off here. Reading the real setting would newly arm it on every
+        // Elasticsearch cluster.
+        return new ClusterShardAllocation(Integer.MAX_VALUE, catApi.getNodeShardAllocations());
     }
 
     @Override
@@ -283,6 +296,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
         return NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
@@ -307,6 +321,24 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         );
     }
 
+    @Override
+    public Map<String, NodeUtilization> nodesUtilization() {
+        final Request request = new Request("GET", "/_nodes/stats/os,jvm");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Elasticsearch nodes stats data!");
+
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeUtilization(nodes.get(name))));
+    }
+
+    private NodeUtilization createNodeUtilization(JsonNode nodeJson) {
+        return new NodeUtilization(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
+        );
+    }
+
     public <T> Stream<T> toStream(Iterator<T> iterator) {
         return StreamSupport.stream(((Iterable<T>) () -> iterator).spliterator(), false);
     }
@@ -327,18 +359,56 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    @Override
+    public int countOfClusterManagerEligibleNodes() {
+        return (int) nodesInfo().values().stream()
+                .filter(node -> node.roles().contains("cluster_manager") || node.roles().contains("master"))
+                .count();
+    }
+
     private Optional<ClusterHealthResponse> clusterHealth() {
         try {
             final ClusterHealthRequest request = new ClusterHealthRequest()
                     .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private Optional<ClusterHealthResponse> clusterHealth(java.time.Duration timeout) {
+        final TimeValue bound = TimeValue.timeValueMillis(timeout.toMillis());
+        final ClusterHealthRequest request = new ClusterHealthRequest().timeout(bound);
+        // Defaults to 30s, which would outlive the caller's budget server-side.
+        request.masterNodeTimeout(bound);
+
+        final PlainActionFuture<ClusterHealthResponse> future = new PlainActionFuture<>();
+        final Cancellable cancellable = client.clusterHealthAsync(request, future);
+        try {
+            return Optional.of(future.get(timeout.toMillis(), TimeUnit.MILLISECONDS));
+        } catch (TimeoutException e) {
+            // Logged explicitly: a TimeoutException carries no message, so the generic handler would log "null".
+            cancellable.cancel();
+            LOG.warn("Search cluster did not answer the health request within {}ms; treating it as unreachable.", timeout.toMillis());
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            cancellable.cancel();
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (Exception e) {
+            cancellable.cancel();
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 

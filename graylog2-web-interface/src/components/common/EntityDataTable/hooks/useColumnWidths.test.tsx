@@ -48,8 +48,8 @@ describe('useColumnWidths hook test', () => {
 
     expect(result.current).toEqual({
       actions: 0,
-      description: 400,
-      title: 200,
+      description: 399,
+      title: 199,
     });
   });
 
@@ -71,8 +71,8 @@ describe('useColumnWidths hook test', () => {
 
     expect(result.current).toEqual({
       actions: 0,
-      description: 300,
-      title: 300,
+      description: 299,
+      title: 299,
     });
   });
 
@@ -96,7 +96,7 @@ describe('useColumnWidths hook test', () => {
     expect(result.current).toEqual({
       actions: 110,
       'bulk-select': 20,
-      description: 313,
+      description: 312,
       title: 156,
     });
   });
@@ -117,7 +117,7 @@ describe('useColumnWidths hook test', () => {
     );
 
     expect(result.current).toEqual({
-      actions: 200,
+      actions: 199,
       description: 200,
       title: 200,
     });
@@ -147,7 +147,7 @@ describe('useColumnWidths hook test', () => {
       actions: 110,
       'bulk-select': 20,
       description: 150,
-      title: 1220,
+      title: 1219,
     });
   });
 });

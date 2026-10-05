@@ -23,7 +23,7 @@ import { Messages } from '@graylog/server-api';
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { fetchInput } from 'hooks/useInputs';
 import StreamsContext from 'contexts/StreamsContext';
 import FetchError from 'logic/errors/FetchError';
@@ -78,6 +78,7 @@ describe('ShowMessagePage', () => {
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(isLocalNode).mockResolvedValue(true);
     asMock(Messages.search).mockResolvedValue(message);
+    asMock(fetchInput).mockResolvedValue(input);
   });
 
   const testForwarderPlugin = new PluginManifest(
@@ -117,6 +118,17 @@ describe('ShowMessagePage', () => {
     await screen.findByText(/Deprecated field/);
     await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
     await screen.findByText(/"index": "graylog_5"/);
+  });
+
+  it('renders the message when its source input no longer exists', async () => {
+    // The in-memory collector ingest input (and any deleted input) has no persisted record, so the lookup 404s.
+    // That must not break the message view.
+    asMock(fetchInput).mockRejectedValue(new FetchError('Not Found', 404, "Couldn't find input deadbeef"));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
   });
 
   it('retrieves field types only for user-accessible streams', async () => {

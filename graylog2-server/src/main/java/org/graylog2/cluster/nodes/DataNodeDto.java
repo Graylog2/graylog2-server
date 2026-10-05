@@ -56,6 +56,7 @@ public abstract class DataNodeDto extends NodeDto {
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
     public static final String FIELD_CONFIGURATION_WARNINGS = "configuration_warnings";
     public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
+    public static final String FIELD_OPENSEARCH_NODE_NAME = "opensearch_node_name";
 
     @Nullable
     @JsonProperty(FIELD_CLUSTER_ADDRESS)
@@ -83,6 +84,13 @@ public abstract class DataNodeDto extends NodeDto {
     @Nullable
     @JsonProperty(FIELD_OPENSEARCH_ROLES)
     public abstract List<String> getOpensearchRoles();
+
+    /**
+     * The OpenSearch {@code node.name} of this data node. Might differ from the hostname if {@code node_name} is configured.
+     */
+    @Nullable
+    @JsonProperty(FIELD_OPENSEARCH_NODE_NAME)
+    public abstract String getOpensearchNodeName();
 
     @Nullable
     @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
@@ -151,6 +159,10 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_OPENSEARCH_ROLES, getOpensearchRoles());
         }
 
+        if (Objects.nonNull(getOpensearchNodeName())) {
+            params.put(FIELD_OPENSEARCH_NODE_NAME, getOpensearchNodeName());
+        }
+
         if(Objects.nonNull(getConfigurationWarnings())) {
             params.put(FIELD_CONFIGURATION_WARNINGS, getConfigurationWarnings());
         }
@@ -194,6 +206,9 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_OPENSEARCH_ROLES)
         public abstract Builder setOpensearchRoles(List<String> opensearchRoles);
+
+        @JsonProperty(FIELD_OPENSEARCH_NODE_NAME)
+        public abstract Builder setOpensearchNodeName(String opensearchNodeName);
 
         @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
         public abstract Builder setConfigurationWarnings(List<String> warnings);

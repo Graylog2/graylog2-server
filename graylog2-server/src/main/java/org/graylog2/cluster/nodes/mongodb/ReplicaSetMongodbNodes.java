@@ -23,8 +23,10 @@ import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
@@ -53,6 +55,27 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
         return mongodbClusterCommand.runOnEachNode((host, connection) -> toMongodbNode(host, getMember(members, host), connection, primaryMember))
                 .values()
                 .stream()
+                .toList();
+    }
+
+    /**
+     * Lightweight replica-set membership: a single {@code replSetGetStatus} round-trip with no per-member fan-out.
+     * Each returned {@link MongodbNode} carries only the fields available from the status document -- {@code id},
+     * {@code name} (host), and {@code role} ({@code stateStr}) -- with the per-node stats left at their defaults.
+     * Use this when you only need the roster and its roles; use {@link #allNodes()} when you need per-node
+     * {@code serverStatus}/profiling/storage details (which cost one extra round-trip per member).
+     *
+     * @param timeout client-side operation timeout (CSOT). The read runs against a {@code withTimeout} database view
+     *                so a stuck socket read fails fast rather than blocking indefinitely -- the Mongo driver's
+     *                default socket timeout is infinite, so without this a black-holed connection never returns.
+     */
+    public List<MongodbNode> memberStates(Duration timeout) {
+        final Document replicaStatus = mongoConnection.getDatabase(MongodbClusterCommand.ADMIN_DATABASE_NAME)
+                .withTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+                .runCommand(new Document("replSetGetStatus", 1));
+        return replicaStatus.getList("members", Document.class).stream()
+                .map(m -> new MongodbNode(String.valueOf(m.get("_id", Integer.class)), m.getString("name"),
+                        m.getString("stateStr")))
                 .toList();
     }
 

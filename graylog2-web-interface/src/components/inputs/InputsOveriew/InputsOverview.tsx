@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import * as Immutable from 'immutable';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
@@ -29,8 +29,13 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
 import useTableElements from 'components/inputs/InputsOveriew/useTableElements';
+import { InputMetricsProvider } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import { backendFieldsForVisibleColumns } from 'components/inputs/InputsOveriew/metricColumns';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import { IfPermitted } from 'components/common';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 type Input = {
   id: string;
@@ -64,15 +69,16 @@ const InputsOverview = ({
   const { data: inputStates } = useInputsStates();
   const { tableLayout, additionalAttributes } = getInputsTableElements();
   const resolvedTableLayout = entityTableId ? { ...tableLayout, entityTableId } : tableLayout;
-  const resolvedKeyFn = useCallback(
-    (searchParams: SearchParams) => [...KEY_PREFIX, entityTableId ?? tableLayout.entityTableId, searchParams],
-    [entityTableId, tableLayout.entityTableId],
-  );
+  const resolvedKeyFn = (searchParams: SearchParams) => [
+    ...KEY_PREFIX,
+    entityTableId ?? tableLayout.entityTableId,
+    searchParams,
+  ];
   const { entityActions, expandedSections } = useTableElements({
     inputTypes,
     inputTypeDescriptions,
   });
-  const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
+  const columnRenderers = customColumnRenderers({ inputTypes, inputStates });
   const fetchEntities = (options: SearchParams) => {
     const optionsCopy = { ...options };
 
@@ -85,6 +91,27 @@ const InputsOverview = ({
     return fetchInputs(optionsCopy);
   };
 
+  const [visibleInputIds, setVisibleInputIds] = useState<Array<string>>([]);
+  const onDataLoaded = (data: PaginatedResponse<Input>) => {
+    const nextVisibleInputIds = data.list.map((entity) => entity.id);
+
+    setVisibleInputIds((currentVisibleInputIds) => {
+      const hasSameInputIds =
+        currentVisibleInputIds.length === nextVisibleInputIds.length &&
+        currentVisibleInputIds.every((inputId, index) => inputId === nextVisibleInputIds[index]);
+
+      return hasSameInputIds ? currentVisibleInputIds : nextVisibleInputIds;
+    });
+  };
+
+  const { data: layoutPreferences } = useUserLayoutPreferences(resolvedTableLayout.entityTableId);
+  const userPrefs = layoutPreferences?.attributes ?? {};
+  const userSelection = Object.entries(userPrefs)
+    .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
+    .map(([attributeId]) => attributeId);
+  const visibleColumns = userSelection.length > 0 ? userSelection : resolvedTableLayout.defaultDisplayedAttributes;
+  const requestedFields = backendFieldsForVisibleColumns(visibleColumns);
+
   return (
     <div>
       {!node && !global && (
@@ -92,21 +119,24 @@ const InputsOverview = ({
           <CreateInputControl />
         </IfPermitted>
       )}
-      <PaginatedEntityTable<Input>
-        humanName="inputs"
-        additionalAttributes={additionalAttributes}
-        queryHelpComponent={<QueryHelper entityName={entityName} />}
-        entityActions={entityActions}
-        tableLayout={resolvedTableLayout}
-        fetchEntities={fetchEntities}
-        expandedSectionRenderers={expandedSections}
-        keyFn={resolvedKeyFn}
-        bulkSelection={undefined}
-        withoutURLParams={withoutURLParams}
-        entityAttributesAreCamelCase={false}
-        filterValueRenderers={{}}
-        columnRenderers={columnRenderers}
-      />
+      <InputMetricsProvider inputIds={visibleInputIds} fields={requestedFields}>
+        <PaginatedEntityTable<Input>
+          humanName="inputs"
+          additionalAttributes={additionalAttributes}
+          queryHelpComponent={<QueryHelper entityName={entityName} />}
+          entityActions={entityActions}
+          tableLayout={resolvedTableLayout}
+          fetchEntities={fetchEntities}
+          onDataLoaded={onDataLoaded}
+          expandedSectionRenderers={expandedSections}
+          keyFn={resolvedKeyFn}
+          bulkSelection={undefined}
+          withoutURLParams={withoutURLParams}
+          entityAttributesAreCamelCase={false}
+          filterValueRenderers={{}}
+          columnRenderers={columnRenderers}
+        />
+      </InputMetricsProvider>
     </div>
   );
 };

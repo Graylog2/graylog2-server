@@ -19,7 +19,8 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsInstances from 'components/collectors/instances/CollectorsInstances';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -32,8 +33,9 @@ const CollectorsInstancesPage = () => {
     return <Spinner />;
   }
 
+  // Unconfigured: the overview's onboarding wizard starts with the ingest setup step.
   if (!config?.signing_cert_id) {
-    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.OVERVIEW} />;
   }
 
   return (
@@ -42,9 +44,13 @@ const CollectorsInstancesPage = () => {
       <PageHeader
         title={
           <>
-            Instances <BetaBadge />
+            Instances <PreviewBadge />
           </>
-        }>
+        }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
         <span>
           A collector instance represents a running collector process on a remote host. Instances enroll into a fleet
           using an enrollment token and automatically receive their fleet&apos;s source configuration.

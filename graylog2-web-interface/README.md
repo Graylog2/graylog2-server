@@ -35,6 +35,8 @@ There's an online version of the frontend documentation and component gallery at
 
 The online version is automatically deployed and reflects the current state of the `master` branch in this repository.
 
+Note: We are migrating to a new design system. Please refer to the new design system at [https://graylog2.github.io/design-system](https://graylog2.github.io/design-system) for up-to-date component documentation and guidelines.
+
 ### Run documentation locally
 You may also run the documentation locally to contribute to it or see a different version than the current master:
 

@@ -26,7 +26,7 @@ import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
-import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'logic/streams/types';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
 

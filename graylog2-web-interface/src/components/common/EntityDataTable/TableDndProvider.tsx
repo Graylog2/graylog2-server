@@ -27,8 +27,10 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
+  KeyboardCode,
   DragOverlay,
 } from '@dnd-kit/core';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import type { Table } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 
@@ -54,10 +56,16 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
   );
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(PointerSensor, {}),
-    useSensor(KeyboardSensor, {}),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, {
+      keyboardCodes: {
+        start: [KeyboardCode.Space],
+        cancel: [KeyboardCode.Esc],
+        end: [KeyboardCode.Space, KeyboardCode.Tab],
+      },
+    }),
   );
   const handleDragStart = useCallback(
     ({ active }: DragStartEvent) => {
@@ -93,7 +101,7 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
         <DndStylesProvider>{children}</DndStylesProvider>
       </SortableContext>
       {createPortal(
-        <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody}>
+        <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody} modifiers={[snapCenterToCursor]}>
           {activeColumn ? <ThDragOverlay<Entity> column={activeColumn} /> : null}
         </DragOverlay>,
         document.body,

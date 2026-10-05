@@ -22,13 +22,12 @@ import upperCase from 'lodash/upperCase';
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
-import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import { fetchAllConfigurations } from 'hooks/useCollectorConfigurations';
+import { fetchCollectorsAll, createCollector, updateCollector, validateCollector } from 'hooks/useCollectors';
 import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import connect from 'stores/connect';
 
 type ValidationMessageProps = {
   validationErrors: any;
@@ -109,8 +108,8 @@ class CollectorForm extends React.Component<
   }
 
   componentDidMount() {
-    CollectorsActions.all();
-    CollectorConfigurationsActions.all();
+    fetchCollectorsAll();
+    fetchAllConfigurations();
   }
 
   private _debouncedValidateFormData: (formData: React.FormEvent) => void;
@@ -130,15 +129,14 @@ class CollectorForm extends React.Component<
       let promise;
 
       if (isCreate) {
-        promise = CollectorsActions.create(formData).then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
+        promise = createCollector(formData).then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
       } else {
-        promise = CollectorsActions.update(formData);
+        promise = updateCollector(formData);
       }
 
       promise.then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${isCreate ? 'CREATED' : 'UPDATED'}`], {
           app_pathname: 'sidecars',
-          app_section: 'configuration',
         });
       });
     }
@@ -150,7 +148,6 @@ class CollectorForm extends React.Component<
     if (key === 'service_type' || key === 'node_operating_system') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${upperCase(key).replace(/\s|\//g, '_')}_CHANGED`], {
         app_pathname: 'sidecars',
-        app_section: 'configuration',
         event_details: {
           [key]: value,
         },
@@ -173,7 +170,7 @@ class CollectorForm extends React.Component<
 
   _validateFormData = (nextFormData) => {
     if (nextFormData.name && nextFormData.node_operating_system) {
-      CollectorsActions.validate(nextFormData).then((validation) =>
+      validateCollector(nextFormData).then((validation) =>
         this.setState({ validation_errors: validation.errors, error: validation.failed }),
       );
     }
@@ -369,4 +366,4 @@ class CollectorForm extends React.Component<
   }
 }
 
-export default connect(withTelemetry(withHistory(CollectorForm)), { collectors: CollectorsStore });
+export default withTelemetry(withHistory(CollectorForm), 'configuration');

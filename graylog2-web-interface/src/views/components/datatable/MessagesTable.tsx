@@ -69,8 +69,6 @@ const StyledTable = styled(Table as React.ComponentType<React.ComponentProps<typ
     }
 
     tr.fields-row {
-      cursor: pointer;
-
       td {
         min-width: 50px;
         padding-top: 10px;

@@ -16,10 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import trim from 'lodash/trim';
-import trunc from 'lodash/truncate';
 
-import * as JSON from 'util/json';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
@@ -28,9 +25,9 @@ import useFeature from 'hooks/useFeature';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import usePluginEntities from 'hooks/usePluginEntities';
+import FormattedValue from 'views/components/FormattedValue';
 
-import EmptyValue from './EmptyValue';
-import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
+import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 
 const usePluggableValueRenderer = () => {
@@ -43,27 +40,6 @@ const usePluggableValueRenderer = () => {
 };
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
-
-const stringify = (value: any) => {
-  switch (typeof value) {
-    case 'bigint':
-      return value.toString();
-    case 'string':
-      return value;
-    default:
-      return JSON.stringify(value);
-  }
-};
-const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
-  const stringified = stringify(value);
-  const Component = render;
-
-  return trim(stringified) === '' ? (
-    <EmptyValue />
-  ) : (
-    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
-  );
-};
 
 type TypeSpecificValueProps = {
   field: string;
@@ -80,7 +56,7 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number; unit: FieldUnit
   return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
 };
 
-const FormattedValue = ({
+const FormattedValueWithUnits = ({
   field,
   value = undefined,
   truncate = false,
@@ -93,7 +69,7 @@ const FormattedValue = ({
     unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
   if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
-  return _formatValue(field, value, truncate, render, type);
+  return <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />;
 };
 
 const TypeSpecificValue = ({
@@ -118,7 +94,9 @@ const TypeSpecificValue = ({
     return pluggableValueRenderer[type.type](value, field, render);
   }
 
-  return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
+  return (
+    <FormattedValueWithUnits field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />
+  );
 };
 
 export default TypeSpecificValue;

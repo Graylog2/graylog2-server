@@ -49,11 +49,11 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testMove() {
+    public void testReindex() {
         String movedIndex = "moved_index";
         client().createIndex(movedIndex);
         client().waitForGreenStatus(movedIndex);
-        indicesAdapter.move(TEST_INDEX, movedIndex, result -> {
+        indicesAdapter.reindex(TEST_INDEX, movedIndex, result -> {
             assertThat(result.hasFailedItems()).isFalse();
             assertThat(result.tookMs()).isGreaterThan(0);
             assertThat(result.movedDocuments()).isEqualTo(0);

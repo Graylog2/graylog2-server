@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { importExtractors } from 'hooks/useExtractors';
 
 type ImportExtractorsProps = {
   input: any;
@@ -39,7 +39,7 @@ class ImportExtractors extends React.Component<
       const parsedExtractors = JSON.parse(this.extractorsInput.getValue() as string);
       const { extractors } = parsedExtractors;
 
-      ExtractorsActions.import(this.props.input.id, extractors);
+      importExtractors(this.props.input.id, extractors);
     } catch (error) {
       UserNotification.error(
         `There was an error while parsing extractors. Are they in JSON format? ${error}`,

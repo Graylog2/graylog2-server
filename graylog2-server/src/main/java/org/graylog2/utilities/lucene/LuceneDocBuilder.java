@@ -41,6 +41,17 @@ public class LuceneDocBuilder {
         return this;
     }
 
+    /**
+     * Adds a searchable (but not sortable) string value. Unlike {@link #stringVal(String, String)} this does not add a
+     * {@link SortedDocValuesField}, so it may be called multiple times for the same key to index a multi-valued field.
+     */
+    public LuceneDocBuilder searchableVal(String key, String value) {
+        if (value != null) {
+            doc.add(new TextField(key, value, Field.Store.NO));
+        }
+        return this;
+    }
+
     public LuceneDocBuilder dateVal(String key, Date value) {
         return longVal(key, value.getTime());
     }

@@ -29,6 +29,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -55,6 +56,11 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                 schemaGeneratorProvider
         );
         this.streamService = streamService;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.STREAMS_READ);
     }
 
     @Override

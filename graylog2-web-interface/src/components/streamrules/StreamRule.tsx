@@ -26,7 +26,7 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
-import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
+import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'logic/streams/types';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
 

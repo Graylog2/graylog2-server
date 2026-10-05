@@ -33,7 +33,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
 
 const ColorHint = styled.div(
@@ -64,25 +64,33 @@ const VariableContainer = styled.div<{ $height: number; $width: number }>(
   `,
 );
 
-const LegendContainer = styled.div`
-  padding: 5px;
+const LegendContainerBase = styled.div(
+  ({ theme }) => css`
+    padding: ${theme.spacings.xxs};
+  `,
+);
+
+const LegendContainer = styled(LegendContainerBase)`
   max-height: 100px;
   overflow: auto;
 `;
 
-const Legend = styled.div`
-  display: table;
-  width: 100%;
-`;
+const Legend = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xxs};
+    width: 100%;
+  `,
+);
 
-const LegendRow = styled.div`
-  display: table-row;
-`;
-
-const LegendCell = styled.div`
-  padding: 4px;
-  display: table-cell;
-`;
+const LegendRow = styled.div(
+  ({ theme }) => css`
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: ${theme.spacings.xs};
+  `,
+);
 
 const LegendEntryContainer = styled.div`
   display: flex;
@@ -134,7 +142,7 @@ type LegendEntryProps = Pick<TableCellProps, 'value'> & {
 
 const LegendEntry = ({ value, labelsWithField }: LegendEntryProps) => {
   const { colors, setColor } = useContext(ChartColorContext);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const mapKeys = useMapKeys();
   const [showPopover, setShowPopover] = useState(false);
   const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
@@ -179,9 +187,9 @@ const TableCell = ({ value, fieldTypes, labelFields }: TableCellProps) => {
   });
 
   return (
-    <LegendCell key={value}>
+    <div key={value}>
       <LegendEntry labelsWithField={labelsWithField} value={value} />
-    </LegendCell>
+    </div>
   );
 };
 
@@ -208,11 +216,13 @@ const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendCo
   );
 };
 
-const FlexLegendContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
+const FlexLegendContainer = styled(LegendContainerBase)(
+  ({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacings.xxs} ${theme.spacings.xs};
+    flex-wrap: wrap;
+  `,
+);
 
 const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
@@ -245,7 +255,7 @@ const PlotLegend = ({
 }: Props) => {
   const { columnPivots, series } = config;
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const fieldTypes = useContext(FieldTypesContext);
   const { limitHeight } = useContext(WidgetRenderingContext);
 

@@ -34,6 +34,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResponse;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadBuilder;
 import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -42,6 +44,7 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
 import org.graylog2.rest.models.system.plugins.responses.PluginList;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
@@ -134,6 +137,7 @@ public class SupportBundleService {
     private final List<URI> elasticsearchHosts;
     private final ClusterAdapter searchDbClusterAdapter;
     private final DatanodeRestApiProxy datanodeProxy;
+    private final ProcessingLoadBuilder processingLoadBuilder;
 
     @Inject
     public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
@@ -145,7 +149,9 @@ public class SupportBundleService {
                                 ClusterStatsService clusterStatsService,
                                 VersionProbeFactory searchDbProbeFactory,
                                 @IndexerHosts List<URI> searchDbHosts,
-                                ClusterAdapter searchDbClusterAdapter, DatanodeRestApiProxy datanodeProxy) {
+                                ClusterAdapter searchDbClusterAdapter,
+                                DatanodeRestApiProxy datanodeProxy,
+                                ProcessingLoadBuilder processingLoadBuilder) {
         this.executor = executor;
         this.nodeService = nodeService;
         this.datanodeService = datanodeService;
@@ -157,6 +163,7 @@ public class SupportBundleService {
         this.elasticsearchHosts = searchDbHosts;
         this.searchDbClusterAdapter = searchDbClusterAdapter;
         this.datanodeProxy = datanodeProxy;
+        this.processingLoadBuilder = processingLoadBuilder;
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
@@ -190,7 +197,9 @@ public class SupportBundleService {
 
         // fetchClusterInfos runs concurrently with per-node collection — they are independent.
         // Its requestOnAllNodes wrappers run on their own orchestrationExecutor (created inside
-        // the method), so only 4 simple leaf tasks land on `executor` — no starvation risk.
+        // the method), so only 4 simple leaf tasks land on `executor`.
+        // tryFetchProcessingLoadSnapshot adds one more `executor` task that runs at most one fan-out inline
+        // (none when debug metrics are off).
         final List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         nodeManifests.entrySet().stream()
@@ -203,6 +212,11 @@ public class SupportBundleService {
 
         futures.add(CompletableFuture.runAsync(
                 () -> tryFetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir, errors), executor));
+
+        futures.add(CompletableFuture.runAsync(
+                () -> tryFetchProcessingLoadSnapshot(proxiedResourceHelper, spoolDir, errors),
+                executor
+        ));
 
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
 
@@ -229,6 +243,52 @@ public class SupportBundleService {
             LOG.warn("Failed to collect cluster infos for support bundle, skipping", e);
             errors.add(BundleError.of("cluster/infos", e));
         }
+    }
+
+    private void tryFetchProcessingLoadSnapshot(ProxiedResourceHelper proxiedResourceHelper,
+                                                Path spoolDir, List<BundleError> errors) {
+        try {
+            if (!processingLoadBuilder.metricsEnabled()) {
+                return;
+            }
+            fetchProcessingLoadSnapshot(proxiedResourceHelper, spoolDir, errors);
+        } catch (Exception e) {
+            LOG.warn("Failed to collect pipeline processing-load snapshot for support bundle, skipping", e);
+            errors.add(BundleError.of("cluster/processing-load", e));
+        }
+    }
+
+    private void fetchProcessingLoadSnapshot(ProxiedResourceHelper proxiedResourceHelper, Path spoolDir,
+                                             List<BundleError> errors) throws IOException {
+        final ProcessingLoadResponse snapshot = processingLoadBuilder.buildUnfiltered(
+                timerNames -> fetchPerNodeMetrics(proxiedResourceHelper, timerNames, errors));
+
+        if (!snapshot.available()) {
+            errors.add(new BundleError("cluster/processing-load",
+                    "Debug metrics are enabled but the Processing Load snapshot had no usable data "
+                            + "(no active pipeline rules, no traffic in the last collection window, or "
+                            + "per-node metric collection failed. See any node-level processing-load "
+                            + "errors). Snapshot omitted.", null));
+            return;
+        }
+
+        try (var snapshotFile = new FileOutputStream(spoolDir.resolve("pipeline-processing-load.json").toFile())) {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(snapshotFile, snapshot);
+        }
+    }
+
+    private Map<String, MetricsSummaryResponse> fetchPerNodeMetrics(
+            ProxiedResourceHelper proxiedResourceHelper, List<String> timerNames, List<BundleError> errors) {
+        final MetricsReadRequest request = MetricsReadRequest.create(timerNames);
+        return stripCallResult(
+                proxiedResourceHelper.requestOnAllNodes(
+                        RemoteMetricsResource.class,
+                        r -> r.multipleMetrics(request),
+                        CALL_TIMEOUT
+                ),
+                errors,
+                "processing-load"
+        );
     }
 
     private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir, List<BundleError> errors) throws IOException {

@@ -87,6 +87,16 @@ public class MongoDbPipelineMetadataService {
                 .collect(Collectors.toMap(PipelineRulesMetadataDao::pipelineId, dao -> dao));
     }
 
+    public List<PipelineRulesMetadataDao> getConnectedToStreams(Set<String> streamIds) {
+        return collection.find(Filters.in(PipelineRulesMetadataDao.FIELD_STREAMS, streamIds))
+                .into(new ArrayList<>());
+    }
+
+    public List<RoutingRuleDao> getRoutingToStreams(Set<String> streamIds) {
+        return routingRulesCollection.find(Filters.in(FIELD_ROUTED_STREAM_IDS, streamIds))
+                .into(new ArrayList<>());
+    }
+
     public Set<String> getPipelinesReferencingStream(String streamId) {
         final Set<String> pipelineIds = routingRulesCollection
                 .find(Filters.eq(FIELD_ROUTED_STREAM_IDS, streamId))
@@ -147,6 +157,9 @@ public class MongoDbPipelineMetadataService {
     }
 
     public void delete(Collection<String> pipelineIds) {
+        if (pipelineIds == null || pipelineIds.isEmpty()) {
+            return;
+        }
         final DeleteResult deleteResult = collection.deleteMany(Filters.in(FIELD_PIPELINE_ID, pipelineIds));
         routingRulesCollection.deleteMany(Filters.in(RoutingRuleDao.FIELD_PIPELINE_ID, pipelineIds));
         if (deleteResult.getDeletedCount() == 0) {

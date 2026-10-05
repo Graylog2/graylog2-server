@@ -16,23 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 
-import java.util.Optional;
+import java.util.List;
 
-@Singleton
-public class OpensearchVersionSelector {
-
-    private final Optional<String> requestedVersion;
-
-    @Inject
-    public OpensearchVersionSelector(final Configuration configuration) {
-        this.requestedVersion = Optional.ofNullable(configuration.getOpensearchVersion());
-    }
-
-    public Optional<String> requestedVersion() {
-        return requestedVersion;
-    }
+public interface OpensearchVersionSelector {
+    OpensearchDistribution select(final List<OpensearchDistribution> candidates);
 }

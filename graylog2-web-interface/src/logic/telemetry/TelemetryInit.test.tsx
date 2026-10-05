@@ -23,19 +23,6 @@ import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import AppConfig from 'util/AppConfig';
 import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
 
-const mockedTelemetryConfig = {
-  api_key: 'key',
-  host: 'http://localhost',
-  enabled: true,
-};
-
-jest.mock('util/AppConfig', () => ({
-  gl2ServerUrl: jest.fn(() => {
-    'http://localhost';
-  }),
-  telemetry: jest.fn(() => mockedTelemetryConfig),
-}));
-
 jest.mock('logic/telemetry/useTelemetrySettings');
 
 const Wrapper = ({ children }: { children: React.ReactElement }) => <TelemetryInit>{children}</TelemetryInit>;
@@ -81,5 +68,7 @@ describe('<TelemetryInit>', () => {
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
     expect(result.current.__loaded).toBeTruthy();
+    expect(result.current.config.strict_script_versioning).toBe(true);
+    expect(result.current.config.persistence).toBe('localStorage+cookie');
   });
 });

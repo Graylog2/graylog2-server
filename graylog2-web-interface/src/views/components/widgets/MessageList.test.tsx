@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
@@ -145,10 +145,7 @@ describe('MessageList', () => {
   const findTable = () => screen.findByRole('table');
 
   const clickNextPageButton = async () => {
-    const paginationListItem = screen.getByRole('listitem', { name: /next/i });
-
-    const nextPageButton = within(paginationListItem).getByRole('button');
-    await userEvent.click(nextPageButton);
+    await userEvent.click(screen.getByRole('button', { name: /open next page/i }));
   };
 
   const openBulkActionsMenu = async () => {

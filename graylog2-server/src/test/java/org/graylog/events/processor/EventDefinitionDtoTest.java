@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
+import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.security.UserContext;
@@ -115,8 +116,9 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.getErrors()).containsOnlyKeys("field_spec");
         final List<String> fieldValidation = (List<String>) validationResult.getErrors().get("field_spec");
         assertThat(fieldValidation.size()).isEqualTo(2);
-        assertThat(fieldValidation.get(0)).contains("foo\\bar");
-        assertThat(fieldValidation.get(1)).contains("$yo&^a");
+        // field_spec is sorted, so the errors follow alphabetical field name order
+        assertThat(fieldValidation.get(0)).contains("$yo&^a");
+        assertThat(fieldValidation.get(1)).contains("foo\\bar");
     }
 
     @Test
@@ -136,6 +138,14 @@ public class EventDefinitionDtoTest {
         final ValidationResult validationResult = validate(testSubject);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testTacticsTechniquesCanonicalizedToUpperCaseOnBuild() {
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("ta0002", "T1059", "t1059.001"))
+                .build();
+        assertThat(dto.tacticsTechniques()).containsExactly("TA0002", "T1059", "T1059.001");
     }
 
     @Test
@@ -276,6 +286,37 @@ public class EventDefinitionDtoTest {
     }
 
     @Test
+    public void invalidTacticsTechniquesAreAllReportedInOneMessage() {
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("TA0002", "bogus", "also-bad", "T1059"))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tactics_techniques");
+        final var errors = (java.util.List<String>) validationResult.getErrors().get("tactics_techniques");
+        assertThat(errors).hasSize(1);
+        // Inputs are uppercased by TacticsTechniquesNormalizer before validation, so the
+        // error message reflects the canonical (upper-cased) form.
+        assertThat(errors.get(0))
+                .contains("\"BOGUS\"")
+                .contains("\"ALSO-BAD\"")
+                .doesNotContain("\"TA0002\"")
+                .doesNotContain("\"T1059\"");
+    }
+
+    @Test
+    public void wellFormedTacticsTechniquesAreValidEvenIfUnknownToUs() {
+        // IDs are only checked for format. A technique can be published by MITRE before any
+        // catalogue we ship knows about it, and rejecting those would leave an event definition
+        // that was imported with one permanently uneditable.
+        final EventDefinitionDto valid = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("T1685", "TA9999", "T9999.001"))
+                .build();
+        final ValidationResult validationResult = validate(valid);
+        assertThat(validationResult.getErrors()).doesNotContainKey("tactics_techniques");
+    }
+
+    @Test
     public void tagWithDotIsValid() {
         // The test fixture may have unrelated validation errors, so we only assert that
         // no tags-specific error is reported.
@@ -284,5 +325,19 @@ public class EventDefinitionDtoTest {
                 .build();
         final ValidationResult validationResult = validate(valid);
         assertThat(validationResult.getErrors()).doesNotContainKey("tags");
+    }
+
+    @Test
+    public void sortsFieldSpecAlphabetically() {
+        final EventFieldSpec spec = EventFieldSpec.builder()
+                .dataType(FieldValueType.STRING)
+                .providers(ImmutableList.of())
+                .build();
+
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .fieldSpec(ImmutableMap.of("zulu", spec, "alpha", spec, "charlie", spec))
+                .build();
+
+        assertThat(dto.fieldSpec().keySet()).containsExactly("alpha", "charlie", "zulu");
     }
 }

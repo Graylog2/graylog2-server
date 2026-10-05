@@ -18,7 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { StreamRules } from '@graylog/server-api';
 
-import type { StreamRuleType } from 'stores/streams/StreamsStore';
+import type { StreamRuleType } from 'logic/streams/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {

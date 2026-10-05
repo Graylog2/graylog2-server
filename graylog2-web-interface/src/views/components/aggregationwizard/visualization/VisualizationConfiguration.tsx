@@ -27,6 +27,8 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
 import VisualizationElement from './VisualizationElement';
@@ -67,11 +69,18 @@ const VisualizationConfiguration = () => {
 
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentVisualizationType = findVisualizationType(values.visualization.type);
+  const sendTelemetry = useSendTelemetry();
 
   const setNewVisualizationType = useCallback(
     (newValue: string) => {
       const type = findVisualizationType(newValue);
       const createConfig = type.config?.createConfig ?? (() => ({}));
+
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.VISUALIZATION_TYPE_SELECTED, {
+        app_section: 'search-widget',
+        app_action_value: 'visualization-type-select',
+        event_details: { visualizationType: newValue },
+      });
 
       setFieldValue(
         'visualization',
@@ -82,7 +91,7 @@ const VisualizationConfiguration = () => {
         true,
       );
     },
-    [findVisualizationType, setFieldValue],
+    [findVisualizationType, sendTelemetry, setFieldValue],
   );
 
   const isTimelineChart = isTimeline(values);

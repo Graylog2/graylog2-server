@@ -32,6 +32,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdenti
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import jakarta.inject.Inject;
 
@@ -53,14 +54,17 @@ public class EntityTitleServiceImpl implements EntityTitleService {
 
     private final MongoConnection mongoConnection;
     private final DbEntitiesCatalog entitiesCatalog;
+    private final EntityPermissionsUtils entityPermissionsUtils;
 
     static final String TITLE_IF_NOT_PERMITTED = "";
 
     @Inject
     public EntityTitleServiceImpl(final MongoConnection mongoConnection,
-                                  final DbEntitiesCatalog entitiesCatalog) {
+                                  final DbEntitiesCatalog entitiesCatalog,
+                                  final EntityPermissionsUtils entityPermissionsUtils) {
         this.mongoConnection = mongoConnection;
         this.entitiesCatalog = entitiesCatalog;
+        this.entityPermissionsUtils = entityPermissionsUtils;
     }
 
     @Override
@@ -153,7 +157,8 @@ public class EntityTitleServiceImpl implements EntityTitleService {
                     return;
                 }
 
-                final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
+                final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString)
+                        && (!useCompositeDisplay || entityPermissionsUtils.areAllFieldsReadable(collection, displayFields));
                 final String title;
                 if (!canReadTitle) {
                     title = TITLE_IF_NOT_PERMITTED;

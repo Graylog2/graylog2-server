@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.aws;
 
+import org.graylog.aws.AWSAsyncProxyConfigurationProvider;
 import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
@@ -64,7 +65,8 @@ public class AwsClientBuilderUtilTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        awsClientBuilderUtil = new AWSClientBuilderUtil(AWSAuthFactory::new, encryptedValueService, mock(Configuration.class), mock(AWSProxyConfigurationProvider.class));
+        awsClientBuilderUtil = new AWSClientBuilderUtil(AWSAuthFactory::new, encryptedValueService, mock(Configuration.class),
+                mock(AWSProxyConfigurationProvider.class), mock(AWSAsyncProxyConfigurationProvider.class));
     }
 
     // Test Cases

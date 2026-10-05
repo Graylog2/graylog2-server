@@ -18,27 +18,40 @@ import * as React from 'react';
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
+import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
 import { Link } from 'components/common';
 import { Alert } from 'components/bootstrap';
+import { DataWell } from 'components/lookup-tables/layout-componets';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import streamCategoryName from 'logic/streams/streamCategoryName';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import StreamsContext from 'contexts/StreamsContext';
 
 import AggregationConditionSummary from './AggregationConditionSummary';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
-import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from '../replay-search/EventDefinitionReplaySearchLink';
+
+const StyledDataWell = styled(DataWell)`
+  line-height: 1.8;
+  white-space: pre;
+  font-family: monospace;
+  font-size: medium;
+  color: ${({ theme }) => (theme.mode === 'light' ? 'darkslateblue' : 'lightsteelblue')};
+  overflow: auto;
+  text-wrap: auto;
+`;
 
 const StreamOrId = ({ streamOrId }: { streamOrId: Stream | string }) => {
   if (typeof streamOrId === 'string') {
@@ -64,11 +77,7 @@ const getConditionType = (config: EventDefinition['config']) => {
     : 'aggregation';
 };
 
-const QueryParameters = ({
-  queryParameters,
-}: {
-  queryParameters: Array<LookupTableParameterJson & { embryonic?: boolean }>;
-}) => {
+const QueryParameters = ({ queryParameters }: { queryParameters: Array<ParameterJson & { embryonic?: boolean }> }) => {
   if (queryParameters.some((p) => p.embryonic)) {
     const undeclaredParameters = queryParameters
       .filter((p) => p.embryonic)
@@ -89,7 +98,7 @@ type Props = {
 };
 
 const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters'] }) => {
-  if (!filters || filters.length === 0) {
+  if (!filters || filters?.length === 0) {
     return <dd>No filters configured</dd>;
   }
 
@@ -112,12 +121,12 @@ type StreamsProps = {
 };
 
 const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: StreamsProps) => {
-  if ((!streamIds || streamIds.length === 0) && streamIdsWithMissingPermission.length <= 0) {
+  if ((!streamIds || streamIds?.length === 0) && streamIdsWithMissingPermission?.length <= 0) {
     return <>No Streams selected, searches in all Streams</>;
   }
 
   const warning =
-    streamIdsWithMissingPermission.length > 0 ? (
+    streamIdsWithMissingPermission?.length > 0 ? (
       <Alert bsStyle="warning">
         Missing Stream Permissions for:
         <br />
@@ -178,9 +187,9 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   };
 
   const renderStreamCategories = () => {
-    if (!streamCategories || streamCategories.length === 0) return null;
+    if (!streamCategories || streamCategories?.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={s} />);
+    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={streamCategoryName(s)} />);
 
     return (
       <>
@@ -195,8 +204,10 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       <dt>Type</dt>
       <dd>{upperFirst(conditionType)}</dd>
       <dt>Search Query</dt>
-      <dd>{query || '*'}</dd>
-      {queryParameters.length > 0 && <QueryParameters queryParameters={queryParameters} />}
+      <dd>
+        <StyledDataWell>{query || '*'}</StyledDataWell>
+      </dd>
+      {queryParameters?.length > 0 && <QueryParameters queryParameters={queryParameters} />}
       <dt>Search Filters</dt>
       <SearchFilters filters={config.filters} />
       <dt>Streams</dt>
@@ -242,7 +253,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       {conditionType === 'aggregation' && (
         <>
           <dt>Group by Field(s)</dt>
-          <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
+          <dd>{groupBy && groupBy?.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
           <dt>Create Events if</dt>
           <dd>
             {validationResults.isValid ? (
@@ -255,7 +266,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch id={definitionId} />
+        <EventDefinitionReplaySearchLink eventDefinitionId={definitionId} />
       </dd>
     </dl>
   );

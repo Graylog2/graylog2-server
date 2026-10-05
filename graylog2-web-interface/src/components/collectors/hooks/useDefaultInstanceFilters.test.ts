@@ -65,6 +65,6 @@ describe('useDefaultInstanceFilters', () => {
     const lastSeenFilter = result.current.get('last_seen');
 
     expect(lastSeenFilter).toHaveLength(1);
-    expect(lastSeenFilter[0]).toMatch(/^\d{4}-\d{2}-\d{2}T.*><$/);
+    expect(lastSeenFilter[0]).toMatch(/^relative@86400$/);
   });
 });

@@ -1,0 +1,9 @@
+type = "f"
+message = "Fixed enabling MongoDB profiling from the Graylog UI failing with a permission error on MongoDB 8.0.29 and later."
+
+details.user = """
+MongoDB 8.0.29 introduced [SERVER-130198](https://jira.mongodb.org/browse/SERVER-130198), which raises the authorization requirements for the `profile` command when it includes a `slowms` value. Graylog always sent an explicit `slowms` value when enabling profiling, so on MongoDB 8.0.29+ the request was rejected with an "Unauthorized" error even for MongoDB users with the documented `dbAdmin`/`clusterMonitor` permissions. Graylog no longer sends an explicit `slowms` value (MongoDB's default of 100ms is used instead), so enabling profiling works again with the documented permissions.
+"""
+
+pulls = ["27039"]
+issues = ["Graylog2/graylog-plugin-enterprise#15257"]

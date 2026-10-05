@@ -26,8 +26,10 @@ import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +37,12 @@ import java.util.Set;
 
 public interface ClusterAdapter {
     Optional<HealthStatus> health();
+
+    /**
+     * Cancelled at {@code timeout}, reported empty like an unreachable cluster. {@link #health()} cannot be bounded
+     * by config: its connect and socket timeouts apply per host and the client retries every node in one call.
+     */
+    Optional<HealthStatus> health(Duration timeout);
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
@@ -64,7 +72,18 @@ public interface ClusterAdapter {
 
     Map<String, NodeOSInfo> nodesHostInfo();
 
+    /**
+     * Live per-node runtime utilization ({@code _nodes/stats/os,jvm}): CPU percent and JVM heap-used percent, keyed
+     * by node id. A single bounded round-trip; the search-cluster health reporters sample and window this on the leader.
+     */
+    Map<String, NodeUtilization> nodesUtilization();
+
     ShardStats shardStats();
+
+    /**
+     * The cluster health response has no such field, so implementations derive it from each node's roles.
+     */
+    int countOfClusterManagerEligibleNodes();
 
     Optional<HealthStatus> deflectorHealth(Collection<String> indices);
 }

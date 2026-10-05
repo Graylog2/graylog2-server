@@ -49,6 +49,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.initializers.PeriodicalsService;
+import org.graylog2.web.resources.ResourceFileReader;
 
 import static java.util.Objects.requireNonNull;
 
@@ -76,6 +77,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
         bind(NotificationService.class).to(NullNotificationService.class);
+        bind(ResourceFileReader.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(CertificateRenewalPolicyResource.class);

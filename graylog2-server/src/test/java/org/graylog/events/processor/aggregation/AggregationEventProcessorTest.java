@@ -238,7 +238,7 @@ public class AggregationEventProcessorTest {
         );
         sourceMessagesWithAggregation(groupByFields, 1, emptyList());
 
-        String expectedQueryString = "(aQueryString) AND ((group_field_one:\"\\\" \\\" \\* \\& \\? \\- \\\\\") AND (group_field_two:\"\\/ \\/ \\~ \\| \\[\\]\\{\\}\"))";
+        String expectedQueryString = "(aQueryString) AND ((group_field_one:\"\\\"\\ \\\"\\ \\*\\ \\&\\ \\?\\ \\-\\ \\\\\") AND (group_field_two:\"\\/\\ \\/\\ \\~\\ \\|\\ \\[\\]\\{\\}\"))";
         verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), any(), eq(1), any());
     }
 

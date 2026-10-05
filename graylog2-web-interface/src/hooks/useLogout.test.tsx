@@ -18,8 +18,11 @@ import 'whatwg-fetch';
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DefaultProviders from 'DefaultProviders';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 import userEvent from '@testing-library/user-event';
+import { dataRouterFuture, routerProviderFuture } from 'reactRouterFutureFlags';
 
 import Routes from 'routing/Routes';
 import { usePluginExports } from 'views/test/testPlugins';
@@ -45,13 +48,26 @@ const routes = [
   { path: '/loggedin', element: <TestComponent /> },
 ];
 const Wrapper = () => (
-  <RouterProvider router={createMemoryRouter(routes, { initialEntries: ['/loggedin'], initialIndex: 0 })} />
+  <RouterProvider
+    router={createMemoryRouter(routes, {
+      initialEntries: ['/loggedin'],
+      initialIndex: 0,
+      future: dataRouterFuture,
+    })}
+    future={routerProviderFuture}
+  />
+);
+
+const Providers = ({ children }: { children: React.ReactNode }) => (
+  <DefaultQueryClientProvider>
+    <DefaultProviders>{children}</DefaultProviders>
+  </DefaultQueryClientProvider>
 );
 
 describe('useLogout', () => {
   describe('with no logout hooks', () => {
     it('works when no logout hooks are defined', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
@@ -66,7 +82,7 @@ describe('useLogout', () => {
     usePluginExports({ 'hooks.logout': [logoutHook] });
 
     it('executes logout hook if defined', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
@@ -78,6 +94,29 @@ describe('useLogout', () => {
     });
   });
 
+  describe('streams cache reset', () => {
+    it('clears the cached streams after logging out', async () => {
+      const queryClient = new QueryClient();
+      const removeQueriesSpy = jest.spyOn(queryClient, 'removeQueries');
+
+      const ClientProviders = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>
+          <DefaultProviders>{children}</DefaultProviders>
+        </QueryClientProvider>
+      );
+
+      render(<Wrapper />, { wrapper: ClientProviders });
+      await screen.findByText('Logged in');
+
+      const logoutButton = await screen.findByRole('button', { name: 'logout' });
+      await userEvent.click(logoutButton);
+
+      await screen.findByText('Logged out');
+
+      expect(removeQueriesSpy).toHaveBeenCalledWith({ queryKey: ['streams'] });
+    });
+  });
+
   describe('with faulty logout hook', () => {
     const logoutHook = jest.fn();
     const faultyLogoutHook = jest.fn(() => {
@@ -86,7 +125,7 @@ describe('useLogout', () => {
     usePluginExports({ 'hooks.logout': [faultyLogoutHook, logoutHook] });
 
     it('continues other hooks and logging out if one hook is faulty', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });

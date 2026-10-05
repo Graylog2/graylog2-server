@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Label } from 'components/bootstrap';
+import { Badge, Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
@@ -31,13 +31,15 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     type: {
       renderCell: (type: string) => <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ?? type}</Label>,
-      staticWidth: 140,
+      staticWidth: 190,
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (
-        <Label bsStyle={source.enabled ? 'success' : 'default'}>{source.enabled ? 'Enabled' : 'Disabled'}</Label>
+        <Badge color={source.enabled ? 'success' : 'warning'} variant="light">
+          {source.enabled ? 'Enabled' : 'Disabled'}
+        </Badge>
       ),
-      staticWidth: 100,
+      staticWidth: 110,
     },
     description: {
       renderCell: (description: string) => <span>{description || '—'}</span>,

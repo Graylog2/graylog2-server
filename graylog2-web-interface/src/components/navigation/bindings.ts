@@ -112,6 +112,9 @@ const navigationBindings: PluginExports = {
   ],
   helpMenu: [
     { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
+    ...(AppConfig.gl2DevMode()
+      ? [{ description: 'Design System', externalLink: 'https://graylog2.github.io/design-system' }]
+      : []),
     { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
     {
       description: 'API browser',

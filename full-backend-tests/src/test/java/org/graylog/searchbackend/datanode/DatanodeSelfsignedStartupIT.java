@@ -52,7 +52,7 @@ import java.util.concurrent.ExecutionException;
 public class DatanodeSelfsignedStartupIT {
 
 
-    private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
+    private final Logger log = LoggerFactory.getLogger(DatanodeSelfsignedStartupIT.class);
 
     private static GraylogApis apis;
 

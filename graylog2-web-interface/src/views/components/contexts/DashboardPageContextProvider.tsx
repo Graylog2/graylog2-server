@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import URI from 'urijs';
 
+import useHistory from 'routing/useHistory';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
@@ -55,40 +55,41 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
   }, [uriParams.page, dashboardPage, setDashboardPage, states, dispatch]);
 };
 
-const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
+const useCleanupQueryParams = ({ uriParams, query, replace }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
       const newQuery = baseURI.toString();
 
       if (query !== newQuery) {
-        navigate(newQuery, { replace: true });
+        replace(newQuery);
       }
     }
-  }, [query, navigate, uriParams?.page]);
+  }, [query, replace, uriParams?.page]);
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
-  const navigate = useNavigate();
+  const { replace } = useHistory();
   const [dashboardPage, setDashboardPage] = useState<string | undefined>();
   const params = useQuery();
   const uriParams = useMemo(
     () => ({
       page: params.page,
     }),
+    // eslint-disable-next-line @tanstack/query/no-unstable-deps
     [params],
   );
 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
-  useCleanupQueryParams({ uriParams, query, navigate });
+  useCleanupQueryParams({ uriParams, query, replace });
 
   const dashboardPageContextValue = useMemo(() => {
     const updatePageParams = (newPage: string | undefined) => {
       const newUri = _updateQueryParams(newPage, query);
 
-      navigate(newUri, { replace: true });
+      replace(newUri);
     };
 
     const setDashboardPageParam = (nextPage: string) => updatePageParams(nextPage);
@@ -99,7 +100,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
       unsetDashboardPage: unSetDashboardPageParam,
       dashboardPage: dashboardPage,
     };
-  }, [dashboardPage, navigate, query]);
+  }, [dashboardPage, replace, query]);
 
   return <DashboardPageContext.Provider value={dashboardPageContextValue}>{children}</DashboardPageContext.Provider>;
 };

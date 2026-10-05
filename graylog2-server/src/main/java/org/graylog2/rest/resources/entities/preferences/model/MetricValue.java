@@ -20,5 +20,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record MetricValue(@JsonProperty("value") Long value,
                           @JsonProperty("meaning") String additionalMeaning,
-                          @JsonProperty("metric_name") String metricName) {
+                          @JsonProperty("metric_name") String metricName,
+                          @JsonProperty("count_relation") CountRelation countRelation) {
+
+    public MetricValue(final Long value, final String additionalMeaning, final String metricName) {
+        this(value, additionalMeaning, metricName, CountRelation.EQ);
+    }
+
+    public enum CountRelation {
+        @JsonProperty("eq") EQ,
+        @JsonProperty("gte") GTE
+    }
 }

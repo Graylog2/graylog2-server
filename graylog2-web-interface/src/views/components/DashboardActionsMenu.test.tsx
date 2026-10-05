@@ -18,6 +18,7 @@ import React from 'react';
 import * as mockImmutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -27,6 +28,7 @@ import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
@@ -39,22 +41,33 @@ import DashboardActionsMenu from './DashboardActionsMenu';
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: undefined })),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 describe('DashboardActionsMenu', () => {
   const mockView = View.create()
@@ -110,6 +123,11 @@ describe('DashboardActionsMenu', () => {
     );
 
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   it('should save a new dashboard', async () => {
@@ -170,7 +188,7 @@ describe('DashboardActionsMenu', () => {
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
-    await findByTitle(/Share/);
+    await findByRole('button', { name: /Share/i });
     await findByRole('button', { name: /more actions/i });
   });
 
@@ -180,7 +198,7 @@ describe('DashboardActionsMenu', () => {
     );
 
     const saveButton = queryByTitle(/Save dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -197,7 +215,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -210,5 +228,59 @@ describe('DashboardActionsMenu', () => {
     render(<SUT />);
     await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
+  });
+
+  describe('with an immutable scope', () => {
+    const immutableView = mockView.toBuilder().scope('ILLUMINATE').build();
+
+    beforeEach(() => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useScopePermissions).mockReturnValue({
+        loadingScopePermissions: false,
+        scopePermissions: { is_mutable: false, is_deletable: false },
+        checkPermissions: () => false,
+      });
+    });
+
+    it('disables saving and editing metadata', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByRole('button', { name: 'Save dashboard' })).toHaveAttribute('aria-disabled', 'true');
+
+      await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+      expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+    });
+
+    it('still allows saving as a new dashboard', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByTitle(/Save as new dashboard/)).toBeEnabled();
+    });
+
+    it('explains why saving is disabled', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.hover(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(await screen.findByText(/This dashboard is read-only/i)).toBeInTheDocument();
+    });
+
+    it('does not save view when clicking the disabled save button', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
+
+    it('does not save view when pressing related keyboard shortcut', async () => {
+      render(<SUT view={immutableView} />);
+
+      await screen.findByRole('button', { name: 'Save dashboard' });
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
   });
 });

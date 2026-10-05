@@ -75,8 +75,8 @@ class AgentCertChannelHandlerTest {
 
         channel.pipeline().fireUserEventTriggered(SslHandshakeCompletionEvent.SUCCESS);
 
-        final String uid = channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
-        assertThat(uid).isEqualTo("my-agent-uid");
+        final String uid = channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
+        assertThat(uid).isEqualTo(PemUtils.computeFingerprint(x509));
 
         channel.close();
     }
@@ -92,7 +92,7 @@ class AgentCertChannelHandlerTest {
                 new SslHandshakeCompletionEvent(new RuntimeException("handshake failed"));
         channel.pipeline().fireUserEventTriggered(failEvent);
 
-        final String uid = channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
+        final String uid = channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
         assertThat(uid).isNull();
 
         channel.close();

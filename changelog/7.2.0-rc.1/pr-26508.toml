@@ -1,0 +1,4 @@
+type = "f"
+message = "Propagate scope when resolving referenced search filters during content pack installation."
+
+pulls = ["26508"]

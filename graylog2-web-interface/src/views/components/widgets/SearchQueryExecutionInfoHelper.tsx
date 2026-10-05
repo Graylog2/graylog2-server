@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
@@ -29,7 +29,7 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import type { SearchTypeResult, MessageResult, GenericResult } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 type Props = PropsWithChildren & {
   currentWidgetMapping: SearchTypeIds;
@@ -63,6 +63,7 @@ type WidgetExecutionData = {
 const StyledIcon = styled(Icon)(
   ({ theme }) => css`
     color: ${theme.colors.gray[60]};
+    margin-left: 5px;
   `,
 );
 
@@ -112,7 +113,7 @@ const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecu
 
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Props) => {
   const [open, setOpen] = useState(false);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const result = useViewsSelector(selectCurrentQueryResults);
   const currentWidgetSearchType = useMemo<SearchTypeResult>(() => {
     const searchTypeId = currentWidgetMapping?.toJS()?.[0];

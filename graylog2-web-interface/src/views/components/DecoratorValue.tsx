@@ -15,25 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import isString from 'lodash/isString';
-import trim from 'lodash/trim';
-import trunc from 'lodash/truncate';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import FormattedValue from 'views/components/FormattedValue';
 
-import EmptyValue from './EmptyValue';
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
-
-const _formatValue = (field, value, truncate, render, type) => {
-  const stringified = isString(value) ? value : JSON.stringify(value);
-  const Component = render;
-
-  return trim(stringified) === '' ? (
-    <EmptyValue />
-  ) : (
-    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
-  );
-};
 
 type Props = {
   field: string;
@@ -43,18 +29,13 @@ type Props = {
   type: FieldType;
 };
 
-const DecoratorValue = ({ field, value, truncate, render, type }: Props) => {
-  if (value && value.href && value.type) {
-    const formattedValue = _formatValue(field, value.href, truncate, render, type);
-
-    return (
-      <a href={value.href} target="_blank" rel="noreferrer">
-        {formattedValue}
-      </a>
-    );
-  }
-
-  return _formatValue(field, value, truncate, render, type);
-};
+const DecoratorValue = ({ field, value, truncate, render, type }: Props) =>
+  value && value.href && value.type ? (
+    <a href={value.href} target="_blank" rel="noreferrer">
+      <FormattedValue field={field} value={value.href} truncate={truncate} render={render} type={type} />
+    </a>
+  ) : (
+    <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />
+  );
 
 export default DecoratorValue;

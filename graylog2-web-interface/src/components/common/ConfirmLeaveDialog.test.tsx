@@ -19,8 +19,6 @@ import { renderWithDataRouter } from 'wrappedTestingLibrary';
 
 import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
-jest.mock('util/AppConfig');
-
 describe('ConfirmLeaveDialog', () => {
   const { addEventListener } = window;
   const { removeEventListener } = window;

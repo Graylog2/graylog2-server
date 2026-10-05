@@ -31,7 +31,7 @@ import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
-import TagsCell from 'components/events/TagsCell';
+import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 const EventDefinitionRenderer = ({
@@ -46,7 +46,7 @@ const EventDefinitionRenderer = ({
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
 
-const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
+export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const plugin = useMemo(() => {
     if (!type) {
@@ -92,10 +92,20 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
     <em>No time range</em>
   );
 
-export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined | null }) => {
+export const TagsRenderer = ({
+  tags,
+  interactive = true,
+}: {
+  tags: ReadonlyArray<string> | undefined | null;
+  interactive?: boolean;
+}) => {
   const onTagClick = useAppendTagFilter();
 
-  return <TagsCell tags={tags} onTagClick={onTagClick} />;
+  if (!interactive) {
+    return <ChipsCell items={tags} />;
+  }
+
+  return <ChipsCell items={tags} onItemClick={onTagClick} itemLabel="tag" />;
 };
 
 export const eventTypeAttribute = {

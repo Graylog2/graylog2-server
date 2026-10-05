@@ -14,5 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as DeploymentForm } from './DeploymentForm';
+export { default as DeployTab } from './DeployTab';
 export { default as EnrollmentTokenList } from './EnrollmentTokenList';

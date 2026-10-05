@@ -78,6 +78,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
     }
 
     @Override
+    public Set<String> checkedPermissions() {
+        return Set.of();
+    }
+
+    @Override
     public TabularResponse apply(PermissionHelper permissionHelper, SearchMessagesTool.Parameters parameters) {
         try {
             final MessagesRequestSpec spec = new MessagesRequestSpec(

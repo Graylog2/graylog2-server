@@ -139,6 +139,12 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
               <span>{formData.awsAssumeRoleARN?.value}</span>
             </li>
           )}
+          {formData.awsExternalId?.value && (
+            <li>
+              <strong>AWS External ID </strong>
+              <span>{formData.awsExternalId?.value}</span>
+            </li>
+          )}
           <li>
             <strong>AWS SQS Queue name </strong>
             <span>{formData.awsCloudTrailSqsQueueName?.value}</span>

@@ -75,3 +75,13 @@ export const predicate = (field: string, value: string | number) =>
     : `${field}:${value}`;
 
 export const not = (query: string) => `NOT ${query}`.replace(/^NOT NOT /, '');
+
+export const edgeClause = (
+  a: { field: string; value: string | number },
+  b: { field: string; value: string | number },
+) => {
+  const pair = (v1: string | number, v2: string | number) =>
+    `${predicate(a.field, escape(v1))} AND ${predicate(b.field, escape(v2))}`;
+
+  return `((${pair(a.value, b.value)}) OR (${pair(b.value, a.value)}))`;
+};

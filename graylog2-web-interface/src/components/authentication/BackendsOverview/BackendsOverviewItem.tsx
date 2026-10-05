@@ -18,12 +18,14 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { LinkContainer, Link, TextOverflowEllipsis } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { AUTHENTICATION_QUERY_KEY } from 'hooks/useAuthentication';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 
@@ -73,7 +75,11 @@ const ActionsCell = ({
   isActive: boolean;
 }) => {
   const { title, id } = authenticationBackend;
-  const _setActiveBackend = (backendId) => AuthenticationDomain.setActiveBackend(backendId, title);
+  const queryClient = useQueryClient();
+  const _setActiveBackend = (backendId) =>
+    AuthenticationDomain.setActiveBackend(backendId, title).then(() =>
+      queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
+    );
 
   const _deactivateBackend = () => {
     if (window.confirm(confirmMessage(title, 'deactivate'))) {
@@ -89,7 +95,9 @@ const ActionsCell = ({
 
   const _deleteBackend = () => {
     if (window.confirm(confirmMessage(title, 'delete'))) {
-      AuthenticationDomain.delete(id, title);
+      AuthenticationDomain.delete(id, title).then(() =>
+        queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
+      );
     }
   };
 

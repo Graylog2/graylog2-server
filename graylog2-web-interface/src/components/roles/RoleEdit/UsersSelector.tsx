@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import compact from 'lodash/compact';
 import * as Immutable from 'immutable';
 
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import type Role from 'logic/roles/Role';
 import type { PaginatedListType } from 'components/common/PaginatedItemOverview';
 import type UserOverview from 'logic/users/UserOverview';
@@ -32,6 +31,7 @@ import { Select, ErrorAlert } from 'components/common';
 type Props = {
   onSubmit: (user: Immutable.Set<UserOverview>) => Promise<PaginatedListType | null | undefined>;
   role: Role;
+  refreshVersion?: number;
 };
 
 const SubmitButton = styled(Button)`
@@ -71,7 +71,7 @@ const _renderOption = ({ label }: { label: string }) => <SelectOption>{label}</S
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
-const UsersSelector = ({ role, onSubmit }: Props) => {
+const UsersSelector = ({ role, onSubmit, refreshVersion = 0 }: Props) => {
   const [users, setUsers] = useState<Immutable.List<UserOverview>>(Immutable.List.of());
   const [options, setOptions] = useState([]);
   const [error, setError] = useState<string | undefined>();
@@ -116,15 +116,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
 
   useEffect(() => {
     _loadUsers();
-
-    const unlistenAddMember = AuthzRolesActions.addMembers.completed.listen(_loadUsers);
-    const unlistenRemoveMember = AuthzRolesActions.removeMember.completed.listen(_loadUsers);
-
-    return () => {
-      unlistenRemoveMember();
-      unlistenAddMember();
-    };
-  }, [role, _loadUsers]);
+  }, [role, _loadUsers, refreshVersion]);
 
   return (
     <div>

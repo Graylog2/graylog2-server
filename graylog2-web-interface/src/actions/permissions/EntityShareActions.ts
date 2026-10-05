@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
-
-import type { RefluxActions } from 'stores/StoreTypes';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import type { GRN } from 'logic/permissions/types';
-import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
-import { singletonActions } from 'logic/singleton';
+import type { PaginatedList } from 'stores/PaginationTypes';
 import type { SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
-import type EntityShareState from 'logic/permissions/EntityShareState';
 
 export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
   context: {
@@ -39,26 +34,3 @@ export type EntitySharePayload = {
 export type EntityShare = {
   share_request?: EntitySharePayload;
 };
-
-export type ActionsType = {
-  prepare: (
-    entityType: string,
-    entityTitle: string,
-    GRN?: GRN,
-    payload?: EntitySharePayload,
-  ) => Promise<EntityShareState>;
-  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>;
-  loadUserSharesPaginated: (userId: string, pagination: Pagination) => Promise<PaginatedEntityShares>;
-};
-
-type EntityShareActionsType = RefluxActions<ActionsType>;
-
-const EntityShareActions: EntityShareActionsType = singletonActions('permissions.EntityShare', () =>
-  Reflux.createActions({
-    prepare: { asyncResult: true },
-    update: { asyncResult: true },
-    loadUserSharesPaginated: { asyncResult: true },
-  }),
-);
-
-export default EntityShareActions;

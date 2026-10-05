@@ -22,13 +22,11 @@ import { isPermitted } from 'util/PermissionsMixin';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Modal, Alert } from 'components/bootstrap';
 import { IfPermitted, ModalSubmit } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
@@ -67,8 +65,7 @@ const _updateOrder = (
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('decorators');
   const { permissions } = useCurrentUser();
 
   const canEditStream = useMemo(
@@ -99,11 +96,9 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onSave(modifiedDecorators);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.DECORATORS_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'decorators',
       app_action_value: 'configuration-save',
     });
-  }, [onSave, modifiedDecorators, sendTelemetry, pathname]);
+  }, [onSave, modifiedDecorators, sendTelemetry]);
 
   const currentDecorators = modifiedDecorators.filter(
     (decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream,

@@ -53,10 +53,10 @@ public class LookupTableExtractor extends Extractor {
             throw new ConfigurationException("Missing lookup table extractor configuration field: " + CONFIG_LUT_NAME);
         }
 
-        if (!lookupTableService.hasTable(lookupTableName)) {
-            throw new IllegalStateException("Configured lookup table <" + lookupTableName + "> doesn't exist");
-        }
-
+        // We deliberately do not verify that the lookup table exists here. The table is resolved lazily on every
+        // lookup() call, which already degrades gracefully (LookupResult.withError()) when the table is missing.
+        // Failing here would make existing extractors unloadable - breaking listing, editing and deletion - if their
+        // lookup table is deleted later on (see issue #26122). Existence is validated at create/update time instead.
         this.lookupTable = lookupTableService.newBuilder().lookupTable(lookupTableName).build();
     }
 

@@ -46,6 +46,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,6 +135,28 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
         assertThat(new String(Base64.getDecoder().decode(entry.base64UniqueId()), StandardCharsets.UTF_8))
                 .isNotBlank()
                 .matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+    }
+
+    @Test
+    public void readEntryByDnReadsAtTheDnItselfWithNoSearchBase() throws Exception {
+        // The point of this method: callers following DN references (AD memberOf nesting) need an entry that
+        // a subtree search from their configured base would not reach.
+        final Optional<LDAPEntry> entry = connector.readEntryByDn(connection,
+                "cn=John Doe,ou=users,dc=example,dc=com", "entryUUID",
+                ImmutableSet.of("cn", "uid", "entryUUID"));
+
+        assertThat(entry).isPresent();
+        assertThat(entry.get().dn()).isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
+        assertThat(entry.get().firstAttributeValue("uid")).contains("john");
+    }
+
+    @Test
+    public void readEntryByDnReturnsEmptyForAMissingDnInsteadOfThrowing() throws Exception {
+        // A stale memberOf back-link pointing at a deleted group must be a dead end for the caller, not an
+        // exception that fails the whole login.
+        assertThat(connector.readEntryByDn(connection,
+                "cn=Does Not Exist,ou=users,dc=example,dc=com", "entryUUID", ImmutableSet.of("cn", "entryUUID")))
+                .isEmpty();
     }
 
     @Test

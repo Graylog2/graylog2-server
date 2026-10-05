@@ -18,9 +18,9 @@ import React from 'react';
 
 import InputDescription from 'components/common/InputDescription';
 import type { BsSize } from 'components/bootstrap/types';
+import Radio from 'components/common/Radio';
 
 import Checkbox from './Checkbox';
-import { Radio } from './imports';
 import ControlLabel from './ControlLabel';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
@@ -216,7 +216,7 @@ class Input extends React.Component<
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           <Radio
-            inputRef={(ref) => {
+            ref={(ref) => {
               this.input = ref;
             }}
             {...controlProps}>

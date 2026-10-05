@@ -35,7 +35,7 @@ public class IndexSetTemplateRequirementsChecker {
 
     public Result check(IndexSetTemplate indexSetTemplate) {
         return indexSetTemplateRequirements.stream()
-                .sorted(Comparator.comparing(IndexSetTemplateRequirement::priority))
+                .sorted(Comparator.comparingInt(IndexSetTemplateRequirement::priority))
                 .map(indexSetTemplateRequirement -> indexSetTemplateRequirement.check(indexSetTemplate))
                 .filter(result -> !result.fulfilled())
                 .findFirst()

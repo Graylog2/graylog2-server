@@ -110,6 +110,7 @@ public interface Notification extends Persisted {
         GENERIC,
         GENERIC_WITH_LINK,
         ES_INDEX_BLOCKED,
+        ES_INDEX_MAPPING_ERROR,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
@@ -127,7 +128,8 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
         DATA_TIERING_ROLLOVER_ERROR,
-        DATA_NODE_HEAP_WARNING;
+        DATA_NODE_HEAP_WARNING,
+        KINESIS_SINGLE_TABLE_MIGRATION;
 
         @JsonValue
         public String json() {

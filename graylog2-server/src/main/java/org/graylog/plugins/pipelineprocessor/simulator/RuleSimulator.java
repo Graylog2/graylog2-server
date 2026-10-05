@@ -67,7 +67,7 @@ public class RuleSimulator {
                 .build();
         stage.setPipeline(pipeline);
         PipelineInterpreter pipelineInterpreter = new PipelineInterpreter(
-                new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater);
+                new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater, 1);
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
         pipelineInterpreter.evaluateStage(stage, message, message.getId(),
                 new ArrayList<>(), Collections.emptySet(),

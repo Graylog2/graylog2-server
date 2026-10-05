@@ -20,7 +20,7 @@ import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'c
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import { testContainsString, testRegex } from 'api/tools';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { saveExtractor } from 'hooks/useExtractors';
 
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
@@ -212,7 +212,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
     event.preventDefault();
 
-    ExtractorsActions.save.triggerPromise(inputId, updatedExtractor).then(() => onSave());
+    saveExtractor(inputId, updatedExtractor).then(() => onSave());
   };
 
   render() {

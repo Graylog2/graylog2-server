@@ -14,8 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import usePluginEntities from 'hooks/usePluginEntities';
+import { useContext } from 'react';
 
-const useWidgetActions = () => usePluginEntities('views.widgets.actions');
+import usePluginEntities from 'hooks/usePluginEntities';
+import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
+
+const useWidgetActions = () => {
+  const providedActions = useContext(WidgetActionsContext);
+  const pluginWidgetActions = usePluginEntities('views.widgets.actions');
+
+  return providedActions ?? pluginWidgetActions;
+};
 
 export default useWidgetActions;

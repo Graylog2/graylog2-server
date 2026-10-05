@@ -45,6 +45,7 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+    VISUALIZATION_TYPE_SELECTED: 'Search Widget Visualization Type Selected',
   },
   FAVORITE_FIELDS: {
     EDIT_OPEN: 'Favorite Fields Edit Open',
@@ -260,6 +261,7 @@ export const TELEMETRY_EVENT_TYPE = {
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
     PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
+    WELCOME_PAGE_UPDATED: 'Configurations Welcome Page Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -410,6 +412,16 @@ export const TELEMETRY_EVENT_TYPE = {
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
   },
+  DATANODE_OPENSEARCH_UPGRADE: {
+    ROLLING_UPGRADE_STARTED: 'Datanode OpenSearch Upgrade Rolling Upgrade Started',
+    ROLLING_UPGRADE_FORCE_STARTED: 'Datanode OpenSearch Upgrade Rolling Upgrade Force Started',
+    ROLLING_UPGRADE_RESUMED: 'Datanode OpenSearch Upgrade Rolling Upgrade Resumed',
+    APPLY_ON_NEXT_RESTART_CLICKED: 'Datanode OpenSearch Upgrade Apply On Next Restart Clicked',
+    INDEX_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Delete Confirmed',
+    INDEX_ARCHIVE_AND_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Archive And Delete Confirmed',
+    SYSTEM_INDEX_REINDEX_CONFIRMED: 'Datanode OpenSearch Upgrade System Index Reindex Confirmed',
+    WRITE_INDEX_ROTATE_CONFIRMED: 'Datanode OpenSearch Upgrade Write Index Rotate Confirmed',
+  },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
@@ -442,6 +454,7 @@ export const TELEMETRY_EVENT_TYPE = {
       UPDATED: 'Fleet Updated',
       DELETED: 'Fleet Deleted',
       TAB_SELECTED: 'Fleet Tab Selected',
+      RECEIVED_MESSAGES_CLICKED: 'Fleet Received Messages Clicked',
     },
     SOURCE: {
       CREATE_OPENED: 'Collector Source Create Opened',
@@ -449,9 +462,15 @@ export const TELEMETRY_EVENT_TYPE = {
       CREATED: 'Collector Source Created',
       UPDATED: 'Collector Source Updated',
       DELETED: 'Collector Source Deleted',
+      EDIT_OPENED: 'Collector Source Edit Opened',
+      EDIT_CANCELLED: 'Collector Source Edit Cancelled',
+      RECEIVED_MESSAGES_CLICKED: 'Collector Source Received Messages Clicked',
     },
     INSTANCE: {
       VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
+      RECEIVED_MESSAGES_CLICKED: 'Collector Instance Received Messages Clicked',
+      FLEET_OPENED: 'Collector Instance Fleet Opened',
+      TRANSACTIONS_TOGGLED: 'Collector Instance Queued Transactions Toggled',
       DETAILS_OPENED: 'Collector Instance Details Opened',
       REASSIGNED: 'Collector Instance Reassigned',
       DELETED: 'Collector Instance Deleted',
@@ -459,15 +478,38 @@ export const TELEMETRY_EVENT_TYPE = {
     },
     ENROLLMENT_TOKEN: {
       FLEET_SELECTED: 'Collector Deployment Fleet Selected',
+      MODE_SELECTED: 'Collector Enrollment Token Mode Selected',
       EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
       GENERATED: 'Collector Enrollment Token Generated',
+      GENERATE_FAILED: 'Collector Enrollment Token Generate Failed',
+      CHANGE_CLICKED: 'Collector Enrollment Token Change Clicked',
       TOKEN_COPIED: 'Collector Enrollment Token Copied',
       DELETED: 'Collector Enrollment Token Deleted',
       BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
     },
+    DEPLOYMENT: {
+      TAB_SELECTED: 'Collector Deployment Tab Selected',
+      FLEET_CLEARED: 'Collector Deployment Fleet Cleared',
+      FIRST_HOST_ENROLLED: 'Collector Deployment First Host Enrolled',
+      HOST_SETUP_TOGGLED: 'Collector Deployment Host Setup Toggled',
+      LINK_CLICKED: 'Collector Deployment Link Clicked',
+    },
+    INSTALL: {
+      PLATFORM_SELECTED: 'Collector Install Platform Selected',
+      COMMAND_COPIED: 'Collector Install Command Copied',
+    },
     SETTINGS: {
       UPDATED: 'Collector Settings Updated',
       DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
+    },
+    ONBOARDING: {
+      FLEET_CLEARED: 'Collector Onboarding Fleet Cleared',
+      CONNECTED: 'Collector Onboarding Collector Connected',
+      COMPLETED: 'Collector Onboarding Completed',
+      CONNECTION_LOST: 'Collector Onboarding Connection Lost',
+      AWAITING_DATA: 'Collector Onboarding Awaiting Data',
+      NEXT_STEP_CLICKED: 'Collector Onboarding Next Step Clicked',
+      CHECK_AGAIN_CLICKED: 'Collector Onboarding Check Again Clicked',
     },
   },
   RIGHT_SIDEBAR: {
@@ -477,5 +519,11 @@ export const TELEMETRY_EVENT_TYPE = {
     EXPANDED: 'Right Sidebar Expanded',
     NAVIGATED_BACK: 'Right Sidebar Navigated Back',
     NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
+  },
+  WELCOME: {
+    SETUP_COLLECTOR_CLICKED: 'Welcome Enroll Collector Clicked',
+    CONFIGURE_INPUT_CLICKED: 'Welcome Configure Input Clicked',
+    RESOURCE_CONTINUE_CLICKED: 'Welcome Resource Continue Clicked',
+    DISMISS_CLICKED: 'Welcome Dismiss Clicked',
   },
 } as const;

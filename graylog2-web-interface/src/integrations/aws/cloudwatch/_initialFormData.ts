@@ -41,6 +41,9 @@ const DEFAULT_SETTINGS: FormSettings = {
   awsCloudWatchAddFlowLogPrefix: {
     value: true, // We want to default to true on render, but never compare the default
   },
+  awsCloudWatchStoreFullMessage: {
+    value: false,
+  },
   overrideSource: {
     value: '',
   },

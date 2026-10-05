@@ -103,14 +103,14 @@ describe('<PaginatedItemOverview>', () => {
 
     await screen.findByText(itemName, { exact: false });
 
-    expect(screen.queryByTitle(`Remove ${itemName}`)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Remove ${itemName}` })).not.toBeInTheDocument();
 
     rerender(
       <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)} onDeleteItem={jest.fn()} />,
     );
 
     await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false });
-    await screen.findByTitle(`Remove ${itemName}`);
+    await screen.findByRole('button', { name: `Remove ${itemName}` });
   });
 
   it('uses custom item component', async () => {

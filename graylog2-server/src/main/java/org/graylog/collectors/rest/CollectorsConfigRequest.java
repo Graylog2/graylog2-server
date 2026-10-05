@@ -19,6 +19,7 @@ package org.graylog.collectors.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
 
 import java.time.Duration;
@@ -43,5 +44,19 @@ public record CollectorsConfigRequest(
         public IngestEndpointConfig toConfig() {
             return new IngestEndpointConfig(hostname(), port());
         }
+    }
+
+    public CollectorsConfig.Builder applyTo(CollectorsConfig.Builder configBuilder) {
+        configBuilder.http(http.toConfig());
+        if (collectorOfflineThreshold() != null) {
+            configBuilder.collectorOfflineThreshold(collectorOfflineThreshold());
+        }
+        if (collectorDefaultVisibilityThreshold() != null) {
+            configBuilder.collectorDefaultVisibilityThreshold(collectorDefaultVisibilityThreshold());
+        }
+        if (collectorExpirationThreshold() != null) {
+            configBuilder.collectorExpirationThreshold(collectorExpirationThreshold());
+        }
+        return configBuilder;
     }
 }

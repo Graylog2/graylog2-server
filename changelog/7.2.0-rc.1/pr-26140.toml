@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix NPE when retrieving fields for indices whose mappings have no `properties` block (e.g. system indices)"
+
+pulls = ["26140"]

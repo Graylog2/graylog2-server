@@ -1,0 +1,5 @@
+type = "a"
+message = "Add routing and performance columns to entity tables (inputs, streams, event definitions)."
+
+issues = ["25930"]
+pulls = ["25997", "26072", "25981", "25951", "Graylog2/graylog-plugin-enterprise#14265", "Graylog2/graylog-plugin-enterprise#14277"]

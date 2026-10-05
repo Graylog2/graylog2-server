@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -39,6 +40,8 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -94,7 +97,7 @@ class ViewSharingToGrantsMigrationTest {
             return createUser(argument);
         });
 
-        final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
+        final EntityRegistrar entityRegistrar = new EntityRegistrar(grnRegistry,
                 () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
         final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, mongoCollections);
 
@@ -208,7 +211,7 @@ class ViewSharingToGrantsMigrationTest {
                                EntityRegistrar entityRegistrar, MongoCollections mongoCollections) {
             super(clusterConfigService,
                     view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar,
-                    mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections);
+                    mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new EntityScopeService(Set.of(new DefaultEntityScope())), new IgnoreSearchFilters());
         }
     }
 }

@@ -133,7 +133,9 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(OpensearchState.AVAILABLE)) {
             process.openSearchClient().ifPresent(client -> {
-                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
+                if (this.nodeStatMetricsCollector == null || this.nodeStatMetricsCollector.getClient() != client) {
+                    this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
+                }
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client);
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
@@ -141,7 +143,10 @@ public class MetricsCollector extends Periodical {
                 metrics.put("node", node);
                 addJvmMetrics(metrics);
                 Map<String, Object> nodeMetrics = nodeStatMetricsCollector.getNodeMetrics(node);
-                metrics.putAll(nodeMetrics);
+                // The metrics index and its dashboards expect memory/disk values converted to GiB/MiB.
+                for (Map.Entry<String, Object> entry : nodeMetrics.entrySet()) {
+                    metrics.put(entry.getKey(), NodeStatMetrics.mapValue(entry.getKey(), entry.getValue()));
+                }
                 final Map<String, Object> finalMetrics = metrics;
                 indexDocument(client, IndexRequest.of(i -> i
                         .index(configuration.getMetricsStream())
@@ -158,6 +163,8 @@ public class MetricsCollector extends Periodical {
                     ));
                 }
 
+                // Registry gauges are named after the raw OpenSearch stat paths (e.g. "..._in_bytes"), so they
+                // expose the raw, unconverted values.
                 nodeMetrics.forEach((key, value) -> {
                     opensearchMetrics.put(NodeStatMetrics.getMetricRegistryName(key), value);
                 });
@@ -216,7 +223,7 @@ public class MetricsCollector extends Periodical {
 
         if (Objects.nonNull(searchResponse) && searchResponse.hits().total().value() > 0) {
             // Retrieve the first hit (latest document) from the search response
-            return OSSerializationUtils.toMap(searchResponse.hits().hits().getFirst());
+            return OSSerializationUtils.toMap(searchResponse.hits().hits().getFirst().source());
         } else {
             LOG.info("No previous metrics for cluster");
         }
@@ -228,7 +235,7 @@ public class MetricsCollector extends Periodical {
             CompletableFuture<IndexResponse> response = client.asyncWithoutErrorMapping().index(indexRequest);
             response.whenComplete((indexResponse, throwable) -> {
                 if (Objects.nonNull(throwable)) {
-                    LOG.error("Error indexing metrics");
+                    LOG.error("Error indexing metrics into datastream {}", indexRequest.index(), throwable);
                 }
             });
         } catch (IOException e) {

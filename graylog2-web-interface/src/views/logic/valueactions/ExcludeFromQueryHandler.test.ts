@@ -22,6 +22,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { RootState } from 'views/types';
 import mockDispatch from 'views/test/mockDispatch';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
+import type Widget from 'views/logic/widgets/Widget';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
@@ -125,6 +126,53 @@ describe('ExcludeFromQueryHandler', () => {
     );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND _exists_:do');
+  });
+
+  it('excludes a value across all groupings as a negated OR group', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'source',
+        value: 'a',
+        contexts: {
+          widget: { config: { visualization: 'network' } } as unknown as Widget,
+          valuePath: [{ source: 'a' }, { target: 'a' }],
+          valuePathOperator: 'OR',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT (source:a OR target:a)');
+  });
+
+  it('negates the symmetric edge clause when the operator is EDGE', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'source',
+        value: 'a',
+        contexts: {
+          widget: { config: { visualization: 'network' } } as unknown as Widget,
+          valuePath: [{ source: 'a' }, { target: 'b' }],
+          valuePathOperator: 'EDGE',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'queryId',
+      'answer:42 AND NOT ((source:a AND target:b) OR (source:b AND target:a))',
+    );
   });
 
   it('escapes special characters in field value', async () => {

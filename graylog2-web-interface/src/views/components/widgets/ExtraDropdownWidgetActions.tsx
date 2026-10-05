@@ -65,7 +65,7 @@ const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
   const dispatch = useViewsDispatch();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
 
   const extraWidgetActions = useMemo(
     () =>
@@ -78,7 +78,6 @@ const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
           const handler = createHandler(action, setComponents);
           const _onSelect = () => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
-              app_section: 'search-widget',
               app_action_value: action.type,
             });
 

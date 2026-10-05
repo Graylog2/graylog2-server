@@ -1,0 +1,5 @@
+type = "f"
+message = "Prefer hostname in opensearch sniffer"
+
+issues = ["26743"]
+pulls = ["26744"]

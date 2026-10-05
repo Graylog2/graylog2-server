@@ -19,6 +19,7 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
@@ -28,6 +29,7 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
+import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -40,6 +42,12 @@ interface PluginNavigationItems {
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
+}
+
+interface NavigationBadge {
+  key: string;
+  component: React.ComponentType;
+  useCondition: () => boolean;
 }
 
 interface PluginPages {
@@ -201,8 +209,14 @@ type IndexRetentionConfig = {
 
 type StreamsOverviewTableElement = {
   attributeName: string;
+  group?: 'routing' | 'performance';
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
+  // Optional map of column id → backend metric fields. Plugins use this to plug their
+  // columns into the open-source `POST /streams/metrics` request (e.g. enterprise's
+  // `failure_count`). When the column is visible, the listed fields are added to the
+  // metrics request automatically.
+  metricFields?: Record<string, Array<string>>;
 };
 
 declare module 'graylog-web-plugin/plugin' {
@@ -231,15 +245,17 @@ declare module 'graylog-web-plugin/plugin' {
     api_browser: 'read';
     authentication: 'edit';
     buffers: 'read';
+    collectors: 'create';
     // Do we need both of the following?
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    clusterhealth: 'read';
     collector_fleets: 'read';
     collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
-    datanode: 'start';
+    datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
@@ -248,7 +264,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexercluster: 'read';
     indexranges: 'rebuild';
     indexset_templates: 'create' | 'edit' | 'read';
-    indexsets: 'create' | 'edit' | 'read';
+    indexsets: 'create' | 'delete' | 'edit' | 'read';
     indexsets_field_restrictions: 'edit';
     indices: 'read' | 'changestate' | 'failures';
     input_types: 'create';
@@ -267,7 +283,7 @@ declare module 'graylog-web-plugin/plugin' {
     messagecount: 'read';
     messages: 'analyze' | 'read';
     node: 'shutdown';
-    notifications: 'read';
+    notifications: 'delete' | 'read';
     outputs: 'create' | 'edit' | 'read' | 'terminate';
     pipeline: 'create' | 'delete' | 'edit' | 'read';
     pipeline_rule: 'create' | 'delete' | 'edit' | 'read';
@@ -307,7 +323,7 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
-    DataLakeJournal: React.ComponentType<{
+    DataLakeJournal?: React.ComponentType<{
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{
@@ -334,7 +350,18 @@ declare module 'graylog-web-plugin/plugin' {
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
     }>;
-    DataLakeStreamDeleteWarning: React.ComponentType;
+    DataLakeStreamDeleteWarning: React.ComponentType<{
+      streamId: string;
+      isEnabled: boolean;
+      hasArchivedData: boolean;
+      hasRetrievals: boolean;
+    }>;
+  }
+
+  interface PluginArchive {
+    hooks: {
+      useExcludedStreams: () => Array<string>;
+    };
   }
 
   type HelpMenuItem = {
@@ -369,6 +396,7 @@ declare module 'graylog-web-plugin/plugin' {
     path: QualifiedUrl<string>;
     permissions?: Permission | Array<Permission>;
     requiredFeatureFlag?: string;
+    useCondition?: () => boolean;
   }
 
   type PluginNavigationDropdown = {
@@ -384,6 +412,17 @@ declare module 'graylog-web-plugin/plugin' {
     useCondition?: () => boolean;
   } & (PluginNavigationLink | PluginNavigationDropdown);
 
+  type EntityLinkOnClickContext = {
+    openSidebar: RightSidebarContextType['openSidebar'];
+  };
+
+  type EntityLinkResolver = {
+    uriSegment: string;
+    resolve: (
+      trailingSegments: ReadonlyArray<string>,
+    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
+  };
+
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     /**
@@ -393,12 +432,14 @@ declare module 'graylog-web-plugin/plugin' {
      */
     pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    archive?: Array<PluginArchive>;
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
@@ -429,9 +470,11 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition?: () => boolean;
     }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    'indices.archive'?: Array<IndexArchiveBinding>;
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };
     }>;
+    'markdown.entityLinkResolvers'?: Array<EntityLinkResolver>;
   }
   interface PluginMetadata {
     name?: string;

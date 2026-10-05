@@ -28,7 +28,13 @@ import org.graylog.datanode.filesystem.index.IndexerInformationParserException;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
+/**
+ * Reads shards with the Lucene version the datanode compiles against. Anything older than the previous major
+ * index format fails with {@link IncompatibleIndexVersionException}; {@link Lucene9ShardStatsParser} is the
+ * fallback for those.
+ */
 @Singleton
 public class ShardStatsParserImpl implements ShardStatsParser {
     @Override
@@ -39,13 +45,16 @@ public class ShardStatsParserImpl implements ShardStatsParser {
             // values, postings, etc.), making it far cheaper than DirectoryReader.open().
             final SegmentInfos segmentInfos = SegmentInfos.readLatestCommit(directory);
             final int documentsCount = computeDocumentsCount(segmentInfos);
-            final Version minSegmentLuceneVersion = segmentInfos.getMinSegmentLuceneVersion();
-            return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion);
+            return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion(segmentInfos));
         } catch (IndexFormatTooOldException e) {
             throw new IncompatibleIndexVersionException(e);
         } catch (IOException e) {
             throw new IndexerInformationParserException("Failed to open index for read", e);
         }
+    }
+
+    private String minSegmentLuceneVersion(SegmentInfos segmentInfos) {
+        return Optional.ofNullable(segmentInfos.getMinSegmentLuceneVersion()).map(Version::toString).orElse(null);
     }
 
     /**

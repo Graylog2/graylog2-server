@@ -37,6 +37,7 @@ export interface Event {
   priority: number;
   message: string;
   associated_assets?: string[];
+  tactics_techniques?: string[];
   tags?: string[];
   group_by_fields: {
     [_key: string]: string;

@@ -26,11 +26,16 @@ import org.opensearch.client.opensearch.generic.Requests;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
+
+    private static final Pattern HOST_PORT_PATTERN = Pattern.compile("^([^/]+)/.*:(\\d+)$");
+
     private final OfficialOpensearchClient client;
     private final String defaultScheme;
 
@@ -59,9 +64,16 @@ public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
         if (address.startsWith("http://") || address.startsWith("https://")) {
             return URI.create(address);
         }
-        // publish_address can be in "hostname/ip:port" format — use the ip:port part
-        final int slashIndex = address.indexOf('/');
-        final String hostPort = slashIndex >= 0 ? address.substring(slashIndex + 1) : address;
-        return URI.create(f("%s://%s", defaultScheme, hostPort));
+
+        final Matcher matcher = HOST_PORT_PATTERN.matcher(address);
+        if (matcher.matches()) {
+            // publish_address is in "hostname/ip:port" format — prefer the host:port part
+            final String hostname = matcher.group(1);
+            final int port = Integer.parseInt(matcher.group(2));
+            return URI.create(f("%s://%s:%d", defaultScheme, hostname, port));
+        } else {
+            // otherwise use the "ip:port" value and prepend scheme
+            return URI.create(f("%s://%s", defaultScheme, address));
+        }
     }
 }

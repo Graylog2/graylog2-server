@@ -92,6 +92,7 @@ export const eventDefinition: EventDefinition = {
   ],
   scheduler: null,
   state: 'ENABLED',
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: null,

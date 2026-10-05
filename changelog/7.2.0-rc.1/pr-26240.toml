@@ -1,0 +1,3 @@
+type = "a"
+message = "Added Collector onboarding UI."
+pulls = ["26240"]

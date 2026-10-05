@@ -55,7 +55,7 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
         details = (
           <tr>
             <td colSpan={2}>
-              <Table condensed striped hover>
+              <Table condensed>
                 <thead>
                   <tr>
                     <th>Parameter</th>

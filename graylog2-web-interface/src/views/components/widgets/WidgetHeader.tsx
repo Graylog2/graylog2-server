@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon, OverlayTrigger } from 'components/common';
@@ -23,7 +22,7 @@ import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
 import IconButton from 'components/common/IconButton';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -195,7 +194,7 @@ const WidgetHeader = ({
   onRename = undefined,
   onUpdateDescription = undefined,
 }: Props) => {
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
 
   return (
     <Container>
@@ -205,7 +204,12 @@ const WidgetHeader = ({
             <WidgetDragHandle name="drag_indicator" />
           </DragHandleContainer>
         )}
-        <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
+        <WidgetTitle
+          editing={editing}
+          title={title}
+          titleIcon={titleIcon}
+          onChange={interactive ? onRename : undefined}
+        />
         {interactive && (
           <WidgetDescription editing={editing} description={description} onChange={onUpdateDescription} />
         )}

@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import mapValues from 'lodash/mapValues';
 
 import { FavoriteFields } from '@graylog/server-api';
 
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import UserNotification from 'util/UserNotification';
 import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
@@ -40,6 +40,7 @@ const useMessageFavoriteFieldsMutation = (
   initialFavoriteFields: Array<string>,
 ) => {
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
+  const queryClient = useQueryClient();
   const { isPending: setFieldsIsPending, mutate: setFavoriteFields } = useMutation({
     mutationFn: (props: SetFavoriteFieldsRequest) => FavoriteFields.set(props),
     onSuccess: (_, newFavoriteFieldsByStream) => {
@@ -47,7 +48,7 @@ const useMessageFavoriteFieldsMutation = (
         fields_lengths: Object.values(newFavoriteFieldsByStream.fields).map((fields) => fields.length),
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(
@@ -63,7 +64,7 @@ const useMessageFavoriteFieldsMutation = (
         app_action_value: 'add',
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(
@@ -79,7 +80,7 @@ const useMessageFavoriteFieldsMutation = (
         app_action_value: 'remove',
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(

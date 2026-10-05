@@ -32,6 +32,7 @@ const useTableLayout = ({
   entityTableId,
   layoutVariant,
   defaultSort,
+  defaultSlicing,
   defaultPageSize,
 }: DefaultLayout): {
   isInitialLoading: boolean;
@@ -39,28 +40,20 @@ const useTableLayout = ({
 } => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId, layoutVariant);
 
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    const hasSlicingPreference = Object.prototype.hasOwnProperty.call(userLayoutPreferences, 'slicing');
+
+    return {
       layoutConfig: {
         attributes: userLayoutPreferences?.attributes,
         order: userLayoutPreferences.order,
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
-        slicing: userLayoutPreferences.slicing,
+        slicing: hasSlicingPreference ? (userLayoutPreferences.slicing ?? undefined) : defaultSlicing,
         sort: userLayoutPreferences.sort ?? defaultSort,
       },
       isInitialLoading,
-    }),
-    [
-      defaultPageSize,
-      defaultSort,
-      isInitialLoading,
-      userLayoutPreferences?.attributes,
-      userLayoutPreferences.order,
-      userLayoutPreferences.perPage,
-      userLayoutPreferences.slicing,
-      userLayoutPreferences.sort,
-    ],
-  );
+    };
+  }, [defaultPageSize, defaultSlicing, defaultSort, isInitialLoading, userLayoutPreferences]);
 };
 
 export default useTableLayout;

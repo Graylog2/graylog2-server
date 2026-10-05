@@ -74,6 +74,24 @@ describe('useUserSearchFilterQuery hook', () => {
     });
   });
 
+  it('should return null slicing preferences', async () => {
+    asMock(fetch).mockImplementation(() =>
+      Promise.resolve({
+        ...layoutPreferencesJSON,
+        slicing: null,
+      }),
+    );
+    const { result } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
+
+    await waitFor(() => result.current.isInitialLoading);
+    await waitFor(() => !result.current.isInitialLoading);
+
+    expect(result.current.data).toEqual({
+      ...layoutPreferences,
+      slicing: null,
+    });
+  });
+
   it('should fetch layout preferences for a layout variant', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(layoutPreferencesJSON));
     const { result } = renderHook(() => useUserLayoutPreferences('streams', 'security-events'), { wrapper });

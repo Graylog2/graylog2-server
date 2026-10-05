@@ -19,7 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import * as Immutable from 'immutable';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import { DataTable, NoSearchResult, PaginatedList, Spinner, Text, Pluralize } from 'components/common';

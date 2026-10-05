@@ -1,0 +1,4 @@
+type = "s"
+message = "Fix Painless script injection via pivot field names in aggregations."
+
+pulls = ["27211"]

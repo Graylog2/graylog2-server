@@ -20,7 +20,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import StageRules from 'components/pipelines/StageRules';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import type { ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 jest.mock('components/metrics', () => ({
   MetricContainer: ({ children, name }: { children: React.ReactNode; name: string }) => (
@@ -261,5 +262,101 @@ describe('StageRules', () => {
 
     expect(screen.getByText('Actions')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Remove .* Rule/ })).not.toBeInTheDocument();
+  });
+
+  describe('Rule Load column', () => {
+    const baseProcessingLoad: ProcessingLoadResponse = {
+      available: true,
+      total_cost_microseconds_per_second: 100,
+      pipelines: [],
+      rules: [],
+      stage_rules: [
+        {
+          pipeline_id: 'pipeline-123',
+          rule_id: 'rule-1',
+          stage: 0,
+          load_percent: 5,
+          pipeline_share_percent: 60.4242,
+        },
+        {
+          pipeline_id: 'pipeline-123',
+          rule_id: 'rule-2',
+          stage: 0,
+          load_percent: 3,
+          pipeline_share_percent: 0,
+        },
+      ],
+    };
+
+    it('hides the column when showLoadColumn is false', () => {
+      render(
+        <StageRules pipeline={mockPipeline} stage={mockStage} rules={mockRules} processingLoad={baseProcessingLoad} />,
+      );
+
+      expect(screen.queryByText('Rule Load (15m)')).not.toBeInTheDocument();
+      expect(screen.queryByText('60.42%')).not.toBeInTheDocument();
+    });
+
+    it('renders pipeline_share_percent for the matching stage triple', () => {
+      render(
+        <StageRules
+          pipeline={mockPipeline}
+          stage={mockStage}
+          rules={mockRules}
+          showLoadColumn
+          processingLoad={baseProcessingLoad}
+        />,
+      );
+
+      expect(screen.getByText('Rule Load (15m)')).toBeInTheDocument();
+      expect(screen.getByText('60.42%')).toBeInTheDocument();
+      expect(screen.getByText('0.00%')).toBeInTheDocument();
+    });
+
+    it('renders blank for invalid (renamed/deleted) rules', () => {
+      const stageWithInvalidRule: StageType = { ...mockStage, rules: ['rule-1', 'deleted-rule'] };
+
+      render(
+        <StageRules
+          pipeline={mockPipeline}
+          stage={stageWithInvalidRule}
+          rules={[mockRules[0], undefined]}
+          showLoadColumn
+          processingLoad={baseProcessingLoad}
+        />,
+      );
+
+      expect(screen.getByText('60.42%')).toBeInTheDocument();
+      expect(screen.queryByText(/deleted-rule .*%$/)).not.toBeInTheDocument();
+    });
+
+    it('renders blank when total_cost is zero', () => {
+      render(
+        <StageRules
+          pipeline={mockPipeline}
+          stage={mockStage}
+          rules={mockRules}
+          showLoadColumn
+          processingLoad={{ ...baseProcessingLoad, total_cost_microseconds_per_second: 0 }}
+        />,
+      );
+
+      expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    });
+
+    it('renders an em-dash with an accessible error label when processingLoadError is true', () => {
+      render(
+        <StageRules
+          pipeline={mockPipeline}
+          stage={mockStage}
+          rules={mockRules}
+          showLoadColumn
+          processingLoad={undefined}
+          processingLoadError
+        />,
+      );
+
+      expect(screen.getAllByLabelText(/Pipeline Load is unavailable/i).length).toBeGreaterThan(0);
+    });
   });
 });

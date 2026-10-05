@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import * as JSON from 'util/json';
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -39,7 +39,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   const [lookupKey, setLookupKey] = useState('');
   const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
@@ -56,7 +56,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   };
 
   const handleEdit = () => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
+    push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
   };
 
   const plugin = usePluginEntities('lookupTableAdapters').find(

@@ -41,7 +41,7 @@ const EventsNumber = ({ data }: WidgetComponentProps<EventsWidgetConfig, EventsL
   return (
     <NumberBox resizeDelay={20}>
       {({ height, width }) => (
-        <AutoFontSizer height={height} width={width} center>
+        <AutoFontSizer height={height} width={width} alignment="center">
           <div>{data.totalResults}</div>
         </AutoFontSizer>
       )}

@@ -17,11 +17,27 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import LookupTableQueryParameterEdit from 'components/lookup-table-parameters/LookupTableQueryParameterEdit';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
+
 import FilterAggregationFormContainer from './FilterAggregationFormContainer';
 import FilterAggregationForm from './FilterAggregationForm';
 import FilterAggregationSummary from './FilterAggregationSummary';
 
 const bindings: PluginExports = {
+  eventDefinitionQueryParameterTypes: [
+    {
+      type: LookupTableParameter.type,
+      title: 'Lookup Table',
+      fromJSON: LookupTableParameter.fromJSON.bind(LookupTableParameter),
+      validate: (param: any) => ({
+        lookupTable: !param.lookupTable ? 'Cannot be empty' : undefined,
+        key: !param.key ? 'Cannot be empty' : undefined,
+      }),
+      editComponent: LookupTableQueryParameterEdit,
+    },
+  ],
   eventDefinitionTypes: [
     {
       type: 'aggregation-v1',
@@ -34,6 +50,18 @@ const bindings: PluginExports = {
       summaryComponent: FilterAggregationSummary,
       defaultConfig: FilterAggregationForm.defaultConfig,
       useCondition: () => true,
+    },
+    {
+      type: SYSTEM_EVENT_DEFINITION_TYPE,
+      displayName: 'System Event Definition',
+      sortOrder: 6,
+      description: 'Built-in Event Definition Graylog uses to report system notifications as Events.',
+      defaultConfig: { type: SYSTEM_EVENT_DEFINITION_TYPE },
+      // Only ever created by Graylog itself, never through the wizard, so it has no
+      // form/summary component and is hidden from the creation dropdown. It's registered here
+      // purely so it can be offered as an Event Definition Type filter option.
+      useCondition: () => true,
+      hideFromCreation: true,
     },
   ],
 };

@@ -22,13 +22,20 @@ import { hoverIndicatorStyles, activeIndicatorStyles } from 'components/common/N
 
 const StyledNavbar = styled(Navbar)(
   ({ theme }) => css`
+    --nav-item-horizontal-padding: 15px;
+
     .dev-badge-wrap > a {
       cursor: default;
     }
 
+    a:focus:not(:focus-visible),
+    button:focus:not(:focus-visible) {
+      outline: none;
+    }
+
     &.navbar-default {
       .navbar-nav > li > a {
-        padding: 0 15px;
+        padding: 0 var(--nav-item-horizontal-padding);
         height: ${NAV_ITEM_HEIGHT};
         display: inline-flex;
         align-items: center;

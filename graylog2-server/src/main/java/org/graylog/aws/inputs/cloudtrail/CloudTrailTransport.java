@@ -63,6 +63,7 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SECRET_KE
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_QUEUE_NAME;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_EXTERNAL_ID;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 
 public class CloudTrailTransport extends ThrottleableTransport2 {
@@ -137,6 +138,7 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         }
 
         final String assumeRoleArn = input.getConfiguration().getString(CK_ASSUME_ROLE_ARN);
+        final String externalId = input.getConfiguration().getString(CK_EXTERNAL_ID);
         final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, DEFAULT_REGION.getName());
         final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, DEFAULT_REGION.getName());
 
@@ -150,7 +152,9 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
                 .region(sqsRegionName)
                 .awsAccessKeyId(awsAccessKey)
                 .awsSecretAccessKey(secretAccessKey)
-                .assumeRoleArn(assumeRoleArn).build();
+                .assumeRoleArn(assumeRoleArn)
+                .externalId(externalId)
+                .build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProviderWithStsProxy(awsRequest);
 
         SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, inputFailureRecorder);

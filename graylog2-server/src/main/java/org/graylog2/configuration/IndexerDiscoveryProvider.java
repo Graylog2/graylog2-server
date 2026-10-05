@@ -91,6 +91,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
         // configured hosts, just use these and don't try any detection
         if (hosts != null && !hosts.isEmpty()) {
             LOG.info("Indexer hosts are set in configuration, using {} provided hosts", hosts.size()); // do not log hosts, may contain uname+pass
+            indexerDiscoveryListeners.forEach(listener -> listener.onExplicitlyConfiguredNodes(hosts));
             return hosts;
         }
 

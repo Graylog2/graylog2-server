@@ -98,7 +98,7 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+    await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
 
     await userEvent.click(searchButton);
 
@@ -124,7 +124,7 @@ describe('DashboardSearchBar', () => {
         name: /perform search \(changes were made after last search execution\)/i,
       });
 
-      await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+      await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
 
       await userEvent.click(searchButton);
 

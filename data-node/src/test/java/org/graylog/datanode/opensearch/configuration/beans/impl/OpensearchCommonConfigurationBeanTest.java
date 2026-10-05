@@ -42,7 +42,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "false");
@@ -57,7 +57,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "false");
@@ -72,7 +72,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "true");
@@ -87,7 +87,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.warnings())
                 .hasSize(1)
@@ -103,7 +103,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.warnings()).isEmpty();
     }

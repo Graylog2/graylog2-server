@@ -17,10 +17,10 @@
 import React, { useMemo } from 'react';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
-import ExpandedRowToggleWrapper from 'components/indices/IndexSetFieldTypes/originBadges/ExpandedRowToggleWrapper';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
+import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 
 const useCustomColumnRenderers = () => {
   const {
@@ -35,9 +35,9 @@ const useCustomColumnRenderers = () => {
         },
         origin: {
           renderCell: (origin: FieldTypeOrigin, { id }) => (
-            <ExpandedRowToggleWrapper id={id}>
+            <ExpandedSectionToggleWrapper id={id} section="overriddenProfile">
               <OriginCell origin={origin} />
-            </ExpandedRowToggleWrapper>
+            </ExpandedSectionToggleWrapper>
           ),
           staticWidth: 200,
         },

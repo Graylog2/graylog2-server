@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
@@ -44,7 +44,7 @@ const FlexCol = styled(Col)`
 `;
 
 function LUTFormPage() {
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   return (
     <FlexContainer>
@@ -53,7 +53,7 @@ function LUTFormPage() {
         pageTitle="Lookup Tables Create"
         pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
         actions={
-          <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW)}>
+          <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW)}>
             Back to list
           </Button>
         }>

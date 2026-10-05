@@ -22,9 +22,9 @@ import React from 'react';
 
 import { FavoriteFields } from '@graylog/server-api';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import type { Stream } from 'logic/streams/types';
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import UserNotification from 'util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
@@ -37,11 +37,6 @@ jest.mock('@graylog/server-api', () => ({
     add: jest.fn(),
     remove: jest.fn(),
   },
-}));
-
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsActions: { refresh: jest.fn() },
-  StreamsStore: MockStore(['getInitialState', () => ({ streams: [{ id: 'streamId', title: 'Stream' }] })]),
 }));
 
 jest.mock('util/UserNotification', () => ({
@@ -98,11 +93,18 @@ describe('useMessageFavoriteFieldsMutation', () => {
     } as unknown as Stream,
   ];
 
+  let invalidateQueriesSpy: jest.SpyInstance;
+
   beforeEach(() => {
     asMock(FavoriteFields.set).mockImplementation(() => Promise.resolve());
     asMock(FavoriteFields.remove).mockImplementation(() => Promise.resolve());
     asMock(FavoriteFields.add).mockImplementation(() => Promise.resolve());
     asMock(useCurrentUser).mockReturnValue(adminUser);
+    invalidateQueriesSpy = jest.spyOn(queryClient, 'invalidateQueries').mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    invalidateQueriesSpy.mockRestore();
   });
 
   it('saveFavoriteField: calls FavoriteFields.set with correct per-stream payload and toggles isLoading', async () => {
@@ -118,7 +120,7 @@ describe('useMessageFavoriteFieldsMutation', () => {
       },
     };
     await waitFor(() => expect(FavoriteFields.set).toHaveBeenCalledWith(expectedPayload));
-    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: STREAMS_QUERY_KEY }));
   });
 
   it('saveFavoriteField: shows error notification when FavoriteFields.set rejects', async () => {
@@ -148,7 +150,7 @@ describe('useMessageFavoriteFieldsMutation', () => {
     });
 
     await waitFor(() => expect(FavoriteFields.remove).toHaveBeenCalledWith({ field: 'a', stream_ids: ['s1', 's2'] }));
-    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: STREAMS_QUERY_KEY }));
   });
 
   it('toggleField: when field is not favorite -> calls FavoriteFields.add for all streams', async () => {
@@ -160,7 +162,7 @@ describe('useMessageFavoriteFieldsMutation', () => {
     });
 
     await waitFor(() => expect(FavoriteFields.add).toHaveBeenCalledWith({ field: 'b', stream_ids: ['s1', 's2'] }));
-    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: STREAMS_QUERY_KEY }));
   });
 
   it('toggleField: shows error notification when FavoriteFields.add rejects', async () => {

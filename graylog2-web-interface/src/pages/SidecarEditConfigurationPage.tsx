@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import withParams from 'routing/withParams';
-import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
-import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
+import { fetchConfiguration, fetchConfigurationSidecars } from 'hooks/useCollectorConfigurations';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import useHistory from 'routing/useHistory';
@@ -31,36 +31,27 @@ type SidecarEditConfigurationPageProps = {
 };
 
 const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPageProps) => {
-  const [configuration, setConfiguration] = useState<Configuration>(null);
-  const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);
   const history = useHistory();
+  const { configurationId } = params;
+
+  const { data: configuration, error: configurationError } = useQuery({
+    queryKey: ['collector-configurations', 'detail', configurationId],
+    queryFn: () => fetchConfiguration(configurationId),
+  });
+
+  const { data: configurationSidecars } = useQuery({
+    queryKey: ['collector-configurations', 'sidecars', configurationId],
+    queryFn: () => fetchConfigurationSidecars(configurationId),
+    enabled: !!configuration,
+  });
 
   useEffect(() => {
-    const _reloadConfiguration = () => {
-      const { configurationId } = params;
+    if (configurationError && (configurationError as { status?: number }).status === 404) {
+      history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);
+    }
+  }, [configurationError, history]);
 
-      CollectorConfigurationsActions.getConfiguration(configurationId).then(
-        (_configuration) => {
-          setConfiguration(_configuration);
-
-          CollectorConfigurationsActions.getConfigurationSidecars(configurationId).then((_configurationSidecars) =>
-            setConfigurationSidecars(_configurationSidecars),
-          );
-        },
-        (error) => {
-          if (error.status === 404) {
-            history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);
-          }
-        },
-      );
-    };
-
-    _reloadConfiguration();
-  }, [history, params]);
-
-  const _isLoading = () => !configuration || !configurationSidecars;
-
-  if (_isLoading()) {
+  if (!configuration || !configurationSidecars) {
     return <Spinner />;
   }
 

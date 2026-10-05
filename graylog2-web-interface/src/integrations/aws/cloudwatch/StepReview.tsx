@@ -104,7 +104,9 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   const {
     awsAuthenticationType,
     awsCloudWatchAddFlowLogPrefix = { value: undefined },
+    awsCloudWatchStoreFullMessage = { value: undefined },
     awsAssumeRoleARN = { value: undefined },
+    awsExternalId = { value: undefined },
     awsAccessKey = { value: undefined },
     awsCloudWatchAwsRegion,
     awsCloudWatchBatchSize,
@@ -121,6 +123,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const storeFullMessage = !!awsCloudWatchStoreFullMessage.value;
   const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
@@ -141,7 +144,9 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      store_full_message: storeFullMessage,
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      aws_external_id: awsExternalId.value ?? '',
       override_source: overrideSource?.value ?? '',
     }),
   );
@@ -200,6 +205,13 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <li>
               <strong>AWS Assumed ARN Role</strong>
               <span>{awsAssumeRoleARN.value}</span>
+            </li>
+          )}
+
+          {awsExternalId.value && (
+            <li>
+              <strong>AWS External ID</strong>
+              <span>{awsExternalId.value}</span>
             </li>
           )}
 
@@ -288,6 +300,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <strong>Add Flow Log prefix to field names</strong>
             <span>
               <StatusIcon active={addPrefix} />
+            </span>
+          </li>
+          <li>
+            <strong>Store full message</strong>
+            <span>
+              <StatusIcon active={storeFullMessage} />
             </span>
           </li>
           {overrideSource.value && (

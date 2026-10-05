@@ -19,17 +19,20 @@ package org.graylog.integrations.dataadapters;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
-import com.unboundid.util.json.JSONException;
-import com.unboundid.util.json.JSONObject;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotEmpty;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -47,10 +50,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.Nonnull;
-import jakarta.inject.Inject;
-import jakarta.validation.constraints.NotEmpty;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -59,12 +58,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(GreyNoiseQuickIPDataAdapter.class);
     public static final String NAME = "GreyNoise";
-    static final String GREYNOISE_IPQC_ENDPOINT = "https://api.greynoise.io/v2/noise/quick/";
+    // v3 unified IP Lookup endpoint; the quick variant is selected with the "quick=true" query parameter.
+    static final String GREYNOISE_IPQC_ENDPOINT = "https://api.greynoise.io/v3/ip/";
 
     private final EncryptedValueService encryptedValueService;
     private final Config config;
     private final OkHttpClient okHttpClient;
     private final CustomizationConfig customizationConfig;
+    private final ObjectMapper objectMapper;
 
     private static final AtomicBoolean VALID_GREYNOISE_LICENSE = new AtomicBoolean(false);
 
@@ -75,12 +76,14 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
                                        MetricRegistry metricRegistry,
                                        EncryptedValueService encryptedValueService,
                                        OkHttpClient okHttpClient,
-                                       CustomizationConfig customizationConfig) {
+                                       CustomizationConfig customizationConfig,
+                                       ObjectMapper objectMapper) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
         this.encryptedValueService = encryptedValueService;
         this.okHttpClient = okHttpClient;
         this.customizationConfig = customizationConfig;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -135,10 +138,10 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
             }
         }
         Request request = new Request.Builder()
-                .url(GREYNOISE_IPQC_ENDPOINT + ip)
+                .url(GREYNOISE_IPQC_ENDPOINT + ip + "?quick=true")
                 .method("GET", null)
                 .addHeader("Accept", "application/json")
-                .addHeader("key", encryptedValueService.decrypt(config.apiToken()))
+                .addHeader("key", Objects.requireNonNull(encryptedValueService.decrypt(config.apiToken())))
                 .addHeader("User-Agent", customizationConfig.productName())
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
@@ -150,18 +153,31 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
     }
 
     @VisibleForTesting
-    static LookupResult parseResponse(Response response) {
-
+    LookupResult parseResponse(Response response) {
         if (response.isSuccessful()) {
             Map<Object, Object> map = Maps.newHashMap();
 
             try {
-                JSONObject obj = new JSONObject(response.body().string());
-                map.put("ip", Objects.requireNonNull(obj).getFieldAsString("ip"));
-                map.put("noise", Objects.requireNonNull(obj).getFieldAsBoolean("noise"));
-                map.put("code", Objects.requireNonNull(obj).getFieldAsString("code"));
-                map.put("riot", Objects.requireNonNull(obj).getFieldAsBoolean("riot"));
-            } catch (JSONException | IOException e) {
+                JsonNode root = objectMapper.readTree(response.body().string());
+                if (root.hasNonNull("ip")) {
+                    map.put("ip", root.get("ip").asText());
+                }
+
+                // v3 nests the scanner data; "found" is the v3 equivalent of the v2 top-level "noise" flag.
+                JsonNode isi = root.path("internet_scanner_intelligence");
+                map.put("noise", isi.path("found").asBoolean(false));
+                if (isi.hasNonNull("classification")) {
+                    map.put("classification", isi.get("classification").asText());
+                }
+
+                // v3 nests the RIOT data under business_service_intelligence; "found" replaces the v2 "riot" flag.
+                JsonNode bsi = root.path("business_service_intelligence");
+                map.put("riot", bsi.path("found").asBoolean(false));
+                final String trustLevel = bsi.path("trust_level").asText("");
+                if (!trustLevel.isEmpty()) {
+                    map.put("trust_level", trustLevel);
+                }
+            } catch (IOException e) {
                 LOG.error("An error occurred while parsing Lookup result [{}]", e.toString());
             }
             return LookupResult.withoutTTL().multiValue(map).build();
@@ -174,7 +190,9 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
     public void set(Object key, Object value) {
     }
 
-    // Check if provided API token has a valid non-community GreyNoise subscription.
+    // Check if the provided API token is accepted by GreyNoise. The free/community tier has been retired, so any
+    // authenticated request (HTTP 200) corresponds to a valid subscription, while an invalid or missing key returns
+    // HTTP 401.
     private boolean isValidSubscription(String apiKey) {
         Request request = new Request.Builder()
                 .url("https://api.greynoise.io/ping")
@@ -185,9 +203,7 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
                 .build();
 
         try (Response response = okHttpClient.newCall(request).execute()) {
-            JSONObject json = new JSONObject(response.body().string());
-            return response.isSuccessful()
-                    && json.hasField("offering") && !json.getFieldAsString("offering").equals("community");
+            return response.isSuccessful();
         } catch (Exception e) {
             LOG.warn("An error occurred while retrieving subscription type.", e);
             return false;

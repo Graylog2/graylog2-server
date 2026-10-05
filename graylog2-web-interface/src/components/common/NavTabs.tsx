@@ -72,7 +72,7 @@ const NavTabs = ({ items }: Props) => (
   <Container>
     {items.map(({ path, description, exactPathMatch, BadgeComponent }) => (
       <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
-        <StyledButton bsStyle="transparent">
+        <StyledButton bsStyle="transparent" showOverflow>
           <NavItemStateIndicator>
             {BadgeComponent ? <BadgeComponent text={description} /> : description}
           </NavItemStateIndicator>

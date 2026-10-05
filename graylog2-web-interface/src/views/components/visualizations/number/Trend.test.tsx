@@ -22,9 +22,9 @@ import Trend from './Trend';
 const renderTrend = ({
   current = 42,
   previous = 42,
-  trendPreference = 'NEUTRAL',
+  trend = undefined,
 }: Partial<React.ComponentProps<typeof Trend>> = {}) =>
-  render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+  render(<Trend current={current} previous={previous} trend={trend} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');
@@ -37,6 +37,9 @@ describe('Trend', () => {
     renderTrend({ previous: 23 });
 
     expect(await findTrend()).toMatch(/\+19/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: +19 (+82.6%) compared to previous value of 23',
+    );
   });
 
   it('shows relative delta as percentage', async () => {
@@ -49,6 +52,9 @@ describe('Trend', () => {
     renderTrend();
 
     expect(await findTrend()).toMatch(/^0 \//);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: 0 (0.0%) compared to previous value of 42',
+    );
   });
 
   it('shows relative delta as percentage if values are equal', async () => {
@@ -61,6 +67,9 @@ describe('Trend', () => {
     renderTrend({ current: 23 });
 
     expect(await findTrend()).toMatch(/-19/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: -19 (-45.2%) compared to previous value of 42',
+    );
   });
 
   it('shows negative relative delta as percentage', async () => {
@@ -73,6 +82,9 @@ describe('Trend', () => {
     renderTrend({ current: 23, previous: 0 });
 
     expect(await findTrend()).toMatch(/\+23/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: +23 (--) compared to previous value of 0',
+    );
   });
 
   it('shows adequate results if previous value is NaN', async () => {
@@ -85,78 +97,15 @@ describe('Trend', () => {
     renderTrend({ current: 0, previous: 42 });
 
     expect(await findTrend()).toMatch(/-42 \/ -100\.0%/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: -42 (-100.0%) compared to previous value of 42',
+    );
   });
 
   it('shows adequate results if current value is NaN', async () => {
     renderTrend({ current: NaN, previous: 42 });
 
     expect(await findTrend()).toEqual('-- / --');
-  });
-
-  describe('renders background according to values and trend preference', () => {
-    it.each`
-      trendPreference
-      ${'NEUTRAL'}
-      ${'HIGHER'}
-      ${'LOWER'}
-    `(
-      'shows neutral background if values are equal and trend preference is $trendPreference',
-      async ({ trendPreference }: { trendPreference: 'NEUTRAL' | 'LOWER' | 'HIGHER' }) => {
-        renderTrend({ trendPreference });
-
-        const background = await screen.findByTestId('trend-background');
-
-        expect(background).toHaveStyleRule('background-color', '#fff!important');
-      },
-    );
-
-    it('shows good background if current value and preference are higher', async () => {
-      renderTrend({ current: 43, trendPreference: 'HIGHER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
-    });
-
-    it('shows good background if current value and preference are lower', async () => {
-      renderTrend({ current: 41, trendPreference: 'LOWER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
-    });
-
-    it('shows bad background if current value is lower but preference is higher', async () => {
-      renderTrend({ current: 41, trendPreference: 'HIGHER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
-    });
-
-    it('shows bad background if current value is higher but preference is lower', async () => {
-      renderTrend({ current: 43, trendPreference: 'LOWER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
-    });
-
-    it('shows neutral background if current value is higher but preference is neutral', async () => {
-      renderTrend({ current: 43, trendPreference: 'NEUTRAL' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
-
-    it('shows neutral background if current value is lower but preference is neutral', async () => {
-      renderTrend({ current: 41, trendPreference: 'NEUTRAL' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
   });
 
   describe('renders icon indicating trend direction', () => {
@@ -173,6 +122,9 @@ describe('Trend', () => {
       const trendIcon = await screen.findByTestId('trend-icon');
 
       within(trendIcon).getByText('arrow_circle_down');
+      expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+        'Trend: -1 (-2.4%) compared to previous value of 42',
+      );
     });
 
     it('shows circle up if current values is higher', async () => {
@@ -180,6 +132,35 @@ describe('Trend', () => {
       const trendIcon = await screen.findByTestId('trend-icon');
 
       within(trendIcon).getByText('arrow_circle_up');
+      expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+        'Trend: +1 (+2.4%) compared to previous value of 42',
+      );
+    });
+  });
+
+  describe('background coloring', () => {
+    it('does not color the background when no trend direction is passed', async () => {
+      renderTrend();
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).not.toHaveStyleRule('background-color');
+    });
+
+    it('colors the background when a trend direction is passed', async () => {
+      renderTrend({ current: 43, previous: 42, trend: 'good' });
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
+    });
+
+    it('spans the full width, not just the width of the trend text', async () => {
+      renderTrend({ current: 43, previous: 42, trend: 'good' });
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).toHaveStyleRule('width', '100%');
     });
   });
 });

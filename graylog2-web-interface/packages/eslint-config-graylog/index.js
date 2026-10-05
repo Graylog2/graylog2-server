@@ -178,6 +178,11 @@ export default [
               message: 'Please use `routing/useLocation` instead.',
             },
             {
+              name: 'react-router-dom',
+              importNames: ['useNavigate'],
+              message: 'Please use `routing/useHistory` instead.',
+            },
+            {
               name: 'create-react-class',
               message: 'Please use an ES6 or functional component instead.',
             },
@@ -200,6 +205,11 @@ export default [
             {
               name: 'lodash/max',
               message: 'Please use `Math.max` instead.',
+            },
+            {
+              name: '@mantine/hooks',
+              message:
+                'We wrap Mantine hooks with our own abstractions. Check `util/hooks/` for an existing wrapper before importing from `@mantine/hooks` directly.',
             },
           ],
         },

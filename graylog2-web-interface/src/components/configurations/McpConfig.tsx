@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -32,13 +31,14 @@ import DocsHelper from 'util/DocsHelper';
 type McpConfigState = {
   enable_remote_access: boolean;
   enable_output_schema: boolean;
+  enable_input_validation: boolean;
 };
 
 const McpConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
   const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.MCP_CONFIG).then(() => {
@@ -58,6 +58,10 @@ const McpConfig = () => {
 
   const onModalClickEnableOutputSchema = () => {
     setModalConfig({ ...modalConfig, enable_output_schema: !modalConfig.enable_output_schema });
+  };
+
+  const onModalClickEnableInputValidation = () => {
+    setModalConfig({ ...modalConfig, enable_input_validation: !modalConfig.enable_input_validation });
   };
 
   const onModalCancel = () => {
@@ -92,6 +96,9 @@ const McpConfig = () => {
         <br />
         <dt>Output schema</dt>
         <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
+        <br />
+        <dt>Input validation</dt>
+        <dd>{viewConfig.enable_input_validation ? 'Enabled' : 'Disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -125,6 +132,15 @@ const McpConfig = () => {
               name="output-schema-enabled"
               checked={modalConfig.enable_output_schema}
               onChange={onModalClickEnableOutputSchema}
+            />
+            <Input
+              id="enable-input-validation-checkbox"
+              disabled={!modalConfig.enable_remote_access}
+              type="checkbox"
+              label="Enable Tool Input Validation"
+              name="input-validation-enabled"
+              checked={modalConfig.enable_input_validation}
+              onChange={onModalClickEnableInputValidation}
             />
           </fieldset>
         </BootstrapModalForm>

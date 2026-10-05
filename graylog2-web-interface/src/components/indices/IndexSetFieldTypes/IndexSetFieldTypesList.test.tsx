@@ -454,7 +454,7 @@ describe('IndexSetFieldTypesList', () => {
       });
 
       renderIndexSetFieldTypesList();
-      const button = await screen.findByTitle('Set field type profile');
+      const button = await screen.findByRole('button', { name: 'Set field type profile' });
       await userEvent.click(button);
       const modal = await screen.findByRole('dialog', { name: /Set Profile/i });
       await within(modal).findByRole('button', { name: /Set Profile/i });
