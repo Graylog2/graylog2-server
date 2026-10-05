@@ -105,7 +105,7 @@ const WelcomeMetricsContainer = styled.div`
 `;
 
 const WelcomeMetricsSection = () => {
-  const hasAccessToAnyStream = useHasAccessToAnyStream();
+  const { hasAccessToAnyStream } = useHasAccessToAnyStream();
 
   const content = !hasAccessToAnyStream ? <NoStreamAccessAlert /> : <WelcomeMetricsContent />;
 

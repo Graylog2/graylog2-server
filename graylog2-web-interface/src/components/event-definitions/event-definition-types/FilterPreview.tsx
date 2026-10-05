@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useMemo } from 'react';
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
@@ -36,7 +36,7 @@ import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 import useDebouncedValue from 'hooks/useDebouncedValue';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import type { Stream } from 'logic/streams/types';
 
 type FilterPreviewProps = {
@@ -148,7 +148,7 @@ const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['con
 };
 
 const useExecutePreview = (config: EventDefinition['config']) => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
 
   const currentUser = useCurrentUser();
   const queryId = useMemo(() => generateId(), []);
@@ -163,7 +163,7 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   const { data, isFetching } = useQuery({
     queryKey: ['filter-preview', debouncedConfig, searchTypeId, queryId, streams],
     queryFn: async () => {
-      const search = constructSearch(debouncedConfig, searchTypeId, queryId, streams);
+      const search = constructSearch(debouncedConfig, searchTypeId, queryId, streams ?? []);
       const createdSearch = await createSearch(search);
       const jobIds = await startJob(createdSearch, [searchTypeId], SearchExecutionState.empty());
       const result = await executeJobResult({ jobIds });

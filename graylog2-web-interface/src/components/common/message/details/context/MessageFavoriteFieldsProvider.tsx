@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import zip from 'lodash/zip';
 import uniq from 'lodash/uniq';
 import flattenDeep from 'lodash/flattenDeep';
@@ -23,7 +23,7 @@ import flattenDeep from 'lodash/flattenDeep';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import type { Stream } from 'logic/streams/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -36,7 +36,7 @@ type OriginalProps = React.PropsWithChildren<{
 }>;
 
 const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
-  const streamsContext = useContext(StreamsContext);
+  const { data: streamsContext } = useAllStreams();
   const streamsList = useMemo(() => streamsContext ?? [], [streamsContext]);
   const { permissions } = useCurrentUser();
   const streams = useMemo<Array<Stream>>(() => {

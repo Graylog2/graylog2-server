@@ -14,11 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { singleton } from 'logic/singleton';
 import type { Stream } from 'logic/streams/types';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+import asMock from './AsMock';
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+/**
+ * Mocks the `useAllStreams` hook. Requires `jest.mock('components/streams/hooks/useAllStreams')`
+ * in the test file, since `jest.mock` calls are hoisted per module.
+ */
+const mockUseAllStreams = (streams: Array<Stream> | undefined = []) =>
+  asMock(useAllStreams).mockReturnValue({ data: streams, isLoading: false, refetch: jest.fn() });
+
+export default mockUseAllStreams;

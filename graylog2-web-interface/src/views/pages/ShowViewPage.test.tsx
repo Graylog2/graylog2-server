@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import useQuery from 'routing/useQuery';
 import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
@@ -43,6 +43,7 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 
 jest.mock('routing/useParams');
 jest.mock('routing/useQuery');
+jest.mock('components/streams/hooks/useAllStreams');
 
 describe('ShowViewPage', () => {
   const view = View.fromJSON({
@@ -63,15 +64,12 @@ describe('ShowViewPage', () => {
     .toBuilder()
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
-  const SimpleShowViewPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' } as Stream]}>
-      <ShowViewPage />
-    </StreamsContext.Provider>
-  );
+  const SimpleShowViewPage = () => <ShowViewPage />;
 
   useViewsPlugin();
 
   beforeEach(() => {
+    mockUseAllStreams([{ id: 'stream-id-1', title: 'Stream 1' } as Stream]);
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
     asMock(useProcessHooksForView).mockReturnValue({

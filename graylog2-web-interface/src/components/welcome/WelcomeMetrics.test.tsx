@@ -24,7 +24,7 @@ import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -38,6 +38,7 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
 jest.mock('hooks/usePluggableLicenseCheck');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('components/streams/hooks/useAllStreams');
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),
   set: jest.fn(),
@@ -51,12 +52,11 @@ const licenseCheck = (valid: boolean): ReturnType<typeof usePluggableLicenseChec
   refetch: () => {},
 });
 
-const renderWithStreams = (streams: Array<Stream>) =>
-  render(
-    <StreamsContext.Provider value={streams}>
-      <WelcomeMetricsSection />
-    </StreamsContext.Provider>,
-  );
+const renderWithStreams = (streams: Array<Stream>) => {
+  mockUseAllStreams(streams);
+
+  return render(<WelcomeMetricsSection />);
+};
 
 describe('WelcomeMetrics', () => {
   useViewsPlugin();

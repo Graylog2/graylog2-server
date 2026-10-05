@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
+import Spinner from 'components/common/Spinner';
 
 type Props = {
   children: React.ReactElement;
@@ -25,10 +26,14 @@ type Props = {
 };
 
 export default ({ children, skipNoStreamsCheck = false }: Props) => {
-  const hasAccessToAnyStream = useHasAccessToAnyStream();
+  const { isLoading, hasAccessToAnyStream } = useHasAccessToAnyStream();
 
   if (skipNoStreamsCheck) {
     return children;
+  }
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
   return hasAccessToAnyStream ? children : <UserHasNoStreamAccess />;
