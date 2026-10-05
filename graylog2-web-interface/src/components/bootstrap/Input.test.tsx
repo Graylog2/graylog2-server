@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { Button } from 'components/bootstrap';
 
@@ -74,5 +75,18 @@ describe('Input', () => {
 
     await screen.findByText('The error message');
     await screen.findByText('The help text');
+  });
+
+  it('exposes the checkbox DOM state through `getChecked()`', async () => {
+    const inputRef = React.createRef<Input>();
+    render(<Input ref={inputRef} id="checkboxInput" type="checkbox" label="Toggle" defaultChecked />);
+
+    const checkbox = await screen.findByRole('checkbox');
+
+    expect(inputRef.current.getChecked()).toBe(true);
+
+    await userEvent.click(checkbox);
+
+    expect(inputRef.current.getChecked()).toBe(false);
   });
 });
