@@ -159,21 +159,18 @@ const useMainNavigationItems = () => {
   const navigationItems = usePluginEntities('navigation');
 
   const allNavigationItems = navigationItems.flatMap((item) => {
-    const { useCondition } = item;
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const itemConditionMet = useCondition?.() ?? true;
-    const children =
+    // Conditions are hooks, so they are evaluated for every item and child before the early return.
+    const itemVisible =
+      (item.useCondition?.() ?? true) && isFeatureEnabled(item.requiredFeatureFlag) && isPermitted(item.permissions);
+    const visibleChildren =
       'children' in item
-        ? item.children.map((child) => {
-            const { useCondition: useChildCondition } = child;
-
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            return { child, conditionMet: useChildCondition?.() ?? true };
-          })
+        ? item.children.filter(
+            (child) => (child.useCondition?.() ?? true) && isFeatureEnabled(child.requiredFeatureFlag),
+          )
         : [];
 
     // A dropdown's feature flag, condition and permissions also apply to its children.
-    if (!itemConditionMet || !isFeatureEnabled(item.requiredFeatureFlag) || !isPermitted(item.permissions)) {
+    if (!itemVisible) {
       return [];
     }
 
@@ -181,12 +178,10 @@ const useMainNavigationItems = () => {
       return [item];
     }
 
-    return children
-      .filter(({ child, conditionMet }) => conditionMet && isFeatureEnabled(child.requiredFeatureFlag))
-      .map<BaseNavigationItem>(({ child }) => ({
-        ...child,
-        description: `${item.description} / ${child.description}`,
-      }));
+    return visibleChildren.map<BaseNavigationItem>((child) => ({
+      ...child,
+      description: `${item.description} / ${child.description}`,
+    }));
   });
 
   return allNavigationItems
