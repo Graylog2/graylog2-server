@@ -79,6 +79,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
@@ -287,7 +288,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).scope(DefaultEntityScope.NAME).build(), user);
         recentActivityService.create(result.id(), toGRNType(dto), searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
@@ -420,7 +421,12 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         final var grnType = toGRNType(dto);
         createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(updatedDTO.id())));
 
-        var result = dbService.update(updatedDTO);
+        final ViewDTO result;
+        try {
+            result = dbService.update(updatedDTO);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
         recentActivityService.update(result.id(), grnType, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
@@ -455,7 +461,11 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
             throw new ForbiddenException("Unable to delete " + summarize(view) + ".");
         }
 
-        dbService.delete(id);
+        try {
+            dbService.delete(id);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
         triggerDeletedEvent(view);
         recentActivityService.delete(view.id(), toGRNType(view), view.title(), searchUser);
         return view;
