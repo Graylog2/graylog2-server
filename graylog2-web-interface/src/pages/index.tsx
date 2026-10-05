@@ -64,6 +64,7 @@ const IndexSetTemplatesPage = loadAsync(() => import('./IndexSetTemplatesPage'))
 const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCreatePage'));
 const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
+const IndexManagementPage = loadAsync(() => import('components/indices/management/IndexManagementPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const InputDiagnosisPage = loadAsync(() => import('./InputDiagnosisPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
@@ -178,6 +179,7 @@ export {
   IndexSetTemplateCreatePage,
   IndexSetTemplateEditPage,
   IndicesPage,
+  IndexManagementPage,
   InputsPage,
   InputDiagnosisPage,
   KeyboardShortcutsPage,
