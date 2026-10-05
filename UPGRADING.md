@@ -268,7 +268,7 @@ There are two things to know about how this applies to your inputs:
 - **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
     "Migrate to single DynamoDB table for state tracking" input option.  
 
-To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+To let you migrate existing inputs on your own schedule, the input's **Edit input** dialog exposes a
 **Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
 Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
@@ -284,7 +284,7 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
    attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
    readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
    to fail to start.
-3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+3. Enable the **Migrate to single DynamoDB table for state tracking** option in the input's **Edit input** dialog and save. The
    migration begins.
 4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
    `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
@@ -293,8 +293,10 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
 
-For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
-now-unused legacy tables afterward, see AWS's documentation:
+For how to monitor the migration, along with the migration steps and how to remove the now-unused legacy tables
+afterward, see AWS's documentation. Use the KCL 3.x to 3.5 guide for inputs that were already running KCL 3.x, and the
+KCL 2.x to 3.x guide for inputs that were running KCL 2.x:
 
 - [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 3.x to KCL 3.5](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html)
 - [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)
