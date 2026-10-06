@@ -80,6 +80,19 @@ describe('rowMenu', () => {
     expect(items.find(({ action }) => action.key === 'flush').applies).toBe(true);
   });
 
+  it('offers close, open and delete on indices outside Graylog, but not on system indices', () => {
+    const applying = (idx: IndexSummary) =>
+      rowMenu(idx, admin)
+        .filter(({ applies }) => applies)
+        .map(({ action }) => action.key);
+    const foreign = index('security-auditlog', { index_set_id: null, index_set_title: null });
+    const system = index('.plugins-ml-config', { index_set_id: null, index_set_title: null });
+
+    expect(applying(foreign)).toEqual(['close', 'force_merge', 'clear_cache', 'flush', 'delete']);
+    expect(applying(index('old', { index_set_id: null, status: 'close' }))).toEqual(['open', 'delete']);
+    expect(applying(system)).toEqual(['force_merge', 'clear_cache', 'flush']);
+  });
+
   it('leaves out actions the user may not run on that index', () => {
     const can = canWith('indices:changestate:graylog_3');
 

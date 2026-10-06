@@ -16,7 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 import type { IndexOverviewResponse, IndexSummary } from './types';
@@ -34,7 +34,8 @@ const useIndexOverview = (): {
 } => {
   const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: INDEX_OVERVIEW_QUERY_KEY,
-    queryFn: () => fetch<IndexOverviewResponse>('GET', qualifyUrl(INDEX_OVERVIEW_URL)),
+    // Polled: fetchPeriodically doesn't extend the session, so an idle tab still times out.
+    queryFn: () => fetchPeriodically<IndexOverviewResponse>('GET', qualifyUrl(INDEX_OVERVIEW_URL)),
     refetchInterval: REFETCH_INTERVAL_MS,
   });
 

@@ -60,7 +60,8 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Per-index and bulk actions. Close, open and delete work on any index except a current write index. Close and
+ * Per-index and bulk actions. Close, open and delete work on any index except a current write index and system
+ * indices (names starting with a dot). Close and
  * delete go through Graylog's {@link Indices} service, like its own endpoints, so index ranges stay consistent; open
  * is Graylog's reopen (retention skips the index afterwards) for indices Graylog manages, and a plain OpenSearch open
  * for the others. Flush, clear cache and force merge work on any open index.
@@ -244,6 +245,11 @@ public class IndexActionsResource extends RestResource {
         ANY_OPEN
     }
 
+    // As OutdatedIndex#isSystemIndex: OpenSearch's and its plugins' own indices start with a dot.
+    private static boolean isSystemIndex(String index) {
+        return index.startsWith(".");
+    }
+
     @FunctionalInterface
     private interface Action {
         String apply(String index, CatIndex row) throws Exception;
@@ -269,13 +275,17 @@ public class IndexActionsResource extends RestResource {
     }
 
     private IndexActionResult runOne(String index, CatIndex row, String permission, Scope scope, Action action) {
-        if (row == null) {
-            return IndexActionResult.failed(index, "no such index");
-        }
+        // Permission first, so the answer doesn't tell a user which index names exist.
         if (!isPermitted(permission, index)) {
             return IndexActionResult.failed(index, f("not permitted (needs %s)", permission));
         }
+        if (row == null) {
+            return IndexActionResult.failed(index, "no such index");
+        }
         try {
+            if (scope != Scope.ANY_OPEN && isSystemIndex(index)) {
+                return IndexActionResult.failed(index, "system index (name starts with a dot); OpenSearch or a plugin owns it");
+            }
             if (scope == Scope.NOT_WRITE_INDEX && indexSetRegistry.isCurrentWriteIndex(index)) {
                 return IndexActionResult.failed(index, "current write index; rotate the index set first");
             }

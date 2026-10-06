@@ -18,8 +18,13 @@ package org.graylog2.indexer.management;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public record IndexActionRequest(@JsonProperty("indices") @NotEmpty List<String> indices) {
+/**
+ * The indices to run one action on. Bounded, since actions run one index after another in the request.
+ */
+public record IndexActionRequest(@JsonProperty("indices") @NotEmpty @Size(max = IndexActionRequest.MAX_INDICES) List<String> indices) {
+    public static final int MAX_INDICES = 1000;
 }

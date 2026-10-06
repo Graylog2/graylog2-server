@@ -19,6 +19,8 @@ import type { CanRun, IndexAction, IndexSummary } from './types';
 // Which rows an action applies to is a hint for the UI only; the server checks again and reports per index.
 const isClosed = (index: IndexSummary) => index.status === 'close';
 const isManaged = (index: IndexSummary) => index.index_set_id !== null && index.index_set_id !== undefined;
+// As the server: OpenSearch's and its plugins' own indices start with a dot; close, open and delete leave them alone.
+const isSystem = (index: IndexSummary) => index.index.startsWith('.');
 
 // The permission the server checks for each action (IndexActionsResource); actions the user lacks it for aren't shown.
 const changeState = (index: IndexSummary) => `indices:changestate:${index.index}` as const;
@@ -40,7 +42,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     label: 'Close',
     pastTense: 'closed',
     permission: changeState,
-    appliesTo: (index) => !isClosed(index) && !index.is_write_index,
+    appliesTo: (index) => !isSystem(index) && !isClosed(index) && !index.is_write_index,
     notes: 'Closed indices keep their data on disk but can\'t be searched until reopened.',
   },
   {
@@ -48,7 +50,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     label: 'Open',
     pastTense: 'opened',
     permission: changeState,
-    appliesTo: (index) => isClosed(index),
+    appliesTo: (index) => !isSystem(index) && isClosed(index),
     notes:
       'Indices in a Graylog index set are reopened as Graylog\'s own reopen does, so retention skips them from then on. Other indices are simply opened.',
   },
@@ -82,7 +84,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'deleted',
     danger: true,
     permission: (index) => `indices:delete:${index.index}` as const,
-    appliesTo: (index) => !index.is_write_index,
+    appliesTo: (index) => !isSystem(index) && !index.is_write_index,
     notes:
       'Deletes the index and all its messages. This cannot be undone. An index not managed by Graylog may belong to OpenSearch itself or to a plugin, which can stop working without it.',
   },
@@ -113,6 +115,6 @@ export const canActOnAny = (indices: Array<IndexSummary>, can: CanRun) =>
   indices.some((index) => INDEX_ACTIONS.some((action) => can(action, index)));
 
 export const NOT_APPLICABLE_REASON =
-  'Rotate needs a current write index. Close and delete never work on a current write index, and open needs a closed index. Flush, clear cache and force merge need an open index.';
+  'Rotate needs a current write index. Close and delete never work on a current write index, and open needs a closed index; none of the three work on system indices (names starting with a dot). Flush, clear cache and force merge need an open index.';
 
 export default INDEX_ACTIONS;

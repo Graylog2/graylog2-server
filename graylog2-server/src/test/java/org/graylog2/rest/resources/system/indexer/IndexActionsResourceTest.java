@@ -121,12 +121,35 @@ class IndexActionsResourceTest {
     }
 
     @Test
-    void unknownIndexNamesAreRejectedBeforeAnythingElse() {
+    void unknownIndexNamesAreRejected() {
         givenIndices(open("graylog_3"));
 
         assertThat(resource.delete(request("graylog_*")).results())
                 .containsExactly(IndexActionResult.failed("graylog_*", "no such index"));
         verify(indices, never()).delete(anyString());
+    }
+
+    @Test
+    void permissionIsCheckedBeforeExistenceSoNamesCannotBeProbed() {
+        givenIndices(open("graylog_3"));
+        subject = TestSubjects.withPermissions("indices:read", "indices:delete:graylog_3");
+
+        assertThat(resource.delete(request("secret-index")).results())
+                .containsExactly(IndexActionResult.failed("secret-index", "not permitted (needs indices:delete)"));
+    }
+
+    @Test
+    void closeOpenAndDeleteLeaveSystemIndicesAlone() throws Exception {
+        givenIndices(open(".plugins-ml-config"), closed(".old-system"));
+
+        assertThat(resource.close(request(".plugins-ml-config")).results().get(0).message()).startsWith("system index");
+        assertThat(resource.open(request(".old-system")).results().get(0).message()).startsWith("system index");
+        assertThat(resource.delete(request(".plugins-ml-config")).results().get(0).message()).startsWith("system index");
+        assertThat(resource.flush(request(".plugins-ml-config")).results())
+                .containsExactly(IndexActionResult.ok(".plugins-ml-config", "flushed"));
+        verify(indices, never()).close(anyString());
+        verify(indices, never()).delete(anyString());
+        verify(indicesAdapter, never()).openIndex(anyString());
     }
 
     @Test

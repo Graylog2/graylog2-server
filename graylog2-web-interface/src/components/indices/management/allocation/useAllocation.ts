@@ -16,7 +16,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
@@ -60,7 +60,8 @@ export const useShardMap = (
 } => {
   const { data, error, isFetching, refetch } = useQuery({
     queryKey: MAP_QUERY_KEY,
-    queryFn: () => fetch<ShardMapResponse>('GET', qualifyUrl(`${ALLOCATION_URL}/map`)),
+    // Polled: fetchPeriodically doesn't extend the session, so an idle tab still times out.
+    queryFn: () => fetchPeriodically<ShardMapResponse>('GET', qualifyUrl(`${ALLOCATION_URL}/map`)),
     enabled,
     refetchInterval: MAP_REFETCH_INTERVAL_MS,
   });
