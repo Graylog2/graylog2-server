@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Projections;
@@ -36,13 +37,18 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService
  * <p>
  * Each spec joins the other collection before the sort, writes the sort key into a temporary field, and
  * removes that field after the sort. The page then deserializes into plain {@link IndexSetConfig} documents.
- * Each join runs once per index set. The collection holds tens to hundreds of documents, so the cost is small.
+ * <p>
+ * The page runs under a case-insensitive collation. Indexes on string fields use the simple collation and cannot
+ * serve equality under any other, so a join that matches a string field per index set would scan the other
+ * collection once per index set. Joins here either match by ObjectId, which collation does not affect, or run
+ * once for the whole page.
  */
 public final class IndexSetAttributeSorts {
     static final String PROFILE_TITLE_SORT_FIELD = "_sort_field_type_profile";
     static final String STREAM_COUNT_SORT_FIELD = "_sort_stream_count";
     private static final String JOINED_PROFILE = "_profile";
-    private static final String JOINED_STREAMS = "_streams";
+    private static final String JOINED_STREAM_COUNTS = "_stream_counts";
+    private static final String COUNT = "count";
 
     private IndexSetAttributeSorts() {
     }
@@ -68,17 +74,26 @@ public final class IndexSetAttributeSorts {
                 List.of(Aggregates.unset(PROFILE_TITLE_SORT_FIELD)));
     }
 
-    /** Sorts by the number of streams routed to the index set. */
+    /**
+     * Sorts by the number of streams routed to the index set. Index sets without streams sort as 0.
+     * <p>
+     * The lookup has no {@code let}, so it is uncorrelated: MongoDB runs its pipeline once and hands every index
+     * set the same list of per-index-set counts. The list has one entry per index set that has streams, so it
+     * stays small. Each index set then picks its own entry out of that list.
+     */
     public static AttributeSortSpec streamCount() {
+        final Document ownCounts = new Document("$filter", new Document("input", "$" + JOINED_STREAM_COUNTS)
+                .append("cond", new Document("$eq", List.of("$$this._id", new Document("$toString", "$_id")))));
+        final Document ownCount = new Document("$ifNull", List.of(
+                new Document("$first", new Document("$map", new Document("input", ownCounts).append("in", "$$this." + COUNT))),
+                0));
         return new AttributeSortSpec(
                 List.of(
                         Aggregates.lookup(StreamServiceImpl.COLLECTION_NAME,
-                                List.of(new Variable<>("indexSetId", new Document("$toString", "$_id"))),
-                                List.of(Aggregates.match(new Document("$expr", new Document("$eq", List.of("$" + StreamImpl.FIELD_INDEX_SET_ID, "$$indexSetId")))),
-                                        Aggregates.project(Projections.include("_id"))),
-                                JOINED_STREAMS),
-                        Aggregates.set(new Field<>(STREAM_COUNT_SORT_FIELD, new Document("$size", "$" + JOINED_STREAMS))),
-                        Aggregates.unset(JOINED_STREAMS)),
+                                List.of(Aggregates.group("$" + StreamImpl.FIELD_INDEX_SET_ID, Accumulators.sum(COUNT, 1))),
+                                JOINED_STREAM_COUNTS),
+                        Aggregates.set(new Field<>(STREAM_COUNT_SORT_FIELD, ownCount)),
+                        Aggregates.unset(JOINED_STREAM_COUNTS)),
                 STREAM_COUNT_SORT_FIELD,
                 List.of(Aggregates.unset(STREAM_COUNT_SORT_FIELD)));
     }
