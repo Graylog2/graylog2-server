@@ -39,11 +39,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     css`
       background-color: ${highlightColor};
 
-      & > .list-group-item {
-        background-color: ${highlightColor};
-        color: ${theme.colors.text.primary};
-      }
-
       a {
         color: inherit;
         text-decoration: none;

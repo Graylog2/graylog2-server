@@ -88,10 +88,22 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
         final MessageFieldTypeMapper fieldsMapper = new MessageFieldTypeMapper(knownFields);
 
-        return searchRequestSpec.requestedFields()
-                .stream()
+        final var fields = searchRequestSpec.requestedFields().isEmpty()
+                ? knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList()
+                : searchRequestSpec.requestedFields();
+
+        return fields.stream()
                 .map(fieldsMapper)
                 .collect(Collectors.toList());
+    }
+
+    private List<RequestedField> getRequestedFields(MessagesRequestSpec searchRequestSpec, ResultMessageSummary resultMessageSummary, SearchUser searchUser) {
+        if(searchRequestSpec.requestedFields().isEmpty()) {
+            final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
+            final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
+            return knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList();
+        }
+        return searchRequestSpec.requestedFields();
     }
 
     private List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
@@ -101,7 +113,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
         return messageListResult.messages()
                 .stream()
-                .map(message -> messagesRequestSpec.requestedFields()
+                .map(message -> getRequestedFields(messagesRequestSpec, message, searchUser)
                         .stream()
                         .map(field -> extractValue(message, field, cachedDecorators, searchUser))
                         .collect(Collectors.toList())).collect(Collectors.toList());

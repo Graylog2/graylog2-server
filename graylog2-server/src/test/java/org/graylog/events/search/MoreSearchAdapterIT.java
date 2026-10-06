@@ -68,7 +68,9 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
     @Test
     public void eventsHistogram() {
-        final MoreSearch.Histogram result = toTest.eventHistogram("*", AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000"), Set.of(INDEX_NAME), ALL_STREAMS, "*", allAllowed(), ZoneId.of("Europe/Vienna"), Map.of());
+        final AbsoluteRange timerange = AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000");
+        final MoreSearch.Histogram result = toTest.eventHistogram("*", timerange, Set.of(INDEX_NAME), ALL_STREAMS, "*", allAllowed(), ZoneId.of("Europe/Vienna"), Map.of());
+        Assertions.assertThat(result.effectiveTimerange()).isEqualTo(timerange);
         Assertions.assertThat(result.buckets().alerts())
                 .hasSize(85);
         Assertions.assertThat(result.buckets().events())

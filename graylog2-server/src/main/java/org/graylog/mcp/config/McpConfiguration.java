@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 public abstract class McpConfiguration {
     public static final McpConfiguration DEFAULT_VALUES = create(
             false,
+            false,
             false
     );
 
@@ -35,11 +36,15 @@ public abstract class McpConfiguration {
     @JsonProperty("enable_output_schema")
     public abstract boolean enableOutputSchema();
 
+    @JsonProperty("enable_input_validation")
+    public abstract boolean enableInputValidation();
+
     @JsonCreator
     public static McpConfiguration create(
             @JsonProperty("enable_remote_access") boolean enableRemoteAccess,
-            @JsonProperty("enable_output_schema") boolean enableOutputSchema
+            @JsonProperty("enable_output_schema") boolean enableOutputSchema,
+            @JsonProperty("enable_input_validation") boolean enableInputValidation
     ) {
-        return new AutoValue_McpConfiguration(enableRemoteAccess, enableOutputSchema);
+        return new AutoValue_McpConfiguration(enableRemoteAccess, enableOutputSchema, enableInputValidation);
     }
 }

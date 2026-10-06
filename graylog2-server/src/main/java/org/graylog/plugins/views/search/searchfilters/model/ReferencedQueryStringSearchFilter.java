@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -64,11 +65,13 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-    public abstract boolean negation();
+    @Nullable
+    public abstract Boolean negation();
 
     @Override
     @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-    public abstract boolean disabled();
+    @Nullable
+    public abstract Boolean disabled();
 
     public static ReferencedQueryStringSearchFilter create(final String id) {
         return builder().id(id).build();
@@ -103,11 +106,11 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         @JsonProperty(FIELD_SCOPE)
         public abstract Builder scope(String scope);
 
-        @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-        public abstract Builder negation(boolean negation);
+        @JsonProperty(value = NEGATION_FIELD)
+        public abstract Builder negation(@Nullable Boolean negation);
 
-        @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-        public abstract Builder disabled(boolean disabled);
+        @JsonProperty(value = DISABLED_FIELD)
+        public abstract Builder disabled(@Nullable Boolean disabled);
 
         @JsonCreator
         public static Builder create() {
@@ -133,8 +136,14 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                 .build();
     }
 
+    @Override
     public ReferencedSearchFilter withId(String id) {
         return toBuilder().id(id).build();
+    }
+
+    @Override
+    public ReferencedSearchFilter stripToId() {
+        return builder().id(id()).negation(null).disabled(null).build();
     }
 
     @Override
@@ -142,8 +151,12 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                            Map<EntityDescriptor, Object> nativeEntities) {
         final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if (dbFilter != null) {
-            // If this filter references a newly imported filter, update this filter with the ID of the new filter created in MongoDB.
-            return this.withId(dbFilter.id());
+            // If this filter references a newly imported filter, update this filter with the ID and scope of the new filter created in MongoDB.
+            final Builder builder = toBuilder().id(dbFilter.id());
+            if (dbFilter instanceof ScopedEntity<?> scopedFilter) {
+                builder.scope(scopedFilter.scope());
+            }
+            return builder.build();
         } else {
             // Otherwise return this filter as it is in the parent entity, but convert to inline.
             return this.toInlineRepresentation();

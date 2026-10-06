@@ -16,14 +16,21 @@
  */
 package org.graylog2.rest.resources.entities.preferences.service;
 
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
+
+import java.util.List;
 
 public interface EntityListPreferencesService {
 
     StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
 
+    List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId);
+
     boolean save(final StoredEntityListPreferences preferences);
 
     int deleteAllForUser(final String userId);
+
+    boolean delete(final StoredEntityListPreferencesId preferencesId) throws ValidationException;
 }

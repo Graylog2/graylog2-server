@@ -25,7 +25,7 @@ import DocumentTitle from 'components/common/DocumentTitle';
 import { qualifyUrl } from 'util/URLUtils';
 import LoginChrome from 'components/login/LoginChrome';
 import useProductName from 'brand-customization/useProductName';
-import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
+import type { ServerError } from 'contexts/ServerAvailabilityContext';
 import DocsHelper from 'util/DocsHelper';
 
 const StyledIcon = styled(Icon)`

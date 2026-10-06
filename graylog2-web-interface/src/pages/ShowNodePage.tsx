@@ -19,9 +19,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { fetchInputStates } from 'hooks/useInputsStates';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
+import useClusterOverview, { fetchNodeJvm } from 'hooks/useClusterOverview';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
@@ -33,11 +33,11 @@ const ShowNodePage = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
   const { data: inputDescriptions } = useInputTypesDescriptions();
   const { nodes } = useStore(NodesStore);
-  const { clusterOverview } = useStore(ClusterOverviewStore);
+  const { data: clusterOverview } = useClusterOverview();
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
   const { data: jvmInformation } = useQuery({
     queryKey: ['jvm', nodeId],
-    queryFn: () => ClusterOverviewStore.jvm(nodeId),
+    queryFn: () => fetchNodeJvm(nodeId),
   });
   const { data: inputStates } = useQuery({
     queryKey: ['inputs', 'states', nodeId],

@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { SystemStore } from 'stores/system/SystemStore';
+import useSystemInfo from 'hooks/useSystemStore';
 
-const useSystemDetails = () => useStore(SystemStore, (_system) => _system?.system);
+const useSystemDetails = () => {
+  const { data } = useSystemInfo();
+
+  return data;
+};
+
 export default useSystemDetails;

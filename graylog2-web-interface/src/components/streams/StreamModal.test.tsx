@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as mockImmutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import selectEvent from 'helpers/selectEvent';
 import { indexSets } from 'fixtures/indexSets';
 import { stream } from 'fixtures/streams';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import StreamModal from './StreamModal';
 
@@ -34,17 +36,29 @@ const exampleStream = {
   index_set_id: indexSets[0].id,
 };
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
+jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
-  EntityShareActions: {
+  default: {
     prepare: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
+    loadUserSharesPaginated: jest.fn(() =>
+      Promise.resolve({
+        list: mockImmutable.List(),
+        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      }),
+    ),
   },
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
   <StreamModal
     onSubmit={() => Promise.resolve()}
@@ -60,7 +74,7 @@ jest.setTimeout(10000);
 
 describe('StreamModal', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
   });
 
   it('should render without provided stream', async () => {
@@ -75,6 +89,8 @@ describe('StreamModal', () => {
     await screen.findByRole('textbox', {
       name: /description/i,
     });
+
+    expect(await screen.findByRole('checkbox', { name: /remove matches from/i })).toBeChecked();
   });
 
   it('should update stream', async () => {
@@ -146,7 +162,7 @@ describe('StreamModal', () => {
     await userEvent.click(addCollaborator);
 
     await waitFor(() => {
-      const prepareCalls = asMock(EntityShareActions.prepare).mock.calls;
+      const prepareCalls = asMock(EntityShareDomain.prepare).mock.calls;
       expect(prepareCalls).toHaveLength(2);
 
       const lastCallPayload = prepareCalls[1][3];
@@ -173,7 +189,7 @@ describe('StreamModal', () => {
       expect(onSubmit).toHaveBeenCalledWith({
         description: 'New description',
         index_set_id: 'index-set-id-2',
-        remove_matches_from_default_stream: false,
+        remove_matches_from_default_stream: true,
         title: 'New title',
         share_request: {
           selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({

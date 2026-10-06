@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
@@ -106,6 +107,12 @@ public class PipelineMetadataUpdater {
         inputsMetadataService.deleteInput(event.inputId());
     }
 
+    public void handleStreamChanged(String streamId, PipelineInterpreter.State state) {
+        Set<String> pipelineIds = pipelineMetadataService.getPipelinesReferencingStream(streamId);
+        Set<PipelineDao> pipelineDaos = loadPipelineDaos(pipelineIds);
+        handleUpdates(pipelineDaos, state);
+    }
+
     private void deleteInputMentionsForPipelines(PipelinesChangedEvent event) {
         Stream.concat(event.deletedPipelineIds().stream(), event.updatedPipelineIds().stream())
                 .forEach(inputsMetadataService::deleteInputMentionsByPipelineId);
@@ -120,10 +127,12 @@ public class PipelineMetadataUpdater {
                                PipelineInterpreter.State state) {
         ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
         List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
-        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, ruleRecords);
+        List<RoutingRuleDao> routingRuleRecords = new ArrayList<>();
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
+                pipelineAnalyzer.analyzePipelines(pipelines, ruleRecords, routingRuleRecords);
 
         inputsMetadataService.save(inputMentions, true);
-        pipelineMetadataService.save(ruleRecords, true);
+        pipelineMetadataService.save(ruleRecords, routingRuleRecords, true);
     }
 
     private Set<PipelineDao> loadPipelineDaos(Set<String> ids) {

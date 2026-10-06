@@ -28,8 +28,6 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
-
 jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: MockStore(['isLoggedIn', jest.fn()]),
 }));
@@ -40,10 +38,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
     listen: () => jest.fn(),
     getInitialState: () => ({ currentUser: mockDefaultUser.toJSON() }),
   },
-}));
-
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({ streams: [] })]),
 }));
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

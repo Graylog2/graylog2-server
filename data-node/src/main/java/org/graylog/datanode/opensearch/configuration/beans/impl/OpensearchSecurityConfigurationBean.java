@@ -34,6 +34,7 @@ import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfigurationFile;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog2.indexer.security.IndexerAdminCertConstants;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
@@ -192,7 +193,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
         config.put("plugins.security.nodes_dn", "CN=*");
         config.put("plugins.security.allow_default_init_securityindex", "true");
-        //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
+        config.put("plugins.security.authcz.admin_dn", IndexerAdminCertConstants.ADMIN_DN);
 
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");

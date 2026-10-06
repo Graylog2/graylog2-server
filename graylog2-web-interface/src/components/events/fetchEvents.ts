@@ -25,12 +25,12 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
-import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
   filter: {
-    readonly extra_filters: {
+    extra_filters: {
       readonly [_key: string]: string[];
     };
 
@@ -99,6 +99,12 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
     result.filter.part_of_detection_chain = filters.get('part_of_detection_chain')[0];
   }
 
+  const tagFilters = filters.get('tags');
+
+  if (tagFilters?.length > 0) {
+    result.filter.extra_filters = { ...(result.filter.extra_filters ?? {}), tags: [...tagFilters] };
+  }
+
   return result;
 };
 
@@ -110,7 +116,7 @@ export const getConcatenatedQuery = (query: string, streamId: string) => {
   return `(${query}) AND source_streams:${streamId}`;
 };
 
-export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 30 * 86400 } as const;
+export const defaultTimeRange: RelativeTimeRangeStartOnly = { type: 'relative', range: 7 * 86400 } as const;
 export const fetchEventsHistogram = async (searchParams: SearchParams) => {
   const { timerange, filter } = parseFilters(searchParams.filters, defaultTimeRange);
 
@@ -123,7 +129,10 @@ export const fetchEventsHistogram = async (searchParams: SearchParams) => {
     sort_unmapped_type: undefined,
     filter,
     timerange,
-  }).then((results) => ({ timerange, results }));
+  }).then(({ buckets, effective_timerange }) => ({
+    timerange: effective_timerange,
+    results: { buckets },
+  }));
 };
 
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];

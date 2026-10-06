@@ -18,42 +18,36 @@ package org.graylog2.rest.resources.streams;
 
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
 import org.graylog2.rest.resources.streams.responses.StreamReference;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -72,14 +66,11 @@ class StreamPipelineRulesResourceTest {
 
     @Mock
     private MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
-    @Mock
-    private PipelineService pipelineService;
-    @Mock
-    private RuleService ruleService;
-    @Mock
-    private PipelineStreamConnectionsService connectionsService;
-    @Mock
-    private StreamService streamService;
+
+    @Captor
+    private ArgumentCaptor<Predicate<RoutingRuleDao>> entityFilterCaptor;
+    @Captor
+    private ArgumentCaptor<Predicate<StreamReference>> streamFilterCaptor;
 
     private Predicate<String> permissionCheck;
     private StreamPipelineRulesResource resource;
@@ -89,18 +80,9 @@ class StreamPipelineRulesResourceTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         permissionCheck = permission -> true;
-        resource = new TestResource(mongoDbPipelineMetadataService, pipelineService,
-                ruleService, connectionsService, streamService);
-
-        // Create stream mocks before stubbing to avoid Mockito's UnfinishedStubbing detection
-        final Stream stream1 = mockStream(STREAM_ID, "Stream One");
-        final Stream stream2 = mockStream(STREAM_ID_2, "Stream Two");
-        final Stream stream3 = mockStream(STREAM_ID_3, "Stream Three");
-        lenient().when(streamService.load(STREAM_ID)).thenReturn(stream1);
-        lenient().when(streamService.load(STREAM_ID_2)).thenReturn(stream2);
-        lenient().when(streamService.load(STREAM_ID_3)).thenReturn(stream3);
+        resource = new TestResource(mongoDbPipelineMetadataService);
     }
 
     @Test
@@ -114,82 +96,51 @@ class StreamPipelineRulesResourceTest {
     }
 
     @Test
-    void getPage_filtersPipelinesByPipelineReadPermission() throws Exception {
-        // User can read the target stream and pipeline-1, but NOT pipeline-2
+    void getPage_filtersPipelinesByPipelineReadPermission() {
+        // User can read stream and pipeline-1, but NOT pipeline-2
         permissionCheck = permission -> !permission.equals(PipelineRestPermissions.PIPELINE_READ + ":" + PIPELINE_ID_2);
 
-        final PipelineRulesMetadataDao dao1 = buildMetadataDao(PIPELINE_ID_1, RULE_ID_1, STREAM_ID);
-        final PipelineRulesMetadataDao dao2 = buildMetadataDao(PIPELINE_ID_2, RULE_ID_2, STREAM_ID);
-        when(mongoDbPipelineMetadataService.getRoutingPipelines(STREAM_ID)).thenReturn(Set.of(dao1, dao2));
+        stubPaginatedResult(List.of(
+                new StreamPipelineRulesResponse(RULE_ID_1, PIPELINE_ID_1, "Pipeline One", RULE_ID_1, "Rule One", List.of()),
+                new StreamPipelineRulesResponse(RULE_ID_2, PIPELINE_ID_2, "Pipeline Two", RULE_ID_2, "Rule Two", List.of())
+        ));
 
-        stubPipeline(PIPELINE_ID_1, "Pipeline One");
-        stubRule(RULE_ID_1, "Rule One");
-        stubConnections(PIPELINE_ID_1, STREAM_ID);
+        resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
 
-        final PageListResponse<StreamPipelineRulesResponse> response =
-                resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
-
-        assertThat(response.elements()).hasSize(1);
-        assertThat(response.elements().getFirst().pipelineId()).isEqualTo(PIPELINE_ID_1);
+        // Verify the entity filter predicate correctly filters by PIPELINE_READ
+        final Predicate<RoutingRuleDao> entityFilter = entityFilterCaptor.getValue();
+        assertThat(entityFilter.test(routingRuleDao(PIPELINE_ID_1, RULE_ID_1))).isTrue();
+        assertThat(entityFilter.test(routingRuleDao(PIPELINE_ID_2, RULE_ID_2))).isFalse();
     }
 
     @Test
-    void getPage_filtersConnectedStreamsByStreamsReadPermission() throws Exception {
+    void getPage_filtersConnectedStreamsByStreamsReadPermission() {
         // User can read STREAM_ID and STREAM_ID_2, but NOT STREAM_ID_3
         permissionCheck = permission -> !permission.equals(RestPermissions.STREAMS_READ + ":" + STREAM_ID_3);
 
-        final PipelineRulesMetadataDao dao = buildMetadataDao(PIPELINE_ID_1, RULE_ID_1, STREAM_ID);
-        when(mongoDbPipelineMetadataService.getRoutingPipelines(STREAM_ID)).thenReturn(Set.of(dao));
+        stubPaginatedResult(List.of(
+                new StreamPipelineRulesResponse(RULE_ID_1, PIPELINE_ID_1, "Pipeline One", RULE_ID_1, "Rule One",
+                        List.of(new StreamReference(STREAM_ID, "Stream One"),
+                                new StreamReference(STREAM_ID_2, "Stream Two"),
+                                new StreamReference(STREAM_ID_3, "Stream Three")))
+        ));
 
-        stubPipeline(PIPELINE_ID_1, "Pipeline One");
-        stubRule(RULE_ID_1, "Rule One");
-        // Pipeline is connected to three streams — user can only see two
-        stubConnections(PIPELINE_ID_1, STREAM_ID, STREAM_ID_2, STREAM_ID_3);
+        resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
 
-        final PageListResponse<StreamPipelineRulesResponse> response =
-                resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
-
-        assertThat(response.elements()).hasSize(1);
-        final List<String> connectedStreamIds = response.elements().getFirst().connectedStreams().stream()
-                .map(StreamReference::id)
-                .toList();
-        assertThat(connectedStreamIds).containsExactlyInAnyOrder(STREAM_ID, STREAM_ID_2);
-        assertThat(connectedStreamIds).doesNotContain(STREAM_ID_3);
+        // Verify the connected stream filter predicate correctly filters by STREAMS_READ
+        final Predicate<StreamReference> streamFilter = streamFilterCaptor.getValue();
+        assertThat(streamFilter.test(new StreamReference(STREAM_ID, "Stream One"))).isTrue();
+        assertThat(streamFilter.test(new StreamReference(STREAM_ID_2, "Stream Two"))).isTrue();
+        assertThat(streamFilter.test(new StreamReference(STREAM_ID_3, "Stream Three"))).isFalse();
     }
 
     @Test
-    void getPage_excludesRulesNotRoutingToQueriedStream() throws Exception {
-        // Pipeline has two rules: RULE_ID_1 routes to STREAM_ID, RULE_ID_2 routes to STREAM_ID_2
-        final PipelineRulesMetadataDao dao = PipelineRulesMetadataDao.builder()
-                .pipelineId(PIPELINE_ID_1)
-                .rules(Set.of(RULE_ID_1, RULE_ID_2))
-                .streams(Set.of(STREAM_ID, STREAM_ID_2))
-                .streamsByRuleId(Map.of(
-                        RULE_ID_1, Set.of(STREAM_ID),
-                        RULE_ID_2, Set.of(STREAM_ID_2)))
-                .build();
-        when(mongoDbPipelineMetadataService.getRoutingPipelines(STREAM_ID)).thenReturn(Set.of(dao));
-
-        stubPipeline(PIPELINE_ID_1, "Pipeline One");
-        stubRule(RULE_ID_1, "Rule One");
-        stubConnections(PIPELINE_ID_1, STREAM_ID, STREAM_ID_2);
-
-        final PageListResponse<StreamPipelineRulesResponse> response =
-                resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
-
-        assertThat(response.elements()).hasSize(1);
-        assertThat(response.elements().getFirst().ruleId()).isEqualTo(RULE_ID_1);
-        assertThat(response.elements().getFirst().rule()).isEqualTo("Rule One");
-    }
-
-    @Test
-    void getPage_returnsResultsWhenFullyPermitted() throws Exception {
-        final PipelineRulesMetadataDao dao = buildMetadataDao(PIPELINE_ID_1, RULE_ID_1, STREAM_ID);
-        when(mongoDbPipelineMetadataService.getRoutingPipelines(STREAM_ID)).thenReturn(Set.of(dao));
-
-        stubPipeline(PIPELINE_ID_1, "Pipeline One");
-        stubRule(RULE_ID_1, "Rule One");
-        stubConnections(PIPELINE_ID_1, STREAM_ID);
+    void getPage_returnsResultsWhenFullyPermitted() {
+        final List<StreamPipelineRulesResponse> entries = List.of(
+                new StreamPipelineRulesResponse(RULE_ID_1, PIPELINE_ID_1, "Pipeline One", RULE_ID_1, "Rule One",
+                        List.of(new StreamReference(STREAM_ID, "Stream One")))
+        );
+        stubPaginatedResult(entries);
 
         final PageListResponse<StreamPipelineRulesResponse> response =
                 resource.getPage(STREAM_ID, 1, 50, "", List.of(), "rule", SortOrder.ASCENDING);
@@ -206,55 +157,28 @@ class StreamPipelineRulesResourceTest {
 
     // --- helpers ---
 
-    private PipelineRulesMetadataDao buildMetadataDao(String pipelineId, String ruleId, String streamId) {
-        return PipelineRulesMetadataDao.builder()
-                .pipelineId(pipelineId)
-                .rules(Set.of(ruleId))
-                .streams(Set.of(streamId))
-                .streamsByRuleId(Map.of(ruleId, Set.of(streamId)))
+    private void stubPaginatedResult(List<StreamPipelineRulesResponse> entries) {
+        final PaginatedList<StreamPipelineRulesResponse> paginatedList =
+                new PaginatedList<>(entries, entries.size(), 1, 50);
+        when(mongoDbPipelineMetadataService.getRoutingRulesPaginated(
+                eq(STREAM_ID), any(), entityFilterCaptor.capture(), streamFilterCaptor.capture(),
+                anyString(), any(SortOrder.class), anyInt(), anyInt()))
+                .thenReturn(paginatedList);
+    }
+
+    private RoutingRuleDao routingRuleDao(String pipelineId, String ruleId) {
+        return RoutingRuleDao.builder()
+                .pipelineId(pipelineId).pipelineTitle("Pipeline")
+                .ruleId(ruleId).ruleTitle("Rule")
+                .routedStreamIds(List.of(STREAM_ID))
+                .connectedStreams(List.of())
                 .build();
-    }
-
-    private void stubPipeline(String pipelineId, String title) throws Exception {
-        final PipelineDao pipelineDao = PipelineDao.builder()
-                .id(pipelineId)
-                .title(title)
-                .source("pipeline \"" + title + "\"\nstage 0 match either\nend")
-                .build();
-        when(pipelineService.load(pipelineId)).thenReturn(pipelineDao);
-    }
-
-    private void stubRule(String ruleId, String title) throws Exception {
-        final RuleDao ruleDao = RuleDao.builder()
-                .id(ruleId)
-                .title(title)
-                .source("rule \"" + title + "\"\nwhen true\nthen\nend")
-                .build();
-        when(ruleService.load(ruleId)).thenReturn(ruleDao);
-    }
-
-    private void stubConnections(String pipelineId, String... streamIds) {
-        final List<PipelineConnections> connections = Arrays.stream(streamIds)
-                .map(sid -> PipelineConnections.create(null, sid, Set.of(pipelineId)))
-                .toList();
-        when(connectionsService.loadByPipelineId(pipelineId)).thenReturn(Set.copyOf(connections));
-    }
-
-    private Stream mockStream(String streamId, String title) {
-        final Stream stream = mock(Stream.class);
-        lenient().when(stream.getTitle()).thenReturn(title);
-        lenient().when(stream.getId()).thenReturn(streamId);
-        return stream;
     }
 
     private class TestResource extends StreamPipelineRulesResource {
 
-        TestResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService,
-                     PipelineService pipelineService,
-                     RuleService ruleService,
-                     PipelineStreamConnectionsService connectionsService,
-                     StreamService streamService) {
-            super(mongoDbPipelineMetadataService, pipelineService, ruleService, connectionsService, streamService);
+        TestResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService) {
+            super(mongoDbPipelineMetadataService);
         }
 
         @Override
@@ -262,7 +186,7 @@ class StreamPipelineRulesResourceTest {
             final Subject mockSubject = mock(Subject.class);
             when(mockSubject.isPermitted(anyString())).thenAnswer(
                     invocation -> permissionCheck.test(invocation.getArgument(0)));
-            lenient().when(mockSubject.getPrincipal()).thenReturn("test-user");
+            when(mockSubject.getPrincipal()).thenReturn("test-user");
             return mockSubject;
         }
     }

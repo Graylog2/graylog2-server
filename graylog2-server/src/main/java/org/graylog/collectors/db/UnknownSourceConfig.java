@@ -19,6 +19,7 @@ package org.graylog.collectors.db;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 
 import java.util.LinkedHashMap;
@@ -53,7 +54,7 @@ public class UnknownSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id, CollectorOSType osType) {
         return Optional.empty();
     }
 }

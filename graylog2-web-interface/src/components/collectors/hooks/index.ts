@@ -24,7 +24,13 @@ export {
   FLEETS_KEY_PREFIX,
 } from './useFleetQueries';
 
-export { useInstances, fetchPaginatedInstances, instancesKeyFn, INSTANCES_KEY_PREFIX } from './useInstanceQueries';
+export {
+  useInstances,
+  useInstance,
+  fetchPaginatedInstances,
+  instancesKeyFn,
+  INSTANCES_KEY_PREFIX,
+} from './useInstanceQueries';
 
 export { useSources, fetchPaginatedSources, sourcesKeyFn, SOURCES_KEY_PREFIX } from './useSourceQueries';
 
@@ -39,8 +45,14 @@ export {
   ENROLLMENT_TOKENS_KEY_PREFIX,
 } from './useEnrollmentTokenQueries';
 
+export { default as useEnrollmentTokenCount } from './useEnrollmentTokenCount';
+
 export { default as useCollectorsMutations } from './useCollectorsMutations';
 export { default as useCollectorInputMutations } from './useCollectorInputMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
 export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';
+export { default as useInstancePendingChanges } from './useInstancePendingChanges';
+export { default as useCollectorRefetchInterval } from './useCollectorRefetchInterval';
+export { default as useCollectorPermissions } from './useCollectorPermissions';
+export { default as useCanAccessDeployment } from './useCanAccessDeployment';

@@ -92,6 +92,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
         createSelectPlaceholder={createSelectPlaceholder}
         isFieldQualified={isFieldQualified}
         showUnit={showFieldUnit}
+        allowCreate
       />
     </Input>
   );

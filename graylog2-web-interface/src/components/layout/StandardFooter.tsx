@@ -14,35 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { getFullVersion } from 'util/Version';
-import { SystemStore } from 'stores/system/SystemStore';
 import useProductName from 'brand-customization/useProductName';
 import useSystemDetails from 'hooks/useSystemDetails';
-
-type Jvm = {
-  info: string;
-};
+import { fetchSystemJvm } from 'hooks/useSystemStore';
 
 const StandardFooter = () => {
   const productName = useProductName();
-  const [jvm, setJvm] = useState<Jvm | undefined>();
+  const { data: jvm } = useQuery({ queryKey: ['system', 'jvm'], queryFn: fetchSystemJvm });
   const system = useSystemDetails();
-
-  useEffect(() => {
-    let mounted = true;
-
-    SystemStore.jvm().then((jvmInfo) => {
-      if (mounted) {
-        setJvm(jvmInfo);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   return !(system && jvm) ? (
     <>

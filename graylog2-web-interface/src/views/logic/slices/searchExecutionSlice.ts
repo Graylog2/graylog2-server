@@ -225,10 +225,11 @@ export const executeWithExecutionState =
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) =>
-  (dispatch: ViewsDispatch) =>
-    dispatch(parseSearch(search, searchExecutors.parse))
+  async (dispatch: ViewsDispatch) => {
+    dispatch(loading());
+
+    return dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
-        dispatch(loading());
         dispatch(cancelExecutedJob());
 
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
@@ -242,6 +243,7 @@ export const executeWithExecutionState =
 
         throw error;
       });
+  };
 
 export const execute =
   ({

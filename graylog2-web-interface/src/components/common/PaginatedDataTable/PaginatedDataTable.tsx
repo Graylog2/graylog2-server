@@ -54,6 +54,7 @@ type Props = {
   headerCellFormatter?: (header: string) => React.ReactElement;
   /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
   headers: Array<string>;
+  hover?: boolean;
   /** Element id to use in the table container */
   id: string;
   /** Text or element to show when there is no data. */
@@ -88,6 +89,7 @@ const PaginatedDataTable = ({
   filterKeys = undefined,
   id,
   useResponsiveTable = false,
+  hover = undefined,
   ...rest
 }: Props) => {
   const rows = useMemo(() => rowsProp ?? [], [rowsProp]);

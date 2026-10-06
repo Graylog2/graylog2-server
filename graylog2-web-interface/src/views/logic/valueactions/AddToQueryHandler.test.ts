@@ -17,6 +17,7 @@
 import * as Immutable from 'immutable';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Query from 'views/logic/queries/Query';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import { createSearch } from 'fixtures/searches';
@@ -126,6 +127,106 @@ describe('AddToQueryHandler', () => {
     );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:43 AND baz:44');
+  });
+
+  it('combines multiple grouping values with OR when the value path operator is OR', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'a' }],
+          valuePathOperator: 'OR',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND (source:a OR target:a)');
+  });
+
+  it('combines an edge value path into a symmetric compound clause when the operator is EDGE', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'b' }],
+          valuePathOperator: 'EDGE',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND ((source:a AND target:b) OR (source:b AND target:a))',
+    );
+  });
+
+  it('resolves the field type per value path entry for mixed field types', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('bar').build())
+      .build();
+    // The value path mixes a `date` field with a `keyword` field. Each entry must be formatted
+    // according to its own field's type, not the type of the action's primary field.
+    const contexts = {
+      view,
+      widget,
+      valuePath: [{ timestamp: '2019-01-17T11:00:09.025Z' }, { took_ms: 42 }],
+      fieldTypes: Immutable.List([
+        new FieldTypeMapping('timestamp', new FieldType('date', [], [])),
+        new FieldTypeMapping('took_ms', new FieldType('keyword', [], [])),
+      ]),
+      analysisDisabledFields: [],
+      currentUser: alice,
+      message: {} as Message,
+      isLocalNode: true,
+    };
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'timestamp',
+        value: '2019-01-17T11:00:09.025Z',
+        type: new FieldType('date', [], []),
+        contexts,
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND timestamp:"2019-01-17T11:00:09.025Z" AND took_ms:42',
+    );
   });
 
   it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', async () => {

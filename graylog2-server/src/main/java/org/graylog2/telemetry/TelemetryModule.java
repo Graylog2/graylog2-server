@@ -19,18 +19,19 @@ package org.graylog2.telemetry;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
-import org.graylog2.telemetry.suppliers.UsersMetricsSupplier;
-import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.MongoDBMetricsSupplier;
-import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.LookupTablesSupplier;
+import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventDefinitionsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventNotificationsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.StreamsMetricsSupplier;
-import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
+import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.LookupTablesSupplier;
+import org.graylog2.telemetry.suppliers.MongoDBMetricsSupplier;
 import org.graylog2.telemetry.suppliers.NodesSystemMetricsSupplier;
+import org.graylog2.telemetry.suppliers.OutdatedIndicesMetricsSupplier;
+import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
+import org.graylog2.telemetry.suppliers.StreamsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.UsersMetricsSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override
@@ -53,5 +54,6 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Streams Metrics", StreamsMetricsSupplier.class);
         addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
         addTelemetryMetricProvider("Nodes System Metrics", NodesSystemMetricsSupplier.class);
+        addTelemetryMetricProvider("Outdated Indices Metrics", OutdatedIndicesMetricsSupplier.class);
     }
 }

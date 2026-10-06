@@ -30,6 +30,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import barOnClickPopover from 'views/components/visualizations/bar/barOnClickPopover';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -50,7 +51,7 @@ const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({
   marker: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
-const defineSingleDateBarWidth = (
+export const defineSingleDateBarWidth = (
   chartDataResult: ChartDefinition[],
   config: AggregationWidgetConfig,
   timeRangeFrom: string,
@@ -63,16 +64,21 @@ const defineSingleDateBarWidth = (
     return chartDataResult;
   }
 
-  return chartDataResult.map((data) => {
-    if (data?.x?.length === 1) {
-      // @ts-ignore
-      const timeRangeMS = new Date(timeRangeTo) - new Date(timeRangeFrom);
-      const widthXUnits = timeRangeMS * barWidth;
+  const distinctBarXValues = new Set(
+    chartDataResult.filter((data) => data?.type === 'bar').flatMap((data) => data?.x ?? []),
+  );
 
-      return {
-        ...data,
-        width: [Math.max(minXUnits, widthXUnits)],
-      };
+  if (distinctBarXValues.size !== 1) {
+    return chartDataResult;
+  }
+
+  const timeRangeMS = new Date(timeRangeTo).getTime() - new Date(timeRangeFrom).getTime();
+  const widthXUnits = timeRangeMS * barWidth;
+  const width = Math.max(minXUnits, widthXUnits);
+
+  return chartDataResult.map((data) => {
+    if (data?.type === 'bar' && data?.x?.length === 1) {
+      return { ...data, width: [width] };
     }
 
     return data;
@@ -151,7 +157,7 @@ const BarVisualization = makeVisualization(
       return _layouts;
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...barOnClickPopover, config });
 
     return (
       <>

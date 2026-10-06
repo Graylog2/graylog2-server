@@ -18,7 +18,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Formik, Form } from 'formik';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';
@@ -69,7 +69,7 @@ const StreamModal = ({
   initialValues = {
     title: '',
     description: '',
-    remove_matches_from_default_stream: false,
+    remove_matches_from_default_stream: true,
     share_request: null,
   },
   title: modalTitle,

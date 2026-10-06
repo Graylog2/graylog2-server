@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import type { ModalData } from 'views/logic/valueactions/createEventDefinition/types';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
-import { useStore } from 'stores/connect';
+import type { Stream } from 'logic/streams/types';
+import StreamsContext from 'contexts/StreamsContext';
 
 const useModalData = (mappedData) => {
-  const normalizedStreams: { [name: string]: Pick<Stream, 'id' | 'title'> } = useStore(StreamsStore, ({ streams }) =>
-    Object.fromEntries(streams.map((stream) => [stream.id, { id: stream.id, title: stream.title }])),
+  const allStreams = useContext(StreamsContext);
+  const normalizedStreams: { [name: string]: Pick<Stream, 'id' | 'title'> } = useMemo(
+    () => Object.fromEntries((allStreams ?? []).map((stream) => [stream.id, { id: stream.id, title: stream.title }])),
+    [allStreams],
   );
 
   return useMemo<ModalData>(() => {

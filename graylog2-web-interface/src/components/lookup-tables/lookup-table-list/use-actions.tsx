@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -34,19 +34,18 @@ type ActionsProps = {
 
 function Actions({ lut }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut');
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
-  }, [lut, navigate]);
+    push(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+  }, [lut, push]);
 
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
       app_pathname: 'lut',
-      app_section: 'lut',
     });
 
     deleteLookupTable(lut.id).then(() => setShowDeleteModal(false));

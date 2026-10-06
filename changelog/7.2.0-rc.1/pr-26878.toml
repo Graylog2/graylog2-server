@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Added needed input create permissions checks for the AWS CloudWatch and Kinesis input API endpoints."
+
+pulls = ["26878"]

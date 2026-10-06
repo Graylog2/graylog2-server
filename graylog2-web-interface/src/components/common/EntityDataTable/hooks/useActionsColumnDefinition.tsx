@@ -23,8 +23,18 @@ import styled, { css } from 'styled-components';
 import useResizeObserver from '@react-hook/resize-observer';
 
 import { ButtonToolbar } from 'components/bootstrap';
+import {
+  TABLE_ROW_HOVER_TRANSITION,
+  TABLE_ROW_PINNED_HOVER_BG_VAR,
+  flattenTableBackground,
+  isStripedRowIndex,
+} from 'components/bootstrap/Table';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import {
+  ACTIONS_COL_ID,
+  CELL_PADDING_HORIZONTAL,
+  CELL_PADDING_VERTICAL,
+} from 'components/common/EntityDataTable/Constants';
 import { actionsHeaderWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 const AlignRight = styled.div`
@@ -33,22 +43,34 @@ const AlignRight = styled.div`
   height: 100%;
 `;
 
-const BackgroundFoundation = styled.div<{ $parentBgColor: string }>(
-  ({ theme, $parentBgColor }) => css`
-    background-color: ${$parentBgColor ?? theme.colors.global.contentBackground};
-    height: 100%;
-    width: var(${actionsHeaderWidthVar});
+const BackgroundFoundation = styled.div`
+  height: 100%;
+  width: var(${actionsHeaderWidthVar});
+  overflow: hidden;
+`;
+
+const HeaderBackground = styled(BackgroundFoundation)(
+  ({ theme }) => css`
+    background-color: ${flattenTableBackground(theme, theme.colors.table.head.background)};
   `,
 );
 
-const Actions = styled.div<{ $isEvenRow: boolean }>(
-  ({ $isEvenRow, theme }) => css`
+const Actions = styled.div<{ $isStripedRow: boolean }>(
+  ({ $isStripedRow, theme }) => css`
     display: flex;
     justify-content: flex-end;
-    padding: ${CELL_PADDING}px;
-    background: ${$isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped};
+    padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+    background-color: ${flattenTableBackground(
+      theme,
+      $isStripedRow ? theme.colors.table.row.backgroundStriped : theme.colors.table.row.background,
+    )};
     height: 100%;
-    align-items: flex-start;
+    align-items: center;
+    transition: ${TABLE_ROW_HOVER_TRANSITION};
+
+    tr:hover & {
+      background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
+    }
   `,
 );
 
@@ -56,12 +78,10 @@ const ActionCell = <Entity extends EntityBase>({
   row,
   entityActions,
   onWidthChange,
-  parentBgColor,
 }: {
   row: Row<Entity>;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   onWidthChange: (rowId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -75,8 +95,8 @@ const ActionCell = <Entity extends EntityBase>({
 
   return (
     <AlignRight>
-      <BackgroundFoundation $parentBgColor={parentBgColor}>
-        <Actions $isEvenRow={row.index % 2 === 0}>
+      <BackgroundFoundation>
+        <Actions $isStripedRow={isStripedRowIndex(row.index + 1)}>
           <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
         </Actions>
       </BackgroundFoundation>
@@ -89,37 +109,30 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   entityActions,
   hasRowActions,
   onWidthChange,
-  parentBgColor,
 }: {
   colWidth: number;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   hasRowActions: boolean;
   minWidth: number;
   onWidthChange: (colId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
     ({ row }: { row: Row<Entity> }) =>
       entityActions ? (
-        <ActionCell<Entity>
-          row={row}
-          entityActions={entityActions}
-          onWidthChange={onWidthChange}
-          parentBgColor={parentBgColor}
-        />
+        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
       ) : null,
-    [entityActions, onWidthChange, parentBgColor],
+    [entityActions, onWidthChange],
   );
 
   const header = useCallback(
     () => (
       <AlignRight>
-        <BackgroundFoundation $parentBgColor={parentBgColor} />
+        <HeaderBackground />
       </AlignRight>
     ),
-    [parentBgColor],
+    [],
   );
 
   return useMemo(

@@ -56,8 +56,6 @@ jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(),
@@ -333,7 +331,6 @@ describe('InputSetupWizard Start Input', () => {
     it('should show the progress for all steps', async () => {
       renderWizard();
       await createStream();
-      await goToStartInputStep();
       await startInput();
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
@@ -345,7 +342,6 @@ describe('InputSetupWizard Start Input', () => {
     it('should start the input', async () => {
       renderWizard();
       await createStream();
-      await goToStartInputStep();
       await startInput();
 
       await waitFor(() => expect(ClusterInputState.start).toHaveBeenCalledWith(input.id));
@@ -354,7 +350,6 @@ describe('InputSetupWizard Start Input', () => {
     it('should create the new stream', async () => {
       renderWizard();
       await createStream();
-      await goToStartInputStep();
       await startInput();
 
       await waitFor(() =>
@@ -368,7 +363,6 @@ describe('InputSetupWizard Start Input', () => {
     it('should start the new stream', async () => {
       renderWizard();
       await createStream();
-      await goToStartInputStep();
       await startInput();
 
       await waitFor(() => expect(Streams.resume).toHaveBeenCalled());

@@ -533,10 +533,10 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Open Sidebar'));
 
+      expect(useSendTelemetry).toHaveBeenCalledWith('right-sidebar');
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED,
         expect.objectContaining({
-          app_section: 'right-sidebar',
           event_details: { content_id: 'test-sidebar', component_key: undefined },
         }),
       );
@@ -554,10 +554,7 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Close Sidebar'));
 
-      expect(mockSendTelemetry).toHaveBeenCalledWith(
-        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
-      );
+      expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED, expect.anything());
     });
 
     it('sends COLLAPSED event when collapsing sidebar', async () => {
@@ -572,10 +569,7 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Collapse Sidebar'));
 
-      expect(mockSendTelemetry).toHaveBeenCalledWith(
-        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
-      );
+      expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED, expect.anything());
     });
 
     it('sends EXPANDED event when expanding sidebar', async () => {
@@ -591,10 +585,7 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Expand Sidebar'));
 
-      expect(mockSendTelemetry).toHaveBeenCalledWith(
-        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
-      );
+      expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED, expect.anything());
     });
 
     it('sends NAVIGATED_BACK event when going back', async () => {
@@ -612,7 +603,7 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.anything(),
       );
     });
 
@@ -632,7 +623,7 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.anything(),
       );
     });
   });

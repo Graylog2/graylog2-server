@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add support for validating MCP tool call arguments. Upgrade io.modelcontextprotocol.sdk dependency to version 2.0.0"
+
+issues = [""]
+pulls = ["26526"]

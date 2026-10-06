@@ -20,25 +20,16 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useInputsStates from 'hooks/useInputsStates';
-import { useStore } from 'stores/connect';
+import useInputsList from 'hooks/useInputs';
 import { useQueryParams } from 'routing/QueryParams';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 import InputsNotifications from './InputsNotifications';
 
-const mockInputsActionsList = jest.fn();
 const mockSetQueryParams = jest.fn();
 
 jest.mock('hooks/useInputsStates');
-jest.mock('stores/connect', () => ({
-  useStore: jest.fn(),
-}));
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsStore: {},
-  InputsActions: {
-    list: (...args: any) => mockInputsActionsList(...args),
-  },
-}));
+jest.mock('hooks/useInputs');
 jest.mock('routing/QueryParams', () => ({
   ...jest.requireActual('routing/QueryParams'),
   useQueryParams: jest.fn(),
@@ -55,7 +46,7 @@ describe('<InputsNotifications />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useQueryParams).mockReturnValue([{}, mockSetQueryParams]);
-    asMock(useStore).mockReturnValue([{ id: 'input-1' }, { id: 'input-2' }]);
+    asMock(useInputsList).mockReturnValue({ data: [{ id: 'input-1' }, { id: 'input-2' }] } as any);
   });
 
   it('renders filter links for failed/setup/stopped warnings', () => {

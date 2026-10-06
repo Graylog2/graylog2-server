@@ -54,6 +54,9 @@ const BootstrapModalForm = ({
   const form = useRef(null);
 
   const submit = (event) => {
+    // The modal can be rendered inside another form, make sure the submit event does not reach it.
+    event.stopPropagation();
+
     const formDOMNode = form.current;
 
     if (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) {

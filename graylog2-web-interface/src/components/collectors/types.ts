@@ -25,6 +25,26 @@ export type Fleet = {
   updated_at: string;
 };
 
+// Mirrors the OpAMP ComponentHealth message as stored/served by the backend.
+// Recursive; today's agent only ever fills the root node (healthy + last_error).
+export type ComponentHealth = {
+  healthy: boolean;
+  status?: string;
+  last_error?: string;
+  start_time?: string;
+  status_time?: string;
+  components?: Record<string, ComponentHealth>;
+};
+
+export type CollectorHealth = {
+  // Server-clocked timestamp of the last root-`healthy` transition. All health timestamps
+  // (`healthy_changed_at`, `start_time`, `status_time`) are backend-rendered with a
+  // `+0000`-style offset, unlike the instance-level timestamps' `Z` — fine for RelativeTime,
+  // never string-compare timestamps.
+  healthy_changed_at: string;
+  component_health: ComponentHealth;
+};
+
 export type CollectorInstanceView = {
   id: string;
   instance_uid: string;
@@ -42,9 +62,13 @@ export type CollectorInstanceView = {
   os: string | null;
   version: string | null;
   status: 'online' | 'offline';
+  has_pending_changes: boolean;
+  // The fleet the instance is being moved to, until the collector checks in and fleet_id is updated.
+  pending_fleet_id: string | null;
+  health: CollectorHealth | null;
 };
 
-export type SourceType = 'file' | 'journald' | 'windows_event_log';
+export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'macos_unified_logging';
 
 export type SourceBase = {
   id: string;
@@ -75,10 +99,21 @@ export type WindowsEventLogSourceConfig = {
   read_mode: 'beginning' | 'end';
 };
 
+export type MacOSUnifiedLoggingSourceConfig = {
+  predicate?: string;
+  // ISO-8601 durations (e.g. 'PT30S', 'PT24H')
+  max_poll_interval: string;
+  max_log_age: string;
+};
+
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type Source = FileSource | JournaldSource | WindowsEventLogSource;
+export type MacOSUnifiedLoggingSource = SourceBase & {
+  type: 'macos_unified_logging';
+  config: MacOSUnifiedLoggingSourceConfig;
+};
+export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 
 export type EnrollmentTokenCreator = {
   user_id: string;
@@ -124,6 +159,7 @@ export type CollectorsConfig = {
   token_signing_key: TokenSigningKey | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
+  collector_heartbeat_interval: string;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
@@ -151,6 +187,8 @@ export type FleetStatsSummary = {
   online_instances: number;
   offline_instances: number;
   total_sources: number;
+  // Instances that are or will be in this fleet, counting pending reassignments. Deleting requires 0.
+  assigned_instances: number;
 };
 
 export type BulkFleetStatsResponse = {
@@ -191,5 +229,19 @@ export type FleetReassignedActivityEntry = ActivityEntryBase & {
 export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
 
 export type RecentActivityResponse = {
+  activities: ActivityEntry[];
+};
+
+export type CoalescedActions = {
+  recompute_config: boolean;
+  recompute_ingest_config: boolean;
+  reassign: boolean;
+  restart: boolean;
+  run_discovery: boolean;
+};
+
+export type PendingChangesResponse = {
+  has_pending_changes: boolean;
+  coalesced: CoalescedActions;
   activities: ActivityEntry[];
 };

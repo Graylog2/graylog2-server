@@ -19,7 +19,7 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { css } from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
 import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
 import useCurrentUser from 'hooks/useCurrentUser';

@@ -31,6 +31,9 @@ public abstract class NodeInfo {
     }
 
     @JsonProperty
+    public abstract String name();
+
+    @JsonProperty
     public abstract String version();
 
     @JsonProperty
@@ -44,6 +47,8 @@ public abstract class NodeInfo {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        public abstract Builder name(String name);
+
         public abstract Builder version(String version);
 
         public abstract Builder os(Object os);

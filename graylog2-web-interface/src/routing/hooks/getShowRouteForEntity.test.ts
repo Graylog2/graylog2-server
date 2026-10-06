@@ -16,11 +16,12 @@
  */
 
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
+import { PluginManifest } from 'graylog-web-plugin/plugin';
 
 import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
 import type { QualifiedUrl } from 'routing/Routes';
 import Routes from 'routing/Routes';
+import { usePlugin } from 'views/test/testPlugins';
 
 describe('getShowRouteFromGRN', () => {
   describe('should return correct route', () => {
@@ -46,9 +47,7 @@ describe('getShowRouteFromGRN', () => {
       },
     );
 
-    beforeAll(() => PluginStore.register(plugin));
-
-    afterAll(() => PluginStore.unregister(plugin));
+    usePlugin(plugin);
 
     it('should return entity routes defined by plugins', () => {
       const { result } = renderHook(() => useShowRouteForEntity('special-id', 'dashboard'));

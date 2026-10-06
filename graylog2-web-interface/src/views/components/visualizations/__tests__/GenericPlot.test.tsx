@@ -27,10 +27,6 @@ import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
-// We need to mock the Popover, because it implements the GraylogThemeProvider which does not render its children
-// without CurrentUser & UserPreferences
-jest.mock('components/bootstrap/Popover');
-
 jest.mock('views/components/visualizations/plotly/AsyncPlot', () => jest.fn());
 jest.mock('components/common/ColorPicker', () => 'color-picker');
 

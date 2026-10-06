@@ -148,8 +148,14 @@ public class SearchQueryParser {
      */
     public SearchQueryParser(@Nonnull String defaultField,
                              @Nonnull final List<EntityAttribute> attributes) {
+        this(defaultField, attributes, Map.of());
+    }
 
+    public SearchQueryParser(@Nonnull String defaultField,
+                             @Nonnull final List<EntityAttribute> attributes,
+                             @Nonnull final Map<String, SearchQueryField> extraSearchFields) {
         this.dbFieldMapping = DbFieldMappingCreator.createFromEntityAttributes(attributes);
+        this.dbFieldMapping.putAll(extraSearchFields);
         final SearchQueryField resolvedDefault = this.dbFieldMapping.get(requireNonNull(defaultField));
         if (resolvedDefault != null) {
             this.defaultField = resolvedDefault.getDbField();

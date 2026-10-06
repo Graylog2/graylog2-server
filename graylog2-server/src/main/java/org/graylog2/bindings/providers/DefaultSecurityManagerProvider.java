@@ -20,6 +20,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
@@ -32,10 +34,12 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.OrderedAuthenticatingRealms;
+import org.graylog2.security.sessions.AuthenticationInfoWithSessionAuthContext;
+import org.graylog2.security.sessions.SessionAuthContext;
 import org.graylog2.security.sessions.SessionDAO;
-import org.graylog2.shared.security.PersistSessionDataListener;
 import org.graylog2.shared.security.ThrowingFirstSuccessfulStrategy;
 
 import java.util.ArrayList;
@@ -45,20 +49,36 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityManager> {
-    private DefaultSecurityManager sm = null;
+    private final DefaultSecurityManager sm;
 
     @Inject
     public DefaultSecurityManagerProvider(SessionDAO sessionDAO,
                                           Map<String, AuthorizingRealm> authorizingOnlyRealms,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                           OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
-        sm = new DefaultSecurityManager(orderedAuthenticatingRealms);
+
+        this.sm = new DefaultSecurityManager(orderedAuthenticatingRealms) {
+            /**
+             * If the authentication info carries a {@link SessionAuthContext}, persist it to the subject's session —
+             * eagerly creating one if none exists. The presence of a {@link SessionAuthContext} signals that this
+             * login is expected to produce a server-side session.
+             */
+            @Override
+            protected void onSuccessfulLogin(AuthenticationToken token, AuthenticationInfo info, Subject subject) {
+                super.onSuccessfulLogin(token, info, subject);
+                if (info instanceof AuthenticationInfoWithSessionAuthContext(
+                        AuthenticationInfo ignored, SessionAuthContext sessionAuthContext
+                )) {
+                    subject.getSession().setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
+                }
+            }
+        };
+
         final Authenticator authenticator = sm.getAuthenticator();
         if (authenticator instanceof ModularRealmAuthenticator modularAuthenticator) {
             FirstSuccessfulStrategy strategy = new ThrowingFirstSuccessfulStrategy();
             strategy.setStopAfterFirstSuccess(true);
             modularAuthenticator.setAuthenticationStrategy(strategy);
-            modularAuthenticator.setAuthenticationListeners(List.of(new PersistSessionDataListener()));
         }
 
         List<Realm> authorizingRealms = new ArrayList<>();

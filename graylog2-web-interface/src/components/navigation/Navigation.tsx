@@ -61,6 +61,9 @@ const BrandLink = styled(Link)(
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const pluginBadges = usePluginEntities('navigation.badges');
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -79,6 +82,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
 
+        {activePluginBadges.map(({ key, component: PluginBadge }) => (
+          <PluginBadge key={key} />
+        ))}
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">

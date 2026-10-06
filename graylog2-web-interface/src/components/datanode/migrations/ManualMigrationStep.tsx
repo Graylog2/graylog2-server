@@ -31,17 +31,16 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const inPlaceMigrationAction: MigrationActions = 'SELECT_ROLLING_UPGRADE_MIGRATION';
 
-  const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) =>
+  const onMigrationStepChange = async (step: MigrationActions, args: StepArgs = {}) =>
     onTriggerNextState({ step, args });
 
-  const handleSelectMigrationType = async (step: MigrationActions, args?: StepArgs = {}) => {
+  const handleSelectMigrationType = async (step: MigrationActions, args: StepArgs = {}) => {
     if (step === inPlaceMigrationAction) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
         app_pathname: 'datanode',
-        app_section: 'migration',
         event_details: { migration_type: 'IN-PLACE' },
       });
     }

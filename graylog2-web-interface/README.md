@@ -26,7 +26,7 @@ E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server i
 
 ## Contributing
 
-Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of our conventions, best practices and tips.
+Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute, and at [CONVENTIONS.md](CONVENTIONS.md) for our coding conventions and best practices.
 
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:
@@ -34,6 +34,8 @@ There's an online version of the frontend documentation and component gallery at
 [https://graylog2.github.io/frontend-documentation/](https://graylog2.github.io/frontend-documentation/)
 
 The online version is automatically deployed and reflects the current state of the `master` branch in this repository.
+
+Note: We are migrating to a new design system. Please refer to the new design system at [https://graylog2.github.io/design-system](https://graylog2.github.io/design-system) for up-to-date component documentation and guidelines.
 
 ### Run documentation locally
 You may also run the documentation locally to contribute to it or see a different version than the current master:

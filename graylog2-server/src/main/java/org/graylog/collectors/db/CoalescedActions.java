@@ -41,4 +41,15 @@ public record CoalescedActions(boolean recomputeConfig,
     public static CoalescedActions empty(long currentSeq) {
         return new CoalescedActions(false, false, null, false, false, currentSeq);
     }
+
+    /**
+     * Sets both recompute flags because markers up to {@code purgeBoundary} may have been purged
+     * from the transaction log and can no longer be replayed. Advances {@link #maxSeq()} to at
+     * least the boundary so that the collector's APPLIED report moves its cursor past the purged
+     * range.
+     */
+    public CoalescedActions withForcedRecompute(long purgeBoundary) {
+        return new CoalescedActions(true, true, newFleetId(), restart(),
+                runDiscovery(), Math.max(maxSeq(), purgeBoundary));
+    }
 }

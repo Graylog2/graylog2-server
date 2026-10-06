@@ -33,9 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
@@ -44,14 +43,13 @@ import static org.mockito.Mockito.verify;
 class EntityListPreferencesCleanerOnUserDeletionTest {
     private AsyncEventBus eventBus;
     private EntityListPreferencesService service;
-    @SuppressWarnings("unused")
-    private EntityListPreferencesCleanerOnUserDeletion listener;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp(MongoCollections mongoCollections) {
         this.eventBus = new AsyncEventBus(MoreExecutors.directExecutor());
         this.service = Mockito.spy(new EntityListPreferencesServiceImpl(mongoCollections));
-        this.listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
+        final EntityListPreferencesCleanerOnUserDeletion listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
     }
 
     @Test
@@ -65,7 +63,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId1)
-                .preferences(EntityListPreferences.create(List.of(), 42, null))
+                .preferences(mock(EntityListPreferences.class))
                 .build());
 
         final StoredEntityListPreferencesId preferenceId2 = StoredEntityListPreferencesId.builder()
@@ -74,7 +72,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId2)
-                .preferences(EntityListPreferences.create(List.of(), 42, null))
+                .preferences(mock(EntityListPreferences.class))
                 .build());
 
         //verify they are present

@@ -24,6 +24,7 @@ import DecoratedValue from 'views/components/messagelist/decoration/DecoratedVal
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type { NumberAlignment } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import ElementDimensions from 'components/common/ElementDimensions';
@@ -34,13 +35,23 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 import AutoFontSizer from './AutoFontSizer';
 import Trend from './Trend';
+import trendDirection, { trendBackground } from './trendDirection';
+import type { TrendDirection } from './trendDirection';
 
-const Container = styled.div<{ $height: number }>(
-  ({ $height }) => css`
+const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(({ theme, $height, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
+
+  return css`
     height: ${$height}px;
     width: 100%;
-  `,
-);
+    ${$trend &&
+    css`
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
 
 const GridContainer = styled(Container)`
   display: grid;
@@ -59,12 +70,18 @@ const SingleItemGrid = styled(Container)`
 const NumberBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
-  padding-bottom: 10px;
+  padding-bottom: ${({ theme }) => theme.spacings.xxs};
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const TrendBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const _extractValueAndField = (rows: Rows) => {
@@ -91,6 +108,8 @@ const _extractFirstSeriesName = (config) => {
   return series.length === 0 ? undefined : series[0].function;
 };
 
+const DEFAULT_ALIGNMENT: NumberAlignment = 'bottom-right';
+
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
   const targetRef = useRef();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
@@ -100,6 +119,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
     (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
+  const alignment = visualizationConfig.alignment ?? DEFAULT_ALIGNMENT;
 
   useEffect(onRenderComplete, [onRenderComplete]);
   const chartRows = retrieveChartData(data);
@@ -119,12 +139,19 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   }
 
   const ContainerComponent = visualizationConfig.trend ? GridContainer : SingleItemGrid;
+  const trend = visualizationConfig.trend
+    ? trendDirection(value, previousValue, visualizationConfig.trendPreference)
+    : undefined;
+  const highlightEntireWidget = visualizationConfig.colorPreference !== 'TREND_ONLY';
 
   return (
-    <ContainerComponent $height={heightProp}>
-      <NumberBox resizeDelay={20}>
+    <ContainerComponent
+      $height={heightProp}
+      $trend={highlightEntireWidget ? trend : undefined}
+      data-testid="trend-background">
+      <NumberBox resizeDelay={50}>
         {({ height, width }) => (
-          <AutoFontSizer height={height} width={width} center>
+          <AutoFontSizer height={height} width={width} alignment={alignment}>
             <CustomHighlighting field={field} value={value}>
               <Value
                 field={field}
@@ -140,13 +167,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
       {visualizationConfig.trend && (
         <TrendBox>
           {({ height, width }) => (
-            <AutoFontSizer height={height} width={width} target={targetRef}>
+            <AutoFontSizer height={height} width={width} target={targetRef} alignment={alignment}>
               <Trend
                 ref={targetRef}
                 current={value}
                 previous={previousValue}
-                trendPreference={visualizationConfig.trendPreference}
                 unit={unit}
+                trend={highlightEntireWidget ? undefined : trend}
               />
             </AutoFontSizer>
           )}

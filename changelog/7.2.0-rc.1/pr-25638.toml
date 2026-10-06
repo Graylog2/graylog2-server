@@ -1,0 +1,4 @@
+type = "c"
+message = "Indices directory parser optimizations and parallelism for faster and more reliable preflight checks in datanode"
+
+pulls = ["25638"]

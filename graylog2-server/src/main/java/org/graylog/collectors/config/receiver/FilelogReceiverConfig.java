@@ -135,6 +135,17 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
 
         public abstract Builder storage(String storage);
 
-        public abstract FilelogReceiverConfig build();
+        abstract FilelogReceiverConfig autoBuild();
+
+        public FilelogReceiverConfig build(CollectorOSType osType) {
+            // The file_log receiver doesn't support the "include_file_owner_name" and "include_file_owner_group_name"
+            // options on Windows. Setting the values to true would fail the OTel collector startup.
+            // See: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver#configuration
+            if (CollectorOSType.WINDOWS.equals(osType)) {
+                includeFileOwnerName(false);
+                includeFileOwnerGroupName(false);
+            }
+            return autoBuild();
+        }
     }
 }

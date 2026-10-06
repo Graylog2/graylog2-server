@@ -17,8 +17,8 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Icon } from 'components/common';
-import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';
+import { ClearFloat, Icon } from 'components/common';
+import { Button, ButtonToolbar, Col, FormGroup } from 'components/bootstrap';
 import {
   emptyBooleanExpressionConfig,
   emptyGroupExpressionConfig,
@@ -241,7 +241,7 @@ class AggregationConditionExpression extends React.Component<
             operator={this.getEffectiveGlobalGroupOperator()}
             onOperatorChange={this.handleOperatorChange}
           />
-          <Clearfix />
+          <ClearFloat />
           {expressionComponent}
         </>
       );

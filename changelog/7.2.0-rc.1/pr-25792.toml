@@ -1,0 +1,4 @@
+type = "f"
+message = "Validate index field type profiles when saving and updating them."
+
+pulls = ["25792"]

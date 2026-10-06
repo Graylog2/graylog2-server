@@ -20,15 +20,24 @@ import { CollectorsActivity } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
+import useCollectorRefetchInterval from './useCollectorRefetchInterval';
+// Import directly (not via '../hooks'): useRecentActivity is itself re-exported from that barrel,
+// so going through it would risk a circular import.
+import useCollectorPermissions from './useCollectorPermissions';
+
 import type { RecentActivityResponse } from '../types';
 
 export const ACTIVITY_KEY = ['collectors', 'activity', 'recent'];
 
 const fetchRecentActivity = (): Promise<RecentActivityResponse> =>
-  CollectorsActivity.recent() as Promise<RecentActivityResponse>;
+  // The activity feed auto-refreshes; don't let its polling keep idle sessions alive.
+  CollectorsActivity.recent({ requestShouldExtendSession: false }) as Promise<RecentActivityResponse>;
 
-export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } =>
-  useQuery<RecentActivityResponse>({
+export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } => {
+  const refetchInterval = useCollectorRefetchInterval();
+  const { canReadActivities } = useCollectorPermissions();
+
+  return useQuery<RecentActivityResponse>({
     queryKey: ACTIVITY_KEY,
     queryFn: () =>
       defaultOnError(
@@ -36,5 +45,9 @@ export const useRecentActivity = (): { data: RecentActivityResponse | undefined;
         'Loading recent activity failed with status',
         'Could not load recent activity',
       ),
-    refetchInterval: 30000,
+    refetchInterval,
+    // A 403 here would be reported by FetchProvider and replace the whole Overview page
+    // (FetchProvider.ts:47). The activity feed is an optional panel, so skip the request instead.
+    enabled: canReadActivities,
   });
+};

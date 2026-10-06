@@ -162,7 +162,10 @@ public class IndexSetTemplateService {
                         filter
                 ))
                 .into(new ArrayList<>());
-        templates.sort(Comparator.comparing(indexSetTemplate -> indexSetTemplate.indexSetConfig().dataTieringConfig().indexLifetimeMax().getMillis()));
+        templates.sort(Comparator.comparingInt(indexSetTemplate ->
+                Optional.ofNullable(indexSetTemplate.indexSetConfig().dataTieringConfig())
+                        .map(i -> i.indexLifetimeMax().getMillis())
+                        .orElse(0)));
         return templates;
     }
 }

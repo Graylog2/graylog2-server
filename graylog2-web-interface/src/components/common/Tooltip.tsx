@@ -18,6 +18,8 @@ import * as React from 'react';
 import { Tooltip as MantineTooltip } from '@mantine/core';
 import { useTheme } from 'styled-components';
 
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
+
 type Props = React.ComponentProps<typeof MantineTooltip>;
 
 const Tooltip = ({ ...props }: Props) => {
@@ -27,11 +29,21 @@ const Tooltip = ({ ...props }: Props) => {
       backgroundColor: theme.colors.global.contentBackground,
       color: theme.colors.text.primary,
       fontWeight: 400,
-      fontSize: theme.fonts.size.root,
+      fontSize: theme.fonts.size.small,
+      padding: `${theme.spacings.xs} ${theme.spacings.sm}`,
+      borderRadius: '6px',
+      boxShadow: `0 2px 8px rgb(0 0 0 / ${theme.mode === COLOR_SCHEME_LIGHT ? '10%' : '40%'})`,
     },
   });
 
-  return <MantineTooltip zIndex="var(--mantine-z-index-max)" styles={styles} {...props} />;
+  return (
+    <MantineTooltip
+      zIndex="var(--mantine-z-index-max)"
+      styles={styles}
+      events={{ hover: true, focus: true, touch: false }}
+      {...props}
+    />
+  );
 };
 
 export default Tooltip;

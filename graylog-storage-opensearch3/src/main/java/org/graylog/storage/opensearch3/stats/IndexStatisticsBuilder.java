@@ -122,7 +122,7 @@ public class IndexStatisticsBuilder {
                         return shardRouting;
                     }).toList();
                 }).flatMap(List::stream)
-                .sorted(Comparator.comparing(org.graylog2.rest.models.system.indexer.responses.ShardRouting::id).thenComparing(org.graylog2.rest.models.system.indexer.responses.ShardRouting::nodeId))
+                .sorted(Comparator.comparingInt(org.graylog2.rest.models.system.indexer.responses.ShardRouting::id).thenComparing(org.graylog2.rest.models.system.indexer.responses.ShardRouting::nodeId))
                 .toList();
 
     }

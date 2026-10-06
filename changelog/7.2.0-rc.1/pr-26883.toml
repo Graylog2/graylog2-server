@@ -1,0 +1,4 @@
+type = "s"
+message = "Prevent users from assigning permissions or roles they do not hold themselves when creating or updating a user."
+
+pulls = ["26883"]

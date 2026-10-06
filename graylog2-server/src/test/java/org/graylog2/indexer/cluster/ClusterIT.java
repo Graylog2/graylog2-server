@@ -21,11 +21,15 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -82,6 +87,45 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     public void getDiskUsageStats() {
         final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
         assertThat(diskUsageStats).isNotEmpty();
+    }
+
+    @Test
+    public void getNodesUtilization() {
+        final Map<String, NodeUtilization> nodesUtilization = cluster.getNodesUtilization();
+        assertThat(nodesUtilization).isNotEmpty();
+        assertThat(nodesUtilization.values()).allSatisfy(node -> {
+            assertThat(node.name()).isNotBlank();
+            assertThat(node.cpuPercent()).isGreaterThanOrEqualTo(0);
+            assertThat(node.jvmHeapUsedPercent()).isGreaterThanOrEqualTo(0);
+        });
+    }
+
+    @Test
+    public void getNodesInfo() {
+        final Map<String, NodeInfo> nodesInfo = cluster.getNodesInfo();
+        assertThat(nodesInfo).isNotEmpty();
+        assertThat(nodesInfo.values()).allSatisfy(node -> {
+            assertThat(node.name()).isNotBlank();
+            assertThat(node.version()).isNotBlank();
+            assertThat(node.jvmMemHeapMaxInBytes()).isGreaterThan(0);
+            assertThat(node.roles()).isNotEmpty();
+        });
+    }
+
+    @Test
+    public void clusterShardAllocation() {
+        client().createRandomIndex("cluster_it_");
+
+        final ClusterShardAllocation allocation = cluster.clusterShardAllocation();
+
+        // Elasticsearch leaves the maximum unbounded on purpose (see ClusterAdapterES7), OpenSearch reads the real
+        // cluster.max_shards_per_node; both are positive, and the notification path only compares a ratio of it.
+        assertThat(allocation.maxShardsPerNode()).isPositive();
+        assertThat(allocation.nodeShardAllocations()).isNotEmpty();
+        assertThat(allocation.nodeShardAllocations()).allSatisfy(node ->
+                assertThat(node.node()).isNotBlank());
+        assertThat(allocation.nodeShardAllocations().stream().mapToInt(NodeShardAllocation::shards).sum())
+                .isGreaterThanOrEqualTo(1);
     }
 
     @Test

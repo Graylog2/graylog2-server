@@ -14,29 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as JSON from 'util/json';
+
 const ObjectUtils = {
   clone<T>(object: T): T {
     return JSON.parse(JSON.stringify(object));
-  },
-
-  isEmpty(object) {
-    const keys = Object.keys(object);
-
-    return keys && keys.length === 0;
-  },
-
-  trimObjectFields(obj: object, fieldsToTrim: string[]) {
-    const newObj = { ...obj };
-
-    if (fieldsToTrim.length > 0) {
-      fieldsToTrim.forEach((field) => {
-        if (field in obj && typeof obj[field] === 'string') {
-          newObj[field] = obj[field].trim();
-        }
-      });
-    }
-
-    return newObj;
   },
 };
 

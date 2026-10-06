@@ -51,8 +51,6 @@ public interface InputService {
 
     String save(Input model) throws ValidationException;
 
-    String saveWithoutEvents(Input input) throws ValidationException;
-
     String update(Input input) throws ValidationException;
 
     int destroy(Input input);
@@ -118,6 +116,11 @@ public interface InputService {
     void addStaticField(Input input, String key, String value) throws ValidationException;
 
     List<Extractor> getExtractors(String inputId);
+
+    /**
+     * Returns the number of embedded extractors for each of the given input IDs in a single query.
+     */
+    Map<String, Integer> extractorCountByInputId(Collection<String> inputIds);
 
     Extractor getExtractor(Input input, String extractorId) throws NotFoundException;
 

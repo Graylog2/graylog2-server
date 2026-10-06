@@ -16,19 +16,29 @@
  */
 import React from 'react';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import DocsHelper from 'util/DocsHelper';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import CreateButton from 'components/common/CreateButton';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesPageNavigation />
     <PageHeader
       title="Pipelines overview"
-      actions={<CreateButton entityKey="Pipeline" />}
+      actions={
+        <ButtonToolbar>
+          <EnableDebugMetricsButton />
+          <CreateButton entityKey="Pipeline" />
+        </ButtonToolbar>
+      }
       documentationLink={{
         title: 'Pipelines documentation',
         path: DocsHelper.PAGES.PIPELINES,
@@ -40,7 +50,10 @@ const PipelinesOverviewPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <ProcessingTimelineComponent />
+        <ProcessingLoadProvider>
+          <ProcessingLoadDebugMetricsBanner />
+          <ProcessingTimelineComponent />
+        </ProcessingLoadProvider>
       </Col>
     </Row>
   </DocumentTitle>

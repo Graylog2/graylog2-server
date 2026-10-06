@@ -31,4 +31,5 @@ public class IndicesAdapterOS2IT extends IndicesAdapterIT {
     protected SearchServerInstance searchServer() {
         return openSearchInstance;
     }
+
 }

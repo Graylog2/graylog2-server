@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix problem in `GET /messages/{index}/{messageId}`. Permission requirements introduced by previous security fix have been too strong, they have been relaxed."
+
+pulls = ["26657"]

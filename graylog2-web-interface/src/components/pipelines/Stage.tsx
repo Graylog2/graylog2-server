@@ -21,11 +21,9 @@ import { Col, Button } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import { useStore } from 'stores/connect';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import type { RuleType } from 'stores/rules/RulesStore';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import { useRules, deleteRule } from 'components/rules/hooks/useRules';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import usePermissions from 'hooks/usePermissions';
 import { PIPELINE_QUERY_KEY } from 'hooks/usePipeline';
 
 import StageForm from './StageForm';
@@ -43,9 +41,9 @@ type Props = {
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit = false }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const queryClient = useQueryClient();
-  const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
+  const { data: allRules } = useRules();
   const [removingRuleId, setRemovingRuleId] = useState<string | undefined>(undefined);
   const [rulePendingRemoval, setRulePendingRemoval] = useState<RuleType | undefined>(undefined);
 
@@ -54,8 +52,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
     [allRules, stage.rules],
   );
 
-  const canRemoveRoutingRules =
-    pipeline.title === DEFAULT_ROUTING_PIPELINE && isPermitted(currentUser.permissions, 'pipeline_rule:delete');
+  const canRemoveRoutingRules = pipeline.title === DEFAULT_ROUTING_PIPELINE && isPermitted('pipeline_rule:delete');
 
   const openRemoveRoutingRuleDialog = useCallback(
     (rule: RuleType) => {
@@ -79,8 +76,11 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
 
     setRulePendingRemoval(undefined);
     setRemovingRuleId(ruleToDelete.id);
-    RulesActions.delete(ruleToDelete)
+    deleteRule(ruleToDelete)
       .then(() => queryClient.invalidateQueries({ queryKey: [...PIPELINE_QUERY_KEY, pipeline.id] }))
+      .catch(() => {
+        /* feedback handled in deleteRule */
+      })
       .finally(() => setRemovingRuleId(undefined));
   }, [pipeline.id, queryClient, removingRuleId, rulePendingRemoval]);
 
@@ -95,7 +95,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
 
   const actions = [
     <Button
-      disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
+      disabled={!isPermitted('pipeline:edit') || disableEdit}
       key={`delete-stage-${stage}`}
       bsStyle="danger"
       onClick={onDelete}>

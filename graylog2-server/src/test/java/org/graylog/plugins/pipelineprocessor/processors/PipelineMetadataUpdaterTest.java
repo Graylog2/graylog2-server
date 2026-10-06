@@ -121,6 +121,18 @@ class PipelineMetadataUpdaterTest {
     }
 
     @Test
+    void testHandleStreamChanged() {
+        when(pipelineMetadataService.getPipelinesReferencingStream("stream1")).thenReturn(Set.of("id1", "id2"));
+
+        updater.handleStreamChanged("stream1", state);
+
+        ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any());
+        assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id1")));
+        assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id2")));
+    }
+
+    @Test
     void testHandleInputDeletedDeletesInput() throws NotFoundException {
         InputDeletedEvent event = new InputDeletedEvent("input1", "input1_title");
 

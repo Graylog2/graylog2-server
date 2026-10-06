@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed a ClassCastException in inputs service that caused cluster_stats to appear as an error string in the support bundle's cluster.json."
+
+pulls = ["25781"]

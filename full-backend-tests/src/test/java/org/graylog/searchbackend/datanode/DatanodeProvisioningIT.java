@@ -156,7 +156,7 @@ public class DatanodeProvisioningIT {
                     .truststore(truststore)
                     .jwtAuthToken(createJwtAuthToken())
                     .build())
-                    .waitForNodesCount(1);
+                    .waitForGreenStatusAndNodesCount(1);
             log.info("Successfully connected to OpenSearch");
         } catch (Exception e) {
             log.error("Could not connect to Opensearch. Port: {}, Truststore size: {}",

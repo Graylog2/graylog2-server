@@ -54,7 +54,7 @@ class DataNodeHousekeepingPeriodicalTest {
     void testDropOutdatedCalled() {
         periodical.doRun();
         verify(nodeService).dropOutdated();
-        verifyNoInteractions(notificationService);
+        verify(notificationService).fixed(Notification.Type.DATA_NODE_VERSION_MISMATCH);
     }
 
     @Test
@@ -81,7 +81,7 @@ class DataNodeHousekeepingPeriodicalTest {
         when(sameVersion2.isCompatibleWithVersion()).thenReturn(true);
         when(nodeService.allActive()).thenReturn(Map.of("node1", sameVersion, "node2", sameVersion2));
         periodical.doRun();
-        verifyNoInteractions(notificationService);
+        verify(notificationService).fixed(Notification.Type.DATA_NODE_VERSION_MISMATCH);
     }
 
 

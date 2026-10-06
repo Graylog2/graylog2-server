@@ -32,6 +32,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import useView from 'views/hooks/useView';
 import useIsDirty from 'views/hooks/useIsDirty';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -43,8 +44,8 @@ import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import { createEntityShareState } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { createView } from 'views/api/views';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -55,19 +56,29 @@ jest.mock('formik', () => ({
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
@@ -132,9 +143,14 @@ describe('SearchActionsMenu', () => {
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
     // @ts-expect-error context return type is not complete
     asMock(useFormikContext).mockReturnValue({ dirty: false });
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   useViewsPlugin();
@@ -305,6 +321,44 @@ describe('SearchActionsMenu', () => {
       });
     });
 
+    describe('with an immutable scope', () => {
+      beforeEach(() => {
+        asMock(OnSaveViewAction).mockClear();
+        asMock(useView).mockReturnValue(_createView('some-id').toBuilder().scope('ILLUMINATE').build());
+        asMock(useScopePermissions).mockReturnValue({
+          loadingScopePermissions: false,
+          scopePermissions: { is_mutable: false, is_deletable: false },
+          checkPermissions: () => false,
+        });
+      });
+
+      it('only offers saving as a new search', async () => {
+        render(<SimpleSearchActionsMenu />);
+
+        await userEvent.click(await screen.findByTitle('Saved search'));
+
+        await findCreateNewButton();
+
+        expect(screen.queryByRole('button', { name: /^save$/i })).not.toBeInTheDocument();
+      });
+
+      it('disables editing metadata', async () => {
+        render(<SimpleSearchActionsMenu />);
+        await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+
+        expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+      });
+
+      it('opens the save form instead of saving when pressing related keyboard shortcut', async () => {
+        render(<SimpleSearchActionsMenu />);
+        await userEvent.keyboard('{Meta>}s{/Meta}');
+
+        await findCreateNewButton();
+
+        expect(OnSaveViewAction).not.toHaveBeenCalled();
+      });
+    });
+
     describe('has "Share" option', () => {
       beforeEach(() => {
         asMock(useView).mockReturnValue(defaultView.toBuilder().id(adminUser.id).build());
@@ -325,7 +379,7 @@ describe('SearchActionsMenu', () => {
 
         const shareButton = await findShareButton();
 
-        expect(shareButton).toBeDisabled();
+        expect(shareButton).toHaveAttribute('aria-disabled', 'true');
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
@@ -376,7 +430,7 @@ describe('SearchActionsMenu', () => {
 
         render(<SimpleSearchActionsMenu />);
 
-        expect(await findShareButton()).toBeDisabled();
+        expect(await findShareButton()).toHaveAttribute('aria-disabled', 'true');
       });
     });
   });

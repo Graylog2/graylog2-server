@@ -1,0 +1,26 @@
+{
+  "streams": [
+    {
+      "_id": {"$oid": "aaaaaaaaaaaaaaaaaaaaaaaa"},
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE",
+      "creator_user_id": "admin",
+      "index_set_id": "586bb9288e82bf5e2c9ab68d",
+      "matching_type": "AND",
+      "description": "A system stream",
+      "created_at": {"$date": "2025-10-08T14:09:03.197+00:00"},
+      "disabled": false,
+      "title": "System Stream"
+    },
+    {
+      "_id": {"$oid": "bbbbbbbbbbbbbbbbbbbbbbbb"},
+      "_scope": "DEFAULT",
+      "creator_user_id": "admin",
+      "index_set_id": "586bb9288e82bf5e2c9ab68d",
+      "matching_type": "AND",
+      "description": "A regular stream",
+      "created_at": {"$date": "2025-10-08T14:09:03.197+00:00"},
+      "disabled": false,
+      "title": "Regular Stream"
+    }
+  ]
+}

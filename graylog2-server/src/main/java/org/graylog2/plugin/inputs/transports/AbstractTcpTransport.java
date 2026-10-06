@@ -64,6 +64,7 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.util.KeyUtil;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,9 +146,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
+            EncryptedValueService encryptedValueService,
             org.graylog2.Configuration graylogConfiguration) {
         this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
-                nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
+                nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()),
+                encryptedValueService);
     }
 
     public AbstractTcpTransport(
@@ -157,7 +160,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
-            TLSProtocolsConfiguration tlsConfiguration) {
+            TLSProtocolsConfiguration tlsConfiguration,
+            EncryptedValueService encryptedValueService) {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
@@ -169,7 +173,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
         this.tlsKeyFile = getTlsFile(configuration, CK_TLS_KEY_FILE);
-        this.tlsKeyPassword = configuration.getString(CK_TLS_KEY_PASSWORD);
+        this.tlsKeyPassword = encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_KEY_PASSWORD));
         this.tlsClientAuth = configuration.getString(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_DISABLED);
         this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
 
@@ -427,6 +431,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             "",
                             "The password for the encrypted key file.",
                             ConfigurationField.Optional.OPTIONAL,
+                            true,
                             TextField.Attribute.IS_PASSWORD
                     )
             );

@@ -60,7 +60,7 @@ import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.ShardFailure;
+import org.opensearch.client.opensearch._types.ShardSearchFailure;
 import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
@@ -457,7 +457,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         final MultiSearchItem<JsonData> searchResponse = multiSearchResponse.result();
         if (searchResponse != null && searchResponse.shards().failed() > 0) {
             final List<ErrorCause> shardFailures = searchResponse.shards().failures().stream()
-                    .map(ShardFailure::reason)
+                    .map(ShardSearchFailure::reason)
                     .toList();
             final List<String> nonNumericFieldErrors = shardFailures
                     .stream()

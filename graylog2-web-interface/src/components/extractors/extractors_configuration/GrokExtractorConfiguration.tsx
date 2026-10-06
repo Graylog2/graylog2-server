@@ -21,7 +21,7 @@ import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testGrok } from 'api/tools';
 import { loadGrokPatterns } from 'hooks/useGrokPatterns';
 
 import Style from './GrokExtractorConfiguration.css';
@@ -99,7 +99,7 @@ class GrokExtractorConfiguration extends React.Component<
 
     this.setState({ trying: true });
 
-    const promise = ToolsStore.testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
+    const promise = testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
 
     promise.then((result) => {
       if (result.error_message != null) {

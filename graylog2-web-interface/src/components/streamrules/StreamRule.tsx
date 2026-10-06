@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import { useStore } from 'stores/connect';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
-import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
-import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
-
-import useCurrentUser from '../../hooks/useCurrentUser';
+import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'logic/streams/types';
+import usePermissions from 'hooks/usePermissions';
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;
@@ -47,14 +44,10 @@ type Props = {
 };
 
 const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
-  const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: inputs } = useStreamRulesInputs();
   const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
-
-  useEffect(() => {
-    StreamRulesInputsActions.list();
-  }, []);
 
   const _onEdit = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -98,7 +91,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
   );
 
   const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
-  const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
+  const actionItems = isPermitted([`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small> ({streamRule.description})</small> : null;
   const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null;
 

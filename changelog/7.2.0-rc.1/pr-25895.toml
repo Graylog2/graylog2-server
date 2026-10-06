@@ -1,0 +1,7 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "a"
+message = "Added support for multiple OpenSearch versions in DataNode"
+
+issues = ["Graylog2/graylog-plugin-enterprise#14156"]
+pulls = ["25895"]
+

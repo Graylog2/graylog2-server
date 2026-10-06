@@ -28,7 +28,7 @@ import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import useFeature from 'hooks/useFeature';
@@ -64,7 +64,6 @@ const Header = styled.div`
 `;
 
 type Props = {
-  allStreams?: Immutable.List<Stream>;
   disableMessageActions?: boolean;
   disableSurroundingSearch?: boolean;
   disableTestAgainstStream?: boolean;
@@ -86,7 +85,6 @@ const MessageDetail = ({
   streams = Immutable.Map(),
   inputs = Immutable.Map(),
   showTimestamp = true,
-  allStreams = Immutable.List(),
 }: Props) => {
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
   const [showOriginal, setShowOriginal] = useState(false);
@@ -156,7 +154,6 @@ const MessageDetail = ({
                     disableTestAgainstStream={disableTestAgainstStream}
                     showOriginal={showOriginal}
                     toggleShowOriginal={_toggleShowOriginal}
-                    streams={allStreams}
                   />
                 </Header>
               </Col>

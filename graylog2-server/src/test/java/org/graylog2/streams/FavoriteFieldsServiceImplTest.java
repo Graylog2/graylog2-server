@@ -50,7 +50,9 @@ class FavoriteFieldsServiceImplTest {
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
         final var streamService = new StreamServiceImpl(mongoCollections, mock(StreamRuleService.class),
                 mock(OutputService.class), mock(IndexSetService.class), mock(MongoIndexSet.Factory.class),
-                mock(EntityRegistrar.class), mock(ClusterEventBus.class), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new EventBus());
+                mock(EntityRegistrar.class), mock(ClusterEventBus.class), Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
+                new StreamCache(mongoCollections, new EventBus()));
         this.favoriteFieldsService = new FavoriteFieldsServiceImpl(mongoCollections, streamService);
     }
 

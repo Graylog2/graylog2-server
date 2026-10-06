@@ -27,8 +27,10 @@ import org.graylog.events.contentpack.entities.NotificationEntity;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.shared.security.RestPermissions;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -37,6 +39,9 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = NotificationDto.Builder.class)
+@DbEntity(collection = DBNotificationService.NOTIFICATION_COLLECTION_NAME,
+          readPermission = RestPermissions.EVENT_NOTIFICATIONS_READ,
+          titleField = NotificationDto.FIELD_TITLE)
 public abstract class NotificationDto implements ContentPackable, MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";

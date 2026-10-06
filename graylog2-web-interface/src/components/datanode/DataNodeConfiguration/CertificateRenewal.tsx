@@ -20,7 +20,8 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import moment from 'moment';
 
-import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
+import ProductName from 'brand-customization/ProductName';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
@@ -29,7 +30,6 @@ import { Alert, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { Badge } from 'preflight/components/common';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -38,7 +38,8 @@ import DataNodeBadge from '../DataNodeList/DataNodeBadge';
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
 
-  .list-group-item {
+  li > div,
+  li > a {
     display: flex;
     justify-content: space-between;
   }
@@ -97,8 +98,7 @@ const provisioningWording = {
 } as const;
 
 export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: DataNode['status'] }) => {
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('data-node');
   const [isRenewing, setIsRenewing] = useState(false);
   const { buttonTitle, buttonLoadingTitle, successActionTitle, errorActionTitle, telemetryAppSection, buttonStyle } =
     status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
@@ -107,8 +107,6 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
     setIsRenewing(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.CERTIFICATE_RENEWAL_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'data-node',
       app_action_value: telemetryAppSection,
     });
 
@@ -148,7 +146,7 @@ const CertificateRenewal = () => {
     <div>
       <h2>Certificate Renewal & Provisioning</h2>
       <p>
-        Here you can manually trigger the certificate renewal or provisioning for Graylog Data Nodes. It is only
+        Here you can manually trigger the certificate renewal or provisioning for <ProductName /> Data Nodes. It is only
         necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
         Data Nodes have been started after the initial certificate provisioning.
       </p>

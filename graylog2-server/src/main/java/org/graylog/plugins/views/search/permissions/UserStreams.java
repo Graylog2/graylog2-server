@@ -33,7 +33,7 @@ public class UserStreams {
     private final StreamPermissions streamPermissions;
     private final PermittedStreams permittedStreams;
 
-    private static final Logger LOG = LoggerFactory.getLogger(FieldTypesResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserStreams.class);
 
     public UserStreams(StreamPermissions streamPermissions, PermittedStreams permittedStreams) {
         this.streamPermissions = streamPermissions;

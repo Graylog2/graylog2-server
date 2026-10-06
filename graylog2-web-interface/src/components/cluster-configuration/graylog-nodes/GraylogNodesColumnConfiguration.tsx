@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 
 import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
@@ -27,7 +28,7 @@ import ProcessingStateCell from './cells/ProcessingStateCell';
 import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
 import CpuMetricsCell from '../shared-components/CpuMetricsCell';
-import { SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
+import { SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 const JOURNAL_WARNING_THRESHOLD = 0.1;
@@ -68,7 +69,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     is_leader: {
       renderCell: (isLeader: boolean) => (
-        <SecondaryText>{isLeader ? <StyledLabel bsSize="xs">Leader</StyledLabel> : <span>-</span>}</SecondaryText>
+        <SecondaryText>{isLeader ? <Label bsSize="xs">Leader</Label> : <span>-</span>}</SecondaryText>
       ),
       staticWidth: 'matchHeader',
     },

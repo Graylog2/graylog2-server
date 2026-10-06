@@ -1,0 +1,40 @@
+diff --git a/node_modules/openapi-explorer/dist/lib/utils/schema-utils.js b/node_modules/openapi-explorer/dist/lib/utils/schema-utils.js
+--- a/node_modules/openapi-explorer/dist/lib/utils/schema-utils.js
++++ b/node_modules/openapi-explorer/dist/lib/utils/schema-utils.js
+@@ -514,11 +514,14 @@
+               '🆁': schema.readOnly && '🆁',
+               '🆆': schema.writeOnly && '🆆'
+             },
+-            '::link': arrayItemsSchema.title || schema.title || '',
++            '::link': (arrayItemsSchema === null || arrayItemsSchema === void 0 ? void 0 : arrayItemsSchema.title) || schema.title || '',
+             '::circular': !!schema.circularReference,
+             '::type': 'array',
+             // Array properties are read from the ::props object instead of reading from the keys of this object
+-            '::props': schemaInObjectNotation(Object.assign({}, schema, arrayItemsSchema, {
++            // Use type: undefined to prevent schema recursion by passing array from the parent to the next loop, matching the single-type-array branch below.
++            '::props': schemaInObjectNotation(Object.assign({}, schema, {
++              type: undefined
++            }, arrayItemsSchema, {
+               description: schema.description || (arrayItemsSchema === null || arrayItemsSchema === void 0 ? void 0 : arrayItemsSchema.description)
+             }), options, level + 1),
+             '::deprecated': schema.deprecated || false,
+diff --git a/node_modules/openapi-explorer/dist/es/utils/schema-utils.js b/node_modules/openapi-explorer/dist/es/utils/schema-utils.js
+--- a/node_modules/openapi-explorer/dist/es/utils/schema-utils.js
++++ b/node_modules/openapi-explorer/dist/es/utils/schema-utils.js
+@@ -505,11 +505,14 @@
+               '🆁': schema.readOnly && '🆁',
+               '🆆': schema.writeOnly && '🆆'
+             },
+-            '::link': arrayItemsSchema.title || schema.title || '',
++            '::link': (arrayItemsSchema === null || arrayItemsSchema === void 0 ? void 0 : arrayItemsSchema.title) || schema.title || '',
+             '::circular': !!schema.circularReference,
+             '::type': 'array',
+             // Array properties are read from the ::props object instead of reading from the keys of this object
+-            '::props': schemaInObjectNotation(Object.assign({}, schema, arrayItemsSchema, {
++            // Use type: undefined to prevent schema recursion by passing array from the parent to the next loop, matching the single-type-array branch below.
++            '::props': schemaInObjectNotation(Object.assign({}, schema, {
++              type: undefined
++            }, arrayItemsSchema, {
+               description: schema.description || (arrayItemsSchema === null || arrayItemsSchema === void 0 ? void 0 : arrayItemsSchema.description)
+             }), options, level + 1),
+             '::deprecated': schema.deprecated || false,

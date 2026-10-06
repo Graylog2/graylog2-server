@@ -24,6 +24,7 @@ import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -50,6 +51,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,6 +91,10 @@ class McpServiceTest {
         );
     }
 
+    private Optional<McpSchema.Result> handle(McpSchema.JSONRPCRequest request) {
+        return mcpService.handle(permissionHelper, request, "session123", null, McpConfiguration.DEFAULT_VALUES);
+    }
+
     @Test
     void testInitializeWithValidProtocolVersion() throws Exception {
         // Given
@@ -105,7 +111,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -120,6 +126,31 @@ class McpServiceTest {
         assertThat(initResult.capabilities().tools()).isNotNull();
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
+    }
+
+    @Test
+    void testInitializeToleratesUnknownCapabilityFields() throws Exception {
+        // Regression test for https://github.com/Graylog2/graylog2-server/issues/25956
+        // Newer MCP clients may send forward-compatible fields (e.g. capabilities.sampling.tools)
+        // that the SDK's Sampling record doesn't declare.
+        var params = Map.of(
+                "protocolVersion", ProtocolVersions.MCP_2025_06_18,
+                "capabilities", Map.of("sampling", Map.of("tools", Map.of())),
+                "clientInfo", Map.of("name", "TestClient", "version", "1.0.0")
+        );
+        var request = new McpSchema.JSONRPCRequest(
+                "2.0",
+                McpSchema.METHOD_INITIALIZE,
+                "1",
+                params
+        );
+
+        Optional<McpSchema.Result> result = handle(request);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.InitializeResult.class);
+        McpSchema.InitializeResult initResult = (McpSchema.InitializeResult) result.get();
+        assertThat(initResult.protocolVersion()).isEqualTo(ProtocolVersions.MCP_2025_06_18);
     }
 
     @Test
@@ -138,7 +169,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -166,7 +197,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isEmpty();
@@ -194,7 +225,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -230,7 +261,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -259,9 +290,48 @@ class McpServiceTest {
         );
 
         // When/Then
-        assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
+        assertThatThrownBy(() -> handle(request))
                 .isInstanceOf(McpError.class)
                 .hasMessageContaining("Failed to read resource");
+    }
+
+    @Test
+    void testReadResourceWithNullDescriptionStillReturnsResource() throws Exception {
+        // Regression guard for the MCP SDK 2.0.0 upgrade: the SDK now enforces required fields in its
+        // record constructors. McpService builds McpSchema.TextResourceContents(uri, null, description),
+        // where the resource description is the (nullable) "text" argument. SDK 2.0.0 rejects a null
+        // text with IllegalArgumentException("text must not be null"), which McpService's catch-all maps
+        // to RESOURCE_NOT_FOUND. A readable entity with no description (common in Graylog) must not be
+        // reported as missing.
+        ResourceProvider mockProvider = mock(ResourceProvider.class);
+        McpSchema.Resource resource = McpSchema.Resource.builder()
+                .uri("grn::dashboard:test123")
+                .name("Test Dashboard")
+                // intentionally no description -> null
+                .build();
+        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(Optional.of(resource));
+
+        resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
+
+        var readParams = new McpSchema.ReadResourceRequest("grn:local:0:internal:dashboard:test123");
+        var request = new McpSchema.JSONRPCRequest(
+                "2.0",
+                McpSchema.METHOD_RESOURCES_READ,
+                "1",
+                objectMapper.convertValue(readParams, Map.class)
+        );
+
+        // When
+        Optional<McpSchema.Result> result = handle(request);
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.ReadResourceResult.class);
+
+        McpSchema.ReadResourceResult readResult = (McpSchema.ReadResourceResult) result.get();
+        assertThat(readResult.contents()).hasSize(1);
+
+        verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 
     @Test
@@ -287,7 +357,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -307,7 +377,7 @@ class McpServiceTest {
         when(mockTool.name()).thenReturn("test_tool");
         when(mockTool.title()).thenReturn("Test Tool");
         when(mockTool.description()).thenReturn("A test tool");
-        when(mockTool.inputSchema()).thenReturn(Optional.empty());
+        when(mockTool.inputSchema()).thenReturn(Map.of("type", "object"));
 
         tools.put("test_tool", mockTool);
 
@@ -319,7 +389,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -351,7 +421,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -376,7 +446,7 @@ class McpServiceTest {
         );
 
         // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = handle(request);
 
         // Then
         assertThat(result).isPresent();
@@ -405,7 +475,7 @@ class McpServiceTest {
         );
 
         // When/Then
-        assertThat(mcpService.handle(permissionHelper, request, "session123")).get().satisfies(result -> {
+        assertThat(handle(request)).get().satisfies(result -> {
             assertThat(result).isInstanceOf(McpSchema.CallToolResult.class);
             final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result;
             assertThat(callResult.isError()).isTrue();
@@ -426,7 +496,7 @@ class McpServiceTest {
 
         // When/Then
         assertThatNoException().isThrownBy(() -> {
-            Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+            Optional<McpSchema.Result> result = handle(request);
 
             assertThat(result).isPresent();
             assertThat(result.get()).isInstanceOf(McpSchema.ListPromptsResult.class);
@@ -452,7 +522,7 @@ class McpServiceTest {
 
         // When/Then
         assertThatNoException().isThrownBy(() -> {
-            Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+            Optional<McpSchema.Result> result = handle(request);
 
             assertThat(result).isPresent();
             assertThat(result.get()).isInstanceOf(McpSchema.GetPromptResult.class);
@@ -477,7 +547,7 @@ class McpServiceTest {
         );
 
         // When/Then
-        assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
+        assertThatThrownBy(() -> handle(request))
                 .isInstanceOf(McpError.class)
                 .hasMessageContaining("Unsupported method");
     }
@@ -493,8 +563,61 @@ class McpServiceTest {
         );
 
         // When/Then
-        assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
+        assertThatThrownBy(() -> handle(request))
                 .isInstanceOf(McpError.class)
                 .hasMessageContaining("Unsupported method");
+    }
+
+    @Test
+    void testCallToolRejectsInvalidArgumentsWhenValidationEnabled() throws Exception {
+        final McpConfiguration config = McpConfiguration.create(false, false, true);
+
+        Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
+        when(mockTool.inputSchema()).thenReturn(Map.of(
+                "type", "object",
+                "properties", Map.of("limit", Map.of("type", "integer")),
+                "required", List.of("limit")));
+        tools.put("test_tool", mockTool);
+
+        // missing the required "limit" property
+        var callParams = new McpSchema.CallToolRequest("test_tool", Map.of());
+        var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
+                objectMapper.convertValue(callParams, Map.class));
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123", null, config);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
+        final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result.get();
+        assertThat(callResult.isError()).isTrue();
+        verify(mockTool, never()).apply(any(), any());
+        verify(auditEventSender).failure(any(AuditActor.class), any(AuditEventType.class), anyMap());
+    }
+
+    @Test
+    void testCallToolAcceptsValidArgumentsWhenValidationEnabled() throws Exception {
+        final McpConfiguration config = McpConfiguration.create(false, false, true);
+
+        Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
+        when(mockTool.inputSchema()).thenReturn(Map.of(
+                "type", "object",
+                "properties", Map.of("limit", Map.of("type", "integer")),
+                "required", List.of("limit")));
+        when(mockTool.outputSchema()).thenReturn(Optional.empty());
+        when(mockTool.apply(eq(permissionHelper), any())).thenReturn("Tool result");
+        tools.put("test_tool", mockTool);
+
+        var callParams = new McpSchema.CallToolRequest("test_tool", Map.of("limit", 5));
+        var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
+                objectMapper.convertValue(callParams, Map.class));
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123", null, config);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
+        final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result.get();
+        assertThat(callResult.isError()).isFalse();
+        verify(mockTool).apply(eq(permissionHelper), any());
+        verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 }

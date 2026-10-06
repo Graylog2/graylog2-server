@@ -1,0 +1,36 @@
+{
+  "entity_list_preferences": [
+    {
+      "_id": {
+        "user_id": "local:admin",
+        "entity_list_id": "streams"
+      },
+      "per_page": 20,
+      "sort": {"field": "title", "order": "asc"}
+    },
+    {
+      "_id": {
+        "user_id": "local:admin",
+        "entity_list_id": "dashboards"
+      },
+      "attributes": {
+        "title": {"status": "show"},
+        "description": {"status": "show"}
+      }
+    },
+    {
+      "_id": {
+        "user_id": "other-user",
+        "entity_list_id": "streams"
+      }
+    },
+    {
+      "_id": {
+        "user_id": "local:admin",
+        "entity_list_id": "events",
+        "layout_variant": "#general#"
+      },
+      "per_page": 100
+    }
+  ]
+}

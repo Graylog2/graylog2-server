@@ -22,7 +22,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testRegex } from 'api/tools';
 
 type Props = {
   configuration: any;
@@ -54,7 +54,7 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
   _onTryClick = () => {
     this.setState({ trying: true });
 
-    const promise = ToolsStore.testRegex(this.props.configuration.regex_value, this.props.exampleMessage);
+    const promise = testRegex(this.props.configuration.regex_value, this.props.exampleMessage);
 
     promise.then((result) => {
       if (!result.matched) {

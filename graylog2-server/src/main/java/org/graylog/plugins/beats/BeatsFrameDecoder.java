@@ -64,6 +64,10 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         FRAME_WINDOW_SIZE
     }
 
+    private static final int MAX_JSON_FRAME_BYTES = 16 * 1024 * 1024;
+    private static final int MAX_DATA_PAIRS = 1024;
+    private static final int MAX_DATA_ITEM_BYTES = 1024 * 1024;
+
     private long windowSize;
     private long sequenceNum;
 
@@ -165,6 +169,9 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         LOG.trace("Received sequence number {}", sequenceNum);
 
         final int jsonLength = Ints.saturatedCast(channelBuffer.readUnsignedInt());
+        if (jsonLength > MAX_JSON_FRAME_BYTES) {
+            throw new IllegalStateException("JSON frame size " + jsonLength + " exceeds maximum " + MAX_JSON_FRAME_BYTES);
+        }
 
         final ByteBuf buffer = channelBuffer.readBytes(jsonLength);
         sendACK(channel);
@@ -211,6 +218,9 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         LOG.trace("Received sequence number {}", sequenceNum);
 
         final int pairs = Ints.saturatedCast(channelBuffer.readUnsignedInt());
+        if (pairs > MAX_DATA_PAIRS) {
+            throw new IllegalStateException("Data frame pair count " + pairs + " exceeds maximum " + MAX_DATA_PAIRS);
+        }
         final JsonFactory jsonFactory = new JsonFactory();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (final JsonGenerator jg = jsonFactory.createGenerator(outputStream)) {
@@ -231,6 +241,9 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
 
     private String parseDataItem(ByteBuf buf) {
         int length = Ints.saturatedCast(buf.readUnsignedInt());
+        if (length > MAX_DATA_ITEM_BYTES) {
+            throw new IllegalStateException("Data item size " + length + " exceeds maximum " + MAX_DATA_ITEM_BYTES);
+        }
         final ByteBuf item = buf.readSlice(length);
         return item.toString(StandardCharsets.UTF_8);
     }

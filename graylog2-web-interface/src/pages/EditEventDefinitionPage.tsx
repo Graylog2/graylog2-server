@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import usePermissions from 'hooks/usePermissions';
+import { getEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
@@ -36,24 +36,30 @@ import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 const EditEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
-  const navigate = useNavigate();
+
+  const canEdit = isPermitted(`eventdefinitions:edit:${params.definitionId}`);
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [history]);
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-      EventDefinitionsActions.get(params.definitionId).then(
-        (response: any) => {
-          const eventDefinitionResponse = response.event_definition;
+    if (!canEdit) {
+      history.push(Routes.NOTFOUND);
+    }
+  }, [canEdit, history]);
+
+  useEffect(() => {
+    if (canEdit) {
+      getEventDefinition(params.definitionId).then(
+        (response) => {
+          const eventDefinitionResponse = response.eventDefinition;
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
-          // backend. This field will be removed in the event definitions store before sending an event definition
-          // back to the server.
+          // backend. This field will be removed again before sending an event definition back to the server.
           eventDefinitionResponse.config._is_scheduled = response.context.scheduler.is_scheduled;
           setEventDefinition(eventDefinitionResponse);
         },
@@ -64,17 +70,13 @@ const EditEventDefinitionPage = () => {
         },
       );
     }
-  }, [params, currentUser, history]);
+  }, [canEdit, params.definitionId, history]);
 
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
-    return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
+    return streams.filter((streamId) => !isPermitted(`streams:read:${streamId}`));
   };
-
-  if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-    history.push(Routes.NOTFOUND);
-  }
 
   const missingStreams = streamsWithMissingPermissions();
 
@@ -114,7 +116,7 @@ const EditEventDefinitionPage = () => {
         <Col md={12}>
           <EventDefinitionFormContainer
             action="edit"
-            initialStep={step as string}
+            initialStep={normalizeStepKey(step as string)}
             onChangeStep={updateURLStepQueryParam}
             eventDefinition={eventDefinition}
             onSubmit={goToOverview}

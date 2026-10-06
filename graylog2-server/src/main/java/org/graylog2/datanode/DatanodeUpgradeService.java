@@ -19,7 +19,7 @@ package org.graylog2.datanode;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.Node;
@@ -28,6 +28,8 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.plugin.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,20 +43,29 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatanodeUpgradeService {
 
-    private final DatanodeUpgradeServiceAdapter upgradeService;
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeService.class);
+
+    private final DatanodeClusterAdminAdapter clusterAdmin;
     private final NodeService<DataNodeDto> nodeService;
     private final Version serverVersion;
 
+    /**
+     * Caches the last successfully retrieved {@link ClusterState}. During a rolling restart the current OpenSearch
+     * manager node may be temporarily unavailable, causing {@link DatanodeClusterAdminAdapter#getClusterState()} to
+     * fail. In that case we fall back to the last known cluster state instead of failing the whole status request.
+     */
+    private volatile ClusterState cachedClusterState;
+
     @Inject
-    public DatanodeUpgradeService(DatanodeUpgradeServiceAdapter upgradeService, NodeService<DataNodeDto> nodeService, Version serverVersion) {
-        this.upgradeService = upgradeService;
+    public DatanodeUpgradeService(DatanodeClusterAdminAdapter clusterAdmin, NodeService<DataNodeDto> nodeService, Version serverVersion) {
+        this.clusterAdmin = clusterAdmin;
         this.nodeService = nodeService;
         this.serverVersion = serverVersion;
     }
 
     public DatanodeUpgradeStatus status() {
 
-        final ClusterState clusterState = upgradeService.getClusterState();
+        final ClusterState clusterState = getClusterState();
         final Collection<DataNodeDto> dataNodes = nodeService.allActive().values();
 
         final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isDatanodeUpToDate(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
@@ -75,6 +86,27 @@ public class DatanodeUpgradeService {
                 enrichData(toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade),
                 warnings
         );
+    }
+
+    /**
+     * Retrieves the current cluster state, caching the last successful result. If the fresh retrieval fails (e.g. the
+     * manager node is temporarily unavailable during a rolling restart), the cached state is returned instead. Only
+     * if there is no cached state to fall back on will the original exception be propagated.
+     */
+    private ClusterState getClusterState() {
+        try {
+            final ClusterState clusterState = clusterAdmin.getClusterState();
+            cachedClusterState = clusterState;
+            return clusterState;
+        } catch (Exception e) {
+            final ClusterState cached = cachedClusterState;
+            if (cached != null) {
+                LOG.warn("Failed to retrieve current cluster state, falling back to last known cluster state. " +
+                        "This is expected while the manager node is unavailable during a restart.", e);
+                return cached;
+            }
+            throw e;
+        }
     }
 
     private List<String> datanodeVersionHigherThanServer(List<DataNodeDto> upToDateDataNodes, Version serverVersion) {
@@ -132,10 +164,10 @@ public class DatanodeUpgradeService {
     }
 
     public FlushResponse stopReplication() {
-        return upgradeService.disableShardReplication();
+        return clusterAdmin.disableShardReplication();
     }
 
     public FlushResponse startReplication() {
-        return upgradeService.enableShardReplication();
+        return clusterAdmin.enableShardReplication();
     }
 }

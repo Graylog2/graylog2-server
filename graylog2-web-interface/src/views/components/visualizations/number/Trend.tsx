@@ -15,90 +15,50 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
-import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import { getPrettifiedValue, convertValueToUnit } from 'views/components/visualizations/utils/unitConverters';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
 import { formatTrend } from 'util/NumberFormatting';
 
-type TrendDirection = 'good' | 'bad' | 'neutral';
-
-const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') =>
-  ({
-    good: theme.colors.variant.success,
-    bad: theme.colors.variant.danger,
-    neutral: theme.colors.global.contentBackground,
-  })[trend];
+import { diff, trendBackground } from './trendDirection';
+import type { TrendDirection } from './trendDirection';
 
 const Background = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
-  const bgColor = background(theme, $trend);
+  const bgColor = trendBackground(theme, $trend);
 
   return css`
-    text-align: right;
+    width: 100%;
     ${$trend &&
     css`
       background-color: ${bgColor} !important; /* Needed for report generation */
-      color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
       color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
 });
 
-const TextContainer = styled.div<{ $trend: TrendDirection | undefined; ref }>(({ theme, $trend }) => {
-  const bgColor = background(theme, $trend);
+const TextContainer = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
 
   return css`
-    margin: 5px;
-    color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
+    padding: ${theme.spacings.xxs};
+    text-align: right;
     font-family: ${theme.fonts.family.body};
-    color-adjust: exact !important; /* Needed for report generation */
+    ${$trend &&
+    css`
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
   `;
 });
-
-const StyledIcon = styled(Icon)<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
-  const bgColor = background(theme, $trend);
-
-  return css`
-    path {
-      fill: ${theme.utils.contrastingColor(bgColor)};
-    }
-  `;
-});
-
-const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
-  if (delta === 0) {
-    return 'neutral';
-  }
-  switch (trendPreference) {
-    case 'LOWER':
-      return delta > 0 ? 'bad' : 'good';
-    case 'HIGHER':
-      return delta > 0 ? 'good' : 'bad';
-    case 'NEUTRAL':
-    default:
-      return 'neutral';
-  }
-};
 
 const _trendIcon = (delta: number) =>
   // eslint-disable-next-line no-nested-ternary
   delta === 0 ? 'arrow_circle_right' : delta > 0 ? 'arrow_circle_up' : 'arrow_circle_down';
-
-const diff = (current: number | undefined, previous: number | undefined): [number, number] => {
-  if (typeof current === 'number' && typeof previous === 'number') {
-    const difference = current - previous;
-    const differencePercent = difference / previous;
-
-    return [difference, differencePercent];
-  }
-
-  return [NaN, NaN];
-};
 
 const getTrendConvertedValues = (
   current: number,
@@ -138,13 +98,13 @@ const getTrendConvertedValues = (
 type Props = {
   current: number;
   previous: number | undefined | null;
-  trendPreference: TrendPreference;
   unit?: FieldUnit;
+  trend?: TrendDirection;
 };
 
 const Trend = (
-  { current, previous, trendPreference, unit = undefined }: Props,
-  ref: React.ForwardedRef<HTMLSpanElement>,
+  { current, previous, unit = undefined, trend = undefined }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(
     current,
@@ -152,7 +112,6 @@ const Trend = (
     unit,
   );
 
-  const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
   const trendIcon = _trendIcon(differenceConverted);
 
   const absoluteDifference = Number.isFinite(differenceConverted)
@@ -163,10 +122,13 @@ const Trend = (
     : '--';
 
   return (
-    <Background $trend={backgroundTrend} data-testid="trend-background">
-      <TextContainer $trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
-        <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
+    <Background $trend={trend} data-testid="trend-info-background">
+      <TextContainer $trend={trend} ref={ref}>
+        <Icon name={trendIcon} data-testid="trend-icon" />{' '}
+        <span
+          data-testid="trend-value"
+          aria-label={`Trend: ${absoluteDifference} (${relativeDifference}) compared to previous value of ${previousConverted}`}
+          title={`Previous value: ${previousConverted}`}>
           {absoluteDifference} / {relativeDifference}
         </span>
       </TextContainer>

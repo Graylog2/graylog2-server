@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import { onError } from 'util/conditional/onError';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 
 const INITIAL_DATA = {

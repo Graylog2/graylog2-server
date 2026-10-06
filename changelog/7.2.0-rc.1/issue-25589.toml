@@ -1,0 +1,5 @@
+type = "c"
+message = "Sets opensearch config bootstrap.memory_lock in datanode, disabled by default"
+
+pulls = ["25655"]
+issues = ["25589"]

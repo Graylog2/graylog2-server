@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IndexBlockCheck extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexBlockCheck.class);
 
     private final NotificationService notificationService;
     private final IndexSetRegistry indexSetRegistry;

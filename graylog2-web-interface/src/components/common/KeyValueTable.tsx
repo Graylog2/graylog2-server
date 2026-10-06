@@ -206,7 +206,7 @@ class KeyValueTable extends React.Component<
     return (
       <div className="key-value-table-component">
         <div className={`table-responsive ${this.props.containerClassName}`}>
-          <Table className={`table table-striped ${this.props.className}`}>
+          <Table className={this.props.className}>
             <thead>{this._formattedHeaders(this.props.headers)}</thead>
             <tbody>
               {this._formattedRows(this.props.pairs)}

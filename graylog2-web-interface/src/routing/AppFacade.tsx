@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
+import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
 import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
@@ -44,14 +44,14 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
-  const server = useStore(ServerAvailabilityStore, (state) => state?.server);
+  const { server, ping } = useContext(ServerAvailabilityContext);
   const username = useStore(SessionStore, (state) => state?.username ?? '');
 
   useEffect(() => {
-    const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
+    const interval = setInterval(ping, SERVER_PING_TIMEOUT);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [ping]);
 
   const ThemeProvider = useMemo(
     () => (server.up && username && currentUser ? React.Fragment : LoggedOutThemeProvider),

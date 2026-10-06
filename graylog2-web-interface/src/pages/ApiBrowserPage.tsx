@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
@@ -109,8 +109,10 @@ const addRequestedByHeader = (event: CustomEvent) => {
   event.detail.request.headers.append('X-Requested-By', 'API Browser');
 };
 
+type ExplorerElement = HTMLElement & { loadSpec: (spec: object) => void };
+
 const ApiBrowserPage = () => {
-  const explorerRef = useRef<HTMLElement & { loadSpec: (spec: object) => void }>(null);
+  const explorerRef = useRef<ExplorerElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const {
     data: spec,
@@ -128,23 +130,17 @@ const ApiBrowserPage = () => {
     });
   }, []);
 
-  useEffect(() => {
-    const el = explorerRef.current;
+  const attachExplorer = useCallback((el: ExplorerElement | null) => {
+    explorerRef.current = el;
 
     if (el) {
       el.addEventListener('request', addRequestedByHeader);
     }
-
-    return () => {
-      if (el) {
-        el.removeEventListener('request', addRequestedByHeader);
-      }
-    };
-  }, [loaded]);
+  }, []);
 
   useEffect(() => {
     if (loaded && !loadingSpec && !isError) {
-      explorerRef.current.loadSpec(spec);
+      explorerRef.current?.loadSpec(spec);
     }
   }, [isError, loaded, loadingSpec, spec]);
 
@@ -164,7 +160,7 @@ const ApiBrowserPage = () => {
     <DocumentTitle title="API Browser">
       <StyledExplorerContainer>
         {/* @ts-ignore - openapi-explorer is a web component */}
-        <openapi-explorer ref={explorerRef} server-url="api/" hide-authentication hide-server-selection>
+        <openapi-explorer ref={attachExplorer} server-url="api/" hide-authentication hide-server-selection>
           <DownloadSpecSelect />
           {/* @ts-ignore - openapi-explorer is a web component */}
         </openapi-explorer>

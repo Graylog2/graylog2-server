@@ -27,6 +27,8 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Set;
+
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
@@ -58,6 +60,11 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
                 clusterConfigService,
                 schemaGeneratorProvider
         );
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of();
     }
 
     @Override

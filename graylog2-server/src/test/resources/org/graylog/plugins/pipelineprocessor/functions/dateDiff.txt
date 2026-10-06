@@ -1,0 +1,52 @@
+rule "date diff"
+when
+    true
+then
+    let earlier = parse_date(value: "2023-05-10T00:00:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    let later   = parse_date(value: "2023-05-12T00:00:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+    // Positive 2-day interval exercises every numeric unit, direction, and friendly
+    let positive = date_diff(earlier, later);
+    set_field("pos_millis",    positive.millis);
+    set_field("pos_seconds",   positive.seconds);
+    set_field("pos_minutes",   positive.minutes);
+    set_field("pos_hours",     positive.hours);
+    set_field("pos_days",      positive.days);
+    set_field("pos_weeks",     positive.weeks);
+    set_field("pos_direction", positive.direction);
+    set_field("pos_friendly",  positive.friendly);
+
+    // Swapped args → signed result with "behind" direction
+    let negative = date_diff(later, earlier);
+    set_field("neg_millis",    negative.millis);
+    set_field("neg_direction", negative.direction);
+
+    // absolute=true strips sign from numeric but preserves direction
+    let abs = date_diff(left: later, right: earlier, absolute: true);
+    set_field("abs_millis",    abs.millis);
+    set_field("abs_direction", abs.direction);
+
+    // Equal instants
+    let equal = date_diff(earlier, earlier);
+    set_field("eq_direction", equal.direction);
+    set_field("eq_friendly",  equal.friendly);
+
+    // Friendly: multi-component breakdown
+    let mixed_end = parse_date(value: "2023-05-18T03:15:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("mixed_friendly", date_diff(earlier, mixed_end).friendly);
+
+    // Friendly: sub-second remainder shown for short intervals, suppressed for ≥ 1 minute
+    let one_and_a_half = parse_date(value: "2023-05-10T00:00:01.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    let one_min_plus   = parse_date(value: "2023-05-10T00:01:00.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("sub_friendly",         date_diff(earlier, one_and_a_half).friendly);
+    set_field("over_minute_friendly", date_diff(earlier, one_min_plus).friendly);
+
+    // Half-away-from-zero rounding on numeric keys (1m30s sits exactly on the boundary)
+    let m30 = parse_date(value: "2023-05-10T00:01:30.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("rnd_minutes", date_diff(earlier, m30).minutes);
+
+    // Realistic flow: to_date($message.timestamp) against a parsed field.
+    // Test fixture's message timestamp is GRAYLOG_EPOCH = 2010-07-30T16:03:25Z.
+    let session_open = parse_date(value: "2010-07-30T15:33:25.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("session_minutes", date_diff(session_open, to_date($message.timestamp)).minutes);
+end

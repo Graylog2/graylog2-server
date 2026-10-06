@@ -17,7 +17,8 @@
 import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
@@ -27,9 +28,13 @@ const CollectorsSettingsPage = () => (
     <PageHeader
       title={
         <>
-          Collectors Settings <BetaBadge />
+          Collectors Settings <PreviewBadge />
         </>
-      }>
+      }
+      documentationLink={{
+        title: 'Collectors documentation',
+        path: DocsHelper.PAGES.COLLECTORS,
+      }}>
       <span>
         Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to
         receive configuration updates and send collected log data.

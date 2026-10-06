@@ -38,7 +38,7 @@ import {
   TIME_BASED_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
-} from 'stores/indices/IndicesStore';
+} from 'hooks/useIndices';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { useIndexRetention } from 'components/indices/contexts/IndexRetentionContext';

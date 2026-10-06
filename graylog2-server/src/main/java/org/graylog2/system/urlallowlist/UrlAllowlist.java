@@ -18,6 +18,7 @@ package org.graylog2.system.urlallowlist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -27,6 +28,9 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
+// "enforce_for_notifications" was a short-lived option that never shipped.
+// This prevents installations with the field from erroring.
+@JsonIgnoreProperties({"enforce_for_notifications"})
 public abstract class UrlAllowlist {
 
     @JsonProperty("entries")

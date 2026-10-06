@@ -18,6 +18,7 @@ package org.graylog.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -36,7 +37,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -94,7 +94,7 @@ class CollectorCaServiceTest {
         when(clusterIdService.getString()).thenReturn("cluster-id");
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
     }
 
@@ -317,7 +317,8 @@ class CollectorCaServiceTest {
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
         initConfig();
         final var cache = new CollectorCaCache(collectorCaService, certificateService, encryptedValueService, new EventBus(), TestClocks.fixedEpoch());
-        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache), new CollectorCaTrustManager(cache, clock));
+        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache),
+                new CollectorCaTrustManager(cache, mock(CertBindingResolver.class), clock), MoreExecutors.directExecutor());
         final SslContextBuilder builder = tlsUtils.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 

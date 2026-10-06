@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix Inputs Metrics telemetry not being reported."
+
+pulls = ["26244"]

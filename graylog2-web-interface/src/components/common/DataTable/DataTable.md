@@ -34,7 +34,7 @@ const rowFormatter = (entity, idx) => {
 
 <DataTable
   id="entity-list"
-  className="table-hover"
+  hover
   headers={headers}
   headerCellFormatter={(header) => <th>{header}</th>}
   sortByKey={'title'}
@@ -84,7 +84,7 @@ const rowFormatter = (entity, idx) => {
 
 <DataTable
   id="entity-list"
-  className="table-hover"
+  hover
   headers={headers}
   headerCellFormatter={(header) => <th>{header}</th>}
   sortBy={(entity) => entity.roles[0]}

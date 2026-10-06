@@ -16,38 +16,35 @@
  */
 import * as React from 'react';
 
-import { Label } from 'components/bootstrap';
-import { Link, RelativeTime } from 'components/common';
-import Routes from 'routing/Routes';
+import { RelativeTime } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
+import FleetReference from '../common/FleetReference';
+import InstanceStatusLabel from '../common/InstanceStatusLabel';
+import SyncStateIndicator from '../common/SyncStateIndicator';
+import collectorOsName from '../common/collectorOsName';
 import type { CollectorInstanceView } from '../types';
 
-const OsIcon = ({ os }: { os: string | null }) => {
-  if (os === 'linux') return <span title="Linux">Linux</span>;
-  if (os === 'windows') return <span title="Windows">Windows</span>;
-  if (os === 'darwin') return <span title="macOS">macOS</span>;
+const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
+  // The description can blow up the column content, so we only render the "os.type".
+  const label = collectorOsName(instance, false);
 
-  return (
-    <span title="Unknown">
-      <i>Unknown</i>
-    </span>
-  );
+  return <span title={label}>{label}</span>;
 };
 
-type Props = {
-  fleetNames: Record<string, string>;
-};
-
-const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<CollectorInstanceView> => ({
+const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
   attributes: {
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
-        <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
-          {instance.status === 'online' ? 'Online' : 'Offline'}
-        </Label>
+        <InstanceStatusLabel status={instance.status} />
       ),
       staticWidth: 100,
+    },
+    has_pending_changes: {
+      renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
+        <SyncStateIndicator pending={instance.has_pending_changes} />
+      ),
+      staticWidth: 60,
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (
@@ -56,14 +53,12 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
       width: 0.3,
     },
     os: {
-      renderCell: (_os: string, instance: CollectorInstanceView) => <OsIcon os={instance.os} />,
-      staticWidth: 60,
+      renderCell: (_os: string, instance: CollectorInstanceView) => <OsName instance={instance} />,
+      staticWidth: 80,
     },
     fleet_id: {
       renderCell: (_fleetId: string, instance: CollectorInstanceView) => (
-        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
-          {fleetNames[instance.fleet_id] || instance.fleet_id}
-        </Link>
+        <FleetReference fleetId={instance.fleet_id} pendingFleetId={instance.pending_fleet_id} />
       ),
       width: 0.2,
     },

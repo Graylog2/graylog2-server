@@ -19,7 +19,7 @@ import React from 'react';
 import NumberUtils from 'util/NumberUtils';
 
 import { buildRatioIndicator, computeRatio } from './RatioIndicator';
-import { MetricPlaceholder, MetricsColumn, MetricsRow } from './NodeMetricsLayout';
+import { GrowContainer, MetricPlaceholder, MetricsColumn, MetricsRow } from './NodeMetricsLayout';
 
 type Props = {
   used: number | undefined | null;
@@ -55,7 +55,7 @@ const SizeAndRatioMetric = ({
     <MetricsColumn>
       {sizeLabel && (
         <MetricsRow>
-          <span>{sizeLabel}</span>
+          <GrowContainer>{sizeLabel}</GrowContainer>
         </MetricsRow>
       )}
       {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}

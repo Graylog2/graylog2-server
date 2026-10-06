@@ -22,7 +22,11 @@ import styled, { css } from 'styled-components';
 import { Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import {
+  ACTIONS_COL_ID,
+  CELL_PADDING_VERTICAL,
+  CELL_PADDING_HORIZONTAL,
+} from 'components/common/EntityDataTable/Constants';
 import type {
   EntityBase,
   ExpandedSectionRenderers,
@@ -46,45 +50,39 @@ const StyledTable = styled(BaseTable)(
     margin-bottom: 0;
     height: 100%; // required to be able to use height: 100% in td
 
-    thead > tr > th,
-    tbody > tr > td {
-      padding: ${CELL_PADDING}px;
-    }
-
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-      > tbody > tr.active {
-        background-color: ${theme.colors.table.row.backgroundStriped} !important;
-
-        & td {
-          background-color: transparent !important;
-        }
-      }
+    tbody > tr.active {
+      background-color: ${theme.colors.table.row.backgroundStriped} !important;
     }
   `,
 );
 
 const Td = styled.td<{
   $colId: string;
+  $hideEmptyTailBorder: boolean;
   $hidePadding: boolean;
+  $isLastVisibleColumn: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $textAlign: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+  ({ $colId, $hideEmptyTailBorder, $hidePadding, $isLastVisibleColumn, $pinningPosition, $textAlign, theme }) => css`
     word-break: break-word;
+    ${$textAlign &&
+    css`
+      text-align: ${$textAlign};
+    `}
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
+    && {
+      padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+    }
+
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
@@ -98,10 +96,25 @@ const Td = styled.td<{
         padding: 0;
       }
     `}
+
+    ${$hideEmptyTailBorder &&
+    css`
+      &&& {
+        border-right: none;
+      }
+    `}
+
+    ${$isLastVisibleColumn &&
+    css`
+      && {
+        border-right-color: ${theme.colors.table.row.divider};
+      }
+    `}
   `,
 );
 
 type Props<Entity extends EntityBase> = {
+  columnWidths: { [colId: string]: number };
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   rowOverride?: RowOverride<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
@@ -109,6 +122,7 @@ type Props<Entity extends EntityBase> = {
 };
 
 const Table = <Entity extends EntityBase>({
+  columnWidths,
   expandedSectionRenderers,
   rowOverride = undefined,
   headerGroups,
@@ -118,9 +132,13 @@ const Table = <Entity extends EntityBase>({
 
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
+  const isTailColumnEmpty = !columnWidths[ACTIONS_COL_ID];
+  const leafHeaders = headerGroups[headerGroups.length - 1]?.headers ?? [];
+  const lastVisibleColumnId = isTailColumnEmpty ? leafHeaders[leafHeaders.length - 2]?.column.id : undefined;
+
   return (
-    <StyledTable striped condensed hover>
-      <TableHead headerGroups={headerGroups} />
+    <StyledTable condensed bordered>
+      <TableHead columnWidths={columnWidths} headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
@@ -131,8 +149,11 @@ const Table = <Entity extends EntityBase>({
             <Td
               key={cell.id}
               $colId={cell.column.id}
+              $hideEmptyTailBorder={cell.column.id === ACTIONS_COL_ID && isTailColumnEmpty}
+              $isLastVisibleColumn={cell.column.id === lastVisibleColumnId}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}>
+              $hidePadding={columnMeta?.hideCellPadding}
+              $textAlign={columnMeta?.columnRenderer?.textAlign}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );

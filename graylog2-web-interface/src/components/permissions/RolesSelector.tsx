@@ -20,7 +20,7 @@ import compact from 'lodash/compact';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type Role from 'logic/roles/Role';
 import { Button } from 'components/bootstrap';

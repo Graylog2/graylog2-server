@@ -34,7 +34,7 @@ type Props = {
  */
 const ExternalLink = ({ children, className = '', href = '', iconName = 'open_in_new', target = '_blank' }: Props) => {
   const content = (
-    <span>
+    <span className="external-link-inner">
       {children}
       &nbsp;
       <Icon name={iconName} />

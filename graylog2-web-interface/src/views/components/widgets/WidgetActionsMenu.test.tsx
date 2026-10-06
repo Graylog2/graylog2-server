@@ -157,7 +157,7 @@ describe('<WidgetActionsMenu />', () => {
     const mockSetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" setWidgetFocusing={mockSetWidgetFocusing} />);
 
-    const focusButton = await screen.findByTitle('Focus this widget');
+    const focusButton = await screen.findByRole('button', { name: 'Focus this widget' });
 
     await userEvent.click(focusButton);
 
@@ -168,7 +168,7 @@ describe('<WidgetActionsMenu />', () => {
     const mockUnsetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" isFocused unsetWidgetFocusing={mockUnsetWidgetFocusing} />);
 
-    const unfocusButton = screen.getByTitle('Un-focus widget');
+    const unfocusButton = screen.getByRole('button', { name: 'Un-focus widget' });
 
     await userEvent.click(unfocusButton);
 

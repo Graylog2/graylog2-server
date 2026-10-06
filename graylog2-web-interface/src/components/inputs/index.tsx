@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as CreateInputControl } from './CreateInputControl';
+export { default as EditInputButton } from './EditInputButton';
 export { default as InputDropdown } from './InputDropdown';
 export { default as InputForm } from './InputForm';
 export { default as InputStateBadge } from './InputStateBadge';

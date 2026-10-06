@@ -23,11 +23,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = ContentPackUninstallation.Builder.class)
@@ -50,9 +48,6 @@ public abstract class ContentPackUninstallation {
     @JsonProperty(FIELD_SKIPPED_ENTITIES)
     public abstract ImmutableSet<NativeEntityDescriptor> skippedEntities();
 
-    @JsonProperty(FIELD_ENTITY_GRANTS)
-    public abstract ImmutableMap<ModelId, List<GrantDTO>> entityGrants();
-
     public static Builder builder() {
         return Builder.create();
     }
@@ -63,7 +58,7 @@ public abstract class ContentPackUninstallation {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ContentPackUninstallation.Builder().entityGrants(ImmutableMap.of());
+            return new AutoValue_ContentPackUninstallation.Builder();
         }
 
         @JsonProperty(FIELD_ENTITIES)
@@ -76,9 +71,6 @@ public abstract class ContentPackUninstallation {
 
         @JsonProperty(FIELD_SKIPPED_ENTITIES)
         public abstract Builder skippedEntities(ImmutableSet<NativeEntityDescriptor> skippedEntities);
-
-        @JsonProperty(FIELD_ENTITY_GRANTS)
-        public abstract Builder entityGrants(ImmutableMap<ModelId, List<GrantDTO>> entityGrants);
 
         public abstract ContentPackUninstallation build();
     }

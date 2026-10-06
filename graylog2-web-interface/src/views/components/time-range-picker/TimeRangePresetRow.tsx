@@ -26,13 +26,15 @@ import { IfPermitted } from 'components/common';
 import SaveTimeRangeAsPresetButton from 'views/components/time-range-picker/SaveTimeRangeAsPresetButton';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import { classifyRelativeTimeRange } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { ButtonToolbar } from 'components/bootstrap';
 
 const Container = styled(ButtonToolbar)`
-  float: right;
-  margin-top: 6px;
+  position: absolute;
+  z-index: 1;
+  right: 15px;
+  top: 6px;
 `;
 
 const normalizePresetTimeRange = (timeRange: TimeRange) => {

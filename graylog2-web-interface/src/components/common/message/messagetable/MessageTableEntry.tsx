@@ -20,15 +20,14 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import { useStore } from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import StreamsContext from 'contexts/StreamsContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList from 'hooks/useInputs';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
@@ -173,15 +172,14 @@ const MessageTableEntry = ({
   isEntitySelectable = () => false,
   overrideContent = undefined,
 }: Props) => {
-  const { inputs: inputsList = [] } = useStore(InputsStore);
-  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const { data: inputsList = [] } = useInputsList();
+  const streamsList = useContext(StreamsContext);
   const highlightMessageId = useContext(HighlightMessageContext);
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('widget');
   const additionalContextValue = useMemo(() => ({ message }), [message]);
-  const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
   const streams = useMemo(
-    () => Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream])),
+    () => Immutable.Map<string, Stream>((streamsList ?? []).map((stream) => [stream.id, stream])),
     [streamsList],
   );
   const inputs = useMemo(
@@ -198,7 +196,6 @@ const MessageTableEntry = ({
 
     if (!isSelectingText) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED, {
-        app_section: 'widget',
         app_action_value: 'widget-message-table-toggle-details',
       });
 
@@ -269,7 +266,6 @@ const MessageTableEntry = ({
                 message={message}
                 fields={fields}
                 streams={streams}
-                allStreams={allStreams}
                 inputs={inputs}
                 disableSurroundingSearch={disableSurroundingSearch}
                 expandAllRenderAsync={expandAllRenderAsync}

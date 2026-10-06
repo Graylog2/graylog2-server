@@ -21,7 +21,7 @@ import { defaultUser } from 'defaultMockValues';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { adminUser } from 'fixtures/users';
-import type { PreferencesMap } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'api/preferences';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import type { UserPreferences } from './UserPreferencesContext';

@@ -122,7 +122,9 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         final Search.Builder searchBuilder = Search.builder()
                 .queries(ImmutableSet.copyOf(queries))
-                .parameters(this.parameters())
+                .parameters(this.parameters().stream()
+                        .map(parameter -> parameter.toNativeEntity(parameters, nativeEntities))
+                        .collect(ImmutableSet.toImmutableSet()))
                 .requires(this.requires())
                 .createdAt(this.createdAt());
         if (this.owner().isPresent()) {
@@ -137,5 +139,6 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         queries().forEach(query -> query.resolveForInstallation(entity, parameters, entities, graph));
+        parameters().forEach(parameter -> parameter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

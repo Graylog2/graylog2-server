@@ -22,11 +22,15 @@ import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import { filtersToStreamSet, filtersToStreamCategorySet } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHistory from 'routing/useHistory';
+
+const TIMERANGE_PARAMS = ['from', 'to', 'keyword', 'relative', 'rangetype'] as const;
 
 const extractTimerangeParams = (timerange: TimeRange): [string, string | number][] => {
   const { type } = timerange;
@@ -58,39 +62,71 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   }
 };
 
-const uriForView = (viewType: ViewType, query: string, searchQuery: Query) => {
-  if (viewType !== View.Type.Search) {
-    return undefined;
+const uriForSearchView = (query: string, searchQuery: Query) => {
+  const {
+    query: { query_string: queryString },
+    timerange,
+    filter = Immutable.Map(),
+  } = searchQuery;
+  const baseUri = new URI(query)
+    .setSearch('q', queryString)
+    .removeQuery('from')
+    .removeQuery('to')
+    .removeQuery('keyword')
+    .removeQuery('relative');
+  const uriWithTimerange = extractTimerangeParams(timerange).reduce(
+    (prev, [key, value]) => prev.setSearch(key, String(value)),
+    baseUri,
+  );
+  const currentStreams = filtersToStreamSet(filter);
+  const currentStreamCategories = filtersToStreamCategorySet(filter);
+
+  const uriWithStreams = currentStreams.isEmpty()
+    ? uriWithTimerange.removeSearch('streams')
+    : uriWithTimerange.setSearch('streams', currentStreams.join(','));
+
+  const uri = currentStreamCategories.isEmpty()
+    ? uriWithStreams.removeSearch('stream_categories')
+    : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(','));
+
+  return uri.toString();
+};
+
+const uriForDashboardView = (query: string, globalOverride: GlobalOverride | undefined | null) => {
+  const baseUri = TIMERANGE_PARAMS.reduce((acc, param) => acc.removeQuery(param), new URI(query)).removeQuery('q');
+
+  if (!globalOverride) {
+    return baseUri.toString();
   }
 
-  if (searchQuery) {
-    const {
-      query: { query_string: queryString },
-      timerange,
-      filter = Immutable.Map(),
-    } = searchQuery;
-    const baseUri = new URI(query)
-      .setSearch('q', queryString)
-      .removeQuery('from')
-      .removeQuery('to')
-      .removeQuery('keyword')
-      .removeQuery('relative');
-    const uriWithTimerange = extractTimerangeParams(timerange).reduce(
-      (prev, [key, value]) => prev.setSearch(key, String(value)),
-      baseUri,
-    );
-    const currentStreams = filtersToStreamSet(filter);
-    const currentStreamCategories = filtersToStreamCategorySet(filter);
+  const queryString = globalOverride.query?.query_string;
+  const { timerange } = globalOverride;
 
-    const uriWithStreams = currentStreams.isEmpty()
-      ? uriWithTimerange.removeSearch('streams')
-      : uriWithTimerange.setSearch('streams', currentStreams.join(','));
+  let uri = baseUri;
 
-    const uri = currentStreamCategories.isEmpty()
-      ? uriWithStreams.removeSearch('stream_categories')
-      : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(','));
+  if (queryString) {
+    uri = uri.setSearch('q', queryString);
+  }
 
-    return uri.toString();
+  if (timerange) {
+    uri = extractTimerangeParams(timerange).reduce((acc, [key, value]) => acc.setSearch(key, String(value)), uri);
+  }
+
+  return uri.toString();
+};
+
+const uriForView = (
+  viewType: ViewType,
+  query: string,
+  searchQuery: Query,
+  globalOverride: GlobalOverride | undefined | null,
+) => {
+  if (viewType === View.Type.Search) {
+    return searchQuery ? uriForSearchView(query, searchQuery) : undefined;
+  }
+
+  if (viewType === View.Type.Dashboard) {
+    return uriForDashboardView(query, globalOverride);
   }
 
   return undefined;
@@ -123,12 +159,13 @@ function isSameUri(a: string, b: string) {
 const useSyncWithQueryParameters = (currentUri: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
+  const globalOverride = useGlobalOverride();
   const history = useHistory();
   const lastSyncedUriRef = useRef(currentUri);
   const isFirstSyncRef = useRef(true);
 
   useEffect(() => {
-    const uriForCurrentView = uriForView(viewType, currentUri, currentQuery);
+    const uriForCurrentView = uriForView(viewType, currentUri, currentQuery, globalOverride);
 
     if (!uriForCurrentView) {
       return;
@@ -149,7 +186,7 @@ const useSyncWithQueryParameters = (currentUri: string) => {
 
     isFirstSyncRef.current = false;
     lastSyncedUriRef.current = uriForCurrentView;
-  }, [currentQuery, history, currentUri, viewType]);
+  }, [currentQuery, globalOverride, history, currentUri, viewType]);
 };
 
 export default useSyncWithQueryParameters;

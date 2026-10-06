@@ -87,6 +87,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
       onClick={handleSortChange}
       $disabled={disabled}>
       <Icon
+        size="xs"
         name={isAscSort ? 'arrow_upward' : 'arrow_downward'}
         data-testid="sort-icon-svg"
         className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`}

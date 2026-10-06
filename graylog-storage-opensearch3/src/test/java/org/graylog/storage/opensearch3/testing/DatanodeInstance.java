@@ -16,12 +16,16 @@
  */
 package org.graylog.storage.opensearch3.testing;
 
+import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.datanode.DatanodeDevContainerInstanceProvider;
 import org.graylog2.storage.SearchVersion;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,6 +67,15 @@ public class DatanodeInstance extends OpenSearchInstance {
         final var builder = DatanodeDevContainerInstanceProvider.getBuilderFor(version())
                 .orElseThrow(() -> new UnsupportedOperationException("Can not build container for search version " + version() + " - not supported."));
 
+        final Path log4jhostPath = DefaultPluginJarsProvider.getProjectReposPath()
+                .resolve(Path.of("graylog2-server", "data-node", "config", "log4j2.xml"));
+
+        if (!Files.exists(log4jhostPath)) {
+            throw new IllegalStateException("log4j2-server config file does not exist: " + log4jhostPath);
+        }
+
+        final String log4j2ContainerPath = "/usr/share/graylog/datanode/config/log4j2.xml";
+
         return builder
                 .nodeName(hostname)
                 .passwordSecret(passwordSecret)
@@ -73,6 +86,14 @@ public class DatanodeInstance extends OpenSearchInstance {
                 .openSearchTransportPort(9300)
                 .env(getContainerEnv())
                 .pluginJarsProvider(pluginJarsProvider)
+                .customizer(container -> {
+                    container.withFileSystemBind(
+                            log4jhostPath.toString(),
+                            log4j2ContainerPath,
+                            BindMode.READ_ONLY
+                    );
+                    container.withEnv("JAVA_TOOL_OPTIONS", "-Dlog4j.configurationFile=file://" + log4j2ContainerPath);
+                })
                 .build();
     }
 }

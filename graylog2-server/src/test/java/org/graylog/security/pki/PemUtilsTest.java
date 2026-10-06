@@ -16,19 +16,29 @@
  */
 package org.graylog.security.pki;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -102,6 +112,72 @@ class PemUtilsTest {
     void parseCertificateThrowsForInvalidPem() {
         assertThatThrownBy(() -> PemUtils.parseCertificate("not a certificate"))
                 .isInstanceOf(Exception.class);
+    }
+
+    // parseCsr tests
+
+    @Test
+    void parseCsrReturnsCsrForValidPem() throws Exception {
+        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
+
+        final VerifiedCsr csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+
+        assertThat(csr).isNotNull();
+        assertThat(csr.csr().getSubject().toString()).contains("CN=test-agent");
+    }
+
+    @Test
+    void parseCsrRejectsCertPem() throws Exception {
+        final CertificateEntry entry = builder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(365));
+
+        assertThatThrownBy(() -> PemUtils.parseCsr(entry.certificate()))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("not contain a valid CSR");
+    }
+
+    @Test
+    void parseCsrRejectsGarbageInput() {
+        assertThatThrownBy(() -> PemUtils.parseCsr("not a CSR"))
+                .isInstanceOf(CertificateException.class);
+    }
+
+    @Test
+    void parseCsrRejectsSignatureFromMismatchedKey() throws Exception {
+        final KeyPair signingKey = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final KeyPair claimedKey = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+
+        // CSR claims claimedKey's public key but is signed with signingKey's private key.
+        // This is the forgery the self-signature check exists to reject: a requester
+        // asserting a public key it doesn't hold the private key for.
+        final var csrBuilder = new JcaPKCS10CertificationRequestBuilder(
+                new X500Name("CN=forged-agent"), claimedKey.getPublic());
+        final ContentSigner signer = new JcaContentSignerBuilder("Ed25519")
+                .setProvider("BC")
+                .build(signingKey.getPrivate());
+        final PKCS10CertificationRequest forged = csrBuilder.build(signer);
+
+        final StringWriter pem = new StringWriter();
+        try (JcaPEMWriter writer = new JcaPEMWriter(pem)) {
+            writer.writeObject(forged);
+        }
+
+        assertThatThrownBy(() -> PemUtils.parseCsr(pem.toString()))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("signature is invalid");
+    }
+
+    // VerifiedCsr.publicKey tests
+
+    @Test
+    void verifiedCsrPublicKeyReturnsCsrPublicKey() throws Exception {
+        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
+        final VerifiedCsr csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+
+        final PublicKey extracted = csr.publicKey();
+
+        assertThat(Arrays.equals(keyPair.getPublic().getEncoded(), extracted.getEncoded())).isTrue();
     }
 
     // parsePrivateKey tests

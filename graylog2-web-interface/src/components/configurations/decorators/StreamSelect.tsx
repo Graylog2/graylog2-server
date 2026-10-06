@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 export const DEFAULT_STREAM_ID = '000000000000000000000001';

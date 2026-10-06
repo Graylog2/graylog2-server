@@ -84,6 +84,7 @@ const searchPageLayout: Partial<LayoutState> = {
     title: 'Replay Search',
     sections: [replaySection, ...sidebarSections],
   },
+  synchronizeUrl: false,
 };
 
 const ReplayedSearch = ({

@@ -20,6 +20,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
+import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.EventFields;
@@ -98,6 +99,36 @@ class CollectorIngestCodecTest {
     }
 
     @Test
+    void marksOnlyCollectorLogMessagesAsExcludedFromTrafficAccounting() {
+        final var codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory,
+                dumpWriter, typeConverter,
+                Map.of("file_log", log -> Map.of(),
+                        CollectorLogRecordProcessor.RECEIVER_TYPE, new CollectorLogRecordProcessor(typeConverter)));
+
+        final var collectorLog = codec.decodeSafe(rawMessageForReceiverType(CollectorLogRecordProcessor.RECEIVER_TYPE));
+        assertThat(collectorLog).isPresent();
+        assertThat(collectorLog.get().isAccounted()).isFalse();
+
+        final var customerLog = codec.decodeSafe(rawMessageForReceiverType("file_log"));
+        assertThat(customerLog).isPresent();
+        assertThat(customerLog.get().isAccounted()).isTrue();
+    }
+
+    private RawMessage rawMessageForReceiverType(String receiverType) {
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(LogRecord.newBuilder()
+                        .setBody(AnyValue.newBuilder().setStringValue("test message"))
+                        .setTimeUnixNano(1700000000000000000L)
+                        .build())
+                .build();
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(OTelJournal.Record.newBuilder().setLog(log).build())
+                .setCollectorReceiverType(receiverType)
+                .build();
+        return new RawMessage(collectorRecord.toByteArray());
+    }
+
+    @Test
     void timeUnixNanoMapsToTimestamp() {
         // 1700000000000000000 nanoseconds = 1700000000000 milliseconds = 2023-11-14T22:13:20.000Z
         final var logRecord = LogRecord.newBuilder()
@@ -125,6 +156,7 @@ class CollectorIngestCodecTest {
         assertThat(decoded).isPresent();
         final var expectedTimestamp = new DateTime(1700000000000L, DateTimeZone.UTC);
         assertThat(decoded.get().getTimestamp()).isEqualTo(expectedTimestamp);
+        assertThat(decoded.get().getField(EventFields.EVENT_CREATED)).isEqualTo(expectedTimestamp);
     }
 
     @Test
@@ -154,6 +186,65 @@ class CollectorIngestCodecTest {
         assertThat(decoded).isPresent();
         final var expectedTimestamp = new DateTime(1700000000000L, DateTimeZone.UTC);
         assertThat(decoded.get().getTimestamp()).isEqualTo(expectedTimestamp);
+        assertThat(decoded.get().getField(EventFields.EVENT_RECEIVED_TIME)).isEqualTo(expectedTimestamp);
+    }
+
+    @Test
+    void timeUnixNanoMapsToEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("test"))
+                .setTimeUnixNano(1700000000000000001L)
+                .setObservedTimeUnixNano(1700000000000000002L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        // Full nanosecond precision is kept, and the log record time wins over the observed time.
+        assertThat(decoded.get().getField(EventFields.EVENT_SEQUENCE)).isEqualTo(1700000000000000001L);
+    }
+
+    @Test
+    void observedTimeUnixNanoFallbackForEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("test"))
+                .setObservedTimeUnixNano(1700000000000000002L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(EventFields.EVENT_SEQUENCE)).isEqualTo(1700000000000000002L);
     }
 
     @Test
@@ -242,7 +333,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isEqualTo(TEST_INSTANCE_UID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_ID)).isEqualTo(TEST_INSTANCE_UID);
     }
 
     @Test
@@ -269,7 +360,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_ID)).isNull();
     }
 
     @Test
@@ -297,7 +388,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isEqualTo(TEST_SOURCE_ID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID)).isEqualTo(TEST_SOURCE_ID);
     }
 
     @Test
@@ -324,7 +415,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID)).isNull();
     }
 
     @Test
@@ -352,7 +443,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isEqualTo(TEST_FLEET_ID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_FLEET_ID)).isEqualTo(TEST_FLEET_ID);
     }
 
     @Test
@@ -379,7 +470,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_FLEET_ID)).isNull();
     }
 
     @Test
@@ -501,7 +592,7 @@ class CollectorIngestCodecTest {
         final var decoded = codecWithProcessor.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("file_log");
+        assertThat(decoded.get().getField("agent_receiver_type")).isEqualTo("file_log");
         assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 

@@ -18,23 +18,42 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
+import useSystemInfo, { fetchSystemJvm } from 'hooks/useSystemStore';
 
 import PageContentLayout from './PageContentLayout';
 
-jest.mock('stores/system/SystemStore', () => ({
-  SystemStore: MockStore(
-    [
-      'getInitialState',
-      () => ({
-        system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
-      }),
-    ],
-    ['jvm', jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' }))],
-  ),
+jest.mock('hooks/useSystemStore', () => ({
+  __esModule: true,
+  ...jest.requireActual('hooks/useSystemStore'),
+  default: jest.fn(),
+  fetchSystemJvm: jest.fn(),
 }));
 
 describe('PageContentLayout', () => {
+  beforeEach(() => {
+    asMock(useSystemInfo).mockReturnValue({
+      data: {
+        version: '23.42.0-SNAPSHOT+SPECIALFEATURE',
+        hostname: 'hopper.local',
+        cluster_id: 'deadbeef',
+        codename: 'test',
+        facility: 'graylog-server',
+        is_leader: true,
+        is_processing: true,
+        lb_status: 'alive',
+        lifecycle: 'running',
+        node_id: 'deadbeef',
+        operating_system: 'Linux',
+        started_at: '2023-01-01T00:00:00.000Z',
+        timezone: 'UTC',
+      },
+      isLoading: false,
+    } as ReturnType<typeof useSystemInfo>);
+
+    asMock(fetchSystemJvm).mockResolvedValue({ info: 'SomeJDK v12.0.0' });
+  });
+
   it('renders its children', async () => {
     render(
       <PageContentLayout>

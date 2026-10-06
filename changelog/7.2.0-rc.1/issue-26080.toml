@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix duplicate metric registration error during concurrent pipeline state builds"
+
+issues = ["26080"]

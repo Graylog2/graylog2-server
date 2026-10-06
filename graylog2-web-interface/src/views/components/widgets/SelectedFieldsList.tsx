@@ -48,6 +48,7 @@ type ListItemProps = {
   selectSize: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit: boolean;
+  allowCreate: boolean;
 };
 
 const Actions = styled.div`
@@ -66,6 +67,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       selectSize,
       selectedFields,
       showUnit,
+      allowCreate,
     }: ListItemProps,
     ref,
   ) => {
@@ -82,6 +84,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
           <EditFieldSelect
             id="add-field-select"
             as={fieldSelect}
+            allowCreate={allowCreate}
             onChange={_onChange}
             onMenuClose={() => setIsEditing(false)}
             autoFocus
@@ -119,6 +122,7 @@ type Props = {
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit?: boolean;
+  allowCreate?: boolean;
 };
 
 const SelectedFieldsList = ({
@@ -128,6 +132,7 @@ const SelectedFieldsList = ({
   displayOverlayInPortal = false,
   showUnit = false,
   fieldSelect = undefined,
+  allowCreate = false,
 }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
@@ -171,10 +176,11 @@ const SelectedFieldsList = ({
           className={className}
           ref={ref}
           showUnit={showUnit}
+          allowCreate={allowCreate}
         />
       );
     },
-    [selectSize, selectedFields, fieldSelect, showUnit, onChangeField, onRemoveField],
+    [selectSize, selectedFields, fieldSelect, showUnit, allowCreate, onChangeField, onRemoveField],
   );
 
   const onSortChange = useCallback(

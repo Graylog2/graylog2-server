@@ -119,6 +119,7 @@ const WidgetWrap = styled.div(
       .${widgetActionsMenuClass} {
       position: relative;
       opacity: 1;
+      transform: none;
       transition-delay: 0s;
     }
   `,

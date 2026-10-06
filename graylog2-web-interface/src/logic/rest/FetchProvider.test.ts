@@ -22,26 +22,36 @@ import FormData from 'form-data';
 import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
+import { SessionStore } from 'stores/sessions/SessionStore';
 
 import fetch, { Builder, fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 const mockLogout = jest.fn();
+const mockLoginListeners = new Set<() => void>();
+const mockCompleteLogin = () => [...mockLoginListeners].forEach((listener) => listener());
 
 jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: {
     isLoggedIn: jest.fn(() => true),
   },
   SessionActions: {
-    logout: mockLogout,
+    logout: (...args: Array<unknown>) => mockLogout(...args),
+    login: {
+      completed: {
+        listen: (listener: () => void) => {
+          mockLoginListeners.add(listener);
+
+          return () => mockLoginListeners.delete(listener);
+        },
+      },
+    },
   },
 }));
 
-jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
-  ServerAvailabilityActions: {
-    reportSuccess: jest.fn(),
-    reportError: jest.fn(),
-  },
+jest.mock('api/server-availability', () => ({
+  reportSuccess: jest.fn(),
+  reportError: jest.fn(),
 }));
 
 jest.mock('actions/errors/ErrorsActions', () => ({
@@ -148,6 +158,25 @@ describe('FetchProvider', () => {
       expect(response).toEqual(expectedResponse);
     }),
   );
+
+  it('sends a request queued until login only once', async () => {
+    asMock(SessionStore.isLoggedIn).mockReturnValueOnce(false);
+    const fetchSpy = jest.spyOn(window, 'fetch');
+
+    const response = fetch('GET', `${baseUrl}/test1`);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    mockCompleteLogin();
+
+    await expect(response).resolves.toEqual({ text: 'test' });
+
+    mockCompleteLogin();
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    fetchSpy.mockRestore();
+  });
 
   it('sets correct accept header', async () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');

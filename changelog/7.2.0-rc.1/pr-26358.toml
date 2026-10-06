@@ -1,0 +1,4 @@
+type = "a"
+message = "Add rolling restart feature and endpoint for data nodes' OpenSearch."
+
+pulls = ["26358"]

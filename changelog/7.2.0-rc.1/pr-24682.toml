@@ -1,0 +1,4 @@
+type = "added"
+message = "Changed behaviour for default fields in SimpleScriptingAPI message export to default to all fields instead of source,timestamp."
+
+pulls = ["24682"]

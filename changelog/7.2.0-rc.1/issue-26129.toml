@@ -1,0 +1,5 @@
+type = "a"
+message = "Add support for relative, keyword, and absolute time ranges in entity data table filters."
+
+issues = ["26129"]
+pulls = ["26125"]

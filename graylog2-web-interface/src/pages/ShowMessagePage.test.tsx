@@ -23,8 +23,8 @@ import { Messages } from '@graylog/server-api';
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type { Stream } from 'views/stores/StreamsStore';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import type { Stream } from 'logic/streams/types';
+import { fetchInput } from 'hooks/useInputs';
 import StreamsContext from 'contexts/StreamsContext';
 import FetchError from 'logic/errors/FetchError';
 import suppressConsole from 'helpers/suppressConsole';
@@ -49,11 +49,9 @@ jest.mock('@graylog/server-api', () => ({
   Messages: { search: jest.fn() },
 }));
 
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsActions: {
-    get: jest.fn(),
-  },
-  InputsStore: MockStore(),
+jest.mock('hooks/useInputs', () => ({
+  ...jest.requireActual('hooks/useInputs'),
+  fetchInput: jest.fn(),
 }));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
@@ -80,6 +78,7 @@ describe('ShowMessagePage', () => {
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(isLocalNode).mockResolvedValue(true);
     asMock(Messages.search).mockResolvedValue(message);
+    asMock(fetchInput).mockResolvedValue(input);
   });
 
   const testForwarderPlugin = new PluginManifest(
@@ -102,7 +101,7 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic message', async () => {
-    asMock(InputsActions.get).mockResolvedValue(input);
+    asMock(fetchInput).mockResolvedValue(input);
 
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
@@ -112,13 +111,24 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic message if streams are (yet) missing', async () => {
-    asMock(InputsActions.get).mockResolvedValue(input);
+    asMock(fetchInput).mockResolvedValue(input);
 
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" streams={null} />);
 
     await screen.findByText(/Deprecated field/);
     await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
     await screen.findByText(/"index": "graylog_5"/);
+  });
+
+  it('renders the message when its source input no longer exists', async () => {
+    // The in-memory collector ingest input (and any deleted input) has no persisted record, so the lookup 404s.
+    // That must not break the message view.
+    asMock(fetchInput).mockRejectedValue(new FetchError('Not Found', 404, "Couldn't find input deadbeef"));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
   });
 
   it('retrieves field types only for user-accessible streams', async () => {
@@ -170,7 +180,7 @@ describe('ShowMessagePage', () => {
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
     await screen.findByText(/Deprecated field/);
 
-    expect(InputsActions.get).not.toHaveBeenCalled();
+    expect(fetchInput).not.toHaveBeenCalled();
   });
 
   it('renders explanation when fetching of message fails because index does not exist', async () => {

@@ -1,0 +1,119 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.collectors.input.processor;
+
+import com.google.common.base.Strings;
+import org.apache.commons.lang.StringUtils;
+import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.schema.EventFields;
+import org.graylog.schema.ProcessFields;
+import org.graylog.schema.UserFields;
+import org.graylog.schema.VendorFields;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.graylog.inputs.otel.OTelValues.asLong;
+import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
+
+/**
+ * Processes macOS unified logging records into GIM fields.
+ * <p>
+ * The fixed receiver emits a plain-text body (the human-readable message), native OTel severity
+ * and timestamp — all handled by {@link org.graylog.collectors.input.CollectorIngestCodec} — plus
+ * structured {@code macos.*} attributes. This processor maps only those attributes: well-fitting
+ * ones to GIM fields, and macOS-specific identifiers (boot session, activity/trace IDs, sender
+ * image) preserved under a {@code macos_*} prefix.
+ * <p>
+ * The macOS identifiers are unsigned 64-bit values, so the receiver emits them as OTLP integers
+ * while they fit in a signed long and as decimal strings above that, per OpenTelemetry's AnyValue
+ * mapping. They are mapped to strings here; see
+ * {@link org.graylog.inputs.otel.OTelValues#unsignedAsString}.
+ *
+ * @see <a href="https://developer.apple.com/documentation/os/logging">Apple Unified Logging</a>
+ */
+public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
+
+    @Override
+    public Map<String, Object> process(OTelJournal.Log log) {
+        final Map<String, Object> result = new HashMap<>();
+        String processImagePath = null;
+
+        for (final var attr : log.getLogRecord().getAttributesList()) {
+            final var value = attr.getValue();
+            switch (attr.getKey()) {
+                // Mapped to GIM fields.
+                case "macos.subsystem" -> putStr(result, EventFields.EVENT_SOURCE, value.getStringValue());
+                case "macos.category" -> putStr(result, VendorFields.VENDOR_SUBTYPE, value.getStringValue());
+                case "macos.eventType" -> putStr(result, VendorFields.VENDOR_EVENT_TYPE, value.getStringValue());
+                case "macos.formatString" -> putStr(result, VendorFields.VENDOR_EVENT_DESCRIPTION, value.getStringValue());
+                case "macos.processImagePath" -> {
+                    final var path = Strings.emptyToNull(value.getStringValue());
+                    if (path != null) {
+                        processImagePath = path;
+                        result.put(ProcessFields.PROCESS_PATH, path);
+                    }
+                }
+                case "macos.processID" -> result.put(ProcessFields.PROCESS_ID, Long.toString(value.getIntValue()));
+                case "macos.userID" -> result.put(UserFields.USER_ID, Long.toString(value.getIntValue()));
+                // macOS-specific identifiers preserved under a macos_* prefix.
+                case "macos.threadID" -> putStr(result, "macos_thread_id", unsignedAsString(value));
+                case "macos.bootUUID" -> putStr(result, "macos_boot_uuid", value.getStringValue());
+                case "macos.machTimestamp" -> {
+                    putStr(result, "macos_mach_timestamp", unsignedAsString(value));
+                    // The mach absolute time counter increases monotonically within a boot session
+                    // (see macos_boot_uuid), so it orders records that share a timestamp. Values that
+                    // don't fit a signed long are skipped, leaving the codec's default in place.
+                    final var sequence = asLong(value);
+                    if (sequence != null && sequence > 0) {
+                        result.put(EventFields.EVENT_SEQUENCE, sequence);
+                    }
+                }
+                case "macos.traceID" -> putStr(result, "macos_trace_id", unsignedAsString(value));
+                case "macos.activityIdentifier" -> putStr(result, "macos_activity_id", unsignedAsString(value));
+                case "macos.parentActivityIdentifier" -> putStr(result, "macos_parent_activity_id", unsignedAsString(value));
+                case "macos.creatorActivityID" -> putStr(result, "macos_creator_activity_id", unsignedAsString(value));
+                case "macos.processImageUUID" -> putStr(result, "macos_process_image_uuid", value.getStringValue());
+                case "macos.senderImagePath" -> putStr(result, "macos_sender_image_path", value.getStringValue());
+                case "macos.senderImageUUID" -> putStr(result, "macos_sender_image_uuid", value.getStringValue());
+                case "macos.senderProgramCounter" -> putStr(result, "macos_sender_program_counter", unsignedAsString(value));
+                default -> {
+                    // Ignore non-macos attributes.
+                }
+            }
+        }
+
+        // Derive the process name from the executable path.
+        if (processImagePath != null) {
+            Path path = Paths.get(processImagePath);
+            final var fileName = path.getFileName();
+            if (fileName != null) {
+                result.put(ProcessFields.PROCESS_NAME, fileName.toString());
+            }
+        }
+
+        return result;
+    }
+
+    private static void putStr(Map<String, Object> target, String field, String value) {
+        if (StringUtils.isNotBlank(value)) {
+            target.put(field, value);
+        }
+    }
+}

@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
+import type { CSSProperties } from 'react';
 
-const ControlLabel = styled(BootstrapControlLabel)(
+import { FormGroupControlIdContext } from './FormGroup';
+
+const StyledLabel = styled.label(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
     font-weight: bold;
@@ -26,6 +29,23 @@ const ControlLabel = styled(BootstrapControlLabel)(
     display: inline-block;
   `,
 );
+
+type Props = {
+  children: React.ReactNode;
+  className?: string;
+  htmlFor?: string;
+  style?: CSSProperties;
+};
+
+const ControlLabel = ({ children, className = undefined, htmlFor = undefined, style = undefined }: Props) => {
+  const controlId = useContext(FormGroupControlIdContext);
+
+  return (
+    <StyledLabel htmlFor={htmlFor ?? controlId} className={`${className ?? ''} control-label`} style={style}>
+      {children}
+    </StyledLabel>
+  );
+};
 
 /** @component */
 export default ControlLabel;

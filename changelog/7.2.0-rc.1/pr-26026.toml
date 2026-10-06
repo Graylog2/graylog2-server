@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix event definition procedure in sidebar when security license is absent."
+issues = ["Graylog2/graylog-plugin-enterprise#14259"]
+pulls = ["26026"]

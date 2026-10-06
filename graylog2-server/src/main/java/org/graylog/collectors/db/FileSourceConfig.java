@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
@@ -61,12 +62,12 @@ public abstract class FileSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id, CollectorOSType osType) {
         return Optional.of(FilelogReceiverConfig.builder(id)
                 .startAt(readMode())
                 .include(paths())
                 .includeFilePath(true)
-                .build());
+                .build(osType));
     }
 
     @AutoValue.Builder

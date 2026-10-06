@@ -31,12 +31,27 @@ public class TestMessageFactory implements MessageFactory {
     }
 
     @Override
+    public Message createUnaccountedMessage(String message, String source, DateTime timestamp) {
+        return new Message(message, source, timestamp, false);
+    }
+
+    @Override
     public Message createMessage(Map<String, Object> fields) {
         return new Message(fields);
     }
 
     @Override
+    public Message createUnaccountedMessage(Map<String, Object> fields) {
+        return new Message(fields, false);
+    }
+
+    @Override
     public Message createMessage(String id, Map<String, Object> newFields) {
         return new Message(id, newFields);
+    }
+
+    @Override
+    public Message createUnaccountedMessage(String id, Map<String, Object> newFields) {
+        return new Message(id, newFields, false);
     }
 }

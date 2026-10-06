@@ -23,6 +23,7 @@ import { Button } from 'components/bootstrap';
 import { PaginatedList, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import type { SlicingPreferences } from 'components/common/EntityDataTable/types';
 
 import SliceFilters, {
   ALPHABETICAL_SORT,
@@ -78,6 +79,8 @@ type Props = {
   fetchSlices: FetchSlices;
   sortOptions: Array<SortOption>;
   defaultSliceSort?: { mode: string; direction: SortDirection };
+  onSlicingPreferencesChange: (slicing: SlicingPreferences) => void;
+  slicingPreferences?: SlicingPreferences;
 };
 
 type UseAutoExpandEmptySlicesArgs = {
@@ -131,16 +134,21 @@ const SlicesOverview = ({
   fetchSlices,
   sortOptions,
   defaultSliceSort = undefined,
+  onSlicingPreferencesChange,
+  slicingPreferences = undefined,
 }: Props) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
-  const [sortMode, setSortMode] = useState<SortMode>(defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(
-    defaultSortDirectionForMode(sortMode, defaultSliceSort),
-  );
-  const sendTelemetry = useSendTelemetry();
+  const preferredSortMode = slicingPreferences?.sortBy;
+  const sortMode =
+    preferredSortMode && sortOptions.some((option) => option.value === preferredSortMode)
+      ? preferredSortMode
+      : (defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
+  const sortDirection = slicingPreferences?.order ?? defaultSortDirectionForMode(sortMode, defaultSliceSort);
+
+  const sendTelemetry = useSendTelemetry(appSection);
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
       fetchSlices,
@@ -162,15 +170,32 @@ const SlicesOverview = ({
     setEmptyPage(1);
   };
   const onSortModeUpdate = (mode: SortMode) => {
-    setSortMode(mode);
-    setSortDirection(defaultSortDirectionForMode(mode, defaultSliceSort));
+    const direction = defaultSortDirectionForMode(mode, defaultSliceSort);
+
     setNonEmptyPage(1);
     setEmptyPage(1);
+
+    if (sliceCol) {
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: mode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
+    }
   };
   const onSortDirectionUpdate = (direction: SortDirection) => {
-    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
+
+    if (sliceCol) {
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: sortMode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
+    }
   };
 
   const onToggleEmptySlices = () => {
@@ -178,7 +203,6 @@ const SlicesOverview = ({
       const next = !current;
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_EMPTY_VALUES_TOGGLED, {
-        app_section: appSection,
         event_details: {
           attribute_id: sliceCol,
           show_empty_slices: next,

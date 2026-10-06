@@ -26,6 +26,7 @@ import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import UserConfig from 'components/configurations/UserConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
+import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
 import PasswordComplexityConfig from 'components/configurations/PasswordComplexityConfig';
 
@@ -110,6 +111,14 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: MarkdownConfig,
         title: 'Markdown',
+      },
+    },
+    {
+      name: 'Welcome Page',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: WelcomePageConfig,
+        title: 'Welcome Page',
       },
     },
     {

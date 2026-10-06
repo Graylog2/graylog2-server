@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService.INPUTS_COLLECTION_NAME;
+import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService.ROUTING_RULES_COLLECTION_NAME;
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService.RULES_COLLECTION_NAME;
 
 /**
@@ -90,22 +92,20 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
     // or partial writes. Rebuilding from scratch on startup guarantees consistency.
     @Override
     public void upgrade() {
-        doUpgrade();
+        db.getCollection(RULES_COLLECTION_NAME).drop();
+        db.getCollection(ROUTING_RULES_COLLECTION_NAME).drop();
+        db.getCollection(INPUTS_COLLECTION_NAME).drop();
+        createMetadata();
     }
 
     private void createMetadata() {
         LOG.info("Rebuilding pipeline metadata collections.");
         final List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
+        final List<RoutingRuleDao> routingRuleRecords = new ArrayList<>();
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
-                pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
+                pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords, routingRuleRecords);
 
-        pipelineMetadataService.save(ruleRecords, false);
+        pipelineMetadataService.save(ruleRecords, routingRuleRecords, false);
         inputsMetadataService.save(inputMentions, false);
-    }
-
-    public void doUpgrade() {
-        db.getCollection(RULES_COLLECTION_NAME).drop();
-        db.getCollection(INPUTS_COLLECTION_NAME).drop();
-        createMetadata();
     }
 }

@@ -42,7 +42,7 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
   const { eventDefinition, isScheduled } = extractSchedulerInfo(rest);
 
   return EventsDefinitions.create(isScheduled, {
-    entity: eventDefinition,
+    entity: { ...eventDefinition, tactics_techniques: eventDefinition.tactics_techniques ?? [] },
     share_request: {
       selected_collections: share_request?.selected_collections,
       selected_grantee_capabilities: share_request?.selected_grantee_capabilities?.toJS(),

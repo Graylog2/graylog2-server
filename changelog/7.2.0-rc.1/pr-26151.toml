@@ -1,0 +1,4 @@
+type = "f"
+message = "Carry search filters into widget replay search so the replayed search matches what the widget displayed."
+issues = ["Graylog2/graylog-plugin-enterprise#8869"]
+pulls = ["26151"]

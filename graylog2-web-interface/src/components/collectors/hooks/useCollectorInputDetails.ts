@@ -19,8 +19,8 @@ import { useQueries } from '@tanstack/react-query';
 
 import { SystemInputs } from '@graylog/server-api';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
+import AppConfig from 'util/AppConfig';
 import { onError } from 'util/conditional/onError';
 import FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
@@ -28,12 +28,12 @@ import UserNotification from 'util/UserNotification';
 import { useCollectorInputIds } from './useCollectorInputIds';
 
 export const useCollectorInputDetails = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { data: collectorInputIds = [], isLoading: isLoadingIds } = useCollectorInputIds();
 
   const readableInputIds = useMemo(
-    () => collectorInputIds.filter((id) => isPermitted(currentUser?.permissions, `inputs:read:${id}`)),
-    [collectorInputIds, currentUser?.permissions],
+    () => collectorInputIds.filter((id) => isPermitted(`inputs:read:${id}`)),
+    [collectorInputIds, isPermitted],
   );
 
   const inputQueries = useQueries({
@@ -49,6 +49,7 @@ export const useCollectorInputDetails = () => {
           );
         }),
       retry: false,
+      enabled: !AppConfig.isCloud(),
       refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
     })),
   });

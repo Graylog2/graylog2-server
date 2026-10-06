@@ -44,7 +44,7 @@ import java.util.stream.StreamSupport;
 
 public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches extends Migration {
     private static final int DEFAULT_LIMIT = 15;
-    private static final Logger LOG = LoggerFactory.getLogger(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<Document> searches;
     private final Document matchValuePivots = doc("pivot.type", "values");

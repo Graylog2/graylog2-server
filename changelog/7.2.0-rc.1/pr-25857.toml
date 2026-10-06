@@ -1,0 +1,4 @@
+type = "a"
+message = "Display configuration warnings in data node detail page and in the support bundle"
+
+pulls = ["25857"]

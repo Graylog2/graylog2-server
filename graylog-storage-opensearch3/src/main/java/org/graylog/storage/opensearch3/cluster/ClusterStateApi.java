@@ -23,6 +23,7 @@ import org.opensearch.client.opensearch.cluster.StateResponse;
 import org.opensearch.client.opensearch.cluster.state.ClusterStateMetric;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,5 +75,9 @@ public class ClusterStateApi {
     /*
       Field name -> field properties (ignored, we don't need them)
      */
-    private record Mapping(Map<String, Object> properties) {}
+    private record Mapping(Map<String, Object> properties) {
+        public Map<String, Object> properties() {
+            return properties == null ? Collections.emptyMap() : properties;
+        }
+    }
 }

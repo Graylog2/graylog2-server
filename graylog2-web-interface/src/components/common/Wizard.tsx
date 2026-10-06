@@ -278,6 +278,7 @@ export type StepType<StepKey extends string> = {
   title: React.ReactNode;
   component: React.ReactElement;
   disabled?: boolean;
+  hidden?: boolean;
 };
 
 export type StepsType<StepKey extends string> = Array<StepType<StepKey>>;

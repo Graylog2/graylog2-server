@@ -1,0 +1,4 @@
+type = "f"
+message = "Upgrade openapi-explorer to fix schema parsing bugs in the REST API browser."
+
+pulls = ["26105"]

@@ -42,12 +42,7 @@ jest.mock(
     ),
 );
 
-jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
-  StreamRulesInputsStore: {
-    getInitialState: jest.fn(() => ({ inputs: [] })),
-    listen: jest.fn(() => jest.fn()),
-  },
-}));
+jest.mock('hooks/useStreamRulesInputs', () => jest.fn(() => ({ data: [] })));
 
 const commonAttributes: Attribute[] = [
   {

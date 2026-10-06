@@ -33,6 +33,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import type { Stream } from 'logic/streams/types';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -45,6 +46,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('views/hooks/useMinimumRefreshInterval');
 
 describe('NewSearchPage', () => {
   const query = {
@@ -62,6 +64,7 @@ describe('NewSearchPage', () => {
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue(query);
+    asMock(useMinimumRefreshInterval).mockReturnValue({ data: undefined, isInitialLoading: false });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({
       status: 'loaded',

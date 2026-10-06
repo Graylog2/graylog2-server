@@ -20,12 +20,12 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
 import asMock from 'helpers/mocking/AsMock';
-import ToolsStore from 'stores/tools/ToolsStore';
+import * as ToolsApi from 'api/tools';
 import { EMPTY_RANGE } from 'views/components/time-range-picker/TimeRangeDisplay';
 
 import OriginalTabKeywordTimeRange from './TabKeywordTimeRange';
 
-jest.mock('stores/tools/ToolsStore', () => ({
+jest.mock('api/tools', () => ({
   testNaturalDate: jest.fn(),
 }));
 
@@ -52,7 +52,7 @@ const TabKeywordTimeRange = ({
 
 describe('TabKeywordTimeRange', () => {
   beforeEach(() => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+    asMock(ToolsApi.testNaturalDate).mockImplementation(() =>
       Promise.resolve({
         type: 'absolute',
         from: '2018-11-14 13:52:38',
@@ -61,7 +61,7 @@ describe('TabKeywordTimeRange', () => {
       }),
     );
 
-    asMock(ToolsStore.testNaturalDate).mockClear();
+    asMock(ToolsApi.testNaturalDate).mockClear();
   });
 
   const changeInput = async (input, value) => {
@@ -87,23 +87,23 @@ describe('TabKeywordTimeRange', () => {
   });
 
   it('calls testNaturalDate', async () => {
-    expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
+    expect(ToolsApi.testNaturalDate).not.toHaveBeenCalled();
 
     await asyncRender(<TabKeywordTimeRange keyword="Last hour" />);
 
-    expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour', 'Europe/Berlin');
+    expect(ToolsApi.testNaturalDate).toHaveBeenCalledWith('Last hour', 'Europe/Berlin');
   });
 
   it('does not call testNaturalDate when keyword is empty', async () => {
-    expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
+    expect(ToolsApi.testNaturalDate).not.toHaveBeenCalled();
 
     await asyncRender(<TabKeywordTimeRange keyword="   " />);
 
-    expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
+    expect(ToolsApi.testNaturalDate).not.toHaveBeenCalled();
   });
 
   it('shows validation errors', async () => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+    asMock(ToolsApi.testNaturalDate).mockImplementation(() => Promise.reject());
 
     render(<TabKeywordTimeRange keyword="invalid" />);
 
@@ -111,7 +111,7 @@ describe('TabKeywordTimeRange', () => {
   });
 
   it('does not show keyword preview if parsing fails', async () => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+    asMock(ToolsApi.testNaturalDate).mockImplementation(() => Promise.reject());
     await asyncRender(<TabKeywordTimeRange keyword="invalid" />);
 
     await waitFor(() => expect(screen.getAllByText(EMPTY_RANGE).length).toEqual(2));

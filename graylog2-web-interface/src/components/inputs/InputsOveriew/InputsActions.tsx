@@ -16,18 +16,15 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
 
-import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
+import { ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
+import { ConfirmDialog, IfPermitted, LinkContainer, IconButton } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import useInputStateMutations from 'hooks/useInputsStateMutations';
@@ -43,33 +40,13 @@ type Props = {
   input: Input;
   inputTypes: InputTypesSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
-  currentNode: {
-    node?: {
-      cluster_id: string;
-      hostname: string;
-      is_leader: boolean;
-      is_master: boolean;
-      last_seen: string;
-      node_id: string;
-      short_node_id: string;
-      transport_address: string;
-    };
-  };
 };
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  align-items: center;
-
-  .dropdown.btn-group {
-    display: flex;
-  }
-`;
 
 const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
 const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
 const GL2_SOURCE_INPUT = 'gl2_source_input';
 
-const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNode }: Props) => {
+const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
@@ -79,7 +56,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const { updateInput, deleteInput } = useInputMutations();
   const { setupInput, stopInput: stopInputMutation } = useInputStateMutations(input as any);
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const openWizard = () => {
@@ -98,14 +74,12 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
     setShowConfigurationForm(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_EDIT_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'show-received-messages',
     });
   };
 
   const hanleInputUpdate = async (inputData: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
 
@@ -114,7 +88,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
 
   const enterInputSetupMode = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_ENTERED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-enter-setup',
     });
 
@@ -123,7 +96,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
 
   const exitInputSetupMode = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_EXITED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-exit-setup',
     });
 
@@ -132,7 +104,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
 
   const handleConfirmDelete = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DELETED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-delete',
     });
 
@@ -146,21 +117,22 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const queryField = input.type === FORWARDER_SERVICE_INPUT ? GL2_FORWARDER_INPUT : GL2_SOURCE_INPUT;
 
   return (
-    <StyledButtonToolbar>
+    <ButtonToolbar>
       <IfPermitted permissions={['searches:relative']}>
         <LinkContainer
           key={`received-messages-${input.id}`}
           to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
-          <Button
-            bsSize="xsmall"
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
-                app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'show-received-messages',
               });
-            }}>
-            Received messages
-          </Button>
+            }}
+          />
         </LinkContainer>
       </IfPermitted>
 
@@ -186,12 +158,11 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
                 to={
                   input.global
                     ? Routes.global_input_extractors(input.id)
-                    : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
+                    : Routes.local_input_extractors(input.node, input.id)
                 }>
                 <MenuItem
                   onClick={() => {
                     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
-                      app_pathname: getPathnameWithoutId(pathname),
                       app_action_value: 'manage-extractors',
                     });
                   }}>
@@ -205,7 +176,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
               key={`input-diagnosis-${input.id}`}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DIAGNOSIS_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
                   app_action_value: 'input-diagnosis',
                 });
               }}>
@@ -239,7 +209,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
               key={`show-metrics-${input.id}`}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
                   app_action_value: 'show-metrics',
                 });
               }}>
@@ -293,7 +262,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
           values={input.attributes}
         />
       )}
-    </StyledButtonToolbar>
+    </ButtonToolbar>
   );
 };
 

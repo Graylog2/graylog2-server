@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
 import type { Input } from 'components/messageloaders/Types';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStates, InputState } from 'hooks/useInputsStates';
-import { useStore } from 'stores/connect';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import useInputsList from 'hooks/useInputs';
 import { useQueryParams, ArrayParam, NumberParam, StringParam } from 'routing/QueryParams';
 
 import { RUNTIME_STATUS_FILTER, FAILED_MESSAGE, SETUP_MESSAGE, STOPPED_MESSAGE } from './Constants';
@@ -34,8 +33,6 @@ const INPUT_STATES = {
   FAILING: 'FAILING',
   SETUP: 'SETUP',
 } as const;
-
-const INPUTS_LIST_REFETCH_INTERVAL = 5000;
 
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
   const statesToCheck = Array.isArray(targetStates) ? targetStates : [targetStates];
@@ -77,20 +74,13 @@ const getNotificationItems = (
 
 const InputsNotifications = () => {
   const { data: inputStates, isLoading } = useInputsStates();
-  const inputs = useStore(InputsStore, (state) => state.inputs);
+  const { data: inputs } = useInputsList();
   const [, setQueryParams] = useQueryParams({
     filters: ArrayParam,
     page: NumberParam,
     slice: StringParam,
     sliceCol: StringParam,
   });
-
-  useEffect(() => {
-    InputsActions.list();
-    const interval = setInterval(InputsActions.list, INPUTS_LIST_REFETCH_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const applyRuntimeStatusFilter = useCallback(
     (status: 'FAILED' | 'SETUP' | 'NOT_RUNNING') => {

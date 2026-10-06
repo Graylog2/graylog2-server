@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix replayed search not refreshing when selecting a different event on the Bulk Replay Search page."
+issues = ["Graylog2/graylog-plugin-enterprise#14234"]
+pulls = ["25999"]

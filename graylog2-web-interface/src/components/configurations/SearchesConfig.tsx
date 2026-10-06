@@ -20,7 +20,6 @@ import moment from 'moment';
 import Immutable from 'immutable';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -39,11 +38,9 @@ import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import Alert from 'components/bootstrap/Alert';
-import useLocation from 'routing/useLocation';
 import ReadableDuration from 'components/common/ReadableDuration';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
@@ -89,7 +86,7 @@ const SearchesConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(
     undefined,
   );
@@ -104,8 +101,7 @@ const SearchesConfig = () => {
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
   const [timeRangePresetsUpdated, setTimeRangePresetsUpdated] = useState<Immutable.List<TimeRangePreset>>(undefined);
   const [showCancelAfterSeconds, setShowCancelAfterSeconds] = useState(false);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('search');
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
@@ -199,8 +195,6 @@ const SearchesConfig = () => {
     const update = { ...formConfig };
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.SEARCHES_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search',
       app_action_value: 'configuration-save',
     });
 

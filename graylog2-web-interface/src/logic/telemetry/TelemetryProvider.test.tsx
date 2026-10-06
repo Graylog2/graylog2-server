@@ -18,17 +18,12 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { asMock, MockStore } from 'helpers/mocking';
-import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
+import { asMock } from 'helpers/mocking';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
+import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 
-const mockedTelemetryConfig = {
-  api_key: 'key',
-  host: 'http://localhost',
-  enabled: true,
-};
 const mockTelemetryData = {
   current_user: {
     user: '1',
@@ -47,19 +42,10 @@ const mockTelemetryData = {
 jest.mock('logic/telemetry/TelemetryInfoModal', () => mockComponent('MockTelemetryInfoModal'));
 jest.mock('./useTelemetryData');
 
-jest.mock('util/AppConfig', () => ({
-  gl2ServerUrl: jest.fn(() => {
-    'http://localhost';
-  }),
-  gl2AppPathPrefix: jest.fn,
-  telemetry: jest.fn(() => mockedTelemetryConfig),
-}));
-
-jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
-  TelemetrySettingsActions: {
-    get: jest.fn(),
-  },
-  TelemetrySettingsStore: MockStore(),
+jest.mock('logic/telemetry/useTelemetrySettings', () => ({
+  useUpdateTelemetrySettings: jest.fn(() => ({
+    mutateAsync: jest.fn(() => Promise.resolve()),
+  })),
 }));
 
 jest.useFakeTimers();
@@ -85,17 +71,14 @@ const renderSUT = () => {
 describe('<TelemetryProvider>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    asMock(useUpdateTelemetrySettings).mockReturnValue({
+      mutateAsync: jest.fn(() => Promise.resolve()),
+    } as any);
   });
 
   it('should render TelemetryProvider', () => {
     asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
-
-    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySetting: {
-        telemetry_permission_asked: false,
-        telemetry_enabled: true,
-      },
-    });
 
     const consume = renderSUT();
 

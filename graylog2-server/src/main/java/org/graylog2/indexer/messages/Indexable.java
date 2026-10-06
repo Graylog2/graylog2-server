@@ -40,7 +40,31 @@ public interface Indexable {
      */
     String getMessageId();
 
+    /**
+     * Returns the size of this indexable in bytes as used for <em>output</em> traffic accounting; it is
+     * summed into the cluster output-traffic counter and persisted on the indexed document as
+     * {@link org.graylog2.plugin.Message#FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, the figure used for
+     * output-based license accounting.
+     * <p>
+     * Whether the value is counted at all is governed separately by {@link #isAccounted()}.
+     */
     long getSize();
+
+
+    /**
+     * Returns the size of this indexable in bytes as used for <em>input</em> traffic accounting — the
+     * size of the data as originally received at the input, before processing.
+     * <p>
+     * The value is summed into the cluster input-indexed-traffic counter and is the figure used for
+     * input-based license accounting. The default of {@code 0} reflects that a generic indexable has no
+     * associated input message (for example, internally generated indexables);
+     * {@link org.graylog2.plugin.Message} overrides this to report the size recorded at decode time.
+     * <p>
+     * Whether the value is counted at all is governed separately by {@link #isAccounted()}.
+     */
+    default long getInputMessageSize() {
+        return 0L;
+    }
 
     DateTime getReceiveTime();
 
@@ -70,5 +94,16 @@ public interface Indexable {
      */
     default boolean supportsFailureHandling() {
         return false;
+    }
+
+    /**
+     * Whether this indexable is counted in license/traffic accounting.
+     * <p>
+     * When {@code false}, the indexable is excluded from <em>both</em> the output- and input-traffic
+     * counters, so it counts against neither output-based nor input-based license traffic. Defaults to
+     * {@code true}.
+     */
+    default boolean isAccounted() {
+        return true;
     }
 }

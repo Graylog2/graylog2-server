@@ -15,16 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
 import type { DataNode } from 'components/datanode/Types';
-
-const StatusLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`;
 
 type Props = {
   dataNode: DataNode;
@@ -35,17 +28,17 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
 
   return (
     <>
-      <StatusLabel
+      <Label
         bsStyle={datanodeDisabled ? 'warning' : 'success'}
         title={dataNode.datanode_status}
         aria-label={dataNode.datanode_status}>
         {dataNode.datanode_status}
-      </StatusLabel>
+      </Label>
       &nbsp;
       {dataNode.action_queue && (
-        <StatusLabel bsStyle="warning" title={dataNode.datanode_status} aria-label={dataNode.datanode_status}>
+        <Label bsStyle="warning" title={dataNode.datanode_status} aria-label={dataNode.datanode_status}>
           queued for {dataNode.action_queue}
-        </StatusLabel>
+        </Label>
       )}
     </>
   );

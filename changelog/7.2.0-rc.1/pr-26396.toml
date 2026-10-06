@@ -1,0 +1,5 @@
+type = "s"
+message = "Upgrade OpenSearch bundled log4j dependencies from 2.25.3 to 2.25.4 in Data Node."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14512"]
+pulls = ["26396"]

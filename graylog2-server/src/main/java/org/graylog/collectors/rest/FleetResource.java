@@ -29,6 +29,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -45,6 +46,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorInstanceService.InstanceCount;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
@@ -62,6 +64,7 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
@@ -76,6 +79,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class FleetResource extends RestResource {
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
@@ -155,18 +159,21 @@ public class FleetResource extends RestResource {
         final var instanceCounts = instanceService.countByFleetGrouped(
                 Instant.now().minus(getOfflineThreshold()));
         final var sourceCountByFleet = sourceService.countByFleetGrouped();
+        final var assignedCountByFleet = fleetService.countAssignedInstancesByFleet();
 
         final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
+                .filter(fleet -> isPermitted(CollectorsPermissions.FLEET_READ, fleet.id()))
                 .sorted(Comparator.comparing(FleetDTO::name))
                 .map(fleet -> {
-                    final long[] counts = instanceCounts.getOrDefault(fleet.id(), new long[]{0, 0});
+                    final var count = instanceCounts.getOrDefault(fleet.id(), new InstanceCount(0L, 0L));
                     return new BulkFleetStatsResponse.FleetStatsSummary(
                             fleet.id(),
                             fleet.name(),
-                            counts[0],
-                            counts[1],
-                            counts[0] - counts[1],
-                            sourceCountByFleet.getOrDefault(fleet.id(), 0L));
+                            count.total(),
+                            count.online(),
+                            count.offline(),
+                            sourceCountByFleet.getOrDefault(fleet.id(), 0L),
+                            assignedCountByFleet.getOrDefault(fleet.id(), 0L));
                 })
                 .toList();
 
@@ -182,12 +189,9 @@ public class FleetResource extends RestResource {
         if (fleetService.get(fleetId).isEmpty()) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }
-        final long totalInstances = instanceService.countByFleet(fleetId);
-        final long onlineInstances = instanceService.countOnlineByFleet(fleetId,
-                Instant.now().minus(getOfflineThreshold()));
+        final var instances = instanceService.countByFleet(fleetId, Instant.now().minus(getOfflineThreshold()));
         final long totalSources = sourceService.countByFleet(fleetId);
-        return new FleetStatsResponse(totalInstances, onlineInstances,
-                totalInstances - onlineInstances, totalSources);
+        return new FleetStatsResponse(instances.total(), instances.online(), instances.offline(), totalSources);
     }
 
     @POST
@@ -223,11 +227,21 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Delete a fleet")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "The fleet still has assigned instances"),
+    })
     @NoAuditEvent("inline")
     public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_DELETE, fleetId);
         final var fleet = fleetService.get(fleetId)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+        final long assignedInstances = fleetService.countAssignedInstances(fleetId);
+        if (assignedInstances > 0) {
+            throw new ClientErrorException(
+                    "Fleet " + fleetId + " still has " + assignedInstances + " assigned instance(s). "
+                            + "Reassign or delete them before deleting the fleet.",
+                    Response.Status.CONFLICT);
+        }
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }

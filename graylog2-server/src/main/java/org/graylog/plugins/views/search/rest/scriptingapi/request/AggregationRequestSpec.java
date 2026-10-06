@@ -33,8 +33,8 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
                                      @JsonProperty("streams") Set<String> streams,
                                      @JsonProperty("stream_categories") Set<String> streamCategories,
                                      @JsonProperty("timerange") TimeRange timerange,
-                                     @JsonProperty("group_by") @Valid @NotEmpty List<Grouping> groupings,
-                                     @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics) implements SearchRequestSpec {
+                                     @JsonProperty("group_by") @NotEmpty List<@Valid Grouping> groupings,
+                                     @JsonProperty("metrics") @NotEmpty List<@Valid Metric> metrics) implements SearchRequestSpec {
 
 
     public AggregationRequestSpec {

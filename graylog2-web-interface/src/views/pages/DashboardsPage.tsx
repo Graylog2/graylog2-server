@@ -21,12 +21,17 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DashboardsOverview from 'views/components/dashboard/DashboardsOverview';
 import CreateButton from 'components/common/CreateButton';
+import IfPermitted from 'components/common/IfPermitted';
 
 const DashboardsPage = () => (
   <DocumentTitle title="Dashboards">
     <PageHeader
       title="Dashboards"
-      actions={<CreateButton entityKey="Dashboard" />}
+      actions={
+        <IfPermitted permissions={['dashboards:create']}>
+          <CreateButton entityKey="Dashboard" />
+        </IfPermitted>
+      }
       documentationLink={{
         title: 'Dashboard documentation',
         path: DocsHelper.PAGES.DASHBOARDS,

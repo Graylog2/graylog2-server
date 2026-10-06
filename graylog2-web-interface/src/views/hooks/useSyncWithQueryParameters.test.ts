@@ -23,6 +23,8 @@ import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import { asMock } from 'helpers/mocking';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewType from 'views/hooks/useViewType';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
 
@@ -30,6 +32,7 @@ import useSyncWithQueryParameters from './useSyncWithQueryParameters';
 
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useViewType');
+jest.mock('views/hooks/useGlobalOverride');
 jest.mock('routing/useHistory');
 
 const lastFiveMinutes: RelativeTimeRange = { type: 'relative', from: 300 };
@@ -48,6 +51,7 @@ describe('SyncWithQueryParameters', () => {
     asMock(useHistory).mockReturnValue(history);
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes));
+    asMock(useGlobalOverride).mockReturnValue(undefined);
   });
 
   afterEach(() => {
@@ -62,12 +66,12 @@ describe('SyncWithQueryParameters', () => {
     expect(history.push).not.toHaveBeenCalled();
   });
 
-  it('does not do anything if current view is not a search', () => {
+  it('strips stale q/timerange params from URL on a dashboard when globalOverride is empty', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-    renderHook(() => useSyncWithQueryParameters('/search'));
+    asMock(useGlobalOverride).mockReturnValue(undefined);
+    renderHook(() => useSyncWithQueryParameters('/dashboards/abc?q=stale&rangetype=relative&relative=3600'));
 
-    expect(history.replace).not.toHaveBeenCalled();
-    expect(history.push).not.toHaveBeenCalled();
+    expect(history.replace).toHaveBeenCalledWith('/dashboards/abc');
   });
 
   describe('if current view is search, adds state to history', () => {
@@ -187,6 +191,79 @@ describe('SyncWithQueryParameters', () => {
       await waitFor(() =>
         expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=900'),
       );
+    });
+  });
+
+  describe('if current view is dashboard with a globalOverride', () => {
+    beforeEach(() => {
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    });
+
+    it('does not touch history when no globalOverride is set and URL has no q/range params', () => {
+      asMock(useGlobalOverride).mockReturnValue(undefined);
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).not.toHaveBeenCalled();
+      expect(history.push).not.toHaveBeenCalled();
+    });
+
+    it('writes q from globalOverride.query to URL', () => {
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.builder().query({ type: 'elasticsearch', query_string: 'source:nginx' }).build(),
+      );
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?q=source%3Anginx');
+    });
+
+    it('writes relative timerange from globalOverride.timerange to URL', () => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create({ type: 'relative', range: 3600 }));
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?rangetype=relative&relative=3600');
+    });
+
+    it('writes absolute timerange from globalOverride.timerange to URL', () => {
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.create({
+          type: 'absolute',
+          from: '2024-01-01T00:00:00.000Z',
+          to: '2024-01-02T00:00:00.000Z',
+        }),
+      );
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith(
+        '/dashboards/abc?rangetype=absolute&from=2024-01-01T00%3A00%3A00.000Z&to=2024-01-02T00%3A00%3A00.000Z',
+      );
+    });
+
+    it('writes keyword timerange from globalOverride.timerange to URL', () => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create({ type: 'keyword', keyword: 'Last five days' }));
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?rangetype=keyword&keyword=Last+five+days');
+    });
+
+    it('writes both q and timerange when globalOverride has both', () => {
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.builder()
+          .query({ type: 'elasticsearch', query_string: 'source:nginx' })
+          .timerange({ type: 'relative', range: 3600 })
+          .build(),
+      );
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?q=source%3Anginx&rangetype=relative&relative=3600');
+    });
+
+    it('preserves unrelated query parameters', () => {
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.builder().query({ type: 'elasticsearch', query_string: 'source:nginx' }).build(),
+      );
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc?focusedWidget=widget-1'));
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?focusedWidget=widget-1&q=source%3Anginx');
     });
   });
 });

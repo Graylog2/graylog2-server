@@ -23,11 +23,11 @@ import AppRoutes, { SECURITY_PATH } from 'routing/Routes';
 import { Overview, UserActivity, HostActivity, NetworkActivity, Anomalies } from 'components/security/pages';
 
 const subRoutes = [
-  { path: AppRoutes.SECURITY.OVERVIEW, element: <Overview /> },
-  { path: AppRoutes.SECURITY.USER_ACTIVITY, element: <UserActivity /> },
-  { path: AppRoutes.SECURITY.HOST_ACTIVITY, element: <HostActivity /> },
-  { path: AppRoutes.SECURITY.NETWORK_ACTIVITY, element: <NetworkActivity /> },
-  { path: AppRoutes.SECURITY.ANOMALIES, element: <Anomalies /> },
+  { path: AppRoutes.unqualified.SECURITY.OVERVIEW, element: <Overview /> },
+  { path: AppRoutes.unqualified.SECURITY.USER_ACTIVITY, element: <UserActivity /> },
+  { path: AppRoutes.unqualified.SECURITY.HOST_ACTIVITY, element: <HostActivity /> },
+  { path: AppRoutes.unqualified.SECURITY.NETWORK_ACTIVITY, element: <NetworkActivity /> },
+  { path: AppRoutes.unqualified.SECURITY.ANOMALIES, element: <Anomalies /> },
 ].map((route) => ({ ...route, path: route.path.slice(SECURITY_PATH.length) }));
 
 const SecurityPage = () => (

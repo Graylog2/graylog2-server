@@ -28,6 +28,8 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -57,6 +59,11 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     }
 
     @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.STREAMS_READ);
+    }
+
+    @Override
     public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
         try (var dtos = streamService.streamAllDTOs()) {
             return getObjectMapper().writeValueAsString(
@@ -64,7 +71,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                             .map(stream -> Map.of(
                                     "id", stream.getId(),
                                     "title", stream.getTitle(),
-                                    "description", stream.getDescription(),
+                                    "description", Objects.requireNonNullElse(stream.getDescription(), ""),
                                     "disabled", stream.getDisabled(),
                                     "matching_type", stream.getMatchingType(),
                                     "created_at", stream.getCreatedAt(),

@@ -87,17 +87,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         configureOpensearchKeystoreSecrets(config);
         final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
-        logWarnings(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
-    }
-
-    private void logWarnings(OpensearchConfiguration config) {
-        if (!config.warnings().isEmpty()) {
-            LOG.warn("Your system is overriding forbidden opensearch configuration properties. " +
-                    "This may cause unexpected results and may break in any future release!");
-        }
-        config.warnings().forEach(LOG::warn);
     }
 
     private void configureOpensearchKeystoreSecrets(OpensearchConfiguration config) {
@@ -122,11 +113,29 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void waitForProcessTermination() {
+        final long pid = commandLineProcess.processInfo().pid();
+        if (waitUntilTerminated(60)) {
+            LOG.info("Process " + pid + " successfully terminated.");
+            return;
+        }
+
+        LOG.warn("Process " + pid + " didn't terminate gracefully within timeout, forcing termination.");
+        commandLineProcess.destroyForcibly();
+
+        if (!waitUntilTerminated(10)) {
+            final String message = "Failed to terminate opensearch process " + pid;
+            LOG.error(message);
+            throw new RuntimeException(message);
+        }
+        LOG.info("Process " + pid + " forcibly terminated.");
+    }
+
+    private boolean waitUntilTerminated(long timeoutSeconds) {
         try {
             RetryerBuilder.newBuilder()
                     .retryIfResult(Boolean.TRUE::equals)
                     .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
-                    .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(timeoutSeconds, TimeUnit.SECONDS))
                     .withRetryListener(new RetryListener() {
                         @Override
                         public <V> void onRetry(Attempt<V> attempt) {
@@ -135,11 +144,9 @@ public class OpensearchCommandLineProcess implements Closeable {
                     })
                     .build()
                     .call(() -> commandLineProcess.processInfo().alive());
-            LOG.info("Process " + commandLineProcess.processInfo().pid() + " successfully terminated.");
+            return true;
         } catch (ExecutionException | RetryException e) {
-            final String message = "Failed to terminate opensearch process " + commandLineProcess.processInfo().pid();
-            LOG.error(message, e);
-            throw new RuntimeException(message, e);
+            return false;
         }
     }
 

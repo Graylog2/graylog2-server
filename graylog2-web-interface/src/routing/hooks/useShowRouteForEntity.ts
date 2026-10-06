@@ -120,6 +120,13 @@ export const usePluginEntityTypeGenerators = () => {
   );
 };
 
+export const useGetEntityRoute = () => {
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+  const entityTypeGenerators = usePluginEntityTypeGenerators();
+
+  return (id: string, type: string) => getEntityRoute(id, type, pluginEntityRoutesResolver, entityTypeGenerators);
+};
+
 const useShowRouteForEntity = (id: string, type: string) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();

@@ -1,0 +1,5 @@
+type = "f"
+message = "Show the Outputs and Pipelines count columns for the default stream in the Streams overview."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14572"]
+pulls = ["26971"]

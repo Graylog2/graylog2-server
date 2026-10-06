@@ -29,6 +29,8 @@ import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -40,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -49,6 +52,8 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStr
         defaultImpl = SearchTypeEntity.Fallback.class)
 @JsonAutoDetect
 public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
+    Logger LOG = LoggerFactory.getLogger(SearchTypeEntity.class);
+
     String TYPE_FIELD = "type";
     String FIELD_SEARCH_FILTERS = "filters";
 
@@ -207,17 +212,30 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
     default Set<String> mappedStreams(Map<EntityDescriptor, Object> nativeEntities) {
         return streams().stream()
-                .map(id -> resolveStreamEntityObject(id, nativeEntities))
-                .map(object -> {
-                    if (object == null) {
-                        throw new ContentPackException("Missing Stream for event definition");
-                    } else if (object instanceof Stream) {
-                        Stream stream = (Stream) object;
-                        return stream.getId();
-                    } else {
-                        throw new ContentPackException(
-                                "Invalid type for stream Stream for event definition: " + object.getClass());
-                    }
-                }).collect(Collectors.toSet());
+                .map(streamId -> resolveStreamReference(streamId, nativeEntities))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Resolves a single stream reference from the search type's {@code streams} set to the native stream id.
+     * <p>
+     * A reference that cannot be resolved (e.g. a dangling reference left over in an exported content pack) is
+     * skipped with a warning rather than aborting the whole content pack installation. Note this import side is
+     * deliberately more tolerant than the export side ({@code SearchType.mappedStreams}), which still throws on an
+     * unresolvable reference.
+     */
+    default Optional<String> resolveStreamReference(String streamId, Map<EntityDescriptor, Object> nativeEntities) {
+        final Object object = resolveStreamEntityObject(streamId, nativeEntities);
+        if (object == null) {
+            LOG.warn("Skipping unresolvable stream reference <{}> for search type <{}> during content pack installation", streamId, id());
+            return Optional.empty();
+        } else if (object instanceof Stream) {
+            return Optional.of(((Stream) object).getId());
+        } else {
+            throw new ContentPackException(
+                    f("Invalid type for stream <%s> in search type <%s>: %s", streamId, id(), object.getClass()));
+        }
     }
 }

@@ -66,6 +66,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_STOP = "datanode:stop";
     public static final String DATANODE_START = "datanode:start";
     public static final String DATANODE_MIGRATION = "datanode:migration";
+    public static final String DATANODE_RESTART = "datanode:restart";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
@@ -100,6 +101,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";
     public static final String INDICES_READ = "indices:read";
+    public static final String INDICES_REINDEX = "indices:reindex";
     public static final String INPUTS_CHANGESTATE = "inputs:changestate";
     public static final String INPUTS_CREATE = "inputs:create";
     public static final String INPUTS_EDIT = "inputs:edit";
@@ -230,6 +232,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_STOP, ""))
             .add(create(DATANODE_START, ""))
             .add(create(DATANODE_MIGRATION, ""))
+            .add(create(DATANODE_RESTART, ""))
             .add(create(DATANODE_OPENSEARCH_PROXY, ""))
             .add(create(DATANODE_REST_PROXY, ""))
             .add(create(GRAYLOG_CA_CREATE, ""))
@@ -268,6 +271,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INDICES_DELETE, ""))
             .add(create(INDICES_FAILURES, ""))
             .add(create(INDICES_READ, ""))
+            .add(create(INDICES_REINDEX, ""))
             .add(create(INPUTS_CHANGESTATE, ""))
             .add(create(INPUTS_CREATE, ""))
             .add(create(INPUTS_EDIT, ""))

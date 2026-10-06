@@ -1,0 +1,4 @@
+type = "c"
+message = "Generate stable operation IDs in OpenAPI description."
+
+pulls = ["25862", "graylog-plugin-enterprise#14125"]

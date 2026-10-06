@@ -16,16 +16,15 @@
  */
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useStore } from 'stores/connect';
 import { Link, SelectableList } from 'components/common';
 import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import { RulesStore } from 'stores/rules/RulesStore';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import { useRules } from 'components/rules/hooks/useRules';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import usePermissions from 'hooks/usePermissions';
 
 type Props = {
   pipeline: PipelineType;
@@ -46,7 +45,7 @@ const StageForm = ({
   save,
   disableEdit = false,
 }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const _initialStageNumber = useMemo(
@@ -55,17 +54,17 @@ const StageForm = ({
   );
 
   const [nextStage, setNextStage] = useState<StageType>({ ...stage, stage: _initialStageNumber });
-  const { rules } = useStore(RulesStore);
+  const { data: rules } = useRules();
 
   const openModal = () => {
     setShowModal(true);
   };
 
-  const _onChange = ({ target }) => {
+  const _onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setNextStage((currentStage) => ({ ...currentStage, [target.name]: getValueFromInput(target) }));
   };
 
-  const _onRulesChange = (newRules) => {
+  const _onRulesChange = (newRules: Array<string>) => {
     setNextStage((currentStage) => ({ ...currentStage, rules: newRules }));
   };
 
@@ -88,9 +87,9 @@ const StageForm = ({
     }
   };
 
-  const _formatRuleOption = ({ title }) => ({ value: title, label: title });
+  const _formatRuleOption = ({ title }: RuleType) => ({ value: title, label: title });
 
-  const _filterChosenRules = (rule, chosenRules) => !chosenRules.includes(rule.title);
+  const _filterChosenRules = (rule: RuleType, chosenRules: Array<string>) => !chosenRules.includes(rule.title);
 
   const _getFormattedOptions = useCallback(() => {
     const chosenRules = nextStage.rules;
@@ -111,7 +110,7 @@ const StageForm = ({
   return (
     <span>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
+        disabled={!isPermitted('pipeline:edit') || disableEdit}
         onClick={openModal}
         bsStyle={create ? 'primary' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}

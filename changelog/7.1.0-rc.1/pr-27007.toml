@@ -1,0 +1,5 @@
+type = "f"
+message = "Data node ships with OpenSearch 2.19.6 and 3.7.0."
+
+issues = ["26799"]
+pulls = ["27007"]

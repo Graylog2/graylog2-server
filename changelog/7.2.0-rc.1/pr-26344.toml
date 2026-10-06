@@ -1,0 +1,3 @@
+type = "s"
+message = "Validate ownership for share requests when updating view (search/dashboard)."
+pulls = ["26344"]

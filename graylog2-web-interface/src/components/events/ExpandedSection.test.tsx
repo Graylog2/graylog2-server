@@ -35,7 +35,7 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
-  useGetEventDefinition: () => ({
+  useEventDefinitionWithContext: () => ({
     data: { eventDefinition: { event_procedure: '' } },
     isFetching: false,
   }),
@@ -48,12 +48,6 @@ describe('ExpandedSection', () => {
   ];
 
   asMock(useTableFetchContext).mockReturnValue({
-    searchParams: {
-      page: 1,
-      pageSize: 10,
-      query: '',
-      sort: { attributeId: 'timestamp', direction: 'desc' },
-    },
     refetch: jest.fn(),
     attributes,
     entityTableId: eventsTableElements.defaultLayout.entityTableId,

@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Modal, Button } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
-import { useStore } from 'stores/connect';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import StreamsContext from 'contexts/StreamsContext';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
 import { ModalSubmit } from 'components/common';
@@ -58,8 +57,10 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   } = useMessageFavoriteFieldsForEditing();
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
-  const messageStreams = useStore(StreamsStore, ({ streams }) =>
-    streams.filter((stream) => message.fields.streams.includes(stream.id)),
+  const streams = useContext(StreamsContext);
+  const messageStreams = useMemo(
+    () => (streams ?? []).filter((stream) => message.fields.streams.includes(stream.id)),
+    [streams, message.fields.streams],
   );
 
   const _saveFavoriteField = useCallback(() => {

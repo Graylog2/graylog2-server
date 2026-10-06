@@ -15,21 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import UserNotification from 'util/UserNotification';
-import { isPermitted } from 'util/PermissionsMixin';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import { useStore } from 'stores/connect';
 import { ConfirmDialog, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
-import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
-
-import useCurrentUser from '../../hooks/useCurrentUser';
+import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'logic/streams/types';
+import usePermissions from 'hooks/usePermissions';
 
 const ActionButtonsWrap = styled.span(
   ({ theme }) => css`
@@ -52,15 +49,11 @@ type Props = {
 };
 
 const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: inputs } = useStreamRulesInputs();
   const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
-
-  useEffect(() => {
-    StreamRulesInputsActions.list();
-  }, []);
 
   const onConfirmDelete = () => {
     removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
@@ -91,7 +84,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
     </ActionButtonsWrap>
   );
 
-  const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
+  const actionItems = isPermitted([`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small> ({streamRule.description})</small> : null;
 
   return (
