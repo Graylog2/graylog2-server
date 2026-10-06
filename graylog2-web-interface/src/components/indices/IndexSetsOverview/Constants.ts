@@ -37,7 +37,7 @@ export const filterCloudHiddenAttributes = <T extends string | { id: string }>(i
 export const CATEGORY_ATTRIBUTE = 'category';
 
 export const INDEX_SET_CATEGORY_TITLES: Record<IndexSetCategory, string> = {
-  user: 'User',
+  user: 'User-defined',
   illuminate: 'Illuminate',
   system: 'System',
 };

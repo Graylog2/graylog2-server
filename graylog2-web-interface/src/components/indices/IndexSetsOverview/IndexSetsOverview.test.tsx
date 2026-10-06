@@ -156,7 +156,7 @@ describe('IndexSetsOverview', () => {
     render(<IndexSetsOverview />);
 
     await screen.findByRole('button', { name: /^all\s*9/i });
-    await screen.findByRole('button', { name: /^user\s*5/i });
+    await screen.findByRole('button', { name: /^user-defined\s*5/i });
     await screen.findByRole('button', { name: /^system\s*4/i });
 
     expect(screen.queryByRole('button', { name: /^illuminate/i })).not.toBeInTheDocument();
