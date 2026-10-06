@@ -36,7 +36,6 @@ public class PathConfiguration extends PluginPathConfiguration implements Native
     @Documentation("""
             Set the bin directory here (relative or absolute)
             This directory contains binaries that are used by the Graylog server.
-            Default: bin
             """)
     @Parameter(value = "bin_dir", required = true)
     private Path binDir = DEFAULT_BIN_DIR;

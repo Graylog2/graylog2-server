@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
@@ -64,6 +65,7 @@ import org.graylog2.contentpacks.model.entities.MessageListEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
+import org.graylog2.contentpacks.model.entities.ScopedContentPackEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
@@ -71,6 +73,9 @@ import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
@@ -111,7 +116,7 @@ public class ViewFacadeTest {
         protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new IgnoreSearchFilters());
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new IgnoreSearchFilters());
         }
     }
 
@@ -177,6 +182,7 @@ public class ViewFacadeTest {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         assertThat(viewEntity.title().asString()).isEqualTo(viewDTO.title());
         assertThat(viewEntity.type().toString()).isEqualTo(ViewDTO.Type.SEARCH.toString());
+        assertThat(viewEntity.scope().asString()).isEqualTo(DefaultEntityScope.NAME);
 
         assertThat(viewEntity.search().queries().size()).isEqualTo(1);
         final QueryEntity queryEntity = viewEntity.search().queries().iterator().next();
@@ -252,6 +258,72 @@ public class ViewFacadeTest {
     }
 
     @Test
+    public void itShouldUseScopedEntities() {
+        assertThat(facade.usesScopedEntities()).isTrue();
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldCreateAScopedDTOFromAScopedEntity() throws Exception {
+        final NativeEntity<ViewDTO> nativeEntity = createNativeView(ImmutableSystemScope.NAME);
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id()))
+                .hasValueSatisfying(view -> assertThat(view.scope()).isEqualTo(ImmutableSystemScope.NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldInstallEntitiesWithoutScopeWithDefaultScope() throws Exception {
+        final EntityV1 entity = createViewEntity(ImmutableSystemScope.NAME, "title");
+        final ObjectNode dataWithoutScope = entity.data().deepCopy();
+        dataWithoutScope.remove(ScopedContentPackEntity.FIELD_SCOPE);
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(Set.of()),
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
+
+        final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(entity.toBuilder().data(dataWithoutScope).build(),
+                Collections.emptyMap(), streamNativeEntities(), "testuser");
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id()))
+                .hasValueSatisfying(view -> assertThat(view.scope()).isEqualTo(DefaultEntityScope.NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldExposeScopeInViewSummaries() throws Exception {
+        final NativeEntity<ViewDTO> nativeEntity = createNativeView(ImmutableSystemScope.NAME);
+
+        assertThat(viewSummaryService.get(nativeEntity.descriptor().id().id()))
+                .hasValueSatisfying(summary -> assertThat(summary.scope()).isEqualTo(ImmutableSystemScope.NAME));
+        assertThat(viewSummaryService.get(viewId))
+                .hasValueSatisfying(summary -> assertThat(summary.scope()).isEqualTo(DefaultEntityScope.NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldUpdateAnImmutableViewAndKeepItsScope() throws Exception {
+        final NativeEntity<ViewDTO> nativeEntity = createNativeView(ImmutableSystemScope.NAME);
+
+        facade.updateNativeEntity(createViewEntity(DefaultEntityScope.NAME, "updated title"), nativeEntity,
+                Collections.emptyMap(), streamNativeEntities(), "testuser");
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id())).hasValueSatisfying(view -> {
+            assertThat(view.title()).isEqualTo("updated title");
+            assertThat(view.scope()).isEqualTo(ImmutableSystemScope.NAME);
+        });
+    }
+
+    @Test
+    @MongoDBFixtures("ViewFacadeTest.json")
+    public void itShouldDeleteAnImmutableView() throws Exception {
+        final NativeEntity<ViewDTO> nativeEntity = createNativeView(ImmutableSystemScope.NAME);
+
+        facade.delete(nativeEntity.entity());
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id())).isEmpty();
+    }
+
+    @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForInstallation() throws Exception {
         Entity streamEntity = createStreamEntity();
@@ -295,7 +367,22 @@ public class ViewFacadeTest {
                 .build();
     }
 
+    private NativeEntity<ViewDTO> createNativeView(String scope) throws Exception {
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(Set.of()),
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
+        return facade.createNativeEntity(createViewEntity(scope, "title"), Collections.emptyMap(), streamNativeEntities(), "testuser");
+    }
+
+    private Map<EntityDescriptor, Object> streamNativeEntities() {
+        return Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), new StreamMock(Collections.emptyMap()));
+    }
+
     private EntityV1 createViewEntity() throws Exception {
+        return createViewEntity(DefaultEntityScope.NAME, "title");
+    }
+
+    private EntityV1 createViewEntity(String scope, String title) throws Exception {
         final QueryEntity query = QueryEntity.builder()
                 .id("dead-beef")
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
@@ -319,9 +406,10 @@ public class ViewFacadeTest {
                 .build();
         String newViewId = "5def958063303ae5f68edead";
         final ViewEntity entity = ViewEntity.builder()
+                .scope(ValueReference.of(scope))
                 .type(ViewEntity.Type.SEARCH)
                 .summary(ValueReference.of("summary"))
-                .title(ValueReference.of("title"))
+                .title(ValueReference.of(title))
                 .description(ValueReference.of("description"))
                 .search(searchEntity)
                 .properties(Set.of())

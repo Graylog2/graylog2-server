@@ -16,19 +16,18 @@
  */
 import React from 'react';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 
 const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   if (!title) {
     return <em>{id}</em>;
   }
 
-  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
+  if (isPermitted(`eventdefinitions:read:${id}`)) {
     return <SidebarNavigationLink content={SidebarEventDefinitionDetails(id)}>{title}</SidebarNavigationLink>;
   }
 
