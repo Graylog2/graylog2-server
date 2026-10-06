@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { MIGRATION_STATE } from 'components/datanode/Constants';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 import useMigrationState from './useMigrationState';
 import useRunsWithDataNode from './useRunsWithDataNode';
@@ -25,8 +24,8 @@ const useShowDatanodeMigration = (): {
   isDatanodeConfiguredAndUsed: boolean;
   showDatanodeMigration: boolean;
 } => {
-  const { permissions } = useCurrentUser();
-  const canStartDataNode = isPermitted(permissions, 'datanode:start');
+  const { isPermitted } = usePermissions();
+  const canStartDataNode = isPermitted('datanode:start');
 
   const { data: isDatanodeConfiguredAndUsed } = useRunsWithDataNode({ enabled: canStartDataNode });
 
