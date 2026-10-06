@@ -132,6 +132,6 @@ class IndexAllocationResourceTest {
 
     private static ShardExplanation explanation(UnassignedShard shard) {
         return new ShardExplanation(shard.index(), shard.shard(), shard.primary(), "unassigned", shard.reason(),
-                shard.since(), 5, null, null, "no", null, false, List.of(), null);
+                shard.since(), 5, null, null, "no", null, false, List.of(), null, null);
     }
 }

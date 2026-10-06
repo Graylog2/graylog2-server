@@ -23,7 +23,8 @@ import java.util.List;
 /**
  * The essentials of one {@code _cluster/allocation/explain} answer: which shard, why it is unassigned, whether it
  * can be allocated, and per node only the deciders that said NO (or THROTTLE). Weights, YES decisions and store
- * details are dropped. Decider names and wording differ between OpenSearch versions: display text only.
+ * details are dropped from the display fields; {@code diagnosis} is computed from the full answer
+ * ({@link AllocationDiagnoser}).
  */
 public record ShardExplanation(@JsonProperty("index") String index,
                                @JsonProperty("shard") int shard,
@@ -38,6 +39,7 @@ public record ShardExplanation(@JsonProperty("index") String index,
                                @JsonProperty("explanation") String explanation,
                                @JsonProperty("max_retries_exceeded") boolean maxRetriesExceeded,
                                @JsonProperty("nodes") List<NodeDecision> nodes,
+                               @JsonProperty("diagnosis") AllocationDiagnosis diagnosis,
                                @JsonProperty("error") String error) {
 
     public record NodeDecision(@JsonProperty("node_name") String nodeName,
@@ -53,7 +55,7 @@ public record ShardExplanation(@JsonProperty("index") String index,
     /** An unassigned shard whose explain call failed (e.g. it got assigned in the meantime). */
     public static ShardExplanation failed(UnassignedShard shard, String error) {
         return new ShardExplanation(shard.index(), shard.shard(), shard.primary(), "unassigned", shard.reason(),
-                shard.since(), null, null, null, null, null, false, List.of(), error);
+                shard.since(), null, null, null, null, null, false, List.of(), null, error);
     }
 
     public record Response(@JsonProperty("unassigned_total") int unassignedTotal,

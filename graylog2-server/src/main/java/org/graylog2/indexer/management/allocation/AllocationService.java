@@ -139,6 +139,7 @@ public class AllocationService {
                 explanation,
                 maxRetriesExceeded,
                 nodes,
+                AllocationDiagnoser.diagnose(json),
                 null);
     }
 
@@ -158,7 +159,7 @@ public class AllocationService {
         return matcher.matches() ? f("%s: %s", matcher.group(1), matcher.group(2)) : last;
     }
 
-    private static String trimEcho(String explanation) {
+    static String trimEcho(String explanation) {
         if (explanation == null) {
             return null;
         }

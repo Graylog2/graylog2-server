@@ -103,7 +103,91 @@ export type ShardExplanation = {
   explanation: string | null;
   max_retries_exceeded: boolean;
   nodes: Array<NodeDecision>;
+  diagnosis: AllocationDiagnosis | null;
   error: string | null;
+};
+
+// AllocationDiagnosis on the server: what the situation is, in terms a Graylog user can act on.
+export type Situation =
+  | 'INITIALIZING'
+  | 'DELAYED_NODE_LEFT'
+  | 'FETCHING_SHARD_DATA'
+  | 'THROTTLED'
+  | 'REPLICA_REBUILDS_FROM_PRIMARY'
+  | 'PRIMARY_NOT_ACTIVE'
+  | 'TRANSIENT_FAILURE'
+  | 'RESTORE_FAILED'
+  | 'TRANSLOG_DAMAGED'
+  | 'RETENTION_LEASES_DAMAGED'
+  | 'SEGMENT_DATA_DAMAGED'
+  | 'COMMIT_UNREADABLE'
+  | 'DAMAGED_OTHER'
+  | 'STALE_COPY_ONLY'
+  | 'NO_COPY_FOUND'
+  | 'TOO_FEW_NODES'
+  | 'ALLOCATION_FILTER'
+  | 'SHARDS_PER_NODE_LIMIT'
+  | 'ALLOCATION_DISABLED'
+  | 'DISK_WATERMARK'
+  | 'AWARENESS'
+  | 'NODE_VERSION'
+  | 'RETRY_LIMIT'
+  | 'OTHER_RULE'
+  | 'UNKNOWN';
+
+export type DiagnosisAction =
+  | 'WAIT'
+  | 'RETRY_FAILED'
+  | 'FIX_ENVIRONMENT_THEN_RETRY'
+  | 'FIX_PRIMARY'
+  | 'RESTORE_AGAIN'
+  | 'SHARD_TOOL_THEN_ALLOCATE_STALE_PRIMARY'
+  | 'ALLOCATE_STALE_PRIMARY'
+  | 'RESTORE_SNAPSHOT'
+  | 'ALLOCATE_EMPTY_PRIMARY'
+  | 'DELETE_INDEX'
+  | 'BRING_NODE_BACK'
+  | 'ADD_NODES'
+  | 'LOWER_REPLICAS'
+  | 'CHANGE_ALLOCATION_FILTER'
+  | 'RAISE_SHARD_LIMIT'
+  | 'ENABLE_ALLOCATION'
+  | 'FREE_DISK_SPACE'
+  | 'FIX_AWARENESS'
+  | 'FINISH_UPGRADE';
+
+export type DataLoss =
+  | 'NONE'
+  | 'UNFLUSHED_OPERATIONS'
+  | 'DOCUMENTS_IN_DAMAGED_SEGMENTS'
+  | 'WRITES_THE_STALE_COPY_MISSED'
+  | 'WRITES_SINCE_SNAPSHOT'
+  | 'WHOLE_SHARD'
+  | 'WHOLE_INDEX'
+  | 'UNKNOWN';
+
+export type Where = 'AUTOMATIC' | 'GRAYLOG' | 'OPENSEARCH_API' | 'HOST_ACCESS' | 'INFRASTRUCTURE';
+
+export type DiagnosisOption = {
+  action: DiagnosisAction;
+  data_loss: DataLoss;
+  where: Where;
+  node: string | null;
+  command: string | null;
+};
+
+export type AllocationDiagnosis = {
+  situation: Situation;
+  needs_action: boolean;
+  copies: Array<{ node: string; state: 'IN_SYNC' | 'STALE' | 'DAMAGED' | 'LOCKED'; problem: string | null }>;
+  failed_on_node: string | null;
+  left_node: string | null;
+  damaged_file: string | null;
+  cause: string | null;
+  blocking: Array<{ rule: string; decision: string; explanation: string | null }>;
+  remaining_delay_ms: number | null;
+  options: Array<DiagnosisOption>;
+  avoid: Array<DiagnosisAction>;
 };
 
 export type AllocationExplanation = {

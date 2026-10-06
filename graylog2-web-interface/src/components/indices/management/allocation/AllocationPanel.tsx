@@ -16,26 +16,17 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 
 import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import Label from 'components/bootstrap/Label';
-import Table from 'components/bootstrap/Table';
 import Spinner from 'components/common/Spinner';
 
+import ExplanationGroup from './ExplanationGroup';
+import { formatTime, plural } from './format';
 import { useAllocationExplain } from './useAllocation';
 
-import type { AllocationExplanation, ShardExplanation } from '../types';
-
-const CAN_ALLOCATE_STYLES: { [canAllocate: string]: ColorVariant } = {
-  no: 'danger',
-  throttled: 'warning',
-  awaiting_info: 'warning',
-  allocation_delayed: 'warning',
-  yes: 'success',
-};
+import type { AllocationExplanation, ShardExplanation, Situation } from '../types';
 
 const Section = styled.section(
   ({ theme }) => css`
@@ -68,51 +59,25 @@ const Muted = styled.span(
   `,
 );
 
-const Group = styled.div(
-  ({ theme }) => css`
-    border-top: 1px solid ${theme.colors.gray[90]};
-    padding-top: 10px;
-    margin-top: 10px;
-  `,
-);
+// Problems with one particular copy are told per shard; rule-based ones (disk, filters, ...) can cover many.
+const PER_COPY: Array<Situation> = [
+  'TRANSIENT_FAILURE',
+  'RESTORE_FAILED',
+  'TRANSLOG_DAMAGED',
+  'RETENTION_LEASES_DAMAGED',
+  'SEGMENT_DATA_DAMAGED',
+  'COMMIT_UNREADABLE',
+  'DAMAGED_OTHER',
+  'STALE_COPY_ONLY',
+  'NO_COPY_FOUND',
+  'REPLICA_REBUILDS_FROM_PRIMARY',
+];
 
-const GroupTitle = styled.p`
-  font-weight: bold;
-  margin-bottom: 6px;
-`;
-
-const IndexLink = styled(Button)`
-  padding: 0;
-  font-family: monospace;
-`;
-
-const RootCause = styled.td`
-  max-width: 480px;
-  word-break: break-word;
-
-  summary {
-    cursor: pointer;
-  }
-
-  pre {
-    white-space: pre-wrap;
-    max-height: 200px;
-    overflow-y: auto;
-    font-size: 0.85em;
-  }
-`;
-
-const NodeList = styled.ul`
-  margin-bottom: 0;
-`;
-
-const formatTime = (iso: string | null) => (iso ? new Date(iso).toLocaleString() : '');
-const plural = (count: number, singular: string, pluralForm: string) =>
-  `${count} ${count === 1 ? singular : pluralForm}`;
-
-// Shards with the same answer (verdict, explanation, NO deciders per node) are shown once.
+// Shards with the same answer (situation, verdict, explanation, NO deciders per node) are shown once.
 const groupKey = (shard: ShardExplanation) =>
   JSON.stringify([
+    shard.diagnosis?.situation,
+    PER_COPY.includes(shard.diagnosis?.situation) ? `${shard.index}[${shard.shard}]` : null,
     shard.error ? `error:${shard.error}` : shard.can_allocate,
     shard.explanation,
     shard.nodes.map((node) => [node.node_name, node.deciders.map((d) => [d.decider, d.explanation])]),
@@ -126,93 +91,6 @@ const groupShards = (shards: Array<ShardExplanation>) => {
   });
 
   return [...groups.values()];
-};
-
-type ShardsProps = {
-  shards: Array<ShardExplanation>;
-  onShowIndex: (index: string) => void;
-};
-
-const ShardTable = ({ shards, onShowIndex }: ShardsProps) => (
-  <Table condensed>
-    <thead>
-      <tr>
-        <th>Index</th>
-        <th>Shard</th>
-        <th>Copy</th>
-        <th>Unassigned because</th>
-        <th>Since</th>
-        <th>Failed attempts</th>
-        <th>Root cause</th>
-      </tr>
-    </thead>
-    <tbody>
-      {shards.map((shard) => (
-        <tr key={`${shard.index}-${shard.shard}-${shard.primary}`}>
-          <td>
-            <IndexLink bsStyle="link" title="Show this index in the list below" onClick={() => onShowIndex(shard.index)}>
-              {shard.index}
-            </IndexLink>
-          </td>
-          <td>{shard.shard}</td>
-          <td>{shard.primary ? <Label bsStyle="danger">primary</Label> : <Label bsStyle="warning">replica</Label>}</td>
-          <td>{shard.unassigned_reason}</td>
-          <td>{formatTime(shard.unassigned_since)}</td>
-          <td>{shard.failed_attempts ?? ''}</td>
-          <RootCause>
-            {shard.error ?? shard.root_cause ?? ''}
-            {shard.details && (
-              <details>
-                <summary>Full details</summary>
-                <pre>{shard.details}</pre>
-              </details>
-            )}
-          </RootCause>
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-);
-
-const ExplanationGroup = ({ shards, onShowIndex }: ShardsProps) => {
-  const [first] = shards;
-
-  return (
-    <Group>
-      <GroupTitle>
-        {first.error ? (
-          <Label bsStyle="default">not explained</Label>
-        ) : (
-          <Label bsStyle={CAN_ALLOCATE_STYLES[first.can_allocate] ?? 'default'}>
-            can allocate: {first.can_allocate ?? 'unknown'}
-          </Label>
-        )}{' '}
-        {plural(shards.length, 'shard', 'shards')}: {first.error ? 'OpenSearch returned an error' : first.explanation}
-      </GroupTitle>
-      <ShardTable shards={shards} onShowIndex={onShowIndex} />
-      {first.nodes.some((node) => node.deciders.length > 0) && (
-        <>
-          <Muted>Why, per node (only the checks that said no):</Muted>
-          <NodeList>
-            {first.nodes
-              .filter((node) => node.deciders.length > 0)
-              .map((node) => (
-                <li key={node.node_name}>
-                  <strong>{node.node_name}</strong>
-                  <ul>
-                    {node.deciders.map((decider) => (
-                      <li key={decider.decider}>
-                        <code>{decider.decider}</code> ({decider.decision}): {decider.explanation}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-          </NodeList>
-        </>
-      )}
-    </Group>
-  );
 };
 
 const Summary = ({ explanation }: { explanation: AllocationExplanation }) => {
@@ -233,9 +111,10 @@ type BodyProps = {
   explanation: AllocationExplanation;
   onShowIndex: (index: string) => void;
   onRetry: (() => void) | undefined;
+  shardCounts: { [index: string]: number };
 };
 
-const AllocationBody = ({ explanation, onShowIndex, onRetry }: BodyProps) => {
+const AllocationBody = ({ explanation, onShowIndex, onRetry, shardCounts }: BodyProps) => {
   const groups = groupShards(explanation.explained);
   const maxRetriesExceeded = explanation.explained.some((shard) => shard.max_retries_exceeded);
 
@@ -256,12 +135,16 @@ const AllocationBody = ({ explanation, onShowIndex, onRetry }: BodyProps) => {
           ) : (
             'Retrying failed allocations'
           )}{' '}
-          asks it to try again. That helps if the cause was temporary; if the root cause is still there (corrupted
-          files, for example) they will fail again, and restoring or deleting the index is the way out.
+          asks it to try again. That helps when the cause was temporary; each shard below says whether it does.
         </Alert>
       )}
       {groups.map((shards) => (
-        <ExplanationGroup key={groupKey(shards[0])} shards={shards} onShowIndex={onShowIndex} />
+        <ExplanationGroup
+          key={groupKey(shards[0])}
+          shards={shards}
+          onShowIndex={onShowIndex}
+          shardCounts={shardCounts}
+        />
       ))}
     </>
   );
@@ -272,9 +155,11 @@ type Props = {
   onShowIndex: (index: string) => void;
   // Without it (the user may not retry), the hint names the action instead of offering a button.
   onRetry?: () => void;
+  // Primary shard count per index, for "shard 0 of 3".
+  shardCounts?: { [index: string]: number };
 };
 
-const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined }: Props) => {
+const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined, shardCounts = {} }: Props) => {
   const { explanation, error, isFetching, refetch } = useAllocationExplain(true);
 
   return (
@@ -293,7 +178,14 @@ const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined }: Props) =
       </Header>
       {isFetching && !explanation && <Spinner text="Asking OpenSearch about unassigned shards..." />}
       {error && <Alert bsStyle="danger">Couldn&apos;t explain shard allocation: {error.message}</Alert>}
-      {explanation && <AllocationBody explanation={explanation} onShowIndex={onShowIndex} onRetry={onRetry} />}
+      {explanation && (
+        <AllocationBody
+          explanation={explanation}
+          onShowIndex={onShowIndex}
+          onRetry={onRetry}
+          shardCounts={shardCounts}
+        />
+      )}
     </Section>
   );
 };

@@ -467,6 +467,7 @@ const IndexManagementContent = () => {
           onClose={() => setShowAllocation(false)}
           onShowIndex={showIndex}
           onRetry={canRetry ? () => setConfirmRetry(true) : undefined}
+          shardCounts={Object.fromEntries(indices.map((index) => [index.index, index.primary_shards]))}
         />
       )}
       <Toolbar>
