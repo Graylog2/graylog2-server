@@ -17,8 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import { isAnyPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { Badge } from 'components/bootstrap';
 import useStreamMutations from 'hooks/useStreamMutations';
 import type { Stream } from 'logic/streams/types';
@@ -30,11 +29,8 @@ type Props = {
 };
 
 const StatusCell = ({ stream }: Props) => {
-  const currentUser = useCurrentUser();
-  const userHasPermissions = isAnyPermitted(currentUser.permissions, [
-    `streams:changestate:${stream.id}`,
-    `streams:edit:${stream.id}`,
-  ]);
+  const { isAnyPermitted } = usePermissions();
+  const userHasPermissions = isAnyPermitted([`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]);
   const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
   const statusLabel = stream.disabled ? 'Paused' : 'Running';
   const toggleLabel = stream.disabled ? 'Start stream' : 'Pause stream';

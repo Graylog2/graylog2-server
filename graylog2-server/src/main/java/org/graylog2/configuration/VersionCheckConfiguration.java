@@ -25,11 +25,11 @@ import java.net.URI;
 
 @DocumentationSection(heading = "Version check configuration", description = "")
 public class VersionCheckConfiguration {
-    @Documentation(value = "tbd", visible = false)
+    @Documentation(value = "Periodically check whether a newer Graylog version is available and show a notification.", visible = false)
     @Parameter(value = "versionchecks")
     private boolean enabled = true;
 
-    @Documentation(value = "tbd", visible = false)
+    @Documentation(value = "URI of the service used for version checks.", visible = false)
     @Parameter(value = "versionchecks_uri")
     private URI uri = URI.create("https://versioncheck.graylog.com/check");
 

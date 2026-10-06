@@ -23,8 +23,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
@@ -54,8 +53,8 @@ const LookupTableFields = ({
   customKeyField = null,
 }: Props) => {
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
-  const currentUser = useCurrentUser();
-  const hasPermission = isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
+  const { isPermitted } = usePermissions();
+  const hasPermission = isPermitted(LOOKUP_PERMISSIONS);
 
   const { data: tables } = useQuery({
     queryKey: ['lookup-tables', 'all'],

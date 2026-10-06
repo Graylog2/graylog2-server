@@ -24,8 +24,7 @@ import {
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
 import { Badge, BootstrapModalConfirm } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
@@ -46,10 +45,9 @@ const StatusCell = ({ eventDefinition }: Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const isEnabled = eventDefinition?.state === 'ENABLED';
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const disableChange =
-    isSystemEventDefinition(eventDefinition) ||
-    !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
+    isSystemEventDefinition(eventDefinition) || !isPermitted(`eventdefinitions:edit:${eventDefinition.id}`);
   const description = isEnabled ? 'Enabled' : 'Disabled';
   const title = _title(!isEnabled, disableChange, description);
   const toggleIcon = isEnabled ? 'pause' : 'play_arrow';

@@ -246,6 +246,7 @@ declare module 'graylog-web-plugin/plugin' {
     path: QualifiedUrl<string>;
     permissions?: Permissions;
     telemetryEvent?: CreatorTelemetryEvent;
+    requiredFeatureFlag?: string;
   }
 
   interface EntityActions {
