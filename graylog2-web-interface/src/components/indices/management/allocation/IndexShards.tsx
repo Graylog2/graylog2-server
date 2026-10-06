@@ -19,13 +19,12 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
 
-import Label from 'components/bootstrap/Label';
-import Table from 'components/bootstrap/Table';
+import { Label, Table } from 'components/bootstrap';
+import { Collapsible, Icon, Timestamp } from 'components/common';
 
 import DiagnosisSummary from './DiagnosisSummary';
 import { situationTitle } from './diagnosisText';
-import DisclosureToggle from './DisclosureToggle';
-import { dataOn, formatTime } from './format';
+import { dataOn } from './format';
 
 import type { ShardExplanation } from '../types';
 
@@ -39,7 +38,7 @@ const CAN_ALLOCATE_STYLES: { [canAllocate: string]: ColorVariant } = {
 
 export const Muted = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -65,28 +64,31 @@ export const DetailsCell = styled.td(
 );
 
 // What OpenSearch said, word for word, collapsed below the plain-language summary.
-const Reported = styled.details`
-  margin-bottom: 6px;
-  word-break: break-word;
+const Reported = styled.div(
+  ({ theme }) => css`
+    word-break: break-word;
 
-  pre {
-    white-space: pre-wrap;
-    max-height: 200px;
-    overflow-y: auto;
-    font-size: 0.85em;
-  }
-`;
+    pre {
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: ${theme.fonts.size.small};
+    }
+  `,
+);
 
-const ReportedList = styled.ul`
-  margin-bottom: 6px;
-`;
+const ReportedList = styled.ul(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
 const WhatOpenSearchReported = ({ shard }: { shard: ShardExplanation }) => {
   const nodes = shard.nodes.filter((node) => node.deciders.length > 0);
 
   return (
-    <Reported>
-      <DisclosureToggle>What OpenSearch reported</DisclosureToggle>
+    <Collapsible label="What OpenSearch reported">
+      <Reported>
       <p>
         <Label bsStyle={CAN_ALLOCATE_STYLES[shard.can_allocate] ?? 'default'}>
           can allocate: {shard.can_allocate ?? 'unknown'}
@@ -95,10 +97,9 @@ const WhatOpenSearchReported = ({ shard }: { shard: ShardExplanation }) => {
       </p>
       {shard.root_cause && <p>{shard.root_cause}</p>}
       {shard.details && (
-        <details>
-          <DisclosureToggle>Full details</DisclosureToggle>
+        <Collapsible label="Full details">
           <pre>{shard.details}</pre>
-        </details>
+        </Collapsible>
       )}
       {nodes.length > 0 && (
         <>
@@ -119,7 +120,8 @@ const WhatOpenSearchReported = ({ shard }: { shard: ShardExplanation }) => {
           </ReportedList>
         </>
       )}
-    </Reported>
+      </Reported>
+    </Collapsible>
   );
 };
 
@@ -167,7 +169,7 @@ const IndexShards = ({ shards, totalShards }: Props) => {
                       event.stopPropagation();
                       toggle();
                     }}>
-                    {isOpen ? '▾' : '▸'}
+                    <Icon name={isOpen ? 'keyboard_arrow_down' : 'chevron_right'} />
                   </Toggle>
                 </td>
                 <td>{shard.shard}</td>
@@ -176,7 +178,7 @@ const IndexShards = ({ shards, totalShards }: Props) => {
                 </td>
                 <td>{shard.error ? 'not explained' : situationTitle(shard.diagnosis?.situation ?? null)}</td>
                 <td>{dataOn(shard)}</td>
-                <td>{formatTime(shard.unassigned_since)}</td>
+                <td>{shard.unassigned_since && <Timestamp dateTime={shard.unassigned_since} />}</td>
               </Row>
               {isOpen && (
                 <tr>

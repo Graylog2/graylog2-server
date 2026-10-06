@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
+import { ConfirmDialog } from 'components/common';
 
 type Props = {
   isRetrying: boolean;
@@ -25,28 +25,21 @@ type Props = {
 };
 
 const RetryAllocationConfirm = ({ isRetrying, onConfirm, onCancel }: Props) => (
-  <BootstrapModalConfirm
-    showModal
-    title="Retry failed shard allocations?"
-    confirmButtonText="Retry"
+  <ConfirmDialog
+    show
+    title="Retry Failed Shard Allocations?"
+    btnConfirmText="Retry failed allocations"
     isAsyncSubmit
     isSubmitting={isRetrying}
     submitLoadingText="Retrying..."
     onConfirm={onConfirm}
     onCancel={onCancel}>
-    <>
-      <p>
-        After a shard fails to allocate several times in a row (<code>index.allocation.max_retries</code>, 5 by
-        default), OpenSearch stops trying. This asks it to try those shards again (
-        <code>_cluster/reroute?retry_failed=true</code>).
-      </p>
-      <p>
-        It moves no data and doesn&apos;t force stale or empty primaries, so nothing is lost. It fixes temporary causes
-        such as a node that was down or a full disk. If the cause is still there (corrupted files, for example), the
-        shards fail again.
-      </p>
-    </>
-  </BootstrapModalConfirm>
+    <p>
+      After a shard fails to allocate several times in a row (<code>index.allocation.max_retries</code>, 5 by default),
+      OpenSearch stops trying. This asks it to try those shards again. It moves no data, so nothing is lost; if the cause
+      is still there, the shards fail again.
+    </p>
+  </ConfirmDialog>
 );
 
 export default RetryAllocationConfirm;

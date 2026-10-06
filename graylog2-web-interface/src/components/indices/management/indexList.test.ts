@@ -19,7 +19,7 @@ import { OrderedMap } from 'immutable';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import {
-  filterAttributes,
+  indexAttributes,
   healthBucket,
   matchesFilters,
   matchesQuery,
@@ -90,14 +90,20 @@ describe('matchesFilters', () => {
     expect(matchesFilters(red, filtersOf({ index_set: ['set-1'] }))).toBe(true);
   });
 
+  it('narrows to exactly the picked index names, hyphens included', () => {
+    const picked = filtersOf({ index: ['security-auditlog', 'graylog_2'] });
+
+    expect(names([red, warm, foreign, closed].filter((i) => matchesFilters(i, picked)))).toEqual(['security-auditlog']);
+  });
+
   it('ignores filters it does not know (e.g. from an old link)', () => {
     expect(matchesFilters(red, filtersOf({ no_such_attribute: ['x'] }))).toBe(true);
   });
 });
 
-describe('filterAttributes', () => {
+describe('indexAttributes', () => {
   it('offers each index set present once, plus indices outside Graylog', () => {
-    const attributes = filterAttributes([
+    const attributes = indexAttributes([
       index('graylog_1'),
       index('graylog_2'),
       index('events_1', { index_set_id: 'set-2', index_set_title: 'Events' }),
@@ -112,17 +118,27 @@ describe('filterAttributes', () => {
     ]);
   });
 
-  it('describes all four filters as static, filterable string attributes', () => {
-    const attributes = filterAttributes([]);
+  it('describes the filters as static, filterable string attributes; the index filter offers every index', () => {
+    const attributes = indexAttributes([index('graylog_1'), index('graylog_2')]);
+    const filters = attributes.filter((a) => a.filterable);
 
-    expect(attributes.map((a) => a.id)).toEqual(['health', 'tier', 'index_set', 'write_index']);
-    expect(attributes.every((a) => a.filterable && a.type === 'STRING' && a.filter_options.length > 0)).toBe(true);
+    expect(filters.map((a) => a.id)).toEqual(['index', 'health', 'tier', 'index_set', 'write_index']);
+    expect(filters.every((a) => a.type === 'STRING' && a.filter_options.length > 0)).toBe(true);
+    expect(attributes.find((a) => a.id === 'index').filter_options.map((o) => o.value)).toEqual(['graylog_1', 'graylog_2']);
     expect(attributes.find((a) => a.id === 'health').filter_options.map((o) => o.value)).toEqual([
       'green',
       'yellow',
       'red',
       'closed',
     ]);
+  });
+
+  it('makes every column sortable except the filter-only write index', () => {
+    expect(
+      indexAttributes([])
+        .filter((a) => !a.sortable)
+        .map((a) => a.id),
+    ).toEqual(['write_index']);
   });
 });
 

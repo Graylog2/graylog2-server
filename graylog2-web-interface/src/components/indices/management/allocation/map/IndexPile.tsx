@@ -50,7 +50,7 @@ const IndexBox = styled.div<{ $open: boolean }>(
 // The index's name, a hairline under it; long names cut at the end (full name in the title).
 const NameStrip = styled.div(
   ({ theme }) => css`
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
     font-size: ${theme.fonts.size.small};
     border-bottom: 1px solid ${theme.colors.gray[80]};
     white-space: nowrap;

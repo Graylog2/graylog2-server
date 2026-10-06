@@ -41,7 +41,7 @@ const Toolbar = styled.div(
 
 const Muted = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -93,7 +93,7 @@ const Indices = styled.div(
 const Legend = styled.span(
   ({ theme }) => css`
     flex: 1 1 320px;
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -106,7 +106,7 @@ const Scope = styled.div(
     align-items: center;
     gap: ${theme.spacings.sm};
     margin-left: auto;
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

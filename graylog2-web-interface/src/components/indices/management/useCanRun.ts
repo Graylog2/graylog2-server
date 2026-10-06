@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.management;
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import type { CanRun } from './types';
 
-import java.util.List;
+// Controls follow the permissions the server checks, per index.
+const useCanRun = (): CanRun => {
+  const currentUser = useCurrentUser();
 
-/**
- * The indices to run one action on. Bounded, since actions run one index after another in the request.
- */
-public record IndexActionRequest(@JsonProperty("indices") @NotEmpty @Size(max = IndexActionRequest.MAX_INDICES) List<String> indices) {
-    public static final int MAX_INDICES = 1000;
-}
+  return (action, index) => isPermitted(currentUser.permissions, action.permission(index));
+};
+
+export default useCanRun;

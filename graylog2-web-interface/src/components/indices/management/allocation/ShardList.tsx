@@ -18,20 +18,19 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Button from 'components/bootstrap/Button';
-import Label from 'components/bootstrap/Label';
-import Table from 'components/bootstrap/Table';
+import { Button, Label, Table } from 'components/bootstrap';
+import { Icon, Timestamp } from 'components/common';
 
-import { byIndex, formatTime, plural } from './format';
+import { byIndex, plural } from './format';
 import IndexShards, { DetailsCell, Muted, Row, Toggle } from './IndexShards';
 
 import type { ShardExplanation } from '../types';
 
 // Picked indices (in the list below) are bold with a tick; picking one again takes it out.
 const IndexLink = styled(Button)<{ $picked: boolean }>(
-  ({ $picked }) => css`
+  ({ theme, $picked }) => css`
     padding: 0;
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
     font-weight: ${$picked ? 'bold' : 'normal'};
   `,
 );
@@ -100,7 +99,7 @@ const ShardList = ({ shards, picked, onTogglePicked, shardCounts }: Props) => {
                       event.stopPropagation();
                       toggle(group.index);
                     }}>
-                    {isOpen ? '▾' : '▸'}
+                    <Icon name={isOpen ? 'keyboard_arrow_down' : 'chevron_right'} />
                   </Toggle>
                 </td>
                 <td>
@@ -113,7 +112,7 @@ const ShardList = ({ shards, picked, onTogglePicked, shardCounts }: Props) => {
                       event.stopPropagation();
                       onTogglePicked(group.index);
                     }}>
-                    {isPicked && '✓ '}
+                    {isPicked && <Icon name="check" />} 
                     {group.index}
                   </IndexLink>
                 </td>
@@ -130,7 +129,7 @@ const ShardList = ({ shards, picked, onTogglePicked, shardCounts }: Props) => {
                   {group.situations.join('; ')}
                 </td>
                 <td>{group.dataOn.join(', ')}</td>
-                <td>{formatTime(group.since)}</td>
+                <td>{group.since && <Timestamp dateTime={group.since} />}</td>
               </Row>
               {isOpen && (
                 <tr>

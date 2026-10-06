@@ -14,42 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// The JSON of /system/indexer/management/... (IndexOverview, IndexActionResult, ShardExplanation on the server).
+// The responses of /system/indexer/management/..., from the generated API stubs, plus types of the UI's own.
 import type { Permission } from 'graylog-web-plugin/plugin';
 
-export type IndexHealth = 'green' | 'yellow' | 'red';
-export type IndexTier = 'hot' | 'warm';
+import type { IndexerIndicesManagement, IndexerIndicesManagementAllocation } from '@graylog/server-api';
 
-export type IndexSummary = {
-  index: string;
-  health: IndexHealth | null;
-  status: 'open' | 'close' | null;
-  primary_shards: number | null;
-  replicas: number | null;
-  docs_count: number | null;
-  store_size_bytes: number | null;
-  index_set_id: string | null;
-  index_set_title: string | null;
-  is_write_index: boolean;
-  tier: IndexTier | null;
-};
+export type IndexOverviewResponse = Awaited<ReturnType<typeof IndexerIndicesManagement.list>>;
+export type IndexSummary = IndexOverviewResponse['indices'][number];
 
-export type IndexOverviewResponse = {
-  indices: Array<IndexSummary>;
-};
+export type AllocationExplanation = Awaited<ReturnType<typeof IndexerIndicesManagementAllocation.explain>>;
+export type ShardExplanation = AllocationExplanation['explained'][number];
+export type AllocationDiagnosis = ShardExplanation['diagnosis'];
+export type Situation = AllocationDiagnosis['situation'];
+export type DiagnosisOption = AllocationDiagnosis['options'][number];
+export type DiagnosisAction = DiagnosisOption['action'];
+export type DataLoss = DiagnosisOption['data_loss'];
+export type Where = DiagnosisOption['where'];
 
-export type IndexActionResult = {
-  index: string;
-  ok: boolean;
-  message: string;
-};
+export type ShardMapResponse = Awaited<ReturnType<typeof IndexerIndicesManagementAllocation.map>>;
+export type MapCopy = ShardMapResponse['shards'][number];
 
-export type IndexActionResponse = {
-  results: Array<IndexActionResult>;
-};
+export type RetryFailedResponse = Awaited<ReturnType<typeof IndexerIndicesManagementAllocation.retryFailed>>;
+
+export type IndexActionKey = 'rotate' | 'close' | 'open' | 'force_merge' | 'clear_cache' | 'flush' | 'delete';
 
 export type IndexAction = {
-  key: string;
+  key: IndexActionKey;
   label: string;
   pastTense: string;
   notes: string;
@@ -75,152 +65,4 @@ export type SortField =
 export type Sort = {
   field: SortField;
   direction: 'asc' | 'desc';
-};
-
-export type Decider = {
-  decider: string;
-  decision: string;
-  explanation: string;
-};
-
-export type NodeDecision = {
-  node_name: string;
-  decision: string;
-  deciders: Array<Decider>;
-};
-
-export type ShardExplanation = {
-  index: string;
-  shard: number;
-  primary: boolean;
-  current_state: string;
-  unassigned_reason: string | null;
-  unassigned_since: string | null;
-  failed_attempts: number | null;
-  root_cause: string | null;
-  details: string | null;
-  can_allocate: string | null;
-  explanation: string | null;
-  max_retries_exceeded: boolean;
-  nodes: Array<NodeDecision>;
-  diagnosis: AllocationDiagnosis | null;
-  error: string | null;
-};
-
-// AllocationDiagnosis on the server: what the situation is, in terms a Graylog user can act on.
-export type Situation =
-  | 'INITIALIZING'
-  | 'DELAYED_NODE_LEFT'
-  | 'FETCHING_SHARD_DATA'
-  | 'THROTTLED'
-  | 'REPLICA_REBUILDS_FROM_PRIMARY'
-  | 'PRIMARY_NOT_ACTIVE'
-  | 'TRANSIENT_FAILURE'
-  | 'RESTORE_FAILED'
-  | 'TRANSLOG_DAMAGED'
-  | 'RETENTION_LEASES_DAMAGED'
-  | 'SEGMENT_DATA_DAMAGED'
-  | 'COMMIT_UNREADABLE'
-  | 'DAMAGED_OTHER'
-  | 'STALE_COPY_ONLY'
-  | 'NO_COPY_FOUND'
-  | 'TOO_FEW_NODES'
-  | 'ALLOCATION_FILTER'
-  | 'SHARDS_PER_NODE_LIMIT'
-  | 'ALLOCATION_DISABLED'
-  | 'DISK_WATERMARK'
-  | 'AWARENESS'
-  | 'NODE_VERSION'
-  | 'RETRY_LIMIT'
-  | 'OTHER_RULE'
-  | 'UNKNOWN';
-
-export type DiagnosisAction =
-  | 'WAIT'
-  | 'RETRY_FAILED'
-  | 'FIX_ENVIRONMENT_THEN_RETRY'
-  | 'FIX_PRIMARY'
-  | 'RESTORE_AGAIN'
-  | 'SHARD_TOOL_THEN_ALLOCATE_STALE_PRIMARY'
-  | 'ALLOCATE_STALE_PRIMARY'
-  | 'RESTORE_SNAPSHOT'
-  | 'ALLOCATE_EMPTY_PRIMARY'
-  | 'DELETE_INDEX'
-  | 'BRING_NODE_BACK'
-  | 'ADD_NODES'
-  | 'LOWER_REPLICAS'
-  | 'CHANGE_ALLOCATION_FILTER'
-  | 'RAISE_SHARD_LIMIT'
-  | 'ENABLE_ALLOCATION'
-  | 'FREE_DISK_SPACE'
-  | 'FIX_AWARENESS'
-  | 'FINISH_UPGRADE';
-
-export type DataLoss =
-  | 'NONE'
-  | 'UNFLUSHED_OPERATIONS'
-  | 'DOCUMENTS_IN_DAMAGED_SEGMENTS'
-  | 'WRITES_THE_STALE_COPY_MISSED'
-  | 'WRITES_SINCE_SNAPSHOT'
-  | 'WHOLE_SHARD'
-  | 'WHOLE_INDEX'
-  | 'UNKNOWN';
-
-export type Where = 'AUTOMATIC' | 'GRAYLOG' | 'OPENSEARCH_API' | 'HOST_ACCESS' | 'INFRASTRUCTURE';
-
-export type DiagnosisOption = {
-  action: DiagnosisAction;
-  data_loss: DataLoss;
-  where: Where;
-  node: string | null;
-  command: string | null;
-};
-
-export type AllocationDiagnosis = {
-  situation: Situation;
-  needs_action: boolean;
-  copies: Array<{ node: string; state: 'IN_SYNC' | 'STALE' | 'DAMAGED' | 'LOCKED'; problem: string | null }>;
-  failed_on_node: string | null;
-  left_node: string | null;
-  damaged_file: string | null;
-  cause: string | null;
-  blocking: Array<{ rule: string; decision: string; explanation: string | null }>;
-  remaining_delay_ms: number | null;
-  options: Array<DiagnosisOption>;
-  avoid: Array<DiagnosisAction>;
-};
-
-export type AllocationExplanation = {
-  unassigned_total: number;
-  unassigned_primaries: number;
-  explained: Array<ShardExplanation>;
-  truncated: boolean;
-  generated_at: string;
-};
-
-// ShardMap on the server: every node and shard copy; unassigned copies with a quick diagnosis.
-export type MapNode = { id: string; name: string; roles: string | null };
-
-export type MapCopy = {
-  index: string;
-  shard: number;
-  primary: boolean;
-  state: 'STARTED' | 'INITIALIZING' | 'RELOCATING' | 'UNASSIGNED';
-  node: string | null;
-  unassigned_reason: string | null;
-  unassigned_since: string | null;
-  failed_on_node: string | null;
-  left_node: string | null;
-  situation: Situation | null;
-  needs_action: boolean;
-};
-
-export type ShardMapResponse = {
-  nodes: Array<MapNode>;
-  shards: Array<MapCopy>;
-  generated_at: string;
-};
-
-export type RetryFailedResponse = {
-  acknowledged: boolean;
 };

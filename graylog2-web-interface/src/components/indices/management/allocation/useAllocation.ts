@@ -16,15 +16,15 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { IndexerIndicesManagementAllocation } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 
+import { INDICES_QUERY_KEY } from '../fetchIndices';
 import type { AllocationExplanation, RetryFailedResponse, ShardExplanation, ShardMapResponse } from '../types';
 import { INDEX_OVERVIEW_QUERY_KEY } from '../useIndexOverview';
 
-const ALLOCATION_URL = '/system/indexer/management/allocation';
-const EXPLAIN_QUERY_KEY = ['moremgmt', 'allocation', 'explain'];
+const EXPLAIN_QUERY_KEY = ['indices', 'management', 'allocation', 'explain'];
 
 // Explaining runs one OpenSearch call per unassigned shard: it runs when the panel opens and on demand, not on
 // window focus or a timer.
@@ -38,7 +38,7 @@ export const useAllocationExplain = (
 } => {
   const { data, error, isFetching, refetch } = useQuery({
     queryKey: EXPLAIN_QUERY_KEY,
-    queryFn: () => fetch<AllocationExplanation>('GET', qualifyUrl(`${ALLOCATION_URL}/explain`)),
+    queryFn: () => IndexerIndicesManagementAllocation.explain(),
     enabled,
     refetchOnWindowFocus: false,
   });
@@ -46,7 +46,7 @@ export const useAllocationExplain = (
   return { explanation: data, error, isFetching, refetch };
 };
 
-const MAP_QUERY_KEY = ['moremgmt', 'allocation', 'map'];
+const MAP_QUERY_KEY = ['indices', 'management', 'allocation', 'map'];
 const MAP_REFETCH_INTERVAL_MS = 30000;
 
 // Two _cat calls however big the cluster: cheap enough to refresh like the index list.
@@ -60,8 +60,8 @@ export const useShardMap = (
 } => {
   const { data, error, isFetching, refetch } = useQuery({
     queryKey: MAP_QUERY_KEY,
-    // Polled: fetchPeriodically doesn't extend the session, so an idle tab still times out.
-    queryFn: () => fetchPeriodically<ShardMapResponse>('GET', qualifyUrl(`${ALLOCATION_URL}/map`)),
+    // Polled, so it doesn't extend the session: an idle tab still times out.
+    queryFn: () => IndexerIndicesManagementAllocation.map({ requestShouldExtendSession: false }),
     enabled,
     refetchInterval: MAP_REFETCH_INTERVAL_MS,
   });
@@ -75,13 +75,7 @@ export const useShardExplanation = (
 ): { explanation: ShardExplanation | undefined; error: Error | null; isLoading: boolean } => {
   const { data, error, isLoading } = useQuery({
     queryKey: [...EXPLAIN_QUERY_KEY, copy?.index, copy?.shard, copy?.primary],
-    queryFn: () =>
-      fetch<ShardExplanation>(
-        'GET',
-        qualifyUrl(
-          `${ALLOCATION_URL}/explain/${encodeURIComponent(copy.index)}/${copy.shard}?primary=${copy.primary}`,
-        ),
-      ),
+    queryFn: () => IndexerIndicesManagementAllocation.explainOne(copy.index, copy.shard, copy.primary),
     enabled: copy !== undefined,
     refetchOnWindowFocus: false,
   });
@@ -96,7 +90,7 @@ export const useRetryFailedAllocations = (): {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: () => fetch<RetryFailedResponse>('POST', qualifyUrl(`${ALLOCATION_URL}/retry_failed`)),
+    mutationFn: () => IndexerIndicesManagementAllocation.retryFailed(),
     onSuccess: (response) => {
       if (response.acknowledged) {
         UserNotification.success(
@@ -109,6 +103,7 @@ export const useRetryFailedAllocations = (): {
     },
     onError: (error) => UserNotification.error(`Retrying failed allocations failed: ${error.message}`),
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: INDEX_OVERVIEW_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: EXPLAIN_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MAP_QUERY_KEY });

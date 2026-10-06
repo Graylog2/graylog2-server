@@ -19,21 +19,22 @@ package org.graylog2.indexer.management;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * An index as the Index Management tab shows it: OpenSearch's view plus the Graylog index set it belongs to.
  */
 public record IndexOverview(@JsonProperty("index") String index,
-                            @JsonProperty("health") String health,
-                            @JsonProperty("status") String status,
-                            @JsonProperty("primary_shards") Integer primaryShards,
-                            @JsonProperty("replicas") Integer replicas,
-                            @JsonProperty("docs_count") Long docsCount,
-                            @JsonProperty("store_size_bytes") Long storeSizeBytes,
-                            @JsonProperty("index_set_id") String indexSetId,
-                            @JsonProperty("index_set_title") String indexSetTitle,
+                            @JsonProperty("health") @Nullable String health,
+                            @JsonProperty("status") @Nullable String status,
+                            @JsonProperty("primary_shards") @Nullable Integer primaryShards,
+                            @JsonProperty("replicas") @Nullable Integer replicas,
+                            @JsonProperty("docs_count") @Nullable Long docsCount,
+                            @JsonProperty("store_size_bytes") @Nullable Long storeSizeBytes,
+                            @JsonProperty("index_set_id") @Nullable String indexSetId,
+                            @JsonProperty("index_set_title") @Nullable String indexSetTitle,
                             @JsonProperty("is_write_index") boolean isWriteIndex,
-                            @JsonProperty("tier") String tier) {
+                            @JsonProperty("tier") @Nullable String tier) {
 
     /** Hot: a regular index. Warm: a searchable snapshot (Graylog's warm tier). Room for "archive"/"cold" later. */
     public static final String TIER_HOT = "hot";

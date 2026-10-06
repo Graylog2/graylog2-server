@@ -25,6 +25,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -34,16 +35,17 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.management.allocation.AllocationService;
 import org.graylog2.indexer.management.allocation.ShardExplanation;
 import org.graylog2.indexer.management.allocation.ShardMap;
 import org.graylog2.indexer.management.allocation.UnassignedShard;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.util.List;
 
 @RequiresAuthentication
@@ -90,7 +92,7 @@ public class IndexAllocationResource extends RestResource {
                 (int) unassigned.stream().filter(UnassignedShard::primary).count(),
                 explained,
                 unassigned.size() > MAX_EXPLAINED,
-                Instant.now().toString());
+                Tools.nowUTC());
     }
 
     @GET
@@ -118,7 +120,11 @@ public class IndexAllocationResource extends RestResource {
         if (shard < 0) {
             throw new BadRequestException("The shard number can't be negative.");
         }
-        return allocationService.explain(new UnassignedShard(index, shard, primary, null, null));
+        try {
+            return allocationService.explain(new UnassignedShard(index, shard, primary, null, null));
+        } catch (IndexNotFoundException e) {
+            throw new NotFoundException(e.getMessage(), e);
+        }
     }
 
     @POST

@@ -16,32 +16,44 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.scheduler.system.SystemJobConfig;
 import org.graylog.scheduler.system.SystemJobManager;
+import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.management.CatIndex;
-import org.graylog2.indexer.management.IndexActionRequest;
-import org.graylog2.indexer.management.IndexActionResult;
 import org.graylog2.indexer.management.IndexHealthService;
 import org.graylog2.indexer.management.TestSubjects;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.bulk.model.BulkOperationFailure;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -54,16 +66,21 @@ class IndexActionsResourceTest {
     private final IndexSetRegistry indexSetRegistry = mock(IndexSetRegistry.class);
     private final Indices indices = mock(Indices.class);
     private final SystemJobManager systemJobManager = mock(SystemJobManager.class);
-    private final ActivityWriter activityWriter = mock(ActivityWriter.class);
+    private final AuditEventSender auditEventSender = mock(AuditEventSender.class);
+    private final UserContext userContext = mock(UserContext.class);
 
     private Subject subject = TestSubjects.admin();
     private IndexActionsResource resource;
 
-    private final IndexSet defaultSet = indexSet("set-1", "Default index set", true, 2);
+    private final IndexSet defaultSet = indexSet(2);
 
     @BeforeEach
     void setUp() {
-        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, systemJobManager, activityWriter) {
+        final User user = mock(User.class);
+        when(user.getName()).thenReturn("admin");
+        when(userContext.getUser()).thenReturn(user);
+        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, systemJobManager,
+                auditEventSender, new ObjectMapper()) {
             @Override
             protected Subject getSubject() {
                 return subject;
@@ -74,34 +91,43 @@ class IndexActionsResourceTest {
     @Test
     void closesAGraylogIndexThroughGraylogsIndicesService() throws Exception {
         givenIndices(open("graylog_3"));
-        givenManaged("graylog_3", defaultSet, false);
+        givenManaged("graylog_3", false);
 
-        assertThat(resource.close(request("graylog_3")).results())
-                .containsExactly(IndexActionResult.ok("graylog_3", "closed"));
+        assertThat(resource.close(request("graylog_3"), userContext).successfullyPerformed()).isEqualTo(1);
         verify(indices).close("graylog_3");
+    }
+
+    @Test
+    void auditsEachIndexSeparatelyWithItsOutcome() throws Exception {
+        givenIndices(open("graylog_3"), open("graylog_21"));
+        givenManaged("graylog_3", false);
+        givenManaged("graylog_21", true);
+
+        resource.close(request("graylog_3", "graylog_21"), userContext);
+
+        verify(auditEventSender).success(eq(AuditActor.user("admin")), eq(AuditEventTypes.ES_INDEX_CLOSE), any());
+        verify(auditEventSender).failure(eq(AuditActor.user("admin")), eq(AuditEventTypes.ES_INDEX_CLOSE), any());
     }
 
     @Test
     void neverClosesOrDeletesTheCurrentWriteIndex() throws Exception {
         givenIndices(open("graylog_21"));
-        givenManaged("graylog_21", defaultSet, true);
+        givenManaged("graylog_21", true);
 
-        assertThat(resource.close(request("graylog_21")).results())
-                .containsExactly(IndexActionResult.failed("graylog_21", "current write index; rotate the index set first"));
-        assertThat(resource.delete(request("graylog_21")).results())
-                .containsExactly(IndexActionResult.failed("graylog_21", "current write index; rotate the index set first"));
+        assertThat(failures(resource.close(request("graylog_21"), userContext)))
+                .containsExactly(tuple("graylog_21", "Current write index; rotate the index set first"));
+        assertThat(failures(resource.delete(request("graylog_21"), userContext)))
+                .containsExactly(tuple("graylog_21", "Current write index; rotate the index set first"));
         verify(indices, never()).close(anyString());
         verify(indices, never()).delete(anyString());
     }
 
     @Test
     void closeOpenAndDeleteWorkOnIndicesGraylogDoesNotManage() throws Exception {
-        givenIndices(open("security-auditlog"), closed("old-index"), open("scratch"));
+        givenIndices(open("security-auditlog"), open("scratch"));
 
-        assertThat(resource.close(request("security-auditlog")).results())
-                .containsExactly(IndexActionResult.ok("security-auditlog", "closed"));
-        assertThat(resource.delete(request("scratch")).results())
-                .containsExactly(IndexActionResult.ok("scratch", "deleted"));
+        assertThat(resource.close(request("security-auditlog"), userContext).failures()).isEmpty();
+        assertThat(resource.delete(request("scratch"), userContext).failures()).isEmpty();
         verify(indices).close("security-auditlog");
         verify(indices).delete("scratch");
     }
@@ -110,8 +136,7 @@ class IndexActionsResourceTest {
     void opensAnIndexGraylogDoesNotManageWithoutMarkingItReopened() {
         givenIndices(closed("old-index"));
 
-        assertThat(resource.open(request("old-index")).results())
-                .containsExactly(IndexActionResult.ok("old-index", "opened"));
+        assertThat(resource.open(request("old-index"), userContext).successfullyPerformed()).isEqualTo(1);
         verify(indexHealthService).openIndex("old-index");
         verify(indices, never()).reopenIndex(anyString());
     }
@@ -120,8 +145,8 @@ class IndexActionsResourceTest {
     void unknownIndexNamesAreRejected() {
         givenIndices(open("graylog_3"));
 
-        assertThat(resource.delete(request("graylog_*")).results())
-                .containsExactly(IndexActionResult.failed("graylog_*", "no such index"));
+        assertThat(failures(resource.delete(request("graylog_*"), userContext)))
+                .containsExactly(tuple("graylog_*", "No such index"));
         verify(indices, never()).delete(anyString());
     }
 
@@ -130,19 +155,19 @@ class IndexActionsResourceTest {
         givenIndices(open("graylog_3"));
         subject = TestSubjects.withPermissions("indices:read", "indices:delete:graylog_3");
 
-        assertThat(resource.delete(request("secret-index")).results())
-                .containsExactly(IndexActionResult.failed("secret-index", "not permitted (needs indices:delete)"));
+        assertThat(failures(resource.delete(request("secret-index"), userContext)))
+                .containsExactly(tuple("secret-index", "Not permitted (needs indices:delete)"));
     }
 
     @Test
     void closeOpenAndDeleteLeaveSystemIndicesAlone() throws Exception {
         givenIndices(open(".plugins-ml-config"), closed(".old-system"));
 
-        assertThat(resource.close(request(".plugins-ml-config")).results().get(0).message()).startsWith("system index");
-        assertThat(resource.open(request(".old-system")).results().get(0).message()).startsWith("system index");
-        assertThat(resource.delete(request(".plugins-ml-config")).results().get(0).message()).startsWith("system index");
-        assertThat(resource.flush(request(".plugins-ml-config")).results())
-                .containsExactly(IndexActionResult.ok(".plugins-ml-config", "flushed"));
+        assertThat(resource.close(request(".plugins-ml-config"), userContext).failures()).singleElement()
+                .extracting(BulkOperationFailure::failureExplanation).asString().startsWith("System index");
+        assertThat(resource.open(request(".old-system"), userContext).failures()).hasSize(1);
+        assertThat(resource.delete(request(".plugins-ml-config"), userContext).failures()).hasSize(1);
+        assertThat(resource.flush(request(".plugins-ml-config"), userContext).failures()).isEmpty();
         verify(indices, never()).close(anyString());
         verify(indices, never()).delete(anyString());
         verify(indexHealthService, never()).openIndex(anyString());
@@ -151,26 +176,25 @@ class IndexActionsResourceTest {
     @Test
     void deleteNeedsTheDeletePermissionForThatIndex() throws Exception {
         givenIndices(open("graylog_3"), open("graylog_4"));
-        givenManaged("graylog_3", defaultSet, false);
-        givenManaged("graylog_4", defaultSet, false);
+        givenManaged("graylog_3", false);
+        givenManaged("graylog_4", false);
         subject = TestSubjects.withPermissions("indices:read", "indices:changestate", "indices:delete:graylog_4");
 
-        assertThat(resource.delete(request("graylog_3", "graylog_4")).results()).containsExactly(
-                IndexActionResult.failed("graylog_3", "not permitted (needs indices:delete)"),
-                IndexActionResult.ok("graylog_4", "deleted"));
+        final BulkOperationResponse response = resource.delete(request("graylog_3", "graylog_4"), userContext);
+
+        assertThat(response.successfullyPerformed()).isEqualTo(1);
+        assertThat(failures(response)).containsExactly(tuple("graylog_3", "Not permitted (needs indices:delete)"));
         verify(indices, never()).delete("graylog_3");
         verify(indices).delete("graylog_4");
     }
 
     @Test
-    void openReopensClosedIndicesAndSkipsOpenOnes() throws Exception {
+    void openReopensClosedGraylogIndicesAndSkipsOpenOnes() throws Exception {
         givenIndices(closed("graylog_5"), open("graylog_6"));
-        givenManaged("graylog_5", defaultSet, false);
-        givenManaged("graylog_6", defaultSet, false);
+        givenManaged("graylog_5", false);
+        givenManaged("graylog_6", false);
 
-        assertThat(resource.open(request("graylog_5", "graylog_6")).results()).containsExactly(
-                IndexActionResult.ok("graylog_5", "reopened (retention will skip it)"),
-                IndexActionResult.ok("graylog_6", "already open"));
+        assertThat(resource.open(request("graylog_5", "graylog_6"), userContext).successfullyPerformed()).isEqualTo(2);
         verify(indices).reopenIndex("graylog_5");
         verify(indices, never()).reopenIndex("graylog_6");
     }
@@ -178,10 +202,9 @@ class IndexActionsResourceTest {
     @Test
     void closingAClosedIndexDoesNothing() throws Exception {
         givenIndices(closed("graylog_5"));
-        givenManaged("graylog_5", defaultSet, false);
+        givenManaged("graylog_5", false);
 
-        assertThat(resource.close(request("graylog_5")).results())
-                .containsExactly(IndexActionResult.ok("graylog_5", "already closed"));
+        assertThat(resource.close(request("graylog_5"), userContext).failures()).isEmpty();
         verify(indices, never()).close(anyString());
     }
 
@@ -189,11 +212,9 @@ class IndexActionsResourceTest {
     void flushAndClearCacheWorkOnAnyOpenIndexButNotOnClosedOnes() {
         givenIndices(open("security-auditlog"), closed("graylog_5"));
 
-        assertThat(resource.flush(request("security-auditlog", "graylog_5")).results()).containsExactly(
-                IndexActionResult.ok("security-auditlog", "flushed"),
-                IndexActionResult.failed("graylog_5", "index is closed"));
-        assertThat(resource.clearCache(request("security-auditlog")).results())
-                .containsExactly(IndexActionResult.ok("security-auditlog", "cache cleared"));
+        assertThat(failures(resource.flush(request("security-auditlog", "graylog_5"), userContext)))
+                .containsExactly(tuple("graylog_5", "Index is closed"));
+        assertThat(resource.clearCache(request("security-auditlog"), userContext).failures()).isEmpty();
         verify(indices).flush("security-auditlog");
         verify(indices, never()).flush("graylog_5");
         verify(indexHealthService).clearCache("security-auditlog");
@@ -202,12 +223,9 @@ class IndexActionsResourceTest {
     @Test
     void forceMergeQueuesGraylogsOptimizeJobWithTheIndexSetsSegmentCount() {
         givenIndices(open("graylog_3"), open("security-auditlog"));
-        when(indexSetRegistry.isManagedIndex("graylog_3")).thenReturn(true);
         when(indexSetRegistry.getForIndex("graylog_3")).thenReturn(Optional.of(defaultSet));
 
-        assertThat(resource.forceMerge(request("graylog_3", "security-auditlog")).results()).containsExactly(
-                IndexActionResult.ok("graylog_3", "force merge to 2 segment(s) queued as a system job"),
-                IndexActionResult.ok("security-auditlog", "force merge to 1 segment(s) queued as a system job"));
+        assertThat(resource.forceMerge(request("graylog_3", "security-auditlog"), userContext).successfullyPerformed()).isEqualTo(2);
 
         final ArgumentCaptor<SystemJobConfig> jobs = ArgumentCaptor.forClass(SystemJobConfig.class);
         verify(systemJobManager, times(2)).submit(jobs.capture());
@@ -217,68 +235,48 @@ class IndexActionsResourceTest {
     }
 
     @Test
-    void rotateCyclesEachIndexSetOnceAndOnlyForCurrentWriteIndices() throws Exception {
-        givenIndices(open("graylog_21"), open("graylog_20"));
-        givenManaged("graylog_21", defaultSet, true);
-        givenManaged("graylog_20", defaultSet, false);
-
-        assertThat(resource.rotate(request("graylog_21", "graylog_21", "graylog_20")).results()).containsExactly(
-                IndexActionResult.ok("graylog_21", "rotated: index set <Default index set> now writes to a new index"),
-                IndexActionResult.failed("graylog_20", "not a current write index; only write indices can be rotated"));
-        verify(defaultSet, times(1)).cycle();
-        verify(activityWriter).write(any());
-    }
-
-    @Test
-    void rotateNeedsTheUnscopedDeflectorCyclePermission() throws Exception {
-        givenIndices(open("graylog_21"));
-        givenManaged("graylog_21", defaultSet, true);
-        subject = TestSubjects.withPermissions("indices:*", "deflector:cycle:graylog_21");
-
-        assertThat(resource.rotate(request("graylog_21")).results())
-                .containsExactly(IndexActionResult.failed("graylog_21", "not permitted (needs deflector:cycle)"));
-        verify(defaultSet, never()).cycle();
-    }
-
-    @Test
-    void rotateRefusesReadOnlyIndexSets() throws Exception {
-        final IndexSet readOnly = indexSet("set-2", "Archive set", false, 1);
-        givenIndices(open("archive_1"));
-        givenManaged("archive_1", readOnly, true);
-
-        assertThat(resource.rotate(request("archive_1")).results())
-                .containsExactly(IndexActionResult.failed("archive_1", "index set <Archive set> is not writable"));
-        verify(readOnly, never()).cycle();
-    }
-
-    @Test
     void anActionFailingOnOneIndexDoesNotStopTheOthers() throws Exception {
         givenIndices(open("graylog_3"), open("graylog_4"));
-        givenManaged("graylog_3", defaultSet, false);
-        givenManaged("graylog_4", defaultSet, false);
+        givenManaged("graylog_3", false);
+        givenManaged("graylog_4", false);
         doThrow(new IllegalStateException("boom")).when(indices).close("graylog_3");
 
-        assertThat(resource.close(request("graylog_3", "graylog_4")).results()).containsExactly(
-                IndexActionResult.failed("graylog_3", "boom"),
-                IndexActionResult.ok("graylog_4", "closed"));
+        final BulkOperationResponse response = resource.close(request("graylog_3", "graylog_4"), userContext);
+
+        assertThat(failures(response)).containsExactly(tuple("graylog_3", "boom"));
+        assertThat(response.successfullyPerformed()).isEqualTo(1);
+    }
+
+    @Test
+    void refusesMoreIndicesThanTheLimitAndEmptyRequests() {
+        givenIndices();
+        final List<String> tooMany = IntStream.rangeClosed(0, IndexActionsResource.MAX_INDICES).mapToObj(i -> f("x%d", i)).toList();
+
+        assertThatThrownBy(() -> resource.flush(new BulkOperationRequest(tooMany), userContext)).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> resource.flush(new BulkOperationRequest(Collections.emptyList()), userContext))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    private static List<Tuple> failures(BulkOperationResponse response) {
+        return response.failures().stream()
+                .map(failure -> tuple(failure.entityId(), failure.failureExplanation()))
+                .toList();
     }
 
     private void givenIndices(CatIndex... rows) {
         when(indexHealthService.indices()).thenReturn(List.of(rows));
     }
 
-    private void givenManaged(String index, IndexSet indexSet, boolean isWriteIndex) throws Exception {
+    private void givenManaged(String index, boolean isWriteIndex) throws Exception {
         when(indexSetRegistry.isManagedIndex(index)).thenReturn(true);
-        when(indexSetRegistry.getForIndex(index)).thenReturn(Optional.of(indexSet));
+        when(indexSetRegistry.getForIndex(index)).thenReturn(Optional.of(defaultSet));
         when(indexSetRegistry.isCurrentWriteIndex(index)).thenReturn(isWriteIndex);
     }
 
-    private static IndexSet indexSet(String id, String title, boolean writable, int maxNumSegments) {
-        final IndexSetConfig config = mock(IndexSetConfig.class);
-        when(config.id()).thenReturn(id);
-        when(config.title()).thenReturn(title);
-        when(config.isWritable()).thenReturn(writable);
-        when(config.indexOptimizationMaxNumSegments()).thenReturn(maxNumSegments);
+    private static IndexSet indexSet(int maxNumSegments) {
+        final IndexSetConfig config = IndexSetTestUtils.createIndexSetConfig().toBuilder()
+                .indexOptimizationMaxNumSegments(maxNumSegments)
+                .build();
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getConfig()).thenReturn(config);
         return indexSet;
@@ -292,7 +290,7 @@ class IndexActionsResourceTest {
         return new CatIndex(name, null, "close", 1, 0, null, null);
     }
 
-    private static IndexActionRequest request(String... names) {
-        return new IndexActionRequest(Arrays.asList(names));
+    private static BulkOperationRequest request(String... names) {
+        return new BulkOperationRequest(List.of(names));
     }
 }

@@ -24,6 +24,7 @@ import org.graylog2.indexer.management.allocation.AllocationService;
 import org.graylog2.indexer.management.allocation.ShardExplanation;
 import org.graylog2.indexer.management.allocation.ShardMap;
 import org.graylog2.indexer.management.allocation.UnassignedShard;
+import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -122,7 +123,7 @@ class IndexAllocationResourceTest {
         when(allocationService.shardMap()).thenReturn(new ShardMap(List.of(new ShardMap.Node("n1", "node-1", "dim")), List.of(
                 new ShardMap.Copy("graylog_20", 0, true, "STARTED", "node-1", null, null, null, null, null, false),
                 new ShardMap.Copy("graylog_19", 0, true, "UNASSIGNED", null, "CLUSTER_RECOVERED", null, null, null,
-                        AllocationDiagnosis.Situation.UNKNOWN, true)), "2026-10-06T17:00:00Z"));
+                        AllocationDiagnosis.Situation.UNKNOWN, true)), Tools.nowUTC()));
 
         final ShardMap map = resource.map();
 

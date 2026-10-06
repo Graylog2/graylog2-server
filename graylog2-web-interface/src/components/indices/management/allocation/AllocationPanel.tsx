@@ -18,48 +18,19 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Alert from 'components/bootstrap/Alert';
-import Button from 'components/bootstrap/Button';
-import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import SegmentedControl from 'components/bootstrap/SegmentedControl';
-import Spinner from 'components/common/Spinner';
+import { Alert, Button, ButtonToolbar, SegmentedControl } from 'components/bootstrap';
+import { Section, Spinner, Timestamp } from 'components/common';
 
-import { formatTime, plural } from './format';
+import { plural } from './format';
 import AllocationMap from './map/AllocationMap';
 import ShardList from './ShardList';
 import { useAllocationExplain, useShardMap } from './useAllocation';
 
 import type { AllocationExplanation } from '../types';
 
-const Section = styled.section(
-  ({ theme }) => css`
-    border: 1px solid ${theme.colors.gray[80]};
-    border-radius: 4px;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-  `,
-);
-
-const Header = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 10px;
-
-  h3 {
-    margin: 0;
-  }
-`;
-
-const HeaderEnd = styled(ButtonToolbar)`
-  margin-left: auto;
-  align-items: center;
-`;
-
 const Muted = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -140,11 +111,18 @@ const AllocationPanel = ({ onClose, picked, onTogglePicked, onRetry = undefined,
   const generatedAt = view === 'map' ? shardMap.map?.generated_at : list.explanation?.generated_at;
 
   return (
-    <Section aria-label="Shard allocation">
-      <Header>
-        <h3>Shard allocation</h3>
-        {generatedAt && !isFetching && <Muted>as of {formatTime(generatedAt)}</Muted>}
-        <HeaderEnd>
+    <Section
+      title="Shard Allocation"
+      titleAs="h3"
+      headerLeftSection={
+        generatedAt && !isFetching ? (
+          <Muted>
+            as of <Timestamp dateTime={generatedAt} />
+          </Muted>
+        ) : null
+      }
+      actions={
+        <ButtonToolbar>
           <SegmentedControl<View> data={VIEWS} value={view} onChange={setView} />
           <Button
             bsSize="small"
@@ -153,10 +131,10 @@ const AllocationPanel = ({ onClose, picked, onTogglePicked, onRetry = undefined,
             {isFetching ? 'Explaining...' : 'Explain again'}
           </Button>
           <Button bsSize="small" onClick={onClose}>
-            Close
+            Hide
           </Button>
-        </HeaderEnd>
-      </Header>
+        </ButtonToolbar>
+      }>
       {isFetching && !generatedAt && <Spinner text="Asking OpenSearch about shards..." />}
       {error && <Alert bsStyle="danger">Couldn&apos;t explain shard allocation: {error.message}</Alert>}
       {view === 'map' && shardMap.map && (

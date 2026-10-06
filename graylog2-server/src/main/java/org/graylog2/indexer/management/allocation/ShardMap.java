@@ -18,6 +18,7 @@ package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.indexer.management.allocation.AllocationDiagnosis.Situation;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import javax.annotation.Nullable;
@@ -29,7 +30,7 @@ import javax.annotation.Nullable;
  */
 public record ShardMap(@JsonProperty("nodes") List<Node> nodes,
                        @JsonProperty("shards") List<Copy> shards,
-                       @JsonProperty("generated_at") String generatedAt) {
+                       @JsonProperty("generated_at") DateTime generatedAt) {
 
     public record Node(@JsonProperty("id") String id,
                        @JsonProperty("name") String name,

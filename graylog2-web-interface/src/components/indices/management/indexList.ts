@@ -24,18 +24,20 @@ import type { IndexSummary, Sort, SortField } from './types';
 // Closed indices have no health; they get their own value.
 export const healthBucket = (index: IndexSummary): string => (index.status === 'close' ? 'closed' : index.health);
 
-// Filters: core's EntityFilters with static value lists ("Filters" dropdown + removable chips, state in the URL's
-// `filters` query parameter). Values of one attribute are OR-ed, attributes are AND-ed, as in core's tables.
+// The table's attributes: its columns, and the filters of core's EntityFilters ("Filters" dropdown and removable chips,
+// state in the URL's `filters` query parameter). Values of one attribute are OR-ed, attributes are AND-ed, as in core's
+// tables. The `index` filter is how indices picked in the allocation panel narrow the list.
 export const NO_INDEX_SET = 'none';
 
 const FILTER_VALUE: { [attributeId: string]: (index: IndexSummary) => string } = {
+  index: (index) => index.index,
   health: healthBucket,
   tier: (index) => index.tier,
   index_set: (index) => index.index_set_id ?? NO_INDEX_SET,
   write_index: (index) => String(Boolean(index.is_write_index)),
 };
 
-export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
+export const indexAttributes = (indices: Array<IndexSummary>): Attributes => {
   const indexSets = new Map<string, string>();
   indices.forEach((index) => {
     if (index.index_set_id) {
@@ -45,9 +47,18 @@ export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
 
   return [
     {
+      id: 'index',
+      title: 'Index',
+      type: 'STRING',
+      sortable: true,
+      filterable: true,
+      filter_options: indices.map(({ index }) => ({ value: index, title: index })),
+    },
+    {
       id: 'health',
       title: 'Health',
       type: 'STRING',
+      sortable: true,
       filterable: true,
       filter_options: [
         { value: 'green', title: 'Green' },
@@ -60,6 +71,7 @@ export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
       id: 'tier',
       title: 'Tier',
       type: 'STRING',
+      sortable: true,
       filterable: true,
       filter_options: [
         { value: 'hot', title: 'Hot' },
@@ -68,8 +80,9 @@ export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
     },
     {
       id: 'index_set',
-      title: 'Index set',
+      title: 'Index Set',
       type: 'STRING',
+      sortable: true,
       filterable: true,
       filter_options: [
         ...[...indexSets].map(([value, title]) => ({ value, title })),
@@ -78,7 +91,7 @@ export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
     },
     {
       id: 'write_index',
-      title: 'Write index',
+      title: 'Write Index',
       type: 'STRING',
       filterable: true,
       filter_options: [
@@ -86,11 +99,16 @@ export const filterAttributes = (indices: Array<IndexSummary>): Attributes => {
         { value: 'false', title: 'No' },
       ],
     },
+    { id: 'primary_shards', title: 'Primaries', type: 'INT', sortable: true },
+    { id: 'replicas', title: 'Replicas', type: 'INT', sortable: true },
+    { id: 'docs_count', title: 'Documents', type: 'LONG', sortable: true },
+    { id: 'store_size_bytes', title: 'Size', type: 'LONG', sortable: true },
   ];
 };
 
 // `filters` (from useUrlQueryFilters) maps attribute id → selected values.
-export const matchesFilters = (index: IndexSummary, filters: UrlQueryFilters) =>
+export const matchesFilters = (index: IndexSummary, filters: UrlQueryFilters | undefined) =>
+  !filters ||
   filters.every((values, attributeId) => {
     const valueOf = FILTER_VALUE[attributeId];
 

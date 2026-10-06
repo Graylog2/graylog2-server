@@ -16,30 +16,21 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { IndexerIndicesManagement } from '@graylog/server-api';
 
-import type { IndexOverviewResponse, IndexSummary } from './types';
+import type { IndexSummary } from './types';
 
-export const INDEX_OVERVIEW_URL = '/system/indexer/management/indices';
-export const INDEX_OVERVIEW_QUERY_KEY = ['moremgmt', 'indices'];
-const REFETCH_INTERVAL_MS = 30000;
+export const INDEX_OVERVIEW_QUERY_KEY = ['indices', 'management', 'overview'];
 
-const useIndexOverview = (): {
-  indices: Array<IndexSummary>;
-  error: Error | null;
-  isLoading: boolean;
-  isFetching: boolean;
-  refetch: () => void;
-} => {
-  const { data, error, isLoading, isFetching, refetch } = useQuery({
+// Every index, for what the paged table doesn't hold: the selection's rows and the shard counts of the allocation
+// panel. The table refreshes itself; this one follows when an action invalidates it.
+const useIndexOverview = (): { indices: Array<IndexSummary>; isLoading: boolean } => {
+  const { data, isLoading } = useQuery({
     queryKey: INDEX_OVERVIEW_QUERY_KEY,
-    // Polled: fetchPeriodically doesn't extend the session, so an idle tab still times out.
-    queryFn: () => fetchPeriodically<IndexOverviewResponse>('GET', qualifyUrl(INDEX_OVERVIEW_URL)),
-    refetchInterval: REFETCH_INTERVAL_MS,
+    queryFn: () => IndexerIndicesManagement.list(),
   });
 
-  return { indices: data?.indices ?? [], error, isLoading, isFetching, refetch };
+  return { indices: data?.indices ?? [], isLoading };
 };
 
 export default useIndexOverview;

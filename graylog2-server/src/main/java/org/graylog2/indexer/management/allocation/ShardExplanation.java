@@ -17,6 +17,7 @@
 package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
@@ -62,6 +63,6 @@ public record ShardExplanation(@JsonProperty("index") String index,
                            @JsonProperty("unassigned_primaries") int unassignedPrimaries,
                            @JsonProperty("explained") List<ShardExplanation> explained,
                            @JsonProperty("truncated") boolean truncated,
-                           @JsonProperty("generated_at") String generatedAt) {
+                           @JsonProperty("generated_at") DateTime generatedAt) {
     }
 }

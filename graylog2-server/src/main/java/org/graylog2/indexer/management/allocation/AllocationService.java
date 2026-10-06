@@ -24,8 +24,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.management.CatShard;
 import org.graylog2.indexer.management.IndexManagementAdapter;
+import org.graylog2.plugin.Tools;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -69,7 +69,7 @@ public class AllocationService {
                 .sorted(Comparator.comparing(ShardMap.Node::name))
                 .toList();
         final List<ShardMap.Copy> copies = adapter.shards().stream().map(row -> copy(row, nodes)).toList();
-        return new ShardMap(nodes, copies, Instant.now().toString());
+        return new ShardMap(nodes, copies, Tools.nowUTC());
     }
 
     static ShardMap.Copy copy(CatShard row, List<ShardMap.Node> nodes) {

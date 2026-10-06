@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import StringUtils from 'util/StringUtils';
+
 import { situationTitle } from './diagnosisText';
 
 import type { ShardExplanation, Situation } from '../types';
 
-export const formatTime = (iso: string | null) => (iso ? new Date(iso).toLocaleString() : '');
-
+// "1 replica", "2 replicas".
 export const plural = (count: number, singular: string, pluralForm: string) =>
-  `${count} ${count === 1 ? singular : pluralForm}`;
+  `${count} ${StringUtils.pluralize(count, singular, pluralForm)}`;
 
 const COPY_STATES = { IN_SYNC: 'current copy', STALE: 'older copy', DAMAGED: 'damaged copy', LOCKED: 'locked copy' };
 

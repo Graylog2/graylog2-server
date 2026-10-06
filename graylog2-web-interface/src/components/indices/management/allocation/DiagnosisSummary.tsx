@@ -18,9 +18,9 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Label from 'components/bootstrap/Label';
+import { Collapsible } from 'components/common';
 
 import { avoidText, headline, optionText } from './diagnosisText';
-import DisclosureToggle from './DisclosureToggle';
 import type { ShardContext } from './diagnosisText';
 
 import type { AllocationDiagnosis } from '../types';
@@ -44,7 +44,7 @@ const Options = styled.ol(
 
 const Muted = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -65,16 +65,6 @@ const Warnings = styled.div(
   `,
 );
 
-const Section = styled.details(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.sm};
-  `,
-);
-
-const SectionToggle = styled(DisclosureToggle)`
-  font-weight: bold;
-`;
-
 type Props = {
   diagnosis: AllocationDiagnosis;
   context: ShardContext;
@@ -90,10 +80,8 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
     <div>
       <Headline>{headline(diagnosis, context)}</Headline>
       {actionable.length > 0 && (
-        <Section>
-          <SectionToggle>
-            What you can do ({actionable.length === 1 ? '1 option' : `${actionable.length} options, most data kept first`})
-          </SectionToggle>
+        <Collapsible
+          label={`What you can do (${actionable.length === 1 ? '1 option' : `${actionable.length} options, most data kept first`})`}>
           <Options>
             {actionable.map((option) => {
               const text = optionText(option, context);
@@ -103,16 +91,15 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
                   {text.title} {text.dataLoss && <Muted>{text.dataLoss}</Muted>}{' '}
                   {text.where && <Label bsStyle="default">{text.where}</Label>}
                   {option.command && (
-                    <details>
-                      <DisclosureToggle>Show command</DisclosureToggle>
+                    <Collapsible label="Show command">
                       <Command>{option.command}</Command>
-                    </details>
+                    </Collapsible>
                   )}
                 </li>
               );
             })}
           </Options>
-        </Section>
+        </Collapsible>
       )}
       {warnings.length === 1 && (
         <Warnings>
