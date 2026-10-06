@@ -36,8 +36,7 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic/fieldactions/ChangeFieldType/types';
 import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import ModalSubmit from 'components/common/ModalSubmit';
 
 const StyledSelect = styled(Select)`
@@ -104,8 +103,8 @@ const ChangeFieldTypeModal = ({
     isLoading: isLoadingFieldTypes,
   } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
-  const currentUser = useCurrentUser();
-  const hasFailureStreamAccess = isPermitted(currentUser.permissions, `streams:read:${failureStreamId}`);
+  const { isPermitted } = usePermissions();
+  const hasFailureStreamAccess = isPermitted(`streams:read:${failureStreamId}`);
   const fieldTypeOptions = useMemo(
     () =>
       Object.entries(fieldTypes)

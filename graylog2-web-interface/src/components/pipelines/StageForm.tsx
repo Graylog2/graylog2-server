@@ -24,8 +24,7 @@ import Routes from 'routing/Routes';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import { useRules } from 'components/rules/hooks/useRules';
 import type { RuleType } from 'components/rules/hooks/useRules';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 type Props = {
   pipeline: PipelineType;
@@ -46,7 +45,7 @@ const StageForm = ({
   save,
   disableEdit = false,
 }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const _initialStageNumber = useMemo(
@@ -111,7 +110,7 @@ const StageForm = ({
   return (
     <span>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
+        disabled={!isPermitted('pipeline:edit') || disableEdit}
         onClick={openModal}
         bsStyle={create ? 'primary' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
