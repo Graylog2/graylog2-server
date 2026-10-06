@@ -103,7 +103,7 @@ const useValidateSession = () => {
       }
     };
 
-    validate().then(onValidated, onValidated);
+    validate().then(onValidated, () => {});
 
     return () => {
       ignore = true;

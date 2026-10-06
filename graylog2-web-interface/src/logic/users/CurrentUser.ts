@@ -22,10 +22,10 @@ import createExternalStore from 'logic/createExternalStore';
 import isDeepEqual from 'stores/isDeepEqual';
 import Session from 'logic/session/Session';
 
-export type CurrentUserState = { currentUser: UserJSON | undefined };
+export type CurrentUserState = { currentUser: UserJSON | undefined; loadError?: Error };
 
 const createCurrentUser = () => {
-  const store = createExternalStore<CurrentUserState>({ currentUser: undefined });
+  const store = createExternalStore<CurrentUserState>({ currentUser: undefined, loadError: undefined });
   let latestRequest = 0;
 
   const load = (username: string) => {
@@ -47,10 +47,17 @@ const createCurrentUser = () => {
     const { username } = Session.getState();
 
     latestRequest += 1;
-    store.setState({ currentUser: undefined });
+    store.setState({ currentUser: undefined, loadError: undefined });
 
     if (username) {
-      load(username).catch(() => {});
+      const initialLoad = load(username);
+      const request = latestRequest;
+
+      initialLoad.catch((loadError) => {
+        if (request === latestRequest) {
+          store.setState({ loadError });
+        }
+      });
     }
   };
 

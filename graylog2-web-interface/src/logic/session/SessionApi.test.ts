@@ -60,7 +60,7 @@ describe('SessionApi', () => {
     unsubscribe();
   });
 
-  it('keeps session if logout fails', async () => {
+  it('keeps session but notifies listeners if logout fails', async () => {
     Session.setUsername('alice');
     mockLogoutResponse = Promise.resolve({ ok: false, status: 500 });
     const onLogout = jest.fn();
@@ -69,8 +69,26 @@ describe('SessionApi', () => {
     await logout();
 
     expect(Session.isLoggedIn()).toBe(true);
-    expect(onLogout).not.toHaveBeenCalled();
+    expect(onLogout).toHaveBeenCalledTimes(1);
 
+    unsubscribe();
+  });
+
+  it('notifies remaining listeners if one fails', async () => {
+    Session.setUsername('alice');
+    mockLogoutResponse = Promise.resolve({ ok: true, status: 204 });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const onLogout = jest.fn();
+    const unsubscribeFailing = Session.on('logout', () => {
+      throw new Error('failing listener');
+    });
+    const unsubscribe = Session.on('logout', onLogout);
+
+    await expect(logout()).resolves.toBeUndefined();
+
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribeFailing();
     unsubscribe();
   });
 

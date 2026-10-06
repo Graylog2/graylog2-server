@@ -112,4 +112,17 @@ describe('CurrentUser', () => {
 
     expect(mockGetUser).toHaveBeenCalledTimes(2);
   });
+
+  it('exposes error if initial load fails and clears it when session ends', async () => {
+    const error = new Error('Loading failed');
+    mockGetUser.mockRejectedValue(error);
+
+    Session.setUsername('alice');
+
+    await waitFor(() => expect(CurrentUser.getState().loadError).toBe(error));
+
+    Session.setUsername(undefined);
+
+    expect(CurrentUser.getState().loadError).toBeUndefined();
+  });
 });

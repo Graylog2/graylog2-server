@@ -27,7 +27,15 @@ const createSession = () => {
   const store = createExternalStore<SessionState>({ username: undefined });
   const eventListeners: Record<SessionEvent, Set<() => void>> = { logout: new Set(), validated: new Set() };
   const isLoggedIn = () => !!store.getState().username;
-  const notify = (event: SessionEvent) => eventListeners[event].forEach((listener) => listener());
+  const notify = (event: SessionEvent) =>
+    eventListeners[event].forEach((listener) => {
+      try {
+        listener();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Session '${event}' listener failed:`, error);
+      }
+    });
   const setUsername = (username: string | undefined) => {
     if (username) {
       Store.set(USERNAME_KEY, username);
@@ -37,13 +45,11 @@ const createSession = () => {
 
     store.setState({ username });
   };
-  const endSession = () => {
-    if (isLoggedIn()) {
-      setUsername(undefined);
-      notify('logout');
-    }
+  const endSession = () => setUsername(undefined);
+  let logoutHandler = async () => {
+    endSession();
+    notify('logout');
   };
-  let logoutHandler = async () => endSession();
   let pendingLogout: Promise<void> | undefined;
 
   return {
@@ -81,6 +87,7 @@ const createSession = () => {
         eventListeners[event].delete(listener);
       };
     },
+    notifyLogout: () => notify('logout'),
     notifyValidated: () => notify('validated'),
   };
 };

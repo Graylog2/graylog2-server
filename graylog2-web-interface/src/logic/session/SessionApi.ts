@@ -36,7 +36,7 @@ const terminateSession = () =>
       }
     },
     () => Session.endSession(),
-  );
+  ).then(() => Session.notifyLogout());
 
 Session.setLogoutHandler(terminateSession);
 

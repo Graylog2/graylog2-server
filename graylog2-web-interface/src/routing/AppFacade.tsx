@@ -18,6 +18,8 @@ import * as React from 'react';
 import { useContext, useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
+import ErrorPage from 'components/errors/ErrorPage';
+import Button from 'components/bootstrap/Button';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import 'bootstrap/less/bootstrap.less';
 import CurrentUser from 'logic/users/CurrentUser';
@@ -45,6 +47,7 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 
 const AppFacade = () => {
   const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
+  const loadError = useExternalStore(CurrentUser, (state) => state.loadError);
   const { server, ping } = useContext(ServerAvailabilityContext);
   const username = useExternalStore(Session, (state) => state.username ?? '');
 
@@ -71,12 +74,25 @@ const AppFacade = () => {
       return <LoginPage />;
     }
 
+    if (loadError) {
+      return (
+        <ErrorPage
+          title="Loading your user failed"
+          description={loadError.message}
+          displayPageLayout={false}>
+          <Button bsStyle="primary" onClick={() => window.location.reload()}>
+            Reload page
+          </Button>
+        </ErrorPage>
+      );
+    }
+
     if (!currentUser) {
       return <LoadingPage text="We are preparing the web interface for you..." />;
     }
 
     return <LoggedInPage />;
-  }, [currentUser, server, username]);
+  }, [currentUser, loadError, server, username]);
 
   return <ThemeProvider>{content}</ThemeProvider>;
 };
