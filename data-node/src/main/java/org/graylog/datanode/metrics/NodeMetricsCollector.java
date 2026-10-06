@@ -33,51 +33,62 @@ import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.software.os.CgroupInfo;
 
-import java.time.Clock;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.LongSupplier;
+import java.util.stream.Stream;
 
 public class NodeMetricsCollector {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NodeMetricsCollector.class);
     private static final long CGROUP_UNLIMITED_THRESHOLD = 1L << 60;
+    private static final Path DEFAULT_CGROUP_ROOT = Path.of("/sys/fs/cgroup");
 
     private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
-    private final Supplier<CgroupInfo> cgroupInfo;
-    private final Clock clock;
+    private final Supplier<Optional<CgroupInfo>> cgroupInfo;
+    private final LongSupplier nanoTime;
+    private final Path cgroupRoot;
     private final Map<String, CpuSample> lastCpuSamples = new ConcurrentHashMap<>();
-    Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
     private static class CpuSample {
-        final long timestampMillis;
+        final long timestampNanos;
         final long usageNanos;
 
-        CpuSample(long timestampMillis, long usageNanos) {
-            this.timestampMillis = timestampMillis;
+        CpuSample(long timestampNanos, long usageNanos) {
+            this.timestampNanos = timestampNanos;
             this.usageNanos = usageNanos;
         }
     }
 
     public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
-        this(client, objectMapper, Suppliers.memoize(NodeMetricsCollector::detectCgroupInfo), Clock.systemUTC());
+        this(client, objectMapper, Suppliers.memoize(NodeMetricsCollector::detectContainerCgroup), System::nanoTime, DEFAULT_CGROUP_ROOT);
     }
 
-    NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper, Supplier<CgroupInfo> cgroupInfo, Clock clock) {
+    NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper, Supplier<Optional<CgroupInfo>> cgroupInfo,
+                         LongSupplier nanoTime, Path cgroupRoot) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.cgroupInfo = cgroupInfo;
-        this.clock = clock;
+        this.nanoTime = nanoTime;
+        this.cgroupRoot = cgroupRoot;
     }
 
-    private static CgroupInfo detectCgroupInfo() {
+    private static Optional<CgroupInfo> detectContainerCgroup() {
         try {
-            return new SystemInfo().getOperatingSystem().getCgroupInfo();
+            return Optional.ofNullable(new SystemInfo().getOperatingSystem().getCgroupInfo())
+                    .filter(CgroupInfo::isContainerized);
         } catch (LinkageError | RuntimeException e) {
-            LoggerFactory.getLogger(NodeMetricsCollector.class).debug("Cgroup information not available: {}", e.getMessage());
-            return null;
+            LOG.debug("Cgroup information not available: {}", e.getMessage());
+            return Optional.empty();
         }
     }
 
@@ -108,14 +119,13 @@ public class NodeMetricsCollector {
                         try {
                             metrics.put(metric.getFieldName(), nodeContext.read(metric.getNodeStat()));
                         } catch (Exception e) {
-                            log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
+                            LOG.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
                         }
                     });
-            final CgroupInfo cgroup = cgroupInfo.get();
-            if (cgroup != null) {
+            cgroupInfo.get().ifPresent(cgroup -> {
                 applyCgroupMemoryMetrics(cgroup, metrics);
                 applyCgroupCpuMetrics(cgroup, metrics, node);
-            }
+            });
         }
 
         return metrics;
@@ -123,14 +133,15 @@ public class NodeMetricsCollector {
 
     /**
      * OpenSearch's node stats only contain cgroup v1 information, so the cgroup is read directly. OpenSearch is
-     * running in the same cgroup (container) as the Data Node. The used memory includes the page cache.
+     * running in the same cgroup (container) as the Data Node.
      */
     private void applyCgroupMemoryMetrics(CgroupInfo cgroup, Map<String, Object> metrics) {
         try {
-            final long usedBytes = cgroup.getMemoryUsage();
-            if (usedBytes <= 0) {
+            final long usageBytes = cgroup.getMemoryUsage();
+            if (usageBytes <= 0) {
                 return;
             }
+            final long usedBytes = usageBytes - readInactiveFileBytes(cgroup.getVersion(), usageBytes);
             // Without a memory limit, the host memory is the effective limit, but the usage still has to be
             // the cgroup's and not the host's.
             final long limitBytes = cgroup.getMemoryLimit();
@@ -147,27 +158,50 @@ public class NodeMetricsCollector {
             metrics.put(NodeStatMetrics.MEM_FREE.getFieldName(), freeBytes);
             metrics.put(NodeStatMetrics.MEM_TOTAL_USED.getFieldName(), usedPercent);
         } catch (RuntimeException e) {
-            log.debug("Cgroup memory metrics not available: {}", e.getMessage());
+            LOG.debug("Cgroup memory metrics not available: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * The cgroup memory usage includes the page cache, which OpenSearch fills quickly and which the kernel reclaims
+     * when needed. Like {@code docker stats}, the inactive part of the page cache is not reported as used.
+     * Inside a container, the container's cgroup is mounted as the root of the cgroup filesystem.
+     */
+    private long readInactiveFileBytes(int cgroupVersion, long usageBytes) {
+        final Path memoryStat = cgroupVersion == 1
+                ? cgroupRoot.resolve("memory").resolve("memory.stat")
+                : cgroupRoot.resolve("memory.stat");
+        final String key = cgroupVersion == 1 ? "total_inactive_file " : "inactive_file ";
+        try (Stream<String> lines = Files.lines(memoryStat)) {
+            final long inactiveFileBytes = lines.filter(line -> line.startsWith(key))
+                    .findFirst()
+                    .map(line -> Long.parseLong(line.substring(key.length()).trim()))
+                    .orElse(0L);
+            // a larger value means memory.stat does not belong to the container's cgroup
+            return inactiveFileBytes > 0 && inactiveFileBytes < usageBytes ? inactiveFileBytes : 0L;
+        } catch (IOException | UncheckedIOException | NumberFormatException e) {
+            LOG.debug("Could not read inactive page cache from {}: {}", memoryStat, e.getMessage());
+            return 0L;
         }
     }
 
     private void applyCgroupCpuMetrics(CgroupInfo cgroup, Map<String, Object> metrics, String node) {
         try {
             final long usageNanos = cgroup.getCpuUsage();
-            final long timestampMillis = clock.millis();
+            final long timestampNanos = nanoTime.getAsLong();
             if (usageNanos <= 0) {
                 return;
             }
 
             final CpuSample prev = lastCpuSamples.get(node);
-            lastCpuSamples.put(node, new CpuSample(timestampMillis, usageNanos));
+            lastCpuSamples.put(node, new CpuSample(timestampNanos, usageNanos));
 
             if (prev == null) {
                 return;
             }
 
             final long deltaUsageNanos = usageNanos - prev.usageNanos;
-            final long deltaTimeNanos = (timestampMillis - prev.timestampMillis) * 1_000_000L;
+            final long deltaTimeNanos = timestampNanos - prev.timestampNanos;
             final double cpuLimit = cgroup.getEffectiveCpus();
             final double effectiveCpus = cpuLimit > 0 ? cpuLimit : Runtime.getRuntime().availableProcessors();
 
@@ -177,7 +211,7 @@ public class NodeMetricsCollector {
                 metrics.put(NodeStatMetrics.CPU_PERCENT.getFieldName(), roundedCpuPercent);
             }
         } catch (RuntimeException e) {
-            log.debug("Cgroup CPU metrics not available for node {}: {}", node, e.getMessage());
+            LOG.debug("Cgroup CPU metrics not available for node {}: {}", node, e.getMessage());
         }
     }
 
@@ -213,7 +247,7 @@ public class NodeMetricsCollector {
             JsonNode nodeStats = objectMapper.convertValue(nodeStatNode, JsonNode.class);
             return JsonPath.parse(nodeStats.get(0).toString());
         }
-        log.error("No node stats returned for node {}", node);
+        LOG.error("No node stats returned for node {}", node);
         return null;
     }
 
