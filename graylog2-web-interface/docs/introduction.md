@@ -1,7 +1,7 @@
 ### Welcome to the Graylog UI documentation!
 
 Our UI documentation provides a collection of our UI and UX guidelines. It also provides gallery of shared components
-that you can use when writing frontend code. You can find an overview of our frontend code conventions in the [`CONTRIBUTING.md`](https://github.com/Graylog2/graylog2-server/blob/master/graylog2-web-interface/CONTRIBUTING.md).
+that you can use when writing frontend code. You can find an overview of our frontend code conventions in the [`CONVENTIONS.md`](https://github.com/Graylog2/graylog2-server/blob/master/graylog2-web-interface/CONVENTIONS.md).
 
 Please take your time to read through these documents and make sure you follow our guidelines.
 
