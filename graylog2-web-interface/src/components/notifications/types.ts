@@ -40,6 +40,7 @@ export type NotificationKind =
   | 'generic'
   | 'generic_with_link'
   | 'es_index_blocked'
+  | 'es_index_mapping_error'
   | 'es_node_disk_watermark_low'
   | 'es_node_disk_watermark_high'
   | 'es_node_disk_watermark_flood_stage'
@@ -57,7 +58,8 @@ export type NotificationKind =
   | 'remote_reindex_finished'
   | 'data_node_version_mismatch'
   | 'data_tiering_rollover_error'
-  | 'data_node_heap_warning';
+  | 'data_node_heap_warning'
+  | 'kinesis_single_table_migration';
 
 export type NotificationType = {
   id: string;

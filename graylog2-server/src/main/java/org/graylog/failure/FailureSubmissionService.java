@@ -26,6 +26,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
@@ -58,6 +60,7 @@ public class FailureSubmissionService {
 
     private final InputDiagnosisMetrics inputDiagnosisMetrics;
     private final ObjectMapper objectMapper;
+    private final NotificationService notificationService;
     private final Meter dummyMeter = new Meter();
 
     @Inject
@@ -65,7 +68,9 @@ public class FailureSubmissionService {
             FailureSubmissionQueue failureSubmissionQueue,
             FailureHandlingConfiguration failureHandlingConfiguration,
             InputDiagnosisMetrics inputDiagnosisMetrics,
-            ObjectMapperProvider objectMapperProvider) {
+            ObjectMapperProvider objectMapperProvider,
+            NotificationService notificationService) {
+        this.notificationService = notificationService;
         this.failureSubmissionQueue = failureSubmissionQueue;
         this.failureHandlingConfiguration = failureHandlingConfiguration;
         this.inputDiagnosisMetrics = inputDiagnosisMetrics;
@@ -225,6 +230,28 @@ public class FailureSubmissionService {
             logger.warn("Failed to submit an input failure for failure handling. The thread has been interrupted!");
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Tells the administrator that an index rejects the values Graylog writes for a field, because
+     * {@code MappingErrorCoercion} only keeps ingestion going - it does not resolve the underlying conflict, and a
+     * field's type cannot be changed in an existing index.
+     * <p>
+     * One notification per index and field: the key has to include the field, otherwise a conflict discovered later
+     * would be suppressed as a duplicate of the first one and never reach the administrator.
+     *
+     * @param conflictingFieldsByIndex the fields Graylog had to rewrite, per index
+     */
+    public void notifyAboutIndexMappingConflicts(Map<String, ? extends Collection<String>> conflictingFieldsByIndex) {
+        conflictingFieldsByIndex.forEach((index, fields) -> fields.forEach(field -> {
+            final Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.ES_INDEX_MAPPING_ERROR)
+                    .addKey(index + "/" + field)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addDetail("index", index)
+                    .addDetail("field", field);
+            notificationService.publishIfFirst(notification);
+        }));
     }
 
     private IndexingFailure fromIndexingError(IndexingError indexingError) {

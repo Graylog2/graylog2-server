@@ -60,6 +60,8 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
@@ -77,6 +79,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
@@ -97,6 +100,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -269,8 +273,14 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         return dto;
     }
 
+    private List<UsedSearchFilter> cleanReferencedSearchFilters(List<UsedSearchFilter> searchFilters) {
+        return searchFilters.stream().map(sf -> sf instanceof ReferencedSearchFilter rsf ? rsf.stripToId() : sf).toList();
+    }
+
     private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
-        final ViewDTO dto = createEntityRequest.entity();
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
+
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
@@ -278,7 +288,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).scope(DefaultEntityScope.NAME).build(), user);
         recentActivityService.create(result.id(), toGRNType(dto), searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
@@ -403,14 +413,20 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
            throw new BadRequestException("Invalid update request");
         }
 
-        final ViewDTO dto = createEntityRequest.entity();
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
         final var grnType = toGRNType(dto);
         createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(updatedDTO.id())));
 
-        var result = dbService.update(updatedDTO);
+        final ViewDTO result;
+        try {
+            result = dbService.update(updatedDTO);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
         recentActivityService.update(result.id(), grnType, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
@@ -445,7 +461,11 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
             throw new ForbiddenException("Unable to delete " + summarize(view) + ".");
         }
 
-        dbService.delete(id);
+        try {
+            dbService.delete(id);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
         triggerDeletedEvent(view);
         recentActivityService.delete(view.id(), toGRNType(view), view.title(), searchUser);
         return view;

@@ -90,6 +90,11 @@ public class ClusterAdapterOS implements ClusterAdapter {
         return clusterHealth().map(this::healthStatusFrom);
     }
 
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(this::healthStatusFrom);
+    }
+
     private HealthStatus healthStatusFrom(HealthResponse response) {
         return switch (response.status()) {
             case Red -> HealthStatus.Red;
@@ -382,6 +387,25 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    private Optional<HealthResponse> clusterHealth(java.time.Duration timeout) {
+        // clusterManagerTimeout defaults to 30s, which would outlive the caller's budget server-side.
+        final Time bound = new Time.Builder().time(timeout.toMillis() + "ms").build();
+        try {
+            final HealthResponse health = opensearchClient.executeWithClientTimeout(
+                    asyncClient -> asyncClient.cluster().health(HealthRequest.builder()
+                            .timeout(bound)
+                            .clusterManagerTimeout(bound)
+                            .build()),
+                    "Unable to retrieve cluster health",
+                    Duration.milliseconds(timeout.toMillis()));
+            return Optional.of(health);
+        } catch (Exception e) {
+            // Broader than the un-timed variant's IOException: an error response throws a runtime OpenSearchException.
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
     @Override
     public int countOfClusterManagerEligibleNodes() {
         return (int)nodesInfo().values().stream()
@@ -398,12 +422,17 @@ public class ClusterAdapterOS implements ClusterAdapter {
             );
             return Optional.of(health);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 

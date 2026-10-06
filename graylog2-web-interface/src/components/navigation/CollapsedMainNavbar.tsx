@@ -72,8 +72,11 @@ const CollapsedMainNavbar = ({ navigationItems }: Props) => {
             return <NavigationLink key={description} description={description} path={path} Badge={BadgeComponent} />;
           }
 
-          const accessibleChildren = children.filter(({ requiredFeatureFlag, permissions: childPermissions }) =>
-            shouldRenderNavigationItem(requiredFeatureFlag, childPermissions, permissions),
+          const accessibleChildren = children.filter(
+            ({ requiredFeatureFlag, permissions: childPermissions, useCondition }) =>
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              (useCondition?.() ?? true) &&
+              shouldRenderNavigationItem(requiredFeatureFlag, childPermissions, permissions),
           );
 
           if (!accessibleChildren.length) {

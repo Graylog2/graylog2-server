@@ -1,0 +1,11 @@
+type = "f"
+message = "Fix event searches failing when a large set of event IDs is excluded from the results."
+
+details.user = """
+Excluded event IDs were inlined into the search query string as `NOT (id:a OR id:b ...)`, which
+exceeds OpenSearch's `search.query.max_query_string_length` (32000 characters by default) at roughly
+969 IDs and made the whole search fail. They are now applied as a `must_not` terms filter, which is
+not subject to that limit.
+"""
+
+pulls = ["27400"]

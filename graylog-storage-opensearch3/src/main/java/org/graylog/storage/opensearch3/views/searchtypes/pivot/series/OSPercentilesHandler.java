@@ -47,6 +47,7 @@ public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
                         .findFirst()
                         .map(Map.Entry::getValue)
                         .map(OSSerializationUtils::toObject)
-                );
+                )
+                .orElse(null);
     }
 }

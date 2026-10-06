@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.outputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,13 +42,16 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.outputs.MessageOutputFactory;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.OutputListResponse;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.OutputService;
@@ -66,12 +70,15 @@ import java.util.Set;
 public class OutputResource extends RestResource {
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public OutputResource(OutputService outputService,
-                          MessageOutputFactory messageOutputFactory) {
+                          MessageOutputFactory messageOutputFactory,
+                          ObjectMapper objectMapper) {
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
+        this.objectMapper = objectMapper;
     }
 
     @GET
@@ -135,7 +142,7 @@ public class OutputResource extends RestResource {
         final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
                 csor.title(),
                 csor.type(),
-                ConfigurationMapConverter.convertValues(csor.configuration(), outputSummary.requestedConfiguration()),
+                convertConfiguration(csor.configuration(), outputSummary.requestedConfiguration()),
                 csor.streams()
         );
 
@@ -209,12 +216,44 @@ public class OutputResource extends RestResource {
         if (deltas.containsKey("configuration")) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> configuration = (Map<String, Object>) deltas.get("configuration");
-            // Merge with existing configuration to avoid losing fields not included in the update.
-            final Map<String, Object> mergedConfiguration = new HashMap<>(oldOutput.getConfiguration());
-            mergedConfiguration.putAll(ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
+            final Map<String, Object> converted = convertConfiguration(configuration, outputSummary.requestedConfiguration());
+            // Merge with existing configuration to avoid losing fields not included in the update. This also honors the
+            // keep_value/delete_value markers of encrypted fields against the stored EncryptedValue.
+            final Map<String, Object> mergedConfiguration = EncryptedInputConfigs.merge(oldOutput.getConfiguration(), converted);
             deltas.put("configuration", mergedConfiguration);
         }
 
         return this.outputService.update(outputId, deltas);
+    }
+
+    /**
+     * Coerces the raw configuration values to their requested types. Encrypted fields carry a
+     * {@code {set_value=...}}/{@code {keep_value}}/{@code {delete_value}} marker that is converted into an
+     * {@link EncryptedValue} instead of being stringified, so secrets are encrypted before being persisted.
+     */
+    private Map<String, Object> convertConfiguration(Map<String, Object> configuration,
+                                                     ConfigurationRequest requestedConfiguration) throws ValidationException {
+        final Set<String> encryptedFields = EncryptedInputConfigs.getEncryptedFields(requestedConfiguration);
+
+        // Non-encrypted fields go through the regular type coercion.
+        final Map<String, Object> plainFields = new HashMap<>(configuration);
+        encryptedFields.forEach(plainFields::remove);
+        final Map<String, Object> converted = new HashMap<>(
+                ConfigurationMapConverter.convertValues(plainFields, requestedConfiguration));
+
+        for (String field : encryptedFields) {
+            if (configuration.containsKey(field)) {
+                try {
+                    converted.put(field, objectMapper.convertValue(configuration.get(field), EncryptedValue.class));
+                } catch (IllegalArgumentException e) {
+                    // convertValue wraps the mapping failure, which would otherwise surface as a 500. The message is
+                    // intentionally generic because the rejected value can contain the secret.
+                    throw new ValidationException(field,
+                            "Invalid value for encrypted field. Expected one of set_value, keep_value or delete_value.");
+                }
+            }
+        }
+
+        return converted;
     }
 }

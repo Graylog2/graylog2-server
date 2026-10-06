@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -168,7 +169,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getOpensearchClusterUrl() {
-        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
+        // HostAndPort brackets IPv6 literals ("[2001:db8::1]:9300"); a plain concatenation would produce
+        // "2001:db8::1:9300", which is itself a valid IPv6 address and would silently point peers to the wrong host.
+        return HostAndPort.fromParts(configuration.getOpensearchNetworkPublishHost(), configuration.getOpensearchTransportPort()).toString();
     }
 
     @Override
@@ -453,19 +456,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 }
             });
         }
-    }
-
-    @Override
-    public void reset() {
-        stop();
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
-        start();
     }
 
     @Override
