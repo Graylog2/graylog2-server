@@ -236,6 +236,17 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void testClosedIndicesWithWildcard() throws IOException {
+        assertThat(indicesAdapter.closedIndices(Set.of())).isEmpty();
+        assertThat(indicesAdapter.closedIndices(Set.of("nonexistent_*"))).isEmpty();
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).doesNotContain(TEST_INDEX);
+        indicesAdapter.close(TEST_INDEX);
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).contains(TEST_INDEX);
+        indicesAdapter.openIndex(TEST_INDEX);
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).doesNotContain(TEST_INDEX);
+    }
+
+    @Test
     public void testIndexExists() throws IOException {
         assertThat(indicesAdapter.exists(TEST_INDEX)).isTrue();
         assertThat(indicesAdapter.exists("idonotexist")).isFalse();
