@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog2.storage.providers;
 
-import com.google.inject.multibindings.OptionalBinder;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.indexer.management.IndexManagementAdapter;
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.VersionAwareProvider;
 
-/**
- * Provides Index Management's adapter. Not version-specific, so OpenSearch3Plugin installs it once, not once per
- * supported version like {@link OpenSearch3Module}.
- */
-public class IndexManagementOSModule extends PluginModule {
-    @Override
-    protected void configure() {
-        OptionalBinder.newOptionalBinder(binder(), IndexManagementAdapter.class)
-                .setBinding().to(IndexManagementAdapterOS.class);
+import java.util.Map;
+
+public class IndexManagementAdapterProvider extends VersionAwareProvider<IndexManagementAdapter> {
+    @Inject
+    public IndexManagementAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<IndexManagementAdapter>> pluginBindings) {
+        super(indexerVersion, pluginBindings);
     }
 }

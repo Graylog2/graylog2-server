@@ -17,21 +17,16 @@
 package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.ws.rs.ServiceUnavailableException;
+import org.graylog2.indexer.management.CatNode;
+import org.graylog2.indexer.management.CatShard;
 import org.graylog2.indexer.management.IndexManagementAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +34,7 @@ import static org.mockito.Mockito.when;
 class AllocationServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final IndexManagementAdapter adapter = mock(IndexManagementAdapter.class);
-    private final AllocationService service = new AllocationService(Optional.of(adapter), objectMapper);
+    private final AllocationService service = new AllocationService(adapter);
 
     /** Real answer from graylog-dev's single-node OpenSearch after an unclean power-off (2026-10-03). */
     @Test
@@ -72,12 +67,12 @@ class AllocationServiceTest {
     }
 
     @Test
-    void listsOnlyUnassignedShardsPrimariesFirst() throws Exception {
-        when(adapter.request(eq("GET"), eq("/_cat/shards"), anyMap(), isNull(), anyString())).thenReturn(objectMapper.readTree("""
-                [{"index":"graylog_21","shard":"0","prirep":"p","state":"STARTED"},
-                 {"index":"security-auditlog","shard":"0","prirep":"r","state":"UNASSIGNED","unassigned.reason":"INDEX_CREATED","unassigned.at":"2026-10-05T01:00:00.000Z"},
-                 {"index":"graylog_20","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"ALLOCATION_FAILED","unassigned.at":"2026-10-05T01:05:00.000Z"},
-                 {"index":"graylog_17","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"ALLOCATION_FAILED","unassigned.at":null}]"""));
+    void listsOnlyUnassignedShardsPrimariesFirst() {
+        when(adapter.shards()).thenReturn(List.of(
+                new CatShard("graylog_21", 0, true, "STARTED", "os-dev-node-0", null, null, null),
+                new CatShard("security-auditlog", 0, false, "UNASSIGNED", null, "INDEX_CREATED", "2026-10-05T01:00:00.000Z", null),
+                new CatShard("graylog_20", 0, true, "UNASSIGNED", null, "ALLOCATION_FAILED", "2026-10-05T01:05:00.000Z", null),
+                new CatShard("graylog_17", 0, true, "UNASSIGNED", null, "ALLOCATION_FAILED", null, null)));
 
         assertThat(service.unassignedShards()).containsExactly(
                 new UnassignedShard("graylog_17", 0, true, "ALLOCATION_FAILED", null),
@@ -86,22 +81,13 @@ class AllocationServiceTest {
     }
 
     @Test
-    void explainsOneShardWithAnExplicitBody() throws Exception {
-        when(adapter.request(eq("POST"), eq("/_cluster/allocation/explain"), anyMap(), anyString(), anyString()))
+    void explainsExactlyTheShardCopyAskedAbout() throws Exception {
+        when(adapter.allocationExplain("graylog_20", 0, true))
                 .thenReturn(objectMapper.readTree("{\"index\":\"graylog_20\",\"shard\":0,\"primary\":true}"));
 
-        service.explain(new UnassignedShard("graylog_20", 0, true, "ALLOCATION_FAILED", null));
-
-        verify(adapter).request(eq("POST"), eq("/_cluster/allocation/explain"), eq(Map.of()),
-                eq(objectMapper.writeValueAsString(Map.of("index", "graylog_20", "shard", 0, "primary", true))), anyString());
-    }
-
-    @Test
-    void withoutTheOpensearch3ModuleItAnswers503() {
-        final AllocationService unavailable = new AllocationService(Optional.empty(), objectMapper);
-
-        assertThatThrownBy(unavailable::unassignedShards).isInstanceOf(ServiceUnavailableException.class);
-        assertThatThrownBy(unavailable::retryFailedAllocations).isInstanceOf(ServiceUnavailableException.class);
+        assertThat(service.explain(new UnassignedShard("graylog_20", 0, true, "ALLOCATION_FAILED", null)).index())
+                .isEqualTo("graylog_20");
+        verify(adapter).allocationExplain("graylog_20", 0, true);
     }
 
     /** graylog-dev 2026-10-05: a torn Lucene commit point; OpenSearch marked the copy corrupt after one attempt. */
@@ -141,28 +127,25 @@ class AllocationServiceTest {
     }
 
     @Test
-    void retriesOnlyWithRetryFailedAndReportsTheAcknowledgement() throws Exception {
-        when(adapter.request(eq("POST"), eq("/_cluster/reroute"), anyMap(), isNull(), anyString()))
-                .thenReturn(objectMapper.readTree("{\"acknowledged\":true}"));
+    void reportsWhetherTheRetryWasAcknowledged() {
+        when(adapter.retryFailedAllocations()).thenReturn(true);
 
         assertThat(service.retryFailedAllocations()).isTrue();
-        verify(adapter).request(eq("POST"), eq("/_cluster/reroute"),
-                eq(Map.of("retry_failed", "true", "filter_path", "acknowledged")), isNull(), anyString());
     }
 
     /** Rows as graylog-dev's 3-node cluster returned them on 2026-10-06. */
     @Test
-    void mapsEveryCopyAndDiagnosesUnassignedOnesFromTheirFailureText() throws Exception {
-        when(adapter.request(eq("GET"), eq("/_cat/nodes"), anyMap(), isNull(), anyString())).thenReturn(objectMapper.readTree("""
-                [{"id":"rtBtz0HaSxu-1B50379-zA","name":"os-dev-node-0","node.role":"dim"},
-                 {"id":"2svFqa49RO2JWKoEAwoX_g","name":"os-dev-node-1","node.role":"dim"}]"""));
-        when(adapter.request(eq("GET"), eq("/_cat/shards"), anyMap(), isNull(), anyString())).thenReturn(objectMapper.readTree("""
-                [{"index":"graylog_16","shard":"0","prirep":"p","state":"STARTED","node":"os-dev-node-1"},
-                 {"index":"graylog_15","shard":"0","prirep":"p","state":"RELOCATING","node":"os-dev-node-0 -> 10.40.2.171 2svFqa49RO2JWKoEAwoX_g os-dev-node-1"},
-                 {"index":"graylog_17","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"ALLOCATION_FAILED","unassigned.at":"2026-10-06T15:31:26.479Z",
-                  "unassigned.details":"failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_17][0]: Recovery failed on {os-dev-node-0}]; nested: IndexShardRecoveryException[failed recovery]; nested: TranslogCorruptedException[translog from source [/usr/share/opensearch/data/nodes/0/indices/Csx/0/translog/translog.ckp] is corrupted]; "},
-                 {"index":"graylog_19","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"CLUSTER_RECOVERED","unassigned.at":"2026-10-06T12:48:23.400Z"},
-                 {"index":"logs","shard":"1","prirep":"r","state":"UNASSIGNED","unassigned.reason":"NODE_LEFT","unassigned.details":"node_left [gone-node-id]"}]"""));
+    void mapsEveryCopyAndDiagnosesUnassignedOnesFromTheirFailureText() {
+        when(adapter.nodes()).thenReturn(List.of(
+                new CatNode("2svFqa49RO2JWKoEAwoX_g", "os-dev-node-1", "dim"),
+                new CatNode("rtBtz0HaSxu-1B50379-zA", "os-dev-node-0", "dim")));
+        when(adapter.shards()).thenReturn(List.of(
+                new CatShard("graylog_16", 0, true, "STARTED", "os-dev-node-1", null, null, null),
+                new CatShard("graylog_15", 0, true, "RELOCATING", "os-dev-node-0", null, null, null),
+                new CatShard("graylog_17", 0, true, "UNASSIGNED", null, "ALLOCATION_FAILED", "2026-10-06T15:31:26.479Z",
+                        "failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_17][0]: Recovery failed on {os-dev-node-0}]; nested: IndexShardRecoveryException[failed recovery]; nested: TranslogCorruptedException[translog from source [/usr/share/opensearch/data/nodes/0/indices/Csx/0/translog/translog.ckp] is corrupted]; "),
+                new CatShard("graylog_19", 0, true, "UNASSIGNED", null, "CLUSTER_RECOVERED", "2026-10-06T12:48:23.400Z", null),
+                new CatShard("logs", 1, false, "UNASSIGNED", null, "NODE_LEFT", null, "node_left [gone-node-id]")));
 
         final ShardMap map = service.shardMap();
 
@@ -171,7 +154,6 @@ class AllocationServiceTest {
                         ShardMap.Copy::failedOnNode, ShardMap.Copy::leftNode, ShardMap.Copy::situation)
                 .containsExactly(
                         tuple("graylog_16", "STARTED", "os-dev-node-1", null, null, null),
-                        // A relocating copy is still on the node it moves from.
                         tuple("graylog_15", "RELOCATING", "os-dev-node-0", null, null, null),
                         tuple("graylog_17", "UNASSIGNED", null, "os-dev-node-0", null, AllocationDiagnosis.Situation.TRANSLOG_DAMAGED),
                         // Found while listing copies: only a full explain tells; the map says so.

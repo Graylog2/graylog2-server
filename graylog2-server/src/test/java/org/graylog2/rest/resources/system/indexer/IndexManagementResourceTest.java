@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
-import jakarta.ws.rs.ServiceUnavailableException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -29,11 +28,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,19 +52,19 @@ class IndexManagementResourceTest {
                 return subject;
             }
         };
-        when(indexHealthService.storeTypes()).thenReturn(Map.of());
+        when(indexHealthService.warmIndices()).thenReturn(Set.of());
     }
 
     @Test
     void addsIndexSetWriteIndexAndTierToOpenSearchsView() throws Exception {
         final IndexSet defaultSet = indexSet("set-1", "Default index set", "graylog_21");
-        when(indexHealthService.catIndices()).thenReturn(Optional.of(List.of(
+        when(indexHealthService.indices()).thenReturn(List.of(
                 new CatIndex("graylog_21", "green", "open", 1, 0, 5L, 900L),
                 new CatIndex("graylog_20", "red", "open", 1, 0, null, null),
-                new CatIndex("security-auditlog", "yellow", "open", 1, 1, 7L, 1200L))));
+                new CatIndex("security-auditlog", "yellow", "open", 1, 1, 7L, 1200L)));
         when(indexSetRegistry.getForIndex("graylog_21")).thenReturn(Optional.of(defaultSet));
         when(indexSetRegistry.getForIndex("graylog_20")).thenReturn(Optional.of(defaultSet));
-        when(indexHealthService.storeTypes()).thenReturn(Map.of("graylog_20", "remote_snapshot", "graylog_21", "fs"));
+        when(indexHealthService.warmIndices()).thenReturn(Set.of("graylog_20"));
 
         final List<IndexOverview> indices = resource.list().indices();
 
@@ -85,9 +83,9 @@ class IndexManagementResourceTest {
     @Test
     void listsOnlyIndicesTheUserMayRead() {
         subject = TestSubjects.withPermissions("indices:read:graylog_3");
-        when(indexHealthService.catIndices()).thenReturn(Optional.of(List.of(
+        when(indexHealthService.indices()).thenReturn(List.of(
                 new CatIndex("graylog_3", "green", "open", 1, 0, 0L, 208L),
-                new CatIndex("graylog_4", "green", "open", 1, 0, 0L, 208L))));
+                new CatIndex("graylog_4", "green", "open", 1, 0, 0L, 208L)));
 
         assertThat(resource.list().indices()).extracting(IndexOverview::index).containsExactly("graylog_3");
     }
@@ -96,20 +94,14 @@ class IndexManagementResourceTest {
     void anUnresolvableWriteIndexMarksNoIndexAsWriteIndex() throws Exception {
         final IndexSet broken = indexSet("set-1", "Default index set", null);
         when(broken.getActiveWriteIndex()).thenThrow(new IllegalStateException("alias missing"));
-        when(indexHealthService.catIndices()).thenReturn(Optional.of(List.of(
-                new CatIndex("graylog_20", "red", "open", 1, 0, null, null))));
+        when(indexHealthService.indices()).thenReturn(List.of(
+                new CatIndex("graylog_20", "red", "open", 1, 0, null, null)));
         when(indexSetRegistry.getForIndex("graylog_20")).thenReturn(Optional.of(broken));
 
         assertThat(resource.list().indices()).singleElement()
                 .satisfies(index -> assertThat(index.isWriteIndex()).isFalse());
     }
 
-    @Test
-    void withoutTheOpensearch3ModuleTheListAnswers503() {
-        when(indexHealthService.catIndices()).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> resource.list()).isInstanceOf(ServiceUnavailableException.class);
-    }
 
     private static IndexSet indexSet(String id, String title, String activeWriteIndex) throws Exception {
         final IndexSetConfig config = mock(IndexSetConfig.class);

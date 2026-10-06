@@ -25,10 +25,8 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.storage.SearchVersion;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,12 +61,10 @@ public class OpenSearch3Plugin implements Plugin {
         }
 
         var useComposableIndexTemplates = featureFlags.isOn(COMPOSABLE_INDEX_TEMPLATES_FEATURE);
-        final List<PluginModule> modules = SUPPORTED_OS_VERSIONS.stream()
-                .flatMap(version -> Stream.<PluginModule>of(
+        return SUPPORTED_OS_VERSIONS.stream()
+                .flatMap(version -> Stream.of(
                         new OpenSearch3Module(version, useComposableIndexTemplates),
                         new ViewsOSBackendModule(version)))
-                .collect(Collectors.toCollection(ArrayList::new));
-        modules.add(new IndexManagementOSModule());
-        return modules;
+                .collect(Collectors.toList());
     }
 }

@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
-import jakarta.ws.rs.ServiceUnavailableException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.scheduler.system.SystemJobConfig;
 import org.graylog.scheduler.system.SystemJobManager;
@@ -24,7 +23,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.management.CatIndex;
 import org.graylog2.indexer.management.IndexActionRequest;
@@ -41,7 +39,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -56,7 +53,6 @@ class IndexActionsResourceTest {
     private final IndexHealthService indexHealthService = mock(IndexHealthService.class);
     private final IndexSetRegistry indexSetRegistry = mock(IndexSetRegistry.class);
     private final Indices indices = mock(Indices.class);
-    private final IndicesAdapter indicesAdapter = mock(IndicesAdapter.class);
     private final SystemJobManager systemJobManager = mock(SystemJobManager.class);
     private final ActivityWriter activityWriter = mock(ActivityWriter.class);
 
@@ -67,7 +63,7 @@ class IndexActionsResourceTest {
 
     @BeforeEach
     void setUp() {
-        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, indicesAdapter, systemJobManager, activityWriter) {
+        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, systemJobManager, activityWriter) {
             @Override
             protected Subject getSubject() {
                 return subject;
@@ -116,7 +112,7 @@ class IndexActionsResourceTest {
 
         assertThat(resource.open(request("old-index")).results())
                 .containsExactly(IndexActionResult.ok("old-index", "opened"));
-        verify(indicesAdapter).openIndex("old-index");
+        verify(indexHealthService).openIndex("old-index");
         verify(indices, never()).reopenIndex(anyString());
     }
 
@@ -149,7 +145,7 @@ class IndexActionsResourceTest {
                 .containsExactly(IndexActionResult.ok(".plugins-ml-config", "flushed"));
         verify(indices, never()).close(anyString());
         verify(indices, never()).delete(anyString());
-        verify(indicesAdapter, never()).openIndex(anyString());
+        verify(indexHealthService, never()).openIndex(anyString());
     }
 
     @Test
@@ -267,15 +263,8 @@ class IndexActionsResourceTest {
                 IndexActionResult.ok("graylog_4", "closed"));
     }
 
-    @Test
-    void withoutTheOpensearch3ModuleActionsAnswer503() {
-        when(indexHealthService.catIndices()).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> resource.flush(request("graylog_3"))).isInstanceOf(ServiceUnavailableException.class);
-    }
-
     private void givenIndices(CatIndex... rows) {
-        when(indexHealthService.catIndices()).thenReturn(Optional.of(List.of(rows)));
+        when(indexHealthService.indices()).thenReturn(List.of(rows));
     }
 
     private void givenManaged(String index, IndexSet indexSet, boolean isWriteIndex) throws Exception {

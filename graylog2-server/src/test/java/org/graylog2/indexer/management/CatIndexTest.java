@@ -16,36 +16,26 @@
  */
 package org.graylog2.indexer.management;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CatIndexTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Test
-    void parsesARowWhoseColumnsAreAllStrings() throws Exception {
-        final CatIndex row = CatIndex.fromJson(objectMapper.readTree("""
-                {"index":"graylog_21","health":"green","status":"open","pri":"1","rep":"0",
-                 "docs.count":"12345","store.size":"6789012"}"""));
-
-        assertThat(row).isEqualTo(new CatIndex("graylog_21", "green", "open", 1, 0, 12345L, 6789012L));
+    void parsesColumnsThatAreAllStrings() {
+        assertThat(CatIndex.of("graylog_21", "green", "open", "1", "0", "12345", "6789012"))
+                .isEqualTo(new CatIndex("graylog_21", "green", "open", 1, 0, 12345L, 6789012L));
     }
 
     @Test
-    void closedIndicesHaveNoHealthDocsOrSize() throws Exception {
-        final CatIndex row = CatIndex.fromJson(objectMapper.readTree("""
-                {"index":"graylog_5","health":null,"status":"close","pri":"1","rep":"0",
-                 "docs.count":null,"store.size":null}"""));
-
-        assertThat(row).isEqualTo(new CatIndex("graylog_5", null, "close", 1, 0, null, null));
+    void closedIndicesHaveNoHealthDocsOrSize() {
+        assertThat(CatIndex.of("graylog_5", null, "close", "1", "0", null, null))
+                .isEqualTo(new CatIndex("graylog_5", null, "close", 1, 0, null, null));
     }
 
     @Test
-    void unparseableOrMissingNumbersBecomeNull() throws Exception {
-        final CatIndex row = CatIndex.fromJson(objectMapper.readTree("""
-                {"index":"graylog_20","health":"red","status":"open","pri":"1","docs.count":"","store.size":"n/a"}"""));
+    void unparseableOrMissingNumbersBecomeNull() {
+        final CatIndex row = CatIndex.of("graylog_20", "red", "open", "1", null, "", "n/a");
 
         assertThat(row.replicas()).isNull();
         assertThat(row.docsCount()).isNull();

@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -111,9 +112,12 @@ public class IndexAllocationResource extends RestResource {
     @Operation(summary = "Explain one shard copy, e.g. the one opened on the map.")
     public ShardExplanation explainOne(@Parameter(name = "index") @PathParam("index") String index,
                                        @Parameter(name = "shard") @PathParam("shard") int shard,
-                                       @Parameter(name = "primary") @QueryParam("primary") @DefaultValue("true") boolean primary) throws Exception {
+                                       @Parameter(name = "primary") @QueryParam("primary") @DefaultValue("true") boolean primary) {
         checkPermission(RestPermissions.INDEXERCLUSTER_READ);
         checkPermission(RestPermissions.INDICES_READ, index);
+        if (shard < 0) {
+            throw new BadRequestException("The shard number can't be negative.");
+        }
         return allocationService.explain(new UnassignedShard(index, shard, primary, null, null));
     }
 

@@ -17,30 +17,26 @@
 package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.ServiceUnavailableException;
-import org.graylog2.indexer.management.IndexHealthService;
+import org.graylog2.indexer.management.CatShard;
 import org.graylog2.indexer.management.IndexManagementAdapter;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Unassigned shards and why. Called with no body, {@code _cluster/allocation/explain} explains one arbitrary
- * unassigned shard, so this lists them from {@code _cat/shards} and asks about each one.
+ * Unassigned shards and why. The backend's allocation explain covers one shard copy per call, so this lists the
+ * unassigned copies and asks about each one.
  */
 @Singleton
 public class AllocationService {
@@ -48,103 +44,68 @@ public class AllocationService {
     // The max_retry decider repeats the whole unassigned_info after its own sentence.
     private static final String UNASSIGNED_INFO_ECHO = ", [unassigned_info[";
 
-    private final Optional<IndexManagementAdapter> adapter;
-    private final ObjectMapper objectMapper;
+    private final IndexManagementAdapter adapter;
 
     @Inject
-    public AllocationService(Optional<IndexManagementAdapter> adapter, ObjectMapper objectMapper) {
+    public AllocationService(IndexManagementAdapter adapter) {
         this.adapter = adapter;
-        this.objectMapper = objectMapper;
     }
 
     /** Primaries first (they make an index red), then by index and shard number. */
     public List<UnassignedShard> unassignedShards() {
-        final JsonNode rows = adapter().request("GET", "/_cat/shards",
-                Map.of("format", "json", "h", "index,shard,prirep,state,unassigned.reason,unassigned.at"),
-                null, "Couldn't list shards");
-
-        final List<UnassignedShard> shards = new ArrayList<>();
-        rows.forEach(row -> {
-            if ("UNASSIGNED".equals(row.path("state").asText())) {
-                shards.add(new UnassignedShard(
-                        row.path("index").asText(),
-                        row.path("shard").asInt(),
-                        "p".equals(row.path("prirep").asText()),
-                        textOrNull(row.path("unassigned.reason")),
-                        textOrNull(row.path("unassigned.at"))));
-            }
-        });
-        shards.sort(Comparator.comparing((UnassignedShard s) -> !s.primary())
-                .thenComparing(UnassignedShard::index)
-                .thenComparingInt(UnassignedShard::shard));
-        return shards;
+        return adapter.shards().stream()
+                .filter(CatShard::isUnassigned)
+                .map(row -> new UnassignedShard(row.index(), row.shard(), row.primary(), row.unassignedReason(), row.unassignedAt()))
+                .sorted(Comparator.comparing((UnassignedShard s) -> !s.primary())
+                        .thenComparing(UnassignedShard::index)
+                        .thenComparingInt(UnassignedShard::shard))
+                .toList();
     }
 
     /** All nodes and all shard copies; unassigned copies get a quick diagnosis from their failure text. */
     public ShardMap shardMap() {
-        final JsonNode nodeRows = adapter().request("GET", "/_cat/nodes",
-                Map.of("format", "json", "h", "id,name,node.role", "full_id", "true"), null, "Couldn't list nodes");
-        final JsonNode shardRows = adapter().request("GET", "/_cat/shards",
-                Map.of("format", "json", "h", "index,shard,prirep,state,node,unassigned.reason,unassigned.at,unassigned.details"),
-                null, "Couldn't list shards");
-
-        final List<ShardMap.Node> nodes = new ArrayList<>();
-        nodeRows.forEach(row -> nodes.add(new ShardMap.Node(row.path("id").asText(), row.path("name").asText(),
-                textOrNull(row.path("node.role")))));
-        nodes.sort(Comparator.comparing(ShardMap.Node::name));
-
-        final List<ShardMap.Copy> copies = new ArrayList<>();
-        shardRows.forEach(row -> copies.add(copy(row, nodes)));
+        final List<ShardMap.Node> nodes = adapter.nodes().stream()
+                .map(node -> new ShardMap.Node(node.id(), node.name(), node.roles()))
+                .sorted(Comparator.comparing(ShardMap.Node::name))
+                .toList();
+        final List<ShardMap.Copy> copies = adapter.shards().stream().map(row -> copy(row, nodes)).toList();
         return new ShardMap(nodes, copies, Instant.now().toString());
     }
 
-    static ShardMap.Copy copy(JsonNode row, List<ShardMap.Node> nodes) {
-        final String index = row.path("index").asText();
-        final int shard = row.path("shard").asInt();
-        final boolean primary = "p".equals(row.path("prirep").asText());
-        final String state = row.path("state").asText();
-        if (!"UNASSIGNED".equals(state)) {
-            // A relocating copy reads "<from> -> <to address> <to id> <to name>"; it is still on <from>.
-            final String node = textOrNull(row.path("node"));
-            return new ShardMap.Copy(index, shard, primary, state, node == null ? null : node.split(" -> ")[0].trim(),
+    static ShardMap.Copy copy(CatShard row, List<ShardMap.Node> nodes) {
+        if (!row.isUnassigned()) {
+            return new ShardMap.Copy(row.index(), row.shard(), row.primary(), row.state(), row.node(),
                     null, null, null, null, null, false);
         }
 
         // The same diagnosis as for a full explain answer, from what _cat/shards has: reason and failure text.
         final ObjectNode quick = JsonNodeFactory.instance.objectNode()
-                .put("index", index)
-                .put("shard", shard)
-                .put("primary", primary)
+                .put("index", row.index())
+                .put("shard", row.shard())
+                .put("primary", row.primary())
                 .put("current_state", "unassigned");
         quick.putObject("unassigned_info")
-                .put("reason", textOrNull(row.path("unassigned.reason")))
-                .put("details", textOrNull(row.path("unassigned.details")));
+                .put("reason", row.unassignedReason())
+                .put("details", row.unassignedDetails());
         final ArrayNode known = quick.putArray("node_allocation_decisions");
         nodes.forEach(node -> known.addObject().put("node_id", node.id()).put("node_name", node.name()));
         final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(quick);
 
-        return new ShardMap.Copy(index, shard, primary, state, null,
-                textOrNull(row.path("unassigned.reason")), textOrNull(row.path("unassigned.at")),
+        return new ShardMap.Copy(row.index(), row.shard(), row.primary(), row.state(), null,
+                row.unassignedReason(), row.unassignedAt(),
                 diagnosis.failedOnNode(), diagnosis.leftNode(), diagnosis.situation(), diagnosis.needsAction());
     }
 
-    public ShardExplanation explain(UnassignedShard shard) throws Exception {
-        final String body = objectMapper.writeValueAsString(Map.of(
-                "index", shard.index(),
-                "shard", shard.shard(),
-                "primary", shard.primary()));
-        return parse(adapter().request("POST", "/_cluster/allocation/explain", Map.of(), body,
-                f("Couldn't explain the allocation of %s[%d]", shard.index(), shard.shard())));
+    public ShardExplanation explain(UnassignedShard shard) {
+        return parse(adapter.allocationExplain(shard.index(), shard.shard(), shard.primary()));
     }
 
     /**
-     * {@code _cluster/reroute?retry_failed=true}: retries shards that hit the allocation retry limit
-     * ({@code index.allocation.max_retries}, default 5). Moves no data and forces no stale or empty primaries.
+     * Retries shards that hit the allocation retry limit ({@code index.allocation.max_retries}, default 5).
+     * Moves no data and forces no stale or empty primaries.
      */
     public boolean retryFailedAllocations() {
-        return adapter().request("POST", "/_cluster/reroute", Map.of("retry_failed", "true", "filter_path", "acknowledged"),
-                        null, "Couldn't retry failed shard allocations")
-                .path("acknowledged").asBoolean(false);
+        return adapter.retryFailedAllocations();
     }
 
     static ShardExplanation parse(JsonNode json) {
@@ -221,9 +182,5 @@ public class AllocationService {
 
     private static String textOrNull(JsonNode node) {
         return node.isMissingNode() || node.isNull() ? null : node.asText();
-    }
-
-    private IndexManagementAdapter adapter() {
-        return adapter.orElseThrow(() -> new ServiceUnavailableException(IndexHealthService.UNAVAILABLE));
     }
 }

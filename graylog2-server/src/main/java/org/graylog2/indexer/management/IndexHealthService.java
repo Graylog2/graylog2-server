@@ -16,80 +16,48 @@
  */
 package org.graylog2.indexer.management;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.ServiceUnavailableException;
+import org.graylog2.indexer.indices.IndicesAdapter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
+import java.util.Set;
 
 /**
- * Reads per-index health from the search backend through Graylog's own client.
+ * Index Management's view of the search backend: every index, hidden and closed ones included, and the actions
+ * Graylog's {@link org.graylog2.indexer.indices.Indices} service has no method for.
  */
 @Singleton
 public class IndexHealthService {
-    public static final String UNAVAILABLE = "Index Management needs Graylog's opensearch3 storage module (feature flag opensearch3_client=on).";
-    private static final String CAT_COLUMNS = "index,health,status,pri,rep,docs.count,store.size";
-
-    private final Optional<IndexManagementAdapter> adapter;
+    private final IndexManagementAdapter indexManagementAdapter;
+    private final IndicesAdapter indicesAdapter;
 
     @Inject
-    public IndexHealthService(Optional<IndexManagementAdapter> adapter) {
-        this.adapter = adapter;
+    public IndexHealthService(IndexManagementAdapter indexManagementAdapter, IndicesAdapter indicesAdapter) {
+        this.indexManagementAdapter = indexManagementAdapter;
+        this.indicesAdapter = indicesAdapter;
     }
 
-    /**
-     * Every index, hidden and closed ones included. Empty when the opensearch3 storage module isn't active.
-     */
-    public Optional<List<CatIndex>> catIndices() {
-        if (adapter.isEmpty()) {
-            return Optional.empty();
-        }
-
-        final JsonNode rows = adapter.get().request("GET", "/_cat/indices",
-                Map.of("format", "json", "bytes", "b", "expand_wildcards", "all", "h", CAT_COLUMNS),
-                null, "Couldn't list indices");
-
-        final List<CatIndex> indices = new ArrayList<>(rows.size());
-        rows.forEach(row -> indices.add(CatIndex.fromJson(row)));
-        return Optional.of(indices);
+    /** Every index, hidden and closed ones included. */
+    public List<CatIndex> indices() {
+        return indexManagementAdapter.indices();
     }
 
-    /**
-     * {@code index.store.type} of every index that sets one, in one call. Graylog's warm tier is a searchable
-     * snapshot ({@code remote_snapshot}); that is the same test Graylog's own {@code getWarmIndexInfo} makes.
-     */
-    public Map<String, String> storeTypes() {
-        final JsonNode settingsByIndex = requireAdapter().request("GET", "/_all/_settings/index.store.type",
-                Map.of("flat_settings", "true", "expand_wildcards", "all"), null, "Couldn't read index store types");
-
-        final Map<String, String> storeTypes = new HashMap<>();
-        settingsByIndex.properties().forEach(entry -> {
-            final JsonNode storeType = entry.getValue().path("settings").path("index.store.type");
-            if (!storeType.isMissingNode() && !storeType.isNull()) {
-                storeTypes.put(entry.getKey(), storeType.asText());
-            }
-        });
-        return storeTypes;
+    /** Names of the indices on the warm tier. */
+    public Set<String> warmIndices() {
+        return indexManagementAdapter.warmIndices();
     }
 
-    /**
-     * Clears the field data, query and request caches of one index. Graylog has no adapter method for this.
-     * The name must be an exact, existing index (no wildcards or lists): callers check it against {@link #catIndices()}.
-     */
+    /** Clears the caches of one index; the name must be an exact, existing index. */
     public void clearCache(String index) {
-        requireAdapter().request("POST", f("/%s/_cache/clear", index), Map.of(), null,
-                f("Couldn't clear the cache of index %s", index));
+        indexManagementAdapter.clearCache(index);
     }
 
-    /** For REST resources: a 503 with the reason instead of an empty Optional. */
-    public IndexManagementAdapter requireAdapter() {
-        return adapter.orElseThrow(() -> new ServiceUnavailableException(UNAVAILABLE));
+    /**
+     * Opens an index that isn't Graylog's. Graylog's own indices are reopened through {@code Indices#reopenIndex},
+     * which marks them so retention skips them; that marker (a Graylog alias) doesn't belong on other indices.
+     */
+    public void openIndex(String index) {
+        indicesAdapter.openIndex(index);
     }
 }

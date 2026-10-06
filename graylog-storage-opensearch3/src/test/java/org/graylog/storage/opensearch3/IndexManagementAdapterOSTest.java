@@ -16,45 +16,29 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.graylog2.indexer.management.CatShard;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.opensearch.client.opensearch.generic.Request;
-
-import java.util.Map;
+import org.opensearch.client.opensearch.cat.shards.ShardsRecord;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class IndexManagementAdapterOSTest {
-    private final OfficialOpensearchClient client = mock(OfficialOpensearchClient.class);
-    private final IndexManagementAdapterOS adapter = new IndexManagementAdapterOS(client);
-
     @Test
-    void sendsMethodEndpointParametersAndBodyThroughGraylogsClient() {
-        when(client.performRequest(any(Request.class), any())).thenReturn(JsonNodeFactory.instance.objectNode().put("ok", true));
+    void aRelocatingCopyIsStillOnTheNodeItMovesFrom() {
+        final CatShard copy = IndexManagementAdapterOS.toCatShard(ShardsRecord.of(r -> r
+                .index("graylog_15").shard("0").prirep("p").state("RELOCATING")
+                .node("os-dev-node-0 -> 10.40.2.171 2svFqa49RO2JWKoEAwoX_g os-dev-node-1")));
 
-        assertThat(adapter.request("POST", "/_cluster/allocation/explain", Map.of("pretty", "false"),
-                "{\"index\":\"graylog_20\",\"shard\":0,\"primary\":true}", "Couldn't explain").path("ok").asBoolean()).isTrue();
-
-        final ArgumentCaptor<Request> request = ArgumentCaptor.forClass(Request.class);
-        verify(client).performRequest(request.capture(), eq("Couldn't explain"));
-        assertThat(request.getValue().getMethod()).isEqualTo("POST");
-        assertThat(request.getValue().getEndpoint()).isEqualTo("/_cluster/allocation/explain");
-        assertThat(request.getValue().getParameters()).isEqualTo(Map.of("pretty", "false"));
-        assertThat(request.getValue().getBody()).isPresent();
+        assertThat(copy).isEqualTo(new CatShard("graylog_15", 0, true, "RELOCATING", "os-dev-node-0", null, null, null));
     }
 
     @Test
-    void sendsNoBodyWhenThereIsNone() {
-        adapter.request("GET", "/_cat/indices", Map.of(), null, "Couldn't list indices");
+    void anUnassignedReplicaKeepsWhyAndSinceWhen() {
+        final CatShard copy = IndexManagementAdapterOS.toCatShard(ShardsRecord.of(r -> r
+                .index("logs").shard("1").prirep("r").state("UNASSIGNED")
+                .unassignedReason("NODE_LEFT").unassignedAt("2026-10-06T12:48:23.400Z").unassignedDetails("node_left [gone]")));
 
-        final ArgumentCaptor<Request> request = ArgumentCaptor.forClass(Request.class);
-        verify(client).performRequest(request.capture(), eq("Couldn't list indices"));
-        assertThat(request.getValue().getBody()).isEmpty();
+        assertThat(copy).isEqualTo(new CatShard("logs", 1, false, "UNASSIGNED", null, "NODE_LEFT",
+                "2026-10-06T12:48:23.400Z", "node_left [gone]"));
     }
 }

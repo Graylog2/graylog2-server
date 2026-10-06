@@ -26,7 +26,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ServiceUnavailableException;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.scheduler.system.SystemJobManager;
@@ -36,7 +35,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.management.CatIndex;
 import org.graylog2.indexer.management.IndexActionRequest;
@@ -78,7 +76,6 @@ public class IndexActionsResource extends RestResource {
     private final IndexHealthService indexHealthService;
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
-    private final IndicesAdapter indicesAdapter;
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
 
@@ -86,13 +83,11 @@ public class IndexActionsResource extends RestResource {
     public IndexActionsResource(IndexHealthService indexHealthService,
                                 IndexSetRegistry indexSetRegistry,
                                 Indices indices,
-                                IndicesAdapter indicesAdapter,
                                 SystemJobManager systemJobManager,
                                 ActivityWriter activityWriter) {
         this.indexHealthService = indexHealthService;
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
-        this.indicesAdapter = indicesAdapter;
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
     }
@@ -128,7 +123,7 @@ public class IndexActionsResource extends RestResource {
                 return "reopened (retention will skip it)";
             }
             // Not Graylog's: no reopened marker (a Graylog alias) on someone else's index.
-            indicesAdapter.openIndex(index);
+            indexHealthService.openIndex(index);
             return "opened";
         });
     }
@@ -257,10 +252,7 @@ public class IndexActionsResource extends RestResource {
 
     // Only exact names of existing indices get through: no wildcards, comma lists or aliases.
     private Map<String, CatIndex> existingIndices() {
-        return indexHealthService.catIndices()
-                .orElseThrow(() -> new ServiceUnavailableException(
-                        IndexHealthService.UNAVAILABLE))
-                .stream()
+        return indexHealthService.indices().stream()
                 .filter(row -> row.index() != null)
                 .collect(Collectors.toMap(CatIndex::index, Function.identity(), (a, b) -> a));
     }

@@ -18,25 +18,42 @@ package org.graylog2.indexer.management;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Plain REST calls to the search backend for Index Management (_cat/indices, _cat/shards, allocation explain, ...)
- * through Graylog's configured client: hosts, credentials, TLS.
- * <p>
- * Implemented by the storage modules. It is an optional binding (declared in {@code VersionAwareStorageModule}):
- * only the opensearch3 module provides it, so with the opensearch2 module active it is absent and the Index
- * Management endpoints answer 503.
+ * What Index Management reads from and does to the search backend, beyond {@link org.graylog2.indexer.indices.IndicesAdapter}:
+ * every index (hidden and closed ones included), every shard copy with why it is unassigned, the nodes, and
+ * shard allocation. Implemented per storage module; backends that can't support it throw
+ * {@link UnsupportedOperationException}.
  */
 public interface IndexManagementAdapter {
+    /** Every index, hidden and closed ones included. */
+    List<CatIndex> indices();
+
+    /** Names of the indices on the warm tier (searchable snapshots). */
+    Set<String> warmIndices();
+
+    /** Clears the field data, query and request caches of one existing index. */
+    void clearCache(String index);
+
+    /** Every shard copy in the cluster, with why and since when it is unassigned. */
+    List<CatShard> shards();
+
+    /** Every node in the cluster. */
+    List<CatNode> nodes();
+
     /**
-     * @param method       HTTP method
-     * @param endpoint     path, e.g. {@code /_cat/indices}
-     * @param parameters   query parameters
-     * @param jsonBody     request body, or {@code null}
-     * @param errorMessage message of the exception thrown when the request fails
-     * @return the response body as JSON
+     * The backend's own explanation of one shard copy's allocation, as returned by it. The response is deeply
+     * nested and differs between versions, so it is returned as JSON for the caller to read what it needs.
      */
-    JsonNode request(String method, String endpoint, Map<String, String> parameters, @Nullable String jsonBody, String errorMessage);
+    JsonNode allocationExplain(String index, int shard, boolean primary);
+
+    /**
+     * Retries the allocation of shards that hit the allocation retry limit. Moves no data and forces no stale or
+     * empty primaries.
+     *
+     * @return whether the backend acknowledged the request
+     */
+    boolean retryFailedAllocations();
 }

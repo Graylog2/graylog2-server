@@ -18,7 +18,6 @@ package org.graylog2.storage;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
@@ -55,6 +54,7 @@ import org.graylog2.storage.providers.DataStreamAdapterProvider;
 import org.graylog2.storage.providers.DatanodeClusterAdminAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
+import org.graylog2.storage.providers.IndexManagementAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
 import org.graylog2.storage.providers.IndexerHostsAdapterProvider;
 import org.graylog2.storage.providers.IndicesAdapterProvider;
@@ -101,11 +101,9 @@ public class VersionAwareStorageModule extends AbstractModule {
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
         bind(DatanodeClusterAdminAdapter.class).toProvider(DatanodeClusterAdminAdapterProvider.class);
+        bind(IndexManagementAdapter.class).toProvider(IndexManagementAdapterProvider.class);
 
         bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);
-
-        // Only the opensearch3 storage module binds it; Index Management answers 503 without it.
-        OptionalBinder.newOptionalBinder(binder(), IndexManagementAdapter.class);
 
         bindQueryBackend();
     }

@@ -23,7 +23,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ServiceUnavailableException;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.indexset.IndexSet;
@@ -41,13 +40,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiresAuthentication
 @Tag(name = "Indexer/Indices/Management", description = "Index Management: per-index health")
 @Path("/system/indexer/management/indices")
 public class IndexManagementResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexManagementResource.class);
-    private static final String REMOTE_SNAPSHOT = "remote_snapshot";
 
     private final IndexHealthService indexHealthService;
     private final IndexSetRegistry indexSetRegistry;
@@ -63,12 +62,11 @@ public class IndexManagementResource extends RestResource {
     @Operation(summary = "List every index with its health, status, shards, size and Graylog index set.")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexOverview.Response list() {
-        final List<CatIndex> rows = indexHealthService.catIndices()
-                .orElseThrow(() -> new ServiceUnavailableException(IndexHealthService.UNAVAILABLE));
+        final List<CatIndex> rows = indexHealthService.indices();
 
         // One alias lookup per index set, not per index.
         final Map<String, Optional<String>> writeIndexBySet = new HashMap<>();
-        final Map<String, String> storeTypes = indexHealthService.storeTypes();
+        final Set<String> warmIndices = indexHealthService.warmIndices();
 
         final List<IndexOverview> indices = rows.stream()
                 .filter(row -> row.index() != null && isPermitted(RestPermissions.INDICES_READ, row.index()))
@@ -90,7 +88,7 @@ public class IndexManagementResource extends RestResource {
                             indexSetId,
                             indexSet.map(set -> set.getConfig().title()).orElse(null),
                             isWriteIndex,
-                            REMOTE_SNAPSHOT.equals(storeTypes.get(row.index())) ? IndexOverview.TIER_WARM : IndexOverview.TIER_HOT);
+                            warmIndices.contains(row.index()) ? IndexOverview.TIER_WARM : IndexOverview.TIER_HOT);
                 })
                 .sorted(Comparator.comparing(IndexOverview::index))
                 .toList();

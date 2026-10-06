@@ -16,38 +16,29 @@
  */
 package org.graylog2.indexer.management;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.annotation.Nullable;
 
 /**
- * One row of {@code _cat/indices?format=json&bytes=b}. OpenSearch returns every column as a string;
- * closed indices have no health, docs or size.
+ * One index as the backend lists it. Closed indices have no health, docs or size.
  */
 public record CatIndex(String index,
-                       String health,
-                       String status,
-                       Integer primaryShards,
-                       Integer replicas,
-                       Long docsCount,
-                       Long storeSizeBytes) {
+                       @Nullable String health,
+                       @Nullable String status,
+                       @Nullable Integer primaryShards,
+                       @Nullable Integer replicas,
+                       @Nullable Long docsCount,
+                       @Nullable Long storeSizeBytes) {
 
-    static CatIndex fromJson(JsonNode row) {
-        return new CatIndex(
-                text(row, "index"),
-                text(row, "health"),
-                text(row, "status"),
-                integer(row, "pri"),
-                integer(row, "rep"),
-                number(row, "docs.count"),
-                number(row, "store.size"));
+    /**
+     * From the backend's columns, which are all strings: counts and the size in bytes may be missing or blank.
+     */
+    public static CatIndex of(String index, @Nullable String health, @Nullable String status, @Nullable String primaryShards,
+                              @Nullable String replicas, @Nullable String docsCount, @Nullable String storeSizeBytes) {
+        return new CatIndex(index, health, status, integer(primaryShards), integer(replicas), number(docsCount),
+                number(storeSizeBytes));
     }
 
-    private static String text(JsonNode row, String field) {
-        final JsonNode value = row.path(field);
-        return value.isMissingNode() || value.isNull() ? null : value.asText();
-    }
-
-    private static Long number(JsonNode row, String field) {
-        final String value = text(row, field);
+    private static Long number(@Nullable String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -58,8 +49,8 @@ public record CatIndex(String index,
         }
     }
 
-    private static Integer integer(JsonNode row, String field) {
-        final Long value = number(row, field);
-        return value == null ? null : value.intValue();
+    private static Integer integer(@Nullable String value) {
+        final Long number = number(value);
+        return number == null ? null : number.intValue();
     }
 }
