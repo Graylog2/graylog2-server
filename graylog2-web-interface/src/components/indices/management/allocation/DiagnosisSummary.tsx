@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import Label from 'components/bootstrap/Label';
 
 import { avoidText, headline, optionText } from './diagnosisText';
+import DisclosureToggle from './DisclosureToggle';
 import type { ShardContext } from './diagnosisText';
 
 import type { AllocationDiagnosis } from '../types';
@@ -47,13 +48,6 @@ const Muted = styled.span(
   `,
 );
 
-const CommandToggle = styled.summary(
-  ({ theme }) => css`
-    cursor: pointer;
-    color: ${theme.colors.global.link};
-  `,
-);
-
 const Command = styled.pre`
   white-space: pre-wrap;
   word-break: break-all;
@@ -77,8 +71,7 @@ const Section = styled.details(
   `,
 );
 
-const SectionToggle = styled.summary`
-  cursor: pointer;
+const SectionToggle = styled(DisclosureToggle)`
   font-weight: bold;
 `;
 
@@ -111,7 +104,7 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
                   {text.where && <Label bsStyle="default">{text.where}</Label>}
                   {option.command && (
                     <details>
-                      <CommandToggle>Show command</CommandToggle>
+                      <DisclosureToggle>Show command</DisclosureToggle>
                       <Command>{option.command}</Command>
                     </details>
                   )}

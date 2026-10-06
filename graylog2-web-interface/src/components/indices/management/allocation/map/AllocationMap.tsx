@@ -59,8 +59,8 @@ const Containers = styled.div(
 // panes', shard: its colour), so neighbours don't run together.
 const ContainerBox = styled.section<{ $kind: Container['kind'] }>(
   ({ theme, $kind }) => css`
-    border: ${$kind === 'unplaced' || $kind === 'left' ? '3px dashed' : '3px solid'}
-      ${$kind === 'unplaced' ? theme.colors.variant.danger : theme.colors.gray[60]};
+    // Dashed: copies on no node, or on a node that left; the same grey as the nodes, the shards carry the colour.
+    border: ${$kind === 'unplaced' || $kind === 'left' ? '3px dashed' : '3px solid'} ${theme.colors.gray[60]};
     border-radius: ${$kind === 'index' ? '0' : '14px'};
     background-color: ${theme.colors.global.background};
     padding: ${theme.spacings.sm};
@@ -79,25 +79,34 @@ const ContainerTitle = styled.h4(
   `,
 );
 
+// Each index keeps its own height: opening one doesn't stretch its neighbours.
 const Indices = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-start;
     gap: ${theme.spacings.sm};
   `,
 );
 
-// How much of the cluster is drawn, and the switch to draw all of it.
+// The colour legend takes the room left and wraps inside it, so the scope stays on the same line.
+const Legend = styled.span(
+  ({ theme }) => css`
+    flex: 1 1 320px;
+    color: ${theme.colors.gray[60]};
+  `,
+);
+
+// How much of the cluster is drawn, and the switch to draw all of it: at the end of the toolbar, as quiet as the
+// colour legend, next to the other controls that change what the map shows.
 const Scope = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: ${theme.spacings.sm};
-    border-left: 4px solid ${theme.colors.variant.info};
-    background-color: ${theme.colors.variant.lightest.info};
-    padding: ${theme.spacings.xs} ${theme.spacings.sm};
-    margin-bottom: ${theme.spacings.md};
+    margin-left: auto;
+    color: ${theme.colors.gray[60]};
   `,
 );
 
@@ -110,12 +119,13 @@ const GROUP_BY: Array<{ value: GroupBy; label: string }> = [
 type Props = {
   map: ShardMapResponse;
   shardCounts: { [index: string]: number };
-  onShowIndex: (index: string) => void;
+  picked: Set<string>;
+  onTogglePicked: (index: string) => void;
 };
 
 // The user's map: nodes holding indices holding shard copies; only copies with a problem, plus whole indices on
 // request. Scales to many nodes because nodes without problem copies are only counted.
-const AllocationMap = ({ map, shardCounts, onShowIndex }: Props) => {
+const AllocationMap = ({ map, shardCounts, picked, onTogglePicked }: Props) => {
   const [groupBy, setGroupBy] = useState<GroupBy>('node');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<string | undefined>(undefined);
@@ -152,17 +162,17 @@ const AllocationMap = ({ map, shardCounts, onShowIndex }: Props) => {
     <>
       <Toolbar>
         <SegmentedControl<GroupBy> data={GROUP_BY} value={groupBy} onChange={setGroupBy} />
-        <Muted>
+        <Legend>
           Red: primary not placed (index red). Yellow: replica not placed. Blue: starting or moving. Green: healthy.
           Click a shard for what happened and what to do.
-        </Muted>
+        </Legend>
+        <Scope>
+          <span>{scope}</span>
+          <Button bsSize="xsmall" onClick={() => setShowAll(!showAll)} aria-pressed={showAll}>
+            {showAll ? 'Show problems only' : `Show ${quietNodes > 0 ? 'all nodes' : 'everything'}`}
+          </Button>
+        </Scope>
       </Toolbar>
-      <Scope>
-        <span>{scope}</span>
-        <Button bsSize="xsmall" onClick={() => setShowAll(!showAll)} aria-pressed={showAll}>
-          {showAll ? 'Show problems only' : `Show ${quietNodes > 0 ? 'all nodes' : 'everything'}`}
-        </Button>
-      </Scope>
       {containers.length === 0 && <Alert bsStyle="success">Every shard is placed and healthy.</Alert>}
       <Containers>
         {containers.map((container) => (
@@ -182,7 +192,8 @@ const AllocationMap = ({ map, shardCounts, onShowIndex }: Props) => {
                   selected={selected}
                   onSelect={setSelected}
                   shardCounts={shardCounts}
-                  onShowIndex={onShowIndex}
+                  picked={picked}
+                  onTogglePicked={onTogglePicked}
                 />
               ))}
             </Indices>

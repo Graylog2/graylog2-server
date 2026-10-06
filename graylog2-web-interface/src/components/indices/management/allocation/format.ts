@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { situationTitle } from './diagnosisText';
+
 import type { ShardExplanation, Situation } from '../types';
 
 export const formatTime = (iso: string | null) => (iso ? new Date(iso).toLocaleString() : '');
@@ -61,4 +63,39 @@ export const dataOn = (shard: ShardExplanation) => {
   }
 
   return shard.primary && shard.can_allocate === 'no_valid_shard_copy' ? 'no copy on any node' : '';
+};
+
+export type IndexShards = {
+  index: string;
+  shards: Array<ShardExplanation>;
+  primaries: number;
+  replicas: number;
+  // Distinct, in the order first seen.
+  situations: Array<string>;
+  dataOn: Array<string>;
+  // The earliest, ISO.
+  since: string | null;
+};
+
+const distinct = (values: Array<string | null>) => [...new Set(values.filter((value): value is string => !!value))];
+
+/** The unassigned shards per index, in the order the indices first appear (the server lists primaries first). */
+export const byIndex = (shards: Array<ShardExplanation>): Array<IndexShards> => {
+  const groups = new Map<string, Array<ShardExplanation>>();
+  shards.forEach((shard) => groups.set(shard.index, [...(groups.get(shard.index) ?? []), shard]));
+
+  return [...groups.entries()].map(([index, list]) => ({
+    index,
+    shards: list,
+    primaries: list.filter((shard) => shard.primary).length,
+    replicas: list.filter((shard) => !shard.primary).length,
+    situations: distinct(
+      list.map((shard) => (shard.error ? 'not explained' : situationTitle(shard.diagnosis?.situation ?? null))),
+    ),
+    dataOn: distinct(list.map(dataOn)),
+    since: list
+      .map((shard) => shard.unassigned_since)
+      .filter((since) => since)
+      .sort()[0] ?? null,
+  }));
 };

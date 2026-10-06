@@ -145,6 +145,19 @@ const ActionsRow = styled.div`
 `;
 
 // Below the table: the selection count on the left, page links centred.
+// The indices picked in the allocation panel, which the list is narrowed to.
+const PickedRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+`;
+
+const PickedName = styled.code`
+  white-space: nowrap;
+`;
+
 const FooterRow = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -353,6 +366,7 @@ const IndexManagementContent = () => {
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useUrlQueryFilters();
   const [selectedNames, setSelectedNames] = useState<Set<string>>(new Set());
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   const [pending, setPending] = useState<PendingAction | undefined>(undefined);
   const [showAllocation, setShowAllocation] = useState(false);
   const [confirmRetry, setConfirmRetry] = useState(false);
@@ -390,10 +404,26 @@ const IndexManagementContent = () => {
     toFirstPage();
   };
 
-  // From the allocation panel: narrow the list to one index.
-  const showIndex = (name: string) => {
-    changeFilters(filters.clear());
-    changeQuery(name);
+  // From the allocation panel: picking an index adds it to the list, picking it again takes it out. While any are
+  // picked, the list shows only those, so a set of indices can be built up for a bulk action.
+  const togglePicked = (name: string) => {
+    if (!picked.has(name)) {
+      changeFilters(filters.clear());
+      changeQuery('');
+    }
+
+    setPicked((current) => {
+      const next = new Set(current);
+
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+
+      return next;
+    });
+    toFirstPage();
   };
 
   const confirmRetryFailed = async () => {
@@ -406,10 +436,18 @@ const IndexManagementContent = () => {
 
   const attributes = filterAttributes(indices);
   const visible = sortIndices(
-    indices.filter((index) => matchesFilters(index, filters) && matchesQuery(index, query)),
+    indices.filter(
+      (index) =>
+        (picked.size === 0 || picked.has(index.index)) &&
+        matchesFilters(index, filters) &&
+        matchesQuery(index, query),
+    ),
     sort,
   );
   const { totalPages, currentPage, rows: pageRows } = pageOf(visible, pagination.page, pagination.pageSize);
+  // While the allocation panel is open, the list waits for something to narrow it, so opening the panel doesn't
+  // suddenly make the page much longer.
+  const waitingForNarrowing = showAllocation && picked.size === 0 && !query && filters.size === 0;
 
   // Selected indices that still exist (deleted ones drop out after a refresh).
   const selected = indices.filter((index) => selectedNames.has(index.index));
@@ -465,7 +503,8 @@ const IndexManagementContent = () => {
       {showAllocation && (
         <AllocationPanel
           onClose={() => setShowAllocation(false)}
-          onShowIndex={showIndex}
+          picked={picked}
+          onTogglePicked={togglePicked}
           onRetry={canRetry ? () => setConfirmRetry(true) : undefined}
           shardCounts={Object.fromEntries(indices.map((index) => [index.index, index.primary_shards]))}
         />
@@ -519,9 +558,24 @@ const IndexManagementContent = () => {
           </Button>
         </ToolbarEnd>
       </Toolbar>
-      {visible.length === 0 ? (
-        <NoSearchResult>No indices match the filter.</NoSearchResult>
-      ) : (
+      {picked.size > 0 && (
+        <PickedRow>
+          <span>Showing only the {picked.size === 1 ? 'index' : `${picked.size} indices`} picked above:</span>
+          {[...picked].sort().map((name) => (
+            <PickedName key={name}>{name}</PickedName>
+          ))}
+          <Button bsSize="xsmall" onClick={() => setPicked(new Set())}>
+            Show all indices
+          </Button>
+        </PickedRow>
+      )}
+      {waitingForNarrowing && (
+        <NoSearchResult>
+          Pick an index in Shard allocation above, or search or filter, to list indices here.
+        </NoSearchResult>
+      )}
+      {!waitingForNarrowing && visible.length === 0 && <NoSearchResult>No indices match the filter.</NoSearchResult>}
+      {!waitingForNarrowing && visible.length > 0 && (
         <>
           <ActionsRow>
             <PageSizeSelect

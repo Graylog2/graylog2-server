@@ -38,11 +38,12 @@ export const copyId = (copy: MapCopy) => `${copy.index}[${copy.shard}]${copy.pri
 type DetailsProps = {
   copy: MapCopy;
   totalShards: number | undefined;
-  onShowIndex: (index: string) => void;
+  picked: Set<string>;
+  onTogglePicked: (index: string) => void;
 };
 
 // The pop-up of one copy. Only an unassigned copy is explained, and only once it is opened.
-const CopyDetails = ({ copy, totalShards, onShowIndex }: DetailsProps) => {
+const CopyDetails = ({ copy, totalShards, picked, onTogglePicked }: DetailsProps) => {
   const unassigned = copy.state === 'UNASSIGNED';
   const { explanation, error, isLoading } = useShardExplanation(unassigned ? copy : undefined);
 
@@ -61,8 +62,8 @@ const CopyDetails = ({ copy, totalShards, onShowIndex }: DetailsProps) => {
           On {copy.node}: {copy.state === 'STARTED' ? 'healthy' : copy.state.toLowerCase()}.
         </p>
       )}
-      <Button bsSize="xsmall" onClick={() => onShowIndex(copy.index)}>
-        Show {copy.index} in the list
+      <Button bsSize="xsmall" onClick={() => onTogglePicked(copy.index)} aria-pressed={picked.has(copy.index)}>
+        {picked.has(copy.index) ? `Remove ${copy.index} from the list` : `Add ${copy.index} to the list`}
       </Button>
     </Details>
   );
@@ -76,15 +77,16 @@ export type IndexViewProps = {
   selected: string | undefined;
   onSelect: (id: string | undefined) => void;
   shardCounts: { [index: string]: number };
-  onShowIndex: (index: string) => void;
+  picked: Set<string>;
+  onTogglePicked: (index: string) => void;
 };
 
-type Props = Pick<IndexViewProps, 'selected' | 'onSelect' | 'shardCounts' | 'onShowIndex'> & {
+type Props = Pick<IndexViewProps, 'selected' | 'onSelect' | 'shardCounts' | 'picked' | 'onTogglePicked'> & {
   copy: MapCopy;
 };
 
 // One shard copy; the open one carries the pop-up with its diagnosis.
-const CopyGlyph = ({ copy, selected, onSelect, shardCounts, onShowIndex }: Props) => {
+const CopyGlyph = ({ copy, selected, onSelect, shardCounts, picked, onTogglePicked }: Props) => {
   const id = copyId(copy);
 
   if (id !== selected) {
@@ -99,7 +101,7 @@ const CopyGlyph = ({ copy, selected, onSelect, shardCounts, onShowIndex }: Props
       <Popover.Dropdown
         title={`${copy.index}, shard ${copy.shard} (${copy.primary ? 'primary' : 'replica'})`}
         id={`shard-${id}`}>
-        <CopyDetails copy={copy} totalShards={shardCounts[copy.index]} onShowIndex={onShowIndex} />
+        <CopyDetails copy={copy} totalShards={shardCounts[copy.index]} picked={picked} onTogglePicked={onTogglePicked} />
       </Popover.Dropdown>
     </Popover>
   );

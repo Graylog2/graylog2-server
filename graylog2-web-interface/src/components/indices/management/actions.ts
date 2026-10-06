@@ -40,16 +40,17 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     label: 'Close',
     pastTense: 'closed',
     permission: changeState,
-    appliesTo: (index) => isManaged(index) && !isClosed(index) && !index.is_write_index,
+    appliesTo: (index) => !isClosed(index) && !index.is_write_index,
     notes: 'Closed indices keep their data on disk but can\'t be searched until reopened.',
   },
   {
     key: 'open',
     label: 'Open',
-    pastTense: 'reopened',
+    pastTense: 'opened',
     permission: changeState,
-    appliesTo: (index) => isManaged(index) && isClosed(index),
-    notes: 'As with Graylog\'s own reopen, reopened indices are skipped by retention from then on.',
+    appliesTo: (index) => isClosed(index),
+    notes:
+      'Indices in a Graylog index set are reopened as Graylog\'s own reopen does, so retention skips them from then on. Other indices are simply opened.',
   },
   {
     key: 'force_merge',
@@ -81,8 +82,9 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'deleted',
     danger: true,
     permission: (index) => `indices:delete:${index.index}` as const,
-    appliesTo: (index) => isManaged(index) && !index.is_write_index,
-    notes: 'Deletes the index and all its messages. This cannot be undone.',
+    appliesTo: (index) => !index.is_write_index,
+    notes:
+      'Deletes the index and all its messages. This cannot be undone. An index not managed by Graylog may belong to OpenSearch itself or to a plugin, which can stop working without it.',
   },
 ];
 
@@ -111,6 +113,6 @@ export const canActOnAny = (indices: Array<IndexSummary>, can: CanRun) =>
   indices.some((index) => INDEX_ACTIONS.some((action) => can(action, index)));
 
 export const NOT_APPLICABLE_REASON =
-  'Rotate needs a current write index. Close, open and delete work only on indices Graylog manages, and never on a current write index. Flush, clear cache and force merge need an open index.';
+  'Rotate needs a current write index. Close and delete never work on a current write index, and open needs a closed index. Flush, clear cache and force merge need an open index.';
 
 export default INDEX_ACTIONS;

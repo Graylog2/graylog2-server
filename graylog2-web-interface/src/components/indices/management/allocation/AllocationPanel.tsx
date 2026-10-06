@@ -79,12 +79,13 @@ const Summary = ({ explanation }: { explanation: AllocationExplanation }) => {
 
 type BodyProps = {
   explanation: AllocationExplanation;
-  onShowIndex: (index: string) => void;
+  picked: Set<string>;
+  onTogglePicked: (index: string) => void;
   onRetry: (() => void) | undefined;
   shardCounts: { [index: string]: number };
 };
 
-const AllocationBody = ({ explanation, onShowIndex, onRetry, shardCounts }: BodyProps) => {
+const AllocationBody = ({ explanation, picked, onTogglePicked, onRetry, shardCounts }: BodyProps) => {
   const maxRetriesExceeded = explanation.explained.some((shard) => shard.max_retries_exceeded);
 
   if (explanation.unassigned_total === 0) {
@@ -107,14 +108,15 @@ const AllocationBody = ({ explanation, onShowIndex, onRetry, shardCounts }: Body
           asks it to try again. That helps when the cause was temporary; open a shard below to see whether it does.
         </Alert>
       )}
-      <ShardList shards={explanation.explained} onShowIndex={onShowIndex} shardCounts={shardCounts} />
+      <ShardList shards={explanation.explained} picked={picked} onTogglePicked={onTogglePicked} shardCounts={shardCounts} />
     </>
   );
 };
 
 type Props = {
   onClose: () => void;
-  onShowIndex: (index: string) => void;
+  picked: Set<string>;
+  onTogglePicked: (index: string) => void;
   // Without it (the user may not retry), the hint names the action instead of offering a button.
   onRetry?: () => void;
   // Primary shard count per index, for "shard 0 of 3".
@@ -129,7 +131,7 @@ const VIEWS: Array<{ value: View; label: string }> = [
 ];
 
 // The map needs two cheap calls and explains one shard when opened; the list explains up to 50 shards at once.
-const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined, shardCounts = {} }: Props) => {
+const AllocationPanel = ({ onClose, picked, onTogglePicked, onRetry = undefined, shardCounts = {} }: Props) => {
   const [view, setView] = useState<View>('map');
   const list = useAllocationExplain(view === 'list');
   const shardMap = useShardMap(view === 'map');
@@ -158,12 +160,13 @@ const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined, shardCount
       {isFetching && !generatedAt && <Spinner text="Asking OpenSearch about shards..." />}
       {error && <Alert bsStyle="danger">Couldn&apos;t explain shard allocation: {error.message}</Alert>}
       {view === 'map' && shardMap.map && (
-        <AllocationMap map={shardMap.map} shardCounts={shardCounts} onShowIndex={onShowIndex} />
+        <AllocationMap map={shardMap.map} shardCounts={shardCounts} picked={picked} onTogglePicked={onTogglePicked} />
       )}
       {view === 'list' && list.explanation && (
         <AllocationBody
           explanation={list.explanation}
-          onShowIndex={onShowIndex}
+          picked={picked}
+          onTogglePicked={onTogglePicked}
           onRetry={onRetry}
           shardCounts={shardCounts}
         />

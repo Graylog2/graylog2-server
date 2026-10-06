@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.management.CatIndex;
 import org.graylog2.indexer.management.IndexActionRequest;
@@ -55,6 +56,7 @@ class IndexActionsResourceTest {
     private final IndexHealthService indexHealthService = mock(IndexHealthService.class);
     private final IndexSetRegistry indexSetRegistry = mock(IndexSetRegistry.class);
     private final Indices indices = mock(Indices.class);
+    private final IndicesAdapter indicesAdapter = mock(IndicesAdapter.class);
     private final SystemJobManager systemJobManager = mock(SystemJobManager.class);
     private final ActivityWriter activityWriter = mock(ActivityWriter.class);
 
@@ -65,7 +67,7 @@ class IndexActionsResourceTest {
 
     @BeforeEach
     void setUp() {
-        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, systemJobManager, activityWriter) {
+        resource = new IndexActionsResource(indexHealthService, indexSetRegistry, indices, indicesAdapter, systemJobManager, activityWriter) {
             @Override
             protected Subject getSubject() {
                 return subject;
@@ -97,15 +99,25 @@ class IndexActionsResourceTest {
     }
 
     @Test
-    void closeOpenAndDeleteRefuseIndicesGraylogDoesNotManage() {
-        givenIndices(open("security-auditlog"), closed("old-index"));
+    void closeOpenAndDeleteWorkOnIndicesGraylogDoesNotManage() throws Exception {
+        givenIndices(open("security-auditlog"), closed("old-index"), open("scratch"));
 
-        assertThat(resource.close(request("security-auditlog")).results().get(0).ok()).isFalse();
-        assertThat(resource.open(request("old-index")).results().get(0).message()).startsWith("not managed by Graylog");
-        assertThat(resource.delete(request("security-auditlog")).results().get(0).ok()).isFalse();
-        verify(indices, never()).close(anyString());
+        assertThat(resource.close(request("security-auditlog")).results())
+                .containsExactly(IndexActionResult.ok("security-auditlog", "closed"));
+        assertThat(resource.delete(request("scratch")).results())
+                .containsExactly(IndexActionResult.ok("scratch", "deleted"));
+        verify(indices).close("security-auditlog");
+        verify(indices).delete("scratch");
+    }
+
+    @Test
+    void opensAnIndexGraylogDoesNotManageWithoutMarkingItReopened() {
+        givenIndices(closed("old-index"));
+
+        assertThat(resource.open(request("old-index")).results())
+                .containsExactly(IndexActionResult.ok("old-index", "opened"));
+        verify(indicesAdapter).openIndex("old-index");
         verify(indices, never()).reopenIndex(anyString());
-        verify(indices, never()).delete(anyString());
     }
 
     @Test

@@ -36,6 +36,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.management.CatIndex;
 import org.graylog2.indexer.management.IndexActionRequest;
@@ -59,9 +60,10 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Per-index and bulk actions. Close, open and delete go through Graylog's {@link Indices} service, like its own
- * endpoints, so index ranges and the reopened marker stay consistent; they are limited to indices Graylog manages
- * and never touch a current write index. Flush, clear cache and force merge work on any open index.
+ * Per-index and bulk actions. Close, open and delete work on any index except a current write index. Close and
+ * delete go through Graylog's {@link Indices} service, like its own endpoints, so index ranges stay consistent; open
+ * is Graylog's reopen (retention skips the index afterwards) for indices Graylog manages, and a plain OpenSearch open
+ * for the others. Flush, clear cache and force merge work on any open index.
  */
 @RequiresAuthentication
 @Tag(name = "Indexer/Indices/Management/Actions", description = "Index Management: actions on indices")
@@ -75,6 +77,7 @@ public class IndexActionsResource extends RestResource {
     private final IndexHealthService indexHealthService;
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
+    private final IndicesAdapter indicesAdapter;
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
 
@@ -82,11 +85,13 @@ public class IndexActionsResource extends RestResource {
     public IndexActionsResource(IndexHealthService indexHealthService,
                                 IndexSetRegistry indexSetRegistry,
                                 Indices indices,
+                                IndicesAdapter indicesAdapter,
                                 SystemJobManager systemJobManager,
                                 ActivityWriter activityWriter) {
         this.indexHealthService = indexHealthService;
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
+        this.indicesAdapter = indicesAdapter;
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
     }
@@ -94,10 +99,10 @@ public class IndexActionsResource extends RestResource {
     @POST
     @Timed
     @Path("/close")
-    @Operation(summary = "Close indices managed by Graylog (not a current write index).")
+    @Operation(summary = "Close indices (not a current write index).")
     @AuditEvent(type = AuditEventTypes.ES_INDEX_CLOSE)
     public IndexActionResult.Response close(@Valid @NotNull IndexActionRequest request) {
-        return run(request, RestPermissions.INDICES_CHANGESTATE, Scope.GRAYLOG_NOT_WRITE_INDEX, (index, row) -> {
+        return run(request, RestPermissions.INDICES_CHANGESTATE, Scope.NOT_WRITE_INDEX, (index, row) -> {
             if (STATUS_CLOSED.equals(row.status())) {
                 return "already closed";
             }
@@ -109,25 +114,31 @@ public class IndexActionsResource extends RestResource {
     @POST
     @Timed
     @Path("/open")
-    @Operation(summary = "Reopen closed indices managed by Graylog. Like Graylog's own reopen, retention then skips them.")
+    @Operation(summary = "Open closed indices. For indices Graylog manages this is Graylog's own reopen, so retention "
+            + "then skips them; other indices are opened as they are.")
     @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
     public IndexActionResult.Response open(@Valid @NotNull IndexActionRequest request) {
-        return run(request, RestPermissions.INDICES_CHANGESTATE, Scope.GRAYLOG, (index, row) -> {
+        return run(request, RestPermissions.INDICES_CHANGESTATE, Scope.ANY, (index, row) -> {
             if (!STATUS_CLOSED.equals(row.status())) {
                 return "already open";
             }
-            indices.reopenIndex(index);
-            return "reopened (retention will skip it)";
+            if (indexSetRegistry.isManagedIndex(index)) {
+                indices.reopenIndex(index);
+                return "reopened (retention will skip it)";
+            }
+            // Not Graylog's: no reopened marker (a Graylog alias) on someone else's index.
+            indicesAdapter.openIndex(index);
+            return "opened";
         });
     }
 
     @POST
     @Timed
     @Path("/delete")
-    @Operation(summary = "Delete indices managed by Graylog (not a current write index).")
+    @Operation(summary = "Delete indices (not a current write index).")
     @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
     public IndexActionResult.Response delete(@Valid @NotNull IndexActionRequest request) {
-        return run(request, RestPermissions.INDICES_DELETE, Scope.GRAYLOG_NOT_WRITE_INDEX, (index, row) -> {
+        return run(request, RestPermissions.INDICES_DELETE, Scope.NOT_WRITE_INDEX, (index, row) -> {
             indices.delete(index);
             return "deleted";
         });
@@ -225,10 +236,10 @@ public class IndexActionsResource extends RestResource {
     }
 
     private enum Scope {
-        /** Indices Graylog manages. */
-        GRAYLOG,
-        /** Indices Graylog manages, except a current write index. */
-        GRAYLOG_NOT_WRITE_INDEX,
+        /** Any index. */
+        ANY,
+        /** Any index except a current write index. */
+        NOT_WRITE_INDEX,
         /** Any open index. */
         ANY_OPEN
     }
@@ -265,10 +276,7 @@ public class IndexActionsResource extends RestResource {
             return IndexActionResult.failed(index, f("not permitted (needs %s)", permission));
         }
         try {
-            if (scope != Scope.ANY_OPEN && !indexSetRegistry.isManagedIndex(index)) {
-                return IndexActionResult.failed(index, "not managed by Graylog; only Graylog's own indices can be closed, opened or deleted here");
-            }
-            if (scope == Scope.GRAYLOG_NOT_WRITE_INDEX && indexSetRegistry.isCurrentWriteIndex(index)) {
+            if (scope == Scope.NOT_WRITE_INDEX && indexSetRegistry.isCurrentWriteIndex(index)) {
                 return IndexActionResult.failed(index, "current write index; rotate the index set first");
             }
             if (scope == Scope.ANY_OPEN && STATUS_CLOSED.equals(row.status())) {

@@ -60,7 +60,7 @@ const NameStrip = styled.div(
   `,
 );
 
-// The logs. Boxes in a row are as tall as the tallest pile; the logs sit in the middle of their box.
+// The logs, in the middle of their box.
 const Stack = styled.div(
   ({ theme }) => css`
     flex: 1;
@@ -95,7 +95,8 @@ const IndexPile = ({
   selected,
   onSelect,
   shardCounts,
-  onShowIndex,
+  picked,
+  onTogglePicked,
 }: IndexViewProps) => {
   const { shown, toggle } = indexContent(group, expanded);
   // Fill from the bottom: the problems (first in `shown`) end up on the bottom row, where the pile starts.
@@ -116,7 +117,8 @@ const IndexPile = ({
                 selected={selected}
                 onSelect={onSelect}
                 shardCounts={shardCounts}
-                onShowIndex={onShowIndex}
+                picked={picked}
+                onTogglePicked={onTogglePicked}
               />
             ))}
           </Row>
