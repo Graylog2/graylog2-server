@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+package org.graylog2.indexer.indexset;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EventBusConfiguration {
-
-    @Documentation("Number of threads used exclusively for dispatching internal events.")
-    @Parameter(value = "async_eventbus_processors")
-    private final int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
-    }
-
+/** Number of index sets the caller may read, overall and per {@link IndexSetCategory}. */
+public record IndexSetCategoryCounts(@JsonProperty("all") long all,
+                                     @JsonProperty("user") long user,
+                                     @JsonProperty("system") long system,
+                                     @JsonProperty("illuminate") long illuminate) {
 }

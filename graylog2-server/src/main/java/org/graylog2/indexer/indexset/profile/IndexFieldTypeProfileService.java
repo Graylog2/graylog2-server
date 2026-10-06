@@ -55,7 +55,7 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_F
 
 public class IndexFieldTypeProfileService {
 
-    static final String INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME = "index_field_type_profiles";
+    public static final String INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME = "index_field_type_profiles";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(ID_FIELD_NAME).title("Profile Id").hidden(true).sortable(true).build(),
