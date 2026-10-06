@@ -20,6 +20,7 @@ import { screen, renderPreflight } from 'wrappedTestingLibrary';
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import AppConfig from 'util/AppConfig';
 
 import App from './App';
 
@@ -58,6 +59,7 @@ describe('App', () => {
   useWindowConfirmMock();
 
   beforeEach(() => {
+    asMock(AppConfig.branding).mockReturnValue(undefined);
     asMock(fetch).mockReturnValue(Promise.resolve());
   });
 
@@ -67,5 +69,18 @@ describe('App', () => {
     await screen.findByText(
       /It looks like you are starting Graylog for the first time and have not configured a data node./,
     );
+  });
+
+  it('uses the customized product name', async () => {
+    asMock(AppConfig.branding).mockReturnValue({ product_name: 'Acme Logs' });
+
+    renderPreflight(<App />);
+
+    await screen.findByText('Acme Logs Initial Setup');
+    await screen.findByText(
+      /It looks like you are starting Acme Logs for the first time and have not configured a data node./,
+    );
+    await screen.findByText('Acme Logs Data Nodes');
+    await screen.findByText(/Acme Logs data nodes offer a better integration with Acme Logs/);
   });
 });

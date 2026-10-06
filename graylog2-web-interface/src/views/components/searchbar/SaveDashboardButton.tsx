@@ -30,9 +30,10 @@ import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredP
 type Props = {
   userIsAllowedToEdit: boolean;
   openSaveAsModal: () => void;
+  disabledInfo?: string;
 };
 
-const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal }: Props) => {
+const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal, disabledInfo = undefined }: Props) => {
   const view = useView();
   const isNewView = useIsNew();
   const sendTelemetry = useSendTelemetry('dashboard');
@@ -59,6 +60,7 @@ const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal }: Props) =>
       title="Save dashboard"
       onClick={_onSaveView}
       disabled={hasUndeclaredParameters || isNewView || !userIsAllowedToEdit}
+      disabledInfo={disabledInfo}
     />
   );
 };
