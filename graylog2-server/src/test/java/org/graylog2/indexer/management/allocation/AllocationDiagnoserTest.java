@@ -34,6 +34,7 @@ import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * The fixtures are real allocation explain answers from an OpenSearch 2.19.6 cluster (1 and 3 nodes), one per
@@ -64,6 +65,35 @@ class AllocationDiagnoserTest {
             """)
     void recognisesEveryCapturedSituation(String fixture, Situation situation, String damagedFile) throws IOException {
         final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(fixture(fixture));
+
+        assertThat(diagnosis.situation()).isEqualTo(situation);
+        assertThat(diagnosis.damagedFile()).isEqualTo(damagedFile);
+    }
+
+    /**
+     * The same situations reproduced on a throwaway OpenSearch 3.7.0 cluster (3 nodes, 2026-10-06), in fixtures/os3:
+     * the classifier must read 3.x answers the same way.
+     */
+    @ParameterizedTest(name = "OpenSearch 3.7: {0} → {1}")
+    @CsvSource(nullValues = "-", textBlock = """
+            translog-checkpoint-damaged,                TRANSLOG_DAMAGED,              translog.ckp
+            translog-file-missing,                      TRANSLOG_DAMAGED,              translog-3.tlog
+            segments-file-damaged,                      COMMIT_UNREADABLE,             segments_3
+            retention-leases-damaged,                   RETENTION_LEASES_DAMAGED,      retention-leases-1.st
+            segment-data-damaged,                       SEGMENT_DATA_DAMAGED,          _0.cfs
+            segment-data-damaged-after-stale-primary,   SEGMENT_DATA_DAMAGED,          _0.cfs
+            stale-copy-only,                            STALE_COPY_ONLY,               -
+            replica-waits-for-primary,                  PRIMARY_NOT_ACTIVE,            -
+            node-left-delayed,                          DELAYED_NODE_LEFT,             -
+            too-few-nodes,                              TOO_FEW_NODES,                 -
+            allocation-filter,                          ALLOCATION_FILTER,             -
+            shards-per-node-limit,                      SHARDS_PER_NODE_LIMIT,         -
+            allocation-disabled,                        ALLOCATION_DISABLED,           -
+            disk-watermark,                             DISK_WATERMARK,                -
+            awareness,                                  AWARENESS,                     -
+            """)
+    void recognisesEverySituationOnOpenSearch3(String fixture, Situation situation, String damagedFile) throws IOException {
+        final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(fixture(f("os3/%s", fixture)));
 
         assertThat(diagnosis.situation()).isEqualTo(situation);
         assertThat(diagnosis.damagedFile()).isEqualTo(damagedFile);
@@ -262,7 +292,7 @@ class AllocationDiagnoserTest {
     }
 
     private JsonNode fixture(String name) throws IOException {
-        try (InputStream in = getClass().getResourceAsStream("fixtures/" + name + ".json")) {
+        try (InputStream in = getClass().getResourceAsStream(f("fixtures/%s.json", name))) {
             return objectMapper.readTree(in);
         }
     }

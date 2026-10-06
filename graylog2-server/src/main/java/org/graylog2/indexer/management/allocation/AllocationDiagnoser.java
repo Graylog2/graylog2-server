@@ -49,7 +49,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * names and file names in the failure text. A few phrases of OpenSearch's own failure messages are matched too
  * ({@link #TRANSIENT}, {@link #CHECK_INDEX_PHRASES}, {@link #UNREADABLE_COMMIT_PHRASE}, {@link #FAILED_ON_NODE},
  * {@link #NODE_LEFT}); messages can change between versions, so they are the first thing to re-check on a new one.
- * The rules were checked against answers captured on OpenSearch 2.19 (the test fixtures); none from 3.x yet.
+ * The rules were checked against answers captured on OpenSearch 2.19.6 and 3.7.0 (the test fixtures).
  */
 public final class AllocationDiagnoser {
     private static final Pattern EXCEPTION_CLASS = Pattern.compile("(\\w+(?:Exception|Error))\\[");
