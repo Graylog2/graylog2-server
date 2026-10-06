@@ -16,9 +16,9 @@
  */
 import type { ColorScheme } from '@graylog/sawmill';
 
+import { Users } from '@graylog/server-api';
+
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
@@ -63,9 +63,8 @@ export const saveUserPreferences = (
   displaySuccessNotification = true,
 ): Promise<void> => {
   const convertedPreferences = convertPreferences(preferences);
-  const url = `${qualifyUrl('/users/')}${encodeURIComponent(userName)}/preferences`;
 
-  return fetch('PUT', url, { preferences: convertedPreferences }).then(
+  return Users.savePreferences(encodeURIComponent(userName), { preferences: convertedPreferences }).then(
     () => {
       if (displaySuccessNotification) {
         UserNotification.success('User preferences successfully saved');

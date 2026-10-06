@@ -18,12 +18,13 @@ import * as Immutable from 'immutable';
 import URI from 'urijs';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { Users } from '@graylog/server-api';
+
 import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
 import UserOverview from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import type { UserJSON } from 'logic/users/User';
 import User from 'logic/users/User';
 import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
@@ -119,17 +120,10 @@ export const updateUser = (userId: string, request: UserUpdate): Promise<void> =
   return fetch('PUT', url, request);
 };
 
-export const deleteUser = (userId: string): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(userId)).url);
+export const deleteUser = (userId: string): Promise<void> => Users.deleteUserById(encodeURIComponent(userId));
 
-  return fetch('DELETE', url);
-};
-
-export const changeUserPassword = (userId: string, request: ChangePasswordRequest): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(userId)).url);
-
-  return fetch('PUT', url, request);
-};
+export const changeUserPassword = (userId: string, request: ChangePasswordRequest): Promise<void> =>
+  Users.changePassword(encodeURIComponent(userId), request);
 
 export const createUserToken = (userId: string, tokenName: string, tokenTtl: string): Promise<Token> => {
   const url = qualifyUrl(
@@ -145,13 +139,8 @@ export const loadUserTokens = (userId: string): Promise<TokenSummary[]> => {
   return fetch('GET', url).then((response) => response.tokens);
 };
 
-export const deleteUserToken = (userId: string, tokenId: string): Promise<void> => {
-  const url = qualifyUrl(
-    ApiRoutes.UsersApiController.delete_token(encodeURIComponent(userId), encodeURIComponent(tokenId)).url,
-  );
-
-  return fetch('DELETE', url);
-};
+export const deleteUserToken = (userId: string, tokenId: string): Promise<void> =>
+  Users.revokeToken(encodeURIComponent(userId), encodeURIComponent(tokenId));
 
 export const loadUsers = (query: Query = {}): Promise<Immutable.List<User>> => {
   const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
@@ -161,10 +150,8 @@ export const loadUsers = (query: Query = {}): Promise<Immutable.List<User>> => {
   );
 };
 
-export const loadUsersPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedUsers> => {
-  const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
-
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
+export const loadUsersPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedUsers> =>
+  Users.getPage(undefined, page, perPage, query).then((response: PaginatedUsersResponse) => ({
     adminUser: response.context?.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
     list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
     pagination: {
@@ -175,7 +162,6 @@ export const loadUsersPaginated = ({ page, perPage, query }: Pagination): Promis
       total: response.total,
     },
   }));
-};
 
 export const setUserStatus = (userId: string, accountStatus: AccountStatus): Promise<void> => {
   const url = qualifyUrl(ApiRoutes.UsersApiController.setStatus(userId, accountStatus).url);
