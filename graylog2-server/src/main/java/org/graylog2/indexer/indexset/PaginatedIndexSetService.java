@@ -17,9 +17,12 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableList;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -110,9 +113,20 @@ public class PaginatedIndexSetService {
     private MongoPaginationHelper<IndexSetConfig> helper(Bson dbQuery, DbSortResolver.ResolvedSort sort, int perPage) {
         return paginationHelper
                 .filter(dbQuery)
-                .sort(sort.sort())
+                .sort(withDeterministicOrder(sort.sort()))
                 .pipeline(sort.preSortStages())
                 .postSortPipeline(sort.postSortStages())
                 .perPage(perPage);
+    }
+
+    /**
+     * Each page is its own query, and MongoDB returns documents with equal sort keys in no fixed order. Two
+     * queries could then disagree on which of those documents fall on which page, so one shows up twice and
+     * another never. Sorting equal keys by {@code _id} makes every page query agree. A sort that already names
+     * {@code _id} is returned as is: merging the same key twice would overwrite the caller's direction.
+     */
+    private static Bson withDeterministicOrder(Bson sort) {
+        final BsonDocument keys = sort.toBsonDocument(BsonDocument.class, MongoClientSettings.getDefaultCodecRegistry());
+        return keys.containsKey("_id") ? sort : Sorts.orderBy(sort, Sorts.ascending("_id"));
     }
 }

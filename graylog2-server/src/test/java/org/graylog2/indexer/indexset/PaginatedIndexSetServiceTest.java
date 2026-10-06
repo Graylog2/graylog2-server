@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -205,6 +206,31 @@ public class PaginatedIndexSetServiceTest {
         assertThat(ids.get(0)).isEqualTo(ID_BRAVO);
         assertThat(ids.get(1)).isEqualTo(ID_DELTA);
         assertThat(result.pagination().total()).isEqualTo(FIXTURE_COUNT);
+    }
+
+    @Test
+    @MongoDBFixtures(FIXTURE)
+    void pagesOfTiedSortKeysNeitherOverlapNorSkip() {
+        // Six fixtures have no streams and tie on stream count. Equal keys fall back to _id, so each page query
+        // places them the same way. Without that fallback a tied set could appear on two pages or on none.
+        final DbSortResolver.ResolvedSort sort = lookupSort(IndexSetAttributeSorts.streamCount(), SortOrder.DESCENDING);
+
+        final List<String> ids = Stream.of(1, 2, 3)
+                .flatMap(page -> service.findPaginated(Filters.empty(), ALLOW_ALL, sort, page, 3).stream())
+                .map(IndexSetConfig::id)
+                .toList();
+
+        assertThat(ids).containsExactly(ID_BRAVO, ID_DELTA, ID_ALPHA, ID_CHARLIE, ID_ECHO, ID_FOXTROT, ID_GOLF, ID_HOTEL);
+    }
+
+    @Test
+    @MongoDBFixtures(FIXTURE)
+    void keepsDirectionOfAnExplicitIdSort() {
+        final PaginatedList<IndexSetConfig> result = service.findPaginated(Filters.empty(), ALLOW_ALL,
+                plainSort("_id", SortOrder.DESCENDING), 1, 0);
+
+        assertThat(result).extracting(IndexSetConfig::id)
+                .containsExactly(ID_HOTEL, ID_GOLF, ID_FOXTROT, ID_ECHO, ID_DELTA, ID_CHARLIE, ID_BRAVO, ID_ALPHA);
     }
 
     @Test
