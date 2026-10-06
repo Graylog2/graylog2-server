@@ -28,7 +28,7 @@ import {
   resumeStream as resumeStreamApi,
   cloneStream as cloneStreamApi,
 } from 'api/streams';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import useStreamMutations from 'hooks/useStreamMutations';
 
 jest.mock('@graylog/server-api', () => ({
@@ -49,8 +49,9 @@ jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: {
+jest.mock('logic/users/CurrentUser', () => ({
+  __esModule: true,
+  default: {
     reload: jest.fn(),
   },
 }));
@@ -91,7 +92,7 @@ describe('useStreamMutations', () => {
     });
 
     await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: ['streams'] }));
-    expect(CurrentUserStore.reload).toHaveBeenCalled();
+    expect(CurrentUser.reload).toHaveBeenCalled();
   });
 
   it('updateStream invalidates the streams list and the single stream', async () => {

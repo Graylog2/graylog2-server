@@ -19,15 +19,13 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import CACreateForm from './CACreateForm';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),

@@ -266,9 +266,6 @@ const ApiRoutes = {
     delete: (savedSearchId: string) => ({ url: `/search/saved/${savedSearchId}` }),
     update: (savedSearchId: string) => ({ url: `/search/saved/${savedSearchId}` }),
   },
-  SessionsApiController: {
-    validate: () => ({ url: '/system/sessions' }),
-  },
   StreamsApiController: {
     index: () => ({ url: '/streams' }),
     paginated: () => ({ url: '/streams/paginated' }),

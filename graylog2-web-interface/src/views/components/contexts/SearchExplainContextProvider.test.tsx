@@ -21,23 +21,18 @@ import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 import { waitFor } from '@testing-library/react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
-jest.mock('stores/sessions/SessionStore', () => ({
-  SessionStore: MockStore(['isLoggedIn', jest.fn()]),
-}));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
+jest.mock('logic/users/CurrentUser', () => ({
   __esModule: true,
-  CurrentUserStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({ currentUser: mockDefaultUser.toJSON() }),
-  },
+  default: jest
+    .requireActual('helpers/mocking')
+    .ExternalStoreMock(() => ({ currentUser: mockDefaultUser.toJSON() }), { reload: jest.fn(() => Promise.resolve()) }),
 }));
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

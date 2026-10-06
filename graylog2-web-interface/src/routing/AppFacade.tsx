@@ -18,12 +18,15 @@ import * as React from 'react';
 import { useContext, useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
+import ErrorPage from 'components/errors/ErrorPage';
+import Button from 'components/bootstrap/Button';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
-import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
+import Session from 'logic/session/Session';
+import { validate } from 'logic/session/SessionApi';
+import useExternalStore from 'hooks/useExternalStore';
 import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
-import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
@@ -43,9 +46,14 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 );
 
 const AppFacade = () => {
-  const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
+  const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
+  const loadError = useExternalStore(CurrentUser, (state) => state.loadError);
   const { server, ping } = useContext(ServerAvailabilityContext);
-  const username = useStore(SessionStore, (state) => state?.username ?? '');
+  const username = useExternalStore(Session, (state) => state.username ?? '');
+
+  useEffect(() => {
+    validate().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(ping, SERVER_PING_TIMEOUT);
@@ -66,12 +74,25 @@ const AppFacade = () => {
       return <LoginPage />;
     }
 
+    if (loadError) {
+      return (
+        <ErrorPage
+          title="Loading your user failed"
+          description={loadError.message}
+          displayPageLayout={false}>
+          <Button bsStyle="primary" onClick={() => window.location.reload()}>
+            Reload page
+          </Button>
+        </ErrorPage>
+      );
+    }
+
     if (!currentUser) {
       return <LoadingPage text="We are preparing the web interface for you..." />;
     }
 
     return <LoggedInPage />;
-  }, [currentUser, server, username]);
+  }, [currentUser, loadError, server, username]);
 
   return <ThemeProvider>{content}</ThemeProvider>;
 };

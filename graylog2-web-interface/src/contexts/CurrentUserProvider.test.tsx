@@ -19,14 +19,16 @@ import { render, screen, act } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import { alice } from 'fixtures/users';
-import { StoreMock as MockStore } from 'helpers/mocking';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 
 import CurrentUserContext from './CurrentUserContext';
 import CurrentUserProvider from './CurrentUserProvider';
 
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]),
+const mockEmptyState = {};
+
+jest.mock('logic/users/CurrentUser', () => ({
+  __esModule: true,
+  default: { getState: jest.fn(() => mockEmptyState), subscribe: jest.fn(() => () => {}) },
 }));
 
 jest.useFakeTimers();
@@ -56,7 +58,7 @@ describe('CurrentUserProvider', () => {
   });
 
   it('provides current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: alice.toJSON() });
+    asMock(CurrentUser.getState).mockReturnValue({ currentUser: alice.toJSON() });
 
     const consume = renderSUT();
 
