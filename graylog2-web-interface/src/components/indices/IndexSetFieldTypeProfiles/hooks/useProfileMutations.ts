@@ -16,6 +16,8 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -39,21 +41,16 @@ const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileFo
 };
 
 const postProfile = async (profile: IndexSetFieldTypeProfileForm) => {
-  const url = qualifyUrl(urlPrefix);
   const body: IndexSetFieldTypeProfileRequestJson = {
     name: profile.name,
     description: profile.description,
     custom_field_mappings: profile.customFieldMappings,
   };
 
-  return fetch('POST', url, body);
+  return SystemIndexSetsFieldTypeProfiles.create(body);
 };
 
-const deleteProfile = async (id: string) => {
-  const url = qualifyUrl(`${urlPrefix}/${id}`);
-
-  return fetch('DELETE', url);
-};
+const deleteProfile = async (id: string) => SystemIndexSetsFieldTypeProfiles.remove(id);
 
 const useProfileMutation = () => {
   const queryClient = useQueryClient();

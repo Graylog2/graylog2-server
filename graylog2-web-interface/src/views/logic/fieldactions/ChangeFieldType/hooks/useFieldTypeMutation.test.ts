@@ -16,15 +16,15 @@
  */
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { qualifyUrl } from 'util/URLUtils';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 
-const urlPrefix = '/system/indices/mappings';
-
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({
+  SystemFieldTypes: { changeFieldType: jest.fn() },
+}));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -37,7 +37,6 @@ describe('useFieldTypeMutation', () => {
   });
 
   describe('putFieldTypeMutation', () => {
-    const putUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = { rotated: true, field: 'field', newFieldType: 'int', indexSetSelection: ['001'] };
 
     const requestBodyJSON = {
@@ -48,14 +47,14 @@ describe('useFieldTypeMutation', () => {
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+      asMock(SystemFieldTypes.changeFieldType).mockResolvedValue({});
       const { result } = renderHook(() => useFieldTypeMutation());
 
       act(() => {
         result.current.putFieldTypeMutation(requestBody);
       });
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
+      await waitFor(() => expect(SystemFieldTypes.changeFieldType).toHaveBeenCalledWith(requestBodyJSON));
 
       await waitFor(() =>
         expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'),
@@ -63,7 +62,7 @@ describe('useFieldTypeMutation', () => {
     });
 
     it('should display notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(SystemFieldTypes.changeFieldType).mockRejectedValue(new Error('Error'));
 
       const { result } = renderHook(() => useFieldTypeMutation());
 
