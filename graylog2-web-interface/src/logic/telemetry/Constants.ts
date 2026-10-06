@@ -98,6 +98,7 @@ export const TELEMETRY_EVENT_TYPE = {
   DASHBOARD_ACTION: {
     DASHBOARD_NEW_SAVED: 'Dashboard New Saved',
     ILLUMINATE_DASHBOARD_CLONED: 'Illuminate Dashboard Cloned',
+    ILLUMINATE_DASHBOARD_VIEWED: 'Illuminate Dashboard Viewed',
     DASHBOARD_SAVED: 'Dashboard Saved',
     DASHBOARD_UPDATED: 'Dashboard Updated',
     DASHBOARD_CREATE_CLICKED: 'Dashboard Create Clicked',
