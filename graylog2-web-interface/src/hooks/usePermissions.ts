@@ -18,6 +18,7 @@ import { useCallback, useMemo } from 'react';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useCurrentUser from 'hooks/useCurrentUser';
+// eslint-disable-next-line no-restricted-imports
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 
 const usePermissions = () => {

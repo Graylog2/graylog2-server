@@ -29,6 +29,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ExportModal from 'views/components/export/ExportModal';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import * as ViewsPermissions from 'views/Permissions';
 import type User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
@@ -110,7 +111,8 @@ const SearchActionsMenu = () => {
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
-  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser);
+  const { scopePermissions } = useGetPermissionsByScope({ _scope: view?.scope });
+  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser) && !!scopePermissions?.is_mutable;
   const formTarget = useRef();
   const [showForm, setShowForm] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -210,9 +212,9 @@ const SearchActionsMenu = () => {
 
   useHotkey({
     actionKey: 'save',
-    callback: () => (loaded ? saveSearch(currentTitle) : openFormModal()),
+    callback: () => (loaded && isAllowedToEdit ? saveSearch(currentTitle) : openFormModal()),
     scope: 'search',
-    dependencies: [loaded, saveSearch, currentTitle],
+    dependencies: [loaded, isAllowedToEdit, saveSearch, currentTitle],
   });
 
   useHotkey({

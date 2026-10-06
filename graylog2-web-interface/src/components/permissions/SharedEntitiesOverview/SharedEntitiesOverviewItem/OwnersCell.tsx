@@ -23,8 +23,7 @@ import { Link, RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
@@ -55,12 +54,12 @@ type OwnerTitleProps = {
 };
 
 const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { id: ownerId } = getValuesFromGRN(grn);
 
   switch (type) {
     case 'user':
-      if (!isPermitted(currentUser.permissions, `users:edit:${ownerId}`))
+      if (!isPermitted(`users:edit:${ownerId}`))
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
@@ -69,7 +68,7 @@ const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
 
       return <TitleWithLink title={title} entityGrn={grn} />;
     case 'team':
-      if (!isPermitted(currentUser.permissions, `team:edit:${ownerId}`))
+      if (!isPermitted(`team:edit:${ownerId}`))
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />

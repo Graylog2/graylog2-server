@@ -16,15 +16,12 @@
  */
 
 import type { Attribute } from 'stores/PaginationTypes';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  return attributes.filter(
-    ({ permissions }) => !permissions?.length || isPermitted(currentUser.permissions, permissions),
-  );
+  return attributes.filter(({ permissions }) => !permissions?.length || isPermitted(permissions));
 };
 
 export default useAuthorizedAttributes;

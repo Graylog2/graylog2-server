@@ -102,7 +102,7 @@
         <airline.version>3.3.0</airline.version>
         <amqp-client.version>5.32.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
-        <apache-directory-version>2.1.8</apache-directory-version>
+        <apache-directory-version>2.1.9</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpclient5.version>5.6.4</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
@@ -112,8 +112,8 @@
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.54.13</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>3.5.2</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.8</aws-msk-iam-auth.version>
+        <aws-kinesis-client.version>3.5.3</aws-kinesis-client.version>
+        <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <caffeine.version>3.3.0</caffeine.version>
@@ -190,7 +190,7 @@
         <lucene.version>10.5.1</lucene.version>
         <lz4.version>1.12.0</lz4.version>
         <metrics.version>4.2.40</metrics.version>
-        <mongodb-driver.version>5.12.0</mongodb-driver.version>
+        <mongodb-driver.version>5.13.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.18.Final</netty.version>
@@ -206,7 +206,6 @@
         <protobuf.version>4.36.2</protobuf.version>
         <proto-google-common-protos.version>2.77.0</proto-google-common-protos.version>
         <proto-google-iam-v1.version>1.72.0</proto-google-iam-v1.version>
-        <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -225,14 +224,12 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-19</zstd.version>
+        <zstd.version>1.5.7-20</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <!-- mcp-core 2.0.0 pulls in an older reactor-core than azure-core requires. When bumping, check if the
-             explicit reactor-core dependency management can be removed. -->
         <mcp-bom.version>2.0.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
@@ -379,12 +376,6 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-json</artifactId>
                 <version>${azure-json.version}</version>
-            </dependency>
-            <!-- mcp-core pulls in an older reactor-core than azure-core requires -->
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-core</artifactId>
-                <version>${reactor.version}</version>
             </dependency>
             <!-- The guice-bom import pins outdated versions of these annotation
                  libraries. Override them with the versions required by our other
@@ -951,12 +942,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
