@@ -17,10 +17,11 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import Alert from 'components/bootstrap/Alert';
 import Label from 'components/bootstrap/Label';
 import { Collapsible } from 'components/common';
 
-import { avoidText, headline, optionText } from './diagnosisText';
+import { avoidText, commandWarning, headline, optionText } from './diagnosisText';
 import type { ShardContext } from './diagnosisText';
 
 import type { AllocationDiagnosis } from '../types';
@@ -92,6 +93,7 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
                   {text.where && <Label bsStyle="default">{text.where}</Label>}
                   {option.command && (
                     <Collapsible label="Show command">
+                      {commandWarning(option) && <Alert bsStyle="danger">{commandWarning(option)}</Alert>}
                       <Command>{option.command}</Command>
                     </Collapsible>
                   )}

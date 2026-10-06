@@ -36,8 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 /**
- * The fixtures are real answers from graylog-dev's OpenSearch 2.19.6 (1 node on 10-04, 3 nodes on 10-06), one per
- * reproduced situation; how each was produced is in research/allocation-fixtures/README.md (graylog-more-mgmt).
+ * The fixtures are real allocation explain answers from an OpenSearch 2.19.6 cluster (1 and 3 nodes), one per
+ * reproduced situation: damaged translog, retention leases and segments, filters, limits, disk watermarks and so on.
  */
 class AllocationDiagnoserTest {
     private final ObjectMapper objectMapper = new ObjectMapper();

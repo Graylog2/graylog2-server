@@ -193,6 +193,15 @@ const WHERE: { [where in Where]: string | null } = {
   INFRASTRUCTURE: 'Infrastructure change',
 };
 
+/**
+ * Shown above a ready-made command that changes data: it can't be undone, and how much it loses. Null for a
+ * command that keeps everything.
+ */
+export const commandWarning = (option: DiagnosisOption): string | null =>
+  option.command && option.data_loss !== 'NONE'
+    ? `Running this can't be undone. ${DATA_LOSS[option.data_loss] ?? DATA_LOSS.UNKNOWN}`
+    : null;
+
 export const optionText = (option: DiagnosisOption, context: ShardContext) => ({
   title: ACTIONS[option.action]?.(option, context) ?? option.action,
   dataLoss: option.action === 'WAIT' ? null : (DATA_LOSS[option.data_loss] ?? null),

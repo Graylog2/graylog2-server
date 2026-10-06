@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { avoidText, causeText, headline, optionText } from './diagnosisText';
+import { avoidText, causeText, commandWarning, headline, optionText } from './diagnosisText';
 import { dataOn } from './format';
 
 import type { AllocationDiagnosis, DiagnosisAction, ShardExplanation, Situation } from '../types';
@@ -160,6 +160,22 @@ describe('optionText', () => {
     expect(
       optionText({ action: 'WAIT', data_loss: 'NONE', where: 'AUTOMATIC', node: null, command: null }, primary).dataLoss,
     ).toBeNull();
+  });
+});
+
+describe('commandWarning', () => {
+  it('warns above every ready-made command that loses data, and says how much', () => {
+    const withCommand = translogDamaged.options.filter((option) => option.command);
+
+    expect(withCommand.length).toBeGreaterThan(0);
+    withCommand.forEach((option) => expect(commandWarning(option)).toMatch(/^Running this can't be undone\. Loses /));
+  });
+
+  it('does not warn when the command keeps all documents or there is no command', () => {
+    const [first] = translogDamaged.options;
+
+    expect(commandWarning({ ...first, data_loss: 'NONE' })).toBeNull();
+    expect(commandWarning({ ...first, command: null })).toBeNull();
   });
 });
 

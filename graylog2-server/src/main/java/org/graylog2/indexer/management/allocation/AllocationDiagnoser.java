@@ -43,10 +43,13 @@ import javax.annotation.Nullable;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Turns one {@code _cluster/allocation/explain} answer into an {@link AllocationDiagnosis}. The rules follow
- * research-allocation-explain.md (graylog-more-mgmt repo) and were checked against output captured on OpenSearch
- * 2.19 (the test fixtures). Matching is on structured fields first, then on exception class names and file names
- * in the failure text, never on whole sentences, which differ between OpenSearch versions.
+ * Turns one {@code _cluster/allocation/explain} answer into an {@link AllocationDiagnosis}.
+ * <p>
+ * Matching is on structured fields first ({@code can_allocate}, store flags, decider names), then on exception class
+ * names and file names in the failure text. A few phrases of OpenSearch's own failure messages are matched too
+ * ({@link #TRANSIENT}, {@link #CHECK_INDEX_PHRASES}, {@link #UNREADABLE_COMMIT_PHRASE}, {@link #FAILED_ON_NODE},
+ * {@link #NODE_LEFT}); messages can change between versions, so they are the first thing to re-check on a new one.
+ * The rules were checked against answers captured on OpenSearch 2.19 (the test fixtures); none from 3.x yet.
  */
 public final class AllocationDiagnoser {
     private static final Pattern EXCEPTION_CLASS = Pattern.compile("(\\w+(?:Exception|Error))\\[");
@@ -63,11 +66,16 @@ public final class AllocationDiagnoser {
             "corrupt_state_exception", "index_format_too_old_exception", "index_format_too_new_exception");
     private static final String LOCK_TYPE = "shard_lock_obtained_failed_exception";
 
-    /** Failures where the files are fine and the environment was the problem: fix it, then retry. */
+    /** Failures where the files are fine and the environment was the problem: fix it, then retry. Class names and phrases. */
     private static final List<String> TRANSIENT = List.of("ShardLockObtainFailedException", "No space left on device",
             "CircuitBreakingException", "NodeDisconnectedException", "NodeNotConnectedException",
             "ConnectTransportException", "ReceiveTimeoutTransportException", "AlreadyClosedException",
             "source has canceled the recovery", "source shard is closed", "checksums are ok");
+
+    /** Phrases with which OpenSearch reports a copy it found corrupt on its own check at startup. */
+    private static final List<String> CHECK_INDEX_PHRASES = List.of("preexisting_corruption", "check index failed");
+    /** Phrase with which a recovery reports a Lucene commit point it couldn't read. */
+    private static final String UNREADABLE_COMMIT_PHRASE = "failed to fetch index version";
 
     /** When several rules say no on every node, the first of these is the cause; the others follow from it. */
     private static final List<String> RULE_PRIORITY = List.of("replica_after_primary_active", "restore_in_progress",
@@ -78,6 +86,17 @@ public final class AllocationDiagnoser {
 
     public static AllocationDiagnosis diagnose(JsonNode explain) {
         return new Facts(explain).diagnose();
+    }
+
+    /**
+     * A quick diagnosis of an unassigned copy from what a shard listing has (its failure text), without asking for
+     * an explain: enough to place it on the map. Situations only the full answer shows come out as UNKNOWN.
+     *
+     * @param nodeNamesById the cluster's nodes, to name the node a failure happened on
+     */
+    public static AllocationDiagnosis diagnoseFromFailure(String index, int shard, boolean primary,
+                                                          @Nullable String details, Map<String, String> nodeNamesById) {
+        return new Facts(index, shard, primary, details, nodeNamesById).diagnose();
     }
 
     private static final class Facts {
@@ -116,6 +135,23 @@ public final class AllocationDiagnoser {
             // The reason text keeps "node_left [id]" after that node rejoined; only a node still missing has left.
             final String leftId = group(NODE_LEFT, details);
             leftNode = leftId != null && !nodeNames.containsKey(leftId) ? leftId : null;
+        }
+
+        Facts(String index, int shard, boolean primary, @Nullable String details, Map<String, String> nodeNamesById) {
+            this.index = index;
+            this.shard = shard;
+            this.primary = primary;
+            this.state = "unassigned";
+            this.canAllocate = null;
+            this.details = Optional.ofNullable(details).orElse("");
+            this.remainingDelayMs = null;
+            this.nodeNames.putAll(nodeNamesById);
+            this.blocking = List.of();
+
+            final String failedOnId = group(FAILED_ON_NODE, this.details);
+            this.failedOnNode = failedOnId == null ? null : nodeNames.getOrDefault(failedOnId, failedOnId);
+            final String leftId = group(NODE_LEFT, this.details);
+            this.leftNode = leftId != null && !nodeNames.containsKey(leftId) ? leftId : null;
         }
 
         // Primaries only: replicas carry matching sizes, never a copy state (OpenSearch NodeAllocationResult).
@@ -171,8 +207,7 @@ public final class AllocationDiagnoser {
             final String evidence = String.join("; ", details, String.join("; ", storeProblems));
             final List<String> classes = exceptionClasses(details);
             final boolean damaged = classes.stream().anyMatch(CORRUPTION::contains)
-                    || details.contains("preexisting_corruption")
-                    || details.contains("check index failed")
+                    || CHECK_INDEX_PHRASES.stream().anyMatch(details::contains)
                     || copies.stream().anyMatch(c -> c.state() == CopyState.DAMAGED
                     && CORRUPTION_TYPES.stream().anyMatch(t -> c.problem().startsWith(t)));
 
@@ -218,7 +253,7 @@ public final class AllocationDiagnoser {
                                 reroute("allocate_stale_primary", node)), fallbacks),
                         List.of(Action.RETRY_FAILED));
             }
-            if (SEGMENTS_FILE.matcher(evidence).find() || evidence.contains("failed to fetch index version")) {
+            if (SEGMENTS_FILE.matcher(evidence).find() || evidence.contains(UNREADABLE_COMMIT_PHRASE)) {
                 return diagnosis(Situation.COMMIT_UNREADABLE, true, file, cause, fallbacks,
                         List.of(Action.RETRY_FAILED, Action.ALLOCATE_STALE_PRIMARY));
             }

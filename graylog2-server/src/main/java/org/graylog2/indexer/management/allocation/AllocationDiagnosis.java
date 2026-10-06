@@ -50,7 +50,7 @@ public record AllocationDiagnosis(@JsonProperty("situation") Situation situation
                                   @JsonProperty("options") List<Option> options,
                                   @JsonProperty("avoid") List<Action> avoid) {
 
-    /** Situations, see research-allocation-explain.md §5 and §6 in the graylog-more-mgmt repo. */
+    /** What is going on with an unassigned copy, grouped by whether it resolves itself, needs a fix, or needs a decision. */
     public enum Situation {
         // Resolves itself
         INITIALIZING,

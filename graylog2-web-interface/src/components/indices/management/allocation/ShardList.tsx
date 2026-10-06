@@ -112,7 +112,7 @@ const ShardList = ({ shards, picked, onTogglePicked, shardCounts }: Props) => {
                       event.stopPropagation();
                       onTogglePicked(group.index);
                     }}>
-                    {isPicked && <Icon name="check" />} 
+                    {isPicked && <Icon name="check" />}{isPicked && " "}
                     {group.index}
                   </IndexLink>
                 </td>

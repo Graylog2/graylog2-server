@@ -17,9 +17,6 @@
 package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.management.CatShard;
@@ -31,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -78,18 +76,9 @@ public class AllocationService {
                     null, null, null, null, null, false);
         }
 
-        // The same diagnosis as for a full explain answer, from what _cat/shards has: reason and failure text.
-        final ObjectNode quick = JsonNodeFactory.instance.objectNode()
-                .put("index", row.index())
-                .put("shard", row.shard())
-                .put("primary", row.primary())
-                .put("current_state", "unassigned");
-        quick.putObject("unassigned_info")
-                .put("reason", row.unassignedReason())
-                .put("details", row.unassignedDetails());
-        final ArrayNode known = quick.putArray("node_allocation_decisions");
-        nodes.forEach(node -> known.addObject().put("node_id", node.id()).put("node_name", node.name()));
-        final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(quick);
+        // From what the shard listing has: the failure text.
+        final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnoseFromFailure(row.index(), row.shard(), row.primary(),
+                row.unassignedDetails(), nodes.stream().collect(Collectors.toMap(ShardMap.Node::id, ShardMap.Node::name, (a, b) -> a)));
 
         return new ShardMap.Copy(row.index(), row.shard(), row.primary(), row.state(), null,
                 row.unassignedReason(), row.unassignedAt(),
