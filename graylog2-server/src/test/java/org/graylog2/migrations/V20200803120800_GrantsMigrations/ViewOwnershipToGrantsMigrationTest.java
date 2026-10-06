@@ -33,6 +33,8 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -140,7 +142,7 @@ class ViewOwnershipToGrantsMigrationTest {
                                ViewSummaryService viewSummaryService,
                                EntitySourceService entitySourceService,
                                MongoCollections mongoCollections) {
-            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections, new IgnoreSearchFilters());
+            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections, new EntityScopeService(Set.of(new DefaultEntityScope())), new IgnoreSearchFilters());
         }
     }
 }

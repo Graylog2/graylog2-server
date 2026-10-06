@@ -501,7 +501,6 @@ export const TELEMETRY_EVENT_TYPE = {
     SETTINGS: {
       UPDATED: 'Collector Settings Updated',
       DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
-      ADVANCED_TOGGLED: 'Collector Settings Advanced Options Toggled',
     },
     ONBOARDING: {
       FLEET_CLEARED: 'Collector Onboarding Fleet Cleared',

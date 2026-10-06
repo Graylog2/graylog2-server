@@ -25,6 +25,8 @@ import org.graylog2.search.SearchQuery;
 import java.util.Map;
 
 public class DashboardService {
+    private static final String ILLUMINATE_SCOPE_NAME = "ILLUMINATE";
+
     private final ViewService viewService;
 
     @Inject
@@ -43,7 +45,7 @@ public class DashboardService {
     public Map<String, Long> countBySource() {
         long illuminateDashboardCount = viewService.collection().countDocuments(
                 Filters.and(
-                        Filters.regex(ViewDTO.FIELD_TITLE, "^Illuminate:"),
+                        Filters.eq(ViewDTO.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME),
                         Filters.eq(ViewDTO.FIELD_TYPE, ViewDTO.Type.DASHBOARD)
                 )
         );
