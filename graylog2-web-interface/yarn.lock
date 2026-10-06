@@ -2681,10 +2681,10 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.100.9.tgz#dcf44ef25cf42a4da229bcab1d8d33e80a740a99"
   integrity sha512-SJSFw1S8+kQ0+knv/XGfrbocWoAlT7vDKsSImtLx3ZPQmEcR46hkDjLSvynSy25N8Ms4tIEini1FuBd5k7IscQ==
 
-"@tanstack/query-core@5.103.2":
-  version "5.103.2"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.103.2.tgz#9dd1792b42046808c1e8e997807b83137012dedd"
-  integrity sha512-I8DkFXls5jXLqtm8+QpOhEmG07hIblhSZFzafg9wHsMSEvMzULy9hK17wU1T/ahfhMbtITJhbxutwwCoihkR7A==
+"@tanstack/query-core@5.104.0":
+  version "5.104.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.104.0.tgz#31e432c573b9ed383d9a9fb2ed9ba7871fcfbd17"
+  integrity sha512-JrC2r/JQlXt7khBSdUpsgxNvybzOg+aITa+ARRMlP2AFo93Y8vIqz077rp+e61mJetSZ0T6AJbwW1JHer1vrPQ==
 
 "@tanstack/query-persist-client-core@5.100.9":
   version "5.100.9"
@@ -2708,12 +2708,12 @@
   dependencies:
     "@tanstack/query-persist-client-core" "5.100.9"
 
-"@tanstack/react-query@5.103.2":
-  version "5.103.2"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.103.2.tgz#1d063909424ecf259fd88f974a4ecafe32edcfed"
-  integrity sha512-B+fWiYZBc+0uUD5zDZAeLw9dKj7XEsdnuu6zRZ+no6LNKpeE3P3bJ+N6HINjcIlWR6fW3vUoTneEaGa2V6ehqw==
+"@tanstack/react-query@5.104.0":
+  version "5.104.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.104.0.tgz#5ddb71742d8ccdaf42aa3e42d1c4dd2148d5569e"
+  integrity sha512-e1TZmDCQnWIfiDVryIHeA6Idj+Lfx1hORLOhXS/l5wcgvtVD4yYqbTDl378sGQKIi2cSgb0TEMC9cKK8GGoJEw==
   dependencies:
-    "@tanstack/query-core" "5.103.2"
+    "@tanstack/query-core" "5.104.0"
 
 "@tanstack/react-table@^8.21.3":
   version "8.21.3"
@@ -8192,7 +8192,7 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "4.0.11"
     "@reduxjs/toolkit" "^2.5.1"
-    "@tanstack/react-query" "5.103.2"
+    "@tanstack/react-query" "5.104.0"
     "@types/react" "18.3.13"
     eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.9"
@@ -13313,15 +13313,10 @@ source-list-map@^2.0.0:
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-2.0.1.tgz#3993bd873bfc48479cca9ea3a547835c7c154b34"
   integrity sha512-qnQ7gVMxGNxsiL4lEuJwe/To8UnK7fAnmbGEEH8RpLouuKbeEm0lhbQVFIrNSuB+G7tVrAlVsZgETT5nljf+Iw==
 
-source-map-js@^1.0.1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
-  integrity sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==
-
-source-map-js@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
-  integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
+source-map-js@^1.0.1, source-map-js@^1.2.1:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.2.tgz#79fb88d97535a21cb27162cb05d211b67acea4ab"
+  integrity sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==
 
 source-map-support@~0.5.20:
   version "0.5.21"
