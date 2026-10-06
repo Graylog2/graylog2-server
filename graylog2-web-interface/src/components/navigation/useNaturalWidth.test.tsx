@@ -19,7 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import useNaturalWidth from './useNaturalWidth';
 
-// jsdom performs no layout, so widths come from a `data-width` attribute instead.
 const mockRectsFromDataWidth = () =>
   jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function mockRect(this: Element) {
     const width = Number(this.getAttribute('data-width') ?? 0);

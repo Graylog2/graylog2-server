@@ -35,13 +35,8 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-// Hovering a step darkens the whole item, the separator drawn between items included, so that the two
-// move together.
 const stepHoverBackground = (theme: DefaultTheme) => theme.colors.background.body;
 
-// `Nav` no longer carries the `.nav`, `.nav-pills` and `.nav-justified` classes it used to get from
-// react-bootstrap, so the selectors which relied on them address this component and its own items
-// directly, and the two former modifier props became styling props.
 const StyledNav: React.ComponentType<any> = styled(Nav)<{
   $style?: 'stepper';
   $stacked?: boolean;
@@ -54,7 +49,6 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
   align-items: stretch;
   `
       : `
-  /* The steps share the width of the bar equally, whatever their titles are. */
   > li {
     flex: 1 1 0;
     min-width: 0;
@@ -150,7 +144,6 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
     }
     & {
       > li {
-        /* The step being shown is where you are rather than somewhere to go, so it is not a link. */
         &.active > button {
           &,
           &:hover,
@@ -208,8 +201,6 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
       }
 
       &.active button {
-        /* This step is filled with the link colour, so its label has to contrast with it instead of
-           being a link itself. */
         &,
         &:hover,
         &:focus {
@@ -273,16 +264,8 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
   `,
 );
 
-/**
- * Lets a consumer address the list of steps, which used to be possible through the `nav-pills` class
- * react-bootstrap put on it.
- */
 export const WIZARD_STEP_LIST_CLASS = 'wizard-step-list';
 
-// Replaces what react-bootstrap's `NavItem` used to render. The `active` and `disabled` classes are
-// the hooks `StyledNav` styles, and the button replaces the anchor react-bootstrap rendered, which
-// Bootstrap's still-loaded base stylesheet would style as a link.
-// A step which is not the current one reads as a link, since that is what following it does.
 const StepButton = styled.button(
   ({ theme }) => css`
     background: none;
@@ -292,8 +275,6 @@ const StepButton = styled.button(
     text-align: center;
     cursor: pointer;
 
-    /* The arrow drawn between two steps is positioned against this button, which is what Bootstrap's
-       own nav rules used to provide. */
     position: relative;
     color: ${theme.colors.global.link};
 

@@ -75,8 +75,6 @@ const TAB_MENU_ITEM_CLASS = 'tab-menu-item';
 const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
 const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
 const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
-// Distinguishes a page tab from the two buttons which share the list with them, which used to be
-// implicit in only the tabs being anchors.
 const TAB_LI_CLASS = 'query-tab-li';
 
 const tabButtonStyles = css`
@@ -97,9 +95,6 @@ const Container = styled.div`
   }
 `;
 
-// `Nav` no longer carries the `.nav`/`.nav-tabs` classes it used to get from react-bootstrap, so
-// these selectors address this component directly, and each tab renders its own list item and button
-// where react-bootstrap's `NavItem` used to render a list item and an anchor.
 const StyledQueryNav = styled(Nav)(
   ({ theme }) => css`
     & {
@@ -109,13 +104,8 @@ const StyledQueryNav = styled(Nav)(
       position: relative;
       padding-left: ${NAV_PADDING}px;
 
-      /* Separates the tabs from each other, which Bootstrap's nav rules did with a margin on each
-         tab of their own. */
       gap: ${theme.spacings.sm};
 
-      /* The buttons sharing this list with the tabs are taller than a tab, so centring the items
-         would leave the selected tab floating above the content it belongs to. Bootstrap sat tabs on
-         the bottom of the bar with floats instead. */
       align-items: flex-end;
 
       > li.${TAB_LI_CLASS} {
@@ -164,12 +154,8 @@ const StyledQueryNav = styled(Nav)(
   `,
 );
 
-// An anchor rather than a button, because a tab's title contains buttons of its own, and because
-// Bootstrap's nav rules no longer suppress the underline its base stylesheet gives a hovered anchor.
 const QueryTabLink = styled.a`
   cursor: pointer;
-  /* Bootstrap's nav rules made these anchors blocks, without which their padding does not count
-     towards their height and the tabs end up shorter than they were. */
   display: inline-block;
   padding: 10px 15px;
 
@@ -179,8 +165,6 @@ const QueryTabLink = styled.a`
     text-decoration: none;
   }
 
-  /* Bootstrap rings a focused anchor whichever way it was focused, so clicking a tab leaves a ring
-     behind. Reaching it by keyboard still shows one. */
   &:focus:not(:focus-visible) {
     outline: none;
   }

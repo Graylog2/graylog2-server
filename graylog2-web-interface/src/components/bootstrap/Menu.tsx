@@ -112,7 +112,6 @@ const StyledMenuSubItem = styled(MantineMenu.Sub.Item)(
   `,
 );
 
-// A nested submenu, for menu entries which open a menu of their own instead of navigating.
 const MenuSub = ({ children = undefined }: PropsWithChildren<{}>) => <MantineMenu.Sub>{children}</MantineMenu.Sub>;
 
 MenuSub.Target = MantineMenu.Sub.Target;

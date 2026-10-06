@@ -1,12 +1,3 @@
-// Bootstrap, without the stylesheets whose classes nothing renders any more.
-//
-// This mirrors `bootstrap/less/bootstrap.less`, which imports everything. Importing that meant
-// shipping the styling of components the navigation bar and its consumers stopped being built on.
-// Keep the order: the variables and mixins have to come first, and the rest relies on being
-// cascaded in this order.
-//
-// Dropping a stylesheet from here needs evidence that nothing renders any of the classes it
-// defines, in this repository and in the plugins.
 
 // Core variables and mixins
 @import "bootstrap/less/variables.less";
@@ -31,8 +22,6 @@
 @import "bootstrap/less/dropdowns.less";
 @import "bootstrap/less/button-groups.less";
 @import "bootstrap/less/input-groups.less";
-// `navs.less` and `navbar.less` are left out: nothing renders `nav`, `nav-tabs`, `nav-pills`,
-// `nav-stacked`, `nav-justified`, `nav-tabs-justified`, `tab-content` or any `navbar` class.
 @import "bootstrap/less/breadcrumbs.less";
 @import "bootstrap/less/pagination.less";
 @import "bootstrap/less/pager.less";

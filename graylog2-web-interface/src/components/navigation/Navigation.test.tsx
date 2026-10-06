@@ -126,8 +126,6 @@ describe('Navigation', () => {
     });
   });
 
-  // The icons are links built from a navigation item, which renders the state indicator but leaves it
-  // to the item to say when it applies, and these have no item of their own to do so.
   it('shows the state indicator while an icon is hovered', async () => {
     render(<SUT />);
 

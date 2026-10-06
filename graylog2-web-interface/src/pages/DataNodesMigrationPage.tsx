@@ -29,8 +29,6 @@ import ClusterConfigurationPageNavigation from 'components/cluster-configuration
 import useProductName from 'brand-customization/useProductName';
 import { WIZARD_STEP_LIST_CLASS } from 'components/common/Wizard';
 
-// The migration decides which step follows, so its steps are shown but not offered as something to
-// pick. `Wizard` renders them as buttons rather than the links it used to.
 const WizardContainer = styled(Col)`
   .${WIZARD_STEP_LIST_CLASS} > li > button {
     pointer-events: none;

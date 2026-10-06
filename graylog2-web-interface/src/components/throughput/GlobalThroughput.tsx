@@ -24,9 +24,6 @@ import { itemStateIndicatorContainerSelector } from 'components/common/NavItemSt
 import { useGlobalThroughput } from 'hooks/useMetrics';
 import { NAVBAR_GAP } from 'theme/constants';
 
-// The state indicator wraps the counter in an inline element, whose own box is only as tall as a line
-// of text, so the indicator would be drawn through the middle of the counter. Letting it wrap the
-// counter as a block puts it along the bottom, where it belongs.
 const ThroughputNavItem = styled(NavItem)`
   ${itemStateIndicatorContainerSelector} {
     display: inline-block;

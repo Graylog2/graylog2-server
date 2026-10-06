@@ -23,7 +23,6 @@ import HotkeysProvider from 'contexts/HotkeysProvider';
 import ScratchpadToggle from './ScratchpadToggle';
 
 describe('ScratchpadToggle', () => {
-  // The shared button hides its overflow, which clips the state indicator drawn just below the icon.
   it('lets the state indicator show outside the button', async () => {
     render(
       <HotkeysProvider>

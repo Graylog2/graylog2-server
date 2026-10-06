@@ -18,20 +18,11 @@ import styled, { css } from 'styled-components';
 
 import { Nav } from 'components/bootstrap';
 
-/**
- * The list of links to the sections of a configuration page, laid out vertically. react-bootstrap
- * used to do this through its `stacked` prop.
- */
 export const SectionNav = styled(Nav)`
   flex-direction: column;
   align-items: stretch;
 `;
 
-/**
- * One entry of a `SectionNav`, styled the way react-bootstrap's `nav-pills` used to style it. The
- * page rendering the item decides when it is active, because a section stays active for every path
- * below it, which is more than `LinkContainer` treats as a match.
- */
 export const SectionNavItem = styled.li(
   ({ theme }) => css`
     & + & {

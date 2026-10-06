@@ -42,8 +42,6 @@ const MAX_NAV_LOGO_WIDTH = '120px';
 
 const MAX_NAV_ICON_WIDTH = '30px';
 
-// Numeric, because the navigation bar both renders this as its `gap` and subtracts it when working
-// out how much room is left for the navigation menu.
 const NAVBAR_GAP = 15;
 
 export {

@@ -27,8 +27,6 @@ const Navbar = styled.header(
     align-items: center;
     gap: ${NAVBAR_GAP}px;
 
-    /* The navigation menu collapses into a burger menu instead of wrapping onto a second line,
-       which the fixed height could not accommodate anyway. */
     flex-wrap: nowrap;
     padding: 0 15px;
     background-color: ${theme.colors.global.navigationBackground};

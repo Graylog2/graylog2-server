@@ -69,9 +69,6 @@ const Icons = styled.nav(
     margin-left: auto;
     flex: 0 0 auto;
 
-    /* Navigation items render the state indicator but leave it to the item to say when it applies,
-       and the icons in here are links without an item of their own to do so. Buttons among them,
-       such as the menus, bring their own. */
     a:hover,
     a:focus-visible {
       ${hoverIndicatorStyles(theme)}
@@ -84,7 +81,6 @@ const MainNavAndNotificationBadge = styled.nav`
   align-items: center;
 `;
 
-// Measured as one region, whichever badge ends up in it.
 const Badges = styled.div`
   display: flex;
   align-items: center;
@@ -99,8 +95,6 @@ const DevelopmentHeaderBadgeContainer = styled.div`
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
   const pluginBadges = usePluginEntities('navigation.badges');
-  // A badge decides for itself whether it applies, and does so with a hook. Plugins register their
-  // badges once for as long as the page lives, so the number of calls stays the same between renders.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
   const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();

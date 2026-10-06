@@ -47,11 +47,6 @@ type Props = {
   navigationItems: Array<PluginNavigation>;
 };
 
-/**
- * The navigation menu for widths where it does not fit into the navigation bar. Renders the same
- * items as the expanded menu, but as a single dropdown behind a burger toggle, with items which
- * have children becoming nested submenus.
- */
 const CollapsedMainNavbar = ({ navigationItems }: Props) => {
   const { permissions } = useCurrentUser();
 

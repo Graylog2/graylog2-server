@@ -72,11 +72,6 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
-/**
- * `NavItem` renders the state indicator for every navigation item, but leaves it to the item to say
- * when it applies. `NavDropdown` does that for a dropdown trigger; this does it for a plain link,
- * which otherwise shows no hover or active state at all. `LinkContainer` supplies the active class.
- */
 const NavListItem = styled.li(
   ({ theme }) => css`
     > a {

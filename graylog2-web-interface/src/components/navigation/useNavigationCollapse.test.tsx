@@ -19,8 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import useNavigationCollapse from './useNavigationCollapse';
 
-// jsdom performs no layout, so every element reports a zero-sized rect. Widths are taken from a
-// `data-width` attribute instead, which lets a test describe a navigation bar of any size.
 const mockRectsFromDataWidth = () =>
   jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function mockRect(this: Element) {
     const width = Number(this.getAttribute('data-width') ?? 0);
@@ -42,7 +40,6 @@ const Harness = ({ navbarWidth, brandWidth, badgesWidth, iconsWidth, menuWidth }
   return (
     <header ref={navbarRef} data-width={navbarWidth}>
       <div ref={brandRef} data-width={brandWidth} />
-      {/* Mirrors how the navigation bar stops rendering the menu once it collapses. */}
       {collapsed ? <button type="button">burger</button> : <ul ref={menuRef} data-width={menuWidth} />}
       <div ref={badgesRef} data-width={badgesWidth} />
       <nav ref={iconsRef} data-width={iconsWidth} />
@@ -61,21 +58,18 @@ describe('useNavigationCollapse', () => {
   });
 
   it('keeps the menu expanded while it fits beside the other regions', async () => {
-    // 1000 - 100 brand - 50 badges - 200 icons - 45 gaps leaves 605 for a menu wanting 400.
     render(<Harness navbarWidth={1000} brandWidth={100} badgesWidth={50} iconsWidth={200} menuWidth={400} />);
 
     expect(await screen.findByText('expanded')).toBeInTheDocument();
   });
 
   it('collapses the menu when the other regions leave too little room', async () => {
-    // The same regions leave 605, which a menu wanting 700 exceeds.
     render(<Harness navbarWidth={1000} brandWidth={100} badgesWidth={50} iconsWidth={200} menuWidth={700} />);
 
     expect(await screen.findByText('collapsed')).toBeInTheDocument();
   });
 
   it('accounts for the gaps between the regions', async () => {
-    // Without the 45px of gaps this menu would look like it just fits.
     render(<Harness navbarWidth={1000} brandWidth={100} badgesWidth={50} iconsWidth={200} menuWidth={650} />);
 
     expect(await screen.findByText('collapsed')).toBeInTheDocument();
@@ -86,7 +80,6 @@ describe('useNavigationCollapse', () => {
 
     await screen.findByText('collapsed');
 
-    // The menu is gone now, so a width which is no longer measurable must not read as "it fits".
     expect(screen.queryByText('expanded')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'burger' })).toBeInTheDocument();
   });

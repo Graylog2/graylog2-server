@@ -20,10 +20,6 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 
-/**
- * Whether a navigation item is available to the current user. Shared by the expanded and the
- * collapsed navigation menu so that both show exactly the same set of items.
- */
 const shouldRenderNavigationItem = (
   requiredFeatureFlag: string | undefined,
   requiredPermissions: Permission | Array<Permission> | undefined,

@@ -32,9 +32,6 @@ const Toggle = styled(Button)(
     min-height: ${NAV_ITEM_HEIGHT};
     color: ${theme.colors.text.primary};
 
-    /* The shared button hides its overflow, on itself and on the element wrapping its content, which
-       would clip the state indicator sitting just below the icon. Doubled, so that it does not
-       depend on which of the two stylesheets is loaded last. */
     && {
       overflow: visible;
     }

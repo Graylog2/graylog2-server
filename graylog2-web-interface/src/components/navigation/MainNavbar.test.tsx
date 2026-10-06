@@ -253,9 +253,6 @@ describe('MainNavbar', () => {
       expect(screen.getByRole('list')).toHaveStyleRule('flex', '0 0 auto');
     });
 
-    // Bootstrap's base stylesheet, which is still loaded, underlines anchors on hover. Its own nav
-    // rules used to suppress that, but they no longer apply to the navigation bar, so a hovered link
-    // would otherwise show a line right beneath its text.
     it('does not underline a plain link on hover', async () => {
       render(<SUT />);
 
@@ -266,9 +263,6 @@ describe('MainNavbar', () => {
       );
     });
 
-    // `NavItem` renders the state indicator for every navigation item, but only the item itself can
-    // decide when to show it. A dropdown trigger does so; a plain link has to do the same, or it ends
-    // up with no hover or active state at all.
     describe('state indicator of a plain link', () => {
       const listItemFor = async (name: RegExp) => {
         await screen.findByRole('link', { name });

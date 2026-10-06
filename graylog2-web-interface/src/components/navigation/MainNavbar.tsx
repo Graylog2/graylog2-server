@@ -23,8 +23,6 @@ import NavigationItem from 'components/navigation/NavigationItem';
 import CollapsedMainNavbar from 'components/navigation/CollapsedMainNavbar';
 import useNavigationItems from 'components/navigation/useNavigationItems';
 
-// Must not shrink: its measured width tells `useNavigationCollapse` how much room the menu wants,
-// which a shrunk menu would understate.
 const ExpandedNav = styled(Nav)`
   flex: 0 0 auto;
   align-items: stretch;
