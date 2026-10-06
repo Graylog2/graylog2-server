@@ -35,8 +35,7 @@ import UserNotification from 'util/UserNotification';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 import EventDefinitionReplaySearchLink from 'components/event-definitions/replay-search/EventDefinitionReplaySearchLink';
@@ -86,7 +85,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
     usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
   const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
@@ -96,9 +95,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   // Every entry of the "more actions" menu is permission gated, so without any of them the menu would
   // render as an empty dropdown box.
   const hasMoreActions =
-    isPermitted(permissions, `eventdefinitions:edit:${eventDefinition.id}`) ||
-    isPermitted(permissions, 'eventdefinitions:create') ||
-    (showActions() && isPermitted(permissions, `eventdefinitions:delete:${eventDefinition.id}`)) ||
+    isPermitted(`eventdefinitions:edit:${eventDefinition.id}`) ||
+    isPermitted('eventdefinitions:create') ||
+    (showActions() && isPermitted(`eventdefinitions:delete:${eventDefinition.id}`)) ||
     isAggregationEventDefinition(eventDefinition) ||
     pluggableActions.length > 0;
 
