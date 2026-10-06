@@ -20,6 +20,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
+import { filterCloudHiddenAttributes } from './Constants';
 import type { IndexSetEntity } from './types';
 
 type SortField = Parameters<typeof SystemIndexSets.getPage>[4];
@@ -37,6 +38,6 @@ export const fetchIndexSets = (searchParams: SearchParams): Promise<PaginatedRes
     searchParams.sort.direction,
   ).then((response) => ({
     list: response.elements as unknown as Array<IndexSetEntity>,
-    attributes: response.attributes,
+    attributes: filterCloudHiddenAttributes(response.attributes),
     pagination: { total: response.total },
   }));

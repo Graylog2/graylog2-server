@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Attribute, Sort } from 'stores/PaginationTypes';
+import AppConfig from 'util/AppConfig';
 
 import type { ExtensionColumnGroups } from './hooks/useIndexSetsOverviewExtensions';
 
@@ -24,6 +25,13 @@ export const INDEX_SET_VIEW_VARIANTS = {
 };
 
 export const DETAILS_SECTION = 'details';
+
+const CLOUD_HIDDEN_ATTRIBUTES = ['shards', 'replicas'];
+
+export const filterCloudHiddenAttributes = <T extends string | { id: string }>(items: Array<T>): Array<T> =>
+  AppConfig.isCloud()
+    ? items.filter((item) => !CLOUD_HIDDEN_ATTRIBUTES.includes(typeof item === 'string' ? item : item.id))
+    : items;
 
 const SHARED_LAYOUT = {
   entityTableId: 'index-sets',
@@ -39,16 +47,16 @@ const getIndexSetTableElements = (
   const ungroupedExtensionIds = extensionAttributes.map(({ id }) => id).filter((id) => !groupedIds.has(id));
 
   const defaultCols = ['title', 'description', 'index_prefix', 'index_template_type', 'creation_date'];
-  const configurationCols = [
+  const configurationCols = filterCloudHiddenAttributes([
     'title',
     'shards',
     'replicas',
     'field_type_refresh_interval',
     'field_type_profile',
     ...extensionColumnGroups.configuration,
-  ];
+  ]);
 
-  const defaultColumnOrder = [
+  const defaultColumnOrder = filterCloudHiddenAttributes([
     'title',
     'description',
     'index_prefix',
@@ -60,7 +68,7 @@ const getIndexSetTableElements = (
     ...extensionColumnGroups.configuration,
     ...ungroupedExtensionIds,
     'creation_date',
-  ];
+  ]);
 
   const defaultVariantLayout = {
     ...SHARED_LAYOUT,
