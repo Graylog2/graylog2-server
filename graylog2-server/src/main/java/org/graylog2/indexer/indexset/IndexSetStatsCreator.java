@@ -17,22 +17,37 @@
 package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
+import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Singleton
 public class IndexSetStatsCreator {
+    private static final Duration MEMO_DURATION = Duration.ofSeconds(10);
+
     private final Indices indices;
+    private final Cache<String, IndexSetStats> memo;
 
     @Inject
     public IndexSetStatsCreator(final Indices indices) {
+        this(indices, Ticker.systemTicker());
+    }
+
+    IndexSetStatsCreator(final Indices indices, final Ticker ticker) {
         this.indices = indices;
+        this.memo = Caffeine.newBuilder().expireAfterWrite(MEMO_DURATION).ticker(ticker).build();
     }
 
     public IndexSetStats getForIndexSet(final IndexSet indexSet) {
@@ -44,9 +59,15 @@ public class IndexSetStatsCreator {
     }
 
     /**
-     * Computes the stats of several index sets with one stats call and one closed-indices call.
+     * Computes the stats of several index sets with one stats call and one closed-indices call, memoized for
+     * {@link #MEMO_DURATION} because several metric descriptors ask for the same index sets within one request.
      */
     public Map<String, IndexSetStats> getForIndexSets(final Collection<IndexSet> indexSets) {
+        final Map<String, IndexSet> byId = Maps.uniqueIndex(indexSets, indexSet -> indexSet.getConfig().id());
+        return memo.getAll(byId.keySet(), missing -> fetch(missing.stream().map(byId::get).toList()));
+    }
+
+    private Map<String, IndexSetStats> fetch(final Collection<IndexSet> indexSets) {
         // An empty wildcard list would make the adapters query the whole cluster.
         if (indexSets.isEmpty()) {
             return Map.of();

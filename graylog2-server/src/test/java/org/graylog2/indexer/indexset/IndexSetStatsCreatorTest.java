@@ -20,8 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.graylog2.utilities.FakeTicker;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,13 +34,15 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class IndexSetStatsCreatorTest {
     private final Indices indices = mock(Indices.class);
-    private final IndexSetStatsCreator creator = new IndexSetStatsCreator(indices);
+    private final FakeTicker ticker = new FakeTicker(Duration.ZERO);
+    private final IndexSetStatsCreator creator = new IndexSetStatsCreator(indices, ticker);
 
     @Test
     void getForIndexSetSumsOpenPrimariesAndCountsClosedIndices() throws Exception {
@@ -56,9 +60,8 @@ class IndexSetStatsCreatorTest {
 
     @Test
     void getForIndexSetsGroupsBatchedStatsByIndexSet() throws Exception {
-        final List<String> wildcards = List.of("graylog_*", "other_*");
-        when(indices.getClosedIndices(wildcards)).thenReturn(Set.of("graylog_0", "other_3"));
-        when(indices.getIndexStats(wildcards)).thenReturn(new ObjectMapper().readTree("""
+        when(indices.getClosedIndices(anyCollection())).thenReturn(Set.of("graylog_0", "other_3"));
+        when(indices.getIndexStats(anyCollection())).thenReturn(new ObjectMapper().readTree("""
                 {
                   "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}},
                   "graylog_2": {"primaries": {"docs": {"count": 5}, "store": {"size_in_bytes": 50}}},
@@ -79,6 +82,40 @@ class IndexSetStatsCreatorTest {
     void getForIndexSetsMakesNoCallsWithoutIndexSets() {
         assertThat(creator.getForIndexSets(List.of())).isEmpty();
         verifyNoInteractions(indices);
+    }
+
+    @Test
+    void getForIndexSetsReusesStatsWithinTheMemoWindow() {
+        when(indices.getIndexStats(anyCollection())).thenReturn(new ObjectMapper().createObjectNode());
+        final IndexSet indexSet = indexSet("a", "graylog");
+
+        creator.getForIndexSets(List.of(indexSet));
+        creator.getForIndexSets(List.of(indexSet));
+        verify(indices, times(1)).getIndexStats(anyCollection());
+
+        ticker.advance(Duration.ofSeconds(11));
+        creator.getForIndexSets(List.of(indexSet));
+        verify(indices, times(2)).getIndexStats(anyCollection());
+    }
+
+    @Test
+    void getForIndexSetsFetchesOnlyTheIndexSetsMissingFromTheMemo() throws Exception {
+        when(indices.getIndexStats(anyCollection())).thenReturn(new ObjectMapper().readTree("""
+                {
+                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}},
+                  "other_4": {"primaries": {"docs": {"count": 1}, "store": {"size_in_bytes": 1}}}
+                }
+                """));
+        final IndexSet graylog = indexSet("a", "graylog");
+        final IndexSet other = indexSet("b", "other");
+
+        creator.getForIndexSets(List.of(graylog));
+        final Map<String, IndexSetStats> stats = creator.getForIndexSets(List.of(graylog, other));
+
+        verify(indices).getIndexStats(List.of("other_*"));
+        assertThat(stats).containsOnly(
+                entry("a", IndexSetStats.create(1, 10, 100)),
+                entry("b", IndexSetStats.create(1, 1, 1)));
     }
 
     private static IndexSet indexSet(String id, String prefix) {

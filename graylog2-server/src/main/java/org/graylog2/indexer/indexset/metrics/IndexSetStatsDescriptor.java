@@ -33,8 +33,8 @@ import java.util.function.ToLongFunction;
 import static org.graylog2.metrics.entity.cache.MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG;
 
 /**
- * Cached {@code index_count}, {@code document_count} and {@code size_bytes} metrics, each recomputed with one stats
- * call and one closed-indices call that cover all requested index sets.
+ * Cached metrics derived from the index stats of an index set, one nested class per field, which share one batched
+ * stats fetch through the memo in {@link IndexSetStatsCreator}.
  */
 public abstract class IndexSetStatsDescriptor extends IndexSetMetricDescriptor<Long> {
     private final String fieldName;
