@@ -20,8 +20,7 @@ import { useMemo } from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Nav } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import NavigationItem from 'components/navigation/NavigationItem';
 import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
@@ -46,7 +45,7 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
 };
 
 const useNavigationItems = () => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const allNavigationItems = usePluginEntities('navigation');
   const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
 
@@ -55,7 +54,7 @@ const useNavigationItems = () => {
   return useMemo(() => {
     const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_ENTERPRISE_NAV_ITEM.description);
     const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
-    const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
+    const isPermittedToEnterpriseOrSecurity = isPermitted(['licenseinfos:read']);
 
     if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
       // no enterprise plugin menu, so we will add one
@@ -76,7 +75,7 @@ const useNavigationItems = () => {
     }
 
     return sortNavigationItems<PluginNavigation>(navigationItems);
-  }, [navigationItems, permissions, securityLicenseInvalid]);
+  }, [navigationItems, isPermitted, securityLicenseInvalid]);
 };
 
 const MainNavbar = ({ pathname }: { pathname: string }) => {
