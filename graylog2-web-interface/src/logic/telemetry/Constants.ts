@@ -123,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
+  ILLUMINATE_EVENTDEFINITION_CLONED: 'Illuminate EventDefinition Cloned',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
   EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
