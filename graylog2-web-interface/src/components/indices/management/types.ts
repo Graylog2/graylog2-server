@@ -198,6 +198,29 @@ export type AllocationExplanation = {
   generated_at: string;
 };
 
+// ShardMap on the server: every node and shard copy; unassigned copies with a quick diagnosis.
+export type MapNode = { id: string; name: string; roles: string | null };
+
+export type MapCopy = {
+  index: string;
+  shard: number;
+  primary: boolean;
+  state: 'STARTED' | 'INITIALIZING' | 'RELOCATING' | 'UNASSIGNED';
+  node: string | null;
+  unassigned_reason: string | null;
+  unassigned_since: string | null;
+  failed_on_node: string | null;
+  left_node: string | null;
+  situation: Situation | null;
+  needs_action: boolean;
+};
+
+export type ShardMapResponse = {
+  nodes: Array<MapNode>;
+  shards: Array<MapCopy>;
+  generated_at: string;
+};
+
 export type RetryFailedResponse = {
   acknowledged: boolean;
 };

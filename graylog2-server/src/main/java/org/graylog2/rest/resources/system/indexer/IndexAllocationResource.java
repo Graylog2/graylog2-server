@@ -19,18 +19,23 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.management.allocation.AllocationService;
 import org.graylog2.indexer.management.allocation.ShardExplanation;
+import org.graylog2.indexer.management.allocation.ShardMap;
 import org.graylog2.indexer.management.allocation.UnassignedShard;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -85,6 +90,31 @@ public class IndexAllocationResource extends RestResource {
                 explained,
                 unassigned.size() > MAX_EXPLAINED,
                 Instant.now().toString());
+    }
+
+    @GET
+    @Timed
+    @Path("/map")
+    @Operation(summary = "Every node and shard copy, unassigned copies with a quick diagnosis (no explain calls).")
+    public ShardMap map() {
+        checkPermission(RestPermissions.INDEXERCLUSTER_READ);
+
+        final ShardMap map = allocationService.shardMap();
+        return new ShardMap(map.nodes(),
+                map.shards().stream().filter(copy -> isPermitted(RestPermissions.INDICES_READ, copy.index())).toList(),
+                map.generatedAt());
+    }
+
+    @GET
+    @Timed
+    @Path("/explain/{index}/{shard}")
+    @Operation(summary = "Explain one shard copy, e.g. the one opened on the map.")
+    public ShardExplanation explainOne(@Parameter(name = "index") @PathParam("index") String index,
+                                       @Parameter(name = "shard") @PathParam("shard") int shard,
+                                       @Parameter(name = "primary") @QueryParam("primary") @DefaultValue("true") boolean primary) throws Exception {
+        checkPermission(RestPermissions.INDEXERCLUSTER_READ);
+        checkPermission(RestPermissions.INDICES_READ, index);
+        return allocationService.explain(new UnassignedShard(index, shard, primary, null, null));
     }
 
     @POST

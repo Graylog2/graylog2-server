@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -147,6 +148,36 @@ class AllocationServiceTest {
         assertThat(service.retryFailedAllocations()).isTrue();
         verify(adapter).request(eq("POST"), eq("/_cluster/reroute"),
                 eq(Map.of("retry_failed", "true", "filter_path", "acknowledged")), isNull(), anyString());
+    }
+
+    /** Rows as graylog-dev's 3-node cluster returned them on 2026-10-06. */
+    @Test
+    void mapsEveryCopyAndDiagnosesUnassignedOnesFromTheirFailureText() throws Exception {
+        when(adapter.request(eq("GET"), eq("/_cat/nodes"), anyMap(), isNull(), anyString())).thenReturn(objectMapper.readTree("""
+                [{"id":"rtBtz0HaSxu-1B50379-zA","name":"os-dev-node-0","node.role":"dim"},
+                 {"id":"2svFqa49RO2JWKoEAwoX_g","name":"os-dev-node-1","node.role":"dim"}]"""));
+        when(adapter.request(eq("GET"), eq("/_cat/shards"), anyMap(), isNull(), anyString())).thenReturn(objectMapper.readTree("""
+                [{"index":"graylog_16","shard":"0","prirep":"p","state":"STARTED","node":"os-dev-node-1"},
+                 {"index":"graylog_15","shard":"0","prirep":"p","state":"RELOCATING","node":"os-dev-node-0 -> 10.40.2.171 2svFqa49RO2JWKoEAwoX_g os-dev-node-1"},
+                 {"index":"graylog_17","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"ALLOCATION_FAILED","unassigned.at":"2026-10-06T15:31:26.479Z",
+                  "unassigned.details":"failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_17][0]: Recovery failed on {os-dev-node-0}]; nested: IndexShardRecoveryException[failed recovery]; nested: TranslogCorruptedException[translog from source [/usr/share/opensearch/data/nodes/0/indices/Csx/0/translog/translog.ckp] is corrupted]; "},
+                 {"index":"graylog_19","shard":"0","prirep":"p","state":"UNASSIGNED","unassigned.reason":"CLUSTER_RECOVERED","unassigned.at":"2026-10-06T12:48:23.400Z"},
+                 {"index":"logs","shard":"1","prirep":"r","state":"UNASSIGNED","unassigned.reason":"NODE_LEFT","unassigned.details":"node_left [gone-node-id]"}]"""));
+
+        final ShardMap map = service.shardMap();
+
+        assertThat(map.nodes()).extracting(ShardMap.Node::name).containsExactly("os-dev-node-0", "os-dev-node-1");
+        assertThat(map.shards()).extracting(ShardMap.Copy::index, ShardMap.Copy::state, ShardMap.Copy::node,
+                        ShardMap.Copy::failedOnNode, ShardMap.Copy::leftNode, ShardMap.Copy::situation)
+                .containsExactly(
+                        tuple("graylog_16", "STARTED", "os-dev-node-1", null, null, null),
+                        // A relocating copy is still on the node it moves from.
+                        tuple("graylog_15", "RELOCATING", "os-dev-node-0", null, null, null),
+                        tuple("graylog_17", "UNASSIGNED", null, "os-dev-node-0", null, AllocationDiagnosis.Situation.TRANSLOG_DAMAGED),
+                        // Found while listing copies: only a full explain tells; the map says so.
+                        tuple("graylog_19", "UNASSIGNED", null, null, null, AllocationDiagnosis.Situation.UNKNOWN),
+                        tuple("logs", "UNASSIGNED", null, null, "gone-node-id", AllocationDiagnosis.Situation.UNKNOWN));
+        assertThat(map.shards().get(2).unassignedSince()).isEqualTo("2026-10-06T15:31:26.479Z");
     }
 
     @Test

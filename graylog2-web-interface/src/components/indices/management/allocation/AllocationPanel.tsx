@@ -15,18 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+import SegmentedControl from 'components/bootstrap/SegmentedControl';
 import Spinner from 'components/common/Spinner';
 
-import ExplanationGroup from './ExplanationGroup';
 import { formatTime, plural } from './format';
-import { useAllocationExplain } from './useAllocation';
+import AllocationMap from './map/AllocationMap';
+import ShardList from './ShardList';
+import { useAllocationExplain, useShardMap } from './useAllocation';
 
-import type { AllocationExplanation, ShardExplanation, Situation } from '../types';
+import type { AllocationExplanation } from '../types';
 
 const Section = styled.section(
   ({ theme }) => css`
@@ -51,6 +54,7 @@ const Header = styled.div`
 
 const HeaderEnd = styled(ButtonToolbar)`
   margin-left: auto;
+  align-items: center;
 `;
 
 const Muted = styled.span(
@@ -58,40 +62,6 @@ const Muted = styled.span(
     color: ${theme.colors.gray[60]};
   `,
 );
-
-// Problems with one particular copy are told per shard; rule-based ones (disk, filters, ...) can cover many.
-const PER_COPY: Array<Situation> = [
-  'TRANSIENT_FAILURE',
-  'RESTORE_FAILED',
-  'TRANSLOG_DAMAGED',
-  'RETENTION_LEASES_DAMAGED',
-  'SEGMENT_DATA_DAMAGED',
-  'COMMIT_UNREADABLE',
-  'DAMAGED_OTHER',
-  'STALE_COPY_ONLY',
-  'NO_COPY_FOUND',
-  'REPLICA_REBUILDS_FROM_PRIMARY',
-];
-
-// Shards with the same answer (situation, verdict, explanation, NO deciders per node) are shown once.
-const groupKey = (shard: ShardExplanation) =>
-  JSON.stringify([
-    shard.diagnosis?.situation,
-    PER_COPY.includes(shard.diagnosis?.situation) ? `${shard.index}[${shard.shard}]` : null,
-    shard.error ? `error:${shard.error}` : shard.can_allocate,
-    shard.explanation,
-    shard.nodes.map((node) => [node.node_name, node.deciders.map((d) => [d.decider, d.explanation])]),
-  ]);
-
-const groupShards = (shards: Array<ShardExplanation>) => {
-  const groups = new Map<string, Array<ShardExplanation>>();
-  shards.forEach((shard) => {
-    const key = groupKey(shard);
-    groups.set(key, [...(groups.get(key) ?? []), shard]);
-  });
-
-  return [...groups.values()];
-};
 
 const Summary = ({ explanation }: { explanation: AllocationExplanation }) => {
   const replicas = explanation.unassigned_total - explanation.unassigned_primaries;
@@ -115,7 +85,6 @@ type BodyProps = {
 };
 
 const AllocationBody = ({ explanation, onShowIndex, onRetry, shardCounts }: BodyProps) => {
-  const groups = groupShards(explanation.explained);
   const maxRetriesExceeded = explanation.explained.some((shard) => shard.max_retries_exceeded);
 
   if (explanation.unassigned_total === 0) {
@@ -135,17 +104,10 @@ const AllocationBody = ({ explanation, onShowIndex, onRetry, shardCounts }: Body
           ) : (
             'Retrying failed allocations'
           )}{' '}
-          asks it to try again. That helps when the cause was temporary; each shard below says whether it does.
+          asks it to try again. That helps when the cause was temporary; open a shard below to see whether it does.
         </Alert>
       )}
-      {groups.map((shards) => (
-        <ExplanationGroup
-          key={groupKey(shards[0])}
-          shards={shards}
-          onShowIndex={onShowIndex}
-          shardCounts={shardCounts}
-        />
-      ))}
+      <ShardList shards={explanation.explained} onShowIndex={onShowIndex} shardCounts={shardCounts} />
     </>
   );
 };
@@ -159,16 +121,33 @@ type Props = {
   shardCounts?: { [index: string]: number };
 };
 
+type View = 'map' | 'list';
+
+const VIEWS: Array<{ value: View; label: string }> = [
+  { value: 'map', label: 'Map' },
+  { value: 'list', label: 'List' },
+];
+
+// The map needs two cheap calls and explains one shard when opened; the list explains up to 50 shards at once.
 const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined, shardCounts = {} }: Props) => {
-  const { explanation, error, isFetching, refetch } = useAllocationExplain(true);
+  const [view, setView] = useState<View>('map');
+  const list = useAllocationExplain(view === 'list');
+  const shardMap = useShardMap(view === 'map');
+  const isFetching = view === 'map' ? shardMap.isFetching : list.isFetching;
+  const error = view === 'map' ? shardMap.error : list.error;
+  const generatedAt = view === 'map' ? shardMap.map?.generated_at : list.explanation?.generated_at;
 
   return (
     <Section aria-label="Shard allocation">
       <Header>
         <h3>Shard allocation</h3>
-        {explanation && !isFetching && <Muted>as of {formatTime(explanation.generated_at)}</Muted>}
+        {generatedAt && !isFetching && <Muted>as of {formatTime(generatedAt)}</Muted>}
         <HeaderEnd>
-          <Button bsSize="small" onClick={() => refetch()} disabled={isFetching}>
+          <SegmentedControl<View> data={VIEWS} value={view} onChange={setView} />
+          <Button
+            bsSize="small"
+            onClick={() => (view === 'map' ? shardMap.refetch() : list.refetch())}
+            disabled={isFetching}>
             {isFetching ? 'Explaining...' : 'Explain again'}
           </Button>
           <Button bsSize="small" onClick={onClose}>
@@ -176,11 +155,14 @@ const AllocationPanel = ({ onClose, onShowIndex, onRetry = undefined, shardCount
           </Button>
         </HeaderEnd>
       </Header>
-      {isFetching && !explanation && <Spinner text="Asking OpenSearch about unassigned shards..." />}
+      {isFetching && !generatedAt && <Spinner text="Asking OpenSearch about shards..." />}
       {error && <Alert bsStyle="danger">Couldn&apos;t explain shard allocation: {error.message}</Alert>}
-      {explanation && (
+      {view === 'map' && shardMap.map && (
+        <AllocationMap map={shardMap.map} shardCounts={shardCounts} onShowIndex={onShowIndex} />
+      )}
+      {view === 'list' && list.explanation && (
         <AllocationBody
-          explanation={explanation}
+          explanation={list.explanation}
           onShowIndex={onShowIndex}
           onRetry={onRetry}
           shardCounts={shardCounts}

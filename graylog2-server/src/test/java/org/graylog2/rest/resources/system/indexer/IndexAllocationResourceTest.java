@@ -19,8 +19,10 @@ package org.graylog2.rest.resources.system.indexer;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.management.TestSubjects;
+import org.graylog2.indexer.management.allocation.AllocationDiagnosis;
 import org.graylog2.indexer.management.allocation.AllocationService;
 import org.graylog2.indexer.management.allocation.ShardExplanation;
+import org.graylog2.indexer.management.allocation.ShardMap;
 import org.graylog2.indexer.management.allocation.UnassignedShard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,6 +114,30 @@ class IndexAllocationResourceTest {
         assertThat(response.explained()).hasSize(50);
         assertThat(response.truncated()).isTrue();
         verify(allocationService, times(50)).explain(any());
+    }
+
+    @Test
+    void theMapShowsOnlyIndicesTheUserMayRead() {
+        subject = TestSubjects.withPermissions("indexercluster:read", "indices:read:graylog_20");
+        when(allocationService.shardMap()).thenReturn(new ShardMap(List.of(new ShardMap.Node("n1", "node-1", "dim")), List.of(
+                new ShardMap.Copy("graylog_20", 0, true, "STARTED", "node-1", null, null, null, null, null, false),
+                new ShardMap.Copy("graylog_19", 0, true, "UNASSIGNED", null, "CLUSTER_RECOVERED", null, null, null,
+                        AllocationDiagnosis.Situation.UNKNOWN, true)), "2026-10-06T17:00:00Z"));
+
+        final ShardMap map = resource.map();
+
+        assertThat(map.nodes()).hasSize(1);
+        assertThat(map.shards()).extracting(ShardMap.Copy::index).containsExactly("graylog_20");
+    }
+
+    @Test
+    void explainingOneShardNeedsReadOnThatIndex() throws Exception {
+        subject = TestSubjects.withPermissions("indexercluster:read", "indices:read:graylog_20");
+        when(allocationService.explain(any())).thenAnswer(invocation -> explanation(invocation.getArgument(0)));
+
+        assertThat(resource.explainOne("graylog_20", 0, true).index()).isEqualTo("graylog_20");
+        verify(allocationService).explain(new UnassignedShard("graylog_20", 0, true, null, null));
+        assertThatThrownBy(() -> resource.explainOne("graylog_19", 0, true)).isInstanceOf(ForbiddenException.class);
     }
 
     @Test

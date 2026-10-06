@@ -17,7 +17,7 @@
 // Plain-language text for an AllocationDiagnosis: what happened, what can be done and what each option costs.
 // Written for Graylog users who don't work with shards, segments or translogs (the "bridge" in the design notes):
 // OpenSearch terms appear only where the user has to act on them.
-import type { AllocationDiagnosis, DataLoss, DiagnosisAction, DiagnosisOption, Where } from '../types';
+import type { AllocationDiagnosis, DataLoss, DiagnosisAction, DiagnosisOption, Situation, Where } from '../types';
 
 export type ShardContext = {
   index: string;
@@ -59,6 +59,37 @@ const CAUSES: Array<[string, string]> = [
 
 export const causeText = (cause: string | null) =>
   CAUSES.find(([key]) => cause?.includes(key))?.[1] ?? cause ?? 'an unknown problem';
+
+const TITLES: { [situation in Situation]: string } = {
+  INITIALIZING: 'Starting up',
+  DELAYED_NODE_LEFT: 'Waiting for its node to return',
+  FETCHING_SHARD_DATA: 'Looking for copies',
+  THROTTLED: 'Waiting its turn',
+  REPLICA_REBUILDS_FROM_PRIMARY: 'Damaged replica, rebuilt from the primary',
+  PRIMARY_NOT_ACTIVE: 'Waiting for its primary',
+  TRANSIENT_FAILURE: 'Temporary problem on the node',
+  RESTORE_FAILED: 'Snapshot restore failed',
+  TRANSLOG_DAMAGED: 'Damaged transaction log',
+  RETENTION_LEASES_DAMAGED: 'Damaged bookkeeping file',
+  SEGMENT_DATA_DAMAGED: 'Damaged stored data',
+  COMMIT_UNREADABLE: "Damaged beyond repair",
+  DAMAGED_OTHER: 'Damaged file',
+  STALE_COPY_ONLY: 'Only an older copy left',
+  NO_COPY_FOUND: 'No copy left',
+  TOO_FEW_NODES: 'More copies than nodes',
+  ALLOCATION_FILTER: 'Kept off by a filter',
+  SHARDS_PER_NODE_LIMIT: 'Nodes are full (shard limit)',
+  ALLOCATION_DISABLED: 'Placement switched off',
+  DISK_WATERMARK: 'Disks too full',
+  AWARENESS: 'Zone rules',
+  NODE_VERSION: 'Mixed versions',
+  RETRY_LIMIT: 'Stopped retrying',
+  OTHER_RULE: 'Blocked by a rule',
+  UNKNOWN: 'Open it to find out why',
+};
+
+/** A few words for a situation, e.g. for grouping. */
+export const situationTitle = (situation: Situation | null) => (situation ? TITLES[situation] : null) ?? situation;
 
 /** One or two sentences: what happened to this shard, before any OpenSearch vocabulary. */
 export const headline = (diagnosis: AllocationDiagnosis, context: ShardContext) => {

@@ -113,7 +113,9 @@ public final class AllocationDiagnoser {
 
             final String failedOnId = group(FAILED_ON_NODE, details);
             failedOnNode = failedOnId == null ? null : nodeNames.getOrDefault(failedOnId, failedOnId);
-            leftNode = group(NODE_LEFT, details);
+            // The reason text keeps "node_left [id]" after that node rejoined; only a node still missing has left.
+            final String leftId = group(NODE_LEFT, details);
+            leftNode = leftId != null && !nodeNames.containsKey(leftId) ? leftId : null;
         }
 
         // Primaries only: replicas carry matching sizes, never a copy state (OpenSearch NodeAllocationResult).

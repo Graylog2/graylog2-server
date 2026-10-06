@@ -20,7 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-import type { AllocationExplanation, RetryFailedResponse } from '../types';
+import type { AllocationExplanation, RetryFailedResponse, ShardExplanation, ShardMapResponse } from '../types';
 import { INDEX_OVERVIEW_QUERY_KEY } from '../useIndexOverview';
 
 const ALLOCATION_URL = '/system/indexer/management/allocation';
@@ -46,6 +46,48 @@ export const useAllocationExplain = (
   return { explanation: data, error, isFetching, refetch };
 };
 
+const MAP_QUERY_KEY = ['moremgmt', 'allocation', 'map'];
+const MAP_REFETCH_INTERVAL_MS = 30000;
+
+// Two _cat calls however big the cluster: cheap enough to refresh like the index list.
+export const useShardMap = (
+  enabled: boolean,
+): {
+  map: ShardMapResponse | undefined;
+  error: Error | null;
+  isFetching: boolean;
+  refetch: () => void;
+} => {
+  const { data, error, isFetching, refetch } = useQuery({
+    queryKey: MAP_QUERY_KEY,
+    queryFn: () => fetch<ShardMapResponse>('GET', qualifyUrl(`${ALLOCATION_URL}/map`)),
+    enabled,
+    refetchInterval: MAP_REFETCH_INTERVAL_MS,
+  });
+
+  return { map: data, error, isFetching, refetch };
+};
+
+// One explain call, only for the copy the user opened on the map.
+export const useShardExplanation = (
+  copy: { index: string; shard: number; primary: boolean } | undefined,
+): { explanation: ShardExplanation | undefined; error: Error | null; isLoading: boolean } => {
+  const { data, error, isLoading } = useQuery({
+    queryKey: [...EXPLAIN_QUERY_KEY, copy?.index, copy?.shard, copy?.primary],
+    queryFn: () =>
+      fetch<ShardExplanation>(
+        'GET',
+        qualifyUrl(
+          `${ALLOCATION_URL}/explain/${encodeURIComponent(copy.index)}/${copy.shard}?primary=${copy.primary}`,
+        ),
+      ),
+    enabled: copy !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  return { explanation: data, error, isLoading };
+};
+
 export const useRetryFailedAllocations = (): {
   retryFailed: () => Promise<RetryFailedResponse>;
   isRetrying: boolean;
@@ -68,6 +110,7 @@ export const useRetryFailedAllocations = (): {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: INDEX_OVERVIEW_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: EXPLAIN_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: MAP_QUERY_KEY });
     },
   });
 

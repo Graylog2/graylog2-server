@@ -225,6 +225,20 @@ class AllocationDiagnoserTest {
         assertThat(restore.situation()).isEqualTo(Situation.RESTORE_FAILED);
     }
 
+    /** graylog-dev 10-06: after a restart, replicas that never fit kept "node_left [id]" of a node that was back. */
+    @Test
+    void aNodeThatRejoinedHasNotLeft() {
+        final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(json("""
+                {"index":"demo-too-many-replicas","shard":0,"primary":false,"current_state":"unassigned",
+                 "unassigned_info":{"reason":"NODE_LEFT","details":"node_left [n2]"},"can_allocate":"no",
+                 "node_allocation_decisions":[
+                   {"node_id":"n1","node_name":"node-1","deciders":[{"decider":"same_shard","decision":"NO","explanation":"a copy of this shard is already allocated to this node"}]},
+                   {"node_id":"n2","node_name":"node-2","deciders":[{"decider":"same_shard","decision":"NO","explanation":"a copy of this shard is already allocated to this node"}]}]}"""));
+
+        assertThat(diagnosis.leftNode()).isNull();
+        assertThat(diagnosis.situation()).isEqualTo(Situation.TOO_FEW_NODES);
+    }
+
     @Test
     void unknownAnswersStayUnknown() {
         final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(json("""

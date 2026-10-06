@@ -60,28 +60,47 @@ const Command = styled.pre`
   margin: 4px 0 0;
 `;
 
-const Avoid = styled.p(
+const Warnings = styled.div(
   ({ theme }) => css`
     color: ${theme.colors.variant.darker.warning};
     margin-bottom: ${theme.spacings.xs};
+
+    ul {
+      margin-bottom: 0;
+    }
   `,
 );
+
+const Section = styled.details(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
+
+const SectionToggle = styled.summary`
+  cursor: pointer;
+  font-weight: bold;
+`;
 
 type Props = {
   diagnosis: AllocationDiagnosis;
   context: ShardContext;
 };
 
-// The plain-language part of a shard's explanation: what happened, then what can be done, most data kept first.
+// The plain-language part of a shard's explanation: what happened first; what can be done (most data kept first)
+// folded away until opened; then the warnings.
 const DiagnosisSummary = ({ diagnosis, context }: Props) => {
   const actionable = diagnosis.options.filter((option) => option.action !== 'WAIT');
+  const warnings = diagnosis.avoid.map(avoidText).filter((text) => text !== null);
 
   return (
     <div>
       <Headline>{headline(diagnosis, context)}</Headline>
       {actionable.length > 0 && (
-        <>
-          <strong>What you can do{actionable.length > 1 ? ', most data kept first' : ''}:</strong>
+        <Section>
+          <SectionToggle>
+            What you can do ({actionable.length === 1 ? '1 option' : `${actionable.length} options, most data kept first`})
+          </SectionToggle>
           <Options>
             {actionable.map((option) => {
               const text = optionText(option, context);
@@ -100,13 +119,23 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
               );
             })}
           </Options>
-        </>
+        </Section>
       )}
-      {diagnosis.avoid.map((action) => {
-        const text = avoidText(action);
-
-        return text ? <Avoid key={action}>{text}</Avoid> : null;
-      })}
+      {warnings.length === 1 && (
+        <Warnings>
+          <strong>Warning:</strong> {warnings[0]}
+        </Warnings>
+      )}
+      {warnings.length > 1 && (
+        <Warnings>
+          <strong>Warnings:</strong>
+          <ul>
+            {warnings.map((text) => (
+              <li key={text}>{text}</li>
+            ))}
+          </ul>
+        </Warnings>
+      )}
     </div>
   );
 };

@@ -18,12 +18,16 @@ package org.graylog2.indexer.management.allocation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ServiceUnavailableException;
 import org.graylog2.indexer.management.IndexHealthService;
 import org.graylog2.indexer.management.IndexManagementAdapter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -74,6 +78,54 @@ public class AllocationService {
                 .thenComparing(UnassignedShard::index)
                 .thenComparingInt(UnassignedShard::shard));
         return shards;
+    }
+
+    /** All nodes and all shard copies; unassigned copies get a quick diagnosis from their failure text. */
+    public ShardMap shardMap() {
+        final JsonNode nodeRows = adapter().request("GET", "/_cat/nodes",
+                Map.of("format", "json", "h", "id,name,node.role", "full_id", "true"), null, "Couldn't list nodes");
+        final JsonNode shardRows = adapter().request("GET", "/_cat/shards",
+                Map.of("format", "json", "h", "index,shard,prirep,state,node,unassigned.reason,unassigned.at,unassigned.details"),
+                null, "Couldn't list shards");
+
+        final List<ShardMap.Node> nodes = new ArrayList<>();
+        nodeRows.forEach(row -> nodes.add(new ShardMap.Node(row.path("id").asText(), row.path("name").asText(),
+                textOrNull(row.path("node.role")))));
+        nodes.sort(Comparator.comparing(ShardMap.Node::name));
+
+        final List<ShardMap.Copy> copies = new ArrayList<>();
+        shardRows.forEach(row -> copies.add(copy(row, nodes)));
+        return new ShardMap(nodes, copies, Instant.now().toString());
+    }
+
+    static ShardMap.Copy copy(JsonNode row, List<ShardMap.Node> nodes) {
+        final String index = row.path("index").asText();
+        final int shard = row.path("shard").asInt();
+        final boolean primary = "p".equals(row.path("prirep").asText());
+        final String state = row.path("state").asText();
+        if (!"UNASSIGNED".equals(state)) {
+            // A relocating copy reads "<from> -> <to address> <to id> <to name>"; it is still on <from>.
+            final String node = textOrNull(row.path("node"));
+            return new ShardMap.Copy(index, shard, primary, state, node == null ? null : node.split(" -> ")[0].trim(),
+                    null, null, null, null, null, false);
+        }
+
+        // The same diagnosis as for a full explain answer, from what _cat/shards has: reason and failure text.
+        final ObjectNode quick = JsonNodeFactory.instance.objectNode()
+                .put("index", index)
+                .put("shard", shard)
+                .put("primary", primary)
+                .put("current_state", "unassigned");
+        quick.putObject("unassigned_info")
+                .put("reason", textOrNull(row.path("unassigned.reason")))
+                .put("details", textOrNull(row.path("unassigned.details")));
+        final ArrayNode known = quick.putArray("node_allocation_decisions");
+        nodes.forEach(node -> known.addObject().put("node_id", node.id()).put("node_name", node.name()));
+        final AllocationDiagnosis diagnosis = AllocationDiagnoser.diagnose(quick);
+
+        return new ShardMap.Copy(index, shard, primary, state, null,
+                textOrNull(row.path("unassigned.reason")), textOrNull(row.path("unassigned.at")),
+                diagnosis.failedOnNode(), diagnosis.leftNode(), diagnosis.situation(), diagnosis.needsAction());
     }
 
     public ShardExplanation explain(UnassignedShard shard) throws Exception {
