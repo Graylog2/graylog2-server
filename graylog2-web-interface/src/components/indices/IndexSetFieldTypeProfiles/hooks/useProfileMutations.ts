@@ -41,13 +41,14 @@ const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileFo
 };
 
 const postProfile = async (profile: IndexSetFieldTypeProfileForm) => {
+  const url = qualifyUrl(urlPrefix);
   const body: IndexSetFieldTypeProfileRequestJson = {
     name: profile.name,
     description: profile.description,
     custom_field_mappings: profile.customFieldMappings,
   };
 
-  return SystemIndexSetsFieldTypeProfiles.create(body);
+  return fetch('POST', url, body);
 };
 
 const deleteProfile = async (id: string) => SystemIndexSetsFieldTypeProfiles.remove(id);

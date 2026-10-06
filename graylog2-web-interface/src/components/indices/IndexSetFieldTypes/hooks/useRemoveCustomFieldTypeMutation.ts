@@ -17,8 +17,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import mapValues from 'lodash/mapValues';
 
-import { SystemFieldTypes } from '@graylog/server-api';
-
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type {
   RemoveFieldTypeBody,
@@ -27,14 +27,17 @@ import type {
   IndexSetFieldTypeJson,
 } from 'components/indices/IndexSetFieldTypes/types';
 
+export const urlPrefix = '/system/indices/mappings/remove_mapping';
+
 const putFieldType = async ({ indexSets, fields, rotated }: RemoveFieldTypeBody) => {
+  const url = qualifyUrl(urlPrefix);
   const body: RemoveFieldTypeBodyJson = {
     index_sets: indexSets,
     fields,
     rotate: rotated,
   };
 
-  return SystemFieldTypes.removeCustomMapping(body);
+  return fetch('PUT', url, body);
 };
 
 type IndexSetResponseJSON = {

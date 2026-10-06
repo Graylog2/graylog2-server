@@ -16,7 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { PipelinesRulebuilder, PipelinesRules } from '@graylog/server-api';
+import { PipelinesRulebuilder } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
@@ -75,9 +75,10 @@ const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule
   return fetch('POST', qualifyUrl(ApiRoutes.RuleBuilderController.validate().url), ruleToValidate);
 };
 
-const fetchRule = async (ruleId: string = '') => PipelinesRules.get(ruleId);
-const fetchConditionsDict = async () => PipelinesRulebuilder.conditions();
-const fetchActionsDict = async () => PipelinesRulebuilder.actions();
+const fetchRule = async (ruleId: string = '') => fetch('GET', qualifyUrl(ApiRoutes.RulesController.get(ruleId).url));
+const fetchConditionsDict = async () =>
+  fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));
+const fetchActionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listActionsDict().url));
 
 const useRuleBuilder = () => {
   const { ruleId } = useParams();

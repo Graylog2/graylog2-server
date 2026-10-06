@@ -42,7 +42,7 @@ type SystemInfo = {
 
 export const fetchSystemInfo = (): Promise<SystemInfo> => System.system();
 
-export const fetchSystemJvm = () => System.jvm();
+export const fetchSystemJvm = () => fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.jvm().url));
 
 export const fetchSystemLocales = (): Promise<{ locales: Array<Locales> }> =>
   fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.locales().url));

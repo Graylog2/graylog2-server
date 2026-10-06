@@ -30,7 +30,7 @@ const urlPrefix = '/system/indices/index_sets/profiles';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('@graylog/server-api', () => ({
-  SystemIndexSetsFieldTypeProfiles: { create: jest.fn(), remove: jest.fn() },
+  SystemIndexSetsFieldTypeProfiles: { remove: jest.fn() },
 }));
 
 jest.mock('util/UserNotification', () => ({
@@ -83,12 +83,13 @@ describe('useProfileMutations', () => {
   });
 
   describe('createProfile', () => {
+    const postUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = formValuesProfile1;
 
     const requestBodyJSON = omit(requestBodyProfile1JSON, ['id']);
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(SystemIndexSetsFieldTypeProfiles.create).mockResolvedValue(requestBodyProfile1JSON);
+      asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
       const { result } = renderHook(() => useProfileMutations());
 
@@ -96,7 +97,7 @@ describe('useProfileMutations', () => {
         result.current.createProfile(requestBody);
       });
 
-      await waitFor(() => expect(SystemIndexSetsFieldTypeProfiles.create).toHaveBeenCalledWith(requestBodyJSON));
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', postUrl, requestBodyJSON));
 
       await waitFor(() =>
         expect(UserNotification.success).toHaveBeenCalledWith(
@@ -107,7 +108,7 @@ describe('useProfileMutations', () => {
     });
 
     it('should display notification on fail', async () => {
-      asMock(SystemIndexSetsFieldTypeProfiles.create).mockRejectedValue(new Error('Error'));
+      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useProfileMutations());
 

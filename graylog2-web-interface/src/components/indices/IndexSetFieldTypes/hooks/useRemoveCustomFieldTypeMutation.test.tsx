@@ -16,16 +16,16 @@
  */
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
-import { SystemFieldTypes } from '@graylog/server-api';
-
 import asMock from 'helpers/mocking/AsMock';
+import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import { qualifyUrl } from 'util/URLUtils';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import { overriddenIndexField, overriddenIndexFieldJson } from 'fixtures/indexSetFieldTypes';
 
-jest.mock('@graylog/server-api', () => ({
-  SystemFieldTypes: { removeCustomMapping: jest.fn() },
-}));
+const urlPrefix = '/system/indices/mappings/remove_mapping';
+
+jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -41,6 +41,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
   });
 
   describe('removeCustomFieldTypeMutation', () => {
+    const putUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = { rotated: true, fields: ['field'], indexSets: ['001'] };
 
     const requestBodyJSON = {
@@ -50,14 +51,16 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(SystemFieldTypes.removeCustomMapping).mockResolvedValue({
-        '001': {
-          succeeded: [overriddenIndexFieldJson],
-          failures: [],
-          successfully_performed: 1,
-          errors: [],
-        },
-      });
+      asMock(fetch).mockImplementation(() =>
+        Promise.resolve({
+          '001': {
+            succeeded: [overriddenIndexFieldJson],
+            failures: [],
+            successfully_performed: 1,
+            errors: [],
+          },
+        }),
+      );
 
       const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({
@@ -70,7 +73,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         result.current.removeCustomFieldTypeMutation(requestBody);
       });
 
-      await waitFor(() => expect(SystemFieldTypes.removeCustomMapping).toHaveBeenCalledWith(requestBodyJSON));
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
       await waitFor(() =>
         expect(mockOnSuccessHandler).toHaveBeenCalledWith({
@@ -90,7 +93,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     });
 
     it('should display notification on fail', async () => {
-      asMock(SystemFieldTypes.removeCustomMapping).mockRejectedValue(new Error('Error'));
+      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({
@@ -112,14 +115,16 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     });
 
     it('should run onErrorHandler when response has failures', async () => {
-      asMock(SystemFieldTypes.removeCustomMapping).mockResolvedValue({
-        '001': {
-          successfully_performed: 0,
-          failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
-          succeeded: [],
-          errors: ['Some error'],
-        },
-      });
+      asMock(fetch).mockImplementation(() =>
+        Promise.resolve({
+          '001': {
+            successfully_performed: 0,
+            failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
+            succeeded: [],
+            errors: ['Some error'],
+          },
+        }),
+      );
 
       const { result } = renderHook(() =>
         useRemoveCustomFieldTypeMutation({

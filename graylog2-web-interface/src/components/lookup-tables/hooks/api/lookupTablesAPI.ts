@@ -137,4 +137,4 @@ export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
 export const deleteDataAdapter = async (adapterId: string) => SystemLookup.deleteAdapter(adapterId);
 
 export const lookupDataAdapter = async (adapterName: string, key: string) =>
-  SystemLookup.performAdapterLookup(adapterName, key);
+  fetch('GET', _url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));

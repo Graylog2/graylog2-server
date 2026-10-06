@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Cluster } from '@graylog/server-api';
 
-import { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
+import fetch, { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import type { SystemOverview } from 'stores/cluster/types';
@@ -28,7 +28,7 @@ const SOURCE_URL = '/cluster';
 export const fetchClusterOverview = (): Promise<{ [nodeId: string]: SystemOverview }> => Cluster.get();
 
 export const fetchNodeJvm = (nodeId: string) => {
-  const promise = Cluster.jvm(nodeId);
+  const promise = fetch('GET', qualifyUrl(`${SOURCE_URL}/${nodeId}/jvm`));
 
   promise.catch((error) =>
     UserNotification.error(
