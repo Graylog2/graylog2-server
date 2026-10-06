@@ -90,6 +90,7 @@ const openMoreActions = async (indexSet: IndexSetEntity) =>
 
 describe('IndexSetsOverview', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { ...layoutPreferences, attributes: undefined },
       isInitialLoading: false,
