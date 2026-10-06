@@ -18,8 +18,7 @@ import * as React from 'react';
 
 import { Link, DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -27,10 +26,9 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import useBasicSidecarUser from 'components/sidecars/hooks/useBasicSidecarUser';
 
 const SidecarsPage = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { data: sidecarUser } = useBasicSidecarUser();
-  const canCreateSidecarUserTokens =
-    sidecarUser && isPermitted(currentUser?.permissions, [`users:tokencreate:${sidecarUser.username}`]);
+  const canCreateSidecarUserTokens = sidecarUser && isPermitted([`users:tokencreate:${sidecarUser.username}`]);
 
   return (
     <DocumentTitle title="Sidecars">

@@ -26,7 +26,7 @@ E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server i
 
 ## Contributing
 
-Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of our conventions, best practices and tips.
+Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute, and at [CONVENTIONS.md](CONVENTIONS.md) for our coding conventions and best practices.
 
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:

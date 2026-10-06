@@ -141,7 +141,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Documentation("""
             The size of the thread pool in the output buffer processor.
-            Default: 3
             """)
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
@@ -153,7 +152,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = NODE_ID_FILE, validators = NodeIdFileValidator.class)
     private String nodeIdFile;
 
-    @Documentation("The default root user is named 'admin'")
+    @Documentation("Username of the root user.")
     @Parameter(value = "root_username")
     private String rootUsername = "admin";
 
@@ -171,14 +170,12 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Documentation("""
             The time zone setting of the root user. See http://www.joda.org/joda-time/timezones.html for a list of valid time zones.
-            Default is UTC
             """)
     @Parameter(value = "root_timezone")
     private DateTimeZone rootTimeZone = DateTimeZone.UTC;
 
     @Documentation("""
             The email address of the root user.
-            Default is empty
             """)
     @Parameter(value = "root_email")
     private String rootEmail = "";
@@ -216,14 +213,14 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             take an unusual amount of time to run, for example if its using regular expressions that perform excessive backtracking.
             This will impact the processing of the entire server. To keep such misbehaving stream rules from impacting other
             streams, Graylog limits the execution time for each stream.
-            The default values are noted below, the timeout is in milliseconds.
+            The timeout is in milliseconds.
             If the stream matching for one stream took longer than the timeout value, and this happened more than "max_faults" times
             that stream is disabled and a notification is shown in the web interface.
             """)
     @Parameter(value = "stream_processing_timeout", validators = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
-    @Documentation("tbd")
+    @Documentation("Number of times a stream may exceed \"stream_processing_timeout\" before it is disabled and a notification is shown in the web interface.")
     @Parameter(value = "stream_processing_max_faults", validators = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
@@ -256,7 +253,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     /**
      * Deprecated! Use staleLeaderTimeout instead
      */
-    @Documentation("tbd")
+    @Documentation("Deprecated, use \"stale_leader_timeout\" instead. Time in milliseconds after which a detected stale leader node is being rechecked on startup.")
     @Parameter(value = "stale_master_timeout", validators = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
@@ -267,7 +264,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
 
-    @Documentation("tbd")
+    @Documentation("Grace period during which a missing leader node is tolerated in static leader election mode before a \"no leader\" notification is raised.")
     @Parameter(value = "static_leader_timeout", converter = JavaDurationConverter.class)
     private java.time.Duration staticLeaderTimeout = java.time.Duration.of(60, java.time.temporal.ChronoUnit.SECONDS);
 
@@ -275,28 +272,28 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
-    @Documentation("tbd")
+    @Documentation("Deprecated. Time range in seconds that legacy field content alert conditions search for matching messages.")
     @Parameter(value = "alert_check_interval", validators = PositiveIntegerValidator.class)
     @Deprecated
     private int alertCheckInterval = 60;
 
-    @Documentation("tbd")
+    @Documentation("Fully qualified class name of a message output to use as the default output for all messages. If empty, messages are written to the search backend.")
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
 
-    @Documentation("The default cache time for dashboard widgets. (Default: 10 seconds, minimum: 1 second)")
+    @Documentation("The default cache time for dashboard widgets. Minimum: 1 second.")
     @Parameter(value = "dashboard_widget_default_cache_time", validators = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
 
-    @Documentation("tbd")
+    @Documentation("Hashing algorithm used for new user passwords. Built-in options: bcrypt, pbkdf2, sha-1.")
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
 
-    @Documentation("tbd")
+    @Documentation("BCrypt cost factor (log rounds) used when generating salts for user passwords hashed with the bcrypt algorithm.")
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
-    @Documentation("tbd")
+    @Documentation("Number of iterations used when hashing user passwords with the pbkdf2 algorithm.")
     @Parameter(value = "user_password_pbkdf2_iterations", validators = PositiveIntegerValidator.class)
     private int userPasswordPbkdf2Iterations = PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS;
 
@@ -306,7 +303,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Documentation("""
             The directory which contains content packs which should be loaded on the first start of Graylog.
-            Default: <data_dir>/contentpacks
             """)
     @Parameter(value = CONTENT_PACKS_DIR)
     private Path contentPacksDir;
@@ -314,7 +310,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Documentation("""
             A comma-separated list of content packs (files in "content_packs_dir") which should be applied on
             the first start of Graylog.
-            Default: empty
             """)
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
@@ -322,7 +317,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Documentation("""
             Time interval for index range information cleanups. This setting defines how often stale index range information
             is being purged from the database.
-            Default: 1h
             """)
     @Parameter(value = "index_ranges_cleanup_interval", validators = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
@@ -334,7 +328,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
     private Set<IpSubnet> trustedProxies = Collections.emptySet();
 
-    @Documentation("tbd")
+    @Documentation("Comma-separated list of built-in authentication realms to disable, e.g. \"root-user\" to disable the root user login. Available: access-token, root-user, mongodb-session, http-header-authentication, username-password, bearer-token.")
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
 
@@ -342,20 +336,19 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Documentation("""
             The allowed TLS protocols for system wide TLS enabled servers. (e.g. message inputs, http interface)
             Setting this to an empty value, leaves it up to system libraries and the used JDK to chose a default.
-            Default: TLSv1.2,TLSv1.3  (might be automatically adjusted to protocols supported by the JDK)
             """)
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = null;
 
-    @Documentation("tbd")
+    @Documentation("Capacity of the in-memory queue buffering failure batches (e.g. processing or indexing failures) until they are handled.")
     @Parameter(value = "failure_handling_queue_capacity", validators = {PositiveIntegerValidator.class})
     private int failureHandlingQueueCapacity = 1000;
 
-    @Documentation("tbd")
+    @Documentation("On shutdown, how long the failure handling service waits for further failure batches before it stops.")
     @Parameter(value = "failure_handling_shutdown_await", validators = {PositiveDurationValidator.class})
     private Duration failureHandlingShutdownAwait = Duration.milliseconds(3000);
 
-    @Documentation("tbd")
+    @Documentation("Internal flag marking the node as part of a Graylog Cloud installation, which enables cloud-specific behavior. Do not set this for self-managed installations.")
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
@@ -363,72 +356,69 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "auto_restart_inputs")
     private boolean autoRestartInputs = false;
 
-    @Documentation("tbd")
+    @Documentation("Whether the leader node runs database migrations on startup.")
     @Parameter(value = "run_migrations")
     private boolean runMigrations = true;
 
     @Documentation("""
             Ignore any exceptions encountered when running migrations
             Use with caution - skipping failing migrations may result in an inconsistent DB state.
-            Default: false
             """)
     @Parameter(value = "ignore_migration_failures")
     private boolean ignoreMigrationFailures = false;
 
     @Documentation("""
             Do not perform any preflight checks when starting Graylog
-            Default: false
             """)
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
-    @Documentation("tbd")
+    @Documentation("Always start the preflight (initial setup) web interface, even if Graylog is not a fresh installation or the preflight setup has already been completed.")
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
 
-    @Documentation("tbd")
+    @Documentation("Password for logging into the preflight web interface. If not set, the automatically generated initial password stored in the database is used.")
     @Parameter(value = "preflight_web_password")
     private String preflightWebPassword = null;
 
-    @Documentation("tbd")
+    @Documentation("Enable collection of search query execution statistics and the related monitoring REST resources.")
     @Parameter(value = "query_latency_monitoring_enabled")
     private boolean queryLatencyMonitoringEnabled = false;
 
-    @Documentation("tbd")
+    @Documentation("Number of recent query executions kept in memory for query latency monitoring. Only effective if \"query_latency_monitoring_enabled\" is true and the value is greater than 0.")
     @Parameter(value = "query_latency_monitoring_window_size")
     private int queryLatencyMonitoringWindowSize = 0;
 
-    @Documentation("tbd")
+    @Documentation("Leader election mode: \"static\" uses the \"is_leader\" setting, \"automatic\" dynamically elects a leader using a cluster-wide lock.")
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
-    @Documentation("tbd")
+    @Documentation("Interval in which nodes try to acquire or renew the leader lock in automatic leader election mode. Minimum 1 second, must be lower than \"lock_service_lock_ttl\".")
     @Parameter(value = "leader_election_lock_polling_interval", converter = JavaDurationConverter.class)
     private java.time.Duration leaderElectionLockPollingInterval = AutomaticLeaderElectionService.DEFAULT_POLLING_INTERVAL;
 
-    @Documentation("tbd")
+    @Documentation("Time-to-live of cluster-wide locks stored in MongoDB, such as the leader lock used in automatic leader election mode. Minimum 60 seconds.")
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
 
     @Documentation("""
             Comma-separated list of notification types which should not emit a system event.
-            Default: SIDECAR_STATUS_UNKNOWN which would create a new event whenever the status of a sidecar becomes "Unknown"
             """)
     @Parameter(value = "system_event_excluded_types", converter = TrimmedStringSetConverter.class)
     private Set<String> systemEventExcludedTypes = Sets.newHashSet(Notification.Type.SIDECAR_STATUS_UNKNOWN.name());
 
-    @Documentation("tbd")
+    @Documentation("Restrict requests proxied to the Data Node REST API to an allowlist of endpoints. If disabled, all Data Node API endpoints can be accessed via the proxy.")
     @Parameter(value = "datanode_proxy_api_allowlist")
     private boolean datanodeProxyAPIAllowlist = true;
 
-    @Documentation("tbd")
+    @Documentation("Minimum auto-refresh interval that can be selected for searches and dashboards in the web interface.")
     @Parameter(value = "minimum_auto_refresh_interval", required = true)
     private Period minimumAutoRefreshInterval = Period.seconds(1);
 
     /**
      * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
      */
-    @Documentation("tbd")
+    @Documentation("Classes considered safe to load by name. A comma-separated set of prefixes matched against the fully qualified class name.")
     @Parameter(value = SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
     private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
 
@@ -436,7 +426,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             Sets field value suggestion mode. The possible values are:
               1. "off" - field value suggestions are turned off
               2. "textual_only" - field values are suggested only for textual fields
-              3. "on" (default) - field values are suggested for all field types, even the types where suggestions are inefficient performance-wise
+              3. "on" - field values are suggested for all field types, even the types where suggestions are inefficient performance-wise
             """)
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
@@ -446,7 +436,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             WARNING: This configuration setting should only be changed if you are certain of what you are doing.
                      Modifying this setting without proper knowledge may lead to unexpected behavior or system
                      instability. Proceed with caution.
-            Default: 4
             """)
     @Parameter(value = "search_query_engine_indexer_jobs_pool_size", validators = PositiveIntegerValidator.class)
     private int searchQueryEngineIndexerJobsPoolSize = 4;
@@ -457,7 +446,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             WARNING: This configuration setting should only be changed if you are certain of what you are doing.
                      Modifying this setting without proper knowledge may lead to unexpected behavior or system
                      instability. Proceed with caution.
-            Default: 0
             """)
     @Parameter("search_query_engine_indexer_jobs_queue_size")
     private int searchQueryEngineIndexerJobsQueueSize = 0;
@@ -467,7 +455,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             WARNING: This configuration setting should only be changed if you are certain of what you are doing.
                      Modifying this setting without proper knowledge may lead to unexpected behavior or system
                      instability. Proceed with caution.
-            Default: 4
             """)
     @Parameter(value = "search_query_engine_data_lake_jobs_pool_size", validators = PositiveIntegerValidator.class)
     private int searchQueryEngineDataLakeJobsPoolSize = 4;
@@ -478,7 +465,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             WARNING: This configuration setting should only be changed if you are certain of what you are doing.
                      Modifying this setting without proper knowledge may lead to unexpected behavior or system
                      instability. Proceed with caution.
-            Default: 0
             """)
     @Parameter("search_query_engine_data_lake_jobs_queue_size")
     private int searchQueryEngineDataLakeJobsQueueSize = 0;
@@ -498,21 +484,21 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     private static final int DEFAULT_INSTALL_RETRIES = 150;
     private static final Duration DEFAULT_INSTALL_SECONDS = Duration.seconds(2);
 
-    @Documentation("tbd")
+    @Documentation("Timeout for HTTP requests to other nodes when pausing and resuming message processing across the cluster (e.g. during Illuminate installations).")
     @Parameter(value = INSTALL_HTTP_CONNECTION_TIMEOUT, validators = PositiveDurationValidator.class)
     private Duration installHttpConnectionTimeout = Duration.seconds(10L);
 
-    @Documentation("tbd")
+    @Documentation("Interval between checks whether the output buffers of all nodes have drained after message processing was paused cluster-wide (e.g. during Illuminate installations).")
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL, validators = PositiveDurationValidator.class)
     private Duration installOutputBufferDrainingInterval = DEFAULT_INSTALL_SECONDS;
 
     // The maximum number of times to check if buffers have drained during Illuminate restarts on all
     // nodes before giving up
-    @Documentation("tbd")
+    @Documentation("Maximum number of checks whether the output buffers of all nodes have drained after message processing was paused cluster-wide, before giving up.")
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
     private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
 
-    @Documentation("tbd")
+    @Documentation("Only allow creating global inputs, which run on all nodes. Requests to create node-specific inputs are rejected.")
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
