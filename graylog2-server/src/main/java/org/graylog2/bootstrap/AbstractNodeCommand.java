@@ -213,7 +213,8 @@ public abstract class AbstractNodeCommand implements CliCommand {
 
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
-     * Please note that this happens *before* the configuration file has been parsed.
+     * Runs before the configuration beans are processed, so configuration still holds defaults;
+     * read what you need from configFile directly, as the TLS setup here does.
      */
     protected void beforeStart() {
         // This needs to run before the first SSLContext is instantiated,
