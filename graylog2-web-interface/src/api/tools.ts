@@ -16,6 +16,8 @@
  */
 import URI from 'urijs';
 
+import { SystemUrlAllowlist } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -140,8 +142,7 @@ export const urlAllowListCheck = (
   url: string;
   is_allowlisted: boolean;
 }> => {
-  const { url } = ApiRoutes.ToolsApiController.urlAllowlistCheck();
-  const promise = fetch('POST', qualifyUrl(url), {
+  const promise = SystemUrlAllowlist.check({
     url: urlToCheck,
   });
 

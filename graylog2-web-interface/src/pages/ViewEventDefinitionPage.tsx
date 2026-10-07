@@ -29,7 +29,10 @@ import { useEventNotifications } from 'components/event-notifications/hooks/useE
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
+import {
+  isIlluminateEventDefinition,
+  isSystemEventDefinition,
+} from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import {
   useEventDefinitionWithContext,
@@ -71,9 +74,17 @@ const ViewEventDefinitionPage = () => {
   }, [eventDefinition, history, isFetching]);
 
   const handleDuplicateEvent = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
-      app_pathname: 'event-definition',
-    });
+    if (isIlluminateEventDefinition(eventDefinition)) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ILLUMINATE_EVENTDEFINITION_CLONED, {
+        app_pathname: 'event-definition',
+        app_action_value: 'illuminate-event-definition-clone',
+        event_details: { event_definition_title: eventDefinition.title },
+      });
+    } else {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
+        app_pathname: 'event-definition',
+      });
+    }
 
     copyEventDefinition(eventDefinition).then(
       (duplicatedEvent) => {

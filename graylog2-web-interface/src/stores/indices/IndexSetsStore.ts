@@ -16,6 +16,8 @@
  */
 import isArray from 'lodash/isArray';
 
+import { SystemIndexSets } from '@graylog/server-api';
+
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -155,10 +157,8 @@ export const updateIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
   );
 };
 
-export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
-
-  return fetch('DELETE', url).then(
+export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Promise<void> =>
+  SystemIndexSets.remove(indexSet.id, deleteIndices).then(
     () => {
       UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
     },
@@ -171,12 +171,9 @@ export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Prom
       throw error;
     },
   );
-};
 
-export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
-
-  return fetch('PUT', url).then(
+export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> =>
+  SystemIndexSets.setDefault(indexSet.id).then(
     () => {
       UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
     },
@@ -189,10 +186,9 @@ export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> => {
       throw error;
     },
   );
-};
 
 export const fetchIndexSetsStats = (): Promise<IndexSetStats> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url)).then((response) => ({
+  SystemIndexSets.globalStats().then((response) => ({
     indices: response.indices,
     documents: response.documents,
     size: response.size,
