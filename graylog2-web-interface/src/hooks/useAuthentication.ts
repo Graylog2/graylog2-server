@@ -17,6 +17,8 @@
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemAuthenticationServicesBackends } from '@graylog/server-api';
+
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { qualifyUrl } from 'util/URLUtils';
@@ -161,11 +163,8 @@ export const updateAuthBackend = (
   );
 };
 
-export const deleteAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.AuthenticationController.delete(backendId).url);
-
-  return fetch('DELETE', url);
-};
+export const deleteAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<void> =>
+  SystemAuthenticationServicesBackends.remove(backendId);
 
 export const testAuthConnection = (payload: ConnectionTestPayload): Promise<ConnectionTestResult> => {
   const url = qualifyUrl(ApiRoutes.AuthenticationController.testConnection().url);
@@ -208,15 +207,8 @@ export const loadAuthBackendsPaginated = ({ page, perPage, query }: Pagination):
 export const loadAuthBackendUsersPaginated = (
   authBackendId: string,
   { page, perPage, query }: Pagination,
-): Promise<PaginatedUsers> => {
-  const url = PaginationURL(
-    ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url,
-    page,
-    perPage,
-    query,
-  );
-
-  return fetch('GET', qualifyUrl(url)).then(
+): Promise<PaginatedUsers> =>
+  SystemAuthenticationServicesBackends.getUsers(undefined, authBackendId, page, perPage, query).then(
     (response: PaginatedUsersResponse): PaginatedUsers => ({
       list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
       pagination: {
@@ -229,7 +221,6 @@ export const loadAuthBackendUsersPaginated = (
       adminUser: undefined,
     }),
   );
-};
 
 export const loadActiveAuthBackendType = (): Promise<string | undefined> => {
   const url = qualifyUrl(ApiRoutes.AuthenticationController.loadActiveBackendType().url);

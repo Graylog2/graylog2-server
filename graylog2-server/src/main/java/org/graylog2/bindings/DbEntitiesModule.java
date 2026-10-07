@@ -26,6 +26,7 @@ import org.graylog2.database.dbcatalog.DbEntitiesCatalogProvider;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.plugin.PluginModule;
@@ -48,6 +49,7 @@ public class DbEntitiesModule extends PluginModule {
                 DecoratorImpl.class,
                 EventDefinition.class,
                 IndexFailureImpl.class,
+                IndexFieldTypeProfile.class,
                 IndexSetConfig.class,
                 InputImpl.class,
                 NotificationDto.class,

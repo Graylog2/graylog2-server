@@ -22,19 +22,18 @@ import ClusterConfigurationPageNavigation from 'components/cluster-configuration
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 import ClusterConfigurationNodes from 'components/cluster-configuration/ClusterConfigurationNodes';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import Routes from 'routing/Routes';
 
 const ClusterConfigurationPage = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { push } = useHistory();
 
   useEffect(() => {
-    if (!isPermitted(currentUser.permissions, 'clusterconfiguration:read')) {
+    if (!isPermitted('clusterconfiguration:read')) {
       push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, push]);
+  }, [isPermitted, push]);
 
   return (
     <DocumentTitle title="Cluster Configuration">

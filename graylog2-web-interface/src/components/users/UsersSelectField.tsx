@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 import PaginatedSelect from '../common/Select/PaginatedSelect';
 
@@ -32,11 +31,11 @@ type Props = {
 };
 
 const UsersSelectField = ({ value, onChange }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   const loadUsers = useCallback(
     (pagination: { page: number; perPage: number; query: string }) => {
-      if (!isPermitted(currentUser.permissions, 'users:list')) {
+      if (!isPermitted('users:list')) {
         return Promise.resolve({
           pagination,
           total: 0,
@@ -50,7 +49,7 @@ const UsersSelectField = ({ value, onChange }: Props) => {
         pagination,
       }));
     },
-    [currentUser.permissions],
+    [isPermitted],
   );
 
   return (

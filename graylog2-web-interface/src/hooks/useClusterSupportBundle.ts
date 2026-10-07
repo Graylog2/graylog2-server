@@ -18,7 +18,8 @@ import { useState } from 'react';
 import type { QueryObserverResult } from '@tanstack/react-query';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
+import { ClusterDebugSupportBundle } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -29,8 +30,7 @@ export type BundleFile = {
   file_name: string;
 };
 
-const fetchSupportBundleList = async () =>
-  fetch('GET', qualifyUrl(ApiRoutes.ClusterSupportBundleController.list().url));
+const fetchSupportBundleList = async () => ClusterDebugSupportBundle.listBundles();
 
 const createSupportBundle = async (
   refetchList: () => Promise<QueryObserverResult<any, unknown>>,
@@ -38,7 +38,7 @@ const createSupportBundle = async (
 ) => {
   try {
     setLoading(true);
-    await fetch('POST', qualifyUrl(ApiRoutes.ClusterSupportBundleController.create().url));
+    await ClusterDebugSupportBundle.buildBundle();
     await refetchList();
   } catch (errorThrown) {
     UserNotification.error(
@@ -52,7 +52,7 @@ const createSupportBundle = async (
 
 const deleteSupportBundle = async (filename: string, refetchList: () => Promise<QueryObserverResult<any, unknown>>) => {
   try {
-    await fetch('DELETE', qualifyUrl(ApiRoutes.ClusterSupportBundleController.delete(filename).url));
+    await ClusterDebugSupportBundle.remove(filename);
     await refetchList();
   } catch (errorThrown) {
     UserNotification.error(
