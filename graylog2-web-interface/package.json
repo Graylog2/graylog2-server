@@ -137,7 +137,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "cors": "^2.8.5",
     "cross-env": "^10.1.0",
-    "css-loader": "^6.5.1",
+    "css-loader": "^7.1.5",
     "esbuild-loader": "4.3.0",
     "esbuild-register": "^3.6.0",
     "eslint": "^9.36.0",
