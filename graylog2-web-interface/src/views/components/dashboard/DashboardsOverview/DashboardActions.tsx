@@ -28,8 +28,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type FetchError from 'logic/errors/FetchError';
-import { isAnyPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -118,7 +117,7 @@ const DashboardDeleteAction = ({
 const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
-  const currentUser = useCurrentUser();
+  const { isAnyPermitted } = usePermissions();
   const { refetch } = useTableFetchContext();
   const { scopePermissions } = useGetPermissionsByScope({ _scope: dashboard.scope });
   const hideDeleteAction = hideDelete || !scopePermissions?.is_mutable;
@@ -126,7 +125,7 @@ const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: 
   const moreActions = [
     pluggableActions.length ? pluggableActions : null,
     pluggableActions.length && !hideDeleteAction ? <MenuItem divider key="divider" /> : null,
-    scopePermissions?.is_mutable && isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit']) ? (
+    scopePermissions?.is_mutable && isAnyPermitted([`view:edit:${dashboard.id}`, 'view:edit']) ? (
       <DashboardDeleteAction
         dashboard={dashboard}
         refetchDashboards={refetch}

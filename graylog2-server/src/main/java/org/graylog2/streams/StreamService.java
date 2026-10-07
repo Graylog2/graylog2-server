@@ -98,6 +98,13 @@ public interface StreamService {
      */
     Map<String, Long> countBySource();
 
+    /**
+     * Counts the streams routed to each given index set, in one query.
+     *
+     * @return stream count by index set id; an index set without streams has no entry
+     */
+    Map<String, Long> countByIndexSet(Collection<String> indexSetIds);
+
     void pause(Stream stream) throws ValidationException;
 
     void resume(Stream stream) throws ValidationException;
