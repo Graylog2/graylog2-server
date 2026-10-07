@@ -16,6 +16,8 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { SystemIndexSetDefaults, SystemIndexSetsTemplates } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -35,12 +37,11 @@ const putTemplate = async ({ template, id }: { template: IndexSetTemplate; id: s
 };
 
 const putTemplateDefault = async (id: string) => {
-  const url = qualifyUrl('/system/indices/index_set_defaults');
   const body: Pick<IndexSetTemplate, 'id'> = {
     id,
   };
 
-  return fetch('PUT', url, body);
+  return SystemIndexSetDefaults.update(body);
 };
 
 const postTemplate = async (template: IndexSetTemplate) => {
@@ -54,11 +55,7 @@ const postTemplate = async (template: IndexSetTemplate) => {
   return fetch('POST', url, body);
 };
 
-const deleteProfile = async (id: string) => {
-  const url = qualifyUrl(`${urlPrefix}/${id}`);
-
-  return fetch('DELETE', url);
-};
+const deleteProfile = async (id: string) => SystemIndexSetsTemplates.remove(id);
 
 const useTemplate = () => {
   const queryClient = useQueryClient();

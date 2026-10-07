@@ -16,14 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemIndexSets } from '@graylog/server-api';
+
 import type { IndexSetStats } from 'stores/indices/IndexSetsStore';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchIndexSetStats = (indexSetId: string): Promise<IndexSetStats> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.getIndexSetStats(indexSetId).url));
+  SystemIndexSets.indexSetStatistics(indexSetId);
 
 const useIndexSetStats = (indexSetId: string) => {
   const { data, refetch, isLoading, error, isSuccess } = useQuery({

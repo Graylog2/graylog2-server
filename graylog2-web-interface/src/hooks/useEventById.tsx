@@ -16,16 +16,14 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { Events } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import type { Event } from 'components/events/events/types';
 import type FetchError from 'logic/errors/FetchError';
 import { onError } from 'util/conditional/onError';
 
-export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
-
-const fetchEvent = (eventId: string) => fetch('GET', eventsUrl(eventId)).then((data) => data.event);
+const fetchEvent = (eventId: string) => Events.getById(eventId).then((data) => data.event);
 
 const useEventById = (
   eventId: string,

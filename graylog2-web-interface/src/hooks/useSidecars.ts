@@ -17,6 +17,8 @@
 import { useQuery } from '@tanstack/react-query';
 import URI from 'urijs';
 
+import { Sidecar } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -71,7 +73,7 @@ const fetchSidecarsList = ({
 };
 
 export const fetchSidecar = (sidecarId: string): Promise<SidecarSummary> => {
-  const promise: Promise<SidecarSummary> = fetch('GET', qualifyUrl(`${SOURCE_URL}/${sidecarId}`));
+  const promise: Promise<SidecarSummary> = Sidecar.get(sidecarId);
 
   promise.catch((error) => {
     let errorMessage = `Fetching Sidecar failed with status: ${error}`;
@@ -129,7 +131,7 @@ export const assignConfigurations = (
     return { node_id: sidecar.node_id, assignments };
   });
 
-  const promise = fetch('PUT', qualifyUrl(`${SOURCE_URL}/configurations`), { nodes });
+  const promise = Sidecar.assignConfiguration({ nodes });
 
   promise.then(
     (response) => {
