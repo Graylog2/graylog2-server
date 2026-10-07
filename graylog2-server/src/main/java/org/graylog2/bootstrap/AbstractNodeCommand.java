@@ -179,15 +179,6 @@ public abstract class AbstractNodeCommand implements CliCommand {
         this.nodeModule = new GraylogNodeModule(configuration, chainingClassLoader);
     }
 
-    /**
-     * Validate the given configuration for this command.
-     *
-     * @return {@code true} if the configuration is valid, {@code false}.
-     */
-    protected boolean validateConfiguration() {
-        return true;
-    }
-
     public boolean isDumpConfig() {
         return dumpConfig;
     }
@@ -374,12 +365,6 @@ public abstract class AbstractNodeCommand implements CliCommand {
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
         }
-
-        if (!validateConfiguration()) {
-            LOG.error("Validating configuration file failed - exiting.");
-            System.exit(1);
-        }
-
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
