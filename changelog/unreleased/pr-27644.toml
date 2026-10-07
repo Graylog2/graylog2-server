@@ -1,4 +1,0 @@
-type = "a"
-message = "Added a tactics_techniques filter to the event definitions list."
-
-pulls = ["27644"]
