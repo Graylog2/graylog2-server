@@ -47,7 +47,6 @@ import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
-import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.migrations.Migration;
@@ -80,7 +79,6 @@ import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -361,7 +359,8 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
             return;
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
+        final var instance = injector.getInstance(shutdownHook());
+        Runtime.getRuntime().addShutdownHook(new Thread(instance, "server-shutdown-hook"));
 
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
@@ -391,8 +390,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         // Block forever.
         try {
             Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            return;
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -427,9 +425,9 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
                 throw new Exception("Could not determine PID.");
             }
 
-            Files.write(pidFilePath, pid.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS);
+            Files.writeString(pidFilePath, pid, StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS);
         } catch (Exception e) {
-            LOG.error("Could not write PID file: " + e.getMessage(), e);
+            LOG.error("Could not write PID file: {}", e.getMessage(), e);
             System.exit(1);
         }
     }
