@@ -88,11 +88,6 @@ const Badges = styled.div`
   flex: 0 0 auto;
 `;
 
-const DevelopmentHeaderBadgeContainer = styled.div`
-  padding-left: ${NAVBAR_GAP}px;
-  padding-right: ${NAVBAR_GAP}px;
-`;
-
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
   const pluginBadges = usePluginEntities('navigation.badges');
@@ -134,9 +129,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <li>
             <InactiveNavItem>
-              <DevelopmentHeaderBadgeContainer>
-                <DevelopmentHeaderBadge />
-              </DevelopmentHeaderBadgeContainer>
+              <DevelopmentHeaderBadge />
               {pluginItems.map(({ key, component: Item }) => (
                 <Item key={key} />
               ))}
