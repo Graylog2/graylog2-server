@@ -22,6 +22,10 @@ const Nav = styled.ul`
 
   margin: 0;
   padding-left: 0;
+
+  > li {
+    flex-shrink: 0;
+  }
 `;
 
 /** @component */

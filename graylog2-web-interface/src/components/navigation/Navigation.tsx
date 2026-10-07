@@ -35,7 +35,6 @@ import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
 import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
-import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 
 import { QuickJumpModalContainer } from '../quick-jump';
@@ -131,9 +130,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           {pluginItems.map(({ key, component: Item }) => (
             <li key={key}>
-              <InactiveNavItem>
-                <Item  />
-              </InactiveNavItem>
+              <Item />
             </li>
           ))}
 

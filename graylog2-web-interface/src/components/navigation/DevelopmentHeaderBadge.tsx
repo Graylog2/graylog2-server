@@ -15,22 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/bootstrap';
 import InactiveNavItem from 'components/navigation/InactiveNavItem';
 
-const StyledBadge = styled(Badge)`
-  min-width: 50px;
-`;
 const DevelopmentHeaderBadge = () =>
   AppConfig.gl2DevMode() ? (
     <li>
       <InactiveNavItem>
-        <StyledBadge className="dev-badge" bsStyle="danger">
+        <Badge className="dev-badge" bsStyle="danger">
           {AppConfig.isCloud() ? String.fromCharCode(0x26c8) : ''} DEV
-        </StyledBadge>
+        </Badge>
       </InactiveNavItem>
     </li>
   ) : null;
