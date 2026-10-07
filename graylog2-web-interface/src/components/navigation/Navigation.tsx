@@ -127,14 +127,15 @@ const Navigation = React.memo(({ pathname }: Props) => {
             )}
           </li>
 
-          <li>
-            <InactiveNavItem>
-              <DevelopmentHeaderBadge />
-              {pluginItems.map(({ key, component: Item }) => (
-                <Item key={key} />
-              ))}
-            </InactiveNavItem>
-          </li>
+          <DevelopmentHeaderBadge />
+
+          {pluginItems.map(({ key, component: Item }) => (
+            <li key={key}>
+              <InactiveNavItem>
+                <Item  />
+              </InactiveNavItem>
+            </li>
+          ))}
 
           <ScratchpadToggle />
 

@@ -19,15 +19,20 @@ import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/bootstrap';
+import InactiveNavItem from 'components/navigation/InactiveNavItem';
 
 const StyledBadge = styled(Badge)`
   min-width: 50px;
 `;
 const DevelopmentHeaderBadge = () =>
   AppConfig.gl2DevMode() ? (
-    <StyledBadge className="dev-badge" bsStyle="danger">
-      {AppConfig.isCloud() ? String.fromCharCode(0x26c8) : ''} DEV
-    </StyledBadge>
+    <li>
+      <InactiveNavItem>
+        <StyledBadge className="dev-badge" bsStyle="danger">
+          {AppConfig.isCloud() ? String.fromCharCode(0x26c8) : ''} DEV
+        </StyledBadge>
+      </InactiveNavItem>
+    </li>
   ) : null;
 
 export default DevelopmentHeaderBadge;
