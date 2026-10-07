@@ -102,7 +102,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 
-    private final Configuration configuration;
+    protected final Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
