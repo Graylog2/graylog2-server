@@ -35,8 +35,8 @@ const QuickJumpModalContainer = () => {
 
   return (
     <>
-      <NavigationButton aria-label="Search" id="quickjump-search-nav" onClick={toggleModal}>
-        <NavIcon type="search" title="Search" />
+      <NavigationButton aria-label="Open Quick Jump" id="quickjump-search-nav" onClick={toggleModal}>
+        <NavIcon type="search" title="Open Quick Jump" />
       </NavigationButton>
       {showQuickJumpModal && <QuickJumpModal onToggle={() => toggleModal()} />}
     </>
