@@ -55,10 +55,6 @@ const NavItem = styled.li`
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
   padding: 0;
-
-  @media (width <= 991px) {
-    width: 100%;
-  }
 `;
 
 type Props = {
