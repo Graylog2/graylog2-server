@@ -1,4 +1,4 @@
-type = "fixed"
-message = "The Risk Score filter on the Alerts & Events page can now only be added once. Previously, additional Risk Score filters could be added but were ignored."
+type = "a"
+message = "Entity table filters can now be limited to a single active filter per attribute."
 
 pulls = ["27692"]
