@@ -373,7 +373,8 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Map<String, Set<String>> aliases(String indexPattern) {
         final GetAliasesRequest request = new GetAliasesRequest()
                 .indices(indexPattern)
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                // allowNoIndices: a pattern without indices must not fail a lookup over several patterns
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, false));
         final GetAliasesResponse result = client.execute((c, requestOptions) -> c.indices().getAlias(request, requestOptions),
                 "Couldn't collect aliases for index pattern " + indexPattern);
         return result.getAliases()

@@ -21,8 +21,7 @@ import { Button, Alert, Row, Col, Table } from 'components/bootstrap';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import InputStateBadge from 'components/inputs/InputStateBadge';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import useInputsStates from 'hooks/useInputsStates';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -41,7 +40,7 @@ type Props = {
 };
 
 const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { createCollectorInput } = useCollectorInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({
@@ -49,7 +48,7 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
   });
   const sendTelemetry = useSendCollectorsTelemetry();
 
-  const canCreateInputs = isPermitted(currentUser?.permissions, [
+  const canCreateInputs = isPermitted([
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);

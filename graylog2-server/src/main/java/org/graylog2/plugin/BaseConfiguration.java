@@ -66,7 +66,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     private int processBufferProcessors = defaultNumberOfProcessBufferProcessors();
 
     @Documentation("""
-            Wait strategy describing how buffer processors wait on a cursor sequence. (default: sleeping)
+            Wait strategy describing how buffer processors wait on a cursor sequence.
             Possible types:
               - yielding
                 Compromise between performance and CPU usage.
@@ -88,15 +88,15 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 65536;
 
-    @Documentation("tbd")
+    @Documentation("Size of the input buffer ring buffer. Must be a power of 2. (512, 1024, 2048, ...)")
     @Parameter(value = "inputbuffer_ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int inputBufferRingSize = 65536;
 
-    @Documentation("tbd")
+    @Documentation("Wait strategy of the input buffer processors, see processor_wait_strategy for possible values.")
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
 
-    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
+    @Documentation("Number of threads used exclusively for dispatching internal events.")
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
 
@@ -108,7 +108,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
 
-    @Documentation("tbd")
+    @Documentation("Implementation of the message journal: \"disk\" (persistent on-disk journal) or \"noop\" (no journal).")
     @Parameter(value = "message_journal_mode")
     private String messageJournalMode = MessageQueueModule.DISK_JOURNAL_MODE;
 
@@ -116,17 +116,16 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
-    @Documentation("tbd")
+    @Documentation("Record per-message timing and counter information during processing, useful for debugging or benchmarking.")
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
-    @Documentation("Disable the use of a native system stats collector (currently OSHI)")
+    @Documentation("Disable the use of a native system stats collector (currently OSHI).")
     @Parameter("disable_native_system_stats_collector")
     private boolean disableNativeSystemStatsCollector = false;
 
     @Documentation("""
             The User-Agent header for outgoing HTTP connections.
-            Default: Graylog
             """)
     @Parameter(value = "http_user_agent")
     private String httpUserAgent = "Graylog";
@@ -156,7 +155,6 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default connect timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 5s
             """)
     @Parameter(value = "http_connect_timeout", validator = PositiveDurationValidator.class)
     private Duration httpConnectTimeout = Duration.seconds(5L);
@@ -164,7 +162,6 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default write timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 10s
             """)
     @Parameter(value = "http_write_timeout", validator = PositiveDurationValidator.class)
     private Duration httpWriteTimeout = Duration.seconds(10L);
@@ -172,12 +169,11 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default read timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 10s
             """)
     @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
     private Duration httpReadTimeout = Duration.seconds(10L);
 
-    @Documentation("tbd")
+    @Documentation("Identifier of the source Graylog was installed from, logged at startup and included in telemetry data.")
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 

@@ -20,14 +20,13 @@ import styled from 'styled-components';
 
 import { IndexerCluster } from '@graylog/server-api';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import type FetchError from 'logic/errors/FetchError';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
@@ -88,8 +87,8 @@ type Props = {
 };
 
 const IndexerClusterHealth = ({ minimal = false }: Props) => {
-  const currentUser = useCurrentUser();
-  const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
+  const { isPermitted } = usePermissions();
+  const userHasRequiredPermissions = isPermitted('indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
 
   if (!userHasRequiredPermissions) {
