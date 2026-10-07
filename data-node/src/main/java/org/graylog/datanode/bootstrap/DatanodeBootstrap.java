@@ -155,7 +155,7 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
     @Override
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
-        result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new GenericBindings());
         result.add(new GenericInitializerBindings());
         result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());
