@@ -151,7 +151,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                      List<Converter> converters,
                      ConditionType conditionType,
                      String conditionValue) throws ReservedFieldException {
-        if (Message.RESERVED_FIELDS.contains(targetField) && !Message.RESERVED_SETTABLE_FIELDS.contains(targetField)) {
+        if (Message.isReservedNonSettableField(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
         }
 
