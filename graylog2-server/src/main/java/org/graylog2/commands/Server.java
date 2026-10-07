@@ -252,8 +252,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
 
     @Override
     protected @Nonnull List<Object> getNodeCommandConfigurationBeans() {
-        return Arrays.asList(configuration,
-                httpConfiguration,
+        return Arrays.asList(httpConfiguration,
                 elasticsearchConfiguration,
                 elasticsearchClientConfiguration,
                 emailConfiguration,
