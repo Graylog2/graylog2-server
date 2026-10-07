@@ -22,7 +22,6 @@ import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { itemStateIndicatorContainerSelector } from 'components/common/NavItemStateIndicator';
 import { useGlobalThroughput } from 'hooks/useMetrics';
-import { NAVBAR_GAP } from 'theme/constants';
 
 const ThroughputNavItem = styled(NavItem)`
   ${itemStateIndicatorContainerSelector} {
