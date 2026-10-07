@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import * as React from 'react';
+import styled from 'styled-components';
 
-import { IndexerCluster } from '@graylog/server-api';
+import { Label } from 'components/bootstrap';
 
-const fetchClusterName = async () => IndexerCluster.clusterInfo();
+const StyledLabel = styled(Label)`
+  margin-left: 5px;
+  vertical-align: inherit;
+`;
 
-const useIsElasticsearch = (): boolean => {
-  const { data } = useQuery({
-    queryKey: ['cluster-name'],
-    queryFn: fetchClusterName,
-    refetchInterval: 5000,
-  });
+/**
+ * Marks the default entity in a list, e.g. the default stream. Render it next to the entity's title.
+ */
+const DefaultLabel = () => (
+  <StyledLabel bsStyle="primary" bsSize="xsmall">
+    Default
+  </StyledLabel>
+);
 
-  return data?.distribution === 'Elasticsearch';
-};
-
-export default useIsElasticsearch;
+export default DefaultLabel;

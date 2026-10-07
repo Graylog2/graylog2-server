@@ -18,6 +18,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import URI from 'urijs';
 import concat from 'lodash/concat';
 
+import { EventsNotifications } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
@@ -109,7 +111,7 @@ export const fetchLegacyEventNotificationTypes = (): Promise<{
 }> => fetch('GET', eventNotificationsUrl({ segments: ['legacy', 'types'] }));
 
 export const getEventNotification = (notificationId: string): Promise<EventNotification> =>
-  fetch('GET', eventNotificationsUrl({ segments: [notificationId] })).then(
+  EventsNotifications.get(encodeURIComponent(notificationId)).then(
     (response) => response,
     (error: { status?: number }) => {
       if (error.status === 404) {
@@ -171,7 +173,7 @@ export const updateEventNotification = (notificationId: string, notification: Ev
   );
 
 export const deleteEventNotification = (notification: EventNotification): Promise<unknown> =>
-  fetch('DELETE', eventNotificationsUrl({ segments: [notification.id] })).then(
+  EventsNotifications.remove(encodeURIComponent(notification.id)).then(
     (response: unknown) => {
       UserNotification.success(
         'Notification deleted successfully',
@@ -197,7 +199,7 @@ export const testEventNotification = (notification: EventNotification): Cancella
 
 // Port of the old `testPersisted` action.
 export const testPersistedEventNotification = (notification: EventNotification): Promise<unknown> =>
-  fetch('POST', eventNotificationsUrl({ segments: [notification.id, 'test'] }));
+  EventsNotifications.testBynotificationId(encodeURIComponent(notification.id));
 
 // Query key for the event notifications overview table (PaginatedEntityTable), which supplies
 // its own (notifying) queryFn. Kept distinct from the other hooks' keys to avoid sharing a

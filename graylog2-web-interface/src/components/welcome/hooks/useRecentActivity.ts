@@ -17,20 +17,16 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import { StartPage } from '@graylog/server-api';
+
 import type { PaginatedRecentActivity, PaginatedResponseRecentActivity, RequestQuery } from 'components/welcome/types';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
-import PaginationURL from 'util/PaginationURL';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
-const urlPrefix = '/startpage';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
 
-const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivity> => {
-  const url = PaginationURL(`${urlPrefix}/recentActivity`, page, 5, '');
-
-  return fetch('GET', qualifyUrl(url)).then(
+const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivity> =>
+  StartPage.getRecentActivity(page, 5).then(
     (data: PaginatedResponseRecentActivity): PaginatedRecentActivity => ({
       page: data.page,
       per_page: data.per_page,
@@ -46,7 +42,6 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
       })),
     }),
   );
-};
 
 const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity; isFetching: boolean } =>
   useQuery({
