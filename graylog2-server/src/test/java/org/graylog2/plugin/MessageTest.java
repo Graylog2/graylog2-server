@@ -965,4 +965,17 @@ public class MessageTest {
         assertThat(Message.isReservedNonSettableField(Message.FIELD_GL2_SOURCE_INPUT)).isFalse();
         assertThat(Message.isReservedNonSettableField("custom_field")).isFalse();
     }
+
+    @Test
+    public void getFieldsWithKeyFilter() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField("custom_field", "value");
+        message.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id");
+
+        final Map<String, Object> fields = message.getFields(key -> !Message.STANDARD_FIELDS.contains(key));
+
+        assertThat(fields).containsOnlyKeys("custom_field", Message.FIELD_GL2_SOURCE_INPUT);
+        assertThat(message.getFields(key -> false)).isEmpty();
+        assertThat(message.getFields(key -> true)).isEqualTo(message.getFields());
+    }
 }

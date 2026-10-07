@@ -97,7 +97,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
     private String getMessageKey(ResultMessageSummary messageSummary) {
         // Use index and message ID as key to allow the same message ID from different indices.
         // This will happen when the same message is indexed into different index sets.
-        return messageSummary.index() + "-" + messageSummary.message().get("_id").toString();
+        return messageSummary.index() + "-" + messageSummary.message().get(Message.FIELD_ID).toString();
     }
 
     private Set<String> extractFields(List<ResultMessageSummary> messages) {
