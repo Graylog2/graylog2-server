@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.management.CatIndex;
