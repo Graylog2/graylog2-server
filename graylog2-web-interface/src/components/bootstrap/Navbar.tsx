@@ -16,7 +16,7 @@
  */
 import styled, { css } from 'styled-components';
 
-import { NAV_ITEM_HEIGHT, NAVBAR_GAP } from 'theme/constants';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 const Navbar = styled.header(
   ({ theme }) => css`
@@ -25,12 +25,11 @@ const Navbar = styled.header(
     min-height: auto;
     display: flex;
     align-items: center;
-    gap: ${NAVBAR_GAP}px;
 
     flex-wrap: nowrap;
-    padding: 0 15px;
     background-color: ${theme.colors.global.navigationBackground};
     border: 0;
+    padding: 0;
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     margin-bottom: 0;
     font-family: ${theme.fonts.family.navigation};

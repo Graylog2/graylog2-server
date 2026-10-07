@@ -36,8 +36,6 @@ const ContentWrap = styled.strong`
   grid-template-rows: 1fr 1fr;
   gap: 0;
   height: 30px;
-  padding-left: ${NAVBAR_GAP}px;
-  padding-right: ${NAVBAR_GAP}px;
 `;
 
 const ThroughputData = styled.span<{ $dataIn?: boolean }>(

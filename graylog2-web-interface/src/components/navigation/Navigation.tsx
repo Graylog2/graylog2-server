@@ -50,6 +50,7 @@ const BrandLink = styled(Link)(
     align-items: center;
     min-height: ${NAV_ITEM_HEIGHT};
     color: ${theme.colors.text.primary};
+    padding: 0 ${NAVBAR_GAP}px;
 
     &:hover,
     &:active,

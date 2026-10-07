@@ -18,10 +18,6 @@ import { useRef } from 'react';
 
 import useElementDimensions from 'hooks/useElementDimensions';
 import useNaturalWidth from 'components/navigation/useNaturalWidth';
-import { NAVBAR_GAP } from 'theme/constants';
-
-const NAVBAR_REGIONS = 4;
-const RESERVED_GAP = NAVBAR_GAP * (NAVBAR_REGIONS - 1);
 
 const MEASURE_DEBOUNCE_MS = 0;
 
@@ -37,7 +33,7 @@ const useNavigationCollapse = () => {
   const { width: iconsWidth } = useElementDimensions(iconsRef, MEASURE_DEBOUNCE_MS);
   const [menuRef, menuWidth] = useNaturalWidth<HTMLUListElement>();
 
-  const availableWidth = navbarWidth - brandWidth - badgesWidth - iconsWidth - RESERVED_GAP;
+  const availableWidth = navbarWidth - brandWidth - badgesWidth - iconsWidth;
   const collapsed = menuWidth > 0 && menuWidth > availableWidth;
 
   return { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed };
