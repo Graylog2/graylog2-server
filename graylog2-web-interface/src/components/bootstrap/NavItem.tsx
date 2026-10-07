@@ -18,10 +18,10 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
-import {NAVBAR_GAP, NAV_ITEM_HEIGHT} from 'theme/constants';
+import { NAVBAR_GAP, NAV_ITEM_HEIGHT } from 'theme/constants';
 
-const NavigationLink = styled.a<{ $hasOnClick: boolean; $withMinHeight: boolean }>(
-  ({ theme, $hasOnClick, $withMinHeight }) => css`
+const NavigationLink = styled.a<{ $withMinHeight: boolean }>(
+  ({ theme, $withMinHeight }) => css`
     color: ${theme.colors.text.primary};
     ${$withMinHeight &&
     css`
@@ -30,12 +30,8 @@ const NavigationLink = styled.a<{ $hasOnClick: boolean; $withMinHeight: boolean 
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    ${$hasOnClick &&
-    css`
-      padding-left: ${NAVBAR_GAP}px;
-      padding-right: ${NAVBAR_GAP}px;
-    `}
+    padding-left: ${NAVBAR_GAP}px;
+    padding-right: ${NAVBAR_GAP}px;
 
     &:hover,
     &:focus {
@@ -55,7 +51,7 @@ const NavItem = ({
   withMinHeight = true,
   ...props
 }: React.ComponentProps<typeof NavItem> & { withMinHeight?: boolean }) => (
-  <NavigationLink {...props} $hasOnClick={Boolean(props.onClick)} $withMinHeight={withMinHeight}>
+  <NavigationLink {...props} $withMinHeight={withMinHeight}>
     <NavItemStateIndicator>{children}</NavItemStateIndicator>
   </NavigationLink>
 );
