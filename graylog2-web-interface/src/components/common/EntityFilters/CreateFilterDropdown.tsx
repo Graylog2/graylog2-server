@@ -84,7 +84,8 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
         dropdownZIndex={1050}>
         {({ toggleDropdown }) => {
           const _onCreateFilter = (filter: { title: string; value: string }, closeDropdown = true) => {
-            if (closeDropdown) {
+            // Keeping the dropdown open would let a single-filter attribute receive a second value.
+            if (closeDropdown || selectedAttribute?.single_filter) {
               toggleDropdown();
             }
 
