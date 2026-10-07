@@ -268,17 +268,21 @@ describe('EventDefinitionsContainer', () => {
         ],
       },
     );
-    PluginStore.register(manifest);
     asMock(useFetchEntities).mockReturnValue(paginatedEventDefinitions());
     asMock(fetchEventDefinitions).mockResolvedValue({ list: [], pagination: { total: 0 }, attributes });
 
-    render(<EventDefinitionsContainer />);
-    await screen.findByTestId(`table-row-${simpleEventDefinition.id}`);
+    PluginStore.register(manifest);
 
-    const { fetchEntities } = asMock(useFetchEntities).mock.calls.at(-1)[0];
-    const result = await fetchEntities({ filters: OrderedMap() } as SearchParams);
-    PluginStore.unregister(manifest);
+    try {
+      render(<EventDefinitionsContainer />);
+      await screen.findByTestId(`table-row-${simpleEventDefinition.id}`);
 
-    expect(result.attributes).toEqual([...attributes, tacticsTechniquesAttribute]);
+      const { fetchEntities } = asMock(useFetchEntities).mock.calls.at(-1)[0];
+      const result = await fetchEntities({ filters: OrderedMap() } as SearchParams);
+
+      expect(result.attributes).toEqual([...attributes, tacticsTechniquesAttribute]);
+    } finally {
+      PluginStore.unregister(manifest);
+    }
   });
 });
