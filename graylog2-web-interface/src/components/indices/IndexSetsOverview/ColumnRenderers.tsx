@@ -21,11 +21,16 @@ import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable'
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { Timestamp } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import NumberUtils from 'util/NumberUtils';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
 import { DETAILS_SECTION, INDEX_SET_CATEGORY_TITLES } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
+import MetricCell from './cells/MetricCell';
+import DeflectorHealthCell from './cells/DeflectorHealthCell';
+import { METRIC_COLUMN_IDS } from './metricColumns';
 
 type ToggleProps = React.PropsWithChildren<{
   indexSet: IndexSetEntity;
@@ -126,6 +131,48 @@ const customColumnRenderers = (
         </DetailsToggle>
       ),
       staticWidth: 160,
+    },
+    [METRIC_COLUMN_IDS.indexCount]: {
+      renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
+        <MetricCell indexSet={indexSet} field="index_count" renderValue={(count) => NumberUtils.formatNumber(count)} />
+      ),
+      staticWidth: 'matchHeader',
+      textAlign: 'right',
+    },
+    [METRIC_COLUMN_IDS.documentCount]: {
+      renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
+        <MetricCell
+          indexSet={indexSet}
+          field="document_count"
+          renderValue={(count) => formatReadableNumber(count)}
+        />
+      ),
+      staticWidth: 120,
+      textAlign: 'right',
+    },
+    [METRIC_COLUMN_IDS.sizeBytes]: {
+      renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
+        <MetricCell indexSet={indexSet} field="size_bytes" renderValue={(size) => NumberUtils.formatBytes(size)} />
+      ),
+      staticWidth: 120,
+      textAlign: 'right',
+    },
+    [METRIC_COLUMN_IDS.deflectorHealth]: {
+      renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
+        <MetricCell
+          indexSet={indexSet}
+          field="deflector_health"
+          renderValue={(health) => <DeflectorHealthCell health={health} />}
+        />
+      ),
+      staticWidth: 'matchHeader',
+    },
+    [METRIC_COLUMN_IDS.fieldCount]: {
+      renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
+        <MetricCell indexSet={indexSet} field="field_count" renderValue={(count) => NumberUtils.formatNumber(count)} />
+      ),
+      staticWidth: 'matchHeader',
+      textAlign: 'right',
     },
     ...extensionColumnRenderers,
   },

@@ -44,6 +44,7 @@ const NarrowSegmentedControl = styled(SegmentedControl)`
 const SEGMENTS = [
   { label: 'Default', value: INDEX_SET_VIEW_VARIANTS.default },
   { label: 'Configuration', value: INDEX_SET_VIEW_VARIANTS.configuration },
+  { label: 'Routing', value: INDEX_SET_VIEW_VARIANTS.routing },
 ];
 
 type VariantValue = (typeof INDEX_SET_VIEW_VARIANTS)[keyof typeof INDEX_SET_VIEW_VARIANTS];

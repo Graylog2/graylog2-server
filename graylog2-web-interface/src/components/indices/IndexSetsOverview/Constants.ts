@@ -18,14 +18,21 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 import AppConfig from 'util/AppConfig';
 
 import type { ExtensionColumnGroups } from './hooks/useIndexSetsOverviewExtensions';
+import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
 import type { IndexSetCategory } from './types';
 
 export const INDEX_SET_VIEW_VARIANTS = {
   default: '' as const,
   configuration: 'configuration' as const,
+  routing: 'routing' as const,
 };
 
 export const DETAILS_SECTION = 'details';
+
+// Hidden until BE-4: the backend reports the worst deflector health of all writable sets for each of them.
+const DISPLAYED_METRIC_COLUMN_IDS = Object.values(METRIC_COLUMN_IDS).filter(
+  (id) => id !== METRIC_COLUMN_IDS.deflectorHealth,
+);
 
 const CLOUD_HIDDEN_ATTRIBUTES = ['shards', 'replicas'];
 
@@ -55,13 +62,22 @@ const getIndexSetTableElements = (
   const groupedIds = new Set(extensionColumnGroups.configuration);
   const ungroupedExtensionIds = extensionAttributes.map(({ id }) => id).filter((id) => !groupedIds.has(id));
 
-  const defaultCols = ['title', 'description', 'index_prefix', 'index_template_type', 'stream_count', 'creation_date'];
+  const defaultCols = [
+    'title',
+    'description',
+    'index_prefix',
+    'index_template_type',
+    METRIC_COLUMN_IDS.indexCount,
+    METRIC_COLUMN_IDS.sizeBytes,
+    'creation_date',
+  ];
   const configurationCols = filterCloudHiddenAttributes([
     'title',
     'shards',
     'replicas',
     'field_type_refresh_interval',
     'field_type_profile',
+    METRIC_COLUMN_IDS.fieldCount,
     ...extensionColumnGroups.configuration,
   ]);
 
@@ -72,10 +88,14 @@ const getIndexSetTableElements = (
     'index_template_type',
     CATEGORY_ATTRIBUTE,
     'stream_count',
+    METRIC_COLUMN_IDS.indexCount,
+    METRIC_COLUMN_IDS.documentCount,
+    METRIC_COLUMN_IDS.sizeBytes,
     'shards',
     'replicas',
     'field_type_refresh_interval',
     'field_type_profile',
+    METRIC_COLUMN_IDS.fieldCount,
     ...extensionColumnGroups.configuration,
     ...ungroupedExtensionIds,
     'creation_date',
@@ -94,14 +114,23 @@ const getIndexSetTableElements = (
     defaultDisplayedAttributes: configurationCols,
   };
 
+  const routingVariantLayout = {
+    ...SHARED_LAYOUT,
+    layoutVariant: INDEX_SET_VIEW_VARIANTS.routing,
+    defaultColumnOrder,
+    defaultDisplayedAttributes: ['title', 'index_prefix', 'stream_count'],
+  };
+
   const additionalAttributes: Array<Attribute> = [
     { id: 'field_type_refresh_interval', title: 'Field Type Refresh Interval', sortable: false },
+    ...DISPLAYED_METRIC_COLUMN_IDS.map((id) => ({ id, title: METRIC_COLUMN_TITLES[id], sortable: false })),
     ...extensionAttributes,
   ];
 
   return {
     defaultVariantLayout,
     configurationVariantLayout,
+    routingVariantLayout,
     additionalAttributes,
   };
 };
