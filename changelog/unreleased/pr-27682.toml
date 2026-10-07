@@ -1,0 +1,4 @@
+type = "a"
+message = "Add an Index Management page under System > Indices that lists every index with its health, offers index actions, and diagnoses unassigned shards."
+
+pulls = ["27682"]
