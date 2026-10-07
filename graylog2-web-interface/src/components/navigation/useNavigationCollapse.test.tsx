@@ -69,10 +69,16 @@ describe('useNavigationCollapse', () => {
     expect(await screen.findByText('collapsed')).toBeInTheDocument();
   });
 
-  it('accounts for the gaps between the regions', async () => {
+  it('keeps the menu expanded when it exactly fills the remaining room', async () => {
     render(<Harness navbarWidth={1000} brandWidth={100} badgesWidth={50} iconsWidth={200} menuWidth={650} />);
 
-    expect(await screen.findByText('collapsed')).toBeInTheDocument();
+    await screen.findByText('expanded');
+  });
+
+  it('collapses the menu as soon as it needs more than the remaining room', async () => {
+    render(<Harness navbarWidth={1000} brandWidth={100} badgesWidth={50} iconsWidth={200} menuWidth={651} />);
+
+    await screen.findByText('collapsed');
   });
 
   it('remembers how much room the menu wanted after it stopped being rendered', async () => {
