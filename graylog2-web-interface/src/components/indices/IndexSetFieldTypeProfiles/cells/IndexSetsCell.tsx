@@ -19,8 +19,7 @@ import { styled } from 'styled-components';
 
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 const List = styled.div`
   display: flex;
@@ -34,9 +33,9 @@ const IndexSetsCell = ({
   indexSetIds: Array<string>;
   normalizedIndexSetsTitles: Record<string, string>;
 }) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  if (!isPermitted(currentUser.permissions, ['indexsets:read'])) {
+  if (!isPermitted(['indexsets:read'])) {
     return null;
   }
 

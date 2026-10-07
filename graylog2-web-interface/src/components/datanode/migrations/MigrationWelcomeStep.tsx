@@ -24,6 +24,7 @@ import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/co
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 import useProductName from 'brand-customization/useProductName';
+import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
 import useIsElasticsearch from '../hooks/useIsElasticsearch';
 
@@ -47,6 +48,7 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
 const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const isElasticsearch = useIsElasticsearch();
   const productName = useProductName();
+  const { data: dataNodes } = useDataNodes();
 
   return (
     <Row>
@@ -84,6 +86,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: Migra
         {!isElasticsearch && (
           <MigrationStepTriggerButtonToolbar
             hidden={hideActions}
+            disabled={dataNodes.list.length === 0}
             nextSteps={currentStep.next_steps}
             onTriggerStep={onTriggerStep}
           />

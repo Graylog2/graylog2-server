@@ -211,6 +211,10 @@ export default [
               message:
                 'We wrap Mantine hooks with our own abstractions. Check `util/hooks/` for an existing wrapper before importing from `@mantine/hooks` directly.',
             },
+            {
+              name: 'util/PermissionsMixin',
+              message: 'Please use the `usePermissions` hook from `hooks/usePermissions` instead.',
+            },
           ],
         },
       ],

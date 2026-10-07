@@ -20,5 +20,6 @@ import org.graylog2.notifications.Notification;
 
 import java.util.Map;
 
-public record DataNodeNotficationEvent(String nodeId, Notification.Type notificationType, Map<String, Object> details) {
+public record DataNodeNotficationEvent(String nodeId, Notification.Type notificationType, Notification.Severity severity,
+                                        Map<String, Object> details) {
 }

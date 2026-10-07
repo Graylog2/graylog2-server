@@ -20,10 +20,9 @@ import styled, { css } from 'styled-components';
 import { Input } from 'components/bootstrap';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import type { Stream } from 'logic/streams/types';
 import useStreamMutations from 'hooks/useStreamMutations';
-import { isPermitted } from 'util/PermissionsMixin';
 
 const StreamRuleConnector = styled.div(
   ({ theme }) => css`
@@ -57,10 +56,9 @@ type Props = {
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
   const [matchingType, setMatchingType] = useState<'AND' | 'OR' | undefined>(undefined);
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { updateStream } = useStreamMutations();
-  const disabled =
-    stream.is_default || !stream.is_editable || !isPermitted(currentUser.permissions, `streams:edit:${stream.id}`);
+  const disabled = stream.is_default || !stream.is_editable || !isPermitted(`streams:edit:${stream.id}`);
 
   const handleTypeChange = (newValue: 'AND' | 'OR') => {
     // The api fn handles the error toast on rejection, so we only run the success path on resolve.
