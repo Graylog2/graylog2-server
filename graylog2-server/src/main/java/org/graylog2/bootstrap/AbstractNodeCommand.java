@@ -107,6 +107,13 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
+/**
+ * Inherit from this command to create new standalone node types.
+ * <p>
+ * Loads the configuration and, if the node uses them, the plugins, then creates the injector from
+ * {@link GraylogNodeModule} and the modules of {@link #getNodeCommandBindings(FeatureFlags)}, and finally runs
+ * {@link #startCommand()}.
+ */
 public abstract class AbstractNodeCommand implements CliCommand {
 
     static {
@@ -193,7 +200,7 @@ public abstract class AbstractNodeCommand implements CliCommand {
         return debug;
     }
 
-    protected List<Module> getCommandBindings(final FeatureFlags featureFlags) {
+    private List<Module> getCommandBindings(final FeatureFlags featureFlags) {
         final List<Module> modules = Lists.newArrayList(nodeModule);
         modules.addAll(getNodeCommandBindings(featureFlags));
         return modules;
@@ -201,7 +208,7 @@ public abstract class AbstractNodeCommand implements CliCommand {
 
     protected abstract @Nonnull List<Module> getNodeCommandBindings(final FeatureFlags featureFlags);
 
-    protected List<Object> getCommandConfigurationBeans() {
+    protected final List<Object> getCommandConfigurationBeans() {
         final List<Object> configurationBeans = new ArrayList<>(nodeModule.getConfigurationBeans());
         configurationBeans.addAll(getNodeCommandConfigurationBeans());
         return configurationBeans;
@@ -394,12 +401,10 @@ public abstract class AbstractNodeCommand implements CliCommand {
 
         addInstrumentedAppender(metricRegistry);
         // Report metrics via JMX.
-        final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
-        reporter.start();
-
-        startCommand();
-        // should be properly closed
-        reporter.close();
+        try (final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build()) {
+            reporter.start();
+            startCommand();
+        }
     }
 
     protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
