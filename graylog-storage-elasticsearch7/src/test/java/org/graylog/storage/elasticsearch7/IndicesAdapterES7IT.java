@@ -14,12 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+package org.graylog.storage.elasticsearch7;
 
-import org.graylog2.notifications.Notification;
+import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.indices.IndicesAdapterIT;
 
-import java.util.Map;
+public class IndicesAdapterES7IT extends IndicesAdapterIT {
+    @SearchInstance
+    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
-public record DataNodeNotficationEvent(String nodeId, Notification.Type notificationType, Notification.Severity severity,
-                                        Map<String, Object> details) {
+    @Override
+    protected SearchServerInstance searchServer() {
+        return this.elasticsearch;
+    }
 }
