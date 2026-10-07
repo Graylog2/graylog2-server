@@ -73,6 +73,17 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    void testAliasesForSeveralPatternsWhenOneMatchesNoIndex() {
+        final String alias = "multi_pattern_alias";
+        indicesAdapter.cycleAlias(alias, TEST_INDEX);
+
+        final Map<String, Set<String>> result = indicesAdapter.aliases(TEST_INDEX + "*,nonexistent_*");
+
+        assertThat(result).containsOnlyKeys(TEST_INDEX);
+        assertThat(result.get(TEST_INDEX)).containsExactly(alias);
+    }
+
+    @Test
     public void testAliasHandling() throws IOException {
         String alias = "test_alias";
         assertThat(indicesAdapter.aliasExists(alias)).isFalse();

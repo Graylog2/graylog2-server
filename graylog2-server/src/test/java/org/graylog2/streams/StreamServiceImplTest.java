@@ -46,6 +46,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,6 +98,15 @@ public class StreamServiceImplTest {
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2"))).hasSize(1);
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a5deadbeef"))).isEmpty();
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2", "565f02223b0c25a5deadbeef"))).hasSize(1);
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void countByIndexSet() {
+        final Map<String, Long> counts = streamService.countByIndexSet(List.of("586bb9288e82bf5e2c9ab68d", "000000000000000000000000"));
+
+        assertThat(counts).containsOnly(Map.entry("586bb9288e82bf5e2c9ab68d", 2L));
+        assertThat(streamService.countByIndexSet(List.of())).isEmpty();
     }
 
     @Test

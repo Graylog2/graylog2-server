@@ -16,7 +16,7 @@
  */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -25,7 +25,6 @@ import type { ConfigurationsStoreState, AllowListConfig } from 'stores/configura
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
-import { isPermitted } from 'util/PermissionsMixin';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -48,14 +47,14 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlAllowListConfig = configuration[URL_ALLOWLIST_CONFIG];
 
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, ['urlallowlist:read'])) {
+    if (isPermitted(['urlallowlist:read'])) {
       ConfigurationsActions.listAllowListConfig(URL_ALLOWLIST_CONFIG);
     }
-  }, [currentUser]);
+  }, [isPermitted]);
 
   const setDefaultAllowListState = useCallback(
     (defaultUrlAllowListConfig) => {

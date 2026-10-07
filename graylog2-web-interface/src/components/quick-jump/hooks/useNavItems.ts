@@ -27,12 +27,19 @@ import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
+const isFeatureEnabled = (featureFlag?: string) => {
+  if (!featureFlag) return true;
+
+  return AppConfig.isFeatureEnabled(featureFlag);
+};
+
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
   const entityCreators = usePluginEntities('entityCreators');
 
   return entityCreators
     .filter((creator) => (creator.permissions ? isPermitted(creator.permissions) : true))
+    .filter((creator) => isFeatureEnabled(creator.requiredFeatureFlag))
     .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
 };
 
@@ -51,7 +58,7 @@ const useConfigurationPages = () => {
 
   const pluginNavItems = pluginSystemConfigurations
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    .filter(({ useCondition }) => (typeof useCondition === 'function' ? useCondition() : true))
+    .filter(({ useCondition }) => useCondition?.() ?? true)
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
@@ -141,12 +148,6 @@ const useHelpMenuItems = () => {
     });
 };
 
-const isFeatureEnabled = (featureFlag?: string) => {
-  if (!featureFlag) return true;
-
-  return AppConfig.isFeatureEnabled(featureFlag);
-};
-
 type BaseNavigationItem = {
   description: string;
   path: QualifiedUrl<string>;
@@ -157,14 +158,31 @@ const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const navigationItems = usePluginEntities('navigation');
 
-  const allNavigationItems = navigationItems.flatMap((item) =>
-    'children' in item
-      ? item.children.map<BaseNavigationItem>((child) => ({
-          ...child,
-          description: `${item.description} / ${child.description}`,
-        }))
-      : [item],
-  );
+  const allNavigationItems = navigationItems.flatMap((item) => {
+    // Conditions are hooks, so they are evaluated for every item and child before the early return.
+    const itemVisible =
+      (item.useCondition?.() ?? true) && isFeatureEnabled(item.requiredFeatureFlag) && isPermitted(item.permissions);
+    const visibleChildren =
+      'children' in item
+        ? item.children.filter(
+            (child) => (child.useCondition?.() ?? true) && isFeatureEnabled(child.requiredFeatureFlag),
+          )
+        : [];
+
+    // A dropdown's feature flag, condition and permissions also apply to its children.
+    if (!itemVisible) {
+      return [];
+    }
+
+    if (!('children' in item)) {
+      return [item];
+    }
+
+    return visibleChildren.map<BaseNavigationItem>((child) => ({
+      ...child,
+      description: `${item.description} / ${child.description}`,
+    }));
+  });
 
   return allNavigationItems
     .filter((item) => isPermitted(item.permissions))
@@ -177,7 +195,11 @@ const usePageNavigationItems = () => {
 
   return pageNavigationItems.flatMap((group) =>
     [...group.children]
-      .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
+      .filter(
+        ({ useCondition, requiredFeatureFlag }) =>
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          (useCondition?.() ?? true) && isFeatureEnabled(requiredFeatureFlag),
+      )
       .filter((page) => isPermitted(page.permissions))
       .slice(1)
       .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
