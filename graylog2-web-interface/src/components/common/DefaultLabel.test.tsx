@@ -15,20 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import Routes from 'routing/Routes';
-import { DefaultLabel, Link } from 'components/common';
-import type { Stream } from 'logic/streams/types';
+import DefaultLabel from './DefaultLabel';
 
-type Props = {
-  stream: Stream;
-};
+describe('DefaultLabel', () => {
+  it('marks an entity as the default', async () => {
+    render(<DefaultLabel />);
 
-const TitleCell = ({ stream }: Props) => (
-  <>
-    <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-    {stream.is_default && <DefaultLabel />}
-  </>
-);
-
-export default TitleCell;
+    await screen.findByText('Default');
+  });
+});

@@ -15,20 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import Routes from 'routing/Routes';
-import { DefaultLabel, Link } from 'components/common';
-import type { Stream } from 'logic/streams/types';
+import { Label } from 'components/bootstrap';
 
-type Props = {
-  stream: Stream;
-};
+const StyledLabel = styled(Label)`
+  margin-left: 5px;
+  vertical-align: inherit;
+`;
 
-const TitleCell = ({ stream }: Props) => (
-  <>
-    <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-    {stream.is_default && <DefaultLabel />}
-  </>
+/**
+ * Marks the default entity in a list, e.g. the default stream. Render it next to the entity's title.
+ */
+const DefaultLabel = () => (
+  <StyledLabel bsStyle="primary" bsSize="xsmall">
+    Default
+  </StyledLabel>
 );
 
-export default TitleCell;
+export default DefaultLabel;
