@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { Menu } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { hoverIndicatorStyles } from 'components/common/NavItemStateIndicator';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import NavigationLink from 'components/navigation/NavigationLink';
 import shouldRenderNavigationItem from 'components/navigation/util/shouldRenderNavigationItem';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
@@ -48,10 +48,10 @@ type Props = {
 };
 
 const CollapsedMainNavbar = ({ navigationItems }: Props) => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  const accessibleItems = navigationItems.filter(({ requiredFeatureFlag, permissions: itemPermissions }) =>
-    shouldRenderNavigationItem(requiredFeatureFlag, itemPermissions, permissions),
+  const accessibleItems = navigationItems.filter(({ requiredFeatureFlag, permissions }) =>
+    shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
   );
 
   return (
@@ -68,10 +68,10 @@ const CollapsedMainNavbar = ({ navigationItems }: Props) => {
           }
 
           const accessibleChildren = children.filter(
-            ({ requiredFeatureFlag, permissions: childPermissions, useCondition }) =>
+            ({ requiredFeatureFlag, permissions, useCondition }) =>
               // eslint-disable-next-line react-hooks/rules-of-hooks
               (useCondition?.() ?? true) &&
-              shouldRenderNavigationItem(requiredFeatureFlag, childPermissions, permissions),
+              shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
           );
 
           if (!accessibleChildren.length) {
