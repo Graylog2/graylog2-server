@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,13 +47,10 @@ public class CatApi {
         this.client = client;
     }
 
-    public Map<String, String> aliases() {
-        final Request request = request("GET", "aliases");
+    public List<AliasSummaryResponse> aliases(Collection<String> aliases) {
+        final Request request = request("GET", "aliases/" + String.join(",", aliases));
         request.addParameter("h", "alias,index");
-        final List<AliasSummaryResponse> response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
-
-        return response.stream()
-                .collect(Collectors.toMap(AliasSummaryResponse::alias, AliasSummaryResponse::index));
+        return perform(request, new TypeReference<>() {}, "Unable to retrieve aliases");
     }
 
     public List<NodeResponse> nodes() {

@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
+import org.graylog.storage.elasticsearch7.cat.AliasSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
@@ -38,7 +39,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -200,10 +200,10 @@ class ClusterAdapterES7Test {
 
     @Test
     void testDeflectorHealth() {
-        when(catApi.aliases()).thenReturn(Map.of(
-                "foo_deflector", "foo_42",
-                "bar_deflector", "bar_17",
-                "baz_deflector", "baz_23"
+        when(catApi.aliases(any())).thenReturn(List.of(
+                new AliasSummaryResponse("foo_deflector", "foo_42"),
+                new AliasSummaryResponse("bar_deflector", "bar_17"),
+                new AliasSummaryResponse("baz_deflector", "baz_23")
         ));
 
         when(catApi.indices()).thenReturn(List.of(

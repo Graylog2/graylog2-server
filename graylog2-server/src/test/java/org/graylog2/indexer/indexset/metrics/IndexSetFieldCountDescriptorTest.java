@@ -86,4 +86,12 @@ class IndexSetFieldCountDescriptorTest {
                 new EntityMetric<>(A, null),
                 new EntityMetric<>(B, 1));
     }
+
+    @Test
+    void reportsNoValueWhenTheLookupFails() {
+        IndexSetMocks.stubLookup(indexSetService, indexSetRegistry, IndexSetMocks.indexSet(A, "graylog", true));
+        when(indices.getIndexNamesAndAliases(anyCollection())).thenThrow(new IllegalStateException("Connection refused"));
+
+        assertThat(descriptor.compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+    }
 }

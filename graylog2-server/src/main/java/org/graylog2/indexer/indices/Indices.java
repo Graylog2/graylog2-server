@@ -62,6 +62,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -361,7 +362,11 @@ public class Indices {
     }
 
     public Set<String> getClosedIndices(final Collection<String> indices) {
-        return indicesAdapter.closedIndices(indices);
+        final Set<String> result = new HashSet<>();
+        for (final List<String> batch : IndexNameBatching.partitionByJoinedLength(indices)) {
+            result.addAll(indicesAdapter.closedIndices(batch));
+        }
+        return result;
     }
 
     public Set<String> getClosedIndices(final BasicIndexSet indexSet) {

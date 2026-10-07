@@ -27,6 +27,7 @@ import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -44,16 +45,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -87,6 +95,19 @@ class IndicesTest {
                 profileService,
                 countsAdapter
         );
+    }
+
+    @Test
+    void getClosedIndicesSplitsLongNameListsAndMergesTheAnswers() {
+        final List<String> wildcards = IntStream.range(0, 40).mapToObj(i -> "index-set-" + i + "-" + "x".repeat(190) + "_*").toList();
+        when(indicesAdapter.closedIndices(anyCollection())).thenAnswer(invocation ->
+                invocation.<Collection<String>>getArgument(0).stream().map(w -> w.replace("_*", "_0")).collect(Collectors.toSet()));
+
+        final Set<String> closed = underTest.getClosedIndices(wildcards);
+
+        assertThat(closed).hasSize(40);
+        verify(indicesAdapter, times(IndexNameBatching.partitionByJoinedLength(wildcards).size())).closedIndices(anyCollection());
+        assertThat(IndexNameBatching.partitionByJoinedLength(wildcards).size()).isGreaterThan(1);
     }
 
     @Test

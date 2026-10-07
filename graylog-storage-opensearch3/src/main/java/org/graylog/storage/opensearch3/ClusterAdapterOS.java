@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.ElasticsearchException;
@@ -33,6 +34,7 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
@@ -437,40 +439,30 @@ public class ClusterAdapterOS implements ClusterAdapter {
     }
 
     @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        if (indices.isEmpty()) {
-            return Optional.of(HealthStatus.Green);
+    public Map<String, HealthStatus> deflectorHealthByAlias(Collection<String> writeAliases) {
+        final Map<String, String> indexByAlias = singleIndexByAlias(writeAliases);
+        if (indexByAlias.isEmpty()) {
+            return Map.of();
         }
+        final Set<String> indices = Set.copyOf(indexByAlias.values());
+        final Map<String, HealthStatus> healthByIndex = opensearchClient
+                .sync(c -> c.cat().indices().valueBody(), "Unable to retrieve indices").stream()
+                .filter(index -> indices.contains(index.index()))
+                .collect(Collectors.toMap(IndicesRecord::index, index -> HealthStatus.fromString(index.health())));
+        return indexByAlias.entrySet().stream()
+                .filter(entry -> healthByIndex.containsKey(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> healthByIndex.get(entry.getValue())));
+    }
 
-        final Map<String, String> aliasMapping;
-        aliasMapping = opensearchClient.sync(c -> c.cat().aliases().valueBody()
-                        .stream()
-                        .filter(alias -> Objects.nonNull(alias.index()))
-                        .collect(Collectors.toMap(AliasesRecord::alias, AliasesRecord::index)),
-                "Unable to retrieve aliases"
-        );
-
-        final Set<String> mappedIndices = indices
-                .stream()
-                .map(index -> aliasMapping.getOrDefault(index, index))
-                .collect(Collectors.toSet());
-
-        final Set<IndicesRecord> indexSummaries = opensearchClient.sync(client ->
-                        client.cat().indices().valueBody()
-                                .stream()
-                                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
-                                .collect(Collectors.toSet()),
-                "Unable to retrieve indices");
-
-        if (indexSummaries.size() < mappedIndices.size()) {
-            return Optional.empty();
-        }
-
-        return indexSummaries.stream()
-                .map(IndicesRecord::health)
-                .map(HealthStatus::fromString)
-                .min(HealthStatus::compareTo);
-
+    private Map<String, String> singleIndexByAlias(Collection<String> aliases) {
+        return IndexNameBatching.partitionByJoinedLength(aliases).stream()
+                .flatMap(chunk -> opensearchClient
+                        .sync(c -> c.cat().aliases(r -> r.name(chunk)).valueBody(), "Unable to retrieve aliases").stream())
+                .collect(Collectors.groupingBy(record -> Objects.requireNonNull(record.alias()),
+                        Collectors.mapping(AliasesRecord::index, Collectors.toSet())))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Iterables.getOnlyElement(entry.getValue())));
     }
 
     public String getClusterSetting(String setting) {
