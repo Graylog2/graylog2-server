@@ -183,7 +183,6 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new GraylogServerProvisioningBindings());
         modules.add(new PreflightWebModule(configuration));
         modules.add(new SchedulerBindings());
 
