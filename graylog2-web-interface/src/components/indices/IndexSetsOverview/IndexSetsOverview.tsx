@@ -22,6 +22,7 @@ import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLa
 import getIndexSetTableElements, { DETAILS_SECTION, INDEX_SET_VIEW_VARIANTS } from './Constants';
 import customColumnRenderers from './ColumnRenderers';
 import IndexSetActions from './IndexSetActions';
+import IndexSetCategoryButtons from './IndexSetCategoryButtons';
 import IndexSetViewButtons from './IndexSetViewButtons';
 import IndexSetDetailsSection from './expanded-sections/IndexSetDetailsSection';
 import { fetchIndexSets, keyFn } from './fetchIndexSets';
@@ -34,6 +35,13 @@ const expandedSections = {
     content: (indexSet: IndexSetEntity) => <IndexSetDetailsSection indexSet={indexSet} />,
   },
 };
+
+const TopSection = () => (
+  <>
+    <IndexSetCategoryButtons />
+    <IndexSetViewButtons />
+  </>
+);
 
 const renderActions = (indexSet: IndexSetEntity) => <IndexSetActions indexSet={indexSet} />;
 
@@ -63,7 +71,7 @@ const IndexSetsOverview = () => {
       expandedSectionRenderers={expandedSections}
       entityAttributesAreCamelCase={false}
       columnRenderers={customColumnRenderers(extensionColumnRenderers)}
-      topSection={IndexSetViewButtons}
+      topSection={TopSection}
     />
   );
 };

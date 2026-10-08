@@ -16,4 +16,11 @@
  */
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-export type IndexSetEntity = IndexSet & { id: string };
+export type IndexSetCategory = 'user' | 'system' | 'illuminate';
+
+export type IndexSetEntity = IndexSet & {
+  id: string;
+  category: IndexSetCategory;
+  can_have_profile: boolean;
+  stream_count: number;
+};
