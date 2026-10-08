@@ -1,4 +1,0 @@
-type = "a"
-message = "Entity table filters can now be limited to a single active filter per attribute."
-
-pulls = ["27692"]
