@@ -1,0 +1,8 @@
+type = "a"
+message = "Add an absolute time range and a sort order to the MCP search_messages tool."
+
+details.user = """
+The `search_messages` tool of the MCP server accepts `from` and `to` for an absolute time range in ISO 8601, in addition to `range_seconds`, and `sort_order` to get the newest (`desc`, the default) or the oldest (`asc`) messages first. An empty `fields` list returns all fields.
+"""
+
+pulls = ["27657"]

@@ -38,7 +38,7 @@ type PluginNavigationLink = {
 
 interface PluginNavigationItems {
   key: string;
-  component: React.ComponentType<{ smallScreen?: boolean }>;
+  component: React.ComponentType;
 }
 interface GlobalNotification {
   key: string;

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { Streams } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -116,19 +118,17 @@ export const updateStream = (streamId: string, data: Partial<Stream>): Promise<S
   });
 
 export const removeStream = (streamId: string): Promise<unknown> =>
-  fetch('DELETE', qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url)).then(() =>
-    CurrentUserStore.reload(),
-  );
+  Streams.remove(streamId).then(() => CurrentUserStore.reload());
 
 export const pauseStream = (streamId: string): Promise<unknown> =>
-  fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url)).catch((errorThrown): never => {
+  Streams.pause(streamId).catch((errorThrown): never => {
     UserNotification.error(`Pausing Stream failed with status: ${errorThrown}`, 'Could not pause Stream');
 
     throw errorThrown;
   });
 
 export const resumeStream = (streamId: string): Promise<unknown> =>
-  fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url)).catch((errorThrown): never => {
+  Streams.resume(streamId).catch((errorThrown): never => {
     UserNotification.error(`Resuming Stream failed with status: ${errorThrown}`, 'Could not resume Stream');
 
     throw errorThrown;
