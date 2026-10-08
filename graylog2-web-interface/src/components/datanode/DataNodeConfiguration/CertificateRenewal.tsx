@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import moment from 'moment';
 
+import ProductName from 'brand-customization/ProductName';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'components/datanode/Types';
@@ -145,7 +146,7 @@ const CertificateRenewal = () => {
     <div>
       <h2>Certificate Renewal & Provisioning</h2>
       <p>
-        Here you can manually trigger the certificate renewal or provisioning for Graylog Data Nodes. It is only
+        Here you can manually trigger the certificate renewal or provisioning for <ProductName /> Data Nodes. It is only
         necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
         Data Nodes have been started after the initial certificate provisioning.
       </p>

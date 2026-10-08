@@ -97,6 +97,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_SIDEBAR_UNDO: 'Search Sidebar Undo',
   DASHBOARD_ACTION: {
     DASHBOARD_NEW_SAVED: 'Dashboard New Saved',
+    ILLUMINATE_DASHBOARD_CLONED: 'Illuminate Dashboard Cloned',
+    ILLUMINATE_DASHBOARD_VIEWED: 'Illuminate Dashboard Viewed',
     DASHBOARD_SAVED: 'Dashboard Saved',
     DASHBOARD_UPDATED: 'Dashboard Updated',
     DASHBOARD_CREATE_CLICKED: 'Dashboard Create Clicked',
@@ -122,6 +124,7 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
+  ILLUMINATE_EVENTDEFINITION_CLONED: 'Illuminate EventDefinition Cloned',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
   EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
@@ -501,7 +504,6 @@ export const TELEMETRY_EVENT_TYPE = {
     SETTINGS: {
       UPDATED: 'Collector Settings Updated',
       DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
-      ADVANCED_TOGGLED: 'Collector Settings Advanced Options Toggled',
     },
     ONBOARDING: {
       FLEET_CLEARED: 'Collector Onboarding Fleet Cleared',

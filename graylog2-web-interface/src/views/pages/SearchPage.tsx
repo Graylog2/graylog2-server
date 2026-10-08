@@ -35,6 +35,7 @@ import useHistory from 'routing/useHistory';
 import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
 import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
+import IlluminateDashboardViewTelemetry from 'views/components/IlluminateDashboardViewTelemetry';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean;
@@ -89,6 +90,7 @@ const SearchPage = ({
       isNew={isNew}
       initialQuery={initialQuery}
       result={searchResult}>
+      <IlluminateDashboardViewTelemetry />
       <SearchPageTitle>
         <DashboardPageContextProvider>
           <NewViewLoaderContext.Provider value={loadNewView}>

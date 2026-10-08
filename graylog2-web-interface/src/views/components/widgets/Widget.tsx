@@ -305,7 +305,14 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
 
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
-      sendWidgetConfigUpdateTelemetry();
+      sendWidgetConfigUpdateTelemetry(
+        newWidgetConfig instanceof AggregationWidgetConfig
+          ? {
+              visualizationType: newWidgetConfig.visualization,
+              visualizationConfig: newWidgetConfig.visualizationConfig,
+            }
+          : {},
+      );
 
       return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {});
     },

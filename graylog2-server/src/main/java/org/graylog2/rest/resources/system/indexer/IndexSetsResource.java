@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,17 +45,30 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
+import org.bson.conversions.Bson;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetAttributeSorts;
+import org.graylog2.indexer.indexset.IndexSetCategory;
+import org.graylog2.indexer.indexset.IndexSetCategoryCounts;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.PaginatedIndexSetService;
+import org.graylog2.indexer.indexset.RotationModel;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
@@ -63,19 +77,29 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetOverviewResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.streams.StreamService;
 import org.graylog2.system.jobs.LegacySystemJobManager;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -86,6 +110,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
 @RequiresAuthentication
 @Tag(name = "System/IndexSets", description = "Index sets")
@@ -93,6 +118,35 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetsResource.class);
+    private static final String DEFAULT_SORT_FIELD = IndexSetConfig.FIELD_TITLE;
+    private static final List<EntityAttribute> ATTRIBUTES = List.of(
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_DESCRIPTION).title("Description").sortable(false).searchable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_INDEX_PREFIX).title("Index prefix").filterable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_SHARDS).title("Shards").type(SearchQueryField.Type.INT).filterable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_REPLICAS).title("Replicas").type(SearchQueryField.Type.INT).filterable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_CREATION_DATE).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE).title("Template type").filterable(true).build(),
+            EntityAttribute.builder().id("category").title("Category").sortable(false).filterable(true)
+                    .filterOptions(Arrays.stream(IndexSetCategory.values()).map(IndexSetCategory::filterOption).collect(toSet()))
+                    .bsonFilterCreator((field, value) -> IndexSetCategory.fromValue(value.getValue().toString()).toBson())
+                    .build(),
+            EntityAttribute.builder().id(IndexSetConfig.FIELD_PROFILE_ID).title("Field type profile").filterable(true)
+                    .relatedCollection(IndexFieldTypeProfileService.INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME)
+                    .relatedProperty(IndexFieldTypeProfile.NAME_FIELD_NAME)
+                    .sortSpec(IndexSetAttributeSorts.profileTitle())
+                    .build(),
+            EntityAttribute.builder().id("stream_count").title("Associated streams").type(SearchQueryField.Type.INT)
+                    .sortSpec(IndexSetAttributeSorts.streamCount())
+                    .build(),
+            EntityAttribute.builder().id("rotation_model").title("Rotation model").sortable(false).filterable(true)
+                    .filterOptions(Arrays.stream(RotationModel.values()).map(RotationModel::filterOption).collect(toSet()))
+                    .bsonFilterCreator((field, value) -> RotationModel.fromValue(value.getValue().toString()).toBson())
+                    .build()
+    );
+    private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.ASC))
+            .build();
 
     private final Indices indices;
     private final IndexSetService indexSetService;
@@ -107,6 +161,10 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetRestrictionsService indexSetRestrictionsService;
     private final EventBus eventBus;
     private final RefreshingLockService.Factory lockServiceFactory;
+    private final PaginatedIndexSetService paginatedIndexSetService;
+    private final StreamService streamService;
+    private final EntityPermissionsUtils entityPermissionsUtils;
+    private final DbQueryCreator dbQueryCreator = new DbQueryCreator(DEFAULT_SORT_FIELD, ATTRIBUTES);
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -120,7 +178,10 @@ public class IndexSetsResource extends RestResource {
                              final DataTieringStatusService tieringStatusService,
                              final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
                              final EventBus eventBus,
-                             final RefreshingLockService.Factory lockServiceFactory) {
+                             final RefreshingLockService.Factory lockServiceFactory,
+                             final PaginatedIndexSetService paginatedIndexSetService,
+                             final StreamService streamService,
+                             final EntityPermissionsUtils entityPermissionsUtils) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -134,11 +195,76 @@ public class IndexSetsResource extends RestResource {
         this.indexSetRestrictionsService = indexSetRestrictionsService;
         this.eventBus = eventBus;
         this.lockServiceFactory = lockServiceFactory;
+        this.paginatedIndexSetService = requireNonNull(paginatedIndexSetService);
+        this.streamService = requireNonNull(streamService);
+        this.entityPermissionsUtils = requireNonNull(entityPermissionsUtils);
     }
 
     @GET
+    @Path("paginated")
     @Timed
-    @Operation(summary = "Get a list of all index sets")
+    @Operation(summary = "Get a paginated list of index sets, with sorting and filtering")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns one page of index sets", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+    })
+    public PageListResponse<IndexSetOverviewResponse> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                      @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                      @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                      @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                      @Parameter(name = "sort", description = "The field to sort the result on",
+                                                                 schema = @Schema(allowableValues = {"title", "index_prefix", "shards", "replicas", "creation_date", "index_template_type", "field_type_profile", "stream_count"}))
+                                                      @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                      @Parameter(name = "order", description = "The sort direction",
+                                                                 schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        final DbSortResolver.ResolvedSort resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
+        // A user who may read every index set pages in MongoDB. Anyone else needs the per-entity predicate;
+        // the helper applies it after fetching, so totals stay consistent.
+        final PaginatedList<IndexSetConfig> result = canReadAllIndexSets()
+                ? paginatedIndexSetService.findPaginated(dbQuery, resolvedSort, page, perPage)
+                : paginatedIndexSetService.findPaginated(dbQuery, this::mayRead, resolvedSort, page, perPage);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+        final Map<String, Long> streamCounts = streamService.countByIndexSet(result.stream().map(IndexSetConfig::id).toList());
+        final List<IndexSetOverviewResponse> elements = result.stream()
+                .map(config -> IndexSetOverviewResponse.create(config, config.equals(defaultIndexSet), streamCounts.getOrDefault(config.id(), 0L)))
+                .toList();
+
+        return PageListResponse.create(query, result.pagination(), result.pagination().total(), sort, order, elements, ATTRIBUTES, DEFAULTS);
+    }
+
+    @GET
+    @Path("categories/count")
+    @Timed
+    @Operation(summary = "Count the index sets the caller may read, overall and per category")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the counts", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+    })
+    public IndexSetCategoryCounts getCategoryCounts() {
+        return canReadAllIndexSets()
+                ? paginatedIndexSetService.countCategories()
+                : paginatedIndexSetService.countCategories(this::mayRead);
+    }
+
+    private boolean canReadAllIndexSets() {
+        final Subject subject = getSubject();
+        return entityPermissionsUtils.hasAllPermission(subject)
+                || entityPermissionsUtils.hasReadPermissionForWholeCollection(subject, MongoIndexSetService.COLLECTION_NAME);
+    }
+
+    private boolean mayRead(IndexSetConfig config) {
+        return isPermitted(RestPermissions.INDEXSETS_READ, config.id());
+    }
+
+    /**
+     * @deprecated Use {@link #getPage} ({@code GET /system/indices/index_sets/paginated}); it sorts, filters, and paginates in the database.
+     */
+    @Deprecated(forRemoval = true)
+    @GET
+    @Timed
+    @Operation(summary = "Get a list of all index sets", deprecated = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
@@ -164,16 +290,20 @@ public class IndexSetsResource extends RestResource {
         return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, indexSetConfigStream.toList());
     }
 
+    /**
+     * @deprecated Use {@link #getPage} ({@code GET /system/indices/index_sets/paginated}) with the {@code query} parameter.
+     */
+    @Deprecated(forRemoval = true)
     @GET
     @Path("search")
     @Timed
-    @Operation(summary = "Get a list of all index sets")
+    @Operation(summary = "Search index sets by title", deprecated = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetsResponse search(@Parameter(name = "searchTitle", description = "The number of elements to skip (offset).")
-                                    @QueryParam("searchTitle") String searchTitle,
+                                    @QueryParam("searchTitle") @DefaultValue("") String searchTitle,
                                     @Parameter(name = "skip", description = "The number of elements to skip (offset).", required = true)
                                     @QueryParam("skip") @DefaultValue("0") int skip,
                                     @Parameter(name = "limit", description = "The maximum number of elements to return.", required = true)

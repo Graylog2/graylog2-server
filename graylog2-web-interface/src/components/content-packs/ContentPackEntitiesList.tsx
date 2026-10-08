@@ -125,7 +125,10 @@ class ContentPackEntitiesList extends React.Component<
     };
 
     const applyModal = (
-      <BootstrapModalWrapper showModal={entity.id === this.state.showApplyConfigModalId} onHide={closeModal} bsSize="large">
+      <BootstrapModalWrapper
+        showModal={entity.id === this.state.showApplyConfigModalId}
+        onHide={closeModal}
+        bsSize="large">
         <Modal.Header>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>

@@ -28,7 +28,7 @@ public class PluginPathConfiguration {
 
     protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
 
-    @Documentation("Set plugin directory here (relative or absolute)")
+    @Documentation("Set plugin directory here (relative or absolute).")
     @Parameter(value = "plugin_dir", required = true)
     private final Path pluginDir = DEFAULT_PLUGIN_DIR;
 

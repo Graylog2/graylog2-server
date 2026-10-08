@@ -16,6 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { Datanode } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
@@ -29,7 +31,7 @@ export const bulkRemoveDataNode = async (
   selectBackFailedEntities: (entity_ids: string[]) => void,
 ) => {
   try {
-    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), {
+    const { failures, successfully_performed } = await Datanode.bulkRemove({
       entity_ids,
     });
 
@@ -61,7 +63,7 @@ export const bulkStartDataNode = async (
   selectBackFailedEntities: (entity_ids: string[]) => void,
 ) => {
   try {
-    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), {
+    const { failures, successfully_performed } = await Datanode.bulkStart({
       entity_ids,
     });
 
@@ -93,7 +95,7 @@ export const bulkStopDataNode = async (
   selectBackFailedEntities: (entity_ids: string[]) => void,
 ) => {
   try {
-    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_stop'), { entity_ids });
+    const { failures, successfully_performed } = await Datanode.bulkStop({ entity_ids });
 
     selectBackFailedEntities([]);
 
@@ -120,7 +122,7 @@ export const bulkStopDataNode = async (
 
 export const removeDataNode = async (datanodeId: string) => {
   try {
-    await fetch('DELETE', qualifyUrl(`/datanode/${datanodeId}`));
+    await Datanode.removeNode(datanodeId);
 
     UserNotification.success(`Data Node "${datanodeId}" removed successfully.`);
   } catch (errorThrown) {
@@ -130,7 +132,7 @@ export const removeDataNode = async (datanodeId: string) => {
 
 export const startDataNode = async (datanodeId: string) => {
   try {
-    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/start`));
+    await Datanode.startNode(datanodeId);
 
     UserNotification.success(`Data Node "${datanodeId}" started successfully.`);
   } catch (errorThrown) {
@@ -140,7 +142,7 @@ export const startDataNode = async (datanodeId: string) => {
 
 export const stopDataNode = async (datanodeId: string) => {
   try {
-    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/stop`));
+    await Datanode.stopNode(datanodeId);
 
     UserNotification.success(`Data Node "${datanodeId}" stopped successfully.`);
   } catch (errorThrown) {
@@ -150,7 +152,7 @@ export const stopDataNode = async (datanodeId: string) => {
 
 export const rejoinDataNode = async (datanodeId: string) => {
   try {
-    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/reset`));
+    await Datanode.resetNode(datanodeId);
 
     UserNotification.success(`Data Node "${datanodeId}" rejoined successfully.`);
   } catch (errorThrown) {
