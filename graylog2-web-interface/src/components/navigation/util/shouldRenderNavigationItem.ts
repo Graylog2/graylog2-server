@@ -14,28 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import AppConfig from 'util/AppConfig';
 
-const Navbar = styled.header(
-  ({ theme }) => css`
-    position: relative;
-    height: ${NAV_ITEM_HEIGHT};
-    min-height: auto;
-    display: flex;
-    align-items: center;
+const shouldRenderNavigationItem = (
+  requiredFeatureFlag: string | undefined,
+  requiredPermissions: Permission | Array<Permission> | undefined,
+  isPermitted: (permissions: Permission | Array<Permission>) => boolean,
+) => {
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return false;
+  }
 
-    flex-wrap: nowrap;
-    background-color: ${theme.colors.global.navigationBackground};
-    border: 0;
-    padding: 0;
-    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-    margin-bottom: 0;
-    font-family: ${theme.fonts.family.navigation};
-    font-size: ${theme.fonts.size.navigation};
-  `,
-);
+  if (requiredPermissions && !isPermitted(requiredPermissions)) {
+    return false;
+  }
 
-/** @component */
-export default Navbar;
+  return true;
+};
+
+export default shouldRenderNavigationItem;

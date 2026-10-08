@@ -108,14 +108,11 @@ export const fetchAllIndices = (): Promise<IndicesListResponse> =>
 export const fetchMultipleIndices = (indexNames: string[]): Promise<Indices> =>
   IndexerIndices.multiple({ indices: indexNames }, { requestShouldExtendSession: false });
 
-export const closeIndex = (indexName: string): Promise<unknown> =>
-  IndexerIndices.close(indexName);
+export const closeIndex = (indexName: string): Promise<unknown> => IndexerIndices.close(indexName);
 
-export const deleteIndex = (indexName: string): Promise<unknown> =>
-  IndexerIndices.remove(indexName);
+export const deleteIndex = (indexName: string): Promise<unknown> => IndexerIndices.remove(indexName);
 
-export const reopenIndex = (indexName: string): Promise<unknown> =>
-  IndexerIndices.reopen(indexName);
+export const reopenIndex = (indexName: string): Promise<unknown> => IndexerIndices.reopen(indexName);
 
 type ListResult = {
   indices: Indices | undefined;
