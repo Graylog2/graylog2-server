@@ -29,6 +29,8 @@ import { prefixUrl } from 'routing/Routes';
 
 import useNavItems from './useNavItems';
 
+jest.mock('util/AppConfig');
+
 const helpMenuItemWithPath: PluginExports = {
   helpMenu: [
     {
@@ -210,8 +212,7 @@ describe('useNavItems conditions', () => {
       {
         description: 'Menu',
         children: [
-          { description: 'Shown child', path: prefixUrl('/menu/shown'), useCondition: met },
-          { description: 'Hidden child', path: prefixUrl('/menu/hidden'), useCondition: notMet },
+          { description: 'Shown child', path: prefixUrl('/menu/shown') },
         ],
       },
       {
@@ -248,7 +249,6 @@ describe('useNavItems conditions', () => {
     const result = titles();
 
     expect(result).not.toContain('Hidden link');
-    expect(result).not.toContain('Menu / Hidden child');
     expect(result).not.toContain('Group / Hidden page');
   });
 

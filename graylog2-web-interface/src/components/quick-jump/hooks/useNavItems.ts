@@ -159,15 +159,11 @@ const useMainNavigationItems = () => {
   const navigationItems = usePluginEntities('navigation');
 
   const allNavigationItems = navigationItems.flatMap((item) => {
-    // Conditions are hooks, so they are evaluated for every item and child before the early return.
+    // Conditions are hooks, so they are evaluated for every item before the early return.
     const itemVisible =
       (item.useCondition?.() ?? true) && isFeatureEnabled(item.requiredFeatureFlag) && isPermitted(item.permissions);
     const visibleChildren =
-      'children' in item
-        ? item.children.filter(
-            (child) => (child.useCondition?.() ?? true) && isFeatureEnabled(child.requiredFeatureFlag),
-          )
-        : [];
+      'children' in item ? item.children.filter((child) => isFeatureEnabled(child.requiredFeatureFlag)) : [];
 
     // A dropdown's feature flag, condition and permissions also apply to its children.
     if (!itemVisible) {
