@@ -69,7 +69,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
-import java.util.Set;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
@@ -551,10 +550,6 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected Multibinder<Class<?>> dbEntitiesBinder() {
         return Multibinder.newSetBinder(binder(), new TypeLiteral<>() {}, Names.named(DB_ENTITIES));
-    }
-
-    protected Set<Object> getConfigurationBeans() {
-        return Set.of();
     }
 
     protected Multibinder<CSPResources.ResourceProvider> cspResourceProviderBinder() {
