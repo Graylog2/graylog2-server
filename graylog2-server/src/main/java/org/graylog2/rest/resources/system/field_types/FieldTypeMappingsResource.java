@@ -213,28 +213,20 @@ public class FieldTypeMappingsResource extends RestResource {
             throw new BadRequestException("Index set ids must not be null");
         }
         final AuditActor actor = AuditActor.user(getCurrentUser());
-        final Map<String, Object> requestContext = ImmutableMap.<String, Object>builder()
-                .putAll(auditContext).put("index_sets", indexSetsIds).build();
         final Set<String> permittedIds = indexSetsIds.stream()
                 .filter(indexSetId -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSetId))
                 .collect(Collectors.toSet());
         if (permittedIds.isEmpty()) {
-            auditEventSender.failure(actor, INDEX_SET_UPDATE, requestContext);
+            auditEventSender.failure(actor, INDEX_SET_UPDATE, ImmutableMap.<String, Object>builder()
+                    .putAll(auditContext).put("index_sets", indexSetsIds).build());
             throw new ForbiddenException("Not authorized");
         }
 
-        final Map<String, String> titles;
-        final Map<String, BulkOperationResponse> result;
-        try {
-            // ids are unvalidated input and findByIds throws on anything that is not an ObjectId
-            titles = indexSetService.findByIds(indexSetsIds.stream().filter(ObjectId::isValid).collect(Collectors.toSet()))
-                    .stream()
-                    .collect(Collectors.toMap(IndexSetConfig::id, IndexSetConfig::title));
-            result = new HashMap<>(change.apply(permittedIds));
-        } catch (RuntimeException e) {
-            auditEventSender.failure(actor, INDEX_SET_UPDATE, requestContext);
-            throw e;
-        }
+        // ids are unvalidated input and findByIds throws on anything that is not an ObjectId
+        final Map<String, String> titles = indexSetService.findByIds(indexSetsIds.stream().filter(ObjectId::isValid).collect(Collectors.toSet()))
+                .stream()
+                .collect(Collectors.toMap(IndexSetConfig::id, IndexSetConfig::title));
+        final Map<String, BulkOperationResponse> result = new HashMap<>(change.apply(permittedIds));
         Sets.difference(indexSetsIds, permittedIds).forEach(indexSetId -> result.put(indexSetId,
                 new BulkOperationResponse(0, List.of(new BulkOperationFailure(indexSetId, "Not authorized")))));
 

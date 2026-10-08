@@ -161,15 +161,15 @@ public class FieldTypeMappingsService {
      */
     private Map<String, BulkOperationResponse> changeProfileOfEach(final Set<String> indexSetsIds,
                                                                    final boolean rotateImmediately,
-                                                                   final Predicate<IndexSetConfig> canHaveProfile,
+                                                                   final Predicate<IndexSetConfig> eligible,
                                                                    final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
         return indexSetsIds.stream().collect(Collectors.toMap(Function.identity(),
-                indexSetId -> changeProfile(indexSetId, rotateImmediately, canHaveProfile, change)));
+                indexSetId -> changeProfile(indexSetId, rotateImmediately, eligible, change)));
     }
 
     private BulkOperationResponse changeProfile(final String indexSetId,
                                                 final boolean rotateImmediately,
-                                                final Predicate<IndexSetConfig> canHaveProfile,
+                                                final Predicate<IndexSetConfig> eligible,
                                                 final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
         final Optional<IndexSetConfig> updatedIndexSetConfig;
         try {
@@ -177,7 +177,7 @@ public class FieldTypeMappingsService {
             if (indexSetConfig.isEmpty()) {
                 return failure(indexSetId, "Index set not found");
             }
-            if (!canHaveProfile.test(indexSetConfig.get())) {
+            if (!eligible.test(indexSetConfig.get())) {
                 return failure(indexSetId, "Index set " + indexSetConfig.get().title() + " cannot have a field type profile");
             }
             updatedIndexSetConfig = change.apply(indexSetConfig.get());

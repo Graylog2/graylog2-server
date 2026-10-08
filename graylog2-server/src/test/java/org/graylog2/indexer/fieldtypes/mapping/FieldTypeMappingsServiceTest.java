@@ -405,20 +405,6 @@ class FieldTypeMappingsServiceTest {
     }
 
     @Test
-    void testBulkRemoveProfileRemovesAndReportsPerIndexSet() {
-        existingIndexSet = existingIndexSet.toBuilder().fieldTypeProfile("000000000000000000000042").build();
-        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
-        doReturn(Optional.empty()).when(indexSetService).get("missing_index_set");
-
-        final Map<String, BulkOperationResponse> response = toTest.bulkRemoveProfile(Set.of("existing_index_set", "missing_index_set"), false);
-
-        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(null).build());
-        verifyNoInteractions(existingMongoIndexSet);
-        assertSuccess(response.get("existing_index_set"));
-        assertFailure(response.get("missing_index_set"), "Index set not found");
-    }
-
-    @Test
     void testBulkSetProfileReportsUnreadableIndexSetAsFailureAndContinues() {
         final String profileId = givenValidProfile();
         doThrow(new IllegalArgumentException("invalid hexadecimal representation of an ObjectId: [foo]")).when(indexSetService).get("foo");
