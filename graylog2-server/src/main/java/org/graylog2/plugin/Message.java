@@ -778,7 +778,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * @return {@code true} if the field is internal
      */
     public static boolean isInternalField(final String name) {
-        return name.startsWith(INTERNAL_FIELD_PREFIX) || FIELD_ID.equals(name);
+        return (name != null && name.startsWith(INTERNAL_FIELD_PREFIX)) || FIELD_ID.equals(name);
     }
 
     /**
