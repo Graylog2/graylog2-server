@@ -939,4 +939,43 @@ public class MessageTest {
         assertThat(msg.getMessage()).isNull();
         assertThat(msg.toString()).isNotEmpty();
     }
+
+    @Test
+    public void isInternalField() {
+        assertThat(Message.isInternalField(Message.FIELD_ID)).isTrue();
+        assertThat(Message.isInternalField(Message.FIELD_GL2_SOURCE_INPUT)).isTrue();
+        assertThat(Message.isInternalField(Message.FIELD_GL2_MESSAGE_ID)).isTrue();
+        assertThat(Message.isInternalField("gl2_custom_plugin_field")).isTrue();
+
+        assertThat(Message.isInternalField(Message.FIELD_MESSAGE)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_SOURCE)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_TIMESTAMP)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_INDEX)).isFalse();
+        assertThat(Message.isInternalField("my_gl2_field")).isFalse();
+    }
+
+    @Test
+    public void isReservedNonSettableField() {
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_ID)).isTrue();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_INDEX)).isTrue();
+        assertThat(Message.isReservedNonSettableField("_source")).isTrue();
+
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_MESSAGE)).isFalse();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_TIMESTAMP)).isFalse();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_GL2_SOURCE_INPUT)).isFalse();
+        assertThat(Message.isReservedNonSettableField("custom_field")).isFalse();
+    }
+
+    @Test
+    public void getFieldsWithKeyFilter() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField("custom_field", "value");
+        message.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id");
+
+        final Map<String, Object> fields = message.getFields(key -> !Message.STANDARD_FIELDS.contains(key));
+
+        assertThat(fields).containsOnlyKeys("custom_field", Message.FIELD_GL2_SOURCE_INPUT);
+        assertThat(message.getFields(key -> false)).isEmpty();
+        assertThat(message.getFields(key -> true)).isEqualTo(message.getFields());
+    }
 }

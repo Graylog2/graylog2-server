@@ -304,6 +304,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public static final Set<String> SEARCHABLE_ES_FIELDS = Set.of(FIELD_INDEX, FIELD_ID);
 
+    /**
+     * Fields that have dedicated accessors on a message ({@link #getId()}, {@link #getMessage()},
+     * {@link #getSource()} and {@link #getTimestamp()}) and are therefore usually serialized separately from the
+     * remaining fields.
+     */
+    public static final Set<String> STANDARD_FIELDS = Set.of(FIELD_ID, FIELD_MESSAGE, FIELD_SOURCE, FIELD_TIMESTAMP);
+
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
             .addAll(GRAYLOG_FIELDS)
             .addAll(CORE_MESSAGE_FIELDS)
@@ -656,7 +663,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final String trimmedKey = key.trim();
 
         // Don't accept protected keys. (some are allowed though lol)
-        if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
+        if (isReservedNonSettableField(trimmedKey) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             } else {
@@ -767,6 +774,29 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return accounted;
     }
 
+    /**
+     * Checks whether the given field name denotes an internal field, i.e. Graylog metadata (fields starting with
+     * {@link #INTERNAL_FIELD_PREFIX}) or the message ID ({@link #FIELD_ID}). Internal fields are not meant to be
+     * presented to or processed as user data.
+     * <p>
+     * Note: this differs from the fields excluded from the message size accounting, which use an explicit list.
+     *
+     * @param name the field name
+     * @return {@code true} if the field is internal
+     */
+    public static boolean isInternalField(final String name) {
+        return name.startsWith(INTERNAL_FIELD_PREFIX) || FIELD_ID.equals(name);
+    }
+
+    /**
+     * @param name the field name
+     * @return {@code true} if the field is reserved and must not be set from outside (e.g. by inputs, extractors or
+     * static fields)
+     */
+    public static boolean isReservedNonSettableField(final String name) {
+        return RESERVED_FIELDS.contains(name) && !RESERVED_SETTABLE_FIELDS.contains(name);
+    }
+
     public static boolean validKey(final String key) {
         return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
     }
@@ -812,6 +842,14 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public Map<String, Object> getFields() {
         return ImmutableMap.copyOf(fields);
+    }
+
+    /**
+     * @param keyFilter predicate on the field name, fields for which it returns {@code true} are included
+     * @return an immutable copy of the fields whose names match the given filter
+     */
+    public Map<String, Object> getFields(final Predicate<String> keyFilter) {
+        return ImmutableMap.copyOf(Maps.filterKeys(fields, keyFilter::test));
     }
 
     public Iterable<Map.Entry<String, Object>> getFieldsEntries() {
