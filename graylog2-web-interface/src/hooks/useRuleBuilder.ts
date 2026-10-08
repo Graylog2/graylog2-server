@@ -16,6 +16,8 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { PipelinesRulebuilder } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -56,7 +58,7 @@ const updateRule = async (rule: RuleBuilderRule) => {
   const { source, errors, ...ruleToUpdate }: any = rule;
 
   try {
-    await fetch('PUT', qualifyUrl(ApiRoutes.RuleBuilderController.update(rule.id).url), ruleToUpdate);
+    await PipelinesRulebuilder.updateFromBuilder(ruleToUpdate, rule.id);
 
     UserNotification.success(`Rule "${rule.title}" updated successfully`);
   } catch (errorThrown) {

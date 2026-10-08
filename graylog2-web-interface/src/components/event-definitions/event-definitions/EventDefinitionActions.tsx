@@ -41,7 +41,11 @@ import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActio
 import EventDefinitionReplaySearchLink from 'components/event-definitions/replay-search/EventDefinitionReplaySearchLink';
 
 import type { EventDefinition } from '../event-definitions-types';
-import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
+import {
+  isAggregationEventDefinition,
+  isIlluminateEventDefinition,
+  isSystemEventDefinition,
+} from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -184,6 +188,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const handleConfirm = () => {
     switch (dialogType) {
       case 'copy':
+        if (isIlluminateEventDefinition(currentDefinition)) {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.ILLUMINATE_EVENTDEFINITION_CLONED, {
+            app_section: 'event-definition-row',
+            app_action_value: 'illuminate-event-definition-clone',
+            event_details: { event_definition_title: currentDefinition.title },
+          });
+        }
+
         copyEventDefinition(currentDefinition)
           .catch(() => {
             // Error feedback is handled by `copyEventDefinition` itself.
