@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
 import merge from 'lodash/merge';
 import { useQuery } from '@tanstack/react-query';
+
+import { SidecarCollectors } from '@graylog/server-api';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -48,17 +49,8 @@ type PaginatedCollectorsState = {
   };
 };
 
-const _fetch = ({ query, page, pageSize }: { query?: string; page?: number; pageSize?: number }) => {
-  const search = {
-    query,
-    page,
-    per_page: pageSize,
-  };
-
-  const uri = URI(`${SOURCE_URL}/collectors/summary`).search(search).toString();
-
-  return fetch('GET', URLUtils.qualifyUrl(uri));
-};
+const _fetch = ({ query, page, pageSize }: { query?: string; page?: number; pageSize?: number }) =>
+  SidecarCollectors.listSummary(undefined, page, pageSize, query);
 
 export const fetchCollectorsAll = (): Promise<{ collectors: Array<Collector> }> => {
   const promise = _fetch({ pageSize: 0 });
@@ -89,7 +81,7 @@ export const fetchCollectorsPaginated = ({
 };
 
 export const fetchCollector = (collectorId: string): Promise<Collector> => {
-  const promise = fetch('GET', URLUtils.qualifyUrl(`${SOURCE_URL}/collectors/${collectorId}`));
+  const promise = SidecarCollectors.getCollector(collectorId);
 
   promise.catch((error) => {
     let errorMessage = `Fetching Collector failed with status: ${error}`;
@@ -131,8 +123,7 @@ export const updateCollector = (collector: Collector): Promise<unknown> => {
 };
 
 export const deleteCollector = (collector: Collector): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/collectors/${collector.id}`);
-  const promise = fetch('DELETE', url);
+  const promise = SidecarCollectors.deleteCollector(collector.id);
 
   promise.then(
     () => UserNotification.success('', `Collector "${collector.name}" successfully deleted`),
@@ -148,8 +139,7 @@ export const deleteCollector = (collector: Collector): Promise<unknown> => {
 };
 
 export const copyCollector = (collectorId: string, name: string): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/collectors/${collectorId}/${name}`);
-  const promise = fetch('POST', url);
+  const promise = SidecarCollectors.copyCollector(collectorId, name);
 
   promise.then(
     () => UserNotification.success('', `Collector "${name}" successfully copied`),

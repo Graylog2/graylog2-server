@@ -16,9 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { SystemSearchVersion } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 type VersionCheckType = {
@@ -30,7 +29,7 @@ export const fetchSearchVersionCheck = ({ queryKey }): Promise<VersionCheckType>
   const [, /* queryName */ { distribution, version }] = queryKey;
 
   return defaultOnError(
-    fetch('GET', qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url)),
+    SystemSearchVersion.satisfiesVersion(distribution, version || undefined),
     'Could not fetch override data',
   );
 };

@@ -16,20 +16,17 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import type { ProfileOptions } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = [];
 
-const fetchProfileOptions = async () => {
-  const url = qualifyUrl('/system/indices/index_sets/profiles/all');
-
-  return fetch('GET', url).then((profiles: Array<{ name: string; id: string }>) =>
+const fetchProfileOptions = async () =>
+  SystemIndexSetsFieldTypeProfiles.getAll().then((profiles: Array<{ name: string; id: string }>) =>
     profiles.map(({ name, id }) => ({ value: id, label: name })),
   );
-};
 
 const useProfileOptions = (): {
   options: ProfileOptions;
