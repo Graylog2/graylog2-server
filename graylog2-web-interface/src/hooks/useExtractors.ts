@@ -16,13 +16,11 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import { Extractors } from '@graylog/server-api';
+
 import ExtractorUtils from 'util/ExtractorUtils';
-import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-const SOURCE_URL = '/system/inputs/';
 export const EXTRACTORS_QUERY_KEY = ['extractors'] as const;
 
 export type InputSummary = {
@@ -131,10 +129,10 @@ const getExtractorDTO = (extractor: ExtractorType) => {
 };
 
 export const fetchExtractors = (inputId: string): Promise<{ extractors: Array<ExtractorType> }> =>
-  fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(SOURCE_URL, inputId, 'extractors')));
+  Extractors.list(inputId);
 
 export const fetchExtractor = (inputId: string, extractorId: string): Promise<ExtractorType> =>
-  fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(SOURCE_URL, inputId, 'extractors', extractorId)));
+  Extractors.single(inputId, extractorId);
 
 export const newExtractor = (type: string, field: string) => {
   if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
@@ -151,8 +149,7 @@ export const newExtractor = (type: string, field: string) => {
 };
 
 export const createExtractor = (inputId: string, extractor: ExtractorType): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
-  const promise = fetch('POST', url, getExtractorDTO(extractor));
+  const promise = Extractors.create(inputId, getExtractorDTO(extractor));
 
   promise.then(
     () => UserNotification.success(`Extractor ${extractor.title} created successfully`),
@@ -163,8 +160,7 @@ export const createExtractor = (inputId: string, extractor: ExtractorType): Prom
 };
 
 export const updateExtractor = (inputId: string, extractor: ExtractorType): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
-  const promise = fetch('PUT', url, getExtractorDTO(extractor));
+  const promise = Extractors.update(inputId, extractor.id, getExtractorDTO(extractor));
 
   promise.then(
     () => UserNotification.success(`Extractor "${extractor.title}" updated successfully`),
@@ -183,8 +179,7 @@ export const saveExtractor = (inputId: string, extractor: ExtractorType): Promis
 };
 
 export const deleteExtractor = (inputId: string, extractor: ExtractorType): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
-  const promise = fetch('DELETE', url);
+  const promise = Extractors.terminate(inputId, extractor.id);
 
   promise.then(
     () => UserNotification.success(`Extractor "${extractor.title}" deleted successfully`),
@@ -196,14 +191,13 @@ export const deleteExtractor = (inputId: string, extractor: ExtractorType): Prom
 };
 
 export const orderExtractors = (inputId: string, orderedExtractors: Array<ExtractorType>): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
   const orderedExtractorsMap = {};
 
   orderedExtractors.forEach((extractor, idx) => {
     orderedExtractorsMap[idx] = extractor.id;
   });
 
-  const promise = fetch('POST', url, { order: orderedExtractorsMap });
+  const promise = Extractors.order(inputId, { order: orderedExtractorsMap });
 
   promise.then(
     () => UserNotification.success('Extractor positions updated successfully'),
@@ -220,17 +214,15 @@ export const importExtractors = async (
 ): Promise<{ successful: number; failed: number }> => {
   let successfulImports = 0;
   let failedImports = 0;
-  const promises = extractors.map((extractor) => {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
-
-    return fetch('POST', url, getExtractorDTO(extractor))
+  const promises = extractors.map((extractor) =>
+    Extractors.create(inputId, getExtractorDTO(extractor))
       .then(() => {
         successfulImports += 1;
       })
       .catch(() => {
         failedImports += 1;
-      });
-  });
+      }),
+  );
 
   await Promise.allSettled(promises);
 

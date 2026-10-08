@@ -16,6 +16,8 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { StreamDestinationsFilters } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -33,7 +35,7 @@ const updateStreamOutputRule = async ({ streamId, filterOutputRule }: StreamOutp
     filterOutputRule,
   );
 const removeStreamOutputRule = async ({ streamId, filterId }: { streamId: string; filterId: string }) =>
-  fetch('DELETE', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.delete(streamId, filterId).url));
+  StreamDestinationsFilters.deleteFilter(streamId, filterId);
 
 const useStreamOutputRuleMutation = () => {
   const queryClient = useQueryClient();

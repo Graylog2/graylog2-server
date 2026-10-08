@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { ClusterLookupTable, SystemLookup } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import PaginationURL from 'util/PaginationURL';
@@ -25,17 +27,13 @@ import type { LookupPreviewType } from 'components/lookup-tables/types';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
 const _url = (path: string) => qualifyUrl(`/system/lookup/${path}`);
-const _urlClusterWise = (path: string) => qualifyUrl(`/cluster/system/lookup/${path}`);
 
 // Lookup Tables
 
-export const fetchAllLookupTables = async (resolve: boolean = false): Promise<Array<LookupTable>> => {
-  const url = _url(PaginationURL('tables', 1, 0, undefined, { resolve }));
+export const fetchAllLookupTables = async (resolve: boolean = false): Promise<Array<LookupTable>> =>
+  SystemLookup.tables(undefined, 1, 0, undefined, undefined, resolve).then((response: any) => response.lookup_tables);
 
-  return fetch('GET', url).then((response: any) => response.lookup_tables);
-};
-
-export const deleteLookupTable = async (tableId: string) => fetch('DELETE', _url(`tables/${tableId}`));
+export const deleteLookupTable = async (tableId: string) => SystemLookup.removeTable(tableId);
 
 export const fetchErrors = async ({
   lutNames = undefined,
@@ -68,7 +66,7 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
 };
 
 export const fetchLookupTable = async (idOrName: string): Promise<{ lookup_tables: Array<LookupTable> }> =>
-  fetch('GET', _url(`tables/${idOrName}?resolve=true`));
+  SystemLookup.get(idOrName, true);
 
 export const createLookupTable = async (payload: LookupTableCache) => fetch('POST', _url('tables'), payload);
 
@@ -76,13 +74,12 @@ export const updateLookupTable = async (payload: LookupTableCache) =>
   fetch('PUT', _url(`tables/${(payload as any).id}`), payload);
 
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
-  fetch('POST', _urlClusterWise(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
+  ClusterLookupTable.performPurge(table.id, key);
 
-export const purgeAllLookupTableKey = async (table: LookupTable) =>
-  fetch('POST', _urlClusterWise(`tables/${table.id}/purge`));
+export const purgeAllLookupTableKey = async (table: LookupTable) => ClusterLookupTable.performPurge(table.id);
 
 export const testLookupTableKey = async ({ tableName, key }: { tableName: string; key: string }) =>
-  fetch('GET', _url(`tables/${tableName}/query?key=${encodeURIComponent(key)}`));
+  SystemLookup.performLookup(tableName, key);
 
 export const fetchLookupPreview = async (idOrName: string, size: number): Promise<LookupPreviewType> =>
   fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));
@@ -99,10 +96,9 @@ export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   return fetch('GET', url).then(deserializeCaches);
 };
 
-export const fetchCache = async (idOrName: string): Promise<LookupTableCache> =>
-  fetch('GET', _url(`caches/${idOrName}`));
+export const fetchCache = async (idOrName: string): Promise<LookupTableCache> => SystemLookup.getCache(idOrName);
 
-export const fetchCacheTypes = async () => fetch('GET', _url('types/caches'));
+export const fetchCacheTypes = async () => SystemLookup.availableCacheTypes();
 
 export const validateCache = async (cache: LookupTableCache) => fetch('POST', _url('caches/validate'), cache);
 
@@ -111,7 +107,7 @@ export const createCache = async (payload: LookupTableCache) => fetch('POST', _u
 export const updateCache = async (payload: LookupTableCache) =>
   fetch('PUT', _url(`caches/${(payload as any).id}`), payload);
 
-export const deleteCache = async (cacheId: string) => fetch('DELETE', _url(`caches/${cacheId}`));
+export const deleteCache = async (cacheId: string) => SystemLookup.deleteCache(cacheId);
 
 // Data Adapters
 
@@ -126,9 +122,9 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
 };
 
 export const fetchDataAdapter = async (idOrName: string): Promise<LookupTableAdapter> =>
-  fetch('GET', _url(`adapters/${idOrName}`));
+  SystemLookup.getAdapter(idOrName);
 
-export const fetchDataAdapterTypes = async () => fetch('GET', _url('types/adapters'));
+export const fetchDataAdapterTypes = async () => SystemLookup.availableAdapterTypes();
 
 export const createDataAdapter = async (payload: LookupTableCache) => fetch('POST', _url('adapters'), payload);
 
@@ -138,7 +134,7 @@ export const updateDataAdapter = async (payload: LookupTableCache) =>
 export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
   fetch('POST', _url('adapters/validate'), adapter);
 
-export const deleteDataAdapter = async (adapterId: string) => fetch('DELETE', _url(`adapters/${adapterId}`));
+export const deleteDataAdapter = async (adapterId: string) => SystemLookup.deleteAdapter(adapterId);
 
 export const lookupDataAdapter = async (adapterName: string, key: string) =>
   fetch('GET', _url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));

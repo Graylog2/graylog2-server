@@ -16,9 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { IndexerOverview as IndexerOverviewAPI } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type IndexRange = {
@@ -70,7 +69,7 @@ export type IndexerOverview = {
 };
 
 const fetchIndexerOverview = (indexSetId: string): Promise<IndexerOverview> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
+  IndexerOverviewAPI.indexByindexSetId(indexSetId);
 
 const useIndexerOverview = (indexSetId: string) => {
   const { data, refetch, isLoading, error, isSuccess } = useQuery({
