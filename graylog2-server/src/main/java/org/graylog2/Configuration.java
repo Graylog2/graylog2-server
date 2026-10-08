@@ -26,7 +26,6 @@ import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.util.Size;
-import com.github.joschi.jadconfig.util.SizeUnit;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -43,7 +42,6 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.DocumentationConstants;
 import org.graylog2.configuration.converters.JavaDurationConverter;
-import org.graylog2.configuration.validators.PositiveJavaDurationValidator;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
@@ -68,7 +66,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @SuppressWarnings("FieldMayBeFinal")
 @DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = DocumentationConstants.SERVER_DOCUMENTATION_DESCRIPTION)
-public class Configuration extends CaConfiguration implements CommonNodeConfiguration {
+public class Configuration extends CaConfiguration {
     public static final String SAFE_CLASSES = "safe_classes";
 
     public static final String CONTENT_PACKS_DIR = "content_packs_dir";

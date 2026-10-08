@@ -45,7 +45,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
-import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TLSCipherSuiteSelector;
@@ -596,7 +595,6 @@ public abstract class AbstractNodeCommand implements CliCommand {
         builder.add(binder -> {
             binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
             featureFlagsBinding(binder);
-            binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
         });
         return doCreateInjector(builder.build());
     }
