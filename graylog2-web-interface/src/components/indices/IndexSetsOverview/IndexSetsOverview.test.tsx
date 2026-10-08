@@ -338,7 +338,7 @@ describe('IndexSetsOverview', () => {
 
     await userEvent.click(await screen.findByRole('radio', { name: 'Routing' }));
 
-    await screen.findByRole('button', { name: /sort streams/i });
+    await screen.findByText('Streams');
     within(await findRow(readOnlyIndexSet)).getByText('12');
 
     expect(screen.queryByText('Description')).not.toBeInTheDocument();
