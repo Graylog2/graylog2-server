@@ -17,10 +17,10 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
-  COLLECTOR_FLEET_ID_FIELD,
-  COLLECTOR_INSTANCE_UID_FIELD,
+  AGENT_FLEET_ID_FIELD,
+  AGENT_ID_FIELD,
   COLLECTOR_LOG_RECEIVER_TYPE,
-  COLLECTOR_RECEIVER_TYPE_FIELD,
+  AGENT_RECEIVER_TYPE_FIELD,
 } from 'components/collectors/common/fields';
 import generateId from 'logic/generateId';
 import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -59,7 +59,7 @@ const instanceCountsSearchType = (id: string): AggregationSearchType => ({
   id,
   // `pivot`, not `aggregation` — see the sourceCountsSearchType comment in useCollectorLogPreview.
   type: 'pivot',
-  row_groups: [{ type: 'values', fields: [COLLECTOR_INSTANCE_UID_FIELD], limit: INSTANCE_BUCKET_LIMIT }],
+  row_groups: [{ type: 'values', fields: [AGENT_ID_FIELD], limit: INSTANCE_BUCKET_LIMIT }],
   column_groups: [],
   series: COUNT_SERIES,
   sort: [],
@@ -85,7 +85,7 @@ const buildCountsSearch = (fleetId: string): CountsSearch => {
     .id(ids.queryId)
     .query(
       createElasticsearchQueryString(
-        `${COLLECTOR_FLEET_ID_FIELD}:"${fleetId}" AND NOT ${COLLECTOR_RECEIVER_TYPE_FIELD}:"${COLLECTOR_LOG_RECEIVER_TYPE}"`,
+        `${AGENT_FLEET_ID_FIELD}:"${fleetId}" AND NOT ${AGENT_RECEIVER_TYPE_FIELD}:"${COLLECTOR_LOG_RECEIVER_TYPE}"`,
       ),
     )
     .timerange(countsTimerange)

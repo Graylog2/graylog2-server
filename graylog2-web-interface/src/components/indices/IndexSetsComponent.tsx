@@ -19,7 +19,16 @@ import styled, { css } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { Link, LinkContainer, EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
+import {
+  DefaultLabel,
+  Link,
+  LinkContainer,
+  EntityList,
+  EntityListItem,
+  PaginatedList,
+  SearchForm,
+  Spinner,
+} from 'components/common';
 import { Button, Col, DropdownButton, Label, MenuItem, Row, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -34,9 +43,7 @@ import {
   deleteIndexSet as deleteIndexSetApi,
 } from 'stores/indices/IndexSetsStore';
 import type { IndexSet, IndexSetStats, IndexSetsStats } from 'stores/indices/IndexSetsStore';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Toolbar = styled(Row)(
@@ -84,8 +91,7 @@ const IndexSetsComponent = () => {
   const [indexSetStats, setIndexSetStats] = useState<IndexSetsStats>({});
   const [globalIndexSetStats, setGlobalIndexSetStats] = useState<IndexSetStats>(undefined);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('index-sets');
 
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
@@ -138,8 +144,6 @@ const IndexSetsComponent = () => {
 
   const onSetDefault = (indexSet: IndexSet) => () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DEFAULT_SET, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'index-sets',
       app_action_value: 'set-default-index-set',
     });
 
@@ -152,8 +156,6 @@ const IndexSetsComponent = () => {
 
   const onDeleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DELETED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'index-sets',
       app_action_value: 'delete-index-set',
     });
 
@@ -197,13 +199,7 @@ const IndexSetsComponent = () => {
 
     const indexSetTitle = <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>;
 
-    const isDefault = indexSet.default ? (
-      <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">
-        default
-      </Label>
-    ) : (
-      ''
-    );
+    const isDefault = indexSet.default ? <DefaultLabel key={`index-set-${indexSet.id}-default-label`} /> : '';
     const isReadOnly = !indexSet.writable ? (
       <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">
         read only

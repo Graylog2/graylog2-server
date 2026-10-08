@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback } from 'react';
-
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import type { TelemetryEvent, TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 export type CollectorsSection =
   | 'collectors-overview'
@@ -26,7 +23,8 @@ export type CollectorsSection =
   | 'collectors-fleet-detail'
   | 'collectors-instances'
   | 'collectors-deployment'
-  | 'collectors-settings';
+  | 'collectors-settings'
+  | 'collectors-onboarding';
 
 const sectionForPathname = (pathname: string): CollectorsSection => {
   if (pathname.includes('/system/collectors/fleets/')) return 'collectors-fleet-detail';
@@ -34,22 +32,15 @@ const sectionForPathname = (pathname: string): CollectorsSection => {
   if (pathname.includes('/system/collectors/instances')) return 'collectors-instances';
   if (pathname.includes('/system/collectors/deployment')) return 'collectors-deployment';
   if (pathname.includes('/system/collectors/settings')) return 'collectors-settings';
+  if (pathname.includes('/system/collectors/onboarding')) return 'collectors-onboarding';
 
   return 'collectors-overview';
 };
 
 const useSendCollectorsTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  return useCallback(
-    (eventType: TelemetryEventType, event: TelemetryEvent) => {
-      const section = sectionForPathname(pathname);
-
-      sendTelemetry(eventType, { app_section: section, ...event });
-    },
-    [pathname, sendTelemetry],
-  );
+  return useSendTelemetry(sectionForPathname(pathname));
 };
 
 export default useSendCollectorsTelemetry;

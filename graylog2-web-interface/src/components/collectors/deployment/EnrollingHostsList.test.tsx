@@ -19,6 +19,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
 import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
@@ -26,6 +28,8 @@ import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import EnrollingHostsList from './EnrollingHostsList';
+
+jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstances: jest.fn(),
@@ -62,8 +66,12 @@ describe('EnrollingHostsList', () => {
   const mockInstances = (data: CollectorInstanceView[] | undefined, error: Error | null = null) =>
     asMock(useInstances).mockReturnValue({ data, error } as ReturnType<typeof useInstances>);
 
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
+
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
 
     asMock(useCollectorLogPreview).mockReturnValue({
       selfLogs: undefined,
@@ -162,6 +170,95 @@ describe('EnrollingHostsList', () => {
     const hosts = screen.getAllByText(/host-/);
 
     expect(hosts.map((host) => host.textContent)).toEqual(['host-newer', 'host-older']);
+  });
+
+  describe('telemetry', () => {
+    it('reports the first enrolled host exactly once', () => {
+      mockInstances([]);
+
+      const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
+
+      expect(sendTelemetry).not.toHaveBeenCalled();
+
+      mockInstances([instance('fresh', 'web-prod-02', '2026-08-11T10:00:00Z')]);
+      rerender(<EnrollingHostsList {...defaultProps} />);
+
+      mockInstances([
+        instance('fresh', 'web-prod-02', '2026-08-11T10:00:00Z'),
+        instance('later', 'web-prod-03', '2026-08-11T10:05:00Z'),
+      ]);
+      rerender(<EnrollingHostsList {...defaultProps} />);
+
+      const calls = sendTelemetry.mock.calls.filter(
+        ([event]) => event === TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.FIRST_HOST_ENROLLED,
+      );
+
+      expect(calls).toEqual([
+        [
+          TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.FIRST_HOST_ENROLLED,
+          { app_action_value: 'deployment-first-host-enrolled', fleet_id: 'fleet-1' },
+        ],
+      ]);
+    });
+
+    it('reports expanding and collapsing a host setup row', async () => {
+      const user = userEvent.setup();
+      mockInstances([]);
+
+      const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
+
+      mockInstances([instance('fresh', 'web-prod-02', '2026-08-11T10:00:00Z')]);
+      rerender(<EnrollingHostsList {...defaultProps} />);
+
+      await user.click(screen.getByRole('button', { name: /view setup/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.HOST_SETUP_TOGGLED, {
+        app_action_value: 'deployment-host-setup',
+        expanded: true,
+        instance_id: 'uid-fresh',
+      });
+
+      await user.click(screen.getByRole('button', { name: /hide setup/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.HOST_SETUP_TOGGLED, {
+        app_action_value: 'deployment-host-setup',
+        expanded: false,
+        instance_id: 'uid-fresh',
+      });
+    });
+
+    it('reports the view-all-instances link', async () => {
+      const user = userEvent.setup();
+      mockInstances([]);
+
+      render(<EnrollingHostsList {...defaultProps} />);
+
+      await user.click(screen.getByRole('link', { name: /view all in instances/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.LINK_CLICKED, {
+        app_action_value: 'deployment-view-all-instances',
+        link: 'instances',
+      });
+    });
+
+    it('reports opening an enrolled host in search from the setup view', async () => {
+      const user = userEvent.setup();
+      mockInstances([]);
+
+      const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
+
+      mockInstances([instance('fresh', 'web-prod-02', '2026-08-11T10:00:00Z')]);
+      rerender(<EnrollingHostsList {...defaultProps} />);
+
+      await user.click(screen.getByRole('button', { name: /view setup/i }));
+      await user.click(screen.getByRole('link', { name: /open in search/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.LINK_CLICKED, {
+        app_action_value: 'deployment-open-in-search',
+        link: 'search',
+        instance_id: 'uid-fresh',
+      });
+    });
   });
 
   it('shows an inline notice when polling fails, and keeps listening', () => {

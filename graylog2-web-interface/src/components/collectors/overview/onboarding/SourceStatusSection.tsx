@@ -37,6 +37,7 @@ type Props = {
   receiving: boolean;
   /** Message count per source id for the preview window. `undefined` when the aggregation failed. */
   sourceCounts?: Record<string, number>;
+  onConfigureSources?: () => void;
 };
 
 /* The rows are a three-part flex layout, not a table: the name takes the flexible space, the
@@ -111,6 +112,7 @@ const Footer = styled.div(
 const SOURCE_PLATFORM: Partial<Record<SourceType, string>> = {
   journald: 'linux',
   windows_event_log: 'windows',
+  macos_unified_logging: 'darwin',
 };
 
 /**
@@ -197,7 +199,13 @@ const SourceStatus = ({
  * The fleet's sources with a per-source status: what should be collecting on this host, what
  * cannot apply to its platform, and whether messages are flowing yet.
  */
-const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = undefined }: Props) => {
+const SourceStatusSection = ({
+  instance,
+  sources,
+  receiving,
+  sourceCounts = undefined,
+  onConfigureSources = undefined,
+}: Props) => {
   const online = instance.status === 'online';
 
   return (
@@ -206,7 +214,9 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
       titleAs="h3"
       actions={
         <LinkContainer to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
-          <Button bsSize="xsmall">Configure sources</Button>
+          <Button bsSize="xsmall" onClick={onConfigureSources}>
+            Configure sources
+          </Button>
         </LinkContainer>
       }>
       {!sources?.length ? (

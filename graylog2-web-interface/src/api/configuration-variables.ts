@@ -16,6 +16,8 @@
  */
 import merge from 'lodash/merge';
 
+import { SidecarConfigurationVariables } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -23,7 +25,7 @@ import UserNotification from 'util/UserNotification';
 const SOURCE_URL = '/sidecar/configuration_variables';
 
 export const fetchAllConfigurationVariables = () => {
-  const promise = fetch('GET', qualifyUrl(SOURCE_URL));
+  const promise = SidecarConfigurationVariables.listConfigurationVariables();
 
   promise.catch((error: unknown) => {
     UserNotification.error(
@@ -79,8 +81,7 @@ export const saveConfigurationVariable = (configurationVariable: {
 };
 
 export const deleteConfigurationVariable = (configurationVariable: { id: string; name: string }) => {
-  const url = qualifyUrl(`${SOURCE_URL}/${configurationVariable.id}`);
-  const promise = fetch('DELETE', url);
+  const promise = SidecarConfigurationVariables.deleteConfigurationVariable(configurationVariable.id);
 
   promise.then(
     () => {
@@ -119,8 +120,7 @@ export const validateConfigurationVariable = (configurationVariable: { name?: st
 };
 
 export const getConfigurationsForVariable = (configurationVariable: { id: string }) => {
-  const url = qualifyUrl(`${SOURCE_URL}/${configurationVariable.id}/configurations`);
-  const promise = fetch('GET', url);
+  const promise = SidecarConfigurationVariables.getConfigurationVariablesConfigurations(configurationVariable.id);
 
   promise.catch((error: unknown) => {
     UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);

@@ -76,6 +76,40 @@ versions:
   }
 }
 ```
+### CEF inputs no longer prefix the `source` field with a slash
+
+When a CEF message carries no `deviceAddress`/`dvc` extension and no syslog hostname, the CEF input
+falls back to the sender's socket address for the `source` field. That fallback formatted the address
+with `InetAddress.toString()`, which renders `hostname/1.2.3.4`. Because the CEF input never resolves
+the hostname, the hostname half was always empty and `source` was left with a leading slash
+(`/128.66.23.42`). IPv6 senders were additionally recorded in fully expanded form
+(`0:0:0:0:0:0:0:1`).
+
+`source` now holds the bare address, compressed for IPv6 (`128.66.23.42`, `::1`), which is what every
+other input already does.
+
+This is worth checking if you built anything around the old value. Pipeline rules that strip the
+leading slash off `source`, saved searches or lookup tables keyed on the slash-prefixed form, and
+stream rules matching it will no longer match and should be updated. Messages ingested before the
+upgrade keep their original `source`, so both forms can coexist in existing indices.
+
+### Scripting API default fields on message export
+Per default, we now export all fields in a message on export. Prior to this change, we defaulted to a limited list of 
+fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
+Now you can export with all fields and limit the results by specifying the fields wanted.
+
+### System CPU and Memory Metrics Now Reflect Container Limits When Containerized
+
+When Graylog Server or Data Node runs in a container with cgroup CPU/memory limits configured (e.g. Docker 
+`--memory`/`--cpus`, Kubernetes `resources.limits`), the `org.graylog2.system.cpu.percent` metric and the Data Node 
+metrics `mem_total`, `mem_free`, `mem_total_used_bytes`, and `mem_total_used` now reflect the container's 
+cgroup-scoped limits and usage instead of the underlying host's.
+
+Previously, these metrics always reported host-level values, so a container with a memory limit well below the host's 
+total RAM would show a low, misleadingly small "used" percentage. After upgrading, the same metrics scale to the 
+container's actual limit, so used-percentage values can jump significantly even though nothing about the node's real 
+memory or CPU pressure has changed. Review and, if necessary, adjust any dashboards or alert thresholds built against 
+the old host-scaled values.
 
 ## Web Interface Changes
 
@@ -176,11 +210,53 @@ assigned is now included, and coverage reflects how many of them are enabled ver
 source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
 percentage than it did in 7.1, without any change to the actual installed Event Definitions.
 
+## AWS Kinesis/CloudWatch Input: Required DynamoDB Permissions
+
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5, which calls
+DynamoDB actions that KCL 2.x did not. **This applies to every Kinesis/CloudWatch input, whether it is new or existed
+before 7.2**, so a policy written for an earlier Graylog release can look correct and still deny the input. A policy
+that grants only the actions KCL 2.x needed leaves the input logging an authorization error on a fixed schedule while
+consuming no records. In 7.2 Graylog watches the two calls the consumer cannot work without, DynamoDB lease discovery
+(`Query`) and the Kinesis record fetch (`GetRecords`), and fails the input naming the denied action once one has been
+denied continuously for two minutes; a denial KCL works around, such as one affecting only lease rebalancing, still
+leaves the input running.
+
+In addition to the actions the lease table already needed (`CreateTable`, `DescribeTable`, `GetItem`, `PutItem`,
+`Scan`, `UpdateItem`, `DeleteItem`), KCL 3.5 requires:
+
+- **`dynamodb:Query` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*/index/*`.** KCL 3.5 discovers
+  leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
+  granting `Query` on the table alone still denies this call.
+- **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
+  index on first start. If this is denied, KCL retries the call throughout startup and then aborts, so the input fails
+  with a generic initialization error rather than starting. That is outside the steady-state detection described above,
+  which watches denials of `Query` and `GetRecords` on a running input, but the input still fails visibly instead of
+  consuming nothing.
+
+The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
+access, and how much depends on the input:
+
+- **An input created on 7.2 or later** needs only `dynamodb:DescribeTable` on both. KCL checks whether they exist on
+  every start and treats anything other than "table not found" as a failure, so a policy scoped to the lease table
+  alone prevents the input from starting even though it never had these tables.
+- **An input that existed before 7.2** keeps using both tables until you complete the single-table migration described
+  in the next section. Until then they need the same item-level actions as the lease table (`GetItem`, `PutItem`,
+  `UpdateItem`, `DeleteItem`, `Scan`) in addition to `DescribeTable`: KCL holds its leader lock in
+  `-CoordinatorState` and writes worker metrics to `-WorkerMetricStats` every 30 seconds.
+
+A policy whose resource is `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*` covers the lease table and
+both legacy tables, because their names share that prefix.
+
+If you enable the single-table migration described in the next section, it moves state entities in a DynamoDB
+transaction, which additionally requires `dynamodb:ConditionCheckItem` on the `-CoordinatorState` table alongside
+the item-level actions above. `ConditionCheckItem` is used only by transactions, so policies written for
+non-transactional access usually omit it, and without it the migration never completes while reporting nothing in
+the Graylog UI.
+
 ## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
 
-In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
-The KCL stores its coordination state in DynamoDB. Previously, this used three tables per input: the lease table, plus separate
-`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. The AWS KCL 3.5 introduced a
+The KCL stores its coordination state in DynamoDB. Before KCL 3.5, this used three tables per input: the lease table, plus separate
+`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. KCL 3.5 introduced a
 single-table format that consolidates all of this into the lease table alone (each item is tagged with an
 `entityType` attribute). This reduces the number of DynamoDB tables and helps you stay under account-level table
 limits.
@@ -192,7 +268,7 @@ There are two things to know about how this applies to your inputs:
 - **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
     "Migrate to single DynamoDB table for state tracking" input option.  
 
-To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+To let you migrate existing inputs on your own schedule, the input's **Edit input** dialog exposes a
 **Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
 Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
@@ -208,7 +284,7 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
    attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
    readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
    to fail to start.
-3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+3. Enable the **Migrate to single DynamoDB table for state tracking** option in the input's **Edit input** dialog and save. The
    migration begins.
 4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
    `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
@@ -217,8 +293,10 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
 
-For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
-now-unused legacy tables afterward, see AWS's documentation:
+For how to monitor the migration, along with the migration steps and how to remove the now-unused legacy tables
+afterward, see AWS's documentation. Use the KCL 3.x to 3.5 guide for inputs that were already running KCL 3.x, and the
+KCL 2.x to 3.x guide for inputs that were running KCL 2.x:
 
 - [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 3.x to KCL 3.5](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html)
 - [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

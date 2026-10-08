@@ -17,8 +17,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Modal, Alert } from 'components/bootstrap';
 import { IfPermitted, ModalSubmit } from 'components/common';
@@ -27,8 +26,6 @@ import DecoratorList from 'views/components/messagelist/decorators/DecoratorList
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
@@ -67,13 +64,12 @@ const _updateOrder = (
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const { permissions } = useCurrentUser();
+  const sendTelemetry = useSendTelemetry('decorators');
+  const { isPermitted } = usePermissions();
 
   const canEditStream = useMemo(
-    () => isPermitted(permissions, `streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
-    [currentStream, permissions],
+    () => isPermitted(`streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
+    [currentStream, isPermitted],
   );
 
   const onCreate = useCallback(
@@ -99,11 +95,9 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onSave(modifiedDecorators);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.DECORATORS_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'decorators',
       app_action_value: 'configuration-save',
     });
-  }, [onSave, modifiedDecorators, sendTelemetry, pathname]);
+  }, [onSave, modifiedDecorators, sendTelemetry]);
 
   const currentDecorators = modifiedDecorators.filter(
     (decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream,

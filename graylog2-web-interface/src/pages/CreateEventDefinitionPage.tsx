@@ -23,13 +23,12 @@ import EventDefinitionFormContainer from 'components/event-definitions/event-def
 import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { push } = useHistory();
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
@@ -54,10 +53,10 @@ const CreateEventDefinitionPage = () => {
   }, [push]);
 
   useEffect(() => {
-    if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
+    if (!isPermitted('eventdefinitions:create')) {
       push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, push]);
+  }, [isPermitted, push]);
 
   return (
     <DocumentTitle title={pageTitle}>

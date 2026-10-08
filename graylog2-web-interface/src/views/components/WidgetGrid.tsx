@@ -26,7 +26,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
@@ -219,7 +219,7 @@ const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
 };
 
 const WidgetGrid = () => {
-  const isInteractive = useContext(InteractiveContext);
+  const isInteractive = useIsInteractiveMode();
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();

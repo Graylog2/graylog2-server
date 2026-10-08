@@ -64,6 +64,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     line-height: inherit;
     border-collapse: separate;
     border-spacing: 0;
+    background-color: ${theme.colors.global.contentBackground};
 
     ${$bordered &&
     css`
@@ -112,7 +113,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     }
 
     & tbody > tr {
-      background-color: ${theme.colors.global.contentBackground};
+      background-color: ${theme.colors.table.row.background};
       transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 

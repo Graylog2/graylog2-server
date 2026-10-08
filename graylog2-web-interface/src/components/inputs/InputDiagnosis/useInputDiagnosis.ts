@@ -17,13 +17,13 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemInputs } from '@graylog/server-api';
+
 import { fetchInput } from 'hooks/useInputs';
 import { useMetrics } from 'hooks/useMetrics';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type InputDiagnosisMetrics = {
@@ -87,8 +87,7 @@ const getValueFromMetric = (metric) => {
   }
 };
 
-export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> =>
-  fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
+export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> => SystemInputs.diagnostics(inputId);
 
 const useInputDiagnosis = (
   inputId: string,

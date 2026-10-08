@@ -25,8 +25,6 @@ import { formatTrafficData } from 'util/TrafficUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TrafficGraph, useGraphWidth } from 'components/common/Graph';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
@@ -73,9 +71,8 @@ const TrafficGraphWithDaySelect = ({
 }: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
-  const { pathname } = useLocation();
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic');
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault();
@@ -83,11 +80,7 @@ const TrafficGraphWithDaySelect = ({
 
     setGraphDays(newDays);
 
-    const appSection = trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic';
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
       app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
     });

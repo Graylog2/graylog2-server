@@ -39,6 +39,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SystemNotificationRenderServiceTest {
+    private static final String KINESIS_SINGLE_TABLE_DOCS_URL = "https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html";
+
     static NotificationService notificationService = mock(NotificationService.class);
     static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
     static SystemNotificationRenderService renderService;
@@ -154,6 +156,45 @@ class SystemNotificationRenderServiceTest {
                         }
                     });
         }
+    }
+
+    @Test
+    void kinesisSingleTableMigrationHtmlRender() {
+        notification = new NotificationImpl()
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
+                .addDetail("product_name", "Acme Logs")
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        final SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+
+        assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Kinesis input KCL version update");
+        assertThat(renderResponse.description)
+                .contains("In Acme Logs 7.2,")
+                .contains("review the Acme Logs upgrade documentation and the")
+                .doesNotContain("Graylog")
+                .contains("<br /><br />")
+                .contains("<strong>Migrate to single DynamoDB table for state tracking</strong>")
+                .contains("<a href=\"" + KINESIS_SINGLE_TABLE_DOCS_URL + "\"");
+    }
+
+    @Test
+    void kinesisSingleTableMigrationPlainRender() {
+        notification = new NotificationImpl()
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.KINESIS_SINGLE_TABLE_MIGRATION)
+                .addDetail("product_name", "Acme Logs")
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        final SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
+
+        assertThat(renderResponse.description)
+                .contains("In Acme Logs 7.2,")
+                .contains("review the Acme Logs upgrade documentation and the")
+                .contains("Kinesis Client Library (KCL) 3.5")
+                .contains(KINESIS_SINGLE_TABLE_DOCS_URL)
+                .doesNotContain("<br");
     }
 
     @Test

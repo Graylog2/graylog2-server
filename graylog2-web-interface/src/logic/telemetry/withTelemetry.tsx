@@ -18,9 +18,9 @@ import * as React from 'react';
 
 import useSendTelemetry from './useSendTelemetry';
 
-const withTelemetry = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C) =>
+const withTelemetry = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, appSection?: string) =>
   function WrappedComponent(props: any) {
-    const sendTelemetry = useSendTelemetry();
+    const sendTelemetry = useSendTelemetry(appSection);
 
     return <Component {...props} sendTelemetry={sendTelemetry} />;
   };

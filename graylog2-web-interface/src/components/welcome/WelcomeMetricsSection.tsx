@@ -100,14 +100,16 @@ const WelcomeMetricsContent = () => {
   );
 };
 
+const WelcomeMetricsContainer = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacings.lg};
+`;
+
 const WelcomeMetricsSection = () => {
   const hasAccessToAnyStream = useHasAccessToAnyStream();
 
-  if (!hasAccessToAnyStream) {
-    return <NoStreamAccessAlert />;
-  }
+  const content = !hasAccessToAnyStream ? <NoStreamAccessAlert /> : <WelcomeMetricsContent />;
 
-  return <WelcomeMetricsContent />;
+  return <WelcomeMetricsContainer>{content}</WelcomeMetricsContainer>;
 };
 
 export default WelcomeMetricsSection;

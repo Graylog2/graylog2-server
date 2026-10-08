@@ -16,7 +16,7 @@
  */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -25,7 +25,6 @@ import type { ConfigurationsStoreState, AllowListConfig } from 'stores/configura
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
-import { isPermitted } from 'util/PermissionsMixin';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -40,11 +39,7 @@ type Props = {
 
 const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
-  const [config, setConfig] = useState<AllowListConfig>({
-    entries: [],
-    disabled: false,
-    enforce_for_notifications: false,
-  });
+  const [config, setConfig] = useState<AllowListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
@@ -52,14 +47,14 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlAllowListConfig = configuration[URL_ALLOWLIST_CONFIG];
 
-  const currentUser = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
+  const { isPermitted } = usePermissions();
+  const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, ['urlallowlist:read'])) {
+    if (isPermitted(['urlallowlist:read'])) {
       ConfigurationsActions.listAllowListConfig(URL_ALLOWLIST_CONFIG);
     }
-  }, [currentUser]);
+  }, [isPermitted]);
 
   const setDefaultAllowListState = useCallback(
     (defaultUrlAllowListConfig) => {
@@ -75,7 +70,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
           },
         ],
         disabled: defaultUrlAllowListConfig.disabled,
-        enforce_for_notifications: defaultUrlAllowListConfig.enforce_for_notifications ?? false,
       };
       setNewUrlEntryId(id);
       setConfig(defaultConfig);
@@ -116,7 +110,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
     }
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.URLALLOWLIST_CONFIGURATION_UPDATED, {
-      app_section: 'urlallowlist',
       app_action_value: 'configuration-update',
     });
 
@@ -129,7 +122,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   };
 
   if (urlAllowListConfig) {
-    const { entries, disabled, enforce_for_notifications: enforceForNotifications } = config;
+    const { entries, disabled } = config;
 
     return (
       <>
@@ -151,7 +144,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
             key={newUrlEntryId}
             urls={entries}
             disabled={disabled}
-            enforceForNotifications={enforceForNotifications}
             onUpdate={handleUpdate}
             newEntryId={newUrlEntryId}
           />

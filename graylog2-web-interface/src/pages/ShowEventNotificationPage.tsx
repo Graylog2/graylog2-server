@@ -19,12 +19,11 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
@@ -35,7 +34,7 @@ import PageDescription from 'components/event-notifications/PageDescription';
 import useHistory from '../routing/useHistory';
 
 const ShowEventDefinitionPage = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [notification, setNotification] = useState<EventNotification | undefined>();
   const { notificationId } = useParams();
   const history = useHistory();
@@ -51,7 +50,7 @@ const ShowEventDefinitionPage = () => {
     );
   }, [notificationId]);
 
-  if (!isPermitted(currentUser.permissions, `eventnotifications:read:${notificationId}`)) {
+  if (!isPermitted(`eventnotifications:read:${notificationId}`)) {
     history.push(Routes.NOTFOUND);
   }
 

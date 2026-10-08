@@ -42,14 +42,21 @@ type Props = {
   label: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
+  // Receives the state being switched to, not the one being left.
+  onToggle?: (opened: boolean) => void;
 };
 
-const Collapsible = ({ label, children, defaultOpen = false }: Props) => {
+const Collapsible = ({ label, children, defaultOpen = false, onToggle = undefined }: Props) => {
   const [opened, { toggle }] = useDisclosure(defaultOpen);
+
+  const handleToggle = () => {
+    onToggle?.(!opened);
+    toggle();
+  };
 
   return (
     <Container>
-      <Toggle type="button" onClick={toggle} aria-expanded={opened}>
+      <Toggle type="button" onClick={handleToggle} aria-expanded={opened}>
         <Icon name={opened ? 'keyboard_arrow_down' : 'chevron_right'} />
         {label}
       </Toggle>

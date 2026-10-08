@@ -21,8 +21,6 @@ import styled, { css } from 'styled-components';
 import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
 import { Button, Col, Label, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -116,8 +114,7 @@ const RuleBlockForm = ({
 }: Props) => {
   const [initialValues, setInitialValues] = useState<{}>({});
 
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('pipeline-rule-builder');
 
   useEffect(() => {
     const newInitialValues = {};
@@ -144,8 +141,6 @@ const RuleBlockForm = ({
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_CONDITION_SELECTED
         : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_ACTION_SELECTED,
       {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'pipeline-rule-builder',
         app_action_value: `select-${type}`,
         event_details: { option },
       },
@@ -169,8 +164,6 @@ const RuleBlockForm = ({
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_CONDITION_CLICKED
           : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_ACTION_CLICKED,
         {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'pipeline-rule-builder',
           app_action_value: `update-${type}-button`,
         },
       );
@@ -182,8 +175,6 @@ const RuleBlockForm = ({
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_CONDITION_CLICKED
           : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_ACTION_CLICKED,
         {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'pipeline-rule-builder',
           app_action_value: `add-${type}-button`,
         },
       );

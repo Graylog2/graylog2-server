@@ -16,25 +16,19 @@
  */
 
 import * as React from 'react';
-import { useMemo } from 'react';
 
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 const CreateIndexSetTemplateButton = () => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const { push } = useHistory();
 
   const handleClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'select-index-set-template-opened',
     });
 

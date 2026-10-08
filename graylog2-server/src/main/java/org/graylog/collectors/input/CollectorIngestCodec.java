@@ -31,7 +31,6 @@ import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -59,10 +58,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class CollectorIngestCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestCodec.class);
     public static final String NAME = "CollectorIngest";
-    public static final String FIELD_COLLECTOR_RECEIVER_TYPE = "collector_receiver_type";
-    public static final String FIELD_COLLECTOR_SOURCE_ID = "collector_source_id";
-    public static final String FIELD_COLLECTOR_FLEET_ID = "collector_fleet_id";
-    public static final String FIELD_COLLECTOR_INSTANCE_UID = "collector_instance_uid";
+    public static final String FIELD_AGENT_RECEIVER_TYPE = "agent_receiver_type";
+    public static final String FIELD_AGENT_SOURCE_ID = "agent_source_id";
+    public static final String FIELD_AGENT_FLEET_ID = "agent_fleet_id";
+    public static final String FIELD_AGENT_ID = "agent_id";
 
     private final Configuration configuration;
     private final MessageFactory messageFactory;
@@ -151,16 +150,16 @@ public class CollectorIngestCodec implements Codec {
                 ? messageFactory.createUnaccountedMessage(body, source, timestamp)
                 : messageFactory.createMessage(body, source, timestamp);
 
-        message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, receiverType);
+        message.addField(FIELD_AGENT_RECEIVER_TYPE, receiverType);
 
         if (!instanceUid.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_INSTANCE_UID, instanceUid);
+            message.addField(FIELD_AGENT_ID, instanceUid);
         }
         if (!sourceId.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_SOURCE_ID, sourceId);
+            message.addField(FIELD_AGENT_SOURCE_ID, sourceId);
         }
         if (!fleetId.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_FLEET_ID, fleetId);
+            message.addField(FIELD_AGENT_FLEET_ID, fleetId);
         }
 
         if (!logRecord.getSeverityText().isEmpty()) {
@@ -170,10 +169,19 @@ public class CollectorIngestCodec implements Codec {
             message.addField(VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, logRecord.getSeverityNumberValue());
         }
         if (logRecord.getTimeUnixNano() > 0) {
-            message.addField(EventFields.EVENT_CREATED, Tools.buildElasticSearchTimeFormat(dateTimeFromNano(logRecord.getTimeUnixNano())));
+            message.addField(EventFields.EVENT_CREATED, dateTimeFromNano(logRecord.getTimeUnixNano()));
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            message.addField(EventFields.EVENT_RECEIVED_TIME, Tools.buildElasticSearchTimeFormat(dateTimeFromNano(logRecord.getObservedTimeUnixNano())));
+            message.addField(EventFields.EVENT_RECEIVED_TIME, dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
+        }
+
+        // Set a default event sequence number to serve as a tiebreaker for messages with identical timestamps at
+        // millisecond precision, because we lose the nanosecond precision for OpenSearch date fields. Most processors
+        // will want to override this with a more meaningful sequence number.
+        if (logRecord.getTimeUnixNano() > 0) {
+            message.addField(EventFields.EVENT_SEQUENCE, logRecord.getTimeUnixNano());
+        } else if (logRecord.getObservedTimeUnixNano() > 0) {
+            message.addField(EventFields.EVENT_SEQUENCE, logRecord.getObservedTimeUnixNano());
         }
 
         // TODO: Surface processor errors (e.g. malformed body JSON) as message.addProcessingError()

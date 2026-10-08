@@ -18,22 +18,22 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
+import { Migration } from '@graylog/server-api';
+
 import { ConfirmDialog } from 'components/common';
 import { Button } from 'components/bootstrap';
-import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const resetMigration = async () => fetch('DELETE', qualifyUrl('/migration/state'));
+const resetMigration = async () => Migration.resetState();
 
 const ResetMigrationButton = () => {
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
 
   const { mutateAsync: onResetMigration } = useMutation({
     mutationFn: resetMigration,
@@ -55,7 +55,6 @@ const ResetMigrationButton = () => {
   const handleResetClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     setShowDialog(true);
@@ -64,7 +63,6 @@ const ResetMigrationButton = () => {
   const handleConfirmClick = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CONFIRM_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     await onResetMigration();

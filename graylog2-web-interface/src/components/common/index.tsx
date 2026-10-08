@@ -45,6 +45,7 @@ export { default as CopyToClipboardCapture } from './CopyToClipboardCapture';
 export { default as CountBadge } from './CountBadge';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
+export { default as DefaultLabel } from './DefaultLabel';
 export { default as DefinitionList } from './DefinitionList';
 export { default as Dropzone } from './Dropzone';
 export { default as DocumentTitle } from './DocumentTitle';
@@ -165,3 +166,4 @@ export { default as SearchFiltersFormControls } from './SearchFiltersFormControl
 export { default as ModalButtonToolbar } from './ModalButtonToolbar';
 export { default as AccessibleCard } from './AccessibleCard';
 export { default as StatCard } from './StatCard/StatCard';
+export { default as useChipInput } from './useChipInput';

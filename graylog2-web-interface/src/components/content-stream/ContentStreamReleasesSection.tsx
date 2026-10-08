@@ -28,12 +28,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const ContentStreamReleasesSection = () => {
   const path = 'release-info';
   const { feedList, isLoadingFeed, error } = useContentStream(path);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('content-stream');
 
   const handleSendTelemetry = (feed: FeedItem) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.RELESE_ARTICLE_CLICKED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         title: feed?.title,
         link: feed?.link,

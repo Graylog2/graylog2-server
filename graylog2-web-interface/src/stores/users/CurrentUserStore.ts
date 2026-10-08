@@ -16,9 +16,8 @@
  */
 import Reflux from 'reflux';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { Users } from '@graylog/server-api';
+
 import type { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
@@ -64,10 +63,7 @@ export const CurrentUserStore = singletonStore('core.CurrentUser', () =>
     },
 
     update(username) {
-      return fetch(
-        'GET',
-        qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url),
-      ).then((resp) => {
+      return Users.get(encodeURIComponent(username)).then((resp) => {
         this.currentUser = resp;
         this.trigger({ currentUser: this.currentUser });
 

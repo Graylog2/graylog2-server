@@ -111,7 +111,9 @@ const URLUtils = {
     return acceptedProtocols.includes(url.protocol);
   },
   getPathnameWithoutId(pathname: string) {
-    return pathname.replace(/\/[0-9a-fA-F]{24}/, '').slice(1);
+    return pathname
+      .replace(/\/([0-9a-f]{24}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?=\/|$)/gi, '')
+      .slice(1);
   },
   currentPathname() {
     return window.location.pathname;

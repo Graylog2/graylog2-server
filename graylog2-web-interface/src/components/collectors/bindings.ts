@@ -19,6 +19,8 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import AppConfig from 'util/AppConfig';
+import { COLLECTOR_PERMISSIONS } from 'components/collectors/Permissions';
+import useCanAccessDeployment from 'components/collectors/hooks/useCanAccessDeployment';
 
 export const PAGE_NAV_TITLE = 'Collectors';
 
@@ -31,8 +33,16 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
             { description: 'Overview', path: Routes.SYSTEM.COLLECTORS.OVERVIEW, exactPathMatch: true },
             { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
             { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
-            { description: 'Deployment', path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT },
-            { description: 'Settings', path: Routes.SYSTEM.COLLECTORS.SETTINGS },
+            {
+              description: 'Deployment',
+              path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT,
+              useCondition: useCanAccessDeployment,
+            },
+            {
+              description: 'Settings',
+              path: Routes.SYSTEM.COLLECTORS.SETTINGS,
+              permissions: [COLLECTOR_PERMISSIONS.CONFIGURATION_READ],
+            },
           ],
         },
       ],
@@ -46,7 +56,7 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
             section: 'collectors',
             actionValue: 'create-fleet-button',
           },
-          // TODO we don't have permissions yet      permissions: 'fleets:create',
+          permissions: COLLECTOR_PERMISSIONS.FLEET_CREATE,
         },
       ],
     }

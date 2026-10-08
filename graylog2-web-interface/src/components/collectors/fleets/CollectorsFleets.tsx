@@ -18,24 +18,22 @@ import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
-import { ButtonToolbar } from 'components/bootstrap';
-import { LinkContainer, IconButton } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
 import { FleetFormModal } from './index';
+import FleetActions from './FleetActions';
 import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
-import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_FLEET_ID_FIELD } from '../common/fields';
-import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
+import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
   const { createFleet } = useCollectorsMutations();
+  const { canCreateFleet } = useCollectorPermissions();
   const { pathname } = useLocation();
   const history = useHistory();
 
@@ -46,16 +44,7 @@ const CollectorsFleets = () => {
 
   const fetchEntities = useCallback((searchParams: SearchParams) => fetchPaginatedFleets(searchParams), []);
 
-  const fleetActions = useCallback(
-    (fleet: Fleet) => (
-      <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
-          <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
-        </LinkContainer>
-      </ButtonToolbar>
-    ),
-    [],
-  );
+  const fleetActions = useCallback((fleet: Fleet) => <FleetActions fleet={fleet} />, []);
 
   const closeCreateModal = useCallback(() => {
     history.goBack();
@@ -77,7 +66,7 @@ const CollectorsFleets = () => {
         entityActions={fleetActions}
       />
 
-      {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
+      {showFleetModal && canCreateFleet && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
     </>
   );
 };

@@ -180,7 +180,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
 
 const RightSidebarProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(historyReducer, initialState);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('right-sidebar');
 
   const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
   const canGoBack = state.currentIndex > 0;
@@ -189,7 +189,6 @@ const RightSidebarProvider = ({ children }: Props) => {
   const sendSidebarTelemetry = useCallback(
     (eventType: TelemetryEventType, eventDetails?: Record<string, unknown>) => {
       sendTelemetry(eventType, {
-        app_section: 'right-sidebar',
         ...(eventDetails ? { event_details: eventDetails } : {}),
       });
     },
