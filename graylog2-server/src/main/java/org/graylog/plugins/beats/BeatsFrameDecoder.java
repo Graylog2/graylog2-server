@@ -19,9 +19,9 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,7 +29,6 @@ import io.netty.handler.codec.ReplayingDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +63,8 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         FRAME_WINDOW_SIZE
     }
 
+    public static final int DEFAULT_MAX_COMPRESSED_PAYLOAD_SIZE = 16 * 1024 * 1024;
+    public static final int DEFAULT_MAX_DECOMPRESSED_PAYLOAD_SIZE = 64 * 1024 * 1024;
     private static final int MAX_JSON_FRAME_BYTES = 16 * 1024 * 1024;
     private static final int MAX_DATA_PAIRS = 1024;
     private static final int MAX_DATA_ITEM_BYTES = 1024 * 1024;
@@ -71,8 +72,17 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
     private long windowSize;
     private long sequenceNum;
 
+    private final int maxCompressedPayloadSize;
+    private final int maxDecompressedPayloadSize;
+
     public BeatsFrameDecoder() {
+        this(DEFAULT_MAX_COMPRESSED_PAYLOAD_SIZE, DEFAULT_MAX_DECOMPRESSED_PAYLOAD_SIZE);
+    }
+
+    public BeatsFrameDecoder(int maxCompressedPayloadBytes, int maxDecompressedPayloadBytes) {
         super(DecodingState.PROTOCOL_VERSION);
+        this.maxCompressedPayloadSize = maxCompressedPayloadBytes;
+        this.maxDecompressedPayloadSize = maxDecompressedPayloadBytes;
     }
 
     @Override
@@ -183,13 +193,31 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#compressed-frame-type">'compressed' frame type</a>
      */
     private Collection<ByteBuf> processCompressedFrame(Channel channel, ByteBuf channelBuffer) throws Exception {
-        final long payloadLength = channelBuffer.readUnsignedInt();
-        final byte[] data = new byte[(int) payloadLength];
-        channelBuffer.readBytes(data);
-        try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(data);
-             final InputStream in = new InflaterInputStream(dataStream)) {
-            final ByteBuf buffer = Unpooled.wrappedBuffer(ByteStreams.toByteArray(in));
-            return processCompressedDataFrames(channel, buffer);
+        final int payloadLength = Ints.saturatedCast(channelBuffer.readUnsignedInt());
+        if (payloadLength > maxCompressedPayloadSize) {
+            throw new IllegalStateException("Compressed payload size " + payloadLength + " exceeds maximum " + maxCompressedPayloadSize);
+        }
+        // payload buffer is released by the ByteBufInputStream below (argument releaseOnClose: true)
+        final ByteBuf payload = channelBuffer.readRetainedSlice(payloadLength);
+        try (final InputStream in = new InflaterInputStream(new ByteBufInputStream(payload, true))) {
+            // released below
+            final ByteBuf decompressed = channel.alloc().buffer();
+            // decompress the payload in small chunks so we can stop reading once we hit the configured maximum
+            // without having a gigantic copy in memory
+            try {
+                final byte[] chunk = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(chunk)) != -1) {
+                    if (decompressed.readableBytes() + bytesRead > maxDecompressedPayloadSize) {
+                        throw new IllegalStateException("Decompressed payload size " + (decompressed.readableBytes() + bytesRead) +
+                                " exceeds maximum " + maxDecompressedPayloadSize);
+                    }
+                    decompressed.writeBytes(chunk, 0, bytesRead);
+                }
+                return processCompressedDataFrames(channel, decompressed);
+            } finally {
+                decompressed.release();
+            }
         }
     }
 
