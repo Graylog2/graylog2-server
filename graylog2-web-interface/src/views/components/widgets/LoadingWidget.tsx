@@ -15,28 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
-import { Center } from 'components/common';
-import Spinner from 'components/common/Spinner';
-import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
+import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 
 type Props = {
   visualization?: string;
 };
 
-const LoadingWidget = ({ visualization = undefined }: Props) => {
-  const { widget: Placeholder } = useContext(LoadingPlaceholderContext);
-
-  if (Placeholder) {
-    return <Placeholder visualization={visualization} />;
-  }
-
-  return (
-    <Center>
-      <Spinner data-testid="loading-widget" />
-    </Center>
-  );
-};
+const LoadingWidget = ({ visualization = undefined }: Props) => <WidgetContentSkeleton visualization={visualization} />;
 
 export default LoadingWidget;

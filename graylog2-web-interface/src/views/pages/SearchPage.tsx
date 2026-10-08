@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -34,7 +34,6 @@ import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
-import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
 import IlluminateDashboardViewTelemetry from 'views/components/IlluminateDashboardViewTelemetry';
 
 type Props = React.PropsWithChildren<{
@@ -46,6 +45,7 @@ type Props = React.PropsWithChildren<{
   searchResult?: SearchExecutionResult;
   forceSideBarPinned?: boolean;
   skipNoStreamsCheck?: boolean;
+  loadingPlaceholder?: React.ReactNode;
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -64,6 +64,7 @@ const SearchPage = ({
   searchResult = undefined,
   forceSideBarPinned = false,
   skipNoStreamsCheck = false,
+  loadingPlaceholder = <Spinner />,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -71,7 +72,6 @@ const SearchPage = ({
   const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
   const loadView = useCallback((viewId: string) => _loadView(history, viewId), [_loadView, history]);
   const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
-  const { search: loadingPlaceholder = <Spinner /> } = useContext(LoadingPlaceholderContext);
 
   if (result.status === 'loading') {
     return loadingPlaceholder;
@@ -98,7 +98,7 @@ const SearchPage = ({
               <SearchPageAutoRefreshProvider>
                 {children}
                 <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
-                  <Search forceSideBarPinned={forceSideBarPinned} />
+                  <Search forceSideBarPinned={forceSideBarPinned} loadingPlaceholder={loadingPlaceholder} />
                 </IfUserHasAccessToAnyStream>
               </SearchPageAutoRefreshProvider>
             </ViewLoaderContext.Provider>

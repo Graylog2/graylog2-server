@@ -201,7 +201,7 @@ describe('<Widget />', () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
     render(<DummyWidget />);
 
-    await screen.findByTestId('loading-widget');
+    await screen.findByRole('status', { name: 'Loading widget content' });
   });
 
   it('should render error widget for widget with one error', async () => {
@@ -256,7 +256,7 @@ describe('<Widget />', () => {
 
     await screen.findByTitle('Widget Title');
 
-    expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
+    expect(screen.queryAllByRole('status', { name: 'Loading widget content' })).toHaveLength(0);
   });
 
   it('renders placeholder if widget type is unknown', async () => {

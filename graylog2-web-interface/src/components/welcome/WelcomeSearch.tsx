@@ -22,8 +22,6 @@ import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
-import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
-import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 import type View from 'views/logic/views/View';
 
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
@@ -56,12 +54,14 @@ type Props = {
 const WelcomeSearch = ({ view, entries }: Props) => (
   <InteractiveContext.Provider value="read-only">
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
-      <LoadingPlaceholderContext.Provider
-        value={{ search: <WelcomeSearchSkeleton entries={entries} />, widget: WidgetContentSkeleton }}>
-        <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
-          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-        </SearchPageLayoutProvider>
-      </LoadingPlaceholderContext.Provider>
+      <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
+        <SearchPage
+          view={view}
+          isNew={false}
+          skipNoStreamsCheck
+          loadingPlaceholder={<WelcomeSearchSkeleton entries={entries} />}
+        />
+      </SearchPageLayoutProvider>
     </WidgetActionsContext.Provider>
   </InteractiveContext.Provider>
 );

@@ -25,7 +25,6 @@ import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useIsLoading from 'views/hooks/useIsLoading';
-import LoadingPlaceholderContext from 'views/components/contexts/LoadingPlaceholderContext';
 
 const StyledRow = styled(Row)<{ $hasFocusedWidget: boolean }>(
   ({ $hasFocusedWidget }) => css`
@@ -45,10 +44,13 @@ const SearchLoadingIndicator = () => {
   return isLoading && <LoadingIndicator text="Updating search results..." />;
 };
 
-const SearchResult = React.memo(() => {
+type Props = {
+  loadingPlaceholder?: React.ReactNode;
+};
+
+const SearchResult = React.memo(({ loadingPlaceholder = <Spinner /> }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const { search: loadingPlaceholder = <Spinner /> } = useContext(LoadingPlaceholderContext);
   const hasFocusedWidget = !!focusedWidget?.id;
 
   if (!fieldTypes) {
