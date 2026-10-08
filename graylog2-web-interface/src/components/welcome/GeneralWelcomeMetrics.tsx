@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import useGeneralMetricsSearch from './hooks/useGeneralMetricsSearch';
 import WelcomeSearch from './WelcomeSearch';
+import WelcomeSearchSkeleton from './WelcomeSearchSkeleton';
 
 type Props = {
   topSourcesOnly?: boolean;
@@ -26,7 +27,7 @@ type Props = {
 const GeneralWelcomeMetrics = ({ topSourcesOnly = false }: Props) => {
   const { view, entries } = useGeneralMetricsSearch(topSourcesOnly);
 
-  return <WelcomeSearch view={view} entries={entries} />;
+  return <WelcomeSearch view={view} loadingPlaceholder={<WelcomeSearchSkeleton entries={entries} />} />;
 };
 
 export default GeneralWelcomeMetrics;
