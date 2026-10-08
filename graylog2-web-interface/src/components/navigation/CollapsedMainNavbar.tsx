@@ -70,8 +70,7 @@ const CollapsedMainNavbar = ({ navigationItems }: Props) => {
           const accessibleChildren = children.filter(
             ({ requiredFeatureFlag, permissions, useCondition }) =>
               // eslint-disable-next-line react-hooks/rules-of-hooks
-              (useCondition?.() ?? true) &&
-              shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
+              (useCondition?.() ?? true) && shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
           );
 
           if (!accessibleChildren.length) {
