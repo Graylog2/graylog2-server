@@ -64,6 +64,7 @@ import {
   IndexSetTemplateCreatePage,
   IndexSetTemplateEditPage,
   IndicesPage,
+  IndexManagementPage,
   InputsPage,
   InputDiagnosisPage,
   KeyboardShortcutsPage,
@@ -276,6 +277,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDEX_SETS.FIELD_TYPES(':indexSetId'), element: <IndexSetFieldTypesPage /> },
 
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
+            { path: RoutePaths.SYSTEM.INDICES.MANAGEMENT, element: <IndexManagementPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },

@@ -26,10 +26,10 @@ import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintena
 import CreateButton from 'components/common/CreateButton';
 
 const IndicesPage = () => (
-  <DocumentTitle title="Indices and Index Sets">
+  <DocumentTitle title="Index Sets">
     <IndicesPageNavigation />
     <PageHeader
-      title="Indices & Index Sets"
+      title="Index Sets"
       actions={
         <ButtonToolbar>
           <CreateButton entityKey="Index Set" />

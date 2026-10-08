@@ -21,30 +21,39 @@ import AppConfig from 'util/AppConfig';
 
 export const PAGE_NAV_TITLE = 'Indices';
 
-const PREM_ONLY_NAV_ITEMS = [
-  {
-    description: 'Index Set Templates',
-    path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW,
-    exactPathMatch: false,
-    permissions: 'indexset_templates:read' as const,
-  },
-];
+const INDEX_MANAGEMENT = {
+  description: 'Index Management',
+  path: Routes.SYSTEM.INDICES.MANAGEMENT,
+  exactPathMatch: true,
+  permissions: 'indices:read' as const,
+};
 
-const NAV_ITEMS = [
-  { description: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  {
-    description: 'Field Type Profiles',
-    path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
-    exactPathMatch: false,
-    permissions: 'mappingprofiles:read' as const,
-  },
-];
+const INDEX_SETS = { description: 'Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true };
+
+const INDEX_SET_TEMPLATES = {
+  description: 'Index Set Templates',
+  path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW,
+  exactPathMatch: false,
+  permissions: 'indexset_templates:read' as const,
+};
+
+const FIELD_TYPE_PROFILES = {
+  description: 'Field Type Profiles',
+  path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
+  exactPathMatch: false,
+  permissions: 'mappingprofiles:read' as const,
+};
+
+// Index Set Templates aren't available in Graylog Cloud.
+const NAV_ITEMS = AppConfig.isCloud()
+  ? [INDEX_MANAGEMENT, INDEX_SETS, FIELD_TYPE_PROFILES]
+  : [INDEX_MANAGEMENT, INDEX_SETS, INDEX_SET_TEMPLATES, FIELD_TYPE_PROFILES];
 
 const bindings: PluginExports = {
   pageNavigation: [
     {
       description: PAGE_NAV_TITLE,
-      children: AppConfig.isCloud() ? NAV_ITEMS : [...NAV_ITEMS, ...PREM_ONLY_NAV_ITEMS],
+      children: NAV_ITEMS,
     },
   ],
 };

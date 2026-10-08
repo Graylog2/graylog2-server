@@ -55,7 +55,9 @@ type PluginNavDropdownProps = {
 
 const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }: PluginNavDropdownProps) => {
   const currentUser = useCurrentUser();
-  const activeMenuItem = menuItems.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
+  const activeMenuItem = menuItems.filter(
+    ({ path, activePath, end }) => path && isActiveRoute(pathname, activePath ?? path, end),
+  );
   const title = activeMenuItem.length > 0 ? `${description} / ${activeMenuItem[0].description}` : description;
   const accessibleMenuItems = menuItems.filter(
     ({ requiredFeatureFlag, permissions, useCondition }) =>

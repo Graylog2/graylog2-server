@@ -1,0 +1,62 @@
+{
+  "index" : "graylog_17",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "ALLOCATION_FAILED",
+    "at" : "2026-10-06T15:31:26.078Z",
+    "failed_allocation_attempts" : 5,
+    "details" : "failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_17][0]: Recovery failed on {os-dev-node-0}{rtBtz0HaSxu-1B50379-zA}{wr-NOlKdTlSghG5VE388fQ}{10.40.2.172}{10.40.2.172:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed recovery]; nested: TranslogCorruptedException[translog from source [/usr/share/opensearch/data/nodes/0/indices/CsxybplESu2hkxiRZm_Q2g/0/translog/translog.ckp] is corrupted]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=83886080 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(NIOFSIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/CsxybplESu2hkxiRZm_Q2g/0/translog/translog.ckp\")))]; ",
+    "last_allocation_status" : "no"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes that hold an in-sync shard copy",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "2svFqa49RO2JWKoEAwoX_g",
+      "node_name" : "os-dev-node-1",
+      "transport_address" : "10.40.2.171:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "Ubm6UZfJTACzIT7Ihle31Q",
+      "node_name" : "os-dev-node-2",
+      "transport_address" : "10.40.2.170:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.172:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : true,
+        "allocation_id" : "8bga18NfQAyqdO42xzmtuw"
+      },
+      "deciders" : [
+        {
+          "decider" : "max_retry",
+          "decision" : "NO",
+          "explanation" : "shard has exceeded the maximum number of retries [5] on failed allocation attempts - manually call [/_cluster/reroute?retry_failed=true] to retry, [unassigned_info[[reason=ALLOCATION_FAILED], at[2026-10-06T15:31:26.078Z], failed_attempts[5], failed_nodes[[rtBtz0HaSxu-1B50379-zA]], delayed=false, details[failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_17][0]: Recovery failed on {os-dev-node-0}{rtBtz0HaSxu-1B50379-zA}{wr-NOlKdTlSghG5VE388fQ}{10.40.2.172}{10.40.2.172:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed recovery]; nested: TranslogCorruptedException[translog from source [/usr/share/opensearch/data/nodes/0/indices/CsxybplESu2hkxiRZm_Q2g/0/translog/translog.ckp] is corrupted]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=83886080 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(NIOFSIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/CsxybplESu2hkxiRZm_Q2g/0/translog/translog.ckp\")))]; ], allocation_status[deciders_no]]]"
+        }
+      ]
+    }
+  ]
+}
+

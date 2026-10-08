@@ -52,6 +52,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.management.IndexManagementAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -101,6 +102,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS.class);
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
+        bindForSupportedVersion(IndexManagementAdapter.class).to(IndexManagementAdapterOS.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultOS.Factory.class));
 
