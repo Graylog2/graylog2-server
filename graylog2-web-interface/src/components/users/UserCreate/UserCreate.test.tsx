@@ -49,6 +49,9 @@ jest.mock('@graylog/server-api', () => ({
   Users: {
     checkUsernameAvailability: jest.fn(() => Promise.resolve()),
   },
+  SystemClusterConfig: {
+    read: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('hooks/useAuthzRoles', () => ({
