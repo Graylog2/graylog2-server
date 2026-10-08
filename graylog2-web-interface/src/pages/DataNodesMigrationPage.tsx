@@ -27,9 +27,10 @@ import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import useProductName from 'brand-customization/useProductName';
+import { WIZARD_STEP_LIST_CLASS } from 'components/common/Wizard';
 
 const WizardContainer = styled(Col)`
-  .nav-pills > li > a {
+  .${WIZARD_STEP_LIST_CLASS} > li > button {
     pointer-events: none;
   }
 `;
