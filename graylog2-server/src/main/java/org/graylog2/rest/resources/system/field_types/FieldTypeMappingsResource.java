@@ -18,6 +18,8 @@ package org.graylog2.rest.resources.system.field_types;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +28,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -33,20 +37,30 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.types.ObjectId;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesListService;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
@@ -62,11 +76,18 @@ public class FieldTypeMappingsResource extends RestResource {
 
     private final FieldTypeMappingsService fieldTypeMappingsService;
     private final IndexFieldTypesListService indexFieldTypesListService;
+    private final IndexSetService indexSetService;
+    private final AuditEventSender auditEventSender;
 
     @Inject
-    public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService, final IndexFieldTypesListService indexFieldTypesListService) {
+    public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService,
+                                     final IndexFieldTypesListService indexFieldTypesListService,
+                                     final IndexSetService indexSetService,
+                                     final AuditEventSender auditEventSender) {
         this.fieldTypeMappingsService = fieldTypeMappingsService;
         this.indexFieldTypesListService = indexFieldTypesListService;
+        this.indexSetService = indexSetService;
+        this.auditEventSender = auditEventSender;
     }
 
     @GET
@@ -145,6 +166,90 @@ public class FieldTypeMappingsResource extends RestResource {
         fieldTypeMappingsService.removeProfileFromIndexSets(request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/bulk_set_profile")
+    @Timed
+    @Operation(summary = "Set field type profile for certain index sets, reporting the result per index set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
+    })
+    @NoAuditEvent("Each index set is audited individually")
+    public Map<String, BulkOperationResponse> bulkSetProfile(@Parameter(name = "request")
+                                                             @Valid
+                                                             @NotNull(message = "Request body is mandatory") final FieldTypeProfileChangeRequest request) {
+        return changeProfileOfPermitted(request.indexSetsIds(),
+                Map.of("profile_id", request.profileId(), "rotate", request.rotateImmediately()),
+                permittedIds -> fieldTypeMappingsService.bulkSetProfile(permittedIds, request.profileId(), request.rotateImmediately()));
+    }
+
+    @PUT
+    @Path("/bulk_remove_profile")
+    @Timed
+    @Operation(summary = "Remove field type profile from certain index sets, reporting the result per index set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
+    })
+    @NoAuditEvent("Each index set is audited individually")
+    public Map<String, BulkOperationResponse> bulkRemoveProfile(@Parameter(name = "request")
+                                                                @Valid
+                                                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileUnsetRequest request) {
+        return changeProfileOfPermitted(request.indexSetsIds(),
+                Map.of("rotate", request.rotateImmediately()),
+                permittedIds -> fieldTypeMappingsService.bulkRemoveProfile(permittedIds, request.rotateImmediately()));
+    }
+
+    /**
+     * Denied index sets become per-set failures; a request with no editable index set gets 403.
+     * The audit context carries the index set as {@code response_entity}, where the audit log formatter reads id and title.
+     */
+    private Map<String, BulkOperationResponse> changeProfileOfPermitted(final Set<String> indexSetsIds,
+                                                                        final Map<String, Object> auditContext,
+                                                                        final Function<Set<String>, Map<String, BulkOperationResponse>> change) {
+        if (indexSetsIds.stream().anyMatch(Objects::isNull)) {
+            throw new BadRequestException("Index set ids must not be null");
+        }
+        final AuditActor actor = AuditActor.user(getCurrentUser());
+        final Map<String, Object> requestContext = ImmutableMap.<String, Object>builder()
+                .putAll(auditContext).put("index_sets", indexSetsIds).build();
+        final Set<String> permittedIds = indexSetsIds.stream()
+                .filter(indexSetId -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSetId))
+                .collect(Collectors.toSet());
+        if (permittedIds.isEmpty()) {
+            auditEventSender.failure(actor, INDEX_SET_UPDATE, requestContext);
+            throw new ForbiddenException("Not authorized");
+        }
+
+        final Map<String, String> titles;
+        final Map<String, BulkOperationResponse> result;
+        try {
+            // ids are unvalidated input and findByIds throws on anything that is not an ObjectId
+            titles = indexSetService.findByIds(indexSetsIds.stream().filter(ObjectId::isValid).collect(Collectors.toSet()))
+                    .stream()
+                    .collect(Collectors.toMap(IndexSetConfig::id, IndexSetConfig::title));
+            result = new HashMap<>(change.apply(permittedIds));
+        } catch (RuntimeException e) {
+            auditEventSender.failure(actor, INDEX_SET_UPDATE, requestContext);
+            throw e;
+        }
+        Sets.difference(indexSetsIds, permittedIds).forEach(indexSetId -> result.put(indexSetId,
+                new BulkOperationResponse(0, List.of(new BulkOperationFailure(indexSetId, "Not authorized")))));
+
+        result.forEach((indexSetId, response) -> {
+            final Map<String, Object> context = ImmutableMap.<String, Object>builder()
+                    .putAll(auditContext)
+                    .put("response_entity", Map.of("id", indexSetId, "title", titles.getOrDefault(indexSetId, "")))
+                    .build();
+            if (response.successfullyPerformed() > 0) {
+                auditEventSender.success(actor, INDEX_SET_UPDATE, context);
+            } else {
+                auditEventSender.failure(actor, INDEX_SET_UPDATE, context);
+            }
+        });
+        return result;
     }
 
     @PUT
