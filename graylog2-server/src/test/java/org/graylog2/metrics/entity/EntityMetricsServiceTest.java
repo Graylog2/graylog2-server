@@ -166,6 +166,24 @@ class EntityMetricsServiceTest {
         assertThat(result.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 42L));
     }
 
+    @Test
+    void refresh_recomputesCachedFieldsRegardlessOfFreshness() {
+        cacheService.putFieldBatch(ENTITY_TYPE, "message_count", Map.of("entity-1", Map.of("stream-a", 1L)));
+
+        when(searchUser.canReadStream("stream-a")).thenReturn(true);
+        final var descriptor = new TestCachedDescriptor(
+                "message_count", Duration.ofMinutes(5),
+                Map.of("entity-1", Map.of("stream-a", 42L)));
+
+        final var service = createService(descriptor);
+        service.refresh(List.of("entity-1"));
+        final var result = service.getMetrics(List.of("entity-1"), Set.of("message_count"), searchUser);
+
+        // served from the cache, nothing was recomputed
+        assertThat(result.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 42L));
+        assertThat(descriptor.computeCalls).isEqualTo(1);
+    }
+
     private EntityMetricsService createService(EntityMetricDescriptor descriptor) {
         return new EntityMetricsService(ENTITY_TYPE, Set.of(descriptor), cacheService, new ObjectMapperProvider().get());
     }
