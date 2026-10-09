@@ -32,6 +32,12 @@ import { adminUser } from 'fixtures/users';
 import useIndexSetMutations from 'components/indices/IndexSetsOverview/hooks/useIndexSetMutations';
 import useIndexSetCategoryCounts from 'components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts';
 import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
+import selectEvent from 'helpers/selectEvent';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
+import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldTypes/types';
 
 import IndexSetsOverview from './IndexSetsOverview';
 import type { IndexSetEntity } from './types';
@@ -47,6 +53,10 @@ jest.mock('api/streams', () => ({
 }));
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMutations');
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts');
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation');
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation');
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings');
 jest.mock('components/indices/IndicesConfiguration', () => ({
   __esModule: true,
   default: ({ indexSet }: { indexSet: IndexSetEntity }) => <span>Rotation and retention of {indexSet.title}</span>,
@@ -72,7 +82,20 @@ const readOnlyIndexSet: IndexSetEntity = {
   stream_count: 12,
 };
 
+const eventsIndexSet: IndexSetEntity = {
+  ...exampleIndexSet,
+  id: 'index-set-id-4',
+  title: 'Events index set',
+  index_prefix: 'gl-events',
+  index_template_type: 'events',
+  category: 'system',
+  can_have_profile: false,
+  default: false,
+};
+
 const setDefaultIndexSet = jest.fn();
+const setIndexSetFieldTypeProfile = jest.fn();
+const removeProfileFromIndex = jest.fn();
 
 const restrictedUser = adminUser
   .toBuilder()
@@ -133,6 +156,14 @@ describe('IndexSetsOverview', () => {
     asMock(useIndexSetCategoryCounts).mockReturnValue({
       data: { all: 9, user: 5, system: 4, illuminate: 0 },
     });
+    asMock(useProfileOptions).mockReturnValue({
+      options: [{ value: 'profile-id-1', label: 'My Profile' }],
+      isLoading: false,
+      refetch: () => {},
+    });
+    asMock(useSetIndexSetProfileMutation).mockReturnValue({ setIndexSetFieldTypeProfile, isLoading: false });
+    asMock(useRemoveProfileFromIndexMutation).mockReturnValue({ removeProfileFromIndex, isLoading: false });
+    asMock(useFieldTypesForMappings).mockReturnValue({ data: { fieldTypes: {} }, isLoading: false });
     mockIndexSets();
   });
 
@@ -354,5 +385,170 @@ describe('IndexSetsOverview', () => {
     } finally {
       PluginStore.unregister(plugin);
     }
+  });
+
+  describe('bulk field type profile actions', () => {
+    const selectRow = async (indexSet: IndexSetEntity) =>
+      userEvent.click(within(await findRow(indexSet)).getByRole('checkbox', { name: /select entity/i }));
+
+    const openBulkAction = async (name: RegExp) => {
+      await userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name }));
+    };
+
+    const rowCheckbox = async (indexSet: IndexSetEntity) =>
+      within(await findRow(indexSet)).getByRole('checkbox', { name: /select entity/i });
+
+    beforeEach(() => {
+      mockIndexSets([defaultIndexSet, exampleIndexSet, eventsIndexSet]);
+    });
+
+    it('sets a profile for the selected index sets, skipping those which cannot have one', async () => {
+      setIndexSetFieldTypeProfile.mockResolvedValue({
+        [defaultIndexSet.id]: { indexSetId: defaultIndexSet.id, applied: true, failures: [], errors: [] },
+        [exampleIndexSet.id]: { indexSetId: exampleIndexSet.id, applied: true, failures: [], errors: [] },
+      });
+      render(<IndexSetsOverview />);
+
+      await selectRow(defaultIndexSet);
+      await selectRow(exampleIndexSet);
+      await selectRow(eventsIndexSet);
+      await openBulkAction(/set field type profile/i);
+
+      const modal = await screen.findByRole('dialog');
+      await within(modal).findByText('Applies to 2 index sets, excludes 1.');
+      await within(modal).findByRole('row', { name: /events index set excluded/i });
+
+      await selectEvent.chooseOption('Select index set profile', 'My Profile');
+      await userEvent.click(within(modal).getByRole('button', { name: /set profile/i }));
+
+      expect(setIndexSetFieldTypeProfile).toHaveBeenCalledWith({
+        indexSetIds: [defaultIndexSet.id, exampleIndexSet.id],
+        profileId: 'profile-id-1',
+        rotated: true,
+      });
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      expect(await rowCheckbox(defaultIndexSet)).not.toBeChecked();
+      expect(await rowCheckbox(exampleIndexSet)).not.toBeChecked();
+      expect(await rowCheckbox(eventsIndexSet)).toBeChecked();
+    });
+
+    it('keeps failed index sets selected and the modal open', async () => {
+      removeProfileFromIndex.mockResolvedValue({
+        [readOnlyIndexSet.id]: {
+          indexSetId: readOnlyIndexSet.id,
+          applied: false,
+          failures: ['Not authorized'],
+          errors: [],
+        },
+      });
+      mockIndexSets([defaultIndexSet, readOnlyIndexSet]);
+      render(<IndexSetsOverview />);
+
+      await selectRow(readOnlyIndexSet);
+      await openBulkAction(/remove field type profile/i);
+
+      const modal = await screen.findByRole('dialog');
+      await userEvent.click(within(modal).getByRole('button', { name: /remove profile/i }));
+
+      expect(removeProfileFromIndex).toHaveBeenCalledWith({ indexSetIds: [readOnlyIndexSet.id], rotated: true });
+
+      const alert = await within(modal).findByRole('alert');
+      within(alert).getByText('Not authorized');
+
+      expect(await rowCheckbox(readOnlyIndexSet)).toBeChecked();
+    });
+
+    it('only retries the index sets which were not changed yet', async () => {
+      setIndexSetFieldTypeProfile
+        .mockResolvedValueOnce({
+          [defaultIndexSet.id]: { indexSetId: defaultIndexSet.id, applied: true, failures: [], errors: [] },
+          [exampleIndexSet.id]: {
+            indexSetId: exampleIndexSet.id,
+            applied: false,
+            failures: ['Not authorized'],
+            errors: [],
+          },
+        })
+        .mockResolvedValueOnce({
+          [exampleIndexSet.id]: { indexSetId: exampleIndexSet.id, applied: true, failures: [], errors: [] },
+        });
+      render(<IndexSetsOverview />);
+
+      await selectRow(defaultIndexSet);
+      await selectRow(exampleIndexSet);
+      await openBulkAction(/set field type profile/i);
+
+      const modal = await screen.findByRole('dialog');
+      await selectEvent.chooseOption('Select index set profile', 'My Profile');
+      await userEvent.click(within(modal).getByRole('button', { name: /set profile/i }));
+
+      const alert = await within(modal).findByRole('alert');
+      within(alert).getByText('Not authorized');
+      await within(modal).findByText('Applies to 1 index set.');
+
+      await userEvent.click(within(modal).getByRole('button', { name: /set profile/i }));
+
+      expect(setIndexSetFieldTypeProfile).toHaveBeenLastCalledWith({
+        indexSetIds: [exampleIndexSet.id],
+        profileId: 'profile-id-1',
+        rotated: true,
+      });
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      expect(await rowCheckbox(defaultIndexSet)).not.toBeChecked();
+      expect(await rowCheckbox(exampleIndexSet)).not.toBeChecked();
+    });
+
+    it('keeps showing failures when the refreshed list no longer contains the changed index sets', async () => {
+      let resolveRemoval: (response: ProfileChangeResponse) => void;
+      removeProfileFromIndex.mockReturnValue(
+        new Promise((resolve) => {
+          resolveRemoval = resolve;
+        }),
+      );
+      mockIndexSets([defaultIndexSet, readOnlyIndexSet]);
+      const { rerender } = render(<IndexSetsOverview />);
+
+      await selectRow(readOnlyIndexSet);
+      await openBulkAction(/remove field type profile/i);
+      await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: /remove profile/i }));
+
+      mockIndexSets([]);
+      rerender(<IndexSetsOverview />);
+      await screen.findByText('No index sets have been found.');
+
+      resolveRemoval({
+        [readOnlyIndexSet.id]: {
+          indexSetId: readOnlyIndexSet.id,
+          applied: false,
+          failures: ['Rotation failed'],
+          errors: [],
+        },
+      });
+
+      const alert = await within(screen.getByRole('dialog')).findByRole('alert');
+      within(alert).getByText('Rotation failed');
+    });
+
+    it('offers profile actions to users who may only edit the selected index sets', async () => {
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser
+          .toBuilder()
+          .permissions(
+            Immutable.List(['indexsets:read', `indexsets:edit:${defaultIndexSet.id}`] as Array<Permission>),
+          )
+          .build(),
+      );
+      render(<IndexSetsOverview />);
+
+      await selectRow(defaultIndexSet);
+      await openBulkAction(/set field type profile/i);
+
+      await screen.findByRole('dialog');
+    });
   });
 });

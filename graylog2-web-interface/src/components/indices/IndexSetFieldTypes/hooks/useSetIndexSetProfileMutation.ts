@@ -20,21 +20,30 @@ import { SystemFieldTypes } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type {
+  ProfileChangeResponse,
   SetIndexSetFieldTypeProfileBody,
   SetIndexSetFieldTypeProfileBodyJson,
 } from 'components/indices/IndexSetFieldTypes/types';
+import {
+  parseProfileChangeResponse,
+  refetchAfterProfileChange,
+  resultsWithProblems,
+} from 'components/indices/IndexSetFieldTypes/profileChangeResult';
 
-const putProfile = async ({ indexSetId, profileId, rotated }: SetIndexSetFieldTypeProfileBody) => {
+const putProfile = async ({ indexSetIds, profileId, rotated }: SetIndexSetFieldTypeProfileBody) => {
   const body: SetIndexSetFieldTypeProfileBodyJson = {
-    index_sets: [indexSetId],
+    index_sets: indexSetIds,
     rotate: rotated,
     profile_id: profileId,
   };
 
-  return SystemFieldTypes.setProfile(body);
+  return SystemFieldTypes.bulkSetProfile(body).then(parseProfileChangeResponse);
 };
 
-const useSetIndexSetProfileMutation = () => {
+const useSetIndexSetProfileMutation = (): {
+  setIndexSetFieldTypeProfile: (body: SetIndexSetFieldTypeProfileBody) => Promise<ProfileChangeResponse>;
+  isLoading: boolean;
+} => {
   const queryClient = useQueryClient();
 
   const put = useMutation({
@@ -47,10 +56,12 @@ const useSetIndexSetProfileMutation = () => {
       );
     },
 
-    onSuccess: () => {
-      UserNotification.success('Set index set profile successfully', 'Success!');
+    onSuccess: (response) => {
+      if (resultsWithProblems(response).length === 0) {
+        UserNotification.success('Set index set profile successfully', 'Success!');
+      }
 
-      return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' });
+      return refetchAfterProfileChange(queryClient);
     },
   });
 

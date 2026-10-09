@@ -23,7 +23,7 @@ import UserNotification from 'util/UserNotification';
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemFieldTypes: { removeProfileFromIndexSets: jest.fn(() => Promise.resolve()) },
+  SystemFieldTypes: { bulkRemoveProfile: jest.fn(() => Promise.resolve({})) },
 }));
 
 jest.mock('util/UserNotification', () => ({
@@ -36,7 +36,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
     jest.clearAllMocks();
   });
 
-  const requestBody = { rotated: true, indexSetId: '001' };
+  const requestBody = { rotated: true, indexSetIds: ['001'] };
 
   const requestBodyJSON = {
     index_sets: ['001'],
@@ -44,22 +44,43 @@ describe('useRemoveProfileFromIndexMutation', () => {
   };
 
   it('should run fetch and display UserNotification', async () => {
-    asMock(SystemFieldTypes.removeProfileFromIndexSets).mockImplementation(() => Promise.resolve({}));
+    asMock(SystemFieldTypes.bulkRemoveProfile).mockImplementation(() =>
+      Promise.resolve({ '001': { successfully_performed: 1, failures: [], errors: [] } }),
+    );
     const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody);
     });
 
-    await waitFor(() => expect(SystemFieldTypes.removeProfileFromIndexSets).toHaveBeenCalledWith(requestBodyJSON));
+    await waitFor(() => expect(SystemFieldTypes.bulkRemoveProfile).toHaveBeenCalledWith(requestBodyJSON));
 
     await waitFor(() =>
       expect(UserNotification.success).toHaveBeenCalledWith('Removed profile from index successfully', 'Success!'),
     );
   });
 
+  it('should skip the success notification when an index set failed', async () => {
+    asMock(SystemFieldTypes.bulkRemoveProfile).mockImplementation(() =>
+      Promise.resolve({
+        '001': {
+          successfully_performed: 0,
+          failures: [{ entity_id: '001', failure_explanation: 'Index set not found' }],
+          errors: [],
+        },
+      }),
+    );
+    const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
+
+    await act(async () => {
+      await result.current.removeProfileFromIndex(requestBody);
+    });
+
+    expect(UserNotification.success).not.toHaveBeenCalled();
+  });
+
   it('should display notification on fail', async () => {
-    asMock(SystemFieldTypes.removeProfileFromIndexSets).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemFieldTypes.bulkRemoveProfile).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 

@@ -14,12 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import styled, { css } from 'styled-components';
 
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
+const ScrollContainer = styled.div<{ $maxHeight: number }>(
+  ({ theme, $maxHeight }) => css`
+    max-height: ${$maxHeight}px;
+    overflow-y: auto;
 
-const TEMPLATE_TYPES = ['failures', 'events', 'illuminate_content', 'collector_logs'];
-export const isTemplateTypeAllowsFieldTypeChang = (type: string) => !TEMPLATE_TYPES.includes(type);
-const isIndexFieldTypeChangeAllowed = (indexSet: IndexSet) =>
-  isTemplateTypeAllowsFieldTypeChang(indexSet?.index_template_type);
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
 
-export default isIndexFieldTypeChangeAllowed;
+    &::-webkit-scrollbar-thumb {
+      background-color: ${theme.colors.gray[70]};
+      border-radius: 4px;
+    }
+  `,
+);
+
+export default ScrollContainer;

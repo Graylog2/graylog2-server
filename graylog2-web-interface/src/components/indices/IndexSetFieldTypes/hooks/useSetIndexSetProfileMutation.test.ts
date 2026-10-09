@@ -22,44 +22,80 @@ import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
 
-jest.mock('@graylog/server-api', () => ({ SystemFieldTypes: { setProfile: jest.fn(() => Promise.resolve()) } }));
+jest.mock('@graylog/server-api', () => ({ SystemFieldTypes: { bulkSetProfile: jest.fn(() => Promise.resolve({})) } }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
 
-describe('useRemoveCustomFieldTypeMutation', () => {
+describe('useSetIndexSetProfileMutation', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('removeCustomFieldTypeMutation', () => {
-    const requestBody = { rotated: true, profileId: 'profile-id-111', indexSetId: '001' };
+  describe('setIndexSetFieldTypeProfile', () => {
+    const requestBody = { rotated: true, profileId: 'profile-id-111', indexSetIds: ['001', '002'] };
 
     const requestBodyJSON = {
-      index_sets: ['001'],
+      index_sets: ['001', '002'],
       rotate: true,
       profile_id: 'profile-id-111',
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(SystemFieldTypes.setProfile).mockImplementation(() => Promise.resolve({}));
+      asMock(SystemFieldTypes.bulkSetProfile).mockImplementation(() =>
+        Promise.resolve({
+          '001': { successfully_performed: 1, failures: [], errors: [] },
+          '002': { successfully_performed: 1, failures: [], errors: [] },
+        }),
+      );
       const { result } = renderHook(() => useSetIndexSetProfileMutation());
 
       act(() => {
         result.current.setIndexSetFieldTypeProfile(requestBody);
       });
 
-      await waitFor(() => expect(SystemFieldTypes.setProfile).toHaveBeenCalledWith(requestBodyJSON));
+      await waitFor(() => expect(SystemFieldTypes.bulkSetProfile).toHaveBeenCalledWith(requestBodyJSON));
 
       await waitFor(() =>
         expect(UserNotification.success).toHaveBeenCalledWith('Set index set profile successfully', 'Success!'),
       );
     });
 
+    it('should resolve with the result per index set and skip the success notification on failures', async () => {
+      asMock(SystemFieldTypes.bulkSetProfile).mockImplementation(() =>
+        Promise.resolve({
+          '001': { successfully_performed: 1, failures: [], errors: ['Profile change applied, but rotation failed'] },
+          '002': {
+            successfully_performed: 0,
+            failures: [{ entity_id: '002', failure_explanation: 'Not authorized' }],
+            errors: [],
+          },
+        }),
+      );
+      const { result } = renderHook(() => useSetIndexSetProfileMutation());
+
+      let response: Awaited<ReturnType<typeof result.current.setIndexSetFieldTypeProfile>>;
+
+      await act(async () => {
+        response = await result.current.setIndexSetFieldTypeProfile(requestBody);
+      });
+
+      expect(response).toEqual({
+        '001': {
+          indexSetId: '001',
+          applied: true,
+          failures: [],
+          errors: ['Profile change applied, but rotation failed'],
+        },
+        '002': { indexSetId: '002', applied: false, failures: ['Not authorized'], errors: [] },
+      });
+      expect(UserNotification.success).not.toHaveBeenCalled();
+    });
+
     it('should display notification on fail', async () => {
-      asMock(SystemFieldTypes.setProfile).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(SystemFieldTypes.bulkSetProfile).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useSetIndexSetProfileMutation());
 
