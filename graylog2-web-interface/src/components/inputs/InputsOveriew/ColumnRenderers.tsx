@@ -30,6 +30,7 @@ import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const EXPANDED_SECTION = 'configuration';
 
@@ -70,7 +71,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 150,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (

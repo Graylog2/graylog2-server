@@ -146,7 +146,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
-      staticWidth: 'matchHeader',
+      staticWidth: 130,
     },
   },
 });

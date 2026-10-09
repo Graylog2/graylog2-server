@@ -50,6 +50,7 @@ const customColumnRenderers = (
     },
     type: {
       renderCell: (_type: string, notification) => <NotificationConfigTypeCell notification={notification} />,
+      staticWidth: 230,
     },
     ...(pluggableColumnRenderers || {}),
   },
