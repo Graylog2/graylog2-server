@@ -1,0 +1,5 @@
+type = "f"
+message = "Use field-scoped OR clauses when value actions create queries from array field values."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14322"]
+pulls = ["27364", "Graylog2/graylog-plugin-enterprise#15852"]

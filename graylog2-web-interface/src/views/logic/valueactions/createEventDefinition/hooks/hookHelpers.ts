@@ -29,6 +29,29 @@ import type { FiltersType } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
+import { fieldValueOrClause, formatQueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
+import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
+
+const scalarValue = (value: QueryValue | Array<QueryValue>): QueryValue => (Array.isArray(value) ? value.join(',') : value);
+
+const searchFromValue = ({ field, value, type }: Pick<Parameters<AggregationHandler>[0], 'field' | 'value' | 'type'>) => {
+  if (!Array.isArray(value)) {
+    return `${field}:${formatQueryValue(value, type)}`;
+  }
+
+  if (value.length === 0) {
+    return '';
+  }
+
+  if (value.length === 1) {
+    return `${field}:${formatQueryValue(value[0], type)}`;
+  }
+
+  return fieldValueOrClause(
+    field,
+    value.map((arrayValue: QueryValue) => ({ value: arrayValue, type })),
+  );
+};
 
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
@@ -93,7 +116,7 @@ export const aggregationMetricValueHandler: AggregationHandler = ({ widget, valu
   return {
     aggField: agg_field,
     aggFunction: agg_function,
-    aggValue: value,
+    aggValue: scalarValue(value),
     rowGroupBy: Array.from(flattenRowPivots),
     columnGroupBy: Array.from(flattenColumnPivots),
     rowValuePath,
@@ -101,24 +124,24 @@ export const aggregationMetricValueHandler: AggregationHandler = ({ widget, valu
   };
 };
 
-export const aggregationValueHandler: AggregationHandler = ({ widget, value, field, valuePath }) => {
+export const aggregationValueHandler: AggregationHandler = ({ widget, value, field, valuePath, type }) => {
   const { rowPivots } = widget.config;
   const flattenRowPivots = getFlattenPivots(rowPivots);
   const rowPaths = filtratePathsByPivot({ flattenPivots: flattenRowPivots, valuePath });
   const rowValuePath = transformValuePathToQuery(rowPaths);
 
   return {
-    searchFromValue: `${field}:${escape(value)}`,
+    searchFromValue: searchFromValue({ field, value, type }),
     rowValuePath,
   };
 };
 
-export const messagesValueHandler: AggregationHandler = ({ value, field }) => ({
-  searchFromValue: `${field}:${escape(value)}`,
+export const messagesValueHandler: AggregationHandler = ({ value, field, type }) => ({
+  searchFromValue: searchFromValue({ field, value, type }),
 });
 
-export const logsValueHandler: AggregationHandler = ({ value, field }) => ({
-  searchFromValue: `${field}:${escape(value)}`,
+export const logsValueHandler: AggregationHandler = ({ value, field, type }) => ({
+  searchFromValue: searchFromValue({ field, value, type }),
 });
 
 export const getAggregationHandler = ({ widget, field }: { widget: Widget; field: string }): AggregationHandler => {

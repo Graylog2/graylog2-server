@@ -23,6 +23,7 @@ import type { RootState } from 'views/types';
 import mockDispatch from 'views/test/mockDispatch';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
@@ -109,6 +110,27 @@ describe('ExcludeFromQueryHandler', () => {
     );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
+  });
+
+  it('combines array field values in a negated field scoped OR clause', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'associated_assets',
+        value: ['id1', 'id2', 'id3'],
+        type: new FieldType('associated-assets', [], []),
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'queryId',
+      'answer:42 AND NOT (associated_assets:(id1 OR id2 OR id3))',
+    );
   });
 
   it('appends _exists_ fragment for proper field in case of missing bucket in input', async () => {
