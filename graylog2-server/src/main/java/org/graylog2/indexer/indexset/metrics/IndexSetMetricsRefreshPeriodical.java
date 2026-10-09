@@ -46,6 +46,7 @@ import static org.graylog2.metrics.entity.cache.MetricsCacheConfiguration.METRIC
  */
 public class IndexSetMetricsRefreshPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetMetricsRefreshPeriodical.class);
+    private static final int INITIAL_DELAY_SECONDS = 60;
 
     private final Map<String, EntityCachedMetricDescriptor<?, ?>> descriptorsByField;
     private final MetricsCacheService cacheService;
@@ -111,7 +112,7 @@ public class IndexSetMetricsRefreshPeriodical extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 60;
+        return INITIAL_DELAY_SECONDS;
     }
 
     @Override
