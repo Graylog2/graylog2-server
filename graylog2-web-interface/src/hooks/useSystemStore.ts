@@ -16,6 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { System } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -38,8 +40,7 @@ type SystemInfo = {
   version: string;
 };
 
-export const fetchSystemInfo = (): Promise<SystemInfo> =>
-  fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.info().url));
+export const fetchSystemInfo = (): Promise<SystemInfo> => System.system();
 
 export const fetchSystemJvm = () => fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.jvm().url));
 

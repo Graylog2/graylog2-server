@@ -17,12 +17,11 @@
 import upperFirst from 'lodash/upperFirst';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SidecarAdministration } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import type { SidecarSummary } from 'components/sidecars/types';
 
-const SOURCE_URL = '/sidecar';
 const QUERY_KEY = ['sidecars', 'administration'] as const;
 
 type ListParams = {
@@ -50,7 +49,7 @@ const fetchSidecarsAdministration = ({
   pageSize = 50,
   filters,
 }: ListParams): Promise<ListResponse> =>
-  fetch('POST', qualifyUrl(`${SOURCE_URL}/administration`), {
+  SidecarAdministration.administration({
     query,
     page,
     per_page: pageSize,
@@ -95,7 +94,7 @@ export const useSetSidecarAction = () => {
         collector_ids: collectors[sidecarId],
       }));
 
-      return fetch('PUT', qualifyUrl(`${SOURCE_URL}/administration/action`), {
+      return SidecarAdministration.setAction({
         action,
         collectors: formattedCollectors,
       });
