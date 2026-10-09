@@ -26,6 +26,9 @@ import SeverityCell from './cells/SeverityCell';
 
 const customColumnRenderers = {
   attributes: {
+    node_id: {
+      staticWidth: 300,
+    },
     title: {
       renderCell: (_title: string, row: NotificationType) => <TitleCell row={row} />,
     },

@@ -35,6 +35,9 @@ const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
 
 const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
   attributes: {
+    instance_uid: {
+      staticWidth: 300,
+    },
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
         <InstanceStatusLabel status={instance.status} />

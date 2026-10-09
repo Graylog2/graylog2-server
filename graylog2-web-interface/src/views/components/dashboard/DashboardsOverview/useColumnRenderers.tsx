@@ -26,6 +26,7 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
 import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
@@ -59,6 +60,9 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
   const customColumnRenderers: ColumnRenderers<View> = useMemo(
     () => ({
       attributes: {
+        owner: {
+          staticWidth: COLUMN_WIDTH.user,
+        },
         title: {
           renderCell: (_title: string, dashboard: View) => (
             <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />

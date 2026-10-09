@@ -64,6 +64,9 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
+    node_id: {
+      staticWidth: 300,
+    },
     short_node_id: {
       staticWidth: 'matchHeader',
     },
