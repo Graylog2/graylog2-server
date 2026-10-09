@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
+import com.github.joschi.jadconfig.info.ParameterInfoCollector;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
@@ -58,6 +59,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
+import org.graylog2.configuration.ConfigurationInfoService;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -117,6 +119,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
+    private final ParameterInfoCollector parameterInfoCollector = new ParameterInfoCollector();
     protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
@@ -152,6 +155,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
         jadConfig = new JadConfig();
         addConverters(jadConfig);
+        jadConfig.addParameterListener(parameterInfoCollector);
 
         if (commandName == null) {
             if (this.getClass().isAnnotationPresent(Command.class)) {
@@ -586,6 +590,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         builder.addAll(Arrays.asList(modules));
         builder.add(binder -> {
             binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+            binder.bind(ConfigurationInfoService.class)
+                    .toInstance(new ConfigurationInfoService(parameterInfoCollector.getParameterInfos()));
             featureFlagsBinding(binder);
             binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
         });
