@@ -18,6 +18,7 @@ import React from 'react';
 
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 import BuffersMetricsCell from './cells/BuffersMetricsCell';
@@ -65,7 +66,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
-      minWidth: 300,
+      staticWidth: COLUMN_WIDTH.title,
     },
     is_leader: {
       renderCell: (isLeader: boolean) => (
@@ -79,7 +80,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           <span>{entity.version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      minWidth: 150,
+      staticWidth: 150,
     },
     lifecycle: {
       renderCell: (_value, entity) => <LifecycleCell node={entity} />,

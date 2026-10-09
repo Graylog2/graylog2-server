@@ -24,6 +24,7 @@ import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell'
 import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
 import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import StatusCell from './cells/StatusCell';
 import StreamRulesCell from './cells/StreamRulesCell';
@@ -53,11 +54,10 @@ const customColumnRenderers = (
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
-      width: 0.5,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,

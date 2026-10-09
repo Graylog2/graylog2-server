@@ -49,7 +49,6 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
   attributes: {
     name: {
       renderCell: (_value, entity) => entity.name ?? 'N/A',
-      minWidth: 250,
     },
     role: {
       renderCell: (_value, entity) => {
@@ -65,7 +64,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
 
         return <Label bsSize="xs">{role}</Label>;
       },
-      minWidth: 130,
+      staticWidth: 130,
     },
     version: {
       renderCell: (_value, entity) => (
@@ -73,7 +72,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           <span>{entity.version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      minWidth: 120,
+      staticWidth: 120,
     },
     replication_lag: {
       renderCell: (_value, entity) => (

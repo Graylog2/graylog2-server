@@ -54,7 +54,6 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
   attributes: {
     name: {
       renderCell: (_value, entity) => entity.name ?? 'N/A',
-      minWidth: 250,
     },
     version: {
       renderCell: (_value, entity) => (
@@ -66,7 +65,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
     },
     roles: {
       renderCell: (_value, entity) => getRoleLabels(entity.roles),
-      minWidth: 220,
+      staticWidth: 220,
     },
     cpu_used_percent: {
       renderCell: (_value, entity) => (

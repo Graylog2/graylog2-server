@@ -29,6 +29,7 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 import PriorityName from 'components/events/events/PriorityName';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
@@ -70,8 +71,7 @@ const getCustomColumnRenderers = (
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
         <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
       ),
-      width: 0.15,
-      minWidth: 150,
+      staticWidth: 150,
     },
     priority: {
       renderCell: (priority: number) => <PriorityName priority={priority} />,
@@ -94,8 +94,7 @@ const getCustomColumnRenderers = (
     },
     tags: {
       renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
-      width: 0.2,
-      minWidth: 160,
+      staticWidth: COLUMN_WIDTH.tags,
     },
     ...(tacticsTechniquesPlugin
       ? {
@@ -105,8 +104,7 @@ const getCustomColumnRenderers = (
 
               return <Cell entity={eventDefinition} />;
             },
-            width: 0.2,
-            minWidth: 160,
+            staticWidth: COLUMN_WIDTH.tags,
           },
         }
       : {}),

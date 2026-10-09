@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import BulkActions, { useHasBulkActions } from './BulkActions';
 
@@ -82,29 +83,28 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
   attributes: {
     name: {
       renderCell: (name: string) => <span>{name}</span>,
-      width: 0.3,
     },
     fleet_id: {
       renderCell: (_fleetId: string, token: EnrollmentTokenMetadata) => (
         <Link to={Routes.SYSTEM.COLLECTORS.FLEET(token.fleet_id)}>{fleetNames[token.fleet_id] || token.fleet_id}</Link>
       ),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     created_by: {
       renderCell: (_createdBy: unknown, token: EnrollmentTokenMetadata) => (
         <CreatedByCell username={token.created_by.username} />
       ),
-      width: 0.15,
+      staticWidth: COLUMN_WIDTH.user,
     },
     created_at: {
       renderCell: (_createdAt: string, token: EnrollmentTokenMetadata) => <RelativeTime dateTime={token.created_at} />,
-      width: 0.15,
+      staticWidth: COLUMN_WIDTH.date,
     },
     expires_at: {
       renderCell: (_expiresAt: string | null, token: EnrollmentTokenMetadata) => (
         <ExpiresCell expiresAt={token.expires_at} />
       ),
-      width: 0.15,
+      staticWidth: COLUMN_WIDTH.date,
     },
     usage_count: {
       renderCell: (usageCount: number) => <span>{usageCount}</span>,
@@ -113,7 +113,7 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
     last_used_at: {
       renderCell: (_lastUsedAt: string | null, token: EnrollmentTokenMetadata) =>
         token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <span>Never</span>,
-      width: 0.15,
+      staticWidth: COLUMN_WIDTH.date,
     },
   },
 });
