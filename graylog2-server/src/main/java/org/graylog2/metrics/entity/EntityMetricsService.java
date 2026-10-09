@@ -133,39 +133,18 @@ public class EntityMetricsService {
                 computeAndCache(cachedDescriptors.get(fieldName), ids, searchUser, builder));
     }
 
-    /**
-     * Recomputes and stores every cached field of the given entities, fresh or not.
-     */
-    public void refresh(Collection<String> entityIds) {
-        if (entityIds.isEmpty()) {
-            return;
-        }
-        for (final EntityMetricDescriptor descriptor : descriptorsByField.values()) {
-            if (descriptor instanceof EntityCachedMetricDescriptor<?, ?> cached) {
-                computeAndCache(cached, entityIds);
-            }
-        }
-    }
-
     private <C, R> void computeAndCache(EntityCachedMetricDescriptor<C, R> descriptor,
                                         Collection<String> entityIds,
                                         SearchUser searchUser,
                                         EntityMetricValues.Builder builder) {
-        for (final var metric : computeAndCache(descriptor, entityIds)) {
-            final R filteredValue = descriptor.computeForUser(metric.value(), searchUser);
-            builder.put(metric.entityId(), descriptor.fieldName(), filteredValue);
-        }
-    }
-
-    private <C> List<EntityMetric<C>> computeAndCache(EntityCachedMetricDescriptor<C, ?> descriptor,
-                                                      Collection<String> entityIds) {
         final List<EntityMetric<C>> computed = descriptor.compute(entityIds);
         final Map<String, Object> forCache = new HashMap<>();
         for (final var metric : computed) {
             forCache.put(metric.entityId(), metric.value());
+            final R filteredValue = descriptor.computeForUser(metric.value(), searchUser);
+            builder.put(metric.entityId(), descriptor.fieldName(), filteredValue);
         }
         cacheService.putFieldBatch(entityType, descriptor.fieldName(), forCache);
-        return computed;
     }
 
     private <C, R> R applyFilter(EntityCachedMetricDescriptor<C, R> descriptor,
