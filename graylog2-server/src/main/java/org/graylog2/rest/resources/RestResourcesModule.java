@@ -64,6 +64,7 @@ import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
 import org.graylog2.rest.resources.system.ClusterConfigResource;
 import org.graylog2.rest.resources.system.ClusterResource;
 import org.graylog2.rest.resources.system.ClusterStatsResource;
+import org.graylog2.rest.resources.system.ConfigurationOverridesResource;
 import org.graylog2.rest.resources.system.ConfigurationResource;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.GettingStartedResource;
@@ -153,6 +154,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ClusterResource.class);
         addSystemRestResource(ClusterStatsResource.class);
         addSystemRestResource(ConfigurationResource.class);
+        addSystemRestResource(ConfigurationOverridesResource.class);
         addSystemRestResource(DebugEventsResource.class);
         addSystemRestResource(SupportBundleResource.class);
         addSystemRestResource(SupportBundleClusterResource.class);
