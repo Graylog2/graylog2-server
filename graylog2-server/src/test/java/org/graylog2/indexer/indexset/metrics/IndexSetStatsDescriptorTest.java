@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +64,13 @@ class IndexSetStatsDescriptorTest {
     void malformedIdsAreSkipped() {
         assertThat(indexCount().compute(List.of(A, "not-an-objectid"))).containsExactly(new EntityMetric<>(A, 3L));
         verify(indexSetService).findByIds(Set.of(A));
+    }
+
+    @Test
+    void reportsNoValueWhenTheLookupFails() {
+        when(statsCreator.getForIndexSets(anySet())).thenThrow(new IllegalStateException("Connection refused"));
+
+        assertThat(indexCount().compute(List.of(A))).isEmpty();
     }
 
     private IndexSetStatsDescriptor indexCount() {

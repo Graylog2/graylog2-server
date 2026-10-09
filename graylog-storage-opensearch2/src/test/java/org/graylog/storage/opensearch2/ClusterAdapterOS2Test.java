@@ -27,6 +27,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealt
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.index.search.SimpleQueryStringQueryParser;
+import org.graylog.storage.opensearch2.cat.AliasSummaryResponse;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
@@ -197,13 +198,13 @@ class ClusterAdapterOS2Test {
 
     @Test
     void testDeflectorHealth() {
-        when(catApi.aliases()).thenReturn(Map.of(
-                "foo_deflector", "foo_42",
-                "bar_deflector", "bar_17",
-                "baz_deflector", "baz_23"
+        when(catApi.aliases(any())).thenReturn(List.of(
+                new AliasSummaryResponse("foo_deflector", "foo_42"),
+                new AliasSummaryResponse("bar_deflector", "bar_17"),
+                new AliasSummaryResponse("baz_deflector", "baz_23")
         ));
 
-        when(catApi.indices()).thenReturn(List.of(
+        when(catApi.indexHealth(any())).thenReturn(List.of(
                 new IndexSummaryResponse("foo_42", "", "RED"),
                 new IndexSummaryResponse("bar_17", "", "YELLOW"),
                 new IndexSummaryResponse("baz_23", "", "GREEN")

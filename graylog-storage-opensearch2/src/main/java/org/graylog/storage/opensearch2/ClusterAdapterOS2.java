@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import jakarta.inject.Inject;
@@ -35,6 +36,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
+import org.graylog.storage.opensearch2.cat.AliasSummaryResponse;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
@@ -47,6 +49,7 @@ import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
@@ -419,29 +422,27 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     }
 
     @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        if (indices.isEmpty()) {
-            return Optional.of(HealthStatus.Green);
+    public Map<String, HealthStatus> deflectorHealthByAlias(Collection<String> writeAliases) {
+        final Map<String, String> indexByAlias = singleIndexByAlias(writeAliases);
+        if (indexByAlias.isEmpty()) {
+            return Map.of();
         }
+        final Map<String, HealthStatus> healthByIndex = IndexNameBatching
+                .partitionByJoinedLength(Set.copyOf(indexByAlias.values())).stream()
+                .flatMap(batch -> catApi.indexHealth(batch).stream())
+                .collect(Collectors.toMap(IndexSummaryResponse::index, index -> HealthStatus.fromString(index.health())));
+        return indexByAlias.entrySet().stream()
+                .filter(entry -> healthByIndex.containsKey(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> healthByIndex.get(entry.getValue())));
+    }
 
-        final Map<String, String> aliasMapping = catApi.aliases();
-        final Set<String> mappedIndices = indices
-                .stream()
-                .map(index -> aliasMapping.getOrDefault(index, index))
-                .collect(Collectors.toSet());
-
-        final Set<IndexSummaryResponse> indexSummaries = catApi.indices()
-                .stream()
-                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
-                .collect(Collectors.toSet());
-
-        if (indexSummaries.size() < mappedIndices.size()) {
-            return Optional.empty();
-        }
-
-        return indexSummaries.stream()
-                .map(IndexSummaryResponse::health)
-                .map(HealthStatus::fromString)
-                .min(HealthStatus::compareTo);
+    private Map<String, String> singleIndexByAlias(Collection<String> aliases) {
+        return IndexNameBatching.partitionByJoinedLength(aliases).stream()
+                .flatMap(chunk -> catApi.aliases(chunk).stream())
+                .collect(Collectors.groupingBy(AliasSummaryResponse::alias,
+                        Collectors.mapping(AliasSummaryResponse::index, Collectors.toSet())))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Iterables.getOnlyElement(entry.getValue())));
     }
 }

@@ -22,7 +22,13 @@ import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
+import org.junit.jupiter.api.Test;
+import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
 import org.opensearch.client.opensearch.cat.nodes.NodesRecord;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterOSIT extends ClusterIT {
 
@@ -62,4 +68,11 @@ public class ClusterOSIT extends ClusterIT {
         return clusterAdapterOS.nodeIdToHostName(currentNode.id()).orElse(currentNode.ip());
     }
 
+    @Test
+    public void indexHealth_returns_empty_when_any_requested_index_is_missing() {
+        final String index = client().createRandomIndex("cluster_it_");
+
+        assertThat(clusterAdapterOS.indexHealth(List.of(index))).extracting(IndicesRecord::index).containsExactly(index);
+        assertThat(clusterAdapterOS.indexHealth(List.of(index, "cluster_it_missing"))).isEmpty();
+    }
 }

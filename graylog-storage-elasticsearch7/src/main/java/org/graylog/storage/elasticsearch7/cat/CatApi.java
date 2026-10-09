@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
 import jakarta.inject.Inject;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,13 +48,10 @@ public class CatApi {
         this.client = client;
     }
 
-    public Map<String, String> aliases() {
-        final Request request = request("GET", "aliases");
+    public List<AliasSummaryResponse> aliases(Collection<String> aliases) {
+        final Request request = request("GET", "aliases/" + String.join(",", aliases));
         request.addParameter("h", "alias,index");
-        final List<AliasSummaryResponse> response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
-
-        return response.stream()
-                .collect(Collectors.toMap(AliasSummaryResponse::alias, AliasSummaryResponse::index));
+        return perform(request, new TypeReference<>() {}, "Unable to retrieve aliases");
     }
 
     public List<NodeResponse> nodes() {
@@ -68,6 +65,22 @@ public class CatApi {
         final Request request = request("GET", "indices");
         request.addParameter("h", "index,status,health");
         return perform(request, new TypeReference<>() {}, "Unable to retrieve indices list");
+    }
+
+    public List<IndexSummaryResponse> indexHealth(Collection<String> indices) {
+        final Request request = request("GET", "indices/" + String.join(",", indices));
+        request.addParameter("h", "index,health");
+        return client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            try {
+                return returnType(c.getLowLevelClient().performRequest(request), new TypeReference<>() {});
+            } catch (ResponseException e) {
+                if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                    return List.of();
+                }
+                throw e;
+            }
+        }, "Unable to retrieve index health");
     }
 
     public Set<String> indices(String index, Collection<String> status, String errorMessage) {

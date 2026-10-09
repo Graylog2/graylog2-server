@@ -19,6 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.SearchInstance;
@@ -26,9 +27,12 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterES7IT extends ClusterIT {
     @SearchInstance
@@ -67,6 +71,14 @@ public class ClusterES7IT extends ClusterIT {
     protected String currentHostnameOrIp() {
         final NodeResponse currentNode = currentNode();
         return Optional.ofNullable(currentNode.host()).orElse(currentNode.ip());
+    }
+
+    @Test
+    public void indexHealth_returns_empty_when_any_requested_index_is_missing() {
+        final String index = client().createRandomIndex("cluster_it_");
+
+        assertThat(catApi().indexHealth(List.of(index))).extracting(IndexSummaryResponse::index).containsExactly(index);
+        assertThat(catApi().indexHealth(List.of(index, "cluster_it_missing"))).isEmpty();
     }
 
     private CatApi catApi() {
