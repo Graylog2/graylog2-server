@@ -22,6 +22,8 @@ import jakarta.annotation.Nonnull;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.CommonNodeConfiguration;
+import org.graylog2.GraylogNodeConfiguration;
+import org.graylog2.bootstrap.AbstractNodeCommand;
 import org.graylog2.featureflag.FeatureFlags;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,13 +66,17 @@ public class CommonNodeCommandTest {
     static class CommonNode extends AbstractNodeCommand {
 
         public CommonNode(Path configFile) {
-            super(new CommonNodeConfiguration() {
+            this(null, new CommonNodeConfiguration() {
                 @Parameter("password_secret")
                 String passwordSecret;
                 @Parameter("node_id_file")
                 String nodeIdFile;
             });
             setConfigFile(configFile.toString());
+        }
+
+        public CommonNode(final String commandName, final GraylogNodeConfiguration configuration) {
+            super(commandName, configuration);
         }
 
         @Override

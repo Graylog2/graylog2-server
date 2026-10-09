@@ -18,12 +18,9 @@ package org.graylog2.bindings;
 
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
-
-import java.util.Set;
 
 /**
  * Provides a basic MongoDB connection ready to be used with mongojack
@@ -34,10 +31,5 @@ public class MongoDbConnectionModule extends Graylog2Module {
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(MongoCollections.class).asEagerSingleton();
         bind(MongoJackObjectMapperProvider.class);
-    }
-
-    @Override
-    protected Set<Object> getConfigurationBeans() {
-        return Set.of(new MongoDbConfiguration());
     }
 }
