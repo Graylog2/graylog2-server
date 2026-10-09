@@ -72,6 +72,7 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
                 : 'User Defined'}
             </span>
           ),
+          staticWidth: 110,
         },
         favorite: {
           renderCell: (favorite: boolean, dashboard: View) => (

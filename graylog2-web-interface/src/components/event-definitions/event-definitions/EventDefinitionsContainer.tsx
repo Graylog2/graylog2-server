@@ -55,6 +55,7 @@ const getCustomColumnRenderers = (
     matched_at: {
       renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
         eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {
       renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
@@ -71,7 +72,7 @@ const getCustomColumnRenderers = (
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
         <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
       ),
-      staticWidth: 150,
+      staticWidth: 'matchHeader' as const,
     },
     priority: {
       renderCell: (priority: number) => <PriorityName priority={priority} />,
@@ -82,6 +83,7 @@ const getCustomColumnRenderers = (
         <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
       ),
       textAlign: 'right',
+      staticWidth: 'matchHeader' as const,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -91,6 +93,7 @@ const getCustomColumnRenderers = (
             : 'User Defined'}
         </span>
       ),
+      staticWidth: 110,
     },
     tags: {
       renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,

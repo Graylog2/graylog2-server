@@ -28,6 +28,7 @@ export const COLUMN_WIDTH = {
   tags: 200, // list of badges, e.g. tags or categories
   user: 150,
   date: 160,
+  relativeTime: 140, // e.g. "a few seconds ago"
 } as const;
 export const MORE_ACTIONS_TITLE = 'More';
 export const MORE_ACTIONS_HOVER_TITLE = 'More actions';

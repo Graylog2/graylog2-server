@@ -64,6 +64,9 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
+    short_node_id: {
+      staticWidth: 'matchHeader',
+    },
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
       staticWidth: COLUMN_WIDTH.title,
@@ -102,7 +105,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={CPU_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 130,
+      staticWidth: 80,
     },
     journal: {
       renderCell: (_value, entity) => (

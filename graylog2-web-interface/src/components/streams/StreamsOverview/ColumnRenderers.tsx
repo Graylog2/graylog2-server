@@ -66,7 +66,7 @@ const customColumnRenderers = (
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 160,
+      staticWidth: 120,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
@@ -88,24 +88,24 @@ const customColumnRenderers = (
     },
     [METRIC_COLUMN_IDS.messageCount]: {
       renderCell: (_value: unknown, stream) => <MessageCountCell stream={stream} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.avgProcessingTime]: {
       renderCell: (_value: unknown, stream) => <AvgProcessingTimeCell stream={stream} />,
-      staticWidth: 200,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.maxProcessingTime]: {
       renderCell: (_value: unknown, stream) => <MaxProcessingTimeCell stream={stream} />,
-      staticWidth: 200,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.associatedInputs]: {
       renderCell: (_value: unknown, stream) => <AssociatedInputsCell stream={stream} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader' as const,
       textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
-      staticWidth: 160,
+      staticWidth: 'matchHeader' as const,
       textAlign: 'right',
     },
     ...(extensionColumnRenderers || {}),

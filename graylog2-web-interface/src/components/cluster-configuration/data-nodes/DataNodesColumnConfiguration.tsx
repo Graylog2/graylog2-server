@@ -161,7 +161,7 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
           </SecondaryText>
         );
       },
-      staticWidth: 200,
+      staticWidth: 150,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),

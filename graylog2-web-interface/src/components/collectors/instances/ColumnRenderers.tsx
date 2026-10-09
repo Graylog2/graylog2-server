@@ -39,13 +39,13 @@ const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
       renderCell: (_status: string, instance: CollectorInstanceView) => (
         <InstanceStatusLabel status={instance.status} />
       ),
-      staticWidth: 100,
+      staticWidth: 80,
     },
     has_pending_changes: {
       renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
         <SyncStateIndicator pending={instance.has_pending_changes} />
       ),
-      staticWidth: 60,
+      staticWidth: 'matchHeader',
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (
@@ -67,6 +67,7 @@ const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
       renderCell: (_lastSeen: string, instance: CollectorInstanceView) => (
         <RelativeTime dateTime={instance.last_seen} />
       ),
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     version: {
       renderCell: (version: string) => <span>{version}</span>,

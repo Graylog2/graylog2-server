@@ -30,7 +30,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     type: {
       renderCell: (type: string) => <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ?? type}</Label>,
-      staticWidth: 190,
+      staticWidth: 170,
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (

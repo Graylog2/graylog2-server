@@ -35,7 +35,7 @@ const customColumnRenderers = (): ColumnRenderers<Fleet> => ({
     },
     created_at: {
       renderCell: (_createdAt: string, fleet: Fleet) => <RelativeTime dateTime={fleet.created_at} />,
-      staticWidth: COLUMN_WIDTH.date,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
   },
 });

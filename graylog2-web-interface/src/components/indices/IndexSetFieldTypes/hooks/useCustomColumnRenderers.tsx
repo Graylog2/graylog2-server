@@ -39,7 +39,7 @@ const useCustomColumnRenderers = () => {
               <OriginCell origin={origin} />
             </ExpandedSectionToggleWrapper>
           ),
-          staticWidth: 200,
+          staticWidth: 150,
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>

@@ -111,7 +111,7 @@ export const TagsRenderer = ({
 
 export const eventTypeAttribute = {
   renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
-  staticWidth: 100,
+  staticWidth: 'matchHeader' as const,
 };
 
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
@@ -130,7 +130,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     staticWidth: 260,
   },
   id: {
-    staticWidth: 300,
+    staticWidth: 260,
   },
   alert: eventTypeAttribute,
   priority: {

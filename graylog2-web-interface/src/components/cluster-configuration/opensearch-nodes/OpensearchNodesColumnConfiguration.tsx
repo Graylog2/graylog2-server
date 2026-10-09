@@ -61,7 +61,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
           <span>{entity.version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 120,
+      staticWidth: 'matchHeader',
     },
     roles: {
       renderCell: (_value, entity) => getRoleLabels(entity.roles),
@@ -75,7 +75,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
           dangerThreshold={CPU_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 130,
+      staticWidth: 80,
       textAlign: 'right',
     },
     jvm_heap_used_percent: {
@@ -87,7 +87,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 180,
+      staticWidth: 130,
       textAlign: 'right',
     },
     disk_used_percent: {
@@ -100,7 +100,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
           dangerThreshold={DISK_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 180,
+      staticWidth: 130,
       textAlign: 'right',
     },
   },

@@ -47,6 +47,9 @@ export const DEFAULT_VISIBLE_COLUMNS = [
 
 export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
   attributes: {
+    id: {
+      staticWidth: 'matchHeader',
+    },
     name: {
       renderCell: (_value, entity) => entity.name ?? 'N/A',
     },
@@ -64,7 +67,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
 
         return <Label bsSize="xs">{role}</Label>;
       },
-      staticWidth: 130,
+      staticWidth: 110,
     },
     version: {
       renderCell: (_value, entity) => (
@@ -72,7 +75,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           <span>{entity.version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 120,
+      staticWidth: 'matchHeader',
     },
     replication_lag: {
       renderCell: (_value, entity) => (

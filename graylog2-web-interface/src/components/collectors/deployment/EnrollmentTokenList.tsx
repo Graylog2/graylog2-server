@@ -98,22 +98,22 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
     },
     created_at: {
       renderCell: (_createdAt: string, token: EnrollmentTokenMetadata) => <RelativeTime dateTime={token.created_at} />,
-      staticWidth: COLUMN_WIDTH.date,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     expires_at: {
       renderCell: (_expiresAt: string | null, token: EnrollmentTokenMetadata) => (
         <ExpiresCell expiresAt={token.expires_at} />
       ),
-      staticWidth: COLUMN_WIDTH.date,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     usage_count: {
       renderCell: (usageCount: number) => <span>{usageCount}</span>,
-      staticWidth: 80,
+      staticWidth: 'matchHeader',
     },
     last_used_at: {
       renderCell: (_lastUsedAt: string | null, token: EnrollmentTokenMetadata) =>
         token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <span>Never</span>,
-      staticWidth: COLUMN_WIDTH.date,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
   },
 });

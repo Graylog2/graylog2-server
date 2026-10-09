@@ -138,7 +138,7 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
       textAlign: 'right',
     },
     throughput: {
-      staticWidth: 150,
+      staticWidth: 130,
       renderCell: (_arg: unknown, cache: CacheEntity) => <ThroughputCol cache={cache} />,
       textAlign: 'right',
     },
