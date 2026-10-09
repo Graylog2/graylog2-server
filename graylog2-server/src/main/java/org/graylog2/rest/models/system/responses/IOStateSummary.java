@@ -29,6 +29,7 @@ public abstract class IOStateSummary {
     @JsonProperty
     public abstract String state();
     @JsonProperty
+    @Nullable
     public abstract DateTime startedAt();
 
     @JsonProperty
