@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { Button } from 'components/bootstrap';
-import { Card, ConfirmDialog, FormikInput, RelativeTime } from 'components/common';
+import { Card, FormikInput, RelativeTime } from 'components/common';
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -31,7 +30,6 @@ import type { Fleet } from '../types';
 type Props = {
   fleet: Fleet;
   onSave: (updates: Partial<Fleet>) => Promise<void>;
-  onDelete?: () => Promise<void>;
 };
 
 type FormValues = {
@@ -60,12 +58,6 @@ const InfoValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
 `;
 
-const WarningText = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.gray[60]};
-  margin-bottom: ${({ theme }) => theme.spacings.sm};
-`;
-
 const SectionTitle = styled.h4(
   ({ theme }) => css`
     margin-bottom: ${theme.spacings.sm};
@@ -84,12 +76,10 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+const FleetSettings = ({ fleet, onSave }: Props) => {
   const sendTelemetry = useSendCollectorsTelemetry();
-  const { canEditFleet, canDeleteFleet } = useCollectorPermissions();
+  const { canEditFleet } = useCollectorPermissions();
   const canEdit = canEditFleet(fleet.id);
-  const canDelete = canDeleteFleet(fleet.id);
 
   const initialValues: FormValues = {
     name: fleet.name,
@@ -109,14 +99,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
     },
     [fleet.id, onSave, sendTelemetry],
   );
-
-  const handleConfirmDelete = useCallback(async () => {
-    await onDelete?.();
-    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.DELETED, {
-      app_action_value: 'fleet-delete',
-      fleet_id: fleet.id,
-    });
-  }, [fleet.id, onDelete, sendTelemetry]);
 
   return (
     <div>
@@ -166,30 +148,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
           </InfoRow>
         </div>
       </Section>
-
-      {canDelete && (
-        <Section>
-          <SectionTitle>Danger Zone</SectionTitle>
-          <WarningText>
-            Deleting a fleet removes all source configurations and unenrolls all Collector instances. Instances will
-            stop collecting data and must be re-enrolled into a new fleet.
-          </WarningText>
-          <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
-            Delete Fleet
-          </Button>
-        </Section>
-      )}
-
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          title="Delete fleet"
-          show
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All source configurations will be removed
-          and Collector instances will stop collecting data. Instances must be re-enrolled into a new fleet.
-        </ConfirmDialog>
-      )}
     </div>
   );
 };

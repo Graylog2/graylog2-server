@@ -21,9 +21,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
@@ -33,6 +35,7 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
@@ -88,6 +91,11 @@ public class ClusterAdapterOS implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(this::healthStatusFrom);
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(this::healthStatusFrom);
     }
 
     private HealthStatus healthStatusFrom(HealthResponse response) {
@@ -382,6 +390,25 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    private Optional<HealthResponse> clusterHealth(java.time.Duration timeout) {
+        // clusterManagerTimeout defaults to 30s, which would outlive the caller's budget server-side.
+        final Time bound = new Time.Builder().time(timeout.toMillis() + "ms").build();
+        try {
+            final HealthResponse health = opensearchClient.executeWithClientTimeout(
+                    asyncClient -> asyncClient.cluster().health(HealthRequest.builder()
+                            .timeout(bound)
+                            .clusterManagerTimeout(bound)
+                            .build()),
+                    "Unable to retrieve cluster health",
+                    Duration.milliseconds(timeout.toMillis()));
+            return Optional.of(health);
+        } catch (Exception e) {
+            // Broader than the un-timed variant's IOException: an error response throws a runtime OpenSearchException.
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
     @Override
     public int countOfClusterManagerEligibleNodes() {
         return (int)nodesInfo().values().stream()
@@ -398,50 +425,54 @@ public class ClusterAdapterOS implements ClusterAdapter {
             );
             return Optional.of(health);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
         }
     }
 
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
+        }
+    }
+
     @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        if (indices.isEmpty()) {
-            return Optional.of(HealthStatus.Green);
+    public Map<String, HealthStatus> deflectorHealthByAlias(Collection<String> writeAliases) {
+        final Map<String, String> indexByAlias = singleIndexByAlias(writeAliases);
+        if (indexByAlias.isEmpty()) {
+            return Map.of();
         }
+        final Map<String, HealthStatus> healthByIndex = IndexNameBatching
+                .partitionByJoinedLength(Set.copyOf(indexByAlias.values())).stream()
+                .flatMap(batch -> indexHealth(batch).stream())
+                .collect(Collectors.toMap(IndicesRecord::index, index -> HealthStatus.fromString(index.health())));
+        return indexByAlias.entrySet().stream()
+                .filter(entry -> healthByIndex.containsKey(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> healthByIndex.get(entry.getValue())));
+    }
 
-        final Map<String, String> aliasMapping;
-        aliasMapping = opensearchClient.sync(c -> c.cat().aliases().valueBody()
-                        .stream()
-                        .filter(alias -> Objects.nonNull(alias.index()))
-                        .collect(Collectors.toMap(AliasesRecord::alias, AliasesRecord::index)),
-                "Unable to retrieve aliases"
-        );
+    private Map<String, String> singleIndexByAlias(Collection<String> aliases) {
+        return IndexNameBatching.partitionByJoinedLength(aliases).stream()
+                .flatMap(chunk -> opensearchClient
+                        .sync(c -> c.cat().aliases(r -> r.name(chunk)).valueBody(), "Unable to retrieve aliases").stream())
+                .collect(Collectors.groupingBy(record -> Objects.requireNonNull(record.alias()),
+                        Collectors.mapping(AliasesRecord::index, Collectors.toSet())))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Iterables.getOnlyElement(entry.getValue())));
+    }
 
-        final Set<String> mappedIndices = indices
-                .stream()
-                .map(index -> aliasMapping.getOrDefault(index, index))
-                .collect(Collectors.toSet());
-
-        final Set<IndicesRecord> indexSummaries = opensearchClient.sync(client ->
-                        client.cat().indices().valueBody()
-                                .stream()
-                                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
-                                .collect(Collectors.toSet()),
-                "Unable to retrieve indices");
-
-        if (indexSummaries.size() < mappedIndices.size()) {
-            return Optional.empty();
+    List<IndicesRecord> indexHealth(List<String> indices) {
+        try {
+            return opensearchClient
+                    .sync(c -> c.cat().indices(r -> r.index(indices).headers("index", "health")).valueBody(),
+                            "Unable to retrieve index health");
+        } catch (IndexNotFoundException e) {
+            return List.of();
         }
-
-        return indexSummaries.stream()
-                .map(IndicesRecord::health)
-                .map(HealthStatus::fromString)
-                .min(HealthStatus::compareTo);
-
     }
 
     public String getClusterSetting(String setting) {

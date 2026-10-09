@@ -18,6 +18,8 @@ import URI from 'urijs';
 import merge from 'lodash/merge';
 import { useQuery } from '@tanstack/react-query';
 
+import { SidecarConfigurations } from '@graylog/server-api';
+
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
@@ -95,7 +97,7 @@ export const fetchConfigurationsPaginated = ({
 };
 
 export const fetchConfiguration = (configurationId: string): Promise<Configuration> => {
-  const promise = fetch('GET', URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/${configurationId}`));
+  const promise = SidecarConfigurations.getConfigurations(configurationId);
 
   promise.catch((error) => {
     let errorMessage = `Fetching Configuration failed with status: ${error}`;
@@ -111,7 +113,7 @@ export const fetchConfiguration = (configurationId: string): Promise<Configurati
 };
 
 export const fetchConfigurationSidecars = (configurationId: string): Promise<ConfigurationSidecarsResponse> => {
-  const promise = fetch('GET', URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/${configurationId}/sidecars`));
+  const promise = SidecarConfigurations.getConfigurationSidecars(configurationId);
 
   promise.catch((error) => {
     let errorMessage = `Fetching Configuration failed with status: ${error}`;
@@ -127,7 +129,7 @@ export const fetchConfigurationSidecars = (configurationId: string): Promise<Con
 };
 
 export const renderConfigurationPreview = (template: string): Promise<{ preview: string }> => {
-  const promise = fetch('POST', URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/render/preview`), { template });
+  const promise = SidecarConfigurations.renderConfiguration({ template });
 
   promise.catch((error) => {
     UserNotification.error(`Fetching configuration preview failed with status: ${error}`, 'Could not retrieve preview');
@@ -137,8 +139,7 @@ export const renderConfigurationPreview = (template: string): Promise<{ preview:
 };
 
 export const createConfiguration = (configuration: Configuration): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/configurations`);
-  const promise = fetch('POST', url, configuration);
+  const promise = SidecarConfigurations.createConfiguration(configuration);
 
   promise.then(
     () => UserNotification.success('', 'Configuration successfully created'),
@@ -154,8 +155,7 @@ export const createConfiguration = (configuration: Configuration): Promise<unkno
 };
 
 export const updateConfiguration = (configuration: Configuration): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/${configuration.id}`);
-  const promise = fetch('PUT', url, configuration);
+  const promise = SidecarConfigurations.updateConfiguration(configuration.id, configuration);
 
   promise.then(
     () => UserNotification.success('', 'Configuration successfully updated'),
@@ -188,8 +188,7 @@ export const copyConfiguration = (configurationId: string, name: string): Promis
 };
 
 export const deleteConfiguration = (configuration: Configuration): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/${configuration.id}`);
-  const promise = fetch('DELETE', url);
+  const promise = SidecarConfigurations.deleteConfiguration(configuration.id);
 
   promise.then(
     () => UserNotification.success('', `Configuration "${configuration.name}" successfully deleted`),

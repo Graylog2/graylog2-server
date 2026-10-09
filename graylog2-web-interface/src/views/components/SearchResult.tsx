@@ -44,13 +44,17 @@ const SearchLoadingIndicator = () => {
   return isLoading && <LoadingIndicator text="Updating search results..." />;
 };
 
-const SearchResult = React.memo(() => {
+type Props = {
+  loadingPlaceholder?: React.ReactNode;
+};
+
+const SearchResult = React.memo(({ loadingPlaceholder = <Spinner /> }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const hasFocusedWidget = !!focusedWidget?.id;
 
   if (!fieldTypes) {
-    return <Spinner />;
+    return loadingPlaceholder;
   }
 
   return (

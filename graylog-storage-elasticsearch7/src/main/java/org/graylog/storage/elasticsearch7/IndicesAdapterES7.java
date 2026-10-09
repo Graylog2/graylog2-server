@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -38,7 +39,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
@@ -107,6 +110,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.elasticsearch7.ElasticsearchClient.withTimeout;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
@@ -372,7 +376,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public Map<String, Set<String>> aliases(String indexPattern) {
         final GetAliasesRequest request = new GetAliasesRequest()
                 .indices(indexPattern)
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                // allowNoIndices: a pattern without indices must not fail a lookup over several patterns
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, false));
         final GetAliasesResponse result = client.execute((c, requestOptions) -> c.indices().getAlias(request, requestOptions),
                 "Couldn't collect aliases for index pattern " + indexPattern);
         return result.getAliases()
@@ -392,8 +397,33 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public Set<String> closedIndices(Collection<String> indices) {
-        return catApi.indices(indices, Collections.singleton("close"),
-                "Unable to retrieve list of closed indices for " + indices);
+        if (indices.isEmpty()) {
+            return Set.of();
+        }
+        final String errorMessage = f("Unable to retrieve list of closed indices for %s", indices);
+        try {
+            return resolveClosedIndices(indices, errorMessage);
+        } catch (ElasticsearchException e) {
+            if (!isForbidden(e)) {
+                throw e;
+            }
+            LOG.debug("Resolve index API is forbidden, falling back to the cat API", e);
+            return catApi.indices(indices, Collections.singleton("close"), errorMessage);
+        }
+    }
+
+    private Set<String> resolveClosedIndices(Collection<String> indices, String errorMessage) {
+        final Request request = new Request("GET", f("/_resolve/index/%s", String.join(",", indices)));
+        request.addParameter("expand_wildcards", "closed,hidden");
+        return client.executeRequest(request, errorMessage).path("indices").valueStream()
+                .filter(index -> index.path("attributes").valueStream().map(JsonNode::asText).anyMatch("closed"::equals))
+                .map(index -> index.path("name").asText())
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean isForbidden(ElasticsearchException e) {
+        return e.getCause() instanceof ResponseException cause
+                && cause.getResponse().getStatusLine().getStatusCode() == 403;
     }
 
     @Override

@@ -21,8 +21,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
@@ -36,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -43,6 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +59,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     private IndexSetRegistry indexSetRegistry;
 
     protected Cluster cluster;
+    private ClusterAdapter adapter;
 
     protected abstract ClusterAdapter clusterAdapter(Duration timeout);
 
@@ -72,7 +77,8 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
                 new ThreadFactoryBuilder().setNameFormat("cluster-it-%d").build()
         );
         final Duration requestTimeout = Duration.seconds(1L);
-        cluster = new Cluster(indexSetRegistry, scheduler, requestTimeout, clusterAdapter(requestTimeout));
+        adapter = clusterAdapter(requestTimeout);
+        cluster = new Cluster(indexSetRegistry, scheduler, requestTimeout, adapter);
     }
 
     @Test
@@ -108,6 +114,22 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
             assertThat(node.jvmMemHeapMaxInBytes()).isGreaterThan(0);
             assertThat(node.roles()).isNotEmpty();
         });
+    }
+
+    @Test
+    public void clusterShardAllocation() {
+        client().createRandomIndex("cluster_it_");
+
+        final ClusterShardAllocation allocation = cluster.clusterShardAllocation();
+
+        // Elasticsearch leaves the maximum unbounded on purpose (see ClusterAdapterES7), OpenSearch reads the real
+        // cluster.max_shards_per_node; both are positive, and the notification path only compares a ratio of it.
+        assertThat(allocation.maxShardsPerNode()).isPositive();
+        assertThat(allocation.nodeShardAllocations()).isNotEmpty();
+        assertThat(allocation.nodeShardAllocations()).allSatisfy(node ->
+                assertThat(node.node()).isNotBlank());
+        assertThat(allocation.nodeShardAllocations().stream().mapToInt(NodeShardAllocation::shards).sum())
+                .isGreaterThanOrEqualTo(1);
     }
 
     @Test
@@ -151,6 +173,23 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{});
         final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
         assertThat(deflectorHealth).contains(HealthStatus.Green);
+    }
+
+    @Test
+    public void deflectorHealthByAlias_maps_each_alias_with_one_index_to_its_health() {
+        final String greenIndex = client().createRandomIndex("cluster_it_green_");
+        final String yellowIndex = "cluster_it_yellow_" + System.nanoTime();
+        // the single node cannot allocate the replica, which keeps the index yellow
+        client().createIndex(yellowIndex, 1, 1);
+        client().addAliasMapping(greenIndex, "green_alias");
+        client().addAliasMapping(yellowIndex, "yellow_alias");
+        client().addAliasMapping(greenIndex, "shared_alias");
+        client().addAliasMapping(yellowIndex, "shared_alias");
+
+        final Map<String, HealthStatus> health = adapter.deflectorHealthByAlias(
+                List.of("green_alias", "yellow_alias", "shared_alias", "missing_alias"));
+
+        assertThat(health).containsOnly(entry("green_alias", HealthStatus.Green), entry("yellow_alias", HealthStatus.Yellow));
     }
 
     @Test

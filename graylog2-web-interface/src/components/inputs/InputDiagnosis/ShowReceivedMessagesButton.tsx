@@ -17,12 +17,11 @@
 import React from 'react';
 
 import { Button } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import type { Input } from 'components/messageloaders/Types';
 import { LinkContainer } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import Routes from 'routing/Routes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -31,7 +30,7 @@ type Props = {
 };
 
 const ShowReceivedMessagesButton = ({ input }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const sendTelemetry = useSendTelemetry();
 
   const queryField =
@@ -39,7 +38,7 @@ const ShowReceivedMessagesButton = ({ input }: Props) => {
       ? 'gl2_forwarder_input'
       : 'gl2_source_input';
 
-  if (input?.id && isPermitted(currentUser.permissions, ['searches:relative'])) {
+  if (input?.id && isPermitted(['searches:relative'])) {
     return (
       <LinkContainer
         key={`received-messages-${input.id}`}

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import jakarta.inject.Inject;
@@ -29,9 +30,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog.storage.elasticsearch7.cat.AliasSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
@@ -44,6 +48,7 @@ import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
@@ -62,6 +67,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -87,6 +94,11 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(response -> healthStatusFrom(response.getStatus()));
     }
 
     private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
@@ -145,8 +157,11 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterShardAllocation clusterShardAllocation() {
-        // unsupported in Elasticsearch, return empty
-        return new ClusterShardAllocation(Integer.MAX_VALUE, List.of());
+        // maxShardsPerNode stays unbounded on purpose. #22228 scoped its cluster.max_shards_per_node notification to
+        // OpenSearch, and IndexerClusterCheckerThread only notifies above a ratio of the maximum, so an unreachable
+        // maximum keeps that notification off here. Reading the real setting would newly arm it on every
+        // Elasticsearch cluster.
+        return new ClusterShardAllocation(Integer.MAX_VALUE, catApi.getNodeShardAllocations());
     }
 
     @Override
@@ -360,39 +375,68 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                     .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
         }
     }
 
-    @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        if (indices.isEmpty()) {
-            return Optional.of(HealthStatus.Green);
-        }
+    private Optional<ClusterHealthResponse> clusterHealth(java.time.Duration timeout) {
+        final TimeValue bound = TimeValue.timeValueMillis(timeout.toMillis());
+        final ClusterHealthRequest request = new ClusterHealthRequest().timeout(bound);
+        // Defaults to 30s, which would outlive the caller's budget server-side.
+        request.masterNodeTimeout(bound);
 
-        final Map<String, String> aliasMapping = catApi.aliases();
-        final Set<String> mappedIndices = indices
-                .stream()
-                .map(index -> aliasMapping.getOrDefault(index, index))
-                .collect(Collectors.toSet());
-
-        final Set<IndexSummaryResponse> indexSummaries = catApi.indices()
-                .stream()
-                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
-                .collect(Collectors.toSet());
-
-        if (indexSummaries.size() < mappedIndices.size()) {
+        final PlainActionFuture<ClusterHealthResponse> future = new PlainActionFuture<>();
+        final Cancellable cancellable = client.clusterHealthAsync(request, future);
+        try {
+            return Optional.of(future.get(timeout.toMillis(), TimeUnit.MILLISECONDS));
+        } catch (TimeoutException e) {
+            // Logged explicitly: a TimeoutException carries no message, so the generic handler would log "null".
+            cancellable.cancel();
+            LOG.warn("Search cluster did not answer the health request within {}ms; treating it as unreachable.", timeout.toMillis());
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            cancellable.cancel();
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (Exception e) {
+            cancellable.cancel();
+            logHealthFailure(e);
             return Optional.empty();
         }
+    }
 
-        return indexSummaries.stream()
-                .map(IndexSummaryResponse::health)
-                .map(HealthStatus::fromString)
-                .min(HealthStatus::compareTo);
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
+        }
+    }
+
+    @Override
+    public Map<String, HealthStatus> deflectorHealthByAlias(Collection<String> writeAliases) {
+        final Map<String, String> indexByAlias = singleIndexByAlias(writeAliases);
+        if (indexByAlias.isEmpty()) {
+            return Map.of();
+        }
+        final Map<String, HealthStatus> healthByIndex = IndexNameBatching
+                .partitionByJoinedLength(Set.copyOf(indexByAlias.values())).stream()
+                .flatMap(batch -> catApi.indexHealth(batch).stream())
+                .collect(Collectors.toMap(IndexSummaryResponse::index, index -> HealthStatus.fromString(index.health())));
+        return indexByAlias.entrySet().stream()
+                .filter(entry -> healthByIndex.containsKey(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> healthByIndex.get(entry.getValue())));
+    }
+
+    private Map<String, String> singleIndexByAlias(Collection<String> aliases) {
+        return IndexNameBatching.partitionByJoinedLength(aliases).stream()
+                .flatMap(chunk -> catApi.aliases(chunk).stream())
+                .collect(Collectors.groupingBy(AliasSummaryResponse::alias,
+                        Collectors.mapping(AliasSummaryResponse::index, Collectors.toSet())))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Iterables.getOnlyElement(entry.getValue())));
     }
 }

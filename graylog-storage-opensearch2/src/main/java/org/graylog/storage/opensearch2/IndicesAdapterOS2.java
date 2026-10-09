@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -38,7 +39,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
@@ -107,6 +110,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndicesAdapterOS2 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
@@ -373,7 +377,8 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Map<String, Set<String>> aliases(String indexPattern) {
         final GetAliasesRequest request = new GetAliasesRequest()
                 .indices(indexPattern)
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                // allowNoIndices: a pattern without indices must not fail a lookup over several patterns
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, false));
         final GetAliasesResponse result = client.execute((c, requestOptions) -> c.indices().getAlias(request, requestOptions),
                 "Couldn't collect aliases for index pattern " + indexPattern);
         return result.getAliases()
@@ -393,8 +398,33 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public Set<String> closedIndices(Collection<String> indices) {
-        return catApi.indices(indices, Collections.singleton("close"),
-                "Unable to retrieve list of closed indices for " + indices);
+        if (indices.isEmpty()) {
+            return Set.of();
+        }
+        final String errorMessage = f("Unable to retrieve list of closed indices for %s", indices);
+        try {
+            return resolveClosedIndices(indices, errorMessage);
+        } catch (OpenSearchException e) {
+            if (!isForbidden(e)) {
+                throw e;
+            }
+            LOG.debug("Resolve index API is forbidden, falling back to the cat API", e);
+            return catApi.indices(indices, Collections.singleton("close"), errorMessage);
+        }
+    }
+
+    private Set<String> resolveClosedIndices(Collection<String> indices, String errorMessage) {
+        final Request request = new Request("GET", f("/_resolve/index/%s", String.join(",", indices)));
+        request.addParameter("expand_wildcards", "closed,hidden");
+        return client.executeRequest(request, errorMessage).path("indices").valueStream()
+                .filter(index -> index.path("attributes").valueStream().map(JsonNode::asText).anyMatch("closed"::equals))
+                .map(index -> index.path("name").asText())
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean isForbidden(OpenSearchException e) {
+        return e.getCause() instanceof ResponseException cause
+                && cause.getResponse().getStatusLine().getStatusCode() == 403;
     }
 
     @Override

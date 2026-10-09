@@ -21,7 +21,6 @@ import styled from 'styled-components';
 import merge from 'lodash/merge';
 
 import { Alert } from 'components/bootstrap';
-import Spinner from 'components/common/Spinner';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -36,9 +35,10 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 
 const config = AggregationWidgetConfig.builder()
-  .visualization('line')
+  .visualization('area')
   .rowPivots([Pivot.create(['timestamp'], DateType)])
   .columnPivots([Pivot.createValues(['type'])])
   .series([Series.forFunction('count()')])
@@ -69,6 +69,7 @@ const generateChart = (
     name: type,
     x,
     y,
+    fill: 'tozeroy',
     originalName: type,
     line: {
       shape: 'linear',
@@ -217,7 +218,11 @@ const EventsHistogram = ({
   );
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <GraphContainer $height={height}>
+        <WidgetContentSkeleton visualization="area" />
+      </GraphContainer>
+    );
   }
 
   if (isError || !data) {

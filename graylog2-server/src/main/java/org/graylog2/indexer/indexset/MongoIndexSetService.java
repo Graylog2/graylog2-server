@@ -26,6 +26,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
@@ -41,7 +42,6 @@ import org.graylog2.streams.StreamService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -53,6 +53,7 @@ import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_
 import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
 import static org.graylog2.indexer.indexset.fields.IndexPrefixField.FIELD_INDEX_PREFIX;
 
+@Singleton
 public class MongoIndexSetService implements IndexSetService {
     public static final String COLLECTION_NAME = "index_sets";
     public static final String FIELD_TITLE = "title";
@@ -148,8 +149,8 @@ public class MongoIndexSetService implements IndexSetService {
 
     @Override
     public List<IndexSetConfig> searchByTitle(String searchString) {
-        String formatedSearchString = String.format(Locale.getDefault(), ".*%s.*", searchString);
-        Pattern searchPattern = Pattern.compile(formatedSearchString, Pattern.CASE_INSENSITIVE);
+        // Quote the input: it is a literal search term, not a regular expression.
+        final Pattern searchPattern = Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE);
 
         return ImmutableList.copyOf(collection.find(Filters.regex(FIELD_TITLE, searchPattern))
                 .sort(Sorts.ascending(FIELD_TITLE)));

@@ -15,15 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { NavItem as BootstrapNavItem } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
 
 import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+import { NAVBAR_GAP, NAV_ITEM_HEIGHT } from 'theme/constants';
 
-const NavItem = ({ children = undefined, ...props }: React.ComponentProps<typeof NavItem>) => (
-  <BootstrapNavItem {...props}>
+const NavigationLink = styled.a<{ $withMinHeight: boolean }>(
+  ({ theme, $withMinHeight }) => css`
+    color: ${theme.colors.text.primary};
+    ${$withMinHeight &&
+    css`
+      min-height: ${NAV_ITEM_HEIGHT};
+    `}
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: ${NAVBAR_GAP}px;
+    padding-right: ${NAVBAR_GAP}px;
+
+    &:hover,
+    &:focus {
+      color: ${theme.colors.variant.darker.default};
+      background-color: transparent;
+
+      text-decoration: none;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+  `,
+);
+const NavItem = ({
+  children = undefined,
+  withMinHeight = true,
+  ...props
+}: React.ComponentProps<typeof NavItem> & { withMinHeight?: boolean }) => (
+  <NavigationLink {...props} $withMinHeight={withMinHeight}>
     <NavItemStateIndicator>{children}</NavItemStateIndicator>
-  </BootstrapNavItem>
+  </NavigationLink>
 );
 
 NavItem.displayName = 'NavItem';

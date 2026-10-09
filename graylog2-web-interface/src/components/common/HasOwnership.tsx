@@ -16,9 +16,7 @@
  */
 import * as React from 'react';
 
-import { createGRN } from 'logic/permissions/GRN';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { hasAdminPermission } from 'util/PermissionsMixin';
+import useHasEntityOwnership from 'hooks/useHasEntityOwnership';
 
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
@@ -30,7 +28,7 @@ type Props = {
 };
 
 const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: Props) => {
-  const currentUser = useCurrentUser();
+  const hasOwnership = useHasEntityOwnership(id, type);
 
   if (typeof children !== 'function') {
     throw new Error('Invalid prop: "children" must be a function.');
@@ -40,18 +38,7 @@ const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: 
     return null;
   }
 
-  if (currentUser) {
-    const { grnPermissions = [], permissions } = currentUser;
-    const isAdmin = hasAdminPermission(permissions);
-    const entity = createGRN(type, id);
-    const ownership = `entity:own:${entity}`;
-
-    if (grnPermissions.includes(ownership) || isAdmin) {
-      return <>{children({ disabled: false })} </>;
-    }
-  }
-
-  return <>{children({ disabled: true })} </>;
+  return <>{children({ disabled: !hasOwnership })} </>;
 };
 
 export default HasOwnership;

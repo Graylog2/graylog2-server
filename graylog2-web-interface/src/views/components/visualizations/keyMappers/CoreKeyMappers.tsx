@@ -21,6 +21,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import { useInputs } from 'hooks/useInputs';
 import useNodeSummaries from 'hooks/useNodeSummaries';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
@@ -47,6 +48,7 @@ const CoreKeyMappers: PluginExports['visualizationKeyMappers'] = [
   { type: 'streams', useKeyMapper: useStreamsKeyMapper },
   { type: 'input', useKeyMapper: useInputKeyMapper },
   { type: 'node', useKeyMapper: useNodeKeyMapper },
+  { type: 'priority', useKeyMapper: () => getPriorityName },
 ];
 
 export default CoreKeyMappers;

@@ -28,18 +28,23 @@ import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import { createView } from 'views/api/views';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
+jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/api/views', () => ({
@@ -111,7 +116,11 @@ describe('DashboardActionsMenu', () => {
     await userEvent.click(saveAsMenuItem);
   };
 
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
+    sendTelemetry.mockClear();
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCurrentUser).mockReturnValue(
       adminUser
         .toBuilder()
@@ -121,6 +130,11 @@ describe('DashboardActionsMenu', () => {
     );
 
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   it('should save a new dashboard', async () => {
@@ -156,6 +170,24 @@ describe('DashboardActionsMenu', () => {
       .build();
 
     await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
+  });
+
+  it('does not send Illuminate clone telemetry when duplicating a non-Illuminate dashboard', async () => {
+    render(<SUT view={mockView} />);
+
+    await openDashboardSaveForm();
+    await submitDashboardSaveForm();
+
+    await waitFor(() => expect(createView).toHaveBeenCalled());
+
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED,
+      expect.anything(),
+    );
+    expect(sendTelemetry).not.toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.ILLUMINATE_DASHBOARD_CLONED,
+      expect.anything(),
+    );
   });
 
   it('should open edit dashboard meta information modal', async () => {
@@ -221,5 +253,78 @@ describe('DashboardActionsMenu', () => {
     render(<SUT />);
     await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
+  });
+
+  describe('with an immutable scope', () => {
+    const immutableView = mockView.toBuilder().scope('ILLUMINATE').build();
+
+    beforeEach(() => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useScopePermissions).mockReturnValue({
+        loadingScopePermissions: false,
+        scopePermissions: { is_mutable: false, is_deletable: false },
+        checkPermissions: () => false,
+      });
+    });
+
+    it('disables saving and editing metadata', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByRole('button', { name: 'Save dashboard' })).toHaveAttribute('aria-disabled', 'true');
+
+      await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+      expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+    });
+
+    it('sends only Illuminate clone telemetry with the original title when saving as a new dashboard', async () => {
+      render(<SUT view={immutableView} />);
+
+      await openDashboardSaveForm();
+      await submitDashboardSaveForm();
+
+      await waitFor(() =>
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.ILLUMINATE_DASHBOARD_CLONED, {
+          app_pathname: 'dashboard',
+          app_action_value: 'illuminate-dashboard-clone',
+          event_details: { dashboard_title: 'View title' },
+        }),
+      );
+      expect(sendTelemetry).not.toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED,
+        expect.anything(),
+      );
+    });
+
+    it('still allows saving as a new dashboard', async () => {
+      render(<SUT view={immutableView} />);
+
+      expect(await screen.findByTitle(/Save as new dashboard/)).toBeEnabled();
+    });
+
+    it('explains why saving is disabled', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.hover(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(await screen.findByText(/This dashboard is read-only/i)).toBeInTheDocument();
+    });
+
+    it('does not save view when clicking the disabled save button', async () => {
+      render(<SUT view={immutableView} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Save dashboard' }));
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
+
+    it('does not save view when pressing related keyboard shortcut', async () => {
+      render(<SUT view={immutableView} />);
+
+      await screen.findByRole('button', { name: 'Save dashboard' });
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      expect(OnSaveViewAction).not.toHaveBeenCalled();
+    });
   });
 });

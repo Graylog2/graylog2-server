@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.model.Filters;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.assertj.core.api.Assertions;
@@ -64,6 +66,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -227,6 +230,97 @@ public class EventDefinitionsResourceTest {
         Assertions.assertThat(predicate.getValue().test(withTags())).isFalse();
     }
 
+    @Test
+    public void getPageMatchesAnyOfTheFilteredTacticsTechniquesInMongo() {
+        when(subject.isPermitted(anyString())).thenReturn(true);
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        resource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+        resource.getPage(1, 50, "", List.of("tactics_techniques:t1059", "tactics_techniques:TA0002"), "title", SortOrder.ASCENDING);
+
+        final ArgumentCaptor<Bson> query = ArgumentCaptor.forClass(Bson.class);
+        verify(dbService, times(2)).searchPaginated(query.capture(), any(), any(), anyInt(), anyInt());
+
+        // Lowercase input is normalized to the stored uppercase form.
+        final Bson unfiltered = query.getAllValues().get(0);
+        Assertions.assertThat(query.getAllValues().get(1).toBsonDocument()).isEqualTo(
+                Filters.and(unfiltered, Filters.in(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, List.of("T1059", "TA0002"))).toBsonDocument());
+    }
+
+    @Test
+    public void getPageCombinesTacticsTechniquesWithOtherFilters() {
+        when(subject.isPermitted(anyString())).thenReturn(true);
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        resource.getPage(1, 50, "", List.of("status:ENABLED"), "title", SortOrder.ASCENDING);
+        resource.getPage(1, 50, "", List.of("tactics_techniques:T1059", "tags:phishing", "status:ENABLED"), "title", SortOrder.ASCENDING);
+
+        final ArgumentCaptor<Bson> query = ArgumentCaptor.forClass(Bson.class);
+        @SuppressWarnings("unchecked") final ArgumentCaptor<Predicate<EventDefinitionDto>> predicate =
+                ArgumentCaptor.forClass(Predicate.class);
+        verify(dbService, times(2)).searchPaginated(query.capture(), predicate.capture(), any(), anyInt(), anyInt());
+
+        // The status filter stays in the DB query, tactics/techniques is ANDed onto it, and tags stay in the predicate.
+        final Bson statusOnly = query.getAllValues().get(0);
+        Assertions.assertThat(query.getAllValues().get(1).toBsonDocument()).isEqualTo(
+                Filters.and(statusOnly, Filters.in(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, List.of("T1059"))).toBsonDocument());
+        final Predicate<EventDefinitionDto> combined = predicate.getAllValues().get(1);
+        Assertions.assertThat(combined.test(withTags("phishing"))).isTrue();
+        Assertions.assertThat(combined.test(withTags("malware"))).isFalse();
+    }
+
+    @Test
+    public void getPageRejectsInvalidTacticsTechniquesFilterValues() {
+        final BadRequestException e = assertThrows(BadRequestException.class, () ->
+                resource.getPage(1, 50, "", List.of("tactics_techniques:T1059", "tactics_techniques:not-an-id"), "title", SortOrder.ASCENDING));
+
+        Assertions.assertThat(e.getMessage()).contains("NOT-AN-ID");
+        verify(dbService, never()).searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt());
+    }
+
+    @Test
+    public void getPageAcceptsNonCanonicalTacticsTechniquesWhenValidationIsDisabled() {
+        final EventDefinitionConfiguration configuration = mock(EventDefinitionConfiguration.class);
+        when(configuration.isTacticsTechniquesValidationEnabled()).thenReturn(false);
+        final EventDefinitionsResource unvalidatedResource = new TestEventDefinitionsResource(subject, configuration);
+        when(subject.isPermitted(anyString())).thenReturn(true);
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        unvalidatedResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
+        unvalidatedResource.getPage(1, 50, "", List.of("tactics_techniques:custom-id"), "title", SortOrder.ASCENDING);
+
+        final ArgumentCaptor<Bson> query = ArgumentCaptor.forClass(Bson.class);
+        verify(dbService, times(2)).searchPaginated(query.capture(), any(), any(), anyInt(), anyInt());
+        Assertions.assertThat(query.getAllValues().get(1).toBsonDocument()).isEqualTo(
+                Filters.and(query.getAllValues().get(0), Filters.in(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, List.of("CUSTOM-ID"))).toBsonDocument());
+    }
+
+    @Test
+    public void getPageSearchesByIdUsingMongoIdField() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        resource.getPage(1, 50, "id:" + definitionId, List.of(), "title", SortOrder.ASCENDING);
+
+        final ArgumentCaptor<Bson> query = ArgumentCaptor.forClass(Bson.class);
+        verify(dbService).searchPaginated(query.capture(), any(), any(), anyInt(), anyInt());
+
+        Assertions.assertThat(query.getValue()).isEqualTo(
+                Filters.and(Filters.and(Filters.or(Filters.eq("_id", new ObjectId(definitionId))))));
+    }
+
     static EventDefinitionDto withTags(String... tags) {
         return eventDefinitionDto(mock(EventProcessorConfig.class)).toBuilder()
                 .id("54e3deadbeefdeadbeefaffe")
@@ -258,8 +352,12 @@ public class EventDefinitionsResourceTest {
         private final Subject subject;
 
         TestEventDefinitionsResource(Subject subject) {
+            this(subject, new EventDefinitionConfiguration());
+        }
+
+        TestEventDefinitionsResource(Subject subject, EventDefinitionConfiguration configuration) {
             super(dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                    auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(),
+                    auditEventSender, objectMapper, new DefaultEventResolver(), configuration,
                     entitySharesService, new org.graylog.events.processor.TacticsTechniquesValidator.NoOp());
             this.subject = subject;
         }

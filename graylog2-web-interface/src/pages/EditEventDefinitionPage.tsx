@@ -25,8 +25,7 @@ import EventDefinitionFormContainer from 'components/event-definitions/event-def
 import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { getEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
@@ -37,16 +36,24 @@ import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 const EditEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
+
+  const canEdit = isPermitted(`eventdefinitions:edit:${params.definitionId}`);
 
   const goToOverview = useCallback(() => {
     history.push(Routes.ALERTS.DEFINITIONS.LIST);
   }, [history]);
 
   useEffect(() => {
-    if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
+    if (!canEdit) {
+      history.push(Routes.NOTFOUND);
+    }
+  }, [canEdit, history]);
+
+  useEffect(() => {
+    if (canEdit) {
       getEventDefinition(params.definitionId).then(
         (response) => {
           const eventDefinitionResponse = response.eventDefinition;
@@ -63,17 +70,13 @@ const EditEventDefinitionPage = () => {
         },
       );
     }
-  }, [params, currentUser, history]);
+  }, [canEdit, params.definitionId, history]);
 
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
-    return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
+    return streams.filter((streamId) => !isPermitted(`streams:read:${streamId}`));
   };
-
-  if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-    history.push(Routes.NOTFOUND);
-  }
 
   const missingStreams = streamsWithMissingPermissions();
 

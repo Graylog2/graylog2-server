@@ -29,6 +29,7 @@ import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,12 @@ import java.util.Set;
 
 public interface ClusterAdapter {
     Optional<HealthStatus> health();
+
+    /**
+     * Cancelled at {@code timeout}, reported empty like an unreachable cluster. {@link #health()} cannot be bounded
+     * by config: its connect and socket timeouts apply per host and the client retries every node in one call.
+     */
+    Optional<HealthStatus> health(Duration timeout);
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
@@ -78,5 +85,23 @@ public interface ClusterAdapter {
      */
     int countOfClusterManagerEligibleNodes();
 
-    Optional<HealthStatus> deflectorHealth(Collection<String> indices);
+    /**
+     * Health of the index behind each write alias, for any number of aliases. An alias that is missing or points at
+     * several indices has no entry.
+     */
+    Map<String, HealthStatus> deflectorHealthByAlias(Collection<String> writeAliases);
+
+    /**
+     * The worst health among the write aliases, empty when one of them cannot be resolved.
+     */
+    default Optional<HealthStatus> deflectorHealth(Collection<String> writeAliases) {
+        if (writeAliases.isEmpty()) {
+            return Optional.of(HealthStatus.Green);
+        }
+        final Map<String, HealthStatus> healthByAlias = deflectorHealthByAlias(writeAliases);
+        if (!healthByAlias.keySet().containsAll(writeAliases)) {
+            return Optional.empty();
+        }
+        return healthByAlias.values().stream().min(HealthStatus::compareTo);
+    }
 }

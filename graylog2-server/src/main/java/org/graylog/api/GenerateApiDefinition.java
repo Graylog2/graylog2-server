@@ -88,7 +88,8 @@ public class GenerateApiDefinition {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, isCloud, false);
+        final Map<Class<?>, String> pluginMapping = PluginRestResourcePrefixes.forResources(resourceClasses, packageNames);
+        final Generator generator = new Generator(resourceClasses, pluginMapping, "/plugins", objectMapper, isCloud, false);
 
         final Map<String, Object> overview = generator.generateOverview();
         writeJsonToFile(targetName + "/api.json", overview);

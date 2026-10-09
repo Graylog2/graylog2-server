@@ -76,10 +76,51 @@ versions:
   }
 }
 ```
+### CEF inputs no longer prefix the `source` field with a slash
+
+When a CEF message carries no `deviceAddress`/`dvc` extension and no syslog hostname, the CEF input
+falls back to the sender's socket address for the `source` field. That fallback formatted the address
+with `InetAddress.toString()`, which renders `hostname/1.2.3.4`. Because the CEF input never resolves
+the hostname, the hostname half was always empty and `source` was left with a leading slash
+(`/128.66.23.42`). IPv6 senders were additionally recorded in fully expanded form
+(`0:0:0:0:0:0:0:1`).
+
+`source` now holds the bare address, compressed for IPv6 (`128.66.23.42`, `::1`), which is what every
+other input already does.
+
+This is worth checking if you built anything around the old value. Pipeline rules that strip the
+leading slash off `source`, saved searches or lookup tables keyed on the slash-prefixed form, and
+stream rules matching it will no longer match and should be updated. Messages ingested before the
+upgrade keep their original `source`, so both forms can coexist in existing indices.
+
 ### Scripting API default fields on message export
 Per default, we now export all fields in a message on export. Prior to this change, we defaulted to a limited list of 
 fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
 Now you can export with all fields and limit the results by specifying the fields wanted.
+
+### System CPU and Memory Metrics Now Reflect Container Limits When Containerized
+
+When Graylog Server or Data Node runs in a container with cgroup CPU/memory limits configured (e.g. Docker 
+`--memory`/`--cpus`, Kubernetes `resources.limits`), the `org.graylog2.system.cpu.percent` metric and the Data Node 
+metrics `mem_total`, `mem_free`, `mem_total_used_bytes`, and `mem_total_used` now reflect the container's 
+cgroup-scoped limits and usage instead of the underlying host's.
+
+Previously, these metrics always reported host-level values, so a container with a memory limit well below the host's 
+total RAM would show a low, misleadingly small "used" percentage. After upgrading, the same metrics scale to the 
+container's actual limit, so used-percentage values can jump significantly even though nothing about the node's real 
+memory or CPU pressure has changed. Review and, if necessary, adjust any dashboards or alert thresholds built against 
+the old host-scaled values.
+
+### `stream_aware_field_types` Is Now Enabled by Default
+
+The `stream_aware_field_types` option now defaults to `true`. Graylog then tracks which fields are used in which streams,
+so field lists and field types match the streams you are searching in. We enabled it because more and more features rely on accurate, stream-specific field types.
+
+If your `graylog.conf` still contains `stream_aware_field_types=false` from a previous version, the option stays disabled.
+If you don't configure it (e.g. Docker setups using only environment variables), it will be enabled after the upgrade.
+
+Enabling this option can decrease performance on systems with many streams and fields. To disable it, set
+`stream_aware_field_types = false` (or `GRAYLOG_STREAM_AWARE_FIELD_TYPES=false`).
 
 ## Web Interface Changes
 
@@ -238,7 +279,7 @@ There are two things to know about how this applies to your inputs:
 - **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
     "Migrate to single DynamoDB table for state tracking" input option.  
 
-To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+To let you migrate existing inputs on your own schedule, the input's **Edit input** dialog exposes a
 **Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
 Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
@@ -254,7 +295,7 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
    attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
    readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
    to fail to start.
-3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+3. Enable the **Migrate to single DynamoDB table for state tracking** option in the input's **Edit input** dialog and save. The
    migration begins.
 4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
    `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
@@ -263,8 +304,10 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
 
-For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
-now-unused legacy tables afterward, see AWS's documentation:
+For how to monitor the migration, along with the migration steps and how to remove the now-unused legacy tables
+afterward, see AWS's documentation. Use the KCL 3.x to 3.5 guide for inputs that were already running KCL 3.x, and the
+KCL 2.x to 3.x guide for inputs that were running KCL 2.x:
 
 - [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 3.x to KCL 3.5](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html)
 - [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

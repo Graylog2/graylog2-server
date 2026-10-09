@@ -20,12 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
+import org.graylog.storage.elasticsearch7.cat.AliasSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeRole;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -35,7 +39,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ClusterAdapterES7Test {
@@ -85,6 +89,28 @@ class ClusterAdapterES7Test {
     }
 
     @Test
+    void clusterShardAllocationReportsPerNodeShardCounts() {
+        when(catApi.getNodeShardAllocations()).thenReturn(List.of(
+                new NodeShardAllocation("es01", 12),
+                new NodeShardAllocation("es02", 7)));
+
+        final ClusterShardAllocation allocation = clusterAdapter.clusterShardAllocation();
+
+        assertThat(allocation.nodeShardAllocations())
+                .containsExactly(new NodeShardAllocation("es01", 12), new NodeShardAllocation("es02", 7));
+    }
+
+    @Test
+    void clusterShardAllocationLeavesTheShardMaximumUnbounded() {
+        // #22228 scoped its max_shards_per_node notification to OpenSearch. IndexerClusterCheckerThread notifies
+        // above a ratio of this maximum, so an unreachable one keeps that notification off on Elasticsearch even
+        // though the per-node counts are now populated.
+        when(catApi.getNodeShardAllocations()).thenReturn(List.of(new NodeShardAllocation("es01", 12)));
+
+        assertThat(clusterAdapter.clusterShardAllocation().maxShardsPerNode()).isEqualTo(Integer.MAX_VALUE);
+    }
+
+    @Test
     void handlesMissingHostField() throws Exception {
         mockNodesResponse();
 
@@ -111,6 +137,20 @@ class ClusterAdapterES7Test {
         when(client.execute(any())).thenThrow(new ElasticsearchException("Exception"));
         final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
+    }
+
+    @Test
+    void boundedHealthGivesUpAndCancelsWhenTheClusterDoesNotAnswerInTime() {
+        // The listener is never notified: a cluster that accepted the connection and then went quiet.
+        final Cancellable cancellable = mock(Cancellable.class);
+        when(client.clusterHealthAsync(any(), any())).thenReturn(cancellable);
+
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health(java.time.Duration.ofMillis(50));
+
+        assertThat(healthStatus).isEmpty();
+        // Cancelling matters as much as giving up: an abandoned request would otherwise keep working through the
+        // client's remaining hosts long after the caller stopped waiting.
+        verify(cancellable).cancel();
     }
 
     @Test
@@ -160,13 +200,13 @@ class ClusterAdapterES7Test {
 
     @Test
     void testDeflectorHealth() {
-        when(catApi.aliases()).thenReturn(Map.of(
-                "foo_deflector", "foo_42",
-                "bar_deflector", "bar_17",
-                "baz_deflector", "baz_23"
+        when(catApi.aliases(any())).thenReturn(List.of(
+                new AliasSummaryResponse("foo_deflector", "foo_42"),
+                new AliasSummaryResponse("bar_deflector", "bar_17"),
+                new AliasSummaryResponse("baz_deflector", "baz_23")
         ));
 
-        when(catApi.indices()).thenReturn(List.of(
+        when(catApi.indexHealth(any())).thenReturn(List.of(
                 new IndexSummaryResponse("foo_42", "", "RED"),
                 new IndexSummaryResponse("bar_17", "", "YELLOW"),
                 new IndexSummaryResponse("baz_23", "", "GREEN")

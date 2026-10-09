@@ -44,6 +44,7 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.indexer.template.IgnoreIndexTemplate;
 import org.graylog2.indexer.template.IndexMappingFactory;
@@ -60,6 +61,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -185,6 +188,18 @@ public class Indices {
     @NotNull
     public Map<String, Set<String>> getIndexNamesAndAliases(String indexPattern) {
         return indicesAdapter.aliases(indexPattern);
+    }
+
+    /**
+     * Returns index names and their aliases for several index patterns, in as few requests as the URL length allows.
+     */
+    @NotNull
+    public Map<String, Set<String>> getIndexNamesAndAliases(Collection<String> indexPatterns) {
+        final Map<String, Set<String>> result = new HashMap<>();
+        for (final List<String> batch : IndexNameBatching.partitionByJoinedLength(indexPatterns)) {
+            result.putAll(indicesAdapter.aliases(String.join(",", batch)));
+        }
+        return result;
     }
 
     public Optional<String> aliasTarget(String alias) throws TooManyAliasesException {
@@ -347,7 +362,11 @@ public class Indices {
     }
 
     public Set<String> getClosedIndices(final Collection<String> indices) {
-        return indicesAdapter.closedIndices(indices);
+        final Set<String> result = new HashSet<>();
+        for (final List<String> batch : IndexNameBatching.partitionByJoinedLength(indices)) {
+            result.addAll(indicesAdapter.closedIndices(batch));
+        }
+        return result;
     }
 
     public Set<String> getClosedIndices(final BasicIndexSet indexSet) {

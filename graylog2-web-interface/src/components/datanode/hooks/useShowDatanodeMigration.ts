@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import { MIGRATION_STATE } from 'components/datanode/Constants';
+import usePermissions from 'hooks/usePermissions';
 
 import useMigrationState from './useMigrationState';
 import useRunsWithDataNode from './useRunsWithDataNode';
@@ -26,17 +24,19 @@ const useShowDatanodeMigration = (): {
   isDatanodeConfiguredAndUsed: boolean;
   showDatanodeMigration: boolean;
 } => {
-  const { permissions } = useCurrentUser();
-  const canStartDataNode = useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
+  const { isPermitted } = usePermissions();
+  const canStartDataNode = isPermitted('datanode:start');
 
   const { data: isDatanodeConfiguredAndUsed } = useRunsWithDataNode({ enabled: canStartDataNode });
 
   const { currentStep } = useMigrationState({ enabled: canStartDataNode });
-  const noMigrationInProgress = !currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED';
+  const migrationNeedsFinalization = currentStep?.state === MIGRATION_STATE.RESTART_GRAYLOG.key;
+  const shouldShowDatanodeMigration =
+    isDatanodeConfiguredAndUsed === false || (isDatanodeConfiguredAndUsed === true && migrationNeedsFinalization);
 
   return {
-    isDatanodeConfiguredAndUsed: canStartDataNode && !!isDatanodeConfiguredAndUsed,
-    showDatanodeMigration: canStartDataNode && (!isDatanodeConfiguredAndUsed || !noMigrationInProgress),
+    isDatanodeConfiguredAndUsed: canStartDataNode && isDatanodeConfiguredAndUsed === true,
+    showDatanodeMigration: canStartDataNode && shouldShowDatanodeMigration,
   };
 };
 

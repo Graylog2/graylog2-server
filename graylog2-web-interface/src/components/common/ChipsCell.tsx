@@ -55,30 +55,18 @@ const HoverableLabel = styled(Label)(
       display: block;
     }
 
-    button:hover > & {
-      background-color: ${theme.colors.gray[60]};
-    }
-  `,
-);
-
-const ChipButton = styled.button(
-  ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-
-    /* Shrink as a flex item so the chip inside can truncate instead of leaking past the cell. */
+    /* Shrink as a flex item so the chip can truncate instead of leaking past the cell. */
     min-width: 0;
     max-width: 100%;
 
-    /* Inner Label/Badge components set their own cursor; force pointer everywhere
-       inside the button so the hover affordance is consistent. */
-    & * {
+    /* Only clickable chips render as a <button> (via Label's own onClick prop) — restrict the
+       hover/focus affordance to those so plain, non-clickable chips don't look interactive. */
+    &:where(button):hover {
+      background-color: ${theme.colors.gray[60]};
       cursor: pointer;
     }
 
-    &:focus-visible {
+    &:where(button):focus-visible {
       outline: 2px solid ${theme.colors.input.borderFocus};
       outline-offset: 2px;
       border-radius: 2px;
@@ -110,14 +98,18 @@ type BaseProps = {
   collapsedCount?: number;
   truncate?: boolean;
   emptyFallback?: React.ReactNode;
-  renderItem?: (item: string) => React.ReactNode;
+  // Renders the chip's label content in place of the raw item; the chip itself (and its click
+  // handling) stays owned by ChipsCell. Plain chips drop their raw-item title, so content that can be
+  // cut off needs its own title; clickable chips already carry a "Filter by ..." title, so skip it there.
+  renderItemContent?: (item: string) => React.ReactNode;
 };
 
 // itemLabel is required when chips are clickable so the aria-label reads as e.g.
 // "Filter by tag" rather than "Filter by item".
+// itemTitle names the item in that label when the raw value isn't readable on its own (e.g. a MITRE ID).
 type Props =
-  | (BaseProps & { onItemClick?: undefined; itemLabel?: never })
-  | (BaseProps & { onItemClick: (item: string) => void; itemLabel: string });
+  | (BaseProps & { onItemClick?: undefined; itemLabel?: never; itemTitle?: never })
+  | (BaseProps & { onItemClick: (item: string) => void; itemLabel: string; itemTitle?: (item: string) => string });
 
 const ChipsCell = ({
   items,
@@ -125,8 +117,9 @@ const ChipsCell = ({
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   truncate = true,
   emptyFallback = null,
-  renderItem: customRenderItem = undefined,
+  renderItemContent = undefined,
   itemLabel,
+  itemTitle = undefined,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -140,29 +133,30 @@ const ChipsCell = ({
   const hiddenCount = sorted.length - collapsedCount;
 
   const renderChip = (item: string) => {
-    if (customRenderItem) {
-      return <React.Fragment key={item}>{customRenderItem(item)}</React.Fragment>;
-    }
+    const content = renderItemContent ? renderItemContent(item) : item;
+
     if (!onItemClick) {
       return (
-        <HoverableLabel key={item} bsStyle="default" title={item}>
-          {item}
+        <HoverableLabel key={item} bsStyle="default" title={renderItemContent ? undefined : item}>
+          {content}
         </HoverableLabel>
       );
     }
 
+    const filterLabel = `Filter by ${itemLabel} "${itemTitle ? itemTitle(item) : item}"`;
+
     return (
-      <ChipButton
+      <HoverableLabel
         key={item}
-        type="button"
+        bsStyle="default"
         onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
           onItemClick(item);
         }}
-        aria-label={`Filter by ${itemLabel} "${item}"`}
-        title={`Filter by ${itemLabel} "${item}"`}>
-        <HoverableLabel bsStyle="default">{item}</HoverableLabel>
-      </ChipButton>
+        aria-label={filterLabel}
+        title={filterLabel}>
+        {content}
+      </HoverableLabel>
     );
   };
 

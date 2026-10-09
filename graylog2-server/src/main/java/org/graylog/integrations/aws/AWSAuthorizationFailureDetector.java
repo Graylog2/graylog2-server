@@ -108,13 +108,14 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
     private static final Set<String> TERMINAL_ERROR_CODES = Sets.union(CREDENTIAL_ERROR_CODES, Set.of(
             "AccessDeniedException",
             "AccessDenied",
-            // KMS failures on an encrypted stream that need an operator to act. KMSInvalidStateException is
-            // deliberately absent: its service documentation does not say which key states produce it, so we cannot
-            // show it is unrecoverable, and an allowlist should fail safe.
-            "KMSAccessDeniedException",
+            // The only KMS failures on an encrypted stream that cannot clear without an operator. KMSDisabledException,
+            // KMSAccessDeniedException and KMSInvalidStateException are deliberately absent because each names a state
+            // that routinely clears on its own - a CMK disabled during rotation, an expired grant or an edited key
+            // policy, an unidentified key state - and failing an input over one would stop a stream that recovers.
+            // The cost is that a deleted key reported as KMSAccessDeniedException rather than KMSNotFoundException is
+            // no longer caught here, since AWS documents that code as covering both.
             "KMSNotFoundException",
-            "KMSOptInRequired",
-            "KMSDisabledException"));
+            "KMSOptInRequired"));
 
     private final Consumer<Throwable> onTerminalFailure;
     private final LongSupplier nanoClock;

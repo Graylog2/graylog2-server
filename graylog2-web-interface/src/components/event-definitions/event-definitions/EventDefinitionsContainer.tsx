@@ -26,7 +26,9 @@ import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type { SearchParams } from 'stores/PaginationTypes';
 import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
+import PriorityName from 'components/events/events/PriorityName';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
@@ -72,6 +74,7 @@ const getCustomColumnRenderers = (
       minWidth: 150,
     },
     priority: {
+      renderCell: (priority: number) => <PriorityName priority={priority} />,
       staticWidth: 'matchHeader' as const,
     },
     notifications: {
@@ -135,10 +138,23 @@ const EventDefinitionsContainer = () => {
   const tacticsTechniquesEnabled = tacticsTechniquesPlugin?.useCondition?.() ?? !!tacticsTechniquesPlugin;
   const activeTacticsTechniquesPlugin = tacticsTechniquesEnabled ? tacticsTechniquesPlugin : undefined;
 
+  const tacticsTechniquesAttribute = activeTacticsTechniquesPlugin?.attribute;
+
   const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(
     pluggableAttributes,
-    activeTacticsTechniquesPlugin?.attribute,
+    tacticsTechniquesAttribute,
   );
+  // The filter dropdown only lists attributes from the fetch response, so the plugin attribute is spliced in there.
+  const fetchEntities = (searchParams: SearchParams) =>
+    tacticsTechniquesAttribute
+      ? fetchEventDefinitions(searchParams).then((result) => ({
+          ...result,
+          attributes: [...result.attributes, tacticsTechniquesAttribute],
+        }))
+      : fetchEventDefinitions(searchParams);
+  const filterValueRenderers = activeTacticsTechniquesPlugin?.filterValueRenderer
+    ? { ...FilterValueRenderers, [tacticsTechniquesAttribute.id]: activeTacticsTechniquesPlugin.filterValueRenderer }
+    : FilterValueRenderers;
   const expandedSections = useMemo(
     () => ({
       notifications: notificationsExpandedSection,
@@ -158,12 +174,12 @@ const EventDefinitionsContainer = () => {
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName="event definition" />}
         tableLayout={defaultLayout}
-        fetchEntities={fetchEventDefinitions}
+        fetchEntities={fetchEntities}
         entityActions={renderEventDefinitionActions}
         keyFn={keyFn}
         entityAttributesAreCamelCase={false}
         expandedSectionRenderers={expandedSections}
-        filterValueRenderers={FilterValueRenderers}
+        filterValueRenderers={filterValueRenderers}
         columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
         bulkSelection={bulkSelection}
       />

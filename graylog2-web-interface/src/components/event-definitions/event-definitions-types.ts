@@ -25,6 +25,7 @@ type Provider = {
   type: string;
   template: string;
   require_values: boolean;
+  exclude_empty_fields: boolean;
   table_name: string;
   key_field: string;
 };
@@ -133,6 +134,9 @@ export type EventDefinitionFormControlsProps = {
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>
   eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
+
+export const isIlluminateEventDefinition = (eventDefinition: EventDefinition) =>
+  eventDefinition?._scope === 'ILLUMINATE';
 
 export const isAggregationEventDefinition = (eventDefinition: EventDefinition) =>
   eventDefinition?.config?.type === 'aggregation-v1';
