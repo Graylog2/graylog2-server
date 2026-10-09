@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
@@ -36,7 +37,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                         Execute Lucene search queries against %1$s log messages and calculate aggregations on based on field values and metrics
                         You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
                         It's more efficient to scope by streams.
-                        Pass the timerange as a parameter, never put it into the query itself.
+                        Pass the timerange as a parameter, never put it into the query itself: either range_seconds, or an absolute window with from and to.
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
@@ -92,7 +92,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    RelativeRange.create(parameters.rangeSeconds()),
+                    McpTimeRanges.timerange(parameters.from(), parameters.to(), parameters.rangeSeconds()),
                     parameters.groupings(),
                     parameters.metrics()
             );
@@ -123,10 +123,20 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
         public abstract Set<String> streamCategories();
 
         @JsonProperty("range_seconds")
-        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past.")
+        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past. Ignored when from and to are given.")
         @DefaultValue("3600")
         @Positive
         public abstract int rangeSeconds();
+
+        @Nullable
+        @JsonProperty("from")
+        @JsonPropertyDescription("Start of an absolute time range, ISO 8601, e.g. 2026-10-05T14:00:00.000Z. Requires to.")
+        public abstract String from();
+
+        @Nullable
+        @JsonProperty("to")
+        @JsonPropertyDescription("End of an absolute time range, ISO 8601. Requires from.")
+        public abstract String to();
 
         @JsonProperty("groupings")
         @JsonPropertyDescription("The list of group by clauses to apply, each grouping consists of a field name and a " +
@@ -162,6 +172,12 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
             @JsonProperty("range_seconds")
             public abstract Builder rangeSeconds(
                     @Positive final int rangeSeconds);
+
+            @JsonProperty("from")
+            public abstract Builder from(@Nullable final String from);
+
+            @JsonProperty("to")
+            public abstract Builder to(@Nullable final String to);
 
             @JsonProperty("streams")
             public abstract Builder streams(final Set<String> streams);
