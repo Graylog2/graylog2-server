@@ -129,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <gcs.version>2.74.0</gcs.version>
+        <gcs.version>2.75.0</gcs.version>
         <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
         <azure-core.version>1.59.1</azure-core.version>
         <azure-json.version>1.5.1</azure-json.version>
@@ -137,16 +137,16 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
         <google-api-client.version>2.9.1</google-api-client.version>
-        <google-api-common.version>2.69.0</google-api-common.version>
+        <google-api-common.version>2.70.0</google-api-common.version>
         <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
         <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
-        <google-auth-library.version>1.53.0</google-auth-library.version>
+        <google-auth-library.version>1.54.0</google-auth-library.version>
         <google-oauth-client.version>1.39.0</google-oauth-client.version>
-        <google-cloud-bigquery.version>2.72.0</google-cloud-bigquery.version>
-        <google-cloud-core.version>2.76.0</google-cloud-core.version>
-        <google-cloud-logging.version>3.39.0</google-cloud-logging.version>
+        <google-cloud-bigquery.version>2.73.0</google-cloud-bigquery.version>
+        <google-cloud-core.version>2.77.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.40.0</google-cloud-logging.version>
         <google-conscrypt.version>2.7.0</google-conscrypt.version>
-        <google-gax.version>2.86.0</google-gax.version>
+        <google-gax.version>2.87.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -204,8 +204,8 @@
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <proto-google-common-protos.version>2.77.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.72.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.78.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.73.0</proto-google-iam-v1.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
