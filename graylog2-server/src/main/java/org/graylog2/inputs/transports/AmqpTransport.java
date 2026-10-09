@@ -242,7 +242,11 @@ public class AmqpTransport extends ThrottleableTransport2 {
         try {
             stopConsumer();
         } finally {
-            eventBus.unregister(this);
+            try {
+                eventBus.unregister(this);
+            } catch (IllegalArgumentException iae) {
+                LOG.warn("Failed to unregister input from eventbus. This hints that stopping the input happens multiple times instead of once.", iae);
+            }
             stopAmqpScheduler();
         }
     }
