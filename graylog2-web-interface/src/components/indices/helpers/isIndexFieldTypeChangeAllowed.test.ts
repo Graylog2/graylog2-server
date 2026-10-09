@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { isTemplateTypeAllowsFieldTypeChang } from './isIndexFieldTypeChangeAllowed';
 
-const TEMPLATE_TYPES = ['failures', 'events', 'illuminate_content', 'collector_logs'];
-export const isTemplateTypeAllowsFieldTypeChang = (type: string) => !TEMPLATE_TYPES.includes(type);
-const isIndexFieldTypeChangeAllowed = (indexSet: IndexSet) =>
-  isTemplateTypeAllowsFieldTypeChang(indexSet?.index_template_type);
+describe('isTemplateTypeAllowsFieldTypeChang', () => {
+  it.each(['failures', 'events', 'illuminate_content', 'collector_logs'])(
+    'does not allow field type changes for %s index sets',
+    (type) => {
+      expect(isTemplateTypeAllowsFieldTypeChang(type)).toBe(false);
+    },
+  );
 
-export default isIndexFieldTypeChangeAllowed;
+  it.each(['messages', undefined])('allows field type changes for %s index sets', (type) => {
+    expect(isTemplateTypeAllowsFieldTypeChang(type)).toBe(true);
+  });
+});

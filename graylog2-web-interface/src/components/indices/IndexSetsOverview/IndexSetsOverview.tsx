@@ -15,12 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
+import { appliedIndexSetIds } from 'components/indices/IndexSetFieldTypes/profileChangeResult';
+import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldTypes/types';
 
 import getIndexSetTableElements, { DETAILS_SECTION, INDEX_SET_VIEW_VARIANTS } from './Constants';
 import customColumnRenderers from './ColumnRenderers';
+import BulkActions from './BulkActions';
+import type { ProfileChange } from './BulkActions';
 import IndexSetActions from './IndexSetActions';
 import IndexSetCategoryButtons from './IndexSetCategoryButtons';
 import IndexSetViewButtons from './IndexSetViewButtons';
@@ -59,20 +66,52 @@ const IndexSetsOverview = () => {
   const activeLayout =
     activeLayoutVariant === INDEX_SET_VIEW_VARIANTS.configuration ? configurationVariantLayout : defaultVariantLayout;
 
+  const [indexSetsById, setIndexSetsById] = useState<Record<string, IndexSetEntity>>({});
+  const [profileChange, setProfileChange] = useState<ProfileChange | null>(null);
+  const onDataLoaded = (data: PaginatedResponse<IndexSetEntity>) =>
+    setIndexSetsById((current) =>
+      data.list.every((indexSet) => current[indexSet.id] === indexSet)
+        ? current
+        : { ...current, ...Object.fromEntries(data.list.map((indexSet) => [indexSet.id, indexSet])) },
+    );
+  const onProfileChangeApplied = (response: ProfileChangeResponse) => {
+    const applied = new Set(appliedIndexSetIds(response));
+
+    setProfileChange(
+      (current) => current && { ...current, indexSets: current.indexSets.filter(({ id }) => !applied.has(id)) },
+    );
+    profileChange?.onChangeApplied(response);
+  };
+
   return (
-    <PaginatedEntityTable<IndexSetEntity>
-      humanName="index sets"
-      searchPlaceholder="Find index sets"
-      additionalAttributes={additionalAttributes}
-      entityActions={renderActions}
-      tableLayout={activeLayout}
-      fetchEntities={fetchIndexSets}
-      keyFn={keyFn}
-      expandedSectionRenderers={expandedSections}
-      entityAttributesAreCamelCase={false}
-      columnRenderers={customColumnRenderers(extensionColumnRenderers)}
-      topSection={TopSection}
-    />
+    <>
+      <PaginatedEntityTable<IndexSetEntity>
+        humanName="index sets"
+        searchPlaceholder="Find index sets"
+        additionalAttributes={additionalAttributes}
+        entityActions={renderActions}
+        tableLayout={activeLayout}
+        fetchEntities={fetchIndexSets}
+        onDataLoaded={onDataLoaded}
+        keyFn={keyFn}
+        bulkSelection={{
+          actions: <BulkActions indexSetsById={indexSetsById} onProfileAction={setProfileChange} />,
+        }}
+        expandedSectionRenderers={expandedSections}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={customColumnRenderers(extensionColumnRenderers)}
+        topSection={TopSection}
+      />
+      {profileChange && (
+        <SetProfileModal
+          show
+          action={profileChange.action}
+          indexSets={profileChange.indexSets}
+          onClose={() => setProfileChange(null)}
+          onChangeApplied={onProfileChangeApplied}
+        />
+      )}
+    </>
   );
 };
 
