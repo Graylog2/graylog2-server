@@ -52,7 +52,7 @@ class ClusterAdapterOSTest {
                 .stubResponse("GET", "/_cluster/settings", Resources.getResource("cluster_settings.json"))
                 .stubResponse("GET", "/_cat/allocation", Resources.getResource("cat_allocation.json"))
                 .stubResponse("GET", "/_cat/aliases/*", Resources.getResource("cat_aliases.json"))
-                .stubResponse("GET", "/_cat/indices", Resources.getResource("cat_indices.json"))
+                .stubResponse("GET", "/_cat/indices/*", Resources.getResource("cat_indices.json"))
                 .stubError("GET", "/_cluster/health", 500, "Server not responding")
                 .build();
         this.clusterAdapter = new ClusterAdapterOS(client, Duration.seconds(1));

@@ -204,7 +204,7 @@ class ClusterAdapterOS2Test {
                 new AliasSummaryResponse("baz_deflector", "baz_23")
         ));
 
-        when(catApi.indices()).thenReturn(List.of(
+        when(catApi.indexHealth(any())).thenReturn(List.of(
                 new IndexSummaryResponse("foo_42", "", "RED"),
                 new IndexSummaryResponse("bar_17", "", "YELLOW"),
                 new IndexSummaryResponse("baz_23", "", "GREEN")

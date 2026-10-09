@@ -427,9 +427,9 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         if (indexByAlias.isEmpty()) {
             return Map.of();
         }
-        final Set<String> indices = Set.copyOf(indexByAlias.values());
-        final Map<String, HealthStatus> healthByIndex = catApi.indices().stream()
-                .filter(index -> indices.contains(index.index()))
+        final Map<String, HealthStatus> healthByIndex = IndexNameBatching
+                .partitionByJoinedLength(Set.copyOf(indexByAlias.values())).stream()
+                .flatMap(batch -> catApi.indexHealth(batch).stream())
                 .collect(Collectors.toMap(IndexSummaryResponse::index, index -> HealthStatus.fromString(index.health())));
         return indexByAlias.entrySet().stream()
                 .filter(entry -> healthByIndex.containsKey(entry.getValue()))

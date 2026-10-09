@@ -23,6 +23,7 @@ import com.google.common.collect.Streams;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 
 import jakarta.inject.Inject;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
@@ -64,6 +65,22 @@ public class CatApi {
         final Request request = request("GET", "indices");
         request.addParameter("h", "index,status,health");
         return perform(request, new TypeReference<>() {}, "Unable to retrieve indices list");
+    }
+
+    public List<IndexSummaryResponse> indexHealth(Collection<String> indices) {
+        final Request request = request("GET", "indices/" + String.join(",", indices));
+        request.addParameter("h", "index,health");
+        return client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            try {
+                return returnType(c.getLowLevelClient().performRequest(request), new TypeReference<>() {});
+            } catch (ResponseException e) {
+                if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                    return List.of();
+                }
+                throw e;
+            }
+        }, "Unable to retrieve index health");
     }
 
     public Set<String> indices(String index, Collection<String> status, String errorMessage) {

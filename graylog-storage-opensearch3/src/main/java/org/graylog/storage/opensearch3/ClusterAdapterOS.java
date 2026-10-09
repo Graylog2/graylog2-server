@@ -25,6 +25,7 @@ import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
@@ -444,10 +445,9 @@ public class ClusterAdapterOS implements ClusterAdapter {
         if (indexByAlias.isEmpty()) {
             return Map.of();
         }
-        final Set<String> indices = Set.copyOf(indexByAlias.values());
-        final Map<String, HealthStatus> healthByIndex = opensearchClient
-                .sync(c -> c.cat().indices().valueBody(), "Unable to retrieve indices").stream()
-                .filter(index -> indices.contains(index.index()))
+        final Map<String, HealthStatus> healthByIndex = IndexNameBatching
+                .partitionByJoinedLength(Set.copyOf(indexByAlias.values())).stream()
+                .flatMap(batch -> indexHealth(batch).stream())
                 .collect(Collectors.toMap(IndicesRecord::index, index -> HealthStatus.fromString(index.health())));
         return indexByAlias.entrySet().stream()
                 .filter(entry -> healthByIndex.containsKey(entry.getValue()))
@@ -463,6 +463,16 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .entrySet().stream()
                 .filter(entry -> entry.getValue().size() == 1)
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Iterables.getOnlyElement(entry.getValue())));
+    }
+
+    List<IndicesRecord> indexHealth(List<String> indices) {
+        try {
+            return opensearchClient
+                    .sync(c -> c.cat().indices(r -> r.index(indices).headers("index", "health")).valueBody(),
+                            "Unable to retrieve index health");
+        } catch (IndexNotFoundException e) {
+            return List.of();
+        }
     }
 
     public String getClusterSetting(String setting) {
