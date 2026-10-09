@@ -58,6 +58,7 @@ const getCustomColumnRenderers = (
       staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {
+      staticWidth: 300,
       renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
         <SchedulingCell definition={eventDefinition} />
       ),
