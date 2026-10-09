@@ -58,7 +58,7 @@ public class FieldTypeMappingsIT {
     @FullBackendTest
     void changeFieldTypeFromStringToIp() throws ExecutionException, RetryException {
         var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", INDEX_PREFIX);
-        var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));
+        var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test_id", false));
         var gelfInput = api.gelf().createGelfHttpInput();
         waitForNewIndex(indexSet, INDEX_PREFIX + "_0");
 
