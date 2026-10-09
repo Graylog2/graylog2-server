@@ -18,6 +18,7 @@ import React from 'react';
 
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 import BuffersMetricsCell from './cells/BuffersMetricsCell';
@@ -63,9 +64,15 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
+    node_id: {
+      staticWidth: 300,
+    },
+    short_node_id: {
+      staticWidth: 'matchHeader',
+    },
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
-      minWidth: 300,
+      staticWidth: COLUMN_WIDTH.title,
     },
     is_leader: {
       renderCell: (isLeader: boolean) => (
@@ -79,7 +86,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           <span>{entity.version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      minWidth: 150,
+      staticWidth: 150,
     },
     lifecycle: {
       renderCell: (_value, entity) => <LifecycleCell node={entity} />,
@@ -101,7 +108,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={CPU_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 130,
+      staticWidth: 80,
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -142,7 +149,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
-      staticWidth: 'matchHeader',
+      staticWidth: 130,
     },
   },
 });

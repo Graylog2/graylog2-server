@@ -26,6 +26,7 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
@@ -71,6 +72,9 @@ const useColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View
 
   return {
     attributes: {
+      owner: {
+        staticWidth: COLUMN_WIDTH.user,
+      },
       title: {
         renderCell: (title: string, search) => (
           <ViewLoaderContext.Consumer key={search.id}>

@@ -29,6 +29,7 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 import PriorityName from 'components/events/events/PriorityName';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
@@ -54,8 +55,10 @@ const getCustomColumnRenderers = (
     matched_at: {
       renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
         eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {
+      staticWidth: 300,
       renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
         <SchedulingCell definition={eventDefinition} />
       ),
@@ -70,8 +73,7 @@ const getCustomColumnRenderers = (
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
         <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
       ),
-      width: 0.15,
-      minWidth: 150,
+      staticWidth: 'matchHeader' as const,
     },
     priority: {
       renderCell: (priority: number) => <PriorityName priority={priority} />,
@@ -82,6 +84,7 @@ const getCustomColumnRenderers = (
         <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
       ),
       textAlign: 'right',
+      staticWidth: 'matchHeader' as const,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -91,11 +94,11 @@ const getCustomColumnRenderers = (
             : 'User Defined'}
         </span>
       ),
+      staticWidth: 110,
     },
     tags: {
       renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
-      width: 0.2,
-      minWidth: 160,
+      staticWidth: COLUMN_WIDTH.tags,
     },
     ...(tacticsTechniquesPlugin
       ? {
@@ -105,8 +108,7 @@ const getCustomColumnRenderers = (
 
               return <Cell entity={eventDefinition} />;
             },
-            width: 0.2,
-            minWidth: 160,
+            staticWidth: COLUMN_WIDTH.tags,
           },
         }
       : {}),

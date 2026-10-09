@@ -21,6 +21,7 @@ import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
 import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const useCustomColumnRenderers = () => {
   const {
@@ -30,6 +31,9 @@ const useCustomColumnRenderers = () => {
   return useMemo(
     () => ({
       attributes: {
+        field_name: {
+          staticWidth: COLUMN_WIDTH.title,
+        },
         type: {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
@@ -39,7 +43,7 @@ const useCustomColumnRenderers = () => {
               <OriginCell origin={origin} />
             </ExpandedSectionToggleWrapper>
           ),
-          staticWidth: 200,
+          staticWidth: 150,
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>

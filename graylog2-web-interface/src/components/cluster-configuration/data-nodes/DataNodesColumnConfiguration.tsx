@@ -23,6 +23,7 @@ import { Icon, Link } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { ClusterDataNode } from './fetchClusterDataNodes';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
@@ -89,7 +90,7 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
 
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
-      minWidth: 300,
+      staticWidth: COLUMN_WIDTH.title,
     },
     datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
@@ -160,11 +161,11 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
           </SecondaryText>
         );
       },
-      minWidth: 200,
+      staticWidth: 150,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
-      minWidth: 220,
+      staticWidth: 220,
     },
   },
 });

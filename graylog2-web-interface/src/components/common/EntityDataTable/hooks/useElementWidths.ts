@@ -17,6 +17,7 @@
 
 import { useMemo } from 'react';
 
+import { TABLE_BORDER_WIDTH } from 'components/bootstrap/Table';
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
@@ -64,12 +65,20 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     scrollContainerWidth,
   });
 
+  // Used as min width for the table. The actions column fills the remaining space with CSS,
+  // so the other columns keep their width while the container width changes.
+  const tableMinWidth = Object.entries(columnWidths).reduce(
+    (total, [colId, width]) => (colId === ACTIONS_COL_ID ? total : total + width),
+    TABLE_BORDER_WIDTH + actionsColMinWidth,
+  );
+
   return {
     handleActionsWidthChange,
     columnWidths,
     tableIsCompressed: actionsColMinWidth === columnWidths[ACTIONS_COL_ID],
     actionsColMinWidth,
     scrollContainerWidth,
+    tableMinWidth,
   };
 };
 

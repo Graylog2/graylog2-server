@@ -20,41 +20,40 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import { Timestamp, StatusIcon } from 'components/common';
 import UsernameCell from 'components/users/UsersTokenManagement/cells/UsernameCell';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const customColumnRenderers = (): ColumnRenderers<Token> => ({
   attributes: {
     id: {
       renderCell: (_id: string, token) => token.id,
-      width: 0.2,
+      staticWidth: 220,
     },
     user_id: {
       renderCell: (_user_id: string, token) => token.user_id,
-      width: 0.2,
+      staticWidth: 220,
     },
     username: {
       renderCell: (_username: string, token) => <UsernameCell token={token} />,
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.user,
     },
     NAME: {
       renderCell: (_NAME: string, token) => token.NAME,
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.title,
     },
     created_at: {
       renderCell: (_created_at: string, token) => token?.created_at && <Timestamp dateTime={token.created_at} />,
-      width: 0.2,
     },
     last_access: {
       renderCell: (_last_access: string, token) =>
         token?.last_access ? <Timestamp dateTime={token.last_access} /> : 'Never',
-      width: 0.2,
     },
     external_user: {
       renderCell: (_external_user: boolean, token) => <StatusIcon active={token.external_user} />,
-      width: 0.2,
+      staticWidth: 'matchHeader',
     },
     title: {
       renderCell: (_title: string, token) => (token.title ? token.title : 'N/A'),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.reference,
     },
   },
 });

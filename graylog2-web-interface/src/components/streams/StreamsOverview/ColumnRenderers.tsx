@@ -24,6 +24,7 @@ import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell'
 import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
 import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import StatusCell from './cells/StatusCell';
 import StreamRulesCell from './cells/StreamRulesCell';
@@ -53,11 +54,10 @@ const customColumnRenderers = (
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
-      width: 0.5,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
@@ -66,7 +66,7 @@ const customColumnRenderers = (
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 160,
+      staticWidth: 120,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
@@ -88,24 +88,24 @@ const customColumnRenderers = (
     },
     [METRIC_COLUMN_IDS.messageCount]: {
       renderCell: (_value: unknown, stream) => <MessageCountCell stream={stream} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.avgProcessingTime]: {
       renderCell: (_value: unknown, stream) => <AvgProcessingTimeCell stream={stream} />,
-      staticWidth: 200,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.maxProcessingTime]: {
       renderCell: (_value: unknown, stream) => <MaxProcessingTimeCell stream={stream} />,
-      staticWidth: 200,
+      staticWidth: 'matchHeader' as const,
     },
     [METRIC_COLUMN_IDS.associatedInputs]: {
       renderCell: (_value: unknown, stream) => <AssociatedInputsCell stream={stream} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader' as const,
       textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
-      staticWidth: 160,
+      staticWidth: 'matchHeader' as const,
       textAlign: 'right',
     },
     ...(extensionColumnRenderers || {}),
