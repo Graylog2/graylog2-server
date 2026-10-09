@@ -175,7 +175,7 @@
         <!-- Jersey 4.0.2 is built against hibernate-validator 8.x and declares jboss-logging 3.6.1, while
              hibernate-validator 9.x requires jboss-logging 3.6.3. When bumping Jersey, check if it aligns with
              hibernate-validator 9.x, so the explicit jboss-logging dependency management can be removed. -->
-        <jersey.version>4.0.2</jersey.version>
+        <jersey.version>4.0.3</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.15.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
