@@ -136,14 +136,7 @@ const HeatmapSkeleton = () => (
       const row = Math.floor(index / HEATMAP_COLUMNS);
       const column = index % HEATMAP_COLUMNS;
 
-      return (
-        <HeatmapCell
-          key={index}
-          $index={row + column}
-          $intensity={heatmapIntensity(row, column)}
-          height="100%"
-        />
-      );
+      return <HeatmapCell key={index} $index={row + column} $intensity={heatmapIntensity(row, column)} height="100%" />;
     })}
   </HeatmapGrid>
 );
