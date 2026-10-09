@@ -37,6 +37,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.bindings.InputRuntimeModule;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
@@ -196,24 +197,15 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected MapBinder<String, Codec.Factory<? extends Codec>> codecMapBinder() {
-        return MapBinder.newMapBinder(binder(),
-                TypeLiteral.get(String.class),
-                new TypeLiteral<Codec.Factory<? extends Codec>>() {
-                });
+        return InputRuntimeModule.makeCodecBinder(binder());
     }
 
     protected MapBinder<String, Transport.Factory<? extends Transport>> transportMapBinder() {
-        return MapBinder.newMapBinder(binder(),
-                TypeLiteral.get(String.class),
-                new TypeLiteral<Transport.Factory<? extends Transport>>() {
-                });
+        return InputRuntimeModule.makeTransportBinder(binder());
     }
 
     protected MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputsMapBinder() {
-        return MapBinder.newMapBinder(binder(),
-                TypeLiteral.get(String.class),
-                new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
-                });
+        return InputRuntimeModule.makeInputBinder(binder());
     }
 
     protected MapBinder<String, RotationStrategy> rotationStrategiesMapBinder() {
@@ -232,6 +224,11 @@ public abstract class Graylog2Module extends AbstractModule {
         mapBinder.addBinding(target.getCanonicalName()).to(target);
     }
 
+    protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
+        installInput(inputsMapBinder(), messageInputClass);
+    }
+
+    @Deprecated(forRemoval = true)
     protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
                                                          Class<T> target,
                                                          Class<? extends MessageInput.Factory<T>> targetFactory) {
@@ -239,17 +236,10 @@ public abstract class Graylog2Module extends AbstractModule {
         inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 
+    @Deprecated(forRemoval = true)
     protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
                                                          Class<T> target) {
-        Class<? extends MessageInput.Factory<T>> factoryClass =
-                (Class<? extends MessageInput.Factory<T>>) findInnerClassAnnotatedWith(FactoryClass.class, target, MessageInput.Factory.class);
-
-        if (factoryClass == null) {
-            LOG.error("Unable to find an inner class annotated with @FactoryClass in input {}. This input will not be available!", target);
-            return;
-        }
-
-        installInput(inputMapBinder, target, factoryClass);
+        InputRuntimeModule.installInput(binder(), inputMapBinder, target);
     }
 
     // This should only be used by plugins that have been built before Graylog 3.0.1.
@@ -507,6 +497,7 @@ public abstract class Graylog2Module extends AbstractModule {
      *
      * @param restResourceClass the resource to add
      */
+    @SuppressWarnings("JavadocReference")
     protected void addSystemRestResource(Class<?> restResourceClass) {
         systemRestResourceBinder().addBinding().toInstance(restResourceClass);
     }
