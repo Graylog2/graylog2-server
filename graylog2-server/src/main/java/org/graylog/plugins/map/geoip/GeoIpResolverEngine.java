@@ -177,7 +177,7 @@ public class GeoIpResolverEngine {
         return message.getFieldNames()
                 .stream()
                 .filter(e -> (!enforceGraylogSchema || ipAddressFields.containsKey(e))
-                        && !e.startsWith(Message.INTERNAL_FIELD_PREFIX))
+                        && !Message.isInternalField(e))
                 .toList();
     }
 

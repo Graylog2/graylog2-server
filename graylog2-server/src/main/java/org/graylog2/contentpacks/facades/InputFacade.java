@@ -404,7 +404,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
             throw new ValidationException(errorMessage);
         }
 
-        if (Message.RESERVED_FIELDS.contains(key) && !Message.RESERVED_SETTABLE_FIELDS.contains(key)) {
+        if (Message.isReservedNonSettableField(key)) {
             final String errorMessage = "Cannot add static field. Field [" + key + "] is reserved.";
             LOG.error(errorMessage);
             throw new ValidationException(errorMessage);
