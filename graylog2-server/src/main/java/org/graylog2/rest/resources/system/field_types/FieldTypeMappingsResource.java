@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -37,7 +36,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -58,7 +56,6 @@ import org.graylog2.shared.security.RestPermissions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -209,9 +206,6 @@ public class FieldTypeMappingsResource extends RestResource {
     private Map<String, BulkOperationResponse> changeProfileOfPermitted(final Set<String> indexSetsIds,
                                                                         final Map<String, Object> auditContext,
                                                                         final Function<Set<String>, Map<String, BulkOperationResponse>> change) {
-        if (indexSetsIds.stream().anyMatch(Objects::isNull)) {
-            throw new BadRequestException("Index set ids must not be null");
-        }
         final AuditActor actor = AuditActor.user(getCurrentUser());
         final Set<String> permittedIds = indexSetsIds.stream()
                 .filter(indexSetId -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSetId))
@@ -222,8 +216,7 @@ public class FieldTypeMappingsResource extends RestResource {
             throw new ForbiddenException("Not authorized");
         }
 
-        // ids are unvalidated input and findByIds throws on anything that is not an ObjectId
-        final Map<String, String> titles = indexSetService.findByIds(indexSetsIds.stream().filter(ObjectId::isValid).collect(Collectors.toSet()))
+        final Map<String, String> titles = indexSetService.findByIds(indexSetsIds)
                 .stream()
                 .collect(Collectors.toMap(IndexSetConfig::id, IndexSetConfig::title));
         final Map<String, BulkOperationResponse> result = new HashMap<>(change.apply(permittedIds));
@@ -231,9 +224,12 @@ public class FieldTypeMappingsResource extends RestResource {
                 new BulkOperationResponse(0, List.of(new BulkOperationFailure(indexSetId, "Not authorized")))));
 
         result.forEach((indexSetId, response) -> {
+            if (!titles.containsKey(indexSetId)) {
+                return; // unknown index set: reported in the response, but not audited
+            }
             final Map<String, Object> context = ImmutableMap.<String, Object>builder()
                     .putAll(auditContext)
-                    .put("response_entity", Map.of("id", indexSetId, "title", titles.getOrDefault(indexSetId, "")))
+                    .put("response_entity", Map.of("id", indexSetId, "title", titles.get(indexSetId)))
                     .build();
             if (response.successfullyPerformed() > 0) {
                 auditEventSender.success(actor, INDEX_SET_UPDATE, context);
