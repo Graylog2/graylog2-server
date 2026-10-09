@@ -19,12 +19,13 @@ package org.graylog2.rest.resources.system.field_types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.validation.ValidObjectId;
 
 import java.util.Set;
 
 public record FieldTypeProfileUnsetRequest(@NotNull @NotEmpty
                                            @JsonProperty("index_sets")
-                                           Set<String> indexSetsIds,
+                                           Set<@NotNull @ValidObjectId String> indexSetsIds,
                                            @JsonProperty("rotate")
                                            boolean rotateImmediately) {
 }

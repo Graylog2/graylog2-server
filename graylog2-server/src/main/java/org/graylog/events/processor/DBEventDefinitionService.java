@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
@@ -30,6 +31,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityRegistrar;
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -377,19 +380,59 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * @return a map with counts of event definitions grouped by source (Illuminate vs user-created).
+     * @return a map with counts of event definitions grouped by source (Illuminate vs user-created), plus usage
+     * counts for user-created event definitions.
      */
     public Map<String, Long> countBySource() {
-        long illuminateEventCount = collection.countDocuments(
-                Filters.eq(ScopedEntity.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME)
-        );
-        long userEventCount = collection.countDocuments(
-                Filters.eq(ScopedEntity.FIELD_SCOPE, DefaultEntityScope.NAME)
-        );
+        final Bson userEventDefinitions = Filters.eq(ScopedEntity.FIELD_SCOPE, DefaultEntityScope.NAME);
+        final Map<String, Long> counts = new HashMap<>();
 
-        return Map.of(
-                "illuminate_event_definitions", illuminateEventCount,
-                "user_event_definitions", userEventCount
-        );
+        counts.put("illuminate_event_definitions", collection.countDocuments(
+                Filters.eq(ScopedEntity.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME)
+        ));
+        counts.put("user_event_definitions", collection.countDocuments(userEventDefinitions));
+        counts.put("user_event_definitions_with_tags", collection.countDocuments(
+                Filters.and(userEventDefinitions, Filters.exists(EventDefinitionDto.FIELD_TAGS + ".0"))
+        ));
+        counts.put("user_event_definitions_with_mitre", collection.countDocuments(
+                Filters.and(userEventDefinitions, hasTacticsTechniquesFilter())
+        ));
+        counts.put("user_event_definitions_unique_tags", (long) documentCollection
+                .distinct(EventDefinitionDto.FIELD_TAGS, userEventDefinitions, String.class)
+                .into(new ArrayList<>())
+                .size());
+        counts.putAll(countUserEventDefinitionsByType(userEventDefinitions));
+
+        return counts;
+    }
+
+    private Map<String, Long> countUserEventDefinitionsByType(Bson userEventDefinitions) {
+        final String typeField = EventDefinitionDto.FIELD_CONFIG + ".type";
+        final Map<String, Long> counts = new HashMap<>();
+
+        documentCollection.aggregate(List.of(
+                Aggregates.match(userEventDefinitions),
+                Aggregates.group("$" + typeField, Accumulators.sum("count", 1L))
+        )).forEach(result -> {
+            final String type = result.getString("_id");
+            if (type == null) {
+                return;
+            }
+            if (AggregationEventProcessorConfig.TYPE_NAME.equals(type)) {
+                // Filter and Aggregation share a type; without series the processor only runs the filter search.
+                final long total = result.get("count", Number.class).longValue();
+                final long aggregations = collection.countDocuments(Filters.and(
+                        userEventDefinitions,
+                        Filters.eq(typeField, type),
+                        Filters.exists(EventDefinitionDto.FIELD_CONFIG + ".series.0")
+                ));
+                counts.put("user_event_definitions_type_filter", total - aggregations);
+                counts.put("user_event_definitions_type_aggregation", aggregations);
+            } else {
+                counts.put("user_event_definitions_type_" + type, result.get("count", Number.class).longValue());
+            }
+        });
+
+        return counts;
     }
 }

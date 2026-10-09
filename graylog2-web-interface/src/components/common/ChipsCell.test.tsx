@@ -75,14 +75,52 @@ describe('ChipsCell', () => {
     expect(onItemClick).toHaveBeenCalledWith('phishing');
   });
 
-  it('uses a custom renderItem when supplied', () => {
+  it('uses custom chip content when renderItemContent is supplied', () => {
     render(
-      <ChipsCell items={['T1059', 'T1003']} renderItem={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>} />,
+      <ChipsCell
+        items={['T1059', 'T1003']}
+        renderItemContent={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>}
+      />,
     );
 
     expect(screen.getByText('CUSTOM-T1003')).toBeInTheDocument();
     expect(screen.getByText('CUSTOM-T1059')).toBeInTheDocument();
     expect(screen.getAllByTestId('custom-chip')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: /Filter by/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps chips clickable when renderItemContent is supplied', async () => {
+    const onItemClick = jest.fn();
+    render(
+      <ChipsCell
+        items={['T1059']}
+        renderItemContent={(t) => <span>CUSTOM-{t}</span>}
+        onItemClick={onItemClick}
+        itemLabel="technique"
+      />,
+    );
+
+    const chip = screen.getByRole('button', { name: 'Filter by technique "T1059"' });
+    expect(chip).toHaveTextContent('CUSTOM-T1059');
+
+    await userEvent.click(chip);
+
+    expect(onItemClick).toHaveBeenCalledWith('T1059');
+  });
+
+  it('names clickable chips with itemTitle when supplied', () => {
+    render(
+      <ChipsCell
+        items={['T1059']}
+        onItemClick={jest.fn()}
+        itemLabel="technique"
+        itemTitle={(t) => `${t}: Command and Scripting Interpreter`}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Filter by technique "T1059: Command and Scripting Interpreter"' }),
+    ).toHaveAttribute('title', 'Filter by technique "T1059: Command and Scripting Interpreter"');
   });
 
   it('respects a custom collapsedCount', () => {

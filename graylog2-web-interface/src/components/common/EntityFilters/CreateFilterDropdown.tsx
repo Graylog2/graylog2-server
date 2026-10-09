@@ -39,16 +39,16 @@ const AttributeSelect = ({
 }) => (
   <>
     <MenuItem header>Create Filter</MenuItem>
-    {attributes.map(({ id, title, type }) => {
+    {attributes.map(({ id, title, type, single_filter }) => {
       const hasActiveFilter = !!activeFilters?.get(id)?.length;
-      const disabled = type === 'BOOLEAN' ? hasActiveFilter : false;
+      const disabled = (type === 'BOOLEAN' || !!single_filter) && hasActiveFilter;
 
       return (
         <MenuItem onSelect={() => setSelectedAttributeId(id)} key={`${title}-filter`} disabled={disabled}>
           {title}
-          {type === 'BOOLEAN' && disabled && (
+          {disabled && (
             <HoverForHelp displayLeftMargin>
-              You can only create one filter for a boolean attribute.
+              You can only create one filter for this attribute.
               <br />
               If you want to change the filter value, you can update the existing one.
             </HoverForHelp>
@@ -84,7 +84,8 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
         dropdownZIndex={1050}>
         {({ toggleDropdown }) => {
           const _onCreateFilter = (filter: { title: string; value: string }, closeDropdown = true) => {
-            if (closeDropdown) {
+            // Keeping the dropdown open would let a single-filter attribute receive a second value.
+            if (closeDropdown || selectedAttribute?.single_filter) {
               toggleDropdown();
             }
 
