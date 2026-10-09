@@ -105,6 +105,18 @@ describe('WelcomeMetrics', () => {
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
   });
 
+  it('shows titled content skeletons for all widgets while the search is being created', async () => {
+    asMock(useCreateSearch).mockReturnValue(new Promise(() => {}));
+
+    renderWithStreams([accessibleStream]);
+
+    await screen.findByText('Messages Today');
+    expect(screen.getByText('Alerts Today')).toBeInTheDocument();
+    expect(screen.getByText('Events Today')).toBeInTheDocument();
+    expect(screen.getByText('Top 5 Sources')).toBeInTheDocument();
+    expect(screen.getAllByRole('status', { name: 'Loading widget content' })).toHaveLength(4);
+  });
+
   describe('welcome page metrics plugins', () => {
     let manifest: PluginManifest;
 

@@ -40,18 +40,20 @@ const SEARCH_PAGE_LAYOUT_CONTEXT_VALUE = {
 
 type Props = {
   view: Promise<View>;
+  loadingPlaceholder: React.ReactNode;
 };
 
 /**
  * Renders a search-backed view as a non-interactive, sidebar-less widget area, e.g. for the welcome
  * page's metrics tiles and charts. Shared by any welcome-page area that builds its own view/search with
  * `useWelcomeSearch` (see components/welcome/hooks/useWelcomeSearch.ts) and just needs it rendered.
+ * `loadingPlaceholder` is shown while the search is being prepared.
  */
-const WelcomeSearch = ({ view }: Props) => (
+const WelcomeSearch = ({ view, loadingPlaceholder }: Props) => (
   <InteractiveContext.Provider value="read-only">
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
       <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
-        <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+        <SearchPage view={view} isNew={false} skipNoStreamsCheck loadingPlaceholder={loadingPlaceholder} />
       </SearchPageLayoutProvider>
     </WidgetActionsContext.Provider>
   </InteractiveContext.Provider>
