@@ -31,6 +31,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 import useIndexSetMutations from 'components/indices/IndexSetsOverview/hooks/useIndexSetMutations';
 import useIndexSetCategoryCounts from 'components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts';
+import useIndexSetMetrics from 'components/indices/IndexSetsOverview/hooks/useIndexSetMetrics';
 import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
 
 import IndexSetsOverview from './IndexSetsOverview';
@@ -47,6 +48,7 @@ jest.mock('api/streams', () => ({
 }));
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMutations');
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetCategoryCounts');
+jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMetrics');
 jest.mock('components/indices/IndicesConfiguration', () => ({
   __esModule: true,
   default: ({ indexSet }: { indexSet: IndexSetEntity }) => <span>Rotation and retention of {indexSet.title}</span>,
@@ -73,6 +75,7 @@ const readOnlyIndexSet: IndexSetEntity = {
 };
 
 const setDefaultIndexSet = jest.fn();
+const refetchMetrics = jest.fn();
 
 const restrictedUser = adminUser
   .toBuilder()
@@ -107,6 +110,23 @@ const mockIndexSets = (list: Array<IndexSetEntity> = [defaultIndexSet, exampleIn
     isInitialLoading: false,
   });
 
+const mockMetrics = (overrides: Partial<ReturnType<typeof useIndexSetMetrics>> = {}) =>
+  asMock(useIndexSetMetrics).mockReturnValue({
+    metricsByIndexSetId: {
+      [exampleIndexSet.id]: {
+        index_count: 1234,
+        document_count: 1234567,
+        size_bytes: 12582912,
+        deflector_health: 'Yellow',
+      },
+      [readOnlyIndexSet.id]: { index_count: 3, size_bytes: 0, deflector_health: null },
+    },
+    isLoading: false,
+    isError: false,
+    refetch: refetchMetrics,
+    ...overrides,
+  });
+
 const lastSearchParams = () => asMock(useFetchEntities).mock.lastCall[0].searchParams;
 
 const findRow = (indexSet: IndexSetEntity) => screen.findByTestId(`table-row-${indexSet.id}`);
@@ -134,6 +154,7 @@ describe('IndexSetsOverview', () => {
       data: { all: 9, user: 5, system: 4, illuminate: 0 },
     });
     mockIndexSets();
+    mockMetrics();
   });
 
   it('renders index sets with their status labels', async () => {
@@ -145,11 +166,12 @@ describe('IndexSetsOverview', () => {
     expect(within(await findRow(exampleIndexSet)).queryByText('Default')).not.toBeInTheDocument();
   });
 
-  it('shows the number of streams per index set', async () => {
+  it('does not show associated streams in the default view', async () => {
     render(<IndexSetsOverview />);
 
-    await screen.findByText('Streams');
-    within(await findRow(readOnlyIndexSet)).getByText('12');
+    await screen.findByText('Description');
+
+    expect(screen.queryByText('Streams')).not.toBeInTheDocument();
   });
 
   it('shows the index set count per category', async () => {
@@ -311,6 +333,18 @@ describe('IndexSetsOverview', () => {
     expect(within(await findRow(exampleIndexSet)).queryByText('Not set')).not.toBeInTheDocument();
   });
 
+  it('shows associated streams in the routing view without requesting metrics', async () => {
+    render(<IndexSetsOverview />);
+
+    await userEvent.click(await screen.findByRole('radio', { name: 'Routing' }));
+
+    await screen.findByText('Streams');
+    within(await findRow(readOnlyIndexSet)).getByText('12');
+
+    expect(screen.queryByText('Description')).not.toBeInTheDocument();
+    expect(asMock(useIndexSetMetrics).mock.lastCall[1]).toEqual([]);
+  });
+
   it('does not load profiles the user may not read', async () => {
     asMock(useCurrentUser).mockReturnValue(restrictedUser);
     render(<IndexSetsOverview />);
@@ -320,6 +354,105 @@ describe('IndexSetsOverview', () => {
     within(await findRow(readOnlyIndexSet)).getByText('profile-id-1');
 
     expect(useProfile).not.toHaveBeenCalledWith('profile-id-1');
+  });
+
+  it('requests metrics of the visible index sets for the default view columns', async () => {
+    render(<IndexSetsOverview />);
+
+    await waitFor(() =>
+      expect(useIndexSetMetrics).toHaveBeenLastCalledWith(
+        [defaultIndexSet.id, exampleIndexSet.id, readOnlyIndexSet.id],
+        ['index_count', 'size_bytes'],
+      ),
+    );
+  });
+
+  it('requests the field count in the configuration view', async () => {
+    render(<IndexSetsOverview />);
+
+    await userEvent.click(await screen.findByRole('radio', { name: 'Configuration' }));
+
+    await waitFor(() => expect(asMock(useIndexSetMetrics).mock.lastCall[1]).toEqual(['field_count']));
+  });
+
+  it('shows the metrics of each index set', async () => {
+    render(<IndexSetsOverview />);
+
+    const exampleRow = await findRow(exampleIndexSet);
+    within(exampleRow).getByText('1,234');
+
+    expect(within(exampleRow).getByText('12.0MiB')).toBeInTheDocument();
+  });
+
+  it('abbreviates the document count', async () => {
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        ...layoutPreferences,
+        attributes: { title: { status: 'show' }, document_count: { status: 'show' } },
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+    render(<IndexSetsOverview />);
+
+    expect(await within(await findRow(exampleIndexSet)).findByText('1.2m')).toBeInTheDocument();
+  });
+
+  it('shows a spinner while metrics are loading', async () => {
+    mockMetrics({ metricsByIndexSetId: {}, isLoading: true });
+    render(<IndexSetsOverview />);
+
+    expect(await within(await findRow(exampleIndexSet)).findAllByText(/loading/i)).toHaveLength(2);
+  });
+
+  it('keeps loaded metrics while the missing ones are loading', async () => {
+    mockMetrics({ metricsByIndexSetId: { [exampleIndexSet.id]: { index_count: 1234 } }, isLoading: true });
+    render(<IndexSetsOverview />);
+
+    const exampleRow = await findRow(exampleIndexSet);
+    within(exampleRow).getByText('1,234');
+
+    expect(await within(exampleRow).findAllByText(/loading/i)).toHaveLength(1);
+  });
+
+  it('does not offer the deflector health column', async () => {
+    render(<IndexSetsOverview />);
+
+    await screen.findByText('Title');
+
+    expect(screen.queryByText('Deflector')).not.toBeInTheDocument();
+  });
+
+  it('offers a retry when metrics could not be loaded', async () => {
+    mockMetrics({ metricsByIndexSetId: {}, isError: true });
+    render(<IndexSetsOverview />);
+
+    await userEvent.click(
+      within(await findRow(exampleIndexSet)).getByRole('button', {
+        name: 'Retry loading indices for index set Example Index Set',
+      }),
+    );
+
+    expect(refetchMetrics).toHaveBeenCalled();
+  });
+
+  it('keeps showing loaded metrics when refreshing them fails', async () => {
+    mockMetrics({ isError: true });
+    render(<IndexSetsOverview />);
+
+    within(await findRow(exampleIndexSet)).getByText('1,234');
+
+    expect(
+      screen.queryByRole('button', { name: /retry loading indices for index set example/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not offer sorting by metric columns', async () => {
+    render(<IndexSetsOverview />);
+
+    await screen.findByRole('button', { name: /sort title/i });
+
+    expect(screen.queryByRole('button', { name: /sort indices/i })).not.toBeInTheDocument();
   });
 
   it('adds plugin columns to the configuration view', async () => {
