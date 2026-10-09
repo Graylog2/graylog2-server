@@ -1,0 +1,79 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000001"
+      },
+      "_scope": "DEFAULT",
+      "title": "User filter with tags and MITRE",
+      "config": {
+        "type": "aggregation-v1",
+        "query": "action:login",
+        "series": [],
+        "group_by": []
+      },
+      "tags": ["auth", "login"],
+      "tactics_techniques": ["TA0001", "T1078"]
+    },
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000002"
+      },
+      "_scope": "DEFAULT",
+      "title": "User filter without series field",
+      "config": {
+        "type": "aggregation-v1",
+        "query": "action:logout"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000003"
+      },
+      "_scope": "DEFAULT",
+      "title": "User aggregation with tags",
+      "config": {
+        "type": "aggregation-v1",
+        "query": "action:login",
+        "series": [{"type": "count", "id": "count-"}],
+        "group_by": ["source"]
+      },
+      "tags": ["login", "brute-force"],
+      "tactics_techniques": []
+    },
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000004"
+      },
+      "_scope": "DEFAULT",
+      "title": "User sigma rule",
+      "config": {
+        "type": "sigma-v1"
+      },
+      "tags": []
+    },
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000005"
+      },
+      "_scope": "ILLUMINATE",
+      "title": "Illuminate aggregation with tags and MITRE",
+      "config": {
+        "type": "aggregation-v1",
+        "series": [{"type": "count", "id": "count-"}]
+      },
+      "tags": ["illuminate-only"],
+      "tactics_techniques": ["TA0002", "T1059"]
+    },
+    {
+      "_id": {
+        "$oid": "6a1f00000000000000000006"
+      },
+      "_scope": "GRAYLOG_NONDELETEABLE_SCOPE",
+      "title": "System notification events",
+      "config": {
+        "type": "system-notifications-v1"
+      }
+    }
+  ]
+}
