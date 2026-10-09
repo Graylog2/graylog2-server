@@ -132,6 +132,7 @@
         <gcs.version>2.74.0</gcs.version>
         <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
         <azure-core.version>1.59.1</azure-core.version>
+        <azure-identity.version>1.18.6</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
         <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -371,6 +372,24 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-messaging-eventhubs</artifactId>
                 <version>${azure-messaging-eventhubs.version}</version>
+            </dependency>
+            <!-- Used by the enterprise plugin. Managed here so it is bumped together with azure-core -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
+                <exclusions>
+                    <!-- Keeps a second JNA off the classpath next to oshi's jna-jpms. Only the IntelliJ and VS Code credentials need it. -->
+                    <exclusion>
+                        <groupId>com.microsoft.azure</groupId>
+                        <artifactId>msal4j-persistence-extension</artifactId>
+                    </exclusion>
+                    <!-- Use the HTTP client that azure-storage-blob brings -->
+                    <exclusion>
+                        <groupId>com.azure</groupId>
+                        <artifactId>azure-core-http-netty</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- msal4j pulls in an older azure-json than azure-core requires -->
             <dependency>
