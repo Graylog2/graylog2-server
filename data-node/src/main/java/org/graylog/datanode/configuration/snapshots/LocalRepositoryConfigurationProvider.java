@@ -14,8 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppendFilter from 'components/common/PaginatedEntityTable/hooks/useAppendFilter';
+package org.graylog.datanode.configuration.snapshots;
 
-const useAppendTagFilter = () => useAppendFilter('tags');
+import java.util.Collection;
+import java.util.List;
 
-export default useAppendTagFilter;
+/**
+ * Provides repositories defined in the datanode configuration file.
+ */
+public class LocalRepositoryConfigurationProvider implements RepositoryConfigurationProvider {
+
+    private final List<RepositoryConfiguration> repositories;
+
+    public LocalRepositoryConfigurationProvider(Collection<RepositoryConfiguration> repositories) {
+        this.repositories = List.copyOf(repositories);
+    }
+
+    @Override
+    public Collection<RepositoryConfiguration> get() {
+        return repositories;
+    }
+}
