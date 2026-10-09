@@ -14,8 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppendFilter from 'components/common/PaginatedEntityTable/hooks/useAppendFilter';
+import { useCallback, useState } from 'react';
+import useResizeObserver from '@react-hook/resize-observer';
 
-const useAppendTagFilter = () => useAppendFilter('tags');
+const useNaturalWidth = <T extends HTMLElement>(): [(node: T | null) => void, number] => {
+  const [width, setWidth] = useState(0);
+  const [element, setElement] = useState<T | null>(null);
 
-export default useAppendTagFilter;
+  const ref = useCallback((node: T | null) => {
+    setElement(node);
+
+    if (node) {
+      setWidth(node.getBoundingClientRect().width);
+    }
+  }, []);
+
+  useResizeObserver(element, ({ contentRect }) => {
+    if (contentRect.width > 0) {
+      setWidth(contentRect.width);
+    }
+  });
+
+  return [ref, width];
+};
+
+export default useNaturalWidth;

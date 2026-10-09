@@ -16,26 +16,39 @@
  */
 import styled, { css } from 'styled-components';
 
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { Nav } from 'components/bootstrap';
 
-const Navbar = styled.header(
+export const SectionNav = styled(Nav)`
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+export const SectionNavItem = styled.li(
   ({ theme }) => css`
-    position: relative;
-    height: ${NAV_ITEM_HEIGHT};
-    min-height: auto;
-    display: flex;
-    align-items: center;
+    & + & {
+      margin-top: 2px;
+    }
 
-    flex-wrap: nowrap;
-    background-color: ${theme.colors.global.navigationBackground};
-    border: 0;
-    padding: 0;
-    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-    margin-bottom: 0;
-    font-family: ${theme.fonts.family.navigation};
-    font-size: ${theme.fonts.size.navigation};
+    > a {
+      display: block;
+      padding: 10px 15px;
+      border-radius: 4px;
+      color: ${theme.colors.global.link};
+
+      &:hover,
+      &:focus {
+        background-color: ${theme.colors.variant.lightest.default};
+        text-decoration: none;
+      }
+    }
+
+    &.active > a {
+      &,
+      &:hover,
+      &:focus {
+        color: ${theme.utils.contrastingColor(theme.colors.global.link)};
+        background-color: ${theme.colors.global.link};
+      }
+    }
   `,
 );
-
-/** @component */
-export default Navbar;

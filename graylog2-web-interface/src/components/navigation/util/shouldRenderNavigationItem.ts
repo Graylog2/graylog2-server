@@ -14,8 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppendFilter from 'components/common/PaginatedEntityTable/hooks/useAppendFilter';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
-const useAppendTagFilter = () => useAppendFilter('tags');
+import AppConfig from 'util/AppConfig';
 
-export default useAppendTagFilter;
+const shouldRenderNavigationItem = (
+  requiredFeatureFlag: string | undefined,
+  requiredPermissions: Permission | Array<Permission> | undefined,
+  isPermitted: (permissions: Permission | Array<Permission>) => boolean,
+) => {
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return false;
+  }
+
+  if (requiredPermissions && !isPermitted(requiredPermissions)) {
+    return false;
+  }
+
+  return true;
+};
+
+export default shouldRenderNavigationItem;

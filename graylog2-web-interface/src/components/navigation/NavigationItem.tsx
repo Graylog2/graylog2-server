@@ -17,31 +17,14 @@
 
 import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
-import type * as Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
+import styled, { css } from 'styled-components';
 
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
-import { isPermitted } from 'util/PermissionsMixin';
 import { NavDropdown } from 'components/bootstrap';
 import NavigationLink from 'components/navigation/NavigationLink';
-import AppConfig from 'util/AppConfig';
-
-const shouldRender = (
-  requiredFeatureFlag: string | undefined,
-  requiredPermissions: Permission | Array<Permission> | undefined,
-  userPermissions: Immutable.List<Permission>,
-) => {
-  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
-    return false;
-  }
-
-  if (requiredPermissions && !isPermitted(userPermissions, requiredPermissions)) {
-    return false;
-  }
-
-  return true;
-};
+import shouldRenderNavigationItem from 'components/navigation/util/shouldRenderNavigationItem';
+import { hoverIndicatorStyles, activeIndicatorStyles } from 'components/common/NavItemStateIndicator';
 
 const renderLinkTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
   Badge ? <Badge text={description} /> : description;
@@ -54,13 +37,13 @@ type PluginNavDropdownProps = {
 };
 
 const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }: PluginNavDropdownProps) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const activeMenuItem = menuItems.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
   const title = activeMenuItem.length > 0 ? `${description} / ${activeMenuItem[0].description}` : description;
   const accessibleMenuItems = menuItems.filter(
     ({ requiredFeatureFlag, permissions, useCondition }) =>
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      (useCondition?.() ?? true) && shouldRender(requiredFeatureFlag, permissions, currentUser.permissions),
+      (useCondition?.() ?? true) && shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
   );
 
   if (!accessibleMenuItems.length) {
@@ -88,13 +71,28 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
+const NavListItem = styled.li(
+  ({ theme }) => css`
+    > a {
+      &:hover,
+      &:focus-visible {
+        ${hoverIndicatorStyles(theme)}
+      }
+
+      &.active {
+        ${activeIndicatorStyles(theme)}
+      }
+    }
+  `,
+);
+
 const NavigationItem = ({
   navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
   pathname,
 }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  if (!shouldRender(requiredFeatureFlag, permissions, currentUser.permissions)) {
+  if (!shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted)) {
     return null;
   }
 
@@ -111,7 +109,14 @@ const NavigationItem = ({
   }
 
   return (
-    <NavigationLink key={description} description={renderLinkTitle(description, BadgeComponent)} path={path} topLevel />
+    <NavListItem>
+      <NavigationLink
+        key={description}
+        description={renderLinkTitle(description, BadgeComponent)}
+        path={path}
+        topLevel
+      />
+    </NavListItem>
   );
 };
 
