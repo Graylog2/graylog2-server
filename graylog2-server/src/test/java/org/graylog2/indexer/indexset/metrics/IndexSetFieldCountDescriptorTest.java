@@ -92,6 +92,6 @@ class IndexSetFieldCountDescriptorTest {
         IndexSetMocks.stubLookup(indexSetService, indexSetRegistry, IndexSetMocks.indexSet(A, "graylog", true));
         when(indices.getIndexNamesAndAliases(anyCollection())).thenThrow(new IllegalStateException("Connection refused"));
 
-        assertThat(descriptor.compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+        assertThat(descriptor.compute(List.of(A))).isEmpty();
     }
 }

@@ -75,6 +75,6 @@ class IndexSetDeflectorHealthDescriptorTest {
         when(clusterAdapter.deflectorHealthByAlias(List.of("graylog_deflector")))
                 .thenThrow(new IllegalStateException("Connection refused"));
 
-        assertThat(descriptor.compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+        assertThat(descriptor.compute(List.of(A))).isEmpty();
     }
 }

@@ -65,9 +65,9 @@ abstract class IndexSetMetricDescriptor<T> implements EntityCachedMetricDescript
         try {
             return computeFor(indexSets);
         } catch (RuntimeException e) {
-            // a backend that is down leaves every value unknown instead of failing the request
+            // returning no values keeps the failure out of the cache, which lets the next request retry
             LOG.warn("Unable to compute {} for index sets {}: {}", fieldName(), entityIds, Throwables.getRootCause(e).getMessage());
-            return indexSets.stream().map(indexSet -> new EntityMetric<T>(indexSet.getConfig().id(), null)).toList();
+            return List.of();
         }
     }
 

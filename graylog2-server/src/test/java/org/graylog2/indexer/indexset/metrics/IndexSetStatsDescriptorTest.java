@@ -70,7 +70,7 @@ class IndexSetStatsDescriptorTest {
     void reportsNoValueWhenTheLookupFails() {
         when(statsCreator.getForIndexSets(anySet())).thenThrow(new IllegalStateException("Connection refused"));
 
-        assertThat(indexCount().compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+        assertThat(indexCount().compute(List.of(A))).isEmpty();
     }
 
     private IndexSetStatsDescriptor indexCount() {
