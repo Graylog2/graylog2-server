@@ -14,8 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppendFilter from 'components/common/PaginatedEntityTable/hooks/useAppendFilter';
+package org.graylog.datanode.configuration.snapshots;
 
-const useAppendTagFilter = () => useAppendFilter('tags');
+import java.util.Collection;
 
-export default useAppendTagFilter;
+/**
+ * Source of snapshot repository definitions. Implementations are collected via a Guice multibinder, so plugins
+ * can contribute additional repositories next to the ones defined in the datanode configuration file.
+ * The provider is queried every time the opensearch configuration is (re)built.
+ */
+public interface RepositoryConfigurationProvider {
+    Collection<RepositoryConfiguration> get();
+}
