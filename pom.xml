@@ -148,7 +148,7 @@
         <google-conscrypt.version>2.7.0</google-conscrypt.version>
         <google-gax.version>2.86.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
-        <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
+        <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.84.0</grpc.version>
         <gson.version>2.14.0</gson.version>
@@ -170,12 +170,7 @@
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
-        <!-- Should match the version required by hibernate-validator. See the comment on jersey.version below. -->
-        <jboss-logging.version>3.6.3.Final</jboss-logging.version>
-        <!-- Jersey 4.0.2 is built against hibernate-validator 8.x and declares jboss-logging 3.6.1, while
-             hibernate-validator 9.x requires jboss-logging 3.6.3. When bumping Jersey, check if it aligns with
-             hibernate-validator 9.x, so the explicit jboss-logging dependency management can be removed. -->
-        <jersey.version>4.0.2</jersey.version>
+        <jersey.version>4.0.3</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.15.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -559,12 +554,6 @@
                 <groupId>io.opentelemetry.semconv</groupId>
                 <artifactId>opentelemetry-semconv</artifactId>
                 <version>${opentelemetry-semconv.version}</version>
-            </dependency>
-            <!-- jersey-bean-validation pulls in an older jboss-logging than hibernate-validator requires -->
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>${jboss-logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
