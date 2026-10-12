@@ -131,7 +131,7 @@
         <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.74.0</gcs.version>
         <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
-        <azure-core.version>1.59.1</azure-core.version>
+        <azure-core.version>1.60.0</azure-core.version>
         <azure-json.version>1.5.1</azure-json.version>
         <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
