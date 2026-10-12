@@ -77,7 +77,9 @@ const IndexSetCategoryButtons = () => {
   const onSelect = (category: CategoryOption) => {
     const filters = searchParams.filters ?? OrderedMap<string, Array<string>>();
 
-    onChangeFilters(category === ALL ? filters.delete(CATEGORY_ATTRIBUTE) : filters.set(CATEGORY_ATTRIBUTE, [category]));
+    onChangeFilters(
+      category === ALL ? filters.delete(CATEGORY_ATTRIBUTE) : filters.set(CATEGORY_ATTRIBUTE, [category]),
+    );
   };
 
   const visibleOptions = CATEGORY_OPTIONS.filter(
