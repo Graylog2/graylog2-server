@@ -572,7 +572,29 @@ describe('IndexSetsOverview', () => {
 
       expect(await rowCheckbox(defaultIndexSet)).not.toBeChecked();
       expect(await rowCheckbox(exampleIndexSet)).not.toBeChecked();
-      expect(await rowCheckbox(eventsIndexSet)).toBeChecked();
+      expect(await rowCheckbox(eventsIndexSet)).not.toBeChecked();
+    });
+
+    it('deselects excluded index sets after removing a profile', async () => {
+      removeProfileFromIndex.mockResolvedValue({
+        [readOnlyIndexSet.id]: { indexSetId: readOnlyIndexSet.id, applied: true, failures: [], errors: [] },
+      });
+      mockIndexSets([defaultIndexSet, readOnlyIndexSet]);
+      render(<IndexSetsOverview />);
+
+      await selectRow(defaultIndexSet);
+      await selectRow(readOnlyIndexSet);
+      await openBulkAction(/remove field type profile/i);
+
+      const modal = await screen.findByRole('dialog');
+      await userEvent.click(within(modal).getByRole('button', { name: /remove profile/i }));
+
+      expect(removeProfileFromIndex).toHaveBeenCalledWith({ indexSetIds: [readOnlyIndexSet.id], rotated: true });
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      expect(await rowCheckbox(defaultIndexSet)).not.toBeChecked();
+      expect(await rowCheckbox(readOnlyIndexSet)).not.toBeChecked();
     });
 
     it('keeps failed index sets selected and the modal open', async () => {

@@ -45,6 +45,11 @@ export const appliedIndexSetIds = (response: ProfileChangeResponse) =>
     .filter(({ applied }) => applied)
     .map(({ indexSetId }) => indexSetId);
 
+export const failedIndexSetIds = (response: ProfileChangeResponse) =>
+  Object.values(response)
+    .filter(({ applied }) => !applied)
+    .map(({ indexSetId }) => indexSetId);
+
 export const refetchAfterProfileChange = (queryClient: QueryClient) =>
   Promise.all([
     queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' }),

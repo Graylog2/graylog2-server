@@ -20,7 +20,7 @@ import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { ProfileAction } from 'components/indices/IndexSetFieldTypes/profileTargets';
-import { appliedIndexSetIds } from 'components/indices/IndexSetFieldTypes/profileChangeResult';
+import { failedIndexSetIds } from 'components/indices/IndexSetFieldTypes/profileChangeResult';
 import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldTypes/types';
 import usePermissions from 'hooks/usePermissions';
 
@@ -43,15 +43,14 @@ const BulkActions = ({ indexSetsById, onProfileAction }: Props) => {
   const selectedIndexSets = selectedEntities.map((id) => indexSetsById[id]).filter(Boolean);
   const canEditSelection = isAnyPermitted(selectedEntities.map((id) => `indexsets:edit:${id}` as const));
 
-  const openProfileAction = (action: ProfileAction) => {
-    const applied = new Set<string>();
-    const onChangeApplied = (response: ProfileChangeResponse) => {
-      appliedIndexSetIds(response).forEach((id) => applied.add(id));
-      setSelectedEntities(selectedEntities.filter((id) => !applied.has(id)));
-    };
+  const onChangeApplied = (response: ProfileChangeResponse) => {
+    const failed = new Set(failedIndexSetIds(response));
 
-    onProfileAction({ action, indexSets: selectedIndexSets, onChangeApplied });
+    setSelectedEntities(selectedEntities.filter((id) => failed.has(id)));
   };
+
+  const openProfileAction = (action: ProfileAction) =>
+    onProfileAction({ action, indexSets: selectedIndexSets, onChangeApplied });
 
   return (
     <BulkActionsDropdown>
