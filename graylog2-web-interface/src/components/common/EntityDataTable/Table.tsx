@@ -44,17 +44,11 @@ import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 import TableHead from './TableHead';
 
-const StyledTable = styled(BaseTable)(
-  ({ theme }) => css`
-    table-layout: fixed;
-    margin-bottom: 0;
-    height: 100%; // required to be able to use height: 100% in td
-
-    tbody > tr.active {
-      background-color: ${theme.colors.table.row.backgroundStriped} !important;
-    }
-  `,
-);
+const StyledTable = styled(BaseTable)`
+  table-layout: fixed;
+  margin-bottom: 0;
+  height: 100%; // required to be able to use height: 100% in td
+`;
 
 const Td = styled.td<{
   $colId: string;
@@ -111,6 +105,16 @@ const Td = styled.td<{
       }
     `}
   `,
+);
+
+const Tr = styled.tr<{ $active: boolean }>(({ theme, $active }) =>
+  $active
+    ? css`
+        &&&:not(:hover) {
+          background-color: ${theme.colors.table.row.backgroundStriped};
+        }
+      `
+    : '',
 );
 
 type Props<Entity extends EntityBase> = {
@@ -172,7 +176,7 @@ const Table = <Entity extends EntityBase>({
               />
             ) : (
               <>
-                <tr className={isRowExpanded(row.id) ? 'active' : null}>{visibleCells.map(renderCell)}</tr>
+                <Tr $active={isRowExpanded(row.id)}>{visibleCells.map(renderCell)}</Tr>
                 <ExpandedSections
                   key={`expanded-sections-${row.id}`}
                   expandedSectionRenderers={expandedSectionRenderers}
