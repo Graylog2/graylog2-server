@@ -1,0 +1,76 @@
+{
+  "responses": [
+    {
+      "took": 7,
+      "timed_out": false,
+      "_shards": {
+        "total": 20,
+        "successful": 17,
+        "skipped": 0,
+        "failed": 3,
+        "failures": [
+          {
+            "shard": 0,
+            "index": "graylog_1",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "too_many_nested_clauses",
+              "reason": "too_many_nested_clauses: Query contains too many nested clauses; maxClauseCount is set to 1024",
+              "caused_by": {
+                "type": "too_many_nested_clauses",
+                "reason": "Query contains too many nested clauses; maxClauseCount is set to 1024"
+              }
+            }
+          },
+          {
+            "shard": 0,
+            "index": "graylog_8",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "too_many_nested_clauses",
+              "reason": "Query contains too many nested clauses; maxClauseCount is set to 1024"
+            }
+          },
+          {
+            "shard": 0,
+            "index": "graylog_9",
+            "node": "Mc1oQWuEQom5uQyCljDEGA",
+            "reason": {
+              "type": "too_many_clauses",
+              "reason": "maxClauseCount is set to 1024"
+            }
+          }
+        ]
+      },
+      "hits": {
+        "total": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "max_score": 0,
+        "hits": []
+      },
+      "status": 200
+    },
+    {
+      "took": 7,
+      "timed_out": false,
+      "_shards": {
+        "total": 20,
+        "successful": 20,
+        "skipped": 0,
+        "failed": 0
+      },
+      "hits": {
+        "total": {
+          "value": 105,
+          "relation": "eq"
+        },
+        "max_score": 0,
+        "hits": []
+      },
+      "status": 200
+    }
+  ],
+  "took": 7
+}
