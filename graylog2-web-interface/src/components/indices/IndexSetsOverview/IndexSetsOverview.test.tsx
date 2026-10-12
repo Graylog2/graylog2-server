@@ -587,7 +587,7 @@ describe('IndexSetsOverview', () => {
     });
 
     it('mentions streams the user may not view', async () => {
-      mockStreams(streams);
+      mockStreams(streams.slice(0, 2));
       render(<IndexSetsOverview />);
 
       await openRoutingView();
