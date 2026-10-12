@@ -1,0 +1,4 @@
+type = "f"
+message = "Trim leading and trailing whitespace from the username on the login form."
+
+pulls = ["25616"]
