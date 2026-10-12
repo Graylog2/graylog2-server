@@ -149,9 +149,10 @@ const useOnWindowUnload = () => {
 
 type Props = {
   forceSideBarPinned?: boolean;
+  loadingPlaceholder?: React.ReactNode;
 };
 
-const Search = ({ forceSideBarPinned = false }: Props) => {
+const Search = ({ forceSideBarPinned = false, loadingPlaceholder = undefined }: Props) => {
   const dispatch = useViewsDispatch();
   const queryClient = useQueryClient();
   const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
@@ -225,7 +226,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                   <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
                                 </IfInteractive>
                                 <HighlightMessageInQuery>
-                                  <SearchResult />
+                                  <SearchResult loadingPlaceholder={loadingPlaceholder} />
                                 </HighlightMessageInQuery>
                               </SearchArea>
                               <IfInteractive>

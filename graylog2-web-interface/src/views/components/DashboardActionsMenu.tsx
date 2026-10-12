@@ -122,10 +122,18 @@ const DashboardActionsMenu = () => {
 
   const _onSaveNewDashboard = useCallback(
     async (newDashboard: View, entityShare?: EntitySharePayload) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
-        app_pathname: 'dashboard',
-        app_action_value: 'dashboard-save-new',
-      });
+      if (!isNewView && view.scope === 'ILLUMINATE') {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.ILLUMINATE_DASHBOARD_CLONED, {
+          app_pathname: 'dashboard',
+          app_action_value: 'illuminate-dashboard-clone',
+          event_details: { dashboard_title: view.title },
+        });
+      } else {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
+          app_pathname: 'dashboard',
+          app_action_value: 'dashboard-save-new',
+        });
+      }
 
       if (!isNewView) {
         const dashboardWithPluginData = await executePluggableDuplicationHandler(
@@ -139,7 +147,17 @@ const DashboardActionsMenu = () => {
 
       return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
     },
-    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id, isNewView],
+    [
+      currentUser.permissions,
+      dispatch,
+      history,
+      pluggableSaveViewControls,
+      sendTelemetry,
+      view.id,
+      view.scope,
+      view.title,
+      isNewView,
+    ],
   );
 
   const _onUpdateView = useCallback(

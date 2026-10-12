@@ -20,14 +20,12 @@ import styled, { css } from 'styled-components';
 import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import { itemStateIndicatorContainerSelector } from 'components/common/NavItemStateIndicator';
 import { useGlobalThroughput } from 'hooks/useMetrics';
 
 const ThroughputNavItem = styled(NavItem)`
-  > a {
-    @media (width <= 991px) {
-      height: auto;
-      display: block;
-    }
+  ${itemStateIndicatorContainerSelector} {
+    display: inline-block;
   }
 `;
 
@@ -37,21 +35,6 @@ const ContentWrap = styled.strong`
   grid-template-rows: 1fr 1fr;
   gap: 0;
   height: 30px;
-
-  @media (width <= 991px) {
-    height: auto;
-    display: block;
-
-    &::before {
-      content: attr(aria-label);
-      font-weight: normal;
-    }
-
-    span,
-    &::after {
-      display: none;
-    }
-  }
 `;
 
 const ThroughputData = styled.span<{ $dataIn?: boolean }>(

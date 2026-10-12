@@ -35,6 +35,8 @@ import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import { createView } from 'views/api/views';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
@@ -42,6 +44,7 @@ jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useScopePermissions');
+jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/api/views', () => ({
@@ -113,7 +116,11 @@ describe('DashboardActionsMenu', () => {
     await userEvent.click(saveAsMenuItem);
   };
 
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
+    sendTelemetry.mockClear();
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCurrentUser).mockReturnValue(
       adminUser
         .toBuilder()
@@ -163,6 +170,24 @@ describe('DashboardActionsMenu', () => {
       .build();
 
     await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
+  });
+
+  it('does not send Illuminate clone telemetry when duplicating a non-Illuminate dashboard', async () => {
+    render(<SUT view={mockView} />);
+
+    await openDashboardSaveForm();
+    await submitDashboardSaveForm();
+
+    await waitFor(() => expect(createView).toHaveBeenCalled());
+
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED,
+      expect.anything(),
+    );
+    expect(sendTelemetry).not.toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.ILLUMINATE_DASHBOARD_CLONED,
+      expect.anything(),
+    );
   });
 
   it('should open edit dashboard meta information modal', async () => {
@@ -250,6 +275,25 @@ describe('DashboardActionsMenu', () => {
       await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
 
       expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+    });
+
+    it('sends only Illuminate clone telemetry with the original title when saving as a new dashboard', async () => {
+      render(<SUT view={immutableView} />);
+
+      await openDashboardSaveForm();
+      await submitDashboardSaveForm();
+
+      await waitFor(() =>
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.ILLUMINATE_DASHBOARD_CLONED, {
+          app_pathname: 'dashboard',
+          app_action_value: 'illuminate-dashboard-clone',
+          event_details: { dashboard_title: 'View title' },
+        }),
+      );
+      expect(sendTelemetry).not.toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED,
+        expect.anything(),
+      );
     });
 
     it('still allows saving as a new dashboard', async () => {
