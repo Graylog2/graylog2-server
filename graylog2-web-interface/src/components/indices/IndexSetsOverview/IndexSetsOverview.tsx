@@ -26,7 +26,7 @@ import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldType
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
-import getIndexSetTableElements, { DETAILS_SECTION, INDEX_SET_VIEW_VARIANTS } from './Constants';
+import getIndexSetTableElements, { DETAILS_SECTION, INDEX_SET_VIEW_VARIANTS, STREAMS_SECTION } from './Constants';
 import customColumnRenderers from './ColumnRenderers';
 import BulkActions from './BulkActions';
 import type { ProfileChange } from './BulkActions';
@@ -34,6 +34,7 @@ import IndexSetActions from './IndexSetActions';
 import IndexSetCategoryButtons from './IndexSetCategoryButtons';
 import IndexSetViewButtons from './IndexSetViewButtons';
 import IndexSetDetailsSection from './expanded-sections/IndexSetDetailsSection';
+import AssociatedStreamsSection from './expanded-sections/AssociatedStreamsSection';
 import { fetchIndexSets, keyFn } from './fetchIndexSets';
 import useIndexSetsOverviewExtensions from './hooks/useIndexSetsOverviewExtensions';
 import { IndexSetMetricsProvider } from './IndexSetMetricsContext';
@@ -44,6 +45,10 @@ const expandedSections = {
   [DETAILS_SECTION]: {
     title: 'Details',
     content: (indexSet: IndexSetEntity) => <IndexSetDetailsSection indexSet={indexSet} />,
+  },
+  [STREAMS_SECTION]: {
+    title: 'Associated streams',
+    content: (indexSet: IndexSetEntity) => <AssociatedStreamsSection indexSet={indexSet} />,
   },
 };
 

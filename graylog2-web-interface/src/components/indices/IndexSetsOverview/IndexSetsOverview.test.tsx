@@ -39,6 +39,10 @@ import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldTypes/types';
+import useStreams from 'components/streams/hooks/useStreams';
+import { streams } from 'fixtures/streams';
+import Routes from 'routing/Routes';
+import type { Stream } from 'logic/streams/types';
 
 import IndexSetsOverview from './IndexSetsOverview';
 import type { IndexSetEntity } from './types';
@@ -58,6 +62,7 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions'
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation');
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings');
+jest.mock('components/streams/hooks/useStreams');
 jest.mock('components/indices/IndexSetsOverview/hooks/useIndexSetMetrics');
 jest.mock('components/indices/IndicesConfiguration', () => ({
   __esModule: true,
@@ -150,6 +155,13 @@ const mockMetrics = (overrides: Partial<ReturnType<typeof useIndexSetMetrics>> =
     ...overrides,
   });
 
+const mockStreams = (list: Array<Stream>, total: number = list.length) =>
+  asMock(useStreams).mockReturnValue({
+    data: { list, pagination: { total }, attributes: [] },
+    refetch: () => {},
+    isInitialLoading: false,
+  });
+
 const lastSearchParams = () => asMock(useFetchEntities).mock.lastCall[0].searchParams;
 
 const findRow = (indexSet: IndexSetEntity) => screen.findByTestId(`table-row-${indexSet.id}`);
@@ -184,6 +196,7 @@ describe('IndexSetsOverview', () => {
     asMock(useSetIndexSetProfileMutation).mockReturnValue({ setIndexSetFieldTypeProfile, isLoading: false });
     asMock(useRemoveProfileFromIndexMutation).mockReturnValue({ removeProfileFromIndex, isLoading: false });
     asMock(useFieldTypesForMappings).mockReturnValue({ data: { fieldTypes: {} }, isLoading: false });
+    mockStreams([]);
     mockIndexSets();
     mockMetrics();
   });
@@ -525,6 +538,65 @@ describe('IndexSetsOverview', () => {
     } finally {
       PluginStore.unregister(plugin);
     }
+  });
+
+  describe('associated streams section', () => {
+    const openRoutingView = async () => userEvent.click(await screen.findByRole('radio', { name: 'Routing' }));
+
+    it('lists the streams of an index set, linked to their detail page', async () => {
+      mockStreams(streams, readOnlyIndexSet.stream_count);
+      render(<IndexSetsOverview />);
+
+      await openRoutingView();
+      await userEvent.click(await screen.findByTitle('Show associated streams for Read-only index set'));
+
+      expect(await screen.findByRole('link', { name: 'One Stream' })).toHaveAttribute(
+        'href',
+        Routes.stream_view('streamId1'),
+      );
+      expect(screen.getByRole('link', { name: 'another Stream' })).toHaveAttribute(
+        'href',
+        Routes.stream_view('streamId2'),
+      );
+      expect(asMock(useStreams).mock.lastCall[0].filters.toJS()).toEqual({ index_set_id: [readOnlyIndexSet.id] });
+      expect(screen.queryByText(/do not have permission/)).not.toBeInTheDocument();
+    });
+
+    it('closes the section when clicking the stream count again', async () => {
+      mockStreams(streams, readOnlyIndexSet.stream_count);
+      render(<IndexSetsOverview />);
+
+      await openRoutingView();
+      await userEvent.click(await screen.findByTitle('Show associated streams for Read-only index set'));
+      await screen.findByRole('link', { name: 'One Stream' });
+
+      await userEvent.click(screen.getByTitle('Hide associated streams for Read-only index set'));
+
+      await waitFor(() => expect(screen.queryByRole('link', { name: 'One Stream' })).not.toBeInTheDocument());
+    });
+
+    it('does not offer the section for index sets without streams', async () => {
+      render(<IndexSetsOverview />);
+
+      await openRoutingView();
+      const row = await findRow(exampleIndexSet);
+
+      within(row).getByText('0');
+
+      expect(within(row).queryByTitle(/associated streams/i)).not.toBeInTheDocument();
+    });
+
+    it('mentions streams the user may not view', async () => {
+      mockStreams(streams);
+      render(<IndexSetsOverview />);
+
+      await openRoutingView();
+      await userEvent.click(await screen.findByTitle('Show associated streams for Read-only index set'));
+
+      await screen.findByText(
+        '10 more streams are routed to this index set, but you do not have permission to view them.',
+      );
+    });
   });
 
   describe('bulk field type profile actions', () => {
