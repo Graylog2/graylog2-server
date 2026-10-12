@@ -25,9 +25,11 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +43,12 @@ class IndexSetDeflectorHealthDescriptorTest {
             clusterAdapter, indexSetService, indexSetRegistry, Duration.ofMinutes(1));
 
     @Test
-    void assignsTheReducedHealthToWritableIndexSetsOnly() {
+    void assignsTheHealthOfTheWriteAliasToWritableIndexSetsOnly() {
         IndexSetMocks.stubLookup(indexSetService, indexSetRegistry,
                 IndexSetMocks.indexSet(A, "graylog", true),
                 IndexSetMocks.indexSet(B, "archive", false));
-        when(clusterAdapter.deflectorHealth(List.of("graylog_deflector"))).thenReturn(Optional.of(HealthStatus.Yellow));
+        when(clusterAdapter.deflectorHealthByAlias(List.of("graylog_deflector")))
+                .thenReturn(Map.of("graylog_deflector", HealthStatus.Yellow));
 
         assertThat(descriptor.compute(List.of(A, B))).containsExactlyInAnyOrder(
                 new EntityMetric<>(A, HealthStatus.Yellow),
@@ -53,18 +56,25 @@ class IndexSetDeflectorHealthDescriptorTest {
     }
 
     @Test
-    void reportsNoValueWhenTheHealthIsUnknown() {
-        IndexSetMocks.stubLookup(indexSetService, indexSetRegistry, IndexSetMocks.indexSet(A, "graylog", true));
-        when(clusterAdapter.deflectorHealth(List.of("graylog_deflector"))).thenReturn(Optional.empty());
+    void blanksOnlyTheIndexSetWhoseWriteAliasHasNoEntry() {
+        IndexSetMocks.stubLookup(indexSetService, indexSetRegistry,
+                IndexSetMocks.indexSet(A, "graylog", true),
+                IndexSetMocks.indexSet(B, "events", true));
+        when(clusterAdapter.deflectorHealthByAlias(argThat(aliases ->
+                Set.copyOf(aliases).equals(Set.of("graylog_deflector", "events_deflector")))))
+                .thenReturn(Map.of("events_deflector", HealthStatus.Green));
 
-        assertThat(descriptor.compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+        assertThat(descriptor.compute(List.of(A, B))).containsExactlyInAnyOrder(
+                new EntityMetric<>(A, null),
+                new EntityMetric<>(B, HealthStatus.Green));
     }
+
     @Test
     void reportsNoValueWhenTheLookupFails() {
         IndexSetMocks.stubLookup(indexSetService, indexSetRegistry, IndexSetMocks.indexSet(A, "graylog", true));
-        when(clusterAdapter.deflectorHealth(List.of("graylog_deflector")))
-                .thenThrow(new IllegalStateException("Duplicate key graylog_deflector"));
+        when(clusterAdapter.deflectorHealthByAlias(List.of("graylog_deflector")))
+                .thenThrow(new IllegalStateException("Connection refused"));
 
-        assertThat(descriptor.compute(List.of(A))).containsExactly(new EntityMetric<>(A, null));
+        assertThat(descriptor.compute(List.of(A))).isEmpty();
     }
 }
