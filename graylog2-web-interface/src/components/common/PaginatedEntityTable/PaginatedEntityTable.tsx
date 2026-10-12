@@ -278,6 +278,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             />
           )}
           <TableWrapper>
+            {MiddleSection ? <MiddleSection searchParams={searchParams} setFilters={onChangeFilters} /> : null}
             {!externalSearch && (
               <SearchRow>
                 <SearchForm
@@ -304,8 +305,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 {topRightCol}
               </SearchRow>
             )}
-            {MiddleSection ? <MiddleSection searchParams={searchParams} setFilters={onChangeFilters} /> : null}
-
             {isError ? (
               <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
             ) : (
