@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Throwables;
 import jakarta.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -85,6 +86,7 @@ import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.RefreshRequest;
 import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
+import org.opensearch.client.opensearch.indices.resolve_index.ResolveIndexItem;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
 import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
@@ -449,16 +451,42 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> closedIndices(Collection<String> indices) {
+        if (indices.isEmpty()) {
+            return Set.of();
+        }
         return c.execute(() -> {
-            List<IndicesRecord> indicesRecords = catClient.indices(r -> r.index(indices.stream().toList())
-                            .expandWildcards(ExpandWildcard.Closed))
-                    .valueBody();
-            return indicesRecords.stream()
-                    .filter(i -> Objects.nonNull(i.status()))
-                    .filter(i -> i.status().equals("close"))
-                    .map(IndicesRecord::index)
-                    .collect(Collectors.toSet());
+            try {
+                return resolveClosedIndices(indices);
+            } catch (IOException e) {
+                if (!isForbidden(e)) {
+                    throw e;
+                }
+                LOG.debug("Resolve index API is forbidden, falling back to the cat API", e);
+                return closedIndicesFromCat(indices);
+            }
         }, "Unable to retrieve list of closed indices for " + indices);
+    }
+
+    // A 403 arrives as an IOException wrapping a ResponseException.
+    private static boolean isForbidden(IOException e) {
+        return Throwables.getCausalChain(e).stream()
+                .anyMatch(cause -> cause instanceof ResponseException response && response.status() == 403);
+    }
+
+    private Set<String> resolveClosedIndices(Collection<String> indices) throws IOException {
+        return indicesClient.resolveIndex(r -> r.name(indices.stream().toList()).expandWildcards(ExpandWildcard.Closed))
+                .indices().stream()
+                .filter(index -> index.attributes().contains("closed"))
+                .map(ResolveIndexItem::name)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> closedIndicesFromCat(Collection<String> indices) throws IOException {
+        return catClient.indices(r -> r.index(indices.stream().toList()).expandWildcards(ExpandWildcard.Closed))
+                .valueBody().stream()
+                .filter(i -> "close".equals(i.status()))
+                .map(IndicesRecord::index)
+                .collect(Collectors.toSet());
     }
 
     @Override

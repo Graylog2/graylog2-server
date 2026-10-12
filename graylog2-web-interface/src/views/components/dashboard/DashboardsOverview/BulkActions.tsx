@@ -18,15 +18,13 @@ import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
+import { Views } from '@graylog/server-api';
+
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import StringUtils from 'util/StringUtils';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { DeleteMenuItem } from 'components/bootstrap';
-
-const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
 const BulkActions = () => {
   const queryClient = useQueryClient();
@@ -37,7 +35,7 @@ const BulkActions = () => {
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      fetch('POST', qualifyUrl(VIEWS_BULK_DELETE_API_ROUTE), { entity_ids: selectedEntities })
+      Views.bulkDelete({ entity_ids: selectedEntities })
         .then(({ failures }) => {
           if (failures?.length) {
             const notDeletedDashboardIds = failures.map(({ entity_id }) => entity_id);

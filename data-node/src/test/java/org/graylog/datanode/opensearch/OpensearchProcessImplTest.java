@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.storage.opensearch3.ClusterAdapterOS;
@@ -87,12 +88,18 @@ public class OpensearchProcessImplTest {
     @Mock
     ClusterEventBus clusterEventBus;
 
+    @Mock
+    DatanodeKeystore datanodeKeystore;
+
+    @Mock
+    CertificateReloadVerifier certificateReloadVerifier;
+
     @BeforeEach
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                objectMapper, processState, nodeId, eventBus, clusterEventBus));
+                objectMapper, processState, nodeId, eventBus, clusterEventBus, datanodeKeystore, certificateReloadVerifier));
         when(opensearchProcess.openSearchClient()).thenReturn(Optional.of(client));
         when(opensearchProcess.clusterAdapter()).thenReturn(clusterAdapter);
     }

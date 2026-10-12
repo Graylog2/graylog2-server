@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { Users } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import { userList as userOverviewList, admin } from 'fixtures/userOverviews';
 import { loadUsers, loadUsersPaginated } from 'hooks/useUsers';
 import fetch from 'logic/rest/FetchProvider';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ Users: { getPage: jest.fn() } }));
 
 const pagination = {
   page: 1,
@@ -57,7 +60,7 @@ describe('useUsers', () => {
     it('should load paginated json users and return result with value classes', async () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
 
-      asMock(fetch).mockReturnValueOnce(
+      asMock(Users.getPage).mockReturnValueOnce(
         Promise.resolve({
           context: {
             admin_user: admin.toJSON(),
@@ -75,7 +78,7 @@ describe('useUsers', () => {
     it('should load paginated json users without root admin and return result with value classes', async () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
 
-      asMock(fetch).mockReturnValueOnce(
+      asMock(Users.getPage).mockReturnValueOnce(
         Promise.resolve({
           context: {
             admin_user: null,

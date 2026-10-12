@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
+import { telemetryDebugStore, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
 import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 
 const mockTelemetryData = {
@@ -83,5 +84,43 @@ describe('<TelemetryProvider>', () => {
     const consume = renderSUT();
 
     expect(consume).toHaveBeenCalledWith(expect.objectContaining({ sendTelemetry: expect.anything() }));
+  });
+
+  // In this suite telemetry is disabled (AppConfig.telemetry() is undefined), exercising the
+  // debug-only provider branch.
+  describe('debug store tap with disabled telemetry', () => {
+    afterEach(() => {
+      setTelemetryDebugEnabled(false);
+      telemetryDebugStore.clear();
+    });
+
+    it('records events as disabled while debugging is on', () => {
+      setTelemetryDebugEnabled(true);
+      asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
+
+      const consume = renderSUT();
+      const { sendTelemetry } = consume.mock.calls[consume.mock.calls.length - 1][0];
+
+      sendTelemetry('Fleet Created', { fleet_id: 'f1' });
+
+      expect(telemetryDebugStore.getEntries()).toEqual([
+        expect.objectContaining({
+          eventType: 'Fleet Created',
+          payload: { fleet_id: 'f1' },
+          status: 'disabled',
+        }),
+      ]);
+    });
+
+    it('records nothing while debugging is off', () => {
+      asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
+
+      const consume = renderSUT();
+      const { sendTelemetry } = consume.mock.calls[consume.mock.calls.length - 1][0];
+
+      sendTelemetry('Fleet Created', { fleet_id: 'f1' });
+
+      expect(telemetryDebugStore.getEntries()).toHaveLength(0);
+    });
   });
 });

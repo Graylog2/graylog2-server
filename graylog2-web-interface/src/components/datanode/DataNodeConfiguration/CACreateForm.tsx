@@ -18,8 +18,8 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { CA } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { FormikInput } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -33,7 +33,7 @@ type FormValues = {
   organization: string;
 };
 
-const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('ca/create'), caData, false);
+const createCA = (caData: FormValues) => CA.createCA(caData);
 
 const CaCreateForm = () => {
   const queryClient = useQueryClient();

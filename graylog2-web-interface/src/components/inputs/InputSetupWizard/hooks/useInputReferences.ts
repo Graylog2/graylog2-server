@@ -16,10 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemInputs } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import { onError } from 'util/conditional/onError';
 
@@ -36,11 +35,7 @@ type ResponseData = {
   pipeline_refs: Array<{ id: string; name: string }>;
 };
 
-const fetchInputReferences = async (inputId: string): Promise<ResponseData> => {
-  const url = qualifyUrl(ApiRoutes.InputsApiController.references(inputId).url);
-
-  return fetch('GET', url);
-};
+const fetchInputReferences = async (inputId: string): Promise<ResponseData> => SystemInputs.getReferences(inputId);
 
 const useInputReferences = (
   inputId?: string,

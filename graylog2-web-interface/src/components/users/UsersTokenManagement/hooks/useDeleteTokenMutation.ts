@@ -16,16 +16,11 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { Users } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import ApiRoutes from 'routing/ApiRoutes';
 
-const deleteToken = async (userId: string, tokenId: string) => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(userId, tokenId).url);
-
-  return fetch('DELETE', url);
-};
+const deleteToken = async (userId: string, tokenId: string) => Users.revokeToken(userId, tokenId);
 
 const useDeleteTokenMutation = (userId: string, tokenId: string) => {
   const queryClient = useQueryClient();
