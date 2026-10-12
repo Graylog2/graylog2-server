@@ -19,12 +19,8 @@ package org.graylog2.telemetry.pipelines;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 import org.graylog2.configuration.TelemetryConfiguration;
-import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.ImmutableSystemScope;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,10 +33,13 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -54,7 +53,7 @@ class PipelineActivityPeriodicalTest {
     @Mock
     private PipelineActivityService activityService;
     @Mock
-    private PipelineService pipelineService;
+    private UserPipelines userPipelines;
     @Captor
     private ArgumentCaptor<Collection<String>> activeIds;
 
@@ -66,15 +65,11 @@ class PipelineActivityPeriodicalTest {
     void setUp() {
         metricRegistry = new MetricRegistry();
         pipelineMetrics = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        periodical = new PipelineActivityPeriodical(metricRegistry, activityService, pipelineService,
+        periodical = new PipelineActivityPeriodical(metricRegistry, activityService, userPipelines,
                 Clock.fixed(NOW, ZoneOffset.UTC), new TelemetryConfiguration());
 
-        // Build mocks before stubbing; nested stubbing inside thenReturn() is rejected by Mockito.
-        final List<PipelineDao> pipelines = List.of(
-                pipeline("p1", DefaultEntityScope.NAME),
-                pipeline("idle", DefaultEntityScope.NAME),
-                pipeline("system", ImmutableSystemScope.NAME));
-        when(pipelineService.loadAll()).thenReturn(pipelines);
+        // Lenient because not every test runs the periodical.
+        lenient().when(userPipelines.pipelineIds()).thenReturn(Set.of("p1", "idle"));
     }
 
     @Test
@@ -113,11 +108,11 @@ class PipelineActivityPeriodicalTest {
     }
 
     @Test
-    void treatsResetMeterWithNewExecutionsAsActive() {
+    void treatsLowerCountWithNewExecutionsAsActive() {
         pipelineMetrics.registerPipelineMeter("p1", "executed").mark(5);
         periodical.doRun();
 
-        // Editing a pipeline removes and re-registers its metrics.
+        // A count that goes down still means new executions, so it must not be skipped.
         pipelineMetrics.removePipelineMetrics("p1");
         pipelineMetrics.registerPipelineMeter("p1", "executed").mark(2);
         periodical.doRun();
@@ -137,6 +132,30 @@ class PipelineActivityPeriodicalTest {
     }
 
     @Test
+    void retriesActivityAfterFailedWrite() {
+        pipelineMetrics.registerPipelineMeter("p1", "executed").mark(3);
+        doThrow(new RuntimeException("write failed")).doNothing().when(activityService).markActive(any(), any());
+
+        assertThatThrownBy(() -> periodical.doRun()).isInstanceOf(RuntimeException.class);
+        periodical.doRun();
+
+        verify(activityService, times(2)).markActive(activeIds.capture(), eq(NOW));
+        assertThat(activeIds.getAllValues().get(1)).containsExactly("p1");
+    }
+
+    @Test
+    void doesNotStartWhenTelemetryIsDisabled() {
+        final TelemetryConfiguration disabled = mock(TelemetryConfiguration.class);
+        when(disabled.isTelemetryEnabled()).thenReturn(false);
+
+        final PipelineActivityPeriodical disabledPeriodical = new PipelineActivityPeriodical(metricRegistry,
+                activityService, userPipelines, Clock.fixed(NOW, ZoneOffset.UTC), disabled);
+
+        assertThat(disabledPeriodical.startOnThisNode()).isFalse();
+        assertThat(periodical.startOnThisNode()).isTrue();
+    }
+
+    @Test
     void ignoresPipelinesThatAreNotUserDefined() {
         // Illuminate registers its bundle pipelines under the same meter prefix, with IDs that aren't in MongoDB.
         pipelineMetrics.registerPipelineMeter("illuminate-pipeline", "executed").mark();
@@ -147,13 +166,5 @@ class PipelineActivityPeriodicalTest {
 
         verify(activityService).markActive(activeIds.capture(), eq(NOW));
         assertThat(activeIds.getValue()).containsExactly("p1");
-    }
-
-    private static PipelineDao pipeline(String id, String scope) {
-        final PipelineDao pipeline = mock(PipelineDao.class);
-        // Lenient because the scope filter runs first, so non-default pipelines never have their ID read.
-        lenient().when(pipeline.id()).thenReturn(id);
-        when(pipeline.scope()).thenReturn(scope);
-        return pipeline;
     }
 }

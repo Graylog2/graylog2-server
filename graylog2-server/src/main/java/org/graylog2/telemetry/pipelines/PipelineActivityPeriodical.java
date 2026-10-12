@@ -19,7 +19,6 @@ package org.graylog2.telemetry.pipelines;
 import com.codahale.metrics.MetricRegistry;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
@@ -41,33 +40,33 @@ public class PipelineActivityPeriodical extends Periodical {
 
     private static final String PIPELINE_METER_PREFIX = Pipeline.class.getName() + ".";
     private static final String EXECUTED_SUFFIX = ".executed";
-    private static final int PERIOD_SECONDS = (int) Duration.ofMinutes(60).toSeconds();
+    private static final int PERIOD_SECONDS = (int) Duration.ofMinutes(15).toSeconds();
 
     private final MetricRegistry metricRegistry;
     private final PipelineActivityService activityService;
-    private final PipelineService pipelineService;
+    private final UserPipelines userPipelines;
     private final Clock clock;
     private final boolean isEnabled;
 
-    // Meters are node-local and reset on restart or pipeline edit, so compare to this node's last run.
+    // Meters are node-local and start from zero on restart, so compare to this node's last run.
     private final Map<String, Long> previousCounts = new HashMap<>();
 
     @Inject
     public PipelineActivityPeriodical(MetricRegistry metricRegistry,
                                       PipelineActivityService activityService,
-                                      PipelineService pipelineService,
+                                      UserPipelines userPipelines,
                                       Clock clock,
                                       TelemetryConfiguration telemetryConfiguration) {
         this.metricRegistry = metricRegistry;
         this.activityService = activityService;
-        this.pipelineService = pipelineService;
+        this.userPipelines = userPipelines;
         this.clock = clock;
         this.isEnabled = telemetryConfiguration.isTelemetryEnabled();
     }
 
     @Override
     public void doRun() {
-        final Map<String, Long> currentCounts = readPipelineCounts(UserPipelines.ids(pipelineService));
+        final Map<String, Long> currentCounts = readPipelineCounts(userPipelines.pipelineIds());
         final List<String> activePipelineIds = currentCounts.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0 && !entry.getValue().equals(previousCounts.get(entry.getKey())))
                 .map(Map.Entry::getKey)

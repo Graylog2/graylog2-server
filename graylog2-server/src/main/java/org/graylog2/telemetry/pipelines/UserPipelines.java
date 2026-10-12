@@ -16,27 +16,51 @@
  */
 package org.graylog2.telemetry.pipelines;
 
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Projections;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public final class UserPipelines {
-    private UserPipelines() {
+import static com.mongodb.client.model.Filters.in;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
+
+/**
+ * Finds user-defined pipelines and rules, ie those with DEFAULT scope.
+ */
+@Singleton
+public class UserPipelines {
+    private static final String FIELD_ID = "_id";
+
+    // A missing or null scope deserializes as DEFAULT, so it counts as user-defined too.
+    private static final Bson USER_SCOPE = in(FIELD_SCOPE, DefaultEntityScope.NAME, null);
+
+    private final MongoCollection<Document> pipelines;
+    private final MongoCollection<Document> rules;
+
+    @Inject
+    public UserPipelines(MongoCollections mongoCollections) {
+        this.pipelines = mongoCollections.nonEntityCollection(MongoDbPipelineService.COLLECTION, Document.class);
+        this.rules = mongoCollections.nonEntityCollection(MongoDbRuleService.COLLECTION, Document.class);
     }
 
-    /**
-     * IDs of user-defined pipelines. Illuminate pipelines load from the bundle rather than MongoDB, and system
-     * pipelines use their own scopes, so only DEFAULT-scoped pipelines qualify.
-     */
-    public static Set<String> ids(PipelineService pipelineService) {
-        return pipelineService.loadAll().stream()
-                .filter(pipeline -> DefaultEntityScope.NAME.equals(pipeline.scope()))
-                .map(PipelineDao::id)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+    public Set<String> pipelineIds() {
+        // Only the ID is needed, so skip loading the pipeline source.
+        return pipelines.find(USER_SCOPE)
+                .projection(Projections.include(FIELD_ID))
+                .map(doc -> doc.get(FIELD_ID).toString())
+                .into(new HashSet<>());
+    }
+
+    public long ruleCount() {
+        return rules.countDocuments(USER_SCOPE);
     }
 }

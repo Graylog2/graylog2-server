@@ -25,6 +25,7 @@ import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.graylog2.database.MongoCollections;
 
@@ -43,6 +44,7 @@ import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
 /**
  * Records when each pipeline last processed a message on any node.
  */
+@Singleton
 public class PipelineActivityService {
     static final String COLLECTION_NAME = "telemetry_pipeline_activity";
     static final String FIELD_PIPELINE_ID = "pipeline_id";

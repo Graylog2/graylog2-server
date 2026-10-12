@@ -16,33 +16,32 @@
  */
 package org.graylog2.telemetry.suppliers;
 
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
-import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.ImmutableSystemScope;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog2.telemetry.pipelines.PipelineActivityService;
+import org.graylog2.telemetry.pipelines.UserPipelines;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
-import org.graylog2.telemetry.suppliers.PipelinesMetricsSupplier.FunctionUsage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Proxy;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
+import static org.graylog2.telemetry.suppliers.PipelinesMetricsSupplier.OTHER_FUNCTIONS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,9 +50,7 @@ class PipelinesMetricsSupplierTest {
     private static final Instant NOW = Instant.parse("2026-10-12T12:00:00Z");
 
     @Mock
-    private PipelineService pipelineService;
-    @Mock
-    private RuleService ruleService;
+    private UserPipelines userPipelines;
     @Mock
     private MongoDbPipelineMetadataService metadataService;
     @Mock
@@ -63,24 +60,25 @@ class PipelinesMetricsSupplierTest {
 
     @BeforeEach
     void setUp() {
-        supplier = new PipelinesMetricsSupplier(pipelineService, ruleService, metadataService, activityService,
+        final FunctionRegistry functionRegistry = new FunctionRegistry(Map.of(
+                SetField.NAME, new SetField(),
+                StringConversion.NAME, new StringConversion(),
+                Lowercase.NAME, new Lowercase(),
+                "acme_hr_lookup", pluginFunction(),
+                "acme_geo_lookup", pluginFunction()));
+        supplier = new PipelinesMetricsSupplier(userPipelines, metadataService, activityService, functionRegistry,
                 Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     @Test
     void reportsUserPipelineCountsAndFunctionUsage() {
         // Build mocks before stubbing the services; nested stubbing inside thenReturn() is rejected by Mockito.
-        final List<PipelineDao> pipelines = List.of(
-                pipeline("user-active-1", DefaultEntityScope.NAME),
-                pipeline("user-active-2", DefaultEntityScope.NAME),
-                pipeline("user-idle", DefaultEntityScope.NAME),
-                pipeline("system", ImmutableSystemScope.NAME));
         final Map<String, PipelineRulesMetadataDao> metadataById = Map.of(
                 "user-active-1", metadata(Set.of("set_field", "to_string")),
-                "user-active-2", metadata(Set.of("set_field", "lookup_value")));
+                "user-active-2", metadata(Set.of("set_field", "lowercase")));
 
-        when(pipelineService.loadAll()).thenReturn(pipelines);
-        when(ruleService.loadAllByScope(DefaultEntityScope.NAME)).thenReturn(List.of(mock(RuleDao.class), mock(RuleDao.class)));
+        when(userPipelines.pipelineIds()).thenReturn(Set.of("user-active-1", "user-active-2", "user-idle"));
+        when(userPipelines.ruleCount()).thenReturn(2L);
         // "system" and "deleted" are active but must not be counted as user pipelines.
         when(activityService.findActiveSince(NOW.minus(Duration.ofHours(24))))
                 .thenReturn(Set.of("user-active-1", "user-active-2", "system", "deleted"));
@@ -91,17 +89,54 @@ class PipelinesMetricsSupplierTest {
         assertThat(event.metrics()).containsEntry("user_pipelines", 3L)
                 .containsEntry("user_pipelines_active_24h", 2L)
                 .containsEntry("user_pipeline_rules", 2L)
-                .containsEntry("active_user_pipeline_functions", List.of(
-                        new FunctionUsage("lookup_value", 1L),
-                        new FunctionUsage("set_field", 2L),
-                        new FunctionUsage("to_string", 1L)));
+                .containsEntry("active_user_pipeline_functions", Map.of(
+                        "lowercase", 1L,
+                        "set_field", 2L,
+                        "to_string", 1L));
+    }
+
+    @Test
+    void reportsFunctionsNotShippedWithGraylogAsOther() {
+        final Map<String, PipelineRulesMetadataDao> metadataById = Map.of(
+                // Two plugin functions in one pipeline count that pipeline once.
+                "plugin-user", metadata(Set.of("set_field", "acme_hr_lookup", "acme_geo_lookup")),
+                // Functions from a removed plugin no longer resolve.
+                "unresolved-user", metadata(Set.of("removed_plugin_function")));
+
+        when(userPipelines.pipelineIds()).thenReturn(Set.of("plugin-user", "unresolved-user"));
+        when(userPipelines.ruleCount()).thenReturn(2L);
+        when(activityService.findActiveSince(NOW.minus(Duration.ofHours(24))))
+                .thenReturn(Set.of("plugin-user", "unresolved-user"));
+        when(metadataService.get(Set.of("plugin-user", "unresolved-user"))).thenReturn(metadataById);
+
+        final TelemetryEvent event = supplier.get().orElseThrow();
+
+        assertThat(event.metrics()).containsEntry("active_user_pipeline_functions", Map.of(
+                OTHER_FUNCTIONS, 2L,
+                "set_field", 1L));
+    }
+
+    @Test
+    void activePipelineWithoutMetadataContributesNoFunctions() {
+        final Map<String, PipelineRulesMetadataDao> metadataById = Map.of(
+                "with-metadata", metadata(Set.of("set_field")));
+
+        when(userPipelines.pipelineIds()).thenReturn(Set.of("with-metadata", "without-metadata"));
+        when(userPipelines.ruleCount()).thenReturn(1L);
+        when(activityService.findActiveSince(NOW.minus(Duration.ofHours(24))))
+                .thenReturn(Set.of("with-metadata", "without-metadata"));
+        when(metadataService.get(Set.of("with-metadata", "without-metadata"))).thenReturn(metadataById);
+
+        final TelemetryEvent event = supplier.get().orElseThrow();
+
+        assertThat(event.metrics()).containsEntry("user_pipelines_active_24h", 2L)
+                .containsEntry("active_user_pipeline_functions", Map.of("set_field", 1L));
     }
 
     @Test
     void reportsZeroesWhenNothingIsActive() {
-        final List<PipelineDao> pipelines = List.of(pipeline("user-idle", DefaultEntityScope.NAME));
-        when(pipelineService.loadAll()).thenReturn(pipelines);
-        when(ruleService.loadAllByScope(DefaultEntityScope.NAME)).thenReturn(List.of());
+        when(userPipelines.pipelineIds()).thenReturn(Set.of("user-idle"));
+        when(userPipelines.ruleCount()).thenReturn(0L);
         when(activityService.findActiveSince(NOW.minus(Duration.ofHours(24)))).thenReturn(Set.of());
         when(metadataService.get(Set.of())).thenReturn(Map.of());
 
@@ -110,15 +145,15 @@ class PipelinesMetricsSupplierTest {
         assertThat(event.metrics()).containsEntry("user_pipelines", 1L)
                 .containsEntry("user_pipelines_active_24h", 0L)
                 .containsEntry("user_pipeline_rules", 0L)
-                .containsEntry("active_user_pipeline_functions", List.of());
+                .containsEntry("active_user_pipeline_functions", Map.of());
     }
 
-    private static PipelineDao pipeline(String id, String scope) {
-        final PipelineDao pipeline = mock(PipelineDao.class);
-        // Lenient because the scope filter runs first, so non-default pipelines never have their ID read.
-        lenient().when(pipeline.id()).thenReturn(id);
-        when(pipeline.scope()).thenReturn(scope);
-        return pipeline;
+    // A JDK proxy class lives outside Graylog's packages, like a function registered by a customer plugin.
+    private static Function<?> pluginFunction() {
+        return (Function<?>) Proxy.newProxyInstance(PipelinesMetricsSupplierTest.class.getClassLoader(),
+                new Class<?>[]{Function.class}, (proxy, method, args) -> {
+                    throw new UnsupportedOperationException();
+                });
     }
 
     private static PipelineRulesMetadataDao metadata(Set<String> functions) {

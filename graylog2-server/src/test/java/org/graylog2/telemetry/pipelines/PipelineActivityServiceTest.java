@@ -17,6 +17,7 @@
 package org.graylog2.telemetry.pipelines;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,10 +38,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PipelineActivityServiceTest {
     private static final Instant NOW = Instant.parse("2026-10-12T12:00:00Z");
 
+    private MongoDBTestService mongodb;
     private PipelineActivityService service;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
+        this.mongodb = mongodb;
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoCollections mongoCollections = new MongoCollections(
                 new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
@@ -81,5 +85,22 @@ class PipelineActivityServiceTest {
         service.markActive(List.of(), NOW);
 
         assertThat(service.findActiveSince(NOW.minus(Duration.ofDays(1)))).isEmpty();
+    }
+
+    @Test
+    void createsUniqueAndTtlIndexes() {
+        final List<Document> indexes = mongodb.mongoConnection().getMongoDatabase()
+                .getCollection(PipelineActivityService.COLLECTION_NAME)
+                .listIndexes()
+                .into(new ArrayList<>());
+
+        assertThat(indexes).anySatisfy(index -> {
+            assertThat(index.get("key", Document.class)).containsKey(PipelineActivityService.FIELD_PIPELINE_ID);
+            assertThat(index.getBoolean("unique")).isTrue();
+        });
+        assertThat(indexes).anySatisfy(index -> {
+            assertThat(index.get("key", Document.class)).containsKey(PipelineActivityService.FIELD_LAST_ACTIVE_AT);
+            assertThat(index.get("expireAfterSeconds", Number.class).longValue()).isEqualTo(Duration.ofDays(2).toSeconds());
+        });
     }
 }
