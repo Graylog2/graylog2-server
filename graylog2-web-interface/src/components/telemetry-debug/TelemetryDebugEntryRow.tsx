@@ -77,7 +77,8 @@ const PayloadLine = ({ property, value }: { property: string; value: unknown }) 
 
   return (
     <div>
-      &quot;{property}&quot;: {suspect ? <SuspectValue title={`PII suspect: ${suspect}`}>{rendered}</SuspectValue> : rendered}
+      &quot;{property}&quot;:{' '}
+      {suspect ? <SuspectValue title={`PII suspect: ${suspect}`}>{rendered}</SuspectValue> : rendered}
     </div>
   );
 };

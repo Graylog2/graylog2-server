@@ -139,9 +139,7 @@ const matchesFilter = (entry: TelemetryDebugEntry, filter: string) => {
 
   const needle = filter.toLowerCase();
 
-  return (
-    entry.eventType.toLowerCase().includes(needle) || JSON.stringify(entry.payload).toLowerCase().includes(needle)
-  );
+  return entry.eventType.toLowerCase().includes(needle) || JSON.stringify(entry.payload).toLowerCase().includes(needle);
 };
 
 /**
