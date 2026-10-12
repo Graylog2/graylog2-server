@@ -20,6 +20,7 @@ import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoCredential;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog2.configuration.MongoDbConfiguration;
@@ -28,10 +29,14 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,16 +46,22 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
-    // Lower-cased, as MongoDB connection string option names are case-insensitive.
-    private static final Set<String> OPTIONS_OVERRIDDEN_PER_NODE = Set.of("replicaset", "directconnection");
+    private static final String SRV_SCHEME_PREFIX = "mongodb+srv://";
 
-    private final MongoClientURI mongoClientURI;
+    // Lower-cased, as MongoDB connection string option names are case-insensitive. Besides the options a direct
+    // connection overrides, these are the options only allowed in mongodb+srv:// connection strings, as the per-node
+    // connection strings are mongodb:// ones.
+    private static final Set<String> OPTIONS_DROPPED_PER_NODE = Set.of("replicaset", "directconnection",
+            "srvmaxhosts", "srvservicename", "srvallowedhostssuffix");
+
+    private final MongoDbConfiguration configuration;
     private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>();
 
 
     @Inject
     public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration, GracefulShutdownService shutdownService) {
-        this.mongoClientURI = configuration.getMongoClientURI();
+        // Don't parse the connection string here: for mongodb+srv:// that means DNS lookups
+        this.configuration = configuration;
         shutdownService.register(DefaultMongodbConnectionResolver.this);
     }
 
@@ -74,7 +85,7 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
      * scheme, credentials end at the last '@' before it and the options follow the next '?'.
      */
     private String buildConnectionString(String nodeName) {
-        final String uri = mongoClientURI.getURI();
+        final String uri = configuration.getUri();
         final String withoutScheme = uri.substring(uri.indexOf("://") + 3);
         final int pathStart = withoutScheme.indexOf('/');
         final String userAndHosts = pathStart < 0 ? withoutScheme : withoutScheme.substring(0, pathStart);
@@ -87,14 +98,44 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
         final String database = optionsStart < 0 ? pathAndOptions : pathAndOptions.substring(0, optionsStart);
         final String options = optionsStart < 0 ? "" : pathAndOptions.substring(optionsStart + 1);
 
-        final String perNodeOptions = Stream.concat(
-                        Splitter.onPattern("[&;]").omitEmptyStrings().splitToStream(options)
-                                .filter(option -> !OPTIONS_OVERRIDDEN_PER_NODE.contains(optionName(option))),
+        final List<String> configuredOptions = Splitter.onPattern("[&;]").omitEmptyStrings().splitToList(options);
+        final Set<String> configuredOptionNames = configuredOptions.stream()
+                .map(DefaultMongodbConnectionResolver::optionName)
+                .collect(Collectors.toSet());
+        final Stream<String> srvImpliedOptions = uri.startsWith(SRV_SCHEME_PREFIX)
+                ? srvImpliedOptions(!userInfo.isEmpty(), configuredOptionNames)
+                : Stream.empty();
+
+        final String perNodeOptions = Stream.of(
+                        configuredOptions.stream().filter(option -> !OPTIONS_DROPPED_PER_NODE.contains(optionName(option))),
+                        srvImpliedOptions,
                         Stream.of("directConnection=true"))
+                .flatMap(Function.identity())
                 .collect(Collectors.joining("&"));
 
         // HostAndPort keeps the brackets of IPv6 addresses
         return f("mongodb://%s%s/%s?%s", userInfo, HostAndPort.fromString(nodeName), database, perNodeOptions);
+    }
+
+    /**
+     * Options a mongodb+srv:// connection string implies, which have to be set explicitly in the mongodb:// per-node
+     * connection string: TLS is enabled unless configured otherwise, and the DNS TXT record may define the authSource.
+     */
+    private Stream<String> srvImpliedOptions(boolean hasCredentials, Set<String> configuredOptionNames) {
+        final Stream.Builder<String> implied = Stream.builder();
+        if (!configuredOptionNames.contains("tls") && !configuredOptionNames.contains("ssl")) {
+            implied.add("tls=true");
+        }
+        if (hasCredentials && !configuredOptionNames.contains("authsource")) {
+            // Parsing resolves the DNS TXT record, so the credential has the effective authSource
+            final MongoCredential credential = configuration.getMongoClientURI().getCredentials();
+            if (credential != null && credential.getSource() != null) {
+                // The MongoDB driver doesn't decode '+' to a space
+                final String authSource = URLEncoder.encode(credential.getSource(), StandardCharsets.UTF_8).replace("+", "%20");
+                implied.add(f("authSource=%s", authSource));
+            }
+        }
+        return implied.build();
     }
 
     private static String optionName(String option) {
