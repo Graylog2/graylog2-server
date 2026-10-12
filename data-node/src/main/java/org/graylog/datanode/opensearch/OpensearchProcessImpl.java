@@ -460,13 +460,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     @Override
-    public void reset() {
-        stop();
-        configure();
-        start();
-    }
-
-    @Override
     public void reloadCertificates() {
         if(commandLineProcess != null) {
             commandLineProcess.hotReload();

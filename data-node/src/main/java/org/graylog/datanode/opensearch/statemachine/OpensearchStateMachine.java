@@ -139,7 +139,10 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .onEntry(process::stop)
                 .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
-                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
+                // the process is already stopped by REMOVED's onEntry action above; the actual restart is
+                // driven by PROCESS_STARTED, fired once OpensearchProcessService rebuilds the configuration
+                // in response to the RESET trigger (see OpensearchProcessService#triggerOpensearchStartup())
+                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
         return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config, tracer);
