@@ -23,6 +23,8 @@ import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/u
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
 import { appliedIndexSetIds } from 'components/indices/IndexSetFieldTypes/profileChangeResult';
 import type { ProfileChangeResponse } from 'components/indices/IndexSetFieldTypes/types';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 import getIndexSetTableElements, { DETAILS_SECTION, INDEX_SET_VIEW_VARIANTS } from './Constants';
 import customColumnRenderers from './ColumnRenderers';
@@ -34,6 +36,8 @@ import IndexSetViewButtons from './IndexSetViewButtons';
 import IndexSetDetailsSection from './expanded-sections/IndexSetDetailsSection';
 import { fetchIndexSets, keyFn } from './fetchIndexSets';
 import useIndexSetsOverviewExtensions from './hooks/useIndexSetsOverviewExtensions';
+import { IndexSetMetricsProvider } from './IndexSetMetricsContext';
+import { backendFieldsForVisibleColumns } from './metricColumns';
 import type { IndexSetEntity } from './types';
 
 const expandedSections = {
@@ -52,28 +56,47 @@ const TopSection = () => (
 
 const renderActions = (indexSet: IndexSetEntity) => <IndexSetActions indexSet={indexSet} />;
 
+const idsEqual = (first: Array<string>, second: Array<string>) =>
+  first.length === second.length && first.every((id, index) => id === second[index]);
+
 const IndexSetsOverview = () => {
   const {
     columnRenderers: extensionColumnRenderers,
     attributes: extensionAttributes,
     columnGroups: extensionColumnGroups,
   } = useIndexSetsOverviewExtensions();
-  const { defaultVariantLayout, configurationVariantLayout, additionalAttributes } = getIndexSetTableElements(
-    extensionAttributes,
-    extensionColumnGroups,
-  );
+  const { defaultVariantLayout, configurationVariantLayout, routingVariantLayout, additionalAttributes } =
+    getIndexSetTableElements(extensionAttributes, extensionColumnGroups);
   const { activeLayoutVariant } = useLayoutVariant();
-  const activeLayout =
-    activeLayoutVariant === INDEX_SET_VIEW_VARIANTS.configuration ? configurationVariantLayout : defaultVariantLayout;
+  const variantLayouts: Record<string, typeof defaultVariantLayout> = {
+    [INDEX_SET_VIEW_VARIANTS.configuration]: configurationVariantLayout,
+    [INDEX_SET_VIEW_VARIANTS.routing]: routingVariantLayout,
+  };
+  const activeLayout = variantLayouts[activeLayoutVariant] ?? defaultVariantLayout;
+
+  const [visibleIndexSetIds, setVisibleIndexSetIds] = useState<Array<string>>([]);
+
+  const { data: layoutPreferences } = useUserLayoutPreferences(
+    activeLayout.entityTableId,
+    activeLayoutVariant || undefined,
+  );
+  const userSelection = Object.entries(layoutPreferences?.attributes ?? {})
+    .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
+    .map(([attributeId]) => attributeId);
+  const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
 
   const [indexSetsById, setIndexSetsById] = useState<Record<string, IndexSetEntity>>({});
   const [profileChange, setProfileChange] = useState<ProfileChange | null>(null);
-  const onDataLoaded = (data: PaginatedResponse<IndexSetEntity>) =>
+  const onDataLoaded = (data: PaginatedResponse<IndexSetEntity>) => {
+    const nextIds = data.list.map(({ id }) => id);
+
+    setVisibleIndexSetIds((currentIds) => (idsEqual(currentIds, nextIds) ? currentIds : nextIds));
     setIndexSetsById((current) =>
       data.list.every((indexSet) => current[indexSet.id] === indexSet)
         ? current
         : { ...current, ...Object.fromEntries(data.list.map((indexSet) => [indexSet.id, indexSet])) },
     );
+  };
   const onProfileChangeApplied = (response: ProfileChangeResponse) => {
     const applied = new Set(appliedIndexSetIds(response));
 
@@ -84,7 +107,7 @@ const IndexSetsOverview = () => {
   };
 
   return (
-    <>
+    <IndexSetMetricsProvider indexSetIds={visibleIndexSetIds} fields={backendFieldsForVisibleColumns(visibleColumns)}>
       <PaginatedEntityTable<IndexSetEntity>
         humanName="index sets"
         searchPlaceholder="Find index sets"
@@ -111,7 +134,7 @@ const IndexSetsOverview = () => {
           onChangeApplied={onProfileChangeApplied}
         />
       )}
-    </>
+    </IndexSetMetricsProvider>
   );
 };
 
