@@ -18,14 +18,15 @@ import React from 'react';
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
+import { Events } from '@graylog/server-api';
+
 import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import suppressConsole from 'helpers/suppressConsole';
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import useEventById, { eventsUrl } from 'hooks/useEventById';
+import useEventById from 'hooks/useEventById';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({ Events: { getById: jest.fn(() => Promise.resolve(mockEventData)) } }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -53,26 +54,23 @@ jest.mock('views/logic/Widgets', () => ({
   }),
 }));
 
-const url = eventsUrl('event-id-1');
-
 describe('useEventById', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should run fetch and store mapped response', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockEventData));
     const { result } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', url);
+    expect(Events.getById).toHaveBeenCalledWith('event-id-1');
     expect(result.current.data).toEqual(mockEventData.event);
   });
 
   it('should display notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(Events.getById).mockRejectedValueOnce(new Error('Error'));
 
     renderHook(() => useEventById('event-id-1'), { wrapper });
 

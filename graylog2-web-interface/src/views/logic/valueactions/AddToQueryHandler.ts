@@ -19,9 +19,8 @@ import uniq from 'lodash/uniq';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
 import {
-  escape,
   addToQuery,
-  formatTimestamp,
+  formatValueForQuery,
   predicate,
   concatQueryStrings,
   edgeClause,
@@ -34,7 +33,7 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const toPredicate = (field: string, value: string | number, type: FieldType) =>
-  predicate(field, type.type === 'date' ? formatTimestamp(value) : escape(value));
+  predicate(field, formatValueForQuery(value, type));
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) =>
   addToQuery(oldQuery, toPredicate(field, value, type));

@@ -92,6 +92,8 @@ export type Attribute = {
   filterable?: boolean;
   filter_options?: Array<{ value: string; title: string }>;
   filter_component?: React.ComponentType<FilterComponentProps>;
+  // Allows only one active filter, like boolean attributes. Users change it by editing the existing filter.
+  single_filter?: boolean;
   related_collection?: string;
   related_identifier?: string;
   related_property?: string;

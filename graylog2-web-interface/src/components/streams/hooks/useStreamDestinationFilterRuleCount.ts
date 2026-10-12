@@ -17,14 +17,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { create, windowScheduler, indexedResolver } from '@yornaath/batshit';
 
+import { Streams } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 
 const streamDestinationFilterRuleCounts = create({
   fetcher: (streamIds: Array<string>) =>
-    fetch('POST', qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.countByStreams().url), {
+    Streams.getDestinationFilterRuleCountsForStreams({
       stream_ids: streamIds,
     }),
   resolver: indexedResolver(),

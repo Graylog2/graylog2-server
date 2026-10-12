@@ -16,15 +16,20 @@
  */
 package org.graylog2.indexer.indexset.metrics;
 
+import com.google.common.base.Throwables;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,8 @@ import java.util.stream.Collectors;
  * Base class for cached index set metrics, served unfiltered because the endpoint checks the read permission per ID.
  */
 abstract class IndexSetMetricDescriptor<T> implements EntityCachedMetricDescriptor<T, T> {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexSetMetricDescriptor.class);
+
     private final IndexSetService indexSetService;
     private final IndexSetRegistry indexSetRegistry;
     private final Duration cacheTtl;
@@ -52,10 +59,24 @@ abstract class IndexSetMetricDescriptor<T> implements EntityCachedMetricDescript
         return cachedValue;
     }
 
+    @Override
+    public final List<EntityMetric<T>> compute(Collection<String> entityIds) {
+        final Set<IndexSet> indexSets = indexSets(entityIds);
+        try {
+            return computeFor(indexSets);
+        } catch (RuntimeException e) {
+            // returning no values keeps the failure out of the cache, which lets the next request retry
+            LOG.warn("Unable to compute {} for index sets {}: {}", fieldName(), entityIds, Throwables.getRootCause(e).getMessage());
+            return List.of();
+        }
+    }
+
+    abstract List<EntityMetric<T>> computeFor(Set<IndexSet> indexSets);
+
     /**
      * Resolves the requested index set IDs with one MongoDB query, skipping unknown and malformed IDs.
      */
-    Set<IndexSet> indexSets(Collection<String> entityIds) {
+    private Set<IndexSet> indexSets(Collection<String> entityIds) {
         final Set<String> validIds = entityIds.stream().filter(ObjectId::isValid).collect(Collectors.toSet());
         return indexSetRegistry.getFromIndexConfig(indexSetService.findByIds(validIds));
     }

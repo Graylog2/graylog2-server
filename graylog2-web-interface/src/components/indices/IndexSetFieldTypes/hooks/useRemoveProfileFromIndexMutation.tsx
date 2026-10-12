@@ -16,24 +16,21 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import type {
   RemoveProfileFromIndexSetBodyJson,
   RemoveProfileFromIndexSetBody,
 } from 'components/indices/IndexSetFieldTypes/types';
 
-export const urlPrefix = '/system/indices/mappings/remove_profile_from';
-
 const putRemoveProfileFromIndex = async ({ indexSetId, rotated }: RemoveProfileFromIndexSetBody) => {
-  const url = qualifyUrl(urlPrefix);
   const body: RemoveProfileFromIndexSetBodyJson = {
     index_sets: [indexSetId],
     rotate: rotated,
   };
 
-  return fetch('PUT', url, body);
+  return SystemFieldTypes.removeProfileFromIndexSets(body);
 };
 
 const useRemoveProfileFromIndexMutation = () => {

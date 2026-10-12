@@ -15,29 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common';
+import { DefaultLabel, Link } from 'components/common';
 import type { Stream } from 'logic/streams/types';
-import { Label } from 'components/bootstrap';
 
 type Props = {
   stream: Stream;
 };
-const DefaultLabel = styled(Label)`
-  margin-left: 5px;
-  vertical-align: inherit;
-`;
 
 const TitleCell = ({ stream }: Props) => (
   <>
     <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-    {stream.is_default && (
-      <DefaultLabel bsStyle="primary" bsSize="xsmall">
-        Default
-      </DefaultLabel>
-    )}
+    {stream.is_default && <DefaultLabel />}
   </>
 );
 
