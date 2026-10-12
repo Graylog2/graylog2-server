@@ -347,7 +347,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     private boolean isMaxClauseCountException(Throwable throwable) {
-       var found = throwable.getMessage().contains("[type=too_many_clauses,");
+       var found = throwable.getMessage().contains("[type=too_many_clauses,") || throwable.getMessage().contains("[type=too_many_nested_clauses,");
 
        if(!found && throwable.getCause() != null) {
            return isMaxClauseCountException(throwable.getCause());
