@@ -91,7 +91,6 @@ const QueryParameters = ({ queryParameters }: { queryParameters: Array<Parameter
 };
 
 type Props = {
-  streams: Array<Stream>;
   config: EventDefinition['config'];
   currentUser: User;
   definitionId?: string;
@@ -135,7 +134,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
     ) : null;
 
   const renderedStreams = streamIds
-    .map((id) => streams.find((s) => s.id === id) || id)
+    .map((id) => streams?.find((s) => s.id === id) ?? id)
     .sort((s1, s2) =>
       naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
     )
