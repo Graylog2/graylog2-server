@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -95,9 +96,14 @@ public class MongodbClusterCommand {
                 try {
                     results.put(entry.getKey(), entry.getValue().get(executionTimeoutSec, TimeUnit.SECONDS));
                 } catch (TimeoutException e) {
+                    LOG.warn("Timed out after {}s executing action on mongodb host {}", executionTimeoutSec, entry.getKey());
                     failedHosts.add(entry.getKey());
                     entry.getValue().cancel(true);
+                } catch (ExecutionException e) {
+                    LOG.warn("Failed to execute action on mongodb host {}", entry.getKey(), e.getCause());
+                    failedHosts.add(entry.getKey());
                 } catch (Exception e) {
+                    LOG.warn("Failed to execute action on mongodb host {}", entry.getKey(), e);
                     failedHosts.add(entry.getKey());
                 }
             }
