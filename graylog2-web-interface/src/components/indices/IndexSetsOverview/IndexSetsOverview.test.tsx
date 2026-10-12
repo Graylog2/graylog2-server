@@ -421,6 +421,11 @@ describe('IndexSetsOverview', () => {
     await screen.findByText('Title');
 
     expect(screen.queryByText('Deflector')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
+    await screen.findByRole('menuitem', { name: /reset all columns/i });
+
+    expect(screen.queryByRole('menuitem', { name: /deflector/i })).not.toBeInTheDocument();
   });
 
   it('offers a retry when metrics could not be loaded', async () => {
@@ -450,9 +455,11 @@ describe('IndexSetsOverview', () => {
   it('does not offer sorting by metric columns', async () => {
     render(<IndexSetsOverview />);
 
-    await screen.findByRole('button', { name: /sort title/i });
+    await userEvent.click(await screen.findByTitle('Toggle Indices actions'));
+    await screen.findByRole('menuitem', { name: /hide column/i });
 
-    expect(screen.queryByRole('button', { name: /sort indices/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /sort ascending/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /sort descending/i })).not.toBeInTheDocument();
   });
 
   it('adds plugin columns to the configuration view', async () => {
