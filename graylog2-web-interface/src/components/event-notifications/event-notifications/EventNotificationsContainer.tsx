@@ -26,7 +26,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { SearchParams } from 'stores/PaginationTypes';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
@@ -56,7 +56,6 @@ const customColumnRenderers = (
 });
 
 const EventNotificationsContainer = () => {
-  const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry('event-notification');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
@@ -95,7 +94,7 @@ const EventNotificationsContainer = () => {
   );
 
   const fetchEntities = async (searchParams: SearchParams): Promise<PaginatedResponse<EventNotification>> => {
-    CurrentUserStore.update(currentUser.currentUser.username);
+    CurrentUser.reload();
 
     return fetchEventNotifications(searchParams);
   };
