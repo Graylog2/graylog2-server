@@ -33,6 +33,7 @@ import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
+import AssociatedNotificationsCell from 'components/events/events/AssociatedNotificationsCell';
 
 const EventDefinitionRenderer = ({
   eventDefinitionId,
@@ -113,10 +114,10 @@ export const eventTypeAttribute = {
   staticWidth: 100,
 };
 
-export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
-  T,
-  M
-> => ({
+export const getGeneralEventAttributeRenderers = <
+  T extends EntityBase & { event_definition_id?: string },
+  M = unknown,
+>(): ColumnRenderersByAttribute<T, M> => ({
   message: {
     minWidth: 300,
     width: 0.5,
@@ -148,6 +149,11 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   tags: {
     renderCell: (tags: string[]) => <TagsRenderer tags={tags} />,
     width: 0.3,
+  },
+  associated_notifications: {
+    renderCell: (_, event) => <AssociatedNotificationsCell eventDefinitionId={event.event_definition_id} />,
+    width: 0.2,
+    minWidth: 200,
   },
 });
 

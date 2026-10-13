@@ -135,6 +135,12 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     filterable: true,
     filter_component: TagsFilter,
   },
+  {
+    id: 'associated_notifications',
+    title: 'Associated Notifications',
+    type: 'STRING',
+    sortable: false,
+  },
 ];
 export const additionalAttributes: Array<Attribute> = [...eventsTableSpecificAttributes, ...detailsAttributes];
 
@@ -160,6 +166,7 @@ export const eventsTableElements = {
       'key',
       'alert',
       'event_definition_id',
+      'associated_notifications',
       'event_definition_type',
       'tags',
       'timestamp',
