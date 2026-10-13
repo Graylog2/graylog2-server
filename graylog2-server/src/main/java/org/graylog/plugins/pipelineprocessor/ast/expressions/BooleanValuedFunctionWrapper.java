@@ -34,8 +34,7 @@ public class BooleanValuedFunctionWrapper extends BaseExpression implements Logi
 
     @Override
     public boolean evaluateBool(EvaluationContext context) {
-        final Object value = expr.evaluateUnsafe(context);
-        return value != null && (Boolean) value;
+        return PipelineOps.toBool(expr.evaluateUnsafe(context));
     }
 
     @Override

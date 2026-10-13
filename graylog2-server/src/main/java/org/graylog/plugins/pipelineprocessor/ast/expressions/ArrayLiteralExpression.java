@@ -23,7 +23,6 @@ import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ArrayLiteralExpression extends BaseExpression {
     private final List<Expression> elements;
@@ -40,9 +39,7 @@ public class ArrayLiteralExpression extends BaseExpression {
 
     @Override
     public List evaluateUnsafe(EvaluationContext context) {
-        return  elements.stream()
-                .map(expression -> expression.evaluateUnsafe(context))
-                .collect(Collectors.toList());
+        return PipelineOps.arrayLiteral(elements.stream().map(expression -> expression.evaluateUnsafe(context)).toArray());
     }
 
     @Override
