@@ -77,6 +77,7 @@ const index = (name: string, overrides: Partial<IndexSummary> = {}): IndexSummar
   ...overrides,
 });
 
+const PRODUCT_NAME = 'Acme Logs';
 const INDICES = [index('graylog_1'), index('graylog_2', { health: 'red' }), index('security-auditlog', { index_set_id: null })];
 
 const searchParams = (overrides: Partial<SearchParams> = {}): SearchParams => ({
@@ -213,6 +214,7 @@ describe('fetchIndices', () => {
   it('searches, filters, sorts and pages the full list in the browser', async () => {
     const { list, pagination, attributes } = await fetchIndices(
       searchParams({ query: 'log', sort: { attributeId: 'health', direction: 'asc' }, pageSize: 1 }),
+      PRODUCT_NAME,
     );
 
     // "log" matches all three; red first when sorting by health ascending; one per page.
@@ -220,16 +222,23 @@ describe('fetchIndices', () => {
     expect(list.map((row) => [row.id, row.index])).toEqual([['graylog_2', 'graylog_2']]);
     expect(attributes.map((attribute) => attribute.id)).toContain('index_set');
 
-    const filtered = await fetchIndices(searchParams({ filters: OrderedMap({ index_set: ['none'] }) }));
+    const filtered = await fetchIndices(
+      searchParams({ filters: OrderedMap({ index_set: ['none'] }) }),
+      PRODUCT_NAME,
+    );
     expect(filtered.list.map((row) => row.index)).toEqual(['security-auditlog']);
   });
 
   it('answers with no rows, but the attributes, while waiting for something to narrow the list', async () => {
-    const waiting = await fetchIndices(searchParams(), true);
+    const waiting = await fetchIndices(searchParams(), PRODUCT_NAME, true);
     expect(waiting.list).toEqual([]);
     expect(waiting.attributes.length).toBeGreaterThan(0);
 
-    const picked = await fetchIndices(searchParams({ filters: OrderedMap({ index: ['graylog_1'] }) }), true);
+    const picked = await fetchIndices(
+      searchParams({ filters: OrderedMap({ index: ['graylog_1'] }) }),
+      PRODUCT_NAME,
+      true,
+    );
     expect(picked.list.map((row) => row.index)).toEqual(['graylog_1']);
   });
 });

@@ -31,6 +31,8 @@ import {
 } from './indexList';
 import type { IndexSummary } from './types';
 
+const PRODUCT_NAME = 'Acme Logs';
+
 const index = (name: string, overrides: Partial<IndexSummary> = {}): IndexSummary => ({
   index: name,
   health: 'green',
@@ -92,7 +94,7 @@ describe('matchesFilters', () => {
     expect(matchesFilters(red, filtersOf({ index_set: ['set-1'] }))).toBe(true);
   });
 
-  it('filters by whether Graylog manages the index, and counts both kinds', () => {
+  it('filters by whether an index set manages the index, and counts both kinds', () => {
     const all = [red, warm, foreign, closed];
 
     expect(names(all.filter((i) => matchesFilters(i, filtersOf({ [MANAGED_ATTRIBUTE]: ['false'] }))))).toEqual([
@@ -114,24 +116,27 @@ describe('matchesFilters', () => {
 });
 
 describe('indexAttributes', () => {
-  it('offers each index set present once, plus indices outside Graylog', () => {
-    const attributes = indexAttributes([
-      index('graylog_1'),
-      index('graylog_2'),
-      index('events_1', { index_set_id: 'set-2', index_set_title: 'Events' }),
-      index('security-auditlog', { index_set_id: null, index_set_title: null }),
-    ]);
+  it('offers each index set present once, plus indices outside any, naming the product', () => {
+    const attributes = indexAttributes(
+      [
+        index('graylog_1'),
+        index('graylog_2'),
+        index('events_1', { index_set_id: 'set-2', index_set_title: 'Events' }),
+        index('security-auditlog', { index_set_id: null, index_set_title: null }),
+      ],
+      PRODUCT_NAME,
+    );
     const indexSet = attributes.find((a) => a.id === 'index_set');
 
     expect(indexSet.filter_options).toEqual([
       { value: 'set-1', title: 'Default index set' },
       { value: 'set-2', title: 'Events' },
-      { value: NO_INDEX_SET, title: 'Not managed by Graylog' },
+      { value: NO_INDEX_SET, title: 'Not managed by Acme Logs' },
     ]);
   });
 
   it('describes the filters as static, filterable string attributes; the index filter offers every index', () => {
-    const attributes = indexAttributes([index('graylog_1'), index('graylog_2')]);
+    const attributes = indexAttributes([index('graylog_1'), index('graylog_2')], PRODUCT_NAME);
     const filters = attributes.filter((a) => a.filterable);
 
     expect(filters.map((a) => a.id)).toEqual(['index', 'health', 'tier', 'index_set', 'managed', 'write_index']);
@@ -147,7 +152,7 @@ describe('indexAttributes', () => {
 
   it('makes every column sortable except the filter-only managed and write index', () => {
     expect(
-      indexAttributes([])
+      indexAttributes([], PRODUCT_NAME)
         .filter((a) => !a.sortable)
         .map((a) => a.id),
     ).toEqual(['managed', 'write_index']);

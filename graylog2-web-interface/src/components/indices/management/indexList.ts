@@ -48,7 +48,7 @@ const FILTER_VALUE: { [attributeId: string]: (index: IndexSummary) => string } =
   write_index: (index) => String(Boolean(index.is_write_index)),
 };
 
-export const indexAttributes = (indices: Array<IndexSummary>): Attributes => {
+export const indexAttributes = (indices: Array<IndexSummary>, productName: string): Attributes => {
   const indexSets = new Map<string, string>();
   indices.forEach((index) => {
     if (index.index_set_id) {
@@ -97,12 +97,12 @@ export const indexAttributes = (indices: Array<IndexSummary>): Attributes => {
       filterable: true,
       filter_options: [
         ...[...indexSets].map(([value, title]) => ({ value, title })),
-        { value: NO_INDEX_SET, title: 'Not managed by Graylog' },
+        { value: NO_INDEX_SET, title: `Not managed by ${productName}` },
       ],
     },
     {
       id: MANAGED_ATTRIBUTE,
-      title: 'Managed by Graylog',
+      title: `Managed by ${productName}`,
       type: 'STRING',
       filterable: true,
       filter_options: [

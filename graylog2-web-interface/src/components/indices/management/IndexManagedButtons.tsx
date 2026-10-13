@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { OrderedMap } from 'immutable';
 
+import useProductName from 'brand-customization/useProductName';
 import { Button, ButtonGroup } from 'components/bootstrap';
 import { Tooltip } from 'components/common';
 import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
@@ -26,18 +27,21 @@ import useIndexOverview from './useIndexOverview';
 
 type Option = 'all' | 'managed' | 'unmanaged';
 
-const OPTIONS: Array<{ value: Option; title: string; description: string; filter?: string }> = [
-  { value: 'all', title: 'All', description: 'All indices in the cluster.' },
+type ManagedOption = { value: Option; title: string; description: (productName: string) => string; filter?: string };
+
+const OPTIONS: Array<ManagedOption> = [
+  { value: 'all', title: 'All', description: () => 'All indices in the cluster.' },
   {
     value: 'managed',
     title: 'Managed',
-    description: 'Indices of a Graylog index set.',
+    description: (productName) => `Indices of a ${productName} index set.`,
     filter: 'true',
   },
   {
     value: 'unmanaged',
     title: 'Unmanaged',
-    description: 'Indices outside any Graylog index set, e.g. created by OpenSearch or other tools.',
+    description: (productName) =>
+      `Indices outside any ${productName} index set, e.g. created by OpenSearch or other tools.`,
     filter: 'false',
   },
 ];
@@ -46,20 +50,21 @@ const OPTIONS: Array<{ value: Option; title: string; description: string; filter
 const IndexManagedButtons = () => {
   const { searchParams, onChangeFilters } = useTableFilterContext();
   const { indices } = useIndexOverview();
+  const productName = useProductName();
   const counts = managedCounts(indices);
   const filters = searchParams.filters ?? OrderedMap<string, Array<string>>();
   const selected = filters.get(MANAGED_ATTRIBUTE) ?? [];
-  const active = OPTIONS.find(({ filter }) => (filter ? selected.length === 1 && selected[0] === filter : selected.length === 0))?.value;
+  const active = OPTIONS.find(({ filter }) =>
+    filter ? selected.length === 1 && selected[0] === filter : selected.length === 0,
+  )?.value;
 
   const onSelect = (filter: string | undefined) =>
-    onChangeFilters(
-      filter ? filters.set(MANAGED_ATTRIBUTE, [filter]) : filters.delete(MANAGED_ATTRIBUTE),
-    );
+    onChangeFilters(filter ? filters.set(MANAGED_ATTRIBUTE, [filter]) : filters.delete(MANAGED_ATTRIBUTE));
 
   return (
     <ButtonGroup>
       {OPTIONS.map(({ value, title, description, filter }) => (
-        <Tooltip key={value} withArrow position="bottom" label={description}>
+        <Tooltip key={value} withArrow position="bottom" label={description(productName)}>
           <Button bsSize="small" active={active === value} onClick={() => onSelect(filter)}>
             {title} <b>{counts[value]}</b>
           </Button>

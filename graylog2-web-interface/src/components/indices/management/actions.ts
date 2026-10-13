@@ -34,8 +34,8 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     hidden: true,
     permission: () => 'deflector:cycle' as const,
     appliesTo: (index) => isManaged(index) && index.is_write_index,
-    notes:
-      'Starts a new write index for each index set, as Graylog\'s own "Rotate active write index" does. The current write index becomes read-only, gets its index range calculated and, if the index set is configured for it, is optimized.',
+    notes: (productName) =>
+      `Starts a new write index for each index set, as ${productName}'s own "Rotate active write index" does. The current write index becomes read-only, gets its index range calculated and, if the index set is configured for it, is optimized.`,
   },
   {
     key: 'close',
@@ -43,7 +43,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'closed',
     permission: changeState,
     appliesTo: (index) => !isSystem(index) && !isClosed(index) && !index.is_write_index,
-    notes: 'Closed indices keep their data on disk but can\'t be searched until reopened.',
+    notes: () => "Closed indices keep their data on disk but can't be searched until reopened.",
   },
   {
     key: 'open',
@@ -51,8 +51,8 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'opened',
     permission: changeState,
     appliesTo: (index) => !isSystem(index) && isClosed(index),
-    notes:
-      'Indices in a Graylog index set are reopened as Graylog\'s own reopen does, so retention skips them from then on. Other indices are simply opened.',
+    notes: (productName) =>
+      `Indices in a ${productName} index set are reopened as ${productName}'s own reopen does, so retention skips them from then on. Other indices are simply opened.`,
   },
   {
     key: 'force_merge',
@@ -60,7 +60,8 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'queued for force merge',
     permission: changeState,
     appliesTo: (index) => !isClosed(index),
-    notes: 'Runs as a Graylog system job (System > Overview), merging to the index set\'s configured segment count, or 1 segment for indices outside Graylog. Heavy on disk I/O.',
+    notes: (productName) =>
+      `Runs as a ${productName} system job (System > Overview), merging to the index set's configured segment count, or 1 segment for indices outside ${productName}. Heavy on disk I/O.`,
   },
   {
     key: 'clear_cache',
@@ -68,7 +69,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'cache cleared',
     permission: changeState,
     appliesTo: (index) => !isClosed(index),
-    notes: 'Clears the field data, query and request caches.',
+    notes: () => 'Clears the field data, query and request caches.',
   },
   {
     key: 'flush',
@@ -76,7 +77,7 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     pastTense: 'flushed',
     permission: changeState,
     appliesTo: (index) => !isClosed(index),
-    notes: 'Writes buffered operations to disk and clears the translog.',
+    notes: () => 'Writes buffered operations to disk and clears the translog.',
   },
   {
     key: 'delete',
@@ -85,8 +86,8 @@ const INDEX_ACTIONS: Array<IndexAction> = [
     danger: true,
     permission: (index) => `indices:delete:${index.index}` as const,
     appliesTo: (index) => !isSystem(index) && !index.is_write_index,
-    notes:
-      'Deletes the index and all its messages. This cannot be undone. An index not managed by Graylog may belong to OpenSearch itself or to a plugin, which can stop working without it.',
+    notes: (productName) =>
+      `Deletes the index and all its messages. This cannot be undone. An index not managed by ${productName} may belong to OpenSearch itself or to a plugin, which can stop working without it.`,
   },
 ];
 

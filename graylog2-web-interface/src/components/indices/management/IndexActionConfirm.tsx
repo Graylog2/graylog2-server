@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import useProductName from 'brand-customization/useProductName';
 import { Alert } from 'components/bootstrap';
 import { ConfirmDialog } from 'components/common';
 import StringUtils from 'util/StringUtils';
@@ -48,29 +49,34 @@ type Props = {
 };
 
 // Asks before running an action, naming the indices it runs on.
-const IndexActionConfirm = ({ action, targets, skipped, isRunning, onConfirm, onCancel }: Props) => (
-  <ConfirmDialog
-    show
-    title={`${action.label} ${indices(targets.length)}?`}
-    btnConfirmText={`${action.label} ${indices(targets.length)}`}
-    isAsyncSubmit
-    isSubmitting={isRunning}
-    submitLoadingText={`${action.label}...`}
-    onConfirm={onConfirm}
-    onCancel={onCancel}>
-    {action.danger ? <Alert bsStyle="danger">{action.notes}</Alert> : <p>{action.notes}</p>}
-    <IndexList>
-      {targets.slice(0, MAX_LISTED).map((index) => (
-        <li key={index.index}>{index.index}</li>
-      ))}
-      {targets.length > MAX_LISTED && <li>…and {targets.length - MAX_LISTED} more</li>}
-    </IndexList>
-    {skipped > 0 && (
-      <Alert bsStyle="info">
-        {indices(skipped)} of the selection will be skipped. {NOT_APPLICABLE_REASON}
-      </Alert>
-    )}
-  </ConfirmDialog>
-);
+const IndexActionConfirm = ({ action, targets, skipped, isRunning, onConfirm, onCancel }: Props) => {
+  const productName = useProductName();
+  const notes = action.notes(productName);
+
+  return (
+    <ConfirmDialog
+      show
+      title={`${action.label} ${indices(targets.length)}?`}
+      btnConfirmText={`${action.label} ${indices(targets.length)}`}
+      isAsyncSubmit
+      isSubmitting={isRunning}
+      submitLoadingText={`${action.label}...`}
+      onConfirm={onConfirm}
+      onCancel={onCancel}>
+      {action.danger ? <Alert bsStyle="danger">{notes}</Alert> : <p>{notes}</p>}
+      <IndexList>
+        {targets.slice(0, MAX_LISTED).map((index) => (
+          <li key={index.index}>{index.index}</li>
+        ))}
+        {targets.length > MAX_LISTED && <li>…and {targets.length - MAX_LISTED} more</li>}
+      </IndexList>
+      {skipped > 0 && (
+        <Alert bsStyle="info">
+          {indices(skipped)} of the selection will be skipped. {NOT_APPLICABLE_REASON}
+        </Alert>
+      )}
+    </ConfirmDialog>
+  );
+};
 
 export default IndexActionConfirm;

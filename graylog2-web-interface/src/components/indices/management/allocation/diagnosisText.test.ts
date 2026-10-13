@@ -35,6 +35,7 @@ const diagnosis = (overrides: Partial<AllocationDiagnosis> = {}): AllocationDiag
 });
 
 const primary = { index: 'graylog_17', shard: 0, primary: true, totalShards: 4 };
+const PRODUCT_NAME = 'Acme Logs';
 
 // As the server answers for graylog_17 on dev (translog.ckp torn, five failed attempts).
 const translogDamaged = diagnosis({
@@ -123,7 +124,7 @@ describe('headline', () => {
 
 describe('optionText', () => {
   it('describes each option with what it loses and who can do it', () => {
-    expect(translogDamaged.options.map((option) => optionText(option, primary))).toEqual([
+    expect(translogDamaged.options.map((option) => optionText(option, primary, PRODUCT_NAME))).toEqual([
       {
         title:
           'Repair the copy on os-dev-node-0: stop OpenSearch on that node, run the shard repair tool, start the node again, then start the repaired copy.',
@@ -140,7 +141,7 @@ describe('optionText', () => {
         dataLoss: 'Loses every document in this shard.',
         where: 'OpenSearch API request',
       },
-      { title: 'Delete the index (on this page).', dataLoss: 'Loses the whole index.', where: 'In Graylog' },
+      { title: 'Delete the index (on this page).', dataLoss: 'Loses the whole index.', where: 'In Acme Logs' },
     ]);
   });
 
@@ -153,12 +154,17 @@ describe('optionText', () => {
     ];
 
     actions.forEach((action) => {
-      const text = optionText({ action, data_loss: 'NONE', where: 'AUTOMATIC', node: null, command: null }, primary);
+      const text = optionText(
+        { action, data_loss: 'NONE', where: 'AUTOMATIC', node: null, command: null },
+        primary,
+        PRODUCT_NAME,
+      );
       expect(text.title).not.toBe(action);
       expect(text.where).toBeNull();
     });
     expect(
-      optionText({ action: 'WAIT', data_loss: 'NONE', where: 'AUTOMATIC', node: null, command: null }, primary).dataLoss,
+      optionText({ action: 'WAIT', data_loss: 'NONE', where: 'AUTOMATIC', node: null, command: null }, primary, PRODUCT_NAME)
+        .dataLoss,
     ).toBeNull();
   });
 });

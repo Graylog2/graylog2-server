@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
+import ProductName from 'brand-customization/ProductName';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
@@ -49,8 +50,8 @@ const IndexManagementPage = () => {
       <IndicesPageNavigation />
       <PageHeader title="Indices" actions={<AllocationActions />}>
         <span>
-          Every index in the cluster with its health, including hidden indices and indices that don&apos;t belong to a
-          Graylog index set.
+          Every index in the cluster with its health, including hidden indices and indices that don&apos;t belong to a{' '}
+          <ProductName /> index set.
         </span>
       </PageHeader>
       <IndexerClusterHealth minimal />

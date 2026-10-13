@@ -57,7 +57,7 @@ describe('IndexManagedButtons', () => {
     });
   });
 
-  it('counts the indices Graylog manages and the others', async () => {
+  it('counts the managed indices and the others', async () => {
     withFilters(OrderedMap({ health: ['red'] }));
     render(<IndexManagedButtons />);
 

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import useProductName from 'brand-customization/useProductName';
 import Alert from 'components/bootstrap/Alert';
 import Label from 'components/bootstrap/Label';
 import { Collapsible } from 'components/common';
@@ -74,6 +75,7 @@ type Props = {
 // The plain-language part of a shard's explanation: what happened first; what can be done (most data kept first)
 // folded away until opened; then the warnings.
 const DiagnosisSummary = ({ diagnosis, context }: Props) => {
+  const productName = useProductName();
   const actionable = diagnosis.options.filter((option) => option.action !== 'WAIT');
   const warnings = diagnosis.avoid.map(avoidText).filter((text) => text !== null);
 
@@ -85,7 +87,7 @@ const DiagnosisSummary = ({ diagnosis, context }: Props) => {
           label={`What you can do (${actionable.length === 1 ? '1 option' : `${actionable.length} options, most data kept first`})`}>
           <Options>
             {actionable.map((option) => {
-              const text = optionText(option, context);
+              const text = optionText(option, context, productName);
 
               return (
                 <li key={option.action}>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import useProductName from 'brand-customization/useProductName';
 import { PaginatedEntityTable } from 'components/common';
 import NoSearchResult from 'components/common/NoSearchResult';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
@@ -55,13 +56,14 @@ type Props = {
 const IndicesTable = ({ waitForNarrowing }: Props) => {
   const can = useCanRun();
   const { indices } = useIndexOverview();
+  const productName = useProductName();
   const renderActions = (index: IndexRow) => <IndexRowActions index={index} />;
 
   return (
     <PaginatedEntityTable<IndexRow>
       humanName="indices"
       tableLayout={TABLE_LAYOUT}
-      fetchEntities={(searchParams: SearchParams) => fetchIndices(searchParams, waitForNarrowing)}
+      fetchEntities={(searchParams: SearchParams) => fetchIndices(searchParams, productName, waitForNarrowing)}
       keyFn={(searchParams: SearchParams) => indicesKeyFn(searchParams, waitForNarrowing)}
       fetchOptions={{ refetchInterval: REFETCH_INTERVAL_MS }}
       columnRenderers={createColumnRenderers()}

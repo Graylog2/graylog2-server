@@ -42,7 +42,7 @@ export type IndexAction = {
   key: IndexActionKey;
   label: string;
   pastTense: string;
-  notes: string;
+  notes: (productName: string) => string;
   hidden?: boolean;
   danger?: boolean;
   permission: (index: IndexSummary) => Permission;

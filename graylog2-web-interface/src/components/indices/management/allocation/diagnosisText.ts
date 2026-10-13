@@ -72,7 +72,7 @@ const TITLES: { [situation in Situation]: string } = {
   TRANSLOG_DAMAGED: 'Damaged transaction log',
   RETENTION_LEASES_DAMAGED: 'Damaged bookkeeping file',
   SEGMENT_DATA_DAMAGED: 'Damaged stored data',
-  COMMIT_UNREADABLE: "Damaged beyond repair",
+  COMMIT_UNREADABLE: 'Damaged beyond repair',
   DAMAGED_OTHER: 'Damaged file',
   STALE_COPY_ONLY: 'Only an older copy left',
   NO_COPY_FOUND: 'No copy left',
@@ -177,7 +177,8 @@ const ACTIONS: { [action in DiagnosisAction]: (option: DiagnosisOption, context:
 const DATA_LOSS: { [loss in DataLoss]: string } = {
   NONE: 'Keeps all documents.',
   UNFLUSHED_OPERATIONS: 'Loses only operations not yet saved to disk, usually the last moments before the failure.',
-  DOCUMENTS_IN_DAMAGED_SEGMENTS: 'Loses the documents in the damaged part; the tool says how many before it changes anything.',
+  DOCUMENTS_IN_DAMAGED_SEGMENTS:
+    'Loses the documents in the damaged part; the tool says how many before it changes anything.',
   WRITES_THE_STALE_COPY_MISSED: 'Loses what was written after this copy fell behind.',
   WRITES_SINCE_SNAPSHOT: 'Loses what was written after the snapshot.',
   WHOLE_SHARD: 'Loses every document in this shard.',
@@ -185,12 +186,12 @@ const DATA_LOSS: { [loss in DataLoss]: string } = {
   UNKNOWN: 'How much is lost depends on what the repair tool finds.',
 };
 
-const WHERE: { [where in Where]: string | null } = {
-  AUTOMATIC: null,
-  GRAYLOG: 'In Graylog',
-  OPENSEARCH_API: 'OpenSearch API request',
-  HOST_ACCESS: 'Needs access to the OpenSearch server',
-  INFRASTRUCTURE: 'Infrastructure change',
+const WHERE: { [where in Where]: (productName: string) => string | null } = {
+  AUTOMATIC: () => null,
+  GRAYLOG: (productName) => `In ${productName}`,
+  OPENSEARCH_API: () => 'OpenSearch API request',
+  HOST_ACCESS: () => 'Needs access to the OpenSearch server',
+  INFRASTRUCTURE: () => 'Infrastructure change',
 };
 
 /**
@@ -202,15 +203,16 @@ export const commandWarning = (option: DiagnosisOption): string | null =>
     ? `Running this can't be undone. ${DATA_LOSS[option.data_loss] ?? DATA_LOSS.UNKNOWN}`
     : null;
 
-export const optionText = (option: DiagnosisOption, context: ShardContext) => ({
+export const optionText = (option: DiagnosisOption, context: ShardContext, productName: string) => ({
   title: ACTIONS[option.action]?.(option, context) ?? option.action,
   dataLoss: option.action === 'WAIT' ? null : (DATA_LOSS[option.data_loss] ?? null),
-  where: WHERE[option.where] ?? null,
+  where: WHERE[option.where]?.(productName) ?? null,
 });
 
 const AVOID: { [action in DiagnosisAction]?: string } = {
   RETRY_FAILED: "Retrying failed allocations won't help here: it would fail the same way.",
-  ALLOCATE_STALE_PRIMARY: "Don't start this copy before it's repaired: it fails again and then looks like an older copy.",
+  ALLOCATE_STALE_PRIMARY:
+    "Don't start this copy before it's repaired: it fails again and then looks like an older copy.",
 };
 
 export const avoidText = (action: DiagnosisAction) => AVOID[action] ?? null;

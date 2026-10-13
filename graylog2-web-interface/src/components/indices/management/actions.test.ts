@@ -80,7 +80,7 @@ describe('rowMenu', () => {
     expect(items.find(({ action }) => action.key === 'flush').applies).toBe(true);
   });
 
-  it('offers close, open and delete on indices outside Graylog, but not on system indices', () => {
+  it('offers close, open and delete on indices outside any index set, but not on system indices', () => {
     const applying = (idx: IndexSummary) =>
       rowMenu(idx, admin)
         .filter(({ applies }) => applies)

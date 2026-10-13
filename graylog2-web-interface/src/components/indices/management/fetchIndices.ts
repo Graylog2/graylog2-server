@@ -38,9 +38,13 @@ const isNarrowed = ({ query, filters }: SearchParams) => Boolean(query) || (filt
  * filters, sorting and paging happen here, with the tested helpers of indexList.ts. With `waitForNarrowing` (while the
  * allocation panel is open) the list stays empty until a search, filter or picked index narrows it.
  */
-export const fetchIndices = async (searchParams: SearchParams, waitForNarrowing = false): Promise<IndicesResponse> => {
+export const fetchIndices = async (
+  searchParams: SearchParams,
+  productName: string,
+  waitForNarrowing = false,
+): Promise<IndicesResponse> => {
   const { indices } = await IndexerIndicesManagement.list({ requestShouldExtendSession: false });
-  const attributes = indexAttributes(indices);
+  const attributes = indexAttributes(indices, productName);
 
   if (waitForNarrowing && !isNarrowed(searchParams)) {
     return { list: [], pagination: { total: 0 }, attributes };

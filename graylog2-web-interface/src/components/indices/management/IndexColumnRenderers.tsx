@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 
+import ProductName from 'brand-customization/ProductName';
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import NumberUtils from 'util/NumberUtils';
@@ -64,11 +65,18 @@ export const createColumnRenderers = (): ColumnRenderers<IndexRow> => ({
     tier: {
       staticWidth: 'matchHeader',
       renderCell: (_value, index) => (
-        <Label bsStyle={TIER_STYLES[index.tier] ?? 'default'}>{TIER_LABELS[index.tier] ?? index.tier ?? 'unknown'}</Label>
+        <Label bsStyle={TIER_STYLES[index.tier] ?? 'default'}>
+          {TIER_LABELS[index.tier] ?? index.tier ?? 'unknown'}
+        </Label>
       ),
     },
     index_set: {
-      renderCell: (_value, index) => index.index_set_title ?? <i>not managed by Graylog</i>,
+      renderCell: (_value, index) =>
+        index.index_set_title ?? (
+          <i>
+            not managed by <ProductName />
+          </i>
+        ),
     },
     write_index: {
       staticWidth: 'matchHeader',
