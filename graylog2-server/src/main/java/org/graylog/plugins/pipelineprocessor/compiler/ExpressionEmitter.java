@@ -16,9 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.compiler;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AdditionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ComparisonExpression;
@@ -26,10 +28,13 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.IndexedAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MultiplicationExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
@@ -78,6 +83,11 @@ final class ExpressionEmitter {
     static final Method SIGNED = Method.getMethod(
             "Object signed(org.graylog.plugins.pipelineprocessor.ast.expressions.SignedExpression, "
                     + "org.graylog.plugins.pipelineprocessor.EvaluationContext, Object)");
+    static final Method INDEXED_ACCESS = Method.getMethod(
+            "Object indexedAccess(org.graylog.plugins.pipelineprocessor.EvaluationContext, Object, Object)");
+    static final Method FIELD_ACCESS = Method.getMethod("Object fieldAccess(Object, Object)");
+    static final Method ARRAY_LITERAL = Method.getMethod("java.util.List arrayLiteral(Object[])");
+    static final Method MAP_LITERAL = Method.getMethod("java.util.Map mapLiteral(String[], Object[])");
 
     private final GeneratorAdapter g;
     private final RuleClassData data;
@@ -168,6 +178,29 @@ final class ExpressionEmitter {
                 bool(e);
                 g.valueOf(Type.BOOLEAN_TYPE);
             }
+            // the interpreter evaluates the index before the indexable object
+            case IndexedAccessExpression i -> {
+                g.loadArg(0);
+                value(i.getIndex());
+                value(i.getIndexableObject());
+                g.invokeStatic(PIPELINE_OPS, INDEXED_ACCESS);
+            }
+            case FieldAccessExpression fa -> {
+                value(fa.object());
+                value(fa.field());
+                g.invokeStatic(PIPELINE_OPS, FIELD_ACCESS);
+            }
+            case ArrayLiteralExpression arr -> {
+                objectArray(ImmutableList.copyOf(arr.children()));
+                g.invokeStatic(PIPELINE_OPS, ARRAY_LITERAL);
+            }
+            case MapLiteralExpression map -> {
+                // entries() iterates the node's HashMap in the same order as its evaluateUnsafe()
+                final List<Map.Entry<String, Expression>> entries = ImmutableList.copyOf(map.entries());
+                constant(entries.stream().map(Map.Entry::getKey).toArray(String[]::new), String[].class);
+                objectArray(entries.stream().map(Map.Entry::getValue).toList());
+                g.invokeStatic(PIPELINE_OPS, MAP_LITERAL);
+            }
             default -> escapeValue(expr);
         }
     }
@@ -224,6 +257,18 @@ final class ExpressionEmitter {
                 g.invokeStatic(PIPELINE_OPS, EQUALITY);
             }
             default -> escapeBool(expr);
+        }
+    }
+
+    /** Pushes a new {@code Object[]} holding the values of {@code elements}, evaluated in order. */
+    private void objectArray(List<Expression> elements) {
+        g.push(elements.size());
+        g.newArray(RuleClassEmitter.OBJECT);
+        for (int i = 0; i < elements.size(); i++) {
+            g.dup();
+            g.push(i);
+            value(elements.get(i));
+            g.arrayStore(RuleClassEmitter.OBJECT);
         }
     }
 

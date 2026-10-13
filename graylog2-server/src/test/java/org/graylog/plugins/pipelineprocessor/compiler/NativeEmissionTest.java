@@ -90,4 +90,30 @@ class NativeEmissionTest {
         assertThat(metrics.getCounters().keySet())
                 .noneMatch(n -> n.startsWith(MetricRegistry.name(RuleCompiler.class, "escaped")));
     }
+
+    /**
+     * Results are bound to a variable first: {@code set_field} is a legacy call whose arguments the AST evaluates, so
+     * the access and literal nodes would otherwise never be emitted.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "rule \"r\" when true then let v = [1, \"x\", $message.missing][1]; set_field(\"a\", v); end",
+            "rule \"r\" when true then let v = {k: \"v\", n: $message.missing}[\"k\"]; set_field(\"a\", v); end",
+            "rule \"r\" when true then let m = {a: 1, b: [2, 3]}; let v = m.b; set_field(\"b\", v); end",
+            // IndexOutOfBoundsException
+            "rule \"r\" when true then let v = [1, 2][5]; set_field(\"a\", v); end",
+            // the index is evaluated first, so the error names the second throw_value() call's position (the type
+            // checker rejects non-indexable operands such as "nope"[0], so the IllegalArgumentException paths are
+            // unreachable from parsed rules)
+            "rule \"r\" when true then let v = [throw_value()][to_long(throw_value())]; set_field(\"a\", v); end",
+            "rule \"r\" when true then let v = $message.num.nope; set_field(\"a\", v); end",
+            "rule \"r\" when true then let v = [$message.num, $message.message]; let w = {x: $message.num}; "
+                    + "set_field(\"a\", v); set_field(\"b\", w); end"
+    })
+    void accessAndLiteralsMatchInterpreterWithoutEscapes(String source) {
+        final Rule rule = parser.parseRule(source, false);
+        DifferentialHarness.assertEquivalent(RuleCompilerTest::input, List.of(rule), compiler::compileOrThrow);
+        assertThat(metrics.getCounters().keySet())
+                .noneMatch(n -> n.startsWith(MetricRegistry.name(RuleCompiler.class, "escaped")));
+    }
 }
