@@ -25,6 +25,7 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration, OpensearchEvent, OpensearchState> {
 
@@ -43,6 +44,11 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     void remove();
 
     void reloadCertificates();
+
+    /**
+     * Update discovery seed hosts of the running opensearch process. Opensearch picks them up without restart.
+     */
+    void updateSeedHosts(Set<String> seedHosts);
 
     void available();
     boolean isManagerNode();
