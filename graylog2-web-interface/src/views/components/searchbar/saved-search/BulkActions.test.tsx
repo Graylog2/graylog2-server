@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import fetch from 'logic/rest/FetchProvider';
+import { Views } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -26,7 +27,7 @@ import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import BulkActions from './BulkActions';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ Views: { bulkDelete: jest.fn() } }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -63,7 +64,7 @@ describe('SavedSearches BulkActions', () => {
   });
 
   it('should delete selected saved searches', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
+    asMock(Views.bulkDelete).mockReturnValue(Promise.resolve({ failures: [], successfully_performed: 2, errors: [] }));
     const setSelectedEntities = jest.fn();
 
     asMock(useSelectedEntities).mockReturnValue({
@@ -84,7 +85,7 @@ describe('SavedSearches BulkActions', () => {
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+      expect(Views.bulkDelete).toHaveBeenCalledWith({
         entity_ids: ['saved-search-id-1', 'saved-search-id-2'],
       }),
     );
@@ -94,9 +95,11 @@ describe('SavedSearches BulkActions', () => {
   });
 
   it('should display warning and not reset saved searches which could not be deleted', async () => {
-    asMock(fetch).mockReturnValue(
+    asMock(Views.bulkDelete).mockReturnValue(
       Promise.resolve({
         failures: [{ entity_id: 'saved-search-id-1', failure_explanation: 'The saved search cannot be deleted.' }],
+        successfully_performed: 1,
+        errors: [],
       }),
     );
 
@@ -120,7 +123,7 @@ describe('SavedSearches BulkActions', () => {
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+      expect(Views.bulkDelete).toHaveBeenCalledWith({
         entity_ids: ['saved-search-id-1', 'saved-search-id-2'],
       }),
     );

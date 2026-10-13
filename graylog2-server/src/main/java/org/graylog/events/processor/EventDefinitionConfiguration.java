@@ -26,7 +26,6 @@ public class EventDefinitionConfiguration {
 
     @Documentation("""
             Maximum value that can be set for an event limit.
-            Default: 1000
             """)
     @Parameter(value = "event_definition_max_event_limit", validators = PositiveIntegerValidator.class)
     private int maxEventLimit = 1000;
@@ -37,7 +36,6 @@ public class EventDefinitionConfiguration {
             technique IDs must match T followed by 4 digits with an optional 3-digit sub-technique
             suffix (e.g. T1021 or T1021.006). Disable as an emergency override if a new ID format is
             introduced before Graylog ships an updated validator.
-            Default: true
             """)
     @Parameter(value = "event_definition_tactics_techniques_validation_enabled")
     private boolean tacticsTechniquesValidationEnabled = true;

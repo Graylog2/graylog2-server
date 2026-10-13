@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
+import { ClusterLoadBalancers } from '@graylog/server-api';
 
-const sourceUrl = (nodeId: string) => `/cluster/${nodeId}/lbstatus`;
+import UserNotification from 'util/UserNotification';
 
 export const overrideLoadBalancerStatus = (nodeId: string, status: string): Promise<void> =>
-  fetch('PUT', qualifyUrl(`${sourceUrl(nodeId)}/override/${status}`)).then(
+  ClusterLoadBalancers.override(nodeId, status).then(
     () => {
       UserNotification.success(`Load balancer status successfully changed do '${status}' in node '${nodeId}'`);
     },

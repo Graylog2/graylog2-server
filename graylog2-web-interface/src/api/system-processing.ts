@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
+import { ClusterProcessing } from '@graylog/server-api';
 
-const sourceUrl = (nodeId: string) => `/cluster/${nodeId}/processing`;
+import UserNotification from 'util/UserNotification';
 
 export const pauseProcessing = (nodeId: string): Promise<void> =>
-  fetch('POST', qualifyUrl(`${sourceUrl(nodeId)}/pause`)).then(
+  ClusterProcessing.pause(nodeId).then(
     () => {
       UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
     },
@@ -34,7 +32,7 @@ export const pauseProcessing = (nodeId: string): Promise<void> =>
   );
 
 export const resumeProcessing = (nodeId: string): Promise<void> =>
-  fetch('POST', qualifyUrl(`${sourceUrl(nodeId)}/resume`)).then(
+  ClusterProcessing.resume(nodeId).then(
     () => {
       UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
     },

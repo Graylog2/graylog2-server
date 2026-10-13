@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 import usePluginEntities from 'hooks/usePluginEntities';
 import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
@@ -55,14 +54,14 @@ type Props = { page?: string; items?: Array<PageNavItem> };
  * Simple tab navigation to allow navigating to subareas of a page.
  */
 const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const items = usePageNavigationItems(page, itemsProp);
 
   const availableItems = items.filter(
     (item) =>
       (item.requiredFeatureFlag ? AppConfig.isFeatureEnabled(item.requiredFeatureFlag) : true) &&
       (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
-      isPermitted(currentUser.permissions, item.permissions) &&
+      isPermitted(item.permissions) &&
       !!item.path,
   );
 

@@ -19,13 +19,15 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
+import { CA } from '@graylog/server-api';
+
 import { asMock } from 'helpers/mocking';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import CACreateForm from './CACreateForm';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({ CA: { createCA: jest.fn() } }));
+
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
@@ -33,7 +35,7 @@ jest.mock('util/UserNotification', () => ({
 
 describe('CACreateForm', () => {
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve());
+    asMock(CA.createCA).mockResolvedValue(undefined);
   });
 
   const submitForm = async () => {
@@ -45,20 +47,13 @@ describe('CACreateForm', () => {
 
     await submitForm();
 
-    await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining('/ca/create'),
-        { organization: 'Graylog CA' },
-        false,
-      ),
-    );
+    await waitFor(() => expect(CA.createCA).toHaveBeenCalledWith({ organization: 'Graylog CA' }));
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA created successfully');
   });
 
   it('should show error when CA creation fails', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(CA.createCA).mockRejectedValue(new Error('Error'));
 
     render(
       <DefaultQueryClientProvider>
@@ -68,14 +63,7 @@ describe('CACreateForm', () => {
 
     await submitForm();
 
-    await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining('/ca/create'),
-        { organization: 'Graylog CA' },
-        false,
-      ),
-    );
+    await waitFor(() => expect(CA.createCA).toHaveBeenCalledWith({ organization: 'Graylog CA' }));
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA creation failed with error: Error: Error');
   });

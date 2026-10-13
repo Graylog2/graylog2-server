@@ -21,7 +21,7 @@ import loadAsync from 'routing/loadAsync';
 import ErrorPage from 'components/errors/ErrorPage';
 import Button from 'components/bootstrap/Button';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
-import 'bootstrap/less/bootstrap.less';
+import 'theme/bootstrap.less';
 import CurrentUser from 'logic/users/CurrentUser';
 import Session from 'logic/session/Session';
 import { validate } from 'logic/session/SessionApi';

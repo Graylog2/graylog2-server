@@ -14,107 +14,77 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
-import type { ParamsContext } from 'routing/withParams';
-import withParams from 'routing/withParams';
-import useCurrentUser from 'hooks/useCurrentUser';
-import type User from 'logic/users/User';
+import useParams from 'routing/useParams';
+import useHistory from 'routing/useHistory';
 import { getEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import type { HistoryContext } from 'routing/withHistory';
-import withHistory from 'routing/withHistory';
 import PageDescription from 'components/event-notifications/PageDescription';
 
-type EditEventDefinitionPageProps = ParamsContext &
-  HistoryContext & {
-    currentUser: User;
-  };
+const EditEventNotificationPage = () => {
+  const { notificationId } = useParams<{ notificationId: string }>();
+  const history = useHistory();
+  const { isPermitted } = usePermissions();
+  const [notification, setNotification] = useState(undefined);
+  const canEdit = isPermitted(`eventnotifications:edit:${notificationId}`);
 
-class EditEventDefinitionPage extends React.Component<
-  EditEventDefinitionPageProps,
-  {
-    [key: string]: any;
-  }
-> {
-  constructor(props: EditEventDefinitionPageProps) {
-    super(props);
-
-    this.state = {
-      notification: undefined,
-    };
-  }
-
-  componentDidMount() {
-    const { params, currentUser } = this.props;
-
-    if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
-      getEventNotification(params.notificationId).then(
-        (notification) => this.setState({ notification: notification }),
-        (error) => {
-          if (error.status === 404) {
-            const { history } = this.props;
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
-        },
-      );
-    }
-  }
-
-  render() {
-    const { notification } = this.state;
-    const { params, currentUser, history } = this.props;
-
-    if (!isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
+  useEffect(() => {
+    if (!canEdit) {
       history.push(Routes.NOTFOUND);
+
+      return;
     }
 
-    if (!notification) {
-      return (
-        <DocumentTitle title="Edit Notification">
-          <span>
-            <PageHeader title="Edit Notification">
-              <Spinner text="Loading Notification information..." />
-            </PageHeader>
-          </span>
-        </DocumentTitle>
-      );
-    }
+    getEventNotification(notificationId).then(
+      (result) => setNotification(result),
+      (error) => {
+        if (error.status === 404) {
+          history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+        }
+      },
+    );
+  }, [canEdit, history, notificationId]);
 
+  if (!notification) {
     return (
-      <DocumentTitle title={`Edit "${notification.title}" Notification`}>
-        <EventsPageNavigation />
-        <PageHeader
-          title={`Edit "${notification.title}" Notification`}
-          actions={<EventNotificationActionLinks notificationId={notification.id} />}
-          documentationLink={{
-            title: 'Alerts documentation',
-            path: DocsHelper.PAGES.ALERTS,
-          }}>
-          <PageDescription />
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventNotificationFormContainer action="edit" notification={notification} />
-          </Col>
-        </Row>
+      <DocumentTitle title="Edit Notification">
+        <span>
+          <PageHeader title="Edit Notification">
+            <Spinner text="Loading Notification information..." />
+          </PageHeader>
+        </span>
       </DocumentTitle>
     );
   }
-}
 
-const EditEventDefinitionPageWithCurrentUser = (props: ParamsContext & HistoryContext) => {
-  const currentUser = useCurrentUser();
+  return (
+    <DocumentTitle title={`Edit "${notification.title}" Notification`}>
+      <EventsPageNavigation />
+      <PageHeader
+        title={`Edit "${notification.title}" Notification`}
+        actions={<EventNotificationActionLinks notificationId={notification.id} />}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <PageDescription />
+      </PageHeader>
 
-  return <EditEventDefinitionPage {...props} currentUser={currentUser} />;
+      <Row className="content">
+        <Col md={12}>
+          <EventNotificationFormContainer action="edit" notification={notification} />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
 };
 
-export default withParams(withHistory(EditEventDefinitionPageWithCurrentUser));
+export default EditEventNotificationPage;

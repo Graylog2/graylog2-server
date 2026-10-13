@@ -21,6 +21,8 @@ import concat from 'lodash/concat';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 
+import { EventsDefinitions, EventsEntityTypes } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
@@ -223,7 +225,7 @@ export const createEventDefinition = (newEventDefinition: EventDefinition): Prom
 };
 
 export const copyEventDefinition = (eventDefinition: EventDefinition): Promise<EventDefinitionCopyResponse> =>
-  fetch<EventDefinitionCopyResponse>('POST', eventDefinitionsUrl({ segments: [eventDefinition.id, 'duplicate'] })).then(
+  EventsDefinitions.duplicate(encodeURIComponent(eventDefinition.id)).then(
     (response) => {
       UserNotification.success(
         'Event Definition duplicated successfully',
@@ -277,10 +279,10 @@ export const updateEventDefinition = (
 };
 
 export const deleteEventDefinition = (eventDefinition: EventDefinition): Promise<unknown> =>
-  fetch('DELETE', eventDefinitionsUrl({ segments: [eventDefinition.id] }));
+  EventsDefinitions.remove(encodeURIComponent(eventDefinition.id));
 
 export const enableEventDefinition = (eventDefinition: EventDefinition): Promise<unknown> =>
-  fetch('PUT', eventDefinitionsUrl({ segments: [eventDefinition.id, 'schedule'] })).then(
+  EventsDefinitions.schedule(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
       UserNotification.success(
         'Event Definition successfully enabled',
@@ -302,7 +304,7 @@ export const enableEventDefinition = (eventDefinition: EventDefinition): Promise
   );
 
 export const disableEventDefinition = (eventDefinition: EventDefinition): Promise<unknown> =>
-  fetch('PUT', eventDefinitionsUrl({ segments: [eventDefinition.id, 'unschedule'] })).then(
+  EventsDefinitions.unschedule(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
       UserNotification.success(
         'Event Definition successfully disabled',
@@ -324,7 +326,7 @@ export const disableEventDefinition = (eventDefinition: EventDefinition): Promis
   );
 
 export const clearNotificationQueue = (eventDefinition: EventDefinition): Promise<unknown> =>
-  fetch('PUT', eventDefinitionsUrl({ segments: [eventDefinition.id, 'clear-notification-queue'] })).then(
+  EventsDefinitions.clearNotificationQueue(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
       UserNotification.success('Queued notifications cleared.', 'Queued notifications were successfully cleared.');
 
@@ -409,7 +411,7 @@ export function useGetEntityTypes() {
     queryKey: ['event-definition-entity-types'],
     queryFn: () =>
       defaultOnError(
-        fetch('GET', qualifyUrl('/events/entity_types')),
+        EventsEntityTypes.all(),
         'Loading event definition entity types failed with status',
         'Could not load event definition entity types',
       ),

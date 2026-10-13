@@ -46,8 +46,7 @@ import useProductName from 'brand-customization/useProductName';
 import HiddenFieldWrapper from 'components/indices/IndexSetConfigurationForm/HiddenFieldWrapper';
 import IndexSetReadOnlyConfiguration from 'components/indices/IndexSetConfigurationForm/IndexSetReadOnlyConfiguration';
 import IndexSetRotationRetentionConfigurationSection from 'components/indices/IndexSetConfigurationForm/IndexSetRotationRetentionConfigurationSection';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
 
 type Props = {
@@ -104,7 +103,8 @@ const IndexSetConfigurationForm = ({
 }: Props) => {
   const history = useHistory();
   const productName = useProductName();
-  const ignoreFieldRestrictions = isPermitted(useCurrentUser().permissions, 'indexsets_field_restrictions:edit');
+  const { isPermitted } = usePermissions();
+  const ignoreFieldRestrictions = isPermitted('indexsets_field_restrictions:edit');
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();

@@ -25,10 +25,9 @@ import { FormikInput, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useInputsStates from 'hooks/useInputsStates';
 import AppConfig from 'util/AppConfig';
-import { isPermitted } from 'util/PermissionsMixin';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
 import PortMismatchAlert from './PortMismatchAlert';
@@ -77,7 +76,7 @@ const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 const CollectorsSettings = () => {
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();
   const { updateConfig } = useCollectorsMutations();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const isConfigured = !!config?.signing_cert_id;
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
@@ -86,7 +85,7 @@ const CollectorsSettings = () => {
 
   const isCloud = AppConfig.isCloud();
 
-  const canCreateInputs = isPermitted(currentUser?.permissions, [
+  const canCreateInputs = isPermitted([
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);

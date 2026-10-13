@@ -16,25 +16,22 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import type {
   SetIndexSetFieldTypeProfileBody,
   SetIndexSetFieldTypeProfileBodyJson,
 } from 'components/indices/IndexSetFieldTypes/types';
 
-export const urlPrefix = '/system/indices/mappings/set_profile';
-
 const putProfile = async ({ indexSetId, profileId, rotated }: SetIndexSetFieldTypeProfileBody) => {
-  const url = qualifyUrl(urlPrefix);
   const body: SetIndexSetFieldTypeProfileBodyJson = {
     index_sets: [indexSetId],
     rotate: rotated,
     profile_id: profileId,
   };
 
-  return fetch('PUT', url, body);
+  return SystemFieldTypes.setProfile(body);
 };
 
 const useSetIndexSetProfileMutation = () => {

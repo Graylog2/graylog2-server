@@ -17,9 +17,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemCodecsTypes } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { CodecTypes } from './Types';
@@ -29,7 +28,7 @@ const useCodecTypes = () => {
     queryKey: ['system', 'codecs', 'types'],
     queryFn: () =>
       defaultOnError(
-        fetch('GET', qualifyUrl(ApiRoutes.CodecTypesController.list().url)),
+        SystemCodecsTypes.getAll(),
         'Fetching codec types failed with status',
         'Could not retrieve codec types',
       ),

@@ -77,6 +77,8 @@ export type TacticsTechniquesEditorPlugin = {
 export type TacticsTechniquesColumnPlugin = {
   attribute: Attribute;
   component: React.ComponentType<{ entity: EventDefinition }>;
+  // Renders an active filter chip for this attribute (e.g. the MITRE name instead of the raw ID).
+  filterValueRenderer?: (value: string) => React.ReactNode;
   // Hook evaluated inside EventDefinitionsContainer to decide whether to render the column.
   // Lets the plugin gate on license/feature state without OSS knowing about it.
   useCondition?: () => boolean;

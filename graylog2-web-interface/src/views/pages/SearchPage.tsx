@@ -34,6 +34,7 @@ import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
+import IlluminateDashboardViewTelemetry from 'views/components/IlluminateDashboardViewTelemetry';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean;
@@ -44,6 +45,7 @@ type Props = React.PropsWithChildren<{
   searchResult?: SearchExecutionResult;
   forceSideBarPinned?: boolean;
   skipNoStreamsCheck?: boolean;
+  loadingPlaceholder?: React.ReactNode;
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -62,6 +64,7 @@ const SearchPage = ({
   searchResult = undefined,
   forceSideBarPinned = false,
   skipNoStreamsCheck = false,
+  loadingPlaceholder = <Spinner />,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -71,7 +74,7 @@ const SearchPage = ({
   const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
 
   if (result.status === 'loading') {
-    return <Spinner />;
+    return loadingPlaceholder;
   }
 
   if (result.status === 'interrupted') {
@@ -87,6 +90,7 @@ const SearchPage = ({
       isNew={isNew}
       initialQuery={initialQuery}
       result={searchResult}>
+      <IlluminateDashboardViewTelemetry />
       <SearchPageTitle>
         <DashboardPageContextProvider>
           <NewViewLoaderContext.Provider value={loadNewView}>
@@ -94,7 +98,7 @@ const SearchPage = ({
               <SearchPageAutoRefreshProvider>
                 {children}
                 <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
-                  <Search forceSideBarPinned={forceSideBarPinned} />
+                  <Search forceSideBarPinned={forceSideBarPinned} loadingPlaceholder={loadingPlaceholder} />
                 </IfUserHasAccessToAnyStream>
               </SearchPageAutoRefreshProvider>
             </ViewLoaderContext.Provider>
@@ -103,7 +107,7 @@ const SearchPage = ({
       </SearchPageTitle>
     </ViewsStoreProvider>
   ) : (
-    <Spinner />
+    loadingPlaceholder
   );
 };
 

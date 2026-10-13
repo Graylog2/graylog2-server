@@ -17,6 +17,8 @@
 import { useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { SystemInputs } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -61,7 +63,7 @@ export const updateInput = (id: string, input: ConfiguredInput): Promise<void> =
 };
 
 export const deleteInput = (input: Input): Promise<void> => {
-  const promise = fetch('DELETE', qualifyUrl(`${SOURCE_URL}/${input.id}`));
+  const promise = SystemInputs.terminate(input.id);
 
   promise.then(
     () => {

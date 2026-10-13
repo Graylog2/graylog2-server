@@ -17,11 +17,11 @@
 import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { Migration } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchJournalDowntimeSize = async () => fetch('GET', qualifyUrl('/migration/journalestimate'));
+const fetchJournalDowntimeSize = async () => Migration.getJournalEstimate();
 
 const useJournalDowntimeSize = (): {
   data: {
