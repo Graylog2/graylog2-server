@@ -54,6 +54,13 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-bom</artifactId>
+                <version>${grizzly.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
                 <version>${jersey.version}</version>
@@ -363,11 +370,6 @@
                 <groupId>com.github.stateless4j</groupId>
                 <artifactId>stateless4j</artifactId>
                 <version>${stateless4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-websockets</artifactId>
-                <version>${grizzly-websockets.version}</version>
             </dependency>
 
             <!-- Tracing dependencies -->

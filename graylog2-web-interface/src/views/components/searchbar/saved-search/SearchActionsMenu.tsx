@@ -18,7 +18,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import UserNotification from 'util/UserNotification';
@@ -29,6 +28,8 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ExportModal from 'views/components/export/ExportModal';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
+import type { IsPermitted } from 'hooks/usePermissions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import * as ViewsPermissions from 'views/Permissions';
 import type User from 'logic/users/User';
@@ -62,8 +63,11 @@ const Container = styled(ButtonGroup)`
   justify-content: flex-end;
 `;
 
-const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) =>
-  view.owner === currentUser?.username || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)]);
+const _isAllowedToEdit = (
+  view: View,
+  currentUser: User | undefined | null,
+  isPermitted: IsPermitted,
+) => view.owner === currentUser?.username || isPermitted([ViewsPermissions.View.Edit(view.id)]);
 
 const _extractErrorMessage = (error: FetchError) =>
   error && error.additional && error.additional.body && error.additional.body.message
@@ -110,9 +114,10 @@ const SearchActionsMenu = () => {
   const isNew = useIsNew();
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const loadNewView = useContext(NewViewLoaderContext);
   const { scopePermissions } = useGetPermissionsByScope({ _scope: view?.scope });
-  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser) && !!scopePermissions?.is_mutable;
+  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser, isPermitted) && !!scopePermissions?.is_mutable;
   const formTarget = useRef();
   const [showForm, setShowForm] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -166,7 +171,7 @@ const SearchActionsMenu = () => {
       }
       const viewWithPluginData = await executePluggableDuplicationHandler(
         view,
-        currentUser.permissions,
+        isPermitted,
         pluggableSaveViewControls,
       );
 
@@ -184,7 +189,7 @@ const SearchActionsMenu = () => {
         .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
         .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
     },
-    [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc],
+    [isPermitted, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc],
   );
 
   const deleteSavedSearch = useCallback(
