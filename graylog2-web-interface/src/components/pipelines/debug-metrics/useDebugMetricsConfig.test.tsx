@@ -18,14 +18,15 @@ import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { PipelinesRules } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import { deleteRule, RULES_QUERY_KEY } from 'components/rules/hooks/useRules';
 import type { RuleType } from 'components/rules/hooks/useRules';
 
 import useDebugMetricsConfig from './useDebugMetricsConfig';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ PipelinesRules: { metricsConfig: jest.fn(), remove: jest.fn() } }));
 jest.mock('util/UserNotification', () => ({ error: jest.fn(), success: jest.fn() }));
 
 describe('useDebugMetricsConfig', () => {
@@ -39,9 +40,8 @@ describe('useDebugMetricsConfig', () => {
   // query key (`rule-metrics-config`), so invalidating the rules query on delete leaves
   // it untouched. This guards against a future regression that re-couples the two caches.
   it('keeps metricsEnabled when a rule is deleted', async () => {
-    asMock(fetch).mockImplementation((method) =>
-      method === 'GET' ? Promise.resolve({ metrics_enabled: true }) : Promise.resolve(undefined),
-    );
+    asMock(PipelinesRules.metricsConfig).mockResolvedValue({ metrics_enabled: true });
+    asMock(PipelinesRules.remove).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => ({
       config: useDebugMetricsConfig(),

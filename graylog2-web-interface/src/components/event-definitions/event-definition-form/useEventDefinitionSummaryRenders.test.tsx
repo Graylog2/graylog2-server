@@ -21,7 +21,6 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultUser } from 'defaultMockValues';
 
-import { alice } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -240,6 +239,9 @@ describe('renderFields', () => {
 });
 
 describe('renderNotifications', () => {
+  const allPermitted = () => true;
+  const nonePermitted = () => false;
+
   const notificationSettings = { grace_period_ms: 0, backlog_size: null };
 
   const definitionNotification = {
@@ -259,13 +261,13 @@ describe('renderNotifications', () => {
   });
 
   it('renders "not configured to trigger any Notifications" when definitionNotifications is empty', () => {
-    render(<>{renderNotifications([], notificationSettings as any, [], defaultUser)}</>);
+    render(<>{renderNotifications([], notificationSettings as any, [], allPermitted)}</>);
 
     expect(screen.getByText(/not configured to trigger any notifications/i)).toBeInTheDocument();
   });
 
   it('renders "Could not find information" when notification is not in the notifications list', () => {
-    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [], defaultUser)}</>);
+    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [], allPermitted)}</>);
 
     expect(screen.getByText(/could not find information for notification/i)).toBeInTheDocument();
   });
@@ -277,7 +279,7 @@ describe('renderNotifications', () => {
 
     render(
       <>
-        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}
+        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], allPermitted)}
       </>,
     );
 
@@ -292,7 +294,7 @@ describe('renderNotifications', () => {
 
     render(
       <>
-        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}
+        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], allPermitted)}
       </>,
     );
 
@@ -300,8 +302,7 @@ describe('renderNotifications', () => {
   });
 
   it('renders a warning for notifications with missing permissions', () => {
-    // alice has reader permissions — no eventnotifications:read privilege
-    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [], alice)}</>);
+    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [], nonePermitted)}</>);
 
     expect(screen.getByRole('alert')).toHaveTextContent(/missing notifications permissions for/i);
     expect(screen.getByRole('alert')).toHaveTextContent('notif-1');
@@ -313,7 +314,7 @@ describe('renderNotifications', () => {
       { type: 'email-notification-v1', displayName: 'Email', summaryComponent: undefined },
     ]);
 
-    render(<>{renderNotifications([definitionNotification], settings as any, [notification as any], defaultUser)}</>);
+    render(<>{renderNotifications([definitionNotification], settings as any, [notification as any], allPermitted)}</>);
 
     expect(screen.getByText(/grace period is set to/i)).toBeInTheDocument();
     expect(screen.getByText(/notifications will include 10 messages/i)).toBeInTheDocument();

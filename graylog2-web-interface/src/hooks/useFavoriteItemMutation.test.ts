@@ -16,13 +16,15 @@
  */
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
-import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
-import useUserSearchFilterMutation, { urlPrefix } from 'hooks/useFavoriteItemMutation';
-import { qualifyUrl } from 'util/URLUtils';
+import { Favorites } from '@graylog/server-api';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+import asMock from 'helpers/mocking/AsMock';
+import UserNotification from 'util/UserNotification';
+import useUserSearchFilterMutation from 'hooks/useFavoriteItemMutation';
+
+jest.mock('@graylog/server-api', () => ({
+  Favorites: { addItemToFavorites: jest.fn(), removeItemFromFavorites: jest.fn() },
+}));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -35,21 +37,19 @@ describe('useFavoriteItemMutation', () => {
   });
 
   describe('putItem to favorites', () => {
-    const putUrl = qualifyUrl(`${urlPrefix}/111`);
-
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+      asMock(Favorites.addItemToFavorites).mockImplementation(() => Promise.resolve());
       const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.putItem('111');
       });
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl));
+      await waitFor(() => expect(Favorites.addItemToFavorites).toHaveBeenCalledWith('111'));
     });
 
     it('should display notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(Favorites.addItemToFavorites).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useUserSearchFilterMutation());
 
@@ -67,21 +67,19 @@ describe('useFavoriteItemMutation', () => {
   });
 
   describe('deleteItem from favorites', () => {
-    const deleteUrl = qualifyUrl(`${urlPrefix}/111`);
-
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve());
+      asMock(Favorites.removeItemFromFavorites).mockImplementation(() => Promise.resolve());
       const { result } = renderHook(() => useUserSearchFilterMutation());
 
       act(() => {
         result.current.deleteItem('111');
       });
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
+      await waitFor(() => expect(Favorites.removeItemFromFavorites).toHaveBeenCalledWith('111'));
     });
 
     it('should display notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(Favorites.removeItemFromFavorites).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useUserSearchFilterMutation());
 

@@ -18,10 +18,9 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { Streams } from '@graylog/server-api';
+
 import StringUtils from 'util/StringUtils';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
@@ -80,7 +79,7 @@ const BulkActions = ({ indexSets }: Props) => {
       // eslint-disable-next-line no-alert
       window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)
     ) {
-      fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url), { entity_ids: selectedEntities })
+      Streams.bulkDelete({ entity_ids: selectedEntities })
         .then(({ failures }) => handleFailures(failures, 'deleted'))
         .catch((error) => {
           UserNotification.error(`An error occurred while deleting streams. ${error}`);

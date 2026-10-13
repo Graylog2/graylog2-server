@@ -1,0 +1,5 @@
+type = "f"
+message = "Enable hot reloading of datanode certificate even if the process is currently failing. Added reload verifier."
+
+issues = []
+pulls = ["27357"]

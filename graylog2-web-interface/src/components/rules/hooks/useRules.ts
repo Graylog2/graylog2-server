@@ -16,10 +16,11 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { PipelinesRules } from '@graylog/server-api';
+
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
@@ -90,10 +91,8 @@ export const fetchRules = (): Promise<Array<RuleType>> => {
   );
 };
 
-export const fetchRulesPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedRules> => {
-  const url = PaginationURL(ApiRoutes.RulesController.paginatedList().url, page, perPage, query);
-
-  return fetch('GET', qualifyUrl(url)).then(
+export const fetchRulesPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedRules> =>
+  PipelinesRules.getPage(undefined, page, perPage, query).then(
     (response: PaginatedRulesResponse) => ({
       list: response.rules,
       context: response.context,
@@ -113,7 +112,6 @@ export const fetchRulesPaginated = ({ page, perPage, query }: Pagination): Promi
       throw error;
     },
   );
-};
 
 export const getRule = (ruleId: string): Promise<RuleType> => {
   const url = qualifyUrl(ApiRoutes.RulesController.get(ruleId).url);
@@ -184,10 +182,8 @@ export const updateRule = (ruleSource: RuleType): Promise<RuleType> => {
   );
 };
 
-export const deleteRule = (rule: RuleType): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
-
-  return fetch('DELETE', url).then(
+export const deleteRule = (rule: RuleType): Promise<void> =>
+  PipelinesRules.remove(rule.id).then(
     () => {
       UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     },
@@ -200,7 +196,6 @@ export const deleteRule = (rule: RuleType): Promise<void> => {
       throw error;
     },
   );
-};
 
 export type RuleParseError = {
   line: number;
@@ -282,24 +277,16 @@ export const simulateRule = (message: string, ruleToSimulate: RuleType): Promise
   return fetch('POST', url, rule);
 };
 
-export const fetchMultipleRules = (ruleNames: Array<string>): Promise<unknown> => {
-  const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);
+export const fetchMultipleRules = (ruleNames: Array<string>): Promise<unknown> =>
+  PipelinesRules.getBulk({ rules: ruleNames });
 
-  return fetch('POST', url, { rules: ruleNames });
-};
-
-export const fetchRuleFunctionDescriptors = (): Promise<Array<BlockDict>> => {
-  const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
-
-  return fetch('GET', url).then((functions: Array<BlockDict>) =>
+export const fetchRuleFunctionDescriptors = (): Promise<Array<BlockDict>> =>
+  PipelinesRules.functionDescriptors().then((functions: Array<BlockDict>) =>
     functions ? [...functions].sort((fn1, fn2) => naturalSort(fn1.name, fn2.name)) : functions,
   );
-};
 
-export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> => {
-  const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
-
-  return fetch('GET', url).then(
+export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> =>
+  PipelinesRules.metricsConfig().then(
     (response: MetricsConfigType) => response,
     (error: Error) => {
       UserNotification.error(
@@ -310,7 +297,6 @@ export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> => {
       throw error;
     },
   );
-};
 
 export const updateRuleMetricsConfig = (nextConfig: MetricsConfigType): Promise<MetricsConfigType> => {
   const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);

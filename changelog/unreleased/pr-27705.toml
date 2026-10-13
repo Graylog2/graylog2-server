@@ -1,0 +1,4 @@
+type = "changed"
+message = "Enable `stream_aware_field_types` by default. Existing installations keep the setting disabled as long as their `graylog.conf` contains `stream_aware_field_types=false`, which is included in the `graylog.conf` of previous versions by default."
+
+pulls = ["27705"]

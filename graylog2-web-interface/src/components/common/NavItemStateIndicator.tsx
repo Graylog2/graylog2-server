@@ -21,7 +21,9 @@ import styled, { css } from 'styled-components';
 const indicatorClassName = 'nav-item-state-indicator';
 const indicatorPseudoElement = '::before';
 
-export const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoElement}`;
+export const itemStateIndicatorContainerSelector = `.${indicatorClassName}`;
+
+export const itemStateIndicatorSelector = `${itemStateIndicatorContainerSelector}${indicatorPseudoElement}`;
 
 export const hoverIndicatorStyles = (theme: DefaultTheme) => css`
   ${itemStateIndicatorSelector} {

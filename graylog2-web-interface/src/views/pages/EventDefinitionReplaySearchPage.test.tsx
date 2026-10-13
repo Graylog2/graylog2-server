@@ -44,6 +44,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateViewForEvent');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 jest.mock('hooks/useEventDefinition');
 jest.mock('hooks/useRightSidebar', () => (): { openSidebar: () => void; closeSidebar: () => void; sidebar: null } => ({

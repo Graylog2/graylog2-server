@@ -24,8 +24,8 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
+import type { IsPermitted } from 'hooks/usePermissions';
 import { Alert } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
@@ -244,10 +244,10 @@ export function renderNotifications(
   definitionNotifications: EventDefinition['notifications'],
   notificationSettings: EventDefinition['notification_settings'],
   notifications: Array<EventNotification>,
-  currentUser: User,
+  isPermitted: IsPermitted,
 ) {
   const effectiveDefinitionNotifications = definitionNotifications.filter((n) =>
-    isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`),
+    isPermitted(`eventnotifications:read:${n.notification_id}`),
   );
 
   const notificationsWithMissingPermissions = definitionNotifications.filter(

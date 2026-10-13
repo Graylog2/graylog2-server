@@ -27,6 +27,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
+import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
@@ -122,6 +123,14 @@ describe('Navigation', () => {
       await screen.findByTestId('notification-badge');
 
       expect(screen.queryByTestId('plugin-badge')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows the state indicator while an icon is hovered', async () => {
+    render(<SUT />);
+
+    expect(await screen.findByRole('navigation', { name: 'Utility' })).toHaveStyleRule('border-color', /.+/, {
+      modifier: `a:hover ${itemStateIndicatorSelector}`,
     });
   });
 });
