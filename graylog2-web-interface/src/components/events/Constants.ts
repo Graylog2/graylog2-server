@@ -157,7 +157,6 @@ export const eventsTableElements = {
       'event_definition_id',
       'key',
       'event_definition_type',
-      'tags',
     ],
     defaultColumnOrder: [
       'timestamp',
