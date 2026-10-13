@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.events.PipelineCompilerConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -179,5 +180,14 @@ class PipelineInterpreterStateUpdaterTest {
         updater.handlePipelineConnectionChanges(mock(PipelineConnectionsChangedEvent.class));
 
         verify(scheduler, times(2)).schedule(any(Runnable.class), eq(0L), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    void compilerConfigChangeSchedulesReload() {
+        final PipelineInterpreter.State initial = nonEmptyState();
+        when(stateBuilder.buildState(any())).thenReturn(initial);
+        final PipelineInterpreterStateUpdater updater = newUpdater();
+        updater.handlePipelineCompilerConfigChange(PipelineCompilerConfigChangedEvent.create(true));
+        verify(scheduler, times(1)).schedule(any(Runnable.class), eq(0L), eq(TimeUnit.SECONDS));
     }
 }

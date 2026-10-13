@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
@@ -44,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
@@ -82,7 +84,8 @@ public class RuleResourceTest {
     @BeforeEach
     public void setup() {
         underTest = new RuleResource(ruleService, ruleSimulator, pipelineService, ruleMetricsConfigService,
-                pipelineRuleService, paginatedRuleService, functionRegistry, pipelineServiceHelper);
+                pipelineRuleService, paginatedRuleService, functionRegistry, pipelineServiceHelper,
+                mock(PipelineCompilerConfigService.class));
     }
 
     @Test

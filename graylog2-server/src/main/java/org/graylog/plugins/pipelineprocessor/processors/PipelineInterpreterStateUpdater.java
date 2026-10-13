@@ -25,6 +25,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.events.PipelineCompilerConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
@@ -161,6 +162,12 @@ public class PipelineInterpreterStateUpdater {
     @Subscribe
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
+        scheduleReload();
+    }
+
+    @Subscribe
+    public void handlePipelineCompilerConfigChange(PipelineCompilerConfigChangedEvent event) {
+        log.debug("Pipeline compiler config changed: {}", event);
         scheduleReload();
     }
 
