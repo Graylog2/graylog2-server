@@ -889,6 +889,12 @@
             <artifactId>junit-platform-reporting</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.jqwik</groupId>
+            <artifactId>jqwik</artifactId>
+            <version>${jqwik.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>

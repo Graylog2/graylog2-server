@@ -43,3 +43,6 @@ dependency-reduced-pom.xml
 data-node/bin/*
 
 .worktrees
+
+# jqwik failure database
+**/.jqwik-database
