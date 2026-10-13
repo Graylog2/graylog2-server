@@ -31,7 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /** Every function with a @PipelineFastPath method must match its descriptor; the expected set guards against silent loss. */
 class FastPathSignatureTest {
-    static final Set<String> EXPECTED_FAST_PATH_FUNCTIONS = Set.of();
+    static final Set<String> EXPECTED_FAST_PATH_FUNCTIONS = Set.of("lowercase", "uppercase", "capitalize", "uncapitalize", "swapcase",
+            "abbreviate", "contains", "starts_with", "ends_with", "substring", "concat", "replace", "split", "length",
+            "first_non_null");
 
     @Test
     void allFastPathSignaturesMatchTheirDescriptors() throws Exception {

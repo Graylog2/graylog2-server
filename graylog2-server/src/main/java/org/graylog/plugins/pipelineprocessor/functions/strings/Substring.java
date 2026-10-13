@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -50,6 +51,17 @@ public class Substring extends AbstractFunction<String> {
         final int start = Ints.saturatedCast(startValue);
         final int end = Ints.saturatedCast(endParam.optional(args, context).orElse((long) value.length()));
 
+        return StringUtils.substring(value, start, end);
+    }
+
+    /** Separate from {@link #evaluate}, which resolves {@code indexEnd} only for non-null {@code value} and {@code start}. */
+    @PipelineFastPath
+    public String fastPath(String value, Long startValue, Long endValue) {
+        if (value == null || startValue == null) {
+            return null;
+        }
+        final int start = Ints.saturatedCast(startValue);
+        final int end = Ints.saturatedCast(endValue == null ? (long) value.length() : endValue);
         return StringUtils.substring(value, start, end);
     }
 

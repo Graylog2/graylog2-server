@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.List;
@@ -66,6 +67,16 @@ public class Split extends AbstractFunction<List<String>> {
         final int limit = this.limit.optional(args, context).orElse(0);
         checkArgument(limit >= 0, "Argument 'limit' cannot be negative");
         return ImmutableList.copyOf(regex.split(value, limit));
+    }
+
+    /** Separate from {@link #evaluate}, which checks {@code pattern} for null before resolving {@code value} and {@code limit}. */
+    @PipelineFastPath
+    public List<String> fastPath(Pattern regex, String string, Integer maxSplits) {
+        requireNonNull(regex, "Argument 'pattern' cannot be 'null'");
+        requireNonNull(string, "Argument 'value' cannot be 'null'");
+        final int limit = maxSplits == null ? 0 : maxSplits;
+        checkArgument(limit >= 0, "Argument 'limit' cannot be negative");
+        return ImmutableList.copyOf(regex.split(string, limit));
     }
 
     @Override
