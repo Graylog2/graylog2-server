@@ -18,6 +18,10 @@ updates:
       # we want to manually update the opensearch-java client and core as long as it requires intensive testing
       - dependency-name: "org.opensearch:opensearch-core"
       - dependency-name: "org.opensearch.client:opensearch-java"
+      # Grizzly 5.x (JDK 21 baseline) belongs to the Jersey 5 line; Jersey 4.x pins Grizzly 4.x.
+      # Remove when upgrading to Jersey 5.
+      - dependency-name: "org.glassfish.grizzly:*"
+        update-types: ["version-update:semver-major"]
     groups:
       # The Google API and Cloud client libraries are released in lockstep,
       # so bumping them individually almost always trips the
@@ -48,6 +52,13 @@ updates:
       bouncycastle:
         patterns:
           - "org.bouncycastle:*"
+      # Jersey pins its own Grizzly and HK2 versions, so bumping Jersey alone
+      # trips the requireUpperBoundDeps enforcer rule.
+      jersey-stack:
+        patterns:
+          - "org.glassfish.jersey:*"
+          - "org.glassfish.grizzly:*"
+          - "org.glassfish.hk2:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies

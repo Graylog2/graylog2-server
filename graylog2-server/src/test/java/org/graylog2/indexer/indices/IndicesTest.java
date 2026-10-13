@@ -44,14 +44,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -87,6 +94,24 @@ class IndicesTest {
                 profileService,
                 countsAdapter
         );
+    }
+
+    @Test
+    void getClosedIndicesSplitsLongNameListsAndMergesTheAnswers() {
+        final List<String> wildcards = IntStream.range(0, 40).mapToObj(i -> "index-set-" + i + "-" + "x".repeat(190) + "_*").toList();
+        final List<Collection<String>> batches = new ArrayList<>();
+        when(indicesAdapter.closedIndices(anyCollection())).thenAnswer(invocation -> {
+            final Collection<String> batch = invocation.getArgument(0);
+            batches.add(List.copyOf(batch));
+            return batch.stream().map(w -> w.replace("_*", "_0")).collect(Collectors.toSet());
+        });
+
+        final Set<String> closed = underTest.getClosedIndices(wildcards);
+
+        assertThat(batches).hasSizeGreaterThan(1)
+                .allSatisfy(batch -> assertThat(String.join(",", batch).length()).isLessThanOrEqualTo(3000));
+        assertThat(batches.stream().flatMap(Collection::stream)).containsExactlyInAnyOrderElementsOf(wildcards);
+        assertThat(closed).containsExactlyInAnyOrderElementsOf(wildcards.stream().map(w -> w.replace("_*", "_0")).toList());
     }
 
     @Test
