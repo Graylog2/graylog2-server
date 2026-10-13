@@ -63,9 +63,13 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_TRIGGER_RESTART = PREFIX + "data_node:trigger_restart";
     public static final String DATANODE_ABORT_RESTART = PREFIX + "data_node:abort_restart";
     public static final String DATANODE_RESUME_RESTART = PREFIX + "data_node:resume_restart";
+    public static final String ES_CLUSTER_REROUTE_RETRY_FAILED = PREFIX + "es_cluster:reroute_retry_failed";
+    public static final String ES_INDEX_CLEAR_CACHE = PREFIX + "es_index:clear_cache";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
+    public static final String ES_INDEX_FLUSH = PREFIX + "es_index:flush";
+    public static final String ES_INDEX_FORCE_MERGE = PREFIX + "es_index:force_merge";
     public static final String ES_INDEX_OPEN = PREFIX + "es_index:open";
     public static final String ES_INDEX_REINDEX = PREFIX + "es_index:reindex";
     public static final String ES_INDEX_RANGE_CREATE = PREFIX + "es_index_range:create";
@@ -253,9 +257,13 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_ABORT_RESTART)
             .add(DATANODE_RESUME_RESTART)
             .add(DATANODE_API_REQUEST)
+            .add(ES_CLUSTER_REROUTE_RETRY_FAILED)
+            .add(ES_INDEX_CLEAR_CACHE)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
+            .add(ES_INDEX_FLUSH)
+            .add(ES_INDEX_FORCE_MERGE)
             .add(ES_INDEX_OPEN)
             .add(ES_INDEX_REINDEX)
             .add(ES_INDEX_RANGE_CREATE)

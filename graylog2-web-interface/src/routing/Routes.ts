@@ -122,6 +122,8 @@ const Routes = {
     GROKPATTERNS: '/system/grokpatterns',
     INDICES: {
       LIST: '/system/indices',
+      MANAGEMENT: '/system/indices/management',
+      EXPLAIN_ALLOCATION: '/system/indices/management?allocation=explain',
       FAILURES: '/system/indices/failures',
       TEMPLATES: {
         view: (templateId: string) => `/system/indices/templates/${templateId}`,

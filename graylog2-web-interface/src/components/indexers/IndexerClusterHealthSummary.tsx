@@ -18,7 +18,10 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
+import { Link } from 'components/common';
 import { DocumentationLink } from 'components/support';
+import usePermissions from 'hooks/usePermissions';
+import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
 const ESClusterStatus = styled(Alert)`
@@ -45,6 +48,10 @@ const IndexerClusterHealthSummary = ({
   };
 }) => {
   const formattedHealthStatus = health.status.toLowerCase();
+  const { isPermitted } = usePermissions();
+  // The Indices page's allocation explanation shows where every shard is, for users who may run it.
+  // Others get the docs.
+  const canExplain = isPermitted('indices:read') && isPermitted('indexercluster:read');
 
   const alertClassForHealth = () => {
     switch (formattedHealthStatus) {
@@ -77,7 +84,11 @@ const IndexerClusterHealthSummary = ({
     <ESClusterStatus bsStyle={alertClassForHealth()}>
       {formattedTextForHealth} Shards: {health.shards.active} active, {health.shards.initializing} initializing,{' '}
       {health.shards.relocating} relocating, {health.shards.unassigned} unassigned,{' '}
-      <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
+      {canExplain ? (
+        <Link to={Routes.SYSTEM.INDICES.EXPLAIN_ALLOCATION}>What does this mean?</Link>
+      ) : (
+        <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
+      )}
     </ESClusterStatus>
   );
 };

@@ -1,0 +1,62 @@
+{
+  "index" : "alloc-test-r10",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "ALLOCATION_FAILED",
+    "at" : "2026-10-06T21:48:37.140Z",
+    "failed_allocation_attempts" : 5,
+    "details" : "failed shard on node [6Rv--47TSK61F9h03QIgEQ]: failed recovery, failure RecoveryFailedException[[alloc-test-r10][0]: Recovery failed on {os3-node-2}{6Rv--47TSK61F9h03QIgEQ}{MV0Y0y_6Sg66bSNW_kjWlA}{10.40.68.10}{10.40.68.10:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed to recover from gateway]; nested: EngineCreationFailureException[failed to create engine]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=MemorySegmentIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/po8kIoDxTdKQSJOa_U9mSQ/0/index/_0.cfs\"))]; ",
+    "last_allocation_status" : "no"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes that hold an in-sync shard copy",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "6Rv--47TSK61F9h03QIgEQ",
+      "node_name" : "os3-node-2",
+      "transport_address" : "10.40.68.10:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : true,
+        "allocation_id" : "_Dv89usISlSE0PHyrI88Fg"
+      },
+      "deciders" : [
+        {
+          "decider" : "max_retry",
+          "decision" : "NO",
+          "explanation" : "shard has exceeded the maximum number of retries [5] on failed allocation attempts - manually call [/_cluster/reroute?retry_failed=true] to retry, [unassigned_info[[reason=ALLOCATION_FAILED], at[2026-10-06T21:48:37.140Z], failed_attempts[5], failed_nodes[[6Rv--47TSK61F9h03QIgEQ]], delayed=false, details[failed shard on node [6Rv--47TSK61F9h03QIgEQ]: failed recovery, failure RecoveryFailedException[[alloc-test-r10][0]: Recovery failed on {os3-node-2}{6Rv--47TSK61F9h03QIgEQ}{MV0Y0y_6Sg66bSNW_kjWlA}{10.40.68.10}{10.40.68.10:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed to recover from gateway]; nested: EngineCreationFailureException[failed to create engine]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=MemorySegmentIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/po8kIoDxTdKQSJOa_U9mSQ/0/index/_0.cfs\"))]; ], allocation_status[deciders_no]]]"
+        }
+      ]
+    },
+    {
+      "node_id" : "KvBPYWMFRkedKhzv-9qoHA",
+      "node_name" : "os3-node-0",
+      "transport_address" : "10.40.68.5:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "R-zGvRGdRlGomtFe_WC9yw",
+      "node_name" : "os3-node-1",
+      "transport_address" : "10.40.68.7:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    }
+  ]
+}
+

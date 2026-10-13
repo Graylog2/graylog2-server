@@ -40,6 +40,7 @@ import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForField
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndexTemplateAdapterProvider;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.management.IndexManagementAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -53,6 +54,7 @@ import org.graylog2.storage.providers.DataStreamAdapterProvider;
 import org.graylog2.storage.providers.DatanodeClusterAdminAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
+import org.graylog2.storage.providers.IndexManagementAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
 import org.graylog2.storage.providers.IndexerHostsAdapterProvider;
 import org.graylog2.storage.providers.IndicesAdapterProvider;
@@ -99,6 +101,7 @@ public class VersionAwareStorageModule extends AbstractModule {
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
         bind(DatanodeClusterAdminAdapter.class).toProvider(DatanodeClusterAdminAdapterProvider.class);
+        bind(IndexManagementAdapter.class).toProvider(IndexManagementAdapterProvider.class);
 
         bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);
 
