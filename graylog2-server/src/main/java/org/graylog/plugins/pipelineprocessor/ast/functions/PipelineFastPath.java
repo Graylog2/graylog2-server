@@ -37,6 +37,11 @@ import java.lang.annotation.Target;
  * </ul>
  * Compiled code only uses the fast path when every argument after the first is absent or a precomputed constant,
  * so conditional evaluation inside {@code evaluate()} is never observable.
+ * <p>
+ * The fast path only applies where compiled code emits the call itself: {@code let} values, conditions, and
+ * arguments of other fast-path calls. A call nested in the arguments of a legacy call (for example
+ * {@code set_field("x", lowercase($message.y))}) is evaluated through the AST by that legacy function and never
+ * reaches the fast path.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

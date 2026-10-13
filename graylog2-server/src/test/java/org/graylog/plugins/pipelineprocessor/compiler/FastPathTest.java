@@ -100,7 +100,7 @@ class FastPathTest {
         return counter == null ? 0 : counter.getCount();
     }
 
-    /** set_field has no fast path, so its arguments are AST-evaluated: calls under test go into a native {@code let}. */
+    /** set_field is legacy, so its arguments are AST-evaluated (see callNestedInLegacyCallIsAstEvaluated): calls under test go into a native {@code let}. */
     private void assertEquivalent(String source) {
         final Rule rule = parser.parseRule(source, false);
         DifferentialHarness.assertEquivalent(FastPathTest::input, List.of(rule), compiler::compileOrThrow);
@@ -131,6 +131,18 @@ class FastPathTest {
     void nestedFastPathErrorKeepsInnerLocation() {
         assertEquivalent("rule \"r\" when true then let s = shout(shout($message.num)); set_field(\"x\", s); end");
         assertThat(calls("fastPath", "shout")).isEqualTo(2);
+    }
+
+    /**
+     * Pins a design limit: a legacy call evaluates its arguments through the AST, so a fast-path function nested in
+     * one is never emitted and takes neither counter. Fast paths only apply at natively emitted positions.
+     */
+    @Test
+    void callNestedInLegacyCallIsAstEvaluated() {
+        assertEquivalent("rule \"r\" when true then set_field(\"x\", shout($message.message)); end");
+        assertThat(calls("legacy", "set_field")).isEqualTo(1);
+        assertThat(calls("fastPath", "shout")).isZero();
+        assertThat(calls("legacy", "shout")).isZero();
     }
 
     @Test

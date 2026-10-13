@@ -138,7 +138,10 @@ final class FunctionCallEmitter {
         g.invokeVirtual(PARAMETER_DESCRIPTOR, CONVERT);
     }
 
-    /** {@code f.evaluateUnsafe(ctx)} on a constant node: the function evaluates its arguments through the AST. */
+    /**
+     * {@code f.evaluateUnsafe(ctx)} on a constant node: the function evaluates its arguments through the AST, so no
+     * call nested in them is emitted (or counted), even if it has a fast path.
+     */
     private void legacy(FunctionExpression f) {
         exprs.recordAstVariables(f);
         calls.add("legacy." + f.getFunction().descriptor().name());
