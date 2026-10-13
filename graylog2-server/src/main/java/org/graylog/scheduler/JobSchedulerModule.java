@@ -18,10 +18,13 @@ package org.graylog.scheduler;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.collectors.job.CollectorInstanceCleanupJob;
+import org.graylog.collectors.job.CollectorInstanceCleanupJobScheduleProvider;
 import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
+import org.graylog.scheduler.system.ScheduledSystemJobManager;
 import org.graylog.scheduler.system.SystemJobFactories;
 import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.scheduler.system.SystemJobSchedulerService;
@@ -42,6 +45,7 @@ public class JobSchedulerModule extends PluginModule {
         bind(UserJobSchedulerService.class).asEagerSingleton();
         bind(JobSchedulerClock.class).toInstance(JobSchedulerSystemClock.INSTANCE);
         bind(SystemJobManager.class).asEagerSingleton();
+        bind(ScheduledSystemJobManager.class).asEagerSingleton();
         bind(SystemJobFactories.class).asEagerSingleton();
 
         install(new FactoryModuleBuilder().build(JobSchedulerEventBus.Factory.class));
@@ -58,6 +62,9 @@ public class JobSchedulerModule extends PluginModule {
 
         // Ensure that system job factories are bound
         systemJobBinder();
+        systemJobScheduleBinder();
+
+        addSystemJobSchedule(CollectorInstanceCleanupJob.TYPE_NAME, CollectorInstanceCleanupJobScheduleProvider.class);
 
         addSystemSchedulerJob(CreateNewSingleIndexRangeJob.TYPE_NAME,
                 CreateNewSingleIndexRangeJob.class,
