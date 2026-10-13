@@ -22,6 +22,8 @@ import {
   indexAttributes,
   healthBucket,
   matchesFilters,
+  MANAGED_ATTRIBUTE,
+  managedCounts,
   matchesQuery,
   NO_INDEX_SET,
   pageOf,
@@ -90,6 +92,16 @@ describe('matchesFilters', () => {
     expect(matchesFilters(red, filtersOf({ index_set: ['set-1'] }))).toBe(true);
   });
 
+  it('filters by whether Graylog manages the index, and counts both kinds', () => {
+    const all = [red, warm, foreign, closed];
+
+    expect(names(all.filter((i) => matchesFilters(i, filtersOf({ [MANAGED_ATTRIBUTE]: ['false'] }))))).toEqual([
+      'security-auditlog',
+    ]);
+    expect(all.filter((i) => matchesFilters(i, filtersOf({ [MANAGED_ATTRIBUTE]: ['true'] })))).toHaveLength(3);
+    expect(managedCounts(all)).toEqual({ all: 4, managed: 3, unmanaged: 1 });
+  });
+
   it('narrows to exactly the picked index names, hyphens included', () => {
     const picked = filtersOf({ index: ['security-auditlog', 'graylog_2'] });
 
@@ -122,7 +134,7 @@ describe('indexAttributes', () => {
     const attributes = indexAttributes([index('graylog_1'), index('graylog_2')]);
     const filters = attributes.filter((a) => a.filterable);
 
-    expect(filters.map((a) => a.id)).toEqual(['index', 'health', 'tier', 'index_set', 'write_index']);
+    expect(filters.map((a) => a.id)).toEqual(['index', 'health', 'tier', 'index_set', 'managed', 'write_index']);
     expect(filters.every((a) => a.type === 'STRING' && a.filter_options.length > 0)).toBe(true);
     expect(attributes.find((a) => a.id === 'index').filter_options.map((o) => o.value)).toEqual(['graylog_1', 'graylog_2']);
     expect(attributes.find((a) => a.id === 'health').filter_options.map((o) => o.value)).toEqual([
@@ -133,12 +145,12 @@ describe('indexAttributes', () => {
     ]);
   });
 
-  it('makes every column sortable except the filter-only write index', () => {
+  it('makes every column sortable except the filter-only managed and write index', () => {
     expect(
       indexAttributes([])
         .filter((a) => !a.sortable)
         .map((a) => a.id),
-    ).toEqual(['write_index']);
+    ).toEqual(['managed', 'write_index']);
   });
 });
 

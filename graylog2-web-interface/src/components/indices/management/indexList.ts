@@ -28,12 +28,23 @@ export const healthBucket = (index: IndexSummary): string => (index.status === '
 // state in the URL's `filters` query parameter). Values of one attribute are OR-ed, attributes are AND-ed, as in core's
 // tables. The `index` filter is how indices picked in the allocation panel narrow the list.
 export const NO_INDEX_SET = 'none';
+export const MANAGED_ATTRIBUTE = 'managed';
+
+// Graylog manages an index when it belongs to one of its index sets.
+const isManaged = (index: IndexSummary) => Boolean(index.index_set_id);
+
+export const managedCounts = (indices: Array<IndexSummary>) => {
+  const managed = indices.filter(isManaged).length;
+
+  return { all: indices.length, managed, unmanaged: indices.length - managed };
+};
 
 const FILTER_VALUE: { [attributeId: string]: (index: IndexSummary) => string } = {
   index: (index) => index.index,
   health: healthBucket,
   tier: (index) => index.tier,
   index_set: (index) => index.index_set_id ?? NO_INDEX_SET,
+  [MANAGED_ATTRIBUTE]: (index) => String(isManaged(index)),
   write_index: (index) => String(Boolean(index.is_write_index)),
 };
 
@@ -87,6 +98,16 @@ export const indexAttributes = (indices: Array<IndexSummary>): Attributes => {
       filter_options: [
         ...[...indexSets].map(([value, title]) => ({ value, title })),
         { value: NO_INDEX_SET, title: 'Not managed by Graylog' },
+      ],
+    },
+    {
+      id: MANAGED_ATTRIBUTE,
+      title: 'Managed by Graylog',
+      type: 'STRING',
+      filterable: true,
+      filter_options: [
+        { value: 'true', title: 'Yes' },
+        { value: 'false', title: 'No' },
       ],
     },
     {

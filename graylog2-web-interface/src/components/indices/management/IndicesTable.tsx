@@ -26,6 +26,7 @@ import { fetchIndices, indicesKeyFn } from './fetchIndices';
 import type { IndexRow } from './fetchIndices';
 import { createColumnRenderers, DEFAULT_DISPLAYED_COLUMNS } from './IndexColumnRenderers';
 import IndexBulkActions from './IndexBulkActions';
+import IndexManagedButtons from './IndexManagedButtons';
 import IndexRowActions from './IndexRowActions';
 import useCanRun from './useCanRun';
 import useIndexOverview from './useIndexOverview';
@@ -71,6 +72,7 @@ const IndicesTable = ({ waitForNarrowing, topRightCol }: Props) => {
       searchPlaceholder="Filter by index or index set"
       topRightCol={topRightCol}
       middleSection={waitForNarrowing ? WaitingForNarrowing : undefined}
+      topSection={IndexManagedButtons}
     />
   );
 };
