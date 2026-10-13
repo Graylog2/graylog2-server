@@ -1,0 +1,4 @@
+type = "s"
+message = "Update snappy-java to 1.1.10.10. [GHSA-6gp7-6wmv-gxqw](https://github.com/xerial/snappy-java/security/advisories/GHSA-6gp7-6wmv-gxqw) [GHSA-q233-g92q-qxp6](https://github.com/xerial/snappy-java/security/advisories/GHSA-q233-g92q-qxp6) [GHSA-wmgv-28fv-894x](https://github.com/xerial/snappy-java/security/advisories/GHSA-wmgv-28fv-894x)"
+
+pulls = ["27724"]
