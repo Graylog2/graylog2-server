@@ -87,13 +87,30 @@ class OpensearchNodeHeartbeatTest {
 
         // the REST API isn't responding, but the process is still running and may bootstrap the cluster
         expireClaim();
-        heartbeat(node1, OpensearchState.FAILED).doRun();
+        heartbeat(node1, OpensearchState.NOT_RESPONDING).doRun();
         assertThat(claimedAt()).isAfter(EXPIRED_CLAIM);
 
         // the process isn't running, the claim has to expire
         expireClaim();
         heartbeat(node1, OpensearchState.PREPARED).doRun();
         assertThat(claimedAt()).isEqualTo(EXPIRED_CLAIM);
+    }
+
+    @Test
+    void failedClaimantStopsRenewingAndIsTakenOver() throws Exception {
+        final ClusterBootstrapService node1 = bootstrapService("node1");
+        assertThat(node1.claimBootstrap()).isTrue();
+
+        // the state machine gave up on the process and won't restart it, the claim has to expire
+        expireClaim();
+        heartbeat(node1, OpensearchState.FAILED).doRun();
+        assertThat(claimedAt()).isEqualTo(EXPIRED_CLAIM);
+        assertThat(claimant()).isEqualTo("node1");
+
+        // a waiting node in FAILED state can still take over and restart its opensearch
+        heartbeat(bootstrapService("node2"), OpensearchState.FAILED).doRun();
+        assertThat(startRequests).hasSize(1);
+        assertThat(claimant()).isEqualTo("node2");
     }
 
     @Test

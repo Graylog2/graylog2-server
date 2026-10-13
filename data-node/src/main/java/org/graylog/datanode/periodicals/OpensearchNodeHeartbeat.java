@@ -39,10 +39,12 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodeHeartbeat.class);
     /**
-     * States in which the opensearch process is running, even if its REST API isn't responding
+     * States in which the opensearch process is running and may still bootstrap the cluster, even if its REST API isn't
+     * responding. FAILED isn't included, the state machine has given up on the process and won't restart it, so its claim
+     * has to expire and let another node take over.
      */
-    private static final Set<OpensearchState> PROCESS_RUNNING_STATES = Set.of(
-            OpensearchState.STARTING, OpensearchState.AVAILABLE, OpensearchState.NOT_RESPONDING, OpensearchState.FAILED);
+    private static final Set<OpensearchState> CLAIM_RENEWING_STATES = Set.of(
+            OpensearchState.STARTING, OpensearchState.AVAILABLE, OpensearchState.NOT_RESPONDING);
 
     /**
      * States from which the opensearch process can be restarted with a new configuration
@@ -91,11 +93,10 @@ public class OpensearchNodeHeartbeat extends Periodical {
      * The REST API may also not respond at all until the cluster has been formed, so this doesn't depend on it.
      */
     private void coordinateBootstrap() {
-        if (PROCESS_RUNNING_STATES.stream().noneMatch(process::isInState)) {
-            return;
-        }
         try {
-            clusterBootstrapService.renewClaim();
+            if (CLAIM_RENEWING_STATES.stream().anyMatch(process::isInState)) {
+                clusterBootstrapService.renewClaim();
+            }
             // a node waiting to join a cluster has to take over if the bootstrapping node is gone
             if (RESTARTABLE_STATES.stream().anyMatch(process::isInState) && initialClusterManagerNodesResolver.takeOverExpiredBootstrap()) {
                 LOG.info("Restarting opensearch to bootstrap the opensearch cluster");
