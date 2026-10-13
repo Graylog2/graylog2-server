@@ -67,6 +67,8 @@ final class RuleClassEmitter {
     @SuppressWarnings("ArrayRecordComponent")
     record Emitted(byte[] bytes, List<Object> classData, List<String> escapes, List<String> calls) {}
 
+    private record Visited(RuleClassData data, List<String> escapes, List<String> calls) {}
+
     private final Rule rule;
     private final FastPathResolver fastPaths;
 
@@ -77,18 +79,20 @@ final class RuleClassEmitter {
 
     Emitted emit() {
         // Dry run: find variables read by AST-evaluated subtrees; those must also be defined in the context.
+        // It only needs the visiting pass, so its writer neither computes frames nor produces a class file.
         final Set<String> contextVariables = new HashSet<>();
-        emitClass(Set.of(), contextVariables);
-        return emitClass(Set.copyOf(contextVariables), new HashSet<>());
-    }
-
-    private Emitted emitClass(Set<String> contextVariables, Set<String> astVariableSink) {
+        emitClass(new ClassWriter(0), Set.of(), contextVariables);
         final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES) {
             @Override
             protected ClassLoader getClassLoader() {
                 return RuleClassEmitter.class.getClassLoader();
             }
         };
+        final Visited visited = emitClass(cw, Set.copyOf(contextVariables), new HashSet<>());
+        return new Emitted(cw.toByteArray(), visited.data().values(), visited.escapes(), visited.calls());
+    }
+
+    private Visited emitClass(ClassWriter cw, Set<String> contextVariables, Set<String> astVariableSink) {
         cw.visit(V21, ACC_PUBLIC | ACC_FINAL | ACC_SUPER, CLASS_NAME, null, "java/lang/Object",
                 new String[]{Type.getInternalName(CompiledRule.class)});
         cw.visitSource(rule.name(), null);
@@ -111,7 +115,7 @@ final class RuleClassEmitter {
         emitThen(cw, data, contextVariables, astVariableSink, escapes, calls);
         emitConstants(cw, data);
         cw.visitEnd();
-        return new Emitted(cw.toByteArray(), data.values(), escapes, calls);
+        return new Visited(data, escapes, calls);
     }
 
     private void emitThen(ClassWriter cw, RuleClassData data, Set<String> contextVariables, Set<String> astVariableSink,
