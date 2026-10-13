@@ -18,3 +18,4 @@
 export { default as TrafficGraphWithDaySelect } from './TrafficGraphWithDaySelect';
 export { default as TrafficGraph } from './TrafficGraph';
 export { default as useGraphWidth } from './useGraphWidth';
+export { default as useTrafficGraphZoom } from './useTrafficGraphZoom';

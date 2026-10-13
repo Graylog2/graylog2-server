@@ -16,17 +16,24 @@
  */
 
 import * as React from 'react';
+import { useState } from 'react';
 
 import { TrafficGraphWithDaySelect } from 'components/common/Graph';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import type { TrafficType } from 'components/common/Graph/types';
 
 import useClusterTraffic from './hooks/useClusterTraffic';
 
 const ClusterTrafficGraph = () => {
   const { graphDays } = useGraphDays();
   const { traffic } = useClusterTraffic(graphDays);
+  const [trafficType, setTrafficType] = useState<TrafficType>('input-indexed');
 
-  return <TrafficGraphWithDaySelect traffic={traffic?.input_indexed} trafficType="input-indexed" />;
+  const trafficSeries = trafficType === 'input-indexed' ? traffic?.input_indexed : traffic?.output;
+
+  return (
+    <TrafficGraphWithDaySelect traffic={trafficSeries} trafficType={trafficType} onTrafficTypeChange={setTrafficType} />
+  );
 };
 
 export default ClusterTrafficGraph;

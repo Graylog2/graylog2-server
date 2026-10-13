@@ -45,7 +45,7 @@ describe('GenericPlot', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Zoom' }));
 
       expect(onZoom).toHaveBeenCalled();
-      expect(onZoom).toHaveBeenCalledWith(23, 42);
+      expect(onZoom).toHaveBeenCalledWith('23', '42');
     });
 
     it('not calling onZoom prop if axis have not changed', async () => {
