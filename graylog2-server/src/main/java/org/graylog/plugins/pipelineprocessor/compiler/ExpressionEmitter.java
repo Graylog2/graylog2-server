@@ -16,10 +16,29 @@
  */
 package org.graylog.plugins.pipelineprocessor.compiler;
 
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.PipelineOps;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
+import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
@@ -35,6 +54,13 @@ final class ExpressionEmitter {
             "Object evaluateUnsafe(org.graylog.plugins.pipelineprocessor.EvaluationContext)");
     static final Method EVALUATE_BOOL = Method.getMethod(
             "boolean evaluateBool(org.graylog.plugins.pipelineprocessor.EvaluationContext)");
+    static final Type PIPELINE_OPS = Type.getType(PipelineOps.class);
+    static final Type MESSAGE = Type.getType(Message.class);
+    static final Method CURRENT_MESSAGE = Method.getMethod("org.graylog2.plugin.Message currentMessage()");
+    static final Method GET_FIELD = Method.getMethod("Object getField(String)");
+    static final Method MESSAGE_FIELD = Method.getMethod(
+            "Object messageField(org.graylog.plugins.pipelineprocessor.EvaluationContext, Object)");
+    static final Method TO_BOOL = Method.getMethod("boolean toBool(Object)");
 
     private final GeneratorAdapter g;
     private final RuleClassData data;
@@ -59,7 +85,15 @@ final class ExpressionEmitter {
 
     /** Pushes the value of {@code expr} with the semantics of {@code expr.evaluateUnsafe(ctx)}. */
     void value(Expression expr) {
+        if (fold(expr)) {
+            return;
+        }
         switch (expr) {
+            case StringExpression s -> g.push((String) s.evaluateUnsafe(EvaluationContext.emptyContext()));
+            case LongExpression l -> constant(l.evaluateUnsafe(EvaluationContext.emptyContext()), Object.class);
+            case DoubleExpression d -> constant(d.evaluateUnsafe(EvaluationContext.emptyContext()), Object.class);
+            case FieldRefExpression f -> g.push(f.fieldName());
+            case MessageRefExpression m -> messageRef(m);
             case VarRefExpression ref -> {
                 final Integer slot = locals.get(ref.varName());
                 if (slot == null) {
@@ -68,13 +102,70 @@ final class ExpressionEmitter {
                 g.loadLocal(slot);
             }
             case FunctionExpression call -> functions.call(call);
+            case BooleanExpression b -> {
+                bool(b);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
+            case AndExpression a -> {
+                bool(a);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
+            case OrExpression o -> {
+                bool(o);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
+            case NotExpression n -> {
+                bool(n);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
+            case BooleanValuedFunctionWrapper w -> {
+                bool(w);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
             default -> escapeValue(expr);
         }
     }
 
     /** Pushes 0/1 with the semantics of {@code ((LogicalExpression) expr).evaluateBool(ctx)}. */
     void bool(Expression expr) {
-        escapeBool(expr);
+        if (foldBool(expr)) {
+            return;
+        }
+        switch (expr) {
+            case BooleanExpression b -> g.push(b.evaluateBool(EvaluationContext.emptyContext()));
+            case AndExpression a -> {
+                final Label isFalse = g.newLabel();
+                final Label end = g.newLabel();
+                bool(a.left());
+                g.ifZCmp(GeneratorAdapter.EQ, isFalse);
+                bool(a.right());
+                g.goTo(end);
+                g.mark(isFalse);
+                g.push(false);
+                g.mark(end);
+            }
+            case OrExpression o -> {
+                final Label isTrue = g.newLabel();
+                final Label end = g.newLabel();
+                bool(o.left());
+                g.ifZCmp(GeneratorAdapter.NE, isTrue);
+                bool(o.right());
+                g.goTo(end);
+                g.mark(isTrue);
+                g.push(true);
+                g.mark(end);
+            }
+            case NotExpression n -> {
+                bool(n.right());
+                g.push(true);
+                g.math(GeneratorAdapter.XOR, Type.INT_TYPE);
+            }
+            case BooleanValuedFunctionWrapper w -> {
+                value(w.expression());
+                g.invokeStatic(PIPELINE_OPS, TO_BOOL);
+            }
+            default -> escapeBool(expr);
+        }
     }
 
     void constant(Object value, Class<?> fieldType) {
@@ -111,5 +202,70 @@ final class ExpressionEmitter {
         constant(expr, LogicalExpression.class);
         g.loadArg(0);
         g.invokeInterface(LOGICAL, EVALUATE_BOOL);
+    }
+
+    @SuppressWarnings("ReferenceEquality") // identity is the "no field" marker returned by getFieldExpr()
+    private void messageRef(MessageRefExpression m) {
+        final Expression fieldExpr = m.getFieldExpr();
+        g.loadArg(0);
+        if (fieldExpr == m) { // `$message` itself: getFieldExpr() returns the node when it has no field
+            g.invokeVirtual(RuleClassEmitter.EVAL_CTX, CURRENT_MESSAGE);
+        } else if (fieldExpr instanceof FieldRefExpression f) {
+            g.invokeVirtual(RuleClassEmitter.EVAL_CTX, CURRENT_MESSAGE);
+            g.push(f.fieldName());
+            g.invokeVirtual(MESSAGE, GET_FIELD);
+        } else {
+            value(fieldExpr);
+            g.invokeStatic(PIPELINE_OPS, MESSAGE_FIELD);
+        }
+    }
+
+    /** Folds a constant subtree to its value, but only for immutable results and only if evaluating it succeeds. */
+    private boolean fold(Expression expr) {
+        if (!expr.isConstant() || expr instanceof ConstantExpression || containsVarRef(expr)) {
+            return false;
+        }
+        final Object folded;
+        try {
+            folded = expr.evaluateUnsafe(EvaluationContext.emptyContext());
+        } catch (Exception e) {
+            return false; // keep the runtime evaluation so the error happens at the same place
+        }
+        if (folded == null) {
+            g.visitInsn(Opcodes.ACONST_NULL);
+            return true;
+        }
+        if (folded instanceof String || folded instanceof Long || folded instanceof Double || folded instanceof Boolean
+                || folded instanceof DateTime || folded instanceof Period || folded instanceof Duration) {
+            constant(folded, Object.class);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean foldBool(Expression expr) {
+        if (!(expr instanceof LogicalExpression logical) || !expr.isConstant() || expr instanceof BooleanExpression
+                || containsVarRef(expr)) {
+            return false;
+        }
+        try {
+            g.push(logical.evaluateBool(EvaluationContext.emptyContext()));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean containsVarRef(Expression expr) {
+        if (expr instanceof VarRefExpression) {
+            return true;
+        }
+        for (Expression child : expr.children()) {
+            // a bare $message has a null child
+            if (child != null && containsVarRef(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
