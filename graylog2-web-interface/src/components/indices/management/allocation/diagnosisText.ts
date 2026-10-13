@@ -76,7 +76,7 @@ const TITLES: { [situation in Situation]: string } = {
   DAMAGED_OTHER: 'Damaged file',
   STALE_COPY_ONLY: 'Only an older copy left',
   NO_COPY_FOUND: 'No copy left',
-  TOO_FEW_NODES: 'More copies than nodes',
+  TOO_FEW_NODES: 'More replicas than nodes',
   ALLOCATION_FILTER: 'Kept off by a filter',
   SHARDS_PER_NODE_LIMIT: 'Nodes are full (shard limit)',
   ALLOCATION_DISABLED: 'Placement switched off',
@@ -101,17 +101,17 @@ export const headline = (diagnosis: AllocationDiagnosis, context: ShardContext) 
     case 'INITIALIZING':
       return `${label} of ${index} is starting up.`;
     case 'DELAYED_NODE_LEFT':
-      return `${label} of ${index} is waiting ${formatDelay(diagnosis.remaining_delay_ms)} for its node to come back. If it doesn't, OpenSearch places the copy on another node.`;
+      return `${label} of ${index} is waiting ${formatDelay(diagnosis.remaining_delay_ms)} for its node to come back. If it doesn't, OpenSearch places the replica on another node.`;
     case 'FETCHING_SHARD_DATA':
       return `OpenSearch is still finding out which nodes hold copies of ${label.toLowerCase()} of ${index}.`;
     case 'THROTTLED':
       return `${label} of ${index} is waiting its turn: the nodes are busy copying other shards.`;
     case 'REPLICA_REBUILDS_FROM_PRIMARY':
       return diagnosis.needs_action
-        ? `${label} of ${index} was damaged. The main copy is fine, so the replica can be copied again from it, but OpenSearch stopped trying after repeated failures.`
-        : `${label} of ${index} was damaged. The main copy is fine, so OpenSearch copies the replica again from it.`;
+        ? `${label} of ${index} was damaged. The primary is fine, so the replica can be rebuilt from it, but OpenSearch stopped trying after repeated failures.`
+        : `${label} of ${index} was damaged. The primary is fine, so OpenSearch rebuilds the replica from it.`;
     case 'PRIMARY_NOT_ACTIVE':
-      return `${label} of ${index} waits for its main copy (the primary shard), which isn't running. Once the primary is fixed, the replica follows.`;
+      return `${label} of ${index} waits for its primary shard, which isn't running. Once the primary is fixed, the replica follows.`;
     case 'TRANSIENT_FAILURE':
       return `${label} of ${index} couldn't start${onNode(diagnosis.failed_on_node ?? node)} because ${causeText(diagnosis.cause)}. Its data isn't damaged.`;
     case 'RESTORE_FAILED':
@@ -131,7 +131,7 @@ export const headline = (diagnosis: AllocationDiagnosis, context: ShardContext) 
     case 'NO_COPY_FOUND':
       return `No node holds a copy of ${label.toLowerCase()} of ${index} any more. It was on a node that left the cluster.`;
     case 'TOO_FEW_NODES':
-      return `${index} asks for more copies of shard ${context.shard} than there are nodes, and two copies of a shard never share a node.`;
+      return `${index} asks for more replicas of shard ${context.shard} than the nodes can hold: a replica never shares a node with its primary or another replica of the same shard.`;
     case 'ALLOCATION_FILTER':
       return `An allocation filter keeps ${label.toLowerCase()} of ${index} off every node.`;
     case 'SHARDS_PER_NODE_LIMIT':
@@ -141,7 +141,7 @@ export const headline = (diagnosis: AllocationDiagnosis, context: ShardContext) 
     case 'DISK_WATERMARK':
       return `The nodes' disks are too full to take ${label.toLowerCase()} of ${index}.`;
     case 'AWARENESS':
-      return `OpenSearch must spread copies across zones, and no node qualifies for ${label.toLowerCase()} of ${index}.`;
+      return `OpenSearch must spread each shard and its replicas across zones, and no node qualifies for ${label.toLowerCase()} of ${index}.`;
     case 'NODE_VERSION':
       return `The nodes run different OpenSearch versions, and ${label.toLowerCase()} of ${index} can't move to an older one.`;
     case 'RETRY_LIMIT':
@@ -159,7 +159,7 @@ const ACTIONS: { [action in DiagnosisAction]: (option: DiagnosisOption, context:
   RESTORE_AGAIN: () => 'Close or delete the index, then restore it from the snapshot again.',
   SHARD_TOOL_THEN_ALLOCATE_STALE_PRIMARY: ({ node }) =>
     `Repair the copy${onNode(node)}: stop OpenSearch on that node, run the shard repair tool, start the node again, then start the repaired copy.`,
-  ALLOCATE_STALE_PRIMARY: ({ node }) => `Start the copy${onNode(node)} as the main copy.`,
+  ALLOCATE_STALE_PRIMARY: ({ node }) => `Start the copy${onNode(node)} as the primary.`,
   RESTORE_SNAPSHOT: () => 'Restore the index from a snapshot, if you have one.',
   ALLOCATE_EMPTY_PRIMARY: (_option, { shard }) => `Start shard ${shard} empty and keep the rest of the index.`,
   DELETE_INDEX: () => 'Delete the index (on this page).',

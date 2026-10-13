@@ -88,7 +88,7 @@ describe('headline', () => {
         primary: false,
       }),
     ).toBe(
-      "A replica of shard 2 of logs is waiting 60 seconds for its node to come back. If it doesn't, OpenSearch places the copy on another node.",
+      "A replica of shard 2 of logs is waiting 60 seconds for its node to come back. If it doesn't, OpenSearch places the replica on another node.",
     );
   });
 
