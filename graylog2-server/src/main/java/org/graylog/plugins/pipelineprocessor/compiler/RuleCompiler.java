@@ -44,7 +44,7 @@ public class RuleCompiler {
 
     private final MetricRegistry metricRegistry;
     private final Consumer<byte[]> bytecodeListener;
-    private final FastPathResolver fastPaths = new FastPathResolver();
+    private final FastPathResolver fastPaths;
     private final Timer compileTime;
     private final AtomicInteger lastCompiled = new AtomicInteger();
     private final AtomicInteger lastFallback = new AtomicInteger();
@@ -56,8 +56,14 @@ public class RuleCompiler {
 
     /** {@code bytecodeListener} sees every generated class before it is loaded (tests verify it). */
     public RuleCompiler(MetricRegistry metricRegistry, Consumer<byte[]> bytecodeListener) {
+        this(metricRegistry, bytecodeListener, true);
+    }
+
+    /** {@code useFastPaths=false} compiles every function call as a legacy call, to measure what fast paths add. */
+    public RuleCompiler(MetricRegistry metricRegistry, Consumer<byte[]> bytecodeListener, boolean useFastPaths) {
         this.metricRegistry = metricRegistry;
         this.bytecodeListener = bytecodeListener;
+        this.fastPaths = new FastPathResolver(useFastPaths);
         this.compileTime = metricRegistry.timer(name(RuleCompiler.class, "compileTime"));
         final Gauge<Integer> compiledRules = lastCompiled::get;
         final Gauge<Integer> fallbackRules = lastFallback::get;

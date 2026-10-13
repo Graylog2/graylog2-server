@@ -146,6 +146,15 @@ class FastPathTest {
     }
 
     @Test
+    void disabledFastPathsUseLegacyPath() {
+        final RuleCompiler withoutFastPaths = new RuleCompiler(metrics, DifferentialHarness::verify, false);
+        final Rule rule = parser.parseRule("rule \"r\" when true then let s = shout($message.message); set_field(\"x\", s); end", false);
+        DifferentialHarness.assertEquivalent(FastPathTest::input, List.of(rule), withoutFastPaths::compileOrThrow);
+        assertThat(calls("fastPath", "shout")).isZero();
+        assertThat(calls("legacy", "shout")).isEqualTo(1);
+    }
+
+    @Test
     void mismatchedSignatureFallsBackToLegacy() {
         assertThatThrownBy(() -> FastPathResolver.validate(new BadShout())).isInstanceOf(IllegalStateException.class);
         assertEquivalent("rule \"r\" when true then let s = bad_shout($message.message); set_field(\"x\", s); end");

@@ -47,8 +47,16 @@ final class FastPathResolver {
     record FastPath(MethodHandle handle, int parameterCount, boolean takesContext) {}
 
     private final Map<Function<?>, Optional<FastPath>> cache = Collections.synchronizedMap(new IdentityHashMap<>());
+    private final boolean enabled;
+
+    FastPathResolver(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     Optional<FastPath> resolve(Function<?> function) {
+        if (!enabled) {
+            return Optional.empty();
+        }
         return cache.computeIfAbsent(function, fn -> {
             try {
                 return Optional.ofNullable(validate(fn));
