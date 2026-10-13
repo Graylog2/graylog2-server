@@ -115,7 +115,7 @@ export const eventTypeAttribute = {
 };
 
 export const getGeneralEventAttributeRenderers = <
-  T extends EntityBase & { event_definition_id?: string },
+  T extends EntityBase & { event_definition_id: string },
   M = unknown,
 >(): ColumnRenderersByAttribute<T, M> => ({
   message: {

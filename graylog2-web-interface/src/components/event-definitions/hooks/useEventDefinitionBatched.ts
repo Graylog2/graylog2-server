@@ -30,7 +30,10 @@ const eventDefinitionsBatcher = create({
 const useEventDefinitionBatched = (eventDefinitionId: string | undefined) =>
   useQuery({
     queryKey: ['event-definitions', 'batched', eventDefinitionId],
-    queryFn: () => eventDefinitionsBatcher.fetch(eventDefinitionId).then((eventDefinition) => eventDefinition ?? null),
+    queryFn: () =>
+      eventDefinitionId
+        ? eventDefinitionsBatcher.fetch(eventDefinitionId).then((eventDefinition) => eventDefinition ?? null)
+        : Promise.resolve(null),
     enabled: !!eventDefinitionId,
   });
 

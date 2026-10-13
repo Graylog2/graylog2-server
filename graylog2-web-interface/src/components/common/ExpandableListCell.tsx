@@ -77,7 +77,7 @@ const ExpandableListCell = ({ items }: Props) => {
     <Wrapper>
       {hasMore && (
         <ToggleButton
-          title="Toggle associated entities"
+          title={isExpanded ? 'Show fewer' : 'Show all'}
           name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
           onClick={() => setIsExpanded(!isExpanded)}
         />
