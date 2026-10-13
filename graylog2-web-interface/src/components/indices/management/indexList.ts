@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// The Index Management list's logic: filtering, sorting, filter options and paging. Only type imports from Graylog,
+// The Indices list's logic: filtering, sorting, filter options and paging. Only type imports from Graylog,
 // so it can be unit-tested on its own (indexList.test.ts).
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';

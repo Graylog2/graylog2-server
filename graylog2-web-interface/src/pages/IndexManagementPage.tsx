@@ -45,9 +45,9 @@ const IndexManagementPage = () => {
   }
 
   return (
-    <DocumentTitle title="Index Management">
+    <DocumentTitle title="Indices">
       <IndicesPageNavigation />
-      <PageHeader title="Index Management">
+      <PageHeader title="Indices">
         <span>
           Every index in the cluster with its health, including hidden indices and indices that don&apos;t belong to a
           Graylog index set.

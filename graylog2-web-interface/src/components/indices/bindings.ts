@@ -21,14 +21,14 @@ import AppConfig from 'util/AppConfig';
 
 export const PAGE_NAV_TITLE = 'Indices';
 
-const INDEX_MANAGEMENT = {
-  description: 'Index Management',
+const INDEX_SETS = { description: 'Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true };
+
+const INDICES = {
+  description: 'Indices',
   path: Routes.SYSTEM.INDICES.MANAGEMENT,
   exactPathMatch: true,
   permissions: 'indices:read' as const,
 };
-
-const INDEX_SETS = { description: 'Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true };
 
 const INDEX_SET_TEMPLATES = {
   description: 'Index Set Templates',
@@ -46,8 +46,8 @@ const FIELD_TYPE_PROFILES = {
 
 // Index Set Templates aren't available in Graylog Cloud.
 const NAV_ITEMS = AppConfig.isCloud()
-  ? [INDEX_MANAGEMENT, INDEX_SETS, FIELD_TYPE_PROFILES]
-  : [INDEX_MANAGEMENT, INDEX_SETS, INDEX_SET_TEMPLATES, FIELD_TYPE_PROFILES];
+  ? [INDEX_SETS, INDICES, FIELD_TYPE_PROFILES]
+  : [INDEX_SETS, INDICES, INDEX_SET_TEMPLATES, FIELD_TYPE_PROFILES];
 
 const bindings: PluginExports = {
   pageNavigation: [
