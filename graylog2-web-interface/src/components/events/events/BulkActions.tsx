@@ -20,8 +20,7 @@ import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import type { Event } from 'components/events/events/types';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useReplayBulkAction from 'components/events/events/hooks/useReplayBulkAction';
 
 type Props = {
@@ -31,12 +30,10 @@ type Props = {
 const BulkActions = ({ selectedEntitiesData }: Props) => {
   const events = Object.values(selectedEntitiesData);
   const { actions, pluggableActionModals } = useEventBulkActions(events);
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   const replayableEvents = events.filter(
-    (event) =>
-      !!event.replay_info &&
-      isPermitted(currentUser?.permissions, `eventdefinitions:read:${event.event_definition_id}`),
+    (event) => !!event.replay_info && isPermitted(`eventdefinitions:read:${event.event_definition_id}`),
   );
   const onReplaySearchClick = useReplayBulkAction(replayableEvents);
 

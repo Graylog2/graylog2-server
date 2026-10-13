@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -30,6 +31,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -108,6 +110,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private final NodeId nodeId;
     private final EventBus eventBus;
     private final ClusterEventBus clusterEventBus;
+    private final DatanodeKeystore datanodeKeystore;
+    private final CertificateReloadVerifier certificateReloadVerifier;
 
 
     static final String CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING = "cluster.routing.allocation.exclude._name";
@@ -117,7 +121,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
                           final Configuration configuration,
                           ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus,
-                          ClusterEventBus clusterEventBus) {
+                          ClusterEventBus clusterEventBus, DatanodeKeystore datanodeKeystore,
+                          CertificateReloadVerifier certificateReloadVerifier) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
@@ -129,6 +134,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.nodeId = nodeId;
         this.eventBus = eventBus;
         this.clusterEventBus = clusterEventBus;
+        this.datanodeKeystore = datanodeKeystore;
+        this.certificateReloadVerifier = certificateReloadVerifier;
         eventBus.register(this);
     }
 
@@ -169,7 +176,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getOpensearchClusterUrl() {
-        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
+        // HostAndPort brackets IPv6 literals ("[2001:db8::1]:9300"); a plain concatenation would produce
+        // "2001:db8::1:9300", which is itself a valid IPv6 address and would silently point peers to the wrong host.
+        return HostAndPort.fromParts(configuration.getOpensearchNetworkPublishHost(), configuration.getOpensearchTransportPort()).toString();
     }
 
     @Override
@@ -229,6 +238,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
             final String recommendedMemory = FileUtils.byteCountToDisplaySize(memoryValues.total() / 2);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
+                    Notification.Severity.NORMAL,
                     Map.of("hostname", configuration.getHostname(),
                             "memoryRatio", f("%.1f", memoryRatio),
                             "totalMemory", FileUtils.byteCountToDisplaySize(memoryValues.total()),
@@ -458,8 +468,14 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public void reloadCertificates() {
-        if(commandLineProcess != null) {
+        // only verify the reload if we're actually about to trigger one - queuing a verification regardless of
+        // whether commandLineProcess is running would leave it waiting for a certificate that opensearch was never
+        // even asked to pick up, and it would incorrectly escalate once its grace period runs out.
+        if (commandLineProcess != null) {
             commandLineProcess.hotReload();
+            // CertificateReloadVerifier is a singleton: queuing this verification automatically supersedes
+            // whatever verification was still in flight for a previous reload.
+            certificateReloadVerifier.verify(datanodeKeystore.getCertificateSerialNumber(), this::getOpensearchBaseUrl);
         }
     }
 

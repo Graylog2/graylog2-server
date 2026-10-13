@@ -16,15 +16,15 @@
  */
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { qualifyUrl } from 'util/URLUtils';
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 
-const urlPrefix = '/system/indices/mappings/remove_profile_from';
-
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({
+  SystemFieldTypes: { removeProfileFromIndexSets: jest.fn(() => Promise.resolve()) },
+}));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -36,7 +36,6 @@ describe('useRemoveProfileFromIndexMutation', () => {
     jest.clearAllMocks();
   });
 
-  const putUrl = qualifyUrl(`${urlPrefix}`);
   const requestBody = { rotated: true, indexSetId: '001' };
 
   const requestBodyJSON = {
@@ -45,14 +44,14 @@ describe('useRemoveProfileFromIndexMutation', () => {
   };
 
   it('should run fetch and display UserNotification', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve({}));
+    asMock(SystemFieldTypes.removeProfileFromIndexSets).mockImplementation(() => Promise.resolve({}));
     const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 
     act(() => {
       result.current.removeProfileFromIndex(requestBody);
     });
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
+    await waitFor(() => expect(SystemFieldTypes.removeProfileFromIndexSets).toHaveBeenCalledWith(requestBodyJSON));
 
     await waitFor(() =>
       expect(UserNotification.success).toHaveBeenCalledWith('Removed profile from index successfully', 'Success!'),
@@ -60,7 +59,7 @@ describe('useRemoveProfileFromIndexMutation', () => {
   });
 
   it('should display notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemFieldTypes.removeProfileFromIndexSets).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result } = renderHook(() => useRemoveProfileFromIndexMutation());
 

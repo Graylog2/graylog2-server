@@ -89,4 +89,24 @@ class OpensearchClusterConfigurationBeanTest {
                 .isInstanceOfSatisfying(TextConfigFile.class, f -> Assertions.assertThat(f.text())
                         .isEqualTo("my_manager_node:9300\nmy_other_manager_node:9300"));
     }
+
+    @Test
+    void testPublishHostDefaultsToHostname(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_hostname"), tempDir), new OpensearchSeedHostsResolver(testNodeService));
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
+
+        Assertions.assertThat(configurationPart.properties().get("network.publish_host")).isEqualTo("this_node_hostname");
+    }
+
+    @Test
+    void testPublishHostOverride(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_hostname", "opensearch_network_publish_host", "externally-routable.example.org"), tempDir), new OpensearchSeedHostsResolver(testNodeService));
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
+
+        Assertions.assertThat(configurationPart.properties().get("network.publish_host")).isEqualTo("externally-routable.example.org");
+    }
 }

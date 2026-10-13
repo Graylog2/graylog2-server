@@ -16,9 +16,11 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { IndexerIndices } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
+import fetch from 'logic/rest/FetchProvider';
 
 export const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
 export const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
@@ -104,16 +106,13 @@ export const fetchAllIndices = (): Promise<IndicesListResponse> =>
   fetch('GET', qualifyUrl(ApiRoutes.IndicesApiController.listAll().url));
 
 export const fetchMultipleIndices = (indexNames: string[]): Promise<Indices> =>
-  fetchPeriodically('POST', qualifyUrl(ApiRoutes.IndicesApiController.multiple().url), { indices: indexNames });
+  IndexerIndices.multiple({ indices: indexNames }, { requestShouldExtendSession: false });
 
-export const closeIndex = (indexName: string): Promise<unknown> =>
-  fetch('POST', qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url));
+export const closeIndex = (indexName: string): Promise<unknown> => IndexerIndices.close(indexName);
 
-export const deleteIndex = (indexName: string): Promise<unknown> =>
-  fetch('DELETE', qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url));
+export const deleteIndex = (indexName: string): Promise<unknown> => IndexerIndices.remove(indexName);
 
-export const reopenIndex = (indexName: string): Promise<unknown> =>
-  fetch('POST', qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url));
+export const reopenIndex = (indexName: string): Promise<unknown> => IndexerIndices.reopen(indexName);
 
 type ListResult = {
   indices: Indices | undefined;

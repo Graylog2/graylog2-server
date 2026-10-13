@@ -19,6 +19,10 @@ package org.graylog.storage.opensearch3;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import okhttp3.HttpUrl;
+import org.apache.hc.core5.http.HttpHost;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -28,17 +32,26 @@ import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.TransportOptions;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +60,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -100,6 +114,54 @@ class IndicesAdapterOSTest {
 
         doReturn(null).when(statsApi).indexStatsWithShardLevel("index_3333");
         assertTrue(toTest.getIndexStats("index_3333").isEmpty());
+    }
+
+    // The real transport is needed because it treats a 403 unlike other errors.
+    @Nested
+    class ClosedIndicesOverHttp {
+        private final MockWebServer server = new MockWebServer();
+        private OfficialOpensearchClient client;
+
+        @BeforeEach
+        void start() throws IOException {
+            server.start();
+            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+            final HttpUrl url = server.url("/");
+            final OpenSearchTransport transport = ApacheHttpClient5TransportBuilder
+                    .builder(new HttpHost(url.scheme(), url.host(), url.port()))
+                    .setMapper(new JacksonJsonpMapper(objectMapper))
+                    .build();
+            client = new OfficialOpensearchClient(new OpenSearchClient(transport), new OpenSearchAsyncClient(transport), objectMapper);
+        }
+
+        @AfterEach
+        void stop() throws IOException {
+            client.close();
+            server.close();
+        }
+
+        @Test
+        void fallsBackToCatApiWhenResolveIsForbidden() throws InterruptedException {
+            server.enqueue(response(403, "{\"error\":{\"type\":\"security_exception\",\"reason\":\"no permissions for [indices:admin/resolve/index]\"},\"status\":403}"));
+            server.enqueue(response(200, "[{\"index\":\"graylog_0\",\"status\":\"close\"}]"));
+
+            assertThat(buildAdapter(client).closedIndices(List.of("graylog_*"))).containsExactly("graylog_0");
+            assertThat(server.takeRequest().getTarget()).startsWith("/_resolve/index/");
+            assertThat(server.takeRequest().getTarget()).startsWith("/_cat/indices/");
+        }
+
+        @Test
+        void propagatesUnauthorizedWithoutFallback() {
+            server.enqueue(response(401, ""));
+
+            assertThatThrownBy(() -> buildAdapter(client).closedIndices(List.of("graylog_*")))
+                    .hasRootCauseInstanceOf(ResponseException.class);
+            assertThat(server.getRequestCount()).isEqualTo(1);
+        }
+
+        private MockResponse response(int code, String body) {
+            return new MockResponse.Builder().code(code).addHeader("Content-Type", "application/json").body(body).build();
+        }
     }
 
     @Test

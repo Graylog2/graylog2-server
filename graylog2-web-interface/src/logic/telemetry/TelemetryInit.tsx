@@ -37,20 +37,14 @@ const getPostHogSettings = (): PostHogSettings => {
   };
 };
 
-const removeLegacyCookie = (key: string) => {
-  document.cookie = `ph_${key}_posthog=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-};
-
 const init = (key: string, host: string) => {
-  removeLegacyCookie(key);
-
   posthog.init(key, {
     autocapture: false,
     api_host: host,
     capture_pageview: false,
     capture_pageleave: false,
     cross_subdomain_cookie: false,
-    persistence: 'localStorage',
+    persistence: 'localStorage+cookie',
     strict_script_versioning: true,
   });
 

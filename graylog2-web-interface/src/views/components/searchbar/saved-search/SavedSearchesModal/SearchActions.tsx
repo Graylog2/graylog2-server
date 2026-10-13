@@ -24,6 +24,7 @@ import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 const onDelete = (
   e: React.MouseEvent<HTMLButtonElement>,
@@ -57,6 +58,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Pro
   const { deselectEntity } = useSelectedEntities();
   const { refetch } = useTableFetchContext();
   const [showShareModal, setShowShareModal] = useState(false);
+  const { scopePermissions } = useGetPermissionsByScope({ _scope: search.scope });
 
   const toggleEntityShareModal = useCallback(() => {
     setShowShareModal((cur) => !cur);
@@ -65,17 +67,19 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Pro
   return (
     <>
       <ShareButton bsSize="xsmall" entityId={search.id} entityType="search" onClick={() => setShowShareModal(true)} />
-      <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
-        <Button
-          onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch, deselectEntity)}
-          role="button"
-          bsSize="xsmall"
-          bsStyle="danger"
-          title={`Delete search ${search.title}`}
-          tabIndex={0}>
-          Delete
-        </Button>
-      </IfPermitted>
+      {scopePermissions?.is_mutable && (
+        <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
+          <Button
+            onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch, deselectEntity)}
+            role="button"
+            bsSize="xsmall"
+            bsStyle="danger"
+            title={`Delete search ${search.title}`}
+            tabIndex={0}>
+            Delete
+          </Button>
+        </IfPermitted>
+      )}
       {showShareModal && (
         <EntityShareModal
           entityId={search.id}

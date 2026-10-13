@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -40,7 +41,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = ViewEntity.Builder.class)
-public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builder> {
+public abstract class ViewEntity extends ScopedContentPackEntity implements NativeEntityConverter<ViewDTO.Builder> {
     public enum Type {
         SEARCH,
         DASHBOARD
@@ -108,7 +109,7 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder extends ScopedContentPackEntity.AbstractBuilder<Builder> {
 
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(Type type);
@@ -174,6 +175,7 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
     @Override
     public ViewDTO.Builder toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final ViewDTO.Builder viewBuilder = ViewDTO.builder()
+                .scope(scope() != null ? scope().asString(parameters) : DefaultEntityScope.NAME)
                 .title(this.title().asString(parameters))
                 .summary(this.summary().asString(parameters))
                 .description(this.description().asString(parameters))

@@ -25,8 +25,7 @@ import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavor
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import StreamsContext from 'contexts/StreamsContext';
 import type { Stream } from 'logic/streams/types';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { getStreamFavoriteFields } from 'components/common/message/helpers';
 import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
 
@@ -38,17 +37,17 @@ type OriginalProps = React.PropsWithChildren<{
 const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
   const streamsContext = useContext(StreamsContext);
   const streamsList = useMemo(() => streamsContext ?? [], [streamsContext]);
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const streams = useMemo<Array<Stream>>(() => {
     const messageStreamIds: Array<string> = message?.fields?.streams ?? [];
     const streamsById = Object.fromEntries(
       streamsList
-        .filter((stream: Stream) => isPermitted(permissions, `streams:read:${stream.id}`))
+        .filter((stream: Stream) => isPermitted(`streams:read:${stream.id}`))
         .map((stream) => [stream.id, stream]),
     );
 
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
-  }, [message?.fields?.streams, permissions, streamsList]);
+  }, [message?.fields?.streams, isPermitted, streamsList]);
 
   const initialFavoriteFieldsByStream = useMemo(
     () => Object.fromEntries(streams.map((stream) => [stream.id, getStreamFavoriteFields(stream, message?.fields)])),
@@ -61,8 +60,8 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
   );
 
   const editableStreams = useMemo(
-    () => streams.filter((stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
-    [permissions, streams],
+    () => streams.filter((stream) => isPermitted(`streams:edit:${stream.id}`)),
+    [isPermitted, streams],
   );
 
   const editableStreamsInitialFavoriteFields = useMemo(

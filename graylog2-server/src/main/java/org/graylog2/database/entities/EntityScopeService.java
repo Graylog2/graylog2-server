@@ -43,7 +43,10 @@ public final class EntityScopeService {
 
     public boolean isMutable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
-        String scope = scopedEntity.scope();
+        return isMutable(scopedEntity.scope());
+    }
+
+    public boolean isMutable(String scope) {
         if (scope == null || scope.isEmpty()) {
             return true;
         }

@@ -26,6 +26,8 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
@@ -44,6 +46,7 @@ import org.mockito.quality.Strictness;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,6 +85,7 @@ public class ViewServiceUsesViewRequirementsTest {
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
                 mongoCollections,
+                new EntityScopeService(Set.of(new DefaultEntityScope())),
                 new IgnoreSearchFilters());
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
         this.searchUser = TestSearchUser.builder().build();

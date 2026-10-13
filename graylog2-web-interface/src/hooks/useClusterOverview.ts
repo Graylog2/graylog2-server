@@ -16,6 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { Cluster } from '@graylog/server-api';
+
 import fetch, { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -23,8 +25,7 @@ import type { SystemOverview } from 'stores/cluster/types';
 
 const SOURCE_URL = '/cluster';
 
-export const fetchClusterOverview = (): Promise<{ [nodeId: string]: SystemOverview }> =>
-  fetch('GET', qualifyUrl(SOURCE_URL));
+export const fetchClusterOverview = (): Promise<{ [nodeId: string]: SystemOverview }> => Cluster.get();
 
 export const fetchNodeJvm = (nodeId: string) => {
   const promise = fetch('GET', qualifyUrl(`${SOURCE_URL}/${nodeId}/jvm`));
@@ -40,7 +41,7 @@ export const fetchNodeJvm = (nodeId: string) => {
 };
 
 export const fetchThreadDump = (nodeId: string): Promise<string> =>
-  fetch('GET', qualifyUrl(`${SOURCE_URL}/${nodeId}/threaddump`)).then(
+  Cluster.threadDump(nodeId).then(
     (response) => response.threaddump,
     (error) => {
       UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump');
@@ -50,7 +51,7 @@ export const fetchThreadDump = (nodeId: string): Promise<string> =>
   );
 
 export const fetchProcessBufferDump = (nodeId: string) =>
-  fetch('GET', qualifyUrl(`${SOURCE_URL}/${nodeId}/processbufferdump`)).then(
+  Cluster.processBufferDump(nodeId).then(
     (response) => response.processbuffer_dump,
     (error) => {
       UserNotification.error(

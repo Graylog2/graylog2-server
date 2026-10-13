@@ -19,7 +19,16 @@ import styled, { css } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { Link, LinkContainer, EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
+import {
+  DefaultLabel,
+  Link,
+  LinkContainer,
+  EntityList,
+  EntityListItem,
+  PaginatedList,
+  SearchForm,
+  Spinner,
+} from 'components/common';
 import { Button, Col, DropdownButton, Label, MenuItem, Row, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -190,13 +199,7 @@ const IndexSetsComponent = () => {
 
     const indexSetTitle = <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>;
 
-    const isDefault = indexSet.default ? (
-      <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">
-        default
-      </Label>
-    ) : (
-      ''
-    );
+    const isDefault = indexSet.default ? <DefaultLabel key={`index-set-${indexSet.id}-default-label`} /> : '';
     const isReadOnly = !indexSet.writable ? (
       <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">
         read only

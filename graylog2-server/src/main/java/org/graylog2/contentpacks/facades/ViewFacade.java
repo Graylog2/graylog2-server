@@ -178,12 +178,15 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         searchDbService.save(searchWithId);
 
         viewBuilder.searchId(existingView.searchId());
-        viewService.update(viewBuilder.build());
+        // Keep the stored scope, since the mutability bypass below would otherwise let the pack change it.
+        viewBuilder.scope(existingView.scope());
+        // Installer-driven write, must be able to rewrite immutable (e.g. Illuminate) views in place.
+        viewService.forceUpdate(viewBuilder.build());
     }
 
     @Override
     public void delete(ViewDTO nativeEntity) {
-        viewService.delete(nativeEntity.id());
+        viewService.forceDelete(nativeEntity.id());
     }
 
     @Override
@@ -208,6 +211,11 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     public abstract ViewDTO.Type getDTOType();
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
+    }
 
     @SuppressWarnings("UnstableApiUsage")
     @Override

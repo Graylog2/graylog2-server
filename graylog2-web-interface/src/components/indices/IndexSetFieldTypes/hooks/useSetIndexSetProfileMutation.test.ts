@@ -16,15 +16,13 @@
  */
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import { qualifyUrl } from 'util/URLUtils';
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
 
-const urlPrefix = '/system/indices/mappings/set_profile';
-
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({ SystemFieldTypes: { setProfile: jest.fn(() => Promise.resolve()) } }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -37,7 +35,6 @@ describe('useRemoveCustomFieldTypeMutation', () => {
   });
 
   describe('removeCustomFieldTypeMutation', () => {
-    const putUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = { rotated: true, profileId: 'profile-id-111', indexSetId: '001' };
 
     const requestBodyJSON = {
@@ -47,14 +44,14 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+      asMock(SystemFieldTypes.setProfile).mockImplementation(() => Promise.resolve({}));
       const { result } = renderHook(() => useSetIndexSetProfileMutation());
 
       act(() => {
         result.current.setIndexSetFieldTypeProfile(requestBody);
       });
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
+      await waitFor(() => expect(SystemFieldTypes.setProfile).toHaveBeenCalledWith(requestBodyJSON));
 
       await waitFor(() =>
         expect(UserNotification.success).toHaveBeenCalledWith('Set index set profile successfully', 'Success!'),
@@ -62,7 +59,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     });
 
     it('should display notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(SystemFieldTypes.setProfile).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useSetIndexSetProfileMutation());
 

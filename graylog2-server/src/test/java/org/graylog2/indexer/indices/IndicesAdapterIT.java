@@ -73,6 +73,17 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    void testAliasesForSeveralPatternsWhenOneMatchesNoIndex() {
+        final String alias = "multi_pattern_alias";
+        indicesAdapter.cycleAlias(alias, TEST_INDEX);
+
+        final Map<String, Set<String>> result = indicesAdapter.aliases(TEST_INDEX + "*,nonexistent_*");
+
+        assertThat(result).containsOnlyKeys(TEST_INDEX);
+        assertThat(result.get(TEST_INDEX)).containsExactly(alias);
+    }
+
+    @Test
     public void testAliasHandling() throws IOException {
         String alias = "test_alias";
         assertThat(indicesAdapter.aliasExists(alias)).isFalse();
@@ -222,6 +233,17 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
         assertThat(indicesAdapter.closedIndices(Set.of(TEST_INDEX))).doesNotContain(TEST_INDEX);
         indicesAdapter.markIndexReopened(TEST_INDEX);
         assertThat(indicesAdapter.aliasExists(TEST_INDEX + Indices.REOPENED_ALIAS_SUFFIX)).isTrue();
+    }
+
+    @Test
+    public void testClosedIndicesWithWildcard() throws IOException {
+        assertThat(indicesAdapter.closedIndices(Set.of())).isEmpty();
+        assertThat(indicesAdapter.closedIndices(Set.of("nonexistent_*"))).isEmpty();
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).doesNotContain(TEST_INDEX);
+        indicesAdapter.close(TEST_INDEX);
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).contains(TEST_INDEX);
+        indicesAdapter.openIndex(TEST_INDEX);
+        assertThat(indicesAdapter.closedIndices(Set.of("test_*"))).doesNotContain(TEST_INDEX);
     }
 
     @Test
