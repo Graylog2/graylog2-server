@@ -72,6 +72,8 @@ public class MessageRefExpression extends BaseExpression {
 
     @Override
     public Iterable<Expression> children() {
-        return Collections.singleton(fieldExpr);
+        return fieldExpr == null
+            ? Collections.emptyList()
+            : Collections.singleton(fieldExpr);
     }
 }
