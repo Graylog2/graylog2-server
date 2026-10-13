@@ -21,6 +21,7 @@ import org.graylog2.plugin.rest.ApiError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,5 +48,12 @@ public class PermissionExceptionMapperTest {
         Response response = sut.toResponse(exception);
 
         assertThat(((ApiError) response.getEntity()).message()).isEqualTo(exception.getMessage());
+    }
+
+    @Test
+    public void responseIsJsonWhateverTheResourceProduces() {
+        Response response = sut.toResponse(new PermissionException(""));
+
+        assertThat(response.getMediaType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
     }
 }
