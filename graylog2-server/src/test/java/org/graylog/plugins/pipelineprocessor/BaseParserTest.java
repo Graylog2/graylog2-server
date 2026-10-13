@@ -105,7 +105,7 @@ public class BaseParserTest {
 
     private void differentialCheck(Rule rule, Message message) {
         if (DifferentialHarness.FIXTURES_ENABLED) {
-            final RuleCompiler compiler = new RuleCompiler(new MetricRegistry());
+            final RuleCompiler compiler = new RuleCompiler(new MetricRegistry(), DifferentialHarness::verify);
             DifferentialHarness.assertEquivalent(() -> DifferentialHarness.copyOf(message, messageFactory),
                     List.of(rule), r -> compiler.compile(r).orElse(null));
         }
