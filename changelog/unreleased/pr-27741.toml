@@ -1,4 +1,4 @@
 type = "c"
-message = "Show the search and filter controls directly above the table on the Alerts & Events page, below its charts, and add an optional Associated Notifications column."
+message = "Show the search and filter controls directly above the table on the Alerts & Events page. Add an optional Associated Notifications column."
 
 pulls = ["27741"]
