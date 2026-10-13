@@ -17,20 +17,25 @@
 package org.graylog.plugins.pipelineprocessor.compiler;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AdditionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.ComparisonExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.DoubleExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MultiplicationExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.PipelineOps;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.SignedExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
 import org.graylog2.plugin.Message;
@@ -61,6 +66,18 @@ final class ExpressionEmitter {
     static final Method MESSAGE_FIELD = Method.getMethod(
             "Object messageField(org.graylog.plugins.pipelineprocessor.EvaluationContext, Object)");
     static final Method TO_BOOL = Method.getMethod("boolean toBool(Object)");
+    static final Method COMPARE = Method.getMethod("boolean compare(String, Object, Object)");
+    static final Method EQUALITY = Method.getMethod(
+            "boolean equality(org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression, "
+                    + "org.graylog.plugins.pipelineprocessor.EvaluationContext, Object, Object)");
+    static final Method ADD = Method.getMethod(
+            "Object add(org.graylog.plugins.pipelineprocessor.ast.expressions.AdditionExpression, Object, Object)");
+    static final Method MULTIPLY = Method.getMethod(
+            "Object multiply(org.graylog.plugins.pipelineprocessor.ast.expressions.MultiplicationExpression, "
+                    + "org.graylog.plugins.pipelineprocessor.EvaluationContext, Object, Object)");
+    static final Method SIGNED = Method.getMethod(
+            "Object signed(org.graylog.plugins.pipelineprocessor.ast.expressions.SignedExpression, "
+                    + "org.graylog.plugins.pipelineprocessor.EvaluationContext, Object)");
 
     private final GeneratorAdapter g;
     private final RuleClassData data;
@@ -122,6 +139,35 @@ final class ExpressionEmitter {
                 bool(w);
                 g.valueOf(Type.BOOLEAN_TYPE);
             }
+            // operands are pushed left first, then right: the interpreter's evaluation order; pushing the node, the
+            // context or the operator has no side effects
+            case AdditionExpression a -> {
+                constant(a, AdditionExpression.class);
+                value(a.left());
+                value(a.right());
+                g.invokeStatic(PIPELINE_OPS, ADD);
+            }
+            case MultiplicationExpression m -> {
+                constant(m, MultiplicationExpression.class);
+                g.loadArg(0);
+                value(m.left());
+                value(m.right());
+                g.invokeStatic(PIPELINE_OPS, MULTIPLY);
+            }
+            case SignedExpression s -> {
+                constant(s, SignedExpression.class);
+                g.loadArg(0);
+                value(s.right());
+                g.invokeStatic(PIPELINE_OPS, SIGNED);
+            }
+            case ComparisonExpression c -> {
+                bool(c);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
+            case EqualityExpression e -> {
+                bool(e);
+                g.valueOf(Type.BOOLEAN_TYPE);
+            }
             default -> escapeValue(expr);
         }
     }
@@ -163,6 +209,19 @@ final class ExpressionEmitter {
             case BooleanValuedFunctionWrapper w -> {
                 value(w.expression());
                 g.invokeStatic(PIPELINE_OPS, TO_BOOL);
+            }
+            case ComparisonExpression c -> {
+                g.push(c.getOperator());
+                value(c.left());
+                value(c.right());
+                g.invokeStatic(PIPELINE_OPS, COMPARE);
+            }
+            case EqualityExpression e -> {
+                constant(e, EqualityExpression.class);
+                g.loadArg(0);
+                value(e.left());
+                value(e.right());
+                g.invokeStatic(PIPELINE_OPS, EQUALITY);
             }
             default -> escapeBool(expr);
         }
