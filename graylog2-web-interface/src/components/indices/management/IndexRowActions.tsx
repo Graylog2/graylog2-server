@@ -17,8 +17,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { MenuItem } from 'components/bootstrap';
+import { ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { IconButton, IfPermitted, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
+import Routes from 'routing/Routes';
 
 import { NOT_APPLICABLE_REASON, rowMenu } from './actions';
 import type { IndexRow } from './fetchIndices';
@@ -27,7 +29,30 @@ import type { IndexAction } from './types';
 import useCanRun from './useCanRun';
 import useIndexActions from './useIndexActions';
 
-// The "More" menu of one row: only actions permitted on that index; none at all if there are none.
+// All time: a search only reaches indices whose time range it overlaps, and the query already narrows it to one.
+export const indexSearchUrl = (index: string) => Routes.search(`_index:${index}`, { relative: 0 });
+
+// Searches the index's messages, as the index sets' rows do for a whole index set. A closed index can't be searched.
+const SearchButton = ({ index }: { index: IndexRow }) => {
+  const closed = index.status === 'close';
+  const button = (
+    <IconButton
+      name="search"
+      title={closed ? `${index.index} is closed and can't be searched` : `Search in index ${index.index}`}
+      bsStyle="default"
+      size="xsmall"
+      disabled={closed}
+    />
+  );
+
+  return (
+    <IfPermitted permissions="searches:relative">
+      {closed ? button : <LinkContainer to={indexSearchUrl(index.index)}>{button}</LinkContainer>}
+    </IfPermitted>
+  );
+};
+
+// A search button, and the "More" menu of one row: only actions permitted on that index; no menu if there are none.
 const IndexRowActions = ({ index }: { index: IndexRow }) => {
   const can = useCanRun();
   const { runAction, isRunning } = useIndexActions();
@@ -35,7 +60,7 @@ const IndexRowActions = ({ index }: { index: IndexRow }) => {
   const items = rowMenu(index, can);
 
   if (items.length === 0) {
-    return null;
+    return <SearchButton index={index} />;
   }
 
   const confirm = async () => {
@@ -47,7 +72,8 @@ const IndexRowActions = ({ index }: { index: IndexRow }) => {
   };
 
   return (
-    <>
+    <ButtonToolbar>
+      <SearchButton index={index} />
       <MoreActions>
         {items.map(({ action, applies }) => (
           <MenuItem
@@ -69,7 +95,7 @@ const IndexRowActions = ({ index }: { index: IndexRow }) => {
           onCancel={() => setPending(undefined)}
         />
       )}
-    </>
+    </ButtonToolbar>
   );
 };
 
