@@ -52,7 +52,7 @@ const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange 
     setShowAddNotificationForm(!showAddNotificationForm);
   };
 
-  const handleAssignNotification = (nextNotification) => {
+  const handleAssignNotification = (nextNotification: string) => {
     const nextNotifications = cloneDeep(eventDefinition.notifications);
 
     nextNotifications.push({
