@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableSetMultimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.compiler.RuleCompiler;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
@@ -34,6 +36,8 @@ public class PipelineInterpreterStateBuilder {
     private final PipelineResolver pipelineResolver;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final PipelineInterpreter.State.Factory stateFactory;
+    private final PipelineCompilerConfigService compilerConfigService;
+    private final RuleCompiler ruleCompiler;
 
     @Inject
     public PipelineInterpreterStateBuilder(RuleService ruleService,
@@ -42,9 +46,13 @@ public class PipelineInterpreterStateBuilder {
                                            PipelineRuleParser pipelineRuleParser,
                                            PipelineResolver.Factory pipelineResolverFactory,
                                            RuleMetricsConfigService ruleMetricsConfigService,
-                                           PipelineInterpreter.State.Factory stateFactory) {
+                                           PipelineInterpreter.State.Factory stateFactory,
+                                           PipelineCompilerConfigService compilerConfigService,
+                                           RuleCompiler ruleCompiler) {
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.stateFactory = stateFactory;
+        this.compilerConfigService = compilerConfigService;
+        this.ruleCompiler = ruleCompiler;
         this.pipelineResolver = pipelineResolverFactory.create(
                 PipelineResolverConfig.of(
                         // TODO: Implement a #streamAll method in the services to get a real database cursor instead of
@@ -60,6 +68,9 @@ public class PipelineInterpreterStateBuilder {
     public PipelineInterpreter.State buildState(PipelineMetricRegistry pipelineMetricRegistry) {
         final ImmutableMap<String, Pipeline> currentPipelines =
                 pipelineResolver.resolvePipelines(pipelineMetricRegistry);
+        if (compilerConfigService.get().enabled()) {
+            ruleCompiler.compileAll(currentPipelines.values());
+        }
         final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections =
                 pipelineResolver.resolveStreamConnections(currentPipelines);
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();

@@ -23,9 +23,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.ProcessingFailureCause;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.compiler.CompiledRule;
+import org.graylog.plugins.pipelineprocessor.compiler.RuleCompiler;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -65,6 +70,7 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +84,8 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -514,7 +522,9 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
-                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true),
+                disabledCompilerConfigService(),
+                new RuleCompiler(new MetricRegistry())
         );
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
@@ -552,8 +562,22 @@ public class PipelineInterpreterTest {
         assertThat(streamIds).containsExactlyInAnyOrder(DEFAULT_STREAM_ID, secondStreamId);
     }
 
-    @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
+        return createPipelineInterpreter(ruleService, pipelineService, functions, disabledCompilerConfigService(), new RuleCompiler(new MetricRegistry()));
+    }
+
+    private static PipelineCompilerConfigService disabledCompilerConfigService() {
+        final PipelineCompilerConfigService compilerConfigService = mock(PipelineCompilerConfigService.class);
+        when(compilerConfigService.get()).thenReturn(PipelineCompilerConfigDto.createDefault());
+        return compilerConfigService;
+    }
+
+    @SuppressForbidden("Allow using default thread factory")
+    private PipelineInterpreter createPipelineInterpreter(RuleService ruleService,
+                                                          PipelineService pipelineService,
+                                                          Map<String, Function<?>> functions,
+                                                          PipelineCompilerConfigService compilerConfigService,
+                                                          RuleCompiler ruleCompiler) {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(MongoDbPipelineStreamConnectionsService.class);
@@ -573,7 +597,9 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
-                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true),
+                compilerConfigService,
+                ruleCompiler
         );
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
@@ -586,6 +612,67 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 stateUpdater,
                 1);
+    }
+
+    /** Runs one message through rule "r" (id "abc") in pipeline "p" (id "p1"), with `body` attached as its compiled form. */
+    private Message processWithCompiledBody(String ruleSource, CompiledRule body) {
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(Collections.singleton(
+                RuleDao.create("abc", null, "title", "description", ruleSource, Tools.nowUTC(), null, null, null)));
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("p1", null, "title", "description",
+                        "pipeline \"p\"\nstage 0 match either\nrule \"r\"\nend", Tools.nowUTC(), null)));
+        final PipelineCompilerConfigService config = mock(PipelineCompilerConfigService.class);
+        when(config.get()).thenReturn(PipelineCompilerConfigDto.create(true));
+        final RuleCompiler compiler = mock(RuleCompiler.class);
+        doAnswer(inv -> {
+            final Collection<Pipeline> pipelines = inv.getArgument(0);
+            pipelines.forEach(p -> p.stages().forEach(s -> s.getRules().forEach(r -> r.setCompiled(body))));
+            return null;
+        }).when(compiler).compileAll(any());
+
+        final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, ImmutableMap.of(), config, compiler);
+        return Iterables.getOnlyElement(interpreter.process(messageInDefaultStream("message", "test")));
+    }
+
+    @Test
+    void usesCompiledRuleBodyWhenPresent() {
+        final Message processed = processWithCompiledBody("rule \"r\"\nwhen false\nthen\nend", new CompiledRule() {
+            @Override
+            public boolean when(EvaluationContext ctx) {
+                return true; // the AST says false
+            }
+
+            @Override
+            public boolean then(EvaluationContext ctx) {
+                ctx.currentMessage().addField("compiled", true);
+                return true;
+            }
+        });
+        assertThat(processed.getField("compiled")).isEqualTo(true);
+    }
+
+    @Test
+    void compiledStatementFailureProducesSameProcessingErrorAsInterpreter() {
+        // a compiled body that records an error exactly as a failing statement would
+        final Message processed = processWithCompiledBody("rule \"r\"\nwhen true\nthen\nend", new CompiledRule() {
+            @Override
+            public boolean when(EvaluationContext ctx) {
+                return true;
+            }
+
+            @Override
+            public boolean then(EvaluationContext ctx) {
+                ctx.addEvaluationError(1, 2, null, new IllegalStateException("boom"));
+                return false;
+            }
+        });
+        assertThat(processed.processingErrors()).singleElement().satisfies(e -> {
+            assertThat(e.getCause()).isEqualTo(ProcessingFailureCause.RuleStatementEvaluationError);
+            assertThat(e.getMessage()).isEqualTo("Error evaluating action for rule <r/abc> (pipeline <p/p1>)");
+            assertThat(e.getDetails()).isEqualTo("At 1:2 an exception was thrown: boom");
+        });
     }
 
     @Test
@@ -634,7 +721,9 @@ public class PipelineInterpreterTest {
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
+                disabledCompilerConfigService(),
+                new RuleCompiler(new MetricRegistry())
         );
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
