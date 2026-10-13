@@ -102,6 +102,7 @@ const VIEWS: Array<{ value: View; label: string }> = [
 ];
 
 // The map needs two cheap calls and explains one shard when opened; the list explains up to 50 shards at once.
+// The page header's Explain allocation button asks again.
 const AllocationPanel = ({ onClose, picked, onTogglePicked, onRetry = undefined, shardCounts = {} }: Props) => {
   const [view, setView] = useState<View>('map');
   const list = useAllocationExplain(view === 'list');
@@ -124,14 +125,8 @@ const AllocationPanel = ({ onClose, picked, onTogglePicked, onRetry = undefined,
       actions={
         <ButtonToolbar>
           <SegmentedControl<View> data={VIEWS} value={view} onChange={setView} />
-          <Button
-            bsSize="small"
-            onClick={() => (view === 'map' ? shardMap.refetch() : list.refetch())}
-            disabled={isFetching}>
-            {isFetching ? 'Explaining...' : 'Explain again'}
-          </Button>
           <Button bsSize="small" onClick={onClose}>
-            Hide
+            Close
           </Button>
         </ButtonToolbar>
       }>

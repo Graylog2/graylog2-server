@@ -50,10 +50,9 @@ const WaitingForNarrowing = ({ searchParams }: MiddleSectionProps) =>
 
 type Props = {
   waitForNarrowing: boolean;
-  topRightCol: React.ReactNode;
 };
 
-const IndicesTable = ({ waitForNarrowing, topRightCol }: Props) => {
+const IndicesTable = ({ waitForNarrowing }: Props) => {
   const can = useCanRun();
   const { indices } = useIndexOverview();
   const renderActions = (index: IndexRow) => <IndexRowActions index={index} />;
@@ -70,7 +69,6 @@ const IndicesTable = ({ waitForNarrowing, topRightCol }: Props) => {
       bulkSelection={canActOnAny(indices, can) ? { actions: <IndexBulkActions /> } : undefined}
       entityAttributesAreCamelCase={false}
       searchPlaceholder="Filter by index or index set"
-      topRightCol={topRightCol}
       middleSection={waitForNarrowing ? WaitingForNarrowing : undefined}
       topSection={IndexManagedButtons}
     />

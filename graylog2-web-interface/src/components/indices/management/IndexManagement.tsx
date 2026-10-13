@@ -15,30 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import usePermissions from 'hooks/usePermissions';
 
 import AllocationPanel from './allocation/AllocationPanel';
-import RetryAllocationConfirm from './allocation/RetryAllocationConfirm';
-import { useRetryFailedAllocations } from './allocation/useAllocation';
 import IndicesTable from './IndicesTable';
 import useAllocationPanel from './useAllocationPanel';
 import useIndexOverview from './useIndexOverview';
+import useRetryAllocationsConfirm from './useRetryAllocationsConfirm';
 
 const PICKED = 'index';
 
-// The index list, with the shard allocation panel above it. Indices picked in the panel are the list's "index"
+// The index list, with the shard allocation panel above it (opened from the page header's AllocationActions). Indices picked in the panel are the list's "index"
 // filter, so they show as filter chips and add up to a selection for bulk actions.
 const IndexManagement = () => {
   const { isPermitted } = usePermissions();
   const { indices } = useIndexOverview();
   const [filters, setFilters] = useUrlQueryFilters();
-  const { retryFailed, isRetrying } = useRetryFailedAllocations();
   const [allocationRequested, setShowAllocation] = useAllocationPanel();
-  const [confirmRetry, setConfirmRetry] = useState(false);
+  const { askToRetry, confirmDialog } = useRetryAllocationsConfirm();
 
   const canExplain = isPermitted('indexercluster:read');
   const canRetry = isPermitted('indices:changestate');
@@ -50,29 +46,6 @@ const IndexManagement = () => {
     setFilters(next.length > 0 ? filters.set(PICKED, next) : filters.remove(PICKED));
   };
 
-  const confirmRetryFailed = async () => {
-    try {
-      await retryFailed();
-    } finally {
-      setConfirmRetry(false);
-    }
-  };
-
-  const toolbar = (
-    <ButtonToolbar>
-      {canExplain && (
-        <Button bsSize="small" onClick={() => setShowAllocation(true)} disabled={showAllocation}>
-          Explain allocation
-        </Button>
-      )}
-      {canRetry && (
-        <Button bsSize="small" onClick={() => setConfirmRetry(true)}>
-          Retry failed allocations
-        </Button>
-      )}
-    </ButtonToolbar>
-  );
-
   return (
     <>
       {showAllocation && (
@@ -80,18 +53,12 @@ const IndexManagement = () => {
           onClose={() => setShowAllocation(false)}
           picked={picked}
           onTogglePicked={togglePicked}
-          onRetry={canRetry ? () => setConfirmRetry(true) : undefined}
+          onRetry={canRetry ? askToRetry : undefined}
           shardCounts={Object.fromEntries(indices.map((index) => [index.index, index.primary_shards]))}
         />
       )}
-      <IndicesTable waitForNarrowing={showAllocation} topRightCol={toolbar} />
-      {confirmRetry && (
-        <RetryAllocationConfirm
-          isRetrying={isRetrying}
-          onConfirm={confirmRetryFailed}
-          onCancel={() => setConfirmRetry(false)}
-        />
-      )}
+      <IndicesTable waitForNarrowing={showAllocation} />
+      {confirmDialog}
     </>
   );
 };

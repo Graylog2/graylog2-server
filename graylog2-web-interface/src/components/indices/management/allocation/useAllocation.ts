@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useIsFetching, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { IndexerIndicesManagementAllocation } from '@graylog/server-api';
 
@@ -83,6 +84,32 @@ export const useShardExplanation = (
   return { explanation: data, error, isLoading };
 };
 
+// Every allocation query: the list, the map and single shards.
+const ALLOCATION_QUERY_KEY = ['indices', 'management', 'allocation'];
+
+// Asks OpenSearch again about whatever the shard allocation panel shows (map or list). `isExplaining` covers that, and
+// a panel's first answer, but not the map's quiet background refresh.
+export const useExplainAgain = (): { explainAgain: () => Promise<void>; isExplaining: boolean } => {
+  const queryClient = useQueryClient();
+  const [isRefetching, setIsRefetching] = useState(false);
+  const firstAnswers = useIsFetching({
+    queryKey: ALLOCATION_QUERY_KEY,
+    predicate: (query) => query.state.data === undefined,
+  });
+
+  const explainAgain = async () => {
+    setIsRefetching(true);
+
+    try {
+      await queryClient.refetchQueries({ queryKey: ALLOCATION_QUERY_KEY, type: 'active' });
+    } finally {
+      setIsRefetching(false);
+    }
+  };
+
+  return { explainAgain, isExplaining: isRefetching || firstAnswers > 0 };
+};
+
 export const useRetryFailedAllocations = (): {
   retryFailed: () => Promise<RetryFailedResponse>;
   isRetrying: boolean;
@@ -94,7 +121,7 @@ export const useRetryFailedAllocations = (): {
     onSuccess: (response) => {
       if (response.acknowledged) {
         UserNotification.success(
-          'OpenSearch is retrying failed shard allocations. Explain again in a moment to see the outcome.',
+          'OpenSearch is retrying failed shard allocations. Explain allocation again in a moment to see the outcome.',
           'Retry requested',
         );
       } else {

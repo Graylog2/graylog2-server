@@ -30,6 +30,7 @@ import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQuer
 import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 
+import AllocationActions from './AllocationActions';
 import IndexManagement from './IndexManagement';
 import { fetchIndices } from './fetchIndices';
 import type { IndexRow } from './fetchIndices';
@@ -37,13 +38,7 @@ import type { IndexSummary } from './types';
 
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
-  // Renders what the page hands it for the table's toolbar.
-  default: jest.fn(({ humanName, topRightCol }) => (
-    <div>
-      Paginated {humanName}
-      {topRightCol}
-    </div>
-  )),
+  default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
   useTableFetchContext: jest.fn(),
 }));
 
@@ -103,6 +98,14 @@ const At = ({ url }: { url: string }) => {
   return null;
 };
 
+// As the page: the allocation actions in its header, the list below.
+const Page = () => (
+  <>
+    <AllocationActions />
+    <IndexManagement />
+  </>
+);
+
 const lastTableProps = () => {
   const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
   const { calls } = asMock(PaginatedEntityTable).mock;
@@ -121,7 +124,7 @@ describe('IndexManagement', () => {
   });
 
   it('lists indices in core\'s paginated entity table, with row and bulk actions', async () => {
-    render(<IndexManagement />);
+    render(<Page />);
 
     expect(await screen.findByText('Paginated indices')).toBeInTheDocument();
     await waitFor(() => expect(lastTableProps().bulkSelection?.actions).toBeTruthy());
@@ -135,24 +138,28 @@ describe('IndexManagement', () => {
   });
 
   it('makes the list wait for a pick, search or filter while the allocation panel is open', async () => {
-    render(<IndexManagement />);
+    render(<Page />);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Explain allocation' }));
 
-    expect(screen.getByRole('button', { name: 'Explain allocation' })).toBeDisabled();
+    // Stays usable: once the panel is open, it asks OpenSearch again.
+    expect(screen.getByRole('button', { name: 'Explain allocation' })).toBeEnabled();
     expect(lastTableProps().middleSection).toBeDefined();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Explain allocation' }));
+
+    screen.getByRole('button', { name: 'Pick graylog_1' });
   });
 
   it('opens the allocation panel when the URL asks for it', async () => {
     render(
       <>
         <At url="/?allocation=explain" />
-        <IndexManagement />
+        <Page />
       </>,
     );
 
     await screen.findByRole('button', { name: 'Pick graylog_1' });
-    expect(screen.getByRole('button', { name: 'Explain allocation' })).toBeDisabled();
   });
 
   it('keeps the allocation panel closed for users who may not explain allocation', async () => {
@@ -160,7 +167,7 @@ describe('IndexManagement', () => {
     render(
       <>
         <At url="/?allocation=explain" />
-        <IndexManagement />
+        <Page />
       </>,
     );
 
@@ -169,7 +176,7 @@ describe('IndexManagement', () => {
   });
 
   it("turns a pick in the allocation panel into the list's index filter", async () => {
-    render(<IndexManagement />);
+    render(<Page />);
     await userEvent.click(await screen.findByRole('button', { name: 'Explain allocation' }));
 
     await userEvent.click(screen.getByRole('button', { name: 'Pick graylog_1' }));
@@ -179,7 +186,7 @@ describe('IndexManagement', () => {
 
   it('removes an index from the filter when it is picked again', async () => {
     asMock(useUrlQueryFilters).mockReturnValue([OrderedMap({ index: ['graylog_1'], health: ['red'] }), setFilters]);
-    render(<IndexManagement />);
+    render(<Page />);
     await userEvent.click(await screen.findByRole('button', { name: 'Explain allocation' }));
 
     await userEvent.click(screen.getByRole('button', { name: 'Pick graylog_1' }));
@@ -190,7 +197,7 @@ describe('IndexManagement', () => {
   it('offers explain and retry only to users permitted to use them', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(['indices:read']).build());
 
-    render(<IndexManagement />);
+    render(<Page />);
 
     expect(await screen.findByText('Paginated indices')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Explain allocation' })).not.toBeInTheDocument();

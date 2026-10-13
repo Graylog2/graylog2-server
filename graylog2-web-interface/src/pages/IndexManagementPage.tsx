@@ -21,6 +21,7 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 import IndicesPageNavigation from 'components/indices/IndicesPageNavigation';
+import AllocationActions from 'components/indices/management/AllocationActions';
 import IndexManagement from 'components/indices/management/IndexManagement';
 import usePermissions from 'hooks/usePermissions';
 import Routes from 'routing/Routes';
@@ -46,7 +47,7 @@ const IndexManagementPage = () => {
   return (
     <DocumentTitle title="Indices">
       <IndicesPageNavigation />
-      <PageHeader title="Indices">
+      <PageHeader title="Indices" actions={<AllocationActions />}>
         <span>
           Every index in the cluster with its health, including hidden indices and indices that don&apos;t belong to a
           Graylog index set.
