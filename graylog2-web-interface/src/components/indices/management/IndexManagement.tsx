@@ -19,8 +19,7 @@ import { useState } from 'react';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 import AllocationPanel from './allocation/AllocationPanel';
 import RetryAllocationConfirm from './allocation/RetryAllocationConfirm';
@@ -33,15 +32,15 @@ const PICKED = 'index';
 // The index list, with the shard allocation panel above it. Indices picked in the panel are the list's "index"
 // filter, so they show as filter chips and add up to a selection for bulk actions.
 const IndexManagement = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { indices } = useIndexOverview();
   const [filters, setFilters] = useUrlQueryFilters();
   const { retryFailed, isRetrying } = useRetryFailedAllocations();
   const [showAllocation, setShowAllocation] = useState(false);
   const [confirmRetry, setConfirmRetry] = useState(false);
 
-  const canExplain = isPermitted(currentUser.permissions, 'indexercluster:read');
-  const canRetry = isPermitted(currentUser.permissions, 'indices:changestate');
+  const canExplain = isPermitted('indexercluster:read');
+  const canRetry = isPermitted('indices:changestate');
   const picked = new Set(filters.get(PICKED) ?? []);
 
   const togglePicked = (name: string) => {

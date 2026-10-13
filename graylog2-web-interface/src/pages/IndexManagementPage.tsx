@@ -22,15 +22,14 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 import IndicesPageNavigation from 'components/indices/IndicesPageNavigation';
 import IndexManagement from 'components/indices/management/IndexManagement';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
-import { isPermitted } from 'util/PermissionsMixin';
 
 // As ClusterConfigurationPage: the route itself isn't permission-gated, so the page checks for itself.
 const IndexManagementPage = () => {
-  const currentUser = useCurrentUser();
-  const canRead = isPermitted(currentUser.permissions, 'indices:read');
+  const { isPermitted } = usePermissions();
+  const canRead = isPermitted('indices:read');
   const { push } = useHistory();
 
   // Without the permission the page doesn't exist for the user.

@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 import type { CanRun } from './types';
 
 // Controls follow the permissions the server checks, per index.
 const useCanRun = (): CanRun => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  return (action, index) => isPermitted(currentUser.permissions, action.permission(index));
+  return (action, index) => isPermitted(action.permission(index));
 };
 
 export default useCanRun;
