@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -55,6 +56,20 @@ public class DoubleConversion extends AbstractConversion<Double> {
         } else {
             final String s = String.valueOf(evaluated);
             return firstNonNull(Doubles.tryParse(s), defaultValue);
+        }
+    }
+
+    /** Lazy in {@link #evaluate}: {@code defaultToNull} is only resolved when {@code value} is null. */
+    @PipelineFastPath
+    public Double fastPath(Object value, Double defaultValue, Boolean defaultToNull) {
+        final Double dflt = defaultValue == null ? 0d : defaultValue;
+        if (value == null) {
+            return (defaultToNull != null && defaultToNull) ? null : dflt;
+        } else if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        } else {
+            final String s = String.valueOf(value);
+            return firstNonNull(Doubles.tryParse(s), dflt);
         }
     }
 

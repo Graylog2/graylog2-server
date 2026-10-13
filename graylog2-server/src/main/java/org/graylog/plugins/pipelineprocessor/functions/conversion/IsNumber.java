@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
@@ -40,8 +41,12 @@ public class IsNumber extends AbstractFunction<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object value = valueParam.required(args, context);
-        final boolean convert = conversionParam.optional(args, context).orElse(false);
+        return fastPath(valueParam.required(args, context), conversionParam.required(args, context));
+    }
+
+    @PipelineFastPath
+    public Boolean fastPath(Object value, Boolean attemptConversion) {
+        final boolean convert = attemptConversion != null && attemptConversion;
         if (value instanceof Number) {
             return true;
         }

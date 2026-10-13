@@ -33,7 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FastPathSignatureTest {
     static final Set<String> EXPECTED_FAST_PATH_FUNCTIONS = Set.of("lowercase", "uppercase", "capitalize", "uncapitalize", "swapcase",
             "abbreviate", "contains", "starts_with", "ends_with", "substring", "concat", "replace", "split", "length",
-            "first_non_null");
+            "first_non_null", "to_string", "to_long", "to_double", "to_bool", "to_map", "is_string", "is_long", "is_double",
+            "is_number", "is_bool", "is_collection", "is_list", "is_map");
 
     @Test
     void allFastPathSignaturesMatchTheirDescriptors() throws Exception {

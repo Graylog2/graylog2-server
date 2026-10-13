@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -56,6 +57,20 @@ public class LongConversion extends AbstractConversion<Long> {
         } else {
             final String s = String.valueOf(evaluated);
             return firstNonNull(tryParse(s), defaultValue);
+        }
+    }
+
+    /** Lazy in {@link #evaluate}: {@code defaultToNull} is only resolved when {@code value} is null. */
+    @PipelineFastPath
+    public Long fastPath(Object value, Long defaultValue, Boolean defaultToNull) {
+        final Long dflt = defaultValue == null ? 0L : defaultValue;
+        if (value == null) {
+            return (defaultToNull != null && defaultToNull) ? null : dflt;
+        } else if (value instanceof Number) {
+            return ((Number) value).longValue();
+        } else {
+            final String s = String.valueOf(value);
+            return firstNonNull(tryParse(s), dflt);
         }
     }
 

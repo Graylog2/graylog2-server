@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Collections;
@@ -50,6 +51,21 @@ public class MapConversion extends AbstractConversion<Map> {
 
         if (value == null) {
             return defaultToNull(args, context) ? null : Collections.emptyMap();
+        } else if (value instanceof Map) {
+            return (Map) value;
+        } else if (value instanceof JsonNode) {
+            final JsonNode jsonNode = (JsonNode) value;
+            return MAPPER.convertValue(jsonNode, Map.class);
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    /** Lazy in {@link #evaluate}: {@code defaultToNull} is only resolved when {@code value} is null. */
+    @PipelineFastPath
+    public Map fastPath(Object value, Boolean defaultToNull) {
+        if (value == null) {
+            return (defaultToNull != null && defaultToNull) ? null : Collections.emptyMap();
         } else if (value instanceof Map) {
             return (Map) value;
         } else if (value instanceof JsonNode) {
