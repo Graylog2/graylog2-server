@@ -43,8 +43,7 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const accessibleMenuItems = menuItems.filter(
     ({ requiredFeatureFlag, permissions, useCondition }) =>
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      (useCondition?.() ?? true) &&
-      shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
+      (useCondition?.() ?? true) && shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
   );
 
   if (!accessibleMenuItems.length) {

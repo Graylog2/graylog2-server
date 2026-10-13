@@ -23,7 +23,6 @@ import { Table } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import HelpPanel from 'components/event-definitions/common/HelpPanel';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import useCurrentUser from 'hooks/useCurrentUser';
 import generateId from 'logic/generateId';
 import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
 import Search from 'views/logic/search/Search';
@@ -32,8 +31,8 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import Query from 'views/logic/queries/Query';
 import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
 import Parameter from 'views/logic/parameters/Parameter';
-import type User from 'logic/users/User';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
+import type { IsPermitted } from 'hooks/usePermissions';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 import StreamsContext from 'contexts/StreamsContext';
@@ -139,10 +138,11 @@ const constructSearch = (
     .build();
 };
 
-const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['config']) => {
-  const missingPermissions = config?.streams?.some(
-    (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
-  );
+const isPermittedToSeePreview = (
+  isPermitted: IsPermitted,
+  config: EventDefinition['config'],
+) => {
+  const missingPermissions = config?.streams?.some((stream) => !isPermitted(`streams:read:${stream}`));
 
   return !missingPermissions;
 };
@@ -150,11 +150,11 @@ const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['con
 const useExecutePreview = (config: EventDefinition['config']) => {
   const streams = useContext(StreamsContext);
 
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const queryId = useMemo(() => generateId(), []);
   const searchTypeId = useMemo(() => generateId(), []);
   const { startJob, executeJobResult } = useSearchExecutors();
-  const permitted = isPermittedToSeePreview(currentUser, config);
+  const permitted = isPermittedToSeePreview(isPermitted, config);
   const [debouncedConfig] = useDebouncedValue(config, 250);
   const hasEmbryonicParams = debouncedConfig?.query_parameters?.some(
     (param: LookupTableParameterJsonEmbryonic) => param.embryonic,
@@ -182,8 +182,8 @@ const useExecutePreview = (config: EventDefinition['config']) => {
 };
 
 const FilterPreview = ({ config }: FilterPreviewProps) => {
-  const currentUser = useCurrentUser();
-  const displayPreview = isPermittedToSeePreview(currentUser, config);
+  const { isPermitted } = usePermissions();
+  const displayPreview = isPermittedToSeePreview(isPermitted, config);
   const { isFetching, result: searchResult = {}, errors = [] } = useExecutePreview(config);
   const isFetchingData = isFetching || !searchResult;
   const hasError = errors?.length > 0;

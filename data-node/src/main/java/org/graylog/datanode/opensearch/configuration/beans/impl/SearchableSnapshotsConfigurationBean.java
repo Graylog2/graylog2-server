@@ -25,6 +25,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfigurationProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
@@ -38,12 +39,16 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * This opensearch configuration bean manages searchable snapshots and their S3 or local filesystem configuration.
@@ -60,8 +65,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     private final Configuration localConfiguration;
 
-    private final Set<RepositoryConfiguration> repositoryConfigurations;
-
+    private final Set<RepositoryConfigurationProvider> repositoryProviders;
 
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
@@ -69,10 +73,10 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     public SearchableSnapshotsConfigurationBean(
             Configuration localConfiguration,
             DatanodeConfiguration datanodeConfiguration,
-            Set<RepositoryConfiguration> repositoryConfigurations,
+            Set<RepositoryConfigurationProvider> repositoryProviders,
             Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.repositoryConfigurations = repositoryConfigurations;
+        this.repositoryProviders = repositoryProviders;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
@@ -80,9 +84,10 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
 
-        final Set<RepositoryConfiguration> enabledRepositories = repositoryConfigurations.stream()
+        final List<RepositoryConfiguration> enabledRepositories = repositoryProviders.stream()
+                .flatMap(provider -> provider.get().stream())
                 .filter(RepositoryConfiguration::isRepositoryEnabled)
-                .collect(Collectors.toSet());
+                .toList();
 
         if (!enabledRepositories.isEmpty()) {
             LOG.info("Searchable snapshots are configured, adding opensearch configuration");
@@ -166,23 +171,30 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return returnValue;
     }
 
-    private Map<String, String> properties(boolean searchRoleEnabled, Set<RepositoryConfiguration> enabledRepositories) {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    private Map<String, String> properties(boolean searchRoleEnabled, List<RepositoryConfiguration> enabledRepositories) {
+        final Map<String, String> properties = new LinkedHashMap<>();
 
         if (searchRoleEnabled) { // configure cache only if we also have the search role
-            builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
+            properties.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
         }
 
-        enabledRepositories.stream()
-                .map(RepositoryConfiguration::opensearchProperties)
-                .forEach(builder::putAll);
+        enabledRepositories.forEach(repo -> repo.opensearchProperties().forEach((key, value) ->
+                properties.merge(key, value, (existing, conflicting) -> Objects.equals(existing, conflicting)
+                        ? existing
+                        : repo.mergeProperty(key, existing, conflicting))));
 
-        return builder.build();
+        return ImmutableMap.copyOf(properties);
     }
 
-    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
-        return enabledRepositories.stream()
+    private Collection<OpensearchKeystoreItem> keystoreItems(List<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
+        final Map<String, OpensearchKeystoreItem> items = new LinkedHashMap<>();
+        enabledRepositories.stream()
                 .flatMap(repo -> repo.keystoreItems(configurationParams.datanodeConfiguration().datanodeDirectories()).stream())
-                .collect(Collectors.toSet());
+                .forEach(item -> {
+                    if (items.putIfAbsent(item.key(), item) != null) {
+                        throw new OpensearchConfigurationException(f("Conflicting snapshot repository configuration, keystore item %s is provided by more repositories. Please use distinct client names.", item.key()));
+                    }
+                });
+        return List.copyOf(items.values());
     }
 }

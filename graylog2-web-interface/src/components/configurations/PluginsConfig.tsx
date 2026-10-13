@@ -46,7 +46,9 @@ const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) 
   return (
     <SectionNavItem className={isActive ? 'active' : undefined}>
       <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
-        <NavItem title={displayName} withMinHeight={false}>{displayName}</NavItem>
+        <NavItem title={displayName} withMinHeight={false}>
+          {displayName}
+        </NavItem>
       </LinkContainer>
     </SectionNavItem>
   );

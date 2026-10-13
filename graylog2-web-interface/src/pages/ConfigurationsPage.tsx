@@ -56,7 +56,8 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
       <LinkContainer key={`nav-${name}`} to={name}>
         <NavItem title={name} withMinHeight={false}>
           {name}
-          {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
+          {showCaret &&
+            (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
         </NavItem>
       </LinkContainer>
     </SectionNavItem>
