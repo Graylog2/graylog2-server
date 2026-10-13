@@ -183,7 +183,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
-        <lucene.version>10.5.1</lucene.version>
+        <lucene.version>10.5.2</lucene.version>
         <lz4.version>1.12.0</lz4.version>
         <metrics.version>4.2.40</metrics.version>
         <mongodb-driver.version>5.13.0</mongodb-driver.version>
