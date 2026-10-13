@@ -59,6 +59,8 @@ import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNot
 import org.graylog.integrations.pagerduty.PagerDutyNotification;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfigEntity;
+import org.graylog2.inputs.transports.SyslogTcpTransport;
+import org.graylog2.inputs.transports.UdpTransport;
 import org.graylog2.migrations.V20251030000000_CloudTrailInputConfigMigration;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -192,6 +194,7 @@ public class IntegrationsModule extends PluginModule {
         LOG.debug("Registering message input: {}", PaloAltoTCPInput.NAME);
         addMessageInput(PaloAltoTCPInput.class);
         addCodec(PaloAltoCodec.NAME, PaloAltoCodec.class);
+        requireBinding(SyslogTcpTransport.Factory.class);
 
         // Palo Alto Networks 9x
         LOG.debug("Registering message input: {}", PaloAlto9xInput.NAME);
@@ -204,6 +207,7 @@ public class IntegrationsModule extends PluginModule {
         LOG.debug("Registering message input: {}", PaloAlto11xUdpInput.NAME);
         addMessageInput(PaloAlto11xUdpInput.class);
         addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
+        requireBinding(UdpTransport.Factory.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);

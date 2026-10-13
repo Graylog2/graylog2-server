@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.documentation.Documentation;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
 import org.graylog2.GraylogNodeConfiguration;
+import org.graylog2.bootstrap.AbstractNodeCommand;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.ServerStatus;
 import org.junit.jupiter.api.Test;

@@ -17,7 +17,6 @@
 package org.graylog.datanode.bootstrap;
 
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -30,11 +29,11 @@ import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bootstrap.plugin.DatanodePluginLoader;
-import org.graylog.datanode.bootstrap.preflight.inits.DatanodeBlockingInitService;
 import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
+import org.graylog.datanode.bootstrap.preflight.inits.DatanodeBlockingInitService;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
+import org.graylog2.bootstrap.AbstractNodeCommand;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginLoaderConfig;
 import org.graylog2.plugin.Tools;
@@ -93,12 +92,7 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(chainingClassLoader),
                 new DatanodeConfigurationBindings(),
-                new Module() {
-                    @Override
-                    public void configure(Binder binder) {
-                        preflightCheckModules.forEach(binder::install);
-                    }
-                });
+                binder -> preflightCheckModules.forEach(binder::install));
     }
 
     @Override
@@ -131,7 +125,8 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
             return;
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
+        final var shutdownHook = injector.getInstance(shutdownHook());
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "datanode-shutdown-hook"));
 
         // Start services.
         try {
@@ -153,14 +148,14 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
         // Block forever.
         try {
             Thread.currentThread().join();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 
     @Override
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
-        result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new GenericBindings());
         result.add(new GenericInitializerBindings());
         result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());

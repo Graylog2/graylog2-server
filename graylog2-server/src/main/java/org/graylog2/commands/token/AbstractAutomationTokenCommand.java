@@ -20,13 +20,14 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
-import java.util.List;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bootstrap.AbstractNodeCommand;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+
+import java.util.List;
 
 public abstract class AbstractAutomationTokenCommand extends AbstractNodeCommand {
     protected AbstractAutomationTokenCommand(String commandName) {

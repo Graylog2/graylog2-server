@@ -19,7 +19,7 @@ package org.graylog2.commands.journal;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
 import org.graylog2.Configuration;
-import org.graylog2.commands.AbstractNodeCommand;
+import org.graylog2.bootstrap.AbstractNodeCommand;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.Plugin;

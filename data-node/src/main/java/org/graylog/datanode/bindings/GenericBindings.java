@@ -28,10 +28,8 @@ import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import javax.net.ssl.X509TrustManager;
 
 public class GenericBindings extends Graylog2Module {
-    private final boolean isMigrationCommand;
 
-    public GenericBindings(boolean isMigrationCommand) {
-        this.isMigrationCommand = isMigrationCommand;
+    public GenericBindings() {
     }
 
     @Override

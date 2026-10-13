@@ -26,6 +26,11 @@ import org.graylog.plugins.cef.input.CEFTCPInput;
 import org.graylog.plugins.cef.input.CEFUDPInput;
 import org.graylog.plugins.cef.pipelines.rules.CEFParserFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog2.inputs.transports.AmqpTransport;
+import org.graylog2.inputs.transports.KafkaTransport;
+import org.graylog2.inputs.transports.TcpTransport;
+import org.graylog2.inputs.transports.UdpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.PluginModule;
 
 public class CEFInputModule extends PluginModule {
@@ -34,10 +39,14 @@ public class CEFInputModule extends PluginModule {
         // Register message input.
         addCodec(CEFCodec.NAME, CEFCodec.class);
 
+        requireBinding(UdpTransport.Factory.class);
         addMessageInput(CEFUDPInput.class);
+        requireBinding(TcpTransport.Factory.class);
         addMessageInput(CEFTCPInput.class);
 
+        requireBinding(AmqpTransport.Factory.class);
         addMessageInput(CEFAmqpInput.class);
+        requireBinding(KafkaTransport.Factory.class);
         addMessageInput(CEFKafkaInput.class);
 
         // Register pipeline function.

@@ -141,7 +141,6 @@ import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap implements DocumentedBeansService {
-    protected static final Configuration configuration = new Configuration();
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
@@ -168,11 +167,11 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private boolean local = false;
 
     public Server() {
-        super("server", configuration);
+        super("server", new Configuration());
     }
 
     public Server(String commandName) {
-        super(commandName, configuration);
+        super(commandName, new Configuration());
     }
 
     public boolean isLocal() {
@@ -253,8 +252,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
 
     @Override
     protected @Nonnull List<Object> getNodeCommandConfigurationBeans() {
-        return Arrays.asList(configuration,
-                httpConfiguration,
+        return Arrays.asList(httpConfiguration,
                 elasticsearchConfiguration,
                 elasticsearchClientConfiguration,
                 emailConfiguration,

@@ -45,17 +45,18 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
-import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TLSCipherSuiteSelector;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import jakarta.annotation.Nonnull;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.GraylogNodeConfiguration;
+import org.graylog2.bindings.GraylogNodeModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.NativeLibPathConfiguration;
@@ -88,9 +89,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,22 +106,30 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfiguration> implements CliCommand {
+/**
+ * Inherit from this command to create new standalone node types.
+ * <p>
+ * Loads the configuration and, if the node uses them, the plugins, then creates the injector from
+ * {@link GraylogNodeModule} and the modules of {@link #getNodeCommandBindings(FeatureFlags)}, and finally runs
+ * {@link #startCommand()}.
+ */
+public abstract class AbstractNodeCommand implements CliCommand {
 
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeCommand.class);
 
     protected static final Version version = Version.CURRENT_CLASSPATH;
-    protected static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    protected static final String FILE_SEPARATOR = FileSystems.getDefault().getSeparator();
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final NodeConfiguration configuration;
+    protected final GraylogNodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
+    protected final GraylogNodeModule nodeModule;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
     protected boolean dumpConfig = false;
@@ -142,11 +153,11 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     protected FeatureFlags featureFlags;
     protected PluginLoader pluginLoader;
 
-    protected CmdLineTool(NodeConfiguration configuration) {
+    protected AbstractNodeCommand(GraylogNodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, NodeConfiguration configuration) {
+    protected AbstractNodeCommand(String commandName, final GraylogNodeConfiguration configuration) {
         // Wrap the context class loader to allow logging of failed class and resource lookups.
         Thread.currentThread().setContextClassLoader(new LoggingClassLoader(Thread.currentThread().getContextClassLoader()));
 
@@ -164,15 +175,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         }
         this.configuration = configuration;
         this.chainingClassLoader = new ChainingClassLoader(this.getClass().getClassLoader());
-    }
-
-    /**
-     * Validate the given configuration for this command.
-     *
-     * @return {@code true} if the configuration is valid, {@code false}.
-     */
-    protected boolean validateConfiguration() {
-        return true;
+        this.nodeModule = new GraylogNodeModule(configuration, chainingClassLoader);
     }
 
     public boolean isDumpConfig() {
@@ -187,9 +190,21 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         return debug;
     }
 
-    protected abstract List<Module> getCommandBindings(FeatureFlags featureFlags);
+    private List<Module> getCommandBindings(final FeatureFlags featureFlags) {
+        final List<Module> modules = Lists.newArrayList(nodeModule);
+        modules.addAll(getNodeCommandBindings(featureFlags));
+        return modules;
+    }
 
-    protected abstract List<Object> getCommandConfigurationBeans();
+    protected abstract @Nonnull List<Module> getNodeCommandBindings(final FeatureFlags featureFlags);
+
+    protected final List<Object> getCommandConfigurationBeans() {
+        final List<Object> configurationBeans = new ArrayList<>(nodeModule.getConfigurationBeans());
+        configurationBeans.addAll(getNodeCommandConfigurationBeans());
+        return configurationBeans;
+    }
+
+    protected abstract @Nonnull List<Object> getNodeCommandConfigurationBeans();
 
     public boolean isMigrationCommand() {
         return commandName.equals(MigrateCmd.MIGRATION_COMMAND);
@@ -197,7 +212,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
-     * Please note that this happens *before* the configuration file has been parsed.
+     * Runs before the configuration beans are processed, so configuration still holds defaults;
+     * read what you need from configFile directly, as the TLS setup here does.
      */
     protected void beforeStart() {
         // This needs to run before the first SSLContext is instantiated,
@@ -282,16 +298,16 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     @Override
     public void run() {
         // Setup logger first to ensure we can log any caught Throwable to the configured log file
-        final Level logLevel = setupLogger();
+        setupLogger();
         try {
-            doRun(logLevel);
+            doRun();
         } catch (Throwable e) {
             LOG.error("Startup error:", e);
             throw e;
         }
     }
 
-    public void doRun(Level logLevel) {
+    public void doRun() {
         if (configuration instanceof NativeLibPathConfiguration) {
             NativeLibPathConfiguration pathConfiguration = parseAndGetNativeLibPathConfiguration(configFile);
 
@@ -350,12 +366,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
             dumpCurrentConfigAndExit();
         }
 
-        if (!validateConfiguration()) {
-            LOG.error("Validating configuration file failed - exiting.");
-            System.exit(1);
-        }
-
-
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
@@ -376,10 +386,10 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
         addInstrumentedAppender(metricRegistry);
         // Report metrics via JMX.
-        final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
-        reporter.start();
-
-        startCommand();
+        try (final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build()) {
+            reporter.start();
+            startCommand();
+        }
     }
 
     protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
@@ -435,7 +445,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected abstract void startCommand();
 
-    protected Level setupLogger() {
+    protected void setupLogger() {
         final Level logLevel;
         if (isDebug()) {
             LOG.info("Running in Debug mode");
@@ -450,8 +460,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         }
 
         initializeLogging(logLevel);
-
-        return logLevel;
     }
 
     private void initializeLogging(final Level logLevel) {
@@ -520,7 +528,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
                     LOG.info("Loaded plugin: {}", plugin);
                     plugins.add(plugin);
                 } else {
-                    LOG.error("Plugin \"" + metadata.getName() + "\" requires version " + metadata.getRequiredVersion() + " - not loading!");
+                    LOG.error("Plugin \"{}\" requires version {} - not loading!", metadata.getName(), metadata.getRequiredVersion());
                 }
             } else {
                 LOG.debug("Skipping plugin \"{}\" because some capabilities are missing ({}).",
@@ -587,7 +595,6 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         builder.add(binder -> {
             binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
             featureFlagsBinding(binder);
-            binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
         });
         return doCreateInjector(builder.build());
     }

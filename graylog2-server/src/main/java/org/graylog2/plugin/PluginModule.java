@@ -98,10 +98,13 @@ public abstract class PluginModule extends Graylog2Module {
         return Collections.emptySet();
     }
 
-    protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
-        installInput(inputsMapBinder(), messageInputClass);
-    }
-
+    /**
+     * Deprecated in favor of {@link Graylog2Module#addMessageInput(Class)}, that now auto-detects all relevant bindings.
+     * @param messageInputClass input
+     * @param factoryClass which factory class to use
+     * @param <T> concrete input type
+     */
+    @Deprecated(forRemoval = true)
     protected <T extends MessageInput> void addMessageInput(Class<T> messageInputClass,
                                                             Class<? extends MessageInput.Factory<T>> factoryClass) {
         installInput(inputsMapBinder(), messageInputClass, factoryClass);
