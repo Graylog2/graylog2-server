@@ -46,7 +46,8 @@ const ChangeFieldType = ({ field, onClose }: ActionComponentProps<AdditionalView
 const hasMappingPermission = ({ isPermitted }: ActionHandlerArguments['contexts']) =>
   !!isPermitted?.('typemappings:edit');
 
-export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(contexts);
+export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) =>
+  !isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(contexts);
 
 export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
   if (hasMappingPermission(contexts)) return null;
