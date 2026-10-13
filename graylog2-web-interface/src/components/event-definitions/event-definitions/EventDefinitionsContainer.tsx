@@ -26,6 +26,7 @@ import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import PriorityName from 'components/events/events/PriorityName';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -57,6 +58,7 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       staticWidth: 100,
     },
     priority: {
+      renderCell: (priority: number) => <PriorityName priority={priority} />,
       staticWidth: 100,
     },
     '_entity_source.source': {
