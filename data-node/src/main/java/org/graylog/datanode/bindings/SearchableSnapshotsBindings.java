@@ -17,14 +17,16 @@
 package org.graylog.datanode.bindings;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.configuration.snapshots.LocalRepositoryConfigurationProvider;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfigurationProvider;
 
 import java.util.Set;
 
 /**
- * The sole purpose of this module is to provide repositories as Set<RepositoryConfiguration> for injection.
+ * Registers the repositories defined in the datanode configuration file as a {@link RepositoryConfigurationProvider}.
+ * Plugins can contribute further providers to the same multibinder.
  */
 public class SearchableSnapshotsBindings extends AbstractModule {
     private final Set<RepositoryConfiguration> repositories;
@@ -35,7 +37,7 @@ public class SearchableSnapshotsBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        final Multibinder<RepositoryConfiguration> multibinder = Multibinder.newSetBinder(binder(), RepositoryConfiguration.class);
-        repositories.forEach(r -> multibinder.addBinding().toInstance(r));
+        Multibinder.newSetBinder(binder(), RepositoryConfigurationProvider.class)
+                .addBinding().toInstance(new LocalRepositoryConfigurationProvider(repositories));
     }
 }

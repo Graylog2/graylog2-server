@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import type * as Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -25,7 +23,7 @@ import Spinner from 'components/common/Spinner';
 import useStreamOutputMutations from 'hooks/useStreamOutputMutations';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import useAvailableOutputTypes, { getOutputTypeDefinition } from 'components/streams/useAvailableOutputTypes';
 import useOutputs from 'hooks/useOutputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
@@ -37,10 +35,10 @@ import AssignOutputDropdown from './AssignOutputDropdown';
 
 type Props = {
   streamId?: string;
-  permissions: Immutable.List<Permission>;
 };
 
-const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
+const OutputsComponent = ({ streamId = undefined }: Props) => {
+  const { isPermitted } = usePermissions();
   const sendTelemetry = useSendTelemetry();
   const { data: types } = useAvailableOutputTypes();
   const { data: allOutputsData, refetch: refetchOutputs } = useOutputs();
@@ -164,7 +162,7 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
   );
 
   if (outputs && types && (!streamId || assignableOutputs)) {
-    const createOutputDropdown = isPermitted(permissions, ['outputs:create']) ? (
+    const createOutputDropdown = isPermitted(['outputs:create']) ? (
       <CreateOutputDropdown types={types} onSubmit={_handleCreateOutput} getTypeDefinition={getTypeDefinition} />
     ) : null;
     const assignOutputDropdown = streamId ? (

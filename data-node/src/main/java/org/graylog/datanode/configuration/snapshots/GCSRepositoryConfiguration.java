@@ -30,13 +30,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class GCSRepositoryConfiguration implements RepositoryConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(GCSRepositoryConfiguration.class);
 
+    private final String clientName;
+
     @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
     @Parameter(value = "gcs_credentials_file")
     private Path gcsCredentialsFile;
+
+    /**
+     * Configuration of the default GCS client, populated from the datanode configuration file.
+     */
+    public GCSRepositoryConfiguration() {
+        this.clientName = DEFAULT_CLIENT_NAME;
+    }
+
+    public GCSRepositoryConfiguration(String clientName, Path credentialsFile) {
+        this.clientName = clientName;
+        this.gcsCredentialsFile = credentialsFile;
+    }
 
     @Override
     public boolean isRepositoryEnabled() {
@@ -50,9 +66,9 @@ public class GCSRepositoryConfiguration implements RepositoryConfiguration {
 
     @Override
     public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
-        LOG.info("Google Cloud Storage repository configured, adding credentials file to opensearch keystore");
+        LOG.info("Google Cloud Storage repository configured, adding credentials file of client {} to opensearch keystore", clientName);
         return List.of(datanodeDirectories.resolveConfigurationSourceFile(gcsCredentialsFile)
-                .map(credentialsFile -> new OpensearchKeystoreFileItem("gcs.client.default.credentials_file", credentialsFile))
+                .map(credentialsFile -> new OpensearchKeystoreFileItem(f("gcs.client.%s.credentials_file", clientName), credentialsFile))
                 .orElseThrow(() -> new IllegalArgumentException("Failed to resolve Google Cloud Storage credentials file. File not found: " + gcsCredentialsFile))
         );
     }
