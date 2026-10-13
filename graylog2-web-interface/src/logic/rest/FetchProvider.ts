@@ -195,9 +195,9 @@ export class Builder {
   }
 
   // Resolves with the body as it arrives. Aborting rejects with the abort's error, not as a server error.
-  stream(body: any, mimeType: string, signal?: AbortSignal) {
+  ndjsonStream(body: any, signal?: AbortSignal) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
-    this.accept = mimeType;
+    this.accept = 'application/x-ndjson';
     this.signal = signal;
 
     this.responseHandler = (resp: Response) => {
@@ -337,10 +337,9 @@ export function fetchStream(
   method: Method,
   url: string,
   body: any,
-  mimeType: string,
   signal?: AbortSignal,
 ): Promise<ReadableStream<Uint8Array>> {
-  const promise = () => new Builder(method, url).stream(body, mimeType, signal).build();
+  const promise = () => new Builder(method, url).ndjsonStream(body, signal).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }

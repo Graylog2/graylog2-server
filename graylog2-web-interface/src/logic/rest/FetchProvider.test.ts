@@ -261,13 +261,13 @@ describe('FetchProvider', () => {
   });
 
   it('streams the body of a response it accepts', async () => {
-    const body = await fetchStream('POST', `${baseUrl}/stream`, {}, 'application/x-ndjson');
+    const body = await fetchStream('POST', `${baseUrl}/stream`, {});
 
     expect(body).toBeTruthy();
   });
 
   it('removes local session if a stream returns 401', async () => {
-    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}, 'application/x-ndjson').catch(
+    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch(
       (e) => e,
     );
 
@@ -279,7 +279,7 @@ describe('FetchProvider', () => {
     const controller = new AbortController();
     controller.abort();
 
-    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, 'application/x-ndjson', controller.signal).catch(
+    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch(
       (e) => e,
     );
 
