@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
+import { Icon } from 'components/common';
 
 import CopyGlyph, { copyId } from './CopyGlyph';
 import type { IndexViewProps } from './CopyGlyph';
@@ -47,12 +48,19 @@ const IndexBox = styled.div<{ $open: boolean }>(
   `,
 );
 
-// The index's name, a hairline under it; long names cut at the end (full name in the title).
-const NameStrip = styled.div(
-  ({ theme }) => css`
+// The index's name, a hairline under it; long names cut at the end (full name in the title). Clicking it adds the
+// index to the list below, or takes it out again; while it's in, the name is bold with a tick, as in the list view.
+const NameStrip = styled(Button)<{ $picked: boolean }>(
+  ({ theme, $picked }) => css`
+    display: block;
+    width: 100%;
+    padding: 0;
     font-family: ${theme.fonts.family.monospace};
     font-size: ${theme.fonts.size.small};
+    font-weight: ${$picked ? 'bold' : 'normal'};
+    border: 0;
     border-bottom: 1px solid ${theme.colors.gray[80]};
+    border-radius: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -99,6 +107,7 @@ const IndexPile = ({
   onTogglePicked,
 }: IndexViewProps) => {
   const { shown, toggle } = indexContent(group, expanded);
+  const isPicked = picked.has(group.index);
   // Fill from the bottom: the problems (first in `shown`) end up on the bottom row, where the pile starts.
   const sizes = expanded ? pileRows(shown.length).reverse() : [shown.length];
   const starts = sizes.map((_size, i) => sizes.slice(0, i).reduce((sum, size) => sum + size, 0));
@@ -106,7 +115,16 @@ const IndexPile = ({
 
   return (
     <IndexBox $open={expanded} aria-label={`Index ${group.index}`}>
-      <NameStrip title={group.index}>{group.index}</NameStrip>
+      <NameStrip
+        bsStyle="link"
+        bsSize="xsmall"
+        $picked={isPicked}
+        title={isPicked ? `Remove ${group.index} from the list below` : `Add ${group.index} to the list below`}
+        onClick={() => onTogglePicked(group.index)}>
+        {isPicked && <Icon name="check" />}
+        {isPicked && ' '}
+        {group.index}
+      </NameStrip>
       <Stack>
         {rows.map((row) => (
           <Row key={row.map(copyId).join()}>

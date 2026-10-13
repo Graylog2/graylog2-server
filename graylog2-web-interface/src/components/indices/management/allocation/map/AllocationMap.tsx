@@ -22,11 +22,12 @@ import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
 import SegmentedControl from 'components/bootstrap/SegmentedControl';
 
-import { layout } from './mapLayout';
+import { layout, situationsOf } from './mapLayout';
 import type { Container, GroupBy } from './mapLayout';
 import IndexPile from './IndexPile';
 
 import { plural } from '../format';
+import { useAllocationExplain } from '../useAllocation';
 import type { ShardMapResponse } from '../../types';
 
 const Toolbar = styled.div(
@@ -130,7 +131,11 @@ const AllocationMap = ({ map, shardCounts, picked, onTogglePicked }: Props) => {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<string | undefined>(undefined);
   const [showAll, setShowAll] = useState(false);
-  const { containers, quietNodes } = layout(map, groupBy, expanded, showAll);
+  // By cause, unassigned copies go by what explaining them found, as in the list view (same, cached request).
+  const byCause = groupBy === 'cause';
+  const { explanation, isFetching: isExplaining } = useAllocationExplain(byCause);
+  const situations = byCause ? situationsOf(explanation?.explained ?? []) : undefined;
+  const { containers, quietNodes } = layout(map, groupBy, expanded, showAll, situations);
   const healthyCopies = map.shards.filter((copy) => copy.state === 'STARTED').length;
 
   const scope = (() => {
@@ -167,6 +172,7 @@ const AllocationMap = ({ map, shardCounts, picked, onTogglePicked }: Props) => {
           Click a shard for what happened and what to do.
         </Legend>
         <Scope>
+          {byCause && isExplaining && <span>Finding out why...</span>}
           <span>{scope}</span>
           <Button bsSize="xsmall" onClick={() => setShowAll(!showAll)} aria-pressed={showAll}>
             {showAll ? 'Show problems only' : `Show ${quietNodes > 0 ? 'all nodes' : 'everything'}`}

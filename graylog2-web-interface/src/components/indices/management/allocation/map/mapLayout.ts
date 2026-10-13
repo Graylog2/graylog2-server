@@ -18,7 +18,7 @@
 // Only copies with a problem are shown, plus every copy of the indices the user opened, so the map stays small
 // on large clusters: healthy nodes are only counted.
 import { situationTitle } from '../diagnosisText';
-import type { MapCopy, ShardMapResponse } from '../../types';
+import type { MapCopy, ShardExplanation, ShardMapResponse, Situation } from '../../types';
 
 export type GroupBy = 'node' | 'index' | 'cause';
 
@@ -52,9 +52,21 @@ const compareText = (a: string, b: string) => a.localeCompare(b, undefined, { nu
 // (its data is there), else a container for copies whose node left, else one for copies on no node at all.
 const nodeKey = (copy: MapCopy) => copy.node ?? copy.failed_on_node ?? (copy.left_node ? LEFT : UNPLACED);
 
-const causeKey = (copy: MapCopy) => {
+// Situations by shard copy, from explaining them: the map's own quick look can't tell most causes apart.
+export type Situations = Map<string, Situation>;
+
+const situationKey = (index: string, shard: number, primary: boolean) => `${index}[${shard}]${primary ? 'p' : 'r'}`;
+
+export const situationsOf = (explained: Array<ShardExplanation>): Situations =>
+  new Map(
+    explained
+      .filter((shard) => shard.diagnosis?.situation)
+      .map((shard) => [situationKey(shard.index, shard.shard, shard.primary), shard.diagnosis.situation]),
+  );
+
+const causeKeyWith = (situations: Situations) => (copy: MapCopy) => {
   if (copy.state === 'UNASSIGNED') {
-    return copy.situation ?? 'UNKNOWN';
+    return situations.get(situationKey(copy.index, copy.shard, copy.primary)) ?? copy.situation ?? 'UNKNOWN';
   }
 
   return copy.state;
@@ -87,9 +99,16 @@ const KIND_ORDER: { [kind in ContainerKind]: number } = { unplaced: 0, left: 1, 
 const byPrimaryFirst = (a: MapCopy, b: MapCopy) => a.shard - b.shard || Number(b.primary) - Number(a.primary);
 
 // `showAll`: every copy on the map, healthy ones included, and (by node) also nodes that hold nothing.
-export const layout = (map: ShardMapResponse, groupBy: GroupBy, expanded: Set<string>, showAll = false): MapLayout => {
+// `situations`: what explaining the unassigned copies found, preferred over the map's own guess when grouping by cause.
+export const layout = (
+  map: ShardMapResponse,
+  groupBy: GroupBy,
+  expanded: Set<string>,
+  showAll = false,
+  situations: Situations = new Map(),
+): MapLayout => {
   const visible = map.shards.filter((copy) => showAll || hasProblem(copy) || expanded.has(copy.index));
-  const keyOf = { node: nodeKey, index: (copy: MapCopy) => copy.index, cause: causeKey }[groupBy];
+  const keyOf = { node: nodeKey, index: (copy: MapCopy) => copy.index, cause: causeKeyWith(situations) }[groupBy];
 
   const containers = new Map<string, Map<string, Array<MapCopy>>>();
 

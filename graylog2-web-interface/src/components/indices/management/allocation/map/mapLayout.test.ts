@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { copyLabel, indexContent, layout, pileRows } from './mapLayout';
+import { copyLabel, indexContent, layout, pileRows, situationsOf } from './mapLayout';
 
-import type { MapCopy, ShardMapResponse } from '../../types';
+import type { MapCopy, ShardExplanation, ShardMapResponse } from '../../types';
 
 const copy = (index: string, overrides: Partial<MapCopy> = {}): MapCopy => ({
   index,
@@ -59,6 +59,21 @@ const map: ShardMapResponse = {
 const titles = (containers: ReturnType<typeof layout>['containers']) => containers.map((c) => c.title);
 
 describe('layout', () => {
+  it('groups unassigned copies by cause as explaining them found, else by the map\'s own guess', () => {
+    const explained = [
+      { index: 'graylog_19', shard: 0, primary: true, diagnosis: { situation: 'ALLOCATION_FILTER' } },
+      { index: 'logs', shard: 1, primary: false, diagnosis: { situation: 'TOO_FEW_NODES' } },
+    ] as Array<ShardExplanation>;
+
+    const { containers } = layout(map, 'cause', new Set(), false, situationsOf(explained));
+    const indicesIn = (title: string) => containers.find((c) => c.title === title)?.indices.map((g) => g.index);
+
+    expect(indicesIn('Kept off by a filter')).toEqual(['graylog_19']);
+    expect(indicesIn('More replicas than nodes')).toEqual(['logs']);
+    expect(indicesIn('Damaged transaction log')).toEqual(['graylog_17', 'graylog_18']);
+    expect(indicesIn('Moving to another node')).toEqual(['graylog_15']);
+  });
+
   it('puts each problem copy where its data is, copies on no node first, healthy nodes only counted', () => {
     const { containers, quietNodes } = layout(map, 'node', new Set());
 
