@@ -249,7 +249,7 @@ declare module 'graylog-web-plugin/plugin' {
     collectors: 'create';
     // Do we need both of the following?
     clusterconfig: 'read';
-    clusterconfigentry: 'read' | 'edit';
+    clusterconfigentry: 'read' | 'create' | 'edit' | 'delete';
     clusterconfiguration: 'read';
     clusterhealth: 'read';
     collector_fleets: 'read';
