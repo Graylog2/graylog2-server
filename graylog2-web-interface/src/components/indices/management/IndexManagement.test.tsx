@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect } from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { OrderedMap } from 'immutable';
@@ -24,6 +25,7 @@ import { IndexerIndicesManagement } from '@graylog/server-api';
 import asMock from 'helpers/mocking/AsMock';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useHistory from 'routing/useHistory';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -91,6 +93,16 @@ const searchParams = (overrides: Partial<SearchParams> = {}): SearchParams => ({
   ...overrides,
 });
 
+// Arrives with the URL a link (e.g. the cluster health summary's) points to.
+const At = ({ url }: { url: string }) => {
+  const { replace } = useHistory();
+  useEffect(() => {
+    replace(url);
+  }, [replace, url]);
+
+  return null;
+};
+
 const lastTableProps = () => {
   const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
   const { calls } = asMock(PaginatedEntityTable).mock;
@@ -129,6 +141,31 @@ describe('IndexManagement', () => {
 
     expect(screen.getByRole('button', { name: 'Explain allocation' })).toBeDisabled();
     expect(lastTableProps().middleSection).toBeDefined();
+  });
+
+  it('opens the allocation panel when the URL asks for it', async () => {
+    render(
+      <>
+        <At url="/?allocation=explain" />
+        <IndexManagement />
+      </>,
+    );
+
+    await screen.findByRole('button', { name: 'Pick graylog_1' });
+    expect(screen.getByRole('button', { name: 'Explain allocation' })).toBeDisabled();
+  });
+
+  it('keeps the allocation panel closed for users who may not explain allocation', async () => {
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(['indices:read']).build());
+    render(
+      <>
+        <At url="/?allocation=explain" />
+        <IndexManagement />
+      </>,
+    );
+
+    expect(await screen.findByText('Paginated indices')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Pick graylog_1' })).not.toBeInTheDocument();
   });
 
   it("turns a pick in the allocation panel into the list's index filter", async () => {

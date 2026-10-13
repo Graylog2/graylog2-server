@@ -25,6 +25,7 @@ import AllocationPanel from './allocation/AllocationPanel';
 import RetryAllocationConfirm from './allocation/RetryAllocationConfirm';
 import { useRetryFailedAllocations } from './allocation/useAllocation';
 import IndicesTable from './IndicesTable';
+import useAllocationPanel from './useAllocationPanel';
 import useIndexOverview from './useIndexOverview';
 
 const PICKED = 'index';
@@ -36,11 +37,12 @@ const IndexManagement = () => {
   const { indices } = useIndexOverview();
   const [filters, setFilters] = useUrlQueryFilters();
   const { retryFailed, isRetrying } = useRetryFailedAllocations();
-  const [showAllocation, setShowAllocation] = useState(false);
+  const [allocationRequested, setShowAllocation] = useAllocationPanel();
   const [confirmRetry, setConfirmRetry] = useState(false);
 
   const canExplain = isPermitted('indexercluster:read');
   const canRetry = isPermitted('indices:changestate');
+  const showAllocation = canExplain && allocationRequested;
   const picked = new Set(filters.get(PICKED) ?? []);
 
   const togglePicked = (name: string) => {
