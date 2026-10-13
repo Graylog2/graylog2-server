@@ -63,7 +63,7 @@ const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange 
     toggleAddNotificationForm();
   };
 
-  const handleRemoveNotification = (notificationId) => {
+  const handleRemoveNotification = (notificationId: string) => {
     const notification = eventDefinition.notifications.find((n) => n.notification_id === notificationId);
     const nextNotifications = without(eventDefinition.notifications, notification);
 
