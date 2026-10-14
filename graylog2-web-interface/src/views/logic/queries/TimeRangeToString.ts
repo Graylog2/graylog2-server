@@ -16,10 +16,10 @@
  */
 
 import moment from 'moment';
+
 import 'moment-duration-format';
 import 'moment-precise-range-plugin';
-import i18n from 'i18next';
-
+import i18n from 'i18n';
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { EffectiveTimeRange } from 'components/events/EventsHistogram';
@@ -28,7 +28,8 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
   const rangeAsSeconds = timerange?.[fieldName];
   const allTimeLabel = i18n.t('time_range.all_time', { ns: 'search', defaultValue: 'All Time' });
   const nowLabel = i18n.t('time_range.now', { ns: 'search', defaultValue: 'Now' });
-  const fallback = placeholder !== undefined ? placeholder : (fieldName === 'to' ? nowLabel : allTimeLabel);
+  const defaultFallback = fieldName === 'to' ? nowLabel : allTimeLabel;
+  const fallback = placeholder ?? defaultFallback;
 
   if (!rangeAsSeconds) {
     return fallback;

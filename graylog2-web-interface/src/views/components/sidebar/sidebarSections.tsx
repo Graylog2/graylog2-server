@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import i18n from 'i18next';
 
+import i18n from 'i18n';
 import type { IconName } from 'components/common/Icon';
 import ViewsHighlightingRules from 'views/components/sidebar/highlighting/ViewsHighlightingRules';
 
@@ -41,14 +41,18 @@ export type SidebarSection = {
 const sidebarSections: Array<SidebarSection> = [
   {
     key: 'viewDescription',
-    get title() { return i18n.t('sidebar.description', { ns: 'search' }); },
+    get title() {
+      return i18n.t('sidebar.description', { ns: 'search' });
+    },
     icon: 'info',
     content: ({ results }: SidebarSectionProps) => <ViewDescription results={results} />,
   },
   {
     key: 'create',
     icon: 'add',
-    get title() { return i18n.t('sidebar.create', { ns: 'search' }); },
+    get title() {
+      return i18n.t('sidebar.create', { ns: 'search' });
+    },
     content: ({ toggleSidebar, sidebarIsPinned }: SidebarSectionProps) => (
       <AddWidgetButton onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
     ),
@@ -56,13 +60,17 @@ const sidebarSections: Array<SidebarSection> = [
   {
     key: 'highlighting',
     icon: 'format_paragraph',
-    get title() { return i18n.t('sidebar.highlighting', { ns: 'search' }); },
+    get title() {
+      return i18n.t('sidebar.highlighting', { ns: 'search' });
+    },
     content: () => <ViewsHighlightingRules />,
   },
   {
     key: 'fieldList',
     icon: 'subscript',
-    get title() { return i18n.t('sidebar.fields', { ns: 'search' }); },
+    get title() {
+      return i18n.t('sidebar.fields', { ns: 'search' });
+    },
     content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
   },
 ];
