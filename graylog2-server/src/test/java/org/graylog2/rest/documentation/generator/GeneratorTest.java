@@ -24,11 +24,20 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jayway.jsonpath.ReadContext;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.resources.HelloWorldResource;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.documentation.generator.Generator;
@@ -41,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -63,6 +73,27 @@ public class GeneratorTest {
         @Operation(summary = "A few details about the Graylog node.")
         @Produces(MediaType.APPLICATION_JSON)
         public SampleResponse sample() {
+            return null;
+        }
+    }
+
+    @Tag(name = "Undocumented", description = "Parameters without OpenAPI annotations")
+    @Path("/undocumented")
+    public class UndocumentedParametersResource {
+        @PUT
+        @Path("/{id}/{name}")
+        @Operation(summary = "Update")
+        public SampleEntity update(@PathParam("id") String id,
+                                   @PathParam("name") String name,
+                                   @QueryParam("variant") String variant,
+                                   @Valid SampleEntity entity,
+                                   @Context User user) {
+            return null;
+        }
+
+        @GET
+        @Operation(summary = "List")
+        public List<SampleEntity> list(@Parameter(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters) {
             return null;
         }
     }
@@ -105,6 +136,35 @@ public class GeneratorTest {
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.foo.required", String.class)).isEqualTo("false");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.another_entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
+    }
+
+    @Test
+    public void includesParametersWithoutOpenApiAnnotations() throws Exception {
+        final var result = jsonPath(createGenerator(UndocumentedParametersResource.class).generateForRoute("/undocumented", "http://localhost:12900/"));
+
+        final List<Map<String, Object>> parameters = result.read("$.apis[?(@.path == '/undocumented/{id}/{name}')].operations[0].parameters[*]");
+        assertThat(parameters).extracting(p -> p.get("name"), p -> p.get("paramType"), p -> p.get("required"))
+                .containsExactly(
+                        tuple("id", "path", true),
+                        tuple("name", "path", true),
+                        tuple("variant", "query", false),
+                        tuple("JSON body", "body", true)
+                );
+    }
+
+    @Test
+    public void expandsBeanParametersIntoQueryParameters() throws Exception {
+        final var result = jsonPath(createGenerator(UndocumentedParametersResource.class).generateForRoute("/undocumented", "http://localhost:12900/"));
+
+        final List<Map<String, Object>> parameters = result.read("$.apis[?(@.path == '/undocumented')].operations[0].parameters[*]");
+        assertThat(parameters).extracting(p -> p.get("name"), p -> p.get("paramType"), p -> p.get("defaultValue"))
+                .containsExactly(
+                        tuple("query", "query", null),
+                        tuple("page", "query", "1"),
+                        tuple("per_page", "query", "50"),
+                        tuple("sort", "query", null),
+                        tuple("order", "query", "asc")
+                );
     }
 
     private Generator createGenerator(Class<?> resource) {
