@@ -37,7 +37,7 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
 `;
 
 const ButtonLabel = ({ children }: React.PropsWithChildren) => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('common');
   const { refreshConfig } = useAutoRefresh();
 
   if (!refreshConfig?.enabled) {
@@ -78,7 +78,7 @@ const RefreshControls = ({
   minimumRefreshInterval,
   defaultInterval,
 }: Props) => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('common');
   const { refreshConfig, startAutoRefresh, stopAutoRefresh, animationId } = useAutoRefresh();
 
   const selectInterval = useCallback(

@@ -33,7 +33,7 @@ export const DEFAULT_LANGUAGE: LanguageCode = 'en';
 
 export const LANGUAGES: Array<Language> = [
   { code: 'en', name: 'English', beta: false },
-  { code: 'de', name: 'Deutsch', beta: false },
+  { code: 'de', name: 'Deutsch', beta: true },
   { code: PSEUDO_LANGUAGE, name: 'Pseudo', beta: false, developmentOnly: true },
 ];
 

@@ -123,16 +123,6 @@
     "loading": "Laden...",
     "configure_presets": "Voreinstellungen konfigurieren"
   },
-  "refresh": {
-    "not_updating": "Keine Aktualisierung",
-    "every": "Alle",
-    "pause": "Aktualisierung pausieren",
-    "start": "Aktualisierung starten"
-  },
-  "bulk_actions": {
-    "title": "Massenaktionen",
-    "cancel": "Auswahl aufheben"
-  },
   "execution_info": {
     "query_executed": "Abfrage ausgeführt in {{duration}}ms um",
     "total_results": "Gesamte Ergebnisse: {{total}}",

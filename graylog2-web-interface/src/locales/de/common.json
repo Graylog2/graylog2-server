@@ -17,5 +17,15 @@
     "seconds_other": "{{count}} Sekunden",
     "milliseconds_one": "{{count}} Millisekunde",
     "milliseconds_other": "{{count}} Millisekunden"
+  },
+  "bulk_actions": {
+    "title": "Massenaktionen",
+    "cancel": "Auswahl aufheben"
+  },
+  "refresh": {
+    "not_updating": "Keine Aktualisierung",
+    "every": "Alle",
+    "pause": "Aktualisierung pausieren",
+    "start": "Aktualisierung starten"
   }
 }

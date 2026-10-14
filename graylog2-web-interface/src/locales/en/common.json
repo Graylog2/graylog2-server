@@ -14,5 +14,15 @@
     "seconds_other": "{{count}} seconds",
     "milliseconds_one": "{{count}} millisecond",
     "milliseconds_other": "{{count}} milliseconds"
+  },
+  "bulk_actions": {
+    "title": "Bulk actions",
+    "cancel": "Cancel selection"
+  },
+  "refresh": {
+    "not_updating": "Not updating",
+    "every": "Every",
+    "pause": "Pause Refresh",
+    "start": "Start Refresh"
   }
 }

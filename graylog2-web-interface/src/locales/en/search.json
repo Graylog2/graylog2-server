@@ -123,16 +123,6 @@
     "loading": "Loading...",
     "configure_presets": "Configure presets"
   },
-  "refresh": {
-    "not_updating": "Not updating",
-    "every": "Every",
-    "pause": "Pause Refresh",
-    "start": "Start Refresh"
-  },
-  "bulk_actions": {
-    "title": "Bulk actions",
-    "cancel": "Cancel selection"
-  },
   "execution_info": {
     "query_executed": "Query executed in {{duration}}ms at",
     "total_results": "Total results: {{total}}",

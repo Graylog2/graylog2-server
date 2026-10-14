@@ -25,7 +25,7 @@ import type { BsSize } from 'components/bootstrap/types';
 import useSelectedEntities from './hooks/useSelectedEntities';
 
 const BulkActionsDropdown = ({ children = undefined, bsSize = 'small' }: PropsWithChildren<{ bsSize?: BsSize }>) => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('common');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
 
