@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import { MenuItem } from 'components/bootstrap';
@@ -87,19 +88,25 @@ export const FilterConfiguration = ({
   filter = undefined,
   filterValueRenderer,
   onSubmit,
-}: FilterComponentProps) => (
-  <>
-    <MenuItem header>
-      {filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter
-    </MenuItem>
-    <FilterComponent
-      attribute={attribute}
-      filterValueRenderer={filterValueRenderer}
-      onSubmit={onSubmit}
-      allActiveFilters={allActiveFilters}
-      filter={filter}
-    />
-  </>
-);
+}: FilterComponentProps) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <>
+      <MenuItem header>
+        {filter
+          ? t('filters.edit_attribute_filter', { attribute: attribute.title })
+          : t('filters.create_attribute_filter', { attribute: attribute.title })}
+      </MenuItem>
+      <FilterComponent
+        attribute={attribute}
+        filterValueRenderer={filterValueRenderer}
+        onSubmit={onSubmit}
+        allActiveFilters={allActiveFilters}
+        filter={filter}
+      />
+    </>
+  );
+};
 
 export default FilterConfiguration;

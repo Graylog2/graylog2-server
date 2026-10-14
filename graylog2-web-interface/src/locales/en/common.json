@@ -182,5 +182,32 @@
     "show_empty_title": "Show empty slices",
     "no_empty": "Empty slices (0)",
     "fetch_failed": "Error fetching table slices"
+  },
+  "filters": {
+    "filters": "Filters",
+    "create_filter": "Create Filter",
+    "change_value": "Change filter value",
+    "delete_filter": "Delete filter",
+    "filter_ignored": "Filter ignored",
+    "slice_conflict": "This filter is ignored because a slice is active for this attribute. Clear the slice to apply the filter.",
+    "single_filter_only": "You can only create one filter for this attribute.",
+    "update_existing": "If you want to change the filter value, you can update the existing one.",
+    "create_attribute_filter": "Create {{attribute, lowercase}} filter",
+    "edit_attribute_filter": "Edit {{attribute, lowercase}} filter",
+    "create_submit": "Create filter",
+    "update_submit": "Update filter",
+    "value_placeholder": "Enter value to filter for",
+    "must_not_be_empty": "Must not be empty.",
+    "search_attribute": "Search for {{attribute, lowercase}}",
+    "no_entities_found": "No entities found",
+    "hold_shift": "Hold Shift to select multiple",
+    "load_suggestions_failed": "Loading suggestions for filter failed with status",
+    "could_not_load_suggestions": "Could not load filter suggestions",
+    "load_titles_failed": "Loading filter titles failed with status",
+    "could_not_load_titles": "Could not load filter titles",
+    "all_time": "All time",
+    "now": "Now",
+    "now_lowercase": "now",
+    "relative_range": "from {{from}} until {{until}}"
   }
 }

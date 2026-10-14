@@ -18,6 +18,7 @@ const TRANSLATED_FILES = [
   'src/components/common/EmptyEntity.tsx',
   'src/components/common/EnterprisePluginNotFound.tsx',
   'src/components/common/EntityDataTable/**',
+  'src/components/common/EntityFilters/**',
   'src/components/common/EntityList.tsx',
   'src/components/common/ErrorAlert.tsx',
   'src/components/common/FetchErrorAlert.tsx',

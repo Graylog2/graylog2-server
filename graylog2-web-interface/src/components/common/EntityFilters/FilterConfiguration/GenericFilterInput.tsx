@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import trim from 'lodash/trim';
 import { Formik, Form } from 'formik';
 
+import i18n from 'i18n';
 import type { Filter } from 'components/common/EntityFilters/types';
 import { ModalSubmit, FormikInput } from 'components/common';
 
@@ -42,13 +44,14 @@ type FormValues = {
 
 const validate = ({ value }: FormValues) => {
   if (!value || trim(value) === '') {
-    return { value: 'Must not be empty.' };
+    return { value: i18n.t('filters.must_not_be_empty', { ns: 'common' }) };
   }
 
   return {};
 };
 
 const GenericFilterInput = ({ filter = undefined, onSubmit }: Props) => {
+  const { t } = useTranslation('common');
   const initialValues = { value: filter?.value };
   const createFilter = useCallback(({ value }: FormValues) => onSubmit({ title: value, value }, true), [onSubmit]);
 
@@ -63,10 +66,10 @@ const GenericFilterInput = ({ filter = undefined, onSubmit }: Props) => {
               name="value"
               formGroupClassName=""
               required
-              placeholder="Enter value to filter for"
+              placeholder={t('filters.value_placeholder')}
             />
             <ModalSubmit
-              submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+              submitButtonText={filter ? t('filters.update_submit') : t('filters.create_submit')}
               bsSize="small"
               disabledSubmit={!isValid}
               displayCancel={false}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -43,6 +44,7 @@ type Props = {
 };
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
+  const { t } = useTranslation('common');
   const { formatTime, userTimezone } = useUserDateTime();
   const validate = useTimeRangeValidation();
   const initialValues = useMemo(
@@ -71,7 +73,7 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
             <TimeRangePickerFormContent limitDuration={0}>
               <ModalSubmit
                 disabledSubmit={!isValid}
-                submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+                submitButtonText={filter ? t('filters.update_submit') : t('filters.create_submit')}
                 bsSize="small"
                 displayCancel={false}
               />

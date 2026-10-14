@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -56,6 +57,7 @@ const FilterValueDropdown = ({
   filter,
   isConflicting,
 }: FilterValueDropdownProps) => {
+  const { t } = useTranslation('common');
   const [show, setShowDropdown] = useState(false);
   const { value, title } = filter;
 
@@ -79,7 +81,7 @@ const FilterValueDropdown = ({
       toggleChild={
         <FilterValueButton
           bsSize="xsmall"
-          title="Change filter value"
+          title={t('filters.change_value')}
           $isConflicting={isConflicting}
           disabled={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
@@ -119,6 +121,7 @@ const ActiveFilter = ({
   onChangeFilter,
   isConflicting,
 }: Props) => {
+  const { t } = useTranslation('common');
   const { value, title } = filter;
 
   const onChangeBooleanValue = () => {
@@ -134,7 +137,7 @@ const ActiveFilter = ({
         <FilterValueButton
           bsSize="xsmall"
           onClick={isConflicting ? undefined : onChangeBooleanValue}
-          title="Change filter value"
+          title={t('filters.change_value')}
           $isConflicting={isConflicting}
           disabled={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
@@ -150,7 +153,10 @@ const ActiveFilter = ({
           isConflicting={isConflicting}
         />
       )}
-      <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
+      <CenteredButton
+        bsSize="xsmall"
+        onClick={() => onDeleteFilter(attribute.id, value)}
+        title={t('filters.delete_filter')}>
         <Icon name="close" />
       </CenteredButton>
     </Container>

@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -102,8 +103,8 @@ const useFilterValueSuggestions = (
           identifierType,
           collectionProperty,
         ),
-        'Loading suggestions for filter failed with status',
-        'Could not load filter suggestions',
+        i18n.t('filters.load_suggestions_failed', { ns: 'common' }),
+        i18n.t('filters.could_not_load_suggestions', { ns: 'common' }),
       ),
 
     retry: 0,

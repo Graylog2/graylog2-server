@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
@@ -36,28 +37,32 @@ const AttributeSelect = ({
   attributes: Attributes;
   activeFilters: Filters | undefined;
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string>>;
-}) => (
-  <>
-    <MenuItem header>Create Filter</MenuItem>
-    {attributes.map(({ id, title, type, single_filter }) => {
-      const hasActiveFilter = !!activeFilters?.get(id)?.length;
-      const disabled = (type === 'BOOLEAN' || !!single_filter) && hasActiveFilter;
+}) => {
+  const { t } = useTranslation('common');
 
-      return (
-        <MenuItem onSelect={() => setSelectedAttributeId(id)} key={`${title}-filter`} disabled={disabled}>
-          {title}
-          {disabled && (
-            <HoverForHelp displayLeftMargin>
-              You can only create one filter for this attribute.
-              <br />
-              If you want to change the filter value, you can update the existing one.
-            </HoverForHelp>
-          )}
-        </MenuItem>
-      );
-    })}
-  </>
-);
+  return (
+    <>
+      <MenuItem header>{t('filters.create_filter')}</MenuItem>
+      {attributes.map(({ id, title, type, single_filter }) => {
+        const hasActiveFilter = !!activeFilters?.get(id)?.length;
+        const disabled = (type === 'BOOLEAN' || !!single_filter) && hasActiveFilter;
+
+        return (
+          <MenuItem onSelect={() => setSelectedAttributeId(id)} key={`${title}-filter`} disabled={disabled}>
+            {title}
+            {disabled && (
+              <HoverForHelp displayLeftMargin>
+                {t('filters.single_filter_only')}
+                <br />
+                {t('filters.update_existing')}
+              </HoverForHelp>
+            )}
+          </MenuItem>
+        );
+      })}
+    </>
+  );
+};
 
 type Props = {
   filterableAttributes: Attributes;
@@ -69,6 +74,7 @@ type Props = {
 };
 
 const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCreateFilter, activeFilters }: Props) => {
+  const { t } = useTranslation('common');
   const [selectedAttributeId, setSelectedAttributeId] = useState<string>();
   const selectedAttribute = filterableAttributes.find(({ id }) => id === selectedAttributeId);
   const onToggleDropdown = () => setSelectedAttributeId(undefined);
@@ -78,7 +84,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
       <OverlayDropdownButton
         title={<Icon name="add" />}
         bsSize="small"
-        buttonTitle="Create Filter"
+        buttonTitle={t('filters.create_filter')}
         onToggle={onToggleDropdown}
         closeOnSelect={false}
         dropdownZIndex={1050}>

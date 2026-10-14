@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
@@ -45,9 +46,6 @@ const FilterGroupTitle = styled.div(
   `,
 );
 
-const SLICE_FILTER_CONFLICT_HELP =
-  'This filter is ignored because a slice is active for this attribute. Clear the slice to apply the filter.';
-
 type Props = {
   attributes: Attributes;
   filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
@@ -66,41 +64,45 @@ const ActiveFilters = ({
   onChangeFilter,
   activeSliceCol = undefined,
   activeSlice = undefined,
-}: Props) => (
-  <>
-    {filters
-      .entrySeq()
-      .map(([attributeId, filterValues]) => {
-        const attribute = attributes?.find(({ id }) => id === attributeId);
-        const isConflictingAttribute = !!activeSliceCol && !!activeSlice && activeSliceCol === attributeId;
+}: Props) => {
+  const { t } = useTranslation('common');
 
-        return (
-          <FilterGroup key={attributeId}>
-            <FilterGroupTitle>
-              <span>{attribute.title}:</span>
-              {isConflictingAttribute && (
-                <HoverForHelp title="Filter ignored" pullRight={false}>
-                  {SLICE_FILTER_CONFLICT_HELP}
-                </HoverForHelp>
-              )}
-            </FilterGroupTitle>
-            {filterValues.map((filter) => (
-              <ActiveFilter
-                filter={filter}
-                allActiveFilters={filters}
-                key={`${attribute.id}-${filter.value}`}
-                attribute={attribute}
-                filterValueRenderer={filterValueRenderers?.[attributeId]}
-                onChangeFilter={onChangeFilter}
-                onDeleteFilter={onDeleteFilter}
-                isConflicting={isConflictingAttribute}
-              />
-            ))}
-          </FilterGroup>
-        );
-      })
-      .toArray()}
-  </>
-);
+  return (
+    <>
+      {filters
+        .entrySeq()
+        .map(([attributeId, filterValues]) => {
+          const attribute = attributes?.find(({ id }) => id === attributeId);
+          const isConflictingAttribute = !!activeSliceCol && !!activeSlice && activeSliceCol === attributeId;
+
+          return (
+            <FilterGroup key={attributeId}>
+              <FilterGroupTitle>
+                <span>{attribute.title}:</span>
+                {isConflictingAttribute && (
+                  <HoverForHelp title={t('filters.filter_ignored')} pullRight={false}>
+                    {t('filters.slice_conflict')}
+                  </HoverForHelp>
+                )}
+              </FilterGroupTitle>
+              {filterValues.map((filter) => (
+                <ActiveFilter
+                  filter={filter}
+                  allActiveFilters={filters}
+                  key={`${attribute.id}-${filter.value}`}
+                  attribute={attribute}
+                  filterValueRenderer={filterValueRenderers?.[attributeId]}
+                  onChangeFilter={onChangeFilter}
+                  onDeleteFilter={onDeleteFilter}
+                  isConflicting={isConflictingAttribute}
+                />
+              ))}
+            </FilterGroup>
+          );
+        })
+        .toArray()}
+    </>
+  );
+};
 
 export default ActiveFilters;
