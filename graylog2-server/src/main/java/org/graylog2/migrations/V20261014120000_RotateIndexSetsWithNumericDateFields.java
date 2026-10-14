@@ -1,0 +1,213 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.migrations;
+
+import jakarta.inject.Inject;
+import org.graylog2.indexer.fieldtypes.datefix.NumericDateFieldDetector;
+import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Rotates index sets whose write index maps a date field numerically.
+ * <p>
+ * Graylog 7.1 serialized date values as numbers until the storage client was fixed to use Graylog's own object
+ * mapper. An index written in the meantime mapped such a field as {@code long} or {@code float}, and now that
+ * Graylog writes dates again that mapping rejects every message carrying the field. The type of a field cannot be
+ * changed in an existing index, so the only way to get back to a date mapping is a new index.
+ * <p>
+ * Only index sets that are actually affected are rotated, see {@link NumericDateFieldDetector} for how they are
+ * recognised. Indices that already exist keep their numeric values; correcting those needs a reindex and is out of
+ * scope here.
+ * <p>
+ * Like {@code V20260902150000_RotateCollectorLogsIndexSet}, a failure does not abort server startup. Ingestion keeps
+ * working, the affected messages simply keep failing until the next regular rotation, so the migration logs the
+ * problem and tries again on the next startup by not writing its completion marker.
+ */
+public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migration {
+    private static final Logger LOG =
+            LoggerFactory.getLogger(V20261014120000_RotateIndexSetsWithNumericDateFields.class);
+
+    /**
+     * The one type that takes both representations: the dates Graylog writes now and the epoch milliseconds that
+     * earlier versions wrote. A custom field mapping creates it without a format restriction.
+     */
+    private static final String DATE_FIELD_TYPE = "date";
+
+    private final ClusterConfigService clusterConfigService;
+    private final IndexSetService indexSetService;
+    private final MongoIndexSet.Factory mongoIndexSetFactory;
+    private final NumericDateFieldDetector detector;
+    private final NotificationService notificationService;
+    private final FieldTypeMappingsService fieldTypeMappingsService;
+
+    @Inject
+    public V20261014120000_RotateIndexSetsWithNumericDateFields(ClusterConfigService clusterConfigService,
+                                                                IndexSetService indexSetService,
+                                                                MongoIndexSet.Factory mongoIndexSetFactory,
+                                                                NumericDateFieldDetector detector,
+                                                                NotificationService notificationService,
+                                                                FieldTypeMappingsService fieldTypeMappingsService) {
+        this.clusterConfigService = clusterConfigService;
+        this.indexSetService = indexSetService;
+        this.mongoIndexSetFactory = mongoIndexSetFactory;
+        this.detector = detector;
+        this.notificationService = notificationService;
+        this.fieldTypeMappingsService = fieldTypeMappingsService;
+    }
+
+    @Override
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2026-10-14T12:00:00Z");
+    }
+
+    @Override
+    public void upgrade() {
+        if (clusterConfigService.get(MigrationCompleted.class) != null) {
+            LOG.debug("Migration already completed.");
+            return;
+        }
+
+        final List<String> rotatedIndexSets = new ArrayList<>();
+        int failed = 0;
+
+        for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
+            if (!indexSetConfig.isWritable()) {
+                continue;
+            }
+            try {
+                if (rotateIfAffected(indexSetConfig)) {
+                    rotatedIndexSets.add(indexSetConfig.title());
+                }
+            } catch (Exception e) {
+                failed++;
+                LOG.error("Could not check or rotate index set <{}> ({}). Messages with a date field that this "
+                                + "index set maps numerically will keep failing to index until it is rotated.",
+                        indexSetConfig.id(), indexSetConfig.title(), e);
+            }
+        }
+
+        if (!rotatedIndexSets.isEmpty()) {
+            LOG.info("Rotated {} index set(s) that mapped a date field numerically: {}",
+                    rotatedIndexSets.size(), String.join(", ", rotatedIndexSets));
+            notifyAboutRotation(rotatedIndexSets);
+        }
+
+        if (failed > 0) {
+            LOG.warn("{} index set(s) could not be handled. Retrying on the next startup.", failed);
+            return;
+        }
+
+        clusterConfigService.write(new MigrationCompleted(rotatedIndexSets.size()));
+    }
+
+    private boolean rotateIfAffected(IndexSetConfig indexSetConfig) throws Exception {
+        final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
+        final String writeIndex = indexSet.getActiveWriteIndex();
+        if (writeIndex == null) {
+            // Nothing has been written to this index set yet, so its next index is created from the current template.
+            return false;
+        }
+
+        final List<NumericDateFieldDetector.Finding> findings =
+                detector.findNumericDateFields(indexSetConfig, writeIndex);
+        if (findings.isEmpty()) {
+            return false;
+        }
+
+        LOG.info("Rotating index set <{}> ({}): index <{}> maps {} numerically.",
+                indexSetConfig.id(), indexSetConfig.title(), writeIndex,
+                findings.stream().map(NumericDateFieldDetector.Finding::describe).collect(Collectors.joining(", ")));
+
+        pinToDate(indexSetConfig, findings);
+
+        // The mappings were written to the index set config, so the index set has to be read again: the new index is
+        // created from the configuration this object holds, and the one captured above no longer has them.
+        indexSetService.get(indexSetConfig.id())
+                .map(mongoIndexSetFactory::create)
+                .orElse(indexSet)
+                .cycle();
+        return true;
+    }
+
+    /**
+     * Pins the affected fields to {@code date} before rotating, so that the new index maps them deterministically
+     * instead of leaving it to whichever value the first document happens to carry. A date mapping accepts both the
+     * dates Graylog writes now and the epoch milliseconds an older source may still send.
+     * <p>
+     * Existing custom field mappings are kept: the mappings are merged, and the detector ignores fields that already
+     * have one. A field that cannot be pinned is not fatal - the rotation alone still gives it a fresh mapping.
+     */
+    private void pinToDate(IndexSetConfig indexSetConfig, List<NumericDateFieldDetector.Finding> findings) {
+        for (NumericDateFieldDetector.Finding finding : findings) {
+            try {
+                fieldTypeMappingsService.changeFieldType(
+                        new CustomFieldMapping(finding.fieldName(), DATE_FIELD_TYPE),
+                        Set.of(indexSetConfig.id()),
+                        // rotate once at the end instead of once per field
+                        false);
+            } catch (Exception e) {
+                LOG.warn("Could not set the type of field <{}> in index set <{}> to date. The rotation will still "
+                                + "give it a fresh mapping, but its type will be determined by the first message.",
+                        finding.fieldName(), indexSetConfig.id(), e);
+            }
+        }
+    }
+
+    /**
+     * A rotation is not invisible: the new index starts with an empty dynamic mapping, so a field that receives
+     * values of more than one type can end up mapped differently than it was in the previous index. Telling the
+     * administrator which index sets were rotated gives them something to correlate such a change with.
+     */
+    private void notifyAboutRotation(List<String> rotatedIndexSets) {
+        try {
+            final Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.GENERIC)
+                    .addKey("numeric-date-field-rotation")
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("title", "Index sets rotated to restore date field mappings")
+                    .addDetail("description", "The following index sets mapped a date field as a number, which "
+                            + "earlier versions wrote for date values, and were rotated so that their new index maps "
+                            + "it as a date again: " + String.join(", ", rotatedIndexSets) + ". "
+                            + "Those fields were set to the type date, existing custom field types were kept. "
+                            + "Until the older indices are removed by their retention strategy, those fields still "
+                            + "have a numeric type there, so a search covering both the old and the new indices "
+                            + "reports a field type conflict for them. That resolves itself once the older indices "
+                            + "are gone; reindexing them clears it sooner. Messages already written keep their "
+                            + "numeric values.");
+            notificationService.publishIfFirst(notification);
+        } catch (Exception e) {
+            LOG.warn("Could not publish the notification about rotated index sets.", e);
+        }
+    }
+
+    public record MigrationCompleted(int rotatedIndexSets) {}
+}
