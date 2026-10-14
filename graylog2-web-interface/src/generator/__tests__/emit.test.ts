@@ -139,4 +139,36 @@ export function sample(requestOptions?: RequestOptions): Promise<AvailableOutput
 ]
 `);
   });
+
+  it('fails if a path variable has no parameter', () => {
+    const api = {
+      name: 'configurations',
+      routes: [
+        {
+          path: '/sidecar/configurations/{id}/{name}',
+          operations: [
+            {
+              method: 'POST' as const,
+              summary: 'Copy a configuration',
+              nickname: 'copyConfiguration',
+              type: { type: 'type_reference' as const, name: 'unknown', optional: false },
+              parameters: [
+                {
+                  name: 'id',
+                  description: '',
+                  paramType: 'path' as const,
+                  required: true,
+                  type: { type: 'type_reference' as const, name: 'string', optional: false },
+                },
+              ],
+              produces: ['application/json' as const],
+            },
+          ],
+        },
+      ],
+      models: {},
+    };
+
+    expect(() => emit([api])).toThrow('POST /sidecar/configurations/{id}/{name} (copyConfiguration) has no parameter for: name');
+  });
 });
