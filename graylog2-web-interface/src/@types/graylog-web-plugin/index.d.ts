@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
-import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
@@ -327,9 +326,7 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginDataLake {
-    StreamDataLake: React.ComponentType<{
-      permissions: Immutable.List<Permission>;
-    }>;
+    StreamDataLake: React.ComponentType;
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
@@ -337,7 +334,6 @@ declare module 'graylog-web-plugin/plugin' {
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{
-      permissions: Immutable.List<Permission>;
       streamId: string;
     }>;
     StreamIlluminateProcessingSection: React.ComponentType<{
