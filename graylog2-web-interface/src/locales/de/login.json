@@ -1,0 +1,13 @@
+{
+  "welcome": "Willkommen bei {{productName}}",
+  "username": "Benutzername",
+  "password": "Passwort",
+  "sign_in": "Anmelden",
+  "signing_in": "Anmeldung läuft...",
+  "invalid_credentials": "Ungültige Anmeldedaten. Bitte überprüfen Sie diese und versuchen Sie es erneut.",
+  "server_error": "Fehler – der Server hat geantwortet: {{status}} – {{message}}",
+  "fallback_error_cloud": "Fehler beim Laden der Anmeldeseite. Bitte wenden Sie sich an Ihren {{productName}}-Accountmanager.",
+  "fallback_error": "Fehler bei der Anmeldung über den aktiven Authentifizierungsdienst. Bitte prüfen Sie dessen Konfiguration oder wenden Sie sich an Ihren {{productName}}-Accountmanager. Fehlerdetails:",
+  "login_with_default": "Mit Standardmethode anmelden",
+  "login_with": "Mit {{method}} anmelden"
+}

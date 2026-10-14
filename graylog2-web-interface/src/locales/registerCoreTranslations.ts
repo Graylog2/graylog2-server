@@ -18,11 +18,16 @@
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
 import enCommon from 'locales/en/common.json';
+import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
 
 registerTranslations('common', enCommon, {
   de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),
+});
+
+registerTranslations('login', enLogin, {
+  de: () => import(/* webpackChunkName: "translations-de-login" */ 'locales/de/login.json'),
 });
 
 registerTranslations('navigation', enNavigation, {

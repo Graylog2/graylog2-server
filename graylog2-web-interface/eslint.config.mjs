@@ -55,7 +55,9 @@ const TRANSLATED_FILES = [
   'src/components/common/TypeAheadDataFilter.tsx',
   'src/components/common/Wizard.tsx',
   'src/components/common/message/**',
+  'src/components/login/**',
   'src/components/navigation/**',
+  'src/pages/LoginPage.tsx',
   'src/views/components/time-range-picker/**',
 ];
 

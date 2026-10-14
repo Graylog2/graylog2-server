@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
@@ -67,23 +68,20 @@ type ErrorFallbackProps = {
 };
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
+  const { t } = useTranslation('login');
   const isCloud = AppConfig.isCloud();
   const productName = useProductName();
 
   return (
     <Alert bsStyle="danger">
       {isCloud ? (
-        <p>Error loading login screen, please contact your {productName} account manager.</p>
+        <p>{t('fallback_error_cloud', { productName })}</p>
       ) : (
         <>
-          <p>
-            Error using active authentication service login. Please check its configuration or contact your{' '}
-            {productName}
-            account manager. Error details:
-          </p>
+          <p>{t('fallback_error', { productName })}</p>
           <StyledPre>{error.message}</StyledPre>
           <Button bsStyle="danger" onClick={resetErrorBoundary}>
-            Login with default method
+            {t('login_with_default')}
           </Button>
         </>
       )}
@@ -110,6 +108,7 @@ const useValidateSession = () => {
 };
 
 const LoginPage = () => {
+  const { t } = useTranslation('login');
   const didValidateSession = useValidateSession();
   const [lastError, setLastError] = useState<string | undefined>(undefined);
   const [useFallback, setUseFallback] = useState(false);
@@ -172,13 +171,13 @@ const LoginPage = () => {
     hasCustomLogin && enableExternalBackend && !isCloud && loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
-    <DocumentTitle title="Sign in">
+    <DocumentTitle title={t('sign_in')}>
       <LoginChrome>
         <LastError />
         <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponentTitle : 'default method'}`}
+            {useFallback ? t('login_with', { method: loginComponentTitle }) : t('login_with_default')}
           </StyledButton>
         )}
       </LoginChrome>

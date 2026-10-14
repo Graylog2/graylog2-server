@@ -1,0 +1,13 @@
+{
+  "welcome": "Welcome to {{productName}}",
+  "username": "Username",
+  "password": "Password",
+  "sign_in": "Sign in",
+  "signing_in": "Signing in...",
+  "invalid_credentials": "Invalid credentials, please verify them and retry.",
+  "server_error": "Error - the server returned: {{status}} - {{message}}",
+  "fallback_error_cloud": "Error loading login screen, please contact your {{productName}} account manager.",
+  "fallback_error": "Error using active authentication service login. Please check its configuration or contact your {{productName}} account manager. Error details:",
+  "login_with_default": "Login with default method",
+  "login_with": "Login with {{method}}"
+}
