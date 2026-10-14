@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -44,13 +45,14 @@ const BootstrapModalForm = ({
   formProps = {},
   bsSize = undefined,
   show,
-  submitButtonText = 'Submit',
+  submitButtonText = undefined,
   onSubmitForm = undefined,
   onCancel,
   title,
   children,
   ...restProps
 }: Props) => {
+  const { t } = useTranslation('common');
   const form = useRef(null);
 
   const submit = (event) => {
@@ -81,7 +83,11 @@ const BootstrapModalForm = ({
       <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">
         <Modal.Body>{body}</Modal.Body>
         <Modal.Footer>
-          <ModalSubmit disabledSubmit={submitButtonDisabled} onCancel={onCancel} submitButtonText={submitButtonText} />
+          <ModalSubmit
+            disabledSubmit={submitButtonDisabled}
+            onCancel={onCancel}
+            submitButtonText={submitButtonText ?? t('actions.submit')}
+          />
         </Modal.Footer>
       </form>
     </BootstrapModalWrapper>

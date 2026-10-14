@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import Button from 'components/bootstrap/Button';
@@ -69,6 +70,7 @@ const isWithCancelProps = (props: Props): props is WithCancelProps =>
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
 const FormSubmit = ({ ...props }: Props) => {
+  const { t } = useTranslation('common');
   const {
     bsSize,
     className,
@@ -90,10 +92,10 @@ const FormSubmit = ({ ...props }: Props) => {
           type="button"
           bsSize={bsSize}
           onClick={props.onCancel}
-          title="Cancel"
-          aria-label="Cancel"
+          title={t('actions.cancel')}
+          aria-label={t('actions.cancel')}
           disabled={props.disabledCancel || submittingAsync}>
-          Cancel
+          {t('actions.cancel')}
         </Button>
       )}
       {centerCol}

@@ -17,6 +17,7 @@
 import type { Location } from 'react-router-dom';
 import { useBlocker } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppConfig from 'util/AppConfig';
 
@@ -40,7 +41,9 @@ const locationHasChanged = (
       !window.confirm(question)
     : false;
 
-const ConfirmLeaveDialog = ({ question = 'Are you sure?', ignoredRoutes = [] }: Props) => {
+const ConfirmLeaveDialog = ({ question: questionProp = undefined, ignoredRoutes = [] }: Props) => {
+  const { t } = useTranslation('common');
+  const question = questionProp ?? t('confirm_leave.question');
   const handleLeavePage = useCallback(
     (e) => {
       if (AppConfig.gl2DevMode()) {

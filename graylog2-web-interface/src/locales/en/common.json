@@ -1,4 +1,13 @@
 {
+  "actions": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "delete": "Delete"
+  },
+  "confirm_leave": {
+    "question": "Are you sure?"
+  },
   "duration": {
     "years_one": "{{count}} year",
     "years_other": "{{count}} years",

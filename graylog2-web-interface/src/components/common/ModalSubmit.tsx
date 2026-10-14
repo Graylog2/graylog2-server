@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import type { SyntheticEvent } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import type { IconName } from 'components/common/Icon';
@@ -92,6 +93,7 @@ const isWithCancelProps = (props: Props): props is WithCancelProps =>
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
 const ModalSubmit = ({ ...props }: Props) => {
+  const { t } = useTranslation('common');
   const {
     autoFocus = false,
     bsSize,
@@ -129,10 +131,10 @@ const ModalSubmit = ({ ...props }: Props) => {
             type="button"
             bsSize={bsSize}
             onClick={props.onCancel}
-            title="Cancel"
-            aria-label="Cancel"
+            title={t('actions.cancel')}
+            aria-label={t('actions.cancel')}
             disabled={props.disabledCancel || submittingAsync}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
         )}
         <Button
