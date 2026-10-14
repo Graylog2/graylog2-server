@@ -25,17 +25,24 @@ import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 class DatanodeKeystoreTest {
 
@@ -198,5 +205,57 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(this.receivedEvents)
                 .hasSize(1)
                 .allSatisfy(e -> Assertions.assertThat(e).isInstanceOf(DatanodeCertificateRevokedEvent.class));
+    }
+
+    @Test
+    void testKeystoreIsNotEncryptedWithPasswordSecret(@TempDir Path tempDir) throws Exception {
+        final DatanodeDirectories directories = DatanodeTestUtils.tempDirectories(tempDir);
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(directories, "foobar", this.eventBus);
+        datanodeKeystore.initWithSelfSignedCertificate();
+
+        final Path keystoreFile = directories.getConfigurationTargetDir().resolve("keystore.jks");
+        Assertions.assertThatThrownBy(() -> readKeystore(keystoreFile, "foobar".toCharArray()))
+                .isInstanceOf(IOException.class);
+        Assertions.assertThat(readKeystore(keystoreFile, DatanodeKeystore.deriveKeystorePassword("foobar")).getKey(DatanodeKeystore.DATANODE_KEY_ALIAS, DatanodeKeystore.deriveKeystorePassword("foobar")))
+                .isNotNull();
+    }
+
+    @Test
+    void testLegacyKeystoreIsReencrypted(@TempDir Path tempDir) throws Exception {
+        final DatanodeDirectories directories = DatanodeTestUtils.tempDirectories(tempDir);
+        final Path keystoreFile = directories.getConfigurationTargetDir().resolve("keystore.jks");
+        final char[] passwordSecret = "foobar".toCharArray();
+
+        // keystore created by previous versions, encrypted directly with the password_secret
+        final KeyPair keyPair = DatanodeTestUtils.generateKeyPair(Duration.ofDays(30));
+        try (FileOutputStream fos = new FileOutputStream(keystoreFile.toFile())) {
+            keyPair.toKeystore(DatanodeKeystore.DATANODE_KEY_ALIAS, passwordSecret).store(fos, passwordSecret);
+        }
+
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(directories, "foobar", this.eventBus);
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
+
+        // the keystore file has been re-encrypted with the derived password
+        final char[] derivedPassword = DatanodeKeystore.deriveKeystorePassword("foobar");
+        Assertions.assertThatThrownBy(() -> readKeystore(keystoreFile, passwordSecret))
+                .isInstanceOf(IOException.class);
+        final KeyStore migrated = readKeystore(keystoreFile, derivedPassword);
+        Assertions.assertThat(migrated.getKey(DatanodeKeystore.DATANODE_KEY_ALIAS, derivedPassword)).isEqualTo(keyPair.privateKey());
+
+        // the migrated keystore is fully usable
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of());
+        Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
+        final InMemoryKeystoreInformation safeCopy = datanodeKeystore.getSafeCopy();
+        Assertions.assertThat(safeCopy.loadKeystore().getKey(DatanodeKeystore.DATANODE_KEY_ALIAS, safeCopy.password()))
+                .isEqualTo(keyPair.privateKey());
+        Assertions.assertThat(this.receivedEvents).isEmpty();
+    }
+
+    private static KeyStore readKeystore(Path file, char[] password) throws Exception {
+        try (FileInputStream fis = new FileInputStream(file.toFile())) {
+            final KeyStore keystore = KeyStore.getInstance(PKCS12);
+            keystore.load(fis, password);
+            return keystore;
+        }
     }
 }
