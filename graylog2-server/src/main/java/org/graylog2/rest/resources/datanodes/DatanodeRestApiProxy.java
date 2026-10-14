@@ -161,14 +161,14 @@ public class DatanodeRestApiProxy {
         }
 
         final String path = DataNodeProxyAllowlist.normalize(StringUtils.removeStart(request.path(), "/"))
-                .orElseThrow(() -> new IllegalArgumentException(f("Path traverses above its root: %s", request.path())));
+                .orElseThrow(() -> new RequestNotAllowedException(f("Path traverses above its root: %s", request.path())));
 
         final HttpUrl.Builder urlBuilder = base.newBuilder().addPathSegments(path);
         request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
         final HttpUrl target = urlBuilder.build();
 
         if (!isWithinBase(base, target)) {
-            throw new IllegalArgumentException(f("Refusing to proxy request outside of datanode %s: %s", request.hostname(), request.path()));
+            throw new RequestNotAllowedException(f("Refusing to proxy request outside of datanode %s: %s", request.hostname(), request.path()));
         }
         return target;
     }
