@@ -18,6 +18,7 @@
 import type { Table, Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -39,8 +40,9 @@ const HeaderCheckboxContainer = styled.div`
 `;
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {
+  const { t } = useTranslation('common');
   const { isSomeRowsSelected, isAllRowsSelected } = useSelectedEntities();
-  const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all visible entities`;
+  const title = isAllRowsSelected ? t('entity_table.deselect_all') : t('entity_table.select_all');
 
   return (
     <HeaderCheckboxContainer>
@@ -57,12 +59,13 @@ const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<E
 };
 
 const BulkSelectCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => {
+  const { t } = useTranslation('common');
   const { selectedEntities } = useSelectedEntities();
 
   return (
     <RowCheckbox
       onChange={row.getToggleSelectedHandler()}
-      title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
+      title={row.getIsSelected() ? t('entity_table.deselect_entity') : t('entity_table.select_entity')}
       checked={selectedEntities.includes(row.id)}
       disabled={!row.getCanSelect()}
     />

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -137,6 +138,7 @@ const SlicesOverview = ({
   onSlicingPreferencesChange,
   slicingPreferences = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
@@ -273,11 +275,13 @@ const SlicesOverview = ({
                   bsStyle="link"
                   bsSize="sm"
                   onClick={onToggleEmptySlices}
-                  title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
-                  {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
+                  title={showEmptySlices ? t('slicing.hide_empty_title') : t('slicing.show_empty_title')}>
+                  {showEmptySlices
+                    ? t('slicing.hide_empty', { count: emptySliceCount })
+                    : t('slicing.show_empty', { count: emptySliceCount })}
                 </Button>
               ) : (
-                <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
+                <EmptySlicesLabel>{t('slicing.no_empty')}</EmptySlicesLabel>
               )}
             </EmptySlicesHeader>
             {showEmptySlices && visibleEmptySlices.length > 0 && (

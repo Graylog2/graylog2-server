@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -228,6 +229,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   noColumnReordering = false,
   noPageSizeSelect = false,
 }: Props<Entity, Meta>) => {
+  const { t } = useTranslation('common');
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
@@ -342,7 +344,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
               {noColumnReordering && noPageSizeSelect ? null : (
                 <LayoutConfigRow>
-                  Show
+                  {t('entity_table.show_label')}
                   <ButtonGroup>
                     {displayPageSizeSelect && !noPageSizeSelect && (
                       <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />

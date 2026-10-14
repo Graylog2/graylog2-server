@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useEffect, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -192,6 +193,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noColumnReordering = false,
   compactView = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
+  const { t } = useTranslation('common');
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
   const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
@@ -313,7 +315,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                   onSearch={onSearch}
                   onReset={onSearchReset}
                   query={searchParams.query}
-                  placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+                  placeholder={searchPlaceholder ?? t('entity_table.search_placeholder', { humanName })}
                   queryHelpComponent={queryHelpComponent}>
                   {attributes.length > 0 && (
                     <div style={{ marginBottom: 5 }}>
@@ -335,7 +337,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             {MiddleSection ? <MiddleSection searchParams={searchParams} setFilters={onChangeFilters} /> : null}
 
             {isError ? (
-              <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
+              <FetchErrorAlert message={t('entity_table.fetch_failed', { humanName })} error={error} />
             ) : (
               <PaginatedList
                 pageSize={layoutConfig.pageSize}
@@ -345,7 +347,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 useQueryParameter={!withoutURLParams}
                 onChange={onPaginationChange}>
                 {list?.length === 0 ? (
-                  <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+                  <NoSearchResult>{t('entity_table.no_results', { humanName })}</NoSearchResult>
                 ) : (
                   <EntityDataTable<T, M>
                     entities={list}

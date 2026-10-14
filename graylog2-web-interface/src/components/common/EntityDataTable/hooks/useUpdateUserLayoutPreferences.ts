@@ -16,6 +16,7 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
@@ -90,7 +91,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?
   const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {
-      UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
+      UserNotification.error(i18n.t('entity_table.update_layout_failed', { ns: 'common', error }));
     },
     onSuccess: () => refetch(),
   });
@@ -99,7 +100,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?
     onError: (error) => {
       if (error instanceof FetchError && error.status === 404) return;
 
-      UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
+      UserNotification.error(i18n.t('entity_table.update_layout_failed', { ns: 'common', error }));
     },
     onSuccess: () => refetch(),
   });

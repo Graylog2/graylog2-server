@@ -16,6 +16,7 @@
  */
 import styled from 'styled-components';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Column, Table } from '@tanstack/react-table';
 
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -63,9 +64,16 @@ const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<
   const isSelected = column.getIsVisible();
   const toggleVisibility = () => column.toggleVisibility();
   const label = colLabel<Entity>(column);
+  const { t } = useTranslation('common');
 
   return (
-    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${label}`}>
+    <MenuItem
+      onSelect={toggleVisibility}
+      title={
+        isSelected
+          ? t('entity_table.hide_column_named', { column: label })
+          : t('entity_table.show_column', { column: label })
+      }>
       <ListItemInner>
         <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
         <ColumnTitle>{label}</ColumnTitle>
@@ -84,28 +92,32 @@ const ColumnsVisibilitySelect = <Entity extends EntityBase>({
   table,
   onResetLayoutPreferences,
   hasColumnLayoutPreferences,
-}: Props<Entity>) => (
-  <StyledDropdownButton
-    title="Columns"
-    withinPortal
-    bsSize="small"
-    pullRight
-    aria-label="Configure visible columns"
-    id="columns-visibility-select"
-    bsStyle="default"
-    closeOnItemClick={false}>
-    {table
-      .getAllLeafColumns()
-      .filter((column) => column.getCanHide())
-      .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
-      .map((column) => (
-        <ColumnListItem<Entity> column={column} key={column.id} />
-      ))}
-    <MenuItem divider />
-    <DeleteMenuItem disabled={!hasColumnLayoutPreferences} onSelect={onResetLayoutPreferences} closeMenuOnClick>
-      <Icon name="reopen_window" /> Reset all columns
-    </DeleteMenuItem>
-  </StyledDropdownButton>
-);
+}: Props<Entity>) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <StyledDropdownButton
+      title={t('entity_table.columns')}
+      withinPortal
+      bsSize="small"
+      pullRight
+      aria-label={t('entity_table.configure_columns')}
+      id="columns-visibility-select"
+      bsStyle="default"
+      closeOnItemClick={false}>
+      {table
+        .getAllLeafColumns()
+        .filter((column) => column.getCanHide())
+        .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
+        .map((column) => (
+          <ColumnListItem<Entity> column={column} key={column.id} />
+        ))}
+      <MenuItem divider />
+      <DeleteMenuItem disabled={!hasColumnLayoutPreferences} onSelect={onResetLayoutPreferences} closeMenuOnClick>
+        <Icon name="reopen_window" /> {t('entity_table.reset_columns')}
+      </DeleteMenuItem>
+    </StyledDropdownButton>
+  );
+};
 
 export default ColumnsVisibilitySelect;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { styled, css } from 'styled-components';
 
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
@@ -37,11 +38,12 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const ExpandedSectionToggleWrapper = ({ id, section, align = undefined, children = undefined }: Props) => {
+  const { t } = useTranslation('common');
   const { toggleSection } = useExpandedSections();
   const _toggleSection = () => toggleSection(id, section);
 
   return (
-    <StyledWrapper title="Show details" onClick={_toggleSection} $align={align}>
+    <StyledWrapper title={t('entity_table.show_details')} onClick={_toggleSection} $align={align}>
       {children}
     </StyledWrapper>
   );

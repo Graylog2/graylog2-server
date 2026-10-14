@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { DropdownButton, Button } from 'components/bootstrap';
@@ -64,6 +65,7 @@ const SliceHeaderControls = ({
   onChangeSlicing,
   isSlicingReadOnly,
 }: Props) => {
+  const { t } = useTranslation('common');
   const { isPermitted } = usePermissions();
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable && isPermitted(schema.permissions))
@@ -86,8 +88,8 @@ const SliceHeaderControls = ({
 
   return (
     <SliceHeader>
-      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'} disabled={isSlicingReadOnly}>
-        <MenuItem header>Slice by</MenuItem>
+      <DropdownButton bsSize="small" title={activeColumnTitle ?? t('slicing.slice_by')} disabled={isSlicingReadOnly}>
+        <MenuItem header>{t('slicing.slice_by')}</MenuItem>
         {sliceableColumns.map((schema) => (
           <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
             {schema.title}
@@ -97,10 +99,15 @@ const SliceHeaderControls = ({
       <HeaderActions>
         {activeSlice && (
           <Button bsStyle="link" bsSize="sm" onClick={() => onChangeSlicing(sliceCol, undefined)}>
-            Unselect slice
+            {t('slicing.unselect_slice')}
           </Button>
         )}
-        <IconButton disabled={isSlicingReadOnly} name="close" title="No slicing" onClick={onRemoveSlicing} />
+        <IconButton
+          disabled={isSlicingReadOnly}
+          name="close"
+          title={t('slicing.no_slicing')}
+          onClick={onRemoveSlicing}
+        />
       </HeaderActions>
     </SliceHeader>
   );

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -79,6 +80,7 @@ const ExpandedSections = <Entity extends EntityBase>({
   entity: Entity;
   visibleCellCount: number;
 }) => {
+  const { t } = useTranslation('common');
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
   const expandedEntitySections = expandedSections?.[entity.id];
 
@@ -103,7 +105,11 @@ const ExpandedSections = <Entity extends EntityBase>({
                       <h3>{section.title}</h3>
                       <Actions>
                         {actions}
-                        <HideSectionButton name="keyboard_arrow_up" onClick={hideSection} title="Collapse section" />
+                        <HideSectionButton
+                          name="keyboard_arrow_up"
+                          onClick={hideSection}
+                          title={t('entity_table.collapse_section')}
+                        />
                       </Actions>
                     </Header>
                   ) : null}

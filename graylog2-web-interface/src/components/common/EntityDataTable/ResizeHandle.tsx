@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined, colTitle }: Props) => {
+  const { t } = useTranslation('common');
   const _onMouseDown = (e) => {
     // Required to prevent text selection while resizing in Safari
     e?.preventDefault();
@@ -54,8 +56,8 @@ const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined, colTi
       onMouseDown={_onMouseDown}
       onTouchStart={_onTouchStart}
       role="separator"
-      aria-label={`Resize ${colTitle} column`}
-      title={`Resize ${colTitle} column`}>
+      aria-label={t('entity_table.resize_column', { column: colTitle })}
+      title={t('entity_table.resize_column', { column: colTitle })}>
       <Icon name="arrows_outward" />
     </Container>
   );

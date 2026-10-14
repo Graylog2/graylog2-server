@@ -17,6 +17,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
@@ -45,7 +46,7 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
         fetchSlices(sliceCol, query, filters).then(
           ({ slices }) => sliceRenderers?.[sliceCol]?.extendSlices?.(slices) ?? slices,
         ),
-        'Error fetching table slices',
+        i18n.t('slicing.fetch_failed', { ns: 'common' }),
       ),
   });
   useOnRefresh(refetch);

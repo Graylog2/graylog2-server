@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { DropdownButton } from 'components/bootstrap';
@@ -92,6 +93,7 @@ const SliceFilters = ({
   sortDirection,
   onSortDirectionChange,
 }: Props) => {
+  const { t } = useTranslation('common');
   const sendTelemetry = useSendTelemetry(appSection);
   const selectedSortOption = sortOptions.find((option) => option.value === sortMode) ?? DEFAULT_SORT_OPTIONS[0];
 
@@ -144,7 +146,7 @@ const SliceFilters = ({
       bsSize="small"
       id="slicing-sort-dropdown"
       title={selectedSortOption.label}
-      buttonTitle={`Sort by ${selectedSortOption.label}`}>
+      buttonTitle={t('slicing.sort_by', { option: selectedSortOption.label })}>
       {sortOptions.map((option) => (
         <MenuItem
           key={option.value}
@@ -162,7 +164,9 @@ const SliceFilters = ({
         <StyledSearchForm
           onQueryChange={handleSearchChange}
           onReset={handleSearchReset}
-          placeholder={`Filter ${activeColumnTitle ?? 'slices'}`}
+          placeholder={
+            activeColumnTitle ? t('slicing.filter', { column: activeColumnTitle }) : t('slicing.filter_slices')
+          }
           query={searchQuery}
           queryWidth={0}
           buttonLeftMargin={0}
@@ -170,7 +174,7 @@ const SliceFilters = ({
         {sortControl}
         <IconButton
           name={sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}
-          title={`Sort ${sortDirection === 'asc' ? 'descending' : 'ascending'}`}
+          title={sortDirection === 'asc' ? t('slicing.sort_descending') : t('slicing.sort_ascending')}
           onClick={handleSortDirectionChange}
         />
       </ControlsRow>

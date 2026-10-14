@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import styled, { css, createGlobalStyle } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
@@ -175,6 +176,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
   isTailColumnEmpty: boolean;
   constrainResizeOverhang: boolean;
 }) => {
+  const { t } = useTranslation('common');
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const isActionsColumn = header.column.id === ACTIONS_COL_ID;
   const forceUpdate = useForceUpdate();
@@ -220,8 +222,8 @@ const TableHeaderCell = <Entity extends EntityBase>({
           $isResizing={header.column.getIsResizing()}
           $constrainOverhang={constrainResizeOverhang}
           role="separator"
-          aria-label={`Resize ${columnMeta?.label ?? header.column.id} column`}
-          title={`Resize ${columnMeta?.label ?? header.column.id} column`}
+          aria-label={t('entity_table.resize_column', { column: columnMeta?.label ?? header.column.id })}
+          title={t('entity_table.resize_column', { column: columnMeta?.label ?? header.column.id })}
         />
       )}
     </Th>

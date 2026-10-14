@@ -15,22 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
 
 type Props = React.PropsWithChildren<{
   disabled?: boolean;
 }>;
-const MoreActions = ({ children = undefined, disabled = false }: Props) => (
-  <OverlayDropdownButton
-    title={MORE_ACTIONS_TITLE}
-    bsSize="xsmall"
-    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-    disabled={disabled}>
-    {children}
-  </OverlayDropdownButton>
-);
+const MoreActions = ({ children = undefined, disabled = false }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <OverlayDropdownButton
+      title={t('entity_table.more')}
+      bsSize="xsmall"
+      buttonTitle={t('entity_table.more_actions')}
+      disabled={disabled}>
+      {children}
+    </OverlayDropdownButton>
+  );
+};
 
 export default MoreActions;
