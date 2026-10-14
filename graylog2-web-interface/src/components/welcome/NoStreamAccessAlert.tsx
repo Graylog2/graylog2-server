@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 
@@ -28,6 +29,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const NoStreamAccessAlert = () => {
+  const { t } = useTranslation('welcome');
   const [noStreamAccessDismissed, setNoStreamAccessDismissed] = useState(!!Store.get(NO_STREAM_ACCESS_DISMISSED_KEY));
 
   const onDismiss = () => {
@@ -42,9 +44,7 @@ const NoStreamAccessAlert = () => {
   return (
     <Row className="content">
       <Col xs={12}>
-        <StyledAlert onDismiss={onDismiss}>
-          Once you have access to a stream, your message metrics will show up here.
-        </StyledAlert>
+        <StyledAlert onDismiss={onDismiss}>{t('no_stream_access')}</StyledAlert>
       </Col>
     </Row>
   );

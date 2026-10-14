@@ -17,6 +17,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import type { PaginatedFavoriteItems, RequestQuery } from 'components/welcome/types';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import PaginationURL from 'util/PaginationURL';
@@ -39,8 +40,8 @@ const useFavoriteItems = (pagination: RequestQuery): { data: PaginatedFavoriteIt
     queryFn: () =>
       defaultOnError(
         fetchFavoriteItems(pagination),
-        'Loading favorite items failed with status',
-        'Could not load favorite items',
+        i18n.t('load_favorites_failed', { ns: 'welcome' }),
+        i18n.t('could_not_load_favorites', { ns: 'welcome' }),
       ),
 
     retry: 0,

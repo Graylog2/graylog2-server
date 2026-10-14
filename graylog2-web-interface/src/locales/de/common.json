@@ -280,5 +280,23 @@
     "add_favorite_failed_title": "Feld konnte nicht zu den Favoriten hinzugefügt werden",
     "remove_favorite_failed": "Entfernen des Favoritenfelds fehlgeschlagen: {{error}}",
     "remove_favorite_failed_title": "Feld konnte nicht aus den Favoriten entfernt werden"
+  },
+  "entity_types": {
+    "user": "Benutzer",
+    "team": "Team",
+    "dashboard": "Dashboard",
+    "event_definition": "Ereignisdefinition",
+    "notification": "Benachrichtigung",
+    "search": "Suche",
+    "stream": "Stream",
+    "search_filter": "Suchfilter",
+    "report": "Bericht",
+    "role": "Rolle",
+    "output": "Output",
+    "sigma_rule": "Sigma-Regel",
+    "event_procedure": "Ereignisprozedur",
+    "event_procedure_step": "Schritt einer Ereignisprozedur",
+    "collection": "Sammlung",
+    "collection_entities": "Sammlungseinträge"
   }
 }

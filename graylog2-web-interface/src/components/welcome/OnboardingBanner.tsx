@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { styled } from 'styled-components';
 
@@ -33,6 +34,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const OnboardingBanner = () => {
+  const { t } = useTranslation('welcome');
   const productName = useProductName();
   const { isAnyPermitted } = usePermissions();
   const { data } = useOnboardingEligibility();
@@ -50,8 +52,7 @@ const OnboardingBanner = () => {
       <Row className="content">
         <Col xs={12}>
           <StyledAlert bsStyle="info" onDismiss={onDismiss}>
-            {productName} is not currently receiving any log data - please contact an administrator so they can begin
-            setting up ingestion.
+            {t('no_ingestion', { productName })}
           </StyledAlert>
         </Col>
       </Row>

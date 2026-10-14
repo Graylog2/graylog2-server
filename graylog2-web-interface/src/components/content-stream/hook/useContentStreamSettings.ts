@@ -18,6 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ContentStream } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';
@@ -105,8 +106,8 @@ const useContentStreamSettings = (): {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Enabling content stream failed with status: ${errorThrown}`,
-        'Could not cancel instant archiving jobs',
+        i18n.t('content_stream.update_failed', { ns: 'welcome', error: errorThrown }),
+        i18n.t('content_stream.update_failed_title', { ns: 'welcome' }),
       );
     },
   });

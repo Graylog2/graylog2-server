@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { StartPage } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { PaginatedRecentActivity, PaginatedResponseRecentActivity, RequestQuery } from 'components/welcome/types';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import { defaultOnError } from 'util/conditional/onError';
@@ -50,8 +51,8 @@ const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentAct
     queryFn: () =>
       defaultOnError(
         fetchRecentActivities(pagination),
-        'Loading recent activity failed with status',
-        'Could not load recent activity',
+        i18n.t('load_recent_activity_failed', { ns: 'welcome' }),
+        i18n.t('could_not_load_recent_activity', { ns: 'welcome' }),
       ),
 
     retry: 0,

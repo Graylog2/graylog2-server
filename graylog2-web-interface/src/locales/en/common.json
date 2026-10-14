@@ -277,5 +277,23 @@
     "add_favorite_failed_title": "Could not add field to favorites",
     "remove_favorite_failed": "Removing field from favorites failed with error: {{error}}",
     "remove_favorite_failed_title": "Could not remove field from favorites"
+  },
+  "entity_types": {
+    "user": "user",
+    "team": "team",
+    "dashboard": "dashboard",
+    "event_definition": "event definition",
+    "notification": "notification",
+    "search": "search",
+    "stream": "stream",
+    "search_filter": "search filter",
+    "report": "report",
+    "role": "role",
+    "output": "output",
+    "sigma_rule": "sigma rule",
+    "event_procedure": "event procedure",
+    "event_procedure_step": "event procedure step",
+    "collection": "collection",
+    "collection_entities": "collection entities"
   }
 }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BootstrapModalWrapper, Modal, Button } from 'components/bootstrap';
 
@@ -24,18 +25,22 @@ type Props = {
 };
 
 // Placeholder for the upcoming guided first-use ingestion setup wizard.
-const IngestionSetupModal = ({ show, onHide }: Props) => (
-  <BootstrapModalWrapper showModal={show} onHide={onHide}>
-    <Modal.Header>
-      <Modal.Title>Set up ingestion</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <p>The guided ingestion setup is coming soon.</p>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button onClick={onHide}>Close</Button>
-    </Modal.Footer>
-  </BootstrapModalWrapper>
-);
+const IngestionSetupModal = ({ show, onHide }: Props) => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <BootstrapModalWrapper showModal={show} onHide={onHide}>
+      <Modal.Header>
+        <Modal.Title>{t('onboarding.ingestion_title')}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>{t('onboarding.ingestion_coming_soon')}</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onHide}>{t('content_stream.close')}</Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
+  );
+};
 
 export default IngestionSetupModal;

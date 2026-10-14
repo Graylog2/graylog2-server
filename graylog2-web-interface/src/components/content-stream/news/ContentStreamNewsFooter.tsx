@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -41,15 +42,19 @@ const StyledReadMoreDiv = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const ContentStreamNewsFooter = () => (
-  <StyledDiv>
-    <StyledReadMoreDiv>
-      <ExternalLink href="https://www.graylog.org/blog/">Read more</ExternalLink>
-    </StyledReadMoreDiv>
-    <StyledActionDiv>
-      <ContentStreamNewsContentActions />
-    </StyledActionDiv>
-  </StyledDiv>
-);
+const ContentStreamNewsFooter = () => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <StyledDiv>
+      <StyledReadMoreDiv>
+        <ExternalLink href="https://www.graylog.org/blog/">{t('content_stream.read_more')}</ExternalLink>
+      </StyledReadMoreDiv>
+      <StyledActionDiv>
+        <ContentStreamNewsContentActions />
+      </StyledActionDiv>
+    </StyledDiv>
+  );
+};
 
 export default ContentStreamNewsFooter;

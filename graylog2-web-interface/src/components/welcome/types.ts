@@ -16,7 +16,7 @@
  */
 import type * as React from 'react';
 
-export type RecentActivityType = 'create' | 'update' | 'share' | 'delete';
+export type RecentActivityType = 'create' | 'update' | 'share' | 'unshare' | 'delete';
 export type Pagination = {
   page: number;
   per_page: number;

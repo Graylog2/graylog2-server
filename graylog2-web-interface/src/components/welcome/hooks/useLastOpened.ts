@@ -17,6 +17,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import type { PaginatedLastOpened, RequestQuery } from 'components/welcome/types';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
@@ -41,8 +42,8 @@ const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOpened; i
     queryFn: () =>
       defaultOnError(
         fetchLastOpen(pagination),
-        'Loading last opened items failed with status',
-        'Could not load last opened items',
+        i18n.t('load_last_opened_failed', { ns: 'welcome' }),
+        i18n.t('could_not_load_last_opened', { ns: 'welcome' }),
       ),
 
     retry: 0,

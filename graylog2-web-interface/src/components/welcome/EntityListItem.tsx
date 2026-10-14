@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Link, RelativeTime } from 'components/common';
@@ -53,7 +54,8 @@ type Props = {
 const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
   const hasReadPermission = useHasEntityPermissionByGRN(grn, 'read');
-  const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
+  const { t } = useTranslation('welcome');
+  const entityTypeTitle = getTitleForEntityType(type, false) ?? t('unknown_type');
   const entityLink = useShowRouteFromGRN(grn);
   const entityTitle = title ?? id;
   const showLink = !!entityLink && hasReadPermission;

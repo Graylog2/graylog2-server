@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 
@@ -44,15 +45,19 @@ type OverviewSectionProps = React.PropsWithChildren<{
   headerActions?: React.ReactNode;
 }>;
 
-const OverviewSection = ({ headerActions = undefined, children = undefined }: OverviewSectionProps) => (
-  <>
-    <SectionHeader>
-      <h2>Overview</h2>
-      {headerActions}
-    </SectionHeader>
-    <Container>{children}</Container>
-  </>
-);
+const OverviewSection = ({ headerActions = undefined, children = undefined }: OverviewSectionProps) => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <>
+      <SectionHeader>
+        <h2>{t('overview')}</h2>
+        {headerActions}
+      </SectionHeader>
+      <Container>{children}</Container>
+    </>
+  );
+};
 
 const MetricsTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetricsPlugin> }) => {
   const [selectedTabValue, setSelectedTabValue] = useState<string>();

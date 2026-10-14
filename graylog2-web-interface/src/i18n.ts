@@ -48,6 +48,8 @@ const i18n = singleton('i18n', () => {
 
   // Lets languages which don't capitalize nouns lower case values, e.g. `Create {{entityName, lowercase}}`.
   instance.services.formatter.add('lowercase', (value: string) => value.toLowerCase());
+  // Lets languages which start sentences with a lower case value capitalize it, e.g. `{{type, capitalize}} was created`.
+  instance.services.formatter.add('capitalize', (value: string) => value.charAt(0).toUpperCase() + value.slice(1));
 
   return instance;
 });

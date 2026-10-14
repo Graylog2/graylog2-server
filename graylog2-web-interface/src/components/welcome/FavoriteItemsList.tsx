@@ -16,6 +16,7 @@
  */
 
 import React, { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
@@ -25,6 +26,7 @@ import Routes from 'routing/Routes';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 
 const FavoriteItemsList = () => {
+  const { t } = useTranslation('welcome');
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const {
     data: { favorites, total },
@@ -42,10 +44,16 @@ const FavoriteItemsList = () => {
   if (favorites.length === 0) {
     return (
       <NoSearchResult>
-        You do not have any favorite items yet.
+        {t('no_favorites')}
         <br />
-        Make any <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.DASHBOARD.NEW}>Dashboard</Link> favorite to
-        show up here.
+        <Trans
+          t={t}
+          i18nKey="no_favorites_hint"
+          components={{
+            searchLink: <Link to={Routes.SEARCH} />,
+            dashboardLink: <Link to={Routes.DASHBOARD.NEW} />,
+          }}
+        />
       </NoSearchResult>
     );
   }

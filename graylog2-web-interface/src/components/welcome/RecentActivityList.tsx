@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
-import upperFirst from 'lodash/upperFirst';
+import React, { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
@@ -31,29 +31,41 @@ import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 type Props = { itemGrn: string; activityType: RecentActivityType; itemTitle: string; userName?: string };
 
+const ACTIVITY_TEXTS = {
+  create: { anonymous: 'activity.create', byUser: 'activity.create_by' },
+  update: { anonymous: 'activity.update', byUser: 'activity.update_by' },
+  share: { anonymous: 'activity.share', byUser: 'activity.share_by' },
+  unshare: { anonymous: 'activity.unshare', byUser: 'activity.unshare_by' },
+  delete: { anonymous: 'activity.delete', byUser: 'activity.delete_by' },
+} as const;
+
+// Activity types added to the server later are shown with their technical name.
+const UNKNOWN_ACTIVITY_TEXTS = { anonymous: 'activity.other', byUser: 'activity.other_by' } as const;
+
 const ActionItem = ({ itemGrn, activityType, itemTitle, userName = null }: Props) => {
   const hasReadPermission = useHasEntityPermissionByGRN(itemGrn, 'read');
   const { id: itemId, type: itemType } = getValuesFromGRN(itemGrn);
-  const entityTypeTitle = useMemo(
-    () => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`,
-    [itemType],
-  );
+  const { t } = useTranslation('welcome');
+  const entityTypeTitle = getTitleForEntityType(itemType, false) ?? t('unsupported_type', { type: itemType });
   const entityLink = useShowRouteFromGRN(itemGrn);
+  const activityTexts = ACTIVITY_TEXTS[activityType] ?? UNKNOWN_ACTIVITY_TEXTS;
   const entityTitle = itemTitle || itemId;
   const showLink = activityType !== 'delete' && !!entityLink && hasReadPermission;
 
   return (
     <div>
-      {`${upperFirst(entityTypeTitle)} `}
-      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
-      {' was '}
-      {`${activityType}d`}
-      {userName ? ` by ${userName}` : ''}
+      <Trans
+        t={t}
+        i18nKey={userName ? activityTexts.byUser : activityTexts.anonymous}
+        values={{ type: entityTypeTitle, user: userName, activity: activityType }}
+        components={{ entity: !showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link> }}
+      />
     </div>
   );
 };
 
 const RecentActivityList = () => {
+  const { t } = useTranslation('welcome');
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const {
     data: { recentActivity, total },
@@ -71,11 +83,8 @@ const RecentActivityList = () => {
   if (recentActivity.length === 0) {
     return (
       <NoSearchResult>
-        There is no recent activity yet.
-        <p>
-          Whenever any other user will update content you have access to, or share new content with you, it will show up
-          here.
-        </p>
+        {t('no_recent_activity')}
+        <p>{t('no_recent_activity_hint')}</p>
       </NoSearchResult>
     );
   }
