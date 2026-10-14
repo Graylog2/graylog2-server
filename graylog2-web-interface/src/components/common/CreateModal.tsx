@@ -18,9 +18,11 @@ import * as React from 'react';
 import { useState } from 'react';
 import type { FormikErrors } from 'formik';
 import { Formik, Form, useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
+import i18n from 'i18n';
 
 type ContentProps = {
   entityName: string;
@@ -30,19 +32,19 @@ type ContentProps = {
 };
 
 const CreateModalContent = ({ entityName, onCancel, submitError, children }: ContentProps) => {
+  const { t } = useTranslation('common');
   const { isSubmitting, isValidating, isValid } = useFormikContext();
-  const entityNameLower = entityName.toLowerCase();
 
   return (
     <Form className="form form-horizontal">
       <Modal.Header>
-        <Modal.Title>Create {entityName}</Modal.Title>
+        <Modal.Title>{t('create_entity.title', { entityName })}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="container-fluid">
           {children}
           {submitError && (
-            <Alert bsStyle="danger" title="Failed to save">
+            <Alert bsStyle="danger" title={t('create_entity.save_failed')}>
               {submitError}
             </Alert>
           )}
@@ -50,8 +52,8 @@ const CreateModalContent = ({ entityName, onCancel, submitError, children }: Con
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit
-          submitButtonText={`Create ${entityNameLower}`}
-          submitLoadingText={`Creating ${entityNameLower}...`}
+          submitButtonText={t('create_entity.submit', { entityName })}
+          submitLoadingText={t('create_entity.submitting', { entityName })}
           isSubmitting={isSubmitting}
           isAsyncSubmit
           disabledSubmit={!isValid || isValidating}
@@ -90,7 +92,7 @@ const CreateModal = <TValues extends object>({
       await onSubmit(values);
       onClose();
     } catch (error) {
-      setSubmitError(error?.message ?? 'An error occurred. Please try again.');
+      setSubmitError(error?.message ?? i18n.t('create_entity.unknown_error', { ns: 'common' }));
     }
   };
 

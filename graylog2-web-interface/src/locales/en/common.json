@@ -3,7 +3,14 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "submit": "Submit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "previous": "Previous",
+    "next": "Next",
+    "add": "Add",
+    "edit": "Edit",
+    "preview": "Preview",
+    "close": "Close",
+    "done": "Done"
   },
   "confirm_leave": {
     "question": "Are you sure?"
@@ -33,5 +40,30 @@
     "every": "Every",
     "pause": "Pause Refresh",
     "start": "Start Refresh"
+  },
+  "create_entity": {
+    "title": "Create {{entityName}}",
+    "submit": "Create {{entityName, lowercase}}",
+    "submitting": "Creating {{entityName, lowercase}}...",
+    "save_failed": "Failed to save",
+    "unknown_error": "An error occurred. Please try again."
+  },
+  "key_value_table": {
+    "name": "Name",
+    "value": "Value",
+    "actions": "Actions"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown Editor",
+    "preview_title": "Markdown Preview",
+    "expand_preview": "Expand preview",
+    "expand_content": "Expand content"
+  },
+  "source_code_editor": {
+    "copy": "Copy (Ctrl+C / ⌘C)",
+    "paste": "Paste (Ctrl+V / ⌘V)",
+    "undo": "Undo (Ctrl+Z / ⌘Z)",
+    "redo": "Redo (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Press Ctrl+V (⌘V on macOS) or select Edit → Paste to paste from clipboard."
   }
 }

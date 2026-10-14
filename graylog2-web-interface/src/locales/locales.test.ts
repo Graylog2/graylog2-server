@@ -32,7 +32,8 @@ const readNamespace = (language: string, file: string) =>
   JSON.parse(fs.readFileSync(path.join(LOCALES_PATH, language, file), 'utf8')) as Translations;
 
 const placeholders = (text: string) =>
-  [...text.matchAll(/{{\s*([\w.]+)\s*}}/g)].map(([, name]) => name).filter((name) => name !== 'count');
+  // Formats like `{{name, lowercase}}` may differ between languages, only the placeholder names have to match.
+  [...text.matchAll(/{{\s*([\w.]+)\s*(?:,[^}]*)?}}/g)].map(([, name]) => name).filter((name) => name !== 'count');
 
 // Languages differ in their plural forms and may need extra contexts (e.g. a grammatical case), so translations are
 // compared by their key without plural suffix. Keys with an additional context fall back to their key without it.

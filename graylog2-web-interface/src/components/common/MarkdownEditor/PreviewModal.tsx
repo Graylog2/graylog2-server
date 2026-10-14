@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
@@ -79,6 +80,7 @@ type Props = {
 };
 
 function PreviewModal({ value, show, onClose }: Props) {
+  const { t } = useTranslation('common');
   const [height, setHeight] = useState<number>(0);
 
   useEffect(() => {
@@ -92,19 +94,19 @@ function PreviewModal({ value, show, onClose }: Props) {
         <Backdrop onClick={() => onClose()}>
           <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
             <Row>
-              <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
+              <h2 style={{ marginBottom: '1rem' }}>{t('markdown_editor.preview_title')}</h2>
               <CloseIcon name="close" onClick={() => onClose()} />
             </Row>
             <Preview value={value} height={height} show />
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
               <Button bsStyle="primary" role="button" onClick={() => onClose()}>
-                Close
+                {t('actions.close')}
               </Button>
             </Row>
           </Content>
         </Backdrop>
       ) : null,
-    [show, value, height, onClose],
+    [show, value, height, onClose, t],
   );
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;

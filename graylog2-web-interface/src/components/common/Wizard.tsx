@@ -18,6 +18,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar, Col, Nav, Row } from 'components/bootstrap';
 
@@ -334,6 +335,32 @@ const warnOnInvalidActiveStep = <StepKey extends BaseStepKey>(
   }
 };
 
+type NavigationButtonProps = {
+  direction: 'previous' | 'next';
+  compact?: boolean;
+  onClick: () => void;
+  disabled: boolean;
+};
+
+const NavigationButton = ({ direction, compact = false, onClick, disabled }: NavigationButtonProps) => {
+  const { t } = useTranslation('common');
+  const label = direction === 'previous' ? t('actions.previous') : t('actions.next');
+
+  if (compact) {
+    return (
+      <Button onClick={onClick} aria-label={label} bsSize="xsmall" bsStyle="info" disabled={disabled}>
+        <Icon name={direction === 'previous' ? 'arrow_left' : 'arrow_right'} />
+      </Button>
+    );
+  }
+
+  return (
+    <Button onClick={onClick} bsSize="small" bsStyle="info" disabled={disabled}>
+      {label}
+    </Button>
+  );
+};
+
 export type StepType<StepKey extends string> = {
   key: StepKey;
   title: React.ReactNode;
@@ -463,18 +490,14 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
             <br />
             <Row>
               <Col xs={6}>
-                <Button
+                <NavigationButton
+                  direction="previous"
                   onClick={this._onPrevious}
-                  bsSize="small"
-                  bsStyle="info"
-                  disabled={this._disableButton('previous')}>
-                  Previous
-                </Button>
+                  disabled={this._disableButton('previous')}
+                />
               </Col>
               <Col className="text-right" xs={6}>
-                <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>
-                  Next
-                </Button>
+                <NavigationButton direction="next" onClick={this._onNext} disabled={this._disableButton('next')} />
               </Col>
             </Row>
           </>
@@ -492,22 +515,18 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
         {!hidePreviousNextButtons && (
           <div className="pull-right">
             <HorizontalButtonToolbar>
-              <Button
+              <NavigationButton
+                direction="previous"
+                compact
                 onClick={this._onPrevious}
-                aria-label="Previous"
-                bsSize="xsmall"
-                bsStyle="info"
-                disabled={this._disableButton('previous')}>
-                <Icon name="arrow_left" />
-              </Button>
-              <Button
+                disabled={this._disableButton('previous')}
+              />
+              <NavigationButton
+                direction="next"
+                compact
                 onClick={this._onNext}
-                aria-label="Next"
-                bsSize="xsmall"
-                bsStyle="info"
-                disabled={this._disableButton('next')}>
-                <Icon name="arrow_right" />
-              </Button>
+                disabled={this._disableButton('next')}
+              />
             </HorizontalButtonToolbar>
           </div>
         )}

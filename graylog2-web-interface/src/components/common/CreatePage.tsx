@@ -18,12 +18,14 @@ import * as React from 'react';
 import { useState } from 'react';
 import type { FormikErrors } from 'formik';
 import { Formik, Form, useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { Alert, Col, Row } from 'components/bootstrap';
 import DocumentTitle from 'components/common/DocumentTitle';
 import FormSubmit from 'components/common/FormSubmit';
 import PageHeader from 'components/common/PageHeader';
+import i18n from 'i18n';
 
 type ContentProps = {
   entityName: string;
@@ -42,9 +44,9 @@ const CreatePageContent = ({
   submitError,
   children,
 }: ContentProps) => {
+  const { t } = useTranslation('common');
   const { isSubmitting, isValidating, isValid } = useFormikContext();
-  const title = `Create ${entityName}`;
-  const entityNameLower = entityName.toLowerCase();
+  const title = t('create_entity.title', { entityName });
 
   return (
     <DocumentTitle title={title}>
@@ -56,13 +58,13 @@ const CreatePageContent = ({
           <Form>
             {children}
             {submitError && (
-              <Alert bsStyle="danger" title="Failed to save">
+              <Alert bsStyle="danger" title={t('create_entity.save_failed')}>
                 {submitError}
               </Alert>
             )}
             <FormSubmit
-              submitButtonText={`Create ${entityNameLower}`}
-              submitLoadingText={`Creating ${entityNameLower}...`}
+              submitButtonText={t('create_entity.submit', { entityName })}
+              submitLoadingText={t('create_entity.submitting', { entityName })}
               isSubmitting={isSubmitting}
               isAsyncSubmit
               disabledSubmit={!isValid || isValidating}
@@ -110,7 +112,7 @@ const CreatePage = <TValues extends object>({
       const { id } = await onSubmit(values);
       history.push(detailsRoute(id));
     } catch (error) {
-      setSubmitError(error?.message ?? 'An error occurred. Please try again.');
+      setSubmitError(error?.message ?? i18n.t('create_entity.unknown_error', { ns: 'common' }));
     }
   };
 

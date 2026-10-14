@@ -3,7 +3,14 @@
     "cancel": "Abbrechen",
     "confirm": "Bestätigen",
     "submit": "Absenden",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "add": "Hinzufügen",
+    "edit": "Bearbeiten",
+    "preview": "Vorschau",
+    "close": "Schließen",
+    "done": "Fertig"
   },
   "confirm_leave": {
     "question": "Sind Sie sicher?"
@@ -36,5 +43,30 @@
     "every": "Alle",
     "pause": "Aktualisierung pausieren",
     "start": "Aktualisierung starten"
+  },
+  "create_entity": {
+    "title": "{{entityName}} erstellen",
+    "submit": "{{entityName}} erstellen",
+    "submitting": "{{entityName}} wird erstellt...",
+    "save_failed": "Speichern fehlgeschlagen",
+    "unknown_error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "key_value_table": {
+    "name": "Name",
+    "value": "Wert",
+    "actions": "Aktionen"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown-Editor",
+    "preview_title": "Markdown-Vorschau",
+    "expand_preview": "Vorschau vergrößern",
+    "expand_content": "Inhalt vergrößern"
+  },
+  "source_code_editor": {
+    "copy": "Kopieren (Strg+C / ⌘C)",
+    "paste": "Einfügen (Strg+V / ⌘V)",
+    "undo": "Rückgängig (Strg+Z / ⌘Z)",
+    "redo": "Wiederholen (Strg+Umschalt+Z / ⌘⇧Z)",
+    "paste_hint": "Drücken Sie Strg+V (⌘V unter macOS) oder wählen Sie Bearbeiten → Einfügen, um aus der Zwischenablage einzufügen."
   }
 }

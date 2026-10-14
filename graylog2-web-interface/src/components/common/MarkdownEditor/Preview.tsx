@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -138,6 +139,7 @@ function Preview({
   noBorder = false,
   noPadding = false,
 }: Props) {
+  const { t } = useTranslation('common');
   const [fullView, setFullView] = useState<boolean>(false);
 
   return (
@@ -147,7 +149,12 @@ function Preview({
           <Markdown text={value} augment />
         </MarkdownStyles>
         {withFullView && (
-          <ExpandIconButton name="expand_content" title="Expand content" size="sm" onClick={() => setFullView(true)} />
+          <ExpandIconButton
+            name="expand_content"
+            title={t('markdown_editor.expand_content')}
+            size="sm"
+            onClick={() => setFullView(true)}
+          />
         )}
         <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
       </Container>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
@@ -93,6 +94,7 @@ function EditorModal({
   onDone = () => {},
   helpBlock = undefined,
 }: Props) {
+  const { t } = useTranslation('common');
   const [height, setHeight] = useState<number>(0);
   const [localValue, setLocalValue] = useState<string>(value);
 
@@ -122,7 +124,7 @@ function EditorModal({
         <Backdrop onClick={() => onClose()}>
           <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
             <Row>
-              <h2 style={{ marginBottom: '1rem' }}>Markdown Editor</h2>
+              <h2 style={{ marginBottom: '1rem' }}>{t('markdown_editor.editor_title')}</h2>
               <CloseIcon name="close" onClick={() => onClose()} />
             </Row>
             {helpBlock && <Row>{helpBlock}</Row>}
@@ -145,15 +147,15 @@ function EditorModal({
               )}
             </Row>
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button onClick={() => onClose()}>Cancel</Button>
+              <Button onClick={() => onClose()}>{t('actions.cancel')}</Button>
               <Button bsStyle="primary" onClick={handleOnDone}>
-                Done
+                {t('actions.done')}
               </Button>
             </Row>
           </Content>
         </Backdrop>
       ) : null,
-    [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange, helpBlock],
+    [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange, helpBlock, t],
   );
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;

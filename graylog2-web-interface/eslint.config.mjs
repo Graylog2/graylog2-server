@@ -8,8 +8,14 @@ const TRANSLATED_FILES = [
   'src/components/bootstrap/menuitem/DeleteMenuItem.tsx',
   'src/components/common/ConfirmDialog.tsx',
   'src/components/common/ConfirmLeaveDialog.tsx',
+  'src/components/common/CreateModal.tsx',
+  'src/components/common/CreatePage.tsx',
   'src/components/common/FormSubmit.tsx',
+  'src/components/common/KeyValueTable.tsx',
+  'src/components/common/MarkdownEditor/**',
   'src/components/common/ModalSubmit.tsx',
+  'src/components/common/SourceCodeEditor.tsx',
+  'src/components/common/Wizard.tsx',
 ];
 
 export default defineConfig([

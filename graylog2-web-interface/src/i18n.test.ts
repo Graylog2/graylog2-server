@@ -41,6 +41,12 @@ describe('i18n', () => {
     expect(i18n.t('farewell', { ns: 'test-switch' })).toBe('Bye');
   });
 
+  it('formats values in lower case on request', () => {
+    registerTranslations('test-format', { create: 'Create {{entityName, lowercase}}' }, {});
+
+    expect(i18n.t('create', { ns: 'test-format', entityName: 'Event Definition' })).toBe('Create event definition');
+  });
+
   it('loads translations registered after the language has been changed', async () => {
     await changeLanguage('de');
 
