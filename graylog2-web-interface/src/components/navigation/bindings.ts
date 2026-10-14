@@ -60,7 +60,7 @@ const navigationBindings: PluginExports = {
             },
             {
               path: Routes.SYSTEM.CLUSTER.NODES,
-              description: 'Cluster Configuration',
+              description: 'Cluster',
               permissions: ['clusterconfiguration:read'],
             },
             {

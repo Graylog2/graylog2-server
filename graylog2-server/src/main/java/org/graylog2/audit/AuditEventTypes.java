@@ -38,6 +38,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CLUSTER_CONFIGURATION_CREATE = PREFIX + "cluster_configuration:create";
     public static final String CLUSTER_CONFIGURATION_DELETE = PREFIX + "cluster_configuration:delete";
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
+    public static final String CONFIGURATION_OVERRIDES_UPDATE = PREFIX + "configuration_overrides:update";
     public static final String CERTIFICATE_RENEWAL_MANUALLY_INITIATED = PREFIX + "certificate_renewal:manual";
     public static final String CONTENT_PACK_CREATE = PREFIX + "content_pack:create";
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
@@ -228,6 +229,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CLUSTER_CONFIGURATION_CREATE)
             .add(CLUSTER_CONFIGURATION_DELETE)
             .add(CLUSTER_CONFIGURATION_UPDATE)
+            .add(CONFIGURATION_OVERRIDES_UPDATE)
             .add(CONTENT_PACK_CREATE)
             .add(CONTENT_PACK_DELETE)
             .add(CONTENT_PACK_DELETE_REV)
