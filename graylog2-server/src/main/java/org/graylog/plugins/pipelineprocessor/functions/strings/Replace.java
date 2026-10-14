@@ -51,7 +51,7 @@ public class Replace extends AbstractFunction<String> {
                 replacementParam.optional(args, context).orElse(null), maxParam.optional(args, context).orElse(null));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 4)
     public String fastPath(String text, String searchString, String replacement, Integer max) {
         return StringUtils.replace(text, searchString, replacement == null ? "" : replacement, max == null ? -1 : max);
     }

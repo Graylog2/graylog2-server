@@ -63,19 +63,28 @@ final class FunctionCallEmitter {
 
     void call(FunctionExpression f) {
         final Optional<FastPathResolver.FastPath> fastPath = fastPaths.resolve(f.getFunction());
-        if (fastPath.isPresent() && eligible(f)) {
+        if (fastPath.isPresent() && eligible(f, fastPath.get())) {
             fast(f, fastPath.get());
         } else {
             legacy(f);
         }
     }
 
-    /** Only the first argument may be computed at runtime; later ones must be absent or precomputed constants. */
-    static boolean eligible(FunctionExpression f) {
+    /**
+     * Only the eager prefix may be computed at runtime; later arguments must be absent or precomputed constants, and
+     * {@code requiresAbsent} params must not be given at all.
+     */
+    static boolean eligible(FunctionExpression f, FastPathResolver.FastPath fastPath) {
         final List<ParameterDescriptor> params = f.getFunction().descriptor().params();
-        for (int i = 1; i < params.size(); i++) {
+        for (int i = 0; i < params.size(); i++) {
             final String name = params.get(i).name();
-            if (f.getArgs().getPreComputedValue(name) == null && f.getArgs().expression(name) != null) {
+            final boolean precomputed = f.getArgs().getPreComputedValue(name) != null;
+            final boolean present = precomputed || f.getArgs().expression(name) != null;
+            if (fastPath.requiresAbsent().contains(name)) {
+                if (present) {
+                    return false;
+                }
+            } else if (i >= fastPath.eagerParams() && present && !precomputed) {
                 return false;
             }
         }

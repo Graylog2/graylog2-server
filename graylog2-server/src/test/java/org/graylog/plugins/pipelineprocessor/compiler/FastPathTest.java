@@ -37,6 +37,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 class FastPathTest {
     /**
@@ -78,14 +79,138 @@ class FastPathTest {
         }
     }
 
+    /** Two params, both resolved unconditionally in order by evaluate(); subclasses differ only in the annotation. */
+    public abstract static class Join extends AbstractFunction<String> {
+        private final ParameterDescriptor<Object, String> firstParam = ParameterDescriptor.object("first", String.class).build();
+        private final ParameterDescriptor<Object, String> secondParam = ParameterDescriptor.object("second", String.class).optional().build();
+        private final String name;
+
+        Join(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String evaluate(FunctionArgs args, EvaluationContext context) {
+            return join(firstParam.required(args, context), secondParam.optional(args, context).orElse(null));
+        }
+
+        public abstract String join(String first, String second);
+
+        static String joined(String first, String second) {
+            return first.toUpperCase(Locale.ROOT) + "+" + second;
+        }
+
+        @Override
+        public FunctionDescriptor<String> descriptor() {
+            return FunctionDescriptor.<String>builder().name(name).returnType(String.class)
+                    .params(firstParam, secondParam).build();
+        }
+    }
+
+    public static class FirstEagerJoin extends Join {
+        public FirstEagerJoin() {
+            super("first_eager_join");
+        }
+
+        @Override
+        @PipelineFastPath
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    public static class EagerJoin extends Join {
+        public EagerJoin() {
+            super("eager_join");
+        }
+
+        @Override
+        @PipelineFastPath(eagerParams = 2)
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    public static class SecondAbsentJoin extends Join {
+        public SecondAbsentJoin() {
+            super("second_absent_join");
+        }
+
+        @Override
+        @PipelineFastPath(eagerParams = 2, requiresAbsent = "second")
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    public static class TooEagerJoin extends Join {
+        public TooEagerJoin() {
+            super("too_eager_join");
+        }
+
+        @Override
+        @PipelineFastPath(eagerParams = 3)
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    public static class NegativeEagerJoin extends Join {
+        public NegativeEagerJoin() {
+            super("negative_eager_join");
+        }
+
+        @Override
+        @PipelineFastPath(eagerParams = -1)
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    public static class UnknownAbsentJoin extends Join {
+        public UnknownAbsentJoin() {
+            super("unknown_absent_join");
+        }
+
+        @Override
+        @PipelineFastPath(requiresAbsent = "third")
+        public String join(String first, String second) {
+            return joined(first, second);
+        }
+    }
+
+    /** Legacy function with an observable side effect: counts its calls and marks the message. */
+    public static class Tick extends AbstractFunction<Object> {
+        private final ParameterDescriptor<Object, Object> valueParam = ParameterDescriptor.object("value").build();
+        private int calls;
+
+        @Override
+        public Object evaluate(FunctionArgs args, EvaluationContext context) {
+            calls++;
+            context.currentMessage().addField("ticked", true);
+            return valueParam.required(args, context);
+        }
+
+        @Override
+        public FunctionDescriptor<Object> descriptor() {
+            return FunctionDescriptor.builder().name("tick").returnType(Object.class).params(valueParam).build();
+        }
+    }
+
     private final MetricRegistry metrics = new MetricRegistry();
     private final RuleCompiler compiler = new RuleCompiler(metrics, DifferentialHarness::verify);
+    private final Tick tick = new Tick();
     private final PipelineRuleParser parser;
 
     FastPathTest() {
         final Map<String, Function<?>> functions = new HashMap<>(RuleCompilerTest.FUNCTIONS);
         functions.put("shout", new Shout());
         functions.put("bad_shout", new BadShout());
+        for (Join join : List.of(new FirstEagerJoin(), new EagerJoin(), new SecondAbsentJoin(), new TooEagerJoin(),
+                new NegativeEagerJoin(), new UnknownAbsentJoin())) {
+            functions.put(join.descriptor().name(), join);
+        }
+        functions.put("tick", tick);
         parser = new PipelineRuleParser(new FunctionRegistry(functions));
     }
 
@@ -159,5 +284,61 @@ class FastPathTest {
         assertThatThrownBy(() -> FastPathResolver.validate(new BadShout())).isInstanceOf(IllegalStateException.class);
         assertEquivalent("rule \"r\" when true then let s = bad_shout($message.message); set_field(\"x\", s); end");
         assertThat(calls("legacy", "bad_shout")).isEqualTo(1);
+    }
+
+    @Test
+    void eagerPrefixAllowsRuntimeLaterArguments() {
+        assertEquivalent("rule \"r\" when true then let s = eager_join($message.message, $message.other); set_field(\"x\", s); end");
+        assertEquivalent("rule \"r\" when true then let s = first_eager_join($message.message, $message.other); set_field(\"x\", s); end");
+        assertThat(calls("fastPath", "eager_join")).isEqualTo(1);
+        assertThat(calls("fastPath", "first_eager_join")).isZero();
+        assertThat(calls("legacy", "first_eager_join")).isEqualTo(1);
+    }
+
+    @Test
+    void eagerArgumentsAreEvaluatedInOrder() {
+        assertEquivalent("rule \"r\" when true then let s = eager_join($message.message, tick($message.other)); set_field(\"x\", s); end");
+        assertThat(calls("fastPath", "eager_join")).isEqualTo(1);
+        // one call per engine
+        assertThat(tick.calls).isEqualTo(2);
+    }
+
+    @Test
+    void firstArgumentFailureSkipsLaterArguments() {
+        assertEquivalent("rule \"r\" when true then let s = eager_join(throw_value(), tick($message.other)); set_field(\"x\", s); end");
+        assertThat(calls("fastPath", "eager_join")).isEqualTo(1);
+        assertThat(tick.calls).isZero();
+    }
+
+    @Test
+    void firstArgumentConversionFailureSkipsLaterArguments() {
+        // `num` is a Long, the param converts to String: the ClassCastException happens before `second` is evaluated
+        assertEquivalent("rule \"r\" when true then let s = eager_join($message.num, tick($message.other)); set_field(\"x\", s); end");
+        assertThat(calls("fastPath", "eager_join")).isEqualTo(1);
+        assertThat(tick.calls).isZero();
+    }
+
+    @Test
+    void requiresAbsentParamMustBeAbsent() {
+        assertEquivalent("rule \"r\" when true then let s = second_absent_join($message.message, \"const\"); set_field(\"x\", s); end");
+        assertThat(calls("legacy", "second_absent_join")).isEqualTo(1);
+        assertThat(calls("fastPath", "second_absent_join")).isZero();
+        assertEquivalent("rule \"r\" when true then let s = second_absent_join($message.message); set_field(\"x\", s); end");
+        assertThat(calls("fastPath", "second_absent_join")).isEqualTo(1);
+    }
+
+    @Test
+    void invalidEagerAnnotationsAreRejected() {
+        assertThatThrownBy(() -> FastPathResolver.validate(new TooEagerJoin()))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("eagerParams");
+        assertThatThrownBy(() -> FastPathResolver.validate(new NegativeEagerJoin()))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("eagerParams");
+        assertThatThrownBy(() -> FastPathResolver.validate(new UnknownAbsentJoin()))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("requiresAbsent");
+        for (String name : List.of("too_eager_join", "negative_eager_join", "unknown_absent_join")) {
+            assertEquivalent(f("rule \"r\" when true then let s = %s($message.message); set_field(\"x\", s); end", name));
+            assertThat(calls("legacy", name)).as(name).isEqualTo(1);
+            assertThat(calls("fastPath", name)).as(name).isZero();
+        }
     }
 }

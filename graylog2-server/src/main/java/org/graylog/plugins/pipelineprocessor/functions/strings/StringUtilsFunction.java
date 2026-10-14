@@ -61,7 +61,7 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     }
 
     /** Fast path for locale aware subclasses (descriptor has `value` and `locale`). */
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public String fastPath(String value, Locale locale) {
         return apply(value, locale == null ? Locale.ENGLISH : locale);
     }

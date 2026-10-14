@@ -42,7 +42,7 @@ public class Concat extends AbstractFunction<String> {
         return fastPath(firstParam.required(args, context), secondParam.required(args, context));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public String fastPath(String first, String second) {
         return Strings.nullToEmpty(first).concat(Strings.nullToEmpty(second));
     }

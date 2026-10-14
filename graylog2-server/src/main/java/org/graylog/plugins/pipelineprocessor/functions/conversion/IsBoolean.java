@@ -46,7 +46,7 @@ public class IsBoolean extends AbstractFunction<Boolean> {
         return fastPath(valueParam.required(args, context), conversionParam.required(args, context));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public Boolean fastPath(Object value, Boolean attemptConversion) {
         final boolean convert = attemptConversion != null && attemptConversion;
         if (!convert) {

@@ -45,7 +45,7 @@ public class EndsWith extends AbstractFunction<Boolean> {
                 ignoreCaseParam.optional(args, context).orElse(null));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 3)
     public Boolean fastPath(String value, String suffix, Boolean ignoreCase) {
         if (ignoreCase != null && ignoreCase) {
             return StringUtils.endsWithIgnoreCase(value, suffix);

@@ -46,7 +46,7 @@ public class Abbreviate extends AbstractFunction<String> {
         return fastPath(valueParam.required(args, context), widthParam.required(args, context));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public String fastPath(String value, Long width) {
         if (width == null) {
             return null;

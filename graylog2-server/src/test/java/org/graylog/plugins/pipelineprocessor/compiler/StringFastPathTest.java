@@ -146,18 +146,21 @@ class StringFastPathTest {
             "replace(str($message.message), \"o\", \"0\", 1)", "replace(str($message.missing), \"o\", \"0\")",
             "split(str($message.empty), \"a b\")", "split(str($message.missing), \"a b\")", "split(\" \", \"a b c\", 2)",
             "length(str($message.message))", "length(str($message.message), true)", "length(str($message.missing))",
-            "first_non_null(list($message.list))", "first_non_null(list($message.missing))"
+            "first_non_null(list($message.list))", "first_non_null(list($message.missing))",
+            // eager functions: runtime arguments after the first stay on the fast path
+            "contains(str($message.message), str($message.empty))", "concat(str($message.message), str($message.missing))",
+            "concat(str($message.num), str($message.message))", "replace(str($message.message), str($message.empty), str($message.message))",
+            "lowercase(str($message.message), str($message.empty))"
     })
     void fastPathMatchesInterpreter(String call) {
         assertEquivalent(call);
         assertThat(calls("fastPath", functionName(call))).as(call).isEqualTo(1);
     }
 
-    /** A runtime argument after the first one keeps the call on the legacy path (Refinement 1). */
+    /** A runtime argument after the first one keeps a lazy function's call on the legacy path (Refinement 1). */
     @ParameterizedTest
     @ValueSource(strings = {
-            "split(\" \", str($message.message))", "contains(str($message.message), str($message.empty))",
-            "substring(str($message.message), 0, length(str($message.empty)))"
+            "split(\" \", str($message.message))", "substring(str($message.message), 0, length(str($message.empty)))"
     })
     void laterRuntimeArgumentUsesLegacyPath(String call) {
         assertEquivalent(call);

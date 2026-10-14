@@ -36,6 +36,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -43,8 +44,12 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 final class FastPathResolver {
     private static final Logger LOG = LoggerFactory.getLogger(FastPathResolver.class);
 
-    /** {@code handle} has type {@code (Object × parameterCount [+ ctx]) -> Object} and is bound to the function. */
-    record FastPath(MethodHandle handle, int parameterCount, boolean takesContext) {}
+    /**
+     * {@code handle} has type {@code (Object × parameterCount [+ ctx]) -> Object} and is bound to the function;
+     * {@code eagerParams} and {@code requiresAbsent} come from the {@link PipelineFastPath} annotation.
+     */
+    record FastPath(MethodHandle handle, int parameterCount, boolean takesContext, int eagerParams,
+                    Set<String> requiresAbsent) {}
 
     private final Map<Function<?>, Optional<FastPath>> cache = Collections.synchronizedMap(new IdentityHashMap<>());
     private final boolean enabled;
@@ -84,10 +89,22 @@ final class FastPathResolver {
                     descriptor.name(), params.size(), matching.size(), annotated.size()));
         }
         final Method method = matching.get(0);
+        final PipelineFastPath annotation = method.getAnnotation(PipelineFastPath.class);
+        if (annotation.eagerParams() < 0 || annotation.eagerParams() > params.size()) {
+            throw new IllegalStateException(f("function %s: eagerParams %d is outside 0..%d",
+                    descriptor.name(), annotation.eagerParams(), params.size()));
+        }
+        final Set<String> requiresAbsent = Set.of(annotation.requiresAbsent());
+        final List<String> paramNames = params.stream().map(ParameterDescriptor::name).toList();
+        if (!paramNames.containsAll(requiresAbsent)) {
+            throw new IllegalStateException(f("function %s: requiresAbsent %s names unknown params (known: %s)",
+                    descriptor.name(), requiresAbsent, paramNames));
+        }
         try {
             final MethodHandle bound = MethodHandles.publicLookup().unreflect(method).bindTo(function);
             final MethodHandle generic = bound.asType(MethodType.genericMethodType(bound.type().parameterCount()));
-            return new FastPath(generic, params.size(), method.getParameterCount() == params.size() + 1);
+            return new FastPath(generic, params.size(), method.getParameterCount() == params.size() + 1,
+                    annotation.eagerParams(), requiresAbsent);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(f("function %s: fast path is not accessible", descriptor.name()), e);
         }

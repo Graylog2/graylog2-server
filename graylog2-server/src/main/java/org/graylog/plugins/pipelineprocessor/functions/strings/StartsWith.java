@@ -45,7 +45,7 @@ public class StartsWith extends AbstractFunction<Boolean> {
                 ignoreCaseParam.optional(args, context).orElse(null));
     }
 
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 3)
     public Boolean fastPath(String value, String prefix, Boolean ignoreCase) {
         if (ignoreCase != null && ignoreCase) {
             return StringUtils.startsWithIgnoreCase(value, prefix);
