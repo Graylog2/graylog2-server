@@ -18,6 +18,7 @@
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
 import enCommon from 'locales/en/common.json';
+import enDashboards from 'locales/en/dashboards.json';
 import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
@@ -26,6 +27,10 @@ import enWidgets from 'locales/en/widgets.json';
 
 registerTranslations('common', enCommon, {
   de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),
+});
+
+registerTranslations('dashboards', enDashboards, {
+  de: () => import(/* webpackChunkName: "translations-de-dashboards" */ 'locales/de/dashboards.json'),
 });
 
 registerTranslations('login', enLogin, {

@@ -1,0 +1,45 @@
+{
+  "human_name": "Dashboards",
+  "full_screen": {
+    "menu": "Vollbild",
+    "title": "Vollbild konfigurieren",
+    "start": "Vollbildansicht starten",
+    "refresh_interval": "Aktualisierungsintervall",
+    "refresh_interval_help": "Nach wie vielen Sekunden soll das Dashboard aktualisiert werden?",
+    "tabs": "Tabs",
+    "tabs_help": "Wählen Sie die Abfrage-Tabs aus, die abwechselnd angezeigt werden sollen.",
+    "cycle_interval": "Wechselintervall der Tabs",
+    "cycle_interval_help": "Nach wie vielen Sekunden soll der nächste Tab angezeigt werden?"
+  },
+  "properties": {
+    "title": "Titel",
+    "title_help": "Der Titel des Dashboards.",
+    "summary": "Zusammenfassung",
+    "summary_help": "Eine hilfreiche Zusammenfassung des Dashboards.",
+    "description": "Beschreibung",
+    "description_help": "Eine ausführlichere, hilfreiche Beschreibung des Dashboards und seiner Funktionen."
+  },
+  "overview": {
+    "missing_requirements": "Fehlende Voraussetzungen",
+    "user_defined": "Benutzerdefiniert",
+    "load_failed": "Laden der Dashboards fehlgeschlagen mit Status",
+    "could_not_load": "Dashboards konnten nicht geladen werden"
+  },
+  "delete": {
+    "confirm": "Möchten Sie \"{{title}}\" wirklich löschen?",
+    "success": "Das Dashboard \"{{title}}\" wurde erfolgreich gelöscht!",
+    "success_title": "Erfolg!",
+    "failed": "Löschen des Dashboards fehlgeschlagen: {{error}}",
+    "failed_title": "Fehler!"
+  },
+  "bulk_delete": {
+    "confirm_one": "Möchten Sie {{count}} Dashboard wirklich entfernen?",
+    "confirm_other": "Möchten Sie {{count}} Dashboards wirklich entfernen?",
+    "partial_failure_one": "{{failed}} von {{count}} ausgewähltem Dashboard konnte nicht gelöscht werden.",
+    "partial_failure_other": "{{failed}} von {{count}} ausgewählten Dashboards konnten nicht gelöscht werden.",
+    "success_one": "{{count}} Dashboard wurde erfolgreich gelöscht.",
+    "success_other": "{{count}} Dashboards wurden erfolgreich gelöscht.",
+    "success_title": "Erfolg",
+    "failed": "Beim Löschen der Dashboards ist ein Fehler aufgetreten. {{error}}"
+  }
+}

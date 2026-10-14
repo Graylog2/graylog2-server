@@ -15,44 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { Views } from '@graylog/server-api';
 
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
-import StringUtils from 'util/StringUtils';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { DeleteMenuItem } from 'components/bootstrap';
 
 const BulkActions = () => {
+  const { t } = useTranslation('dashboards');
   const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const selectedItemsAmount = selectedEntities?.length;
-  const descriptor = StringUtils.pluralize(selectedItemsAmount, 'dashboard', 'dashboards');
 
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
+    if (window.confirm(t('bulk_delete.confirm', { count: selectedItemsAmount }))) {
       Views.bulkDelete({ entity_ids: selectedEntities })
         .then(({ failures }) => {
           if (failures?.length) {
             const notDeletedDashboardIds = failures.map(({ entity_id }) => entity_id);
             setSelectedEntities(notDeletedDashboardIds);
             UserNotification.error(
-              `${notDeletedDashboardIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`,
+              t('bulk_delete.partial_failure', { failed: notDeletedDashboardIds.length, count: selectedItemsAmount }),
             );
           } else {
             setSelectedEntities([]);
             UserNotification.success(
-              `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`,
-              'Success',
+              t('bulk_delete.success', { count: selectedItemsAmount }),
+              t('bulk_delete.success_title'),
             );
           }
         })
         .catch((error) => {
-          UserNotification.error(`An error occurred while deleting dashboards. ${error}`);
+          UserNotification.error(t('bulk_delete.failed', { error }));
         })
         .finally(() => {
           queryClient.invalidateQueries({
@@ -60,7 +60,7 @@ const BulkActions = () => {
           });
         });
     }
-  }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);
+  }, [queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities, t]);
 
   return (
     <BulkActionsDropdown>

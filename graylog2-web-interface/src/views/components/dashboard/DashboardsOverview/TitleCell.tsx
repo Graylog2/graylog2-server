@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type View from 'views/logic/views/View';
 import type { Requirements } from 'views/logic/views/View';
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }: Props) => {
+  const { t } = useTranslation('dashboards');
   const _missingRequirements = missingRequirements(requires, requirementsProvided);
   const isMissingRequirements = Object.keys(_missingRequirements).length > 0;
 
@@ -47,7 +49,7 @@ const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }:
     return (
       <>
         {title}
-        <HoverForHelp title="Missing Requirements">
+        <HoverForHelp title={t('overview.missing_requirements')}>
           <RequirementsList requirements={_missingRequirements} />
         </HoverForHelp>
       </>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import * as FormsUtils from 'util/FormsUtils';
@@ -44,6 +45,7 @@ const DashboardPropertiesModal = ({
   submitButtonText,
   dashboardId = null,
 }: Props) => {
+  const { t } = useTranslation('dashboards');
   const [updatedDashboard, setUpdatedDashboard] = useState(view);
   const [sharePayload, setSharePayload] = useState(null);
   const pluggableFormComponents = useSaveViewFormControls();
@@ -91,8 +93,8 @@ const DashboardPropertiesModal = ({
           id="title"
           type="text"
           name="title"
-          label="Title"
-          help="The title of the dashboard."
+          label={t('properties.title')}
+          help={t('properties.title_help')}
           required
           onChange={_onChange}
           value={updatedDashboard.title}
@@ -101,8 +103,8 @@ const DashboardPropertiesModal = ({
           id="summary"
           type="text"
           name="summary"
-          label="Summary"
-          help="A helpful summary of the dashboard."
+          label={t('properties.summary')}
+          help={t('properties.summary_help')}
           onChange={_onChange}
           value={updatedDashboard.summary}
         />
@@ -110,14 +112,14 @@ const DashboardPropertiesModal = ({
           id="description"
           type="textarea"
           name="description"
-          label="Description"
-          help="A longer, helpful description of the dashboard and its functionality."
+          label={t('properties.description')}
+          help={t('properties.description_help')}
           onChange={_onChange}
           value={updatedDashboard.description}
         />
         {dashboardId !== view.id && (
           <EntityCreateShareFormGroup
-            description="Search for a User or Team to add as collaborator on this dashboard."
+            description={t('search:dashboard_actions.share_description')}
             entityType="dashboard"
             entityTitle=""
             onSetEntityShare={(payload) => setSharePayload(payload)}

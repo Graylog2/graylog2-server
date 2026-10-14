@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import URI from 'urijs';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -55,6 +56,7 @@ interface CheckboxTarget {
 }
 
 const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalProps) => {
+  const { t } = useTranslation('dashboards');
   const availableTabs = view.search.queries
     .keySeq()
     .map((query, idx) => [idx, queryTitle(view, query.id)])
@@ -82,8 +84,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
       bsSize="large"
       onCancel={onClose}
       onSubmitForm={_onSave}
-      submitButtonText="Start full screen view"
-      title="Configuring Full Screen"
+      submitButtonText={t('full_screen.start')}
+      title={t('full_screen.title')}
       show={show}>
       <Input
         autoFocus
@@ -91,8 +93,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
         type="number"
         min="1"
         name="refresh-interval"
-        label="Refresh Interval"
-        help="After how many seconds should the dashboard refresh?"
+        label={t('full_screen.refresh_interval')}
+        help={t('full_screen.refresh_interval_help')}
         onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
         required
         step={1}
@@ -100,7 +102,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
       />
 
       <FormGroup>
-        <ControlLabel>Tabs</ControlLabel>
+        <ControlLabel>{t('full_screen.tabs')}</ControlLabel>
         <ul>
           {availableTabs.map(([idx, title]) => (
             <li key={`${idx}-${title}`}>
@@ -115,7 +117,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
             </li>
           ))}
         </ul>
-        <HelpBlock>Select the query tabs to include in rotation.</HelpBlock>
+        <HelpBlock>{t('full_screen.tabs_help')}</HelpBlock>
       </FormGroup>
 
       <Input
@@ -123,8 +125,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
         type="number"
         min="1"
         name="query-cycle-interval"
-        label="Tab cycle interval"
-        help="After how many seconds should the next tab be shown?"
+        label={t('full_screen.cycle_interval')}
+        help={t('full_screen.cycle_interval_help')}
         onChange={({ target: { value } }) => setQueryCycleInterval(Number.parseInt(value, 10))}
         required
         step="1"
@@ -170,6 +172,7 @@ type Props = {
 };
 
 const BigDisplayModeConfiguration = ({ disabled = false, show = false, view }: Props) => {
+  const { t } = useTranslation('dashboards');
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const history = useHistory();
@@ -189,7 +192,7 @@ const BigDisplayModeConfiguration = ({ disabled = false, show = false, view }: P
         <ConfigurationModal onClose={() => setShowConfigurationModal(false)} onSave={onSave} show view={view} />
       )}
       <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)} icon="live_tv">
-        Full Screen
+        {t('full_screen.menu')}
       </MenuItem>
     </>
   );

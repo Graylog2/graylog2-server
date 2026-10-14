@@ -64,6 +64,7 @@ const TRANSLATED_FILES = [
   'src/views/components/*.tsx',
   'src/views/components/actions/**',
   'src/views/components/common/**',
+  'src/views/components/dashboard/**',
   'src/views/components/datatable/**',
   'src/views/components/export/**',
   'src/views/components/fieldtypes/**',
