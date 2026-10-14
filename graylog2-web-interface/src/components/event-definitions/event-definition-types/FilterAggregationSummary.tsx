@@ -25,14 +25,13 @@ import { Link } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import { DataWell } from 'components/lookup-tables/layout-componets';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'logic/streams/types';
 import streamCategoryName from 'logic/streams/streamCategoryName';
-import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import StreamsContext from 'contexts/StreamsContext';
@@ -92,7 +91,6 @@ const QueryParameters = ({ queryParameters }: { queryParameters: Array<Parameter
 
 type Props = {
   config: EventDefinition['config'];
-  currentUser: User;
   definitionId?: string;
 };
 
@@ -148,8 +146,9 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
   );
 };
 
-const FilterAggregationSummary = ({ config, currentUser, definitionId = undefined }: Props) => {
+const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) => {
   const streams = useContext(StreamsContext);
+  const { isPermitted } = usePermissions();
   const {
     query,
     query_parameters: queryParameters,
@@ -172,7 +171,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-  const effectiveStreamIds = configStreams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
+  const effectiveStreamIds = configStreams?.filter((s) => isPermitted(`streams:read:${s}`));
   const streamIdsWithMissingPermission = configStreams?.filter((s) => !effectiveStreamIds.includes(s));
 
   const validationResults = validateExpression(conditions?.expression as Expression | null, series);

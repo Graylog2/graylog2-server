@@ -103,7 +103,7 @@ public class StaticFieldsResource extends RestResource {
             throw new BadRequestException(msg);
         }
 
-        if (Message.RESERVED_FIELDS.contains(csfr.key()) && !Message.RESERVED_SETTABLE_FIELDS.contains(csfr.key())) {
+        if (Message.isReservedNonSettableField(csfr.key())) {
             final String message = "Cannot add static field. Field [" + csfr.key() + "] is reserved.";
             LOG.error(message);
             throw new BadRequestException(message);
