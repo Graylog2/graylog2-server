@@ -36,6 +36,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.resources.HelloWorldResource;
@@ -83,6 +84,7 @@ public class GeneratorTest {
         @PUT
         @Path("/{id}/{name}")
         @Operation(summary = "Update")
+        @NoAuditEvent("Test resource")
         public SampleEntity update(@PathParam("id") String id,
                                    @PathParam("name") String name,
                                    @QueryParam("variant") String variant,
