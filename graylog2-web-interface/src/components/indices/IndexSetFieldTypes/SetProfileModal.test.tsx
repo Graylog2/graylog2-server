@@ -193,6 +193,19 @@ describe('SetProfileModal', () => {
     await screen.findByRole('row', { name: /http_method string \(aggregatable\)/i });
   });
 
+  it('shows a message instead of a spinner when the profile could not be loaded', async () => {
+    asMock(useProfile).mockReturnValue({
+      data: { id: null, name: null, description: null, customFieldMappings: [], indexSetIds: [] },
+      isFetched: true,
+      isFetching: false,
+      refetch: () => {},
+    });
+    renderModal({ currentProfile: null });
+    await selectEvent.chooseOption('Select index set profile', 'Profile-2');
+
+    await screen.findByText('Could not load the details of this profile.');
+  });
+
   it('lists affected and skipped index sets', async () => {
     renderModal({ indexSets: [userIndexSet, readOnlyIndexSet, eventsIndexSet], currentProfile: null });
 
@@ -224,6 +237,20 @@ describe('SetProfileModal', () => {
     await submit(/Remove profile/i);
 
     expect(removeProfileFromIndexMock).toHaveBeenCalledWith({ indexSetIds: ['111'], rotated: true });
+  });
+
+  it('cannot be closed while the change is submitting', async () => {
+    asMock(useSetIndexSetProfileMutation).mockReturnValue({
+      setIndexSetFieldTypeProfile: setIndexSetFieldTypeProfileMock,
+      isLoading: true,
+    });
+    renderModal();
+
+    expect(await screen.findByRole('button', { name: /cancel/i })).toBeDisabled();
+
+    await userEvent.keyboard('{Escape}');
+
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('closes after every index set was changed', async () => {

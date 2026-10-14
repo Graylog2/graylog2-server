@@ -115,6 +115,10 @@ const SetProfileModal = ({
   };
 
   const onCancel = () => {
+    if (isSubmitting) {
+      return;
+    }
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CANCELED, {
       app_action_value: 'removed-custom-field-type-closed',
     });
@@ -182,6 +186,7 @@ const SetProfileModal = ({
             onCancel={onClose}
             submitButtonType="submit"
             disabledSubmit={isSubmitting || affected.length === 0 || (isSetAction && !profile)}
+            isAsyncSubmit
             isSubmitting={isSubmitting}
             leftCol={
               isSetAction &&

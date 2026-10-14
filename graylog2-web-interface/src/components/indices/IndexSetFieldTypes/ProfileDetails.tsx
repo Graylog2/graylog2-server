@@ -44,8 +44,16 @@ const ProfileDetails = ({ profileId }: Props) => {
     data: { fieldTypes },
   } = useFieldTypesForMappings();
 
-  if (isFetching || id !== profileId) {
+  if (isFetching) {
     return <Spinner />;
+  }
+
+  if (id !== profileId) {
+    return (
+      <Container>
+        <i>Could not load the details of this profile.</i>
+      </Container>
+    );
   }
 
   const usageCount = indexSetIds?.length ?? 0;
