@@ -19,10 +19,10 @@ import React, { useState } from 'react';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { IfPermitted, Spinner } from 'components/common';
 import type User from 'logic/users/User';
-import { isPermitted } from 'util/PermissionsMixin';
 import TelemetrySettingsDetails from 'logic/telemetry/TelemetrySettingsDetails';
 import useCurrentUser from 'hooks/useCurrentUser';
 import usePluginEntities from 'hooks/usePluginEntities';
+import usePermissions from 'hooks/usePermissions';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
 
 import PreferencesSection from './PreferencesSection';
@@ -48,6 +48,7 @@ export const editableUserSegments: Array<{ value: UserSegment; label: string }> 
 
 const UserDetails = ({ user }: Props) => {
   const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const pluggableSegments = usePluginEntities('users.details.segments');
   const activePluggableSegments = pluggableSegments.filter((s) => (s.useCondition ? s.useCondition() : true));
 
@@ -64,7 +65,7 @@ const UserDetails = ({ user }: Props) => {
   ];
 
   const filteredUserSegments = () => {
-    if (isPermitted(currentUser.permissions, `users:edit:${user?.username}`)) {
+    if (isPermitted(`users:edit:${user?.username}`)) {
       return userSegments;
     }
 

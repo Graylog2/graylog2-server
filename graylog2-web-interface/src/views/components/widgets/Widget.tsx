@@ -147,7 +147,11 @@ const Visualization = ({
     );
   }
 
-  return <LoadingWidget />;
+  return (
+    <LoadingWidget
+      visualization={widget.config instanceof AggregationWidgetConfig ? widget.config.visualization : undefined}
+    />
+  );
 };
 
 type EditWrapperProps = {

@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset.metrics;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -26,8 +27,8 @@ import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.ToLongFunction;
 
 import static org.graylog2.metrics.entity.cache.MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG;
@@ -64,8 +65,8 @@ public abstract class IndexSetStatsDescriptor extends IndexSetMetricDescriptor<L
     }
 
     @Override
-    public List<EntityMetric<Long>> compute(Collection<String> entityIds) {
-        return statsCreator.getForIndexSets(indexSets(entityIds)).entrySet().stream()
+    List<EntityMetric<Long>> computeFor(Set<IndexSet> indexSets) {
+        return statsCreator.getForIndexSets(indexSets).entrySet().stream()
                 .map(entry -> new EntityMetric<>(entry.getKey(), value.applyAsLong(entry.getValue())))
                 .toList();
     }

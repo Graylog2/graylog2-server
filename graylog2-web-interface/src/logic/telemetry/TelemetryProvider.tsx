@@ -21,6 +21,7 @@ import { useTheme } from 'styled-components';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import { telemetryDebugStore } from 'logic/telemetry/debug/TelemetryDebugStore';
 import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
@@ -108,7 +109,10 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
 
   const TelemetryContextValue = useMemo(() => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
-      if (isPosthogLoaded() && globalProps) {
+      const willSend = isPosthogLoaded() && Boolean(globalProps);
+      telemetryDebugStore.record(eventType, event, willSend ? 'sent' : 'suppressed');
+
+      if (willSend) {
         try {
           posthog.capture(eventType, {
             ...event,
@@ -155,7 +159,23 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   );
 };
 
+// With telemetry disabled nothing ever leaves the browser, but the debug overlay still wants to
+// see what instrumentation would have fired — so the disabled branch records (and only records).
+const debugOnlyContextValue = {
+  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) =>
+    telemetryDebugStore.record(eventType, event, 'disabled'),
+  sendErrorReport: () => {},
+};
+
+const DebugOnlyTelemetryProvider = ({ children }: { children: React.ReactNode }) => (
+  <TelemetryContext.Provider value={debugOnlyContextValue}>{children}</TelemetryContext.Provider>
+);
+
 const isTelemetryEnabled = AppConfig?.telemetry()?.enabled;
 const TelemetryProvider = ({ children }) =>
-  isTelemetryEnabled ? <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider> : children;
+  isTelemetryEnabled ? (
+    <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider>
+  ) : (
+    <DebugOnlyTelemetryProvider>{children}</DebugOnlyTelemetryProvider>
+  );
 export default TelemetryProvider;
