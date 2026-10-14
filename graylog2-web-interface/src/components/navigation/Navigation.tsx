@@ -36,7 +36,6 @@ import HelpMenu from './HelpMenu';
 import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import ScratchpadToggle from './ScratchpadToggle';
-import LanguageSwitcher from './LanguageSwitcher';
 
 import { QuickJumpModalContainer } from '../quick-jump';
 
@@ -136,8 +135,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
           ))}
 
           <ScratchpadToggle />
-
-          <LanguageSwitcher />
 
           <HelpMenu />
 

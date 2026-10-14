@@ -23,26 +23,32 @@ import { FormikFormGroup, ReadOnlyFormGroup, Select } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
+import { DEFAULT_LANGUAGE, LANGUAGES, getLanguage } from 'components/users/languages/Languages';
+import LanguageLabel from 'components/users/languages/LanguageLabel';
+import useProductName from 'brand-customization/useProductName';
 
-const LANGUAGE_OPTIONS = [
-  { value: 'en', label: 'English' },
-  { value: 'de', label: 'Deutsch' },
-];
+const LANGUAGE_OPTIONS = LANGUAGES.map(({ code, name }) => ({ value: code, label: name }));
+
+const renderLanguageOption = ({ value }: { value: string }) => <LanguageLabel language={getLanguage(value)} showBeta />;
 
 const LanguageSelect = () => {
   const { values, setFieldValue } = useFormikContext<PreferencesUpdateMap>();
+  const productName = useProductName();
 
   return (
     <Input
-      id="language-controls"
+      id="language"
       labelClassName="col-sm-3"
       wrapperClassName="col-sm-9"
-      label="Language">
+      label="Language"
+      help={`Language of the ${productName} interface. Translations marked Beta have not been reviewed yet.`}>
       <Select
         inputId="language"
         options={LANGUAGE_OPTIONS}
-        value={values.language ?? 'en'}
+        value={values.language ?? DEFAULT_LANGUAGE}
         onChange={(value) => setFieldValue('language', value)}
+        optionRenderer={renderLanguageOption}
+        valueRenderer={renderLanguageOption}
         clearable={false}
       />
     </Input>
@@ -61,6 +67,8 @@ const PreferencesSection = ({ user }: Props) => {
       <Formik<PreferencesUpdateMap> onSubmit={onSubmit} initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
+            <LanguageSelect />
+
             <Input
               id="timeout-controls"
               labelClassName="col-sm-3"
@@ -120,8 +128,6 @@ const PreferencesSection = ({ user }: Props) => {
               value={user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'}
               help="Can be changed by using the toggle in the user dropdown"
             />
-
-            <LanguageSelect />
 
             <Row className="no-bm">
               <Col xs={12}>

@@ -21,6 +21,8 @@ import { ReadOnlyFormGroup } from 'components/common';
 import Store from 'logic/local-storage/Store';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import { DEFAULT_LANGUAGE, getLanguage } from 'components/users/languages/Languages';
+import LanguageLabel from 'components/users/languages/LanguageLabel';
 
 type Props = {
   user: User;
@@ -31,7 +33,7 @@ const defaultPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
-  language: 'en',
+  language: DEFAULT_LANGUAGE,
 };
 
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
@@ -46,7 +48,8 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
     preferences = { ...preferences, ...localStoragePreferences } as typeof preferences;
   }
 
-  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned, language } = preferences;
+  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned, language } =
+    preferences;
 
   return (
     <SectionComponent title="Preferences">
@@ -55,7 +58,7 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
       <ReadOnlyFormGroup label="Pin search sidebar" value={searchSidebarIsPinned ?? false} />
       <ReadOnlyFormGroup label="Pin dashboard sidebar" value={dashboardSidebarIsPinned ?? false} />
       <ReadOnlyFormGroup label="Theme mode" value={preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'} />
-      <ReadOnlyFormGroup label="Language" value={language ?? 'en'} />
+      <ReadOnlyFormGroup label="Language" value={<LanguageLabel language={getLanguage(language)} />} />
     </SectionComponent>
   );
 };

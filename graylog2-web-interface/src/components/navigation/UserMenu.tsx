@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+import React, { useContext } from 'react';
+import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/common';
+import { Icon, LinkContainer } from 'components/common';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
 import useLogout from 'hooks/useLogout';
 import NavIcon from 'components/navigation/NavIcon';
+import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import { getLanguage } from 'components/users/languages/Languages';
+import LanguageLabel from 'components/users/languages/LanguageLabel';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -32,8 +35,28 @@ const FullName = styled.span`
   font-weight: 700;
 `;
 
+const LanguageRow = styled.span(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    min-width: 220px;
+  `,
+);
+
+const CurrentLanguage = styled.span(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+    margin-left: auto;
+    color: ${theme.colors.text.secondary};
+  `,
+);
+
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
+  const { language } = useContext(UserPreferencesContext);
   const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
   const label = readOnly ? 'Show profile' : 'Edit profile';
 
@@ -48,6 +71,18 @@ const UserMenu = () => {
       <Menu.Label>
         <ThemeModeToggle />
       </Menu.Label>
+      <MenuItem divider />
+      <LinkContainer to={route}>
+        <MenuItem icon="translate">
+          <LanguageRow>
+            Language
+            <CurrentLanguage>
+              <LanguageLabel language={getLanguage(language)} />
+              <Icon name="chevron_right" />
+            </CurrentLanguage>
+          </LanguageRow>
+        </MenuItem>
+      </LinkContainer>
       <MenuItem divider />
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>
