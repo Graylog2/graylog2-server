@@ -150,7 +150,8 @@ class StringFastPathTest {
             // eager functions: runtime arguments after the first stay on the fast path
             "contains(str($message.message), str($message.empty))", "concat(str($message.message), str($message.missing))",
             "concat(str($message.num), str($message.message))", "replace(str($message.message), str($message.empty), str($message.message))",
-            "lowercase(str($message.message), str($message.empty))"
+            "lowercase(str($message.message), str($message.empty))",
+            "substring(str($message.message), length(str($message.empty)))"
     })
     void fastPathMatchesInterpreter(String call) {
         assertEquivalent(call);

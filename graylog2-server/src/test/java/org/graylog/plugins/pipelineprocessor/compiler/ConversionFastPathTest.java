@@ -51,6 +51,8 @@ class ConversionFastPathTest {
 
     static {
         FUNCTIONS.put("str", new StringFastPathTest.Raw("str", String.class));
+        FUNCTIONS.put("lng", new StringFastPathTest.Raw("lng", Long.class));
+        FUNCTIONS.put("dbl", new StringFastPathTest.Raw("dbl", Double.class));
         FUNCTIONS.put(SetField.NAME, new SetField());
         FUNCTIONS.put(StringConversion.NAME, new StringConversion());
         FUNCTIONS.put(LongConversion.NAME, new LongConversion());
@@ -116,7 +118,9 @@ class ConversionFastPathTest {
             "is_bool($message.message)", "is_bool($message.flag)", "is_bool(\"yes\", true)", "is_bool($message.message, true)",
             "is_collection($message.list)", "is_collection($message.map)", "is_list($message.list)", "is_list($message.missing)",
             "is_map($message)", "is_map($message.map)",
-            "to_map($message.list)", "to_map($message.map)", "to_map($message.missing)", "to_map($message.missing, true)"
+            "to_map($message.list)", "to_map($message.map)", "to_map($message.missing)", "to_map($message.missing, true)",
+            // eager value and default: a runtime default stays on the fast path
+            "to_long($message.message, lng($message.map.a))", "to_double($message.missing, dbl($message.dbl))"
     })
     void fastPathMatchesInterpreter(String call) {
         assertEquivalent(call);

@@ -60,7 +60,7 @@ public class DoubleConversion extends AbstractConversion<Double> {
     }
 
     /** Lazy in {@link #evaluate}: {@code defaultToNull} is only resolved when {@code value} is null. */
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public Double fastPath(Object value, Double defaultValue, Boolean defaultToNull) {
         final Double dflt = defaultValue == null ? 0d : defaultValue;
         if (value == null) {

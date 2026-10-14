@@ -61,7 +61,7 @@ public class LongConversion extends AbstractConversion<Long> {
     }
 
     /** Lazy in {@link #evaluate}: {@code defaultToNull} is only resolved when {@code value} is null. */
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public Long fastPath(Object value, Long defaultValue, Boolean defaultToNull) {
         final Long dflt = defaultValue == null ? 0L : defaultValue;
         if (value == null) {

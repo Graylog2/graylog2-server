@@ -55,7 +55,7 @@ public class Substring extends AbstractFunction<String> {
     }
 
     /** Separate from {@link #evaluate}, which resolves {@code indexEnd} only for non-null {@code value} and {@code start}. */
-    @PipelineFastPath
+    @PipelineFastPath(eagerParams = 2)
     public String fastPath(String value, Long startValue, Long endValue) {
         if (value == null || startValue == null) {
             return null;
