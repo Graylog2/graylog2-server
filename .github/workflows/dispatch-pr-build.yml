@@ -75,19 +75,25 @@ jobs:
           echo "repo_fork=$repo_fork" | tee -a "$GITHUB_ENV"
 
       - name: Dispatch job to graylog-project-internal
-        if: ${{ (github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success' }}
-        run: >
-          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
-          -f caller_repo="${{ env.repo }}"
-          -f caller_repo_fork="${{ env.repo_fork }}"
-          -f caller_pr_nr=${{ github.event.number }}
-          -f caller_base_branch="$BASE_BRANCH"
-          -f caller_head_branch="$HEAD_BRANCH"
-          -f head_sha=${{ github.event.pull_request.head.sha }}
-          -f initial_actor="$ACTOR/$TRIGGERING_ACTOR"
-          -f e2e_tests=${{ steps.e2e-tests.outputs.run }}
+        if: ${{ ((github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success') && env.repo_fork == '' }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "No GH_TOKEN available. Skipping cross-repo dispatch (repository secrets are unavailable to forked PRs)."
+            exit 0
+          fi
+
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master \
+            -f caller_repo="${{ env.repo }}" \
+            -f caller_repo_fork="${{ env.repo_fork }}" \
+            -f caller_pr_nr=${{ github.event.number }} \
+            -f caller_base_branch="$BASE_BRANCH" \
+            -f caller_head_branch="$HEAD_BRANCH" \
+            -f head_sha=${{ github.event.pull_request.head.sha }} \
+            -f initial_actor="$ACTOR/$TRIGGERING_ACTOR" \
+            -f e2e_tests=${{ steps.e2e-tests.outputs.run }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
+          GH_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
           # See: https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks
           BASE_BRANCH: "${{ github.base_ref || github.ref_name }}"
           HEAD_BRANCH: "${{ github.head_ref }}"
