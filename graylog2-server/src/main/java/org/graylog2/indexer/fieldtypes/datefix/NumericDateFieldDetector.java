@@ -24,6 +24,8 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
@@ -36,6 +38,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +46,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Finds index sets whose write index maps a date field numerically, which is what Graylog 7.1 produced before it
@@ -78,18 +83,21 @@ public class NumericDateFieldDetector {
     private final IndexRangeService indexRangeService;
     private final SearchesAdapter searchesAdapter;
     private final NumericDateFieldClassifier classifier;
+    private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public NumericDateFieldDetector(IndexFieldTypesService indexFieldTypesService,
                                     IndexFieldTypePoller indexFieldTypePoller,
                                     IndexRangeService indexRangeService,
                                     SearchesAdapter searchesAdapter,
-                                    NumericDateFieldClassifier classifier) {
+                                    NumericDateFieldClassifier classifier,
+                                    IndexFieldTypeProfileService profileService) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexFieldTypePoller = indexFieldTypePoller;
         this.indexRangeService = indexRangeService;
         this.searchesAdapter = searchesAdapter;
         this.classifier = classifier;
+        this.profileService = profileService;
     }
 
     /**
@@ -106,9 +114,9 @@ public class NumericDateFieldDetector {
         final Optional<IndexFieldTypesDTO> writeIndexTypes =
                 indexFieldTypePoller.pollIndex(writeIndex, indexSetConfig.id());
         if (writeIndexTypes.isEmpty()) {
-            LOG.debug("Could not read the mapping of write index <{}>, skipping index set <{}>.",
-                    writeIndex, indexSetConfig.id());
-            return List.of();
+            // Not knowing the mapping is not the same as knowing there is nothing to repair. Reporting this as a
+            // failure keeps the migration eligible to run again instead of marking the index set as done.
+            throw new IllegalStateException(f("Could not read the mapping of write index <%s>", writeIndex));
         }
 
         final Set<String> deliberatelyTyped = deliberatelyTypedFields(indexSetConfig);
@@ -135,15 +143,13 @@ public class NumericDateFieldDetector {
             return findings;
         }
 
-        // Nothing to compare against, so fall back to reading the values. One hit is enough to decide that this
-        // index set has to be rotated, so we stop there instead of querying every remaining field.
+        // Nothing to compare against, so fall back to reading the values. Every candidate is inspected: each affected
+        // field has to be named so that it can be pinned, otherwise it is left to dynamic mapping and the next value
+        // that arrives decides its type again.
         for (FieldTypeDTO field : candidates) {
             final String type = field.physicalType().toLowerCase(Locale.ROOT);
-            final Optional<Reason> reason = valuesLookLikeTimestamps(writeIndex, field.fieldName(), type);
-            if (reason.isPresent()) {
-                findings.add(new Finding(field.fieldName(), type, reason.get()));
-                return findings;
-            }
+            valuesLookLikeTimestamps(writeIndex, field.fieldName(), type)
+                    .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
         }
         return findings;
     }
@@ -153,12 +159,26 @@ public class NumericDateFieldDetector {
      * somebody wanted them to be.
      */
     private Set<String> deliberatelyTypedFields(IndexSetConfig indexSetConfig) {
-        if (indexSetConfig.customFieldMappings() == null) {
-            return Set.of();
+        final Set<String> fieldNames = new HashSet<>();
+
+        if (indexSetConfig.customFieldMappings() != null) {
+            indexSetConfig.customFieldMappings().stream()
+                    .map(CustomFieldMapping::fieldName)
+                    .forEach(fieldNames::add);
         }
-        return indexSetConfig.customFieldMappings().stream()
-                .map(CustomFieldMapping::fieldName)
-                .collect(Collectors.toSet());
+
+        // A profile's mappings are stored separately and merged into the template, so they are just as deliberate
+        // as the ones on the index set itself.
+        final String profileId = indexSetConfig.fieldTypeProfile();
+        if (profileId != null && !profileId.isEmpty()) {
+            profileService.get(profileId)
+                    .map(IndexFieldTypeProfile::customFieldMappings)
+                    .ifPresent(mappings -> mappings.stream()
+                            .map(CustomFieldMapping::fieldName)
+                            .forEach(fieldNames::add));
+        }
+
+        return fieldNames;
     }
 
     /**
@@ -176,28 +196,23 @@ public class NumericDateFieldDetector {
     }
 
     /**
-     * Asks the index what the field actually contains. Any failure here is reported as "no finding": a detector that
-     * cannot read the values must not cause a rotation.
+     * Asks the index what the field actually contains. A failure is propagated rather than read as "no finding":
+     * not being able to judge a field is not the same as knowing that it is fine, and only a failure keeps the
+     * migration eligible to try again.
      */
     private Optional<Reason> valuesLookLikeTimestamps(String index, String fieldName, String physicalType) {
-        try {
-            final TimeRange allTime = RelativeRange.allTime();
-            final var stats = searchesAdapter.fieldStats("*", null, allTime, Set.of(index), fieldName,
-                    false, true, true);
+        final TimeRange allTime = RelativeRange.allTime();
+        final var stats = searchesAdapter.fieldStats("*", null, allTime, Set.of(index), fieldName,
+                false, true, true);
 
-            final var verdict = classifier.classify(physicalType, stats.count(), stats.min(), stats.max(),
-                    indexPeriod(index));
+        final var verdict = classifier.classify(physicalType, stats.count(), stats.min(), stats.max(),
+                indexPeriod(index));
 
-            return switch (verdict) {
-                case EPOCH_MILLIS -> Optional.of(Reason.VALUES_ARE_EPOCH_MILLIS);
-                case EPOCH_SECONDS -> Optional.of(Reason.VALUES_ARE_EPOCH_SECONDS);
-                case NOT_A_DATE -> Optional.empty();
-            };
-        } catch (Exception e) {
-            LOG.debug("Could not read values of field <{}> in index <{}>, not treating it as a date.",
-                    fieldName, index, e);
-            return Optional.empty();
-        }
+        return switch (verdict) {
+            case EPOCH_MILLIS -> Optional.of(Reason.VALUES_ARE_EPOCH_MILLIS);
+            case EPOCH_SECONDS -> Optional.of(Reason.VALUES_ARE_EPOCH_SECONDS);
+            case NOT_A_DATE -> Optional.empty();
+        };
     }
 
     @Nullable
@@ -229,7 +244,7 @@ public class NumericDateFieldDetector {
 
     public record Finding(String fieldName, String physicalType, Reason reason) {
         public String describe() {
-            return String.format(Locale.ROOT, "%s (mapped as %s, %s)", fieldName, physicalType, reason.description());
+            return f("%s (mapped as %s, %s)", fieldName, physicalType, reason.description());
         }
     }
 }

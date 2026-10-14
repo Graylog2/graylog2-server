@@ -104,8 +104,12 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 continue;
             }
             try {
-                if (rotateIfAffected(indexSetConfig)) {
+                final Outcome outcome = rotateIfAffected(indexSetConfig);
+                if (outcome != Outcome.NOT_AFFECTED) {
                     rotatedIndexSets.add(indexSetConfig.title());
+                }
+                if (outcome == Outcome.ROTATED_WITH_ERRORS) {
+                    failed++;
                 }
             } catch (Exception e) {
                 failed++;
@@ -129,25 +133,25 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
         clusterConfigService.write(new MigrationCompleted(rotatedIndexSets.size()));
     }
 
-    private boolean rotateIfAffected(IndexSetConfig indexSetConfig) throws Exception {
+    private Outcome rotateIfAffected(IndexSetConfig indexSetConfig) throws Exception {
         final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
         final String writeIndex = indexSet.getActiveWriteIndex();
         if (writeIndex == null) {
             // Nothing has been written to this index set yet, so its next index is created from the current template.
-            return false;
+            return Outcome.NOT_AFFECTED;
         }
 
         final List<NumericDateFieldDetector.Finding> findings =
                 detector.findNumericDateFields(indexSetConfig, writeIndex);
         if (findings.isEmpty()) {
-            return false;
+            return Outcome.NOT_AFFECTED;
         }
 
         LOG.info("Rotating index set <{}> ({}): index <{}> maps {} numerically.",
                 indexSetConfig.id(), indexSetConfig.title(), writeIndex,
                 findings.stream().map(NumericDateFieldDetector.Finding::describe).collect(Collectors.joining(", ")));
 
-        pinToDate(indexSetConfig, findings);
+        final boolean allPinned = pinToDate(indexSetConfig, findings);
 
         // The mappings were written to the index set config, so the index set has to be read again: the new index is
         // created from the configuration this object holds, and the one captured above no longer has them.
@@ -155,7 +159,18 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 .map(mongoIndexSetFactory::create)
                 .orElse(indexSet)
                 .cycle();
-        return true;
+
+        return allPinned ? Outcome.ROTATED : Outcome.ROTATED_WITH_ERRORS;
+    }
+
+    private enum Outcome {
+        NOT_AFFECTED,
+        ROTATED,
+        /**
+         * Rotated, but at least one field could not be pinned, so its type is left to the first value that arrives.
+         * The migration treats this as unfinished and tries again on the next startup.
+         */
+        ROTATED_WITH_ERRORS
     }
 
     /**
@@ -164,9 +179,13 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
      * dates Graylog writes now and the epoch milliseconds an older source may still send.
      * <p>
      * Existing custom field mappings are kept: the mappings are merged, and the detector ignores fields that already
-     * have one. A field that cannot be pinned is not fatal - the rotation alone still gives it a fresh mapping.
+     * have one.
+     *
+     * @return whether every field could be pinned. A field that could not is left to dynamic mapping, where the next
+     * value that arrives decides its type again, so the caller has to treat that as unfinished work.
      */
-    private void pinToDate(IndexSetConfig indexSetConfig, List<NumericDateFieldDetector.Finding> findings) {
+    private boolean pinToDate(IndexSetConfig indexSetConfig, List<NumericDateFieldDetector.Finding> findings) {
+        boolean allPinned = true;
         for (NumericDateFieldDetector.Finding finding : findings) {
             try {
                 fieldTypeMappingsService.changeFieldType(
@@ -175,11 +194,14 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                         // rotate once at the end instead of once per field
                         false);
             } catch (Exception e) {
-                LOG.warn("Could not set the type of field <{}> in index set <{}> to date. The rotation will still "
-                                + "give it a fresh mapping, but its type will be determined by the first message.",
+                allPinned = false;
+                LOG.warn("Could not set the type of field <{}> in index set <{}> to date. The index set is still "
+                                + "rotated, but the type of that field is determined by the first message written "
+                                + "to the new index. Retrying on the next startup.",
                         finding.fieldName(), indexSetConfig.id(), e);
             }
         }
+        return allPinned;
     }
 
     /**

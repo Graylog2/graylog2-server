@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -142,6 +144,17 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     @Test
+    void retriesOnTheNextStartupWhenAFieldCannotBePinned() {
+        givenFindings("event_start");
+        doThrowOnChangeFieldType();
+
+        migration.upgrade();
+
+        // an unpinned field is left to dynamic mapping, so the work is not finished and must not be marked done
+        verify(clusterConfigService, never()).write(any());
+    }
+
+    @Test
     void notifiesAboutTheRotation() {
         givenFindings("event_start");
 
@@ -173,7 +186,7 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     private void givenFindings(String... fieldNames) {
-        final List<NumericDateFieldDetector.Finding> findings = java.util.Arrays.stream(fieldNames)
+        final List<NumericDateFieldDetector.Finding> findings = Arrays.stream(fieldNames)
                 .map(name -> new NumericDateFieldDetector.Finding(name, "long",
                         NumericDateFieldDetector.Reason.MAPPED_AS_DATE_IN_OLDER_INDEX))
                 .toList();
@@ -181,7 +194,7 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     private void doThrowOnChangeFieldType() {
-        org.mockito.Mockito.doThrow(new RuntimeException("not allowed"))
+        doThrow(new RuntimeException("not allowed"))
                 .when(fieldTypeMappingsService).changeFieldType(any(), any(), anyBoolean());
     }
 

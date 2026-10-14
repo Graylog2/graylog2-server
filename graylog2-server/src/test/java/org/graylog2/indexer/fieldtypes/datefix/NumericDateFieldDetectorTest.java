@@ -24,6 +24,8 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,13 +58,14 @@ class NumericDateFieldDetectorTest {
     private final IndexFieldTypePoller indexFieldTypePoller = mock(IndexFieldTypePoller.class);
     private final IndexRangeService indexRangeService = mock(IndexRangeService.class);
     private final SearchesAdapter searchesAdapter = mock(SearchesAdapter.class);
+    private final IndexFieldTypeProfileService profileService = mock(IndexFieldTypeProfileService.class);
 
     private NumericDateFieldDetector detector;
 
     @BeforeEach
     void setUp() {
         detector = new NumericDateFieldDetector(indexFieldTypesService, indexFieldTypePoller, indexRangeService,
-                searchesAdapter, new NumericDateFieldClassifier());
+                searchesAdapter, new NumericDateFieldClassifier(), profileService);
     }
 
     @Test
@@ -132,10 +136,13 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void reportsNothingWhenTheWriteIndexMappingCannotBeRead() {
+    void failsWhenTheWriteIndexMappingCannotBeRead() {
         givenIndices(index(OLDER_INDEX, field("event_start", "date")));
 
-        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
+        // not knowing the mapping must not look like "nothing to repair", or the migration would mark itself done
+        assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(WRITE_INDEX);
     }
 
     @Test
@@ -152,28 +159,45 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void stopsReadingValuesAfterTheFirstAffectedField() {
-        givenIndices(index(WRITE_INDEX,
-                field("event_start", "long"), field("event_end", "long"), field("took_ms", "long")));
-        // every field looks like a timestamp, but one is enough to decide that the index set must be rotated
+    void reportsEveryAffectedFieldFoundByItsValues() {
+        givenIndices(index(WRITE_INDEX, field("event_start", "long"), field("event_end", "long")));
         final FieldStatsResult stats = statsOf(10, EPOCH_MILLIS);
         when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), anyString(),
                 anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(stats);
 
-        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).hasSize(1);
-        verify(searchesAdapter, times(1)).fieldStats(anyString(), any(), any(), any(), anyString(),
-                anyBoolean(), anyBoolean(), anyBoolean());
+        // every affected field has to be named, otherwise it is not pinned and dynamic mapping decides it again
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .extracting(NumericDateFieldDetector.Finding::fieldName)
+                .containsExactlyInAnyOrder("event_start", "event_end");
     }
 
     @Test
-    void reportsNothingWhenTheValuesCannotBeRead() {
+    void ignoresFieldsTypedByTheIndexSetsFieldTypeProfile() {
+        givenIndices(
+                index(WRITE_INDEX, field("event_start", "long")),
+                index(OLDER_INDEX, field("event_start", "date")));
+
+        final IndexFieldTypeProfile profile = mock(IndexFieldTypeProfile.class);
+        when(profile.customFieldMappings())
+                .thenReturn(new CustomFieldMappings(List.of(new CustomFieldMapping("event_start", "long"))));
+        when(profileService.get("profile-1")).thenReturn(Optional.of(profile));
+
+        final IndexSetConfig config = indexSetConfig();
+        when(config.fieldTypeProfile()).thenReturn("profile-1");
+
+        assertThat(detector.findNumericDateFields(config, WRITE_INDEX)).isEmpty();
+    }
+
+    @Test
+    void failsWhenTheValuesCannotBeRead() {
         givenIndices(index(WRITE_INDEX, field("event_start", "long")));
         when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), eq("event_start"),
                 anyBoolean(), anyBoolean(), anyBoolean()))
                 .thenThrow(new RuntimeException("index is closed"));
 
-        // a detector that cannot read the values must not cause a rotation
-        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
+        // being unable to judge a field is not the same as knowing it is fine
+        assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test

@@ -18,6 +18,8 @@ package org.graylog2.indexer.fieldtypes.datefix;
 
 import org.graylog2.indexer.fieldtypes.datefix.NumericDateFieldClassifier.IndexPeriod;
 import org.graylog2.indexer.fieldtypes.datefix.NumericDateFieldClassifier.Verdict;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,8 +100,8 @@ class NumericDateFieldClassifierTest {
     void ignoresCountersThatOnlyLookLikeTimestamps() {
         // ~1.75 TB in bytes lands inside the epoch window, but nowhere near when this index was written
         final IndexPeriod lastYear = IndexPeriod.of(
-                new org.joda.time.DateTime(2020, 1, 1, 0, 0, org.joda.time.DateTimeZone.UTC),
-                new org.joda.time.DateTime(2020, 1, 2, 0, 0, org.joda.time.DateTimeZone.UTC));
+                new DateTime(2020, 1, 1, 0, 0, DateTimeZone.UTC),
+                new DateTime(2020, 1, 2, 0, 0, DateTimeZone.UTC));
 
         assertThat(classifier.classify("long", 10, EPOCH_MILLIS, EPOCH_MILLIS, lastYear))
                 .isEqualTo(Verdict.NOT_A_DATE);
