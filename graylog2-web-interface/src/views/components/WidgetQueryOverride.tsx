@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -68,15 +69,19 @@ type Props = {
   onReset: () => void;
 };
 
-const WidgetQueryOverride = ({ value, onReset }: Props) => (
-  <Wrapper>
-    <QueryInfo>
-      <StyledBasicQueryInput disabled value={value.query_string} height={34} wrapEnabled={false} maxLines={1} />
-      <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
-        Reset Global Filter
-      </ResetButton>
-    </QueryInfo>
-  </Wrapper>
-);
+const WidgetQueryOverride = ({ value, onReset }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Wrapper>
+      <QueryInfo>
+        <StyledBasicQueryInput disabled value={value.query_string} height={34} wrapEnabled={false} maxLines={1} />
+        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
+          {t('widget_query.reset_global_filter')}
+        </ResetButton>
+      </QueryInfo>
+    </Wrapper>
+  );
+};
 
 export default WidgetQueryOverride;

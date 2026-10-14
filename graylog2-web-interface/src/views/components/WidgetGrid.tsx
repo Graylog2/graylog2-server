@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { createSelector } from '@reduxjs/toolkit';
@@ -91,6 +92,7 @@ type WidgetsProps = {
 };
 
 const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget, isNewWidget }: WidgetsProps) => {
+  const { t } = useTranslation('search');
   const dispatch = useViewsDispatch();
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
@@ -101,7 +103,7 @@ const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget,
       <ScrollToHint
         autoScroll
         scrollContainer={{ current: document.body }}
-        title="Scroll to new widget"
+        title={t('widget_creation.scroll_to_new_widget')}
         ifTrue={isNewWidget}
         onSettled={onSettled}
       />

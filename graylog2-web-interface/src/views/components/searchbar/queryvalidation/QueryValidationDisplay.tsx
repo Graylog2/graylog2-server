@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext, useState, useRef, useCallback, useEffect } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import delay from 'lodash/delay';
@@ -189,6 +190,7 @@ type Props = {
 };
 
 const QueryValidationDisplay = ({ queryStringErrors = undefined, validationExplanations = [] }: Props) => {
+  const { t } = useTranslation('search');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -201,16 +203,27 @@ const QueryValidationDisplay = ({ queryStringErrors = undefined, validationExpla
   const hasExplanations = validationState && validationState?.status !== 'OK';
   const isInfo = validationState && validationState.status === 'INFO';
 
-  const validationTitle = () => {
-    if (!validationState) return '';
-
-    switch (validationState.status) {
+  const toggleTitle = () => {
+    switch (validationState?.status) {
       case 'WARNING':
-        return 'warning';
+        return t('query_validation.toggle_warning');
       case 'INFO':
-        return 'information';
+        return t('query_validation.toggle_information');
       default:
-        return 'error explanation';
+        return t('query_validation.toggle_error');
+    }
+  };
+
+  const statusTitle = () => {
+    switch (status) {
+      case 'WARNING':
+        return t('query_validation.status_warning');
+      case 'INFO':
+        return t('query_validation.status_info');
+      case 'ERROR':
+        return t('query_validation.status_error');
+      default:
+        return StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase());
     }
   };
 
@@ -219,18 +232,13 @@ const QueryValidationDisplay = ({ queryStringErrors = undefined, validationExpla
       <Popover.Target>
         <Container ref={explanationTriggerRef}>
           {hasExplanations ? (
-            <ExplanationTrigger
-              title={`Toggle validation ${validationTitle()}`}
-              onClick={toggleShow}
-              $clickable
-              tabIndex={0}
-              type="button">
+            <ExplanationTrigger title={toggleTitle()} onClick={toggleShow} $clickable tabIndex={0} type="button">
               <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink
               page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-              title="Search query syntax documentation"
+              title={t('query_validation.syntax_documentation')}
               text={<Icon name="lightbulb_circle" />}
             />
           )}
@@ -239,7 +247,7 @@ const QueryValidationDisplay = ({ queryStringErrors = undefined, validationExpla
       {hasExplanations && showExplanation && (
         <StyledPopoverDropdown
           id="query-validation-error-explanation"
-          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+          title={<ExplanationTitle title={statusTitle()} />}
           $shaking={shakingPopover}>
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
@@ -250,7 +258,7 @@ const QueryValidationDisplay = ({ queryStringErrors = undefined, validationExpla
                 {errorType && (
                   <DocumentationLink
                     page={DocsHelper.PAGES.SEARCH_QUERY_ERRORS}
-                    title="Query error documentation"
+                    title={t('query_validation.error_documentation')}
                     text={<DocumentationIcon name="lightbulb_circle" />}
                   />
                 )}

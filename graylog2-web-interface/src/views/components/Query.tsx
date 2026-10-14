@@ -26,6 +26,17 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
+// `Trans` provides the link texts as children.
+const EnterpriseLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
+const DashboardsDocumentationLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text={children} />
+);
+
 const NoWidgetsInfo = () => {
   const UpsellWrapper = usePluggableUpsellWrapper();
   const { t } = useTranslation('search');
@@ -64,11 +75,11 @@ const NoWidgetsInfo = () => {
               4. <Trans i18nKey="empty_state.tip_4" ns="search" components={{ bold: <b /> }} />
               <UpsellWrapper>
                 {' '}
-                (contained in{' '}
-                <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
-                  Graylog Enterprise
-                </a>
-                )
+                <Trans
+                  t={t}
+                  i18nKey="query.contained_in_enterprise"
+                  components={{ enterpriseLink: <EnterpriseLink /> }}
+                />
               </UpsellWrapper>
               .
             </p>
@@ -76,8 +87,7 @@ const NoWidgetsInfo = () => {
         </IfDashboard>
       </ul>
       <p>
-        You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />,
-        to learn more about the widget creation.
+        <Trans t={t} i18nKey="query.documentation_hint" components={{ docsLink: <DashboardsDocumentationLink /> }} />
       </p>
     </Jumbotron>
   );

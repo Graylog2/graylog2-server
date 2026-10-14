@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ActionDropdown from 'views/components/common/ActionDropdown';
 import IconButton from 'components/common/IconButton';
@@ -23,13 +24,22 @@ type Props = {
   children: React.ReactElement | React.ReactElement[];
 };
 
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown
-    element={
-      <IconButton name="arrow_drop_down" data-testid="query-action-dropdown" title="Page Actions" showTooltip={false} />
-    }>
-    {children}
-  </ActionDropdown>
-);
+const QueryActionDropdown = ({ children }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <ActionDropdown
+      element={
+        <IconButton
+          name="arrow_drop_down"
+          data-testid="query-action-dropdown"
+          title={t('query_title.page_actions')}
+          showTooltip={false}
+        />
+      }>
+      {children}
+    </ActionDropdown>
+  );
+};
 
 export default QueryActionDropdown;

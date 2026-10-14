@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useCallback, useRef } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
@@ -127,6 +128,7 @@ type Props = {
 };
 
 const DashboardSearchBar = ({ scrollContainer }: Props) => {
+  const { t } = useTranslation('search');
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const { userTimezone } = useUserDateTime();
@@ -188,7 +190,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                   <ScrollToHint
                     ifValueChanges={queryString}
                     scrollContainer={scrollContainer}
-                    title="Scroll to search bar"
+                    title={t('search_bar.scroll_hint')}
                   />
                   <SearchBarContainer>
                     <ValidateOnParameterChange parameters={parameters} />
@@ -227,7 +229,7 @@ const DashboardSearchBar = ({ scrollContainer }: Props) => {
                                         value={value}
                                         view={view}
                                         timeRange={values?.timerange}
-                                        placeholder="Apply filter to all widgets"
+                                        placeholder={t('dashboard_search_bar.filter_placeholder')}
                                         name={name}
                                         onChange={onChange}
                                         disableExecution={disableSearchSubmit}

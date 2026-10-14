@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -32,6 +33,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
 
 const AssetDetailsActions = ({ assetId }: { assetId: string }) => {
+  const { t } = useTranslation('search');
   const { all } = useContext(FieldTypesContext);
   const fieldType = all.find((f) => f.name === 'associated_assets')?.type;
   const queryId = useActiveQueryId();
@@ -41,7 +43,7 @@ const AssetDetailsActions = ({ assetId }: { assetId: string }) => {
 
   return (
     <Button bsSize="xs" bsStyle="primary" onClick={() => handleAddToQuery()}>
-      Add to query
+      {t('common_views.add_to_query')}
     </Button>
   );
 };

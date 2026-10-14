@@ -145,7 +145,11 @@ const TimeRangePresetDropdown = ({
   const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime } = useUserDateTime();
-  const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration, t('time_range.no_available_presets'));
+  const { options, setOptions: setDropdownOptions } = usePresetOptions(
+    disabled,
+    limitDuration,
+    t('time_range.no_available_presets'),
+  );
 
   const _onChange = useCallback(
     (timerange: TimeRange) => {
@@ -178,7 +182,7 @@ const TimeRangePresetDropdown = ({
     <DropdownButton
       title={displayTitle && t('time_range.load_preset')}
       id="relative-timerange-selector"
-      aria-label="Open time range preset select"
+      aria-label={t('time_range_presets.open_preset_select')}
       bsSize={bsSize}
       className={className}
       onToggle={onToggle}

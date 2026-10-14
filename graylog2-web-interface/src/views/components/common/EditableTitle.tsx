@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -55,6 +56,7 @@ type Props = {
 };
 
 const EditableTitle = ({ disabled = false, value: propsValue, onChange }: Props) => {
+  const { t } = useTranslation('search');
   const [value, setValue] = useState(propsValue);
   const [editing, { toggle }] = useDisclosure(false);
 
@@ -95,11 +97,18 @@ const EditableTitle = ({ disabled = false, value: propsValue, onChange }: Props)
   return editing ? (
     <span>
       <form onSubmit={_onSubmit} className={styles.inlineForm}>
-        <StyledInput autoFocus type="text" value={value} onBlur={_onBlur} title="Edit title" onChange={_onChange} />
+        <StyledInput
+          autoFocus
+          type="text"
+          value={value}
+          onBlur={_onBlur}
+          title={t('editable_title.edit')}
+          onChange={_onChange}
+        />
       </form>
     </span>
   ) : (
-    <Title onDoubleClick={_toggleEditing} title={`${value} - Double click the title to edit it.`}>
+    <Title onDoubleClick={_toggleEditing} title={t('editable_title.hint', { value })}>
       {value}
     </Title>
   );

@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
+import { formatNumber } from 'util/NumberFormatting';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
@@ -59,7 +59,12 @@ const SearchResultOverview = ({ results }: Props) => {
     <>
       <p>
         {t('sidebar_description.query_executed_in')} <br />
-        {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
+        <Trans
+          t={t}
+          i18nKey="search_result_overview.duration_at"
+          values={{ duration: formatNumber(duration, { digits: 0 }) }}
+          components={{ timestamp: <Timestamp dateTime={timestamp} /> }}
+        />
       </p>
       <EffectiveTimeRange>
         {t('sidebar_description.effective_time_range')}
@@ -71,13 +76,13 @@ const SearchResultOverview = ({ results }: Props) => {
             <tbody>
               <tr>
                 <td>{t('sidebar_description.time_from')}</td>
-                <td aria-label="Effective time range from">
+                <td aria-label={t('search_result_overview.effective_from')}>
                   <Timestamp dateTime={effectiveTimerange.from} format="complete" />
                 </td>
               </tr>
               <tr>
                 <td>{t('sidebar_description.time_to')}</td>
-                <td aria-label="Effective time range to">
+                <td aria-label={t('search_result_overview.effective_to')}>
                   <Timestamp dateTime={effectiveTimerange.to} format="complete" />
                 </td>
               </tr>
@@ -88,7 +93,7 @@ const SearchResultOverview = ({ results }: Props) => {
       <p>
         {t('sidebar_description.total_results')}
         <br />
-        {isVariesPerWidget ? <i>{t('sidebar_description.varies_per_widget')}</i> : numeral(total).format('0,0')}
+        {isVariesPerWidget ? <i>{t('sidebar_description.varies_per_widget')}</i> : formatNumber(total, { digits: 0 })}
       </p>
     </>
   );

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -72,6 +73,7 @@ const NewWidgetPlaceholder = (
 ) => {
   const [show, setShow] = useState(false);
   const onCancel = useCallback(() => setShow(false), []);
+  const { t } = useTranslation('search');
   const onClick = useCallback(() => setShow(true), []);
 
   const containerStyle = {
@@ -83,7 +85,7 @@ const NewWidgetPlaceholder = (
     <div style={containerStyle} ref={ref}>
       <PlaceholderBox onClick={onClick}>
         <HugeIcon name="add_circle" />
-        Create a new widget here
+        {t('widget_creation.placeholder')}
       </PlaceholderBox>
       {show && <Component onCancel={onCancel} position={position} />}
     </div>

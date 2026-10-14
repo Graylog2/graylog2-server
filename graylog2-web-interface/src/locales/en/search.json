@@ -195,5 +195,219 @@
     "value_required": "Value is required",
     "update_rule": "Update rule",
     "create_rule": "Create rule"
+  },
+  "query_tabs": {
+    "create_page": "Create New Page",
+    "more_pages": "More Dashboard Pages",
+    "open_configuration": "Open pages configuration",
+    "copy_page": "Copy page",
+    "copying_page": "Copying page...",
+    "copy_page_failed": "Copying dashboard page failed with error {{error}}",
+    "remove_page": "Remove page {{title}}",
+    "configuration_title": "Update Dashboard Pages Configuration",
+    "update_configuration": "Update configuration",
+    "order": "Order",
+    "order_help": "Use drag and drop to change the order of the dashboard pages. Double-click on a dashboard title to change it."
+  },
+  "widget_creation": {
+    "title": "Create new widget",
+    "create_widget": "Create {{title}} Widget",
+    "placeholder": "Create a new widget here",
+    "scroll_to_new_widget": "Scroll to new widget"
+  },
+  "dashboard_actions": {
+    "immutable": "This dashboard is read-only because it is managed by {{productName}}. Use \"Save as\" to create an editable copy.",
+    "debug": "Debug",
+    "share_unsaved": "Only saved dashboards can be shared.",
+    "edit_metadata": "Edit metadata",
+    "export": "Export",
+    "save_new_title": "Save new dashboard",
+    "create": "Create dashboard",
+    "edit_title": "Editing dashboard",
+    "update": "Update dashboard",
+    "share_description": "Search for a User or Team to add as collaborator on this dashboard."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Apply filter to all widgets"
+  },
+  "debug": {
+    "title": "Debug information"
+  },
+  "common_views": {
+    "empty_value": "<Empty Value>",
+    "add_to_query": "Add to query",
+    "time_range_validation": {
+      "invalid_date_format": "Format must be: {{format}}.",
+      "range_limit": "Range is outside limit duration.",
+      "date_limit": "Date is outside limit duration.",
+      "until_before_from": "The \"Until\" date must come after the \"From\" date.",
+      "empty": "Cannot be empty.",
+      "keyword_empty": "Keyword must not be empty!",
+      "keyword_unparsable": "Unable to parse keyword"
+    },
+    "remove_from_favorites": "Remove from favorites",
+    "add_to_favorites": "Add to favorites",
+    "view_type": {
+      "search": "search",
+      "dashboard": "dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Migrate existing search page charts",
+    "found_charts_one": "We found {{count}} chart, created for an older version of the search. Do you want to migrate this chart for the current search?",
+    "found_charts_other": "We found {{count}} charts, created for an older version of the search. Do you want to migrate these charts for the current search?",
+    "save_hint": "When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard. Otherwise the charts will get lost, when leaving the search page.",
+    "migrate": "Migrate",
+    "discard": "Discard charts"
+  },
+  "query": {
+    "contained_in_enterprise": "(contained in <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "You can also have a look at the <docsLink>documentation</docsLink>, to learn more about the widget creation."
+  },
+  "widget_query": {
+    "reset_global_filter": "Reset Global Filter"
+  },
+  "editable_title": {
+    "edit": "Edit title",
+    "hint": "{{value}} - Double click the title to edit it."
+  },
+  "message_permalink": {
+    "label": "Permalink"
+  },
+  "query_title": {
+    "page_actions": "Page Actions",
+    "edit_title": "Edit Title",
+    "duplicate": "Duplicate",
+    "copy_to_dashboard": "Copy to Dashboard",
+    "edit_modal_title": "Editing dashboard page title",
+    "update_title": "Update title",
+    "title_help": "Enter a helpful dashboard page title. It has a maximum length of 40 characters.",
+    "title": "Title"
+  },
+  "missing_requirements": {
+    "description_search": "Unfortunately executing this search is not possible. It uses the following capabilities which are not available:",
+    "description_dashboard": "Unfortunately executing this dashboard is not possible. It uses the following capabilities which are not available:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - included in <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Back"
+  },
+  "view_header": {
+    "alerts_and_events": "Alerts & Events",
+    "event_definitions": "Event definitions",
+    "edit_search_metadata": "Edit search {{title}} metadata",
+    "edit_dashboard_metadata": "Edit dashboard {{title}} metadata",
+    "editing_search": "Editing saved search",
+    "editing_dashboard": "Editing saved dashboard",
+    "save_search": "Save search",
+    "save_dashboard": "Save dashboard"
+  },
+  "execution": {
+    "not_executed": "No query executed yet."
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard documentation",
+    "description": "Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart you create in other parts of the application with one click."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Search filters</italic> contain their own query and extend the main query using the <bold>AND</bold> operator.",
+    "explanation_saved": "Filters can be saved separately and reused in saved searches and dashboards. Updating a saved filter will automatically affect the search results of searches which include the filter."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Reset Global Override"
+  },
+  "time_range_presets": {
+    "select_time_range": "Select time range",
+    "open_preset_select": "Open time range preset select"
+  },
+  "move_range": {
+    "show_previous": "Show previous",
+    "show_previous_duration": "Show previous {{duration}}",
+    "show_next": "Show next",
+    "show_next_duration": "Show next {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "Toggle validation warning",
+    "toggle_information": "Toggle validation information",
+    "toggle_error": "Toggle validation error explanation",
+    "syntax_documentation": "Search query syntax documentation",
+    "error_documentation": "Query error documentation",
+    "status_warning": "Warning",
+    "status_info": "Info",
+    "status_error": "Error",
+    "validation_failed": "Validating search query failed with status: {{error}}",
+    "warm_tier_title": "Warm Tier Search",
+    "warm_tier_message": "The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm Tier for that stream:"
+  },
+  "saved_searches": {
+    "title": "Saved Searches",
+    "confirm_bulk_delete_one": "Do you really want to remove {{count}} saved search?",
+    "confirm_bulk_delete_other": "Do you really want to remove {{count}} saved searches?",
+    "bulk_delete_partial_one": "{{failed}} out of {{count}} selected saved search could not be deleted.",
+    "bulk_delete_partial_other": "{{failed}} out of {{count}} selected saved searches could not be deleted.",
+    "bulk_delete_success_one": "{{count}} saved search was deleted successfully.",
+    "bulk_delete_success_other": "{{count}} saved searches were deleted successfully.",
+    "success": "Success",
+    "bulk_delete_error": "An error occurred while deleting saved searches. {{error}}",
+    "confirm_delete": "You are about to delete saved search: \"{{title}}\". Are you sure?",
+    "delete_search": "Delete search {{title}}",
+    "delete": "Delete"
+  },
+  "search_meta": {
+    "buttons": "Search Meta Buttons"
+  },
+  "save_view_notifications": {
+    "success_title": "Success!",
+    "error_title": "Error!",
+    "plugin_initial_values_failed": "An error occurred when collecting initial search bar form values from a plugin",
+    "plugin_validation_preparation_failed": "An error occurred when preparing search bar validation for a plugin",
+    "plugin_validation_failed": "An error occurred when validating search bar values from a plugin",
+    "plugin_submit_failed": "An error occurred when executing a submit handler from a plugin: {{error}}",
+    "load_saved_searches_failed": "Loading saved searches failed with status",
+    "could_not_load_saved_searches": "Could not load saved searches",
+    "load_minimum_refresh_interval_failed": "Loading system configuration \"minimum_auto_refresh_interval\" failed with status",
+    "could_not_load_configuration": "Could not load configuration option"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Display sidebar as overlay",
+    "display_inline": "Display sidebar inline"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms at <timestamp/>",
+    "effective_from": "Effective time range from",
+    "effective_to": "Effective time range to"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Filter fields",
+    "reset": "Reset",
+    "list_fields": "List fields of <current>current query</current>, <all>all</all> or <allReserved>all including reserved</allReserved> fields.",
+    "current_title": "This shows fields which occur in your current query.",
+    "all_title": "This shows all fields, but no reserved (gl2_*) fields.",
+    "all_reserved_title": "This shows all fields, including reserved (gl2_*) fields.",
+    "no_field_information": "No field information available.",
+    "no_fields": "No fields to show. Try changing your filter term or select a different field set above."
+  },
+  "highlighting_color": {
+    "color": "Color",
+    "gradient_name": "Gradient Name",
+    "gradient_placeholder": "Select gradient colors",
+    "lowest_placeholder": "Specify lowest value",
+    "lowest_label": "Lowest Value",
+    "lowest_help": "The lowest value expected in the field/series.",
+    "highest_aria": "Specify highest value",
+    "highest_label": "Highest Value",
+    "highest_help": "The highest value expected in the field/series.",
+    "coloring": "Coloring",
+    "static_color": "Static Color",
+    "gradient": "Gradient",
+    "must_be_selected": "Must be selected.",
+    "must_be_present": "Must be present.",
+    "must_be_number": "Must be a number.",
+    "must_be_higher": "Must be higher than lowest value.",
+    "coloring_required": "Coloring is required",
+    "gradient_numeric_only": "A gradient can only be defined for numeric fields."
+  },
+  "highlighting_rule": {
+    "edit": "Edit this Highlighting Rule",
+    "remove": "Remove this Highlighting Rule",
+    "confirm_remove": "Do you really want to remove this highlighting?"
   }
 }

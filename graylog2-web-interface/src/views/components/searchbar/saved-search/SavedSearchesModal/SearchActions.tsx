@@ -16,8 +16,10 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 
+import i18n from 'i18n';
 import { Button } from 'components/bootstrap';
 import { IfPermitted, ShareButton } from 'components/common';
 import type View from 'views/logic/views/View';
@@ -37,7 +39,7 @@ const onDelete = (
   e.stopPropagation();
 
   // eslint-disable-next-line no-alert
-  if (window.confirm(`You are about to delete saved search: "${savedSearch.title}". Are you sure?`)) {
+  if (window.confirm(i18n.t('saved_searches.confirm_delete', { ns: 'search', title: savedSearch.title }))) {
     deleteSavedSearch(savedSearch).then(() => {
       if (savedSearch.id !== activeSavedSearchId) {
         refetch();
@@ -55,6 +57,7 @@ type Props = {
 };
 
 const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Props) => {
+  const { t } = useTranslation('search');
   const { deselectEntity } = useSelectedEntities();
   const { refetch } = useTableFetchContext();
   const [showShareModal, setShowShareModal] = useState(false);
@@ -74,9 +77,9 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Pro
             role="button"
             bsSize="xsmall"
             bsStyle="danger"
-            title={`Delete search ${search.title}`}
+            title={t('saved_searches.delete_search', { title: search.title })}
             tabIndex={0}>
-            Delete
+            {t('saved_searches.delete')}
           </Button>
         </IfPermitted>
       )}
@@ -85,7 +88,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Pro
           entityId={search.id}
           entityType="search"
           entityTitle={search.title}
-          description="Search for a User or Team to add as collaborator on this search."
+          description={t('save_form.share_description')}
           onClose={toggleEntityShareModal}
         />
       )}

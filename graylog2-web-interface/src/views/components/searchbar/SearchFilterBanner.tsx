@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, ButtonGroup } from 'components/bootstrap';
 import { Icon, HoverForHelp } from 'components/common';
@@ -40,17 +40,18 @@ const SearchFilterHelp = styled((props: any) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-export const SearchFilterExplanation = () => (
-  <>
-    <p>
-      <i>Search filters</i> contain their own query and extend the main query using the <b>AND</b> operator.
-    </p>
-    <p>
-      Filters can be saved separately and reused in saved searches and dashboards. Updating a saved filter will
-      automatically affect the search results of searches which include the filter.
-    </p>
-  </>
-);
+export const SearchFilterExplanation = () => {
+  const { t } = useTranslation('search');
+
+  return (
+    <>
+      <p>
+        <Trans t={t} i18nKey="search_filter_banner.explanation" components={{ italic: <i />, bold: <b /> }} />
+      </p>
+      <p>{t('search_filter_banner.explanation_saved')}</p>
+    </>
+  );
+};
 
 type Props = {
   onHide: () => void;

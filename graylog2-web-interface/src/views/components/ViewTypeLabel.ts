@@ -15,8 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import i18n from 'i18n';
 import StringUtils from 'util/StringUtils';
 import type { ViewType } from 'views/logic/views/View';
+
+const VIEW_TYPE_LABELS = {
+  SEARCH: 'common_views.view_type.search',
+  DASHBOARD: 'common_views.view_type.dashboard',
+} as const;
 
 type Props = {
   type: ViewType | undefined | null;
@@ -28,7 +34,7 @@ const ViewTypeLabel = ({ type, capitalize = false }: Props) => {
     return '';
   }
 
-  const typeLabel = type.toLowerCase();
+  const typeLabel = VIEW_TYPE_LABELS[type] ? i18n.t(VIEW_TYPE_LABELS[type], { ns: 'search' }) : type.toLowerCase();
 
   return capitalize ? StringUtils.capitalizeFirstLetter(typeLabel) : typeLabel;
 };

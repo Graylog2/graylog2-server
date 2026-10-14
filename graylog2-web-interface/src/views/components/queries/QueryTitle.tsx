@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useCallback, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -57,6 +58,7 @@ const QueryTitle = ({
   openCopyToDashboardModal,
   title,
 }: Props) => {
+  const { t } = useTranslation('search');
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
   const dispatch = useViewsDispatch();
@@ -78,12 +80,12 @@ const QueryTitle = ({
 
       {active && (
         <QueryActionDropdown>
-          <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
-          <MenuItem onSelect={_onDuplicate}>Duplicate</MenuItem>
-          <MenuItem onSelect={() => openCopyToDashboardModal(true)}>Copy to Dashboard</MenuItem>
+          <MenuItem onSelect={() => openEditModal(titleValue)}>{t('query_title.edit_title')}</MenuItem>
+          <MenuItem onSelect={_onDuplicate}>{t('query_title.duplicate')}</MenuItem>
+          <MenuItem onSelect={() => openCopyToDashboardModal(true)}>{t('query_title.copy_to_dashboard')}</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={onRemove} disabled={!allowsClosing}>
-            Delete
+            {t('common:actions.delete')}
           </MenuItem>
         </QueryActionDropdown>
       )}

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
@@ -74,16 +75,16 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     return (
       <BootstrapModalForm
         show={showModal}
-        title="Editing dashboard page title"
+        title={i18n.t('query_title.edit_modal_title', { ns: 'search' })}
         onSubmitForm={this._onDraftSave}
         onCancel={this.close}
-        submitButtonText="Update title"
+        submitButtonText={i18n.t('query_title.update_title', { ns: 'search' })}
         bsSize="large">
         <Input
           autoFocus
-          help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."
+          help={i18n.t('query_title.title_help', { ns: 'search' })}
           id="title"
-          label="Title"
+          label={i18n.t('query_title.title', { ns: 'search' })}
           name="title"
           onChange={this._onDraftChange}
           maxLength={40}

@@ -16,8 +16,10 @@
  */
 
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import i18n from 'i18n';
 import { Link, Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
@@ -57,7 +59,7 @@ const links: Record<string, (params: LinkParams) => Array<Crumb>> = {
   [View.Type.Dashboard]: ({ id, title }) => [
     {
       link: Routes.DASHBOARDS,
-      label: 'Dashboards',
+      label: i18n.t('main.dashboards', { ns: 'navigation' }),
     },
     {
       label: title || id,
@@ -67,7 +69,7 @@ const links: Record<string, (params: LinkParams) => Array<Crumb>> = {
   [View.Type.Search]: ({ id, title }) => [
     {
       link: Routes.SEARCH,
-      label: 'Search',
+      label: i18n.t('main.search', { ns: 'navigation' }),
     },
     {
       label: title || id,
@@ -77,7 +79,7 @@ const links: Record<string, (params: LinkParams) => Array<Crumb>> = {
   alert: ({ id, onShowDetails }) => [
     {
       link: Routes.ALERTS.LIST,
-      label: 'Alerts & Events',
+      label: i18n.t('view_header.alerts_and_events', { ns: 'search' }),
     },
     {
       label: id,
@@ -88,7 +90,7 @@ const links: Record<string, (params: LinkParams) => Array<Crumb>> = {
   eventDefinition: ({ id, title, onShowDetails }) => [
     {
       link: Routes.ALERTS.DEFINITIONS.LIST,
-      label: 'Event definitions',
+      label: i18n.t('view_header.event_definitions', { ns: 'search' }),
     },
     {
       label: title || id,
@@ -175,6 +177,7 @@ const CrumbLink = ({
 };
 
 const ViewHeader = () => {
+  const { t } = useTranslation('search');
   const view = useView();
   const isNew = useIsNew();
   const isSavedView = view?.id && view?.title && !isNew;
@@ -202,7 +205,7 @@ const ViewHeader = () => {
     [dispatch],
   );
 
-  const typeText = view?.type?.toLocaleLowerCase();
+  const isDashboard = view?.type === View.Type.Dashboard;
   const title = useViewTitle();
   const onChangeFavorite = useCallback(
     (newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())),
@@ -261,7 +264,11 @@ const ViewHeader = () => {
                       <EditButton
                         onClick={toggleMetadataEdit}
                         role="button"
-                        title={`Edit ${typeText} ${view.title} metadata`}
+                        title={
+                          isDashboard
+                            ? t('view_header.edit_dashboard_metadata', { title: view.title })
+                            : t('view_header.edit_search_metadata', { title: view.title })
+                        }
                         tabIndex={0}>
                         <Icon name="edit_square" />
                       </EditButton>
@@ -275,10 +282,10 @@ const ViewHeader = () => {
             <ViewPropertiesModal
               show
               view={view}
-              title={`Editing saved ${typeText}`}
+              title={isDashboard ? t('view_header.editing_dashboard') : t('view_header.editing_search')}
               onClose={toggleMetadataEdit}
               onSave={_onSaveView}
-              submitButtonText={`Save ${typeText}`}
+              submitButtonText={isDashboard ? t('view_header.save_dashboard') : t('view_header.save_search')}
             />
           )}
         </Breadcrumb>

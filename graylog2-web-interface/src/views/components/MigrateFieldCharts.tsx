@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import styled from 'styled-components';
 import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
@@ -218,15 +219,13 @@ const _onCancel = (setMigrationFinished: (finished: boolean) => void) => {
 };
 
 const MigrateFieldCharts = () => {
+  const { t } = useTranslation('search');
   const [migrating, setMigrating] = useState(false);
   const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
   const dispatch = useViewsDispatch();
-  const onMigrate = useCallback(
-    () => _onMigrate(dispatch, legacyCharts, setMigrating, setMigrationFinished),
-    [dispatch, legacyCharts],
-  );
+  const onMigrate = () => _onMigrate(dispatch, legacyCharts, setMigrating, setMigrationFinished);
 
   if (migrationFinished || isEmpty(legacyCharts)) {
     return null;
@@ -235,21 +234,19 @@ const MigrateFieldCharts = () => {
   return (
     <Row>
       <Col>
-        <Alert bsStyle="warning" title="Migrate existing search page charts">
+        <Alert bsStyle="warning" title={t('field_charts_migration.title')}>
           {/* Should we inform the user here about the backend migrations? */}
           <br />
-          We found {chartAmount} chart(s), created for an older version of the search. Do you want to migrate these
-          chart(s) for the current search?
+          {t('field_charts_migration.found_charts', { count: chartAmount })}
           <br />
-          When you have run the migration and want to keep the newly created charts, you will have to save the current
-          search as a new dashboard. Otherwise the charts will get lost, when leaving the search page.
+          {t('field_charts_migration.save_hint')}
           <br />
           <Actions>
             <Button bsStyle="primary" onClick={onMigrate} disabled={migrating} className="save-button-margin">
-              Migrate {migrating && <Spinner text="" />}
+              {t('field_charts_migration.migrate')} {migrating && <Spinner text="" />}
             </Button>
             <Button onClick={() => _onCancel(setMigrationFinished)} disabled={migrating}>
-              Discard charts
+              {t('field_charts_migration.discard')}
             </Button>
           </Actions>
         </Alert>

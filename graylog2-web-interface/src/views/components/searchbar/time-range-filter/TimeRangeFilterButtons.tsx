@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { FormikErrors } from 'formik';
 import { useFormikContext } from 'formik';
@@ -58,6 +59,7 @@ const TimeRangeFilterButtons = ({
   limitDuration,
   submitOnPresetChange = true,
 }: Props) => {
+  const { t } = useTranslation('search');
   const { submitForm } = useFormikContext();
 
   const _onClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -88,7 +90,7 @@ const TimeRangeFilterButtons = ({
           displayTitle={false}
           onChange={selectRelativeTimeRangePreset}
           onToggle={_onPresetSelectToggle}
-          header="Select time range"
+          header={t('time_range_presets.select_time_range')}
           bsSize={null}
         />
       )}

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -88,7 +89,7 @@ export const validateQuery = (
       return undefined;
     })
     .catch((error) => {
-      UserNotification.error(`Validating search query failed with status: ${error}`);
+      UserNotification.error(i18n.t('query_validation.validation_failed', { ns: 'search', error }));
 
       return {
         status: 'OK',

@@ -195,5 +195,219 @@
     "value_required": "Wert ist erforderlich",
     "update_rule": "Regel aktualisieren",
     "create_rule": "Regel erstellen"
+  },
+  "query_tabs": {
+    "create_page": "Neue Seite erstellen",
+    "more_pages": "Weitere Dashboard-Seiten",
+    "open_configuration": "Seitenkonfiguration öffnen",
+    "copy_page": "Seite kopieren",
+    "copying_page": "Seite wird kopiert...",
+    "copy_page_failed": "Kopieren der Dashboard-Seite fehlgeschlagen: {{error}}",
+    "remove_page": "Seite {{title}} entfernen",
+    "configuration_title": "Konfiguration der Dashboard-Seiten aktualisieren",
+    "update_configuration": "Konfiguration aktualisieren",
+    "order": "Reihenfolge",
+    "order_help": "Ändern Sie die Reihenfolge der Dashboard-Seiten per Drag-and-drop. Doppelklicken Sie auf einen Seitentitel, um ihn zu ändern."
+  },
+  "widget_creation": {
+    "title": "Neues Widget erstellen",
+    "create_widget": "Widget {{title}} erstellen",
+    "placeholder": "Hier ein neues Widget erstellen",
+    "scroll_to_new_widget": "Zum neuen Widget scrollen"
+  },
+  "dashboard_actions": {
+    "immutable": "Dieses Dashboard ist schreibgeschützt, weil es von {{productName}} verwaltet wird. Verwenden Sie \"Speichern als\", um eine bearbeitbare Kopie zu erstellen.",
+    "debug": "Debug",
+    "share_unsaved": "Nur gespeicherte Dashboards können geteilt werden.",
+    "edit_metadata": "Metadaten bearbeiten",
+    "export": "Exportieren",
+    "save_new_title": "Neues Dashboard speichern",
+    "create": "Dashboard erstellen",
+    "edit_title": "Dashboard bearbeiten",
+    "update": "Dashboard aktualisieren",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um es als Mitarbeiter zu diesem Dashboard hinzuzufügen."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Filter auf alle Widgets anwenden"
+  },
+  "debug": {
+    "title": "Debug-Informationen"
+  },
+  "common_views": {
+    "empty_value": "<Leerer Wert>",
+    "add_to_query": "Zur Abfrage hinzufügen",
+    "time_range_validation": {
+      "invalid_date_format": "Das Format muss {{format}} sein.",
+      "range_limit": "Der Zeitraum liegt außerhalb der erlaubten Dauer.",
+      "date_limit": "Das Datum liegt außerhalb der erlaubten Dauer.",
+      "until_before_from": "Das \"Bis\"-Datum muss nach dem \"Von\"-Datum liegen.",
+      "empty": "Darf nicht leer sein.",
+      "keyword_empty": "Das Schlüsselwort darf nicht leer sein!",
+      "keyword_unparsable": "Das Schlüsselwort kann nicht ausgewertet werden"
+    },
+    "remove_from_favorites": "Aus Favoriten entfernen",
+    "add_to_favorites": "Zu Favoriten hinzufügen",
+    "view_type": {
+      "search": "Suche",
+      "dashboard": "Dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Vorhandene Diagramme der Suchseite migrieren",
+    "found_charts_one": "Es wurde {{count}} Diagramm gefunden, das für eine ältere Version der Suche erstellt wurde. Möchten Sie es für die aktuelle Suche migrieren?",
+    "found_charts_other": "Es wurden {{count}} Diagramme gefunden, die für eine ältere Version der Suche erstellt wurden. Möchten Sie diese für die aktuelle Suche migrieren?",
+    "save_hint": "Wenn Sie die Migration ausgeführt haben und die neu erstellten Diagramme behalten möchten, müssen Sie die aktuelle Suche als neues Dashboard speichern. Andernfalls gehen die Diagramme beim Verlassen der Suchseite verloren.",
+    "migrate": "Migrieren",
+    "discard": "Diagramme verwerfen"
+  },
+  "query": {
+    "contained_in_enterprise": "(enthalten in <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "Mehr über das Erstellen von Widgets erfahren Sie in der <docsLink>Dokumentation</docsLink>."
+  },
+  "widget_query": {
+    "reset_global_filter": "Globalen Filter zurücksetzen"
+  },
+  "editable_title": {
+    "edit": "Titel bearbeiten",
+    "hint": "{{value}} – Doppelklicken Sie auf den Titel, um ihn zu bearbeiten."
+  },
+  "message_permalink": {
+    "label": "Permalink"
+  },
+  "query_title": {
+    "page_actions": "Seitenaktionen",
+    "edit_title": "Titel bearbeiten",
+    "duplicate": "Duplizieren",
+    "copy_to_dashboard": "In Dashboard kopieren",
+    "edit_modal_title": "Titel der Dashboard-Seite bearbeiten",
+    "update_title": "Titel aktualisieren",
+    "title_help": "Geben Sie einen aussagekräftigen Titel für die Dashboard-Seite ein. Er darf höchstens 40 Zeichen lang sein.",
+    "title": "Titel"
+  },
+  "missing_requirements": {
+    "description_search": "Leider kann diese Suche nicht ausgeführt werden. Sie nutzt folgende Funktionen, die nicht verfügbar sind:",
+    "description_dashboard": "Leider kann dieses Dashboard nicht ausgeführt werden. Es nutzt folgende Funktionen, die nicht verfügbar sind:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> – enthalten in <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Zurück"
+  },
+  "view_header": {
+    "alerts_and_events": "Alarme & Ereignisse",
+    "event_definitions": "Ereignisdefinitionen",
+    "edit_search_metadata": "Metadaten der Suche {{title}} bearbeiten",
+    "edit_dashboard_metadata": "Metadaten des Dashboards {{title}} bearbeiten",
+    "editing_search": "Gespeicherte Suche bearbeiten",
+    "editing_dashboard": "Gespeichertes Dashboard bearbeiten",
+    "save_search": "Suche speichern",
+    "save_dashboard": "Dashboard speichern"
+  },
+  "execution": {
+    "not_executed": "Es wurde noch keine Abfrage ausgeführt."
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard-Dokumentation",
+    "description": "Mit Dashboards erstellen Sie spezifische Ansichten auf Ihre Nachrichten. Erstellen Sie hier ein neues Dashboard und fügen Sie jedes Diagramm, das Sie in anderen Bereichen der Anwendung erstellen, mit einem Klick hinzu."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Suchfilter</italic> enthalten eine eigene Abfrage und erweitern die Hauptabfrage mit dem Operator <bold>AND</bold>.",
+    "explanation_saved": "Filter können separat gespeichert und in gespeicherten Suchen und Dashboards wiederverwendet werden. Änderungen an einem gespeicherten Filter wirken sich automatisch auf die Ergebnisse aller Suchen aus, die diesen Filter enthalten."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Globale Überschreibung zurücksetzen"
+  },
+  "time_range_presets": {
+    "select_time_range": "Zeitraum auswählen",
+    "open_preset_select": "Auswahl der Zeitraum-Vorlagen öffnen"
+  },
+  "move_range": {
+    "show_previous": "Vorherigen Zeitraum anzeigen",
+    "show_previous_duration": "Vorherige {{duration}} anzeigen",
+    "show_next": "Nächsten Zeitraum anzeigen",
+    "show_next_duration": "Nächste {{duration}} anzeigen"
+  },
+  "query_validation": {
+    "toggle_warning": "Validierungswarnung ein-/ausblenden",
+    "toggle_information": "Validierungshinweis ein-/ausblenden",
+    "toggle_error": "Fehlererklärung der Validierung ein-/ausblenden",
+    "syntax_documentation": "Dokumentation zur Syntax von Suchabfragen",
+    "error_documentation": "Dokumentation zu Abfragefehlern",
+    "status_warning": "Warnung",
+    "status_info": "Hinweis",
+    "status_error": "Fehler",
+    "validation_failed": "Validierung der Suchabfrage fehlgeschlagen mit Status: {{error}}",
+    "warm_tier_title": "Suche im Warm Tier",
+    "warm_tier_message": "Der gewählte Zeitraum enthält Daten aus dem Warm Tier, deren Abruf langsam sein kann. Daten, die älter als der angegebene Zeitstempel sind, liegen für den jeweiligen Stream im Warm Tier:"
+  },
+  "saved_searches": {
+    "title": "Gespeicherte Suchen",
+    "confirm_bulk_delete_one": "Möchten Sie {{count}} gespeicherte Suche wirklich entfernen?",
+    "confirm_bulk_delete_other": "Möchten Sie {{count}} gespeicherte Suchen wirklich entfernen?",
+    "bulk_delete_partial_one": "{{failed}} von {{count}} ausgewählten gespeicherten Suche konnte nicht gelöscht werden.",
+    "bulk_delete_partial_other": "{{failed}} von {{count}} ausgewählten gespeicherten Suchen konnten nicht gelöscht werden.",
+    "bulk_delete_success_one": "{{count}} gespeicherte Suche wurde erfolgreich gelöscht.",
+    "bulk_delete_success_other": "{{count}} gespeicherte Suchen wurden erfolgreich gelöscht.",
+    "success": "Erfolg",
+    "bulk_delete_error": "Beim Löschen der gespeicherten Suchen ist ein Fehler aufgetreten. {{error}}",
+    "confirm_delete": "Sie sind dabei, die gespeicherte Suche \"{{title}}\" zu löschen. Sind Sie sicher?",
+    "delete_search": "Suche {{title}} löschen",
+    "delete": "Löschen"
+  },
+  "search_meta": {
+    "buttons": "Aktionen der Suche"
+  },
+  "save_view_notifications": {
+    "success_title": "Erfolg!",
+    "error_title": "Fehler!",
+    "plugin_initial_values_failed": "Beim Ermitteln der Anfangswerte der Suchleiste durch ein Plugin ist ein Fehler aufgetreten",
+    "plugin_validation_preparation_failed": "Beim Vorbereiten der Validierung der Suchleiste für ein Plugin ist ein Fehler aufgetreten",
+    "plugin_validation_failed": "Beim Validieren der Werte der Suchleiste durch ein Plugin ist ein Fehler aufgetreten",
+    "plugin_submit_failed": "Beim Ausführen eines Speicher-Handlers eines Plugins ist ein Fehler aufgetreten: {{error}}",
+    "load_saved_searches_failed": "Laden der gespeicherten Suchen fehlgeschlagen mit Status",
+    "could_not_load_saved_searches": "Gespeicherte Suchen konnten nicht geladen werden",
+    "load_minimum_refresh_interval_failed": "Laden der Systemkonfiguration \"minimum_auto_refresh_interval\" fehlgeschlagen mit Status",
+    "could_not_load_configuration": "Konfigurationsoption konnte nicht geladen werden"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Seitenleiste als Overlay anzeigen",
+    "display_inline": "Seitenleiste eingebettet anzeigen"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}} ms am <timestamp/>",
+    "effective_from": "Tatsächlicher Zeitraum von",
+    "effective_to": "Tatsächlicher Zeitraum bis"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Felder filtern",
+    "reset": "Zurücksetzen",
+    "list_fields": "Felder der <current>aktuellen Abfrage</current>, <all>alle</all> oder <allReserved>alle einschließlich reservierter</allReserved> Felder auflisten.",
+    "current_title": "Zeigt die Felder, die in Ihrer aktuellen Abfrage vorkommen.",
+    "all_title": "Zeigt alle Felder, aber keine reservierten (gl2_*) Felder.",
+    "all_reserved_title": "Zeigt alle Felder, einschließlich reservierter (gl2_*) Felder.",
+    "no_field_information": "Keine Feldinformationen verfügbar.",
+    "no_fields": "Keine Felder vorhanden. Ändern Sie den Filterbegriff oder wählen Sie oben eine andere Feldauswahl."
+  },
+  "highlighting_color": {
+    "color": "Farbe",
+    "gradient_name": "Name des Farbverlaufs",
+    "gradient_placeholder": "Farbverlauf auswählen",
+    "lowest_placeholder": "Niedrigsten Wert angeben",
+    "lowest_label": "Niedrigster Wert",
+    "lowest_help": "Der niedrigste erwartete Wert des Felds bzw. der Reihe.",
+    "highest_aria": "Höchsten Wert angeben",
+    "highest_label": "Höchster Wert",
+    "highest_help": "Der höchste erwartete Wert des Felds bzw. der Reihe.",
+    "coloring": "Färbung",
+    "static_color": "Feste Farbe",
+    "gradient": "Farbverlauf",
+    "must_be_selected": "Muss ausgewählt werden.",
+    "must_be_present": "Muss angegeben werden.",
+    "must_be_number": "Muss eine Zahl sein.",
+    "must_be_higher": "Muss höher als der niedrigste Wert sein.",
+    "coloring_required": "Eine Färbung ist erforderlich",
+    "gradient_numeric_only": "Ein Farbverlauf kann nur für numerische Felder festgelegt werden."
+  },
+  "highlighting_rule": {
+    "edit": "Diese Hervorhebungsregel bearbeiten",
+    "remove": "Diese Hervorhebungsregel entfernen",
+    "confirm_remove": "Möchten Sie diese Hervorhebung wirklich entfernen?"
   }
 }

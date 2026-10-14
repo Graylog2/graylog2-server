@@ -101,7 +101,7 @@ describe('RequirementsProvided', () => {
 
     render(<Component />);
 
-    await screen.findByText(/unfortunately executing this is not possible/i);
+    await screen.findByText(/unfortunately executing this search is not possible/i);
     await screen.findByText(/It uses the following capabilities which are not available/i);
 
     await screen.findByText(/timetravel/i);

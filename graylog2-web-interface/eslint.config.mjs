@@ -61,7 +61,14 @@ const TRANSLATED_FILES = [
   'src/components/welcome/**',
   'src/pages/LoginPage.tsx',
   'src/pages/WelcomePage.tsx',
+  'src/views/components/*.tsx',
+  'src/views/components/common/**',
+  'src/views/components/queries/**',
+  'src/views/components/searchbar/**',
+  'src/views/components/sidebar/**',
   'src/views/components/time-range-picker/**',
+  'src/views/components/views/**',
+  'src/views/pages/**',
 ];
 
 export default defineConfig([

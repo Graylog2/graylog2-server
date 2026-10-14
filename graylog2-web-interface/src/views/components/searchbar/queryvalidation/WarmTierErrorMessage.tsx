@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { adjustFormat } from 'util/DateTime';
 import type { IndexRange } from 'views/components/searchbar/queryvalidation/types';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const WarmTierErrorMessage = ({ warmTierIndices }: Props) => {
+  const { t } = useTranslation('search');
   if (!isSearchingWarmTier(warmTierIndices)) return null;
 
   const formatTimestamp = (timestamp: number): string => `${adjustFormat(new Date(timestamp), 'default')}`;
@@ -56,8 +58,7 @@ const WarmTierErrorMessage = ({ warmTierIndices }: Props) => {
 
   return (
     <span>
-      The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the
-      listed timestamp falls within the Warm Tier for that stream:
+      {t('query_validation.warm_tier_message')}
       <br />
       {streamsWithTimestampMap.map((streamWithTimestamp) => (
         <>

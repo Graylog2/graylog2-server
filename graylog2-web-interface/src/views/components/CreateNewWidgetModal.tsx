@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
@@ -29,8 +30,6 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-
-const modalTitle = 'Create new widget';
 
 const WidgetList = styled.div`
   display: flex;
@@ -71,6 +70,7 @@ type Props = {
 };
 
 const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
+  const { t } = useTranslation('search');
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useViewsDispatch();
@@ -97,7 +97,11 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         };
 
         return (
-          <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
+          <CreateWidgetButton
+            key={title}
+            type="button"
+            title={t('widget_creation.create_widget', { title })}
+            onClick={onClick}>
             <ButtonInner>
               <HugeIcon>
                 <WidgetIcon />
@@ -107,20 +111,20 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           </CreateWidgetButton>
         );
       }),
-    [creators, dispatch, position, sendTelemetry, setWidgetEditing, view],
+    [creators, dispatch, position, sendTelemetry, setWidgetEditing, t, view],
   );
 
   return (
     <Modal onHide={onCancel} show>
       <Modal.Header>
-        <Modal.Title>{modalTitle}</Modal.Title>
+        <Modal.Title>{t('widget_creation.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <WidgetList>{widgetButtons}</WidgetList>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>
-          Cancel
+          {t('common:actions.cancel')}
         </Button>
       </Modal.Footer>
     </Modal>

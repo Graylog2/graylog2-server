@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
@@ -192,6 +193,7 @@ const _validateQueryString = (
 };
 
 const WidgetQueryControls = () => {
+  const { t } = useTranslation('search');
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const streamsContext = useContext(StreamsContext);
@@ -318,7 +320,7 @@ const WidgetQueryControls = () => {
                                   !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange
                                 }
                                 streams={values?.streamsAndCategories?.streams}
-                                placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                placeholder={t('search_bar.query_placeholder')}
                                 error={error}
                                 ref={editorRef}
                                 disableExecution={disableSearchSubmit}

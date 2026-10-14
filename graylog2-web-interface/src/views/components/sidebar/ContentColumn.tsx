@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
@@ -165,6 +166,7 @@ const ContentColumn = ({
   enableSidebarPinning,
   width = 275,
 }: Props) => {
+  const { t } = useTranslation('search');
   const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const titleAttr = typeof title === 'string' ? title : undefined;
   const TitleComponent = typeof title === 'string' ? DefaultTitle : title;
@@ -182,7 +184,9 @@ const ContentColumn = ({
                 <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                   <IconButton
                     onClick={() => toggleSidebarPinning(searchPreferencesLayout)}
-                    title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
+                    title={
+                      sidebarIsPinned ? t('sidebar_layout.display_as_overlay') : t('sidebar_layout.display_inline')
+                    }
                     name="keep"
                   />
                 </OverlayToggle>

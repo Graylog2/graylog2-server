@@ -182,17 +182,30 @@ const SearchActionsMenu = () => {
         .then((createdView) => {
           viewLoaderFunc(createdView.id);
         })
-        .then(() => UserNotification.success(t('actions_menu.save_success', { title: newView.title }), 'Success!'))
-        .catch((error) => UserNotification.error(t('actions_menu.save_error', { error: _extractErrorMessage(error) }), 'Error!'));
+        .then(() =>
+          UserNotification.success(
+            t('actions_menu.save_success', { title: newView.title }),
+            t('save_view_notifications.success_title'),
+          ),
+        )
+        .catch((error) =>
+          UserNotification.error(
+            t('actions_menu.save_error', { error: _extractErrorMessage(error) }),
+            t('save_view_notifications.error_title'),
+          ),
+        );
     },
-    [isPermitted, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc],
+    [isPermitted, pluggableSaveViewControls, t, toggleFormModal, view, viewLoaderFunc],
   );
 
   const deleteSavedSearch = useCallback(
     (deletedView: View) =>
       deleteView(deletedView)
         .then(() =>
-          UserNotification.success(t('actions_menu.delete_success', { title: deletedView.title }), 'Success!'),
+          UserNotification.success(
+            t('actions_menu.delete_success', { title: deletedView.title }),
+            t('save_view_notifications.success_title'),
+          ),
         )
         .then(() => {
           if (deletedView.id === view.id) {
@@ -202,9 +215,12 @@ const SearchActionsMenu = () => {
           return Promise.resolve();
         })
         .catch((error) =>
-          UserNotification.error(t('actions_menu.delete_error', { error: _extractErrorMessage(error) }), 'Error!'),
+          UserNotification.error(
+            t('actions_menu.delete_error', { error: _extractErrorMessage(error) }),
+            t('save_view_notifications.error_title'),
+          ),
         ),
-    [history, view.id],
+    [history, t, view.id],
   );
 
   const _loadAsDashboard = useCallback(() => {
@@ -225,7 +241,7 @@ const SearchActionsMenu = () => {
   });
 
   return (
-    <Container aria-label="Search Meta Buttons">
+    <Container aria-label={t('search_meta.buttons')}>
       <SavedSearchForm
         key={currentTitle}
         show={showForm}

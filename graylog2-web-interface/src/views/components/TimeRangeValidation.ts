@@ -24,16 +24,22 @@ import type {
   RelativeTimeRangeWithEnd,
   AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
+import i18n from 'i18n';
 import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/typeGuards/timeRange';
 import type { DateTime } from 'util/DateTime';
 import { isValidDate, toDateObject } from 'util/DateTime';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { testNaturalDate } from 'api/tools';
 
-const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
-const rangeLimitError = 'Range is outside limit duration.';
-const dateLimitError = 'Date is outside limit duration.';
-const timeRangeError = 'The "Until" date must come after the "From" date.';
+const invalidDateFormatError = () =>
+  i18n.t('common_views.time_range_validation.invalid_date_format', {
+    ns: 'search',
+    format: 'YYYY-MM-DD [HH:mm:ss[.SSS]]',
+  });
+const rangeLimitError = () => i18n.t('common_views.time_range_validation.range_limit', { ns: 'search' });
+const dateLimitError = () => i18n.t('common_views.time_range_validation.date_limit', { ns: 'search' });
+const timeRangeError = () => i18n.t('common_views.time_range_validation.until_before_from', { ns: 'search' });
+const emptyError = () => i18n.t('common_views.time_range_validation.empty', { ns: 'search' });
 
 const exceedsDuration = (
   dateTime: DateTime,
@@ -60,19 +66,19 @@ const validateAbsoluteTimeRange = (
   } = {};
 
   if (!isValidDate(timeRange.from)) {
-    errors = { ...errors, from: invalidDateFormatError };
+    errors = { ...errors, from: invalidDateFormatError() };
   }
 
   if (!isValidDate(timeRange.to)) {
-    errors = { ...errors, to: invalidDateFormatError };
+    errors = { ...errors, to: invalidDateFormatError() };
   }
 
   if (timeRange.from >= timeRange.to) {
-    errors = { ...errors, to: timeRangeError };
+    errors = { ...errors, to: timeRangeError() };
   }
 
   if (exceedsDuration(timeRange.from, limitDuration, formatTime)) {
-    errors = { ...errors, from: dateLimitError };
+    errors = { ...errors, from: dateLimitError() };
   }
 
   return errors;
@@ -83,24 +89,24 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
 
   if (limitDuration > 0) {
     if (timeRange.from > limitDuration || !timeRange.from) {
-      errors = { ...errors, from: rangeLimitError };
+      errors = { ...errors, from: rangeLimitError() };
     }
 
     if (timeRange.to > limitDuration) {
-      errors = { ...errors, to: rangeLimitError };
+      errors = { ...errors, to: rangeLimitError() };
     }
   }
 
   if (timeRange.from === null) {
-    errors = { ...errors, from: 'Cannot be empty.' };
+    errors = { ...errors, from: emptyError() };
   }
 
   if (timeRange.from && timeRange.to === null) {
-    errors = { ...errors, to: 'Cannot be empty.' };
+    errors = { ...errors, to: emptyError() };
   }
 
   if (timeRange.from && timeRange.from <= timeRange.to) {
-    errors = { ...errors, to: timeRangeError };
+    errors = { ...errors, to: timeRangeError() };
   }
 
   return errors;
@@ -118,7 +124,7 @@ const validateKeywordTimeRange = async (
   let errors: { keyword?: string } = {};
 
   if (trim(timeRange.keyword) === '') {
-    errors = { keyword: 'Keyword must not be empty!' };
+    errors = { keyword: i18n.t('common_views.time_range_validation.keyword_empty', { ns: 'search' }) };
 
     return errors;
   }
@@ -127,13 +133,13 @@ const validateKeywordTimeRange = async (
     const actualTimeRange = await debouncedTestNaturalDate(timeRange.keyword, userTimezone).catch(() => undefined);
 
     if (!actualTimeRange) {
-      errors = { keyword: 'Unable to parse keyword' };
+      errors = { keyword: i18n.t('common_views.time_range_validation.keyword_unparsable', { ns: 'search' }) };
 
       return errors;
     }
 
     if (exceedsDuration(formatTime(actualTimeRange.from, 'complete'), limitDuration, formatTime)) {
-      errors = { keyword: rangeLimitError };
+      errors = { keyword: rangeLimitError() };
 
       return errors;
     }

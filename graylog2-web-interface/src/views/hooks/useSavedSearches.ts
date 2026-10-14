@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
@@ -76,8 +77,8 @@ const useSavedSearches = (
     queryFn: () =>
       defaultOnError(
         fetchSavedSearches(searchParams),
-        'Loading saved searches failed with status',
-        'Could not load saved searches',
+        i18n.t('save_view_notifications.load_saved_searches_failed', { ns: 'search' }),
+        i18n.t('save_view_notifications.could_not_load_saved_searches', { ns: 'search' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

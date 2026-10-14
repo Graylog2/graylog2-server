@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { IsPermitted } from 'hooks/usePermissions';
 import type View from 'views/logic/views/View';
 import UserNotification from 'util/UserNotification';
@@ -29,10 +30,9 @@ const executeDuplicationHandler = async (
   for (const duplicationHandler of duplicationHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
     const viewWithPluginData = await duplicationHandler(updatedView, isPermitted).catch((e) => {
-      const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
       // eslint-disable-next-line no-console
-      console.error(errorMessage);
-      UserNotification.error(errorMessage);
+      console.error(`An error occurred when executing a submit handler from a plugin: ${e}`);
+      UserNotification.error(i18n.t('save_view_notifications.plugin_submit_failed', { ns: 'search', error: e }));
 
       return updatedView;
     });
