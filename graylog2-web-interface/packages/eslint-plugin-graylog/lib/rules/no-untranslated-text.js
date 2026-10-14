@@ -59,6 +59,16 @@ const staticText = (node) => {
     return staticText(node.expression);
   }
 
+  // e.g. `{isActive ? 'Active' : 'Inactive'}`
+  if (node.type === 'ConditionalExpression') {
+    return staticText(node.consequent) || staticText(node.alternate);
+  }
+
+  // e.g. `{title ?? 'Untitled'}`, but not `{isActive && <Badge />}`
+  if (node.type === 'LogicalExpression') {
+    return staticText(node.right);
+  }
+
   return false;
 };
 

@@ -42,6 +42,8 @@ ruleTester.run('no-untranslated-text', rule, {
     { code: 'const el = <Icon name="delete" type="regular" />' },
     { code: 'const el = <div id="main-content" className="pull-right" />' },
     { code: 'const el = <Button title={title} />' },
+    { code: 'const el = <span>{isActive && <Badge />}</span>' },
+    { code: "const el = <span>{isActive ? t('active') : t('inactive')}</span>" },
     { code: 'const el = <span aria-label="Ok" />', options: [{ attributes: ['title'] }] },
   ],
   invalid: [
@@ -67,6 +69,14 @@ ruleTester.run('no-untranslated-text', rule, {
     },
     {
       code: 'const el = <span>Lädt …</span>',
+      errors: [{ messageId: 'untranslatedText' }],
+    },
+    {
+      code: "const el = <span>{isSliceActive ? 'No slicing' : 'Slice by values'}</span>",
+      errors: [{ messageId: 'untranslatedText' }],
+    },
+    {
+      code: "const el = <Dropdown title={activeColumnTitle ?? 'Slice by'} />",
       errors: [{ messageId: 'untranslatedText' }],
     },
   ],
