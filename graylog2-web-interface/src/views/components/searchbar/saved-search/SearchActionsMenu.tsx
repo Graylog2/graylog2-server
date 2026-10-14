@@ -63,11 +63,8 @@ const Container = styled(ButtonGroup)`
   justify-content: flex-end;
 `;
 
-const _isAllowedToEdit = (
-  view: View,
-  currentUser: User | undefined | null,
-  isPermitted: IsPermitted,
-) => view.owner === currentUser?.username || isPermitted([ViewsPermissions.View.Edit(view.id)]);
+const _isAllowedToEdit = (view: View, currentUser: User | undefined | null, isPermitted: IsPermitted) =>
+  view.owner === currentUser?.username || isPermitted([ViewsPermissions.View.Edit(view.id)]);
 
 const _extractErrorMessage = (error: FetchError) =>
   error && error.additional && error.additional.body && error.additional.body.message
@@ -117,7 +114,8 @@ const SearchActionsMenu = () => {
   const { isPermitted } = usePermissions();
   const loadNewView = useContext(NewViewLoaderContext);
   const { scopePermissions } = useGetPermissionsByScope({ _scope: view?.scope });
-  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser, isPermitted) && !!scopePermissions?.is_mutable;
+  const isAllowedToEdit =
+    view && view.id && _isAllowedToEdit(view, currentUser, isPermitted) && !!scopePermissions?.is_mutable;
   const formTarget = useRef();
   const [showForm, setShowForm] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -169,11 +167,7 @@ const SearchActionsMenu = () => {
       if (!newTitle || newTitle === '') {
         return;
       }
-      const viewWithPluginData = await executePluggableDuplicationHandler(
-        view,
-        isPermitted,
-        pluggableSaveViewControls,
-      );
+      const viewWithPluginData = await executePluggableDuplicationHandler(view, isPermitted, pluggableSaveViewControls);
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 

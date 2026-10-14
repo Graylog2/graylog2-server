@@ -71,9 +71,7 @@ const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange 
   };
 
   const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
-  const missingPermissions = notificationIds.filter(
-    (id) => !isPermitted(`eventnotifications:read:${id}`),
-  );
+  const missingPermissions = notificationIds.filter((id) => !isPermitted(`eventnotifications:read:${id}`));
 
   if (missingPermissions.length > 0) {
     return (
