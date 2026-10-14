@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 
 import type Widget from 'views/logic/widgets/Widget';
@@ -33,18 +34,18 @@ type ExportSettingsType = {
 };
 
 const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget; view: View }) => {
+  const { t } = useTranslation('widgets');
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
 
   return (
     <Row>
       <i>
         <IfSearch>
-          {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}
+          {selectedWidget && t('export.settings_based_on', { title: selectedWidgetTitle })}
           <br />
         </IfSearch>
         <IfDashboard>
-          {selectedWidget &&
-            `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}
+          {selectedWidget && t('export.exporting_table', { title: selectedWidgetTitle })}
           <br />
         </IfDashboard>
       </i>
@@ -52,68 +53,63 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget; 
   );
 };
 
-const ExportSettings = ({ selectedWidget, view }: ExportSettingsType) => (
-  <>
-    <Row>
-      <ExportFormatSelection />
-    </Row>
+const ExportSettings = ({ selectedWidget, view }: ExportSettingsType) => {
+  const { t } = useTranslation('widgets');
 
-    {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
-    <Row>
-      <p>
-        Define the fields for your file.
-        <br />
-      </p>
-      {selectedWidget && (
+  return (
+    <>
+      <Row>
+        <ExportFormatSelection />
+      </Row>
+
+      {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
+      <Row>
         <p>
-          The export supports fields created by decorators which are part of the message table, but they currently do
-          not appear in the field list. If you want to export a decorated field, just enter its name.
+          {t('export.define_fields')}
+          <br />
         </p>
-      )}
-      <p>
-        When you&apos;ve finished the configuration, click on <q>Start Download</q>.
-      </p>
-    </Row>
-    <Row>
-      <Field name="selectedFields">
-        {({ field: { name, value, onChange } }) => (
-          <>
-            <label htmlFor={name}>Fields to export</label>
-            <FieldsConfiguration
-              onChange={(newFields) =>
-                onChange({
-                  target: { name, value: newFields.map((field) => ({ field })) },
-                })
-              }
-              selectSize="normal"
-              displaySortableListOverlayInPortal
-              selectedFields={value.map(({ field }) => field)}
-              showSelectAllRest
-              showDeSelectAll
-              showListCollapseButton
-            />
-          </>
-        )}
-      </Field>
-    </Row>
-    <Row>
-      <Field name="limit">
-        {({ field: { name, value, onChange } }) => (
-          <>
-            <label htmlFor={name}>Messages limit</label>
-            <Input type="number" id={name} name={name} onChange={onChange} min={1} step={1} value={value} />
-            <HelpBlock>
-              Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached
-              will be retrieved. Which means the total number of delivered messages can be higher than the defined
-              limit.
-            </HelpBlock>
-          </>
-        )}
-      </Field>
-    </Row>
+        {selectedWidget && <p>{t('export.decorated_fields_hint')}</p>}
+        <p>
+          <Trans t={t} i18nKey="export.finish_hint" components={{ quote: <q /> }} />
+        </p>
+      </Row>
+      <Row>
+        <Field name="selectedFields">
+          {({ field: { name, value, onChange } }) => (
+            <>
+              <label htmlFor={name}>{t('export.fields_to_export')}</label>
+              <FieldsConfiguration
+                onChange={(newFields) =>
+                  onChange({
+                    target: { name, value: newFields.map((field) => ({ field })) },
+                  })
+                }
+                selectSize="normal"
+                displaySortableListOverlayInPortal
+                selectedFields={value.map(({ field }) => field)}
+                showSelectAllRest
+                showDeSelectAll
+                showListCollapseButton
+              />
+            </>
+          )}
+        </Field>
+      </Row>
+      <Row>
+        <Field name="limit">
+          {({ field: { name, value, onChange } }) => (
+            <>
+              <label htmlFor={name}>{t('export.messages_limit')}</label>
+              <Input type="number" id={name} name={name} onChange={onChange} min={1} step={1} value={value} />
+              <HelpBlock>{t('export.limit_help')}</HelpBlock>
+            </>
+          )}
+        </Field>
+      </Row>
 
-    <CustomExportSettings widget={selectedWidget} />
-  </>
-);
+      <CustomExportSettings widget={selectedWidget} />
+    </>
+  );
+};
 
 export default ExportSettings;

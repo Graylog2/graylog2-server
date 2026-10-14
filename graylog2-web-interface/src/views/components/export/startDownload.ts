@@ -16,6 +16,7 @@
  */
 import type { Set } from 'immutable';
 
+import i18n from 'i18n';
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import StringUtils from 'util/StringUtils';
 import type Query from 'views/logic/queries/Query';
@@ -36,7 +37,9 @@ const getFilename = (view, selectedWidget) => {
 
     filename = `${widgetTitle}-${filename}`;
   } else {
-    const viewTitle = view.title || `Untitled ${ViewTypeLabel({ type: view.type, capitalize: true })}`;
+    const viewTitle =
+      view.title ||
+      i18n.t('export.untitled_view', { ns: 'widgets', type: ViewTypeLabel({ type: view.type, capitalize: true }) });
 
     filename = `${viewTitle}-${filename}`;
   }

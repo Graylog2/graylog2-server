@@ -22,6 +22,7 @@ import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
 import enWelcome from 'locales/en/welcome.json';
+import enWidgets from 'locales/en/widgets.json';
 
 registerTranslations('common', enCommon, {
   de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),
@@ -41,4 +42,8 @@ registerTranslations('search', enSearch, {
 
 registerTranslations('welcome', enWelcome, {
   de: () => import(/* webpackChunkName: "translations-de-welcome" */ 'locales/de/welcome.json'),
+});
+
+registerTranslations('widgets', enWidgets, {
+  de: () => import(/* webpackChunkName: "translations-de-widgets" */ 'locales/de/widgets.json'),
 });

@@ -15,21 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { IconButton, OverlayTrigger } from 'components/common';
 
-const title = 'Export widget';
-const Explanation = () => (
-  <span>
-    Export aggregation widget feature is available for the enterprise version. This feature provides options to export
-    your data into popular file formats such as CSV, JSON, YAML, XML, etc.
-  </span>
-);
+const Explanation = () => {
+  const { t } = useTranslation('widgets');
 
-const ExportWidgetPlug = () => (
-  <OverlayTrigger trigger="click" title={title} overlay={<Explanation />} placement="bottom">
-    <IconButton name="download" title={title} />
-  </OverlayTrigger>
-);
+  return <span>{t('export_widget.enterprise_explanation')}</span>;
+};
+
+const ExportWidgetPlug = () => {
+  const { t } = useTranslation('widgets');
+  const title = t('export_widget.title');
+
+  return (
+    <OverlayTrigger trigger="click" title={title} overlay={<Explanation />} placement="bottom">
+      <IconButton name="download" title={title} />
+    </OverlayTrigger>
+  );
+};
 
 export default ExportWidgetPlug;

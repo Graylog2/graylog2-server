@@ -1,0 +1,206 @@
+{
+  "copy_to_dashboard": {
+    "title": "Copy widget to dashboard",
+    "no_dashboards": "No dashboards found.",
+    "create_new": "Create a new dashboard"
+  },
+  "edit_message_list": {
+    "fields": "Fields",
+    "message_preview": "Message Preview",
+    "sorting": "Sorting",
+    "direction": "Direction",
+    "decorators": "Decorators"
+  },
+  "widget_frame": {
+    "loading": "Loading widget ..."
+  },
+  "export_widget": {
+    "export_all": "Export all search results",
+    "title": "Export widget",
+    "enterprise_explanation": "Export aggregation widget feature is available for the enterprise version. This feature provides options to export your data into popular file formats such as CSV, JSON, YAML, XML, etc."
+  },
+  "field_sort": {
+    "placeholder": "None: click to add fields",
+    "aria_label": "Select field for sorting"
+  },
+  "fields_configuration": {
+    "add_field": "Add a field",
+    "hide_selected_one": "Hide {{count}} selected field",
+    "hide_selected_other": "Hide {{count}} selected fields",
+    "show_selected_one": "Show {{count}} selected field",
+    "show_selected_other": "Show {{count}} selected fields"
+  },
+  "move_widget": {
+    "no_pages": "No pages found",
+    "copy": "Copy widget",
+    "move": "Move widget",
+    "title": "Choose Target Page",
+    "keep_copy": "Keep Copy on this Page",
+    "keep_copy_help": "When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
+  },
+  "widget_edit": {
+    "update": "Update widget",
+    "updating": "Updating widget..."
+  },
+  "execution_info": {
+    "executed_at": "Executed at:",
+    "executed_at_label": "Executed at",
+    "executed_in": "Executed in:",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "Effective time range:",
+    "from": "From",
+    "to": "To",
+    "from_label": "Effective time range from",
+    "to_label": "Effective time range to",
+    "total_results": "Total results:",
+    "title": "Execution Info",
+    "no_query_executed": "No query executed yet."
+  },
+  "selected_fields": {
+    "fields": "Fields",
+    "edit_field": "Edit {{field}} field",
+    "remove_field": "Remove {{field}} field"
+  },
+  "sort_direction": {
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "no_sorting": "No sorting selected",
+    "select_direction": "Click to select direction"
+  },
+  "timerange_info": {
+    "global_override": "Global Override: {{timerange}}",
+    "effective_unavailable": "Effective widget time range is currently not available.",
+    "independent": "The result of this widget is independent of the current search.",
+    "all_time": "All Time"
+  },
+  "unknown_widget": {
+    "title": "Unknown Widget: {{type}}",
+    "cannot_render": "Unfortunately we are not able to render this widget, because we do not know how to handle widgets of type <strong>{{type}}</strong>. This might be caused by one of these situations:",
+    "missing_plugin": "You created this widget using a plugin that is now missing.",
+    "legacy_dashboard": "This widget was part of a legacy dashboard and created by a plugin that is not available anymore.",
+    "what_to_do": "What can you do about it? You can load the plugin again, contact the original plugin author for a plugin that works with the current version of {{productName}}, or remove the widget if you do not need it anymore.",
+    "copy_config": "Either way, you can copy the widget’s config to the clipboard:"
+  },
+  "widget_actions": {
+    "open_dropdown": "Open actions dropdown",
+    "unfocus": "Un-focus widget",
+    "focus": "Focus this widget",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "copy_to_dashboard": "Copy to Dashboard",
+    "move_to_page": "Move to Page",
+    "copying": "Copying widget...",
+    "copy": "Copy widget",
+    "confirm_remove": "Are you sure you want to remove the widget \"{{title}}\"?",
+    "compress_width": "Compress width",
+    "stretch_width": "Stretch width",
+    "replay_search": "Replay search"
+  },
+  "widget_loading": {
+    "content": "Loading widget content"
+  },
+  "widget_errors": {
+    "render_error": "While rendering this widget, the following error occurred:"
+  },
+  "widget_header": {
+    "no_description": "No widget description provided",
+    "show_description": "Show description for widget",
+    "description_placeholder": "Please add a helpful description to the widget",
+    "drag_handle": "Drag handle for {{title}}"
+  },
+  "warm_tier": {
+    "info": "Info",
+    "loading_slow": "This widget is retrieving data from the Warm Tier and may take longer to load."
+  },
+  "events_widget": {
+    "actions": "Actions",
+    "replay_search": "Replay search",
+    "view_details": "View event details",
+    "toggle_actions": "Toggle event actions",
+    "details_title": "Event details",
+    "close": "Close",
+    "unknown_visualization": "Unknown widget visualization type {{mode}}",
+    "mode_list": "List",
+    "mode_count": "Count",
+    "visualization": "Visualization",
+    "columns": "Columns",
+    "select_column": "Select a new column",
+    "filter": "Filter",
+    "sorting": "Sorting",
+    "unknown_attribute": "Unknown",
+    "unknown_attribute_help": "This attribute is currently not available, because it requires a valid license.",
+    "select_event_definition": "Select event definition",
+    "alert": "Alert",
+    "event": "Event"
+  },
+  "overview_configuration": {
+    "remove_column": "Remove {{column}} column",
+    "column": "Column",
+    "select_column": "Select a column",
+    "direction": "Direction",
+    "select_direction": "Select a direction",
+    "type": "Type",
+    "add_column": "Add a column",
+    "configure_filter": "Configure a new filter",
+    "edit_filter": "Edit {{column}} filter",
+    "delete_filter": "Delete {{column}} filter"
+  },
+  "date_filter": {
+    "single_date": "Single Date",
+    "range": "Range",
+    "select_single_date": "Select type single date",
+    "select_range": "Select type range",
+    "date_range": "{{from}} to {{to}}"
+  },
+  "message_table": {
+    "actions": "Actions",
+    "loading": "Loading",
+    "decorated": "(decorated)",
+    "stopped_node": "stopped node",
+    "cluster_node": "Cluster node {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "Create new {{name}}",
+      "select_decorator": "Select decorator",
+      "none_configured": "No decorators configured.",
+      "actions": "Actions",
+      "edit": "Edit",
+      "edit_named": "Edit {{name}}",
+      "unknown_type": "Unknown decorator type",
+      "create": "Create",
+      "update": "Update",
+      "help_title": "What are message decorators?",
+      "help_description": "Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only shown in the search results. Decorator config is stored <strong>per stream</strong>.",
+      "help_order": "Use drag and drop to modify the order in which decorators are processed.",
+      "help_docs": "Read more about message decorators in the <docsLink>documentation</docsLink>."
+    }
+  },
+  "data_table": {
+    "spacer": "spacer"
+  },
+  "field_types": {
+    "missing_event_definition": "Missing Event Definition: {{id}}"
+  },
+  "export": {
+    "title_search": "Export all search results",
+    "title_dashboard": "Export message table search results",
+    "select_different_table": "Select different message table",
+    "downloading": "Downloading...",
+    "start_download": "Start Download",
+    "settings_based_on": "The following settings are based on the message table: {{title}}",
+    "exporting_table": "You are currently exporting the search results for the message table: {{title}}",
+    "define_fields": "Define the fields for your file.",
+    "decorated_fields_hint": "The export supports fields created by decorators which are part of the message table, but they currently do not appear in the field list. If you want to export a decorated field, just enter its name.",
+    "finish_hint": "When you've finished the configuration, click on <quote>Start Download</quote>.",
+    "fields_to_export": "Fields to export",
+    "messages_limit": "Messages limit",
+    "limit_help": "Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached will be retrieved. Which means the total number of delivered messages can be higher than the defined limit.",
+    "search_contains_all": "The export will contain all messages for your current search.",
+    "search_select_table": "Please select a message table to adopt its fields. You can adjust all settings in the next step.",
+    "dashboard_select_table": "Please select the message table you want to export the search results for. You can adjust its fields in the next step.",
+    "dashboard_equals_action": "Selecting a message table equals using the option \"Export to CSV\" in a message table action menu.",
+    "select_message_table": "Select message table",
+    "no_message_table": "You need to create a message table widget to export its result.",
+    "output_format": "Output Format",
+    "untitled_view": "Untitled {{type}}"
+  }
+}

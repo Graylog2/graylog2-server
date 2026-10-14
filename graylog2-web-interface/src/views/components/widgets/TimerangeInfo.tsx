@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type SearchResult from 'views/logic/SearchResult';
@@ -65,6 +66,7 @@ const TimerangeInfo = ({
   widgetId = undefined,
   returnsAllRecords = undefined,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const { formatTime } = useUserDateTime();
   const { result } = useSearchResult() ?? {};
   const { widgetMapping } = useView();
@@ -73,7 +75,7 @@ const TimerangeInfo = ({
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
   const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}`
+    ? t('timerange_info.global_override', { timerange: timerangeToString(globalOverride.timerange, toLocalTimeWithMS) })
     : undefined;
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
@@ -83,15 +85,17 @@ const TimerangeInfo = ({
     activeQuery && searchTypeId ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
   const effectiveTimerangeString = effectiveTimerange
     ? timerangeToString(effectiveTimerange, toInternalTime)
-    : 'Effective widget time range is currently not available.';
+    : t('timerange_info.effective_unavailable');
   const currentWidgetMapping = widgetMapping?.get(widgetId);
   const timerange = globalTimerangeString || configuredTimerange;
 
   if (returnsAllRecords) {
     return (
       <Wrapper className={className}>
-        <StyledIcon name="warning" title="The result of this widget is independent of the current search." />
-        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>All Time</TextOverflowEllipsis>
+        <StyledIcon name="warning" title={t('timerange_info.independent')} />
+        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
+          {t('timerange_info.all_time')}
+        </TextOverflowEllipsis>
       </Wrapper>
     );
   }

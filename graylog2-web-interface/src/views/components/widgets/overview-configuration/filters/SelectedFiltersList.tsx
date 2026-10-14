@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { useRef } from 'react';
@@ -59,6 +60,7 @@ type Props = {
 };
 
 const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, onDelete, onEdit }: Props) => {
+  const { t } = useTranslation('widgets');
   const container = useRef(null);
 
   return (
@@ -98,7 +100,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
                       <IconButton
                         name="delete"
                         onClick={() => onDelete(filterIndex, value)}
-                        title={`Delete ${_columnTitle} filter`}
+                        title={t('overview_configuration.delete_filter', { column: _columnTitle })}
                       />
                     </ValueActions>
                   </FilterValue>

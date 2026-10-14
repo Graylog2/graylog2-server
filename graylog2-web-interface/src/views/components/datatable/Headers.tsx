@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
@@ -163,7 +164,11 @@ const HeaderFieldForValue = ({
   </CenteredTh>
 );
 
-const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} />;
+const Spacer = ({ span }: { span: number }) => {
+  const { t } = useTranslation('widgets');
+
+  return <th aria-label={t('data_table.spacer')} colSpan={span} />;
+};
 
 const RowNumberHeader = styled(TableHeaderCell)(
   ({ theme }) => css`

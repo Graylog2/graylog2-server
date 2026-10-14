@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
@@ -53,7 +54,7 @@ type Props = {
 };
 
 const FieldsConfiguration = ({
-  createSelectPlaceholder = 'Add a field',
+  createSelectPlaceholder = undefined,
   displaySortableListOverlayInPortal = false,
   onChange,
   isFieldQualified = undefined,
@@ -66,7 +67,9 @@ const FieldsConfiguration = ({
   fieldSelect: FieldSelectComponent = FieldSelect,
   allowCreate = false,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const [showSelectedList, setShowSelectedList] = useState(true);
+  const selectPlaceholder = createSelectPlaceholder ?? t('fields_configuration.add_field');
   const onAddField = useCallback(
     (newField: string) => onChange([...selectedFields, newField]),
     [onChange, selectedFields],
@@ -98,8 +101,8 @@ const FieldsConfiguration = ({
             setShowSelectedList((cur) => !cur);
           }}>
           {showSelectedList
-            ? `Hide ${selectedFields.length} selected fields`
-            : `Show ${selectedFields.length} selected fields`}
+            ? t('fields_configuration.hide_selected', { count: selectedFields.length })
+            : t('fields_configuration.show_selected', { count: selectedFields.length })}
           <ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
         </ToggleButton>
       )}
@@ -124,8 +127,8 @@ const FieldsConfiguration = ({
         value={undefined}
         size={selectSize}
         excludedFields={selectedFields ?? []}
-        placeholder={createSelectPlaceholder}
-        ariaLabel={createSelectPlaceholder}
+        placeholder={selectPlaceholder}
+        ariaLabel={selectPlaceholder}
         onSelectAllRest={showSelectAllRest && onSelectAllRest}
         showSelectAllRest={showSelectAllRest}
         onDeSelectAll={onDeselectAll}

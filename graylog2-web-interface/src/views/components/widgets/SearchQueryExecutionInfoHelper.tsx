@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
+import { formatNumber } from 'util/NumberFormatting';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
@@ -67,51 +68,58 @@ const StyledIcon = styled(Icon)(
   `,
 );
 
-const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData }) => (
-  <StyledTable condensed>
-    <tbody>
-      <tr>
-        <td>
-          <i>Executed at:</i>
-        </td>
-        <td aria-label="Executed at">
-          <Timestamp dateTime={widgetExecutionData?.timestamp} />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <i>Executed in:</i>{' '}
-        </td>
-        <td>{numeral(widgetExecutionData?.duration).format('0,0')}ms</td>
-      </tr>
-      <tr>
-        <td colSpan={2}>
-          <i>Effective time range:</i>
-        </td>
-      </tr>
-      <tr>
-        <td>From</td>
-        <td aria-label="Effective time range from">
-          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" />
-        </td>
-      </tr>
-      <tr>
-        <td>To</td>
-        <td aria-label="Effective time range to">
-          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <i>Total results:</i>
-        </td>
-        <td>{numeral(widgetExecutionData?.total).format('0,0')}</td>
-      </tr>
-    </tbody>
-  </StyledTable>
-);
+const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData }) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <StyledTable condensed>
+      <tbody>
+        <tr>
+          <td>
+            <i>{t('execution_info.executed_at')}</i>
+          </td>
+          <td aria-label={t('execution_info.executed_at_label')}>
+            <Timestamp dateTime={widgetExecutionData?.timestamp} />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>{t('execution_info.executed_in')}</i>{' '}
+          </td>
+          <td>
+            {t('execution_info.duration', { duration: formatNumber(widgetExecutionData?.duration, { digits: 0 }) })}
+          </td>
+        </tr>
+        <tr>
+          <td colSpan={2}>
+            <i>{t('execution_info.effective_time_range')}</i>
+          </td>
+        </tr>
+        <tr>
+          <td>{t('execution_info.from')}</td>
+          <td aria-label={t('execution_info.from_label')}>
+            <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" />
+          </td>
+        </tr>
+        <tr>
+          <td>{t('execution_info.to')}</td>
+          <td aria-label={t('execution_info.to_label')}>
+            <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <i>{t('execution_info.total_results')}</i>
+          </td>
+          <td>{formatNumber(widgetExecutionData?.total, { digits: 0 })}</td>
+        </tr>
+      </tbody>
+    </StyledTable>
+  );
+};
 
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Props) => {
+  const { t } = useTranslation('widgets');
   const [open, setOpen] = useState(false);
   const interactive = useIsInteractiveMode();
   const result = useViewsSelector(selectCurrentQueryResults);
@@ -147,8 +155,12 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
           </>
         </TargetContainer>
       </Popover.Target>
-      <Popover.Dropdown title="Execution Info">
-        {isEmpty(result) ? <i>No query executed yet.</i> : <HelpPopover widgetExecutionData={widgetExecutionData} />}
+      <Popover.Dropdown title={t('execution_info.title')}>
+        {isEmpty(result) ? (
+          <i>{t('execution_info.no_query_executed')}</i>
+        ) : (
+          <HelpPopover widgetExecutionData={widgetExecutionData} />
+        )}
       </Popover.Dropdown>
     </Popover>
   ) : (

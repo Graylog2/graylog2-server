@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
@@ -35,13 +36,17 @@ const ActionsWrapperContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacings.md};
 `;
 
-const ActionsWrapper = ({ children }) => (
-  <ActionsWrapperContainer>
-    <DropdownButton title="Actions" buttonTitle="Actions">
-      {children}
-    </DropdownButton>
-  </ActionsWrapperContainer>
-);
+const ActionsWrapper = ({ children }) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <ActionsWrapperContainer>
+      <DropdownButton title={t('events_widget.actions')} buttonTitle={t('events_widget.actions')}>
+        {children}
+      </DropdownButton>
+    </ActionsWrapperContainer>
+  );
+};
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);

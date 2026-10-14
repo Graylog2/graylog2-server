@@ -26,7 +26,8 @@ import type Query from 'views/logic/queries/Query';
 import type { SearchType } from 'views/logic/queries/SearchType';
 
 type ExportStrategy = {
-  title: string;
+  /** Translation key of the modal title in the `widgets` namespace. */
+  titleKey: string;
   shouldAllowWidgetSelection: (
     singleWidgetDownload: boolean,
     showWidgetSelection: boolean,
@@ -120,7 +121,7 @@ const _exportOnSearchPage = (
 };
 
 const SearchExportStrategy: ExportStrategy = {
-  title: 'Export all search results',
+  titleKey: 'export.title_search',
   shouldEnableDownload: (showWidgetSelection, _selectedWidget, selectedFields, loading) =>
     !loading && !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection, widgets) =>
@@ -133,7 +134,7 @@ const SearchExportStrategy: ExportStrategy = {
 };
 
 const DashboardExportStrategy: ExportStrategy = {
-  title: 'Export message table search results',
+  titleKey: 'export.title_dashboard',
   shouldEnableDownload: (_showWidgetSelection, selectedWidget, selectedFields, loading) =>
     !loading && !!selectedWidget && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) =>

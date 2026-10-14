@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { WidgetComponentProps } from 'views/types';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
@@ -25,6 +26,7 @@ import EventsList from 'views/components/widgets/events/EventsList';
 import EventsNumber from './EventsNumber';
 
 const EventsVisualization = (props: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
+  const { t } = useTranslation('widgets');
   const { config } = props;
 
   if (config.mode === LIST_MODE) {
@@ -35,7 +37,7 @@ const EventsVisualization = (props: WidgetComponentProps<EventsWidgetConfig, Eve
     return <EventsNumber {...props} />;
   }
 
-  return <div>Unknown widget visualization type {config.mode ?? 'undefined'}</div>;
+  return <div>{t('events_widget.unknown_visualization', { mode: config.mode ?? 'undefined' })}</div>;
 };
 
 export default EventsVisualization;

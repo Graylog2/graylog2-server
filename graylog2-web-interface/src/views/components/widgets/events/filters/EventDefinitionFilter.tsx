@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Select, Spinner } from 'components/common';
 import useEventDefinitions from 'components/event-definitions/hooks/useEventDefinitions';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
+  const { t } = useTranslation('widgets');
   const { data: eventDefinitions, isInitialLoading: isLoadingEventDefinitions } = useEventDefinitions({
     query: '',
     page: 1,
@@ -45,7 +47,7 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
 
   return (
     <Select
-      placeholder="Select event definition"
+      placeholder={t('events_widget.select_event_definition')}
       clearable={false}
       menuIsOpen
       options={eventDefinitionOptions}

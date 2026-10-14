@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState, useRef } from 'react';
 
 import { IconButton, LinkContainer, ModalSubmit } from 'components/common';
@@ -55,6 +56,7 @@ type Props = {
 };
 
 const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
+  const { t } = useTranslation('widgets');
   const { isPermitted } = usePermissions();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const toggleDetailsModal = () => setShowDetailsModal((cur) => !cur);
@@ -63,7 +65,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const moreActions = [
     hasReplayInfo && isPermitted(`eventdefinitions:read:${eventDefinitionId}`) ? (
       <LinkContainer to={Routes.ALERTS.replay_search(eventId)} key="replay-search">
-        <MenuItem>Replay search</MenuItem>
+        <MenuItem>{t('events_widget.replay_search')}</MenuItem>
       </LinkContainer>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
@@ -72,11 +74,11 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <IconButton name="open_in_full" title="View event details" onClick={toggleDetailsModal} />
+        <IconButton name="open_in_full" title={t('events_widget.view_details')} onClick={toggleDetailsModal} />
         {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
-              <IconButton name="more_vert" title="Toggle event actions" showTooltip={false} />
+              <IconButton name="more_vert" title={t('events_widget.toggle_actions')} showTooltip={false} />
             </Menu.Target>
             <Menu.Dropdown>{moreActions}</Menu.Dropdown>
           </Menu>
@@ -85,7 +87,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
       {showDetailsModal && (
         <Modal show={showDetailsModal} bsSize="large" onHide={toggleDetailsModal}>
           <Modal.Header>
-            <Modal.Title>Event details</Modal.Title>
+            <Modal.Title>{t('events_widget.details_title')}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <EventDetails eventId={eventId} />
@@ -95,7 +97,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
               displayCancel={false}
               onSubmit={toggleDetailsModal}
               submitButtonType="button"
-              submitButtonText="Close"
+              submitButtonText={t('events_widget.close')}
             />
           </Modal.Footer>
         </Modal>

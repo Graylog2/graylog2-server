@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const SelectedColumnsList = ({ selectedColumns, onChange, displayOverlayInPortal = false, columnTitle }: Props) => {
+  const { t } = useTranslation('widgets');
   const columnsForList = useMemo(
     () => selectedColumns?.map((column) => ({ id: column, title: columnTitle(column) })),
     [columnTitle, selectedColumns],
@@ -67,12 +69,16 @@ const SelectedColumnsList = ({ selectedColumns, onChange, displayOverlayInPortal
           {dragHandle}
           <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
           <div>
-            <IconButton name="delete" title={`Remove ${item.title} column`} onClick={() => onRemoveColumn(item.id)} />
+            <IconButton
+              name="delete"
+              title={t('overview_configuration.remove_column', { column: item.title })}
+              onClick={() => onRemoveColumn(item.id)}
+            />
           </div>
         </ListItemContainer>
       );
     },
-    [onRemoveColumn],
+    [onRemoveColumn, t],
   );
 
   const onSortChange = useCallback(

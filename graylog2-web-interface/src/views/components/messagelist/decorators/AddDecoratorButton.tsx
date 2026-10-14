@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -65,6 +66,7 @@ const AddDecoratorButton = ({
   nextOrder,
   onCreate,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const [typeName, setTypeName] = useState<string | undefined>(undefined);
   const [typeDefinition, setTypeDefinition] = useState<DecoratorType | undefined>(undefined);
   const _handleCancel = () => {
@@ -106,7 +108,7 @@ const AddDecoratorButton = ({
       <ConfigurationForm<Decorator['config']>
         key="configuration-form-output"
         configFields={typeDefinition.requested_configuration}
-        title={`Create new ${typeDefinition.name}`}
+        title={t('message_table.decorators.create_new', { name: typeDefinition.name })}
         typeName={typeName}
         includeTitleField={false}
         wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
@@ -120,7 +122,7 @@ const AddDecoratorButton = ({
       <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
         <div className={DecoratorStyles.addDecoratorSelect}>
           <Select
-            placeholder="Select decorator"
+            placeholder={t('message_table.decorators.select_decorator')}
             onChange={_onTypeChange}
             options={decoratorTypeOptions}
             disabled={disabled}

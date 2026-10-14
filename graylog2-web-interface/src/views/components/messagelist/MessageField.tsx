@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Field from 'views/components/Field';
@@ -77,10 +78,12 @@ const ValueContext = ({
   isDecoratedField,
   children = null,
 }: React.PropsWithChildren<{ isDecoratedField: boolean }>) => {
+  const { t } = useTranslation('widgets');
+
   if (isDecoratedField)
     return (
       <InteractiveContext.Provider value="disabled">
-        {children} <DecoratedField>(decorated)</DecoratedField>
+        {children} <DecoratedField>{t('message_table.decorated')}</DecoratedField>
       </InteractiveContext.Provider>
     );
 

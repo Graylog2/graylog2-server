@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
+
 import ErrorWidget from './ErrorWidget';
 
 type State = {
@@ -43,7 +45,7 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
 
     return error ? (
       <ErrorWidget
-        title="While rendering this widget, the following error occurred:"
+        title={i18n.t('widget_errors.render_error', { ns: 'widgets' })}
         errors={[{ description: error.toString() }]}
       />
     ) : (

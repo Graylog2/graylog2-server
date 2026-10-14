@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
 import styled from 'styled-components';
 
@@ -64,10 +65,11 @@ const EditWidgetFrame = ({
   showQueryControls = true,
   containerComponent: ContainerComponent = WidgetOverrideElements,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const widget = useContext(WidgetContext);
 
   if (!widget) {
-    return <Spinner text="Loading widget ..." />;
+    return <Spinner text={t('widget_frame.loading')} />;
   }
 
   return (

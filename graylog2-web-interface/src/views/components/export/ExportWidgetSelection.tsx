@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { List } from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
+  const { t } = useTranslation('widgets');
   const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });
   const widgetOptions = sortOptions(widgets.map((widget) => widgetOption(widget)).toArray());
 
@@ -41,22 +43,21 @@ const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
     <>
       <Row>
         <IfSearch>
-          The export will contain all messages for your current search.
+          {t('export.search_contains_all')}
           <br />
-          Please select a message table to adopt its fields. You can adjust all settings in the next step.
+          {t('export.search_select_table')}
         </IfSearch>
         <IfDashboard>
-          Please select the message table you want to export the search results for. You can adjust its fields in the
-          next step.
+          {t('export.dashboard_select_table')}
           <br />
-          Selecting a message table equals using the option &quot;Export to CSV&quot; in a message table action menu.
+          {t('export.dashboard_equals_action')}
         </IfDashboard>
       </Row>
       {widgets.size !== 0 ? (
         <Row>
-          <label htmlFor="widget-selection">Select message table</label>
+          <label htmlFor="widget-selection">{t('export.select_message_table')}</label>
           <Select
-            placeholder="Select message table"
+            placeholder={t('export.select_message_table')}
             onChange={selectWidget}
             options={widgetOptions}
             inputId="widget-selection"
@@ -64,7 +65,7 @@ const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
         </Row>
       ) : (
         <Row>
-          <Alert bsStyle="warning">You need to create a message table widget to export its result.</Alert>
+          <Alert bsStyle="warning">{t('export.no_message_table')}</Alert>
         </Row>
       )}
     </>

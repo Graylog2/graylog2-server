@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ExportModal from 'views/components/export/ExportModal';
 import type { WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
@@ -22,6 +23,7 @@ import useView from 'views/hooks/useView';
 import { IconButton } from 'components/common';
 
 const ExportMessageWidgetActionComponent = ({ widget, disabled }: WidgetMenuActionComponentProps) => {
+  const { t } = useTranslation('widgets');
   const [showExport, setShowExport] = useState(false);
   const view = useView();
   const showMessageExportModal = () => setShowExport(true);
@@ -32,7 +34,7 @@ const ExportMessageWidgetActionComponent = ({ widget, disabled }: WidgetMenuActi
         disabled={disabled}
         onClick={showMessageExportModal}
         name="download"
-        title="Export all search results"
+        title={t('export_widget.export_all')}
       />
       {showExport && (
         <ExportModal view={view} directExportWidgetId={widget.id} closeModal={() => setShowExport(false)} />

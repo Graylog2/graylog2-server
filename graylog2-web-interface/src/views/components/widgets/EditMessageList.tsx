@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { EditWidgetComponentProps } from 'views/types';
@@ -82,6 +83,7 @@ const EditMessageList = ({
   onChange,
   onCancel,
 }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
+  const { t } = useTranslation('widgets');
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
@@ -92,13 +94,13 @@ const EditMessageList = ({
     <FullHeightRow>
       <FullHeightCol md={3}>
         <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} />} alignActionsAtBottom>
-          <DescriptionBox description="Fields">
+          <DescriptionBox description={t('edit_message_list.fields')}>
             <FieldsConfiguration
               onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
               selectedFields={config.fields}
             />
           </DescriptionBox>
-          <DescriptionBox description="Message Preview">
+          <DescriptionBox description={t('edit_message_list.message_preview')}>
             {sortedMessagePreviewOptions.map((option) => (
               <PreviewOptionCheckbox
                 key={option.title}
@@ -110,17 +112,17 @@ const EditMessageList = ({
               </PreviewOptionCheckbox>
             ))}
           </DescriptionBox>
-          <DescriptionBox description="Sorting">
+          <DescriptionBox description={t('edit_message_list.sorting')}>
             <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
           </DescriptionBox>
-          <DescriptionBox description="Direction">
+          <DescriptionBox description={t('edit_message_list.direction')}>
             <SortDirectionSelect
               disabled={!sort || sort.length === 0}
               direction={sortDirection && sortDirection.direction}
               onChange={(data) => _onSortDirectionChange(data, config, onChange)}
             />
           </DescriptionBox>
-          <DescriptionBox description="Decorators">
+          <DescriptionBox description={t('edit_message_list.decorators')}>
             <DecoratorSidebar decorators={config.decorators} onChange={onDecoratorsChange} />
           </DescriptionBox>
         </StickyBottomActions>

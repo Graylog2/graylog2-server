@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -71,6 +72,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
     }: ListItemProps,
     ref,
   ) => {
+    const { t } = useTranslation('widgets');
     const [isEditing, setIsEditing] = useState(false);
 
     const _onChange = (newFieldName: string) => {
@@ -92,10 +94,10 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
             clearable={false}
             size={selectSize}
             excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
-            ariaLabel="Fields"
+            ariaLabel={t('selected_fields.fields')}
             name="add-field-select"
             value={item.id}
-            aria-label={`Edit ${item.title} field`}
+            aria-label={t('selected_fields.edit_field', { field: item.title })}
           />
         )}
 
@@ -105,8 +107,16 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
             <FieldTitle>{item.title}</FieldTitle>
             <Actions>
               {showUnit && <FieldUnit field={item.title} />}
-              <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
-              <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
+              <IconButton
+                name="edit_square"
+                title={t('selected_fields.edit_field', { field: item.title })}
+                onClick={() => setIsEditing(true)}
+              />
+              <IconButton
+                name="delete"
+                title={t('selected_fields.remove_field', { field: item.title })}
+                onClick={onRemove}
+              />
             </Actions>
           </>
         )}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 
@@ -46,6 +47,7 @@ type Props = {
 };
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
+  const { t } = useTranslation('widgets');
   const sendTelemetry = useSendTelemetry('search-widget');
 
   const onClick = useCallback(() => {
@@ -72,7 +74,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
   const { width } = position;
   const stretched = width === Infinity;
   const icon = stretched ? 'compress' : 'expand';
-  const title = stretched ? 'Compress width' : 'Stretch width';
+  const title = stretched ? t('widget_actions.compress_width') : t('widget_actions.stretch_width');
 
   return <StyledIconButton onClick={onClick} name={icon} title={title} rotation={90} />;
 };

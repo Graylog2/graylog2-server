@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Select from 'components/common/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -25,18 +26,22 @@ type Props = {
   onChange?: (newDirection: Direction) => any;
 };
 
-const SortDirectionSelect = ({ direction = undefined, disabled = false, onChange = () => {} }: Props) => (
-  <Select
-    disabled={disabled}
-    clearable={false}
-    options={[
-      { label: 'Ascending', value: 'Ascending' },
-      { label: 'Descending', value: 'Descending' },
-    ]}
-    onChange={(value: string) => onChange(Direction.fromString(value))}
-    placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-    value={direction ?? null}
-  />
-);
+const SortDirectionSelect = ({ direction = undefined, disabled = false, onChange = () => {} }: Props) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <Select
+      disabled={disabled}
+      clearable={false}
+      options={[
+        { label: t('sort_direction.ascending'), value: 'Ascending' },
+        { label: t('sort_direction.descending'), value: 'Descending' },
+      ]}
+      onChange={(value: string) => onChange(Direction.fromString(value))}
+      placeholder={disabled ? t('sort_direction.no_sorting') : t('sort_direction.select_direction')}
+      value={direction ?? null}
+    />
+  );
+};
 
 export default SortDirectionSelect;
