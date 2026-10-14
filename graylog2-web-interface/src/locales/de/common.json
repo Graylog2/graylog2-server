@@ -237,5 +237,11 @@
     "unclassified_time_zones": "Nicht zugeordnet",
     "default_locale": "Standard-Gebietsschema",
     "pick_locale": "Gebietsschema auswählen"
+  },
+  "page_header": {
+    "experimental": "Experimentell",
+    "legacy": "Veraltet",
+    "experimental_message": "Diese Funktion ist neu und sollte als experimentell betrachtet werden.",
+    "legacy_message": "Diese Funktion wird nicht mehr weiterentwickelt und in einer zukünftigen Version entfernt."
   }
 }

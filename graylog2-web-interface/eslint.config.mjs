@@ -15,6 +15,7 @@ const TRANSLATED_FILES = [
   'src/components/common/CreatePage.tsx',
   'src/components/common/DataTable/**',
   'src/components/common/DefaultLabel.tsx',
+  'src/components/common/DocumentTitle.tsx',
   'src/components/common/EmptyEntity.tsx',
   'src/components/common/EnterprisePluginNotFound.tsx',
   'src/components/common/EntityDataTable/**',
@@ -33,6 +34,8 @@ const TRANSLATED_FILES = [
   'src/components/common/NoEntitiesExist.tsx',
   'src/components/common/NoSearchResult.tsx',
   'src/components/common/PageErrorOverview.tsx',
+  'src/components/common/PageHeader.tsx',
+  'src/components/common/PageNavigation.tsx',
   'src/components/common/PageSizeSelect.tsx',
   'src/components/common/PaginatedEntityTable/**',
   'src/components/common/PaginatedItemOverview/**',
@@ -51,6 +54,7 @@ const TRANSLATED_FILES = [
   'src/components/common/TimezoneSelect.tsx',
   'src/components/common/TypeAheadDataFilter.tsx',
   'src/components/common/Wizard.tsx',
+  'src/components/navigation/**',
   'src/views/components/time-range-picker/**',
 ];
 

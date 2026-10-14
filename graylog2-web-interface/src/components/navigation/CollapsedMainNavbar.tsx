@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { PluginNavigation } from 'graylog-web-plugin';
 import styled, { css } from 'styled-components';
 
+import useNavigationTitle from 'components/navigation/useNavigationTitle';
 import { Menu } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { hoverIndicatorStyles } from 'components/common/NavItemStateIndicator';
@@ -49,6 +51,8 @@ type Props = {
 
 const CollapsedMainNavbar = ({ navigationItems }: Props) => {
   const { isPermitted } = usePermissions();
+  const navigationTitle = useNavigationTitle();
+  const { t } = useTranslation('navigation');
 
   const accessibleItems = navigationItems.filter(({ requiredFeatureFlag, permissions }) =>
     shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted),
@@ -57,14 +61,21 @@ const CollapsedMainNavbar = ({ navigationItems }: Props) => {
   return (
     <Menu>
       <Menu.Target>
-        <BurgerToggle type="button" aria-label="Toggle navigation">
+        <BurgerToggle type="button" aria-label={t('shell.toggle_navigation')}>
           <Icon name="menu" size="lg" />
         </BurgerToggle>
       </Menu.Target>
       <Menu.Dropdown>
-        {accessibleItems.map(({ description, path, children, BadgeComponent }) => {
+        {accessibleItems.map(({ description, titleKey, path, children, BadgeComponent }) => {
           if (!children) {
-            return <NavigationLink key={description} description={description} path={path} Badge={BadgeComponent} />;
+            return (
+              <NavigationLink
+                key={description}
+                description={navigationTitle({ description, titleKey })}
+                path={path}
+                Badge={BadgeComponent}
+              />
+            );
           }
 
           const accessibleChildren = children.filter(
@@ -80,13 +91,13 @@ const CollapsedMainNavbar = ({ navigationItems }: Props) => {
           return (
             <Menu.Sub key={description}>
               <Menu.Sub.Target>
-                <Menu.Sub.Item>{description}</Menu.Sub.Item>
+                <Menu.Sub.Item>{navigationTitle({ description, titleKey })}</Menu.Sub.Item>
               </Menu.Sub.Target>
               <Menu.Sub.Dropdown>
                 {accessibleChildren.map((child) => (
                   <NavigationLink
                     key={child.description}
-                    description={child.description}
+                    description={navigationTitle(child)}
                     path={child.path}
                     Badge={child.BadgeComponent}
                   />

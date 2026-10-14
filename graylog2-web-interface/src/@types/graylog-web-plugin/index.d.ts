@@ -383,13 +383,19 @@ declare module 'graylog-web-plugin/plugin' {
 
   type HelpMenuItem = {
     description: string;
+    /** Translation key of the displayed title, e.g. `navigation:main.search`. `description` stays the identifier. */
+    titleKey?: string;
     permissions?: Permission | Array<Permission>;
   } & ({ externalLink?: string } | { path?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
 
   interface PageNavigation {
     description: string;
+    /** Translation key of the displayed title, e.g. `navigation:main.search`. `description` stays the identifier. */
+    titleKey?: string;
     children: Array<{
       description: string;
+      /** Translation key of the displayed title, e.g. `navigation:main.search`. `description` stays the identifier. */
+      titleKey?: string;
       position?: PluginNavigation['position'];
       permissions?: Permission | Array<Permission>;
       useCondition?: () => boolean;
@@ -410,6 +416,8 @@ declare module 'graylog-web-plugin/plugin' {
 
   interface PluginNavigationDropdownItem {
     description: string;
+    /** Translation key of the displayed title, e.g. `navigation:main.search`. `description` stays the identifier. */
+    titleKey?: string;
     path: QualifiedUrl<string>;
     position?: PluginNavigation['position'];
     permissions?: Permission | Array<Permission>;
@@ -423,6 +431,8 @@ declare module 'graylog-web-plugin/plugin' {
 
   type PluginNavigation = {
     description: string;
+    /** Translation key of the displayed title, e.g. `navigation:main.search`. `description` stays the identifier. */
+    titleKey?: string;
     requiredFeatureFlag?: string;
     BadgeComponent?: React.ComponentType<{ text: string }>;
     position?: { last: true } | { after: string } | undefined;

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 
+import useNavigationTitle from 'components/navigation/useNavigationTitle';
 import usePermissions from 'hooks/usePermissions';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -58,6 +59,7 @@ type Props = { page?: string; items?: Array<PageNavItem> };
 const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
   const { isPermitted } = usePermissions();
   const items = usePageNavigationItems(page, itemsProp);
+  const navigationTitle = useNavigationTitle();
 
   const availableItems = items.filter(
     (item) =>
@@ -67,11 +69,16 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
       !!item.path,
   );
 
-  if (availableItems.length === 0) {
+  const formattedItems = availableItems.map((item) => ({
+    ...item,
+    description: navigationTitle(item),
+  }));
+
+  if (formattedItems.length === 0) {
     return null;
   }
 
-  return <NavTabs items={availableItems} />;
+  return <NavTabs items={formattedItems} />;
 };
 
 export default PageNavigation;

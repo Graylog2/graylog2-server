@@ -115,6 +115,7 @@ User-visible texts are translated with [i18next](https://www.i18next.com/) and `
 - Translate at render time: call `t()` inside components, also for default prop values. Module-level constants hold keys, not texts. Outside of components, call `i18n.t()` from `i18n` when the text is needed.
 - Never translate user content (e.g. stream or dashboard titles) or technical values (field names, query syntax). Messages of thrown errors and console output are for developers and stay English.
 - German translations follow `src/locales/GLOSSARY.de.md`.
+- Navigation items (`navigation`, `pageNavigation`, `helpMenu` plugin exports) keep their English `description`, because it identifies them, e.g. to merge items of plugins or for `position.after`. Set `titleKey` (e.g. `navigation:main.search`) to translate the displayed title.
 - Format numbers, dates and durations with `util/NumberFormatting`, `util/DateTime` (e.g. `preciseDifference`) and `useUserDateTime`. They follow the UI language.
 - English texts are the fallback. Add every new key to all languages in `src/locales`; `locales.test.ts` fails otherwise. Untranslated drafts may be added in English and marked for review.
 - Tests fail when a component uses a key which does not exist. Keys are not type-checked, because i18next's key types require `strictNullChecks`.

@@ -24,13 +24,26 @@ const routes = [{ path: `${SECURITY_PATH}/*`, component: SecurityPageEntry }];
 
 export const DEFAULT_SECURITY_NAV_ITEM = {
   description: 'Security',
+  titleKey: 'navigation:main.security',
   position: { after: DEFAULT_ENTERPRISE_NAV_ITEM.description },
   children: [
-    { path: Routes.SECURITY.OVERVIEW, description: 'Overview' },
-    { path: Routes.SECURITY.USER_ACTIVITY, description: 'User Activity' },
-    { path: Routes.SECURITY.HOST_ACTIVITY, description: 'Host Activity' },
-    { path: Routes.SECURITY.NETWORK_ACTIVITY, description: 'Network Activity' },
-    { path: Routes.SECURITY.ANOMALIES, description: 'Anomalies' },
+    { path: Routes.SECURITY.OVERVIEW, description: 'Overview', titleKey: 'navigation:security.overview' },
+    {
+      path: Routes.SECURITY.USER_ACTIVITY,
+      description: 'User Activity',
+      titleKey: 'navigation:security.user_activity',
+    },
+    {
+      path: Routes.SECURITY.HOST_ACTIVITY,
+      description: 'Host Activity',
+      titleKey: 'navigation:security.host_activity',
+    },
+    {
+      path: Routes.SECURITY.NETWORK_ACTIVITY,
+      description: 'Network Activity',
+      titleKey: 'navigation:security.network_activity',
+    },
+    { path: Routes.SECURITY.ANOMALIES, description: 'Anomalies', titleKey: 'navigation:security.anomalies' },
   ],
 };
 

@@ -25,6 +25,7 @@ const DevelopmentHeaderBadge = () =>
     <li>
       <InactiveNavItem>
         <Badge className="dev-badge" bsStyle="danger">
+          {/* eslint-disable-next-line graylog/no-untranslated-text -- technical marker, only shown to developers */}
           {AppConfig.isCloud() ? String.fromCharCode(0x26c8) : ''} DEV
         </Badge>
       </InactiveNavItem>

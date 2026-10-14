@@ -234,5 +234,11 @@
     "unclassified_time_zones": "Unclassified",
     "default_locale": "Default locale",
     "pick_locale": "Pick a locale"
+  },
+  "page_header": {
+    "experimental": "Experimental",
+    "legacy": "Legacy",
+    "experimental_message": "This feature is new and should be considered experimental.",
+    "legacy_message": "This feature has been discontinued and will be removed in a future version."
   }
 }

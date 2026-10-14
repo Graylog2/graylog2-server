@@ -33,69 +33,120 @@ const navigationBindings: PluginExports = {
     {
       path: Routes.SEARCH,
       description: SEARCH_LINK_TITLE,
+      titleKey: 'navigation:main.search',
     },
     {
       path: Routes.STREAMS,
       description: 'Streams',
+      titleKey: 'navigation:main.streams',
     },
     {
       path: Routes.ALERTS.LIST,
       description: 'Alerts',
+      titleKey: 'navigation:main.alerts',
     },
     {
       path: Routes.DASHBOARDS,
       description: DASHBOARDS_LINK_TITLE,
+      titleKey: 'navigation:main.dashboards',
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
+      titleKey: 'navigation:main.system',
       BadgeComponent: InputsAggregatedDotBadge,
       position: { last: true },
       children: filterCloudMenuItems(
         filterMenuItems(
           [
-            { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
+            { path: Routes.SYSTEM.OVERVIEW, description: 'Overview', titleKey: 'navigation:system.overview' },
             {
               path: Routes.SYSTEM.CONFIGURATIONS,
               description: 'Configurations',
+              titleKey: 'navigation:system.configurations',
               permissions: ['clusterconfigentry:read'],
             },
             {
               path: Routes.SYSTEM.CLUSTER.NODES,
               description: 'Cluster Configuration',
+              titleKey: 'navigation:system.cluster_configuration',
               permissions: ['clusterconfiguration:read'],
             },
             {
               path: Routes.SYSTEM.INPUTS,
               description: 'Inputs',
+              titleKey: 'navigation:system.inputs',
               permissions: ['inputs:read'],
               BadgeComponent: InputsAggregatedDotBadge,
             },
-            { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
-            { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
-            { path: Routes.SYSTEM.LOGGING, description: 'Logging', permissions: ['loggers:read'] },
-            { path: Routes.SYSTEM.USERS.OVERVIEW, description: 'Users and Teams' },
-            { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },
+            {
+              path: Routes.SYSTEM.OUTPUTS,
+              description: 'Outputs',
+              titleKey: 'navigation:system.outputs',
+              permissions: ['outputs:read'],
+            },
+            {
+              path: Routes.SYSTEM.INDICES.LIST,
+              description: 'Indices',
+              titleKey: 'navigation:system.indices',
+              permissions: ['indices:read'],
+            },
+            {
+              path: Routes.SYSTEM.LOGGING,
+              description: 'Logging',
+              titleKey: 'navigation:system.logging',
+              permissions: ['loggers:read'],
+            },
+            {
+              path: Routes.SYSTEM.USERS.OVERVIEW,
+              description: 'Users and Teams',
+              titleKey: 'navigation:system.users_and_teams',
+            },
+            {
+              path: Routes.SYSTEM.AUTHZROLES.OVERVIEW,
+              description: 'Roles',
+              titleKey: 'navigation:system.roles',
+              permissions: ['roles:read'],
+            },
             {
               path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
               description: AUTHENTICATION_LINK_TITLE,
+              titleKey: 'navigation:system.authentication',
               permissions: ['authentication:edit'],
             },
-            { path: Routes.SYSTEM.CONTENTPACKS.LIST, description: 'Content Packs', permissions: ['contentpack:read'] },
-            { path: Routes.SYSTEM.GROKPATTERNS, description: 'Grok Patterns', permissions: ['grok_pattern:read'] },
+            {
+              path: Routes.SYSTEM.CONTENTPACKS.LIST,
+              description: 'Content Packs',
+              titleKey: 'navigation:system.content_packs',
+              permissions: ['contentpack:read'],
+            },
+            {
+              path: Routes.SYSTEM.GROKPATTERNS,
+              description: 'Grok Patterns',
+              titleKey: 'navigation:system.grok_patterns',
+              permissions: ['grok_pattern:read'],
+            },
             {
               path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW,
               description: 'Lookup Tables',
+              titleKey: 'navigation:system.lookup_tables',
               permissions: ['lookuptables:read'],
             },
             {
               path: Routes.SYSTEM.PIPELINES.OVERVIEW,
               description: 'Pipelines',
+              titleKey: 'navigation:system.pipelines',
               permissions: ['pipeline:read', 'pipeline_connection:read'],
             },
-            { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+            {
+              path: Routes.SYSTEM.SIDECARS.OVERVIEW,
+              description: 'Sidecars',
+              titleKey: 'navigation:system.sidecars',
+              permissions: ['sidecars:read'],
+            },
             {
               path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
               description: 'Collectors',
+              titleKey: 'navigation:system.collectors',
               permissions: ['collector_fleets:read', 'collectors_config:read'],
               requiredFeatureFlag: 'collectors',
             },
@@ -112,13 +163,28 @@ const navigationBindings: PluginExports = {
     },
   ],
   helpMenu: [
-    { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
+    {
+      description: 'Documentation',
+      titleKey: 'navigation:help.documentation',
+      externalLink: DocsHelper.versionedDocsHomePage(),
+    },
     ...(AppConfig.gl2DevMode()
-      ? [{ description: 'Design System', externalLink: 'https://graylog2.github.io/design-system' }]
+      ? [
+          {
+            description: 'Design System',
+            titleKey: 'navigation:help.design_system',
+            externalLink: 'https://graylog2.github.io/design-system',
+          },
+        ]
       : []),
-    { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
+    {
+      description: 'Keyboard Shortcuts',
+      titleKey: 'navigation:help.keyboard_shortcuts',
+      action: ({ showHotkeysModal }) => showHotkeysModal(),
+    },
     {
       description: 'API browser',
+      titleKey: 'navigation:help.api_browser',
       path: Routes.API_BROWSER,
       permissions: 'api_browser:read',
     },

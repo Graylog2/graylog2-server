@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Icon, LinkContainer } from 'components/common';
@@ -58,12 +59,13 @@ const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
   const { language } = useContext(UserPreferencesContext);
   const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
-  const label = readOnly ? 'Show profile' : 'Edit profile';
+  const { t } = useTranslation('navigation');
+  const label = readOnly ? t('user_menu.show_profile') : t('user_menu.edit_profile');
 
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={t('user_menu.title', { name: fullName })} noCaret>
       <Menu.Label>
         <FullName>{fullName}</FullName>
       </Menu.Label>
@@ -75,7 +77,7 @@ const UserMenu = () => {
       <LinkContainer to={route}>
         <MenuItem icon="translate">
           <LanguageRow>
-            Language
+            {t('user_menu.language')}
             <CurrentLanguage>
               <LanguageLabel language={getLanguage(language)} />
               <Icon name="chevron_right" />
@@ -88,7 +90,7 @@ const UserMenu = () => {
         <MenuItem>{label}</MenuItem>
       </LinkContainer>
       <MenuItem onClick={onLogoutClicked} icon="logout">
-        Log out
+        {t('user_menu.log_out')}
       </MenuItem>
     </NavDropdown>
   );
