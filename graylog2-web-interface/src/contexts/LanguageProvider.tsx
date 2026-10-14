@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect, useContext } from 'react';
 import moment from 'moment';
 import 'moment/locale/de';
 
-import i18n from 'i18n';
+import { changeLanguage } from 'i18n';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
 const LanguageProvider = ({ children }: React.PropsWithChildren<{}>) => {
@@ -27,8 +27,7 @@ const LanguageProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   useEffect(() => {
     if (language) {
-      i18n.changeLanguage(language);
-      moment.locale(language);
+      changeLanguage(language).then(() => moment.locale(language));
     }
   }, [language]);
 

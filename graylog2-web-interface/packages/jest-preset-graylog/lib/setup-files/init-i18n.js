@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// Initializes the shared i18next instance with its bundled English resources, like `index.tsx` does in the browser.
+// Registers the core translations with their bundled English texts, like `index.tsx` does in the browser.
 // Without it, components using `useTranslation` render translation keys instead of texts.
 // eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
-require('i18n');
+require('locales/registerCoreTranslations');

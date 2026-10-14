@@ -17,26 +17,71 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import enSearch from 'locales/en/search.json';
-import deSearch from 'locales/de/search.json';
 import { singleton } from 'logic/singleton';
 
-// Plugins are separate bundles. Sharing the instance through `window.singletons` lets them add their own
-// namespaces and follow language changes of the core instead of creating an uninitialized copy.
+type Translations = { [key: string]: unknown };
+export type TranslationsLoader = () => Promise<{ default: Translations }>;
+
+const DEFAULT_LANGUAGE = 'en';
+
+// Plugins are separate bundles which compile their own copy of this module. Sharing the instance and the loaders
+// through `window.singletons` lets them add their own namespaces and follow language changes of the core.
 const i18n = singleton('i18n', () => {
   const instance = i18next.createInstance();
 
   instance.use(initReactI18next).init({
-    resources: {
-      en: { search: enSearch },
-      de: { search: deSearch },
-    },
-    lng: 'en',
-    fallbackLng: 'en',
+    resources: {},
+    lng: DEFAULT_LANGUAGE,
+    fallbackLng: DEFAULT_LANGUAGE,
     interpolation: { escapeValue: false },
   });
 
   return instance;
 });
+
+const loadersByLanguage = singleton('i18n.loaders', () => new Map<string, Map<string, TranslationsLoader>>());
+
+const loadTranslations = async (language: string, namespace: string, loader: TranslationsLoader) => {
+  if (i18n.hasResourceBundle(language, namespace)) {
+    return;
+  }
+
+  const { default: translations } = await loader();
+  i18n.addResourceBundle(language, namespace, translations);
+};
+
+/**
+ * Registers the translations of a namespace. English is bundled, because it is the fallback for missing translations.
+ * Other languages are loaded on demand, e.g. `{ de: () => import('locales/de/search.json') }`.
+ */
+export const registerTranslations = (
+  namespace: string,
+  english: Translations,
+  otherLanguages: { [language: string]: TranslationsLoader },
+) => {
+  i18n.addResourceBundle(DEFAULT_LANGUAGE, namespace, english);
+
+  Object.entries(otherLanguages).forEach(([language, loader]) => {
+    if (!loadersByLanguage.has(language)) {
+      loadersByLanguage.set(language, new Map());
+    }
+
+    loadersByLanguage.get(language).set(namespace, loader);
+  });
+
+  // Plugins can register their translations after the language has been changed already.
+  const currentLanguageLoader = otherLanguages[i18n.language];
+
+  return currentLanguageLoader ? loadTranslations(i18n.language, namespace, currentLanguageLoader) : Promise.resolve();
+};
+
+/** Loads the translations of all registered namespaces before switching, so no texts change twice. */
+export const changeLanguage = async (language: string) => {
+  const loaders = [...(loadersByLanguage.get(language) ?? new Map<string, TranslationsLoader>())];
+
+  await Promise.all(loaders.map(([namespace, loader]) => loadTranslations(language, namespace, loader)));
+
+  return i18n.changeLanguage(language);
+};
 
 export default i18n;
