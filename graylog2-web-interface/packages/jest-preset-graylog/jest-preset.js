@@ -34,6 +34,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     require.resolve('./lib/setup-files/mock-styled-components.js'),
     require.resolve('./lib/setup-files/mock-AppConfig.js'),
+    require.resolve('./lib/setup-files/init-i18n.js'),
     /* eslint-enable no-undef */
     'jest-canvas-mock',
   ],
