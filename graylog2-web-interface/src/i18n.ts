@@ -18,6 +18,7 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { singleton } from 'logic/singleton';
+import pseudoLocalize, { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
 
 type Translations = { [key: string]: unknown };
 export type TranslationsLoader = () => Promise<{ default: Translations }>;
@@ -29,12 +30,21 @@ const DEFAULT_LANGUAGE = 'en';
 const i18n = singleton('i18n', () => {
   const instance = i18next.createInstance();
 
-  instance.use(initReactI18next).init({
-    resources: {},
-    lng: DEFAULT_LANGUAGE,
-    fallbackLng: DEFAULT_LANGUAGE,
-    interpolation: { escapeValue: false },
-  });
+  instance
+    .use(initReactI18next)
+    .use({
+      type: 'postProcessor',
+      name: 'pseudo',
+      process: (value: string, _key: unknown, _options: unknown, translator: { language: string }) =>
+        translator.language === PSEUDO_LANGUAGE ? pseudoLocalize(value) : value,
+    })
+    .init({
+      resources: {},
+      postProcess: ['pseudo'],
+      lng: DEFAULT_LANGUAGE,
+      fallbackLng: DEFAULT_LANGUAGE,
+      interpolation: { escapeValue: false },
+    });
 
   return instance;
 });

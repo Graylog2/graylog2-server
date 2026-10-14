@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
+
 import type { LanguageCode } from './Languages';
 
 const FlagSvg = styled.svg`
@@ -46,6 +48,7 @@ const FLAGS: { [code in LanguageCode]: React.ReactNode } = {
       <rect y="20" width="60" height="10" fill="#FFCE00" />
     </>
   ),
+  [PSEUDO_LANGUAGE]: <rect width="60" height="30" fill="#8C8C8C" />,
 };
 
 type Props = {

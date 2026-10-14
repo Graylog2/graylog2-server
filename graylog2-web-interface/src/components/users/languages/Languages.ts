@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type LanguageCode = 'en' | 'de';
+import AppConfig from 'util/AppConfig';
+import { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
+
+export type LanguageCode = 'en' | 'de' | typeof PSEUDO_LANGUAGE;
 
 export type Language = {
   code: LanguageCode;
@@ -22,6 +25,8 @@ export type Language = {
   name: string;
   /** Translations which have not been reviewed yet. */
   beta: boolean;
+  /** Only offered in development mode. */
+  developmentOnly?: boolean;
 };
 
 export const DEFAULT_LANGUAGE: LanguageCode = 'en';
@@ -29,7 +34,11 @@ export const DEFAULT_LANGUAGE: LanguageCode = 'en';
 export const LANGUAGES: Array<Language> = [
   { code: 'en', name: 'English', beta: false },
   { code: 'de', name: 'Deutsch', beta: false },
+  { code: PSEUDO_LANGUAGE, name: 'Pseudo', beta: false, developmentOnly: true },
 ];
+
+export const availableLanguages = () =>
+  LANGUAGES.filter(({ developmentOnly }) => !developmentOnly || AppConfig.gl2DevMode());
 
 export const getLanguage = (code: string | undefined): Language =>
   LANGUAGES.find((language) => language.code === code) ?? LANGUAGES[0];

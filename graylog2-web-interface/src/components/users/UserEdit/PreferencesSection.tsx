@@ -23,17 +23,16 @@ import { FormikFormGroup, ReadOnlyFormGroup, Select } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
-import { DEFAULT_LANGUAGE, LANGUAGES, getLanguage } from 'components/users/languages/Languages';
+import { DEFAULT_LANGUAGE, availableLanguages, getLanguage } from 'components/users/languages/Languages';
 import LanguageLabel from 'components/users/languages/LanguageLabel';
 import useProductName from 'brand-customization/useProductName';
-
-const LANGUAGE_OPTIONS = LANGUAGES.map(({ code, name }) => ({ value: code, label: name }));
 
 const renderLanguageOption = ({ value }: { value: string }) => <LanguageLabel language={getLanguage(value)} showBeta />;
 
 const LanguageSelect = () => {
   const { values, setFieldValue } = useFormikContext<PreferencesUpdateMap>();
   const productName = useProductName();
+  const options = availableLanguages().map(({ code, name }) => ({ value: code, label: name }));
 
   return (
     <Input
@@ -44,7 +43,7 @@ const LanguageSelect = () => {
       help={`Language of the ${productName} interface. Translations marked Beta have not been reviewed yet.`}>
       <Select
         inputId="language"
-        options={LANGUAGE_OPTIONS}
+        options={options}
         value={values.language ?? DEFAULT_LANGUAGE}
         onChange={(value) => setFieldValue('language', value)}
         optionRenderer={renderLanguageOption}
