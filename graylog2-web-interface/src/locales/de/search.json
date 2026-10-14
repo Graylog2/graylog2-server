@@ -115,6 +115,7 @@
     "no_override": "Keine Überschreibung",
     "now": "Jetzt",
     "all_time": "Gesamte Zeit",
+    "ago": "zurück",
     "range_ago": "vor {{time}}",
     "range_length_placeholder": "Zeitraum auswählen",
     "load_preset": "Voreinstellung laden",

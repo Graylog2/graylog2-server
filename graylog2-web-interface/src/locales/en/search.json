@@ -115,6 +115,7 @@
     "no_override": "No Override",
     "now": "Now",
     "all_time": "All Time",
+    "ago": "ago",
     "range_ago": "{{time}} ago",
     "range_length_placeholder": "Select a range length",
     "load_preset": "Load Preset",
