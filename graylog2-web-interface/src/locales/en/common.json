@@ -10,7 +10,14 @@
     "edit": "Edit",
     "preview": "Preview",
     "close": "Close",
-    "done": "Done"
+    "done": "Done",
+    "filter": "Filter",
+    "reset": "Reset",
+    "reset_search": "Reset search",
+    "more_actions": "More Actions",
+    "sort": "Sort",
+    "clear_selection": "Clear selection",
+    "remove_item": "Remove {{name}}"
   },
   "confirm_leave": {
     "question": "Are you sure?"
@@ -79,7 +86,11 @@
   "empty": {
     "no_data": "No data available.",
     "no_entities": "No entities exist.",
-    "nothing_here": "Looks like there is nothing here, yet!"
+    "nothing_here": "Looks like there is nothing here, yet!",
+    "no_items": "No items to display",
+    "no_items_available": "No items available",
+    "no_items_found": "No items found to display.",
+    "filter_no_match": "Filter does not match any data."
   },
   "badges": {
     "beta": "Beta",
@@ -96,5 +107,30 @@
   "enterprise_plugin_not_found": {
     "title": "Enterprise Feature",
     "description": "To use the <bold>{{featureName}}</bold> functionality you need the <licenseLink>Graylog Enterprise license</licenseLink> and the <docsLink>Graylog Enterprise plugin</docsLink>."
+  },
+  "pagination": {
+    "first": "Open first page",
+    "previous": "Open previous page",
+    "next": "Open next page",
+    "last": "Open last page",
+    "page": "Open page {{page}}",
+    "active_page": "Active page"
+  },
+  "page_size": {
+    "rows_one": "{{count}} Row",
+    "rows_other": "{{count}} Rows",
+    "configure": "Configure page size",
+    "show": "Show <select/>"
+  },
+  "search_form": {
+    "placeholder": "Enter search query...",
+    "filter_placeholder": "Enter query to filter"
+  },
+  "select": {
+    "placeholder": "Select...",
+    "no_options": "No options",
+    "loading": "Loading...",
+    "loading_options": "Loading options...",
+    "type_to_filter": "Type to filter"
   }
 }

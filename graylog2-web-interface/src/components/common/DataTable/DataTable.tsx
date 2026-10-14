@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 
 import Table from 'components/bootstrap/Table';
@@ -24,12 +25,24 @@ import DataTableElement from './DataTableElement';
 
 import NoEntitiesExist from '../NoEntitiesExist';
 
-const NoData = ({ noDataText }) => {
+const NoData = ({ noDataText }: { noDataText: React.ReactNode | undefined }) => {
+  const { t } = useTranslation('common');
+
+  if (noDataText === undefined) {
+    return <NoEntitiesExist>{t('empty.no_data')}</NoEntitiesExist>;
+  }
+
   if (typeof noDataText === 'string') {
     return <NoEntitiesExist>{noDataText}</NoEntitiesExist>;
   }
 
   return noDataText;
+};
+
+const NoMatchingData = () => {
+  const { t } = useTranslation('common');
+
+  return <p>{t('empty.filter_no_match')}</p>;
 };
 
 type DataTableProps = {
@@ -104,8 +117,8 @@ class DataTable extends React.Component<
     hover: undefined,
     condensed: undefined,
     filterKeys: [],
-    filterLabel: 'Filter',
-    noDataText: 'No data available.',
+    filterLabel: undefined,
+    noDataText: undefined,
     rowClassName: '',
     useResponsiveTable: true,
     // eslint-disable-next-line react/no-unstable-nested-components
@@ -197,7 +210,7 @@ class DataTable extends React.Component<
     if (rows.length === 0) {
       data = <NoData noDataText={noDataText} />;
     } else if (effectiveRows.length === 0) {
-      data = <p>Filter does not match any data.</p>;
+      data = <NoMatchingData />;
     } else {
       data = (
         <Table className={className} striped={striped} hover={hover} condensed={condensed}>

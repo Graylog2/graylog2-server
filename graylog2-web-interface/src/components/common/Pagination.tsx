@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pagination as MantinePagination } from '@mantine/core';
 import styled from 'styled-components';
 
@@ -32,12 +33,12 @@ type Props = {
   warnIfPageOutOfBounds?: boolean;
 };
 
-const controlAriaLabels = {
-  first: 'Open first page',
-  previous: 'Open previous page',
-  next: 'Open next page',
-  last: 'Open last page',
-};
+const CONTROL_ARIA_LABELS = {
+  first: 'pagination.first',
+  previous: 'pagination.previous',
+  next: 'pagination.next',
+  last: 'pagination.last',
+} as const;
 
 export enum ICON_NAMES {
   FIRST = 'keyboard_double_arrow_left',
@@ -85,6 +86,8 @@ const Pagination = ({
   onChange = () => {},
   warnIfPageOutOfBounds = true,
 }: Props) => {
+  const { t } = useTranslation('common');
+
   if (totalPages <= 1) {
     return null;
   }
@@ -112,10 +115,10 @@ const Pagination = ({
       nextIcon={NextIcon}
       firstIcon={FirstIcon}
       lastIcon={LastIcon}
-      getControlProps={(control) => ({ 'aria-label': controlAriaLabels[control] })}
+      getControlProps={(control) => ({ 'aria-label': t(CONTROL_ARIA_LABELS[control]) })}
       getItemProps={(page) => ({
-        'aria-label': `Open page ${page}`,
-        ...(page === currentPage ? { title: 'Active page' } : {}),
+        'aria-label': t('pagination.page', { page }),
+        ...(page === currentPage ? { title: t('pagination.active_page') } : {}),
       })}
       data-testid="graylog-pagination"
     />

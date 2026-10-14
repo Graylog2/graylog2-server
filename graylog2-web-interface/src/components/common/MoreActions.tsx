@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DropdownButton } from 'components/bootstrap';
 
@@ -45,20 +46,24 @@ export const MoreActionsMenu = ({
   id = undefined,
   keepMounted = undefined,
   pullRight = undefined,
-  title = 'More Actions',
+  title = undefined,
   solid = false,
-}: React.PropsWithChildren<MoreActionsMenuProps>) => (
-  <DropdownButton
-    aria-label={ariaLabel}
-    bsStyle={solid ? undefined : 'transparent'}
-    buttonTitle={title}
-    className={className}
-    id={id}
-    keepMounted={keepMounted}
-    noCaret
-    pullRight={pullRight}
-    title={<MoreActionsIcon size={size} />}
-    withinPortal>
-    {children}
-  </DropdownButton>
-);
+}: React.PropsWithChildren<MoreActionsMenuProps>) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <DropdownButton
+      aria-label={ariaLabel}
+      bsStyle={solid ? undefined : 'transparent'}
+      buttonTitle={title ?? t('actions.more_actions')}
+      className={className}
+      id={id}
+      keepMounted={keepMounted}
+      noCaret
+      pullRight={pullRight}
+      title={<MoreActionsIcon size={size} />}
+      withinPortal>
+      {children}
+    </DropdownButton>
+  );
+};

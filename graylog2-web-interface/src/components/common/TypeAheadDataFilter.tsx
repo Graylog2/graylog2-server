@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
@@ -78,6 +79,7 @@ const TypeAheadDataFilter = ({
   searchInKeys = [],
   debounceMs = 250,
 }: TypeAheadDataFilterProps) => {
+  const { t } = useTranslation('common');
   const [filterText, setFilterText] = useState('');
   const filterTextRef = useRef('');
   const previousDataRef = useRef<any[] | undefined>(data);
@@ -204,10 +206,10 @@ const TypeAheadDataFilter = ({
           onKeyDown={onFilterKeyDown}
         />
         <StyledButton type="button" onClick={applyFilters}>
-          Filter
+          {t('actions.filter')}
         </StyledButton>
         <StyledButton type="button" onClick={resetFilters} disabled={filterText === ''}>
-          Reset
+          {t('actions.reset')}
         </StyledButton>
       </div>
     </div>

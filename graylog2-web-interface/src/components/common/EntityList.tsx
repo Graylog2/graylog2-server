@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -35,9 +36,11 @@ type Props = {
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = ({ bsNoItemsStyle = undefined, items, noItemsText = 'No items available' }: Props) => {
+const EntityList = ({ bsNoItemsStyle = undefined, items, noItemsText = undefined }: Props) => {
+  const { t } = useTranslation('common');
+
   if (items.length === 0) {
-    return <Alert bsStyle={bsNoItemsStyle}>{noItemsText}</Alert>;
+    return <Alert bsStyle={bsNoItemsStyle}>{noItemsText ?? t('empty.no_items_available')}</Alert>;
   }
 
   return <StyledList>{items}</StyledList>;

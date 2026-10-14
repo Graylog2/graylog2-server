@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
@@ -126,7 +127,7 @@ const SearchForm = ({
   focusAfterMount = false,
   children = null,
   className = '',
-  placeholder = 'Enter search query...',
+  placeholder = undefined,
   buttonLeftMargin = 5,
   label = null,
   onReset = null,
@@ -136,6 +137,7 @@ const SearchForm = ({
   onQueryChange = undefined,
   query: propsQuery = '',
 }: Props) => {
+  const { t } = useTranslation('common');
   const [query, setQuery] = useState(propsQuery);
   const [isLoading, setIsLoading] = useState(false);
   const inputFeedbackContainer = useRef<HTMLDivElement>(undefined);
@@ -217,7 +219,7 @@ const SearchForm = ({
               autoFocus={focusAfterMount}
               onChange={onChange}
               value={query}
-              placeholder={placeholder}
+              placeholder={placeholder ?? t('search_form.placeholder')}
               type="text"
               $queryWidth={queryWidth}
               className="query form-control"
@@ -228,7 +230,7 @@ const SearchForm = ({
             <InputFeedback ref={inputFeedbackContainer}>
               {isLoading && <Spinner text="" />}
               {query && typeof onReset === 'function' && (
-                <IconButton name="close" title="Reset search" onClick={handleReset} />
+                <IconButton name="close" title={t('actions.reset_search')} onClick={handleReset} />
               )}
               {queryHelpComponent}
             </InputFeedback>

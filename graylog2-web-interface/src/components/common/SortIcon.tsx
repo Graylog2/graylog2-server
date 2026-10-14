@@ -17,6 +17,7 @@
 
 import styled, { css } from 'styled-components';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Icon from 'components/common/Icon';
 
@@ -62,12 +63,14 @@ type Props<AscDirection extends string, DescDirection extends string> = {
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange = undefined,
-  title = 'Sort',
+  title = undefined,
   order = undefined,
   ascId = 'Ascending',
   descId = 'Descending',
   className = '',
 }: Props<AscDirection, DescDirection>) => {
+  const { t } = useTranslation('common');
+  const displayedTitle = title ?? t('actions.sort');
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const isAscSort = activeDirection === ascId && activeDirection !== descId;
 
@@ -81,9 +84,9 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   return (
     <StyledSortIcon
       className={`${className} ${sortActive ? 'active' : ''}`}
-      title={title}
+      title={displayedTitle}
       type="button"
-      aria-label={title}
+      aria-label={displayedTitle}
       onClick={handleSortChange}
       $disabled={disabled}>
       <Icon

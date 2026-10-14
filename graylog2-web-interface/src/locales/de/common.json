@@ -10,7 +10,14 @@
     "edit": "Bearbeiten",
     "preview": "Vorschau",
     "close": "Schließen",
-    "done": "Fertig"
+    "done": "Fertig",
+    "filter": "Filtern",
+    "reset": "Zurücksetzen",
+    "reset_search": "Suche zurücksetzen",
+    "more_actions": "Weitere Aktionen",
+    "sort": "Sortieren",
+    "clear_selection": "Auswahl aufheben",
+    "remove_item": "{{name}} entfernen"
   },
   "confirm_leave": {
     "question": "Sind Sie sicher?"
@@ -82,7 +89,11 @@
   "empty": {
     "no_data": "Keine Daten verfügbar.",
     "no_entities": "Es sind keine Einträge vorhanden.",
-    "nothing_here": "Hier gibt es noch nichts zu sehen!"
+    "nothing_here": "Hier gibt es noch nichts zu sehen!",
+    "no_items": "Keine Einträge vorhanden",
+    "no_items_available": "Keine Einträge verfügbar",
+    "no_items_found": "Keine Einträge gefunden.",
+    "filter_no_match": "Der Filter liefert keine Treffer."
   },
   "badges": {
     "beta": "Beta",
@@ -99,5 +110,30 @@
   "enterprise_plugin_not_found": {
     "title": "Enterprise-Funktion",
     "description": "Um die Funktion <bold>{{featureName}}</bold> zu nutzen, benötigen Sie die <licenseLink>Graylog Enterprise-Lizenz</licenseLink> und das <docsLink>Graylog Enterprise-Plugin</docsLink>."
+  },
+  "pagination": {
+    "first": "Erste Seite öffnen",
+    "previous": "Vorherige Seite öffnen",
+    "next": "Nächste Seite öffnen",
+    "last": "Letzte Seite öffnen",
+    "page": "Seite {{page}} öffnen",
+    "active_page": "Aktive Seite"
+  },
+  "page_size": {
+    "rows_one": "{{count}} Zeile",
+    "rows_other": "{{count}} Zeilen",
+    "configure": "Seitengröße festlegen",
+    "show": "<select/> anzeigen"
+  },
+  "search_form": {
+    "placeholder": "Suchanfrage eingeben...",
+    "filter_placeholder": "Abfrage zum Filtern eingeben"
+  },
+  "select": {
+    "placeholder": "Auswählen...",
+    "no_options": "Keine Optionen",
+    "loading": "Wird geladen...",
+    "loading_options": "Optionen werden geladen...",
+    "type_to_filter": "Zum Filtern tippen"
   }
 }

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import IconButton from 'components/common/IconButton';
 
@@ -52,9 +53,10 @@ const StyledDeleteButton = styled(IconButton)`
 `;
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem = undefined, item }: Props) => {
+  const { t } = useTranslation('common');
   const deleteButton =
     typeof onDeleteItem === 'function' ? (
-      <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
+      <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={t('actions.remove_item', { name })} />
     ) : null;
 
   return (
