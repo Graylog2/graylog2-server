@@ -28,6 +28,7 @@ export const INDEX_SET_VIEW_VARIANTS = {
 };
 
 export const DETAILS_SECTION = 'details';
+export const STREAMS_SECTION = 'streams';
 
 // Hidden until BE-4: the backend reports the worst deflector health of all writable sets for each of them.
 const DISPLAYED_METRIC_COLUMN_IDS = Object.values(METRIC_COLUMN_IDS).filter(

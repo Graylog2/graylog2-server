@@ -30,6 +30,7 @@ import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
 import MetricCell from './cells/MetricCell';
 import DeflectorHealthCell from './cells/DeflectorHealthCell';
+import StreamCountCell from './cells/StreamCountCell';
 import { METRIC_COLUMN_IDS } from './metricColumns';
 
 type ToggleProps = React.PropsWithChildren<{
@@ -81,11 +82,14 @@ const customColumnRenderers = (
       staticWidth: 'matchHeader',
     },
     stream_count: {
-      renderCell: (streamCount: number, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet} align="right">
-          {streamCount}
-        </DetailsToggle>
-      ),
+      renderCell: (streamCount: number, indexSet: IndexSetEntity) =>
+        streamCount > 0 ? (
+          <StreamCountCell indexSet={indexSet} />
+        ) : (
+          <DetailsToggle indexSet={indexSet} align="right">
+            {streamCount}
+          </DetailsToggle>
+        ),
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },
