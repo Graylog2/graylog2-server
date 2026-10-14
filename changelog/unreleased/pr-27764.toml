@@ -1,4 +1,4 @@
-type = "c"
+type = "f"
 message = "Improve pipeline rule evaluation performance by using the cached function descriptor."
 
 pulls = ["27764"]
