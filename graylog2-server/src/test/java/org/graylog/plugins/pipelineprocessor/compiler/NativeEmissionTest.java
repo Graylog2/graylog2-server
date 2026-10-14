@@ -92,8 +92,8 @@ class NativeEmissionTest {
     }
 
     /**
-     * Results are bound to a variable first: {@code set_field} is a legacy call whose arguments the AST evaluates, so
-     * the access and literal nodes would otherwise never be emitted.
+     * Results are bound to a variable first, so the access and literal nodes are emitted natively regardless of how
+     * {@code set_field} is called.
      */
     @ParameterizedTest
     @ValueSource(strings = {

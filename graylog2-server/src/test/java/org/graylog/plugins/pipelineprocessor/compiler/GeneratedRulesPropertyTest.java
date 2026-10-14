@@ -48,6 +48,7 @@ class GeneratedRulesPropertyTest {
         FUNCTIONS.putAll(RuleCompilerTest.FUNCTIONS);
         FUNCTIONS.putAll(StringFastPathTest.FUNCTIONS);
         FUNCTIONS.putAll(ConversionFastPathTest.FUNCTIONS);
+        FUNCTIONS.putAll(MessageFastPathTest.FUNCTIONS);
     }
 
     private final RuleCompiler compiler = new RuleCompiler(new MetricRegistry(), DifferentialHarness::verify);
@@ -101,6 +102,11 @@ class GeneratedRulesPropertyTest {
                 values(2).map(v -> f("set_field(\"out\", %s);", v)),
                 values(2).map(v -> f("let x = %s; set_field(\"x\", x);", v)),
                 values(1).map(v -> f("let y = %s; set_field(\"y\", to_string(y));", v)),
+                values(2).map(v -> f("set_field(\"p\", %s, \"pre_\", \"_suf\");", v)),
+                values(1).map(v -> f("set_field(field: \"d\", value: %s, default: \"dflt\");", v)),
+                Combinators.combine(Arbitraries.of("a", "b", "n", "missing"), Arbitraries.of("a", "r", "s"))
+                        .as((from, to) -> f("rename_field(\"%s\", \"%s\");", from, to)),
+                Arbitraries.of("a", "n", "missing").map(field -> f("remove_single_field(\"%s\");", field)),
                 Arbitraries.just("throw_error();"));
     }
 
@@ -132,6 +138,7 @@ class GeneratedRulesPropertyTest {
         final Arbitrary<String> leaf = Arbitraries.oneOf(
                 Arbitraries.of("true", "false", "throw_bool()"),
                 Arbitraries.of("a", "n", "missing").map(field -> f("has_field(\"%s\")", field)),
+                values(1).map(v -> f("has_field(to_string(%s))", v)),
                 values(1).map(v -> f("is_string(%s)", v)),
                 Combinators.combine(values(1), values(1)).as((l, r) -> f("%s == %s", l, r)),
                 Combinators.combine(values(1), values(1)).as((l, r) -> f("%s != %s", l, r)),

@@ -44,8 +44,9 @@ import java.lang.annotation.Target;
  * <p>
  * The fast path only applies where compiled code emits the call itself: {@code let} values, conditions, and
  * arguments of other fast-path calls. A call nested in the arguments of a legacy call (for example
- * {@code set_field("x", lowercase($message.y))} while {@code set_field} has no fast path) is evaluated through the
- * AST by that legacy function and never reaches the fast path.
+ * {@code set_field(field: "x", value: lowercase($message.y), default: "")}, where the present {@code default} keeps
+ * {@code set_field} on the legacy path) is evaluated through the AST by that legacy function and never reaches the
+ * fast path.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

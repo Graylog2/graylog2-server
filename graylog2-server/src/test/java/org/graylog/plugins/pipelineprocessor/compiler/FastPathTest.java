@@ -225,7 +225,7 @@ class FastPathTest {
         return counter == null ? 0 : counter.getCount();
     }
 
-    /** set_field is legacy, so its arguments are AST-evaluated (see callNestedInLegacyCallIsAstEvaluated): calls under test go into a native {@code let}. */
+    /** Calls under test go into a native {@code let}. */
     private void assertEquivalent(String source) {
         final Rule rule = parser.parseRule(source, false);
         DifferentialHarness.assertEquivalent(FastPathTest::input, List.of(rule), compiler::compileOrThrow);
@@ -264,8 +264,8 @@ class FastPathTest {
      */
     @Test
     void callNestedInLegacyCallIsAstEvaluated() {
-        assertEquivalent("rule \"r\" when true then set_field(\"x\", shout($message.message)); end");
-        assertThat(calls("legacy", "set_field")).isEqualTo(1);
+        assertEquivalent("rule \"r\" when true then tick(shout($message.message)); end");
+        assertThat(calls("legacy", "tick")).isEqualTo(1);
         assertThat(calls("fastPath", "shout")).isZero();
         assertThat(calls("legacy", "shout")).isZero();
     }

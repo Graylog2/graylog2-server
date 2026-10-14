@@ -118,7 +118,7 @@ class StringFastPathTest {
         return counter == null ? 0 : counter.getCount();
     }
 
-    /** The call goes into a native {@code let}: arguments of the legacy set_field are AST-evaluated and never reach a fast path. */
+    /** The call goes into a native {@code let}; set_field's value argument would be a native position as well. */
     private void assertEquivalent(String call) {
         final String source = "rule \"r\" when true then let v = " + call + "; set_field(\"out\", v); end";
         DifferentialHarness.assertEquivalent(StringFastPathTest::input, List.of(parser.parseRule(source, false)), compiler::compileOrThrow);

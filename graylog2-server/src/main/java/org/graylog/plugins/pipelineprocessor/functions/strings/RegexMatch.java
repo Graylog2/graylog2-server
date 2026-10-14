@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,27 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
             throw new IllegalStateException("Stack overflow during regex pattern matching");
         }
 
+    }
+
+    /** {@code group_names} is resolved after the null check in {@link #evaluate}, so it is absent or a constant here. */
+    @PipelineFastPath(eagerParams = 2)
+    public RegexMatchResult fastPath(Pattern regex, String value, List groupNamesArg, EvaluationContext context) {
+        if (regex == null || value == null) {
+            final String nullArgument = regex == null ? "pattern" : "value";
+            throw new IllegalArgumentException(
+                    context.pipelineErrorMessage("Argument '" + nullArgument + "' cannot be 'null'"));
+        }
+        //noinspection unchecked
+        final List<String> groupNames = groupNamesArg != null ? (List<String>) groupNamesArg : Collections.emptyList();
+
+        try {
+            final Matcher matcher = regex.matcher(value);
+            final boolean matches = matcher.find();
+
+            return new RegexMatchResult(matches, matcher.toMatchResult(), groupNames);
+        } catch (StackOverflowError e) {
+            throw new IllegalStateException("Stack overflow during regex pattern matching");
+        }
     }
 
     @Override

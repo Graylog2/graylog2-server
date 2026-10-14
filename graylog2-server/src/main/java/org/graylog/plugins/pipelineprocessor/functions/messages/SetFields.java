@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
@@ -67,6 +68,34 @@ public class SetFields extends AbstractFunction<Void> {
                     field = field + suffix.get();
                 }
                 if (cleanFields.optional(args, context).orElse(false)) {
+                    field = Message.cleanKey(field);
+                }
+                message.addField(field, value);
+            });
+        }
+        return null;
+    }
+
+    /**
+     * {@link #evaluate} resolves {@code message} before {@code prefix}, and {@code clean_fields} once per map entry,
+     * so only {@code fields} is eager; the other params are absent or constants here.
+     */
+    @PipelineFastPath
+    public Void fastPath(Map fieldsArg, String prefix, String suffix, Message messageArg, Boolean cleanFieldsArg,
+                         EvaluationContext context) {
+        //noinspection unchecked
+        final Map<String, Object> fields = fieldsArg;
+        final Message message = messageArg != null ? messageArg : context.currentMessage();
+
+        if (fields != null) {
+            fields.forEach((field, value) -> {
+                if (prefix != null) {
+                    field = prefix + field;
+                }
+                if (suffix != null) {
+                    field = field + suffix;
+                }
+                if (cleanFieldsArg != null && cleanFieldsArg) {
                     field = Message.cleanKey(field);
                 }
                 message.addField(field, value);

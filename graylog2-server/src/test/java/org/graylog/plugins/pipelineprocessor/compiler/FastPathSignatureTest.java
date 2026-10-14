@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.compiler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -23,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,7 +37,8 @@ class FastPathSignatureTest {
     static final Set<String> EXPECTED_FAST_PATH_FUNCTIONS = Set.of("lowercase", "uppercase", "capitalize", "uncapitalize", "swapcase",
             "abbreviate", "contains", "starts_with", "ends_with", "substring", "concat", "replace", "split", "length",
             "first_non_null", "to_string", "to_long", "to_double", "to_bool", "to_map", "is_string", "is_long", "is_double",
-            "is_number", "is_bool", "is_collection", "is_list", "is_map");
+            "is_number", "is_bool", "is_collection", "is_list", "is_map", "set_field", "has_field", "rename_field", "set_fields",
+            "regex", "array_contains", "remove_single_field");
 
     @Test
     void allFastPathSignaturesMatchTheirDescriptors() throws Exception {
@@ -51,11 +55,21 @@ class FastPathSignatureTest {
                 if (info.isAbstract()) {
                     continue;
                 }
-                final Function<?> function = (Function<?>) info.loadClass().getDeclaredConstructor().newInstance();
+                final Function<?> function = instantiate(info.loadClass());
                 assertThat(FastPathResolver.validate(function)).as(info.getName()).isNotNull();
                 found.add(function.descriptor().name());
             }
         }
         assertThat(found).containsAll(EXPECTED_FAST_PATH_FUNCTIONS);
+    }
+
+    /** Uses the no-arg constructor, or passes an {@link ObjectMapper} to functions that inject one (array_contains). */
+    private static Function<?> instantiate(Class<?> type) throws Exception {
+        for (Constructor<?> constructor : type.getConstructors()) {
+            if (Arrays.equals(constructor.getParameterTypes(), new Class<?>[]{ObjectMapper.class})) {
+                return (Function<?>) constructor.newInstance(new ObjectMapper());
+            }
+        }
+        return (Function<?>) type.getDeclaredConstructor().newInstance();
     }
 }
