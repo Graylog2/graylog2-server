@@ -103,6 +103,22 @@ The [graylog-luma design system](https://graylog2.github.io/design-system) (sour
 
 - No `link` style buttons — use anchors for navigation.
 
+## Translations
+
+User-visible texts are translated with [i18next](https://www.i18next.com/) and `react-i18next`.
+
+- Texts live in `src/locales/<language>/<namespace>.json`, one namespace per area (`common` for shared components, `search`, `streams`, …). Register new namespaces in `src/locales/registerCoreTranslations.ts`; plugins call `registerTranslations` from `i18n` with their own namespaces.
+- Keys are nested, `snake_case` and describe the purpose, not the English text: `t('bulk_actions.cancel')`.
+- Translate whole sentences. Use interpolation (`{{name}}`) for values and `<Trans>` for markup, never concatenate translated fragments. Word order and grammar differ between languages.
+- Use plurals via `count` (`items_one`, `items_other`) instead of `StringUtils.pluralize`.
+- Translate at render time: call `t()` inside components, also for default prop values. Module-level constants hold keys, not texts. Outside of components, call `i18n.t()` from `i18n` when the text is needed.
+- Never translate user content (e.g. stream or dashboard titles) or technical values (field names, query syntax).
+- Format numbers, dates and durations with `util/NumberFormatting`, `util/DateTime` (e.g. `preciseDifference`) and `useUserDateTime`. They follow the UI language.
+- English texts are the fallback. Add every new key to all languages in `src/locales`; `locales.test.ts` fails otherwise. Untranslated drafts may be added in English and marked for review.
+- Tests fail when a component uses a key which does not exist. Keys are not type-checked, because i18next's key types require `strictNullChecks`.
+- Directories which are completely translated enable the `graylog/no-untranslated-text` lint rule in `eslint.config.mjs`.
+- In development mode, the "Pseudo" language shows translated texts with accents and extra length. Text without accents is not translated yet.
+
 ## Refactoring
 
 - Put refactoring in separate commits, and in a separate PR if it grows large.
