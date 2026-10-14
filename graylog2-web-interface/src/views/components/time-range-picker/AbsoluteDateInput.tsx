@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -49,6 +50,7 @@ const AbsoluteDateInput = ({
   className = undefined,
   label = undefined,
 }: Props) => {
+  const { t } = useTranslation('search');
   const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
@@ -66,7 +68,7 @@ const AbsoluteDateInput = ({
         placeholder={DATE_TIME_FORMATS.default}
         value={value}
         buttonAfter={
-          <Button disabled={disabled} onClick={_onSetTimeToNow} title="Insert current date">
+          <Button disabled={disabled} onClick={_onSetTimeToNow} title={t('time_range.insert_current_date')}>
             <Icon name="calendar_clock" />
           </Button>
         }

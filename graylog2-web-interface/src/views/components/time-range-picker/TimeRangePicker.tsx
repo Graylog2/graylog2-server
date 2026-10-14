@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from 'react';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
+import { preciseDifference } from 'util/DateTime';
 import { Button } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 import { Icon, KeyCapture, ModalSubmit, NestedForm } from 'components/common';
@@ -101,6 +103,7 @@ const TimeRangePicker = ({
   limitDuration,
   withinPortal = true,
 }: Props) => {
+  const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-bar');
   const validateTimeRange = useTimeRangeValidation(limitDuration);
 
@@ -137,11 +140,15 @@ const TimeRangePicker = ({
 
   const title = (
     <PopoverTitle>
-      <span>Search Time Range</span>
+      <span>{t('time_range.picker_title')}</span>
       {limitDuration > 0 && (
         <LimitLabel>
           <Icon name="warning" />
-          <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
+          <span>
+            {t('time_range.admin_limit', {
+              duration: preciseDifference(moment().subtract(limitDuration, 'seconds'), moment()),
+            })}
+          </span>
         </LimitLabel>
       )}
     </PopoverTitle>
@@ -189,13 +196,13 @@ const TimeRangePicker = ({
                     leftCol={
                       noOverride && (
                         <Button bsStyle="link" onClick={handleNoOverride}>
-                          No Override
+                          {t('time_range.no_override')}
                         </Button>
                       )
                     }
                     onCancel={handleCancel}
                     disabledSubmit={!isValid || isValidating}
-                    submitButtonText="Update time range"
+                    submitButtonText={t('time_range.update')}
                   />
                 </TimeRangePickerFormContent>
               </NestedForm>

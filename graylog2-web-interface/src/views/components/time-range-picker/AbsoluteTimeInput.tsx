@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -201,6 +202,28 @@ type AbsoluteTimeInputProps = {
   disableSecond?: boolean;
 };
 
+// Format tokens, which are the same in all languages.
+const TIME_FORMAT_LABELS = { hours: 'HH', minutes: 'mm', seconds: 'ss' } as const;
+
+const RANGE_TITLES = {
+  from: {
+    hoursLabel: 'time_range.from_hours_label',
+    minutesLabel: 'time_range.from_minutes_label',
+    secondsLabel: 'time_range.from_seconds_label',
+    hours: 'time_range.from_hour',
+    minutes: 'time_range.from_minutes',
+    seconds: 'time_range.from_seconds',
+  },
+  to: {
+    hoursLabel: 'time_range.to_hours_label',
+    minutesLabel: 'time_range.to_minutes_label',
+    secondsLabel: 'time_range.to_seconds_label',
+    hours: 'time_range.to_hour',
+    minutes: 'time_range.to_minutes',
+    seconds: 'time_range.to_seconds',
+  },
+} as const;
+
 const AbsoluteTimeInput = ({
   dateTime,
   range,
@@ -208,6 +231,7 @@ const AbsoluteTimeInput = ({
   disableMinute = false,
   disableSecond = false,
 }: AbsoluteTimeInputProps) => {
+  const { t } = useTranslation('search');
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
   const { toUserTimezone } = useUserDateTime();
 
@@ -249,14 +273,14 @@ const AbsoluteTimeInput = ({
   return (
     <SetTimeOption>
       <FormGroupGrid>
-        <label htmlFor={`${range}-time-hours`} title={`${range} hours label`}>
-          HH
+        <label htmlFor={`${range}-time-hours`} title={t(RANGE_TITLES[range].hoursLabel)}>
+          {TIME_FORMAT_LABELS.hours}
         </label>
-        <label htmlFor={`${range}-time-minutes`} title={`${range} minutes label`}>
-          mm
+        <label htmlFor={`${range}-time-minutes`} title={t(RANGE_TITLES[range].minutesLabel)}>
+          {TIME_FORMAT_LABELS.minutes}
         </label>
-        <label htmlFor={`${range}-time-seconds`} title={`${range} seconds label`}>
-          ss
+        <label htmlFor={`${range}-time-seconds`} title={t(RANGE_TITLES[range].secondsLabel)}>
+          {TIME_FORMAT_LABELS.seconds}
         </label>
         <GridInputGroup>
           <StyledInputAddon>
@@ -264,14 +288,14 @@ const AbsoluteTimeInput = ({
               bsStyle="link"
               bsSize="small"
               onClick={onClickHourToggle}
-              title="Toggle between beginning and end of day">
+              title={t('time_range.toggle_day_boundary')}>
               <Icon name={hourIcon.current} />
             </StyledButton>
           </StyledInputAddon>
           <StyledFormControl
             type="number"
             id={`${range}-time-hours`}
-            title={`${range} hour`}
+            title={t(RANGE_TITLES[range].hours)}
             value={initialDateTime.hours ?? ''}
             onChange={onChangeSetTime}
             onFocus={onFocusSelect}
@@ -280,7 +304,7 @@ const AbsoluteTimeInput = ({
           <StyledFormControl
             type="number"
             id={`${range}-time-minutes`}
-            title={`${range} minutes`}
+            title={t(RANGE_TITLES[range].minutes)}
             value={initialDateTime.minutes ?? ''}
             onChange={onChangeSetTime}
             disabled={disableMinute}
@@ -290,14 +314,18 @@ const AbsoluteTimeInput = ({
           <StyledFormControl
             type="number"
             id={`${range}-time-seconds`}
-            title={`${range} seconds`}
+            title={t(RANGE_TITLES[range].seconds)}
             value={initialDateTime.seconds ?? ''}
             onChange={onChangeSetTime}
             disabled={disableSecond}
             onFocus={onFocusSelect}
           />
           <StyledInputAddon>
-            <StyledButton bsStyle="link" bsSize="small" onClick={onClickTimeNow} title="Set to current local time">
+            <StyledButton
+              bsStyle="link"
+              bsSize="small"
+              onClick={onClickTimeNow}
+              title={t('time_range.set_current_time')}>
               <Icon name="calendar_clock" />
             </StyledButton>
           </StyledInputAddon>

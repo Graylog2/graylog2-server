@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { Field, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
@@ -92,12 +93,19 @@ const ErrorMessage = styled.span(
   `,
 );
 
-const buildRangeTypes = (limitDuration) =>
-  RELATIVE_RANGE_TYPES.map(({ label, type }) => {
+const RANGE_TYPE_LABELS = {
+  seconds: 'time_range.unit_seconds',
+  minutes: 'time_range.unit_minutes',
+  hours: 'time_range.unit_hours',
+  days: 'time_range.unit_days',
+} as const;
+
+const buildRangeTypes = (limitDuration: number, t: TFunction<'search'>) =>
+  RELATIVE_RANGE_TYPES.map(({ type }) => {
     const typeDuration = moment.duration(1, type).asSeconds();
 
     if (limitDuration === 0 || typeDuration <= limitDuration) {
-      return { label, value: type };
+      return { label: t(RANGE_TYPE_LABELS[type]), value: type };
     }
 
     return null;
@@ -135,7 +143,7 @@ const RelativeRangeSelectInner = ({
 }) => {
   const { t } = useTranslation('search');
   const { initialValues } = useFormikContext<TimeRangePickerFormValues>();
-  const availableRangeTypes = buildRangeTypes(limitDuration);
+  const availableRangeTypes = buildRangeTypes(limitDuration, t);
   const { isAllTime, value, unit } = classifiedRange;
 
   const _onChange = useCallback(

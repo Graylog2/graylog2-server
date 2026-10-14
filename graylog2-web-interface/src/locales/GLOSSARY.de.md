@@ -24,6 +24,7 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 | Filter (noun / verb) | Filter / Filtern |
 | Hide / Show (columns, sections) | Ausblenden / Einblenden |
 | Preferences | Voreinstellungen |
+| Preset (e.g. time range) | Vorlage |
 | Preview | Vorschau |
 | Refresh | Aktualisierung |
 | Search (noun / verb) | Suche / Durchsuchen |

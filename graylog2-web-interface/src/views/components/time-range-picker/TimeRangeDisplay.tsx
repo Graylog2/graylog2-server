@@ -157,7 +157,7 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined, centerTim
   return (
     <TimeRangeWrapper
       $centerTimestamps={centerTimestamps}
-      aria-label="Search Time Range, Opens Time Range Selector On Click"
+      aria-label={t('time_range.display_label')}
       role="button"
       onClick={toggleDropdownShow}>
       {isNoTimeRangeOverride(timerange) ? (

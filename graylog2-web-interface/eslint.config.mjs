@@ -51,6 +51,7 @@ const TRANSLATED_FILES = [
   'src/components/common/TimezoneSelect.tsx',
   'src/components/common/TypeAheadDataFilter.tsx',
   'src/components/common/Wizard.tsx',
+  'src/views/components/time-range-picker/**',
 ];
 
 export default defineConfig([

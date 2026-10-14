@@ -97,7 +97,7 @@ describe('TimeRangePicker', () => {
   it('Limit duration is shown when setup', async () => {
     render(<TimeRangePicker {...defaultProps} limitDuration={259200} />);
 
-    const limitDuration = await screen.findByText(/admin has limited searching to 3 days ago/i);
+    const limitDuration = await screen.findByText(/admin has limited searching to 3 days/i);
 
     expect(limitDuration).toBeInTheDocument();
   });

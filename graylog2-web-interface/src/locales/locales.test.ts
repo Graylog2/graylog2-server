@@ -57,6 +57,19 @@ const namespaceFiles = fs
   .readdirSync(path.join(LOCALES_PATH, DEFAULT_LANGUAGE))
   .filter((file) => file.endsWith('.json'));
 
+// `Trans` renders tags named like HTML void elements without content, e.g. `<link>text</link>` loses its text.
+const VOID_ELEMENT_TAG = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)>/;
+
+describe('English translations', () => {
+  it.each(namespaceFiles)('in %s use no tags named like HTML void elements', (file) => {
+    const tagsWithContent = flatten(readNamespace(DEFAULT_LANGUAGE, file))
+      .filter(([, text]) => VOID_ELEMENT_TAG.test(text))
+      .map(([key]) => key);
+
+    expect(tagsWithContent).toEqual([]);
+  });
+});
+
 describe.each(languages)('translations for "%s"', (language) => {
   it('exist for all namespaces', () => {
     expect(fs.readdirSync(path.join(LOCALES_PATH, language)).sort()).toEqual(namespaceFiles.sort());

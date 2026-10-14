@@ -110,6 +110,7 @@ User-visible texts are translated with [i18next](https://www.i18next.com/) and `
 - Texts live in `src/locales/<language>/<namespace>.json`, one namespace per area (`common` for shared components, `search`, `streams`, …). Register new namespaces in `src/locales/registerCoreTranslations.ts`; plugins call `registerTranslations` from `i18n` with their own namespaces.
 - Keys are nested, `snake_case` and describe the purpose, not the English text: `t('bulk_actions.cancel')`.
 - Translate whole sentences. Use interpolation (`{{name}}`) for values and `<Trans>` for markup, never concatenate translated fragments. Word order and grammar differ between languages.
+- `<Trans>` fills its components with the text between the tags, so pass components which render `children` (wrap components like `DocumentationLink` that take a `text` prop). Don't name tags like HTML void elements (`link`, `input`, `img`, …), their content gets lost.
 - Use plurals via `count` (`items_one`, `items_other`) instead of `StringUtils.pluralize`.
 - Translate at render time: call `t()` inside components, also for default prop values. Module-level constants hold keys, not texts. Outside of components, call `i18n.t()` from `i18n` when the text is needed.
 - Never translate user content (e.g. stream or dashboard titles) or technical values (field names, query syntax). Messages of thrown errors and console output are for developers and stay English.

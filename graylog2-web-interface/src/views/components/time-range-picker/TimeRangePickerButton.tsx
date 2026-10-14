@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SyntheticEvent } from 'react';
 import styled from 'styled-components';
 
@@ -31,14 +32,18 @@ type Props = {
   onClick?: (e: SyntheticEvent) => void;
 };
 
-const TimeRangePickerButton = ({ hasError = false, disabled = false, onClick = undefined }: Props) => (
-  <StyledButton
-    bsStyle={hasError ? 'danger' : 'info'}
-    disabled={disabled}
-    onClick={onClick}
-    aria-label="Open Time Range Selector">
-    <Icon name={hasError ? 'warning' : 'schedule'} />
-  </StyledButton>
-);
+const TimeRangePickerButton = ({ hasError = false, disabled = false, onClick = undefined }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <StyledButton
+      bsStyle={hasError ? 'danger' : 'info'}
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={t('time_range.open_selector')}>
+      <Icon name={hasError ? 'warning' : 'schedule'} />
+    </StyledButton>
+  );
+};
 
 export default TimeRangePickerButton;
