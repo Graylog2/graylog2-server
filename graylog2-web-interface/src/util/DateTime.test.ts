@@ -18,12 +18,14 @@
 
 import moment from 'moment-timezone';
 
+import { changeLanguage } from 'i18n';
 import {
   DATE_TIME_FORMATS,
   adjustFormat,
   formatAsBrowserTime,
   getBrowserTimezone,
   parseFromIsoString,
+  preciseDifference,
   relativeDifference,
   relativeDifferenceDays,
   toDateObject,
@@ -192,6 +194,29 @@ describe('DateTime utils', () => {
 
     it('should return a readable difference for two dates in ms', () => {
       expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-01T10:00:00.120')).toBe('120 milliseconds');
+    });
+  });
+
+  describe('preciseDifference', () => {
+    const from = moment('2020-01-01T10:00:00.000');
+    const to = moment('2020-01-03T11:05:00.000');
+
+    afterEach(() => changeLanguage('en'));
+
+    it('should return all units of the difference', () => {
+      expect(preciseDifference(from, to)).toBe('2 days 1 hour 5 minutes');
+    });
+
+    it('should return the difference in the current language', async () => {
+      await changeLanguage('de');
+
+      expect(preciseDifference(from, to)).toBe('2 Tage 1 Stunde 5 Minuten');
+    });
+
+    it('should use the case required for "ago" sentences', async () => {
+      await changeLanguage('de');
+
+      expect(preciseDifference(from, to, { ago: true })).toBe('2 Tagen 1 Stunde 5 Minuten');
     });
   });
 

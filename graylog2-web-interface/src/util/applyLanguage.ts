@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import moment from 'moment';
+import numeral from 'numeral';
 import 'moment/locale/de';
+import 'numeral/locales/de';
 
 import { changeLanguage } from 'i18n';
 import Store from 'logic/local-storage/Store';
@@ -29,6 +31,11 @@ export const lastLanguage = () => Store.get<string>(LAST_LANGUAGE_KEY) ?? DEFAUL
 const applyLanguage = async (language: string) => {
   await changeLanguage(language);
   moment.locale(language);
+
+  if (numeral.locales[language]) {
+    numeral.locale(language);
+  }
+
   Store.set(LAST_LANGUAGE_KEY, language);
 };
 

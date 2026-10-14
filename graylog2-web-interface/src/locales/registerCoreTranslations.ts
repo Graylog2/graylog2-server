@@ -17,7 +17,12 @@
 // Only imported by the core entry point, so plugins, which compile core modules into their bundles, don't contain
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
+import enCommon from 'locales/en/common.json';
 import enSearch from 'locales/en/search.json';
+
+registerTranslations('common', enCommon, {
+  de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),
+});
 
 registerTranslations('search', enSearch, {
   de: () => import(/* webpackChunkName: "translations-de-search" */ 'locales/de/search.json'),

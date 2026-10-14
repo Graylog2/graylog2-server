@@ -18,11 +18,11 @@
 import moment from 'moment';
 
 import 'moment-duration-format';
-import 'moment-precise-range-plugin';
 import i18n from 'i18n';
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { EffectiveTimeRange } from 'components/events/EventsHistogram';
+import { preciseDifference } from 'util/DateTime';
 
 export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder?: string) => {
   const rangeAsSeconds = timerange?.[fieldName];
@@ -37,7 +37,7 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
 
   const reference = moment();
   const dateAgo = moment(reference).subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(reference, dateAgo);
+  const rangeTimespan = preciseDifference(dateAgo, reference, { ago: true });
 
   return i18n.t('time_range.range_ago', { ns: 'search', time: rangeTimespan, defaultValue: '{{time}} ago' });
 };
