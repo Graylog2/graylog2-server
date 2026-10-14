@@ -27,6 +27,8 @@ import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
+import LanguageProvider from 'contexts/LanguageProvider';
+import { lastLanguage } from 'util/applyLanguage';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
@@ -38,7 +40,7 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
   <GraylogThemeProvider userIsLoggedIn={false}>
     <GlobalThemeStyles />
     <Notifications />
-    {children}
+    <LanguageProvider language={lastLanguage()}>{children}</LanguageProvider>
   </GraylogThemeProvider>
 );
 

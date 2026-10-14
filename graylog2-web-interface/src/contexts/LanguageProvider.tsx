@@ -14,24 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
-import { useEffect, useContext } from 'react';
-import moment from 'moment';
-import 'moment/locale/de';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
-import { changeLanguage } from 'i18n';
-import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import i18n from 'i18n';
+import Spinner from 'components/common/Spinner';
+import applyLanguage from 'util/applyLanguage';
 
-const LanguageProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const { language } = useContext(UserPreferencesContext);
+type Props = React.PropsWithChildren<{
+  language: string;
+}>;
+
+/**
+ * Applies the language before rendering the children for the first time, so they don't show up in English first.
+ * Later changes keep the children rendered and switch once the translations are loaded.
+ */
+const LanguageProvider = ({ language, children = undefined }: Props) => {
+  const [isReady, setIsReady] = useState(() => i18n.language === language);
 
   useEffect(() => {
-    if (language) {
-      changeLanguage(language).then(() => moment.locale(language));
-    }
+    // If the translations can't be loaded, the current language stays active.
+    applyLanguage(language)
+      .catch(() => {})
+      .finally(() => setIsReady(true));
   }, [language]);
 
-  return children as React.ReactElement;
+  if (!isReady) {
+    return <Spinner />;
+  }
+
+  return children;
 };
 
 export default LanguageProvider;
