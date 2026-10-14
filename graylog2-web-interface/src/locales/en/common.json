@@ -65,5 +65,36 @@
     "undo": "Undo (Ctrl+Z / ⌘Z)",
     "redo": "Redo (Ctrl+Shift+Z / ⌘⇧Z)",
     "paste_hint": "Press Ctrl+V (⌘V on macOS) or select Edit → Paste to paste from clipboard."
+  },
+  "loading": "Loading...",
+  "loading_long_wait": "This is taking a bit longer, please hold on...",
+  "errors": {
+    "runtime_error": "Runtime Error",
+    "unknown_error": "Unknown error",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "Error getting data",
+    "page_error_description": "We had trouble fetching some data required to build this page, so here is a picture instead.",
+    "page_error_logs": "Check your {{productName}} server logs for more information."
+  },
+  "empty": {
+    "no_data": "No data available.",
+    "no_entities": "No entities exist.",
+    "nothing_here": "Looks like there is nothing here, yet!"
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "Preview",
+    "default": "Default",
+    "optional": "(Opt.)"
+  },
+  "clipboard": {
+    "copied": "Copied!"
+  },
+  "restricted_access": {
+    "view": "You don't have permissions to view this {{entityName}}."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise Feature",
+    "description": "To use the <bold>{{featureName}}</bold> functionality you need the <licenseLink>Graylog Enterprise license</licenseLink> and the <docsLink>Graylog Enterprise plugin</docsLink>."
   }
 }

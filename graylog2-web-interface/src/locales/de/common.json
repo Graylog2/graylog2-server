@@ -68,5 +68,36 @@
     "undo": "Rückgängig (Strg+Z / ⌘Z)",
     "redo": "Wiederholen (Strg+Umschalt+Z / ⌘⇧Z)",
     "paste_hint": "Drücken Sie Strg+V (⌘V unter macOS) oder wählen Sie Bearbeiten → Einfügen, um aus der Zwischenablage einzufügen."
+  },
+  "loading": "Wird geladen...",
+  "loading_long_wait": "Das dauert etwas länger, bitte haben Sie einen Moment Geduld...",
+  "errors": {
+    "runtime_error": "Laufzeitfehler",
+    "unknown_error": "Unbekannter Fehler",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "Fehler beim Laden der Daten",
+    "page_error_description": "Einige Daten, die für diese Seite benötigt werden, konnten nicht geladen werden. Deshalb sehen Sie stattdessen dieses Bild.",
+    "page_error_logs": "Weitere Informationen finden Sie in den Server-Logs von {{productName}}."
+  },
+  "empty": {
+    "no_data": "Keine Daten verfügbar.",
+    "no_entities": "Es sind keine Einträge vorhanden.",
+    "nothing_here": "Hier gibt es noch nichts zu sehen!"
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "Vorschau",
+    "default": "Standard",
+    "optional": "(Opt.)"
+  },
+  "clipboard": {
+    "copied": "Kopiert!"
+  },
+  "restricted_access": {
+    "view": "Sie haben keine Berechtigung, {{entityName}} anzuzeigen."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise-Funktion",
+    "description": "Um die Funktion <bold>{{featureName}}</bold> zu nutzen, benötigen Sie die <licenseLink>Graylog Enterprise-Lizenz</licenseLink> und das <docsLink>Graylog Enterprise-Plugin</docsLink>."
   }
 }
