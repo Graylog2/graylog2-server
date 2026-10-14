@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import last from 'lodash/last';
 import isInteger from 'lodash/isInteger';
 import moment from 'moment';
@@ -95,6 +96,18 @@ const defaultUnits: UnitValue[] = [
   'DAYS',
 ];
 
+const UNIT_LABELS = {
+  NANOSECONDS: 'time_units.nanoseconds',
+  MICROSECONDS: 'time_units.microseconds',
+  MILLISECONDS: 'time_units.milliseconds',
+  SECONDS: 'time_units.seconds',
+  MINUTES: 'time_units.minutes',
+  HOURS: 'time_units.hours',
+  DAYS: 'time_units.days',
+  MONTHS: 'time_units.months',
+  YEARS: 'time_units.years',
+} as const;
+
 type UnitOption = {
   value: UnitValue;
   label: string;
@@ -141,7 +154,10 @@ const TimeUnitInput = ({
   wrapperClassName = '',
   labelClassName = '',
 }: Props) => {
-  const [unitOptions, setUnitOptions] = useState<UnitOption[]>([]);
+  const { t } = useTranslation('common');
+  const unitOptions: Array<UnitOption> = unitValues
+    .filter((option) => units.includes(option))
+    .map((option) => ({ value: option, label: t(UNIT_LABELS[option]) }));
   const [checked, setChecked] = useState<boolean>(enabled ?? defaultEnabled);
 
   const getEffectiveValue = () => (clearable ? value : (value ?? defaultValue));
@@ -171,16 +187,6 @@ const TimeUnitInput = ({
     propagateChange({ checked: e.target.checked });
   };
 
-  const parseUnitOptions = useCallback(() => {
-    setUnitOptions(
-      unitValues
-        .filter((option) => units.includes(option))
-        .map((option) => ({ value: option, label: option.toLowerCase() })),
-    );
-  }, [units]);
-
-  useEffect(() => parseUnitOptions(), [parseUnitOptions]);
-
   return (
     <FormGroup>
       {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
@@ -188,14 +194,20 @@ const TimeUnitInput = ({
         <StyledInputGroup>
           {!required && !hideCheckbox && !disabled && (
             <InputGroupAddon>
-              <input type="checkbox" checked={getCheckedValue()} onChange={handleCheckedChange} title="Toggle time" />
+              <input
+                type="checkbox"
+                checked={getCheckedValue()}
+                onChange={handleCheckedChange}
+                title={t('time.toggle_time')}
+                aria-label={t('time.toggle_time')}
+              />
             </InputGroupAddon>
           )}
           <FormControl
             type={typeof value === 'string' ? 'string' : 'number'}
             name={name}
             disabled={!getCheckedValue() || disabled}
-            aria-label={label || 'Time unit input'}
+            aria-label={label || t('time.time_unit_input')}
             onChange={(e) => handleValueChange(e)}
             value={getEffectiveValue() ?? ''}
           />

@@ -36,7 +36,11 @@
     "seconds_one": "{{count}} second",
     "seconds_other": "{{count}} seconds",
     "milliseconds_one": "{{count}} millisecond",
-    "milliseconds_other": "{{count}} milliseconds"
+    "milliseconds_other": "{{count}} milliseconds",
+    "nanoseconds_one": "{{count}} nanosecond",
+    "nanoseconds_other": "{{count}} nanoseconds",
+    "microseconds_one": "{{count}} microsecond",
+    "microseconds_other": "{{count}} microseconds"
   },
   "bulk_actions": {
     "title": "Bulk actions",
@@ -209,5 +213,26 @@
     "now": "Now",
     "now_lowercase": "now",
     "relative_range": "from {{from}} until {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "nanoseconds",
+    "microseconds": "microseconds",
+    "milliseconds": "milliseconds",
+    "seconds": "seconds",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "months": "months",
+    "years": "years"
+  },
+  "time": {
+    "never": "Never",
+    "toggle_time": "Toggle time",
+    "time_unit_input": "Time unit input",
+    "browser_time_zone": "Browser's time zone",
+    "pick_time_zone": "Pick a time zone",
+    "unclassified_time_zones": "Unclassified",
+    "default_locale": "Default locale",
+    "pick_locale": "Pick a locale"
   }
 }

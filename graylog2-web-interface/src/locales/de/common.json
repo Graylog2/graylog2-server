@@ -39,7 +39,11 @@
     "seconds_one": "{{count}} Sekunde",
     "seconds_other": "{{count}} Sekunden",
     "milliseconds_one": "{{count}} Millisekunde",
-    "milliseconds_other": "{{count}} Millisekunden"
+    "milliseconds_other": "{{count}} Millisekunden",
+    "nanoseconds_one": "{{count}} Nanosekunde",
+    "nanoseconds_other": "{{count}} Nanosekunden",
+    "microseconds_one": "{{count}} Mikrosekunde",
+    "microseconds_other": "{{count}} Mikrosekunden"
   },
   "bulk_actions": {
     "title": "Massenaktionen",
@@ -212,5 +216,26 @@
     "now": "Jetzt",
     "now_lowercase": "jetzt",
     "relative_range": "von {{from}} bis {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "Nanosekunden",
+    "microseconds": "Mikrosekunden",
+    "milliseconds": "Millisekunden",
+    "seconds": "Sekunden",
+    "minutes": "Minuten",
+    "hours": "Stunden",
+    "days": "Tage",
+    "months": "Monate",
+    "years": "Jahre"
+  },
+  "time": {
+    "never": "Nie",
+    "toggle_time": "Zeit aktivieren/deaktivieren",
+    "time_unit_input": "Zeitangabe",
+    "browser_time_zone": "Zeitzone des Browsers",
+    "pick_time_zone": "Zeitzone auswählen",
+    "unclassified_time_zones": "Nicht zugeordnet",
+    "default_locale": "Standard-Gebietsschema",
+    "pick_locale": "Gebietsschema auswählen"
   }
 }

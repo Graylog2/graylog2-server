@@ -16,10 +16,9 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { durationInSeconds, durationInMinutes } from 'util/DateTime';
-
-import Pluralize from './Pluralize';
 
 type Props = {
   duration: number | string;
@@ -30,22 +29,15 @@ type Props = {
  */
 
 const ReadableDuration = ({ duration }: Props) => {
+  const { t } = useTranslation('common');
   const durationInSec = durationInSeconds(duration);
   const durationInMin = durationInMinutes(duration);
 
   if (durationInSec < 60) {
-    return (
-      <span>
-        {durationInSec} <Pluralize singular="second" plural="seconds" value={durationInSec} />
-      </span>
-    );
+    return <span>{t('duration.seconds', { count: durationInSec })}</span>;
   }
 
-  return (
-    <span>
-      {durationInMin} <Pluralize singular="minute" plural="minutes" value={durationInMin} />
-    </span>
-  );
+  return <span>{t('duration.minutes', { count: durationInMin })}</span>;
 };
 
 export default ReadableDuration;

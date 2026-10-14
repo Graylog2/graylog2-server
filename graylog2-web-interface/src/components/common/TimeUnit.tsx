@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { TimeUnit as TimeUnitString } from './types';
 
@@ -29,25 +30,23 @@ type Props = {
 };
 
 const UNITS = {
-  NANOSECONDS: 'nanoseconds',
-  MICROSECONDS: 'microseconds',
-  MILLISECONDS: 'milliseconds',
-  SECONDS: 'seconds',
-  MINUTES: 'minutes',
-  HOURS: 'hours',
-  DAYS: 'days',
-};
+  NANOSECONDS: 'duration.nanoseconds',
+  MICROSECONDS: 'duration.microseconds',
+  MILLISECONDS: 'duration.milliseconds',
+  SECONDS: 'duration.seconds',
+  MINUTES: 'duration.minutes',
+  HOURS: 'duration.hours',
+  DAYS: 'duration.days',
+} as const;
 
 const TimeUnit = ({ value, unit, zeroIsNever = true }: Props) => {
+  const { t } = useTranslation('common');
+
   if (value === 0 && zeroIsNever) {
-    return <span>Never</span>;
+    return <span>{t('time.never')}</span>;
   }
 
-  return (
-    <span>
-      {value}&nbsp;{UNITS[unit]}
-    </span>
-  );
+  return <span>{t(UNITS[unit], { count: value })}</span>;
 };
 
 export default TimeUnit;
