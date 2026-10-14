@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 
@@ -28,6 +29,7 @@ const MessageEditFieldConfigurationAction = () => {
 
   const toggleEditMode = useCallback(() => setShowModal((prev) => !prev), []);
 
+  const { t } = useTranslation('common');
   const onClick = useCallback(() => {
     sendFavoriteFieldTelemetry('EDIT_OPEN');
 
@@ -36,8 +38,8 @@ const MessageEditFieldConfigurationAction = () => {
 
   return (
     <>
-      <Button bsSize="small" onClick={onClick} title="Edit favorite fields">
-        Edit favorite fields
+      <Button bsSize="small" onClick={onClick} title={t('message.edit_favorite_fields')}>
+        {t('message.edit_favorite_fields')}
       </Button>
       {showModal && <MessageFieldsEditModal toggleEditMode={toggleEditMode} />}
     </>

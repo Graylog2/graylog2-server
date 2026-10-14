@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useContext, useCallback, useMemo } from 'react';
+import React, { useContext, useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Alert, Modal, Button } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
-import StreamsContext from 'contexts/StreamsContext';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import StringUtils from 'util/StringUtils';
 import { ModalSubmit } from 'components/common';
 import { DEFAULT_FIELDS } from 'components/common/message/helpers';
 
@@ -45,9 +44,8 @@ const StyledAlert = styled(Alert)`
   margin-top: 0;
 `;
 
-const resetActionTitle = `Reset to default fields: ${DEFAULT_FIELDS.join(', ')}`;
-
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
+  const { t } = useTranslation('common');
   const {
     editingFavoriteFields,
     saveEditedFavoriteFields,
@@ -56,12 +54,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     onFavoriteToggle,
   } = useMessageFavoriteFieldsForEditing();
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
-  const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
-  const streams = useContext(StreamsContext);
-  const messageStreams = useMemo(
-    () => (streams ?? []).filter((stream) => message.fields.streams.includes(stream.id)),
-    [streams, message.fields.streams],
-  );
+  const { editableStreams } = useContext(MessageFavoriteFieldsContext);
 
   const _saveFavoriteField = useCallback(() => {
     saveEditedFavoriteFields();
@@ -82,25 +75,33 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   return (
     <Modal onHide={_toggleEditMode} show>
       <Modal.Header>
-        <Modal.Title>Favorite fields configuration</Modal.Title>
+        <Modal.Title>{t('message.favorite_fields_configuration')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <ModalContentContainer>
           <FieldsContainer>
             <StyledAlert bsStyle="info">
-              Favorite fields will appear in all streams this message belongs to, including{' '}
-              {StringUtils.pluralize(editableStreams.length, ' stream ', ' streams ')}
-              {editableStreams.map((stream, index) => {
-                const isLast = index === messageStreams.length - 1;
+              <Trans
+                t={t}
+                i18nKey="message.favorite_fields_hint"
+                count={editableStreams.length}
+                components={{
+                  streams: (
+                    <span>
+                      {editableStreams.map((stream, index) => {
+                        const isLast = index === editableStreams.length - 1;
 
-                return (
-                  <React.Fragment key={stream.id}>
-                    <StreamLink key={stream.id} stream={stream} />
-                    {!isLast && ', '}
-                  </React.Fragment>
-                );
-              })}{' '}
-              in which this message is routed.
+                        return (
+                          <React.Fragment key={stream.id}>
+                            <StreamLink stream={stream} />
+                            {!isLast && ', '}
+                          </React.Fragment>
+                        );
+                      })}
+                    </span>
+                  ),
+                }}
+              />
             </StyledAlert>
             <MessageFieldsEditModeLists
               reorderFavoriteFields={reorderFavoriteFields}
@@ -112,10 +113,13 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit
-          submitButtonText="Save Configuration"
+          submitButtonText={t('message.save_configuration')}
           leftCol={
-            <Button bsStyle="link" onClick={_resetFavoriteFields} title={resetActionTitle}>
-              Reset to default
+            <Button
+              bsStyle="link"
+              onClick={_resetFavoriteFields}
+              title={t('message.reset_to_default_title', { fields: DEFAULT_FIELDS.join(', ') })}>
+              {t('message.reset_to_default')}
             </Button>
           }
           onCancel={toggleEditMode}

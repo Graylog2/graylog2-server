@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MessageDetailsDefinitionList } from 'components/common';
 import type { Stream } from 'logic/streams/types';
@@ -28,31 +29,35 @@ type Props = {
   assets: React.ReactElement;
 };
 
-const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Props) => (
-  <MessageDetailsDefinitionList>
-    {timestamp}
-    {receivedBy}
+const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Props) => {
+  const { t } = useTranslation('common');
 
-    <dt>Stored in index</dt>
-    <dd>{index || 'Message is not stored'}</dd>
+  return (
+    <MessageDetailsDefinitionList>
+      {timestamp}
+      {receivedBy}
 
-    {!!streams.length && (
-      <>
-        <dt>Routed into streams</dt>
-        <dd className="stream-list">
-          <ul>
-            {streams.map((stream) => (
-              <li key={stream.id}>
-                <StreamLink stream={stream} />
-              </li>
-            ))}
-          </ul>
-        </dd>
-      </>
-    )}
+      <dt>{t('message.stored_in_index')}</dt>
+      <dd>{index || t('message.not_stored_in_index')}</dd>
 
-    {assets}
-  </MessageDetailsDefinitionList>
-);
+      {!!streams.length && (
+        <>
+          <dt>{t('message.routed_into_streams')}</dt>
+          <dd className="stream-list">
+            <ul>
+              {streams.map((stream) => (
+                <li key={stream.id}>
+                  <StreamLink stream={stream} />
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )}
+
+      {assets}
+    </MessageDetailsDefinitionList>
+  );
+};
 
 export default MessageMetadata;

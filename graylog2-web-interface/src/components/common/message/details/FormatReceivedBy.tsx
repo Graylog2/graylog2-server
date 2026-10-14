@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type * as Immutable from 'immutable';
 
 import { Spinner, Link } from 'components/common';
@@ -28,16 +30,16 @@ type Inputs = Immutable.Map<string, Input>;
 // Mirrors backend ReservedInputIds.EPHEMERAL_COLLECTOR_INGEST. Single-use, so kept local here.
 const EPHEMERAL_COLLECTOR_INGEST_INPUT_ID = '000000000000000000000001';
 
-const _inputName = (inputs: Inputs, inputId: string) => {
+const _inputName = (inputs: Inputs, inputId: string, t: TFunction<'common'>) => {
   // The Cloud collector ingest input has no persisted Input record (it runs in-memory), so resolve it to a
   // friendly label linking to the Collectors page instead of the "deleted input" fallback.
   if (inputId === EPHEMERAL_COLLECTOR_INGEST_INPUT_ID) {
-    return <Link to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>Collector Ingest</Link>;
+    return <Link to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>{t('message.collector_ingest')}</Link>;
   }
 
   const input = inputs.get(inputId);
 
-  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
+  return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : t('message.deleted_input');
 };
 
 const FormatReceivedBy = ({
@@ -51,6 +53,7 @@ const FormatReceivedBy = ({
   sourceNodeId: string;
   sourceInputId: string;
 }) => {
+  const { t } = useTranslation('common');
   const forwarderPlugin = usePluginEntities('forwarder');
   const ForwarderReceivedBy = forwarderPlugin?.[0]?.ForwarderReceivedBy;
 
@@ -68,9 +71,16 @@ const FormatReceivedBy = ({
 
   return (
     <div>
-      <dt>Received by</dt>
+      <dt>{t('message.received_by')}</dt>
       <dd>
-        <em>{_inputName(inputs, sourceInputId)}</em> on <NodeName nodeId={sourceNodeId} />
+        <Trans
+          t={t}
+          i18nKey="message.received_by_value"
+          components={{
+            inputName: <em>{_inputName(inputs, sourceInputId, t)}</em>,
+            node: <NodeName nodeId={sourceNodeId} />,
+          }}
+        />
       </dd>
     </div>
   );

@@ -54,6 +54,7 @@ const TRANSLATED_FILES = [
   'src/components/common/TimezoneSelect.tsx',
   'src/components/common/TypeAheadDataFilter.tsx',
   'src/components/common/Wizard.tsx',
+  'src/components/common/message/**',
   'src/components/navigation/**',
   'src/views/components/time-range-picker/**',
 ];

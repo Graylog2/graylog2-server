@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import debounce from 'lodash/debounce';
 
@@ -37,6 +38,7 @@ import MessageEditFieldConfigurationAction from './fields/MessageEditFieldConfig
 const PAGE_SIZE = 10;
 
 const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) => {
+  const { t } = useTranslation('common');
   const sendTelemetry = useSendTelemetry('search-message-table');
   const [searchParams, setSearchParams] = useState({
     query: '',
@@ -68,7 +70,7 @@ const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) =
       <Input
         type="text"
         formGroupClassName=""
-        placeholder="Filter streams"
+        placeholder={t('message.filter_streams')}
         onChange={({ target: { value } }) => handleSearch(value)}
       />
       {isInitialLoading && <Spinner />}
@@ -85,7 +87,7 @@ const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) =
           {streams.map((stream) =>
             stream.is_default ? (
               <ListGroupItem key={stream.id} disabled>
-                <span title="Cannot test against the default stream">{stream.title}</span>
+                <span title={t('message.default_stream_not_testable')}>{stream.title}</span>
               </ListGroupItem>
             ) : (
               <ListGroupItem key={stream.id}>
@@ -95,16 +97,21 @@ const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) =
               </ListGroupItem>
             ),
           )}
-          {!isInitialLoading && streams.length === 0 && <ListGroupItem>No streams available</ListGroupItem>}
+          {!isInitialLoading && streams.length === 0 && <ListGroupItem>{t('message.no_streams')}</ListGroupItem>}
         </ListGroup>
       </PaginatedList>
     </>
   );
 
   return (
-    <OverlayTrigger trigger="click" placement="bottom" overlay={popoverContent} title="Test against stream" rootClose>
+    <OverlayTrigger
+      trigger="click"
+      placement="bottom"
+      overlay={popoverContent}
+      title={t('message.test_against_stream')}
+      rootClose>
       <Button bsSize="small">
-        Test against stream <span className="caret" />
+        {t('message.test_against_stream')} <span className="caret" />
       </Button>
     </OverlayTrigger>
   );
@@ -143,6 +150,7 @@ const MessageActions = ({
   showOriginal,
   toggleShowOriginal,
 }: Props) => {
+  const { t } = useTranslation('common');
   const pluggableActions = usePluggableMessageActions(id, index);
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
 
@@ -158,7 +166,7 @@ const MessageActions = ({
 
   const showChanges = decorationStats && (
     <Button onClick={toggleShowOriginal} active={showOriginal}>
-      Show changes
+      {t('message.show_changes')}
     </Button>
   );
 
@@ -168,8 +176,8 @@ const MessageActions = ({
       <MessagePermalinkButton messageIndex={index} messageId={id} />
       {pluggableActions}
 
-      <ClipboardButton title="Copy ID" text={id} bsSize="small" />
-      <JSONClipboardButton title="Copy message" bsSize="small" content={fields} />
+      <ClipboardButton title={t('message.copy_id')} text={id} bsSize="small" />
+      <JSONClipboardButton title={t('message.copy_message')} bsSize="small" content={fields} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}

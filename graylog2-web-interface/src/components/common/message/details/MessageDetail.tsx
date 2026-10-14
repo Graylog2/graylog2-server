@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
@@ -44,6 +45,12 @@ import MessageActions from './MessageActions';
 import MessageAugmentations from './MessageAugmentations';
 import MessageMetadata from './MessageMetadata';
 
+const NotStoredLabel = () => {
+  const { t } = useTranslation('common');
+
+  return <Label bsStyle="warning">{t('message.not_stored')}</Label>;
+};
+
 const _formatMessageTitle = (index, id) => {
   if (index) {
     return <Link to={Routes.message_show(index, id)}>{id}</Link>;
@@ -51,7 +58,7 @@ const _formatMessageTitle = (index, id) => {
 
   return (
     <span>
-      {id} <Label bsStyle="warning">Not stored</Label>
+      {id} <NotStoredLabel />
     </span>
   );
 };
@@ -86,6 +93,7 @@ const MessageDetail = ({
   inputs = Immutable.Map(),
   showTimestamp = true,
 }: Props) => {
+  const { t } = useTranslation('common');
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
@@ -119,7 +127,7 @@ const MessageDetail = ({
     timestamp = [];
     const rawTimestamp = fields.timestamp;
 
-    timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
+    timestamp.push(<dt key={`dt-${rawTimestamp}`}>{t('message.timestamp')}</dt>);
     timestamp.push(
       <dd key={`dd-${rawTimestamp}`}>
         <Timestamp dateTime={rawTimestamp} format="complete" />
