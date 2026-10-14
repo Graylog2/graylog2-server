@@ -394,6 +394,15 @@ const emitRoute = (
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
   const formDataParameters = parameters.filter((parameter) => parameter.paramType === 'formdata');
+  const routePath = firstNonEmpty(operationPath, path) || '/';
+  const parameterNames = parameters.map(({ name }) => cleanVariableName(name));
+  const undeclaredPathVariables = (routePath.match(/{.+?}/g) ?? [])
+    .map(extractVariable)
+    .filter((variable) => !parameterNames.includes(variable));
+
+  if (undeclaredPathVariables.length > 0) {
+    throw new Error(`${method} ${routePath} (${nickname}) has no parameter for: ${undeclaredPathVariables.join(', ')}`);
+  }
 
   const jsDoc = ts.factory.createJSDocComment(
     summary,
@@ -432,7 +441,7 @@ const emitRoute = (
         emitPromiseResultType(emitType(type)),
         emitBlock(
           method,
-          firstNonEmpty(operationPath, path) || '/',
+          routePath,
           bodyParameter[0],
           queryParameters,
           produces,
