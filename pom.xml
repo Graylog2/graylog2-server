@@ -208,7 +208,7 @@
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
-        <snappy-java.version>1.1.10.10</snappy-java.version>
+        <snappy-java.version>1.1.10.11</snappy-java.version>
         <oshi.version>7.7.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
