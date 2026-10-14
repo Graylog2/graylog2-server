@@ -279,7 +279,12 @@ describe('renderNotifications', () => {
 
     render(
       <>
-        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], allPermitted)}
+        {renderNotifications(
+          [definitionNotification],
+          notificationSettings as any,
+          [notification as any],
+          allPermitted,
+        )}
       </>,
     );
 
@@ -294,7 +299,12 @@ describe('renderNotifications', () => {
 
     render(
       <>
-        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], allPermitted)}
+        {renderNotifications(
+          [definitionNotification],
+          notificationSettings as any,
+          [notification as any],
+          allPermitted,
+        )}
       </>,
     );
 
