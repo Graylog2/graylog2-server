@@ -39,8 +39,13 @@ import java.util.Set;
  */
 public class NumericDateFieldClassifier {
 
-    private static final Set<String> INTEGRAL_TYPES = Set.of("long", "unsigned_long");
-    private static final Set<String> FRACTIONAL_TYPES = Set.of("float", "double", "scaled_float");
+    /**
+     * Only the two types dynamic mapping produces are listed, because only those can have been created by the
+     * faulty serialization. Any other numeric type comes from a template, a custom field mapping or a profile,
+     * which all mean somebody chose it on purpose.
+     */
+    private static final Set<String> INTEGRAL_TYPES = Set.of("long");
+    private static final Set<String> FRACTIONAL_TYPES = Set.of("float");
 
     /**
      * Epoch milliseconds from 2001-09-09 to 2033-05-18. Values outside this window are not plausible message
@@ -53,11 +58,11 @@ public class NumericDateFieldClassifier {
     private static final double MAX_EPOCH_SECONDS = MAX_EPOCH_MILLIS / 1000d;
 
     /**
-     * How far outside the index's own time range the implied timestamps may fall and still count as a date. A real
-     * timestamp field tracks the period the index was written in; an unrelated counter that happens to land in the
-     * epoch window usually does not.
+     * How far outside the period an index covers the implied timestamps may fall and still count as a date. A date
+     * field tracks the messages it was written with, give or take: an event time may lag the message that reported
+     * it. A counter that merely happens to land in the epoch window almost never agrees with that period.
      */
-    private static final long INDEX_RANGE_TOLERANCE_MILLIS = 365L * 24 * 60 * 60 * 1000;
+    private static final long DATA_PERIOD_TOLERANCE_MILLIS = 30L * 24 * 60 * 60 * 1000;
 
     public enum Verdict {
         /** The values are epoch milliseconds, so the field was a Joda {@code DateTime} or a {@code java.util.Date}. */
@@ -75,8 +80,8 @@ public class NumericDateFieldClassifier {
      * @param documentCount how many documents of the index have a value for the field
      * @param min           the smallest value in the index
      * @param max           the largest value in the index
-     * @param indexRange    the period the index covers, or {@code null} when it is not known. When given, the implied
-     *                      timestamps have to fall near it.
+     * @param indexRange    the period the index's documents cover, or {@code null} when it is not known. When
+     *                      given, the implied timestamps have to fall near it.
      */
     public Verdict classify(String physicalType,
                             long documentCount,
@@ -113,12 +118,12 @@ public class NumericDateFieldClassifier {
         if (indexRange == null) {
             return true;
         }
-        return maxMillis >= indexRange.beginMillis() - INDEX_RANGE_TOLERANCE_MILLIS
-                && minMillis <= indexRange.endMillis() + INDEX_RANGE_TOLERANCE_MILLIS;
+        return maxMillis >= indexRange.beginMillis() - DATA_PERIOD_TOLERANCE_MILLIS
+                && minMillis <= indexRange.endMillis() + DATA_PERIOD_TOLERANCE_MILLIS;
     }
 
     /**
-     * The period an index covers, taken from its index range.
+     * The period an index covers, taken from the timestamps of the documents it holds.
      */
     public record IndexPeriod(long beginMillis, long endMillis) {
         public static IndexPeriod of(DateTime begin, DateTime end) {

@@ -111,7 +111,7 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
         try (var lockService = lockServiceFactory.create()) {
             lockService.acquireAndKeepLock(ClusterLockResources.name(LOCK_RESOURCE), UUID.randomUUID().toString());
 
-            // Another node may have finished while we were waiting for the lock.
+            // Another node may have finished between the check above and the lock being taken.
             if (clusterConfigService.get(MigrationCompleted.class) != null) {
                 LOG.debug("Migration completed by another node.");
                 return;
@@ -120,21 +120,34 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
             repairAffectedIndexSets();
         } catch (AlreadyLockedException e) {
             LOG.debug("Another node is already repairing index sets with numerically mapped date fields.");
+        } catch (Exception e) {
+            // A migration that throws takes the server down with it, see ServerBootstrap#startCommand. Nothing here
+            // is worth that: ingestion works either way, the affected messages simply keep failing until the next
+            // attempt. Leaving the completion marker unwritten is what makes that attempt happen.
+            LOG.error("Could not repair index sets with numerically mapped date fields. Retrying on the next "
+                    + "startup. Until then, messages with such a field keep failing to index.", e);
         }
     }
 
     private void repairAffectedIndexSets() {
-        final List<String> rotatedIndexSets = new ArrayList<>();
+        int rotated = 0;
         int failed = 0;
 
         for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
             if (!indexSetConfig.isWritable()) {
                 continue;
             }
+            if (!indexSetConfig.canHaveCustomFieldMappings()) {
+                // Index sets with immutable field types - events, failures and the like - reject the mapping change,
+                // so rotating them could not repair anything and would only cost an index on every startup.
+                LOG.debug("Skipping index set <{}> ({}), its field types cannot be changed.",
+                        indexSetConfig.id(), indexSetConfig.title());
+                continue;
+            }
             try {
                 final Outcome outcome = rotateIfAffected(indexSetConfig);
                 if (outcome != Outcome.NOT_AFFECTED) {
-                    rotatedIndexSets.add(indexSetConfig.title());
+                    rotated++;
                 }
                 if (outcome == Outcome.ROTATED_WITH_ERRORS) {
                     failed++;
@@ -147,18 +160,13 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
             }
         }
 
-        if (!rotatedIndexSets.isEmpty()) {
-            LOG.info("Rotated {} index set(s) that mapped a date field numerically: {}",
-                    rotatedIndexSets.size(), String.join(", ", rotatedIndexSets));
-            notifyAboutRotation(rotatedIndexSets);
-        }
-
         if (failed > 0) {
-            LOG.warn("{} index set(s) could not be handled. Retrying on the next startup.", failed);
+            LOG.warn("Rotated {} index set(s), {} could not be handled. Retrying on the next startup.",
+                    rotated, failed);
             return;
         }
 
-        clusterConfigService.write(new MigrationCompleted(rotatedIndexSets.size()));
+        clusterConfigService.write(new MigrationCompleted(rotated));
     }
 
     private Outcome rotateIfAffected(IndexSetConfig indexSetConfig) throws Exception {
@@ -179,7 +187,7 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 indexSetConfig.id(), indexSetConfig.title(), writeIndex,
                 findings.stream().map(NumericDateFieldDetector.Finding::describe).collect(Collectors.joining(", ")));
 
-        final boolean allPinned = pinToDate(indexSetConfig, findings);
+        final List<String> pinned = pinToDate(indexSetConfig, findings);
 
         // The mappings were written to the index set config, so the index set has to be read again: the new index is
         // created from the configuration this object holds, and the one captured above no longer has them.
@@ -188,7 +196,9 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 .orElse(indexSet)
                 .cycle();
 
-        return allPinned ? Outcome.ROTATED : Outcome.ROTATED_WITH_ERRORS;
+        notifyAboutRotation(indexSetConfig, pinned);
+
+        return pinned.size() == findings.size() ? Outcome.ROTATED : Outcome.ROTATED_WITH_ERRORS;
     }
 
     private enum Outcome {
@@ -209,11 +219,11 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
      * Existing custom field mappings are kept: the mappings are merged, and the detector ignores fields that already
      * have one.
      *
-     * @return whether every field could be pinned. A field that could not is left to dynamic mapping, where the next
-     * value that arrives decides its type again, so the caller has to treat that as unfinished work.
+     * @return the fields that were pinned. Anything missing from it is left to dynamic mapping, where the next value
+     * that arrives decides its type again, so the caller has to treat that as unfinished work.
      */
-    private boolean pinToDate(IndexSetConfig indexSetConfig, List<NumericDateFieldDetector.Finding> findings) {
-        boolean allPinned = true;
+    private List<String> pinToDate(IndexSetConfig indexSetConfig, List<NumericDateFieldDetector.Finding> findings) {
+        final List<String> pinned = new ArrayList<>();
         for (NumericDateFieldDetector.Finding finding : findings) {
             try {
                 fieldTypeMappingsService.changeFieldType(
@@ -221,33 +231,38 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                         Set.of(indexSetConfig.id()),
                         // rotate once at the end instead of once per field
                         false);
+                pinned.add(finding.fieldName());
             } catch (Exception e) {
-                allPinned = false;
                 LOG.warn("Could not set the type of field <{}> in index set <{}> to date. The index set is still "
                                 + "rotated, but the type of that field is determined by the first message written "
                                 + "to the new index. Retrying on the next startup.",
                         finding.fieldName(), indexSetConfig.id(), e);
             }
         }
-        return allPinned;
+        return pinned;
     }
 
     /**
-     * A rotation is not invisible: the new index starts with an empty dynamic mapping, so a field that receives
-     * values of more than one type can end up mapped differently than it was in the previous index. Telling the
-     * administrator which index sets were rotated gives them something to correlate such a change with.
+     * Reports what was changed, per index set, so that an administrator can see which fields were given a custom
+     * type and undo one if it was not wanted. The key is the index set, so that an index set repaired by a later
+     * run gets its own notification instead of being swallowed as a duplicate of the first one.
      */
-    private void notifyAboutRotation(List<String> rotatedIndexSets) {
+    private void notifyAboutRotation(IndexSetConfig indexSetConfig, List<String> pinnedFields) {
+        if (pinnedFields.isEmpty()) {
+            return;
+        }
         try {
             final Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.GENERIC)
-                    .addKey("numeric-date-field-rotation")
+                    .addKey(LOCK_RESOURCE + ":" + indexSetConfig.id())
                     .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail("title", "Index sets rotated to restore date field mappings")
-                    .addDetail("description", "The following index sets mapped a date field as a number, which "
-                            + "earlier versions wrote for date values, and were rotated so that their new index maps "
-                            + "it as a date again: " + String.join(", ", rotatedIndexSets) + ". "
-                            + "Those fields were set to the type date, existing custom field types were kept. "
+                    .addDetail("title", "Index set " + indexSetConfig.title()
+                            + " rotated to restore date field mappings")
+                    .addDetail("description", "The index set " + indexSetConfig.title() + " mapped these "
+                            + "fields as numbers, which earlier versions wrote for date values: "
+                            + String.join(", ", pinnedFields) + ". They were given the custom field type date and "
+                            + "the index set was rotated, so that its new index maps them as dates again. Existing "
+                            + "custom field types were kept. "
                             + "Until the older indices are removed by their retention strategy, those fields still "
                             + "have a numeric type there, so a search covering both the old and the new indices "
                             + "reports a field type conflict for them. That resolves itself once the older indices "
@@ -255,7 +270,8 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                             + "numeric values.");
             notificationService.publishIfFirst(notification);
         } catch (Exception e) {
-            LOG.warn("Could not publish the notification about rotated index sets.", e);
+            LOG.warn("Could not publish the notification about the rotation of index set <{}>.",
+                    indexSetConfig.id(), e);
         }
     }
 

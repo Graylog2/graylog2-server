@@ -49,13 +49,14 @@ class NumericDateFieldClassifierTest {
     }
 
     @Test
-    void recognisesTheOtherNumericTypesOfEachShape() {
+    void ignoresNumericTypesDynamicMappingNeverProduces() {
+        // these can only come from a template, a custom field mapping or a profile, so they are deliberate
         assertThat(classifier.classify("unsigned_long", 1, EPOCH_MILLIS, EPOCH_MILLIS, MATCHING_PERIOD))
-                .isEqualTo(Verdict.EPOCH_MILLIS);
+                .isEqualTo(Verdict.NOT_A_DATE);
         assertThat(classifier.classify("double", 1, EPOCH_SECONDS, EPOCH_SECONDS, MATCHING_PERIOD))
-                .isEqualTo(Verdict.EPOCH_SECONDS);
+                .isEqualTo(Verdict.NOT_A_DATE);
         assertThat(classifier.classify("scaled_float", 1, EPOCH_SECONDS, EPOCH_SECONDS, MATCHING_PERIOD))
-                .isEqualTo(Verdict.EPOCH_SECONDS);
+                .isEqualTo(Verdict.NOT_A_DATE);
     }
 
     @Test

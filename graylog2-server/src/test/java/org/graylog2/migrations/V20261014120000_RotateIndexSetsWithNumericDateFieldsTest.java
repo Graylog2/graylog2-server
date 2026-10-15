@@ -31,6 +31,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -123,6 +125,24 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         verify(fieldTypeMappingsService, never()).changeFieldType(any(), any(), anyBoolean());
         verify(indexSet, never()).cycle();
         verify(notificationService, never()).publishIfFirst(any());
+        verify(clusterConfigService).write(any(
+                V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class));
+    }
+
+    @Test
+    void skipsIndexSetsWhoseFieldTypesCannotBeChanged() {
+        // events, failures and the like reject the mapping change, so rotating them could not repair anything and
+        // would repeat on every startup
+        final IndexSetConfig immutableTypes = indexSetConfig(true);
+        when(immutableTypes.canHaveCustomFieldMappings()).thenReturn(false);
+        when(indexSetService.findAll()).thenReturn(List.of(immutableTypes));
+        givenFindings("event_start");
+
+        migration.upgrade();
+
+        verify(indexSet, never()).cycle();
+        verify(fieldTypeMappingsService, never()).changeFieldType(any(), any(), anyBoolean());
+        // nothing was left undone, so the migration is finished
         verify(clusterConfigService).write(any(
                 V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class));
     }
@@ -216,6 +236,60 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         verify(indexSetService, never()).findAll();
     }
 
+
+    @Test
+    void marksItselfCompleteAfterASuccessfulRepair() throws Exception {
+        givenFindings("event_start");
+
+        migration.upgrade();
+
+        verify(clusterConfigService).write(any(
+                V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class));
+        verify(lockService).close();
+    }
+
+    @Test
+    void namesThePinnedFieldsInTheNotification() {
+        givenFindings("event_start", "event_end");
+
+        migration.upgrade();
+
+        final ArgumentCaptor<Notification> published = ArgumentCaptor.forClass(Notification.class);
+        verify(notificationService).publishIfFirst(published.capture());
+        // an administrator has to be able to see which fields were given a custom type, to undo one if unwanted
+        verify(published.getValue()).addDetail(eq("description"), contains("event_start, event_end"));
+    }
+
+    @Test
+    void doesNothingForAnIndexSetThatHasNotBeenWrittenToYet() throws Exception {
+        when(indexSet.getActiveWriteIndex()).thenReturn(null);
+
+        migration.upgrade();
+
+        verify(detector, never()).findNumericDateFields(any(), anyString());
+        verify(indexSet, never()).cycle();
+    }
+
+    @Test
+    void retriesOnTheNextStartupWhenDetectionFails() {
+        when(detector.findNumericDateFields(any(), anyString())).thenThrow(new RuntimeException("cluster hiccup"));
+
+        migration.upgrade();
+
+        verify(indexSet, never()).cycle();
+        verify(clusterConfigService, never()).write(any());
+    }
+
+    @Test
+    void doesNotAbortStartupWhenTheIndexSetsCannotBeRead() {
+        when(indexSetService.findAll()).thenThrow(new RuntimeException("mongo unavailable"));
+
+        // a migration that throws takes the server down, see ServerBootstrap#startCommand
+        migration.upgrade();
+
+        verify(clusterConfigService, never()).write(any());
+    }
+
     private void givenFindings(String... fieldNames) {
         final List<NumericDateFieldDetector.Finding> findings = Arrays.stream(fieldNames)
                 .map(name -> new NumericDateFieldDetector.Finding(name, "long",
@@ -234,6 +308,7 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         when(config.id()).thenReturn(INDEX_SET_ID);
         when(config.title()).thenReturn("Default index set");
         when(config.isWritable()).thenReturn(writable);
+        when(config.canHaveCustomFieldMappings()).thenReturn(true);
         return config;
     }
 }

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.fieldtypes.datefix;
 
 import jakarta.inject.Inject;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
@@ -25,7 +24,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
-import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -43,7 +42,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -65,14 +63,13 @@ public class NumericDateFieldDetector {
     private static final Logger LOG = LoggerFactory.getLogger(NumericDateFieldDetector.class);
 
     private static final String DATE_TYPE = "date";
-    private static final Set<String> NUMERIC_TYPES =
-            Set.of("long", "unsigned_long", "float", "double", "scaled_float");
-
     /**
-     * Mappings that whole numbers never produce, so a timestamp-shaped value in one of them can only have come from
-     * the fractional epoch seconds that a {@code java.time} value serializes to.
+     * The only two numeric mappings dynamic mapping produces, and so the only two the faulty serialization could
+     * have created: {@code long} for the epoch milliseconds of a Joda date, {@code float} for the fractional epoch
+     * seconds of a {@code java.time} one. Any other numeric type comes from a template, a custom field mapping or a
+     * profile, which all mean somebody chose it on purpose.
      */
-    private static final Set<String> FRACTIONAL_TYPES = Set.of("float", "double", "scaled_float");
+    private static final Set<String> NUMERIC_TYPES = Set.of("long", "float");
 
     /**
      * Numeric fields that the index template maps on purpose, so they can never be a mis-mapped date.
@@ -84,7 +81,6 @@ public class NumericDateFieldDetector {
 
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
-    private final IndexRangeService indexRangeService;
     private final SearchesAdapter searchesAdapter;
     private final NumericDateFieldClassifier classifier;
     private final IndexFieldTypeProfileService profileService;
@@ -92,13 +88,11 @@ public class NumericDateFieldDetector {
     @Inject
     public NumericDateFieldDetector(IndexFieldTypesService indexFieldTypesService,
                                     IndexFieldTypePoller indexFieldTypePoller,
-                                    IndexRangeService indexRangeService,
                                     SearchesAdapter searchesAdapter,
                                     NumericDateFieldClassifier classifier,
                                     IndexFieldTypeProfileService profileService) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexFieldTypePoller = indexFieldTypePoller;
-        this.indexRangeService = indexRangeService;
         this.searchesAdapter = searchesAdapter;
         this.classifier = classifier;
         this.profileService = profileService;
@@ -118,9 +112,13 @@ public class NumericDateFieldDetector {
         final Optional<IndexFieldTypesDTO> writeIndexTypes =
                 indexFieldTypePoller.pollIndex(writeIndex, indexSetConfig.id());
         if (writeIndexTypes.isEmpty()) {
-            // Not knowing the mapping is not the same as knowing there is nothing to repair. Reporting this as a
-            // failure keeps the migration eligible to run again instead of marking the index set as done.
-            throw new IllegalStateException(f("Could not read the mapping of write index <%s>", writeIndex));
+            // The poller reports an empty result only for an index that does not exist. A write index the cluster
+            // does not have cannot hold a mis-mapped field, and retrying would not make it appear, so this is
+            // reported as "nothing to do" rather than as a failure that would hold up the whole migration. Any
+            // other problem reading the mapping surfaces as an exception and is treated as a failure.
+            LOG.warn("Write index <{}> of index set <{}> does not exist, skipping it.",
+                    writeIndex, indexSetConfig.id());
+            return List.of();
         }
 
         final Map<String, String> configuredTypes = configuredFieldTypes(indexSetConfig);
@@ -135,6 +133,10 @@ public class NumericDateFieldDetector {
                         || DATE_TYPE.equals(configuredTypes.get(field.fieldName())))
                 .filter(field -> !TEMPLATE_NUMERIC_FIELDS.contains(field.fieldName()))
                 .toList();
+
+        // Read once for the whole index set: the period its documents actually cover, which is what a value has to
+        // agree with to be believable as a timestamp.
+        final NumericDateFieldClassifier.IndexPeriod dataPeriod = candidates.isEmpty() ? null : dataPeriod(writeIndex);
 
         // Every candidate is classified, so that each affected field can be pinned. Leaving one out would hand it
         // back to dynamic mapping, where the next value that arrives decides its type again.
@@ -155,13 +157,12 @@ public class NumericDateFieldDetector {
                 continue;
             }
 
-            // Neither free signal applies, so the only evidence left is the values themselves. That is conclusive
-            // for a floating point mapping - whole numbers never produce one, so it can only have come from the
-            // fractional epoch seconds a java.time value serializes to - but not for an integer mapping, where a
-            // large counter is indistinguishable from epoch milliseconds. Retyping such a field would break a
-            // perfectly healthy installation, so an integer field is only repaired on independent evidence.
-            if (FRACTIONAL_TYPES.contains(type)) {
-                valuesLookLikeTimestamps(writeIndex, field.fieldName(), type)
+            // Neither free signal applies, so the values themselves are the only evidence left. They are only read
+            // when the period the index covers is known, because a large number on its own says very little: a byte
+            // counter is indistinguishable from epoch milliseconds unless it has to agree with when the index was
+            // actually written.
+            if (dataPeriod != null) {
+                valuesLookLikeTimestamps(writeIndex, field.fieldName(), type, dataPeriod)
                         .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
             }
         }
@@ -212,13 +213,11 @@ public class NumericDateFieldDetector {
      * not being able to judge a field is not the same as knowing that it is fine, and only a failure keeps the
      * migration eligible to try again.
      */
-    private Optional<Reason> valuesLookLikeTimestamps(String index, String fieldName, String physicalType) {
-        final TimeRange allTime = RelativeRange.allTime();
-        final var stats = searchesAdapter.fieldStats("*", null, allTime, Set.of(index), fieldName,
-                false, true, true);
+    private Optional<Reason> valuesLookLikeTimestamps(String index, String fieldName, String physicalType,
+                                                      NumericDateFieldClassifier.IndexPeriod dataPeriod) {
+        final var stats = fieldStats(index, fieldName);
 
-        final var verdict = classifier.classify(physicalType, stats.count(), stats.min(), stats.max(),
-                indexPeriod(index));
+        final var verdict = classifier.classify(physicalType, stats.count(), stats.min(), stats.max(), dataPeriod);
 
         return switch (verdict) {
             case EPOCH_MILLIS -> Optional.of(Reason.VALUES_ARE_EPOCH_MILLIS);
@@ -227,21 +226,27 @@ public class NumericDateFieldDetector {
         };
     }
 
+    /**
+     * The period the documents of the index actually cover, taken from their timestamps.
+     * <p>
+     * The index range would be the obvious source, but a write index carries a placeholder range until it is set
+     * read-only, see {@code MongoIndexSet#addDeflectorIndexRange}. The timestamp field is the one thing every
+     * message has, so its own range says when the index was written.
+     *
+     * @return the period, or {@code null} if the index holds nothing to go by
+     */
     @Nullable
-    private NumericDateFieldClassifier.IndexPeriod indexPeriod(String index) {
-        try {
-            final var range = indexRangeService.get(index);
-            if (range.begin().getMillis() == 0 && range.end().getMillis() == 0) {
-                // The range of an active write index is a placeholder that is only filled in once the index is set
-                // read-only, see MongoIndexSet#addDeflectorIndexRange. Taking it literally would put the index in
-                // 1970 and reject every realistic timestamp.
-                return null;
-            }
-            return NumericDateFieldClassifier.IndexPeriod.of(range.begin(), range.end());
-        } catch (NotFoundException | RuntimeException e) {
-            // Without a range we fall back to the plain epoch window.
+    private NumericDateFieldClassifier.IndexPeriod dataPeriod(String index) {
+        final var stats = fieldStats(index, Message.FIELD_TIMESTAMP);
+        if (stats.count() <= 0 || !Double.isFinite(stats.min()) || !Double.isFinite(stats.max())) {
             return null;
         }
+        return new NumericDateFieldClassifier.IndexPeriod((long) stats.min(), (long) stats.max());
+    }
+
+    private FieldStatsResult fieldStats(String index, String fieldName) {
+        final TimeRange allTime = RelativeRange.allTime();
+        return searchesAdapter.fieldStats("*", null, allTime, Set.of(index), fieldName, false, true, true);
     }
 
     public enum Reason {

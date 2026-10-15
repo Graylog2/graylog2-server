@@ -26,8 +26,6 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
-import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
@@ -60,7 +58,6 @@ class NumericDateFieldDetectorTest {
 
     private final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
     private final IndexFieldTypePoller indexFieldTypePoller = mock(IndexFieldTypePoller.class);
-    private final IndexRangeService indexRangeService = mock(IndexRangeService.class);
     private final SearchesAdapter searchesAdapter = mock(SearchesAdapter.class);
     private final IndexFieldTypeProfileService profileService = mock(IndexFieldTypeProfileService.class);
 
@@ -68,8 +65,10 @@ class NumericDateFieldDetectorTest {
 
     @BeforeEach
     void setUp() {
-        detector = new NumericDateFieldDetector(indexFieldTypesService, indexFieldTypePoller, indexRangeService,
+        detector = new NumericDateFieldDetector(indexFieldTypesService, indexFieldTypePoller,
                 searchesAdapter, new NumericDateFieldClassifier(), profileService);
+        // every index the tests look at was written around the timestamps they use
+        givenFieldStats(Message.FIELD_TIMESTAMP, 100, EPOCH_MILLIS);
     }
 
     @Test
@@ -84,8 +83,8 @@ class NumericDateFieldDetectorTest {
             assertThat(finding.fieldName()).isEqualTo("event_start");
             assertThat(finding.reason()).isEqualTo(NumericDateFieldDetector.Reason.MAPPED_AS_DATE_IN_OLDER_INDEX);
         });
-        // the conflict is conclusive, so the values never have to be read
-        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), anyString(),
+        // the conflict is conclusive, so this field's values never have to be read
+        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), eq("event_start"),
                 anyBoolean(), anyBoolean(), anyBoolean());
     }
 
@@ -111,13 +110,14 @@ class NumericDateFieldDetectorTest {
 
     @Test
     void ignoresFieldsTheIndexTemplateTypes() {
+        // these would otherwise be found by value, so the assertion really does exercise the template filter
         givenIndices(index(WRITE_INDEX,
                 field(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, "long"),
-                field(Message.FIELD_GL2_PROCESSING_DURATION_MS, "integer")));
+                field(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, "long")));
+        givenFieldStats(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, 10, EPOCH_MILLIS);
+        givenFieldStats(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 10, EPOCH_MILLIS);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
-        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), anyString(),
-                anyBoolean(), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -140,13 +140,11 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void failsWhenTheWriteIndexMappingCannotBeRead() {
+    void skipsAnIndexSetWhoseWriteIndexDoesNotExist() {
+        // the poller reports an empty result only for a missing index, and retrying would not make it appear
         givenIndices(index(OLDER_INDEX, field("event_start", "date")));
 
-        // not knowing the mapping must not look like "nothing to repair", or the migration would mark itself done
-        assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(WRITE_INDEX);
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
     }
 
     @Test
@@ -165,9 +163,8 @@ class NumericDateFieldDetectorTest {
     @Test
     void reportsEveryAffectedFieldFoundByItsValues() {
         givenIndices(index(WRITE_INDEX, field("event_start", "float"), field("event_end", "float")));
-        final FieldStatsResult stats = statsOf(10, EPOCH_SECONDS);
-        when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), anyString(),
-                anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(stats);
+        givenFieldStats("event_start", 10, EPOCH_SECONDS);
+        givenFieldStats("event_end", 10, EPOCH_SECONDS);
 
         // every affected field has to be named, otherwise it is not pinned and dynamic mapping decides it again
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
@@ -201,7 +198,8 @@ class NumericDateFieldDetectorTest {
 
         // being unable to judge a field is not the same as knowing it is fine
         assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("index is closed");
     }
 
     @Test
@@ -250,33 +248,33 @@ class NumericDateFieldDetectorTest {
 
 
     @Test
-    void stillDetectsValuesWhenTheIndexRangeIsTheWriteIndexPlaceholder() throws Exception {
-        // An active write index has a placeholder range of epoch zero until it is set read-only. Taken literally it
-        // would put the index in 1970 and reject every realistic timestamp.
-        givenIndices(index(WRITE_INDEX, field("event_start", "float")));
-        givenFieldStats("event_start", 10, EPOCH_SECONDS);
-
-        final IndexRange placeholder = mock(IndexRange.class);
-        when(placeholder.begin()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
-        when(placeholder.end()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
-        when(indexRangeService.get(WRITE_INDEX)).thenReturn(placeholder);
+    void findsAnIntegerFieldWhoseValuesAgreeWithTheIndexPeriod() {
+        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+        givenFieldStats("event_start", 10, EPOCH_MILLIS);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
-                .extracting(NumericDateFieldDetector.Finding::fieldName)
-                .containsExactly("event_start");
+                .singleElement()
+                .satisfies(finding -> assertThat(finding.reason())
+                        .isEqualTo(NumericDateFieldDetector.Reason.VALUES_ARE_EPOCH_MILLIS));
     }
 
-
     @Test
-    void doesNotRetypeAnIntegerFieldOnValuesAlone() {
-        // a byte counter is indistinguishable from epoch milliseconds, and retyping it would break a healthy
-        // installation that never had the serializer problem
+    void ignoresACounterThatLandsInTheEpochWindowButNotInTheIndexPeriod() {
+        // ~1.5 TB in bytes reads as a 2017 timestamp, while this index was written in 2025
         givenIndices(index(WRITE_INDEX, field("bytes_total", "long")));
-        givenFieldStats("bytes_total", 10, EPOCH_MILLIS);
+        givenFieldStats("bytes_total", 10, 1_500_000_000_000d);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
-        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), anyString(),
-                anyBoolean(), anyBoolean(), anyBoolean());
+    }
+
+    @Test
+    void readsNoValuesWhenTheIndexPeriodIsUnknown() {
+        // an index with no timestamps gives nothing to check a value against, so nothing is repaired from values
+        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+        givenFieldStats(Message.FIELD_TIMESTAMP, 0, Double.NaN);
+        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
     }
 
     @Test
