@@ -22,13 +22,16 @@ import URI from 'urijs';
 import type { CoreSystemConfiguration } from 'views/types';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, NavItem } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Icon, LinkContainer } from 'components/common';
+import { DocumentTitle, PageHeader, Icon, LinkContainer, Spinner } from 'components/common';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import 'components/maps/configurations';
 import useLocation from 'routing/useLocation';
+import AppRoutes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePermissions from 'hooks/usePermissions';
+import useRuntimeTunables from 'components/configurations/runtime-tunables/useRuntimeTunables';
+import buildSections from 'components/configurations/runtime-tunables/buildSections';
 
 const SubNavIconClosed = styled(Icon)`
   margin-left: 5px;
@@ -64,19 +67,23 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
   );
 };
 
+const pluginsSection: CoreSystemConfiguration = {
+  name: 'Plugins',
+  SectionComponent: PluginsConfig,
+  showCaret: true,
+  catchAll: true,
+};
+
 const ConfigurationsPage = () => {
   const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
+  const pluginSystemConfigurations = usePluginEntities('systemConfigurations');
+  const { features, isLoading } = useRuntimeTunables();
   const { isPermitted } = usePermissions();
 
   const configurationSections = [
-    ...coreSystemConfigurations,
-    {
-      name: 'Plugins',
-      SectionComponent: PluginsConfig,
-      showCaret: true,
-      catchAll: true,
-    } as CoreSystemConfiguration,
-  ].filter(({ permissions }) => (permissions ? isPermitted(permissions) : true));
+    ...buildSections({ features, coreConfigurations: coreSystemConfigurations, isPermitted }),
+    ...(pluginSystemConfigurations.length > 0 ? [pluginsSection] : []),
+  ];
 
   return (
     <DocumentTitle title="Configurations">
@@ -84,26 +91,34 @@ const ConfigurationsPage = () => {
         <span>You can configure system settings for different sub systems on this page.</span>
       </PageHeader>
 
-      <ConfigletRow className="content">
-        <Col md={2}>
-          <SectionNav>
-            {configurationSections.map(({ name, showCaret }) => (
-              <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
-            ))}
-          </SectionNav>
-        </Col>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <ConfigletRow className="content">
+          <Col md={2}>
+            <SectionNav>
+              {configurationSections.map(({ name, showCaret }) => (
+                <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
+              ))}
+            </SectionNav>
+          </Col>
 
-        <Routes>
-          <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
-          {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
+          <Routes>
+            <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
             <Route
-              path={catchAll ? `${name}/*` : name}
-              key={name}
-              element={<SectionComponent {...props} key={name} />}
+              path="*"
+              element={<Navigate to={AppRoutes.SYSTEM.configurationsSection(configurationSections[0].name)} replace />}
             />
-          ))}
-        </Routes>
-      </ConfigletRow>
+            {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
+              <Route
+                path={catchAll ? `${name}/*` : name}
+                key={name}
+                element={<SectionComponent {...props} key={name} />}
+              />
+            ))}
+          </Routes>
+        </ConfigletRow>
+      )}
     </DocumentTitle>
   );
 };

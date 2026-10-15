@@ -34,6 +34,7 @@ const bindings: PluginExports = {
   coreSystemConfigurations: [
     {
       name: 'Search',
+      feature: 'search',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SearchesConfig,
@@ -42,6 +43,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Message Processors',
+      feature: 'message_processors',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MessageProcessorsConfig,
@@ -50,6 +52,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Sidecars',
+      feature: 'sidecars',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SidecarConfig,
@@ -58,6 +61,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Events',
+      feature: 'events',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: EventsConfig,
@@ -66,6 +70,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'URL Allowlist',
+      feature: 'url_allowlist',
       permissions: ['urlallowlist:read'],
       SectionComponent: ConfigurationSection,
       props: {
@@ -75,6 +80,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Decorators',
+      feature: 'decorators',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: DecoratorsConfig,
@@ -83,6 +89,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Permissions',
+      feature: 'permissions',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: PermissionsConfig,
@@ -91,6 +98,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Password Policy',
+      feature: 'password_policy',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: PasswordComplexityConfig,
@@ -99,6 +107,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Users',
+      feature: 'users',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: UserConfig,
@@ -107,6 +116,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Markdown',
+      feature: 'markdown',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MarkdownConfig,
@@ -115,6 +125,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Welcome Page',
+      feature: 'welcome_page',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: WelcomePageConfig,
@@ -123,6 +134,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'MCP',
+      feature: 'mcp',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: McpConfig,

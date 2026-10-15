@@ -264,6 +264,8 @@ export const TELEMETRY_EVENT_TYPE = {
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
     PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
+    RUNTIME_TUNABLE_UPDATED: 'Configurations Runtime Tunable Updated',
+    RUNTIME_TUNABLE_RESET: 'Configurations Runtime Tunable Reset',
     WELCOME_PAGE_UPDATED: 'Configurations Welcome Page Updated',
   },
   INPUTS: {
