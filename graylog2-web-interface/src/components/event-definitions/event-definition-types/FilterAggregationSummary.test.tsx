@@ -19,7 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import StreamsContext from 'contexts/StreamsContext';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
-import { adminUser } from 'fixtures/users';
 
 import FilterAggregationSummary from './FilterAggregationSummary';
 
@@ -29,7 +28,7 @@ describe('FilterAggregationSummary', () => {
   it('shows stream ids while streams are not loaded yet', async () => {
     render(
       <StreamsContext.Provider value={undefined}>
-        <FilterAggregationSummary config={config} currentUser={adminUser} />
+        <FilterAggregationSummary config={config} />
       </StreamsContext.Provider>,
     );
 
