@@ -219,6 +219,12 @@ public class NumericDateFieldDetector {
     private NumericDateFieldClassifier.IndexPeriod indexPeriod(String index) {
         try {
             final var range = indexRangeService.get(index);
+            if (range.begin().getMillis() == 0 && range.end().getMillis() == 0) {
+                // The range of an active write index is a placeholder that is only filled in once the index is set
+                // read-only, see MongoIndexSet#addDeflectorIndexRange. Taking it literally would put the index in
+                // 1970 and reject every realistic timestamp.
+                return null;
+            }
             return NumericDateFieldClassifier.IndexPeriod.of(range.begin(), range.end());
         } catch (NotFoundException | RuntimeException e) {
             // Without a range we fall back to the plain epoch window.

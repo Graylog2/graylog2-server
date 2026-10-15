@@ -26,10 +26,13 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -242,6 +245,24 @@ class NumericDateFieldDetectorTest {
                 .singleElement()
                 .satisfies(finding -> assertThat(finding.reason())
                         .isEqualTo(NumericDateFieldDetector.Reason.CONFIGURED_AS_DATE_BUT_MAPPED_NUMERICALLY));
+    }
+
+
+    @Test
+    void stillDetectsValuesWhenTheIndexRangeIsTheWriteIndexPlaceholder() throws Exception {
+        // An active write index has a placeholder range of epoch zero until it is set read-only. Taken literally it
+        // would put the index in 1970 and reject every realistic timestamp.
+        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+
+        final IndexRange placeholder = mock(IndexRange.class);
+        when(placeholder.begin()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
+        when(placeholder.end()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
+        when(indexRangeService.get(WRITE_INDEX)).thenReturn(placeholder);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .extracting(NumericDateFieldDetector.Finding::fieldName)
+                .containsExactly("event_start");
     }
 
     private void givenIndices(IndexFieldTypesDTO... indices) {
