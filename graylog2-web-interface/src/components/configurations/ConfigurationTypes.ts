@@ -20,7 +20,6 @@ enum ConfigurationType {
   EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration',
   INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration',
   URL_ALLOWLIST_CONFIG = 'org.graylog2.system.urlallowlist.UrlAllowlist',
-  PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig',
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
   PASSWORD_COMPLEXITY_CONFIG = 'org.graylog2.users.PasswordComplexityConfig',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
