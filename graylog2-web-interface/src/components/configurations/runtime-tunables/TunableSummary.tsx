@@ -55,7 +55,7 @@ type Props = {
 const TunableSummary = ({ tunable }: Props) => (
   <DefinitionList>
     {orderedProperties(tunable.schema)
-      .filter(([, property]) => isVisible(property))
+      .filter(([, property]) => isVisible(property, tunable.value))
       .map(([name, property]) => {
         const label = property.title ?? name;
 

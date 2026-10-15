@@ -33,7 +33,7 @@ const ObjectFields = ({ schema }: Props) => {
   return (
     <>
       {orderedProperties(schema)
-        .filter(([, property]) => isVisible(property))
+        .filter(([, property]) => isVisible(property, values))
         .map(([name, property]) => (
           <TunableField
             key={name}

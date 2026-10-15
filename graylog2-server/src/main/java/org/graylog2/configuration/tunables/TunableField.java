@@ -37,6 +37,12 @@ public @interface TunableField {
     /** All conditions must match for the field to be editable. */
     When[] enabledWhen() default {};
 
+    /** All conditions must match for the field to be shown. */
+    When[] visibleWhen() default {};
+
+    /** Restricts the values offered for an enum field. */
+    String[] allowedValues() default {};
+
     /** Hides the field in the UI while keeping its value. */
     boolean hidden() default false;
 }

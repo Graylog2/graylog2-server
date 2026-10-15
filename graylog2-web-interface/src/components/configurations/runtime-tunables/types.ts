@@ -25,6 +25,7 @@ export type TunableSchema = {
   description?: string;
   format?: string;
   enum?: Array<string | null>;
+  'x-graylog-enum-labels'?: Record<string, string>;
   minimum?: number;
   maximum?: number;
   minLength?: number;
@@ -36,6 +37,7 @@ export type TunableSchema = {
   'x-graylog-order'?: number;
   'x-graylog-units'?: Array<DurationUnit>;
   'x-graylog-enabled-when'?: Array<Condition>;
+  'x-graylog-visible-when'?: Array<Condition>;
   'x-graylog-hidden'?: boolean;
 };
 

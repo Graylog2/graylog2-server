@@ -55,6 +55,8 @@ export const fieldKind = (schema: TunableSchema): FieldKind => {
   }
 };
 
+export const enumLabel = (schema: TunableSchema, value: string) => schema['x-graylog-enum-labels']?.[value] ?? value;
+
 export const orderedProperties = (schema: TunableSchema): Array<[string, TunableSchema]> =>
   Object.entries(schema.properties ?? {})
     .map((entry, index) => ({ entry, index }))
@@ -69,7 +71,8 @@ const conditionMatches = ({ property, in: allowed }: Condition, siblings: unknow
 export const conditionsMatch = (conditions: Array<Condition> | undefined, siblings: unknown) =>
   (conditions ?? []).every((condition) => conditionMatches(condition, siblings));
 
-export const isVisible = (schema: TunableSchema) => !schema['x-graylog-hidden'];
+export const isVisible = (schema: TunableSchema, siblings: unknown) =>
+  !schema['x-graylog-hidden'] && conditionsMatch(schema['x-graylog-visible-when'], siblings);
 
 export const isActive = (schema: TunableSchema, siblings: unknown) =>
-  isVisible(schema) && conditionsMatch(schema['x-graylog-enabled-when'], siblings);
+  isVisible(schema, siblings) && conditionsMatch(schema['x-graylog-enabled-when'], siblings);

@@ -41,6 +41,7 @@ const schema: TunableSchema = {
       type: 'string',
       title: 'Mode',
       enum: ['FAST', 'SAFE'],
+      'x-graylog-enum-labels': { SAFE: 'Safe mode' },
       'x-graylog-order': 3,
     },
     grace: {
@@ -51,7 +52,19 @@ const schema: TunableSchema = {
       'x-graylog-order': 4,
     },
     note: { type: ['string', 'null'], title: 'Note', 'x-graylog-order': 5 },
+    hidden: {
+      type: 'string',
+      title: 'Hidden detail',
+      'x-graylog-order': 7,
+      'x-graylog-visible-when': [{ property: 'mode', in: ['SAFE'] }],
+    },
     retries: { type: ['integer', 'null'], title: 'Retries', 'x-graylog-order': 9 },
+    storage: {
+      anyOf: [{ type: 'null' }, { type: 'string', enum: ['s3', 'gcs'] }],
+      title: 'Storage',
+      'x-graylog-enum-labels': { gcs: 'Google Cloud Storage' },
+      'x-graylog-order': 10,
+    },
   },
 };
 
@@ -61,7 +74,9 @@ const initialValues: TunableValues = {
   mode: 'FAST',
   grace: 'PT90M',
   note: null,
+  hidden: '',
   retries: null,
+  storage: 'gcs',
 };
 
 const renderForm = (onSubmit = jest.fn()) => {
@@ -90,6 +105,27 @@ describe('runtime tunable fields', () => {
     expect(screen.getByRole('spinbutton', { name: /limit/i })).toBeEnabled();
   });
 
+  it('shows fields only when visible', async () => {
+    renderForm();
+
+    expect(screen.queryByLabelText(/hidden detail/i)).not.toBeInTheDocument();
+    await userEvent.click(await screen.findByLabelText(/^mode/i));
+    await userEvent.click(await screen.findByText('Safe mode'));
+    await screen.findByLabelText(/hidden detail/i);
+  });
+
+  it('shows enum labels and submits enum values', async () => {
+    const onSubmit = renderForm();
+
+    await userEvent.click(await screen.findByLabelText(/^mode/i));
+    await screen.findByRole('option', { name: 'FAST' });
+    await userEvent.click(await screen.findByText('Safe mode'));
+    await submit();
+
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ mode: 'SAFE' }), expect.anything());
+  });
+
   it('keeps the duration unit and submits ISO durations', async () => {
     const onSubmit = renderForm();
 
@@ -108,6 +144,34 @@ describe('runtime tunable fields', () => {
 
     await screen.findByRole('button', { name: /save/i });
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ retries: 3 }), expect.anything());
+  });
+
+  it('stores empty nullable text as null', async () => {
+    const onSubmit = renderForm();
+
+    const note = await screen.findByRole('textbox', { name: /^note/i });
+    await userEvent.type(note, 'hello');
+    await submit();
+
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ note: 'hello' }), expect.anything());
+
+    await userEvent.clear(note);
+    await submit();
+
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ note: null }), expect.anything());
+  });
+
+  it('clears nullable enums', async () => {
+    const onSubmit = renderForm();
+
+    await screen.findByText('Google Cloud Storage');
+    await userEvent.type(screen.getByLabelText(/^storage/i), '{backspace}');
+    await submit();
+
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ storage: null }), expect.anything());
   });
 
   it('shows validation errors next to fields', async () => {

@@ -16,7 +16,7 @@
  */
 
 import type { TunableSchema } from './types';
-import { fieldKind, nonNullSchema } from './schema';
+import { enumLabel, fieldKind, nonNullSchema } from './schema';
 import { DEFAULT_UNITS, splitDuration } from './duration';
 
 const count = (amount: number, singular: string, plural: string) => `${amount} ${amount === 1 ? singular : plural}`;
@@ -29,6 +29,8 @@ const formatTunableValue = (schema: TunableSchema, value: unknown): string => {
   switch (fieldKind(actual)) {
     case 'boolean':
       return value ? 'Enabled' : 'Disabled';
+    case 'enum':
+      return enumLabel(actual, String(value));
     case 'duration': {
       const split = splitDuration(String(value), actual['x-graylog-units'] ?? DEFAULT_UNITS);
 

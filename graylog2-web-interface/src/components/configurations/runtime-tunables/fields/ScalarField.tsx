@@ -23,17 +23,21 @@ import { Input } from 'components/bootstrap';
 
 import { useFieldError } from './fieldError';
 
-import { fieldKind } from '../schema';
+import { enumLabel, fieldKind, isNullable, nonNullSchema } from '../schema';
 import type { RuntimeTunableFieldProps } from '../types';
+
+const emptyToNull = (value: unknown) => (value === '' || value === undefined ? null : value);
 
 const ScalarField = ({ name, schema, label, help, disabled = false }: RuntimeTunableFieldProps) => {
   const error = useFieldError(name);
   const kind = fieldKind(schema);
+  const actual = nonNullSchema(schema);
+  const nullable = isNullable(schema);
 
   if (kind === 'enum') {
-    const options = (schema.enum ?? [])
+    const options = (actual.enum ?? [])
       .filter((option) => option !== null)
-      .map((option) => ({ label: option, value: option }));
+      .map((option) => ({ label: enumLabel(actual, option), value: option }));
 
     return (
       <Field name={name}>
@@ -43,9 +47,9 @@ const ScalarField = ({ name, schema, label, help, disabled = false }: RuntimeTun
               inputId={name}
               options={options}
               value={value}
-              clearable={false}
+              clearable={nullable}
               disabled={disabled}
-              onChange={(newValue: string) => setFieldValue(name, newValue)}
+              onChange={(newValue: string) => setFieldValue(name, nullable ? emptyToNull(newValue) : newValue)}
             />
           </Input>
         )}
@@ -58,6 +62,26 @@ const ScalarField = ({ name, schema, label, help, disabled = false }: RuntimeTun
   }
 
   const numeric = kind === 'integer' || kind === 'number';
+
+  if (nullable && kind === 'string') {
+    return (
+      <Field name={name}>
+        {({ field: { value }, form: { setFieldValue } }) => (
+          <Input
+            id={name}
+            type="text"
+            label={label}
+            help={help}
+            error={error}
+            disabled={disabled}
+            maxLength={actual.maxLength}
+            value={value ?? ''}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setFieldValue(name, emptyToNull(event.target.value))}
+          />
+        )}
+      </Field>
+    );
+  }
 
   return (
     <FormikInput

@@ -31,7 +31,7 @@ class RuntimeTunableConditionsTest {
                   "enabled":{"type":"boolean"},
                   "path":{"type":"string","x-graylog-enabled-when":[{"property":"enabled","in":["true"]}]},
                   "cloud":{"type":["string","null"],"enum":["GCS","ABS",null]},
-                  "abs_key":{"type":"string","x-graylog-enabled-when":[{"property":"cloud","in":["ABS"]}]}}}
+                  "abs_key":{"type":"string","x-graylog-visible-when":[{"property":"cloud","in":["ABS"]}]}}}
                 """);
         final var value = mapper.readTree("""
                 {"enabled":false,"path":"","cloud":null,"abs_key":""}

@@ -18,6 +18,7 @@
 import type { TunableSchema } from './types';
 import {
   conditionsMatch,
+  enumLabel,
   fieldKind,
   isNullable,
   isVisible,
@@ -64,8 +65,15 @@ describe('schema helpers', () => {
     expect(conditionsMatch(undefined, {})).toBe(true);
   });
 
+  it('resolves enum labels, falling back to the value', () => {
+    const schema: TunableSchema = { type: 'string', enum: ['A', 'B'], 'x-graylog-enum-labels': { A: 'Alpha' } };
+
+    expect(enumLabel(schema, 'A')).toBe('Alpha');
+    expect(enumLabel(schema, 'B')).toBe('B');
+  });
+
   it('hides fields marked as hidden', () => {
-    expect(isVisible({ type: 'boolean', 'x-graylog-hidden': true })).toBe(false);
-    expect(isVisible({ type: 'boolean' })).toBe(true);
+    expect(isVisible({ type: 'boolean', 'x-graylog-hidden': true }, {})).toBe(false);
+    expect(isVisible({ type: 'boolean' }, {})).toBe(true);
   });
 });

@@ -18,10 +18,19 @@
 import * as React from 'react';
 
 import FieldByKind from './FieldByKind';
+import ScalarField from './ScalarField';
 
-import { nonNullSchema } from '../schema';
+import { fieldKind, isNullable, nonNullSchema } from '../schema';
 import type { RuntimeTunableFieldProps } from '../types';
 
-const TunableField = (props: RuntimeTunableFieldProps) => <FieldByKind {...props} schema={nonNullSchema(props.schema)} />;
+const TunableField = (props: RuntimeTunableFieldProps) => {
+  const kind = fieldKind(props.schema);
+
+  if (isNullable(props.schema) && (kind === 'enum' || kind === 'string')) {
+    return <ScalarField {...props} />;
+  }
+
+  return <FieldByKind {...props} schema={nonNullSchema(props.schema)} />;
+};
 
 export default TunableField;

@@ -204,4 +204,54 @@ class RuntimeTunableSchemaGeneratorTest {
         assertThat(property(schema, "legacy").path("x-graylog-hidden").asBoolean()).isTrue();
         assertThat(property(schema, "current").has("x-graylog-hidden")).isFalse();
     }
+
+    public enum Vendor {
+        @TunableEnumLabel("MaxMind GeoIP") MAXMIND,
+        IPINFO
+    }
+
+    public enum Cloud {
+        @TunableEnumLabel("Amazon S3") S3("s3");
+
+        private final String name;
+
+        Cloud(String name) {
+            this.name = name;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonValue
+        public String getName() {
+            return name;
+        }
+    }
+
+    public record EnumLabels(@JsonProperty("vendor") Vendor vendor,
+                             @JsonProperty("cloud") Optional<Cloud> cloud,
+                             @JsonProperty("mode") Mode mode) {}
+
+    @Test
+    void addsEnumLabels() throws Exception {
+        final ObjectNode schema = generator.generate(EnumLabels.class);
+
+        assertThat(property(schema, "vendor").path("x-graylog-enum-labels").properties())
+                .extracting(Map.Entry::getKey, entry -> entry.getValue().asText())
+                .containsExactly(org.assertj.core.groups.Tuple.tuple("MAXMIND", "MaxMind GeoIP"));
+        assertThat(property(schema, "cloud").toString()).contains("\"x-graylog-enum-labels\":{\"s3\":\"Amazon S3\"}");
+        assertThat(property(schema, "mode").has("x-graylog-enum-labels")).isFalse();
+    }
+
+    public record AllowedValues(@JsonProperty("unit") @TunableField(label = "Unit", allowedValues = {"MINUTES", "HOURS"}) java.util.concurrent.TimeUnit unit,
+                                @JsonProperty("vendor") @TunableField(label = "Vendor", allowedValues = "IPINFO") Optional<Vendor> vendor) {}
+
+    public record AllowedValuesOnString(@JsonProperty("name") @TunableField(label = "Name", allowedValues = "a") String name) {}
+
+    @Test
+    void restrictsEnumValues() throws Exception {
+        final ObjectNode schema = generator.generate(AllowedValues.class);
+
+        assertThat(property(schema, "unit").path("enum")).extracting(JsonNode::asText).containsExactly("MINUTES", "HOURS");
+        assertThat(property(schema, "vendor").toString()).contains("\"enum\":[\"IPINFO\"]");
+        assertThatThrownBy(() -> generator.generate(AllowedValuesOnString.class))
+                .isInstanceOf(UnsupportedTunableSchemaException.class).hasMessageContaining("allowedValues");
+    }
 }

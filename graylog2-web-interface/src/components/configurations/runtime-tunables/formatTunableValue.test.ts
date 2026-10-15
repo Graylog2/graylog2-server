@@ -17,10 +17,11 @@
 import formatTunableValue from './formatTunableValue';
 
 describe('formatTunableValue', () => {
-  it('formats enum values and missing values', () => {
-    const schema = { type: ['string', 'null'], enum: ['s3', 'gcs', null] };
+  it('formats enum values with their labels', () => {
+    const schema = { type: ['string', 'null'], enum: ['s3', 'gcs', null], 'x-graylog-enum-labels': { gcs: 'Google Cloud Storage' } };
 
-    expect(formatTunableValue(schema, 'gcs')).toBe('gcs');
+    expect(formatTunableValue(schema, 'gcs')).toBe('Google Cloud Storage');
+    expect(formatTunableValue(schema, 's3')).toBe('s3');
     expect(formatTunableValue(schema, null)).toBe('Not set');
   });
 });

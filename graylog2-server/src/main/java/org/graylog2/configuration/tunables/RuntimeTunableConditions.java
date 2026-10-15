@@ -30,7 +30,8 @@ public final class RuntimeTunableConditions {
         final Set<String> result = new HashSet<>();
         for (Map.Entry<String, JsonNode> property : schema.path("properties").properties()) {
             final JsonNode propertySchema = property.getValue();
-            if (!matches(propertySchema.path("x-graylog-enabled-when"), value)) {
+            if (!matches(propertySchema.path("x-graylog-enabled-when"), value)
+                    || !matches(propertySchema.path("x-graylog-visible-when"), value)) {
                 result.add(property.getKey());
             }
         }
