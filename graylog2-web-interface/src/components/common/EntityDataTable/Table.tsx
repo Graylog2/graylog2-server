@@ -178,6 +178,7 @@ const Table = <Entity extends EntityBase>({
                   key={`expanded-sections-${row.id}`}
                   expandedSectionRenderers={expandedSectionRenderers}
                   entity={row.original}
+                  visibleCellCount={visibleCellCount}
                 />
               </>
             )}
