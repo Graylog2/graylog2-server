@@ -28,7 +28,6 @@ import UserConfig from 'components/configurations/UserConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
 import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
-import PasswordComplexityConfig from 'components/configurations/PasswordComplexityConfig';
 
 const bindings: PluginExports = {
   coreSystemConfigurations: [
@@ -94,15 +93,6 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: PermissionsConfig,
         title: 'Permissions',
-      },
-    },
-    {
-      name: 'Password Policy',
-      feature: 'password_policy',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: PasswordComplexityConfig,
-        title: 'Password Policy',
       },
     },
     {

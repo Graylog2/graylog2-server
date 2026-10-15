@@ -112,6 +112,7 @@ import org.graylog2.system.traffic.TrafficCounterCalculator;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.system.traffic.TrafficUpdater;
 import org.graylog2.users.GrantsCleanupListener;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
@@ -155,6 +156,7 @@ public class ServerBindings extends Graylog2Module {
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
         install(new RuntimeTunablesModule());
+        addRuntimeTunable(PasswordComplexityConfig.class);
         if (isMigrationCommand) {
             install(new FakeLeaderElectionModule());
         } else {
