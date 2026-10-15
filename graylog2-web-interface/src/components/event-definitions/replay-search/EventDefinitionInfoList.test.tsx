@@ -24,8 +24,6 @@ import {
   mockEventData,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
-import TestStoreProvider from 'views/test/TestStoreProvider';
-import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { AlertType } from 'components/event-definitions/types';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
@@ -41,18 +39,6 @@ jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
 }));
 
 jest.mock('./hooks/useAlertAndEventDefinitionData');
-
-jest.mock('views/logic/Widgets', () => ({
-  ...jest.requireActual('views/logic/Widgets'),
-  widgetDefinition: () => ({
-    searchTypes: () => [
-      {
-        type: 'AGGREGATION',
-        typeDefinition: {},
-      },
-    ],
-  }),
-}));
 
 const mockUseAlertAndEventDefinitionData = ({
   eventData = mockEventData.event,
@@ -74,21 +60,17 @@ const mockUseAlertAndEventDefinitionData = ({
 
 describe('<EventDefinitionInfoList />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
-    <TestStoreProvider>
-      <RightSidebarProvider>
-        <ReplaySearchContext.Provider
-          value={{
-            type,
-            definitionId: '',
-            alertId: '',
-          }}>
-          <EventDefinitionInfoList />
-        </ReplaySearchContext.Provider>
-      </RightSidebarProvider>
-    </TestStoreProvider>
+    <RightSidebarProvider>
+      <ReplaySearchContext.Provider
+        value={{
+          type,
+          definitionId: '',
+          alertId: '',
+        }}>
+        <EventDefinitionInfoList />
+      </ReplaySearchContext.Provider>
+    </RightSidebarProvider>
   );
-
-  useViewsPlugin();
 
   beforeEach(() => {
     mockUseAlertAndEventDefinitionData({});
