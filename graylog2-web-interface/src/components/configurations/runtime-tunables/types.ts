@@ -36,6 +36,7 @@ export type TunableSchema = {
   'x-graylog-order'?: number;
   'x-graylog-units'?: Array<DurationUnit>;
   'x-graylog-enabled-when'?: Array<Condition>;
+  'x-graylog-hidden'?: boolean;
 };
 
 export type RuntimeTunableFieldProps = {

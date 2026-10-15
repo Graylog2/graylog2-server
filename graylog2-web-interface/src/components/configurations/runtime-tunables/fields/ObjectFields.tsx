@@ -21,7 +21,7 @@ import { useFormikContext } from 'formik';
 import TunableField from './TunableField';
 
 import type { TunableSchema, TunableValues } from '../types';
-import { isActive, orderedProperties } from '../schema';
+import { isActive, isVisible, orderedProperties } from '../schema';
 
 type Props = {
   schema: TunableSchema;
@@ -33,6 +33,7 @@ const ObjectFields = ({ schema }: Props) => {
   return (
     <>
       {orderedProperties(schema)
+        .filter(([, property]) => isVisible(property))
         .map(([name, property]) => (
           <TunableField
             key={name}

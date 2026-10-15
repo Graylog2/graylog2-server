@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 
 import type { RuntimeTunable } from './types';
 import formatTunableValue from './formatTunableValue';
-import { orderedProperties } from './schema';
+import { isVisible, orderedProperties } from './schema';
 
 const DefinitionList = styled.dl(
   ({ theme }) => css`
@@ -55,6 +55,7 @@ type Props = {
 const TunableSummary = ({ tunable }: Props) => (
   <DefinitionList>
     {orderedProperties(tunable.schema)
+      .filter(([, property]) => isVisible(property))
       .map(([name, property]) => {
         const label = property.title ?? name;
 

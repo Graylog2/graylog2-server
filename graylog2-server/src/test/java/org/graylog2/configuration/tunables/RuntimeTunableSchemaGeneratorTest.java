@@ -193,4 +193,15 @@ class RuntimeTunableSchemaGeneratorTest {
         assertThat(ttl.path("format").asText()).isEqualTo("duration");
         assertThat(ttl.path("x-graylog-units")).extracting(JsonNode::asText).containsExactly("hours", "days");
     }
+
+    public record HiddenField(@JsonProperty("legacy") @TunableField(label = "Legacy", hidden = true) boolean legacy,
+                              @JsonProperty("current") @TunableField(label = "Current") boolean current) {}
+
+    @Test
+    void marksHiddenFields() throws Exception {
+        final ObjectNode schema = generator.generate(HiddenField.class);
+
+        assertThat(property(schema, "legacy").path("x-graylog-hidden").asBoolean()).isTrue();
+        assertThat(property(schema, "current").has("x-graylog-hidden")).isFalse();
+    }
 }

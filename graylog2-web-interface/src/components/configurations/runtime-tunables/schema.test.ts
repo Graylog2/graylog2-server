@@ -20,6 +20,7 @@ import {
   conditionsMatch,
   fieldKind,
   isNullable,
+  isVisible,
   nonNullSchema,
   orderedProperties,
 } from './schema';
@@ -61,5 +62,10 @@ describe('schema helpers', () => {
     expect(conditionsMatch([{ property: 'enabled', in: ['true'] }], { enabled: false })).toBe(false);
     expect(conditionsMatch([{ property: 'cloud', in: ['null'] }], { cloud: null })).toBe(true);
     expect(conditionsMatch(undefined, {})).toBe(true);
+  });
+
+  it('hides fields marked as hidden', () => {
+    expect(isVisible({ type: 'boolean', 'x-graylog-hidden': true })).toBe(false);
+    expect(isVisible({ type: 'boolean' })).toBe(true);
   });
 });

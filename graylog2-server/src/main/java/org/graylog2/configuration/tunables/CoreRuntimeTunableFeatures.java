@@ -31,9 +31,10 @@ public final class CoreRuntimeTunableFeatures {
     public static final RuntimeTunableFeature MARKDOWN = new RuntimeTunableFeature("markdown", "Markdown", 1000);
     public static final RuntimeTunableFeature WELCOME_PAGE = new RuntimeTunableFeature("welcome_page", "Welcome Page", 1100);
     public static final RuntimeTunableFeature MCP = new RuntimeTunableFeature("mcp", "MCP", 1200);
+    public static final RuntimeTunableFeature THREAT_INTELLIGENCE = new RuntimeTunableFeature("threat_intelligence", "Threat Intelligence Lookup", 1300);
 
     public static final Set<RuntimeTunableFeature> ALL = Set.of(SEARCH, MESSAGE_PROCESSORS, SIDECARS, EVENTS,
-            URL_ALLOWLIST, DECORATORS, PERMISSIONS, PASSWORD_POLICY, USERS, MARKDOWN, WELCOME_PAGE, MCP);
+            URL_ALLOWLIST, DECORATORS, PERMISSIONS, PASSWORD_POLICY, USERS, MARKDOWN, WELCOME_PAGE, MCP, THREAT_INTELLIGENCE);
 
     private CoreRuntimeTunableFeatures() {
     }

@@ -104,6 +104,9 @@ public class RuntimeTunableSchemaGenerator {
         if (field.enabledWhen().length > 0) {
             node.set("x-graylog-enabled-when", conditions(field.enabledWhen()));
         }
+        if (field.hidden()) {
+            node.put("x-graylog-hidden", true);
+        }
     }
 
     private void addUnits(ObjectNode node, ChronoUnit minUnit) {

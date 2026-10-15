@@ -17,7 +17,6 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import ThreatIntelPluginConfig from './components/ThreatIntelPluginConfig';
 import {
   SpamhausEDROPAdapterDocumentation,
   SpamhausEDROPAdapterFieldSet,
@@ -41,13 +40,6 @@ import {
 import { OTXAdapterDocumentation, OTXAdapterFieldSet, OTXAdapterSummary } from './components/adapters/otx';
 
 const bindings: PluginExports = {
-  systemConfigurations: [
-    {
-      component: ThreatIntelPluginConfig,
-      displayName: 'Threat Intelligence Lookup',
-      configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
-    },
-  ],
   lookupTableAdapters: [
     {
       type: 'spamhaus-edrop',

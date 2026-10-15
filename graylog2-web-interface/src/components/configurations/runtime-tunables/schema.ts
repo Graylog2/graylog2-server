@@ -69,5 +69,7 @@ const conditionMatches = ({ property, in: allowed }: Condition, siblings: unknow
 export const conditionsMatch = (conditions: Array<Condition> | undefined, siblings: unknown) =>
   (conditions ?? []).every((condition) => conditionMatches(condition, siblings));
 
+export const isVisible = (schema: TunableSchema) => !schema['x-graylog-hidden'];
+
 export const isActive = (schema: TunableSchema, siblings: unknown) =>
-  conditionsMatch(schema['x-graylog-enabled-when'], siblings);
+  isVisible(schema) && conditionsMatch(schema['x-graylog-enabled-when'], siblings);

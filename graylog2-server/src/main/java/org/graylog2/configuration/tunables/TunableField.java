@@ -36,4 +36,7 @@ public @interface TunableField {
 
     /** All conditions must match for the field to be editable. */
     When[] enabledWhen() default {};
+
+    /** Hides the field in the UI while keeping its value. */
+    boolean hidden() default false;
 }
