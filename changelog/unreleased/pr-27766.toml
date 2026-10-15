@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix `remove_from_stream` pipeline function silently not removing messages from a stream after its index set was edited."
+
+pulls = ["27766"]
