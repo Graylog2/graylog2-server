@@ -144,6 +144,14 @@ After the upgrade:
 - If an index set cannot be checked or rotated, for example because the search backend is not ready yet, this is
   logged and retried on the next start. It does not prevent the server from starting.
 
+Every rotation sets the previous write index to read-only and, unless index optimization is disabled for that index
+set, optimizes it. Optimization is the expensive part: it is a force merge, and the search backend does the work. This
+is the same thing that happens after any rotation, but an upgrade that repairs several index sets at once starts a
+batch of them instead of the single one a regular rotation produces. They do not all run at the same time - the number
+of concurrent optimizations is limited by `elasticsearch_index_optimization_jobs` (default `10`), and the remaining
+ones wait for a free slot. If many of your index sets are affected and your search backend has little headroom, lower
+that value before the upgrade, or disable index optimization for the index sets in question.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"

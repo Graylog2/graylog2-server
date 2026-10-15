@@ -22,7 +22,6 @@ import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
-import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
@@ -38,7 +37,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -119,35 +117,39 @@ public class NumericDateFieldDetector {
             throw new IllegalStateException(f("Could not read the mapping of write index <%s>", writeIndex));
         }
 
-        final Set<String> deliberatelyTyped = deliberatelyTypedFields(indexSetConfig);
+        final Map<String, String> configuredTypes = configuredFieldTypes(indexSetConfig);
         // The older indices only serve as a comparison, so the cached types are good enough for them.
         final Map<String, Set<String>> typesInOlderIndices = typesInOlderIndices(
                 indexFieldTypesService.findForIndexSet(indexSetConfig.id()), writeIndex);
 
         final List<FieldTypeDTO> candidates = writeIndexTypes.get().fields().stream()
                 .filter(field -> NUMERIC_TYPES.contains(field.physicalType().toLowerCase(Locale.ROOT)))
-                .filter(field -> !deliberatelyTyped.contains(field.fieldName()))
+                // A field that is configured as something other than a date is numeric on purpose.
+                .filter(field -> !configuredTypes.containsKey(field.fieldName())
+                        || DATE_TYPE.equals(configuredTypes.get(field.fieldName())))
                 .filter(field -> !TEMPLATE_NUMERIC_FIELDS.contains(field.fieldName()))
                 .toList();
 
-        // The free signal first: it needs no query, and naming every affected field makes the log line useful.
-        final List<Finding> findings = candidates.stream()
-                .filter(field -> typesInOlderIndices
-                        .getOrDefault(field.fieldName(), Set.of())
-                        .contains(DATE_TYPE))
-                .map(field -> new Finding(field.fieldName(), field.physicalType().toLowerCase(Locale.ROOT),
-                        Reason.MAPPED_AS_DATE_IN_OLDER_INDEX))
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (!findings.isEmpty()) {
-            return findings;
-        }
-
-        // Nothing to compare against, so fall back to reading the values. Every candidate is inspected: each affected
-        // field has to be named so that it can be pinned, otherwise it is left to dynamic mapping and the next value
-        // that arrives decides its type again.
+        // Every candidate is classified, so that each affected field can be pinned. Leaving one out would hand it
+        // back to dynamic mapping, where the next value that arrives decides its type again.
+        final List<Finding> findings = new ArrayList<>();
         for (FieldTypeDTO field : candidates) {
             final String type = field.physicalType().toLowerCase(Locale.ROOT);
+
+            if (DATE_TYPE.equals(configuredTypes.get(field.fieldName()))) {
+                // Configured as a date, yet this index maps it numerically: the rotation that would have applied the
+                // configuration has not happened yet, most likely because an earlier attempt failed after the
+                // mapping was stored.
+                findings.add(new Finding(field.fieldName(), type, Reason.CONFIGURED_AS_DATE_BUT_MAPPED_NUMERICALLY));
+                continue;
+            }
+
+            if (typesInOlderIndices.getOrDefault(field.fieldName(), Set.of()).contains(DATE_TYPE)) {
+                findings.add(new Finding(field.fieldName(), type, Reason.MAPPED_AS_DATE_IN_OLDER_INDEX));
+                continue;
+            }
+
+            // Neither of the free signals applies, so the values have to be read.
             valuesLookLikeTimestamps(writeIndex, field.fieldName(), type)
                     .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
         }
@@ -158,27 +160,25 @@ public class NumericDateFieldDetector {
      * Fields whose type the user chose, either directly or through a field type profile. Those are numeric because
      * somebody wanted them to be.
      */
-    private Set<String> deliberatelyTypedFields(IndexSetConfig indexSetConfig) {
-        final Set<String> fieldNames = new HashSet<>();
+    private Map<String, String> configuredFieldTypes(IndexSetConfig indexSetConfig) {
+        final Map<String, String> types = new HashMap<>();
 
-        if (indexSetConfig.customFieldMappings() != null) {
-            indexSetConfig.customFieldMappings().stream()
-                    .map(CustomFieldMapping::fieldName)
-                    .forEach(fieldNames::add);
-        }
-
-        // A profile's mappings are stored separately and merged into the template, so they are just as deliberate
-        // as the ones on the index set itself.
+        // A profile's mappings are stored separately and merged into the template, so they are just as deliberate as
+        // the ones on the index set itself. The index set's own mappings win, as they do in the template.
         final String profileId = indexSetConfig.fieldTypeProfile();
         if (profileId != null && !profileId.isEmpty()) {
             profileService.get(profileId)
                     .map(IndexFieldTypeProfile::customFieldMappings)
-                    .ifPresent(mappings -> mappings.stream()
-                            .map(CustomFieldMapping::fieldName)
-                            .forEach(fieldNames::add));
+                    .ifPresent(mappings -> mappings.forEach(
+                            mapping -> types.put(mapping.fieldName(), mapping.type().toLowerCase(Locale.ROOT))));
         }
 
-        return fieldNames;
+        if (indexSetConfig.customFieldMappings() != null) {
+            indexSetConfig.customFieldMappings().forEach(
+                    mapping -> types.put(mapping.fieldName(), mapping.type().toLowerCase(Locale.ROOT)));
+        }
+
+        return types;
     }
 
     /**
@@ -227,6 +227,7 @@ public class NumericDateFieldDetector {
     }
 
     public enum Reason {
+        CONFIGURED_AS_DATE_BUT_MAPPED_NUMERICALLY("it is configured as a date but this index still maps it numerically"),
         MAPPED_AS_DATE_IN_OLDER_INDEX("it is mapped as a date in an older index of the same index set"),
         VALUES_ARE_EPOCH_MILLIS("its values are epoch milliseconds"),
         VALUES_ARE_EPOCH_SECONDS("its values are fractional epoch seconds");

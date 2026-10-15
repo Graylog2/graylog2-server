@@ -216,6 +216,34 @@ class NumericDateFieldDetectorTest {
      * The first index given is the write index, which the detector reads live; the rest are the older indices it
      * compares against, which come from the cached field types.
      */
+
+    @Test
+    void findsBothHistoricallyConfirmedAndValueDetectedFieldsInTheSameIndex() {
+        givenIndices(
+                index(WRITE_INDEX, field("event_start", "long"), field("event_end", "long")),
+                index(OLDER_INDEX, field("event_start", "date")));
+        // only event_end needs a value query, but both have to be reported so that both get pinned
+        givenFieldStats("event_end", 10, EPOCH_MILLIS);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .extracting(NumericDateFieldDetector.Finding::fieldName)
+                .containsExactlyInAnyOrder("event_start", "event_end");
+    }
+
+    @Test
+    void findsAFieldThatIsConfiguredAsDateButStillMappedNumerically() {
+        // an earlier repair stored the mapping and then failed to rotate: the work is not done
+        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+
+        final IndexSetConfig config = indexSetConfig(new CustomFieldMappings(
+                List.of(new CustomFieldMapping("event_start", "date"))));
+
+        assertThat(detector.findNumericDateFields(config, WRITE_INDEX))
+                .singleElement()
+                .satisfies(finding -> assertThat(finding.reason())
+                        .isEqualTo(NumericDateFieldDetector.Reason.CONFIGURED_AS_DATE_BUT_MAPPED_NUMERICALLY));
+    }
+
     private void givenIndices(IndexFieldTypesDTO... indices) {
         when(indexFieldTypesService.findForIndexSet(INDEX_SET_ID)).thenReturn(List.of(indices));
         final Optional<IndexFieldTypesDTO> writeIndexTypes = List.of(indices).stream()
