@@ -267,9 +267,7 @@ describe('FetchProvider', () => {
   });
 
   it('removes local session if a stream returns 401', async () => {
-    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch(
-      (e) => e,
-    );
+    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch((e) => e);
 
     expect(error.status).toEqual(401);
     expect(mockLogout).toHaveBeenCalled();
@@ -279,9 +277,7 @@ describe('FetchProvider', () => {
     const controller = new AbortController();
     controller.abort();
 
-    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch(
-      (e) => e,
-    );
+    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch((e) => e);
 
     expect(error.name).toEqual('AbortError');
     expect(reportServerError).not.toHaveBeenCalled();
