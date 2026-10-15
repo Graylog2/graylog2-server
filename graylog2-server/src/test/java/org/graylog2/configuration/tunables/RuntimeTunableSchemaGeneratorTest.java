@@ -28,6 +28,7 @@ import jakarta.validation.constraints.Min;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
 import org.junit.jupiter.api.Test;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -181,5 +182,15 @@ class RuntimeTunableSchemaGeneratorTest {
     void keepsDeclarationOrderOfProperties() throws Exception {
         assertThat(generator.generate(DeclarationOrder.class).path("properties").properties()).extracting(Map.Entry::getKey)
                 .containsExactly("zeta", "alpha", "mid");
+    }
+
+    public record PeriodDurations(@JsonProperty("ttl") @TunableField(label = "TTL", minUnit = ChronoUnit.HOURS) PeriodDuration ttl) {}
+
+    @Test
+    void mapsPeriodDurationToDuration() throws Exception {
+        final JsonNode ttl = property(generator.generate(PeriodDurations.class), "ttl");
+
+        assertThat(ttl.path("format").asText()).isEqualTo("duration");
+        assertThat(ttl.path("x-graylog-units")).extracting(JsonNode::asText).containsExactly("hours", "days");
     }
 }

@@ -117,6 +117,7 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserAndTeamsConfig;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 
 import java.time.Clock;
@@ -159,6 +160,7 @@ public class ServerBindings extends Graylog2Module {
         install(new RuntimeTunablesModule());
         addRuntimeTunable(PasswordComplexityConfig.class);
         addRuntimeTunable(UserAndTeamsConfig.class);
+        addRuntimeTunable(UserConfiguration.class);
         if (isMigrationCommand) {
             install(new FakeLeaderElectionModule());
         } else {

@@ -22,7 +22,6 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
-import UserConfig from 'components/configurations/UserConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
 import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
@@ -73,15 +72,6 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: DecoratorsConfig,
         title: 'Decorators',
-      },
-    },
-    {
-      name: 'Users',
-      feature: 'users',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UserConfig,
-        title: 'Index Set Defaults',
       },
     },
     {

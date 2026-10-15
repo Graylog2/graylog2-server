@@ -30,6 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.jsonschema.GraylogSchemaGeneratorConfig;
 import org.joda.time.Period;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -44,7 +45,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class RuntimeTunableSchemaGenerator {
-    public static final Set<Class<?>> DURATION_TYPES = Set.of(Duration.class, Period.class);
+    public static final Set<Class<?>> DURATION_TYPES = Set.of(Duration.class, Period.class, PeriodDuration.class);
     private static final List<ChronoUnit> DURATION_UNITS = List.of(ChronoUnit.SECONDS, ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS);
 
     private final ObjectMapper objectMapper;
