@@ -46,6 +46,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.configuration.tunables.RuntimeTunablesModule;
 import org.graylog2.database.filtering.ComputedFieldProvider;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.grok.GrokModule;
@@ -153,6 +154,7 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
+        install(new RuntimeTunablesModule());
         if (isMigrationCommand) {
             install(new FakeLeaderElectionModule());
         } else {
