@@ -104,7 +104,7 @@
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.9</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
-        <apache-httpclient5.version>5.6.4</apache-httpclient5.version>
+        <apache-httpclient5.version>5.6.5</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <apache-httpcore5.version>5.4.4</apache-httpcore5.version>
         <asm.version>9.11</asm.version>
