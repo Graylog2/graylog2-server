@@ -273,6 +273,49 @@ public class MessageTest {
     }
 
     @Test
+    public void removeStreamMatchesStreamInstanceWithSameId() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        final IndexSet otherIndexSet = mock(IndexSet.class);
+        final Stream routedStream = mockStream("stream-1", indexSet);
+        final Stream cachedStream = mock(Stream.class);
+        when(cachedStream.getId()).thenReturn("stream-1");
+        final Stream otherStream = mockStream("stream-2", otherIndexSet);
+
+        message.addStreams(List.of(routedStream, otherStream));
+        final long sizeWithStreams = message.getSize();
+
+        assertThat(message.removeStream(cachedStream)).isTrue();
+        assertThat(message.getStreams()).containsOnly(otherStream);
+        assertThat(message.getIndexSets()).containsOnly(otherIndexSet);
+        assertThat(message.getSize()).isEqualTo(sizeWithStreams - 8);
+        assertThat(message.removeStream(cachedStream)).isFalse();
+    }
+
+    @Test
+    public void addStreamReplacesStreamInstanceWithSameId() {
+        final IndexSet staleIndexSet = mock(IndexSet.class);
+        final IndexSet freshIndexSet = mock(IndexSet.class);
+        final Stream routedStream = mockStream("stream-1", staleIndexSet);
+        final Stream cachedStream = mockStream("stream-1", freshIndexSet);
+
+        message.addStream(routedStream);
+        final long sizeWithStream = message.getSize();
+
+        message.addStream(cachedStream);
+
+        assertThat(message.getStreams()).containsExactly(cachedStream);
+        assertThat(message.getIndexSets()).containsExactly(freshIndexSet);
+        assertThat(message.getSize()).isEqualTo(sizeWithStream);
+    }
+
+    private static Stream mockStream(String id, IndexSet indexSet) {
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn(id);
+        when(stream.getIndexSet()).thenReturn(indexSet);
+        return stream;
+    }
+
+    @Test
     public void testGetStreamIds() throws Exception {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
