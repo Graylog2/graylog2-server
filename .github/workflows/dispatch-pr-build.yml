@@ -59,14 +59,14 @@ jobs:
         env:
           PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
 
-      # Repository secrets are not available to pull_request runs from forks,
-      # so there is no token to dispatch the build with.
+      # Repository secrets are not available to pull_request runs from forks
+      # or to runs inside a fork, so there is no token to dispatch the build with.
       - name: Skip dispatch for forks
-        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        if: ${{ github.repository_owner != 'Graylog2' || github.event.pull_request.head.repo.full_name != github.repository }}
         run: echo "::warning::PR is from a fork. Skipping dispatch to graylog-project-internal."
 
       - name: Dispatch job to graylog-project-internal
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && ((github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success') }}
+        if: ${{ github.repository_owner == 'Graylog2' && github.event.pull_request.head.repo.full_name == github.repository && ((github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success') }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo="${{ github.repository }}"
