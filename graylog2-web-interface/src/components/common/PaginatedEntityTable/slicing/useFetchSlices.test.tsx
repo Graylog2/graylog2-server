@@ -44,7 +44,9 @@ const tableFilterContext: TableFilterContextValue = {
 describe('useFetchSlices', () => {
   it('does not share slices between layout variants with the same filters', async () => {
     let layoutVariant = 'active';
-    const fetchSlices = jest.fn(() => Promise.resolve({ slices: [{ value: layoutVariant, title: layoutVariant, count: 1 }] }));
+    const fetchSlices = jest.fn(() =>
+      Promise.resolve({ slices: [{ value: layoutVariant, title: layoutVariant, count: 1 }] }),
+    );
     const wrapper = ({ children }: React.PropsWithChildren) => (
       <TableFilterContext.Provider value={tableFilterContext}>
         <TableFetchContextProvider
