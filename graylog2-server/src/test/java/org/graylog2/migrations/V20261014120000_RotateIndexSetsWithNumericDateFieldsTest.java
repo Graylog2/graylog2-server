@@ -130,21 +130,42 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     @Test
-    void skipsIndexSetsWhoseFieldTypesCannotBeChanged() {
-        // events, failures and the like reject the mapping change, so rotating them could not repair anything and
-        // would repeat on every startup
-        final IndexSetConfig immutableTypes = indexSetConfig(true);
-        when(immutableTypes.canHaveCustomFieldMappings()).thenReturn(false);
-        when(indexSetService.findAll()).thenReturn(List.of(immutableTypes));
-        givenFindings("event_start");
+    void rotatesIndexSetsWhoseFieldTypesCannotBeChangedWithoutPinningThem() {
+        // Illuminate index sets take their field types from the bundle's template and reject a custom mapping. They
+        // are still affected - their rules write dates into fields the template does not map - so rotating is the
+        // only repair available, and it is enough to stop the failures.
+        givenAnIndexSetWhoseFieldTypesCannotBeChanged();
+        givenFindings("login_timestamp");
 
         migration.upgrade();
 
-        verify(indexSet, never()).cycle();
         verify(fieldTypeMappingsService, never()).changeFieldType(any(), any(), anyBoolean());
-        // nothing was left undone, so the migration is finished
+        verify(indexSet).cycle();
+    }
+
+    @Test
+    void doesNotRetryAnIndexSetWhoseFieldTypesCannotBeChanged() {
+        // everything that can be done for it has been done, so it must not be rotated again on the next startup
+        givenAnIndexSetWhoseFieldTypesCannotBeChanged();
+        givenFindings("login_timestamp");
+
+        migration.upgrade();
+
         verify(clusterConfigService).write(any(
                 V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class));
+    }
+
+    @Test
+    void namesTheAffectedFieldsWhenTheyCouldNotBePinned() {
+        givenAnIndexSetWhoseFieldTypesCannotBeChanged();
+        givenFindings("login_timestamp", "vendor_event_timestamp");
+
+        migration.upgrade();
+
+        final ArgumentCaptor<Notification> published = ArgumentCaptor.forClass(Notification.class);
+        verify(notificationService).publishIfFirst(published.capture());
+        verify(published.getValue())
+                .addDetail(eq("description"), contains("login_timestamp, vendor_event_timestamp"));
     }
 
     @Test
@@ -300,6 +321,10 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         migration.upgrade();
 
         verify(clusterConfigService, never()).write(any());
+    }
+
+    private void givenAnIndexSetWhoseFieldTypesCannotBeChanged() {
+        when(indexSetConfig.canHaveCustomFieldMappings()).thenReturn(false);
     }
 
     private void givenFindings(String... fieldNames) {

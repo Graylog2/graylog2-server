@@ -9,16 +9,19 @@ such fields as `long` or `float`. Now that date values are written again, those 
 carries the field. The type of a field cannot be changed in an existing index, so the only way back to a date mapping
 is a new index.
 
-On the first start after the upgrade, Graylog checks the write index of every writable index set whose field types
-can be changed. A field counts as affected when it is mapped as a date in an older index of the same index set, or
-when the values it holds are epoch timestamps that fall within a month of the period the index itself covers - the
-latter also covers installations that never ran an unaffected version and therefore have nothing to compare against.
-Fields that the index template types, and fields with a custom field type or a field type profile, are left alone, as
-are index sets with fixed field types such as events and failures.
+On the first start after the upgrade, Graylog checks the write index of every writable index set. A field counts as
+affected when it is mapped as a date in an older index of the same index set, or when the values it holds are epoch
+timestamps that fall within a month of the period the index itself covers - the latter also covers installations that
+never ran an unaffected version and therefore have nothing to compare against. Fields that the index template types,
+and fields with a custom field type or a field type profile, are left alone.
 
 For an affected index set, the detected fields are set to the type `date`, keeping any custom field types that are
 already configured, and the index set is rotated once. Graylog raises one notification per repaired index set, naming
 the fields it changed.
+
+Index sets whose field types come from their index template, such as events, failures and Illuminate, do not accept a
+custom field type. An affected one of those is rotated without it, so that its new index maps the field the way a new
+installation of this version would.
 
 Older indices keep their numeric mapping and their numeric values. Until they are removed by their retention strategy,
 a search covering both the old and the new indices reports a field type conflict for those fields. That resolves

@@ -52,6 +52,13 @@ import java.util.stream.Collectors;
  * recognised. Indices that already exist keep their numeric values; correcting those needs a reindex and is out of
  * scope here.
  * <p>
+ * The affected fields are pinned to {@code date} before rotating, so that the new index does not leave the type to
+ * whichever value arrives first. Index sets whose field types come from their index template - events, failures and
+ * Illuminate - do not accept that, and are rotated without it: their new index then maps the field the way a fresh
+ * installation of this version would, which stops the failures even where it does not restore a date type. The
+ * Illuminate templates are the case that matters, because their rules write dates into fields the templates do not
+ * map, and they turn date detection off, so such a field becomes a keyword rather than a date.
+ * <p>
  * Like {@code V20260902150000_RotateCollectorLogsIndexSet}, a failure does not abort server startup. Ingestion keeps
  * working, the affected messages simply keep failing until the next regular rotation, so the migration logs the
  * problem and tries again on the next startup by not writing its completion marker.
@@ -137,13 +144,6 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
             if (!indexSetConfig.isWritable()) {
                 continue;
             }
-            if (!indexSetConfig.canHaveCustomFieldMappings()) {
-                // Index sets with immutable field types - events, failures and the like - reject the mapping change,
-                // so rotating them could not repair anything and would only cost an index on every startup.
-                LOG.debug("Skipping index set <{}> ({}), its field types cannot be changed.",
-                        indexSetConfig.id(), indexSetConfig.title());
-                continue;
-            }
             try {
                 final Outcome outcome = rotateIfAffected(indexSetConfig);
                 if (outcome == Outcome.ROTATED || outcome == Outcome.ROTATED_WITH_ERRORS) {
@@ -187,10 +187,14 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 indexSetConfig.id(), indexSetConfig.title(), writeIndex,
                 findings.stream().map(NumericDateFieldDetector.Finding::describe).collect(Collectors.joining(", ")));
 
-        final List<String> pinned = pinToDate(indexSetConfig, findings);
-        if (pinned.isEmpty()) {
-            // Rotating now would only produce an index that maps the same fields the same way again, and the next
-            // startup would do it once more. Report it as unfinished and leave the indices alone.
+        // Index sets whose field types come from their template - events, failures, Illuminate - reject a custom
+        // mapping by design. Those are rotated without one: the new index maps the field the way a fresh installation
+        // of this version would, which is all that can be reached for them, and is enough to stop the failures.
+        final boolean canPin = indexSetConfig.canHaveCustomFieldMappings();
+        final List<String> pinned = canPin ? pinToDate(indexSetConfig, findings) : List.of();
+        if (canPin && pinned.isEmpty()) {
+            // Pinning was possible in principle but failed for every field. Rotating now would only produce an index
+            // that maps the same fields the same way again, so report it as unfinished and leave the indices alone.
             LOG.warn("Not rotating index set <{}> ({}): none of its affected fields could be set to date.",
                     indexSetConfig.id(), indexSetConfig.title());
             return Outcome.NOT_REPAIRABLE;
@@ -203,9 +207,11 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 .orElse(indexSet)
                 .cycle();
 
-        notifyAboutRotation(indexSetConfig, pinned);
+        notifyAboutRotation(indexSetConfig, findings, pinned);
 
-        return pinned.size() == findings.size() ? Outcome.ROTATED : Outcome.ROTATED_WITH_ERRORS;
+        // An index set that cannot be pinned has had everything done to it that can be done, so it counts as finished
+        // rather than keeping the migration eligible to rotate it again on the next startup.
+        return !canPin || pinned.size() == findings.size() ? Outcome.ROTATED : Outcome.ROTATED_WITH_ERRORS;
     }
 
     private enum Outcome {
@@ -255,13 +261,26 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
 
     /**
      * Reports what was changed, per index set, so that an administrator can see which fields were given a custom
-     * type and undo one if it was not wanted. The key is the index set, so that an index set repaired by a later
-     * run gets its own notification instead of being swallowed as a duplicate of the first one.
+     * type and undo one if it was not wanted. Where no type could be set, the fields are still named, because the
+     * conflict with the older indices is the same either way. The key is the index set, so that an index set
+     * repaired by a later run gets its own notification instead of being swallowed as a duplicate of the first one.
      */
-    private void notifyAboutRotation(IndexSetConfig indexSetConfig, List<String> pinnedFields) {
-        if (pinnedFields.isEmpty()) {
+    private void notifyAboutRotation(IndexSetConfig indexSetConfig,
+                                     List<NumericDateFieldDetector.Finding> findings,
+                                     List<String> pinnedFields) {
+        final List<String> fields = pinnedFields.isEmpty()
+                ? findings.stream().map(NumericDateFieldDetector.Finding::fieldName).toList()
+                : pinnedFields;
+        if (fields.isEmpty()) {
             return;
         }
+        final String whatWasDone = pinnedFields.isEmpty()
+                // Nothing was pinned, so this is an index set whose field types its template decides.
+                ? "The index set was rotated, so that its new index maps them the way a new installation of this "
+                + "version would. Their type cannot be set on this index set, because its field types come "
+                + "from its index template. "
+                : "They were given the custom field type date and the index set was rotated, so that its new index "
+                + "maps them as dates again. Existing custom field types were kept. ";
         try {
             final Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.GENERIC)
@@ -271,9 +290,7 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                             + " rotated to restore date field mappings")
                     .addDetail("description", "The index set " + indexSetConfig.title() + " mapped these "
                             + "fields as numbers, which earlier versions wrote for date values: "
-                            + String.join(", ", pinnedFields) + ". They were given the custom field type date and "
-                            + "the index set was rotated, so that its new index maps them as dates again. Existing "
-                            + "custom field types were kept. "
+                            + String.join(", ", fields) + ". " + whatWasDone
                             + "Until the older indices are removed by their retention strategy, those fields still "
                             + "have a numeric type there, so a search covering both the old and the new indices "
                             + "reports a field type conflict for them. That resolves itself once the older indices "
