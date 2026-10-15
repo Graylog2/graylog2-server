@@ -68,7 +68,7 @@ class DatanodeRestApiProxyTargetUrlTest {
     @ValueSource(strings = {"../secrets", "logs/../../secrets", "..\\secrets", "/../secrets"})
     void rejectsTraversalAboveRoot(String path) {
         assertThatThrownBy(() -> DatanodeRestApiProxy.buildTargetUrl("https://datanode1:8999/api", request(path)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RequestNotAllowedException.class);
     }
 
     @ParameterizedTest
