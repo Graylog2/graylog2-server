@@ -118,8 +118,10 @@ public class NumericDateFieldClassifier {
         if (indexRange == null) {
             return true;
         }
-        return maxMillis >= indexRange.beginMillis() - DATA_PERIOD_TOLERANCE_MILLIS
-                && minMillis <= indexRange.endMillis() + DATA_PERIOD_TOLERANCE_MILLIS;
+        // Every value has to sit in the window, not just overlap it: a counter that happens to span the period from
+        // below would otherwise pass while most of its values are nowhere near it.
+        return minMillis >= indexRange.beginMillis() - DATA_PERIOD_TOLERANCE_MILLIS
+                && maxMillis <= indexRange.endMillis() + DATA_PERIOD_TOLERANCE_MILLIS;
     }
 
     /**

@@ -134,13 +134,12 @@ public class NumericDateFieldDetector {
                 .filter(field -> !TEMPLATE_NUMERIC_FIELDS.contains(field.fieldName()))
                 .toList();
 
-        // Read once for the whole index set: the period its documents actually cover, which is what a value has to
-        // agree with to be believable as a timestamp.
-        final NumericDateFieldClassifier.IndexPeriod dataPeriod = candidates.isEmpty() ? null : dataPeriod(writeIndex);
-
         // Every candidate is classified, so that each affected field can be pinned. Leaving one out would hand it
         // back to dynamic mapping, where the next value that arrives decides its type again.
         final List<Finding> findings = new ArrayList<>();
+        NumericDateFieldClassifier.IndexPeriod dataPeriod = null;
+        boolean dataPeriodRead = false;
+
         for (FieldTypeDTO field : candidates) {
             final String type = field.physicalType().toLowerCase(Locale.ROOT);
 
@@ -157,14 +156,24 @@ public class NumericDateFieldDetector {
                 continue;
             }
 
-            // Neither free signal applies, so the values themselves are the only evidence left. They are only read
-            // when the period the index covers is known, because a large number on its own says very little: a byte
-            // counter is indistinguishable from epoch milliseconds unless it has to agree with when the index was
-            // actually written.
-            if (dataPeriod != null) {
-                valuesLookLikeTimestamps(writeIndex, field.fieldName(), type, dataPeriod)
-                        .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
+            // Neither free signal applies, so the values themselves are the only evidence left. A large number on
+            // its own says very little - a counter is indistinguishable from epoch milliseconds - so it has to agree
+            // with the period the index was actually written in. That period is read once, and only when a candidate
+            // reaches this point.
+            if (!dataPeriodRead) {
+                dataPeriod = dataPeriod(writeIndex);
+                dataPeriodRead = true;
             }
+            if (dataPeriod == null) {
+                // Not knowing when the index was written is not the same as knowing the field is fine. Failing here
+                // keeps the migration eligible to try again rather than marking the index set as done.
+                throw new IllegalStateException(f(
+                        "Could not determine the period covered by index <%s>, so field <%s> cannot be judged",
+                        writeIndex, field.fieldName()));
+            }
+
+            valuesLookLikeTimestamps(writeIndex, field.fieldName(), type, dataPeriod)
+                    .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
         }
         return findings;
     }

@@ -131,7 +131,7 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
 
     private void repairAffectedIndexSets() {
         int rotated = 0;
-        int failed = 0;
+        int incomplete = 0;
 
         for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
             if (!indexSetConfig.isWritable()) {
@@ -146,23 +146,23 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
             }
             try {
                 final Outcome outcome = rotateIfAffected(indexSetConfig);
-                if (outcome != Outcome.NOT_AFFECTED) {
+                if (outcome == Outcome.ROTATED || outcome == Outcome.ROTATED_WITH_ERRORS) {
                     rotated++;
                 }
-                if (outcome == Outcome.ROTATED_WITH_ERRORS) {
-                    failed++;
+                if (outcome == Outcome.ROTATED_WITH_ERRORS || outcome == Outcome.NOT_REPAIRABLE) {
+                    incomplete++;
                 }
             } catch (Exception e) {
-                failed++;
+                incomplete++;
                 LOG.error("Could not check or rotate index set <{}> ({}). Messages with a date field that this "
                                 + "index set maps numerically will keep failing to index until it is rotated.",
                         indexSetConfig.id(), indexSetConfig.title(), e);
             }
         }
 
-        if (failed > 0) {
-            LOG.warn("Rotated {} index set(s), {} could not be handled. Retrying on the next startup.",
-                    rotated, failed);
+        if (incomplete > 0) {
+            LOG.warn("Rotated {} index set(s). {} index set(s) were left unfinished and are retried on the next "
+                    + "startup.", rotated, incomplete);
             return;
         }
 
@@ -188,6 +188,13 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                 findings.stream().map(NumericDateFieldDetector.Finding::describe).collect(Collectors.joining(", ")));
 
         final List<String> pinned = pinToDate(indexSetConfig, findings);
+        if (pinned.isEmpty()) {
+            // Rotating now would only produce an index that maps the same fields the same way again, and the next
+            // startup would do it once more. Report it as unfinished and leave the indices alone.
+            LOG.warn("Not rotating index set <{}> ({}): none of its affected fields could be set to date.",
+                    indexSetConfig.id(), indexSetConfig.title());
+            return Outcome.NOT_REPAIRABLE;
+        }
 
         // The mappings were written to the index set config, so the index set has to be read again: the new index is
         // created from the configuration this object holds, and the one captured above no longer has them.
@@ -208,7 +215,11 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
          * Rotated, but at least one field could not be pinned, so its type is left to the first value that arrives.
          * The migration treats this as unfinished and tries again on the next startup.
          */
-        ROTATED_WITH_ERRORS
+        ROTATED_WITH_ERRORS,
+        /**
+         * Affected, but not a single field could be pinned, so rotating would achieve nothing. Nothing was changed.
+         */
+        NOT_REPAIRABLE
     }
 
     /**

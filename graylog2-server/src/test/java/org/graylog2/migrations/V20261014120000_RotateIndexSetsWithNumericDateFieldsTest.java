@@ -159,14 +159,26 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     @Test
-    void stillRotatesWhenAFieldCannotBePinned() {
+    void stillRotatesWhenAtLeastOneFieldCouldBePinned() {
+        givenFindings("event_start", "event_end");
+        doThrow(new RuntimeException("not allowed")).when(fieldTypeMappingsService).changeFieldType(
+                eq(new CustomFieldMapping("event_end", "date")), any(), anyBoolean());
+
+        migration.upgrade();
+
+        // the pinned field is worth the rotation even though the other one was left behind
+        verify(indexSet, times(1)).cycle();
+    }
+
+    @Test
+    void doesNotRotateWhenNoFieldCouldBePinned() {
         givenFindings("event_start");
         doThrowOnChangeFieldType();
 
         migration.upgrade();
 
-        // the rotation alone still gives the field a fresh mapping, so a failed pin must not stop it
-        verify(indexSet, times(1)).cycle();
+        // the new index would map the field exactly as the old one did, so rotating would only cost an index
+        verify(indexSet, never()).cycle();
     }
 
     @Test

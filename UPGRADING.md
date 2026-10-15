@@ -129,10 +129,13 @@ as `long` or `float`. Now that date values are written again, those mappings rej
 field. The type of a field cannot be changed in an existing index, so the only way back to a date mapping is a new
 index.
 
-On the first start after the upgrade, Graylog checks the write index of every writable index set. A field counts as
-affected when it is mapped as a date in an older index of the same index set, or when the values it holds are epoch
-timestamps. For an affected index set, those fields are set to the type `date`, keeping any custom field types that
-are already configured, and **the index set is rotated once**. A notification lists the index sets that were rotated.
+On the first start after the upgrade, Graylog checks the write index of every writable index set whose field types
+can be changed. Index sets with fixed field types - events, failures, Illuminate and collector logs - are left alone,
+because their mappings cannot be changed. A field counts as affected when it is mapped as a date in an older index of
+the same index set, or when the values it holds are epoch timestamps that fall within a month of the period the index
+itself covers. For an affected index set, those fields are set to the type `date`, keeping any custom field types
+that are already configured, and **the index set is rotated once**. Graylog raises one notification per repaired
+index set, naming the fields it changed.
 
 After the upgrade:
 

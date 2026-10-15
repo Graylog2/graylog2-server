@@ -29,8 +29,6 @@ import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +43,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -214,11 +211,6 @@ class NumericDateFieldDetectorTest {
                 .containsExactlyInAnyOrder("event_start", "event_end");
     }
 
-    /**
-     * The first index given is the write index, which the detector reads live; the rest are the older indices it
-     * compares against, which come from the cached field types.
-     */
-
     @Test
     void findsBothHistoricallyConfirmedAndValueDetectedFieldsInTheSameIndex() {
         givenIndices(
@@ -268,11 +260,38 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void readsNoValuesWhenTheIndexPeriodIsUnknown() {
-        // an index with no timestamps gives nothing to check a value against, so nothing is repaired from values
+    void failsWhenTheIndexPeriodIsUnknown() {
+        // without the period there is nothing to check a value against, and "cannot tell" must not look like "fine"
         givenIndices(index(WRITE_INDEX, field("event_start", "long")));
         givenFieldStats(Message.FIELD_TIMESTAMP, 0, Double.NaN);
         givenFieldStats("event_start", 10, EPOCH_MILLIS);
+
+        assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("event_start");
+    }
+
+    @Test
+    void doesNotReadTheIndexPeriodWhenEveryFieldIsSettledByAFreeSignal() {
+        givenIndices(
+                index(WRITE_INDEX, field("event_start", "long")),
+                index(OLDER_INDEX, field("event_start", "date")));
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).hasSize(1);
+        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), eq(Message.FIELD_TIMESTAMP),
+                anyBoolean(), anyBoolean(), anyBoolean());
+    }
+
+    @Test
+    void ignoresACounterThatSpansTheIndexPeriodFromBelow() {
+        // a counter running from 1.0 to 1.9 trillion overlaps the period without its values being near it
+        givenIndices(index(WRITE_INDEX, field("bytes_total", "long")));
+        final FieldStatsResult spanning = mock(FieldStatsResult.class);
+        when(spanning.count()).thenReturn(10L);
+        when(spanning.min()).thenReturn(1_000_000_000_000d);
+        when(spanning.max()).thenReturn(1_900_000_000_000d);
+        when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), eq("bytes_total"),
+                anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(spanning);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
     }
@@ -288,6 +307,10 @@ class NumericDateFieldDetectorTest {
                 .containsExactly("event_start");
     }
 
+    /**
+     * The first index given is the write index, which the detector reads live; the rest are the older indices it
+     * compares against, which come from the cached field types.
+     */
     private void givenIndices(IndexFieldTypesDTO... indices) {
         when(indexFieldTypesService.findForIndexSet(INDEX_SET_ID)).thenReturn(List.of(indices));
         final Optional<IndexFieldTypesDTO> writeIndexTypes = List.of(indices).stream()
