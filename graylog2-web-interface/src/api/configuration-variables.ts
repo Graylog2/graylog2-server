@@ -50,20 +50,12 @@ export const saveConfigurationVariable = (configurationVariable: {
     content: configurationVariable.content,
   };
 
-  let url = qualifyUrl(SOURCE_URL);
-  let method: 'POST' | 'PUT';
-  let action: string;
+  const isCreate = configurationVariable.id === '';
+  const action = isCreate ? 'created' : 'updated';
 
-  if (configurationVariable.id === '') {
-    method = 'POST';
-    action = 'created';
-  } else {
-    url += `/${configurationVariable.id}`;
-    method = 'PUT';
-    action = 'updated';
-  }
-
-  const promise = fetch(method, url, request);
+  const promise = isCreate
+    ? SidecarConfigurationVariables.createConfigurationVariable(request)
+    : SidecarConfigurationVariables.updateConfigurationVariable(configurationVariable.id, request);
 
   promise.then(
     () => {
