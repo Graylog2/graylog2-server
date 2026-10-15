@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.Module;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
@@ -39,7 +40,7 @@ public class SchemaGeneratorProvider {
     private final SchemaGenerator generator;
 
     @Inject
-    public SchemaGeneratorProvider(@McpSchemaModule Set<Module> contributedModules) {
+    public SchemaGeneratorProvider(ObjectMapper objectMapper, @McpSchemaModule Set<Module> contributedModules) {
         LOG.debug("Initializing SchemaGenerator with {} contributed modules", contributedModules.size());
         if (!contributedModules.isEmpty()) {
             LOG.debug("Contributed modules: {}", contributedModules.stream()
@@ -47,7 +48,7 @@ public class SchemaGeneratorProvider {
                     .toList());
         }
 
-        var builder = GraylogSchemaGeneratorConfig.baseBuilder();
+        var builder = GraylogSchemaGeneratorConfig.baseBuilder(objectMapper);
 
         // Add all contributed modules from plugins
         for (Module module : contributedModules) {

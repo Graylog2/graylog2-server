@@ -17,6 +17,7 @@
 package org.graylog.jsonschema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.MemberScope;
 import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
@@ -38,13 +39,18 @@ public final class GraylogSchemaGeneratorConfig {
      * Creates the base schema generator configuration with standard modules
      * and field/method resolution rules.
      */
-    public static SchemaGeneratorConfigBuilder baseBuilder(JacksonOption... additionalJacksonOptions) {
-        var builder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
+    public static SchemaGeneratorConfigBuilder baseBuilder(ObjectMapper objectMapper, JacksonOption... additionalJacksonOptions) {
+        var builder = new SchemaGeneratorConfigBuilder(objectMapper, SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
                 .with(Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS, Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
                 .with(new EmptyObjectAsObjectModule())
                 .with(new DateTimeAsStringModule())
                 .with(new JacksonModule(jacksonOptions(additionalJacksonOptions)))
                 .with(new JakartaValidationModule());
+
+        // The global naming strategy of the ObjectMapper is not applied by the JacksonModule
+        final var propertyNames = new JacksonPropertyNames(objectMapper);
+        builder.forFields().withPropertyNameOverrideResolver(propertyNames::forField);
+        builder.forMethods().withPropertyNameOverrideResolver(propertyNames::forMethod);
 
         // Fields annotated with @Nullable serialize as null, so their schema must allow it
         builder.forFields().withNullableCheck(GraylogSchemaGeneratorConfig::isNullableAnnotated);

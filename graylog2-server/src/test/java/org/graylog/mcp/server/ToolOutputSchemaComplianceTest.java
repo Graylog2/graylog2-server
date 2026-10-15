@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ToolOutputSchemaComplianceTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private final SchemaGeneratorProvider schemaGeneratorProvider = new SchemaGeneratorProvider(Set.of());
+    private final SchemaGeneratorProvider schemaGeneratorProvider = new SchemaGeneratorProvider(new ObjectMapperProvider().get(), Set.of());
     // the same validator implementation that MCP SDK clients run against tool responses
     private final JsonSchemaValidator schemaValidator = new JacksonJsonSchemaValidatorSupplier().get();
 
