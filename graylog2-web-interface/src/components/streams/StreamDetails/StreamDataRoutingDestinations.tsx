@@ -22,8 +22,7 @@ import styled, { css } from 'styled-components';
 import type { Stream } from 'logic/streams/types';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
 import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 import DestinationPermissionAlert from './DestinationPermissionAlert';
 
@@ -40,15 +39,15 @@ const Container = styled.div(
 );
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const StreamDataLakeComponent = PluginStore.exports('dataLake')?.[0]?.StreamDataLake;
 
-  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? (
+  const destinationIndexset = isPermitted(['indexsets:read']) ? (
     <DestinationIndexSetSection stream={stream} />
   ) : (
     <DestinationPermissionAlert sectionName="Index Set" />
   );
-  const destinationOutput = isPermitted(currentUser.permissions, ['outputs:read', 'stream_outputs:read']) ? (
+  const destinationOutput = isPermitted(['outputs:read', 'stream_outputs:read']) ? (
     <DestinationOutputs stream={stream} />
   ) : (
     <DestinationPermissionAlert sectionName="Outputs" />
@@ -57,7 +56,7 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
   return (
     <Container>
       {destinationIndexset}
-      {StreamDataLakeComponent && <StreamDataLakeComponent permissions={currentUser.permissions} />}
+      {StreamDataLakeComponent && <StreamDataLakeComponent />}
       {destinationOutput}
     </Container>
   );

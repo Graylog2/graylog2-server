@@ -44,6 +44,7 @@ import SearchPagePreferencesProvider from 'views/components/contexts/SearchPageP
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
@@ -117,15 +118,17 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const contextValue = useMemo(
     () => ({
       view,
       analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
       currentUser,
+      isPermitted,
       parameters,
       parameterBindings,
     }),
-    [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view],
+    [currentUser, isPermitted, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view],
   );
 
   return <AdditionalContext.Provider value={contextValue}>{children}</AdditionalContext.Provider>;
