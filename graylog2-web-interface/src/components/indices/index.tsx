@@ -23,7 +23,6 @@ export { default as IndexSection } from './IndexSection';
 export { default as IndexSetConfigurationForm } from './IndexSetConfigurationForm/IndexSetConfigurationForm';
 export { default as IndexSetDeletionForm } from './IndexSetDeletionForm';
 export { default as IndexSetDetails } from './IndexSetDetails';
-export { default as IndexSetsComponent } from './IndexSetsComponent';
 export { default as IndexSummary } from './IndexSummary';
 export { default as IndexSizeSummary } from './IndexSizeSummary';
 export { default as IndicesMaintenanceDropdown } from './IndicesMaintenanceDropdown';

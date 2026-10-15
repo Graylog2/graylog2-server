@@ -106,7 +106,7 @@ const IndexSetFieldTypesList = () => {
       humanName="index set field types"
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
-      topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
+      topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
       keyFn={keyFn}
       bulkSelection={bulkSelection}

@@ -24,6 +24,7 @@ import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
+import type { IndexSetEntity } from 'components/indices/IndexSetsOverview/types';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
@@ -218,6 +219,13 @@ type StreamsOverviewTableElement = {
   metricFields?: Record<string, Array<string>>;
 };
 
+type IndexSetsOverviewTableElement = {
+  attributeName: string;
+  group?: 'configuration';
+  attributes: Array<Attribute>;
+  columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   type Id = string;
   type Wildcard = '*';
@@ -257,6 +265,7 @@ declare module 'graylog-web-plugin/plugin' {
     dashboards: 'create' | 'edit' | 'read';
     datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
+    deflector: 'cycle';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
     fieldnames: 'read';
@@ -413,11 +422,19 @@ declare module 'graylog-web-plugin/plugin' {
     openSidebar: RightSidebarContextType['openSidebar'];
   };
 
+  type EntityLinkTitleProps = {
+    id: string;
+    children: React.ReactNode;
+  };
+
   type EntityLinkResolver = {
     uriSegment: string;
     resolve: (
       trailingSegments: ReadonlyArray<string>,
-    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
+    ) =>
+      | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
+      | { onClick: (context: EntityLinkOnClickContext) => void }
+      | null;
   };
 
   interface PluginExports {
@@ -433,6 +450,7 @@ declare module 'graylog-web-plugin/plugin' {
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;
+    'components.indexSets.overview.tableElements'?: Array<IndexSetsOverviewTableElement>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
