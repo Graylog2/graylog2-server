@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Messages } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import { defaultOnError } from 'util/conditional/onError';
@@ -46,8 +47,8 @@ const useMessage = (
     queryFn: () =>
       defaultOnError(
         fetchMessage(index, id),
-        'Loading message information failed with status',
-        'Could not load message information',
+        i18n.t('views_notifications.load_message_failed', { ns: 'search' }),
+        i18n.t('views_notifications.could_not_load_message', { ns: 'search' }),
       ),
     enabled,
   });

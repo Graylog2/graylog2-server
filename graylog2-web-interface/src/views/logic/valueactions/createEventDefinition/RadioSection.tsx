@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Radio } from 'components/common';
@@ -34,11 +35,12 @@ type Props = {
 };
 
 const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => {
+  const { t } = useTranslation('search');
   const { description } = strategiesLabels[strategy];
 
   return (
     <>
-      <b>Strategy by:</b>
+      <b>{t('create_event_definition.strategy_by')}</b>
       <Container>
         {Object.entries(strategiesLabels).map(([curStrategy, { label }]) => {
           if (!strategyAvailabilities[curStrategy]) return null;
@@ -51,14 +53,14 @@ const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => 
               value={curStrategy}
               checked={curStrategy === strategy}
               onChange={onChange}>
-              {label}
+              {t(label)}
             </Radio>
           );
         })}
       </Container>
       <p>
-        <b>Description: </b>
-        <i>{description}</i>
+        <b>{t('create_event_definition.description')} </b>
+        <i>{t(description)}</i>
       </p>
     </>
   );

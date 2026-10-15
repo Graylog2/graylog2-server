@@ -58,7 +58,10 @@ type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => Pr
 
 type FunctionalCreator = {
   func: CreatorFunction;
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title, e.g. `search:widget_creators.message_count`. */
+  titleKey?: string;
   type: CreatorType;
   useCondition?: () => boolean;
 };
@@ -70,7 +73,10 @@ type CreatorComponentProps = {
 type ComponentCreator = {
   component: React.ComponentType<CreatorComponentProps>;
   useCondition?: () => boolean;
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title. */
+  titleKey?: string;
   type: CreatorType;
 };
 
@@ -89,6 +95,7 @@ const CreateMenuItem = ({
   onClick: () => void;
   setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
+  const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-sidebar');
   const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
@@ -156,7 +163,7 @@ const CreateMenuItem = ({
 
   return (
     <CreateButton key={creator.title} onClick={createHandlerFor()} disabled={disabled}>
-      {creator.title}
+      {creator.titleKey ? t(creator.titleKey) : creator.title}
     </CreateButton>
   );
 };

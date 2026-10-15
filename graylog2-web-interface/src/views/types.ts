@@ -585,7 +585,10 @@ export interface WidgetCreatorArgs {
   view: View;
 }
 export interface WidgetCreator {
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title, e.g. `search:widget_creators.message_count`. */
+  titleKey?: string;
   func: (args: WidgetCreatorArgs) => Widget;
   icon: React.ComponentType<{}>;
 }

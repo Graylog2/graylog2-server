@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -42,17 +43,21 @@ import generateId from 'logic/generateId';
 const Container = styled.div`
   margin-top: 10px;
 `;
-const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey; value: string | number }) => (
-  <span>
-    <i>{`${labels[itemKey]}: `}</i>
-    <b>{value}</b>
-  </span>
-);
+const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey; value: string | number }) => {
+  const { t } = useTranslation('search');
 
-const SECTION_LABELS = {
-  aggregation: 'Aggregation settings',
-  search: 'Search query',
+  return (
+    <span>
+      <i>{t('create_event_definition.item_label', { label: t(labels[itemKey]) })}</i>
+      <b>{value}</b>
+    </span>
+  );
 };
+
+const SECTION_KEYS = {
+  aggregation: 'aggregation',
+  search: 'search',
+} as const;
 
 const CreateEventDefinitionModal = ({
   modalData,
@@ -65,7 +70,8 @@ const CreateEventDefinitionModal = ({
   show: boolean;
   onClose: () => void;
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Array<string>>(Object.values(SECTION_LABELS));
+  const { t } = useTranslation('search');
+  const [expandedSections, setExpandedSections] = useState<Array<string>>(Object.values(SECTION_KEYS));
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
   const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
@@ -132,14 +138,14 @@ const CreateEventDefinitionModal = ({
   return (
     <Modal onHide={onClose} show={show}>
       <Modal.Header>
-        <Modal.Title>Configure new event definition</Modal.Title>
+        <Modal.Title>{t('create_event_definition.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <RadioSection strategyAvailabilities={strategyAvailabilities} strategy={strategy} onChange={onStrategyChange} />
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
           <Icon name={`arrow_${showDetails ? 'drop_down' : 'right'}`} />
           &nbsp;
-          {showDetails ? 'Hide strategy details' : 'Show strategy details'}
+          {showDetails ? t('create_event_definition.hide_details') : t('create_event_definition.show_details')}
         </Button>
         {showDetails && (
           <Container>
@@ -149,7 +155,8 @@ const CreateEventDefinitionModal = ({
               {!isEmpty(aggregationChecks) && (
                 <CheckBoxGroup
                   onChange={onCheckboxChange}
-                  groupLabel={SECTION_LABELS.aggregation}
+                  groupKey={SECTION_KEYS.aggregation}
+                  groupLabel={t('create_event_definition.sections.aggregation')}
                   checked={aggregationChecks}
                   labels={aggregationLabels}
                 />
@@ -157,7 +164,8 @@ const CreateEventDefinitionModal = ({
               {!isEmpty(searchChecks) && (
                 <CheckBoxGroup
                   onChange={onCheckboxChange}
-                  groupLabel={SECTION_LABELS.search}
+                  groupKey={SECTION_KEYS.search}
+                  groupLabel={t('create_event_definition.sections.search')}
                   checked={searchChecks}
                   labels={searchLabels}
                 />
@@ -182,7 +190,7 @@ const CreateEventDefinitionModal = ({
           onClick={onContinueConfigurationClick}
           href={eventDefinitionCreationUrl}
           target="_blank">
-          Continue configuration
+          {t('create_event_definition.continue')}
         </Button>
       </Modal.Footer>
     </Modal>

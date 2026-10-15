@@ -79,7 +79,8 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
 
   const widgetButtons = useMemo(
     () =>
-      creators.map(({ title, func, icon: WidgetIcon }) => {
+      creators.map(({ title, titleKey, func, icon: WidgetIcon }) => {
+        const displayedTitle = titleKey ? t(titleKey) : title;
         const onClick = async () => {
           sendTelemetry(
             TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')] ??
@@ -100,13 +101,13 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           <CreateWidgetButton
             key={title}
             type="button"
-            title={t('widget_creation.create_widget', { title })}
+            title={t('widget_creation.create_widget', { title: displayedTitle })}
             onClick={onClick}>
             <ButtonInner>
               <HugeIcon>
                 <WidgetIcon />
               </HugeIcon>
-              {title}
+              {displayedTitle}
             </ButtonInner>
           </CreateWidgetButton>
         );

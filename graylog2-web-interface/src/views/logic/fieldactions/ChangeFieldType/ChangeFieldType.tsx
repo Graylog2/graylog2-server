@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useState } from 'react';
 
+import i18n from 'i18n';
 import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
@@ -52,7 +53,10 @@ export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandle
 export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
   if (hasMappingPermission(contexts)) return null;
 
-  return { title: 'No permission', description: "You don't have permission to do that action" };
+  return {
+    title: i18n.t('change_field_type.no_permission_title', { ns: 'search' }),
+    description: i18n.t('change_field_type.no_permission_description', { ns: 'search' }),
+  };
 };
 
 export default ChangeFieldType;

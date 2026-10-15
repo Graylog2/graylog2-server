@@ -21,6 +21,7 @@ import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 export const CopyToClipboardFieldActionPlugin = {
   type: 'copy-field-to-clipboard',
   title: 'Copy field name to clipboard',
+  titleKey: 'search:field_actions.copy_field_name',
   handler: CopyFieldToClipboard,
   isEnabled: () => true,
   resetFocus: false,
@@ -29,6 +30,7 @@ export const CopyToClipboardFieldActionPlugin = {
 export const AddFavoriteFieldActionPlugin = {
   type: 'add-field-to-favorite',
   title: 'Add field to favorites',
+  titleKey: 'search:field_actions.add_to_favorites',
   handler: ToggleFavoriteField,
   isEnabled: () => true,
   resetFocus: false,
@@ -38,6 +40,7 @@ export const AddFavoriteFieldActionPlugin = {
 export const RemoveFavoriteFieldActionPlugin = {
   type: 'remove-field-to-favorite',
   title: 'Remove field from favorites',
+  titleKey: 'search:field_actions.remove_from_favorites',
   handler: ToggleFavoriteField,
   isEnabled: () => true,
   resetFocus: false,

@@ -409,5 +409,137 @@
     "edit": "Diese Hervorhebungsregel bearbeiten",
     "remove": "Diese Hervorhebungsregel entfernen",
     "confirm_remove": "Möchten Sie diese Hervorhebung wirklich entfernen?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Keine Berechtigung",
+    "no_permission_description": "Sie haben keine Berechtigung für diese Aktion",
+    "enterprise_plugin_required": "(<enterpriseLink>Enterprise-Plugin</enterpriseLink> erforderlich)",
+    "modal_title": "Feldtyp von {{fieldName}} ändern",
+    "impact_warning": "Das Ändern des Typs des Felds <bold>{{fieldName}}</bold> kann erhebliche Auswirkungen auf die Aufnahme zukünftiger Lognachrichten haben. Wenn Sie für ein Feld einen Typ festlegen, der nicht zu den aufgenommenen Logs passt, kann das zu Fehlern bei der Aufnahme führen.",
+    "failure_processing_hint": "Es wird empfohlen, die <docsLink>Fehlerverarbeitung</docsLink> zu aktivieren und anschließend den Stream <failureStream/> genau zu beobachten.",
+    "select_field_type_for": "Feldtyp für {{fieldName}} auswählen",
+    "select_field_type_for_field": "Feldtyp für das Feld auswählen",
+    "select_field_type": "Feldtyp auswählen",
+    "select_index_sets": "Betroffene Index-Sets auswählen",
+    "index_sets_hint_with_type": "Standardmäßig wird der Feldtyp <bold>{{type}}</bold> für das Feld <bold>{{fieldName}}</bold> in allen Index-Sets der aktuellen Nachricht bzw. Suche gesetzt. Sie können auswählen, für welche Index-Sets die Änderung gelten soll.",
+    "index_sets_hint": "Standardmäßig wird der ausgewählte Feldtyp für das Feld <bold>{{fieldName}}</bold> in allen Index-Sets der aktuellen Nachricht bzw. Suche gesetzt. Sie können auswählen, für welche Index-Sets die Änderung gelten soll.",
+    "select_rotation_strategy": "Rotationsstrategie auswählen",
+    "rotation_hint_type_field": "Um <bold>{{type}}</bold> als Feldtyp für <bold>{{fieldName}}</bold> zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint_type": "Um <bold>{{type}}</bold> als Feldtyp zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint_field": "Um den ausgewählten Feldtyp für <bold>{{fieldName}}</bold> zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint": "Um den ausgewählten Feldtyp zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotate_indices": "Betroffene Indizes nach der Änderung rotieren",
+    "changing": "Feldtyp wird geändert...",
+    "change": "Feldtyp ändern",
+    "select_field": "Feld auswählen",
+    "select_field_placeholder": "Feld auswählen oder eingeben",
+    "type_not_defined": "Typ ist nicht definiert",
+    "previous_values": "(frühere Werte: {{values}})",
+    "load_index_field_types_failed": "Laden der Feldtypen des Index fehlgeschlagen mit Status",
+    "could_not_load_index_field_types": "Feldtypen des Index konnten nicht geladen werden",
+    "load_field_type_options_failed": "Laden der Feldtyp-Optionen fehlgeschlagen mit Status",
+    "could_not_load_field_type_options": "Feldtyp-Optionen konnten nicht geladen werden",
+    "load_field_types_failed": "Laden der Typen von {{field}} fehlgeschlagen mit Status",
+    "could_not_load_field_types": "Feldtypen konnten nicht geladen werden",
+    "load_index_sets_failed": "Laden der Index-Sets mit Unterstützung für Feldtypänderungen fehlgeschlagen mit Status",
+    "could_not_load_index_sets": "Index-Sets mit Unterstützung für Feldtypänderungen konnten nicht geladen werden",
+    "change_failed": "Ändern des Feldtyps fehlgeschlagen mit Status: {{error}}",
+    "change_failed_title": "Feldtyp konnte nicht geändert werden",
+    "change_success": "Der Feldtyp wurde erfolgreich geändert",
+    "success_title": "Erfolg!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Extraktortyp auswählen",
+    "exclude": "Aus den Ergebnissen ausschließen",
+    "add_to_query": "Zur Abfrage hinzufügen",
+    "show_documents": "Dokumente für diesen Wert anzeigen",
+    "create_extractor": "Extraktor erstellen",
+    "highlight_value": "Diesen Wert hervorheben",
+    "create_event_definition": "Ereignisdefinition erstellen",
+    "copy_value": "Wert in die Zwischenablage kopieren"
+  },
+  "create_event_definition": {
+    "title": "Neue Ereignisdefinition konfigurieren",
+    "hide_details": "Details der Strategie ausblenden",
+    "show_details": "Details der Strategie einblenden",
+    "continue": "Konfiguration fortsetzen",
+    "strategy_by": "Strategie:",
+    "description": "Beschreibung:",
+    "sections": {
+      "aggregation": "Aggregationseinstellungen",
+      "search": "Suchanfrage"
+    },
+    "items": {
+      "rowValuePath": "Abfrage aus Tabellenzeile",
+      "columnValuePath": "Abfrage aus Tabellenspalte",
+      "columnGroupBy": "Nach Spaltenwerten gruppieren",
+      "rowGroupBy": "Nach Zeilenwerten gruppieren",
+      "aggCondition": "Bedingung",
+      "queryWithReplacedParams": "Abfrage aus der Suche",
+      "searchFilterQuery": "Abfrage aus Suchfiltern",
+      "streams": "Streams",
+      "searchWithinMs": "Suche innerhalb von ms",
+      "lutParameters": "Lookup-Tabellen-Parameter",
+      "searchFromValue": "Abfrage aus Wert"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Genau dieser Wert",
+        "description": "Die Strategie umfasst alle Suchanfragen, Filter usw., die sich auf die aktuelle Suchansicht beziehen"
+      },
+      "ROW": {
+        "label": "Beliebig in der Zeile",
+        "description": "Die Strategie umfasst Zeilen-Pivots"
+      },
+      "COL": {
+        "label": "Beliebig in der Spalte",
+        "description": "Die Strategie umfasst Spalten-Pivots"
+      },
+      "ALL": {
+        "label": "Beliebig im Widget",
+        "description": "Die Strategie umfasst alle Werte der Zeilen- und Spalten-Pivots, die sich auf den ausgewählten Wert beziehen"
+      },
+      "CUSTOM": {
+        "label": "Benutzerdefiniert",
+        "description": "Sie können beliebige Teile der Suche auswählen"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Etwas ist schiefgelaufen",
+    "unknown_error": "Ein unbekannter Fehler ist aufgetreten. Bitte sehen Sie sich die folgende Meldung und das Server-Log von {{productName}} an, um weitere Informationen zu erhalten."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Löschen der Ansicht {{title}} fehlgeschlagen mit Status: {{error}}",
+    "delete_view_failed_title": "Ansicht konnte nicht gelöscht werden",
+    "apply_widget_changes_failed": "Übernehmen der Widget-Änderungen fehlgeschlagen mit Status: {{error}}",
+    "load_message_failed": "Laden der Nachrichteninformationen fehlgeschlagen mit Status",
+    "could_not_load_message": "Nachrichteninformationen konnten nicht geladen werden"
+  },
+  "field_actions": {
+    "chart": "Diagramm",
+    "show_top_values": "Häufigste Werte anzeigen",
+    "statistics": "Statistiken",
+    "add_to_table": "Zur Tabelle hinzufügen",
+    "remove_from_table": "Aus der Tabelle entfernen",
+    "add_to_all_tables": "Zu allen Tabellen hinzufügen",
+    "remove_from_all_tables": "Aus allen Tabellen entfernen",
+    "change_field_type": "Feldtyp ändern",
+    "copy_field_name": "Feldnamen in die Zwischenablage kopieren",
+    "add_to_favorites": "Feld zu den Favoriten hinzufügen",
+    "remove_from_favorites": "Feld aus den Favoriten entfernen"
+  },
+  "widget_creators": {
+    "message_count": "Nachrichtenanzahl",
+    "message_table": "Nachrichtentabelle",
+    "custom_aggregation": "Benutzerdefinierte Aggregation",
+    "aggregation": "Aggregation",
+    "events_overview": "Ereignisübersicht",
+    "text_markdown": "Text/Markdown"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch begrenzt das Suchergebnis auf {{limit}} Nachrichten. Bei einer Seitengröße von {{pageSize}} Nachrichten können Sie die ersten {{validPages}} Seiten verwenden.",
+    "confirm_delete_dashboard_page": "Möchten Sie diese Dashboard-Seite wirklich löschen?"
   }
 }

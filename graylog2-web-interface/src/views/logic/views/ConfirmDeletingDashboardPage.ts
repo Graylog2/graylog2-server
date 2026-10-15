@@ -17,10 +17,12 @@
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { List, Map } from 'immutable';
 
+import i18n from 'i18n';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 
-// eslint-disable-next-line no-alert
-const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
+const defaultConfirm = async () =>
+  // eslint-disable-next-line no-alert
+  window.confirm(i18n.t('views_logic.confirm_delete_dashboard_page', { ns: 'search' }));
 
 const ConfirmDeletingDashboardPage = async (
   dashboardId: string,

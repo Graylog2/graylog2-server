@@ -17,6 +17,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -42,13 +43,16 @@ const usePutFieldTypeMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Changing the field type failed with status: ${errorThrown}`,
-        'Could not change the field type',
+        i18n.t('change_field_type.change_failed', { ns: 'search', error: errorThrown }),
+        i18n.t('change_field_type.change_failed_title', { ns: 'search' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('The field type changed successfully', 'Success!');
+      UserNotification.success(
+        i18n.t('change_field_type.change_success', { ns: 'search' }),
+        i18n.t('change_field_type.success_title', { ns: 'search' }),
+      );
     },
   });
 

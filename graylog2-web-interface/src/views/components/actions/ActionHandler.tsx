@@ -56,7 +56,10 @@ export type ActionConditions<T extends object = object> = {
 
 type ActionDefinitionBase<T extends object = object> = {
   type: string;
+  /** Identifies the action, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title, e.g. `search:field_actions.chart`. */
+  titleKey?: string;
   resetFocus?: boolean;
   help?: (args: ResolvedActionHandlerArguments<T>) => { title: string; description: React.ReactNode } | undefined;
   condition?: () => boolean;

@@ -18,6 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemFieldTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -41,8 +42,8 @@ const useFieldTypesForMappings = (): {
     queryFn: () =>
       defaultOnError(
         fetchFieldTypes(),
-        'Loading field type options failed with status',
-        'Could not load field type options',
+        i18n.t('change_field_type.load_field_type_options_failed', { ns: 'search' }),
+        i18n.t('change_field_type.could_not_load_field_type_options', { ns: 'search' }),
       ),
 
     placeholderData: keepPreviousData,

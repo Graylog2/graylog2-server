@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import upperCase from 'lodash/upperCase';
@@ -64,6 +65,9 @@ const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
 `;
 
 const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handlerArgs: ActionHandlerArguments }) => {
+  const { t } = useTranslation('search');
+  const displayedTitle = action.titleKey ? t(action.titleKey) : action.title;
+
   if (action.help) {
     const help = action.help(handlerArgs);
 
@@ -72,7 +76,7 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handle
 
       return (
         <>
-          {action.title}
+          {displayedTitle}
           <StyledHoverForHelp title={title} testId="menu-item-help">
             {description}
           </StyledHoverForHelp>
@@ -81,7 +85,7 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handle
     }
   }
 
-  return <>{action.title}</>;
+  return <>{displayedTitle}</>;
 };
 
 type ExternalLinkItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'type'> & {

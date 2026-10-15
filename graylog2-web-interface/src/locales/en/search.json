@@ -409,5 +409,137 @@
     "edit": "Edit this Highlighting Rule",
     "remove": "Remove this Highlighting Rule",
     "confirm_remove": "Do you really want to remove this highlighting?"
+  },
+  "change_field_type": {
+    "no_permission_title": "No permission",
+    "no_permission_description": "You don't have permission to do that action",
+    "enterprise_plugin_required": "(<enterpriseLink>Enterprise Plugin</enterpriseLink> required)",
+    "modal_title": "Change {{fieldName}} Field Type",
+    "impact_warning": "Changing the type of the field <bold>{{fieldName}}</bold> can have a significant impact on the ingestion of future log messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to ingestion errors.",
+    "failure_processing_hint": "It is recommended to enable <docsLink>Failure Processing</docsLink> and watch the <failureStream/> stream closely afterwards.",
+    "select_field_type_for": "Select Field Type For {{fieldName}}",
+    "select_field_type_for_field": "Select Field Type For Field",
+    "select_field_type": "Select field type",
+    "select_index_sets": "Select Targeted Index Sets",
+    "index_sets_hint_with_type": "By default the <bold>{{type}}</bold> field type will be set for the <bold>{{fieldName}}</bold> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.",
+    "index_sets_hint": "By default the selected field type will be set for the <bold>{{fieldName}}</bold> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.",
+    "select_rotation_strategy": "Select Rotation Strategy",
+    "rotation_hint_type_field": "To see and use the <bold>{{type}}</bold> as a field type for <bold>{{fieldName}}</bold>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint_type": "To see and use the <bold>{{type}}</bold> as a field type, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint_field": "To see and use the selected field type as a field type for <bold>{{fieldName}}</bold>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint": "To see and use the selected field type as a field type, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotate_indices": "Rotate affected indices after change",
+    "changing": "Changing field type...",
+    "change": "Change field type",
+    "select_field": "Select Field",
+    "select_field_placeholder": "Select or type the field",
+    "type_not_defined": "type is not defined",
+    "previous_values": "(previous values: {{values}})",
+    "load_index_field_types_failed": "Loading index field types failed with status",
+    "could_not_load_index_field_types": "Could not load index field types",
+    "load_field_type_options_failed": "Loading field type options failed with status",
+    "could_not_load_field_type_options": "Could not load field type options",
+    "load_field_types_failed": "Loading {{field}} types failed with status",
+    "could_not_load_field_types": "Could not load field types",
+    "load_index_sets_failed": "Loading index sets with field type change support failed with status",
+    "could_not_load_index_sets": "Could not load index sets with field type change support",
+    "change_failed": "Changing the field type failed with status: {{error}}",
+    "change_failed_title": "Could not change the field type",
+    "change_success": "The field type changed successfully",
+    "success_title": "Success!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Select extractor type",
+    "exclude": "Exclude from results",
+    "add_to_query": "Add to query",
+    "show_documents": "Show documents for value",
+    "create_extractor": "Create extractor",
+    "highlight_value": "Highlight this value",
+    "create_event_definition": "Create event definition",
+    "copy_value": "Copy value to clipboard"
+  },
+  "create_event_definition": {
+    "title": "Configure new event definition",
+    "hide_details": "Hide strategy details",
+    "show_details": "Show strategy details",
+    "continue": "Continue configuration",
+    "strategy_by": "Strategy by:",
+    "description": "Description:",
+    "sections": {
+      "aggregation": "Aggregation settings",
+      "search": "Search query"
+    },
+    "items": {
+      "rowValuePath": "Query from table row",
+      "columnValuePath": "Query from table column",
+      "columnGroupBy": "Group by column values",
+      "rowGroupBy": "Group by row values",
+      "aggCondition": "Condition",
+      "queryWithReplacedParams": "Query from search",
+      "searchFilterQuery": "Query from search filters",
+      "streams": "Streams",
+      "searchWithinMs": "Search within ms",
+      "lutParameters": "Lookup-table parameters",
+      "searchFromValue": "Query from value"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Exactly this value",
+        "description": "Strategy includes all search queries, filters, etc which relate to current search view"
+      },
+      "ROW": {
+        "label": "Any in row",
+        "description": "Strategy includes row pivots"
+      },
+      "COL": {
+        "label": "Any in column",
+        "description": "Strategy includes column pivots"
+      },
+      "ALL": {
+        "label": "Any in widget",
+        "description": "Strategy includes all row and column pivot values, related to selected value"
+      },
+      "CUSTOM": {
+        "label": "Custom",
+        "description": "You can select any search part"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Something went wrong",
+    "unknown_error": "An unknown error has occurred. Please have a look at the following message and the {{productName}} server log for more information."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Deleting view {{title}} failed with status: {{error}}",
+    "delete_view_failed_title": "Could not delete view",
+    "apply_widget_changes_failed": "Applying widget changes failed with status: {{error}}",
+    "load_message_failed": "Loading message information failed with status",
+    "could_not_load_message": "Could not load message information"
+  },
+  "field_actions": {
+    "chart": "Chart",
+    "show_top_values": "Show top values",
+    "statistics": "Statistics",
+    "add_to_table": "Add to table",
+    "remove_from_table": "Remove from table",
+    "add_to_all_tables": "Add to all tables",
+    "remove_from_all_tables": "Remove from all tables",
+    "change_field_type": "Change field type",
+    "copy_field_name": "Copy field name to clipboard",
+    "add_to_favorites": "Add field to favorites",
+    "remove_from_favorites": "Remove field from favorites"
+  },
+  "widget_creators": {
+    "message_count": "Message Count",
+    "message_table": "Message Table",
+    "custom_aggregation": "Custom Aggregation",
+    "aggregation": "Aggregation",
+    "events_overview": "Events Overview",
+    "text_markdown": "Text/Markdown"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch limits the search result to {{limit}} messages. With a page size of {{pageSize}} messages, you can use the first {{validPages}} pages.",
+    "confirm_delete_dashboard_page": "Do you really want to delete this dashboard page?"
   }
 }

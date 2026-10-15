@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext, useRef, useCallback, useMemo } from 'react';
 
+import i18n from 'i18n';
 import type Widget from 'views/logic/widgets/Widget';
 import UserNotification from 'util/UserNotification';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
@@ -72,7 +73,7 @@ const useApplyAllWidgetChanges = (
 
     return onSubmit(newWidget, hasChanges)
       .catch((error) => {
-        UserNotification.error(`Applying widget changes failed with status: ${error}`);
+        UserNotification.error(i18n.t('views_notifications.apply_widget_changes_failed', { ns: 'search', error }));
 
         return error;
       })

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
@@ -89,13 +90,13 @@ class SelectExtractorType extends React.Component<ActionComponentProps<Additiona
 
     return (
       <BootstrapModalForm
-        title="Select extractor type"
+        title={i18n.t('value_actions.select_extractor_type', { ns: 'search' })}
         submitButtonDisabled={!selectedExtractor}
         show
         onCancel={this.props.onClose}
         onSubmitForm={this._onSubmit}>
         <Select
-          placeholder="Select extractor type"
+          placeholder={i18n.t('value_actions.select_extractor_type', { ns: 'search' })}
           optionRenderer={_renderOption}
           clearable
           onChange={this._onChange}

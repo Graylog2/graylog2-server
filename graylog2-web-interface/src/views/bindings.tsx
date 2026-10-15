@@ -296,6 +296,7 @@ const exports: PluginExports = {
     {
       type: 'chart',
       title: 'Chart',
+      titleKey: 'search:field_actions.chart',
       thunk: ChartActionHandler,
       isEnabled: ({ type }) => type.isNumeric(),
       resetFocus: true,
@@ -303,6 +304,7 @@ const exports: PluginExports = {
     {
       type: 'aggregate',
       title: 'Show top values',
+      titleKey: 'search:field_actions.show_top_values',
       thunk: AggregateActionHandler,
       isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
         !isFunction(field) &&
@@ -314,6 +316,7 @@ const exports: PluginExports = {
     {
       type: 'statistics',
       title: 'Statistics',
+      titleKey: 'search:field_actions.statistics',
       isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
         !isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields),
       thunk: FieldStatisticsHandler,
@@ -322,6 +325,7 @@ const exports: PluginExports = {
     {
       type: 'add-to-table',
       title: 'Add to table',
+      titleKey: 'search:field_actions.add_to_table',
       thunk: AddToTableActionHandler,
       isEnabled: AddToTableActionHandler.isEnabled,
       isHidden: AddToTableActionHandler.isHidden,
@@ -330,6 +334,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-table',
       title: 'Remove from table',
+      titleKey: 'search:field_actions.remove_from_table',
       thunk: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
       isHidden: RemoveFromTableActionHandler.isHidden,
@@ -338,6 +343,7 @@ const exports: PluginExports = {
     {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
+      titleKey: 'search:field_actions.add_to_all_tables',
       thunk: AddToAllTablesActionHandler,
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
@@ -345,6 +351,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
+      titleKey: 'search:field_actions.remove_from_all_tables',
       thunk: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
@@ -353,6 +360,7 @@ const exports: PluginExports = {
     {
       type: 'change-field-type',
       title: 'Change field type',
+      titleKey: 'search:field_actions.change_field_type',
       isEnabled: isChangeFieldTypeEnabled,
       resetFocus: false,
       component: ChangeFieldType,
@@ -366,6 +374,7 @@ const exports: PluginExports = {
       {
         type: 'exclude',
         title: 'Exclude from results',
+        titleKey: 'search:value_actions.exclude',
         thunk: ExcludeFromQueryHandler,
         isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
@@ -374,6 +383,7 @@ const exports: PluginExports = {
       {
         type: 'add-to-query',
         title: 'Add to query',
+        titleKey: 'search:value_actions.add_to_query',
         thunk: AddToQueryHandler,
         isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
@@ -382,6 +392,7 @@ const exports: PluginExports = {
       {
         type: 'show-bucket',
         title: 'Show documents for value',
+        titleKey: 'search:value_actions.show_documents',
         thunk: ShowDocumentsHandler,
         isEnabled: ShowDocumentsHandler.isEnabled,
         resetFocus: true,
@@ -389,6 +400,7 @@ const exports: PluginExports = {
       {
         type: 'create-extractor',
         title: 'Create extractor',
+        titleKey: 'search:value_actions.create_extractor',
         isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
         component: SelectExtractorType,
         resetFocus: false,
@@ -396,6 +408,7 @@ const exports: PluginExports = {
       {
         type: 'highlight-value',
         title: 'Highlight this value',
+        titleKey: 'search:value_actions.highlight_value',
         thunk: HighlightValueHandler,
         isEnabled: HighlightValueHandler.isEnabled,
         resetFocus: false,
@@ -404,6 +417,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
+        titleKey: 'search:value_actions.create_event_definition',
         isEnabled: () => true,
         resetFocus: false,
         component: CreateEventDefinition,
@@ -417,26 +431,31 @@ const exports: PluginExports = {
   widgetCreators: [
     {
       title: 'Message Count',
+      titleKey: 'search:widget_creators.message_count',
       func: CreateMessageCount,
       icon: () => <Icon name="tag" />,
     },
     {
       title: 'Message Table',
+      titleKey: 'search:widget_creators.message_table',
       func: CreateMessagesWidget,
       icon: () => <Icon name="list" />,
     },
     {
       title: 'Custom Aggregation',
+      titleKey: 'search:widget_creators.custom_aggregation',
       func: CreateCustomAggregation,
       icon: () => <Icon name="monitoring" />,
     },
     {
       title: 'Events Overview',
+      titleKey: 'search:widget_creators.events_overview',
       func: CreateEventsWidget,
       icon: () => <Icon name="report" type="regular" />,
     },
     {
       title: 'Text/Markdown',
+      titleKey: 'search:widget_creators.text_markdown',
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
@@ -445,26 +464,31 @@ const exports: PluginExports = {
     {
       type: 'preset',
       title: 'Message Count',
+      titleKey: 'search:widget_creators.message_count',
       func: AddMessageCountActionHandler,
     },
     {
       type: 'preset',
       title: 'Message Table',
+      titleKey: 'search:widget_creators.message_table',
       func: AddMessageTableActionHandler,
     },
     {
       type: 'generic',
       title: 'Aggregation',
+      titleKey: 'search:widget_creators.aggregation',
       func: AddCustomAggregation,
     },
     {
       type: 'events' as const,
       title: 'Events Overview',
+      titleKey: 'search:widget_creators.events_overview',
       func: AddEventsWidgetActionHandler,
     },
     {
       type: 'generic',
       title: 'Text/Markdown',
+      titleKey: 'search:widget_creators.text_markdown',
       func: AddTextWidget,
     },
   ],

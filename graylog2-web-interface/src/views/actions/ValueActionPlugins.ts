@@ -21,6 +21,7 @@ import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 export const CopyToClipBoardValueActionPlugin = {
   type: 'copy-value-to-clipboard',
   title: 'Copy value to clipboard',
+  titleKey: 'search:value_actions.copy_value',
   handler: CopyValueToClipboard,
   isEnabled: CopyValueToClipboard.isEnabled,
   resetFocus: false,
@@ -29,6 +30,7 @@ export const CopyToClipBoardValueActionPlugin = {
 export const CreateExtractorValueActionPlugin = {
   type: 'create-extractor',
   title: 'Create extractor',
+  titleKey: 'search:value_actions.create_extractor',
   isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
   component: SelectExtractorType,
   resetFocus: false,
