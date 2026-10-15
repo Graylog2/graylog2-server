@@ -201,7 +201,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
         // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
         this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
-                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
+                Map.of("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID),
+                       EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
                        EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
