@@ -21,6 +21,7 @@ import asMock from 'helpers/mocking/AsMock';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import PaginatedEntityTable from './PaginatedEntityTable';
+import type { MiddleSectionProps } from './PaginatedEntityTable';
 
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -35,7 +36,9 @@ const tableLayout = {
   defaultColumnOrder: ['title'],
 };
 
-const renderTable = () =>
+const MiddleSection = () => <div>Middle section</div>;
+
+const renderTable = (middleSection: React.ComponentType<MiddleSectionProps> | undefined = undefined) =>
   render(
     <PaginatedEntityTable<TestEntity>
       humanName="things"
@@ -44,9 +47,13 @@ const renderTable = () =>
       keyFn={(params) => ['test', params]}
       columnRenderers={{}}
       entityAttributesAreCamelCase={false}
+      middleSection={middleSection}
       withoutURLParams
     />,
   );
+
+const isBefore = (first: Element, second: Element) =>
+  Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
 
 describe('PaginatedEntityTable', () => {
   it('renders an error message when fetching entities fails', async () => {
@@ -94,5 +101,28 @@ describe('PaginatedEntityTable', () => {
     renderTable();
 
     await screen.findByText(/No things have been found/);
+  });
+
+  it('renders the middle section above the search form, so the search form sits directly above the table', async () => {
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
+      refetch: jest.fn(),
+      data: {
+        list: [],
+        pagination: { total: 0 },
+        attributes: [],
+      },
+      isError: false,
+      error: undefined,
+    });
+
+    renderTable(MiddleSection);
+
+    const middleSection = await screen.findByText('Middle section');
+    const searchInput = await screen.findByPlaceholderText('Search for things');
+    const tableContent = await screen.findByText(/No things have been found/);
+
+    expect(isBefore(middleSection, searchInput)).toBe(true);
+    expect(isBefore(searchInput, tableContent)).toBe(true);
   });
 });
