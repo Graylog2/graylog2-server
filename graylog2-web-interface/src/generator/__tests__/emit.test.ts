@@ -169,6 +169,8 @@ export function sample(requestOptions?: RequestOptions): Promise<AvailableOutput
       models: {},
     };
 
-    expect(() => emit([api])).toThrow('POST /sidecar/configurations/{id}/{name} (copyConfiguration) has no parameter for: name');
+    expect(() => emit([api])).toThrow(
+      'POST /sidecar/configurations/{id}/{name} (copyConfiguration) has no parameter for: name',
+    );
   });
 });
