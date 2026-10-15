@@ -17,15 +17,15 @@
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
 
-import URLUtils from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { AWSConfig } from '@graylog/server-api';
+
 import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { getValueFromInput } from 'util/FormsUtils';
 import useProductName from 'brand-customization/useProductName';
 
-import { PLUGIN_API_ENDPOINT, PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
+import { PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
 import UserNotification from '../../util/UserNotification';
 
 type Props = {
@@ -41,11 +41,7 @@ type Props = {
 
 const _initialState = (config) => omit(config, ['secret_key', 'secret_key_salt']);
 
-const postConfigUpdate = (update) => {
-  const url = URLUtils.qualifyUrl(PLUGIN_API_ENDPOINT);
-
-  return fetch('PUT', url, update);
-};
+const postConfigUpdate = (update) => AWSConfig.updateConfig(update);
 const AWSPluginConfiguration = ({
   config = {
     lookups_enabled: false,
