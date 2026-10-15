@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { Timestamp } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
@@ -54,7 +55,7 @@ const customColumnRenderers = (
           <TitleCell indexSet={indexSet} />
         </DetailsToggle>
       ),
-      width: 0.5,
+      staticWidth: COLUMN_WIDTH.title,
     },
     description: {
       renderCell: (description: string, indexSet: IndexSetEntity) => (
@@ -67,13 +68,13 @@ const customColumnRenderers = (
       renderCell: (indexPrefix: string, indexSet: IndexSetEntity) => (
         <DetailsToggle indexSet={indexSet}>{indexPrefix}</DetailsToggle>
       ),
-      width: 0.3,
+      staticWidth: 200,
     },
     index_template_type: {
       renderCell: (templateType: string, indexSet: IndexSetEntity) => (
         <DetailsToggle indexSet={indexSet}>{templateType}</DetailsToggle>
       ),
-      width: 0.3,
+      staticWidth: 'matchHeader',
     },
     category: {
       renderCell: (category: IndexSetCategory, indexSet: IndexSetEntity) => (
@@ -126,7 +127,7 @@ const customColumnRenderers = (
           <FieldTypeProfileCell profileId={indexSet.field_type_profile} />
         </DetailsToggle>
       ),
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     creation_date: {
       renderCell: (creationDate: string, indexSet: IndexSetEntity) => (
@@ -134,7 +135,7 @@ const customColumnRenderers = (
           <Timestamp dateTime={creationDate} />
         </DetailsToggle>
       ),
-      staticWidth: 160,
+      staticWidth: COLUMN_WIDTH.date,
     },
     [METRIC_COLUMN_IDS.indexCount]: {
       renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
