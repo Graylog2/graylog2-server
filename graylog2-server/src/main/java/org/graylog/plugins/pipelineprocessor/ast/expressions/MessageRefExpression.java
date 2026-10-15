@@ -40,11 +40,7 @@ public class MessageRefExpression extends BaseExpression {
         if (fieldExpr == null) {
             return context.currentMessage();
         }
-        final Object fieldName = fieldExpr.evaluateUnsafe(context);
-        if (fieldName == null) {
-            return null;
-        }
-        return context.currentMessage().getField(fieldName.toString());
+        return PipelineOps.messageField(context, fieldExpr.evaluateUnsafe(context));
     }
 
     @Override

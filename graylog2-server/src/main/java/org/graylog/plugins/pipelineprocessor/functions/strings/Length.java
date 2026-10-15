@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.nio.charset.StandardCharsets;
@@ -46,6 +47,17 @@ public class Length extends AbstractFunction<Long> {
     public Long evaluate(FunctionArgs args, EvaluationContext context) {
         final String string = Objects.requireNonNull(valueParam.required(args, context));
         final Boolean bytesFlag = bytesParam.optional(args, context).orElse(Boolean.FALSE);
+        if (bytesFlag) {
+            return (long) string.getBytes(StandardCharsets.UTF_8).length;
+        }
+        return (long) string.length();
+    }
+
+    /** Separate from {@link #evaluate}, which resolves {@code bytes} only after the null check on {@code value}. */
+    @PipelineFastPath
+    public Long fastPath(String value, Boolean bytes) {
+        final String string = Objects.requireNonNull(value);
+        final Boolean bytesFlag = bytes == null ? Boolean.FALSE : bytes;
         if (bytesFlag) {
             return (long) string.getBytes(StandardCharsets.UTF_8).length;
         }

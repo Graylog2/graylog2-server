@@ -43,6 +43,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -101,6 +103,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
+    private final PipelineCompilerConfigService pipelineCompilerConfigService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -109,7 +112,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PipelineRuleService pipelineRuleService,
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
-                        PipelineServiceHelper pipelineServiceHelper) {
+                        PipelineServiceHelper pipelineServiceHelper,
+                        PipelineCompilerConfigService pipelineCompilerConfigService) {
         this.ruleService = ruleService;
         this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
@@ -118,6 +122,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
+        this.pipelineCompilerConfigService = pipelineCompilerConfigService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -356,5 +361,20 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_METRICS_UPDATE)
     public RuleMetricsConfigDto updateMetricsConfig(RuleMetricsConfigDto config) {
         return ruleMetricsConfigService.save(config);
+    }
+
+    @Operation(summary = "Get pipeline rule compiler configuration (experimental)")
+    @Path("/config/compiler")
+    @GET
+    public PipelineCompilerConfigDto compilerConfig() {
+        return pipelineCompilerConfigService.get();
+    }
+
+    @Operation(summary = "Update pipeline rule compiler configuration (experimental)")
+    @Path("/config/compiler")
+    @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_COMPILER_UPDATE)
+    public PipelineCompilerConfigDto updateCompilerConfig(PipelineCompilerConfigDto config) {
+        return pipelineCompilerConfigService.save(config);
     }
 }

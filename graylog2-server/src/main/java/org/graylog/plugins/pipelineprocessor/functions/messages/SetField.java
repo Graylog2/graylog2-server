@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
@@ -84,6 +85,31 @@ public class SetField extends AbstractFunction<Void> {
                 field = field + suffix.get();
             }
             if (cleanField.optional(args, context).orElse(false)) {
+                field = Message.cleanKey(field);
+            }
+            message.addField(field, value);
+        }
+        return null;
+    }
+
+    /**
+     * {@code default} must be absent: then a {@code value} exception propagates unchanged and a null value stays null,
+     * as in {@link #evaluate}. The params after {@code value} are only resolved for a non-empty field name in
+     * {@link #evaluate}, so they are absent or constants here.
+     */
+    @PipelineFastPath(eagerParams = 2, requiresAbsent = "default")
+    public Void fastPath(String field, Object value, String prefix, String suffix, Message messageArg,
+                         Object defaultValue, Boolean cleanFieldArg, EvaluationContext context) {
+        if (!Strings.isNullOrEmpty(field)) {
+            final Message message = messageArg != null ? messageArg : context.currentMessage();
+
+            if (prefix != null) {
+                field = prefix + field;
+            }
+            if (suffix != null) {
+                field = field + suffix;
+            }
+            if (cleanFieldArg != null && cleanFieldArg) {
                 field = Message.cleanKey(field);
             }
             message.addField(field, value);

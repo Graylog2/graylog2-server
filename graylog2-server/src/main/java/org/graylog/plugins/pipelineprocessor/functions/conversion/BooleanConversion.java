@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -44,6 +45,15 @@ public class BooleanConversion extends AbstractConversion<Boolean> {
         final Object value = valueParam.required(args, context);
         if (value == null) {
             return defaultToNull(args, context) ? null : defaultParam.optional(args, context).orElse(false);
+        }
+        return Boolean.parseBoolean(String.valueOf(value));
+    }
+
+    /** Lazy in {@link #evaluate}: {@code default} and {@code defaultToNull} are only resolved when {@code value} is null. */
+    @PipelineFastPath
+    public Boolean fastPath(Object value, Boolean defaultValue, Boolean defaultToNull) {
+        if (value == null) {
+            return (defaultToNull != null && defaultToNull) ? null : (defaultValue == null ? false : defaultValue);
         }
         return Boolean.parseBoolean(String.valueOf(value));
     }

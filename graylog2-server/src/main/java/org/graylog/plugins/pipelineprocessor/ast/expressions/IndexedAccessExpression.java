@@ -17,14 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.primitives.Ints;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Map;
 
 public class IndexedAccessExpression extends BaseExpression {
     private final Expression indexableObject;
@@ -45,31 +40,7 @@ public class IndexedAccessExpression extends BaseExpression {
     public Object evaluateUnsafe(EvaluationContext context) {
         final Object idxObj = this.index.evaluateUnsafe(context);
         final Object indexable = indexableObject.evaluateUnsafe(context);
-        if (idxObj == null || indexable == null) {
-            return null;
-        }
-
-        if (idxObj instanceof Long) {
-            int idx = Ints.saturatedCast((long) idxObj);
-            if (indexable.getClass().isArray()) {
-                return Array.get(indexable, idx);
-            } else if (indexable instanceof List) {
-                return ((List) indexable).get(idx);
-            } else if (indexable instanceof Iterable) {
-                return Iterables.get((Iterable) indexable, idx);
-            }
-            throw new IllegalArgumentException(
-                    context.pipelineErrorMessage("Object '" + indexable + "' is not an Array, List or Iterable."));
-        } else if (idxObj instanceof String) {
-            final String idx = idxObj.toString();
-            if (indexable instanceof Map) {
-                return ((Map) indexable).get(idx);
-            }
-            throw new IllegalArgumentException(
-                    context.pipelineErrorMessage("Object '" + indexable + "' is not a Map."));
-        }
-        throw new IllegalArgumentException(
-                context.pipelineErrorMessage("Index '" + idxObj + "' is not a Long or String."));
+        return PipelineOps.indexedAccess(context, idxObj, indexable);
     }
 
     @Override

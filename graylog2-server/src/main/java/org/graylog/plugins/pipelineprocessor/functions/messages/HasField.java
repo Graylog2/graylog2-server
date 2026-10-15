@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
@@ -41,8 +42,12 @@ public class HasField extends AbstractFunction<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = fieldParam.required(args, context);
-        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+        return fastPath(fieldParam.required(args, context), messageParam.required(args, context), context);
+    }
+
+    @PipelineFastPath(eagerParams = 2)
+    public Boolean fastPath(String field, Message messageArg, EvaluationContext context) {
+        final Message message = messageArg != null ? messageArg : context.currentMessage();
 
         return message.hasField(field);
     }

@@ -49,18 +49,7 @@ public class SignedExpression extends UnaryExpression implements NumericExpressi
     @Nullable
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
-        final Object value = right.evaluateUnsafe(context);
-
-        if (value instanceof Long) {
-            long number = (long) value;
-            return isPlus ? +number : -number;
-        } else if (value instanceof Double) {
-            double number = (double) value;
-            return isPlus ? +number : -number;
-        }
-        // nothing we could handle, the type checker should've caught it
-        throw new IllegalArgumentException(
-                context.pipelineErrorMessage("Value of '" + right.toString() + "' is not a number: " + value));
+        return PipelineOps.signed(this, context, right.evaluateUnsafe(context));
     }
 
     @Override

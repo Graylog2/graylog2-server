@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.compiler.CompiledRule;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 
 import javax.annotation.Nullable;
@@ -43,6 +44,9 @@ public abstract class Rule {
     private transient Meter localMatched;
     private transient Meter globalNotMatched;
     private transient Meter localNotMatched;
+
+    @Nullable
+    private transient CompiledRule compiled;
 
     @Nullable
     public abstract String id();
@@ -118,6 +122,16 @@ public abstract class Rule {
             globalFailed.mark();
             localFailed.mark();
         }
+    }
+
+    /** The compiled body of this rule, or {@code null} if it is interpreted. Not part of value equality. */
+    @Nullable
+    public CompiledRule compiled() {
+        return compiled;
+    }
+
+    public void setCompiled(@Nullable CompiledRule compiled) {
+        this.compiled = compiled;
     }
 
     /**

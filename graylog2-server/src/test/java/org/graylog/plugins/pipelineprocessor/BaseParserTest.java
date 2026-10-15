@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -23,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.compiler.DifferentialHarness;
+import org.graylog.plugins.pipelineprocessor.compiler.RuleCompiler;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
@@ -45,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -99,7 +103,16 @@ public class BaseParserTest {
         actionsTriggered.set(false);
     }
 
+    private void differentialCheck(Rule rule, Message message) {
+        if (DifferentialHarness.FIXTURES_ENABLED) {
+            final RuleCompiler compiler = new RuleCompiler(new MetricRegistry(), DifferentialHarness::verify);
+            DifferentialHarness.assertEquivalent(() -> DifferentialHarness.copyOf(message, messageFactory),
+                    List.of(rule), r -> compiler.compile(r).orElse(null));
+        }
+    }
+
     protected EvaluationContext contextForRuleEval(Rule rule, Message message) {
+        differentialCheck(rule, message);
         final EvaluationContext context = new EvaluationContext(message);
         if (rule.when().evaluateBool(context)) {
             for (Statement statement : rule.then()) {
@@ -110,6 +123,7 @@ public class BaseParserTest {
     }
 
     protected Message evaluateRule(Rule rule, Message message) {
+        differentialCheck(rule, message);
         final EvaluationContext context = new EvaluationContext(message);
         if (rule.when().evaluateBool(context)) {
 

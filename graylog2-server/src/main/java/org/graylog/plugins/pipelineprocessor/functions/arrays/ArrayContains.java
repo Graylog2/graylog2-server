@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import jakarta.inject.Inject;
@@ -56,12 +57,17 @@ public class ArrayContains extends AbstractArrayFunction<Boolean> {
                 .description("Whether or not to ignore case when checking string arrays").build();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final List<Object> elements = elementsParam.optional(args, context).orElse(Collections.emptyList());
-        final Object value = valueParam.required(args, context);
-        final boolean caseSensitive = caseSensitiveParam.optional(args, context).orElse(false);
+        return fastPath(elementsParam.required(args, context), valueParam.required(args, context),
+                caseSensitiveParam.required(args, context));
+    }
+
+    @SuppressWarnings("unchecked")
+    @PipelineFastPath(eagerParams = 3)
+    public Boolean fastPath(List elementsArg, Object value, Boolean caseSensitiveArg) {
+        final List<Object> elements = elementsArg != null ? elementsArg : Collections.emptyList();
+        final boolean caseSensitive = caseSensitiveArg != null && caseSensitiveArg;
 
         if (elements.isEmpty()) {
             return false;

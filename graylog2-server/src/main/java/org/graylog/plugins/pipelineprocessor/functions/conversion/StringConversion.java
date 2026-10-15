@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.DateTime;
@@ -90,6 +91,43 @@ public class StringConversion extends AbstractConversion<String> {
             } catch (NoSuchMethodException ignored) {
                 // should never happen because toString is always there
                 return defaultParam.optional(args, context).orElse("");
+            }
+        }
+    }
+
+    /** Lazy in {@link #evaluate}: {@code default} and {@code defaultToNull} are only resolved when needed. */
+    @PipelineFastPath
+    public String fastPath(Object value, String defaultValue, Boolean defaultToNull) {
+        if (value == null) {
+            return (defaultToNull != null && defaultToNull) ? null : (defaultValue == null ? "" : defaultValue);
+        }
+        // fast path for the most common targets
+        if (value instanceof String
+                || value instanceof Number
+                || value instanceof Boolean
+                || value instanceof DateTime
+                || value instanceof IpAddress) {
+            return value.toString();
+        } else {
+            //noinspection Duplicates
+            try {
+                // slow path, we aren't sure that the object's class actually overrides toString() so we'll look it up.
+                final Class<?> klass = value.getClass();
+                final LinkedHashMap<Class<?>, Class<?>> classCache = declaringClassCache.get();
+
+                Class<?> declaringClass = classCache.get(klass);
+                if (declaringClass == null) {
+                    declaringClass = klass.getMethod("toString").getDeclaringClass();
+                    classCache.put(klass, declaringClass);
+                }
+                if ((declaringClass != Object.class)) {
+                    return value.toString();
+                } else {
+                    return defaultValue == null ? "" : defaultValue;
+                }
+            } catch (NoSuchMethodException ignored) {
+                // should never happen because toString is always there
+                return defaultValue == null ? "" : defaultValue;
             }
         }
     }

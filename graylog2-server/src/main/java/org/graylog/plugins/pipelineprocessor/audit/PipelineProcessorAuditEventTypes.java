@@ -32,6 +32,7 @@ public class PipelineProcessorAuditEventTypes implements PluginAuditEventTypes {
     public static final String RULE_UPDATE = NAMESPACE + "rule:update";
     public static final String RULE_DELETE = NAMESPACE + "rule:delete";
     public static final String RULE_METRICS_UPDATE = NAMESPACE + "rulemetrics:update";
+    public static final String RULE_COMPILER_UPDATE = NAMESPACE + "rulecompiler:update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(PIPELINE_CONNECTION_UPDATE)
@@ -42,6 +43,7 @@ public class PipelineProcessorAuditEventTypes implements PluginAuditEventTypes {
             .add(RULE_UPDATE)
             .add(RULE_DELETE)
             .add(RULE_METRICS_UPDATE)
+            .add(RULE_COMPILER_UPDATE)
             .build();
 
     @Override

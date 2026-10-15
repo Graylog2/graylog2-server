@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.compiler.CompiledRule;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
@@ -385,6 +386,14 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.executeRule(rule, pipeline);
         try {
             log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
+            final CompiledRule compiled = rule.compiled();
+            if (compiled != null) {
+                if (!compiled.then(context)) {
+                    onStatementError(message, interpreterListener, pipeline, context, rule);
+                    return false;
+                }
+                return true;
+            }
             for (Statement statement : rule.then()) {
                 if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
                     // statement raised an error, skip the rest of the rule
@@ -405,21 +414,29 @@ public class PipelineInterpreter implements MessageProcessor {
         statement.evaluate(context);
         if (context.hasEvaluationErrors()) {
             // if the last statement resulted in an error, do not continue to execute this rules
-            final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-            message.addProcessingError(new Message.ProcessingError(
-                    ProcessingFailureCause.RuleStatementEvaluationError,
-                    String.format(Locale.ENGLISH,
-                            "Error evaluating action for rule <%s/%s> (pipeline <%s/%s>)",
-                            rule.name(), rule.id(), pipeline.name(), pipeline.id()),
-                    lastError.toString()
-            ));
-            interpreterListener.failExecuteRule(rule, pipeline);
-            log.debug("Encountered evaluation error, skipping rest of the rule: {}",
-                    lastError);
-            rule.markFailure();
+            onStatementError(message, interpreterListener, pipeline, context, rule);
             return false;
         }
         return true;
+    }
+
+    private void onStatementError(Message message,
+                                  InterpreterListener interpreterListener,
+                                  Pipeline pipeline,
+                                  EvaluationContext context,
+                                  Rule rule) {
+        final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+        message.addProcessingError(new Message.ProcessingError(
+                ProcessingFailureCause.RuleStatementEvaluationError,
+                String.format(Locale.ENGLISH,
+                        "Error evaluating action for rule <%s/%s> (pipeline <%s/%s>)",
+                        rule.name(), rule.id(), pipeline.name(), pipeline.id()),
+                lastError.toString()
+        ));
+        interpreterListener.failExecuteRule(rule, pipeline);
+        log.debug("Encountered evaluation error, skipping rest of the rule: {}",
+                lastError);
+        rule.markFailure();
     }
 
     private boolean evaluateRuleCondition(Rule rule,
@@ -432,7 +449,8 @@ public class PipelineInterpreter implements MessageProcessor {
         final boolean matched;
         final LogicalExpression logicalExpression = rule.when();
         try {
-            matched = logicalExpression.evaluateBool(context);
+            final CompiledRule compiled = rule.compiled();
+            matched = compiled != null ? compiled.when(context) : logicalExpression.evaluateBool(context);
         } catch (Exception e) {
 
             context.onEvaluationException(e, logicalExpression);

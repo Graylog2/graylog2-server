@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -40,10 +41,13 @@ public class Contains extends AbstractFunction<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = valueParam.required(args, context);
-        final String search = searchParam.required(args, context);
-        final boolean ignoreCase = ignoreCaseParam.optional(args, context).orElse(false);
-        if (ignoreCase) {
+        return fastPath(valueParam.required(args, context), searchParam.required(args, context),
+                ignoreCaseParam.optional(args, context).orElse(null));
+    }
+
+    @PipelineFastPath(eagerParams = 3)
+    public Boolean fastPath(String value, String search, Boolean ignoreCase) {
+        if (ignoreCase != null && ignoreCase) {
             return StringUtils.containsIgnoreCase(value, search);
         } else {
             return StringUtils.contains(value, search);

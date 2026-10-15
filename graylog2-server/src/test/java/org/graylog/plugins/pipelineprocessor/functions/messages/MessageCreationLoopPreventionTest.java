@@ -24,6 +24,9 @@ import com.google.common.eventbus.EventBus;
 import jakarta.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.compiler.RuleCompiler;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.PipelineCompilerConfigService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -133,6 +136,8 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
         final MetricRegistry metricRegistry = new MetricRegistry();
+        final PipelineCompilerConfigService compilerConfigService = mock(PipelineCompilerConfigService.class);
+        when(compilerConfigService.get()).thenReturn(PipelineCompilerConfigDto.createDefault());
         final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
                 ruleService,
                 pipelineService,
@@ -140,7 +145,9 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
+                compilerConfigService,
+                new RuleCompiler(new MetricRegistry())
         );
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,

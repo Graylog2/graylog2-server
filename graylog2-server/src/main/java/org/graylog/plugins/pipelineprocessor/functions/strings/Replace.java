@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -46,12 +47,13 @@ public class Replace extends AbstractFunction<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String text = valueParam.required(args, context);
-        final String searchString = searchParam.required(args, context);
-        final String replacement = replacementParam.optional(args, context).orElse("");
-        final int max = maxParam.optional(args, context).orElse(-1);
+        return fastPath(valueParam.required(args, context), searchParam.required(args, context),
+                replacementParam.optional(args, context).orElse(null), maxParam.optional(args, context).orElse(null));
+    }
 
-        return StringUtils.replace(text, searchString, replacement, max);
+    @PipelineFastPath(eagerParams = 4)
+    public String fastPath(String text, String searchString, String replacement, Integer max) {
+        return StringUtils.replace(text, searchString, replacement == null ? "" : replacement, max == null ? -1 : max);
     }
 
     @Override

@@ -16,16 +16,10 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
-import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.joda.time.DateTime;
-
-import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class EqualityExpression extends BinaryExpression implements LogicalExpression {
-    private static final RateLimitedLog log = createDefaultRateLimitedLog(EqualityExpression.class);
-
     private final boolean checkEquality;
 
     public EqualityExpression(Token start, Expression left, Expression right, boolean checkEquality) {
@@ -45,37 +39,7 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     @Override
     public boolean evaluateBool(EvaluationContext context) {
-        final Object left = this.left.evaluateUnsafe(context);
-        final Object right = this.right.evaluateUnsafe(context);
-        if (left == null) {
-            log.warn(context.pipelineErrorMessage("left expression evaluated to null, returning false: " + this.left));
-            return false;
-        }
-        final boolean equals;
-        // sigh: DateTime::equals takes the chronology into account, so identical instants expressed in different timezones are not equal
-        if (left instanceof DateTime && right instanceof DateTime) {
-            equals = ((DateTime) left).isEqual((DateTime) right);
-        } else {
-            equals = left.equals(right);
-        }
-
-        if (log.isTraceEnabled()) {
-            traceEquality(left, right, equals, checkEquality);
-        }
-        if (checkEquality) {
-            return equals;
-        }
-        return !equals;
-    }
-
-    private void traceEquality(Object left,
-                               Object right,
-                               boolean equals,
-                               boolean checkEquality) {
-        log.trace(checkEquality
-                          ? "[{}] {} == {} : {} == {}"
-                          : "[{}] {} != {} : {} != {}",
-                  checkEquality == equals, this.left, this.right, left, right);
+        return PipelineOps.equality(this, context, this.left.evaluateUnsafe(context), this.right.evaluateUnsafe(context));
     }
 
     public boolean isCheckEquality() {

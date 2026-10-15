@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +40,11 @@ public class FirstNonNull extends AbstractFunction<Object> {
 
     @Override
     public Object evaluate(FunctionArgs args, EvaluationContext context) {
-        List elements = valueParam.required(args, context);
+        return fastPath(valueParam.required(args, context));
+    }
+
+    @PipelineFastPath
+    public Object fastPath(List elements) {
         return elements.stream().filter(Objects::nonNull).findFirst().orElse(null);
     }
 

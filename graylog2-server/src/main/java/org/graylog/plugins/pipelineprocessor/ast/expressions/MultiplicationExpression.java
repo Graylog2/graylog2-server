@@ -54,36 +54,7 @@ public class MultiplicationExpression extends BinaryExpression implements Numeri
         final Object leftValue = left.evaluateUnsafe(context);
         final Object rightValue = right.evaluateUnsafe(context);
 
-        if (isIntegral()) {
-            long l = (long) leftValue;
-            long r = (long) rightValue;
-            switch (operator) {
-                case '*':
-                    return l * r;
-                case '/':
-                    return l / r;
-                case '%':
-                    return l % r;
-                default:
-                    throw new IllegalStateException(
-                            context.pipelineErrorMessage("Invalid operator, this is a bug."));
-            }
-        } else {
-            final double l = (double) leftValue;
-            final double r = (double) rightValue;
-
-            switch (operator) {
-                case '*':
-                    return l * r;
-                case '/':
-                    return l / r;
-                case '%':
-                    return l % r;
-                default:
-                    throw new IllegalStateException(
-                            context.pipelineErrorMessage("Invalid operator, this is a bug."));
-            }
-        }
+        return PipelineOps.multiply(this, context, leftValue, rightValue);
     }
 
     public char getOperator() {

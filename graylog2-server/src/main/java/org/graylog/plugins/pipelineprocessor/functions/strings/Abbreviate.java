@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.primitives.Ints.saturatedCast;
@@ -42,12 +43,15 @@ public class Abbreviate extends AbstractFunction<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = valueParam.required(args, context);
-        final Long required = widthParam.required(args, context);
-        if (required == null) {
+        return fastPath(valueParam.required(args, context), widthParam.required(args, context));
+    }
+
+    @PipelineFastPath(eagerParams = 2)
+    public String fastPath(String value, Long width) {
+        if (width == null) {
             return null;
         }
-        final Long maxWidth = Math.max(required, 4L);
+        final Long maxWidth = Math.max(width, 4L);
 
         return StringUtils.abbreviate(value, saturatedCast(maxWidth));
     }

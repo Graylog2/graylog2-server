@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -38,10 +39,12 @@ public class Concat extends AbstractFunction<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String first = Strings.nullToEmpty(firstParam.required(args, context));
-        final String second = Strings.nullToEmpty(secondParam.required(args, context));
+        return fastPath(firstParam.required(args, context), secondParam.required(args, context));
+    }
 
-        return first.concat(second);
+    @PipelineFastPath(eagerParams = 2)
+    public String fastPath(String first, String second) {
+        return Strings.nullToEmpty(first).concat(Strings.nullToEmpty(second));
     }
 
     @Override

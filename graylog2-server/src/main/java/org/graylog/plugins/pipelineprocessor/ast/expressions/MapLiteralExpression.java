@@ -21,8 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.jooq.lambda.Seq;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,10 +45,15 @@ public class MapLiteralExpression extends BaseExpression {
     @Override
     public Map evaluateUnsafe(EvaluationContext context) {
         // evaluate all values for each key and return the resulting map
-        return Seq.seq(map)
-                .map(entry -> entry.map2(value -> value.evaluateUnsafe(context)))
-                .filter(entry -> entry.v2 != null) // filter out null values, which would throw exceptions.
-                .toMap(Tuple2::v1, Tuple2::v2);
+        final String[] keys = new String[map.size()];
+        final Object[] values = new Object[map.size()];
+        int i = 0;
+        for (Map.Entry<String, Expression> entry : map.entrySet()) {
+            keys[i] = entry.getKey();
+            values[i] = entry.getValue().evaluateUnsafe(context);
+            i++;
+        }
+        return PipelineOps.mapLiteral(keys, values);
     }
 
     @Override

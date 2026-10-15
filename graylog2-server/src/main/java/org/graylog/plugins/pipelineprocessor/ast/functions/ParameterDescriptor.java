@@ -122,6 +122,12 @@ public abstract class ParameterDescriptor<T, R> {
             return null;
         }
         final Object value = valueExpr.evaluateUnsafe(context);
+        return convert(value);
+    }
+
+    /** Applies this parameter's type check and transform exactly as {@link #required} does for an evaluated argument. */
+    @Nullable
+    public R convert(@Nullable Object value) {
         return transformedType().cast(transform().apply(type().cast(value)));
     }
 

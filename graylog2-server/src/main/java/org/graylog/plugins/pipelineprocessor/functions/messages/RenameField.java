@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
@@ -51,6 +52,23 @@ public class RenameField extends AbstractFunction<Void> {
             return null;
         }
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+
+        if (message.hasField(oldName)) {
+            message.addField(newName, message.getField(oldName));
+            message.removeField(oldName);
+        }
+
+        return null;
+    }
+
+    /** {@code message} is resolved after the early exit in {@link #evaluate}, so it is absent or a constant here. */
+    @PipelineFastPath(eagerParams = 2)
+    public Void fastPath(String oldName, String newName, Message messageArg, EvaluationContext context) {
+        // exit early if the field names are the same (so we don't drop the field)
+        if (oldName != null && oldName.equals(newName)) {
+            return null;
+        }
+        final Message message = messageArg != null ? messageArg : context.currentMessage();
 
         if (message.hasField(oldName)) {
             message.addField(newName, message.getField(oldName));

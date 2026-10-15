@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.PipelineFastPath;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import javax.annotation.Nonnull;
@@ -51,6 +52,18 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
             locale = localeParam.optional(args, context).orElse(Locale.ENGLISH);
         }
         return apply(value, locale);
+    }
+
+    /** Fast path for subclasses that are not locale aware (descriptor has only `value`). */
+    @PipelineFastPath
+    public String fastPath(String value) {
+        return apply(value, Locale.ENGLISH);
+    }
+
+    /** Fast path for locale aware subclasses (descriptor has `value` and `locale`). */
+    @PipelineFastPath(eagerParams = 2)
+    public String fastPath(String value, Locale locale) {
+        return apply(value, locale == null ? Locale.ENGLISH : locale);
     }
 
     @Override
