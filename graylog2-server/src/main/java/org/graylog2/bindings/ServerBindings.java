@@ -46,6 +46,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.configuration.WelcomePageConfiguration;
 import org.graylog2.configuration.tunables.RuntimeTunablesModule;
 import org.graylog2.database.filtering.ComputedFieldProvider;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
@@ -161,6 +162,7 @@ public class ServerBindings extends Graylog2Module {
         addRuntimeTunable(PasswordComplexityConfig.class);
         addRuntimeTunable(UserAndTeamsConfig.class);
         addRuntimeTunable(UserConfiguration.class);
+        addRuntimeTunable(WelcomePageConfiguration.class);
         if (isMigrationCommand) {
             install(new FakeLeaderElectionModule());
         } else {

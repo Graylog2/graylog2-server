@@ -23,7 +23,6 @@ import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
-import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
 
 const bindings: PluginExports = {
@@ -81,15 +80,6 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: MarkdownConfig,
         title: 'Markdown',
-      },
-    },
-    {
-      name: 'Welcome Page',
-      feature: 'welcome_page',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: WelcomePageConfig,
-        title: 'Welcome Page',
       },
     },
     {
