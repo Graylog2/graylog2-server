@@ -439,14 +439,7 @@ const emitRoute = (
         undefined,
         [...parameters.sort(sortByOptionality).map(emitFunctionParameter), requestOptionsParameter],
         emitPromiseResultType(emitType(type)),
-        emitBlock(
-          method,
-          routePath,
-          bodyParameter[0],
-          queryParameters,
-          produces,
-          formDataParameters,
-        ),
+        emitBlock(method, routePath, bodyParameter[0], queryParameters, produces, formDataParameters),
       ),
     ],
   };
