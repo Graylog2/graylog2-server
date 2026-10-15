@@ -19,21 +19,31 @@ import { changedProperties, toFormValues } from './formValues';
 import type { TunableSchema } from './types';
 
 describe('toFormValues', () => {
-  it('picks the values of the schema properties', () => {
+  it('turns secrets into keep or set values and leaves the rest', () => {
     const schema: TunableSchema = {
       type: 'object',
       properties: {
         name: { type: 'string' },
-        limit: { type: 'integer' },
+        token: { type: 'string', 'x-graylog-secret': true },
+        other: { type: 'string', 'x-graylog-secret': true },
       },
     };
 
-    expect(toFormValues(schema, { name: 'x', limit: 5, unknown: true })).toEqual({ name: 'x', limit: 5 });
+    expect(toFormValues(schema, { name: 'x', token: { is_set: true }, other: { is_set: false } })).toEqual({
+      name: 'x',
+      token: { keep_value: true },
+      other: { set_value: '' },
+    });
   });
 });
 
 describe('changedProperties', () => {
-  it('lists properties whose value changed', () => {
-    expect(changedProperties({ limit: 5, enabled: true }, { limit: 6, enabled: true })).toEqual(['limit']);
+  it('lists properties whose value changed, counting kept secrets as unchanged', () => {
+    expect(
+      changedProperties(
+        { limit: 5, enabled: true, token: { keep_value: true }, other: { keep_value: true } },
+        { limit: 6, enabled: true, token: { keep_value: true }, other: { set_value: 'new' } },
+      ),
+    ).toEqual(['limit', 'other']);
   });
 });

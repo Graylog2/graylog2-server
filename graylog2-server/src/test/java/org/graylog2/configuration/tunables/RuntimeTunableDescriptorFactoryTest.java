@@ -106,11 +106,24 @@ class RuntimeTunableDescriptorFactoryTest {
                 .isInstanceOf(InvalidRuntimeTunableException.class).hasMessageContaining("@RuntimeTunable");
     }
 
+    @RuntimeTunable(id = "test.optional_secret", feature = "search", title = "Optional secret")
+    public record OptionalSecret(@JsonProperty("key") java.util.Optional<org.graylog2.security.encryption.EncryptedValue> key) {
+        public static OptionalSecret defaults() {
+            return new OptionalSecret(java.util.Optional.empty());
+        }
+    }
+
     @RuntimeTunable(id = "test.with_date", feature = "search", title = "With date")
     public record WithDate(@JsonProperty("expires") org.joda.time.DateTime expires) {
         public static WithDate defaults() {
             return new WithDate(new org.joda.time.DateTime(0L, org.joda.time.DateTimeZone.UTC));
         }
+    }
+
+    @Test
+    void rejectsOptionalSecrets() {
+        assertThatThrownBy(() -> factory.create(OptionalSecret.class, features))
+                .isInstanceOf(InvalidRuntimeTunableException.class).hasMessageContaining("optional").hasMessageContaining("key");
     }
 
     @Test

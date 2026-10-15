@@ -31,6 +31,7 @@ export type TunableSchema = {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  writeOnly?: boolean;
   properties?: Record<string, TunableSchema>;
   required?: Array<string>;
   anyOf?: Array<TunableSchema>;
@@ -39,6 +40,7 @@ export type TunableSchema = {
   'x-graylog-enabled-when'?: Array<Condition>;
   'x-graylog-visible-when'?: Array<Condition>;
   'x-graylog-hidden'?: boolean;
+  'x-graylog-secret'?: boolean;
 };
 
 export type RuntimeTunableFieldProps = {
@@ -48,6 +50,8 @@ export type RuntimeTunableFieldProps = {
   help?: string;
   disabled?: boolean;
 };
+
+export type SecretValue = { is_set: boolean } | { set_value: string } | { keep_value: true } | { delete_value: true };
 
 export type TunableValues = Record<string, unknown>;
 

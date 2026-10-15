@@ -17,11 +17,19 @@
 
 import isEqual from 'lodash/isEqual';
 
-import type { TunableSchema, TunableValues } from './types';
+import type { SecretValue, TunableSchema, TunableValues } from './types';
 import { orderedProperties } from './schema';
 
+const toSecretFormValue = (value: SecretValue | undefined): SecretValue =>
+  value && 'is_set' in value && value.is_set ? { keep_value: true } : { set_value: '' };
+
 export const toFormValues = (schema: TunableSchema, value: TunableValues): TunableValues =>
-  Object.fromEntries(orderedProperties(schema).map(([name]) => [name, value?.[name]]));
+  Object.fromEntries(
+    orderedProperties(schema).map(([name, property]) => [
+      name,
+      property['x-graylog-secret'] ? toSecretFormValue(value?.[name] as SecretValue) : value?.[name],
+    ]),
+  );
 
 export const changedProperties = (initialValues: TunableValues, values: TunableValues) =>
   Object.keys(values).filter((name) => !isEqual(initialValues?.[name], values[name]));

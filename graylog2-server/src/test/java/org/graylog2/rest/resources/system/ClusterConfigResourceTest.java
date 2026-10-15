@@ -29,6 +29,7 @@ import org.graylog2.configuration.tunables.RuntimeTunable;
 import org.graylog2.configuration.tunables.RuntimeTunableDescriptorFactory;
 import org.graylog2.configuration.tunables.RuntimeTunableRegistry;
 import org.graylog2.configuration.tunables.RuntimeTunableSchemaGenerator;
+import org.graylog2.configuration.tunables.RuntimeTunableSecrets;
 import org.graylog2.configuration.tunables.RuntimeTunableService;
 import org.graylog2.configuration.tunables.TunableValidator;
 import org.graylog2.events.ClusterEventBus;
@@ -114,7 +115,7 @@ class ClusterConfigResourceTest {
         final var validator = new TunableValidator(objectMapper, new ClusterConfigValidatorService(Map.of()));
         final var registry = new RuntimeTunableRegistry(Set.of(LegacyTunable.class, RestrictedLegacyTunable.class),
                 CoreRuntimeTunableFeatures.ALL, factory(objectMapper));
-        final var tunableService = new RuntimeTunableService(clusterConfigService, validator, clusterEventBus, nodeId);
+        final var tunableService = new RuntimeTunableService(clusterConfigService, validator, new RuntimeTunableSecrets(objectMapper), clusterEventBus, nodeId);
         final Subject subject = mock(Subject.class, withSettings().strictness(Strictness.LENIENT));
         when(subject.isPermitted(anyString())).thenAnswer(invocation -> Set.of(permissions).contains(invocation.<String>getArgument(0)));
         return new ClusterConfigResource(clusterConfigService,

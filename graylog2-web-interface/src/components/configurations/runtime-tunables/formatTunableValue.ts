@@ -31,6 +31,8 @@ const formatTunableValue = (schema: TunableSchema, value: unknown): string => {
       return value ? 'Enabled' : 'Disabled';
     case 'enum':
       return enumLabel(actual, String(value));
+    case 'secret':
+      return (value as { is_set?: boolean }).is_set ? 'Configured' : 'Not set';
     case 'duration': {
       const split = splitDuration(String(value), actual['x-graylog-units'] ?? DEFAULT_UNITS);
 

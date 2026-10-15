@@ -52,6 +52,7 @@ const schema: TunableSchema = {
       'x-graylog-order': 4,
     },
     note: { type: ['string', 'null'], title: 'Note', 'x-graylog-order': 5 },
+    token: { type: 'string', format: 'password', 'x-graylog-secret': true, title: 'API token', 'x-graylog-order': 6 },
     hidden: {
       type: 'string',
       title: 'Hidden detail',
@@ -74,6 +75,7 @@ const initialValues: TunableValues = {
   mode: 'FAST',
   grace: 'PT90M',
   note: null,
+  token: { keep_value: true },
   hidden: '',
   retries: null,
   storage: 'gcs',
@@ -172,6 +174,39 @@ describe('runtime tunable fields', () => {
 
     await screen.findByRole('button', { name: /save/i });
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ storage: null }), expect.anything());
+  });
+
+  it('keeps configured secrets unless changed', async () => {
+    const onSubmit = renderForm();
+
+    await submit();
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ token: { keep_value: true } }),
+      expect.anything(),
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /change api token/i }));
+    await userEvent.type(screen.getByLabelText(/api token/i, { selector: 'input' }), 's3cr3t');
+    await submit();
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ token: { set_value: 's3cr3t' } }),
+      expect.anything(),
+    );
+  });
+
+  it('can clear a configured secret', async () => {
+    const onSubmit = renderForm();
+
+    await userEvent.click(await screen.findByRole('button', { name: /remove api token/i }));
+    await submit();
+
+    await screen.findByRole('button', { name: /save/i });
+    expect(onSubmit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ token: { delete_value: true } }),
+      expect.anything(),
+    );
   });
 
   it('shows validation errors next to fields', async () => {

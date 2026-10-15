@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
 import org.junit.jupiter.api.Test;
@@ -84,7 +85,8 @@ class RuntimeTunableSchemaGeneratorTest {
     public record Nullables(
             @JsonProperty("limit") @TunableField(label = "Limit") @Nullable Integer limit,
             @JsonProperty("storage") @TunableField(label = "Storage") Optional<Mode> storage,
-            @JsonProperty("note") @TunableField(label = "Note") Optional<String> note) {}
+            @JsonProperty("note") @TunableField(label = "Note") Optional<String> note,
+            @JsonProperty("secret") @TunableField(label = "Secret") EncryptedValue secret) {}
 
     public record Inner(@JsonProperty("name") String name) {}
 
@@ -145,13 +147,19 @@ class RuntimeTunableSchemaGeneratorTest {
     }
 
     @Test
-    void generatesNullableScalars() throws Exception {
+    void generatesNullableScalarsAndSecrets() throws Exception {
         final ObjectNode schema = generator.generate(Nullables.class);
 
         assertThat(schema.toString()).doesNotContain("$ref").doesNotContain("$defs");
         assertThat(property(schema, "limit").path("type")).extracting(JsonNode::asText).containsExactlyInAnyOrder("integer", "null");
         assertThat(property(schema, "storage").toString()).contains("FAST").contains("null");
         assertThat(property(schema, "note").toString()).contains("string").contains("null");
+
+        final var secret = property(schema, "secret");
+        assertThat(secret.path("type").asText()).isEqualTo("string");
+        assertThat(secret.path("format").asText()).isEqualTo("password");
+        assertThat(secret.path("writeOnly").asBoolean()).isTrue();
+        assertThat(secret.path("x-graylog-secret").asBoolean()).isTrue();
     }
 
     @Test

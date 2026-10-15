@@ -31,6 +31,7 @@ import org.graylog2.configuration.tunables.RuntimeTunableDescriptorFactory;
 import org.graylog2.configuration.tunables.RuntimeTunableFeature;
 import org.graylog2.configuration.tunables.RuntimeTunableRegistry;
 import org.graylog2.configuration.tunables.RuntimeTunableSchemaGenerator;
+import org.graylog2.configuration.tunables.RuntimeTunableSecrets;
 import org.graylog2.configuration.tunables.RuntimeTunableService;
 import org.graylog2.configuration.tunables.TunableValidator;
 import org.graylog2.events.ClusterEventBus;
@@ -38,6 +39,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.validate.ClusterConfigValidatorService;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +74,13 @@ class RuntimeTunablesResourceTest {
         }
     }
 
+    @RuntimeTunable(id = "test.with_secret", feature = "alpha", title = "With secret")
+    public record WithSecret(@JsonProperty("token") EncryptedValue token) {
+        public static WithSecret defaults() {
+            return new WithSecret(EncryptedValue.createUnset());
+        }
+    }
+
     @Mock
     private ClusterConfigService clusterConfigService;
     @Mock
@@ -87,10 +96,10 @@ class RuntimeTunablesResourceTest {
     @BeforeEach
     void setUp() {
         final var validator = new TunableValidator(objectMapper, new ClusterConfigValidatorService(Map.of()));
-        final var registry = new RuntimeTunableRegistry(Set.of(Open.class, Restricted.class),
+        final var registry = new RuntimeTunableRegistry(Set.of(Open.class, Restricted.class, WithSecret.class),
                 Set.of(new RuntimeTunableFeature("alpha", "Alpha", 1), new RuntimeTunableFeature("empty", "Empty", 2)),
                 new RuntimeTunableDescriptorFactory(new RuntimeTunableSchemaGenerator(objectMapper), validator, objectMapper));
-        final var service = new RuntimeTunableService(clusterConfigService, validator, clusterEventBus, nodeId);
+        final var service = new RuntimeTunableService(clusterConfigService, validator, new RuntimeTunableSecrets(objectMapper), clusterEventBus, nodeId);
         resource = new RuntimeTunablesResource(registry, service, objectMapper) {
             @Override
             protected Subject getSubject() {
@@ -107,7 +116,7 @@ class RuntimeTunablesResourceTest {
         final RuntimeTunablesResponse response = resource.list();
 
         assertThat(response.features()).extracting(RuntimeTunableFeatureSummary::id).containsExactly("alpha", "empty");
-        assertThat(response.features()).extracting(RuntimeTunableFeatureSummary::tunableCount).containsExactly(1, 0);
+        assertThat(response.features()).extracting(RuntimeTunableFeatureSummary::tunableCount).containsExactly(2, 0);
     }
 
     @Test
@@ -116,7 +125,7 @@ class RuntimeTunablesResourceTest {
 
         assertThat(response.id()).isEqualTo("alpha");
         final var tunables = response.tunables();
-        assertThat(tunables).extracting(RuntimeTunableResponse::id).containsExactly("test.open");
+        assertThat(tunables).extracting(RuntimeTunableResponse::id).containsExactly("test.open", "test.with_secret");
         assertThat(tunables.get(0).value()).isEqualTo(new Open(5));
         assertThat(tunables.get(0).defaults()).isEqualTo(new Open(5));
         assertThat(tunables.get(0).isDefault()).isTrue();
@@ -127,12 +136,12 @@ class RuntimeTunablesResourceTest {
     }
 
     @Test
-    void serializesSnakeCaseFlags() throws Exception {
-        assertThat(objectMapper.writeValueAsString(resource.list())).contains("\"tunable_count\":1");
+    void serializesSnakeCaseFlagsAndMasksSecrets() throws Exception {
+        assertThat(objectMapper.writeValueAsString(resource.list())).contains("\"tunable_count\":2");
 
         final String json = objectMapper.writeValueAsString(resource.getFeature("alpha"));
 
-        assertThat(json).contains("\"is_default\":true").contains("\"can_edit\":true");
+        assertThat(json).contains("\"is_default\":true").contains("\"can_edit\":true").contains("\"token\":{\"is_set\":false}");
     }
 
     @Test

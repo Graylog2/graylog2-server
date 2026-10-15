@@ -31,6 +31,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.jsonschema.GraylogSchemaGeneratorConfig;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.joda.time.Period;
 import org.threeten.extra.PeriodDuration;
 
@@ -69,6 +70,13 @@ public class RuntimeTunableSchemaGenerator {
                     final Class<?> raw = javaType.getErasedType();
                     if (DURATION_TYPES.contains(raw)) {
                         return new CustomDefinition(objectMapper.createObjectNode().put("type", "string").put("format", "duration"));
+                    }
+                    if (raw == EncryptedValue.class) {
+                        return new CustomDefinition(objectMapper.createObjectNode()
+                                .put("type", "string")
+                                .put("format", "password")
+                                .put("writeOnly", true)
+                                .put("x-graylog-secret", true));
                     }
                     return null;
                 });

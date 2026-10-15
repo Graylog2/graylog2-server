@@ -71,7 +71,7 @@ final class RuntimeTunableSchemaChecker {
         final Set<String> types = new HashSet<>(types(value));
         types.remove("null");
         if (types.size() != 1 || !SCALAR_TYPES.contains(types.iterator().next()) || value.has("oneOf")) {
-            throw new UnsupportedTunableSchemaException(f("\"%s\" must be a boolean, number, string, enum or duration, but is: %s", name, node));
+            throw new UnsupportedTunableSchemaException(f("\"%s\" must be a boolean, number, string, enum, duration or secret, but is: %s", name, node));
         }
     }
 

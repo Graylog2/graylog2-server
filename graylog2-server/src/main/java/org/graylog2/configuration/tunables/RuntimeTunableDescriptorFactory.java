@@ -17,10 +17,12 @@
 package org.graylog2.configuration.tunables;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.encryption.EncryptedValue;
 
 import java.util.List;
 import java.util.Set;
@@ -76,6 +78,15 @@ public class RuntimeTunableDescriptorFactory {
             throw new InvalidRuntimeTunableException(f("Runtime tunable %s: schema and JSON properties differ: %s", name, mismatches));
         }
 
+        final List<String> optionalSecrets = jacksonProperties.properties(type).stream()
+                .filter(property -> property.getPrimaryType().isReferenceType()
+                        && property.getPrimaryType().getContentType().getRawClass() == EncryptedValue.class)
+                .map(BeanPropertyDefinition::getName)
+                .toList();
+        if (!optionalSecrets.isEmpty()) {
+            throw new InvalidRuntimeTunableException(f("Runtime tunable %s: secrets must not be optional, use EncryptedValue.createUnset() instead: %s",
+                    name, optionalSecrets));
+        }
 
         final Object defaults;
         try {

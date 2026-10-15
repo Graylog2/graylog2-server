@@ -17,7 +17,7 @@
 
 import type { Condition, TunableSchema } from './types';
 
-export type FieldKind = 'boolean' | 'integer' | 'number' | 'string' | 'enum' | 'duration';
+export type FieldKind = 'boolean' | 'integer' | 'number' | 'string' | 'enum' | 'duration' | 'secret';
 
 const isNullType = (schema: TunableSchema) => schema.type === 'null';
 
@@ -42,6 +42,9 @@ export const nonNullSchema = (schema: TunableSchema): TunableSchema => {
 
 export const fieldKind = (schema: TunableSchema): FieldKind => {
   const actual = nonNullSchema(schema);
+  if (actual['x-graylog-secret']) {
+    return 'secret';
+  }
   if (actual.enum) {
     return 'enum';
   }

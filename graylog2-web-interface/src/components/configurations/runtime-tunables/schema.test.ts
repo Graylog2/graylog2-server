@@ -33,6 +33,7 @@ describe('schema helpers', () => {
     [{ type: ['integer', 'null'] }, 'integer'],
     [{ type: 'string', enum: ['A', 'B'] }, 'enum'],
     [{ type: 'string', format: 'duration' }, 'duration'],
+    [{ type: 'string', format: 'password', 'x-graylog-secret': true }, 'secret'],
     [{ anyOf: [{ type: 'null' }, { type: 'string', enum: ['s3'] }], title: 'Cloud' }, 'enum'],
   ])('detects %j as %s', (schema, kind) => {
     expect(fieldKind(schema)).toBe(kind);

@@ -25,6 +25,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.validate.ClusterConfigValidatorService;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,6 +55,13 @@ class RuntimeTunableServiceTest {
         }
     }
 
+    @RuntimeTunable(id = "test.secret", feature = "search", title = "Secret")
+    public record WithSecret(@JsonProperty("name") String name, @JsonProperty("token") EncryptedValue token) {
+        public static WithSecret defaults() {
+            return new WithSecret("default", EncryptedValue.createUnset());
+        }
+    }
+
     @Mock
     private ClusterConfigService clusterConfigService;
     @Mock
@@ -60,6 +70,7 @@ class RuntimeTunableServiceTest {
     private NodeId nodeId;
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final EncryptedValue storedToken = new EncryptedValueService(UUID.randomUUID().toString()).encrypt("s3cr3t");
     private RuntimeTunableService service;
     private RuntimeTunableDescriptorFactory factory;
 
@@ -67,11 +78,17 @@ class RuntimeTunableServiceTest {
     void setUp() {
         final var validator = new TunableValidator(objectMapper, new ClusterConfigValidatorService(Map.of()));
         factory = new RuntimeTunableDescriptorFactory(new RuntimeTunableSchemaGenerator(objectMapper), validator, objectMapper);
-        service = new RuntimeTunableService(clusterConfigService, validator, clusterEventBus, nodeId);
+        service = new RuntimeTunableService(clusterConfigService, validator, new RuntimeTunableSecrets(objectMapper), clusterEventBus, nodeId);
     }
 
     private RuntimeTunableDescriptor descriptor(Class<?> type) throws Exception {
         return factory.create(type, Set.of("search"));
+    }
+
+    private WithSecret writtenSecretConfig() {
+        final var written = ArgumentCaptor.forClass(Object.class);
+        verify(clusterConfigService).write(written.capture());
+        return (WithSecret) written.getValue();
     }
 
     @Test
@@ -98,6 +115,46 @@ class RuntimeTunableServiceTest {
     }
 
     @Test
+    void keepValueKeepsStoredSecret() throws Exception {
+        when(clusterConfigService.get(WithSecret.class)).thenReturn(new WithSecret("old", storedToken));
+
+        service.update(descriptor(WithSecret.class), new WithSecret("new", EncryptedValue.createWithKeepValue()));
+
+        final WithSecret saved = writtenSecretConfig();
+        assertThat(saved.name()).isEqualTo("new");
+        assertThat(saved.token().value()).isEqualTo(storedToken.value());
+        assertThat(saved.token().salt()).isEqualTo(storedToken.salt());
+        assertThat(saved.token().isKeepValue()).isFalse();
+    }
+
+    @Test
+    void keepValueWithoutStoredConfigIsUnset() throws Exception {
+        service.update(descriptor(WithSecret.class), new WithSecret("new", EncryptedValue.createWithKeepValue()));
+
+        assertThat(writtenSecretConfig().token().isSet()).isFalse();
+    }
+
+    @Test
+    void deleteValueClearsSecret() throws Exception {
+        when(clusterConfigService.get(WithSecret.class)).thenReturn(new WithSecret("old", storedToken));
+
+        service.update(descriptor(WithSecret.class), new WithSecret("old", EncryptedValue.createWithDeleteValue()));
+
+        final WithSecret saved = writtenSecretConfig();
+        assertThat(saved.token().isSet()).isFalse();
+        assertThat(saved.token().isDeleteValue()).isFalse();
+    }
+
+    @Test
+    void secretsAreMaskedInApiSerialization() throws Exception {
+        when(clusterConfigService.get(WithSecret.class)).thenReturn(new WithSecret("old", storedToken));
+
+        final String json = objectMapper.writeValueAsString(service.read(descriptor(WithSecret.class)).value());
+
+        assertThat(json).contains("\"is_set\":true").doesNotContain(storedToken.value());
+    }
+
+    @Test
     void resetRemovesAndPostsChangeEvent() throws Exception {
         when(nodeId.getNodeId()).thenReturn("node-1");
 
@@ -109,5 +166,23 @@ class RuntimeTunableServiceTest {
         verify(clusterEventBus).post(event.capture());
         assertThat(event.getValue().type()).isEqualTo(Limit.class.getCanonicalName());
         assertThat(event.getValue().nodeId()).isEqualTo("node-1");
+    }
+
+    @RuntimeTunable(id = "test.unannotated_secret", feature = "search", title = "Unannotated secret")
+    public record UnannotatedSecret(String displayName, EncryptedValue apiKey) {
+        public static UnannotatedSecret defaults() {
+            return new UnannotatedSecret("default", EncryptedValue.createUnset());
+        }
+    }
+
+    @Test
+    void keepValueWorksWithoutExplicitJsonNames() throws Exception {
+        when(clusterConfigService.get(UnannotatedSecret.class)).thenReturn(new UnannotatedSecret("old", storedToken));
+
+        service.update(descriptor(UnannotatedSecret.class), new UnannotatedSecret("new", EncryptedValue.createWithKeepValue()));
+
+        final var written = ArgumentCaptor.forClass(Object.class);
+        verify(clusterConfigService).write(written.capture());
+        assertThat(((UnannotatedSecret) written.getValue()).apiKey().value()).isEqualTo(storedToken.value());
     }
 }

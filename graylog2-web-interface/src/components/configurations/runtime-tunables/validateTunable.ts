@@ -62,7 +62,7 @@ const validateValue = (schema: TunableSchema, value: unknown): string | undefine
     if (kind === 'string') {
       return value === '' ? validateString(nonNullSchema(schema), value) : undefined;
     }
-    if (!isNullable(schema)) {
+    if (!isNullable(schema) && kind !== 'secret') {
       return kind === 'integer' || kind === 'number' ? 'Must be a number' : 'Required';
     }
 

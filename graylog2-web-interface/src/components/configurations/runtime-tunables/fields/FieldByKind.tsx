@@ -19,6 +19,7 @@ import * as React from 'react';
 
 import ScalarField from './ScalarField';
 import DurationField from './DurationField';
+import SecretField from './SecretField';
 
 import { fieldKind } from '../schema';
 import type { RuntimeTunableFieldProps } from '../types';
@@ -27,6 +28,8 @@ const FieldByKind = (props: RuntimeTunableFieldProps) => {
   switch (fieldKind(props.schema)) {
     case 'duration':
       return <DurationField {...props} />;
+    case 'secret':
+      return <SecretField {...props} />;
     default:
       return <ScalarField {...props} />;
   }

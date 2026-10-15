@@ -35,16 +35,19 @@ public class RuntimeTunableService {
 
     private final ClusterConfigService clusterConfigService;
     private final TunableValidator validator;
+    private final RuntimeTunableSecrets secrets;
     private final ClusterEventBus clusterEventBus;
     private final NodeId nodeId;
 
     @Inject
     public RuntimeTunableService(ClusterConfigService clusterConfigService,
                                  TunableValidator validator,
+                                 RuntimeTunableSecrets secrets,
                                  ClusterEventBus clusterEventBus,
                                  NodeId nodeId) {
         this.clusterConfigService = clusterConfigService;
         this.validator = validator;
+        this.secrets = secrets;
         this.clusterEventBus = clusterEventBus;
         this.nodeId = nodeId;
     }
@@ -55,12 +58,14 @@ public class RuntimeTunableService {
     }
 
     public Object update(RuntimeTunableDescriptor descriptor, Object config) {
-        final ValidationResult result = validator.validate(descriptor.type(), descriptor.schema(), config);
+        final Object stored = clusterConfigService.get(descriptor.type());
+        final Object prepared = secrets.resolve(descriptor, config, stored);
+        final ValidationResult result = validator.validate(descriptor.type(), descriptor.schema(), prepared);
         if (result.failed()) {
             throw new ValidationFailureException(result, f("Invalid runtime tunable \"%s\"", descriptor.id()));
         }
-        clusterConfigService.write(config);
-        return config;
+        clusterConfigService.write(prepared);
+        return prepared;
     }
 
     public void reset(RuntimeTunableDescriptor descriptor) {
