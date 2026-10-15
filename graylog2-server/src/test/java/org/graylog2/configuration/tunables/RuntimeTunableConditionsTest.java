@@ -50,4 +50,17 @@ class RuntimeTunableConditionsTest {
 
         assertThat(RuntimeTunableConditions.inactivePaths(schema, mapper.readTree("{\"enabled\":true,\"path\":\"\"}"))).isEmpty();
     }
+
+    @Test
+    void activeWhenAnyConditionMatches() throws Exception {
+        final var schema = mapper.readTree("""
+                {"type":"object","properties":{"a":{"type":"boolean"},"b":{"type":"boolean"},
+                 "detail":{"type":"boolean","x-graylog-enabled-when-any":[
+                   {"property":"a","in":["true"]},{"property":"b","in":["true"]}]}}}
+                """);
+
+        assertThat(RuntimeTunableConditions.inactivePaths(schema, mapper.readTree("{\"a\":false,\"b\":true,\"detail\":true}"))).isEmpty();
+        assertThat(RuntimeTunableConditions.inactivePaths(schema, mapper.readTree("{\"a\":false,\"b\":false,\"detail\":true}")))
+                .containsExactly("detail");
+    }
 }

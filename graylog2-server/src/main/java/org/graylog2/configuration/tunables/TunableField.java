@@ -37,11 +37,17 @@ public @interface TunableField {
     /** All conditions must match for the field to be editable. */
     When[] enabledWhen() default {};
 
+    /** At least one condition must match for the field to be editable. */
+    When[] enabledWhenAny() default {};
+
     /** All conditions must match for the field to be shown. */
     When[] visibleWhen() default {};
 
     /** Restricts the values offered for an enum field. */
     String[] allowedValues() default {};
+
+    /** Display format of a numeric field. */
+    TunableFormat format() default TunableFormat.NONE;
 
     /** Hides the field in the UI while keeping its value. */
     boolean hidden() default false;

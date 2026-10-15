@@ -31,6 +31,7 @@ public final class RuntimeTunableConditions {
         for (Map.Entry<String, JsonNode> property : schema.path("properties").properties()) {
             final JsonNode propertySchema = property.getValue();
             if (!matches(propertySchema.path("x-graylog-enabled-when"), value)
+                    || !matchesAny(propertySchema.path("x-graylog-enabled-when-any"), value)
                     || !matches(propertySchema.path("x-graylog-visible-when"), value)) {
                 result.add(property.getKey());
             }
@@ -45,6 +46,18 @@ public final class RuntimeTunableConditions {
             }
         }
         return true;
+    }
+
+    private static boolean matchesAny(JsonNode conditions, JsonNode siblings) {
+        if (conditions.isEmpty()) {
+            return true;
+        }
+        for (JsonNode condition : conditions) {
+            if (matchesCondition(condition, siblings)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean matchesCondition(JsonNode condition, JsonNode siblings) {

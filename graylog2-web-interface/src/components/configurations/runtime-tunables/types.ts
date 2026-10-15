@@ -38,6 +38,7 @@ export type TunableSchema = {
   'x-graylog-order'?: number;
   'x-graylog-units'?: Array<DurationUnit>;
   'x-graylog-enabled-when'?: Array<Condition>;
+  'x-graylog-enabled-when-any'?: Array<Condition>;
   'x-graylog-visible-when'?: Array<Condition>;
   'x-graylog-hidden'?: boolean;
   'x-graylog-secret'?: boolean;

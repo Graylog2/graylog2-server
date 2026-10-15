@@ -21,6 +21,7 @@ import {
   enumLabel,
   fieldKind,
   isNullable,
+  isActive,
   isVisible,
   nonNullSchema,
   orderedProperties,
@@ -71,6 +72,19 @@ describe('schema helpers', () => {
 
     expect(enumLabel(schema, 'A')).toBe('Alpha');
     expect(enumLabel(schema, 'B')).toBe('B');
+  });
+
+  it('activates fields when any of their conditions matches', () => {
+    const schema: TunableSchema = {
+      type: 'boolean',
+      'x-graylog-enabled-when-any': [
+        { property: 'a', in: ['true'] },
+        { property: 'b', in: ['true'] },
+      ],
+    };
+
+    expect(isActive(schema, { a: false, b: true })).toBe(true);
+    expect(isActive(schema, { a: false, b: false })).toBe(false);
   });
 
   it('hides fields marked as hidden', () => {

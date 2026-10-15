@@ -44,10 +44,11 @@ class RuntimeTunableSchemaGeneratorTest {
     public enum Mode {FAST, SAFE}
 
     public record Flat(
-            @JsonProperty("min_length") @TunableField(label = "Minimum length", help = "Characters", order = 1) @Min(1) @Max(128) int minLength,
+            @JsonProperty("min_length") @TunableField(label = "Minimum length", help = "Characters", order = 1, format = TunableFormat.BYTES) @Min(1) @Max(128) int minLength,
             @JsonProperty("enabled") @TunableField(label = "Enabled", order = 2) boolean enabled,
             @JsonProperty("grace_period") @TunableField(label = "Grace period", minUnit = ChronoUnit.MINUTES,
-                    enabledWhen = @When(property = "enabled", in = "true")) Duration gracePeriod,
+                    enabledWhen = @When(property = "enabled", in = "true"),
+                    enabledWhenAny = {@When(property = "enabled", in = "true"), @When(property = "mode", in = "SAFE")}) Duration gracePeriod,
             @JsonProperty("mode") @TunableField(label = "Mode") Mode mode) {
         public static final String SOME_CONSTANT = "ignored";
     }
@@ -123,6 +124,7 @@ class RuntimeTunableSchemaGeneratorTest {
         assertThat(minLength.path("minimum").asInt()).isEqualTo(1);
         assertThat(minLength.path("maximum").asInt()).isEqualTo(128);
         assertThat(minLength.path("x-graylog-order").asInt()).isEqualTo(1);
+        assertThat(minLength.path("format").asText()).isEqualTo("bytes");
 
         final var gracePeriod = property(schema, "grace_period");
         assertThat(gracePeriod.path("type").asText()).isEqualTo("string");
@@ -130,6 +132,8 @@ class RuntimeTunableSchemaGeneratorTest {
         assertThat(gracePeriod.path("x-graylog-units")).extracting(JsonNode::asText).containsExactly("minutes", "hours", "days");
         assertThat(gracePeriod.path("x-graylog-enabled-when").get(0).path("property").asText()).isEqualTo("enabled");
         assertThat(gracePeriod.path("x-graylog-enabled-when").get(0).path("in")).extracting(JsonNode::asText).containsExactly("true");
+        assertThat(gracePeriod.path("x-graylog-enabled-when-any")).extracting(condition -> condition.path("property").asText())
+                .containsExactly("enabled", "mode");
 
         assertThat(property(schema, "mode").path("enum")).extracting(JsonNode::asText).containsExactly("FAST", "SAFE");
     }
@@ -261,5 +265,20 @@ class RuntimeTunableSchemaGeneratorTest {
         assertThat(property(schema, "vendor").toString()).contains("\"enum\":[\"IPINFO\"]");
         assertThatThrownBy(() -> generator.generate(AllowedValuesOnString.class))
                 .isInstanceOf(UnsupportedTunableSchemaException.class).hasMessageContaining("allowedValues");
+    }
+
+    public record NullableBytes(@JsonProperty("size") @TunableField(label = "Size", format = TunableFormat.BYTES) @Nullable Long size) {}
+
+    public record BytesOnString(@JsonProperty("size") @TunableField(label = "Size", format = TunableFormat.BYTES) String size) {}
+
+    public record BytesOnDuration(@JsonProperty("size") @TunableField(label = "Size", format = TunableFormat.BYTES) Duration size) {}
+
+    @Test
+    void appliesFormatToNumericFieldsOnly() throws Exception {
+        assertThat(property(generator.generate(NullableBytes.class), "size").path("format").asText()).isEqualTo("bytes");
+        assertThatThrownBy(() -> generator.generate(BytesOnString.class))
+                .isInstanceOf(UnsupportedTunableSchemaException.class).hasMessageContaining("requires a numeric field");
+        assertThatThrownBy(() -> generator.generate(BytesOnDuration.class))
+                .isInstanceOf(UnsupportedTunableSchemaException.class).hasMessageContaining("requires a numeric field");
     }
 }

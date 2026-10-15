@@ -30,7 +30,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 final class RuntimeTunableSchemaChecker {
     private static final Set<String> SCALAR_TYPES = Set.of("boolean", "integer", "number", "string");
-    private static final List<String> CONDITION_KEYS = List.of("x-graylog-enabled-when", "x-graylog-visible-when");
+    private static final List<String> CONDITION_KEYS = List.of("x-graylog-enabled-when", "x-graylog-enabled-when-any", "x-graylog-visible-when");
 
     private RuntimeTunableSchemaChecker() {
     }

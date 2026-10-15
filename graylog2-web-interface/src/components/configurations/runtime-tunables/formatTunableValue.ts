@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import NumberUtils from 'util/NumberUtils';
+
 import type { TunableSchema } from './types';
 import { enumLabel, fieldKind, nonNullSchema } from './schema';
 import { DEFAULT_UNITS, splitDuration } from './duration';
@@ -31,6 +33,9 @@ const formatTunableValue = (schema: TunableSchema, value: unknown): string => {
       return value ? 'Enabled' : 'Disabled';
     case 'enum':
       return enumLabel(actual, String(value));
+    case 'integer':
+    case 'number':
+      return actual.format === 'bytes' ? NumberUtils.formatBytes(Number(value)) : String(value);
     case 'secret':
       return (value as { is_set?: boolean }).is_set ? 'Configured' : 'Not set';
     case 'duration': {

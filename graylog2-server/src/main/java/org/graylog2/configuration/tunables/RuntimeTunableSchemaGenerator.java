@@ -41,6 +41,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -53,6 +54,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class RuntimeTunableSchemaGenerator {
     public static final Set<Class<?>> DURATION_TYPES = Set.of(Duration.class, Period.class, PeriodDuration.class);
     private static final String ALLOWED_VALUES = "x-graylog-allowed-values";
+    private static final String FORMAT = "x-graylog-format";
+    private static final Set<String> NUMERIC_TYPES = Set.of("integer", "number");
     private static final List<ChronoUnit> DURATION_UNITS = List.of(ChronoUnit.SECONDS, ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS);
 
     private final ObjectMapper objectMapper;
@@ -125,11 +128,17 @@ public class RuntimeTunableSchemaGenerator {
         if (field.enabledWhen().length > 0) {
             node.set("x-graylog-enabled-when", conditions(field.enabledWhen()));
         }
+        if (field.enabledWhenAny().length > 0) {
+            node.set("x-graylog-enabled-when-any", conditions(field.enabledWhenAny()));
+        }
         if (field.visibleWhen().length > 0) {
             node.set("x-graylog-visible-when", conditions(field.visibleWhen()));
         }
         if (field.hidden()) {
             node.put("x-graylog-hidden", true);
+        }
+        if (field.format() != TunableFormat.NONE) {
+            node.put(FORMAT, field.format().schemaValue());
         }
         if (field.allowedValues().length > 0) {
             final ArrayNode allowed = node.putArray(ALLOWED_VALUES);
@@ -158,8 +167,32 @@ public class RuntimeTunableSchemaGenerator {
                 object.remove(ALLOWED_VALUES).forEach(value -> allowed.add(value.asText()));
                 restrictEnum(object, allowed);
             }
+            if (object.has(FORMAT)) {
+                applyFormat(object, object.remove(FORMAT).asText());
+            }
         }
         node.forEach(this::applyFieldExtensions);
+    }
+
+    private static void applyFormat(ObjectNode node, String format) {
+        final JsonNode valueSchema = node.has("anyOf")
+                ? StreamSupport.stream(node.get("anyOf").spliterator(), false)
+                        .filter(branch -> !"null".equals(branch.path("type").asText()))
+                        .findFirst()
+                        .orElse(node)
+                : node;
+        final Set<String> types = new HashSet<>();
+        if (valueSchema.path("type").isArray()) {
+            valueSchema.get("type").forEach(type -> types.add(type.asText()));
+        } else {
+            types.add(valueSchema.path("type").asText());
+        }
+        types.remove("null");
+        if (valueSchema.has("format") || types.size() != 1 || !NUMERIC_TYPES.containsAll(types)) {
+            node.put("x-graylog-unsupported", f("format \"%s\" requires a numeric field without another format", format));
+            return;
+        }
+        ((ObjectNode) valueSchema).put("format", format);
     }
 
     private void restrictEnum(ObjectNode node, List<String> allowed) {

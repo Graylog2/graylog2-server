@@ -24,4 +24,9 @@ describe('formatTunableValue', () => {
     expect(formatTunableValue(schema, 's3')).toBe('s3');
     expect(formatTunableValue(schema, null)).toBe('Not set');
   });
+
+  it('formats byte sizes', () => {
+    expect(formatTunableValue({ type: 'integer', format: 'bytes' }, 10737418240)).toBe('10.0GiB');
+    expect(formatTunableValue({ type: 'integer' }, 42)).toBe('42');
+  });
 });
