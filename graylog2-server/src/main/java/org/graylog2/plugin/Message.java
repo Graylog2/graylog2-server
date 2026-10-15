@@ -856,13 +856,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     /**
-     * Assign the given stream to this message.
+     * Assign the given stream to this message. An already assigned instance of the same stream is replaced.
      *
      * @param stream the stream to route this message into
      */
     public void addStream(Stream stream) {
+        final boolean replaced = streams.removeIf(s -> s != stream && isSameStream(s, stream));
+        if (replaced) {
+            rebuildIndexSets();
+        }
         indexSets.add(stream.getIndexSet());
-        if (streams.add(stream)) {
+        if (streams.add(stream) && !replaced) {
             sizeCounter.inc(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
@@ -888,13 +892,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * @return <tt>true</tt> if this message was assigned to the stream
      */
     public boolean removeStream(Stream stream) {
-        final boolean removed = streams.remove(stream);
+        final boolean removed = streams.removeIf(s -> isSameStream(s, stream));
 
         if (removed) {
-            indexSets.clear();
-            for (Stream s : streams) {
-                indexSets.add(s.getIndexSet());
-            }
+            rebuildIndexSets();
             sizeCounter.dec(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
@@ -902,6 +903,19 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
 
         return removed;
+    }
+
+    // Stream instances from different caches can differ in value (e.g. index set config) while representing the same stream.
+    private static boolean isSameStream(Stream a, Stream b) {
+        final String id = a.getId();
+        return id != null ? id.equals(b.getId()) : a.equals(b);
+    }
+
+    private void rebuildIndexSets() {
+        indexSets.clear();
+        for (Stream s : streams) {
+            indexSets.add(s.getIndexSet());
+        }
     }
 
     /**
