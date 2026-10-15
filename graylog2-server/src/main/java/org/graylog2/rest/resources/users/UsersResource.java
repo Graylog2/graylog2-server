@@ -801,6 +801,7 @@ public class UsersResource extends RestResource {
             } else {
                 userManagementService.changePassword(user, cr.password());
             }
+            terminateSessions(user);
         } else {
             throw new BadRequestException("Old password is missing or incorrect.");
         }
