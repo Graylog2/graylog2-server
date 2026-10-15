@@ -59,13 +59,31 @@ export type SetIndexSetFieldTypeProfileBodyJson = {
   profile_id: string;
 };
 
-export type SetIndexSetFieldTypeProfileBody = { indexSetId: string; rotated: boolean; profileId: string };
+export type SetIndexSetFieldTypeProfileBody = { indexSetIds: Array<string>; rotated: boolean; profileId: string };
 
-export type RemoveProfileFromIndexSetBody = { indexSetId: string; rotated: boolean };
+export type RemoveProfileFromIndexSetBody = { indexSetIds: Array<string>; rotated: boolean };
 export type RemoveProfileFromIndexSetBodyJson = {
   index_sets: Array<string>;
   rotate: boolean;
 };
+
+export type ProfileChangeResponseJson = Record<
+  string,
+  {
+    successfully_performed: number;
+    failures: Array<{ entity_id: string; failure_explanation: string }>;
+    errors: Array<string>;
+  }
+>;
+
+export type IndexSetProfileChangeResult = {
+  indexSetId: string;
+  applied: boolean;
+  failures: Array<string>;
+  errors: Array<string>;
+};
+
+export type ProfileChangeResponse = Record<string, IndexSetProfileChangeResult>;
 
 export type IndexSetFieldTypesQueryData = {
   list: Array<IndexSetFieldType>;
