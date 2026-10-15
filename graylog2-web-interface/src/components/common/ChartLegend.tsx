@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import ColorPicker from 'components/common/ColorPicker';
@@ -85,12 +86,13 @@ type EntryProps = {
 };
 
 const LegendEntry = ({ item: { key, label, color, title = key }, colorPicker = undefined }: EntryProps) => {
+  const { t } = useTranslation('aggregation');
   const [showPopover, setShowPopover] = useState(false);
 
   if (!colorPicker) {
     return (
       <Entry>
-        <ColorHint aria-label="Color Hint" $color={color} $clickable={false} />
+        <ColorHint aria-label={t('vis_common.color_hint')} $color={color} $clickable={false} />
         <Label>{label}</Label>
       </Entry>
     );
@@ -106,13 +108,13 @@ const LegendEntry = ({ item: { key, label, color, title = key }, colorPicker = u
       <Popover position="top" withArrow opened={showPopover}>
         <Popover.Target>
           <ColorHint
-            aria-label="Color Hint"
+            aria-label={t('vis_common.color_hint')}
             $color={color}
             $clickable
             onClick={() => setShowPopover((show) => !show)}
           />
         </Popover.Target>
-        <Popover.Dropdown title={`Configuration for ${title}`}>
+        <Popover.Dropdown title={t('vis_common.legend_configuration', { label: title })}>
           <ColorPicker color={color} colors={colorPicker.colors} onChange={onColorSelect} />
         </Popover.Dropdown>
       </Popover>

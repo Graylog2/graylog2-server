@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import capitalize from 'lodash/capitalize';
 
 import type {
   XYVisualizationConfigFormValues,
   XYVisualization,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import type { ConfigurationField, FieldUnitType, CustomField } from 'views/types';
 import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
@@ -52,7 +52,9 @@ export const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigForm
 const getUnitTypeFields = (): Array<CustomField> =>
   ['percent', 'time', 'size'].map((unitType: FieldUnitType) => ({
     name: `axisConfig.${unitType}`,
-    title: `Y-${capitalize(unitType)}`,
+    get title() {
+      return visT(`vis_common.y_axis_${unitType}`);
+    },
     id: unitType,
     type: 'custom',
     component: AxisVisualizationField,
@@ -70,12 +72,16 @@ export const fromAxisConfig = (config: XYVisualization) => ({
 const xyAxisConfigFields: Array<ConfigurationField> = [
   {
     name: 'showAxisLabels',
-    title: 'Show axis labels',
+    get title() {
+      return visT('vis_common.show_axis_labels');
+    },
     type: 'boolean',
   },
   {
     name: 'axisConfig.xaxis',
-    title: 'X-axis',
+    get title() {
+      return visT('vis_common.x_axis');
+    },
     type: 'custom',
     id: 'xaxis',
     component: AxisVisualizationField,
@@ -83,7 +89,9 @@ const xyAxisConfigFields: Array<ConfigurationField> = [
   },
   {
     name: `axisConfig.${DEFAULT_AXIS_KEY}`,
-    title: 'Y-Number',
+    get title() {
+      return visT('vis_common.y_axis_number');
+    },
     type: 'custom',
     id: 'number',
     component: AxisVisualizationField,

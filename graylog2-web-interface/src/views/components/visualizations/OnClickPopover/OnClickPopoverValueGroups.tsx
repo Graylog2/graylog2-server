@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -107,6 +108,7 @@ const GroupingActions = ({
 };
 
 const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotValues, setFieldData, config }: Props) => {
+  const { t } = useTranslation('aggregation');
   const showMultipleAction =
     (rowPivotValues.length ?? 0) + (columnPivotValues.length ?? 0) > 1 &&
     multipleValuesActionsSupportedVisualizations.includes(config.visualization);
@@ -115,11 +117,13 @@ const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotVal
     <StyledListGroup>
       {metricValue && (
         <>
-          <Label>Metric</Label>
+          <Label>{t('vis_popover.metric')}</Label>
           <Group group={[metricValue]} keyPrefix="metricValue" setFieldData={setFieldData} />
         </>
       )}
-      {!!(showMultipleAction || rowPivotValues?.length || columnPivotValues?.length) && <Label>Groupings</Label>}
+      {!!(showMultipleAction || rowPivotValues?.length || columnPivotValues?.length) && (
+        <Label>{t('vis_popover.groupings')}</Label>
+      )}
       {showMultipleAction && (
         <GroupingActions
           columnPivotValues={columnPivotValues}

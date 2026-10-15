@@ -23,7 +23,11 @@ import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from './Wid
 
 export type AggregationElement<T extends keyof WidgetConfigFormValues> = {
   sectionTitle?: string;
+  /** Translation key (namespace `aggregation`) of `sectionTitle`. */
+  sectionTitleKey?: string;
   title: string;
+  /** Translation key (namespace `aggregation`) of `title`, which stays English. */
+  titleKey?: string;
   key: keyof WidgetConfigFormValues;
   allowCreate: (formValues: WidgetConfigFormValues) => boolean;
   order: number;

@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { translatedOptions, visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import NumberVisualizationConfig, {
@@ -28,13 +30,26 @@ type NumberVisualizationConfigFormValues = {
   color_preference: 'TREND_ONLY' | 'FULL_WIDGET';
 };
 
+const TrendHelp = () => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <>
+      <p>{t('vis_number.trend_help_enabled')}</p>
+      <p>{t('vis_number.trend_help_previous')}</p>
+    </>
+  );
+};
+
 const singleNumber: VisualizationType<
   typeof NumberVisualization.type,
   NumberVisualizationConfig,
   NumberVisualizationConfigFormValues
 > = {
   type: NumberVisualization.type,
-  displayName: 'Single Number',
+  get displayName() {
+    return visT('vis_types.single_number');
+  },
   component: NumberVisualization,
   config: {
     createConfig: () => ({ color_preference: DEFAULT_COLOR_PREFERENCE }),
@@ -52,46 +67,36 @@ const singleNumber: VisualizationType<
     fields: [
       {
         name: 'trend',
-        title: 'Trend',
+        get title() {
+          return visT('vis_number.trend');
+        },
         type: 'boolean',
-        description: 'Show trend information for this number.',
-        helpComponent: () => (
-          <>
-            <p>
-              If the user enables trending, a separate box is shown below the current value, indicating the direction of
-              the change by an icon as well as the absolute and the relative differences between the current value and
-              the previous one.
-            </p>
-
-            <p>
-              The previous value is calculated by performing two searches in the background, which are completely
-              identical besides the timerange. The timerange of the first search is identical to the one configured for
-              this query/this widget, the second one is the same timerange, but with an offset of the timerange length
-              shifted to the past.
-            </p>
-          </>
-        ),
+        get description() {
+          return visT('vis_number.trend_description');
+        },
+        helpComponent: TrendHelp,
       },
       {
         name: 'trend_preference',
-        title: 'Trend Preference',
+        get title() {
+          return visT('vis_number.trend_preference');
+        },
         type: 'select',
-        options: [
-          ['Lower', 'LOWER'],
-          ['Neutral', 'NEUTRAL'],
-          ['Higher', 'HIGHER'],
-        ],
+        get options() {
+          return translatedOptions(['LOWER', 'NEUTRAL', 'HIGHER'], 'vis_number.trend_preferences');
+        },
         required: true,
         isShown: (formValues: NumberVisualizationConfigFormValues) => formValues?.trend === true,
       },
       {
         name: 'color_preference',
-        title: 'Highlight',
+        get title() {
+          return visT('vis_number.highlight');
+        },
         type: 'select',
-        options: [
-          ['Trend info only', 'TREND_ONLY'],
-          ['Entire widget', 'FULL_WIDGET'],
-        ],
+        get options() {
+          return translatedOptions(['TREND_ONLY', 'FULL_WIDGET'], 'vis_number.highlight_options');
+        },
         required: true,
         isShown: (formValues: NumberVisualizationConfigFormValues) =>
           formValues?.trend === true &&

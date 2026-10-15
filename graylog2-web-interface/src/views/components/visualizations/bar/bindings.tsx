@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { translatedOptions, visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig, {
@@ -38,7 +40,24 @@ export type BarVisualizationConfigFormValues = XYVisualizationConfigFormValues &
   axisType: AxisType;
 };
 
-const validate = hasAtLeastOneMetric('Bar chart');
+const BAR_MODES = ['group', 'stack', 'relative', 'overlay'] as const;
+
+const BarModeHelp = () => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <ul>
+      {BAR_MODES.map((mode) => (
+        <li key={mode}>
+          <h4>{t(`vis_bar.modes.${mode}`)}</h4>
+          {t(`vis_bar.mode_help.${mode}`)}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const validate = hasAtLeastOneMetric('vis_validation.bar_chart_requires_metric');
 
 const barChart: VisualizationType<
   typeof BarVisualization.type,
@@ -46,7 +65,9 @@ const barChart: VisualizationType<
   BarVisualizationConfigFormValues
 > = {
   type: BarVisualization.type,
-  displayName: 'Bar Chart',
+  get displayName() {
+    return visT('vis_types.bar_chart');
+  },
   component: BarVisualization,
   config: {
     createConfig: () => ({ barmode: DEFAULT_BARMODE, axisType: DEFAULT_AXIS_TYPE, axisConfig: DEFAULT_AXIS_CONFIG }),
@@ -64,54 +85,25 @@ const barChart: VisualizationType<
     fields: [
       {
         name: 'barmode',
-        title: 'Mode',
-        type: 'select',
-        options: [
-          ['Group', 'group'],
-          ['Stack', 'stack'],
-          ['Relative', 'relative'],
-          ['Overlay', 'overlay'],
-        ],
-        required: true,
-        helpComponent: () => {
-          const options = {
-            group: {
-              label: 'Group',
-              help: 'Every series is represented by its own bar in the chart.',
-            },
-            stack: {
-              label: 'Stack',
-              help: 'All series are stacked upon each other resulting in one bar.',
-            },
-            relative: {
-              label: 'Relative',
-              help: 'All series are stacked upon each other resulting in one chart. But negative series are placed below zero.',
-            },
-            overlay: {
-              label: 'Overlay',
-              help:
-                'All series are placed as bars upon each other. To be able to see the bars the opacity is reduced to 75%.' +
-                ' It is recommended to use this option with not more than 3 series.',
-            },
-          };
-
-          return (
-            <ul>
-              {Object.values(options).map(({ label, help }) => (
-                <li key={label}>
-                  <h4>{label}</h4>
-                  {help}
-                </li>
-              ))}
-            </ul>
-          );
+        get title() {
+          return visT('vis_bar.mode');
         },
+        type: 'select',
+        get options() {
+          return translatedOptions(BAR_MODES, 'vis_bar.modes');
+        },
+        required: true,
+        helpComponent: BarModeHelp,
       },
       {
         name: 'axisType',
-        title: 'Axis Type',
+        get title() {
+          return visT('vis_common.axis_type');
+        },
         type: 'select',
-        options: axisTypes,
+        get options() {
+          return translatedOptions(axisTypes, 'vis_common.axis_types');
+        },
         required: true,
       },
       ...xyAxisConfigFields,

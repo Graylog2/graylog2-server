@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { translatedOptions, visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -35,7 +36,7 @@ type LineVisualizationConfigFormValues = {
   showAxisLabels: boolean;
 };
 
-const validate = hasAtLeastOneMetric('Line chart');
+const validate = hasAtLeastOneMetric('vis_validation.line_chart_requires_metric');
 
 const lineChart: VisualizationType<
   typeof LineVisualization.type,
@@ -43,7 +44,9 @@ const lineChart: VisualizationType<
   LineVisualizationConfigFormValues
 > = {
   type: LineVisualization.type,
-  displayName: 'Line Chart',
+  get displayName() {
+    return visT('vis_types.line_chart');
+  },
   component: LineVisualization,
   config: {
     createConfig: () => ({
@@ -65,16 +68,24 @@ const lineChart: VisualizationType<
     fields: [
       {
         name: 'interpolation',
-        title: 'Interpolation',
+        get title() {
+          return visT('vis_common.interpolation');
+        },
         type: 'select',
-        options: interpolationTypes,
+        get options() {
+          return translatedOptions(interpolationTypes, 'vis_common.interpolation_types');
+        },
         required: true,
       },
       {
         name: 'axisType',
-        title: 'Axis Type',
+        get title() {
+          return visT('vis_common.axis_type');
+        },
         type: 'select',
-        options: axisTypes,
+        get options() {
+          return translatedOptions(axisTypes, 'vis_common.axis_types');
+        },
         required: true,
       },
       ...xyAxisConfigFields,

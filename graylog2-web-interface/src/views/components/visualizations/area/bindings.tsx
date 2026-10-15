@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { translatedOptions, visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
@@ -35,7 +36,7 @@ type AreaVisualizationConfigFormValues = {
   showAxisLabels: boolean;
 };
 
-const validate = hasAtLeastOneMetric('Area chart');
+const validate = hasAtLeastOneMetric('vis_validation.area_chart_requires_metric');
 
 const areaChart: VisualizationType<
   typeof AreaVisualization.type,
@@ -43,7 +44,9 @@ const areaChart: VisualizationType<
   AreaVisualizationConfigFormValues
 > = {
   type: AreaVisualization.type,
-  displayName: 'Area Chart',
+  get displayName() {
+    return visT('vis_types.area_chart');
+  },
   component: AreaVisualization,
   config: {
     createConfig: () => ({
@@ -65,16 +68,24 @@ const areaChart: VisualizationType<
     fields: [
       {
         name: 'interpolation',
-        title: 'Interpolation',
+        get title() {
+          return visT('vis_common.interpolation');
+        },
         type: 'select',
-        options: interpolationTypes,
+        get options() {
+          return translatedOptions(interpolationTypes, 'vis_common.interpolation_types');
+        },
         required: true,
       },
       {
         name: 'axisType',
-        title: 'Axis Type',
+        get title() {
+          return visT('vis_common.axis_type');
+        },
         type: 'select',
-        options: axisTypes,
+        get options() {
+          return translatedOptions(axisTypes, 'vis_common.axis_types');
+        },
         required: true,
       },
       ...xyAxisConfigFields,

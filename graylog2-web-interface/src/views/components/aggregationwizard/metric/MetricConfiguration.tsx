@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field, useFormikContext, getIn, FieldArray } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -44,6 +45,11 @@ type Props = {
   index: number;
 };
 
+const PERCENTAGE_STRATEGY_LABELS = {
+  COUNT: 'wizard_metric.strategies.COUNT',
+  SUM: 'wizard_metric.strategies.SUM',
+} as const;
+
 const Wrapper = styled.div``;
 
 export const ActionWrapper = styled.div`
@@ -72,6 +78,7 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
 };
 
 const Metric = ({ index }: Props) => {
+  const { t } = useTranslation('aggregation');
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
@@ -166,7 +173,7 @@ const Metric = ({ index }: Props) => {
           {({ field: { name, value }, meta: { error } }) => (
             <Input
               id="metric-function-select"
-              label="Function"
+              label={t('wizard_metric.function')}
               error={error}
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9">
@@ -175,7 +182,7 @@ const Metric = ({ index }: Props) => {
                 clearable={false}
                 name={name}
                 value={value}
-                placeholder="Select a function"
+                placeholder={t('wizard_metric.select_function')}
                 size="small"
                 onChange={onFunctionChange}
               />
@@ -190,7 +197,7 @@ const Metric = ({ index }: Props) => {
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input
                   id="metric-field"
-                  label="Field"
+                  label={t('wizard_metric.field')}
                   error={error}
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9">
@@ -205,7 +212,7 @@ const Metric = ({ index }: Props) => {
                     isFieldQualified={isFieldQualified}
                     name={name}
                     value={value}
-                    ariaLabel="Select a field"
+                    ariaLabel={t('wizard_metric.select_field')}
                   />
                 </Input>
               )}
@@ -224,7 +231,7 @@ const Metric = ({ index }: Props) => {
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input
                 id="metric-percentile-select"
-                label="Percentile"
+                label={t('wizard_metric.percentile')}
                 error={error}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9">
@@ -233,7 +240,7 @@ const Metric = ({ index }: Props) => {
                   clearable={false}
                   name={name}
                   value={value}
-                  aria-label="Select percentile"
+                  aria-label={t('wizard_metric.select_percentile')}
                   size="small"
                   onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                 />
@@ -249,16 +256,19 @@ const Metric = ({ index }: Props) => {
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input
                   id="metric-percentage-strategy-select"
-                  label="Strategy"
+                  label={t('wizard_metric.strategy')}
                   error={error}
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9">
                   <Select
-                    options={percentageStrategyOptions}
+                    options={percentageStrategyOptions.map((option) => ({
+                      ...option,
+                      label: t(PERCENTAGE_STRATEGY_LABELS[option.value]),
+                    }))}
                     clearable={false}
                     name={name}
                     value={value ?? 'COUNT'}
-                    aria-label="Select strategy"
+                    aria-label={t('wizard_metric.select_strategy')}
                     size="small"
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                   />
@@ -271,7 +281,7 @@ const Metric = ({ index }: Props) => {
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Input
                   id="metric-field"
-                  label="Field"
+                  label={t('wizard_metric.field')}
                   error={error}
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9">
@@ -283,7 +293,7 @@ const Metric = ({ index }: Props) => {
                     isFieldQualified={isFieldQualified}
                     name={name}
                     value={value}
-                    ariaLabel="Select a field"
+                    ariaLabel={t('wizard_metric.select_field')}
                   />
                 </Input>
               )}
@@ -296,11 +306,11 @@ const Metric = ({ index }: Props) => {
           id="name"
           label={
             <>
-              Name <Opt />
+              {t('wizard_metric.name')} <Opt />
             </>
           }
           bsSize="small"
-          placeholder="Specify display name"
+          placeholder={t('wizard_metric.display_name_placeholder')}
           name={`metrics.${index}.name`}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
@@ -314,7 +324,7 @@ const Metric = ({ index }: Props) => {
                 <FormikInput
                   type="checkbox"
                   wrapperClassName="col-sm-12"
-                  label="Show line thresholds"
+                  label={t('wizard_metric.show_thresholds')}
                   id={`${name}-input`}
                   name={name}
                   onChange={() => {
@@ -330,7 +340,7 @@ const Metric = ({ index }: Props) => {
           </Col>
           {currentMetric.showThresholds && (
             <Col sm={1}>
-              <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
+              <IconButton onClick={addThresholds} size="sm" name="add" title={t('wizard_metric.add_threshold')} />
             </Col>
           )}
           {currentMetric.showThresholds && (

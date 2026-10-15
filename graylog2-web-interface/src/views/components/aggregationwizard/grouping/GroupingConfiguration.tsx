@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useFormikContext, Field } from 'formik';
 
@@ -55,28 +56,35 @@ const SkipEmptyValuesLabel = styled.div`
 type SkipEmptyValuesPropes = {
   index: number;
 };
-const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => (
-  <Field name={`groupBy.groupings.${index}.skipEmptyValues`}>
-    {({ field: { name, value, onChange } }) => (
-      <SkipEmptyValuesCheckbox onChange={() => onChange({ target: { name, value: !value } })} checked={value ?? false}>
-        <SkipEmptyValuesLabel>
-          Skip Empty Values
-          <SkipEmptyValuesHoverForHelp title="Skip Empty Values">
-            When this is enabled, messages which do not contain the configured fields will be skipped.
-            <p />
-            Otherwise an &quot;(Empty Value)&quot; bucket will be created.
-          </SkipEmptyValuesHoverForHelp>
-        </SkipEmptyValuesLabel>
-      </SkipEmptyValuesCheckbox>
-    )}
-  </Field>
-);
+const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <Field name={`groupBy.groupings.${index}.skipEmptyValues`}>
+      {({ field: { name, value, onChange } }) => (
+        <SkipEmptyValuesCheckbox
+          onChange={() => onChange({ target: { name, value: !value } })}
+          checked={value ?? false}>
+          <SkipEmptyValuesLabel>
+            {t('wizard_grouping.skip_empty_values')}
+            <SkipEmptyValuesHoverForHelp title={t('wizard_grouping.skip_empty_values')}>
+              {t('wizard_grouping.skip_empty_values_help')}
+              <p />
+              {t('wizard_grouping.skip_empty_values_help_otherwise')}
+            </SkipEmptyValuesHoverForHelp>
+          </SkipEmptyValuesLabel>
+        </SkipEmptyValuesCheckbox>
+      )}
+    </Field>
+  );
+};
 
 const GroupingConfiguration = React.memo(({ index }: Props) => {
   const {
     values: { groupBy },
   } = useFormikContext<WidgetConfigFormValues>();
   const fieldType = groupBy.groupings[index].type;
+  const { t } = useTranslation('aggregation');
 
   return (
     <Wrapper data-testid={`grouping-${index}`}>
@@ -85,7 +93,12 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
       {fieldType === DateType && <Time index={index} />}
       {fieldType === ValuesType && (
         <>
-          <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" bsSize="small" />
+          <FormikFormGroup
+            label={t('wizard_grouping.limit')}
+            name={`groupBy.groupings.${index}.limit`}
+            type="number"
+            bsSize="small"
+          />
           <SkipEmptyValues index={index} />
         </>
       )}

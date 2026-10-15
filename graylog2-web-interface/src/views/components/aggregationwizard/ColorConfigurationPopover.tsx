@@ -17,6 +17,7 @@
 
 import styled, { css } from 'styled-components';
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Popover from 'components/common/Popover';
 import { ColorPicker } from 'components/common';
@@ -40,6 +41,7 @@ export const ColorHint = styled.div(
 );
 
 const ColorConfigurationPopover = ({ onColorSelect, curColor, title }) => {
+  const { t } = useTranslation('aggregation');
   const [showPopover, setShowPopover] = useState(false);
   const togglePopover = useCallback(() => setShowPopover((show) => !show), []);
   const _onColorSelect = useCallback(
@@ -54,7 +56,7 @@ const ColorConfigurationPopover = ({ onColorSelect, curColor, title }) => {
     <Popover position="top" withArrow opened={showPopover}>
       <Popover.Target>
         <ColorHintWrapper>
-          <ColorHint aria-label="Color Hint" onClick={togglePopover} color={curColor} />
+          <ColorHint aria-label={t('wizard_common.color_hint')} onClick={togglePopover} color={curColor} />
         </ColorHintWrapper>
       </Popover.Target>
       <Popover.Dropdown title={title}>

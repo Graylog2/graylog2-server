@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, {
@@ -62,7 +63,9 @@ const heatmap: VisualizationType<
   HeatMapVisualizationConfigFormValues
 > = {
   type: HeatmapVisualization.type,
-  displayName: 'Heatmap',
+  get displayName() {
+    return visT('vis_types.heatmap');
+  },
   component: HeatmapVisualization,
   config: {
     fromConfig: (
@@ -109,7 +112,9 @@ const heatmap: VisualizationType<
     fields: [
       {
         name: 'colorScale',
-        title: 'Color Scale',
+        get title() {
+          return visT('vis_common.color_scale');
+        },
         required: true,
         type: 'select',
         options: [...COLORSCALES].sort(defaultCompare),
@@ -117,36 +122,48 @@ const heatmap: VisualizationType<
       {
         name: 'reverseScale',
         type: 'boolean',
-        title: 'Reverse Scale',
+        get title() {
+          return visT('vis_common.reverse_scale');
+        },
       },
       {
         name: 'autoScale',
         type: 'boolean',
-        title: 'Auto Scale',
+        get title() {
+          return visT('vis_heatmap.auto_scale');
+        },
       },
       {
         name: 'zMin',
         type: 'numeric',
-        title: 'Min',
+        get title() {
+          return visT('vis_heatmap.min');
+        },
         required: true,
         isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
       },
       {
         name: 'zMax',
         type: 'numeric',
-        title: 'Max',
+        get title() {
+          return visT('vis_heatmap.max');
+        },
         required: true,
         isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
       },
       {
         name: 'useSmallestAsDefault',
         type: 'boolean',
-        title: 'Use smallest as default',
+        get title() {
+          return visT('vis_heatmap.use_smallest_as_default');
+        },
       },
       {
         name: 'defaultValue',
         type: 'numeric',
-        title: 'Default Value',
+        get title() {
+          return visT('vis_heatmap.default_value');
+        },
         isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
         required: false,
       },

@@ -63,6 +63,8 @@ const TRANSLATED_FILES = [
   'src/pages/WelcomePage.tsx',
   'src/views/components/*.tsx',
   'src/views/components/actions/**',
+  'src/views/components/aggregationbuilder/**',
+  'src/views/components/aggregationwizard/**',
   'src/views/components/common/**',
   'src/views/components/dashboard/**',
   'src/views/components/datatable/**',
@@ -74,6 +76,7 @@ const TRANSLATED_FILES = [
   'src/views/components/sidebar/**',
   'src/views/components/time-range-picker/**',
   'src/views/components/views/**',
+  'src/views/components/visualizations/**',
   'src/views/components/widgets/**',
   'src/views/pages/**',
 ];

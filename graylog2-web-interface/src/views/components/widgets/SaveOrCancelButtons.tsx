@@ -22,9 +22,6 @@ import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEd
 import { ModalSubmit } from 'components/common';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
-// English text of the update button, used in explanations which are not translated yet.
-export const UPDATE_WIDGET_BTN_TEXT = 'Update widget';
-
 type Props = {
   onCancel: () => void;
 };

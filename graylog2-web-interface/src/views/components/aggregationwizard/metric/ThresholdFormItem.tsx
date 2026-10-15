@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 
 import { Col } from 'components/bootstrap';
@@ -26,6 +27,7 @@ import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorC
 type Props = { metricIndex: number; thresholdIndex: number; onRemove: () => void };
 
 const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => {
+  const { t } = useTranslation('aggregation');
   const {
     values: { metrics, units },
     setFieldValue,
@@ -53,36 +55,36 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
         <FormikInput
           key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-name`}
           id="thresholdName"
-          label="Title"
+          label={t('wizard_metric.threshold_title')}
           bsSize="small"
-          placeholder="Specify threshold name"
+          placeholder={t('wizard_metric.threshold_name_placeholder')}
           name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.name`}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
         />
       </Col>
       <Col sm={1}>
-        <IconButton size="sm" onClick={onRemove} name="delete" title="Remove threshold" />
+        <IconButton size="sm" onClick={onRemove} name="delete" title={t('wizard_metric.remove_threshold')} />
       </Col>
       <Col sm={11}>
         <FormikInput
           key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-value`}
           id="thresholdValue"
-          label="Value"
+          label={t('wizard_metric.threshold_value')}
           bsSize="small"
           type="number"
-          placeholder="Specify threshold value"
+          placeholder={t('wizard_metric.threshold_value_placeholder')}
           name={`metrics.${metricIndex}.thresholds.${thresholdIndex}.value`}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
-          help={curUnitName && `Value is in ${curUnitName}s`}
+          help={curUnitName && t('wizard_metric.value_unit', { unit: curUnitName })}
         />
       </Col>
       <Col sm={1}>
         <ColorConfigurationPopover
           onColorSelect={onColorSelect}
           curColor={curColor}
-          title="Color configuration for threshold"
+          title={t('wizard_metric.threshold_color')}
         />
       </Col>
     </>

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
 export const areAtLeastNMetricsConfigured = (formValues: WidgetConfigFormValues, minimumMetrics: number) =>
@@ -21,5 +22,6 @@ export const areAtLeastNMetricsConfigured = (formValues: WidgetConfigFormValues,
 export const areAtLeastNGroupingsConfigured = (formValues: WidgetConfigFormValues, minimumGroupings: number) =>
   formValues.groupBy?.groupings?.length >= minimumGroupings;
 
-export const hasAtLeastOneMetric = (name: string) => (formValues: WidgetConfigFormValues) =>
-  !areAtLeastNMetricsConfigured(formValues, 1) ? { type: `${name} requires at least one metric` } : {};
+/** `messageKey` is a key of the `aggregation` namespace, e.g. `vis_validation.bar_chart_requires_metric`. */
+export const hasAtLeastOneMetric = (messageKey: string) => (formValues: WidgetConfigFormValues) =>
+  !areAtLeastNMetricsConfigured(formValues, 1) ? { type: visT(messageKey) } : {};

@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
-const validate = hasAtLeastOneMetric('Pie chart');
+const validate = hasAtLeastOneMetric('vis_validation.pie_chart_requires_metric');
 
 const pieChart: VisualizationType<typeof PieVisualization.type> = {
   type: PieVisualization.type,
-  displayName: 'Pie Chart',
+  get displayName() {
+    return visT('vis_types.pie_chart');
+  },
   component: PieVisualization,
   validate,
 };

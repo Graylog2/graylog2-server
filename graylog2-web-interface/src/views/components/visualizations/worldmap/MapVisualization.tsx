@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
@@ -67,6 +68,7 @@ type MarkerProps = {
 };
 
 const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
+  const { t } = useTranslation('aggregation');
   const formattedCoordinates = coordinates
     .split(',')
     .map((component) => Number(component))
@@ -96,14 +98,14 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
       opacity={0.8}>
       <Popup>
         <dl>
-          <dt>Name</dt>
+          <dt>{t('vis_worldmap.name')}</dt>
           <dd>{name}</dd>
           {markerKeys}
-          <dt>Coordinates:</dt>
+          <dt>{t('vis_worldmap.coordinates')}</dt>
           <dd>{coordinates}</dd>
           {value && (
             <>
-              <dt>Value:</dt>
+              <dt>{t('vis_worldmap.value')}</dt>
               <dd>{value}</dd>
             </>
           )}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -74,14 +75,25 @@ type Props = {
 const ElementConfigurationContainer = (
   { children, onRemove = undefined, dragHandle = undefined, className = undefined, elementTitle }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
-) => (
-  <Container className={className} ref={ref}>
-    <ElementActions>
-      {dragHandle}
-      {onRemove && <StyledIconButton size="xs" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
-    </ElementActions>
-    <ElementConfiguration>{children}</ElementConfiguration>
-  </Container>
-);
+) => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <Container className={className} ref={ref}>
+      <ElementActions>
+        {dragHandle}
+        {onRemove && (
+          <StyledIconButton
+            size="xs"
+            onClick={onRemove}
+            name="delete"
+            title={t('wizard_common.remove_named', { element: elementTitle })}
+          />
+        )}
+      </ElementActions>
+      <ElementConfiguration>{children}</ElementConfiguration>
+    </Container>
+  );
+};
 
 export default forwardRef(ElementConfigurationContainer);

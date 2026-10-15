@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -70,6 +71,7 @@ const SettingsSeparator = styled.hr(
 );
 
 const GroupingsConfiguration = () => {
+  const { t } = useTranslation('aggregation');
   const {
     values: { groupBy },
     values,
@@ -94,12 +96,12 @@ const GroupingsConfiguration = () => {
         dragHandle={dragHandle}
         className={className}
         onRemove={removeGrouping(index)}
-        elementTitle={GroupingElement.title}
+        elementTitle={t('wizard_common.grouping')}
         ref={ref}>
         <GroupingConfiguration index={index} />
       </ElementConfigurationContainer>
     ),
-    [removeGrouping],
+    [removeGrouping, t],
   );
 
   const hasGroupByError = isString(errors?.groupBy);
@@ -121,7 +123,7 @@ const GroupingsConfiguration = () => {
       {!isEmpty && (
         <>
           <SettingsSeparator />
-          <ElementConfigurationContainer elementTitle="Settings">
+          <ElementConfigurationContainer elementTitle={t('wizard_grouping.settings')}>
             <Field name="groupBy.columnRollup">
               {({ field: { name, onChange, value } }) => (
                 <RollupColumnsCheckbox
@@ -129,9 +131,9 @@ const GroupingsConfiguration = () => {
                   checked={value ?? false}
                   disabled={disableColumnRollup}>
                   <RollupColumnsLabel>
-                    Rollup Columns
-                    <RollupHoverForHelp title="Rollup Columns">
-                      When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                    {t('wizard_grouping.rollup_columns')}
+                    <RollupHoverForHelp title={t('wizard_grouping.rollup_columns')}>
+                      {t('wizard_grouping.rollup_columns_help')}
                     </RollupHoverForHelp>
                   </RollupColumnsLabel>
                 </RollupColumnsCheckbox>

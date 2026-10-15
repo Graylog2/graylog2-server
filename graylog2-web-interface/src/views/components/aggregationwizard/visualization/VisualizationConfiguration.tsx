@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
@@ -31,7 +32,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
-import VisualizationElement from './VisualizationElement';
 
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
@@ -53,6 +53,7 @@ const isTimeline = (values: WidgetConfigFormValues) => {
 };
 
 const VisualizationConfiguration = () => {
+  const { t } = useTranslation('aggregation');
   const visualizationTypes = usePluginEntities('visualizationTypes');
   const findVisualizationType = useCallback(
     (type: string) => visualizationTypes.find((visualizationType) => visualizationType.type === type),
@@ -105,18 +106,18 @@ const VisualizationConfiguration = () => {
   }, [currentVisualizationType.config?.fields, values]);
 
   return (
-    <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
+    <ElementConfigurationContainer elementTitle={t('wizard_common.visualization')}>
       <Field name="visualization.type">
         {({ field: { name, value }, meta: { error } }) => (
           <Input
             id="visualization-type-select"
-            label="Type"
+            label={t('wizard_visualization.type')}
             error={error}
             labelClassName="col-sm-3"
             wrapperClassName="col-sm-9">
             <Select
               options={visualizationTypeOptions}
-              aria-label="Select visualization type"
+              aria-label={t('wizard_visualization.select_type')}
               clearable={false}
               name={name}
               value={value}
@@ -135,7 +136,7 @@ const VisualizationConfiguration = () => {
           {({ field: { name, value = false }, meta: { error } }) => (
             <Input
               id={`${name}-input`}
-              label="Show Event annotations"
+              label={t('wizard_visualization.show_event_annotations')}
               error={error}
               labelClassName="col-sm-11"
               wrapperClassName="col-sm-1">

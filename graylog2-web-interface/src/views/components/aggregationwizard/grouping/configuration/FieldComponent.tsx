@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useContext } from 'react';
 import { useFormikContext } from 'formik';
 
@@ -30,16 +31,16 @@ import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
-const placeholder = (grouping: GroupByFormValues) => {
+const placeholderKey = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
-    return 'Add a field';
+    return 'wizard_grouping.add_field';
   }
 
   if (grouping.type === DateType) {
-    return 'Add another date field';
+    return 'wizard_grouping.add_another_date_field';
   }
 
-  return 'Add another field';
+  return 'wizard_grouping.add_another_field';
 };
 
 type Props = {
@@ -47,13 +48,14 @@ type Props = {
 };
 
 const FieldComponent = ({ groupingIndex }: Props) => {
+  const { t } = useTranslation('aggregation');
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const showFieldUnit = unitFeatureEnabled && values?.visualization?.type === 'table';
   const grouping = values.groupBy.groupings[groupingIndex];
   const activeQueryId = useActiveQueryId();
-  const createSelectPlaceholder = placeholder(grouping);
+  const createSelectPlaceholder = t(placeholderKey(grouping));
 
   const onChangeSelectedFields = (newFields: Array<string>) => {
     onGroupingFieldsChange({
@@ -82,7 +84,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   return (
     <Input
       id="group-by-field-select"
-      label="Fields"
+      label={t('wizard_grouping.fields')}
       labelClassName="col-sm-3"
       error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
       wrapperClassName="col-sm-9">

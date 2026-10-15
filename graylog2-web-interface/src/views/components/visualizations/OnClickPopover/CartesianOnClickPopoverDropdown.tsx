@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Popover from 'components/common/Popover';
@@ -41,6 +42,7 @@ const CartesianOnClickPopoverDropdown = ({
   setStep,
   showBackButton = false,
 }: OnClickPopoverDropdownProps) => {
+  const { t } = useTranslation('aggregation');
   const traceColor = getHoverSwatchColor(clickPoint);
   const { userTimezone } = useUserDateTime();
   const convertToOriginalValue = useCallback(
@@ -98,7 +100,9 @@ const CartesianOnClickPopoverDropdown = ({
 
   return (
     <Popover.Dropdown
-      title={<PopoverTitle onBackClick={showBackButton && onBackToTraces}>Related values</PopoverTitle>}>
+      title={
+        <PopoverTitle onBackClick={showBackButton && onBackToTraces}>{t('vis_popover.related_values')}</PopoverTitle>
+      }>
       <DivContainer>
         <OnClickPopoverValueGroups
           columnPivotValues={columnPivotValues}

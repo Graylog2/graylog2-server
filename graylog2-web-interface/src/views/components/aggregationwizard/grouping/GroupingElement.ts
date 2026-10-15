@@ -16,6 +16,7 @@
  */
 import isEmpty from 'lodash/isEmpty';
 
+import i18n from 'i18n';
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
@@ -130,26 +131,26 @@ const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
   const groupByError = {} as GroupByError;
 
   if (!grouping.fields?.length) {
-    groupByError.fields = 'Field is required.';
+    groupByError.fields = i18n.t('wizard_common.field_required', { ns: 'aggregation' });
   }
 
   if (grouping.interval.type === 'auto') {
     if (!grouping.interval.scaling) {
-      groupByError.interval = 'Scaling is required.';
+      groupByError.interval = i18n.t('wizard_grouping.scaling_required', { ns: 'aggregation' });
     }
 
     if (grouping.interval.scaling && (grouping.interval.scaling <= 0 || grouping.interval.scaling >= 10)) {
-      groupByError.interval = 'Must be greater than 0 and smaller or equals 10.';
+      groupByError.interval = i18n.t('wizard_grouping.scaling_range', { ns: 'aggregation' });
     }
   }
 
   if (grouping.interval.type === 'timeunit') {
     if (!grouping.interval.value) {
-      groupByError.interval = 'Value is required.';
+      groupByError.interval = i18n.t('wizard_grouping.value_required', { ns: 'aggregation' });
     }
 
     if (grouping.interval.value && grouping.interval.value <= 0) {
-      groupByError.interval = 'Must be greater than 0.';
+      groupByError.interval = i18n.t('wizard_common.must_be_greater_than_zero', { ns: 'aggregation' });
     }
   }
 
@@ -160,17 +161,17 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   const groupByError: GroupByError = {};
 
   if (!grouping.fields?.length) {
-    groupByError.fields = 'Field is required.';
+    groupByError.fields = i18n.t('wizard_common.field_required', { ns: 'aggregation' });
   }
 
   const parsedLimit = parseNumber(grouping.limit);
 
   if (parsedLimit === undefined) {
-    groupByError.limit = 'Limit is required.';
+    groupByError.limit = i18n.t('wizard_grouping.limit_required', { ns: 'aggregation' });
   }
 
   if (grouping.limit <= 0) {
-    groupByError.limit = 'Must be greater than 0.';
+    groupByError.limit = i18n.t('wizard_common.must_be_greater_than_zero', { ns: 'aggregation' });
   }
 
   return groupByError;
@@ -291,7 +292,9 @@ export const createEmptyGrouping = () =>
 
 const GroupByElement: AggregationElement<'groupBy'> = {
   sectionTitle: 'Group By',
+  sectionTitleKey: 'wizard_common.group_by',
   title: 'Grouping',
+  titleKey: 'wizard_common.grouping',
   key: 'groupBy',
   order: 1,
   allowCreate: (formValues: WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),

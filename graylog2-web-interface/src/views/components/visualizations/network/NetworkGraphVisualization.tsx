@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide } from 'd3-force';
@@ -237,6 +238,7 @@ const buildLayout = (width: number, height: number, positions: NodePositions | n
 };
 
 const NetworkGraphVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
+  const { t: translate } = useTranslation('aggregation');
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const theme = useTheme();
@@ -393,7 +395,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
           onInitialized={initializeGraphDivRef}
         />
       ) : (
-        <EmptyState>No connections to display. Adjust your search or grouping to see results.</EmptyState>
+        <EmptyState>{translate('vis_network.no_connections')}</EmptyState>
       )}
       {popover}
     </Container>

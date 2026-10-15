@@ -17,6 +17,7 @@
 import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import type { VisualizationType } from 'views/types';
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -91,7 +92,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
   } = formValues;
 
   if (!type) {
-    return { 'visualization.type': 'Type is required.' };
+    return { 'visualization.type': i18n.t('wizard_visualization.type_required', { ns: 'aggregation' }) };
   }
 
   const visualizationType = findVisualizationType(type);
@@ -107,6 +108,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
 
 const VisualizationElement: AggregationElement<'visualization'> = {
   title: 'Visualization',
+  titleKey: 'wizard_common.visualization',
   key: 'visualization',
   order: 4,
   allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.visualization),

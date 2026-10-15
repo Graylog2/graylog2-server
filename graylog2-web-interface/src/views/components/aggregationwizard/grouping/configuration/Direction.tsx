@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Field } from 'formik';
 
@@ -32,40 +33,44 @@ type Props = {
   groupingIndex: number;
 };
 
-const Direction = ({ groupingIndex }: Props) => (
-  <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
-    {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
-      <Input
-        id="group-by-direction"
-        label="Direction"
-        error={error}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-7">
-        <DirectionOptions>
-          <Input
-            checked={value === 'row'}
-            formGroupClassName=""
-            id={name}
-            label="Row"
-            onBlur={onBlur}
-            onChange={onChange}
-            type="radio"
-            value="row"
-          />
-          <Input
-            checked={value === 'column'}
-            formGroupClassName=""
-            id={name}
-            label="Column"
-            onBlur={onBlur}
-            onChange={onChange}
-            type="radio"
-            value="column"
-          />
-        </DirectionOptions>
-      </Input>
-    )}
-  </Field>
-);
+const Direction = ({ groupingIndex }: Props) => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
+      {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
+        <Input
+          id="group-by-direction"
+          label={t('wizard_grouping.direction')}
+          error={error}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-7">
+          <DirectionOptions>
+            <Input
+              checked={value === 'row'}
+              formGroupClassName=""
+              id={name}
+              label={t('wizard_grouping.row')}
+              onBlur={onBlur}
+              onChange={onChange}
+              type="radio"
+              value="row"
+            />
+            <Input
+              checked={value === 'column'}
+              formGroupClassName=""
+              id={name}
+              label={t('wizard_grouping.column')}
+              onBlur={onBlur}
+              onChange={onChange}
+              type="radio"
+              value="column"
+            />
+          </DirectionOptions>
+        </Input>
+      )}
+    </Field>
+  );
+};
 
 export default Direction;

@@ -17,6 +17,7 @@
 // Only imported by the core entry point, so plugins, which compile core modules into their bundles, don't contain
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
+import enAggregation from 'locales/en/aggregation.json';
 import enCommon from 'locales/en/common.json';
 import enDashboards from 'locales/en/dashboards.json';
 import enLogin from 'locales/en/login.json';
@@ -24,6 +25,10 @@ import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
 import enWelcome from 'locales/en/welcome.json';
 import enWidgets from 'locales/en/widgets.json';
+
+registerTranslations('aggregation', enAggregation, {
+  de: () => import(/* webpackChunkName: "translations-de-aggregation" */ 'locales/de/aggregation.json'),
+});
 
 registerTranslations('common', enCommon, {
   de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),

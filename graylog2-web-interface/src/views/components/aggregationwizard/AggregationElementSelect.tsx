@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 
@@ -28,16 +29,20 @@ type Props = {
 };
 
 const AggregationElementSelect = ({ aggregationElements, onSelect, formValues }: Props) => {
+  const { t } = useTranslation('aggregation');
   const menuItems = aggregationElements
     .filter(({ allowCreate }) => allowCreate(formValues))
-    .map(({ key, title }) => (
+    .map(({ key, title, titleKey }) => (
       <MenuItem key={`element-select-${key}`} onSelect={() => onSelect(key)}>
-        {title}
+        {titleKey ? t(titleKey) : title}
       </MenuItem>
     ));
 
   return (
-    <DropdownButton id="add-aggregation-element" title="Add" buttonTitle="Add an element">
+    <DropdownButton
+      id="add-aggregation-element"
+      title={t('wizard_common.add')}
+      buttonTitle={t('wizard_common.add_element')}>
       {menuItems}
     </DropdownButton>
   );

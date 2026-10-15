@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -33,7 +34,9 @@ const DEFAULT_FORM_VALUES = {
 
 const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
   type: WorldMapVisualization.type,
-  displayName: 'World Map',
+  get displayName() {
+    return visT('vis_types.world_map');
+  },
   component: WorldMapVisualization,
   config: {
     createConfig: () => DEFAULT_FORM_VALUES,
@@ -53,20 +56,26 @@ const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
     fields: [
       {
         name: 'zoom',
-        title: 'Zoom',
+        get title() {
+          return visT('vis_worldmap.zoom');
+        },
         type: 'numeric',
         required: true,
       },
       {
         name: 'centerX',
-        title: 'Latitude',
+        get title() {
+          return visT('vis_worldmap.latitude');
+        },
         type: 'numeric',
         required: true,
         step: 'any',
       },
       {
         name: 'centerY',
-        title: 'Longitude',
+        get title() {
+          return visT('vis_worldmap.longitude');
+        },
         type: 'numeric',
         required: true,
         step: 'any',

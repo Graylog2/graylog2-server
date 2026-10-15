@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
@@ -36,6 +37,7 @@ const SortConfigurationContainer = styled(ElementConfigurationContainer)(
 );
 
 const SortsConfiguration = () => {
+  const { t } = useTranslation('aggregation');
   const {
     values: { sort },
     setFieldValue,
@@ -65,13 +67,13 @@ const SortsConfiguration = () => {
           dragHandle={dragHandle}
           className={className}
           onRemove={removeSort(index)}
-          elementTitle={SortElement.title}
+          elementTitle={t('wizard_common.sort')}
           ref={ref}>
           <SortConfiguration index={index} />
         </SortConfigurationContainer>
       );
     },
-    [removeSort],
+    [removeSort, t],
   );
 
   return (

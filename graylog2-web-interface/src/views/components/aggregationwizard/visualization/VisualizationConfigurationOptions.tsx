@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Field, getIn, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
@@ -57,13 +59,13 @@ const componentForType = (type: string): React.FC<FieldComponentProps> => {
   }
 };
 
-const titleForField = (field: ConfigurationField) => {
+const titleForField = (field: ConfigurationField, t: TFunction<'aggregation'>) => {
   const { helpComponent: HelpComponent } = field;
 
   return HelpComponent ? (
     <TitleLabelWithHelp>
       {field.title}
-      <TitleHoverForHelp title={`Help for ${field.title}`} placement="top">
+      <TitleHoverForHelp title={t('wizard_visualization.help_for', { field: field.title })} placement="top">
         <HelpComponent />
       </TitleHoverForHelp>
     </TitleLabelWithHelp>
@@ -89,6 +91,7 @@ type Props = {
 };
 
 const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) => {
+  const { t } = useTranslation('aggregation');
   const { values } = useFormikContext<WidgetConfigFormValues>();
   const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
 
@@ -97,7 +100,7 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) 
       {fields
         ?.filter((field) => (field.isShown ? field.isShown(visualizationConfig, values) : true))
         .map((field) => {
-          const title = titleForField(field);
+          const title = titleForField(field, t);
           const inputHelp =
             typeof field.inputHelp === 'function' ? field.inputHelp(visualizationConfig, values) : undefined;
 

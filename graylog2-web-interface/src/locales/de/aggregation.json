@@ -1,0 +1,236 @@
+{
+  "wizard_common": {
+    "grouping": "Gruppierung",
+    "group_by": "Gruppieren nach",
+    "metric": "Metrik",
+    "metrics": "Metriken",
+    "sort": "Sortierung",
+    "visualization": "Visualisierung",
+    "add": "Hinzufügen",
+    "add_element": "Element hinzufügen",
+    "add_named": "{{element}} hinzufügen",
+    "remove_named": "{{element}} entfernen",
+    "update_preview": "Vorschau aktualisieren",
+    "updating_preview": "Vorschau wird aktualisiert...",
+    "color_hint": "Farbhinweis",
+    "select_all_fields": "Alle Felder auswählen",
+    "deselect_all_fields": "Auswahl aller Felder aufheben",
+    "field_required": "Ein Feld ist erforderlich.",
+    "must_be_greater_than_zero": "Muss größer als 0 sein."
+  },
+  "wizard_grouping": {
+    "settings": "Einstellungen",
+    "skip_empty_values": "Leere Werte überspringen",
+    "skip_empty_values_help": "Wenn diese Option aktiviert ist, werden Nachrichten übersprungen, die die konfigurierten Felder nicht enthalten.",
+    "skip_empty_values_help_otherwise": "Andernfalls wird ein Bucket \"(Empty Value)\" erstellt.",
+    "limit": "Limit",
+    "rollup_columns": "Spalten zusammenfassen",
+    "rollup_columns_help": "Wenn das Zusammenfassen aktiviert ist, wird eine zusätzliche Linie mit der Summe der einzelnen Teillinien angezeigt.",
+    "direction": "Richtung",
+    "row": "Zeile",
+    "column": "Spalte",
+    "fields": "Felder",
+    "add_field": "Feld hinzufügen",
+    "add_another_date_field": "Weiteres Datumsfeld hinzufügen",
+    "add_another_field": "Weiteres Feld hinzufügen",
+    "interval": "Intervall",
+    "auto": "Automatisch",
+    "interval_types": "Intervallarten",
+    "auto_bucket_size": "Automatische Bucket-Größe",
+    "auto_bucket_size_help": "Zum Beispiel 1,5x. Eine kleinere Granularität führt zu <strong>weniger</strong> Werten, eine größere zeigt <strong>mehr</strong> Werte.",
+    "fixed_bucket_size": "Feste Bucket-Größe",
+    "fixed_bucket_size_help": "Zum Beispiel 2 Minuten. Die Zeit bestimmt die Größe der Buckets für diesen Zeitstempeltyp.",
+    "scale": "{{scale}}x",
+    "scaling_required": "Eine Skalierung ist erforderlich.",
+    "scaling_range": "Muss größer als 0 und kleiner oder gleich 10 sein.",
+    "value_required": "Ein Wert ist erforderlich.",
+    "limit_required": "Ein Limit ist erforderlich."
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "Sekunden",
+      "minutes": "Minuten",
+      "hours": "Stunden",
+      "days": "Tage",
+      "weeks": "Wochen",
+      "months": "Monate"
+    },
+    "unit_settings": "Einheiteneinstellungen für {{field}}",
+    "type": "Typ",
+    "select_unit_type": "Einheitentyp auswählen",
+    "unit": "Einheit",
+    "unit_help": "Einheit, mit der der angezeigte Wert in Diagrammen berechnet wird.",
+    "select_unit": "Einheit auswählen",
+    "predefined_unit": "Für das Feld <bold>{{field}}</bold> wurde die Einheit <bold>{{unit}}</bold> konfiguriert. Eine Änderung dieser Einheit kann dazu führen, dass Daten in den Diagrammen falsch dargestellt werden.",
+    "clear": "Zurücksetzen",
+    "ok": "OK"
+  },
+  "wizard_metric": {
+    "function": "Funktion",
+    "select_function": "Funktion auswählen",
+    "field": "Feld",
+    "select_field": "Feld auswählen",
+    "percentile": "Perzentil",
+    "select_percentile": "Perzentil auswählen",
+    "strategy": "Strategie",
+    "select_strategy": "Strategie auswählen",
+    "strategies": {
+      "COUNT": "Anzahl der Dokumente",
+      "SUM": "Summe des Felds"
+    },
+    "name": "Name",
+    "display_name_placeholder": "Anzeigenamen angeben",
+    "show_thresholds": "Schwellenwertlinien anzeigen",
+    "add_threshold": "Schwellenwert hinzufügen",
+    "threshold_title": "Titel",
+    "threshold_name_placeholder": "Namen des Schwellenwerts angeben",
+    "remove_threshold": "Schwellenwert entfernen",
+    "threshold_value": "Wert",
+    "threshold_value_placeholder": "Schwellenwert angeben",
+    "value_unit": "Wert in {{unit}}",
+    "threshold_color": "Farbe des Schwellenwerts konfigurieren",
+    "function_required": "Eine Funktion ist erforderlich.",
+    "field_required_for_function": "Für die Funktion {{function}} ist ein Feld erforderlich.",
+    "percentile_required": "Ein Perzentil ist erforderlich.",
+    "name_unique": "Der Name muss eindeutig sein.",
+    "threshold_value_required": "Ein Schwellenwert ist erforderlich."
+  },
+  "wizard_sort": {
+    "field": "Feld",
+    "field_placeholder": "Feld oder Metrik zum Sortieren angeben",
+    "select_field": "Feld zum Sortieren auswählen",
+    "direction": "Richtung",
+    "select_direction": "Sortierrichtung auswählen",
+    "ascending": "Aufsteigend",
+    "descending": "Absteigend",
+    "direction_required": "Eine Richtung ist erforderlich.",
+    "time_row_unsupported": "Das Sortieren funktioniert nicht für Visualisierungen außer Datentabellen, wenn Zeilen nach Zeit gruppiert werden."
+  },
+  "wizard_visualization": {
+    "type": "Typ",
+    "select_type": "Visualisierungstyp auswählen",
+    "show_event_annotations": "Event-Anmerkungen anzeigen",
+    "help_for": "Hilfe zu {{field}}",
+    "select_field": "{{field}} auswählen",
+    "color_for": "Farbe für {{field}} konfigurieren",
+    "axis_label_or_color": "Für mindestens eine Achse muss eine Beschriftung oder Farbe festgelegt werden.",
+    "type_required": "Ein Typ ist erforderlich."
+  },
+  "builder_empty": {
+    "title": "Leere Aggregation",
+    "editing": "Sie bearbeiten gerade das Widget.",
+    "add_metric_hint": "Fügen Sie mindestens eine Metrik hinzu, um Ergebnisse zu sehen. Sie können Daten gruppieren, indem Sie Zeilen oder Spalten hinzufügen.",
+    "preview_hint": "Eine Vorschau der Suchergebnisse des Widgets erhalten Sie mit \"{{button}}\".",
+    "finish_hint": "Klicken Sie zum Abschluss auf \"{{update}}\", um zu speichern, oder auf \"{{cancel}}\", um die Änderungen zu verwerfen.",
+    "edit_hint_interactive": "Bitte <editButton>bearbeiten</editButton> Sie das Widget, um hier Ergebnisse zu sehen.",
+    "edit_hint": "Bitte bearbeiten Sie das Widget, um hier Ergebnisse zu sehen."
+  },
+  "vis_types": {
+    "area_chart": "Flächendiagramm",
+    "bar_chart": "Balkendiagramm",
+    "heatmap": "Heatmap",
+    "line_chart": "Liniendiagramm",
+    "network_graph": "Netzwerkgraph",
+    "pie_chart": "Kreisdiagramm",
+    "sankey": "Sankey-Diagramm",
+    "scatter_plot": "Streudiagramm",
+    "single_number": "Einzelwert",
+    "world_map": "Weltkarte"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "Ein Flächendiagramm benötigt mindestens eine Metrik",
+    "bar_chart_requires_metric": "Ein Balkendiagramm benötigt mindestens eine Metrik",
+    "line_chart_requires_metric": "Ein Liniendiagramm benötigt mindestens eine Metrik",
+    "pie_chart_requires_metric": "Ein Kreisdiagramm benötigt mindestens eine Metrik",
+    "scatter_plot_requires_metric": "Ein Streudiagramm benötigt mindestens eine Metrik",
+    "sankey_requires_groupings": "Ein Sankey-Diagramm benötigt mindestens zwei Gruppierungsfelder.",
+    "sankey_single_metric": "Ein Sankey-Diagramm unterstützt nur eine einzige Metrik.",
+    "network_requires_groupings": "Ein Netzwerkgraph benötigt mindestens zwei Gruppierungsfelder."
+  },
+  "vis_common": {
+    "interpolation": "Interpolation",
+    "interpolation_types": {
+      "linear": "linear",
+      "step-after": "Stufe danach",
+      "spline": "Spline"
+    },
+    "axis_type": "Achsentyp",
+    "axis_types": {
+      "linear": "linear",
+      "logarithmic": "logarithmisch"
+    },
+    "color_scale": "Farbskala",
+    "reverse_scale": "Skala umkehren",
+    "show_axis_labels": "Achsenbeschriftungen anzeigen",
+    "x_axis": "X-Achse",
+    "y_axis_number": "Y-Zahl",
+    "y_axis_percent": "Y-Prozent",
+    "y_axis_time": "Y-Zeit",
+    "y_axis_size": "Y-Größe",
+    "color_hint": "Farbhinweis",
+    "legend_configuration": "Konfiguration für {{label}}"
+  },
+  "vis_heatmap": {
+    "auto_scale": "Automatische Skalierung",
+    "min": "Min",
+    "max": "Max",
+    "use_smallest_as_default": "Kleinsten Wert als Standard verwenden",
+    "default_value": "Standardwert"
+  },
+  "vis_worldmap": {
+    "zoom": "Zoom",
+    "latitude": "Breitengrad",
+    "longitude": "Längengrad",
+    "name": "Name",
+    "coordinates": "Koordinaten:",
+    "value": "Wert:"
+  },
+  "vis_bar": {
+    "mode": "Modus",
+    "modes": {
+      "group": "Gruppiert",
+      "stack": "Gestapelt",
+      "relative": "Relativ",
+      "overlay": "Überlagert"
+    },
+    "mode_help": {
+      "group": "Jede Serie wird durch einen eigenen Balken im Diagramm dargestellt.",
+      "stack": "Alle Serien werden übereinander gestapelt, sodass ein Balken entsteht.",
+      "relative": "Alle Serien werden übereinander gestapelt, sodass ein Diagramm entsteht. Negative Serien werden jedoch unterhalb von null dargestellt.",
+      "overlay": "Alle Serien werden als Balken übereinandergelegt. Damit die Balken sichtbar bleiben, wird die Deckkraft auf 75 % reduziert. Es wird empfohlen, diese Option mit höchstens 3 Serien zu verwenden."
+    }
+  },
+  "vis_number": {
+    "trend": "Trend",
+    "trend_description": "Trendinformationen für diese Zahl anzeigen.",
+    "trend_help_enabled": "Wenn der Trend aktiviert ist, wird unterhalb des aktuellen Werts ein separates Feld angezeigt, das die Richtung der Änderung mit einem Symbol sowie die absolute und relative Differenz zwischen aktuellem und vorherigem Wert anzeigt.",
+    "trend_help_previous": "Der vorherige Wert wird durch zwei Suchen im Hintergrund berechnet, die bis auf den Zeitraum identisch sind. Der Zeitraum der ersten Suche entspricht dem für diese Abfrage bzw. dieses Widget konfigurierten, die zweite Suche verwendet denselben Zeitraum, um dessen Länge in die Vergangenheit verschoben.",
+    "trend_preference": "Trendpräferenz",
+    "trend_preferences": {
+      "LOWER": "Niedriger",
+      "NEUTRAL": "Neutral",
+      "HIGHER": "Höher"
+    },
+    "highlight": "Hervorhebung",
+    "highlight_options": {
+      "TREND_ONLY": "Nur Trendinformation",
+      "FULL_WIDGET": "Gesamtes Widget"
+    },
+    "not_available": "k. A.",
+    "trend_label": "Trend: {{absolute}} ({{relative}}) im Vergleich zum vorherigen Wert {{previous}}",
+    "previous_value": "Vorheriger Wert: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "Zugehörige Werte",
+    "data_points": "Datenpunkte",
+    "metric": "Metrik",
+    "groupings": "Gruppierungen",
+    "back": "Zurück"
+  },
+  "vis_network": {
+    "no_connections": "Keine Verbindungen vorhanden. Passen Sie Ihre Suche oder Gruppierung an, um Ergebnisse zu sehen."
+  },
+  "vis_sankey": {
+    "no_flows": "Keine Flüsse vorhanden. Passen Sie Ihre Suche oder Gruppierung an, um Ergebnisse zu sehen."
+  }
+}

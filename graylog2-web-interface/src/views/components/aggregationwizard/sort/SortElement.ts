@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -44,18 +45,18 @@ const validateSorts = (values: WidgetConfigFormValues) => {
     const sortError: SortError = {};
 
     if (!sort.field || sort.field === '') {
-      sortError.field = 'Field is required.';
+      sortError.field = i18n.t('wizard_common.field_required', { ns: 'aggregation' });
     }
 
     if (!sort.direction) {
-      sortError.direction = 'Direction is required.';
+      sortError.direction = i18n.t('wizard_sort.direction_required', { ns: 'aggregation' });
     }
 
     const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.type === 'time');
     const nonDataTableVisExists = values.visualization && values.visualization.type !== 'table';
 
     if (timeRowExists && nonDataTableVisExists) {
-      sortError.field = 'Sort on non data table with time based row grouping does not work.';
+      sortError.field = i18n.t('wizard_sort.time_row_unsupported', { ns: 'aggregation' });
     }
 
     return sortError;
@@ -93,6 +94,7 @@ const formValueTypeToConfigType = (type: 'groupBy' | 'metric') => {
 
 const SortElement: AggregationElement<'sort'> = {
   title: 'Sort',
+  titleKey: 'wizard_common.sort',
   key: 'sort',
   order: 3,
   allowCreate: () => true,

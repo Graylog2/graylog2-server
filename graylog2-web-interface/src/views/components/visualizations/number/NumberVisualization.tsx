@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -111,6 +112,7 @@ const _extractFirstSeriesName = (config) => {
 const DEFAULT_ALIGNMENT: NumberAlignment = 'bottom-right';
 
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
+  const { t } = useTranslation('aggregation');
   const targetRef = useRef();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
@@ -135,7 +137,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   }, [field, unitFeatureEnabled, widgetUnits]);
 
   if (!field || (value !== 0 && !value)) {
-    return <>N/A</>;
+    return <>{t('vis_number.not_available')}</>;
   }
 
   const ContainerComponent = visualizationConfig.trend ? GridContainer : SingleItemGrid;
