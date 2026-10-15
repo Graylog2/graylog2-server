@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations;
 
+import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.indexer.fieldtypes.datefix.NumericDateFieldDetector;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
@@ -24,6 +25,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.notifications.Notification;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +60,8 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     private final NumericDateFieldDetector detector = mock(NumericDateFieldDetector.class);
     private final NotificationService notificationService = mock(NotificationService.class);
     private final FieldTypeMappingsService fieldTypeMappingsService = mock(FieldTypeMappingsService.class);
+    private final RefreshingLockService.Factory lockServiceFactory = mock(RefreshingLockService.Factory.class);
+    private final RefreshingLockService lockService = mock(RefreshingLockService.class);
 
     private IndexSet indexSet;
     private IndexSetConfig indexSetConfig;
@@ -75,8 +79,10 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         final Notification notification = mock(Notification.class, Answers.RETURNS_SELF);
         when(notificationService.buildNow()).thenReturn(notification);
 
+        when(lockServiceFactory.create()).thenReturn(lockService);
+
         migration = new V20261014120000_RotateIndexSetsWithNumericDateFields(clusterConfigService, indexSetService,
-                mongoIndexSetFactory, detector, notificationService, fieldTypeMappingsService);
+                mongoIndexSetFactory, detector, notificationService, fieldTypeMappingsService, lockServiceFactory);
     }
 
     @Test
@@ -183,6 +189,31 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         assertThat(migration.createdAt()).isNotNull();
         // no completion marker, so the migration runs again next time
         verify(clusterConfigService, never()).write(any());
+    }
+
+
+    @Test
+    void doesNothingWhenAnotherNodeHoldsTheLock() throws Exception {
+        givenFindings("event_start");
+        doThrow(new AlreadyLockedException("held by another node"))
+                .when(lockService).acquireAndKeepLock(anyString(), anyString());
+
+        migration.upgrade();
+
+        // standard migrations run on every node that considers itself leader, so two nodes must not both rotate
+        verify(indexSetService, never()).findAll();
+        verify(clusterConfigService, never()).write(any());
+    }
+
+    @Test
+    void stopsWhenAnotherNodeCompletedTheMigrationWhileWaitingForTheLock() {
+        when(clusterConfigService.get(V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class))
+                .thenReturn(null)
+                .thenReturn(new V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted(1));
+
+        migration.upgrade();
+
+        verify(indexSetService, never()).findAll();
     }
 
     private void givenFindings(String... fieldNames) {

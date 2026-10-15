@@ -69,6 +69,12 @@ public class NumericDateFieldDetector {
             Set.of("long", "unsigned_long", "float", "double", "scaled_float");
 
     /**
+     * Mappings that whole numbers never produce, so a timestamp-shaped value in one of them can only have come from
+     * the fractional epoch seconds that a {@code java.time} value serializes to.
+     */
+    private static final Set<String> FRACTIONAL_TYPES = Set.of("float", "double", "scaled_float");
+
+    /**
      * Numeric fields that the index template maps on purpose, so they can never be a mis-mapped date.
      */
     private static final Set<String> TEMPLATE_NUMERIC_FIELDS = Set.of(
@@ -149,9 +155,15 @@ public class NumericDateFieldDetector {
                 continue;
             }
 
-            // Neither of the free signals applies, so the values have to be read.
-            valuesLookLikeTimestamps(writeIndex, field.fieldName(), type)
-                    .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
+            // Neither free signal applies, so the only evidence left is the values themselves. That is conclusive
+            // for a floating point mapping - whole numbers never produce one, so it can only have come from the
+            // fractional epoch seconds a java.time value serializes to - but not for an integer mapping, where a
+            // large counter is indistinguishable from epoch milliseconds. Retyping such a field would break a
+            // perfectly healthy installation, so an integer field is only repaired on independent evidence.
+            if (FRACTIONAL_TYPES.contains(type)) {
+                valuesLookLikeTimestamps(writeIndex, field.fieldName(), type)
+                        .ifPresent(reason -> findings.add(new Finding(field.fieldName(), type, reason)));
+            }
         }
         return findings;
     }

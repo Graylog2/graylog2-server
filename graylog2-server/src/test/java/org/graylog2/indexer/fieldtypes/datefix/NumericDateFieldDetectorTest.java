@@ -56,6 +56,7 @@ class NumericDateFieldDetectorTest {
     private static final String WRITE_INDEX = "graylog_42";
     private static final String OLDER_INDEX = "graylog_41";
     private static final double EPOCH_MILLIS = 1_758_528_672_000d;
+    private static final double EPOCH_SECONDS = 1_758_528_672d;
 
     private final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
     private final IndexFieldTypePoller indexFieldTypePoller = mock(IndexFieldTypePoller.class);
@@ -91,13 +92,13 @@ class NumericDateFieldDetectorTest {
     @Test
     void findsAFieldByItsValuesWhenThereIsNothingToCompareAgainst() {
         // a fresh installation: every index was written by the affected version, so no index maps the field as a date
-        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
-        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+        givenIndices(index(WRITE_INDEX, field("event_start", "float")));
+        givenFieldStats("event_start", 10, EPOCH_SECONDS);
 
         final var findings = detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX);
 
         assertThat(findings).singleElement().satisfies(finding ->
-                assertThat(finding.reason()).isEqualTo(NumericDateFieldDetector.Reason.VALUES_ARE_EPOCH_MILLIS));
+                assertThat(finding.reason()).isEqualTo(NumericDateFieldDetector.Reason.VALUES_ARE_EPOCH_SECONDS));
     }
 
     @Test
@@ -153,8 +154,8 @@ class NumericDateFieldDetectorTest {
         // a field polled into the write index after the cache was last written still has to be found
         when(indexFieldTypesService.findForIndexSet(INDEX_SET_ID)).thenReturn(List.of());
         when(indexFieldTypePoller.pollIndex(WRITE_INDEX, INDEX_SET_ID))
-                .thenReturn(Optional.of(index(WRITE_INDEX, field("event_start", "long"))));
-        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+                .thenReturn(Optional.of(index(WRITE_INDEX, field("event_start", "float"))));
+        givenFieldStats("event_start", 10, EPOCH_SECONDS);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
                 .extracting(NumericDateFieldDetector.Finding::fieldName)
@@ -163,8 +164,8 @@ class NumericDateFieldDetectorTest {
 
     @Test
     void reportsEveryAffectedFieldFoundByItsValues() {
-        givenIndices(index(WRITE_INDEX, field("event_start", "long"), field("event_end", "long")));
-        final FieldStatsResult stats = statsOf(10, EPOCH_MILLIS);
+        givenIndices(index(WRITE_INDEX, field("event_start", "float"), field("event_end", "float")));
+        final FieldStatsResult stats = statsOf(10, EPOCH_SECONDS);
         when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), anyString(),
                 anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(stats);
 
@@ -193,7 +194,7 @@ class NumericDateFieldDetectorTest {
 
     @Test
     void failsWhenTheValuesCannotBeRead() {
-        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+        givenIndices(index(WRITE_INDEX, field("event_start", "float")));
         when(searchesAdapter.fieldStats(anyString(), any(), any(), any(), eq("event_start"),
                 anyBoolean(), anyBoolean(), anyBoolean()))
                 .thenThrow(new RuntimeException("index is closed"));
@@ -223,10 +224,10 @@ class NumericDateFieldDetectorTest {
     @Test
     void findsBothHistoricallyConfirmedAndValueDetectedFieldsInTheSameIndex() {
         givenIndices(
-                index(WRITE_INDEX, field("event_start", "long"), field("event_end", "long")),
+                index(WRITE_INDEX, field("event_start", "long"), field("event_end", "float")),
                 index(OLDER_INDEX, field("event_start", "date")));
         // only event_end needs a value query, but both have to be reported so that both get pinned
-        givenFieldStats("event_end", 10, EPOCH_MILLIS);
+        givenFieldStats("event_end", 10, EPOCH_SECONDS);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
                 .extracting(NumericDateFieldDetector.Finding::fieldName)
@@ -252,13 +253,37 @@ class NumericDateFieldDetectorTest {
     void stillDetectsValuesWhenTheIndexRangeIsTheWriteIndexPlaceholder() throws Exception {
         // An active write index has a placeholder range of epoch zero until it is set read-only. Taken literally it
         // would put the index in 1970 and reject every realistic timestamp.
-        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
-        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+        givenIndices(index(WRITE_INDEX, field("event_start", "float")));
+        givenFieldStats("event_start", 10, EPOCH_SECONDS);
 
         final IndexRange placeholder = mock(IndexRange.class);
         when(placeholder.begin()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
         when(placeholder.end()).thenReturn(new DateTime(0L, DateTimeZone.UTC));
         when(indexRangeService.get(WRITE_INDEX)).thenReturn(placeholder);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .extracting(NumericDateFieldDetector.Finding::fieldName)
+                .containsExactly("event_start");
+    }
+
+
+    @Test
+    void doesNotRetypeAnIntegerFieldOnValuesAlone() {
+        // a byte counter is indistinguishable from epoch milliseconds, and retyping it would break a healthy
+        // installation that never had the serializer problem
+        givenIndices(index(WRITE_INDEX, field("bytes_total", "long")));
+        givenFieldStats("bytes_total", 10, EPOCH_MILLIS);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
+        verify(searchesAdapter, never()).fieldStats(anyString(), any(), any(), any(), anyString(),
+                anyBoolean(), anyBoolean(), anyBoolean());
+    }
+
+    @Test
+    void stillRepairsAnIntegerFieldWhenAnOlderIndexConfirmsIt() {
+        givenIndices(
+                index(WRITE_INDEX, field("event_start", "long")),
+                index(OLDER_INDEX, field("event_start", "date")));
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
                 .extracting(NumericDateFieldDetector.Finding::fieldName)

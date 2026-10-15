@@ -17,6 +17,9 @@
 package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.ClusterLockResources;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.indexer.fieldtypes.datefix.NumericDateFieldDetector;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
@@ -34,6 +37,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -62,12 +66,15 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
      */
     private static final String DATE_FIELD_TYPE = "date";
 
+    private static final String LOCK_RESOURCE = "numeric-date-field-repair";
+
     private final ClusterConfigService clusterConfigService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final NumericDateFieldDetector detector;
     private final NotificationService notificationService;
     private final FieldTypeMappingsService fieldTypeMappingsService;
+    private final RefreshingLockService.Factory lockServiceFactory;
 
     @Inject
     public V20261014120000_RotateIndexSetsWithNumericDateFields(ClusterConfigService clusterConfigService,
@@ -75,13 +82,15 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
                                                                 MongoIndexSet.Factory mongoIndexSetFactory,
                                                                 NumericDateFieldDetector detector,
                                                                 NotificationService notificationService,
-                                                                FieldTypeMappingsService fieldTypeMappingsService) {
+                                                                FieldTypeMappingsService fieldTypeMappingsService,
+                                                                RefreshingLockService.Factory lockServiceFactory) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.detector = detector;
         this.notificationService = notificationService;
         this.fieldTypeMappingsService = fieldTypeMappingsService;
+        this.lockServiceFactory = lockServiceFactory;
     }
 
     @Override
@@ -96,6 +105,25 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
             return;
         }
 
+        // Standard migrations run on every node that considers itself leader, and with automatic leader election
+        // that is decided after the migrations have run. Without a cluster-wide lock two nodes could detect the same
+        // index set and rotate it twice, which costs an index and brings count-based retention forward for nothing.
+        try (var lockService = lockServiceFactory.create()) {
+            lockService.acquireAndKeepLock(ClusterLockResources.name(LOCK_RESOURCE), UUID.randomUUID().toString());
+
+            // Another node may have finished while we were waiting for the lock.
+            if (clusterConfigService.get(MigrationCompleted.class) != null) {
+                LOG.debug("Migration completed by another node.");
+                return;
+            }
+
+            repairAffectedIndexSets();
+        } catch (AlreadyLockedException e) {
+            LOG.debug("Another node is already repairing index sets with numerically mapped date fields.");
+        }
+    }
+
+    private void repairAffectedIndexSets() {
         final List<String> rotatedIndexSets = new ArrayList<>();
         int failed = 0;
 
