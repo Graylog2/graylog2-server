@@ -40,7 +40,7 @@ public class PipelineActivityPeriodical extends Periodical {
 
     private static final String PIPELINE_METER_PREFIX = Pipeline.class.getName() + ".";
     private static final String EXECUTED_SUFFIX = ".executed";
-    private static final int PERIOD_SECONDS = (int) Duration.ofMinutes(15).toSeconds();
+    private static final int PERIOD_SECONDS = (int) Duration.ofMinutes(60).toSeconds();
 
     private final MetricRegistry metricRegistry;
     private final PipelineActivityService activityService;
