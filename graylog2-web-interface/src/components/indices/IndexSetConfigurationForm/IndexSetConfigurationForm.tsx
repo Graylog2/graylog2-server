@@ -17,13 +17,14 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
+import type { FormikHelpers } from 'formik';
 import styled, { css } from 'styled-components';
 import deburr from 'lodash/deburr';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import AppConfig from 'util/AppConfig';
-import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
+import { ConfirmDialog, FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Alert, Col, Row } from 'components/bootstrap';
 import 'components/indices/rotation';
@@ -53,7 +54,7 @@ type Props = {
   cancelLink: string;
   create?: boolean;
   indexSet?: IndexSet;
-  onUpdate: (indexSet: IndexSet) => void;
+  onUpdate: (indexSet: IndexSet) => Promise<void> | void;
   retentionStrategies: Strategies;
   retentionStrategiesContext: RetentionStrategyContext;
   rotationStrategies: Strategies;
@@ -135,7 +136,9 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
-      const indexSetValues = values;
+      // A copy, because this also runs before the confirmation dialog. Deleting keys from the Formik values
+      // themselves would leave a cancelled form missing fields.
+      const indexSetValues = { ...values };
 
       if (!create) {
         delete indexSetValues.index_prefix;
@@ -187,7 +190,18 @@ const IndexSetConfigurationForm = ({
     ],
   );
 
-  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
+  // What the user is being asked about, together with the values waiting for their answer.
+  const [confirmation, setConfirmation] = useState<{ title: string; message: string; values: IndexSet } | null>(null);
+  // A confirmed save bypasses Formik's submit cycle, so its submitting state has to be tracked here to keep the
+  // submit button from starting a second request.
+  const [savingConfirmed, setSavingConfirmed] = useState(false);
+
+  // Plugins may need the user to confirm a change before it is saved. The hook runs here so it can load what it
+  // needs, and hands back a check the submit handler calls. Resolving it this way keeps the hook call count stable.
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
+  const useSubmitConfirmation = dataTieringPlugin?.useIndexSetSubmitConfirmation ?? (() => () => null);
+  // A new index set has nothing to lose yet, so nothing has to be loaded to decide about it.
+  const submitConfirmation = useSubmitConfirmation({ enabled: !create });
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,
@@ -246,9 +260,54 @@ const IndexSetConfigurationForm = ({
     return indexSet as unknown as IndexSetFormValues;
   };
 
+  const saveConfiguration = (values: IndexSetFormValues, { setSubmitting }: FormikHelpers<IndexSetFormValues>) => {
+    // Checking the prepared values rather than the raw ones matters: a form that switched rotation mode still
+    // holds values for the mode it left behind, and only the prepared config says what will be stored.
+    const preparedValues = prepareRetentionConfigBeforeSubmit(values);
+
+    // A plugin may need the user to confirm a change that cannot be undone, such as shortening how long
+    // archives are kept. On a new index set the check is switched off above and never asks for anything.
+    const required = submitConfirmation(prepareInitialValues(), preparedValues);
+
+    if (required) {
+      setConfirmation({ ...required, values: preparedValues });
+      // Nothing is being submitted while the dialog is open, so the form has to leave its submitting state.
+      // Otherwise the submit button stays disabled after the dialog is cancelled.
+      setSubmitting(false);
+
+      return undefined;
+    }
+
+    return onUpdate(preparedValues);
+  };
+
+  const cancelConfirmation = () => setConfirmation(null);
+
+  const acceptConfirmation = () => {
+    const { values } = confirmation;
+    cancelConfirmation();
+    setSavingConfirmed(true);
+
+    // Starting the call inside the chain keeps a synchronous failure from skipping the reset below, which would
+    // leave the submit button disabled for good.
+    return Promise.resolve()
+      .then(() => onUpdate(values))
+      .finally(() => setSavingConfirmed(false));
+  };
+
   return (
     <Row>
       <Col md={12}>
+        {confirmation && (
+          <ConfirmDialog
+            show
+            title={confirmation.title}
+            btnConfirmText="Save"
+            onCancel={cancelConfirmation}
+            onConfirm={acceptConfirmation}>
+            {confirmation.message}
+          </ConfirmDialog>
+        )}
         <Formik validateOnMount onSubmit={saveConfiguration} enableReinitialize initialValues={prepareInitialValues()}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
@@ -411,7 +470,7 @@ const IndexSetConfigurationForm = ({
                       disabledSubmit={!isValid}
                       submitButtonText={submitButtonText}
                       submitLoadingText={submitLoadingText}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSubmitting || savingConfirmed}
                       isAsyncSubmit
                       displayCancel
                       onCancel={onCancel}

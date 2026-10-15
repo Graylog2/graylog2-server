@@ -56,6 +56,10 @@ interface ConfigComponentProps extends SystemConfigurationComponentProps {
   updateConfig: (update: StrategyConfig) => void;
   useMaxNumberOfIndices?: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
   disabled?: boolean;
+  /** Restrictions on single fields of this strategy, keyed as they are on the index set, e.g. retention_strategy.foo. */
+  hiddenFields?: string[];
+  immutableFields?: string[];
+  ignoreFieldRestrictions?: boolean;
 }
 
 type Props = {
@@ -64,7 +68,9 @@ type Props = {
   description?: string;
   selectPlaceholder: string;
   label: string;
+  hiddenFields?: string[];
   immutableFields?: string[];
+  ignoreFieldRestrictions?: boolean;
   disabled?: boolean;
   pluginExports: Array<{
     type: string;
@@ -163,6 +169,7 @@ const getConfigurationComponent = (
   onConfigUpdate: (update: StrategyConfig) => void,
   useMaxNumberOfIndices: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>],
   disabled: boolean = false,
+  fieldRestrictions: { hiddenFields?: string[]; immutableFields?: string[]; ignoreFieldRestrictions?: boolean } = {},
 ) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
@@ -183,6 +190,7 @@ const getConfigurationComponent = (
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
     disabled: disabled,
+    ...fieldRestrictions,
   };
 
   if (selectedStrategy === ARCHIVE_RETENTION_STRATEGY) {
@@ -205,7 +213,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
   label,
   pluginExports,
   strategies,
+  hiddenFields = [],
   immutableFields = [],
+  ignoreFieldRestrictions = false,
   disabled = false,
 
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
@@ -392,6 +402,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               _onConfigUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
               disabled,
+              { hiddenFields, immutableFields, ignoreFieldRestrictions },
             )}
         </Col>
       </Row>

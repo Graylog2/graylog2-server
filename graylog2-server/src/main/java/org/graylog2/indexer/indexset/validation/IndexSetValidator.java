@@ -42,6 +42,7 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY;
@@ -57,15 +58,18 @@ public class IndexSetValidator {
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final DataTieringChecker dataTieringChecker;
+    private final Set<IndexSetConfigValidator> pluginValidators;
 
     @Inject
     public IndexSetValidator(IndexSetRegistry indexSetRegistry,
                              ElasticsearchConfiguration elasticsearchConfiguration,
-                             DataTieringOrchestrator dataTieringOrchestrator, DataTieringChecker dataTieringChecker) {
+                             DataTieringOrchestrator dataTieringOrchestrator, DataTieringChecker dataTieringChecker,
+                             Set<IndexSetConfigValidator> pluginValidators) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
         this.dataTieringChecker = dataTieringChecker;
+        this.pluginValidators = pluginValidators;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
@@ -87,7 +91,14 @@ public class IndexSetValidator {
         if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
         }
-        return Optional.empty();
+        return validatePluginConstraints(newConfig);
+    }
+
+    public Optional<Violation> validatePluginConstraints(RotationAndRetentionFields config) {
+        return pluginValidators.stream()
+                .map(validator -> validator.validate(config))
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
     private Violation validateSimpleIndexSetConfig(RotationAndRetentionFields newConfig) {
