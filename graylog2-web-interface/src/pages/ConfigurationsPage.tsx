@@ -25,7 +25,6 @@ import { Col, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon, LinkContainer, Spinner } from 'components/common';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
-import 'components/maps/configurations';
 import useLocation from 'routing/useLocation';
 import AppRoutes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';

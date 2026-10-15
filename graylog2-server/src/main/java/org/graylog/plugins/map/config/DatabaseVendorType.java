@@ -17,8 +17,12 @@
 
 package org.graylog.plugins.map.config;
 
+import org.graylog2.configuration.tunables.TunableEnumLabel;
+
 public enum DatabaseVendorType {
+    @TunableEnumLabel("MaxMind GeoIP")
     MAXMIND(DatabaseType.MAXMIND_CITY, DatabaseType.MAXMIND_ASN),
+    @TunableEnumLabel("IPInfo Standard Location")
     IPINFO(DatabaseType.IPINFO_STANDARD_LOCATION, DatabaseType.IPINFO_ASN);
 
     private final DatabaseType cityDbType;
