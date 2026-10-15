@@ -19,7 +19,6 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import ConfigurationSection from 'pages/configurations/ConfigurationSection';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
-import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
@@ -47,15 +46,6 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: MessageProcessorsConfig,
         title: 'Message Processors',
-      },
-    },
-    {
-      name: 'Sidecars',
-      feature: 'sidecars',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SidecarConfig,
-        title: 'Sidecars',
       },
     },
     {
