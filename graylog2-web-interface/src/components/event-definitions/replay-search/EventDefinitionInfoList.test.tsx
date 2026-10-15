@@ -18,7 +18,6 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import AppConfig from 'util/AppConfig';
 import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 import {
   mockedMappedAggregation,
@@ -26,9 +25,6 @@ import {
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
-import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { AlertType } from 'components/event-definitions/types';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
@@ -76,10 +72,6 @@ const mockUseAlertAndEventDefinitionData = ({
     isLoading: false,
   });
 
-jest.mock('views/logic/slices/highlightSelectors', () => ({
-  selectHighlightingRules: jest.fn(),
-}));
-
 describe('<EventDefinitionInfoList />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
@@ -98,19 +90,11 @@ describe('<EventDefinitionInfoList />', () => {
 
   useViewsPlugin();
 
-  beforeAll(() => {
-    asMock(selectHighlightingRules).mockReturnValue([
-      HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
-      HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
-    ]);
-  });
-
   beforeEach(() => {
     mockUseAlertAndEventDefinitionData({});
-    asMock(AppConfig.isFeatureEnabled).mockImplementation((feature) => feature !== 'replay_search_right_sidebar');
   });
 
-  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {
+  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications', async () => {
     render(<EventInfoComponent type="event" />);
 
     const priority = await screen.findByTitle('Priority');
@@ -118,19 +102,12 @@ describe('<EventDefinitionInfoList />', () => {
     const searchWithin = await screen.findByTitle('Search within');
     const description = await screen.findByTitle('Description');
     const notifications = await screen.findByTitle('Notifications');
-    const aggregationConditions = await screen.findByTitle('Aggregation conditions');
-    const field1Condition = await screen.findByTestId('color-count(field1)>500');
-    const field2Condition = await screen.findByTestId('color-count(field2)<8000');
 
     expect(priority).toHaveTextContent('Medium');
     expect(execution).toHaveTextContent('1 minute');
     expect(searchWithin).toHaveTextContent('1 minute');
     expect(description).toHaveTextContent('Test description');
     expect(notifications).toHaveTextContent('Email notification');
-    expect(aggregationConditions).toHaveTextContent('count(field1)>500count(field2)<8000');
-
-    expect(field1Condition).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
-    expect(field2Condition).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
   });
 
   it('Shows event definition link for event', async () => {
