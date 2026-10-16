@@ -106,15 +106,32 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void ignoresFieldsTheIndexTemplateTypes() {
-        // these would otherwise be found by value, so the assertion really does exercise the template filter
+    void ignoresFieldsWhoseTypeCannotBeChanged() {
+        // Pinning one of these is rejected by CustomMappingValidation, so reporting it would leave the index set
+        // unfinished and rotate it again on every startup. They would otherwise be found by value, so the assertion
+        // really does exercise the filter.
         givenIndices(index(WRITE_INDEX,
                 field(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, "long"),
-                field(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, "long")));
+                field(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, "long"),
+                field(Message.FIELD_GL2_REMOTE_PORT, "long")));
         givenFieldStats(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, 10, EPOCH_MILLIS);
         givenFieldStats(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 10, EPOCH_MILLIS);
+        givenFieldStats(Message.FIELD_GL2_REMOTE_PORT, 10, EPOCH_MILLIS);
 
         assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
+    }
+
+    @Test
+    void ignoresEveryFieldThatCustomMappingValidationWouldReject() {
+        // the filter has to stay in step with the validation, so it is checked against the same list
+        Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.forEach(fieldName -> {
+            givenIndices(index(WRITE_INDEX, field(fieldName, "long")));
+            givenFieldStats(fieldName, 10, EPOCH_MILLIS);
+
+            assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                    .as("field %s must not be reported", fieldName)
+                    .isEmpty();
+        });
     }
 
     @Test

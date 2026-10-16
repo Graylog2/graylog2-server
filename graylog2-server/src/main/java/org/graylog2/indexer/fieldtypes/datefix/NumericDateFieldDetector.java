@@ -18,8 +18,8 @@ package org.graylog2.indexer.fieldtypes.datefix;
 
 import jakarta.inject.Inject;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
@@ -57,7 +57,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  *     is the only signal available on an installation that started out on an affected version, where every index is
  *     numeric and there is nothing to compare against.</li>
  * </ol>
- * Fields the index template defines and fields the user typed deliberately are never considered.
+ * Fields whose type cannot be changed by a custom mapping, and fields the user typed deliberately, are never
+ * considered.
  */
 public class NumericDateFieldDetector {
     private static final Logger LOG = LoggerFactory.getLogger(NumericDateFieldDetector.class);
@@ -70,14 +71,6 @@ public class NumericDateFieldDetector {
      * profile, which all mean somebody chose it on purpose.
      */
     private static final Set<String> NUMERIC_TYPES = Set.of("long", "float");
-
-    /**
-     * Numeric fields that the index template maps on purpose, so they can never be a mis-mapped date.
-     */
-    private static final Set<String> TEMPLATE_NUMERIC_FIELDS = Set.of(
-            Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-            Message.FIELD_GL2_INPUT_MESSAGE_SIZE,
-            Message.FIELD_GL2_PROCESSING_DURATION_MS);
 
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
@@ -131,7 +124,7 @@ public class NumericDateFieldDetector {
                 // A field that is configured as something other than a date is numeric on purpose.
                 .filter(field -> !configuredTypes.containsKey(field.fieldName())
                         || DATE_TYPE.equals(configuredTypes.get(field.fieldName())))
-                .filter(field -> !TEMPLATE_NUMERIC_FIELDS.contains(field.fieldName()))
+                .filter(field -> !Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(field.fieldName()))
                 .toList();
 
         // Every candidate is classified, so that each affected field can be pinned. Leaving one out would hand it
