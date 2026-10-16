@@ -27,25 +27,25 @@ import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
 const AuthenticationOverviewPage = () => {
-  const { t } = useTranslation('authentication_overview');
+  const { t } = useTranslation('authentication');
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('overview_page.title')}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title={t('title')}
+        title={t('overview_page.title')}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>{t('description')}</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
       {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
-            <Alert bsStyle="warning">{t('no_active_backend')}</Alert>
+            <Alert bsStyle="warning">{t('overview_page.no_active_backend')}</Alert>
           </Col>
         </Row>
       )}

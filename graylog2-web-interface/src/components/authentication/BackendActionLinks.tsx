@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
@@ -26,22 +27,26 @@ type Props = {
   finishedLoading: boolean;
 };
 
-const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
-  <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}>
-      <Button disabled={!finishedLoading || !activeBackend}>View active service</Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(activeBackend?.id)}>
-      <Button disabled={!activeBackend || !finishedLoading} type="button">
-        Edit active service
-      </Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}>
-      <Button bsStyle="primary" type="button">
-        Create service
-      </Button>
-    </LinkContainer>
-  </ButtonToolbar>
-);
+const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => {
+  const { t } = useTranslation('authentication');
+
+  return (
+    <ButtonToolbar>
+      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}>
+        <Button disabled={!finishedLoading || !activeBackend}>{t('action_links.view_active')}</Button>
+      </LinkContainer>
+      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(activeBackend?.id)}>
+        <Button disabled={!activeBackend || !finishedLoading} type="button">
+          {t('action_links.edit_active')}
+        </Button>
+      </LinkContainer>
+      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}>
+        <Button bsStyle="primary" type="button">
+          {t('action_links.create')}
+        </Button>
+      </LinkContainer>
+    </ButtonToolbar>
+  );
+};
 
 export default BackendActionLinks;

@@ -40,7 +40,7 @@ const AuthenticationBackendEditPage = ({
     query: { initialStepKey },
   },
 }: Props) => {
-  const { t } = useTranslation('authentication_backend_edit');
+  const { t } = useTranslation('authentication');
   const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const AuthenticationBackendEditPage = ({
   const authService = getAuthServicePlugin(authBackend.config.type);
 
   if (!authService) {
-    return <>{t('no_plugin_configured', { type: authBackend.config.type })}</>;
+    return <>{t('no_service_plugin_for', { type: authBackend.config.type })}</>;
   }
 
   const { editComponent: BackendEdit } = authService;

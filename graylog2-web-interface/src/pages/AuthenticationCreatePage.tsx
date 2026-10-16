@@ -26,23 +26,23 @@ import DocsHelper from 'util/DocsHelper';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 const AuthenticationCreatePage = () => {
-  const { t } = useTranslation('authentication_create');
+  const { t } = useTranslation('authentication');
   const { finishedLoading, activeBackend } = useActiveBackend();
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('create_page.title')}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title={t('title')}
+        title={t('create_page.title')}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>{t('description')}</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
 
-      <GettingStarted title={t('getting_started_title')} />
+      <GettingStarted title={t('create_page.getting_started_title')} />
     </DocumentTitle>
   );
 };

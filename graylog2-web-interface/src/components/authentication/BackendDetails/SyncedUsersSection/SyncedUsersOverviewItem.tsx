@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, Link } from 'components/common';
 import type Role from 'logic/roles/Role';
@@ -36,8 +37,9 @@ const ActionsWrapper = styled(ButtonToolbar)`
 `;
 
 const SyncedUsersOverviewItem = ({ user: { fullName, id, roles: userRolesIds, username }, roles }: Props) => {
+  const { t } = useTranslation('authentication');
   const userRolesNames = userRolesIds
-    .map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found')
+    .map((roleId) => roles.find((role) => role.id === roleId)?.name ?? t('synced_users.role_not_found'))
     .toSet();
 
   return (
@@ -51,7 +53,7 @@ const SyncedUsersOverviewItem = ({ user: { fullName, id, roles: userRolesIds, us
         <ActionsWrapper>
           <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
             <Button type="button" bsStyle="info" bsSize="xs">
-              Edit
+              {t('synced_users.edit')}
             </Button>
           </LinkContainer>
         </ActionsWrapper>

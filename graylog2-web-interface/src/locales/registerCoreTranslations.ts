@@ -18,14 +18,7 @@
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
 import enAggregation from 'locales/en/aggregation.json';
-import enAuthenticationBackendCreate from 'locales/en/authentication_backend_create.json';
-import enAuthenticationBackendDetails from 'locales/en/authentication_backend_details.json';
-import enAuthenticationBackendEdit from 'locales/en/authentication_backend_edit.json';
-import enAuthenticationCreate from 'locales/en/authentication_create.json';
-import enAuthenticationOverview from 'locales/en/authentication_overview.json';
-import enAuthenticationPage from 'locales/en/authentication_page.json';
-import enAuthenticators from 'locales/en/authenticators.json';
-import enAuthenticatorsEdit from 'locales/en/authenticators_edit.json';
+import enAuthentication from 'locales/en/authentication.json';
 import enClusterCertificateManagement from 'locales/en/cluster_certificate_management.json';
 import enCollectorsDeployment from 'locales/en/collectors_deployment.json';
 import enCollectorsFleets from 'locales/en/collectors_fleets.json';
@@ -37,6 +30,7 @@ import enCommon from 'locales/en/common.json';
 import enContentPacks from 'locales/en/content_packs.json';
 import enDashboards from 'locales/en/dashboards.json';
 import enDataNodesClusterManagement from 'locales/en/data_nodes_cluster_management.json';
+import enEventNotifications from 'locales/en/event_notifications.json';
 import enEvents from 'locales/en/events.json';
 import enExtractors from 'locales/en/extractors.json';
 import enInputs from 'locales/en/inputs.json';
@@ -51,36 +45,8 @@ registerTranslations('aggregation', enAggregation, {
   de: () => import(/* webpackChunkName: "translations-de-aggregation" */ 'locales/de/aggregation.json'),
 });
 
-registerTranslations('authentication_backend_create', enAuthenticationBackendCreate, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-create" */ 'locales/de/authentication_backend_create.json'),
-});
-
-registerTranslations('authentication_backend_details', enAuthenticationBackendDetails, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-details" */ 'locales/de/authentication_backend_details.json'),
-});
-
-registerTranslations('authentication_backend_edit', enAuthenticationBackendEdit, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-edit" */ 'locales/de/authentication_backend_edit.json'),
-});
-
-registerTranslations('authentication_create', enAuthenticationCreate, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-create" */ 'locales/de/authentication_create.json'),
-});
-
-registerTranslations('authentication_overview', enAuthenticationOverview, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-overview" */ 'locales/de/authentication_overview.json'),
-});
-
-registerTranslations('authentication_page', enAuthenticationPage, {
-  de: () => import(/* webpackChunkName: "translations-de-authentication-page" */ 'locales/de/authentication_page.json'),
-});
-
-registerTranslations('authenticators', enAuthenticators, {
-  de: () => import(/* webpackChunkName: "translations-de-authenticators" */ 'locales/de/authenticators.json'),
-});
-
-registerTranslations('authenticators_edit', enAuthenticatorsEdit, {
-  de: () => import(/* webpackChunkName: "translations-de-authenticators-edit" */ 'locales/de/authenticators_edit.json'),
+registerTranslations('authentication', enAuthentication, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication" */ 'locales/de/authentication.json'),
 });
 
 registerTranslations('cluster_certificate_management', enClusterCertificateManagement, {
@@ -125,6 +91,10 @@ registerTranslations('dashboards', enDashboards, {
 
 registerTranslations('data_nodes_cluster_management', enDataNodesClusterManagement, {
   de: () => import(/* webpackChunkName: "translations-de-data-nodes-cluster-management" */ 'locales/de/data_nodes_cluster_management.json'),
+});
+
+registerTranslations('event_notifications', enEventNotifications, {
+  de: () => import(/* webpackChunkName: "translations-de-event-notifications" */ 'locales/de/event_notifications.json'),
 });
 
 registerTranslations('events', enEvents, {

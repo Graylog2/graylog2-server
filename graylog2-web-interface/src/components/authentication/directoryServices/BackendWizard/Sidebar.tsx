@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
@@ -56,6 +57,7 @@ type Props = {
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
+  const { t } = useTranslation('authentication');
   const [activeKey, setActiveKey] = useState<string>(SERVER_CONFIG_KEY);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
@@ -72,7 +74,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
       onSelect={setActiveKey as SelectCallback}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
-          <Panel.Title toggle>Server Connection Check</Panel.Title>
+          <Panel.Title toggle>{t('connection_test.title')}</Panel.Title>
         </Panel.Heading>
         <Panel.Body collapsible>
           <ServerConnectionTest prepareSubmitPayload={prepareSubmitPayload} />
@@ -80,7 +82,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
       </Panel>
       <Panel eventKey={USER_SYNC_KEY}>
         <Panel.Heading>
-          <Panel.Title toggle>User Login Test</Panel.Title>
+          <Panel.Title toggle>{t('login_test.title')}</Panel.Title>
         </Panel.Heading>
         <Panel.Body collapsible>
           <UserLoginTest prepareSubmitPayload={prepareSubmitPayload} />

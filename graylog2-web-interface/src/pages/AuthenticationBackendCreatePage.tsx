@@ -28,11 +28,11 @@ type Props = {
 };
 
 const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {
-  const { t } = useTranslation('authentication_backend_create');
+  const { t } = useTranslation('authentication');
   const authService = getAuthServicePlugin(name);
 
   if (!authService) {
-    return <>{t('no_auth_service_plugin', { name })}</>;
+    return <>{t('no_service_plugin', { type: name })}</>;
   }
 
   const { createComponent: BackendCreate } = authService;

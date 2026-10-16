@@ -53,8 +53,16 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
-        { description: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
+        {
+          description: 'Authentication Services',
+          titleKey: 'authentication:page_navigation.services',
+          path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW,
+        },
+        {
+          description: 'Authenticators',
+          titleKey: 'authentication:page_navigation.authenticators',
+          path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW,
+        },
       ],
     },
   ],

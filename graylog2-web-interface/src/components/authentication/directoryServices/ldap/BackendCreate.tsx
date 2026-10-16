@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
@@ -24,6 +25,7 @@ import WizardPageHeader from './WizardPageHeader';
 
 import handleCreate from '../HandleCreate';
 import BackendWizard from '../BackendWizard';
+import HelpText from '../HelpText';
 
 export const AUTH_BACKEND_META = {
   serviceType: 'ldap',
@@ -32,54 +34,22 @@ export const AUTH_BACKEND_META = {
 
 export const HELP = {
   // server config help
-  systemUserDn: (
-    <span>
-      The username for the initial connection to the LDAP server, e.g. <code>cn=admin,dc=example,dc=com</code>, this
-      might be optional depending on your LDAP server.
-    </span>
-  ),
-  systemUserPassword: 'The password for the initial connection to the LDAP server.',
+  systemUserDn: <HelpText i18nKey="ldap.help.system_user_dn" />,
+  systemUserPassword: <HelpText i18nKey="ldap.help.system_user_password" />,
   // user sync help
-  userSearchBase: (
-    <span>
-      The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
-    </span>
-  ),
+  userSearchBase: <HelpText i18nKey="ldap.help.user_search_base" />,
   userSearchPattern: (
-    <span>
-      For example <code className="text-nowrap">{'(&(uid={0})(objectClass=inetOrgPerson))'}</code>. The string{' '}
-      <code>{'{0}'}</code> will be replaced by the entered username.
-    </span>
+    <HelpText
+      i18nKey="directory_help.user_search_pattern"
+      values={{ example: '(&(uid={0})(objectClass=inetOrgPerson))', placeholder: '{0}' }}
+    />
   ),
-  userNameAttribute: (
-    <span>
-      Which LDAP attribute to use for the username of the synchronized user, e.g <code>uid</code>.<br />
-      Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
-    </span>
-  ),
-  userFullNameAttribute: (
-    <span>
-      Which LDAP attribute to use for the full name of a synchronized user, e.g. <code>cn</code>.<br />
-    </span>
-  ),
-  userUniqueIdAttribute: (
-    <span>
-      Which LDAP attribute to use for the ID of a synchronized user, e.g. <code>entryUUID</code>.<br />
-    </span>
-  ),
-  defaultRoles: (
-    <span>
-      The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web
-      interface
-    </span>
-  ),
-  defaultUserTimezone: <span>Choose the default time zone for new users.</span>,
-  emailAttributes: (
-    <span>
-      Which LDAP attribute to use for the user&apos;s email address, e.g. <code>mail</code>.<br />
-      You can specify multiple attributes, type <kbd>Tab</kbd> or <kbd>Enter</kbd> to accept your value.
-    </span>
-  ),
+  userNameAttribute: <HelpText i18nKey="ldap.help.user_name_attribute" />,
+  userFullNameAttribute: <HelpText i18nKey="ldap.help.user_full_name_attribute" />,
+  userUniqueIdAttribute: <HelpText i18nKey="ldap.help.user_unique_id_attribute" />,
+  defaultRoles: <HelpText i18nKey="directory_help.default_roles" />,
+  defaultUserTimezone: <HelpText i18nKey="directory_help.default_user_timezone" />,
+  emailAttributes: <HelpText i18nKey="ldap.help.email_attributes" />,
 };
 
 const INITIAL_VALUES: Partial<WizardFormValues> = {
@@ -95,6 +65,7 @@ const INITIAL_VALUES: Partial<WizardFormValues> = {
 };
 
 const BackendCreate = () => {
+  const { t } = useTranslation('authentication');
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const { help: groupSyncHelp = {}, initialValues: initialGroupSyncValues = {} } =
     enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
@@ -102,7 +73,7 @@ const BackendCreate = () => {
   const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
 
   return (
-    <DocumentTitle title="Create LDAP Authentication Service">
+    <DocumentTitle title={t('ldap.create_title')}>
       <WizardPageHeader />
       <BackendWizard
         onSubmit={handleCreate}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EnterprisePluginNotFound } from 'components/common';
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
@@ -26,13 +27,14 @@ type Props = {
 };
 
 const SyncedTeamsSection = ({ authenticationBackend }: Props) => {
+  const { t } = useTranslation('authentication');
   const enterpriseAuthenticationPlugin = getEnterpriseAuthenticationPlugin();
   const EnterpriseSyncedTeamsSection = enterpriseAuthenticationPlugin?.components.SyncedTeamsSection;
 
   if (!EnterpriseSyncedTeamsSection) {
     return (
-      <SectionComponent title="Synchronized Teams">
-        <EnterprisePluginNotFound featureName="teams" />
+      <SectionComponent title={t('synced_teams.title')}>
+        <EnterprisePluginNotFound featureName={t('synced_teams.feature_name')} />
       </SectionComponent>
     );
   }

@@ -21,7 +21,9 @@ import camelCase from 'lodash/camelCase';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import type { FormikProps } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { validateField } from 'util/FormsUtils';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { Row, Col, Alert } from 'components/bootstrap';
@@ -49,30 +51,33 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-const SubmitAllError = ({ error, backendId }: { error: FetchError; backendId: string | null | undefined }) => (
-  <Row>
-    <Col xs={9} xsOffset={3}>
-      <Alert
-        bsStyle="danger"
-        style={{ wordBreak: 'break-word' }}
-        title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
-        {error?.message && (
-          <>
-            {error.message}
-            <br />
-            <br />
-          </>
-        )}
-        {error?.additional?.res?.text}
-      </Alert>
-    </Col>
-  </Row>
-);
+const SubmitAllError = ({ error, backendId }: { error: FetchError; backendId: string | null | undefined }) => {
+  const { t } = useTranslation('authentication');
+
+  return (
+    <Row>
+      <Col xs={9} xsOffset={3}>
+        <Alert
+          bsStyle="danger"
+          style={{ wordBreak: 'break-word' }}
+          title={backendId ? t('wizard.edit_failed') : t('wizard.create_failed')}>
+          {error?.message && (
+            <>
+              {error.message}
+              <br />
+              <br />
+            </>
+          )}
+          {error?.additional?.res?.text}
+        </Alert>
+      </Col>
+    </Row>
+  );
+};
 
 const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
-  const backendErrorStrings = mapValues(
-    backendErrors,
-    (errorArray) => `Server validation error: ${errorArray.join(' ')}`,
+  const backendErrorStrings = mapValues(backendErrors, (errorArray) =>
+    i18n.t('wizard.server_validation_error', { ns: 'authentication', errors: errorArray.join(' ') }),
   );
 
   return mapKeys(backendErrorStrings, (_value, key) => camelCase(key));
@@ -222,7 +227,7 @@ const _onSubmitAll = (
   if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
     if (
       // eslint-disable-next-line no-alert
-      window.confirm('Do you really want to remove the group synchronization config for this authentication service?')
+      window.confirm(i18n.t('wizard.confirm_remove_group_sync', { ns: 'authentication' }))
     ) {
       return _submit();
     }

@@ -1,6 +1,0 @@
-{
-  "title": "All Authentication Services",
-  "documentation_title": "Authentication documentation",
-  "description": "Configure authentication services of this cluster.",
-  "no_active_backend": "None of the configured authentication services is currently active."
-}

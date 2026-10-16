@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import type Role from 'logic/roles/Role';
@@ -26,9 +27,9 @@ import EditLinkButton from './EditLinkButton';
 
 import { STEP_KEY as USER_SYNC_KEY } from '../BackendWizard/UserSyncStep';
 
-const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>) => {
+const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>, roleNotFound: string) => {
   const defaultRolesNames = defaultRolesIds.map(
-    (roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found',
+    (roleId) => roles.find((role) => role.id === roleId)?.name ?? roleNotFound,
   );
 
   return defaultRolesNames.join(', ');
@@ -41,6 +42,7 @@ type Props = {
 };
 
 const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: Props) => {
+  const { t } = useTranslation('authentication');
   const {
     userSearchBase,
     userSearchPattern,
@@ -53,20 +55,26 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
 
   return (
     <SectionComponent
-      title="User Synchronization"
+      title={t('user_sync.title')}
       headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
-      <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
-      <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
-      <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />
-      <ReadOnlyFormGroup label="Full Name Attribute" value={userFullNameAttribute} />
+      <ReadOnlyFormGroup label={t('user_sync.search_base_dn')} value={userSearchBase} />
+      <ReadOnlyFormGroup label={t('user_sync.search_pattern')} value={userSearchPattern} />
+      <ReadOnlyFormGroup label={t('user_sync.name_attribute')} value={userNameAttribute} />
+      <ReadOnlyFormGroup label={t('user_sync.full_name_attribute')} value={userFullNameAttribute} />
       {!excludedFields.emailAttributes && (
-        <ReadOnlyFormGroup label="Email Attribute" value={emailAttributes.join(',')} />
+        <ReadOnlyFormGroup label={t('user_sync.email_attribute')} value={emailAttributes.join(',')} />
       )}
       {!excludedFields.userUniqueIdAttribute && (
-        <ReadOnlyFormGroup label="ID Attribute" value={userUniqueIdAttribute} />
+        <ReadOnlyFormGroup label={t('user_sync.id_attribute')} value={userUniqueIdAttribute} />
       )}
-      <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
-      <ReadOnlyFormGroup label="Default User Time Zone" value={defaultUserTimezone || "Browser's time zone"} />
+      <ReadOnlyFormGroup
+        label={t('user_sync.default_roles')}
+        value={rolesList(defaultRoles, roles, t('user_sync.role_not_found'))}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_sync.default_user_time_zone')}
+        value={defaultUserTimezone || t('user_sync.browser_time_zone')}
+      />
     </SectionComponent>
   );
 };

@@ -37,7 +37,7 @@ type Props = {
 };
 
 const _pageTitle = (t: any, authBackendTitle: string, returnString = false) => {
-  const pageName = t('page_name');
+  const pageName = t('backend_details_page.title');
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
   if (returnString) {
@@ -52,7 +52,7 @@ const _pageTitle = (t: any, authBackendTitle: string, returnString = false) => {
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
-  const { t } = useTranslation('authentication_backend_details');
+  const { t } = useTranslation('authentication');
   const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
@@ -71,15 +71,15 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
         actions={
           <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
             <Button bsStyle="primary" type="button">
-              {t('edit_service')}
+              {t('backend_details_page.edit_service')}
             </Button>
           </LinkContainer>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>{t('description')}</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
       <BackendDetails authenticationBackend={authBackend} />
     </DocumentTitle>

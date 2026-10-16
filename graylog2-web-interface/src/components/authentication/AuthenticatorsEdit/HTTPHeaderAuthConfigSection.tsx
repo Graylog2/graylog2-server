@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import type HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
@@ -31,11 +32,12 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useProductName from 'brand-customization/useProductName';
 
 const HTTPHeaderAuthConfigSection = () => {
+  const { t } = useTranslation('authentication');
   const [submitError, setSubmitError] = useState<string | undefined>();
   const productName = useProductName();
 
   const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined | void>();
-  const sectionTitle = 'Trusted Header Authentication';
+  const sectionTitle = t('trusted_header.title');
   const history = useHistory();
   const sendTelemetry = useSendTelemetry('authenticator-trustedheader');
 
@@ -69,13 +71,17 @@ const HTTPHeaderAuthConfigSection = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
-      <p>This authenticator enables you to login a user, based on a HTTP header without further interaction.</p>
+      <p>{t('trusted_header.description')}</p>
       <Formik onSubmit={_onSubmit} initialValues={loadedConfig.toJSON()}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <Input id="enable-http-header-auth" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Enabled">
+            <Input
+              id="enable-http-header-auth"
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"
+              label={t('trusted_header.enabled')}>
               <FormikFormGroup
-                label="Enable single sign-on via HTTP header"
+                label={t('trusted_header.enable_sso')}
                 name="enabled"
                 formGroupClassName="form-group no-bm"
                 wrapperClassName="col-xs-12"
@@ -83,16 +89,20 @@ const HTTPHeaderAuthConfigSection = () => {
               />
             </Input>
             <FormikFormGroup
-              label="Username header"
+              label={t('trusted_header.username_header')}
               name="username_header"
               required
-              help="HTTP header containing the implicitly trusted name of the user. (The header match is ignoring case sensitivity)"
+              help={t('trusted_header.username_header_help')}
             />
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
-                  Please configure the <code>trusted_proxies</code> setting in the {productName} server configuration
-                  file.
+                  <Trans
+                    t={t}
+                    i18nKey="trusted_header.trusted_proxies_hint"
+                    values={{ productName }}
+                    components={{ code: <code /> }}
+                  />
                 </Alert>
               </Col>
             </Row>
@@ -100,8 +110,12 @@ const HTTPHeaderAuthConfigSection = () => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Update Config" type="submit">
-                    Update Config
+                  <Button
+                    bsStyle="primary"
+                    disabled={isSubmitting || !isValid}
+                    title={t('trusted_header.update_config')}
+                    type="submit">
+                    {t('trusted_header.update_config')}
                   </Button>
                 </div>
               </Col>

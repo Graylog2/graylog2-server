@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
@@ -23,8 +24,9 @@ import { Spinner, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {
+  const { t } = useTranslation('authentication');
   const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined>();
-  const sectionTitle = 'Trusted Header Authentication';
+  const sectionTitle = t('trusted_header.title');
 
   useEffect(() => {
     HTTPHeaderAuthConfigDomain.load().then(setLoadedConfig);
@@ -40,9 +42,9 @@ const HTTPHeaderAuthConfigSection = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
-      <p>This authenticator enables you to login a user, based on a HTTP header without further interaction.</p>
-      <ReadOnlyFormGroup label="Enabled" value={loadedConfig.enabled} />
-      <ReadOnlyFormGroup label="Username header" value={loadedConfig.usernameHeader} />
+      <p>{t('trusted_header.description')}</p>
+      <ReadOnlyFormGroup label={t('trusted_header.enabled')} value={loadedConfig.enabled} />
+      <ReadOnlyFormGroup label={t('trusted_header.username_header')} value={loadedConfig.usernameHeader} />
     </SectionComponent>
   );
 };

@@ -19,6 +19,7 @@ import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, Link, TextOverflowEllipsis } from 'components/common';
 import StringUtils from 'util/StringUtils';
@@ -44,28 +45,26 @@ const DescriptionCell = styled.td`
   max-width: 300px;
 `;
 
-const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>) => {
+const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>, roleNotFound: string) => {
   const defaultRolesNames = defaultRolesIds.map(
-    (roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found',
+    (roleId) => roles.find((role) => role.id === roleId)?.name ?? roleNotFound,
   );
 
   return defaultRolesNames.join(', ');
 };
 
 const EditButton = ({ authenticationBackend }: { authenticationBackend: AuthenticationBackend }) => {
+  const { t } = useTranslation('authentication');
   const link = Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackend.id);
 
   return (
     <LinkContainer to={link}>
       <Button bsSize="xs" type="button">
-        Edit
+        {t('backends_overview.edit')}
       </Button>
     </LinkContainer>
   );
 };
-
-const confirmMessage = (authBackendTitle: string, actionName: string) =>
-  `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
 
 const ActionsCell = ({
   isActive,
@@ -75,26 +74,29 @@ const ActionsCell = ({
   isActive: boolean;
 }) => {
   const { title, id } = authenticationBackend;
+  const { t } = useTranslation('authentication');
   const queryClient = useQueryClient();
+  const confirmMessage = (action: 'activate' | 'deactivate' | 'delete') =>
+    t(`backends_overview.confirm_${action}`, { title: StringUtils.truncateWithEllipses(title, 30) });
   const _setActiveBackend = (backendId) =>
     AuthenticationDomain.setActiveBackend(backendId, title).then(() =>
       queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
     );
 
   const _deactivateBackend = () => {
-    if (window.confirm(confirmMessage(title, 'deactivate'))) {
+    if (window.confirm(confirmMessage('deactivate'))) {
       _setActiveBackend(null);
     }
   };
 
   const _activateBackend = () => {
-    if (window.confirm(confirmMessage(title, 'activate'))) {
+    if (window.confirm(confirmMessage('activate'))) {
       _setActiveBackend(id);
     }
   };
 
   const _deleteBackend = () => {
-    if (window.confirm(confirmMessage(title, 'delete'))) {
+    if (window.confirm(confirmMessage('delete'))) {
       AuthenticationDomain.delete(id, title).then(() =>
         queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
       );
@@ -108,17 +110,17 @@ const ActionsCell = ({
           <>
             <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deactivateBackend} bsStyle="warning" bsSize="xs" type="button">
-              Deactivate
+              {t('backends_overview.deactivate')}
             </Button>
           </>
         ) : (
           <>
             <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_activateBackend} bsStyle="warning" bsSize="xs" type="button">
-              Activate
+              {t('backends_overview.activate')}
             </Button>
             <Button onClick={_deleteBackend} bsStyle="danger" bsSize="xs" type="button">
-              Delete
+              {t('backends_overview.delete')}
             </Button>
           </>
         )}
@@ -129,6 +131,7 @@ const ActionsCell = ({
 
 const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
   const { title, description, defaultRoles, id } = authenticationBackend;
+  const { t } = useTranslation('authentication');
   const detailsLink = isActive
     ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE
     : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
@@ -141,7 +144,7 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
       <DescriptionCell>
         <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
       </DescriptionCell>
-      <td className="limited">{rolesList(defaultRoles, roles)}</td>
+      <td className="limited">{rolesList(defaultRoles, roles, t('backends_overview.role_not_found'))}</td>
       <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
   );

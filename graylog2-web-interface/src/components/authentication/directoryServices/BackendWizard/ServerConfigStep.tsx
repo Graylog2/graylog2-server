@@ -19,6 +19,7 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
@@ -98,6 +99,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
     authBackendMeta: { backendHasPassword },
   } = stepsState;
   const sendTelemetry = useSendTelemetry('directory-service');
+  const { t } = useTranslation('authentication');
 
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
     const currentValue = values.transportSecurity;
@@ -139,21 +141,30 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
       validateOnMount={validateOnMount}>
       {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
-          <FormikFormGroup help={help.title} label="Title" name="title" placeholder="Title" />
+          <FormikFormGroup
+            help={help.title}
+            label={t('server_config.title_label')}
+            name="title"
+            placeholder={t('server_config.title_label')}
+          />
 
           <FormikFormGroup
             help={help.description}
             label={
               <>
-                Description <Opt />
+                {t('server_config.description_label')} <Opt />
               </>
             }
             type="textarea"
             name="description"
-            placeholder="Description"
+            placeholder={t('server_config.description_label')}
           />
 
-          <Input id="uri-host" label="Server Address" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+          <Input
+            id="uri-host"
+            label={t('server_config.server_address')}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9">
             <>
               <ServerUrl className="input-group">
                 <FormikInput
@@ -161,7 +172,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                   name="serverHost"
                   id="serverHost"
                   error={backendValidationErrors?.serverHost}
-                  placeholder="Hostname"
+                  placeholder={t('server_config.hostname')}
                   validate={validateField(FORM_VALIDATION.serverHost)}
                 />
                 <span className="input-group-addon input-group-separator">:</span>
@@ -170,7 +181,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                   name="serverPort"
                   id="serverPort"
                   error={backendValidationErrors?.serverPort}
-                  placeholder="Port"
+                  placeholder={t('server_config.port')}
                   type="number"
                   validate={validateField(FORM_VALIDATION.serverPort)}
                 />
@@ -184,7 +195,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                         defaultChecked={value === 'none'}
                         formGroupClassName=""
                         id={name}
-                        label="None"
+                        label={t('server_config.transport_security_none')}
                         onBlur={onBlur}
                         onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                         type="radio"
@@ -194,6 +205,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                         defaultChecked={value === 'tls'}
                         formGroupClassName=""
                         id={name}
+                        // eslint-disable-next-line graylog/no-untranslated-text -- protocol name
                         label="TLS"
                         onBlur={onBlur}
                         onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
@@ -204,6 +216,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                         defaultChecked={value === 'start_tls'}
                         formGroupClassName=""
                         id={name}
+                        // eslint-disable-next-line graylog/no-untranslated-text -- protocol name
                         label="StartTLS"
                         onBlur={onBlur}
                         onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
@@ -216,7 +229,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
 
                 <FormikInput
                   formGroupClassName=""
-                  label="Verify Certificates"
+                  label={t('server_config.verify_certificates')}
                   name="verifyCertificates"
                   id="verifyCertificates"
                   type="checkbox"
@@ -227,10 +240,10 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
           <FormikFormGroup
             help={help.systemUserDn}
             error={backendValidationErrors?.systemUserDn}
-            label="System User DN"
+            label={t('server_config.system_user_dn')}
             name="systemUserDn"
             validate={validateField(FORM_VALIDATION.systemUserDn)}
-            placeholder="System User DN"
+            placeholder={t('server_config.system_user_dn')}
             required
           />
 
@@ -239,13 +252,13 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               id="systemPassword"
               label={
                 <>
-                  System Password <Opt />
+                  {t('server_config.system_password')} <Opt />
                 </>
               }
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9">
               <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
-                Reset Password
+                {t('server_config.reset_password')}
               </Button>
             </Input>
           ) : (
@@ -254,19 +267,19 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               buttonAfter={
                 backendHasPassword && values.systemUserPassword !== undefined ? (
                   <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
-                    Undo Reset
+                    {t('server_config.undo_reset')}
                   </Button>
                 ) : undefined
               }
               help={help.systemUserPassword}
               label={
                 <>
-                  System Password <Opt />
+                  {t('server_config.system_password')} <Opt />
                 </>
               }
               name="systemUserPassword"
               error={backendValidationErrors?.systemUserPassword}
-              placeholder="System Password"
+              placeholder={t('server_config.system_password')}
               validate={validateField(FORM_VALIDATION.systemUserPassword)}
               type="password"
             />
@@ -276,7 +289,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
 
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting} onClick={() => _onSubmitAll(validateForm)} type="button">
-              Finish & Save Service
+              {t('wizard.finish_and_save')}
             </Button>
             <Button
               bsStyle="primary"
@@ -287,7 +300,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                 });
               }}
               type="submit">
-              Next: User Synchronization
+              {t('wizard.next_user_sync')}
             </Button>
           </ButtonToolbar>
         </Form>

@@ -32,7 +32,7 @@ import BackendDetails from 'components/authentication/BackendDetails';
 import useHistory from 'routing/useHistory';
 
 const _pageTitle = (t: any, activeBackend: AuthenticationBackend | undefined | null, returnString?: boolean) => {
-  const pageName = t('page_name');
+  const pageName = t('active_page.title');
 
   if (activeBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(activeBackend.title, 30);
@@ -68,7 +68,7 @@ const useRedirectToAppropriatePage = (
 };
 
 const AuthenticationPage = () => {
-  const { t } = useTranslation('authentication_page');
+  const { t } = useTranslation('authentication');
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
 
   // Only display this page if there is an active backend
@@ -86,10 +86,10 @@ const AuthenticationPage = () => {
         title={_pageTitle(t, activeBackend)}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>{t('description')}</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
 
       {finishedLoading && activeBackend && <BackendDetails authenticationBackend={activeBackend} />}

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import { PageHeader } from 'components/common';
@@ -28,23 +30,22 @@ type Props = {
   authenticationBackend?: DirectoryServiceBackend;
 };
 
-const _pageTitle = (authBackend) => {
+const _pageTitle = (t: TFunction, authBackend) => {
   if (authBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(authBackend.title, 30);
 
     return (
-      <>
-        Edit Authentication Service - <i>{backendTitle}</i>
-      </>
+      <Trans t={t} i18nKey="wizard_header.edit_title" values={{ backendTitle }} components={{ emphasis: <i /> }} />
     );
   }
 
-  return 'Create Active Directory Authentication Service';
+  return t('active_directory.create_title');
 };
 
 const WizardPageHeader = ({ authenticationBackend: authBackend = undefined }: Props) => {
+  const { t } = useTranslation('authentication');
   const { finishedLoading, activeBackend } = useActiveBackend();
-  const pageTitle = _pageTitle(authBackend);
+  const pageTitle = _pageTitle(t, authBackend);
 
   return (
     <>
@@ -53,10 +54,10 @@ const WizardPageHeader = ({ authenticationBackend: authBackend = undefined }: Pr
         title={pageTitle}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: 'Authentication documentation',
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure authentication services of this cluster.</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
     </>
   );

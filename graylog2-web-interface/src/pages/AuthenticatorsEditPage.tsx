@@ -24,19 +24,19 @@ import DocsHelper from 'util/DocsHelper';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 
 const AuthenticatorsEditPage = () => {
-  const { t } = useTranslation('authenticators_edit');
+  const { t } = useTranslation('authentication');
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('authenticators.edit')}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title={t('title')}
+        title={t('authenticators.edit')}
         actions={<AuthenticatorActionLinks />}
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('authenticators.documentation_title'),
           path: DocsHelper.PAGES.AUTHENTICATORS,
         }}>
-        <span>{t('description')}</span>
+        <span>{t('authenticators.description')}</span>
       </PageHeader>
 
       <AuthenticatorsEdit />

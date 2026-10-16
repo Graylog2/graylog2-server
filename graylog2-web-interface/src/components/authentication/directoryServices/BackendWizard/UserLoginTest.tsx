@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -34,6 +35,7 @@ type Props = {
 
 const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
   const { authBackendMeta } = useContext(BackendWizardContext);
+  const { t } = useTranslation('authentication');
   const initialLoginStatus = {
     loading: false,
     success: false,
@@ -84,26 +86,31 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
 
   return (
     <>
-      <p>
-        Verify the settings by loading the entry for the given user name. If you omit the password, no authentication
-        attempt will be made.
-      </p>
+      <p>{t('login_test.description')}</p>
       <Formik onSubmit={_handleLoginTest} initialValues={{ password: '', username: '' }}>
         <Form className="form">
           <Row className="no-bm">
             <Col sm={6}>
-              <FormikInput label="Username" name="username" id="user-login-username" required />
+              <FormikInput label={t('login_test.username')} name="username" id="user-login-username" required />
             </Col>
             <Col sm={6}>
-              <FormikInput label="Password" name="password" type="password" id="user-login-password" required />
+              <FormikInput
+                label={t('login_test.password')}
+                name="password"
+                type="password"
+                id="user-login-password"
+                required
+              />
             </Col>
           </Row>
-          <Button type="submit">{loading ? <Spinner delay={0} text="Test User Login" /> : 'Test User Login'}</Button>
+          <Button type="submit">
+            {loading ? <Spinner delay={0} text={t('login_test.submit')} /> : t('login_test.submit')}
+          </Button>
           {!hasErrors && testFinished && (
             <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
               <b>
-                {!result?.user_exists && 'User does not exist'}
-                {result?.user_exists && <>{result?.login_success ? message : 'Login failed'}</>}
+                {!result?.user_exists && t('login_test.user_does_not_exist')}
+                {result?.user_exists && <>{result?.login_success ? message : t('login_test.login_failed')}</>}
               </b>
               {result?.user_exists && result?.user_details && (
                 <div>
@@ -111,8 +118,8 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>User Attribute</th>
-                        <th>Value</th>
+                        <th>{t('login_test.user_attribute')}</th>
+                        <th>{t('login_test.value')}</th>
                       </tr>
                     </thead>
 
