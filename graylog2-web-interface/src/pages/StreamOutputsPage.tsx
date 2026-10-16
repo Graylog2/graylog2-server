@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import { Col } from 'components/bootstrap';
@@ -37,22 +37,26 @@ const StreamOutputsPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('streams.outputs_for_stream', { streamTitle: stream.title })}>
+    <DocumentTitle title={t('stream_outputs.title', { streamTitle: stream.title })}>
       <div>
         <ContentHeadRow className="content">
           <Col md={10}>
-            <h1 className="page-title">{t('streams.outputs_for_stream', { streamTitle: stream.title })}</h1>
+            <h1 className="page-title">{t('stream_outputs.title', { streamTitle: stream.title })}</h1>
 
             <p className="description">
-              {t('streams.outputs_desc_part1', { productName })}
-              <Link to={Routes.SYSTEM.OUTPUTS}>{t('streams.outputs_desc_link_here')}</Link>.{' '}
-              <MarketplaceLink prefix={t('streams.outputs_desc_marketplace_prefix')} />
+              <Trans
+                t={t}
+                i18nKey="stream_outputs.description"
+                values={{ productName }}
+                components={{ outputsLink: <Link to={Routes.SYSTEM.OUTPUTS} /> }}
+              />{' '}
+              <MarketplaceLink prefix={t('stream_outputs.marketplace_prefix')} />
               <br />
-              <i>{t('streams.outputs_desc_removing')}</i>
-              {t('streams.outputs_desc_part2')}
-              <i>{t('streams.outputs_desc_globally')}</i>
-              {t('streams.outputs_desc_part3')}
-              <Link to={Routes.SYSTEM.OUTPUTS}>{t('streams.outputs_desc_link_global_list')}</Link>.
+              <Trans
+                t={t}
+                i18nKey="stream_outputs.removing_description"
+                components={{ emphasis: <i />, outputsLink: <Link to={Routes.SYSTEM.OUTPUTS} /> }}
+              />
             </p>
           </Col>
         </ContentHeadRow>
