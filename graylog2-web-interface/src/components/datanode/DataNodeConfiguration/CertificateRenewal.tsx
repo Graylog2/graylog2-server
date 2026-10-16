@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { CertificateRenewal } from '@graylog/server-api';
+
 import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
 import { Button } from 'components/bootstrap';
@@ -56,7 +56,7 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
       app_action_value: telemetryAppSection,
     });
 
-    fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+    CertificateRenewal.initiateCertRenewalForNode(nodeId)
       .then(() => {
         UserNotification.success(`Certificate ${successActionTitle} successfully`);
       })
