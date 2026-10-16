@@ -36,13 +36,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesReques
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +44,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, TabularResponse> {
     private static final Logger LOG = LoggerFactory.getLogger(SearchMessagesTool.class);
 
     public static String NAME = "search_messages";
-
-    private static final DateTimeFormatter ISO_8601 = ISODateTimeFormat.dateTimeParser().withZoneUTC();
 
     private final ScriptingApiService scriptingApiService;
 
@@ -101,7 +91,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    timerange(parameters),
+                    McpTimeRanges.timerange(parameters.from(), parameters.to(), parameters.rangeSeconds()),
                     null,
                     parameters.sortOrder(),
                     parameters.offset(),
@@ -115,25 +105,6 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
         } catch (NoSuchElementException | QueryFailedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static TimeRange timerange(Parameters parameters) {
-        if (parameters.from() == null && parameters.to() == null) {
-            return RelativeRange.create(parameters.rangeSeconds());
-        }
-        if (parameters.from() == null || parameters.to() == null) {
-            throw new IllegalArgumentException("Pass both from and to for an absolute time range, or neither");
-        }
-        return AbsoluteRange.create(parseTimestamp("from", parameters.from()), parseTimestamp("to", parameters.to()));
-    }
-
-    // Accepts ISO 8601 with or without fractional seconds, which callers often omit.
-    private static DateTime parseTimestamp(String name, String value) {
-        try {
-            return ISO_8601.parseDateTime(value);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(f("%s must be an ISO 8601 timestamp, got <%s>", name, value), e);
         }
     }
 
