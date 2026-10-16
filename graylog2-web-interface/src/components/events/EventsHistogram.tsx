@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import merge from 'lodash/merge';
@@ -192,6 +193,7 @@ const EventsHistogram = ({
   readOnly = false,
   onEffectiveTimeRangeChange = undefined,
 }: Props) => {
+  const { t } = useTranslation('events');
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
