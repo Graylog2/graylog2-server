@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
@@ -22,26 +23,29 @@ import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
-const CollectorsSettingsPage = () => (
-  <DocumentTitle title="Collectors Settings">
-    <CollectorsPageNavigation />
-    <PageHeader
-      title={
-        <>
-          Collectors Settings <PreviewBadge />
-        </>
-      }
-      documentationLink={{
-        title: 'Collectors documentation',
-        path: DocsHelper.PAGES.COLLECTORS,
-      }}>
-      <span>
-        Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to
-        receive configuration updates and send collected log data.
-      </span>
-    </PageHeader>
-    <CollectorsSettings />
-  </DocumentTitle>
-);
+const CollectorsSettingsPage = () => {
+  const { t } = useTranslation('collectors_settings');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <CollectorsPageNavigation />
+      <PageHeader
+        title={
+          <>
+            {t('settings_title')} <PreviewBadge />
+          </>
+        }
+        documentationLink={{
+          title: t('documentation_title'),
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
+        <span>
+          {t('description')}
+        </span>
+      </PageHeader>
+      <CollectorsSettings />
+    </DocumentTitle>
+  );
+};
 
 export default CollectorsSettingsPage;
