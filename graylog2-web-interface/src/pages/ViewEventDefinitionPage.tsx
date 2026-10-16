@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -43,6 +44,7 @@ import {
 import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
 const ViewEventDefinitionPage = () => {
+  const { t } = useTranslation('events');
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
   const [showDialog, setShowDialog] = useState(false);
@@ -101,10 +103,10 @@ const ViewEventDefinitionPage = () => {
 
   if (isFetching || !eventDefinition || !notifications) {
     return (
-      <DocumentTitle title="View Event Definition">
+      <DocumentTitle title={t('definitions_page.view')}>
         <span>
-          <PageHeader title="View Event Definition">
-            <Spinner text="Loading Event Definition..." />
+          <PageHeader title={t('definitions_page.view')}>
+            <Spinner text={t('definitions_page.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -113,29 +115,29 @@ const ViewEventDefinitionPage = () => {
 
   return (
     <>
-      <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
+      <DocumentTitle title={t('definitions_page.view_named', { title: eventDefinition.title })}>
         <EventsPageNavigation />
         <PageHeader
-          title={`View "${eventDefinition.title}" Event Definition`}
+          title={t('definitions_page.view_named', { title: eventDefinition.title })}
           actions={
             <ButtonToolbar>
               <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                 <Button bsStyle="primary" onClick={onEditEventDefinition}>
-                  Edit Event Definition
+                  {t('definitions_page.edit')}
                 </Button>
               </IfPermitted>
               {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
-                  <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
+                  <Button onClick={() => setShowDialog(true)}>{t('definitions_page.duplicate')}</Button>
                 </IfPermitted>
               )}
             </ButtonToolbar>
           }
           documentationLink={{
-            title: 'Alerts documentation',
+            title: t('definitions_page.alerts_docs'),
             path: DocsHelper.PAGES.ALERTS,
           }}>
-          <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
+          <span>{t('definitions_page.description_events')}</span>
         </PageHeader>
 
         <Row className="content">
@@ -153,11 +155,11 @@ const ViewEventDefinitionPage = () => {
       </DocumentTitle>
       {showDialog && (
         <ConfirmDialog
-          title="Copy Event Definition"
+          title={t('definitions_page.copy_title')}
           show
           onConfirm={() => handleDuplicateEvent()}
           onCancel={() => setShowDialog(false)}>
-          {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
+          {t('definitions_page.copy_confirm', { title: eventDefinition.title })}
         </ConfirmDialog>
       )}
     </>

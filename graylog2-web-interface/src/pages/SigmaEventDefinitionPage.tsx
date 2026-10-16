@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useLocation from 'routing/useLocation';
 
-const PAGE_TITLE_BY_ACTION: Record<string, string> = {
-  'git-import': 'Create Event Definitions - Git Import',
-  'file-import': 'Create Event Definitions - File Import',
-};
+const PAGE_TITLE_BY_ACTION = {
+  'git-import': 'definitions_page.git_import',
+  'file-import': 'definitions_page.file_import',
+} as const;
 
 const PLUGIN_KEY_BY_ACTION: Record<
   string,
@@ -35,6 +36,7 @@ const PLUGIN_KEY_BY_ACTION: Record<
 };
 
 function SigmaEventDefinitionPage() {
+  const { t } = useTranslation('events');
   const { pathname } = useLocation();
   const pathAction = pathname.split('/').pop() ?? '';
   const pluginKey = PLUGIN_KEY_BY_ACTION[pathAction];
@@ -45,13 +47,15 @@ function SigmaEventDefinitionPage() {
     return null;
   }
 
-  const pageTitle = PAGE_TITLE_BY_ACTION[pathAction] ?? 'Create Event Definitions';
+  const pageTitle = PAGE_TITLE_BY_ACTION[pathAction]
+    ? t(PAGE_TITLE_BY_ACTION[pathAction])
+    : t('definitions_page.create_multiple');
 
   return (
     <DocumentTitle title={pageTitle}>
       <EventsPageNavigation />
       <PageHeader title={pageTitle}>
-        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
+        <span>{t('definitions_page.description_alerts')}</span>
       </PageHeader>
       <PluginComponent />
     </DocumentTitle>
