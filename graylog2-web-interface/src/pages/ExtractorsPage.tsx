@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, Spinner } from 'components/common';
@@ -31,6 +31,7 @@ import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
 
 const ExtractorsPage = () => {
+  const { t } = useTranslation('extractors');
   const params = useParams<{ inputId: string; nodeId: string }>();
   const node = useStore(NodesStore, (nodes) => {
     if (!nodes?.nodes) {
@@ -57,29 +58,26 @@ const ExtractorsPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Extractors of ${input.title}`}>
+    <DocumentTitle title={t('extractors_of', { title: input.title })}>
       <div>
         <PageHeader
           title={
             <span>
-              Extractors of <em>{input.title}</em>
+              {t('extractors_of', { title: <em key="title">{input.title}</em> })}
             </span>
           }
           actions={
-            <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title="Actions" pullRight>
-              <MenuItem href={Routes.import_extractors(node.node_id, input.id)}>Import extractors</MenuItem>
-              <MenuItem href={Routes.export_extractors(node.node_id, input.id)}>Export extractors</MenuItem>
+            <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title={t('actions')} pullRight>
+              <MenuItem href={Routes.import_extractors(node.node_id, input.id)}>{t('import_extractors')}</MenuItem>
+              <MenuItem href={Routes.export_extractors(node.node_id, input.id)}>{t('export_extractors')}</MenuItem>
             </DropdownButton>
           }
           documentationLink={{
-            title: 'Extractors documentation',
+            title: t('documentation_title'),
             path: DocsHelper.PAGES.EXTRACTORS,
           }}>
           <span>
-            Extractors are applied on every message that is received by this input. Use them to extract and transform{' '}
-            any text data into fields that allow you easy filtering and analysis later on. Example: Extract the HTTP
-            response code from a log message, transform it to a numeric field and attach it as{' '}
-            <em>http_response_code</em> to the message.
+            {t('description', { field: 'http_response_code' })}
           </span>
         </PageHeader>
         <ExtractorsList input={input} node={node} />

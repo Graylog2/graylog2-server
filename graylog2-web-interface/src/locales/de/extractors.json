@@ -1,0 +1,8 @@
+{
+  "extractors_of": "Extractors von {{title}}",
+  "actions": "Aktionen",
+  "import_extractors": "Extractors importieren",
+  "export_extractors": "Extractors exportieren",
+  "documentation_title": "Extractors-Dokumentation",
+  "description": "Extractors werden auf jede Nachricht angewendet, die von diesem Input empfangen wird. Verwenden Sie sie, um beliebige Textdaten in Felder zu extrahieren und zu transformieren, die Ihnen später eine einfache Filterung und Analyse ermöglichen. Beispiel: Extrahieren Sie den HTTP-Response-Code aus einer Log-Nachricht, transformieren Sie ihn in ein numerisches Feld und hängen Sie ihn als {{field}} an die Nachricht an."
+}
