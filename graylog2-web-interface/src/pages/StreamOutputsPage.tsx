@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Link, ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import { Col } from 'components/bootstrap';
@@ -26,6 +27,7 @@ import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const StreamOutputsPage = () => {
+  const { t } = useTranslation('streams');
   const productName = useProductName();
   const { streamId } = useParams();
   const { data: stream } = useStream(streamId);
@@ -35,22 +37,22 @@ const StreamOutputsPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
+    <DocumentTitle title={t('streams.outputs_for_stream', { streamTitle: stream.title })}>
       <div>
         <ContentHeadRow className="content">
           <Col md={10}>
-            <h1>Outputs for Stream &raquo;{stream.title}&laquo;</h1>
+            <h1 className="page-title">{t('streams.outputs_for_stream', { streamTitle: stream.title })}</h1>
 
             <p className="description">
-              {productName} nodes can forward messages of streams via outputs. Launch or terminate as many outputs as
-              you want here. You can also reuse outputs that are already running for other streams. A global view of all
-              configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.{' '}
-              <MarketplaceLink prefix="You can find output plugins on" />
+              {t('streams.outputs_desc_part1', { productName })}
+              <Link to={Routes.SYSTEM.OUTPUTS}>{t('streams.outputs_desc_link_here')}</Link>.{' '}
+              <MarketplaceLink prefix={t('streams.outputs_desc_marketplace_prefix')} />
               <br />
-              <i>Removing</i> an output removes it from this stream but it will still be in the list of available
-              outputs. Deleting an output <i>globally</i> will remove it from this and all other streams and terminate
-              it. You can see all defined outputs in details at the{' '}
-              <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
+              <i>{t('streams.outputs_desc_removing')}</i>
+              {t('streams.outputs_desc_part2')}
+              <i>{t('streams.outputs_desc_globally')}</i>
+              {t('streams.outputs_desc_part3')}
+              <Link to={Routes.SYSTEM.OUTPUTS}>{t('streams.outputs_desc_link_global_list')}</Link>.
             </p>
           </Col>
         </ContentHeadRow>
