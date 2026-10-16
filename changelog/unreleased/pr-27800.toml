@@ -1,0 +1,4 @@
+type = "c"
+message = "Improve the default column order on the Alerts & Events page."
+
+pulls = ["27800"]

@@ -35,11 +35,11 @@ public final class ClusterLockResources {
         return name("concurrent-index-optimization");
     }
 
-    private static String name(String name, String resource) {
+    public static String name(String name, String resource) {
         return "cluster-lock:" + name + ":" + resource;
     }
 
-    private static String name(String name) {
+    public static String name(String name) {
         return "cluster-lock:" + name;
     }
 }

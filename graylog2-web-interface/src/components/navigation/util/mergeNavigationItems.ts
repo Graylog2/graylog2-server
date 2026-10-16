@@ -16,6 +16,8 @@
  */
 import type { PluginNavigation } from 'graylog-web-plugin';
 
+import sortNavigationItems from './sortNavigationItems';
+
 const _existingDropdownItemIndex = (
   existingNavigationItems: Array<PluginNavigation>,
   newNavigationItem: PluginNavigation,
@@ -38,7 +40,7 @@ const mergeNavigationItems = (navigationItems: Array<PluginNavigation>): Array<P
       const newDropdownItem = {
         ...current,
         ...existingDropdownItem,
-        children: [...existingDropdownItem.children, ...current.children],
+        children: sortNavigationItems([...existingDropdownItem.children, ...current.children]),
       };
       const newResult = [...result];
       newResult[existingDropdownItemIndex] = newDropdownItem;
