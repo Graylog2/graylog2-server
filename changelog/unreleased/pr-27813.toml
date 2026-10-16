@@ -1,0 +1,4 @@
+type = "a"
+message = "Include stream ids in Scripting API message searches that request all fields."
+
+pulls = ["27813"]
