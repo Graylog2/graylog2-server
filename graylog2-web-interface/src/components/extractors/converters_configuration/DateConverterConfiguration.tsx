@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { LocaleSelect, TimezoneSelect } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -93,7 +94,7 @@ class DateConverterConfiguration extends React.Component<
             this.converterEnabled = converterEnabled;
           }}
           id={`enable-${this.props.type}-converter`}
-          label="Convert to date type"
+          label={i18n.t('converters.date_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -104,7 +105,7 @@ class DateConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_date_format`}
-                label="Format string"
+                label={i18n.t('converters.date_format', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.date_format}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
@@ -115,7 +116,7 @@ class DateConverterConfiguration extends React.Component<
               />
 
               <Input
-                label="Time Zone"
+                label={i18n.t('converters.time_zone', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_timezone`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"
@@ -128,7 +129,7 @@ class DateConverterConfiguration extends React.Component<
                 />
               </Input>
               <Input
-                label="Locale"
+                label={i18n.t('converters.locale', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_locale`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"

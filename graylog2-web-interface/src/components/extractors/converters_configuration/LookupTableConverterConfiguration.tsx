@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Link, Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -92,7 +93,7 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
             this.converterEnabled = converterEnabled;
           }}
           id={`enable-${this.props.type}-converter`}
-          label="Convert value by using lookup table"
+          label={i18n.t('converters.lookup_table_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -103,13 +104,13 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
             <div className="xtrc-converter-subfields">
               <Input
                 id="lookup_table_name"
-                label="Lookup Table"
+                label={i18n.t('converters.lookup_table', { ns: 'extractors' })}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
                 required={this.converterEnabled && this.converterEnabled.getChecked()}
                 help={helpMessage}>
                 <Select
-                  placeholder="Select a lookup table"
+                  placeholder={i18n.t('converters.lookup_table_placeholder', { ns: 'extractors' })}
                   clearable={false}
                   options={lookupTables}
                   onChange={this._onSelect('lookup_table_name')}

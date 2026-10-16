@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Row, Col, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
@@ -74,7 +75,7 @@ class CSVConverterConfiguration extends React.Component<
             this.converterEnabled = converterEnabled;
           }}
           id={`enable-${this.props.type}-converter`}
-          label="Add CSV columns as fields"
+          label={i18n.t('converters.csv_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -86,7 +87,7 @@ class CSVConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_column_header`}
-                label="Field names"
+                label={i18n.t('converters.csv_field_names', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.column_header}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
@@ -98,7 +99,7 @@ class CSVConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_separator`}
-                label="Separator character"
+                label={i18n.t('converters.csv_separator', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.separator || ','}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
@@ -110,7 +111,7 @@ class CSVConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_quote_char`}
-                label="Quote character"
+                label={i18n.t('converters.csv_quote', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.quote_char || '"'}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
@@ -121,29 +122,29 @@ class CSVConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_escape_char`}
-                label="Escape character"
+                label={i18n.t('converters.csv_escape', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.escape_char || '\\'}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
                 maxLength={1}
                 onChange={this._onChange('escape_char')}
-                help="Character used to escape the separator and quote characters."
+                help={i18n.t('converters.csv_escape_help', { ns: 'extractors' })}
               />
 
               <Input
                 type="checkbox"
                 id={`${this.props.type}_converter_strict_quotes`}
-                label="Use strict quotes"
+                label={i18n.t('converters.csv_strict_quotes', { ns: 'extractors' })}
                 wrapperClassName="col-md-offset-3 col-md-9"
                 defaultChecked={this.props.configuration.strict_quotes}
                 onChange={this._onChange('strict_quotes')}
-                help="Ignore content outside of quotes."
+                help={i18n.t('converters.csv_strict_quotes_help', { ns: 'extractors' })}
               />
 
               <Input
                 type="checkbox"
                 id={`${this.props.type}_converter_trim_leading_whitespace`}
-                label="Trim leading whitespace"
+                label={i18n.t('converters.csv_trim', { ns: 'extractors' })}
                 wrapperClassName="col-md-offset-3 col-md-9"
                 defaultChecked={this.props.configuration.trim_leading_whitespace}
                 onChange={this._onChange('trim_leading_whitespace')}

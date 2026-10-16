@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -29,52 +30,59 @@ type TimingMetricsProps = {
   timing: any;
 };
 
-const TimingMetrics = ({ timing }: TimingMetricsProps) => (
-  <dl className="metric-def metric-timer">
-    <dt>95th percentile:</dt>
-    <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
+const TimingMetrics = ({ timing }: TimingMetricsProps) => {
+  const { t } = useTranslation('extractors');
 
-    <dt>98th percentile:</dt>
-    <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
+  return (
+    <dl className="metric-def metric-timer">
+      <dt>{t('metrics.percentile_95')}</dt>
+      <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
-    <dt>99th percentile:</dt>
-    <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
+      <dt>{t('metrics.percentile_98')}</dt>
+      <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
-    <dt>Standard deviation:</dt>
-    <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
+      <dt>{t('metrics.percentile_99')}</dt>
+      <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
-    <dt>Mean:</dt>
-    <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
+      <dt>{t('metrics.std_dev')}</dt>
+      <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
 
-    <dt>Minimum:</dt>
-    <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
+      <dt>{t('metrics.mean')}</dt>
+      <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
 
-    <dt>Maximum:</dt>
-    <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
-  </dl>
-);
+      <dt>{t('metrics.minimum')}</dt>
+      <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
+
+      <dt>{t('metrics.maximum')}</dt>
+      <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
+    </dl>
+  );
+};
 
 type MetricsProps = {
   metrics: any;
 };
 
 const Metrics = ({ metrics }: MetricsProps) => {
+  const { t } = useTranslation('extractors');
   let totalRate;
 
   if (metrics.total.rate) {
     totalRate = (
       <div className="meter" style={{ marginBottom: 10 }}>
-        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot, averages:{' '}
-        {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
-        {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
-        {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
+        {t('metrics.invocations', {
+          total: numeral(metrics.total.rate.total).format('0,0'),
+          oneMinute: numeral(metrics.total.rate.one_minute).format('0,0.[00]'),
+          fiveMinutes: numeral(metrics.total.rate.five_minute).format('0,0.[00]'),
+          fifteenMinutes: numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]'),
+        })}
       </div>
     );
   }
 
   const conditionCounts = (
     <div className="meter" style={{ marginBottom: 10 }}>
-      {metrics.condition_hits} hits, {metrics.condition_misses} misses
+      {t('metrics.hits_misses', { hits: metrics.condition_hits, misses: metrics.condition_misses })}
     </div>
   );
 
@@ -83,7 +91,7 @@ const Metrics = ({ metrics }: MetricsProps) => {
   if (metrics.total.time) {
     totalTime = <TimingMetrics timing={metrics.total.time} />;
   } else {
-    totalTime = 'No message passed through here yet.';
+    totalTime = t('metrics.no_messages');
   }
 
   let conditionTime;
@@ -91,7 +99,7 @@ const Metrics = ({ metrics }: MetricsProps) => {
   if (metrics.condition.time) {
     conditionTime = <TimingMetrics timing={metrics.condition.time} />;
   } else {
-    conditionTime = 'No message passed through here yet.';
+    conditionTime = t('metrics.no_messages');
   }
 
   let executionTime;
@@ -99,7 +107,7 @@ const Metrics = ({ metrics }: MetricsProps) => {
   if (metrics.execution.time) {
     executionTime = <TimingMetrics timing={metrics.execution.time} />;
   } else {
-    executionTime = 'No message passed through here yet.';
+    executionTime = t('metrics.no_messages');
   }
 
   let convertersTime;
@@ -107,7 +115,7 @@ const Metrics = ({ metrics }: MetricsProps) => {
   if (metrics.converters.time) {
     convertersTime = <TimingMetrics timing={metrics.converters.time} />;
   } else {
-    convertersTime = 'No message passed through here yet.';
+    convertersTime = t('metrics.no_messages');
   }
 
   return (
@@ -116,22 +124,22 @@ const Metrics = ({ metrics }: MetricsProps) => {
       {conditionCounts}
       <Row>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Total time</h4>
+          <h4 style={{ display: 'inline' }}>{t('metrics.total_time')}</h4>
           <br />
           {totalTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Condition time</h4>
+          <h4 style={{ display: 'inline' }}>{t('metrics.condition_time')}</h4>
           <br />
           {conditionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Execution time</h4>
+          <h4 style={{ display: 'inline' }}>{t('metrics.execution_time')}</h4>
           <br />
           {executionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Converter time</h4>
+          <h4 style={{ display: 'inline' }}>{t('metrics.converter_time')}</h4>
           <br />
           {convertersTime}
         </Col>
@@ -147,6 +155,7 @@ type ExtractorsListItemProps = {
 };
 
 const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemProps) => {
+  const { t } = useTranslation('extractors');
   const [showDetails, setShowDetails] = useState(false);
   const queryClient = useQueryClient();
 
@@ -154,15 +163,19 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
 
   const _deleteExtractor = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Really remove extractor "${extractor.title}?"`)) {
+    if (window.confirm(t('list_item.confirm_delete', { title: extractor.title }))) {
       deleteExtractor(inputId, extractor).then(() => queryClient.invalidateQueries({ queryKey: EXTRACTORS_QUERY_KEY }));
     }
   };
 
   const _formatExtractorSubtitle = () => (
     <span>
-      Trying to extract data from <em>{extractor.source_field}</em> into <em>{extractor.target_field}</em>,{' '}
-      {extractor.cursor_strategy === 'cut' && 'not'} leaving the original intact.
+      <Trans
+        t={t}
+        i18nKey={extractor.cursor_strategy === 'cut' ? 'list_item.subtitle_cut' : 'list_item.subtitle_copy'}
+        values={{ source: extractor.source_field, target: extractor.target_field }}
+        components={{ em: <em /> }}
+      />
     </span>
   );
 
@@ -173,12 +186,15 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
 
     return (
       <div className="configuration-section">
-        <h4>Condition</h4>
+        <h4>{t('list_item.condition')}</h4>
         <ul>
           <li>
-            Will only attempt to run if the message{' '}
-            {extractor.condition_type === 'string' ? 'includes the string' : 'matches the regular expression'}{' '}
-            <em>{extractor.condition_value}</em>
+            <Trans
+              t={t}
+              i18nKey={extractor.condition_type === 'string' ? 'list_item.condition_string' : 'list_item.condition_regex'}
+              values={{ value: extractor.condition_value }}
+              components={{ em: <em /> }}
+            />
           </li>
         </ul>
       </div>
@@ -187,15 +203,15 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
 
   const _formatActions = () => [
     <Button key={`extractor-details-${extractor.id}`} bsStyle="info" onClick={_toggleDetails}>
-      Details
+      {t('list_item.details')}
     </Button>,
     <LinkContainer
       key={`edit-extractor-${extractor.id}`}
       to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
-      <Button>Edit</Button>
+      <Button>{t('list_item.edit')}</Button>
     </LinkContainer>,
     <Button key="delete-extractor-" bsStyle="danger" onClick={_deleteExtractor}>
-      Delete
+      {t('list_item.delete')}
     </Button>,
   ];
 
@@ -213,12 +229,12 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
     let formattedOptions: React.ReactElement | Array<React.ReactElement> = _formatOptions(extractorConfig);
 
     if ((formattedOptions as Array<React.ReactElement>).length === 0) {
-      formattedOptions = <li>No configuration options</li>;
+      formattedOptions = <li>{t('list_item.no_configuration')}</li>;
     }
 
     return (
       <div className="configuration-section">
-        <h4>Configuration</h4>
+        <h4>{t('list_item.configuration')}</h4>
         <ul>{formattedOptions}</ul>
       </div>
     );
@@ -243,7 +259,7 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
 
     return (
       <div className="configuration-section">
-        <h4>Converters</h4>
+        <h4>{t('list_item.converters')}</h4>
         <ul>{formattedConverters}</ul>
       </div>
     );
@@ -260,7 +276,7 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
       </Col>
       <Col md={4}>
         <div className="graylog-input-metrics">
-          <h3>Metrics</h3>
+          <h3>{t('metrics.title')}</h3>
           <Metrics metrics={extractor.metrics} />
         </div>
       </Col>

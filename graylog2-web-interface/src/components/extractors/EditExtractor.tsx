@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -157,22 +159,21 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     let conditionInputHelp;
 
     if (updatedExtractor.condition_type === 'string') {
-      conditionInputLabel = 'Field contains string';
-      conditionInputHelp = 'Type a string that the field should contain in order to attempt the extraction.';
+      conditionInputLabel = i18n.t('edit.condition_string_label', { ns: 'extractors' });
+      conditionInputHelp = i18n.t('edit.condition_string_help', { ns: 'extractors' });
     } else {
-      conditionInputLabel = 'Field matches regular expression';
-      conditionInputHelp =
-        'Type a regular expression that the field should contain in order to attempt the extraction.';
+      conditionInputLabel = i18n.t('edit.condition_regex_label', { ns: 'extractors' });
+      conditionInputHelp = i18n.t('edit.condition_regex_help', { ns: 'extractors' });
     }
 
     let inputStyle;
 
     if (conditionTestResult === true) {
       inputStyle = 'success';
-      conditionInputHelp = 'Matches! Extractor would run against this example.';
+      conditionInputHelp = i18n.t('edit.condition_matches', { ns: 'extractors' });
     } else if (conditionTestResult === false) {
       inputStyle = 'error';
-      conditionInputHelp = 'Does not match! Extractor would not run.';
+      conditionInputHelp = i18n.t('edit.condition_no_match', { ns: 'extractors' });
     }
 
     return (
@@ -197,7 +198,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._testCondition} disabled={this._tryButtonDisabled()}>
-                Try
+                {i18n.t('edit.try', { ns: 'extractors' })}
               </Button>
             </Col>
           </Row>
@@ -218,21 +219,17 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
   render() {
     const { updatedExtractor, exampleMessage } = this.state;
     const { action } = this.props;
-    const conditionTypeHelpMessage =
-      'Extracting only from messages that match a certain condition helps you ' +
-      'avoiding wrong or unnecessary extractions and can also save CPU resources.';
+    const conditionTypeHelpMessage = i18n.t('edit.condition_type_help', { ns: 'extractors' });
 
     const cursorStrategyHelpMessage = (
       <span>
-        Do you want to copy or cut from source? You cannot use the cutting feature on standard fields like{' '}
-        <em>message</em> and <em>source</em>.
+        <Trans i18nKey="edit.cursor_strategy_help" ns="extractors" components={{ em: <em /> }} />
       </span>
     );
 
     const targetFieldHelpMessage = (
       <span>
-        Choose a field name to store the extracted value. It can only contain{' '}
-        <b>alphanumeric characters and underscores</b>. Example: <em>http_response_code</em>.
+        <Trans i18nKey="edit.target_field_help" ns="extractors" components={{ b: <b />, em: <em /> }} />
       </span>
     );
 
@@ -250,7 +247,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             this.targetField = targetField;
           }}
           id="target_field"
-          label="Store as field"
+          label={i18n.t('edit.store_as_field', { ns: 'extractors' })}
           defaultValue={updatedExtractor.target_field}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
@@ -265,7 +262,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
       <div>
         <Row className="content extractor-list">
           <Col md={12}>
-            <h2>Example message</h2>
+            <h2>{i18n.t('edit.example_message', { ns: 'extractors' })}</h2>
             <Row style={{ marginTop: 5 }}>
               <Col md={12}>
                 <ExtractorExampleMessage
@@ -275,15 +272,15 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                 />
               </Col>
             </Row>
-            <h2>Extractor configuration</h2>
+            <h2>{i18n.t('edit.configuration', { ns: 'extractors' })}</h2>
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
                   <StaticField
-                    label="Extractor type"
+                    label={i18n.t('edit.extractor_type', { ns: 'extractors' })}
                     text={ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type)}
                   />
-                  <StaticField label="Source field" text={updatedExtractor.source_field} />
+                  <StaticField label={i18n.t('edit.source_field', { ns: 'extractors' })} text={updatedExtractor.source_field} />
 
                   <EditExtractorConfiguration
                     extractorType={updatedExtractor.type}
@@ -294,7 +291,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="condition-type"
-                    label="Condition"
+                    label={i18n.t('edit.condition', { ns: 'extractors' })}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={conditionTypeHelpMessage}>
@@ -311,7 +308,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                               !updatedExtractor.condition_type || updatedExtractor.condition_type === 'none'
                             }
                           />
-                          Always try to extract
+                          {i18n.t('edit.condition_none', { ns: 'extractors' })}
                         </label>
                       </div>
                       <div className="radio">
@@ -324,7 +321,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'string'}
                           />
-                          Only attempt extraction if field contains string
+                          {i18n.t('edit.condition_string', { ns: 'extractors' })}
                         </label>
                       </div>
                       <div className="radio">
@@ -337,7 +334,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'regex'}
                           />
-                          Only attempt extraction if field matches regular expression
+                          {i18n.t('edit.condition_regex', { ns: 'extractors' })}
                         </label>
                       </div>
                     </span>
@@ -348,7 +345,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="extraction-strategy"
-                    label="Extraction strategy"
+                    label={i18n.t('edit.extraction_strategy', { ns: 'extractors' })}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={cursorStrategyHelpMessage}>
@@ -364,7 +361,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             !updatedExtractor.cursor_strategy || updatedExtractor.cursor_strategy === 'copy'
                           }
                         />
-                        Copy
+                        {i18n.t('edit.copy', { ns: 'extractors' })}
                       </label>
                       <label className="radio-inline" htmlFor="cursor_strategy_cut">
                         <input
@@ -375,7 +372,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                           onChange={this._onFieldChange('cursor_strategy')}
                           defaultChecked={updatedExtractor.cursor_strategy === 'cut'}
                         />
-                        Cut
+                        {i18n.t('edit.cut', { ns: 'extractors' })}
                       </label>
                     </span>
                   </Input>
@@ -383,13 +380,13 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Input
                     type="text"
                     id="title"
-                    label="Extractor title"
+                    label={i18n.t('edit.title', { ns: 'extractors' })}
                     defaultValue={updatedExtractor.title}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     onChange={this._onFieldChange('title')}
                     required
-                    help="A descriptive name for this extractor."
+                    help={i18n.t('edit.title_help', { ns: 'extractors' })}
                   />
 
                   <div style={{ marginBottom: 20 }}>
@@ -403,7 +400,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Row>
                     <Col mdOffset={2} md={10}>
                       <Button type="submit" bsStyle="primary">
-                        {action === 'create' ? 'Create extractor' : 'Update extractor'}
+                        {action === 'create' ? i18n.t('edit.create', { ns: 'extractors' }) : i18n.t('edit.update', { ns: 'extractors' })}
                       </Button>
                     </Col>
                   </Row>

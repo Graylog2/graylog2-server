@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { getValueFromInput } from 'util/FormsUtils';
 import { TimezoneSelect } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
@@ -74,7 +75,7 @@ class FlexdateConverterConfiguration extends React.Component<
         <Input
           type="checkbox"
           id={`enable-${this.props.type}-converter`}
-          label="Flexibly parse date"
+          label={i18n.t('converters.flexdate_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -83,7 +84,7 @@ class FlexdateConverterConfiguration extends React.Component<
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
               <Input
-                label="Time Zone"
+                label={i18n.t('converters.time_zone', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_timezone`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"
