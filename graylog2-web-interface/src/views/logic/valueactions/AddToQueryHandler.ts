@@ -31,7 +31,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, ActionContexts } from 'views/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
-import { fieldValueOrClause, formatQueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
+import { fieldValueOrClause } from 'views/logic/valueactions/ValueActionQueryHelper';
 
 const toPredicate = (field: string, value: string | number, type: FieldType) =>
   predicate(field, formatValueForQuery(value, type));
