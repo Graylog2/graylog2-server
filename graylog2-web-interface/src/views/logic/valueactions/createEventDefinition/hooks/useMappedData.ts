@@ -34,15 +34,17 @@ import {
 import type ValueParameter from 'views/logic/parameters/ValueParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import type { FieldValue, FieldName } from 'views/logic/fieldtypes/FieldType';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ActionContexts } from 'views/types';
 
 type HookProps = {
   contexts: ActionContexts;
   field: FieldName;
   queryId: string;
+  type?: FieldType;
   value: FieldValue;
 };
-const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
+const useMappedData = ({ contexts, field, queryId, type, value }: HookProps) =>
   useMemo<MappedData>(() => {
     const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field });
     const curQuery = contexts.view.search.queries.find((query) => query.id === queryId);
@@ -63,6 +65,7 @@ const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
     const { ...aggregationVales } = aggregationHandler({
       valuePath: contexts.valuePath as Array<Record<string, string>>,
       widget: contexts.widget,
+      type,
       value: value,
       field: field,
     });
@@ -86,6 +89,6 @@ const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
 
       return !!v?.trim();
     });
-  }, [contexts, field, queryId, value]);
+  }, [contexts, field, queryId, type, value]);
 
 export default useMappedData;
