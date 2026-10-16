@@ -18,8 +18,28 @@
 // a copy of the core translations.
 import { registerTranslations } from 'i18n';
 import enAggregation from 'locales/en/aggregation.json';
+import enAuthenticationBackendCreate from 'locales/en/authentication_backend_create.json';
+import enAuthenticationBackendDetails from 'locales/en/authentication_backend_details.json';
+import enAuthenticationBackendEdit from 'locales/en/authentication_backend_edit.json';
+import enAuthenticationCreate from 'locales/en/authentication_create.json';
+import enAuthenticationOverview from 'locales/en/authentication_overview.json';
+import enAuthenticationPage from 'locales/en/authentication_page.json';
+import enAuthenticators from 'locales/en/authenticators.json';
+import enAuthenticatorsEdit from 'locales/en/authenticators_edit.json';
+import enClusterCertificateManagement from 'locales/en/cluster_certificate_management.json';
+import enCollectorsDeployment from 'locales/en/collectors_deployment.json';
+import enCollectorsFleets from 'locales/en/collectors_fleets.json';
+import enCollectorsInstances from 'locales/en/collectors_instances.json';
+import enCollectorsOnboarding from 'locales/en/collectors_onboarding.json';
+import enCollectorsOverview from 'locales/en/collectors_overview.json';
+import enCollectorsSettings from 'locales/en/collectors_settings.json';
 import enCommon from 'locales/en/common.json';
+import enContentPacks from 'locales/en/content_packs.json';
 import enDashboards from 'locales/en/dashboards.json';
+import enDataNodesClusterManagement from 'locales/en/data_nodes_cluster_management.json';
+import enEvents from 'locales/en/events.json';
+import enExtractors from 'locales/en/extractors.json';
+import enInputs from 'locales/en/inputs.json';
 import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
@@ -31,12 +51,92 @@ registerTranslations('aggregation', enAggregation, {
   de: () => import(/* webpackChunkName: "translations-de-aggregation" */ 'locales/de/aggregation.json'),
 });
 
+registerTranslations('authentication_backend_create', enAuthenticationBackendCreate, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-create" */ 'locales/de/authentication_backend_create.json'),
+});
+
+registerTranslations('authentication_backend_details', enAuthenticationBackendDetails, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-details" */ 'locales/de/authentication_backend_details.json'),
+});
+
+registerTranslations('authentication_backend_edit', enAuthenticationBackendEdit, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-backend-edit" */ 'locales/de/authentication_backend_edit.json'),
+});
+
+registerTranslations('authentication_create', enAuthenticationCreate, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-create" */ 'locales/de/authentication_create.json'),
+});
+
+registerTranslations('authentication_overview', enAuthenticationOverview, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-overview" */ 'locales/de/authentication_overview.json'),
+});
+
+registerTranslations('authentication_page', enAuthenticationPage, {
+  de: () => import(/* webpackChunkName: "translations-de-authentication-page" */ 'locales/de/authentication_page.json'),
+});
+
+registerTranslations('authenticators', enAuthenticators, {
+  de: () => import(/* webpackChunkName: "translations-de-authenticators" */ 'locales/de/authenticators.json'),
+});
+
+registerTranslations('authenticators_edit', enAuthenticatorsEdit, {
+  de: () => import(/* webpackChunkName: "translations-de-authenticators-edit" */ 'locales/de/authenticators_edit.json'),
+});
+
+registerTranslations('cluster_certificate_management', enClusterCertificateManagement, {
+  de: () => import(/* webpackChunkName: "translations-de-cluster-certificate-management" */ 'locales/de/cluster_certificate_management.json'),
+});
+
+registerTranslations('collectors_deployment', enCollectorsDeployment, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-deployment" */ 'locales/de/collectors_deployment.json'),
+});
+
+registerTranslations('collectors_fleets', enCollectorsFleets, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-fleets" */ 'locales/de/collectors_fleets.json'),
+});
+
+registerTranslations('collectors_instances', enCollectorsInstances, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-instances" */ 'locales/de/collectors_instances.json'),
+});
+
+registerTranslations('collectors_onboarding', enCollectorsOnboarding, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-onboarding" */ 'locales/de/collectors_onboarding.json'),
+});
+
+registerTranslations('collectors_overview', enCollectorsOverview, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-overview" */ 'locales/de/collectors_overview.json'),
+});
+
+registerTranslations('collectors_settings', enCollectorsSettings, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors-settings" */ 'locales/de/collectors_settings.json'),
+});
+
 registerTranslations('common', enCommon, {
   de: () => import(/* webpackChunkName: "translations-de-common" */ 'locales/de/common.json'),
 });
 
+registerTranslations('content_packs', enContentPacks, {
+  de: () => import(/* webpackChunkName: "translations-de-content-packs" */ 'locales/de/content_packs.json'),
+});
+
 registerTranslations('dashboards', enDashboards, {
   de: () => import(/* webpackChunkName: "translations-de-dashboards" */ 'locales/de/dashboards.json'),
+});
+
+registerTranslations('data_nodes_cluster_management', enDataNodesClusterManagement, {
+  de: () => import(/* webpackChunkName: "translations-de-data-nodes-cluster-management" */ 'locales/de/data_nodes_cluster_management.json'),
+});
+
+registerTranslations('events', enEvents, {
+  de: () => import(/* webpackChunkName: "translations-de-events" */ 'locales/de/events.json'),
+});
+
+registerTranslations('extractors', enExtractors, {
+  de: () => import(/* webpackChunkName: "translations-de-extractors" */ 'locales/de/extractors.json'),
+});
+
+registerTranslations('inputs', enInputs, {
+  de: () => import(/* webpackChunkName: "translations-de-inputs" */ 'locales/de/inputs.json'),
 });
 
 registerTranslations('login', enLogin, {
