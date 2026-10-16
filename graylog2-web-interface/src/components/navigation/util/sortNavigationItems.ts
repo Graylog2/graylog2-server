@@ -18,19 +18,23 @@ import type { PluginNavigation } from 'graylog-web-plugin';
 
 type Item = { position?: PluginNavigation['position']; description: string };
 
+// Walks from each anchor so the result doesn't depend on plugin registration order.
 const sortInAfterItems = <T extends Item>(targetList: Array<T>, afterItems: Array<T>) => {
-  const result = [...targetList];
+  const placed = new Set<T>();
 
-  afterItems.forEach((afterItem) => {
-    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
-    if (index !== -1) {
-      result.splice(index + 1, 0, afterItem);
-    } else {
-      result.push(afterItem);
-    }
-  });
+  const withFollowers = (item: T): Array<T> => {
+    placed.add(item);
+    const followers = afterItems.filter(
+      (afterItem) => !placed.has(afterItem) && afterItem.position.after === item.description,
+    );
 
-  return result;
+    return [item, ...followers.flatMap(withFollowers)];
+  };
+
+  const result = targetList.flatMap(withFollowers);
+  const unanchored = afterItems.flatMap((afterItem) => (placed.has(afterItem) ? [] : withFollowers(afterItem)));
+
+  return [...result, ...unanchored];
 };
 
 const sortNavigationItems = <T extends Item>(navigationItems: Array<T>) => {

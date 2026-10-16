@@ -27,50 +27,48 @@ import PageNavigation from './PageNavigation';
 
 jest.mock('hooks/useCurrentUser');
 
-const plugin = {
+const PAGE = 'Test Page';
+const overview = { description: 'Overview', path: '/overview' };
+const definitions = { description: 'Definitions', path: '/definitions' };
+const notifications = { description: 'Notifications', path: '/notifications' };
+const procedures = { description: 'Procedures', path: '/procedures', position: { after: 'Definitions' } };
+const chains = { description: 'Chains', path: '/chains', position: { after: 'Definitions' } };
+
+const createPlugin = (entries: Array<Array<{ description: string; path: string }>>) => ({
   exports: {
-    pageNavigation: [
-      {
-        description: 'Test Page',
-        children: [
-          { description: 'Overview', path: '/overview' },
-          { description: 'Definitions', path: '/definitions' },
-          { description: 'Notifications', path: '/notifications' },
-        ],
-      },
-      {
-        description: 'Test Page',
-        children: [{ description: 'Procedures', path: '/procedures', position: { after: 'Definitions' } }],
-      },
-      {
-        description: 'Test Page',
-        children: [{ description: 'Chains', path: '/chains', position: { after: 'Definitions' } }],
-      },
-    ],
+    pageNavigation: entries.map((children) => ({ description: PAGE, children })),
   } as PluginExports,
   metadata: { name: 'PageNavigation test plugin' },
-};
+});
 
 describe('PageNavigation', () => {
+  let plugin: ReturnType<typeof createPlugin>;
+
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    PluginStore.register(plugin);
   });
 
   afterEach(() => {
     PluginStore.unregister(plugin);
   });
 
-  it('keeps the order of items positioned after the same item when merging several plugin entries', async () => {
-    render(<PageNavigation page="Test Page" />);
+  it.each([
+    ['a single plugin entry', [[overview, definitions, notifications, procedures, chains]]],
+    ['three plugin entries', [[overview, definitions, notifications], [procedures], [chains]]],
+    ['four plugin entries', [[overview, definitions], [notifications], [procedures], [chains]]],
+  ])('keeps the registration order of items positioned after the same item with %s', async (_name, entries) => {
+    plugin = createPlugin(entries);
+    PluginStore.register(plugin);
+
+    render(<PageNavigation page={PAGE} />);
 
     await screen.findByRole('link', { name: 'Overview' });
 
     expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
       'Overview',
       'Definitions',
-      'Chains',
       'Procedures',
+      'Chains',
       'Notifications',
     ]);
   });
