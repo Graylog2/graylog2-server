@@ -1,0 +1,6 @@
+{
+  "title": "Alle Authentifizierungsdienste",
+  "documentation_title": "Authentifizierungs-Dokumentation",
+  "description": "Konfigurieren Sie die Authentifizierungsdienste dieses Clusters.",
+  "no_active_backend": "Keiner der konfigurierten Authentifizierungsdienste ist derzeit aktiv."
+}
