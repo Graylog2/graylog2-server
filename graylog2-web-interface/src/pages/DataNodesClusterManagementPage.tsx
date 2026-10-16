@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation, Trans } from 'react-i18next';
 
 import ProductName from 'brand-customization/ProductName';
 import { Row, Col } from 'components/bootstrap';
@@ -44,26 +45,30 @@ const StyledCol = styled(Col)`
   }
 `;
 
-const DataNodesClusterManagementPage = () => (
-  <DocumentTitle title="Data Node Dashboard">
-    <ClusterConfigurationPageNavigation />
-    <PageHeader
-      title="Data Node Dashboard"
-      documentationLink={{
-        title: 'Data Nodes documentation',
-        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-      }}>
-      <span>
-        <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
-        allow you to index and search through all the messages in your <ProductName /> message database.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <StyledCol md={12}>
-        <ClusterManagementOverview />
-      </StyledCol>
-    </Row>
-  </DocumentTitle>
-);
+const DataNodesClusterManagementPage = () => {
+  const { t } = useTranslation('data_nodes_cluster_management');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <ClusterConfigurationPageNavigation />
+      <PageHeader
+        title={t('title')}
+        documentationLink={{
+          title: t('documentation_title'),
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}>
+        <Trans i18nKey="description">
+          <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
+          allow you to index and search through all the messages in your <ProductName /> message database.
+        </Trans>
+      </PageHeader>
+      <Row className="content">
+        <StyledCol md={12}>
+          <ClusterManagementOverview />
+        </StyledCol>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default DataNodesClusterManagementPage;
