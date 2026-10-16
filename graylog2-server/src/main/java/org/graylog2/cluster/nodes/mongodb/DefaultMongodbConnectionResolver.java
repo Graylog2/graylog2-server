@@ -20,22 +20,25 @@ import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoCredential;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.apache.http.client.utils.URIBuilder;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.system.shutdown.GracefulShutdownHook;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -43,13 +46,22 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
-    private final MongoClientURI mongoClientURI;
+    private static final String SRV_SCHEME_PREFIX = "mongodb+srv://";
+
+    // Lower-cased, as MongoDB connection string option names are case-insensitive. Besides the options a direct
+    // connection overrides, these are the options only allowed in mongodb+srv:// connection strings, as the per-node
+    // connection strings are mongodb:// ones.
+    private static final Set<String> OPTIONS_DROPPED_PER_NODE = Set.of("replicaset", "directconnection",
+            "srvmaxhosts", "srvservicename", "srvallowedhostssuffix");
+
+    private final MongoDbConfiguration configuration;
     private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>();
 
 
     @Inject
     public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration, GracefulShutdownService shutdownService) {
-        this.mongoClientURI = configuration.getMongoClientURI();
+        // Don't parse the connection string here: for mongodb+srv:// that means DNS lookups
+        this.configuration = configuration;
         shutdownService.register(DefaultMongodbConnectionResolver.this);
     }
 
@@ -64,44 +76,71 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
         return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
     }
 
+    /**
+     * Builds a connection string for a direct connection to a single node, reusing the configured connection string.
+     * Credentials, database and options are copied verbatim (still URL-encoded), as the MongoDB driver already
+     * accepted them for the main connection. Decoding and re-encoding them is not safe: e.g. a ':' in the password
+     * must stay encoded, values may contain an encoded '=' and options like readPreferenceTags may be repeated.
+     * The original string is split the same way the MongoDB driver does it: hosts end at the first '/' after the
+     * scheme, credentials end at the last '@' before it and the options follow the next '?'.
+     */
     private String buildConnectionString(String nodeName) {
-        // Extract credentials from the original connection URI
-        final String username = mongoClientURI.getUsername();
-        final char[] password = mongoClientURI.getPassword();
-        final String database = mongoClientURI.getDatabase();
+        final String uri = configuration.getUri();
+        final String withoutScheme = uri.substring(uri.indexOf("://") + 3);
+        final int pathStart = withoutScheme.indexOf('/');
+        final String userAndHosts = pathStart < 0 ? withoutScheme : withoutScheme.substring(0, pathStart);
+        final String pathAndOptions = pathStart < 0 ? "" : withoutScheme.substring(pathStart + 1);
 
-        // Parse host and port from the nodeName (supports both IPv4 and IPv6)
-        final HostAndPort hostAndPort = HostAndPort.fromString(nodeName);
+        // Includes the trailing '@', if there are credentials at all
+        final String userInfo = userAndHosts.substring(0, userAndHosts.lastIndexOf('@') + 1);
 
-        try {
-            URIBuilder builder = new URIBuilder();
-            builder.setScheme("mongodb");
-            builder.setHost(hostAndPort.getHost());
-            builder.setPort(hostAndPort.getPort());
-            if (username != null && password != null) {
-                builder.setUserInfo(f("%s:%s", username, new String(password)));
-            }
-            builder.setPath(database);
-            final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
-            configParams.put("directConnection", "true");
-            configParams.forEach(builder::addParameter);
-            configParams.remove("replicaSet");
-            configParams.put("maxPoolSize", "5");
+        final int optionsStart = pathAndOptions.indexOf('?');
+        final String database = optionsStart < 0 ? pathAndOptions : pathAndOptions.substring(0, optionsStart);
+        final String options = optionsStart < 0 ? "" : pathAndOptions.substring(optionsStart + 1);
 
-            return builder.build().toString();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        final List<String> configuredOptions = Splitter.onPattern("[&;]").omitEmptyStrings().splitToList(options);
+        final Set<String> configuredOptionNames = configuredOptions.stream()
+                .map(DefaultMongodbConnectionResolver::optionName)
+                .collect(Collectors.toSet());
+        final Stream<String> srvImpliedOptions = uri.startsWith(SRV_SCHEME_PREFIX)
+                ? srvImpliedOptions(!userInfo.isEmpty(), configuredOptionNames)
+                : Stream.empty();
+
+        final String perNodeOptions = Stream.of(
+                        configuredOptions.stream().filter(option -> !OPTIONS_DROPPED_PER_NODE.contains(optionName(option))),
+                        srvImpliedOptions,
+                        Stream.of("directConnection=true"))
+                .flatMap(Function.identity())
+                .collect(Collectors.joining("&"));
+
+        // HostAndPort keeps the brackets of IPv6 addresses
+        return f("mongodb://%s%s/%s?%s", userInfo, HostAndPort.fromString(nodeName), database, perNodeOptions);
     }
 
-    @Nonnull
-    private Map<String, String> configParamsFromQuery() {
-        final URI uri = URI.create(mongoClientURI.getURI());
-        return Optional.ofNullable(uri.getQuery())
-                .map(query -> Splitter.on('&')
-                        .withKeyValueSeparator('=')
-                        .split(query))
-                .orElseGet(Collections::emptyMap);
+    /**
+     * Options a mongodb+srv:// connection string implies, which have to be set explicitly in the mongodb:// per-node
+     * connection string: TLS is enabled unless configured otherwise, and the DNS TXT record may define the authSource.
+     */
+    private Stream<String> srvImpliedOptions(boolean hasCredentials, Set<String> configuredOptionNames) {
+        final Stream.Builder<String> implied = Stream.builder();
+        if (!configuredOptionNames.contains("tls") && !configuredOptionNames.contains("ssl")) {
+            implied.add("tls=true");
+        }
+        if (hasCredentials && !configuredOptionNames.contains("authsource")) {
+            // Parsing resolves the DNS TXT record, so the credential has the effective authSource
+            final MongoCredential credential = configuration.getMongoClientURI().getCredentials();
+            if (credential != null && credential.getSource() != null) {
+                // The MongoDB driver doesn't decode '+' to a space
+                final String authSource = URLEncoder.encode(credential.getSource(), StandardCharsets.UTF_8).replace("+", "%20");
+                implied.add(f("authSource=%s", authSource));
+            }
+        }
+        return implied.build();
+    }
+
+    private static String optionName(String option) {
+        final int separator = option.indexOf('=');
+        return (separator < 0 ? option : option.substring(0, separator)).toLowerCase(Locale.ROOT);
     }
 
     @Override
