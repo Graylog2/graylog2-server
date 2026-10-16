@@ -40,6 +40,7 @@ import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
 import org.slf4j.Logger;
@@ -116,6 +117,8 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
         final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder.builder(hosts);
+
+        builder.setMapper(new JacksonJsonpMapper(objectMapper));
 
         builder.setRequestConfigCallback(requestConfigBuilder ->
                 requestConfigBuilder
