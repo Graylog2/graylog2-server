@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
@@ -25,22 +26,23 @@ import DocsHelper from 'util/DocsHelper';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 const AuthenticationCreatePage = () => {
+  const { t } = useTranslation('authentication_create');
   const { finishedLoading, activeBackend } = useActiveBackend();
 
   return (
-    <DocumentTitle title="Create Authentication Service">
+    <DocumentTitle title={t('title')}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title="Create Authentication Service"
+        title={t('title')}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: 'Authentication documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure authentication services of this cluster.</span>
+        <span>{t('description')}</span>
       </PageHeader>
 
-      <GettingStarted title="Create New Authentication Service" />
+      <GettingStarted title={t('getting_started_title')} />
     </DocumentTitle>
   );
 };
