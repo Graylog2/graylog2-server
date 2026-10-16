@@ -1,0 +1,8 @@
+{
+  "load_error": "Could not load collector instance: {{error}}",
+  "not_found_message": "Collector instance not found. It may have been removed &mdash; see all",
+  "instances": "Instances",
+  "title": "Collector Onboarding",
+  "documentation_title": "Collectors documentation",
+  "status_description": "Status of your newly connected collector."
+}

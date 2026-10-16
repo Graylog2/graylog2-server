@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -33,6 +33,7 @@ import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
+  const { t } = useTranslation('collectors_onboarding');
   const { instanceUid } = useParams<{ instanceUid: string }>();
   const location = useLocation<{ fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
@@ -64,14 +65,13 @@ const CollectorsOnboardingInstancePage = () => {
     if (isLoading) return <Spinner />;
 
     if (error) {
-      return <Alert bsStyle="danger">Could not load collector instance: {extractErrorMessage(error)}</Alert>;
+      return <Alert bsStyle="danger">{t('load_error', { error: extractErrorMessage(error) })}</Alert>;
     }
 
     if (!instance) {
       return (
         <Alert bsStyle="warning">
-          Collector instance not found. It may have been removed &mdash; see all{' '}
-          <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>Instances</Link>.
+          {t('not_found_message')} <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>{t('instances')}</Link>.
         </Alert>
       );
     }
@@ -80,19 +80,19 @@ const CollectorsOnboardingInstancePage = () => {
   };
 
   return (
-    <DocumentTitle title="Collector Onboarding">
+    <DocumentTitle title={t('title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Collector Onboarding <PreviewBadge />
+            {t('title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>Status of your newly connected collector.</span>
+        <span>{t('status_description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>{content()}</Col>
