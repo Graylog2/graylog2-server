@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, useParams } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
@@ -25,6 +26,7 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsFleetDetailPage = () => {
+  const { t } = useTranslation('collectors_fleets');
   const { data: config, isLoading } = useCollectorsConfig();
   const { fleetId } = useParams<{ fleetId: string }>();
 
@@ -38,7 +40,7 @@ const CollectorsFleetDetailPage = () => {
   }
 
   return (
-    <DocumentTitle title="Fleet Detail">
+    <DocumentTitle title={t('fleet_detail')}>
       <CollectorsPageNavigation />
       <Row className="content">
         <Col md={12}>{fleetId && <FleetDetail fleetId={fleetId} />}</Col>

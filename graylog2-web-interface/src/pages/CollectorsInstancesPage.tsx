@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
@@ -27,6 +28,7 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsInstancesPage = () => {
+  const { t } = useTranslation('collectors_instances');
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
@@ -39,21 +41,20 @@ const CollectorsInstancesPage = () => {
   }
 
   return (
-    <DocumentTitle title="Collector Instances">
+    <DocumentTitle title={t('title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Instances <PreviewBadge />
+            {t('instances_title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
         <span>
-          A collector instance represents a running collector process on a remote host. Instances enroll into a fleet
-          using an enrollment token and automatically receive their fleet&apos;s source configuration.
+          {t('description')}
         </span>
       </PageHeader>
 

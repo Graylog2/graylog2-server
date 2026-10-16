@@ -1,0 +1,6 @@
+{
+  "title": "Collector Instances",
+  "instances_title": "Instances",
+  "documentation_title": "Collectors documentation",
+  "description": "A collector instance represents a running collector process on a remote host. Instances enroll into a fleet using an enrollment token and automatically receive their fleet's source configuration."
+}

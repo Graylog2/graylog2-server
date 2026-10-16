@@ -3,5 +3,6 @@
   "fleets_title": "Fleets",
   "documentation_title": "Collectors-Dokumentation",
   "entity_key": "Fleet",
-  "description": "Ein Fleet ist eine Gruppe von Collectoren, die dieselbe Konfiguration teilen. Alle Collectoren in einem Fleet sammeln Daten aus denselben Quellen. Verwenden Sie Fleets, um Collectoren nach Umgebung, Team oder Zweck zu organisieren."
+  "description": "Ein Fleet ist eine Gruppe von Collectoren, die dieselbe Konfiguration teilen. Alle Collectoren in einem Fleet sammeln Daten aus denselben Quellen. Verwenden Sie Fleets, um Collectoren nach Umgebung, Team oder Zweck zu organisieren.",
+  "fleet_detail": "Fleet-Details"
 }
