@@ -42,6 +42,21 @@ describe('PageNavigation', () => {
           description: 'Dummy Page',
           children: [{ description: 'Positioned B', path: '/positioned-b', position: { after: 'Second' } }],
         },
+        {
+          description: 'Chained Page',
+          children: [
+            { description: 'First', path: '/first' },
+            { description: 'Second', path: '/second' },
+          ],
+        },
+        {
+          description: 'Chained Page',
+          children: [{ description: 'Chained B', path: '/chained-b', position: { after: 'Chained A' } }],
+        },
+        {
+          description: 'Chained Page',
+          children: [{ description: 'Chained A', path: '/chained-a', position: { after: 'First' } }],
+        },
       ],
     } as PluginExports,
   };
@@ -65,6 +80,19 @@ describe('PageNavigation', () => {
       'Positioned B',
       'Positioned A',
       'Third',
+    ]);
+  });
+
+  it('renders an item after another positioned item which is registered later', async () => {
+    render(<PageNavigation page="Chained Page" />);
+
+    await screen.findByRole('link', { name: 'First' });
+
+    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'First',
+      'Chained A',
+      'Chained B',
+      'Second',
     ]);
   });
 });
