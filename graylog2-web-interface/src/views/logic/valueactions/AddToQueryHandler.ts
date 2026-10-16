@@ -18,7 +18,13 @@ import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
-import { addToQuery, predicate, concatQueryStrings, edgeClause } from 'views/logic/queries/QueryHelper';
+import {
+  addToQuery,
+  formatValueForQuery,
+  predicate,
+  concatQueryStrings,
+  edgeClause,
+} from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
@@ -28,7 +34,7 @@ import hasMultipleValueForActions from 'views/components/visualizations/utils/ha
 import { fieldValueOrClause, formatQueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
 const toPredicate = (field: string, value: string | number, type: FieldType) =>
-  predicate(field, formatQueryValue(value, type));
+  predicate(field, formatValueForQuery(value, type));
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) =>
   addToQuery(oldQuery, toPredicate(field, value, type));

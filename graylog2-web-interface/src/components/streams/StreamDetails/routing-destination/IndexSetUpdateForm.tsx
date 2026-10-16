@@ -20,13 +20,12 @@ import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 
 import { Button, Modal } from 'components/bootstrap';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import type { Stream } from 'logic/streams/types';
 import useStreamMutations from 'hooks/useStreamMutations';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';
-import { isPermitted } from 'util/PermissionsMixin';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -54,7 +53,7 @@ const validate = (values: FormValues) => {
 
 const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   const { updateStream } = useStreamMutations();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
   const sendTelemetry = useSendTelemetry();
@@ -85,7 +84,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   return (
     <>
       <Button
-        disabled={!isPermitted(currentUser.permissions, `streams:edit:${stream.id}`)}
+        disabled={!isPermitted(`streams:edit:${stream.id}`)}
         bsSize="sm"
         onClick={openModal}
         title="Edit index set">

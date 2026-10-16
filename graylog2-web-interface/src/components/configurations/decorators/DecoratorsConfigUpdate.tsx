@@ -17,8 +17,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Modal, Alert } from 'components/bootstrap';
 import { IfPermitted, ModalSubmit } from 'components/common';
@@ -66,11 +65,11 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const sendTelemetry = useSendTelemetry('decorators');
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   const canEditStream = useMemo(
-    () => isPermitted(permissions, `streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
-    [currentStream, permissions],
+    () => isPermitted(`streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
+    [currentStream, isPermitted],
   );
 
   const onCreate = useCallback(

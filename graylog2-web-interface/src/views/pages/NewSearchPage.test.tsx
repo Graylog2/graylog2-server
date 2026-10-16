@@ -47,6 +47,7 @@ jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 jest.mock('views/hooks/useMinimumRefreshInterval');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 describe('NewSearchPage', () => {
   const query = {

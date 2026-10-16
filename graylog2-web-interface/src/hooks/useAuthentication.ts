@@ -17,11 +17,12 @@
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemAuthenticationServicesBackends } from '@graylog/server-api';
+
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
-import PaginationURL from 'util/PaginationURL';
 import type { PaginatedUsers } from 'hooks/useUsers';
 import type { PaginatedResponseType, Pagination, PaginatedList } from 'stores/PaginationTypes';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -161,11 +162,8 @@ export const updateAuthBackend = (
   );
 };
 
-export const deleteAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.AuthenticationController.delete(backendId).url);
-
-  return fetch('DELETE', url);
-};
+export const deleteAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<void> =>
+  SystemAuthenticationServicesBackends.remove(backendId);
 
 export const testAuthConnection = (payload: ConnectionTestPayload): Promise<ConnectionTestResult> => {
   const url = qualifyUrl(ApiRoutes.AuthenticationController.testConnection().url);
@@ -185,38 +183,30 @@ export const setActiveAuthBackend = (backendId: null | undefined | Authenticatio
   return fetch('POST', url, { active_backend: backendId });
 };
 
-export const loadAuthBackendsPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedBackends> => {
-  const url = PaginationURL(ApiRoutes.AuthenticationController.servicesPaginated().url, page, perPage, query);
-
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedBackendsResponse) => ({
-    context: {
-      activeBackend: response.context.active_backend,
-    },
-    list: Immutable.List<AuthenticationBackend>(
-      response.backends.map((backend) => AuthenticationBackend.fromJSON(backend)),
-    ),
-    pagination: {
-      page: response.page,
-      perPage: response.per_page,
-      query: response.query,
-      count: response.count,
-      total: response.total,
-    },
-  }));
-};
+export const loadAuthBackendsPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedBackends> =>
+  SystemAuthenticationServicesBackends.list(query || undefined, page, perPage).then(
+    (response: PaginatedBackendsResponse) => ({
+      context: {
+        activeBackend: response.context.active_backend,
+      },
+      list: Immutable.List<AuthenticationBackend>(
+        response.backends.map((backend) => AuthenticationBackend.fromJSON(backend)),
+      ),
+      pagination: {
+        page: response.page,
+        perPage: response.per_page,
+        query: response.query,
+        count: response.count,
+        total: response.total,
+      },
+    }),
+  );
 
 export const loadAuthBackendUsersPaginated = (
   authBackendId: string,
   { page, perPage, query }: Pagination,
-): Promise<PaginatedUsers> => {
-  const url = PaginationURL(
-    ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url,
-    page,
-    perPage,
-    query,
-  );
-
-  return fetch('GET', qualifyUrl(url)).then(
+): Promise<PaginatedUsers> =>
+  SystemAuthenticationServicesBackends.getUsers(undefined, authBackendId, page, perPage, query).then(
     (response: PaginatedUsersResponse): PaginatedUsers => ({
       list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
       pagination: {
@@ -229,7 +219,6 @@ export const loadAuthBackendUsersPaginated = (
       adminUser: undefined,
     }),
   );
-};
 
 export const loadActiveAuthBackendType = (): Promise<string | undefined> => {
   const url = qualifyUrl(ApiRoutes.AuthenticationController.loadActiveBackendType().url);

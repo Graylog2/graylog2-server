@@ -111,6 +111,7 @@ class EntityMetricsServiceTest {
                 List.of("entity-1"), Set.of("message_count"), restrictedUser);
 
         assertThat(secondResult.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 100L));
+        assertThat(descriptor.computeCalls).isEqualTo(1);
     }
 
     @Test
@@ -176,6 +177,7 @@ class EntityMetricsServiceTest {
         private final String fieldName;
         private final Duration cacheTtl;
         private final List<EntityMetric<Map<String, Long>>> computeResult;
+        private int computeCalls;
 
         TestCachedDescriptor(String fieldName, Duration cacheTtl, Map<String, Map<String, Long>> computeResult) {
             this.fieldName = fieldName;
@@ -196,6 +198,7 @@ class EntityMetricsServiceTest {
 
         @Override
         public List<EntityMetric<Map<String, Long>>> compute(Collection<String> entityIds) {
+            computeCalls++;
             return computeResult;
         }
 

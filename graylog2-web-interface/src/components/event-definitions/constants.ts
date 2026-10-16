@@ -17,6 +17,8 @@
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
+// Matches the backend's tactics_techniques filter on the event definitions list.
+export const TACTICS_TECHNIQUES_ATTRIBUTE_ID = 'tactics_techniques';
 
 const getEventDefinitionTableElements = (
   pluggableAttributes?: {
@@ -56,14 +58,13 @@ const getEventDefinitionTableElements = (
     ],
   };
 
-  // `tags` is supplied via the fetchEventDefinitions response (so it shows up in the filter
-  // dropdown with its custom filter_component) and is NOT added here, otherwise
-  // PaginatedEntityTable would render a duplicate Tags column.
+  // `tags` and the plugin's tactics/techniques attribute are supplied via the fetch response (so
+  // they show up in the filter dropdown with their custom filter_component) and are NOT added
+  // here, otherwise PaginatedEntityTable would render duplicate columns.
   const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
     { id: 'notifications', title: 'Notifications', sortable: false },
-    ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute] : []),
     ...(pluggableAttributes?.attributes || []),
   ];
 

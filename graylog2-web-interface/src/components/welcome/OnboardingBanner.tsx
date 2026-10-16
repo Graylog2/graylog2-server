@@ -20,8 +20,7 @@ import { styled } from 'styled-components';
 
 import { Alert, Row, Col } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isAnyPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { REQUIRED_PERMISSIONS } from 'components/welcome/Constants';
 import Store from 'logic/local-storage/Store';
 
@@ -35,7 +34,7 @@ const StyledAlert = styled(Alert)`
 
 const OnboardingBanner = () => {
   const productName = useProductName();
-  const { permissions } = useCurrentUser();
+  const { isAnyPermitted } = usePermissions();
   const { data } = useOnboardingEligibility();
   const [onboardingBannerDismissed, setOnboardingBannerDismissed] = useState(
     !!Store.get(ONBOARDING_BANNER_DISMISSED_KEY),
@@ -46,7 +45,7 @@ const OnboardingBanner = () => {
     setOnboardingBannerDismissed(true);
   };
 
-  if (!onboardingBannerDismissed && !isAnyPermitted(permissions, REQUIRED_PERMISSIONS) && data?.status === 'setup') {
+  if (!onboardingBannerDismissed && !isAnyPermitted(REQUIRED_PERMISSIONS) && data?.status === 'setup') {
     return (
       <Row className="content">
         <Col xs={12}>
