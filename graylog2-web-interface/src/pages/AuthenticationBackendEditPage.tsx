@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import withParams from 'routing/withParams';
 import type { Location } from 'routing/withLocation';
@@ -39,6 +40,7 @@ const AuthenticationBackendEditPage = ({
     query: { initialStepKey },
   },
 }: Props) => {
+  const { t } = useTranslation('authentication_backend_edit');
   const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const AuthenticationBackendEditPage = ({
   const authService = getAuthServicePlugin(authBackend.config.type);
 
   if (!authService) {
-    return <>{`No authentication service plugin configured for "${authBackend.config.type}"`}</>;
+    return <>{t('no_plugin_configured', { type: authBackend.config.type })}</>;
   }
 
   const { editComponent: BackendEdit } = authService;
