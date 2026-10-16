@@ -1,0 +1,19 @@
+{
+  "title": "Content Packs",
+  "button_text": "Content Packs",
+  "description": "Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.",
+  "delete_confirmation": "You are about to delete this Content Pack, are you sure?",
+  "delete_success": "Content Pack deleted successfully.",
+  "delete_error_message": "Deleting bundle failed: {{error}}",
+  "install_success": "Content Pack installed successfully.",
+  "install_error_message": "Installing content pack failed with status: {{status}}. Could not install Content Pack with ID: {{id}}",
+  "create_page_title": "Content packs",
+  "create_header_title": "Create content packs",
+  "create_button_text": "Content Packs",
+  "create_description": "Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.",
+  "marketplace_prefix": "Find more content packs in",
+  "import_success_message": "Content pack imported successfully",
+  "import_success_title": "Success!",
+  "import_error_message": "Error importing content pack, please ensure it is a valid JSON file. Check your {{productName}} server logs for more information.",
+  "import_error_title": "Could not import content pack"
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Content Packs",
+  "button_text": "Content Packs",
+  "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
+  "delete_confirmation": "Sie sind im Begriff, dieses Content Pack zu löschen. Sind Sie sicher?",
+  "delete_success": "Content Pack erfolgreich gelöscht.",
+  "delete_error_message": "Löschen des Bundles fehlgeschlagen: {{error}}",
+  "install_success": "Content Pack erfolgreich installiert.",
+  "install_error_message": "Installation des Content Packs fehlgeschlagen mit Status: {{status}}. Das Content Pack mit der ID {{id}} konnte nicht installiert werden.",
+  "create_page_title": "Content Packs",
+  "create_header_title": "Content Packs erstellen",
+  "create_button_text": "Content Packs",
+  "create_description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
+  "marketplace_prefix": "Finden Sie weitere Content Packs in",
+  "import_success_message": "Content Pack erfolgreich importiert",
+  "import_success_title": "Erfolg!",
+  "import_error_message": "Fehler beim Importieren des Content Packs. Bitte stellen Sie sicher, dass es eine gültige JSON-Datei ist. Überprüfen Sie Ihre {{productName}} Server-Logs für weitere Informationen.",
+  "import_error_title": "Content Pack konnte nicht importiert werden"
+}

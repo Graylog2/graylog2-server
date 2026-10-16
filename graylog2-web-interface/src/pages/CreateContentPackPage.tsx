@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -33,6 +34,7 @@ import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const CreateContentPackPage = () => {
+  const { t } = useTranslation('content_packs');
   const productName = useProductName();
   const history = useHistory();
   const { entityIndex } = useEntityIndex();
@@ -61,14 +63,12 @@ const CreateContentPackPage = () => {
 
     createContentPack(contentPack.toJSON()).then(
       () => {
-        UserNotification.success('Content pack imported successfully', 'Success!');
+        UserNotification.success(t('import_success_message'), t('import_success_title'));
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
       },
       (response) => {
-        const message =
-          'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-          `${productName} server logs for more information.`;
-        const title = 'Could not import content pack';
+        const message = t('import_error_message', { productName });
+        const title = t('import_error_title');
         let smallMessage = '';
 
         if (response.additional && response.additional.body && response.additional.body.message) {
@@ -100,20 +100,18 @@ const CreateContentPackPage = () => {
   };
 
   return (
-    <DocumentTitle title="Content packs">
+    <DocumentTitle title={t('create_page_title')}>
       <span>
         <PageHeader
-          title="Create content packs"
+          title={t('create_header_title')}
           topActions={
             <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-              <Button bsStyle="info">Content Packs</Button>
+              <Button bsStyle="info">{t('create_button_text')}</Button>
             </LinkContainer>
           }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include
-            inputs/extractors, streams, and dashboards.
-            <br />
-            <MarketplaceLink prefix="Find more content packs in" />
+            {t('create_description')}
+            <MarketplaceLink prefix={t('marketplace_prefix')} />
           </span>
         </PageHeader>
         <ContentPackEdit

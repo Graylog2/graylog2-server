@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, ButtonToolbar, Button } from 'components/bootstrap';
@@ -39,15 +39,16 @@ const ConfigurationBundles = styled.div(
 );
 
 const ContentPacksPage = () => {
+  const { t } = useTranslation('content_packs');
   const { data, isInitialLoading, refetch } = useContentPacks();
 
   const _deleteContentPack = useCallback(
     (contentPackId: string) => {
       // eslint-disable-next-line no-alert
-      if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
+      if (window.confirm(t('content_packs.delete_confirmation'))) {
         deleteContentPack(contentPackId).then(
           () => {
-            UserNotification.success('Content Pack deleted successfully.', 'Success');
+            UserNotification.success(t('content_packs.delete_success'), 'Success');
             refetch();
           },
           (error) => {
@@ -55,31 +56,30 @@ const ContentPacksPage = () => {
             const err_body = error.additional.body;
 
             if (err_body && err_body.message) {
-              err_message = error.additional.body.message;
+              err_message = err_body.message;
             }
 
-            UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+            UserNotification.error(t('content_packs.delete_error_message', { error: err_message }), 'Error');
           },
         );
       }
     },
-    [refetch],
+    [refetch, t],
   );
 
   const _installContentPack = useCallback(
     (contentPackId: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => {
       installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
         () => {
-          UserNotification.success('Content Pack installed successfully.', 'Success');
+          UserNotification.success(t('content_packs.install_success'), 'Success');
           refetch();
         },
         (error) => {
-          UserNotification.error(`Installing content pack failed with status: ${error}.
-         Could not install Content Pack with ID: ${contentPackId}`);
+          UserNotification.error(t('content_packs.install_error_message', { status: error, id: contentPackId }), 'Error');
         },
       );
     },
-    [refetch],
+    [refetch, t],
   );
 
   if (isInitialLoading) {
@@ -89,11 +89,11 @@ const ContentPacksPage = () => {
   const { content_packs: contentPacks, content_packs_metadata: contentPackMetadata } = data;
 
   return (
-    <DocumentTitle title="Content Packs">
+    <DocumentTitle title={t('content_packs.title')}>
       <span>
         <PageHeader
-          title="Content Packs"
-          topActions={<Button bsStyle="info">Content Packs</Button>}
+          title={t('content_packs.title')}
+          topActions={<Button bsStyle="info">{t('content_packs.button_text')}</Button>}
           actions={
             <ButtonToolbar>
               <ContentPackUploadControls />
@@ -101,8 +101,7 @@ const ContentPacksPage = () => {
             </ButtonToolbar>
           }>
           <span>
-            Content Packs accelerate the set up process for a specific data source. A Content Pack can include
-            inputs/extractors, streams, and dashboards.
+            {t('content_packs.description')}
             <br />
             <MarketplaceLink prefix="Find more Content Packs in" />
           </span>
