@@ -1,0 +1,90 @@
+{
+  "create_input": {
+    "select_input": "Select input",
+    "launch_new": "Launch new input",
+    "launch_new_type": "Launch new <type>{{type}}</type> input",
+    "launch": "Launch Input"
+  },
+  "edit_input": {
+    "edit": "Edit input",
+    "editing": "Editing Input {{title}}",
+    "update": "Update input"
+  },
+  "input_dropdown": {
+    "label": "server input select",
+    "select": "Select an Input"
+  },
+  "input_states": {
+    "title": "Input States for {{title}}",
+    "count_one": "{{count}} {{state}}",
+    "count_other": "{{count}} {{state}}",
+    "CREATED": "Created",
+    "INITIALIZED": "Initialized",
+    "INVALID_CONFIGURATION": "Invalid Configuration",
+    "STARTING": "Starting",
+    "RUNNING": "Running",
+    "FAILED": "Failed",
+    "FAILING": "Failing",
+    "SETUP": "Setup",
+    "STOPPING": "Stopping",
+    "STOPPED": "Stopped",
+    "TERMINATED": "Terminated"
+  },
+  "state_control": {
+    "set_up": "Set-up Input",
+    "stopping": "Stopping...",
+    "stop": "Stop input",
+    "starting": "Starting...",
+    "start": "Start input"
+  },
+  "static_fields": {
+    "title": "Static fields",
+    "add": "Add static field",
+    "add_field": "Add field",
+    "add_success": "Static field '{{field}}' added to '{{input}}' successfully",
+    "add_failed": "Adding static field to input failed with: {{error}}",
+    "add_failed_title": "Could not add static field to input '{{input}}'",
+    "remove_success": "Static field '{{field}}' removed from '{{input}}' successfully",
+    "remove_failed": "Removing static field from input failed with: {{error}}",
+    "remove_failed_title": "Could not remove static field '{{field}}' from input '{{input}}'",
+    "delete_title": "Delete static field",
+    "delete_confirm": "Are you sure you want to remove static field '{{field}}' from '{{input}}'?",
+    "description": "Define a static field that is added to every message that comes in via this input. The field is not overwritten if the message already has that key. Key must only contain alphanumeric characters or underscores and not be a reserved field.",
+    "field_name": "Field name",
+    "field_name_title": "Should consist only of alphanumeric characters and underscores.",
+    "field_value": "Field value"
+  },
+  "notifications": {
+    "warning": "Warning",
+    "failed": "Inputs have failed and will not receive traffic until started.",
+    "setup": "Inputs currently in setup mode will not receive traffic until started.",
+    "stopped": "Inputs currently stopped will not receive traffic until started.",
+    "show_failed": "Show failed inputs",
+    "show_setup": "Show inputs in setup mode",
+    "show_stopped": "Show stopped inputs"
+  },
+  "node_select": {
+    "node": "Node",
+    "node_help": "On which node should this input start",
+    "select_node": "Select Node",
+    "global": "Global",
+    "global_help": "Should this input start on all nodes"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Inputs documentation",
+    "description": "{{productName}} nodes accept data via inputs. Launch or terminate as many inputs as you want here.",
+    "cloud_description": "{{productName}} cloud accepts data via inputs. There are many types of inputs to choose from, but only some can run directly in the cloud. You can launch and terminate them on this page.",
+    "cloud_forwarder_hint": "If you are missing an input type on this page's list of available inputs, you can start the input on a <forwarderLink>Forwarder</forwarderLink>.",
+    "back": "Back",
+    "diagnosis_title": "Input Diagnosis: {{name}}",
+    "diagnosis_description": "Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.",
+    "tab_overview": "Overview",
+    "tab_rules": "Rules",
+    "node_inputs_title": "Inputs of node {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "{{productName}} nodes accept data via inputs. On this page you can see which inputs are running on this specific node.",
+    "node_inputs_hint": "You can launch and terminate inputs on your cluster <inputsLink>here</inputsLink>.",
+    "local_inputs": "Local Inputs",
+    "global_inputs": "Global Inputs"
+  }
+}

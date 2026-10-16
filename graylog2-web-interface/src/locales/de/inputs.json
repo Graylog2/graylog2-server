@@ -1,0 +1,90 @@
+{
+  "create_input": {
+    "select_input": "Input auswählen",
+    "launch_new": "Neuen Input starten",
+    "launch_new_type": "Neuen <type>{{type}}</type>-Input starten",
+    "launch": "Input starten"
+  },
+  "edit_input": {
+    "edit": "Input bearbeiten",
+    "editing": "Input {{title}} bearbeiten",
+    "update": "Input aktualisieren"
+  },
+  "input_dropdown": {
+    "label": "Server-Input-Auswahl",
+    "select": "Input auswählen"
+  },
+  "input_states": {
+    "title": "Input-Status von {{title}}",
+    "count_one": "{{count}} {{state}}",
+    "count_other": "{{count}} {{state}}",
+    "CREATED": "Erstellt",
+    "INITIALIZED": "Initialisiert",
+    "INVALID_CONFIGURATION": "Ungültige Konfiguration",
+    "STARTING": "Wird gestartet",
+    "RUNNING": "Läuft",
+    "FAILED": "Fehlgeschlagen",
+    "FAILING": "Fehlerhaft",
+    "SETUP": "Einrichtung",
+    "STOPPING": "Wird gestoppt",
+    "STOPPED": "Gestoppt",
+    "TERMINATED": "Beendet"
+  },
+  "state_control": {
+    "set_up": "Input einrichten",
+    "stopping": "Wird gestoppt...",
+    "stop": "Input stoppen",
+    "starting": "Wird gestartet...",
+    "start": "Input starten"
+  },
+  "static_fields": {
+    "title": "Statische Felder",
+    "add": "Statisches Feld hinzufügen",
+    "add_field": "Feld hinzufügen",
+    "add_success": "Statisches Feld '{{field}}' wurde erfolgreich zu '{{input}}' hinzugefügt",
+    "add_failed": "Hinzufügen des statischen Felds zum Input fehlgeschlagen: {{error}}",
+    "add_failed_title": "Statisches Feld konnte nicht zu Input '{{input}}' hinzugefügt werden",
+    "remove_success": "Statisches Feld '{{field}}' wurde erfolgreich aus '{{input}}' entfernt",
+    "remove_failed": "Entfernen des statischen Felds aus dem Input fehlgeschlagen: {{error}}",
+    "remove_failed_title": "Statisches Feld '{{field}}' konnte nicht aus Input '{{input}}' entfernt werden",
+    "delete_title": "Statisches Feld löschen",
+    "delete_confirm": "Möchten Sie das statische Feld '{{field}}' wirklich aus '{{input}}' entfernen?",
+    "description": "Definieren Sie ein statisches Feld, das zu jeder Nachricht hinzugefügt wird, die über diesen Input eingeht. Das Feld wird nicht überschrieben, wenn die Nachricht diesen Schlüssel bereits enthält. Der Schlüssel darf nur alphanumerische Zeichen oder Unterstriche enthalten und kein reserviertes Feld sein.",
+    "field_name": "Feldname",
+    "field_name_title": "Darf nur aus alphanumerischen Zeichen und Unterstrichen bestehen.",
+    "field_value": "Feldwert"
+  },
+  "notifications": {
+    "warning": "Warnung",
+    "failed": "Inputs sind fehlgeschlagen und empfangen keine Daten, bis sie gestartet werden.",
+    "setup": "Inputs im Einrichtungsmodus empfangen keine Daten, bis sie gestartet werden.",
+    "stopped": "Gestoppte Inputs empfangen keine Daten, bis sie gestartet werden.",
+    "show_failed": "Fehlgeschlagene Inputs anzeigen",
+    "show_setup": "Inputs im Einrichtungsmodus anzeigen",
+    "show_stopped": "Gestoppte Inputs anzeigen"
+  },
+  "node_select": {
+    "node": "Node",
+    "node_help": "Auf welchem Node soll dieser Input starten",
+    "select_node": "Node auswählen",
+    "global": "Global",
+    "global_help": "Soll dieser Input auf allen Nodes starten"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Inputs-Dokumentation",
+    "description": "{{productName}}-Nodes empfangen Daten über Inputs. Hier können Sie beliebig viele Inputs starten oder beenden.",
+    "cloud_description": "{{productName}} Cloud empfängt Daten über Inputs. Es gibt viele Arten von Inputs, aber nur einige können direkt in der Cloud laufen. Auf dieser Seite können Sie sie starten und beenden.",
+    "cloud_forwarder_hint": "Wenn Ihnen in der Liste der verfügbaren Inputs auf dieser Seite ein Input-Typ fehlt, können Sie den Input auf einem <forwarderLink>Forwarder</forwarderLink> starten.",
+    "back": "Zurück",
+    "diagnosis_title": "Input-Diagnose: {{name}}",
+    "diagnosis_description": "Mit der Input-Diagnose können Sie Inputs und das Parsing testen, ohne Daten in den Such-Cluster zu schreiben.",
+    "tab_overview": "Übersicht",
+    "tab_rules": "Regeln",
+    "node_inputs_title": "Inputs von Node {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "{{productName}}-Nodes empfangen Daten über Inputs. Auf dieser Seite sehen Sie, welche Inputs auf diesem Node laufen.",
+    "node_inputs_hint": "Sie können Inputs in Ihrem Cluster <inputsLink>hier</inputsLink> starten und beenden.",
+    "local_inputs": "Lokale Inputs",
+    "global_inputs": "Globale Inputs"
+  }
+}
