@@ -19,35 +19,32 @@ Last commit: `6f40bce588 i18n(search): Translate view logic, field and value act
 
 Read first: `CONVENTIONS.md` (section "Translations") and `src/locales/GLOSSARY.de.md`.
 
-## 2. Uncommitted work in progress — handle this first
+## 2. Partially translated areas (WIP commits)
 
-The working tree contains **partial** translations (~45 files) for streams/outputs, events, event definitions,
-event notifications, inputs and extractors. The code already calls `t('…')`, but **the keys were lost**: they were
-kept in temporary fragment files that no longer exist. Nothing of this is in `src/locales/*` yet, so these
-files currently render raw keys and their tests fail.
+Several areas were started but not finished. They are committed as `WIP i18n(<area>): …` commits (authentication,
+cluster certificates, collectors, content packs, data node, outputs, events, event definitions, event
+notifications, inputs, extractors). The keys they use now exist in `src/locales/{en,de}`, and all namespaces are
+registered, but the areas still contain untranslated text. Finish them like any other area (see section 4): run
+the lint rule on the area, translate what is left, add the area to `TRANSLATED_FILES` and drop `WIP` when the
+commits are later turned into PRs.
 
 ```bash
-git status -s                                  # the WIP files
-python3 dev/i18n/find-missing-keys.py          # 199 keys used by changed files but missing in src/locales/en
+python3 dev/i18n/find-missing-keys.py src     # must report 0 missing keys
 ```
 
-Affected files (state at the time of writing):
+The script does not see keys built at runtime (template literals, key maps, local `t` wrappers around `i18n.t`).
+Check those by hand; the Jest missing-key handler catches them for rendered components.
 
-- streams/outputs: `src/components/outputs/{AssignOutputDropdown,CreateOutputDropdown,EditOutputButton}.tsx` (streams itself not started)
-- events: `src/components/events/{Constants.ts,EventsHistogram.tsx,SidebarEventDetails.ts}`
-- event definitions: `src/components/event-definitions/event-definitions/BulkActions.tsx`, `src/pages/{CreateEventDefinitionPage,EditEventDefinitionPage,EventDefinitionsPage,SigmaEventDefinitionPage,ViewEventDefinitionPage}.tsx`
-- event notifications: `src/components/event-notifications/**` (5 modified files + new `notificationTypeTitle.ts`)
-- inputs: `src/components/inputs/*` (9 files), `src/pages/{InputDiagnosisPage,InputsPage,NodeInputsPage}.tsx`
-- extractors: `src/components/extractors/**` (15 files)
+To **restart** an area instead of finishing it, revert its WIP commit (`git revert <commit>`, or drop it in an
+interactive rebase done by a human) and do the area from scratch.
 
-Two ways to continue, per area:
+**Every new namespace must be registered** in `src/locales/registerCoreTranslations.ts` (alphabetical, English
+import + lazy German chunk). An unregistered namespace renders raw keys in the browser, and the Jest missing-key
+handler only catches it for components that tests actually render.
 
-- **Recover (recommended for extractors, inputs, notifications):** for every missing key, take the English text
-  from `git diff <file>` (the removed `-` line next to the new `t('…')` call), add it to
-  `src/locales/en/<ns>.json`, add the German translation to `src/locales/de/<ns>.json`, register the namespace (see
-  step 4 below). Check partially edited files for remaining untranslated text with the lint rule.
-- **Restart (simpler for small/barely started areas, e.g. streams/outputs, events):**
-  `git checkout -- <files of that area>` (and delete untracked new files of that area), then do the area from scratch.
+Optional clean-up: authentication and collectors use one namespace per page (`authentication_page`,
+`authentication_create`, …, `collectors_fleets`, …). Merging them into one namespace per area (`authentication`,
+`collectors`) with one section per page matches the convention used elsewhere and is preferred, but not required.
 
 Never use `git stash` here: the repo has older stashes of the user (`stash@{0..2}`) that must stay untouched.
 
