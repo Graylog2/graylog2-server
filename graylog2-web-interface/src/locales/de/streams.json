@@ -22,5 +22,11 @@
   "outputs_desc_part2": " eines Outputs entfernt ihn aus diesem Stream, aber er bleibt in der Liste der verfügbaren Outputs. Das Löschen eines Outputs ",
   "outputs_desc_globally": "global",
   "outputs_desc_part3": " entfernt ihn aus diesem und allen anderen Streams und beendet ihn. Sie können alle definierten Outputs im Detail in der ",
-  "outputs_desc_link_global_list": "globalen Output-Liste"
+  "outputs_desc_link_global_list": "globalen Output-Liste",
+  "outputs_content_pack_title": "Aus einem Content-Pack erstellt",
+  "outputs_plugin_error": "Das für diesen Output erforderliche Plugin ist nicht geladen. Eine Bearbeitung ist nicht möglich. Bitte laden Sie das Plugin oder löschen Sie den Output.",
+  "outputs_delete_from_stream": "Aus Stream löschen",
+  "outputs_id_label": "ID: {{id}}",
+  "outputs_type_label": "Typ: {{type}}",
+  "outputs_delete_globally": "Global löschen"
 }

@@ -22,5 +22,11 @@
   "outputs_desc_part2": " an output removes it from this stream but it will still be in the list of available outputs. Deleting an output ",
   "outputs_desc_globally": "globally",
   "outputs_desc_part3": " will remove it from this and all other streams and terminate it. You can see all defined outputs in details at the ",
-  "outputs_desc_link_global_list": "global output list"
+  "outputs_desc_link_global_list": "global output list",
+  "outputs_content_pack_title": "Created from content pack",
+  "outputs_plugin_error": "The plugin required for this output is not loaded. Editing it is not possible. Please load the plugin or delete the output.",
+  "outputs_delete_from_stream": "Delete from stream",
+  "outputs_id_label": "ID: {{id}}",
+  "outputs_type_label": "Type: {{type}}",
+  "outputs_delete_globally": "Delete globally"
 }
