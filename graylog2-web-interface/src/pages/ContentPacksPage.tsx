@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -45,10 +45,10 @@ const ContentPacksPage = () => {
   const _deleteContentPack = useCallback(
     (contentPackId: string) => {
       // eslint-disable-next-line no-alert
-      if (window.confirm(t('content_packs.delete_confirmation'))) {
+      if (window.confirm(t('delete_confirmation'))) {
         deleteContentPack(contentPackId).then(
           () => {
-            UserNotification.success(t('content_packs.delete_success'), 'Success');
+            UserNotification.success(t('delete_success'), 'Success');
             refetch();
           },
           (error) => {
@@ -59,7 +59,7 @@ const ContentPacksPage = () => {
               err_message = err_body.message;
             }
 
-            UserNotification.error(t('content_packs.delete_error_message', { error: err_message }), 'Error');
+            UserNotification.error(t('delete_error_message', { error: err_message }), 'Error');
           },
         );
       }
@@ -71,11 +71,11 @@ const ContentPacksPage = () => {
     (contentPackId: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => {
       installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
         () => {
-          UserNotification.success(t('content_packs.install_success'), 'Success');
+          UserNotification.success(t('install_success'), 'Success');
           refetch();
         },
         (error) => {
-          UserNotification.error(t('content_packs.install_error_message', { status: error, id: contentPackId }), 'Error');
+          UserNotification.error(t('install_error_message', { status: error, id: contentPackId }), 'Error');
         },
       );
     },
@@ -89,11 +89,11 @@ const ContentPacksPage = () => {
   const { content_packs: contentPacks, content_packs_metadata: contentPackMetadata } = data;
 
   return (
-    <DocumentTitle title={t('content_packs.title')}>
+    <DocumentTitle title={t('title')}>
       <span>
         <PageHeader
-          title={t('content_packs.title')}
-          topActions={<Button bsStyle="info">{t('content_packs.button_text')}</Button>}
+          title={t('title')}
+          topActions={<Button bsStyle="info">{t('button_text')}</Button>}
           actions={
             <ButtonToolbar>
               <ContentPackUploadControls />
@@ -101,7 +101,7 @@ const ContentPacksPage = () => {
             </ButtonToolbar>
           }>
           <span>
-            {t('content_packs.description')}
+            {t('description')}
             <br />
             <MarketplaceLink prefix="Find more Content Packs in" />
           </span>
