@@ -16,7 +16,6 @@
  */
 package org.graylog.aws.inputs.cloudtrail;
 
-import com.amazonaws.regions.Regions;
 import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +48,7 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -68,7 +68,7 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTER
 public class CloudTrailTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailTransport.class);
     public static final String NAME = "AWSCloudTrail";
-    private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
+    private static final Region DEFAULT_REGION = Region.US_EAST_1;
     private final LocalMetricRegistry localRegistry;
     private final ScheduledExecutorService executorService;
     private final SQSClientFactory sqsClientFactory;
@@ -137,8 +137,8 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         }
 
         final String assumeRoleArn = input.getConfiguration().getString(CK_ASSUME_ROLE_ARN);
-        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, DEFAULT_REGION.getName());
-        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, DEFAULT_REGION.getName());
+        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, DEFAULT_REGION.id());
+        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, DEFAULT_REGION.id());
 
         LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
 
