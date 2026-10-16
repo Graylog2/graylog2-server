@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import i18n from 'i18n';
 import { Row, Col, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
+
+// Example values of the format, not translated.
+const FIELD_NAMES_EXAMPLE = 'field1,field2,field3';
 
 type CSVConverterConfigurationProps = {
   type: string;
@@ -63,7 +67,7 @@ class CSVConverterConfiguration extends React.Component<
   render() {
     const separatorHelpMessage = (
       <span>
-        For example <code>,</code>, <code>\n</code>, and <code>\t</code> will be translated to a single character.
+        <Trans i18nKey="converters.csv_separator_help" ns="extractors" components={{ code: <code /> }} />
       </span>
     );
 
@@ -91,7 +95,7 @@ class CSVConverterConfiguration extends React.Component<
                 defaultValue={this.props.configuration.column_header}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
-                placeholder="field1,field2,field3"
+                placeholder={FIELD_NAMES_EXAMPLE}
                 onChange={this._onChange('column_header')}
                 required={this.converterEnabled && this.converterEnabled.getChecked()}
               />

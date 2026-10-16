@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
@@ -24,12 +26,20 @@ import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
 import { testRegexReplace } from 'api/tools';
 
+// Example values of the format, not translated.
+const REGEX_EXAMPLE = '^.*string(.+)$';
+const REPLACEMENT_EXAMPLE = '$1';
+
+const DocsLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text={children} />
+);
+
 type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying: boolean }> {
   static defaultProps = {
@@ -64,13 +74,13 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
 
     promise.then((result) => {
       if (!result.matched) {
-        UserNotification.warning('Regular expression did not match.');
+        UserNotification.warning(this.props.t('regex.no_match'));
 
         return;
       }
 
       if (!result.match) {
-        UserNotification.warning('Regular expression does not contain any matcher group to extract.');
+        UserNotification.warning(this.props.t('regex.no_group'));
 
         return;
       }
@@ -90,23 +100,30 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
     !this.props.exampleMessage;
 
   render() {
+    const { t } = this.props;
     const regexHelpMessage = (
       <span>
-        The regular expression used for extraction. Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
+        <Trans t={t} i18nKey="regex_replace.regex_help" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
     const replacementHelpMessage = (
       <span>
-        The replacement used for the matching text. Please refer to the{' '}
-        <a
-          target="_blank"
-          href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
-          rel="noreferrer">
-          Matcher
-        </a>{' '}
-        API documentation for the possible options.
+        <Trans
+          t={t}
+          i18nKey="regex_replace.replacement_help"
+          components={{
+            matcherLink: (
+              // The link text comes from the translation.
+              // eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/control-has-associated-label
+              <a
+                target="_blank"
+                href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
+                rel="noreferrer"
+              />
+            ),
+          }}
+        />
       </span>
     );
 
@@ -115,9 +132,9 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
         <Input
           type="text"
           id="regex"
-          label="Regular expression"
+          label={t('regex.label')}
           labelClassName="col-md-2"
-          placeholder="^.*string(.+)$"
+          placeholder={REGEX_EXAMPLE}
           onChange={this._onChange('regex')}
           wrapperClassName="col-md-10"
           defaultValue={this.props.configuration.regex}
@@ -128,9 +145,9 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
         <Input
           type="text"
           id="replacement"
-          label="Replacement"
+          label={t('regex_replace.replacement')}
           labelClassName="col-md-2"
-          placeholder="$1"
+          placeholder={REPLACEMENT_EXAMPLE}
           onChange={this._onChange('replacement')}
           wrapperClassName="col-md-10"
           defaultValue={this.props.configuration.replacement}
@@ -141,17 +158,17 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
         <Input
           type="checkbox"
           id="replace_all"
-          label="Replace all occurrences of the pattern"
+          label={t('regex_replace.replace_all')}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked={this.props.configuration.replace_all}
           onChange={this._onChange('replace_all')}
-          help="Whether to replace all occurrences of the given pattern or only the first occurrence."
+          help={t('regex_replace.replace_all_help')}
         />
 
         <Row>
           <Col mdOffset={2} md={10}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
+              {this.state.trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
             </Button>
           </Col>
         </Row>
@@ -160,4 +177,4 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
   }
 }
 
-export default RegexReplaceExtractorConfiguration;
+export default withTranslation('extractors')(RegexReplaceExtractorConfiguration);

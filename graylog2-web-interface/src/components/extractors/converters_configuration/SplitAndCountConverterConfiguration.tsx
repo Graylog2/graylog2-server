@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import i18n from 'i18n';
 import { Row, Col, Input } from 'components/bootstrap';
@@ -63,9 +64,11 @@ class SplitAndCountConverterConfiguration extends React.Component<
   render() {
     const splitByHelpMessage = (
       <span>
-        The Split & Count converter is splitting the extracted part by the defined character and stores the token count
-        as field. <strong>Example:</strong> <em>?fields=first_name,last_name,zip</em> split by <em>,</em> results in{' '}
-        <em>3</em>. You just counted the requested fields of a GET user REST request.
+        <Trans
+          i18nKey="converters.split_by_help"
+          ns="extractors"
+          components={{ strong: <strong />, em: <em /> }}
+        />
       </span>
     );
 

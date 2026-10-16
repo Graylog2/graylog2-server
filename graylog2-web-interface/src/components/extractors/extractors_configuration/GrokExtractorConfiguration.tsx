@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
@@ -31,7 +33,7 @@ type Props = {
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class GrokExtractorConfiguration extends React.Component<
   Props,
@@ -103,15 +105,13 @@ class GrokExtractorConfiguration extends React.Component<
 
     promise.then((result) => {
       if (result.error_message != null) {
-        UserNotification.error(
-          `We were not able to run the grok extraction because of the following error: ${result.error_message}`,
-        );
+        UserNotification.error(this.props.t('grok.error', { error: result.error_message }));
 
         return;
       }
 
       if (!result.matched) {
-        UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
+        UserNotification.warning(this.props.t('grok.no_match'));
 
         return;
       }
@@ -144,23 +144,23 @@ class GrokExtractorConfiguration extends React.Component<
 
   render() {
     const { patterns, trying } = this.state;
-    const { configuration } = this.props;
+    const { configuration, t } = this.props;
 
     return (
       <div>
         <Input
           type="checkbox"
           id="named_captures_only"
-          label="Named captures only"
+          label={t('grok.named_captures_only')}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked={configuration.named_captures_only}
           onChange={this._onChange('named_captures_only')}
-          help="Only put the explicitly named captures into the message."
+          help={t('grok.named_captures_only_help')}
         />
 
         <Row>
           <Col mdOffset={1} md={1}>
-            <ControlLabel className="col-md-offset-2">Grok pattern</ControlLabel>
+            <ControlLabel className="col-md-offset-2">{t('grok.pattern')}</ControlLabel>
           </Col>
           <Col md={10}>
             <GrokPatternInput
@@ -174,7 +174,7 @@ class GrokExtractorConfiguration extends React.Component<
         <Row>
           <Col mdOffset={2} md={1}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {trying ? <Icon name="progress_activity" spin /> : 'Try against example'}
+              {trying ? <Icon name="progress_activity" spin /> : t('configuration.try_example')}
             </Button>
           </Col>
         </Row>
@@ -183,4 +183,4 @@ class GrokExtractorConfiguration extends React.Component<
   }
 }
 
-export default GrokExtractorConfiguration;
+export default withTranslation('extractors')(GrokExtractorConfiguration);

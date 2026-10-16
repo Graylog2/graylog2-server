@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
-import i18n from 'i18n';
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -45,7 +45,7 @@ type EditExtractorProps = {
   inputId: string;
   exampleMessage?: string;
   onSave: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 type EditExtractorState = {
   updatedExtractor?: EditExtractorProps['extractor'];
@@ -150,6 +150,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   _getExtractorConditionControls = () => {
     const { conditionTestResult, updatedExtractor } = this.state;
+    const { t } = this.props;
 
     if (!updatedExtractor.condition_type || updatedExtractor.condition_type === 'none') {
       return <div />;
@@ -159,21 +160,21 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     let conditionInputHelp;
 
     if (updatedExtractor.condition_type === 'string') {
-      conditionInputLabel = i18n.t('edit.condition_string_label', { ns: 'extractors' });
-      conditionInputHelp = i18n.t('edit.condition_string_help', { ns: 'extractors' });
+      conditionInputLabel = t('edit.condition_string_label');
+      conditionInputHelp = t('edit.condition_string_help');
     } else {
-      conditionInputLabel = i18n.t('edit.condition_regex_label', { ns: 'extractors' });
-      conditionInputHelp = i18n.t('edit.condition_regex_help', { ns: 'extractors' });
+      conditionInputLabel = t('edit.condition_regex_label');
+      conditionInputHelp = t('edit.condition_regex_help');
     }
 
     let inputStyle;
 
     if (conditionTestResult === true) {
       inputStyle = 'success';
-      conditionInputHelp = i18n.t('edit.condition_matches', { ns: 'extractors' });
+      conditionInputHelp = t('edit.condition_matches');
     } else if (conditionTestResult === false) {
       inputStyle = 'error';
-      conditionInputHelp = i18n.t('edit.condition_no_match', { ns: 'extractors' });
+      conditionInputHelp = t('edit.condition_no_match');
     }
 
     return (
@@ -198,7 +199,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._testCondition} disabled={this._tryButtonDisabled()}>
-                {i18n.t('edit.try', { ns: 'extractors' })}
+                {t('edit.try')}
               </Button>
             </Col>
           </Row>
@@ -218,18 +219,18 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   render() {
     const { updatedExtractor, exampleMessage } = this.state;
-    const { action } = this.props;
-    const conditionTypeHelpMessage = i18n.t('edit.condition_type_help', { ns: 'extractors' });
+    const { action, t } = this.props;
+    const conditionTypeHelpMessage = t('edit.condition_type_help');
 
     const cursorStrategyHelpMessage = (
       <span>
-        <Trans i18nKey="edit.cursor_strategy_help" ns="extractors" components={{ em: <em /> }} />
+        <Trans t={t} i18nKey="edit.cursor_strategy_help" components={{ em: <em /> }} />
       </span>
     );
 
     const targetFieldHelpMessage = (
       <span>
-        <Trans i18nKey="edit.target_field_help" ns="extractors" components={{ b: <b />, em: <em /> }} />
+        <Trans t={t} i18nKey="edit.target_field_help" components={{ b: <b />, em: <em /> }} />
       </span>
     );
 
@@ -247,7 +248,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             this.targetField = targetField;
           }}
           id="target_field"
-          label={i18n.t('edit.store_as_field', { ns: 'extractors' })}
+          label={t('edit.store_as_field')}
           defaultValue={updatedExtractor.target_field}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
@@ -262,7 +263,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
       <div>
         <Row className="content extractor-list">
           <Col md={12}>
-            <h2>{i18n.t('edit.example_message', { ns: 'extractors' })}</h2>
+            <h2>{t('edit.example_message')}</h2>
             <Row style={{ marginTop: 5 }}>
               <Col md={12}>
                 <ExtractorExampleMessage
@@ -272,15 +273,15 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                 />
               </Col>
             </Row>
-            <h2>{i18n.t('edit.configuration', { ns: 'extractors' })}</h2>
+            <h2>{t('edit.configuration')}</h2>
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
                   <StaticField
-                    label={i18n.t('edit.extractor_type', { ns: 'extractors' })}
+                    label={t('edit.extractor_type')}
                     text={ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type)}
                   />
-                  <StaticField label={i18n.t('edit.source_field', { ns: 'extractors' })} text={updatedExtractor.source_field} />
+                  <StaticField label={t('edit.source_field')} text={updatedExtractor.source_field} />
 
                   <EditExtractorConfiguration
                     extractorType={updatedExtractor.type}
@@ -291,7 +292,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="condition-type"
-                    label={i18n.t('edit.condition', { ns: 'extractors' })}
+                    label={t('edit.condition')}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={conditionTypeHelpMessage}>
@@ -308,7 +309,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                               !updatedExtractor.condition_type || updatedExtractor.condition_type === 'none'
                             }
                           />
-                          {i18n.t('edit.condition_none', { ns: 'extractors' })}
+                          {t('edit.condition_none')}
                         </label>
                       </div>
                       <div className="radio">
@@ -321,7 +322,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'string'}
                           />
-                          {i18n.t('edit.condition_string', { ns: 'extractors' })}
+                          {t('edit.condition_string')}
                         </label>
                       </div>
                       <div className="radio">
@@ -334,7 +335,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'regex'}
                           />
-                          {i18n.t('edit.condition_regex', { ns: 'extractors' })}
+                          {t('edit.condition_regex')}
                         </label>
                       </div>
                     </span>
@@ -345,7 +346,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="extraction-strategy"
-                    label={i18n.t('edit.extraction_strategy', { ns: 'extractors' })}
+                    label={t('edit.extraction_strategy')}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={cursorStrategyHelpMessage}>
@@ -361,7 +362,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             !updatedExtractor.cursor_strategy || updatedExtractor.cursor_strategy === 'copy'
                           }
                         />
-                        {i18n.t('edit.copy', { ns: 'extractors' })}
+                        {t('edit.copy')}
                       </label>
                       <label className="radio-inline" htmlFor="cursor_strategy_cut">
                         <input
@@ -372,7 +373,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                           onChange={this._onFieldChange('cursor_strategy')}
                           defaultChecked={updatedExtractor.cursor_strategy === 'cut'}
                         />
-                        {i18n.t('edit.cut', { ns: 'extractors' })}
+                        {t('edit.cut')}
                       </label>
                     </span>
                   </Input>
@@ -380,13 +381,13 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Input
                     type="text"
                     id="title"
-                    label={i18n.t('edit.title', { ns: 'extractors' })}
+                    label={t('edit.title')}
                     defaultValue={updatedExtractor.title}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     onChange={this._onFieldChange('title')}
                     required
-                    help={i18n.t('edit.title_help', { ns: 'extractors' })}
+                    help={t('edit.title_help')}
                   />
 
                   <div style={{ marginBottom: 20 }}>
@@ -400,7 +401,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Row>
                     <Col mdOffset={2} md={10}>
                       <Button type="submit" bsStyle="primary">
-                        {action === 'create' ? i18n.t('edit.create', { ns: 'extractors' }) : i18n.t('edit.update', { ns: 'extractors' })}
+                        {action === 'create' ? t('edit.create') : t('edit.update')}
                       </Button>
                     </Col>
                   </Row>
@@ -414,4 +415,4 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
   }
 }
 
-export default EditExtractor;
+export default withTranslation('extractors')(EditExtractor);

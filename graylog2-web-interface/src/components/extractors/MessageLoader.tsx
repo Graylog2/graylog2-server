@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { FormSubmit } from 'components/common';
 import useHistory from 'routing/useHistory';
@@ -35,6 +36,7 @@ type LoadMessageFormProps = {
 };
 
 const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => {
+  const { t } = useTranslation('extractors');
   const history = useHistory();
 
   return (
@@ -42,9 +44,9 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
       <form className="form-inline message-loader-form" onSubmit={loadMessage}>
         {children}
         <StyledFormSubmit
-          submitButtonText="Load message"
+          submitButtonText={t('message_loader.load')}
           isSubmitting={loading}
-          submitLoadingText="Loading message..."
+          submitLoadingText={t('message_loader.loading')}
           isAsyncSubmit
           displayCancel
           onCancel={() => history.goBack()}
@@ -69,6 +71,7 @@ const MessageLoader = ({
   messageId: defaultMessageId = '',
   index: defaultIndex = '',
 }: Props) => {
+  const { t } = useTranslation('extractors');
   const [loading, setLoading] = useState(false);
   const [isHidden, setIsHidden] = useState(hidden);
 
@@ -105,9 +108,9 @@ const MessageLoader = ({
     <div className="message-loader">
       {hideText || (
         <p>
-          Wrong example?{' '}
+          {t('message_loader.wrong_example')}{' '}
           <Button bsSize="sm" onClick={toggleMessageForm}>
-            Load another message
+            {t('message_loader.load_another')}
           </Button>
         </p>
       )}
@@ -117,7 +120,8 @@ const MessageLoader = ({
             ref={messageIdRef}
             type="text"
             className="form-control message-id-input"
-            placeholder="Message ID"
+            placeholder={t('message_loader.message_id')}
+            aria-label={t('message_loader.message_id')}
             required
             value={messageId}
             onChange={onChangeMessageId}
@@ -125,7 +129,8 @@ const MessageLoader = ({
           <input
             type="text"
             className="form-control"
-            placeholder="Index"
+            placeholder={t('message_loader.index')}
+            aria-label={t('message_loader.index')}
             required
             value={index}
             onChange={onChangeIndex}

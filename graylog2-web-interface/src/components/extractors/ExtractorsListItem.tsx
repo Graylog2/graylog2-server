@@ -36,25 +36,25 @@ const TimingMetrics = ({ timing }: TimingMetricsProps) => {
   return (
     <dl className="metric-def metric-timer">
       <dt>{t('metrics.percentile_95')}</dt>
-      <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing['95th_percentile']).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.percentile_98')}</dt>
-      <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing['98th_percentile']).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.percentile_99')}</dt>
-      <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing['99th_percentile']).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.std_dev')}</dt>
-      <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing.std_dev).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.mean')}</dt>
-      <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing.mean).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.minimum')}</dt>
-      <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing.min).format('0,0.[00]') })}</dd>
 
       <dt>{t('metrics.maximum')}</dt>
-      <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
+      <dd>{t('metrics.microseconds', { value: numeral(timing.max).format('0,0.[00]') })}</dd>
     </dl>
   );
 };

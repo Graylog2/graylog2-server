@@ -34,7 +34,8 @@
     "total_time": "Total time",
     "condition_time": "Condition time",
     "execution_time": "Execution time",
-    "converter_time": "Converter time"
+    "converter_time": "Converter time",
+    "microseconds": "{{value}}μs"
   },
   "edit": {
     "condition_string_label": "Field contains string",
@@ -91,6 +92,128 @@
     "syslog_pri_facility": "Convert from PRI to syslog facility",
     "syslog_pri_level": "Convert from PRI to syslog level",
     "tokenizer": "Add Key=Value pairs as fields",
-    "uppercase": "Transform value to uppercase"
+    "uppercase": "Transform value to uppercase",
+    "csv_separator_help": "For example <code>,</code>, <code>\\n</code>, and <code>\\t</code> will be translated to a single character.",
+    "date_format_help": "String format the date uses. Read more in the <docsLink>documentation</docsLink>.",
+    "time_zone_help": "Time zone to apply to date. Read more in the <docsLink>documentation</docsLink>.",
+    "locale_help": "Locale to use when parsing the date. Read more in the <docsLink>documentation</docsLink>.",
+    "lookup_table_help": "Lookup tables can be created <lookupTablesLink>here</lookupTablesLink>.",
+    "split_by_help": "The Split & Count converter is splitting the extracted part by the defined character and stores the token count as field. <strong>Example:</strong> <em>?fields=first_name,last_name,zip</em> split by <em>,</em> results in <em>3</em>. You just counted the requested fields of a GET user REST request."
+  },
+  "wizard": {
+    "title": "Add extractor",
+    "description": "Start by loading a message to have an example to work on. You can decide whether to load a recent message received by this input, or manually select a message giving its ID.",
+    "create": "Create extractor"
+  },
+  "configuration": {
+    "preview": "Extractor preview",
+    "nothing_extracted": "Nothing will be extracted",
+    "try_example": "Try against example"
+  },
+  "converters_editor": {
+    "not_supported": "Cannot add converters to <em>{{type}}</em> extractors.",
+    "add_label": "Add converter",
+    "add_help": "Add converters to transform the extracted value.",
+    "select_placeholder": "Select a converter",
+    "add": "Add"
+  },
+  "export": {
+    "json_title": "Extractors JSON",
+    "copy": "Copy extractors"
+  },
+  "example_message": {
+    "not_loaded": "Could not load an example of field ‘{{field}}’. It is not possible to test the extractor before updating it."
+  },
+  "sort": {
+    "title": "Sort extractors for <em>{{title}}</em>",
+    "description": "Drag and drop the extractors on the list to change the order in which they will be applied.",
+    "submit": "Update sort"
+  },
+  "list": {
+    "sort": "Sort extractors",
+    "title": "Configured extractors",
+    "no_extractors": "This input has no configured extractors."
+  },
+  "import": {
+    "parse_error": "There was an error while parsing extractors. Are they in JSON format? {{error}}",
+    "parse_error_title": "Could not import extractors",
+    "submit": "Add extractors to input"
+  },
+  "message_loader": {
+    "load": "Load message",
+    "loading": "Loading message...",
+    "wrong_example": "Wrong example?",
+    "load_another": "Load another message",
+    "message_id": "Message ID",
+    "index": "Index"
+  },
+  "copy_input": {
+    "description": "The entire input will be copied verbatim."
+  },
+  "grok": {
+    "error": "We were not able to run the grok extraction because of the following error: {{error}}",
+    "no_match": "We were not able to run the grok extraction. Please check your parameters.",
+    "named_captures_only": "Named captures only",
+    "named_captures_only_help": "Only put the explicitly named captures into the message.",
+    "pattern": "Grok pattern"
+  },
+  "json": {
+    "flatten": "Flatten structures",
+    "flatten_help": "Whether to flatten JSON objects into a single message field or to expand into multiple fields.",
+    "list_separator": "List item separator",
+    "list_separator_help": "What string to use to concatenate items of a JSON list.",
+    "key_separator": "Key separator",
+    "key_separator_help": "What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).",
+    "kv_separator": "Key/value separator",
+    "kv_separator_help": "What string to use when concatenating key/value pairs of a JSON object (only used if flattened).",
+    "key_prefix": "Key prefix",
+    "key_prefix_help": "Text to prepend to each key extracted from the JSON object.",
+    "replace_key_whitespace": "Replace whitespaces in keys",
+    "replace_key_whitespace_help": "Field keys containing whitespaces will be discarded when storing the extracted message. Check this box to replace whitespaces in JSON keys with another character.",
+    "key_whitespace_replacement": "Key whitespace replacement",
+    "key_whitespace_replacement_help": "What character to use when replacing whitespaces in message keys. Please ensure the replacement character is valid in Lucene, e.g. '-' or '_'."
+  },
+  "lookup_table": {
+    "error": "We were not able to run the lookup: {{error}}"
+  },
+  "regex": {
+    "no_match": "Regular expression did not match.",
+    "no_group": "Regular expression does not contain any matcher group to extract.",
+    "help": "The regular expression used for extraction. First matcher group is used. Learn more in the <docsLink>documentation</docsLink>.",
+    "label": "Regular expression"
+  },
+  "regex_replace": {
+    "regex_help": "The regular expression used for extraction. Learn more in the <docsLink>documentation</docsLink>.",
+    "replacement_help": "The replacement used for the matching text. Please refer to the <matcherLink>Matcher</matcherLink> API documentation for the possible options.",
+    "replacement": "Replacement",
+    "replace_all": "Replace all occurrences of the pattern",
+    "replace_all_help": "Whether to replace all occurrences of the given pattern or only the first occurrence."
+  },
+  "split_and_index": {
+    "no_match": "We were not able to run the split and index extraction. Please check your parameters.",
+    "split_by_help": "What character to split on. <strong>Example:</strong> A whitespace character will split <em>foo bar baz</em> to <em>[foo,bar,baz]</em>.",
+    "index_help": "What part of the split string do you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em> from <em>foo bar baz</em> when split by whitespace.",
+    "index": "Target index"
+  },
+  "substring": {
+    "no_match": "We were not able to run the substring extraction. Please check index boundaries.",
+    "end_index_help": "Where to end extracting. (Exclusive) <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.",
+    "begin_index": "Begin index",
+    "begin_index_help": "Character position from where to start extracting. (Inclusive)",
+    "end_index": "End index"
+  },
+  "pages": {
+    "new_title": "New extractor for input {{title}}",
+    "new_header": "New extractor for input <em>{{title}}</em>",
+    "edit_title": "Edit extractor {{title}}",
+    "edit_header": "Edit extractor <em>{{title}}</em> for input <em>{{inputTitle}}</em>",
+    "description": "Extractors are applied on every message that is received by an input. Use them to extract and transform any text data into fields that allow you easy filtering and analysis later on.",
+    "export_title": "Export extractors of {{title}}",
+    "export_header": "Export extractors of <em>{{title}}</em>",
+    "export_marketplace_prefix": "The extractors of an input can be exported to JSON for importing into other setups or sharing in",
+    "import_title": "Import extractors to {{title}}",
+    "import_header": "Import extractors to <em>{{title}}</em>",
+    "import_description": "Exported extractors can be imported to an input.",
+    "import_marketplace_prefix": "All you need is the JSON export of extractors from any other {{productName}} setup or from"
   }
 }

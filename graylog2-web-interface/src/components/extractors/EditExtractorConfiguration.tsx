@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Col, Panel } from 'components/bootstrap';
 import {
@@ -34,7 +36,7 @@ type Props = {
   configuration: any;
   onChange: (...args: any[]) => void;
   exampleMessage?: string;
-};
+} & WithTranslation;
 
 class EditExtractorConfiguration extends React.Component<
   Props,
@@ -152,8 +154,12 @@ class EditExtractorConfiguration extends React.Component<
       extractorPreview = (
         <div className="form-group">
           <Col md={10} mdOffset={2}>
-            <Panel header="Extractor preview" bsStyle="info">
-              {this.state.extractorPreview === '' ? <em>Nothing will be extracted</em> : this.state.extractorPreview}
+            <Panel header={this.props.t('configuration.preview')} bsStyle="info">
+              {this.state.extractorPreview === '' ? (
+                <em>{this.props.t('configuration.nothing_extracted')}</em>
+              ) : (
+                this.state.extractorPreview
+              )}
             </Panel>
           </Col>
         </div>
@@ -169,4 +175,4 @@ class EditExtractorConfiguration extends React.Component<
   }
 }
 
-export default EditExtractorConfiguration;
+export default withTranslation('extractors')(EditExtractorConfiguration);

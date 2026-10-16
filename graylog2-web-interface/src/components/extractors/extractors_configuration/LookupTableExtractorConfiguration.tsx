@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Link, Select, Spinner, Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
@@ -28,7 +30,7 @@ type Props = {
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class LookupTableExtractorConfiguration extends React.Component<
   Props,
@@ -73,7 +75,7 @@ class LookupTableExtractorConfiguration extends React.Component<
 
     promise.then((result) => {
       if (result.error) {
-        UserNotification.warning(`We were not able to run the lookup: ${result.error_message}`);
+        UserNotification.warning(this.props.t('lookup_table.error', { error: result.error_message }));
 
         return;
       }
@@ -92,6 +94,8 @@ class LookupTableExtractorConfiguration extends React.Component<
     this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
 
   render() {
+    const { t } = this.props;
+
     if (!this.state.lookupTables) {
       return <Spinner />;
     }
@@ -100,7 +104,11 @@ class LookupTableExtractorConfiguration extends React.Component<
 
     const helpMessage = (
       <span>
-        Lookup tables can be created <Link to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>here</Link>.
+        <Trans
+          t={t}
+          i18nKey="converters.lookup_table_help"
+          components={{ lookupTablesLink: <Link to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} /> }}
+        />
       </span>
     );
 
@@ -108,14 +116,14 @@ class LookupTableExtractorConfiguration extends React.Component<
       <div>
         <Input
           id="lookup_table_name"
-          label="Lookup Table"
+          label={t('converters.lookup_table')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
               <Select
-                placeholder="Select a lookup table"
+                placeholder={t('converters.lookup_table_placeholder')}
                 clearable={false}
                 options={lookupTables}
                 onChange={this._onSelect('lookup_table_name')}
@@ -124,7 +132,7 @@ class LookupTableExtractorConfiguration extends React.Component<
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
+                {this.state.trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
               </Button>
             </Col>
           </Row>
@@ -134,4 +142,4 @@ class LookupTableExtractorConfiguration extends React.Component<
   }
 }
 
-export default LookupTableExtractorConfiguration;
+export default withTranslation('extractors')(LookupTableExtractorConfiguration);

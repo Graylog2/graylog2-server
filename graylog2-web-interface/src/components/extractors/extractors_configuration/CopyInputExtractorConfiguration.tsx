@@ -15,17 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 
-const CopyInputExtractorConfiguration = () => (
-  <div className="form-group">
-    <div className="col-md-offset-2 col-md-10">
-      <Panel bsStyle="info" style={{ marginBottom: 0 }}>
-        The entire input will be copied verbatim.
-      </Panel>
+const CopyInputExtractorConfiguration = () => {
+  const { t } = useTranslation('extractors');
+
+  return (
+    <div className="form-group">
+      <div className="col-md-offset-2 col-md-10">
+        <Panel bsStyle="info" style={{ marginBottom: 0 }}>
+          {t('copy_input.description')}
+        </Panel>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default CopyInputExtractorConfiguration;

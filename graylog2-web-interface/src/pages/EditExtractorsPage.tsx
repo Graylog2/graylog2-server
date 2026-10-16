@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
@@ -29,6 +30,7 @@ import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 
 const EditExtractorsPage = () => {
+  const { t } = useTranslation('extractors');
   const history = useHistory();
   const { inputId, extractorId, nodeId } = useParams<{ inputId: string; extractorId: string; nodeId: string }>();
   const { data: extractor } = useExtractor(inputId, extractorId);
@@ -66,21 +68,23 @@ const EditExtractorsPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Edit extractor ${extractor.title}`}>
+    <DocumentTitle title={t('pages.edit_title', { title: extractor.title })}>
       <PageHeader
         title={
           <span>
-            Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em>
+            <Trans
+              t={t}
+              i18nKey="pages.edit_header"
+              values={{ title: extractor.title, inputTitle: input.title }}
+              components={{ em: <em /> }}
+            />
           </span>
         }
         documentationLink={{
-          title: 'Extractors documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.EXTRACTORS,
         }}>
-        <span>
-          Extractors are applied on every message that is received by an input. Use them to extract and transform any
-          text data into fields that allow you easy filtering and analysis later on.
-        </span>
+        <span>{t('pages.description')}</span>
       </PageHeader>
       <EditExtractor
         action="edit"

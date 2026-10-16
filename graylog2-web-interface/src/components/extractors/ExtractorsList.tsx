@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const ExtractorsList = ({ input, node }: Props) => {
+  const { t } = useTranslation('extractors');
   const [showSortModal, setShowSortModal] = useState(false);
   const { data: extractors, refetch } = useExtractors(input.id);
 
@@ -51,7 +53,7 @@ const ExtractorsList = ({ input, node }: Props) => {
   if (extractors?.length > 1) {
     sortExtractorsButton = (
       <Button bsSize="xsmall" bsStyle="primary" className="pull-right" onClick={_openSortModal}>
-        Sort extractors
+        {t('list.sort')}
       </Button>
     );
   }
@@ -72,13 +74,13 @@ const ExtractorsList = ({ input, node }: Props) => {
         <Col md={12}>
           <Row className="row-sm">
             <Col md={8}>
-              <h2>Configured extractors</h2>
+              <h2>{t('list.title')}</h2>
             </Col>
             <Col md={4}>{sortExtractorsButton}</Col>
           </Row>
           <EntityList
             bsNoItemsStyle="info"
-            noItemsText="This input has no configured extractors."
+            noItemsText={t('list.no_extractors')}
             items={formattedExtractors}
           />
         </Col>

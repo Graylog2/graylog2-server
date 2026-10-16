@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
@@ -24,6 +25,7 @@ import useParams from 'routing/useParams';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const ExportExtractorsPage = () => {
+  const { t } = useTranslation('extractors');
   const { inputId } = useParams();
   const { data: input } = useQuery({
     queryKey: ['inputs', inputId],
@@ -35,16 +37,21 @@ const ExportExtractorsPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Export extractors of ${input.title}`}>
+    <DocumentTitle title={t('pages.export_title', { title: input.title })}>
       <div>
         <PageHeader
           title={
             <span>
-              Export extractors of <em>{input.title}</em>
+              <Trans
+                t={t}
+                i18nKey="pages.export_header"
+                values={{ title: input.title }}
+                components={{ em: <em /> }}
+              />
             </span>
           }>
           <span>
-            <MarketplaceLink prefix="The extractors of an input can be exported to JSON for importing into other setups or sharing in" />
+            <MarketplaceLink prefix={t('pages.export_marketplace_prefix')} />
           </span>
         </PageHeader>
         <ExportExtractors id={input.id} />

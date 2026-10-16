@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
@@ -24,12 +26,19 @@ import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
 import { testRegex } from 'api/tools';
 
+// Example value of the format, not translated.
+const REGEX_EXAMPLE = '^.*string(.+)$';
+
+const DocsLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text={children} />
+);
+
 type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class RegexExtractorConfiguration extends React.Component<Props, { trying: boolean }> {
   static defaultProps = {
@@ -58,13 +67,13 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
 
     promise.then((result) => {
       if (!result.matched) {
-        UserNotification.warning('Regular expression did not match.');
+        UserNotification.warning(this.props.t('regex.no_match'));
 
         return;
       }
 
       if (!result.match) {
-        UserNotification.warning('Regular expression does not contain any matcher group to extract.');
+        UserNotification.warning(this.props.t('regex.no_group'));
 
         return;
       }
@@ -80,10 +89,10 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
   _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.regex_value || !this.props.exampleMessage;
 
   render() {
+    const { t } = this.props;
     const helpMessage = (
       <span>
-        The regular expression used for extraction. First matcher group is used. Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
+        <Trans t={t} i18nKey="regex.help" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
@@ -91,7 +100,7 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
       <div>
         <Input
           id="regex-value-input"
-          label="Regular expression"
+          label={t('regex.label')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           help={helpMessage}>
@@ -102,14 +111,15 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
                 id="regex_value"
                 className="form-control"
                 defaultValue={this.props.configuration.regex_value}
-                placeholder="^.*string(.+)$"
+                placeholder={REGEX_EXAMPLE}
+                aria-label={t('regex.label')}
                 onChange={this._onChange('regex_value')}
                 required
               />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
+                {this.state.trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
               </Button>
             </Col>
           </Row>
@@ -119,4 +129,4 @@ class RegexExtractorConfiguration extends React.Component<Props, { trying: boole
   }
 }
 
-export default RegexExtractorConfiguration;
+export default withTranslation('extractors')(RegexExtractorConfiguration);

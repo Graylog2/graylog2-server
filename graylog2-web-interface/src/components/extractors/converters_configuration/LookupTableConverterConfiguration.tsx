@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import i18n from 'i18n';
 import { Link, Select, Spinner } from 'components/common';
@@ -81,7 +82,11 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
 
     const helpMessage = (
       <span>
-        Lookup tables can be created <Link to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>here</Link>.
+        <Trans
+          i18nKey="converters.lookup_table_help"
+          ns="extractors"
+          components={{ lookupTablesLink: <Link to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} /> }}
+        />
       </span>
     );
 

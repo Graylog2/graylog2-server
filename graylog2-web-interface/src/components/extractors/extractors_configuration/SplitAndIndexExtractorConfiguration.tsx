@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
@@ -43,6 +44,7 @@ const SplitAndIndexExtractorConfiguration = ({
   onChange,
   onExtractorPreviewLoad,
 }: Props) => {
+  const { t } = useTranslation('extractors');
   const [configuration, setConfiguration] = useState(_getEffectiveConfiguration(initialConfiguration));
   useEffect(() => {
     setConfiguration(_getEffectiveConfiguration(initialConfiguration));
@@ -65,9 +67,7 @@ const SplitAndIndexExtractorConfiguration = ({
 
     promise.then((result) => {
       if (!result.successful) {
-        UserNotification.warning(
-          'We were not able to run the split and index extraction. Please check your parameters.',
-        );
+        UserNotification.warning(t('split_and_index.no_match'));
 
         return;
       }
@@ -78,19 +78,17 @@ const SplitAndIndexExtractorConfiguration = ({
     });
 
     promise.finally(() => setTrying(false));
-  }, [configuration.index, configuration.split_by, exampleMessage, onExtractorPreviewLoad]);
+  }, [configuration.index, configuration.split_by, exampleMessage, onExtractorPreviewLoad, t]);
 
   const splitByHelpMessage = (
     <span>
-      What character to split on. <strong>Example:</strong> A whitespace character will split <em>foo bar baz</em> to{' '}
-      <em>[foo,bar,baz]</em>.
+      <Trans t={t} i18nKey="split_and_index.split_by_help" components={{ strong: <strong />, em: <em /> }} />
     </span>
   );
 
   const indexHelpMessage = (
     <span>
-      What part of the split string to you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em> from{' '}
-      <em>foo bar baz</em> when split by whitespace.
+      <Trans t={t} i18nKey="split_and_index.index_help" components={{ strong: <strong />, em: <em /> }} />
     </span>
   );
 
@@ -106,7 +104,7 @@ const SplitAndIndexExtractorConfiguration = ({
       <Input
         type="text"
         id="split_by"
-        label="Split by"
+        label={t('converters.split_by')}
         labelClassName="col-md-2"
         wrapperClassName="col-md-10"
         defaultValue={configuration.split_by}
@@ -118,7 +116,7 @@ const SplitAndIndexExtractorConfiguration = ({
       <Input
         type="number"
         id="index"
-        label="Target index"
+        label={t('split_and_index.index')}
         labelClassName="col-md-2"
         wrapperClassName="col-md-10"
         defaultValue={configuration.index}
@@ -131,7 +129,7 @@ const SplitAndIndexExtractorConfiguration = ({
       <Row>
         <Col mdOffset={2} md={10}>
           <Button bsStyle="info" onClick={_onTryClick} disabled={isTryButtonDisabled}>
-            {trying ? <Icon name="progress_activity" spin /> : 'Try'}
+            {trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
           </Button>
         </Col>
       </Row>
