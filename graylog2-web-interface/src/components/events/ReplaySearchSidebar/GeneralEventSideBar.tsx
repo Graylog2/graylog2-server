@@ -16,6 +16,7 @@
  */
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { eventTypeAttribute } from 'components/events/events/ColumnRenderers';
@@ -28,22 +29,29 @@ import EventDefinitionInfoList from 'components/event-definitions/replay-search/
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 
-const attributesList = [
-  {
-    id: 'timestamp',
-    title: 'Timestamp',
-    type: 'DATE',
-  },
-  {
-    id: 'alert',
-    title: 'Type',
-  },
-  {
-    id: 'message',
-    type: 'STRING',
-    title: 'Message',
-  },
-];
+const useAttributesList = () => {
+  const { t } = useTranslation('events');
+
+  return useMemo(
+    () => [
+      {
+        id: 'timestamp',
+        title: t('alerts_attributes.timestamp'),
+        type: 'DATE',
+      },
+      {
+        id: 'alert',
+        title: t('alerts_attributes.type'),
+      },
+      {
+        id: 'message',
+        type: 'STRING',
+        title: t('alerts_attributes.message'),
+      },
+    ],
+    [t],
+  );
+};
 
 const WordBreak = styled.span`
   word-break: break-all;
@@ -57,6 +65,8 @@ const attributesRenderers = {
 };
 
 const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetailsProps) => {
+  const { t } = useTranslation('events');
+  const attributesList = useAttributesList();
   const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
   const resolvedDefinitionId = definitionId ?? eventData?.event_definition_id;
   const { meta, isLoadingEventDefinition } = useEventsAdditionalData({
@@ -78,7 +88,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
   return (
     <div>
       {alertId && (
-        <ExpandableSection title="Event Details">
+        <ExpandableSection title={t('alerts_replay.event_details')}>
           <EventDetailsDefinitionList
             event={eventData}
             meta={meta}
@@ -89,7 +99,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
       )}
       {resolvedDefinitionId && (
         <ReplaySearchContext.Provider value={replaySearchContext}>
-          <ExpandableSection title="Event Definition Details">
+          <ExpandableSection title={t('alerts_replay.event_definition_details')}>
             <EventDefinitionInfoList />
           </ExpandableSection>
         </ReplaySearchContext.Provider>

@@ -17,12 +17,12 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import merge from 'lodash/merge';
+import { useTranslation } from 'react-i18next';
 
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import Center from 'components/common/Center';
 import type View from 'views/logic/views/View';
@@ -35,6 +35,7 @@ type ReplaySearchProps = {
 const defaultSearchPageLayout = {};
 
 const ReplaySearch = ({ searchPageLayout = defaultSearchPageLayout, view: _view }: ReplaySearchProps) => {
+  const { t } = useTranslation('events');
   const view = useCreateSearch(_view);
 
   const _searchPageLayout = useMemo(
@@ -43,12 +44,12 @@ const ReplaySearch = ({ searchPageLayout = defaultSearchPageLayout, view: _view 
         {
           sidebar: {
             isShown: true,
-            title: 'Replayed Search',
+            title: t('alerts_replay.replayed_search'),
           },
         },
         searchPageLayout,
       ),
-    [searchPageLayout],
+    [searchPageLayout, t],
   );
 
   return (
@@ -58,20 +59,12 @@ const ReplaySearch = ({ searchPageLayout = defaultSearchPageLayout, view: _view 
   );
 };
 
-const canReplayEvent = (eventDefinition: EventDefinition) => {
-  const systemEvent = isSystemEventDefinition(eventDefinition);
-  if (systemEvent) {
-    return 'Event is a system event, these have no query/stream/time range attached.';
-  }
-
-  return true;
-};
-
 export const LoadingBarrier = ({ children, eventDefinition }) => {
-  const canReplay = canReplayEvent(eventDefinition);
-  if (canReplay === true) return children;
+  const { t } = useTranslation('events');
 
-  return <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>;
+  if (!isSystemEventDefinition(eventDefinition)) return children;
+
+  return <Center>{t('alerts_replay.cannot_replay', { reason: t('alerts_replay.system_event') })}</Center>;
 };
 
 export default ReplaySearch;

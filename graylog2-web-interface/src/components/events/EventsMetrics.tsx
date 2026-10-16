@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import IconButton from 'components/common/IconButton';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -40,8 +41,9 @@ type EventsMetricsProps = React.PropsWithChildren<{
   onExpandToggle: (expanded: boolean) => void;
 }>;
 const EventsMetrics = ({ children = undefined, expanded: initialExpanded, onExpandToggle }: EventsMetricsProps) => {
+  const { t } = useTranslation('events');
   const [expanded, setExpanded] = useState<boolean>(initialExpanded);
-  const expandTitle = `${expanded ? 'Collapse' : 'Expand'} Metrics`;
+  const expandTitle = expanded ? t('alerts_list.collapse_metrics') : t('alerts_list.expand_metrics');
   const expandIcon = expanded ? 'unfold_less' : 'unfold_more';
   const onClick = useCallback(
     () =>
@@ -57,7 +59,7 @@ const EventsMetrics = ({ children = undefined, expanded: initialExpanded, onExpa
   return (
     <Container>
       <HeadlineContainer>
-        <h2>Metrics</h2>
+        <h2>{t('alerts_list.metrics_title')}</h2>
         <IconButton title={expandTitle} name={expandIcon} onClick={onClick} />
       </HeadlineContainer>
       {expanded ? children : null}

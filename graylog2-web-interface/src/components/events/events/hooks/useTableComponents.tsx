@@ -17,6 +17,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import pickBy from 'lodash/pickBy';
 import keyBy from 'lodash/keyBy';
+import { useTranslation } from 'react-i18next';
 
 import EventActions from 'components/events/events/EventActions';
 import type { Event } from 'components/events/events/types';
@@ -25,6 +26,7 @@ import BulkActions from 'components/events/events/BulkActions';
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 const useTableElements = ({ defaultLayout }: { defaultLayout: DefaultLayout }) => {
+  const { t } = useTranslation('events');
   const entityActions = useCallback((event: Event) => <EventActions event={event} />, []);
 
   const renderExpandedRules = useCallback(
@@ -35,11 +37,11 @@ const useTableElements = ({ defaultLayout }: { defaultLayout: DefaultLayout }) =
   const expandedSections = useMemo(
     () => ({
       restFieldsExpandedSection: {
-        title: 'Details',
+        title: t('alerts_list.details'),
         content: renderExpandedRules,
       },
     }),
-    [renderExpandedRules],
+    [renderExpandedRules, t],
   );
 
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<{ [eventId: string]: Event }>({});

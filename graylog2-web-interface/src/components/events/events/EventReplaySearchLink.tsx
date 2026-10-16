@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const EventReplaySearchLink = ({ eventId, eventDefinitionId, onClick = undefined, isMenuitem = false }: Props) => {
+  const { t } = useTranslation('events');
   const { isPermitted } = usePermissions();
 
   if (!isPermitted(`eventdefinitions:read:${eventDefinitionId}`)) {
@@ -46,7 +48,7 @@ const EventReplaySearchLink = ({ eventId, eventDefinitionId, onClick = undefined
       searchLink={Routes.ALERTS.replay_search(eventId)}
       onClick={onClick}
       component={isMenuitem ? MenuItem : undefined}>
-      Replay search
+      {t('alerts_list.replay_search')}
     </ReplaySearchButtonComponent>
   );
 };

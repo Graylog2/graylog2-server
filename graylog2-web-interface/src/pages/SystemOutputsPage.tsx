@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
@@ -22,17 +23,22 @@ import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const SystemOutputsPage = () => {
+  const { t } = useTranslation('streams');
   const productName = useProductName();
 
   return (
-    <DocumentTitle title="Outputs">
+    <DocumentTitle title={t('system_outputs.title')}>
       <span>
-        <PageHeader title="Outputs in Cluster">
+        <PageHeader title={t('system_outputs.header_title')}>
           <span>
-            {productName} nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
-            <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
+            <Trans
+              t={t}
+              i18nKey="system_outputs.description"
+              values={{ productName }}
+              components={{ highlight: <strong /> }}
+            />
             <br />
-            <MarketplaceLink prefix="You can find output plugins in" />
+            <MarketplaceLink prefix={t('system_outputs.marketplace_prefix')} />
           </span>
         </PageHeader>
 

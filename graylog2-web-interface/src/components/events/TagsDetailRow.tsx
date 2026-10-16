@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DefinitionList from 'components/common/DefinitionList';
 import ChipsCell from 'components/common/ChipsCell';
@@ -29,13 +30,14 @@ type Props = {
 };
 
 const TagsDetailRow = ({ tags, interactive = true }: Props) => {
+  const { t } = useTranslation('events');
   const onTagClick = useAppendTagFilter();
 
   if (!tags?.length) return null;
 
   return (
     <DefinitionList>
-      <dt>Tags</dt>
+      <dt>{t('alerts_attributes.tags')}</dt>
       <dd>
         {interactive ? (
           <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />

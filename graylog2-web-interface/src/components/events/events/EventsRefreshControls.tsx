@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HoverForHelp } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
@@ -43,6 +44,7 @@ const useDisableRefreshWhileSlicing = () => {
 };
 
 const EventsRefreshControls = () => {
+  const { t } = useTranslation('events');
   const sendTelemetry = useSendTelemetry('alerts-page');
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
@@ -85,12 +87,16 @@ const EventsRefreshControls = () => {
       isLoadingMinimumInterval={isLoadingMinimumInterval}
       minimumRefreshInterval={minimumRefreshInterval}
       defaultInterval={defaultInterval}
-      humanName="Events"
+      humanName={t('alerts_list.refresh_human_name')}
       onToggle={onToggle}
       onSelectInterval={onSelectInterval}>
       {isSlicingEnabled && (
-        <HoverForHelp title="Auto refresh unavailable" placement="left" pullRight={false} iconSize="sm">
-          Auto refresh is turned off during slicing to avoid performance issues.
+        <HoverForHelp
+          title={t('alerts_list.auto_refresh_unavailable_title')}
+          placement="left"
+          pullRight={false}
+          iconSize="sm">
+          {t('alerts_list.auto_refresh_unavailable')}
         </HoverForHelp>
       )}
     </RefreshControls>

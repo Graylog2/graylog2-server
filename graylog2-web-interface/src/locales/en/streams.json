@@ -24,5 +24,11 @@
     "marketplace_prefix": "You can find output plugins on",
     "removing_description": "<emphasis>Removing</emphasis> an output removes it from this stream but it will still be in the list of available outputs. Deleting an output <emphasis>globally</emphasis> will remove it from this and all other streams and terminate it. You can see all defined outputs in details at the <outputsLink>global output list</outputsLink>.",
     "title": "Outputs for Stream »{{streamTitle}}«"
+  },
+  "system_outputs": {
+    "description": "{{productName}} nodes can forward messages via outputs. Launch or terminate as many outputs as you want here <highlight>and then assign them to streams to forward all messages of a stream in real-time.</highlight>",
+    "header_title": "Outputs in Cluster",
+    "marketplace_prefix": "You can find output plugins in",
+    "title": "Outputs"
   }
 }

@@ -9,16 +9,40 @@
     "group_by_fields": "Gruppierungsfelder",
     "id": "ID",
     "key": "Schlüssel",
+    "message": "Nachricht",
     "priority": "Priorität",
     "tags": "Tags",
     "timestamp": "Zeitstempel",
     "type": "Typ"
   },
   "alerts_list": {
-    "histogram_failed": "Das Ereignis-Histogramm konnte nicht geladen werden: {{error}}"
+    "auto_refresh_unavailable": "Die automatische Aktualisierung ist während der Gruppierung deaktiviert, um Leistungsprobleme zu vermeiden.",
+    "auto_refresh_unavailable_title": "Automatische Aktualisierung nicht verfügbar",
+    "bulk_replay_search": "Suche wiederholen",
+    "collapse_metrics": "Metriken einklappen",
+    "details": "Details",
+    "expand_metrics": "Metriken ausklappen",
+    "histogram_failed": "Das Ereignis-Histogramm konnte nicht geladen werden: {{error}}",
+    "metrics_title": "Metriken",
+    "no_additional_fields": "Diesem Ereignis wurden keine zusätzlichen Felder hinzugefügt.",
+    "no_further_details": "Keine weiteren Details",
+    "no_group_by_fields": "Dieses Ereignis hat keine Gruppierungsfelder.",
+    "no_key": "Für dieses Ereignis ist kein Schlüssel gesetzt.",
+    "no_time_range": "Kein Zeitraum",
+    "refresh_human_name": "Ereignisse",
+    "replay_search": "Suche wiederholen"
   },
   "alerts_replay": {
-    "details_title": "Alarm-/Ereignisdetails"
+    "cannot_replay": "Dieses Ereignis kann nicht wiederholt werden: {{reason}} Bitte wählen Sie ein anderes aus.",
+    "close_section": "Abschnitt {{title}} schließen",
+    "details_title": "Alarm-/Ereignisdetails",
+    "event_definition_details": "Details der Ereignisdefinition",
+    "event_details": "Ereignisdetails",
+    "no_remediation_steps": "Keine Maßnahmen zur Behebung",
+    "open_section": "Abschnitt {{title}} öffnen",
+    "replay_details": "Details der Wiederholung",
+    "replayed_search": "Wiederholte Suche",
+    "system_event": "Das Ereignis ist ein Systemereignis, diesen sind keine Abfrage, kein Stream und kein Zeitraum zugeordnet."
   },
   "alerts_types": {
     "alert": "Alarm",
@@ -145,5 +169,22 @@
     "http": "HTTP-Benachrichtigung",
     "http_v2": "Benutzerdefinierte HTTP-Benachrichtigung",
     "legacy": "Veraltete Alarm-Callbacks"
+  },
+  "alerts_page": {
+    "description": "Definieren Sie Ereignisse über verschiedene Bedingungen. Fügen Sie Ereignissen, die Ihre Aufmerksamkeit erfordern, Benachrichtigungen hinzu, um Alarme zu erzeugen.",
+    "documentation_title": "Dokumentation zu Alarmen",
+    "title": "Alarme & Ereignisse"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Sie haben alle Ereignisse aus der Liste entfernt. Sie können jetzt zurückkehren, indem Sie auf <backButton>Zurück zu den Ereignissen</backButton> klicken",
+    "all_reviewed": "Sie haben alle Ereignisse geprüft. Sie können jetzt eine Massenaktion auswählen, die auf alle unten aufgeführten Ereignisse angewendet wird.",
+    "list_description": "Die folgende Liste enthält alle Ereignisse/Alarme, die Sie im vorherigen Schritt ausgewählt haben. So können Sie die wiederholte Suche für jedes davon prüfen.",
+    "mark_not_reviewed": "Ereignis \"{{id}}\" als nicht geprüft markieren",
+    "mark_reviewed": "Ereignis \"{{id}}\" als geprüft markieren",
+    "remove_event": "Ereignis \"{{id}}\" aus der Liste entfernen",
+    "replay_search": "Suche wiederholen",
+    "review_progress": "Prüfung von {{completed}}/{{total}} Ereignissen abgeschlossen.",
+    "show_selected": "Ausgewählte Ereignisse anzeigen",
+    "unknown_message": "Unbekannt"
   }
 }
