@@ -449,11 +449,11 @@
     "success_title": "Erfolg!"
   },
   "value_actions": {
-    "select_extractor_type": "Extraktortyp auswählen",
+    "select_extractor_type": "Extractor-Typ auswählen",
     "exclude": "Aus den Ergebnissen ausschließen",
     "add_to_query": "Zur Abfrage hinzufügen",
     "show_documents": "Dokumente für diesen Wert anzeigen",
-    "create_extractor": "Extraktor erstellen",
+    "create_extractor": "Extractor erstellen",
     "highlight_value": "Diesen Wert hervorheben",
     "create_event_definition": "Ereignisdefinition erstellen",
     "copy_value": "Wert in die Zwischenablage kopieren"

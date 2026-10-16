@@ -5,7 +5,7 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 ## Style
 
 - Address users formally with "Sie".
-- Keep product and feature names in English: Graylog, Enterprise, Data Lake, Security, Stream, Dashboard, Widget, Input, Pipeline, Sidecar, Content Pack.
+- Keep product and feature names in English: Graylog, Enterprise, Data Lake, Security, Stream, Dashboard, Widget, Input, Output, Extractor, Pipeline, Sidecar, Content Pack. Compounds use a hyphen, e.g. "Extractor-Typ", "Output-Typ".
 - Use German keyboard names in shortcuts: "Strg" instead of "Ctrl", "Umschalt" instead of "Shift".
 - Use "..." for ongoing actions like the English texts, e.g. "Wird geladen...".
 
