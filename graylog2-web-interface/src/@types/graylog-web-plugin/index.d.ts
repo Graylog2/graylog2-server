@@ -141,6 +141,23 @@ type DataTiering = {
     eventKey: string;
     indexSetId: string;
   }>;
+  /** Lets an index set keep its archives for its own retention time instead of the global one. */
+  ArchiveRetentionFields?: React.ComponentType<{
+    valuesPrefix?: string;
+    archivingEnabled: boolean;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
+  /**
+   * Asks for confirmation before an index set is saved. The hook runs while the form renders, so it may load
+   * what it needs, and returns a check that the form calls on submit. The check returns what to tell the user,
+   * or null when the change needs no confirmation.
+   */
+  useIndexSetSubmitConfirmation?: (options?: { enabled?: boolean }) => (
+    initialValues: unknown,
+    values: unknown,
+  ) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {
