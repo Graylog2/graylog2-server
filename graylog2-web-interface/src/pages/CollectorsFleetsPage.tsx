@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,6 +29,7 @@ import CreateButton from 'components/common/CreateButton';
 import Routes from 'routing/Routes';
 
 const CollectorsFleetsPage = () => {
+  const { t } = useTranslation('collectors_fleets');
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
@@ -40,22 +42,21 @@ const CollectorsFleetsPage = () => {
   }
 
   return (
-    <DocumentTitle title="Collector Fleets">
+    <DocumentTitle title={t('title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Fleets <PreviewBadge />
+            {t('fleets_title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}
-        actions={<CreateButton entityKey={'Fleet'} />}>
+        actions={<CreateButton entityKey={t('entity_key')} />}>
         <span>
-          A fleet is a group of collectors that share the same configuration. All collectors in a fleet collect data
-          from the same sources. Use fleets to organize collectors by environment, team, or purpose.
+          {t('description')}
         </span>
       </PageHeader>
 

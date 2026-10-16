@@ -1,0 +1,7 @@
+{
+  "title": "Collector Fleets",
+  "fleets_title": "Fleets",
+  "documentation_title": "Collectors documentation",
+  "entity_key": "Fleet",
+  "description": "A fleet is a group of collectors that share the same configuration. All collectors in a fleet collect data from the same sources. Use fleets to organize collectors by environment, team, or purpose."
+}
