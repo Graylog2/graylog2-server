@@ -1,0 +1,4 @@
+type = "s"
+message = "Update Jackson to version 2.21.7 to fix [several CVEs](https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.21.7)."
+
+pulls = ["27802"]
