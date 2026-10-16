@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import 'components/authentication/bindings'; // Bind all authentication plugins
+import { useTranslation } from 'react-i18next';
 
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
@@ -30,8 +31,8 @@ import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import useHistory from 'routing/useHistory';
 
-const _pageTitle = (activeBackend: AuthenticationBackend | undefined | null, returnString?: boolean) => {
-  const pageName = 'Active Authentication Service';
+const _pageTitle = (t: any, activeBackend: AuthenticationBackend | undefined | null, returnString?: boolean) => {
+  const pageName = t('page_name');
 
   if (activeBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(activeBackend.title, 30);
@@ -67,6 +68,7 @@ const useRedirectToAppropriatePage = (
 };
 
 const AuthenticationPage = () => {
+  const { t } = useTranslation('authentication_page');
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
 
   // Only display this page if there is an active backend
@@ -78,16 +80,16 @@ const AuthenticationPage = () => {
   }
 
   return (
-    <DocumentTitle title={_pageTitle(activeBackend, true)}>
+    <DocumentTitle title={_pageTitle(t, activeBackend, true)}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title={_pageTitle(activeBackend)}
+        title={_pageTitle(t, activeBackend)}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: 'Authentication documentation',
+          title: t('documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure authentication services of this cluster.</span>
+        <span>{t('description')}</span>
       </PageHeader>
 
       {finishedLoading && activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
