@@ -19,21 +19,17 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import ConfigurationSection from 'pages/configurations/ConfigurationSection';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
-import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
-import PermissionsConfig from 'components/configurations/PermissionsConfig';
-import UserConfig from 'components/configurations/UserConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
-import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
-import PasswordComplexityConfig from 'components/configurations/PasswordComplexityConfig';
 
 const bindings: PluginExports = {
   coreSystemConfigurations: [
     {
       name: 'Search',
+      feature: 'search',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SearchesConfig,
@@ -42,6 +38,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Message Processors',
+      feature: 'message_processors',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MessageProcessorsConfig,
@@ -49,15 +46,8 @@ const bindings: PluginExports = {
       },
     },
     {
-      name: 'Sidecars',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: SidecarConfig,
-        title: 'Sidecars',
-      },
-    },
-    {
       name: 'Events',
+      feature: 'events',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: EventsConfig,
@@ -66,6 +56,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'URL Allowlist',
+      feature: 'url_allowlist',
       permissions: ['urlallowlist:read'],
       SectionComponent: ConfigurationSection,
       props: {
@@ -75,6 +66,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Decorators',
+      feature: 'decorators',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: DecoratorsConfig,
@@ -82,31 +74,8 @@ const bindings: PluginExports = {
       },
     },
     {
-      name: 'Permissions',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: PermissionsConfig,
-        title: 'Permissions',
-      },
-    },
-    {
-      name: 'Password Policy',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: PasswordComplexityConfig,
-        title: 'Password Policy',
-      },
-    },
-    {
-      name: 'Users',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: UserConfig,
-        title: 'Index Set Defaults',
-      },
-    },
-    {
       name: 'Markdown',
+      feature: 'markdown',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MarkdownConfig,
@@ -114,15 +83,8 @@ const bindings: PluginExports = {
       },
     },
     {
-      name: 'Welcome Page',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: WelcomePageConfig,
-        title: 'Welcome Page',
-      },
-    },
-    {
       name: 'MCP',
+      feature: 'mcp',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: McpConfig,
