@@ -44,7 +44,14 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
 const useNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
+  // Sort dropdown children once here, not while merging: a repeated sort reorders items that share a `position.after` target.
+  const navigationItems = useMemo(
+    () =>
+      mergeNavigationItems(allNavigationItems).map((item) =>
+        item.children ? { ...item, children: sortNavigationItems(item.children) } : item,
+      ),
+    [allNavigationItems],
+  );
 
   const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
 
