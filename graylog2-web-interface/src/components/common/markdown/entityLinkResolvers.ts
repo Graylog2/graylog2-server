@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+import StreamTitle from 'components/common/markdown/StreamTitle';
 
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
-);
+const entityLinkResolvers: PluginExports['markdown.entityLinkResolvers'] = [
+  {
+    uriSegment: 'streams',
+    resolve: ([id]) => (id ? { grnType: 'stream', id, Title: StreamTitle } : null),
+  },
+];
 
-export default EventDefinitionSideBar;
+export default entityLinkResolvers;

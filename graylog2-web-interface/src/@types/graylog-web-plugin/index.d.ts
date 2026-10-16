@@ -400,6 +400,7 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginNavigationDropdownItem {
     description: string;
     path: QualifiedUrl<string>;
+    position?: PluginNavigation['position'];
     permissions?: Permission | Array<Permission>;
     requiredFeatureFlag?: string;
     useCondition?: () => boolean;
@@ -422,11 +423,19 @@ declare module 'graylog-web-plugin/plugin' {
     openSidebar: RightSidebarContextType['openSidebar'];
   };
 
+  type EntityLinkTitleProps = {
+    id: string;
+    children: React.ReactNode;
+  };
+
   type EntityLinkResolver = {
     uriSegment: string;
     resolve: (
       trailingSegments: ReadonlyArray<string>,
-    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
+    ) =>
+      | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
+      | { onClick: (context: EntityLinkOnClickContext) => void }
+      | null;
   };
 
   interface PluginExports {
