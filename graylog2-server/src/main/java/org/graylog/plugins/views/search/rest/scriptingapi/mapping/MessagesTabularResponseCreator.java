@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.Ca
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +42,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesTabularResponseCreator.class);
+    private static final String ID_DECORATOR = "id";
 
     private final MappedFieldTypesService mappedFieldTypesService;
     private final Set<FieldDecorator> decorators;
@@ -89,7 +92,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         final MessageFieldTypeMapper fieldsMapper = new MessageFieldTypeMapper(knownFields);
 
         final var fields = searchRequestSpec.requestedFields().isEmpty()
-                ? knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList()
+                ? allFields(knownFields)
                 : searchRequestSpec.requestedFields();
 
         return fields.stream()
@@ -101,9 +104,18 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         if(searchRequestSpec.requestedFields().isEmpty()) {
             final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
             final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
-            return knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList();
+            return allFields(knownFields);
         }
         return searchRequestSpec.requestedFields();
+    }
+
+    // Stream ids are added next to the decorated stream titles.
+    private static List<RequestedField> allFields(Set<MappedFieldTypeDTO> knownFields) {
+        final List<RequestedField> fields = knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList();
+        if (fields.stream().noneMatch(field -> Message.FIELD_STREAMS.equals(field.name()))) {
+            return fields;
+        }
+        return Stream.concat(fields.stream(), Stream.of(new RequestedField(Message.FIELD_STREAMS, ID_DECORATOR))).toList();
     }
 
     private List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
