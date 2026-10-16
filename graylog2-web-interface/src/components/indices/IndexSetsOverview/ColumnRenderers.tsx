@@ -145,11 +145,7 @@ const customColumnRenderers = (
     },
     [METRIC_COLUMN_IDS.documentCount]: {
       renderCell: (_value: unknown, indexSet: IndexSetEntity) => (
-        <MetricCell
-          indexSet={indexSet}
-          field="document_count"
-          renderValue={(count) => formatReadableNumber(count)}
-        />
+        <MetricCell indexSet={indexSet} field="document_count" renderValue={(count) => formatReadableNumber(count)} />
       ),
       staticWidth: 120,
       textAlign: 'right',
