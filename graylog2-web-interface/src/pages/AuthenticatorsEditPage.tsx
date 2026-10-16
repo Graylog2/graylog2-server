@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AuthenticatorActionLinks from 'components/authentication/AuthenticatorActionLinks';
 import AuthenticatorsEdit from 'components/authentication/AuthenticatorsEdit';
@@ -22,21 +23,25 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 
-const AuthenticatorsEditPage = () => (
-  <DocumentTitle title="Edit Authenticators">
-    <AuthenticationPageNavigation />
-    <PageHeader
-      title="Edit Authenticators"
-      actions={<AuthenticatorActionLinks />}
-      documentationLink={{
-        title: 'Authenticators documentation',
-        path: DocsHelper.PAGES.AUTHENTICATORS,
-      }}>
-      <span>Configure the trusted header authentication.</span>
-    </PageHeader>
+const AuthenticatorsEditPage = () => {
+  const { t } = useTranslation('authenticators_edit');
 
-    <AuthenticatorsEdit />
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('title')}>
+      <AuthenticationPageNavigation />
+      <PageHeader
+        title={t('title')}
+        actions={<AuthenticatorActionLinks />}
+        documentationLink={{
+          title: t('documentation_title'),
+          path: DocsHelper.PAGES.AUTHENTICATORS,
+        }}>
+        <span>{t('description')}</span>
+      </PageHeader>
+
+      <AuthenticatorsEdit />
+    </DocumentTitle>
+  );
+};
 
 export default AuthenticatorsEditPage;

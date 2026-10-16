@@ -1,0 +1,3 @@
+{
+  "no_auth_service_plugin": "No authentication service plugin configured for type \"{{name}}\""
+}
