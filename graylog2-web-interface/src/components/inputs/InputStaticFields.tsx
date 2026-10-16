@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -49,6 +50,7 @@ type InputStaticFieldsProps = {
 };
 
 const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
+  const { t } = useTranslation('inputs');
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState(false);
   const [fieldToDelete, setFieldToDelete] = useState<string | null>(null);
@@ -57,15 +59,15 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
   const handleDeleteStaticField = () => {
     StaticFields.remove(fieldToDelete, input.id).then(
       () => {
-        UserNotification.success(`Static field '${fieldToDelete}' removed from '${input.title}' successfully`);
+        UserNotification.success(t('static_fields.remove_success', { field: fieldToDelete, input: input.title }));
         setFieldToDelete(null);
         setShowConfirmDelete(false);
         queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
       },
       (error) => {
         UserNotification.error(
-          `Removing static field from input failed with: ${error}`,
-          `Could not remove static field '${fieldToDelete}' from input '${input.title}'`,
+          t('static_fields.remove_failed', { error }),
+          t('static_fields.remove_failed_title', { field: fieldToDelete, input: input.title }),
         );
       },
     );
@@ -113,7 +115,7 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
   return (
     <StyledWrapper>
       <SectionGrid>
-        <h4>Static fields</h4>
+        <h4>{t('static_fields.title')}</h4>
         <StyledSpan>
           <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
             <Button
@@ -123,7 +125,7 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
               onClick={() => {
                 setShowStaticFieldForm(true);
               }}>
-              Add static field
+              {t('static_fields.add')}
             </Button>
           </IfPermitted>
         </StyledSpan>
@@ -133,11 +135,11 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
       </StyledTable>
       {showConfirmDelete && (
         <ConfirmDialog
-          title="Delete static field"
+          title={t('static_fields.delete_title')}
           show
           onConfirm={() => handleDeleteStaticField()}
           onCancel={() => setShowConfirmDelete(false)}>
-          {`Are you sure you want to remove static field '${fieldToDelete}' from '${input.title}'?`}
+          {t('static_fields.delete_confirm', { field: fieldToDelete, input: input.title })}
         </ConfirmDialog>
       )}
       {showStaticFieldForm && <StaticFieldForm input={input} setShowModal={setShowStaticFieldForm} />}

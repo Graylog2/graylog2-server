@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import { Input } from 'components/bootstrap';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const NodeOrGlobalSelect = ({ global = false, node = undefined, onChange }: Props) => {
+  const { t } = useTranslation('inputs');
   const { nodes } = useStore(NodesStore);
   const [globalState, setGlobal] = useState(global);
   const [nodeState, setNode] = useState(node);
@@ -83,14 +85,14 @@ const NodeOrGlobalSelect = ({ global = false, node = undefined, onChange }: Prop
     <Input
       id="node-select"
       type="select"
-      label="Node"
+      label={t('node_select.node')}
       placeholder="placeholder"
       value={node}
-      help="On which node should this input start"
+      help={t('node_select.node_help')}
       onChange={_onChangeNode}
       required>
       <option key="placeholder" value="">
-        Select Node
+        {t('node_select.select_node')}
       </option>
       {options}
     </Input>
@@ -101,8 +103,8 @@ const NodeOrGlobalSelect = ({ global = false, node = undefined, onChange }: Prop
       <Input
         id="global-checkbox"
         type="checkbox"
-        label="Global"
-        help="Should this input start on all nodes"
+        label={t('node_select.global')}
+        help={t('node_select.global_help')}
         checked={globalState}
         onChange={_onChangeGlobal}
       />

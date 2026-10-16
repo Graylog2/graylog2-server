@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const StaticFieldForm = ({ input, setShowModal }: Props) => {
+  const { t } = useTranslation('inputs');
   const [fieldName, setFieldName] = useState<string>('');
   const [fieldValue, setFieldValue] = useState<string>('');
   const queryClient = useQueryClient();
@@ -38,14 +40,14 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
   const addStaticField = () => {
     StaticFields.create(input.id, { key: fieldName, value: fieldValue }).then(
       () => {
-        UserNotification.success(`Static field '${fieldName}' added to '${input.title}' successfully`);
+        UserNotification.success(t('static_fields.add_success', { field: fieldName, input: input.title }));
         setShowModal(false);
         queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
       },
       (error) => {
         UserNotification.error(
-          `Adding static field to input failed with: ${error}`,
-          `Could not add static field to input '${input.title}'`,
+          t('static_fields.add_failed', { error }),
+          t('static_fields.add_failed_title', { input: input.title }),
         );
       },
     );
@@ -66,17 +68,13 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
   return (
     <BootstrapModalForm
       show
-      title="Add static field"
-      submitButtonText="Add field"
+      title={t('static_fields.add')}
+      submitButtonText={t('static_fields.add_field')}
       onCancel={() => {
         setShowModal(false);
       }}
       onSubmitForm={addStaticField}>
-      <p>
-        Define a static field that is added to every message that comes in via this input. The field is not overwritten
-        If the message already has that key. Key must only contain alphanumeric characters or underscores and not be a
-        reserved field.
-      </p>
+      <p>{t('static_fields.description')}</p>
       <Input
         type="text"
         value={fieldName}
@@ -84,10 +82,10 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
           handleFieldChange('name', event);
         }}
         id="field-name"
-        label="Field name"
+        label={t('static_fields.field_name')}
         required
         pattern="[A-Za-z0-9_]*"
-        title="Should consist only of alphanumeric characters and underscores."
+        title={t('static_fields.field_name_title')}
       />
       <Input
         value={fieldValue}
@@ -96,7 +94,7 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
         }}
         type="text"
         id="field-value"
-        label="Field value"
+        label={t('static_fields.field_value')}
         required
       />
     </BootstrapModalForm>

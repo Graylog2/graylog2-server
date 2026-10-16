@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -29,6 +30,7 @@ import useInputTypes from 'hooks/useInputTypes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 
 const NodeInputsPage = () => {
+  const { t } = useTranslation('inputs');
   const productName = useProductName();
   const { nodeId } = useParams();
   const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
@@ -41,26 +43,25 @@ const NodeInputsPage = () => {
     return <Spinner />;
   }
 
-  const title = (
-    <span>
-      Inputs of node {node.short_node_id} / {node.hostname}
-    </span>
-  );
+  const title = t('pages.node_inputs_title', { nodeId: node.short_node_id, hostname: node.hostname });
 
   return (
-    <DocumentTitle title={`Inputs of node ${node.short_node_id} / ${node.hostname}`}>
+    <DocumentTitle title={title}>
       <div>
         <PageHeader title={title}>
           <span>
-            {productName} nodes accept data via inputs. On this page you can see which inputs are running on this
-            specific node.
+            {t('pages.node_inputs_description', { productName })}
             <br />
-            You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
+            <Trans
+              t={t}
+              i18nKey="pages.node_inputs_hint"
+              components={{ inputsLink: <Link to={Routes.SYSTEM.INPUTS} /> }}
+            />
           </span>
         </PageHeader>
         <Row className="content">
           <Col md={12}>
-            <h2>Local Inputs</h2>
+            <h2>{t('pages.local_inputs')}</h2>
             <InputsOverview
               node={node}
               inputTypes={inputTypes}
@@ -71,7 +72,7 @@ const NodeInputsPage = () => {
         </Row>
         <Row className="content">
           <Col md={12}>
-            <h2>Global Inputs</h2>
+            <h2>{t('pages.global_inputs')}</h2>
             <InputsOverview
               global={true}
               inputTypes={inputTypes}

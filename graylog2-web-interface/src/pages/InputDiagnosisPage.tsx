@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import useHistory from 'routing/useHistory';
@@ -82,9 +83,9 @@ const StyledSegmentedControl = styled(SegmentedControl)(
 type DiagnosisTab = 'overview' | 'rules';
 
 const TABS = [
-  { value: 'overview' as const, label: 'Overview' },
-  { value: 'rules' as const, label: 'Rules' },
-];
+  { value: 'overview' as const, label: 'pages.tab_overview' },
+  { value: 'rules' as const, label: 'pages.tab_rules' },
+] as const;
 
 const getListeningProtocol = (input?: Input) => {
   if (!input) {
@@ -99,6 +100,7 @@ const getListeningProtocol = (input?: Input) => {
 };
 
 const InputDiagnosisPage = () => {
+  const { t } = useTranslation('inputs');
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
   const { push } = useHistory();
@@ -116,16 +118,16 @@ const InputDiagnosisPage = () => {
     <>
       <Header>
         <Button onClick={() => push(Routes.SYSTEM.INPUTS)}>
-          <Icon name="arrow_left_alt" size="sm" /> Back
+          <Icon name="arrow_left_alt" size="sm" /> {t('pages.back')}
         </Button>
         <LeftCol>
-          <h1>Input Diagnosis: {input?.name}</h1>
+          <h1>{t('pages.diagnosis_title', { name: input?.name })}</h1>
 
-          <p>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</p>
+          <p>{t('pages.diagnosis_description')}</p>
         </LeftCol>
       </Header>
       <ControlsRow>
-        <StyledSegmentedControl<DiagnosisTab> data={TABS} radius="sm" value={currentTab} onChange={setCurrentTab} />
+        <StyledSegmentedControl<DiagnosisTab> data={TABS.map(({ value, label }) => ({ value, label: t(label) }))} radius="sm" value={currentTab} onChange={setCurrentTab} />
         {input && (
           <Actions>
             <EditInputButton input={input} />
