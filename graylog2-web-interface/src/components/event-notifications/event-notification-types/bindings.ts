@@ -37,6 +37,7 @@ const pluginExports: PluginExports = {
     {
       type: 'email-notification-v1',
       displayName: 'Email Notification',
+      displayNameKey: 'events:notifications_types.email',
       formComponent: EmailNotificationFormContainer,
       summaryComponent: EmailNotificationSummary,
       detailsComponent: EmailNotificationDetails,
@@ -45,6 +46,7 @@ const pluginExports: PluginExports = {
     {
       type: 'http-notification-v1',
       displayName: 'HTTP Notification',
+      displayNameKey: 'events:notifications_types.http',
       formComponent: HttpNotificationForm,
       summaryComponent: HttpNotificationSummary,
       detailsComponent: HttpNotificationDetails,
@@ -53,6 +55,7 @@ const pluginExports: PluginExports = {
     {
       type: 'http-notification-v2',
       displayName: 'Custom HTTP Notification',
+      displayNameKey: 'events:notifications_types.http_v2',
       formComponent: HttpNotificationFormV2,
       summaryComponent: HttpNotificationSummaryV2,
       detailsComponent: HttpNotificationDetailsV2,
@@ -61,6 +64,7 @@ const pluginExports: PluginExports = {
     {
       type: 'legacy-alarm-callback-notification-v1',
       displayName: 'Legacy Alarm Callbacks',
+      displayNameKey: 'events:notifications_types.legacy',
       formComponent: LegacyNotificationFormContainer,
       summaryComponent: LegacyNotificationSummaryContainer,
       detailsComponent: LegacyNotificationDetails,

@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
+import i18n from 'i18n';
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
 import { LookupTableFields } from 'components/lookup-tables';
 import UsersSelectField from 'components/users/UsersSelectField';
@@ -31,6 +32,9 @@ import {
 } from 'components/event-notifications/event-notification-types/emailNotificationTemplates';
 
 // eslint-disable-next-line no-template-curly-in-string
+// The form is a class component, so texts are translated at render time.
+const t = (key: string) => i18n.t(key, { ns: 'events' });
+
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
 
 const EventProcedureCheckbox = ({ checked, onChange }) => {
@@ -48,7 +52,7 @@ const EventProcedureCheckbox = ({ checked, onChange }) => {
         type="checkbox"
         id="include_event_procedure"
         name="include_event_procedure"
-        label="Include Event Procedure in Email Body"
+        label={t('notifications_email.include_event_procedure')}
         onChange={onChange}
         checked={checked}
       />
@@ -336,19 +340,19 @@ class EmailNotificationForm extends React.Component<
         controlId="notification-email-recipients"
         validationState={validation.errors.recipients ? 'error' : null}>
         <ControlLabel>
-          Email recipient(s) <small className="text-muted">(Optional)</small>
+          {t('notifications_email.email_recipients')} <small className="text-muted">{t('notifications_form.optional')}</small>
         </ControlLabel>
         <MultiSelect
           id="notification-email-recipients"
           value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
-          addLabelText='Add email "{label}"?'
-          placeholder="Type email address"
+          addLabelText={t('notifications_email.add_email')}
+          placeholder={t('notifications_email.type_email')}
           options={[]}
           onChange={this.handleRecipientsChange('email_recipients')}
           allowCreate
         />
         <HelpBlock>
-          {validation?.errors?.recipients?.[0] || 'Add email addresses that will receive this Notification.'}
+          {validation?.errors?.recipients?.[0] || t('notifications_email.email_recipients_help')}
         </HelpBlock>
       </FormGroup>
     );
@@ -361,13 +365,13 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="recipients-table-key"
         name="recipients_lut_key"
-        label="Recipients Lookup Table Key"
+        label={t('notifications_email.recipients_lut_key')}
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
         help={
           validation?.errors?.recipients_lut_key?.[0] ||
-          'Event Field name whose value will be used as Lookup Table Key.'
+          t('notifications_email.lut_key_help')
         }
         value={config.recipients_lut_key || ''}
         onChange={this.handleChange}
@@ -395,20 +399,20 @@ class EmailNotificationForm extends React.Component<
     return (
       <FormGroup controlId="notification-cc-emails" validationState={validation.errors.cc_emails ? 'error' : null}>
         <ControlLabel>
-          CC Email(s) <small className="text-muted">(Optional)</small>
+          {t('notifications_email.cc_emails')} <small className="text-muted">{t('notifications_form.optional')}</small>
         </ControlLabel>
         <MultiSelect
           id="notification-cc-email"
           value={Array.isArray(config.cc_emails) ? config.cc_emails.join(',') : ''}
-          addLabelText='Add email "{label}"?'
-          placeholder="Type email address"
+          addLabelText={t('notifications_email.add_email')}
+          placeholder={t('notifications_email.type_email')}
           options={[]}
           onChange={this.handleRecipientsChange('cc_emails')}
           allowCreate
         />
         <HelpBlock>
           {validation?.errors?.cc_emails?.[0] ||
-            'Add email addresses that will be on the CC line of this Notification.'}
+            t('notifications_email.cc_emails_help')}
         </HelpBlock>
       </FormGroup>
     );
@@ -421,12 +425,12 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="cc-emails-table-key"
         name="cc_emails_lut_key"
-        label="CC Emails Lookup Table Key"
+        label={t('notifications_email.cc_lut_key')}
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.cc_emails_lut_key ? 'error' : null}
         help={
-          validation?.errors?.cc_emails_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.cc_emails_lut_key?.[0] || t('notifications_email.lut_key_help')
         }
         value={config.cc_emails_lut_key || ''}
         onChange={this.handleChange}
@@ -454,20 +458,20 @@ class EmailNotificationForm extends React.Component<
     return (
       <FormGroup controlId="notification-bcc-emails" validationState={validation.errors.bcc_emails ? 'error' : null}>
         <ControlLabel>
-          BCC Email(s) <small className="text-muted">(Optional)</small>
+          {t('notifications_email.bcc_emails')} <small className="text-muted">{t('notifications_form.optional')}</small>
         </ControlLabel>
         <MultiSelect
           id="notification-bcc-email"
           value={Array.isArray(config.bcc_emails) ? config.bcc_emails.join(',') : ''}
-          addLabelText='Add email "{label}"?'
-          placeholder="Type email address"
+          addLabelText={t('notifications_email.add_email')}
+          placeholder={t('notifications_email.type_email')}
           options={[]}
           onChange={this.handleRecipientsChange('bcc_emails')}
           allowCreate
         />
         <HelpBlock>
           {validation?.errors?.bcc_emails?.[0] ||
-            'Add email addresses that will be on the BCC line of this Notification.'}
+            t('notifications_email.bcc_emails_help')}
         </HelpBlock>
       </FormGroup>
     );
@@ -480,13 +484,13 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="bcc-emails-table-key"
         name="bcc_emails_lut_key"
-        label="BCC Emails Lookup Table Key"
+        label={t('notifications_email.bcc_lut_key')}
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.bcc_emails_lut_key ? 'error' : null}
         help={
           validation?.errors?.bcc_emails_lut_key?.[0] ||
-          'Event Field name whose value will be used as Lookup Table Key.'
+          t('notifications_email.lut_key_help')
         }
         value={config.bcc_emails_lut_key || ''}
         onChange={this.handleChange}
@@ -517,14 +521,14 @@ class EmailNotificationForm extends React.Component<
         name="sender"
         label={
           <ControlLabel>
-            Sender <small className="text-muted">(Optional)</small>
+            {t('notifications_email.sender')} <small className="text-muted">{t('notifications_form.optional')}</small>
           </ControlLabel>
         }
         type="text"
         bsStyle={validation.errors.sender ? 'error' : null}
         help={
           validation?.errors?.sender?.[0] ||
-          'The email address that should be used as the notification sender. Leave it empty to use the default sender address.'
+          t('notifications_email.sender_help')
         }
         value={config.sender || ''}
         onChange={this.handleChange}
@@ -539,12 +543,12 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="sender-lookup-table-key"
         name="sender_lut_key"
-        label="Sender Lookup Table Key"
+        label={t('notifications_email.sender_lut_key')}
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.sender_lut_key ? 'error' : null}
         help={
-          validation?.errors?.sender_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.sender_lut_key?.[0] || t('notifications_email.lut_key_help')
         }
         value={config.sender_lut_key || ''}
         onChange={this.handleChange}
@@ -573,10 +577,10 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="notification-replyto"
         name="reply_to"
-        label="Reply-To (Optional)"
+        label={t('notifications_email.reply_to_optional')}
         type="text"
         bsStyle={validation.errors.replyto ? 'error' : null}
-        help={validation?.errors?.reply_to?.[0] || 'The email address that recipients should use for replies.'}
+        help={validation?.errors?.reply_to?.[0] || t('notifications_email.reply_to_help')}
         value={config.reply_to || ''}
         onChange={this.handleChange}
       />
@@ -590,12 +594,12 @@ class EmailNotificationForm extends React.Component<
       <Input
         id="reply-to-lookup-table-key"
         name="reply_to_lut_key"
-        label="Reply To Lookup Table Key"
+        label={t('notifications_email.reply_to_lut_key')}
         type="text"
         placeholder={LOOKUP_KEY_PLACEHOLDER_TEXT}
         bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
         help={
-          validation?.errors?.reply_to_lut_key?.[0] || 'Event Field name whose value will be used as Lookup Table Key.'
+          validation?.errors?.reply_to_lut_key?.[0] || t('notifications_email.lut_key_help')
         }
         value={config.reply_to_lut_key || ''}
         onChange={this.handleChange}
@@ -626,10 +630,10 @@ class EmailNotificationForm extends React.Component<
         <Input
           id="notification-subject"
           name="subject"
-          label="Subject"
+          label={t('notifications_email.subject')}
           type="text"
           bsStyle={validation.errors.subject ? 'error' : null}
-          help={validation?.errors?.subject?.[0] || 'The subject that should be used for the email notification.'}
+          help={validation?.errors?.subject?.[0] || t('notifications_email.subject_help')}
           value={config.subject || ''}
           onChange={this.handleChange}
           required
@@ -639,7 +643,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="single_email"
             name="single_email"
-            label="Send notification as a single email to all recipients."
+            label={t('notifications_email.single_email')}
             onChange={this.handleChange}
             checked={config.single_email}
           />
@@ -650,7 +654,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="lookup_reply_to_email"
             name="lookup_reply_to_email"
-            label="Use lookup table for Reply To email"
+            label={t('notifications_email.use_lut_reply_to')}
             onChange={this.handleUseReplyToLookupChange}
             checked={config.lookup_reply_to_email}
           />
@@ -662,7 +666,7 @@ class EmailNotificationForm extends React.Component<
               type="checkbox"
               id="lookup_sender_email"
               name="lookup_sender_email"
-              label="Use lookup table for Sender email"
+              label={t('notifications_email.use_lut_sender')}
               onChange={this.handleUseSenderLookupChange}
               checked={config.lookup_sender_email}
             />
@@ -674,14 +678,14 @@ class EmailNotificationForm extends React.Component<
             controlId="notification-user-recipients"
             validationState={validation.errors.recipients ? 'error' : null}>
             <ControlLabel>
-              User recipient(s) <small className="text-muted">(Optional)</small>
+              {t('notifications_email.user_recipients')} <small className="text-muted">{t('notifications_form.optional')}</small>
             </ControlLabel>
             <UsersSelectField
               value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
               onChange={this.handleRecipientsChange('user_recipients')}
             />
             <HelpBlock>
-              {validation?.errors?.recipients?.[0] || 'Select users that will receive this Notification.'}
+              {validation?.errors?.recipients?.[0] || t('notifications_email.user_recipients_help')}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -691,7 +695,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="lookup_recipient_emails"
             name="lookup_recipient_emails"
-            label="Use lookup table for Email Recipients"
+            label={t('notifications_email.use_lut_recipients')}
             onChange={this.handleUseRecipientLookupChange}
             checked={config.lookup_recipient_emails}
           />
@@ -700,14 +704,14 @@ class EmailNotificationForm extends React.Component<
         <IfPermitted permissions="users:list">
           <FormGroup controlId="notification-cc-users" validationState={validation.errors.cc_users ? 'error' : null}>
             <ControlLabel>
-              CC User(s) <small className="text-muted">(Optional)</small>
+              {t('notifications_email.cc_users')} <small className="text-muted">{t('notifications_form.optional')}</small>
             </ControlLabel>
             <UsersSelectField
               value={Array.isArray(config.cc_users) ? config.cc_users.join(',') : ''}
               onChange={this.handleRecipientsChange('cc_users')}
             />
             <HelpBlock>
-              {validation?.errors?.cc_users?.[0] || 'Select users that will be on the CC line of this Notification.'}
+              {validation?.errors?.cc_users?.[0] || t('notifications_email.cc_users_help')}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -717,7 +721,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="lookup_cc_emails"
             name="lookup_cc_emails"
-            label="Use lookup table for CC Emails"
+            label={t('notifications_email.use_lut_cc')}
             onChange={this.handleUseCcLookupChange}
             checked={config.lookup_cc_emails}
           />
@@ -726,14 +730,14 @@ class EmailNotificationForm extends React.Component<
         <IfPermitted permissions="users:list">
           <FormGroup controlId="notification-bcc-users" validationState={validation.errors.bcc_users ? 'error' : null}>
             <ControlLabel>
-              BCC User(s) <small className="text-muted">(Optional)</small>
+              {t('notifications_email.bcc_users')} <small className="text-muted">{t('notifications_form.optional')}</small>
             </ControlLabel>
             <UsersSelectField
               value={Array.isArray(config.bcc_users) ? config.bcc_users.join(',') : ''}
               onChange={this.handleRecipientsChange('bcc_users')}
             />
             <HelpBlock>
-              {validation?.errors?.bcc_users?.[0] || 'Select users that will be on the BCC line of this Notification.'}
+              {validation?.errors?.bcc_users?.[0] || t('notifications_email.bcc_users_help')}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -743,7 +747,7 @@ class EmailNotificationForm extends React.Component<
             type="checkbox"
             id="lookup_bcc_emails"
             name="lookup_bcc_emails"
-            label="Use lookup table for BCC Emails"
+            label={t('notifications_email.use_lut_bcc')}
             onChange={this.handleUseBccLookupChange}
             checked={config.lookup_bcc_emails}
           />
@@ -751,10 +755,10 @@ class EmailNotificationForm extends React.Component<
 
         <Input
           id="notification-time-zone"
-          help="Time zone used for timestamps in the email body."
+          help={t('notifications_email.time_zone_help')}
           label={
             <>
-              Time zone for date/time values <small className="text-muted">(Optional)</small>
+              {t('notifications_email.time_zone')} <small className="text-muted">{t('notifications_form.optional')}</small>
             </>
           }>
           <TimezoneSelect
@@ -765,7 +769,7 @@ class EmailNotificationForm extends React.Component<
           />
         </Input>
         <FormGroup controlId="notification-body-template" validationState={validation.errors.body ? 'error' : null}>
-          <ControlLabel>Body Template</ControlLabel>
+          <ControlLabel>{t('notifications_email.body_template')}</ControlLabel>
           <SourceCodeEditor
             id="notification-body-template"
             mode="text"
@@ -774,11 +778,11 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleBodyTemplateChange}
           />
           <HelpBlock>
-            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email body.'}
+            {validation?.errors?.body?.[0] || t('notifications_email.body_template_help')}
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template" validationState={validation.errors.body ? 'error' : null}>
-          <ControlLabel>HTML Body Template</ControlLabel>
+          <ControlLabel>{t('notifications_email.html_body_template')}</ControlLabel>
           <SourceCodeEditor
             id="notification-html-body-template"
             mode="text"
@@ -787,7 +791,7 @@ class EmailNotificationForm extends React.Component<
             onChange={this.handleHtmlBodyTemplateChange}
           />
           <HelpBlock>
-            {validation?.errors?.body?.[0] || 'The template that will be used to generate the email HTML body.'}
+            {validation?.errors?.body?.[0] || t('notifications_email.html_body_template_help')}
           </HelpBlock>
         </FormGroup>
         <EventProcedureCheckbox checked={config.include_event_procedure} onChange={this.handleChange} />
