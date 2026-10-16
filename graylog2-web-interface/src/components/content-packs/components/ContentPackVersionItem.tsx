@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, ModalSubmit } from 'components/common';
 import Routes from 'routing/Routes';
@@ -50,6 +51,7 @@ const ContentPackVersionItem = ({
   onDeletePack = () => {},
   onInstall: onInstallProp = () => {},
 }: Props) => {
+  const { t } = useTranslation('content_packs');
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(contentPackRevisions.latestRevision);
@@ -87,13 +89,13 @@ const ContentPackVersionItem = ({
         <ButtonToolbar className="pull-right">
           {}
           <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
-            Download
+            {t('download.download')}
           </Button>
-          <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
-            <MenuItem onClick={() => handleInstall()}>Install</MenuItem>
+          <DropdownButton id={`action-${pack.rev}`} title={t('version_item.actions')} bsSize="small">
+            <MenuItem onClick={() => handleInstall()}>{t('list_item.install')}</MenuItem>
             <LinkContainer
               to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-              <MenuItem>Create New From Revision</MenuItem>
+              <MenuItem>{t('version_item.create_from_revision')}</MenuItem>
             </LinkContainer>
             <MenuItem divider />
             <DeleteMenuItem
@@ -107,13 +109,17 @@ const ContentPackVersionItem = ({
       {showInstallModal && (
         <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
           <Modal.Header>
-            <Modal.Title>Install Content Pack</Modal.Title>
+            <Modal.Title>{t('list_item.install_title')}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <ContentPackInstall ref={installRef} contentPack={pack} onInstall={onInstallProp} />
           </Modal.Body>
           <Modal.Footer>
-            <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={onCloseInstallModal} />
+            <ModalSubmit
+              submitButtonText={t('list_item.install')}
+              onSubmit={onInstall}
+              onCancel={onCloseInstallModal}
+            />
           </Modal.Footer>
         </BootstrapModalWrapper>
       )}

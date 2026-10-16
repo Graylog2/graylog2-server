@@ -16,11 +16,14 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackUtils from './ContentPackUtils';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackEditParameterProps = {
   onUpdateParameter?: (...args: any[]) => void;
@@ -96,7 +99,7 @@ class ContentPackEditParameter extends React.Component<
     const value = this.state.newParameter.name;
 
     if (value.match(/\W/)) {
-      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
+      this.setState({ nameError: t('edit_parameter.name_invalid') });
 
       return false;
     }
@@ -105,7 +108,7 @@ class ContentPackEditParameter extends React.Component<
       (this.props.parameterToEdit || {}).name !== value &&
       this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0
     ) {
-      this.setState({ nameError: 'The parameter name must be unique.' });
+      this.setState({ nameError: t('edit_parameter.name_not_unique') });
 
       return false;
     }
@@ -122,7 +125,7 @@ class ContentPackEditParameter extends React.Component<
       switch (this.state.newParameter.type) {
         case 'integer': {
           if (`${parseInt(value, 10)}` !== value) {
-            this.setState({ defaultValueError: 'This is not an integer value.' });
+            this.setState({ defaultValueError: t('edit_parameter.not_integer') });
 
             return false;
           }
@@ -132,7 +135,7 @@ class ContentPackEditParameter extends React.Component<
 
         case 'double': {
           if (Number.isNaN(Number.parseFloat(value))) {
-            this.setState({ defaultValueError: 'This is not a double value.' });
+            this.setState({ defaultValueError: t('edit_parameter.not_double') });
 
             return false;
           }
@@ -142,7 +145,7 @@ class ContentPackEditParameter extends React.Component<
 
         case 'boolean': {
           if (value !== 'true' && value !== 'false') {
-            this.setState({ defaultValueError: 'This is not a boolean value. It must be either true or false.' });
+            this.setState({ defaultValueError: t('edit_parameter.not_boolean') });
 
             return false;
           }
@@ -164,7 +167,7 @@ class ContentPackEditParameter extends React.Component<
     const param = this.state.newParameter;
 
     if (!param.name) {
-      this.setState({ nameError: 'Name must be set.' });
+      this.setState({ nameError: t('edit_parameter.name_required') });
 
       return false;
     }
@@ -172,7 +175,7 @@ class ContentPackEditParameter extends React.Component<
     this.setState({ nameError: undefined });
 
     if (!param.title) {
-      this.setState({ titleError: 'Title must be set.' });
+      this.setState({ titleError: t('edit_parameter.title_required') });
 
       return false;
     }
@@ -180,7 +183,7 @@ class ContentPackEditParameter extends React.Component<
     this.setState({ titleError: undefined });
 
     if (!param.description) {
-      this.setState({ descrError: 'Description must be set.' });
+      this.setState({ descrError: t('edit_parameter.description_required') });
 
       return false;
     }
@@ -191,7 +194,7 @@ class ContentPackEditParameter extends React.Component<
   }
 
   render() {
-    const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
+    const header = this.props.parameterToEdit ? t('edit_parameter.edit_title') : t('edit_parameter.create_title');
     const disableType = !!this.props.parameterToEdit;
 
     return (
@@ -215,8 +218,8 @@ class ContentPackEditParameter extends React.Component<
               value={this.state.newParameter.title}
               onChange={this._bindValue}
               bsStyle={this.state.titleError ? 'error' : null}
-              label="Title"
-              help={this.state.titleError ? this.state.titleError : 'Give a descriptive title for this content pack.'}
+              label={t('edit_parameter.title')}
+              help={this.state.titleError ? this.state.titleError : t('edit_parameter.title_help')}
               required
             />
             <Input
@@ -227,12 +230,8 @@ class ContentPackEditParameter extends React.Component<
               bsStyle={this.state.nameError ? 'error' : null}
               value={this.state.newParameter.name}
               onChange={this._bindValue}
-              label="Name"
-              help={
-                this.state.nameError
-                  ? this.state.nameError
-                  : 'This is used as the parameter reference and must not contain a space.'
-              }
+              label={t('edit_parameter.name')}
+              help={this.state.nameError ? this.state.nameError : t('edit_parameter.name_help')}
               required
             />
             <Input
@@ -243,12 +242,8 @@ class ContentPackEditParameter extends React.Component<
               maxLength={250}
               value={this.state.newParameter.description}
               onChange={this._bindValue}
-              label="Description"
-              help={
-                this.state.descrError
-                  ? this.state.descrError
-                  : 'Give a description explaining what will be done with this parameter.'
-              }
+              label={t('edit_parameter.description')}
+              help={this.state.descrError ? this.state.descrError : t('edit_parameter.description_help')}
               required
             />
             <Input
@@ -258,13 +253,13 @@ class ContentPackEditParameter extends React.Component<
               disabled={disableType}
               value={this.state.newParameter.type}
               onChange={this._bindValue}
-              label="Value Type"
-              help="Give the type of the parameter."
+              label={t('edit_parameter.value_type')}
+              help={t('edit_parameter.value_type_help')}
               required>
-              <option value="string">String</option>
-              <option value="integer">Integer</option>
-              <option value="double">Double</option>
-              <option value="boolean">Boolean</option>
+              <option value="string">{t('value_types.string')}</option>
+              <option value="integer">{t('value_types.integer')}</option>
+              <option value="double">{t('value_types.double')}</option>
+              <option value="boolean">{t('value_types.boolean')}</option>
             </Input>
             <Input
               name="default_value"
@@ -274,11 +269,9 @@ class ContentPackEditParameter extends React.Component<
               bsStyle={this.state.defaultValueError ? 'error' : null}
               value={this.state.newParameter.default_value}
               onChange={this._bindValue}
-              label="Default value"
+              label={t('edit_parameter.default_value')}
               help={
-                this.state.defaultValueError
-                  ? this.state.defaultValueError
-                  : 'Give a default value if the parameter is not optional.'
+                this.state.defaultValueError ? this.state.defaultValueError : t('edit_parameter.default_value_help')
               }
             />
           </fieldset>

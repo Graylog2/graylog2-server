@@ -16,12 +16,15 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Row, Col, Button } from 'components/bootstrap';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
 import ContentPackParameterList from './ContentPackParameterList';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackPreviewProps = {
   contentPack: any;
@@ -46,7 +49,7 @@ class ContentPackPreview extends React.Component<
     return (
       <a download={filename} href={href}>
         <Button id="download" bsStyle="info" onClick={this.props.onSave}>
-          Create and Download
+          {t('preview.create_and_download')}
         </Button>
       </a>
     );
@@ -68,7 +71,7 @@ class ContentPackPreview extends React.Component<
         <Row>
           <Col sm={6}>
             <Button id="create" bsStyle="primary" onClick={this.props.onSave}>
-              Create
+              {t('preview.create')}
             </Button>
             &nbsp;
             {this._renderDownload()}

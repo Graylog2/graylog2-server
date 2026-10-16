@@ -17,6 +17,7 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { Set } from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import { DataTable, StatusIcon } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
@@ -27,8 +28,12 @@ type ContentPackConstraintsProps = {
 };
 
 const ContentPackConstraints = ({ constraints = Set(), isFulfilled = false }: ContentPackConstraintsProps) => {
+  const { t } = useTranslation('content_packs');
   const productName = useProductName();
-  const headers = useMemo(() => ['Name', 'Type', 'Version', 'Fulfilled'], []);
+  const headers = useMemo(
+    () => [t('constraints.name'), t('constraints.type'), t('constraints.version'), t('constraints.fulfilled')],
+    [t],
+  );
 
   const renderHeader = useCallback((header: React.ReactNode) => <th>{header}</th>, []);
 
@@ -66,7 +71,7 @@ const ContentPackConstraints = ({ constraints = Set(), isFulfilled = false }: Co
 
   return (
     <div>
-      <h2>Constraints</h2>
+      <h2>{t('constraints.title')}</h2>
       <br />
       <br />
       <DataTable

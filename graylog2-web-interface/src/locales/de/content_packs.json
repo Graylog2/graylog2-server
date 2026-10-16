@@ -1,19 +1,248 @@
 {
-  "title": "Content Packs",
-  "button_text": "Content Packs",
-  "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
-  "delete_confirmation": "Sie sind im Begriff, dieses Content Pack zu löschen. Sind Sie sicher?",
-  "delete_success": "Content Pack erfolgreich gelöscht.",
-  "delete_error_message": "Löschen des Bundles fehlgeschlagen: {{error}}",
-  "install_success": "Content Pack erfolgreich installiert.",
-  "install_error_message": "Installation des Content Packs fehlgeschlagen mit Status: {{status}}. Das Content Pack mit der ID {{id}} konnte nicht installiert werden.",
-  "create_page_title": "Content Packs",
-  "create_header_title": "Content Packs erstellen",
-  "create_button_text": "Content Packs",
-  "create_description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
-  "marketplace_prefix": "Finden Sie weitere Content Packs in",
-  "import_success_message": "Content Pack erfolgreich importiert",
-  "import_success_title": "Erfolg!",
-  "import_error_message": "Fehler beim Importieren des Content Packs. Bitte stellen Sie sicher, dass es eine gültige JSON-Datei ist. Überprüfen Sie Ihre {{productName}} Server-Logs für weitere Informationen.",
-  "import_error_title": "Content Pack konnte nicht importiert werden"
+  "apply_parameter": {
+    "action": "Aktion",
+    "apply": "Anwenden",
+    "choose": "Auswählen...",
+    "choose_config_key": "Konfigurationsschlüssel auswählen",
+    "clear": "Entfernen",
+    "config_key": "Konfigurationsschlüssel",
+    "create_parameter_first": "Erstellen Sie zuerst einen Parameter",
+    "no_parameter_of_type": "Kein Parameter vom Typ {{type}}",
+    "parameter": "Parameter"
+  },
+  "constraints": {
+    "fulfilled": "Erfüllt",
+    "name": "Name",
+    "title": "Abhängigkeiten",
+    "type": "Typ",
+    "version": "Version"
+  },
+  "details": {
+    "description": "Beschreibung",
+    "entities": "Entitäten:",
+    "id": "ID:",
+    "name": "Name:",
+    "parameters": "Parameter:",
+    "summary": "Zusammenfassung:",
+    "title": "Details",
+    "url": "URL:",
+    "vendor": "Anbieter:",
+    "version": "Version:"
+  },
+  "download": {
+    "download": "Herunterladen",
+    "info": "Klicken Sie mit der rechten Maustaste auf den Download-Link unten und wählen Sie „Link speichern unter...“, um die JSON-Datei herunterzuladen.",
+    "title": "Content Pack herunterladen"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parameter",
+      "preview": "Vorschau",
+      "selection": "Inhaltsauswahl"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Parameter erstellen",
+    "default_value": "Standardwert",
+    "default_value_help": "Geben Sie einen Standardwert an, wenn der Parameter nicht optional ist.",
+    "description": "Beschreibung",
+    "description_help": "Beschreiben Sie, wofür dieser Parameter verwendet wird.",
+    "description_required": "Die Beschreibung muss angegeben werden.",
+    "edit_title": "Parameter bearbeiten",
+    "name": "Name",
+    "name_help": "Dieser wird als Referenz auf den Parameter verwendet und darf keine Leerzeichen enthalten.",
+    "name_invalid": "Der Parametername darf nur A-Z, a-z, 0-9 und _ enthalten",
+    "name_not_unique": "Der Parametername muss eindeutig sein.",
+    "name_required": "Der Name muss angegeben werden.",
+    "not_boolean": "Dies ist kein Boolean-Wert. Er muss entweder true oder false sein.",
+    "not_double": "Dies ist kein Double-Wert.",
+    "not_integer": "Dies ist kein Integer-Wert.",
+    "title": "Titel",
+    "title_help": "Geben Sie einen aussagekräftigen Titel für dieses Content Pack an.",
+    "title_required": "Der Titel muss angegeben werden.",
+    "value_type": "Werttyp",
+    "value_type_help": "Geben Sie den Typ des Parameters an."
+  },
+  "entities": {
+    "action": "Aktion",
+    "config_title": "Entitätskonfiguration",
+    "description": "Beschreibung",
+    "edit_title": "Bearbeiten",
+    "list_title": "Entitätenliste",
+    "origin": "Herkunft",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "Server",
+    "show": "Anzeigen",
+    "title": "Titel",
+    "type": "Typ",
+    "used_parameters": "Verwendete Parameter"
+  },
+  "entity_config": {
+    "config_key": "Konfigurationsschlüssel",
+    "parameter_type": "Parameter ({{type}})",
+    "type": "Typ",
+    "value": "Wert"
+  },
+  "entity_index": {
+    "load_failed": "Laden des Entitätsindex fehlgeschlagen mit Status",
+    "load_failed_title": "Entitätsindex konnte nicht geladen werden"
+  },
+  "import": {
+    "error_message": "Fehler beim Importieren des Content Packs. Bitte stellen Sie sicher, dass es eine gültige JSON-Datei ist. Überprüfen Sie Ihre {{productName}} Server-Logs für weitere Informationen.",
+    "error_title": "Content Pack konnte nicht importiert werden",
+    "success_message": "Content Pack erfolgreich importiert",
+    "success_named": "Content Pack „{{name}}“ wurde erfolgreich importiert",
+    "success_title": "Erfolg!"
+  },
+  "install": {
+    "comment": "Installationskommentar",
+    "comment_help": "Dieser Kommentar wird mit der Installation des Content Packs gespeichert und kann den Grund für diese Installation beschreiben.",
+    "configure_parameters": "Parameter konfigurieren:",
+    "needs_to_be_filled": "Muss ausgefüllt werden.",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, das Sie als Mitwirkende an den Entitäten dieses Content Packs hinzufügen möchten."
+  },
+  "install_entities": {
+    "installed": "Installierte Entitäten",
+    "title": "Titel",
+    "to_be_uninstalled": "Zu deinstallierende Entitäten",
+    "type": "Typ"
+  },
+  "install_view": {
+    "comment": "Kommentar:",
+    "general_information": "Allgemeine Informationen",
+    "installed_at": "Installiert am:",
+    "installed_by": "Installiert von:"
+  },
+  "installations": {
+    "action": "Aktion",
+    "comment": "Kommentar",
+    "uninstall": "Deinstallieren",
+    "version": "Version",
+    "view": "Anzeigen",
+    "view_title": "Installation anzeigen"
+  },
+  "list": {
+    "no_match": "Es wurden keine passenden Content Packs gefunden",
+    "none_found": "Keine Content Packs gefunden. Bitte erstellen oder laden Sie eines hoch"
+  },
+  "list_item": {
+    "create_new_version": "Neue Version erstellen",
+    "delete_all_versions": "Alle Versionen löschen",
+    "install": "Installieren",
+    "install_title": "Content Pack installieren",
+    "latest_version": "Neueste Version: {{rev}}",
+    "show": "Anzeigen",
+    "update": "Aktualisieren"
+  },
+  "notifications": {
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "overview": {
+    "button_text": "Content Packs",
+    "delete_confirmation": "Sie sind im Begriff, dieses Content Pack zu löschen. Sind Sie sicher?",
+    "delete_error_message": "Löschen des Bundles fehlgeschlagen: {{error}}",
+    "delete_success": "Content Pack erfolgreich gelöscht.",
+    "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
+    "install_error_message": "Installation des Content Packs fehlgeschlagen mit Status: {{status}}. Das Content Pack mit der ID {{id}} konnte nicht installiert werden.",
+    "install_success": "Content Pack erfolgreich installiert.",
+    "title": "Content Packs"
+  },
+  "pages": {
+    "back_button": "Content Packs",
+    "create_title": "Content Packs erstellen",
+    "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
+    "document_title": "Content Packs",
+    "edit_title": "Content Pack bearbeiten",
+    "marketplace_prefix": "Finden Sie weitere Content Packs in"
+  },
+  "parameter_list": {
+    "action": "Aktion",
+    "default_value": "Standardwert",
+    "delete_parameter": "Parameter löschen",
+    "description": "Beschreibung",
+    "edit_modal": "Dialog bearbeiten",
+    "list_title": "Parameterliste",
+    "modal_title": "Parameter",
+    "name": "Name",
+    "no_data": "Um Parameter in Content Packs zu verwenden, muss zuerst ein Parameter erstellt werden, der dann auf eine Entität angewendet werden kann.",
+    "still_in_use": "Wird noch verwendet",
+    "title": "Titel",
+    "used": "Verwendet",
+    "value_type": "Werttyp"
+  },
+  "parameters": {
+    "confirm_deletion": "Löschen bestätigen",
+    "delete_confirmation": "Möchten Sie diesen Parameter wirklich löschen: {{title}}?"
+  },
+  "preview": {
+    "create": "Erstellen",
+    "create_and_download": "Erstellen und herunterladen"
+  },
+  "revisions": {
+    "fetch_error": "Fehler beim Abrufen der Content-Pack-Revisionen: {{error}}",
+    "fetch_error_title": "Content Pack konnte nicht abgerufen werden"
+  },
+  "selection": {
+    "description": "Beschreibung",
+    "description_help": "Geben Sie eine ausführliche Beschreibung des Content Packs in Markdown an.",
+    "general_information": "Allgemeine Informationen",
+    "must_be_filled": "Muss ausgefüllt werden.",
+    "name": "Name",
+    "name_help": "Erforderlich. Geben Sie einen aussagekräftigen Namen für dieses Content Pack an.",
+    "no_pairs_hint": "Die Entitäten dieser Version des Content Packs wurden nie installiert, daher gibt es keine installierten Entitäten zur Auswahl.",
+    "select_entity": "Wählen Sie mindestens eine Entität aus.",
+    "select_latest": "Zuletzt installierte Versionen auswählen",
+    "select_older": "Ältere Content-Pack-Versionen auswählen",
+    "summary": "Zusammenfassung",
+    "summary_help": "Erforderlich. Geben Sie eine kurze Zusammenfassung des Content Packs an.",
+    "title": "Auswahl für das Content Pack",
+    "url": "URL",
+    "url_help": "Wo ist das Content Pack zu finden, z. B. GitHub-URL",
+    "url_invalid": "Ungültige URL",
+    "url_protocol": "Die URL muss mit http oder https beginnen.",
+    "vendor": "Anbieter",
+    "vendor_help": "Erforderlich. Wer hat dieses Content Pack erstellt und wie ist er erreichbar, z. B. Name und E-Mail.",
+    "version_help": "Für jede Entität können Sie die zuletzt installierte Version (<latestIcon />) oder die ältere Version aus dem Content Pack (<olderIcon />) auswählen."
+  },
+  "show": {
+    "delete_revision_confirmation": "Sie sind im Begriff, diese Revision des Content Packs zu löschen. Sind Sie sicher?",
+    "delete_revision_error": "Löschen des Content Packs fehlgeschlagen: {{error}}",
+    "delete_revision_success": "Revision des Content Packs erfolgreich gelöscht.",
+    "install_error": "Installation des Content Packs fehlgeschlagen mit Status: {{status}}. Das Content Pack mit der ID {{id}} konnte nicht installiert werden.",
+    "installations": "Installationen",
+    "not_found": "Das Content Pack mit der ID {{id}} wurde nicht gefunden und wurde möglicherweise gelöscht.",
+    "server_error": "Ein interner Serverfehler ist aufgetreten. Bitte prüfen Sie Ihre Log-Dateien für weitere Informationen",
+    "uninstall_confirmation": "Möchten Sie dieses Content Pack wirklich deinstallieren?",
+    "uninstall_error": "Deinstallation des Content Packs fehlgeschlagen. Bitte prüfen Sie Ihre Logs für weitere Informationen.",
+    "uninstall_success": "Content Pack erfolgreich deinstalliert.",
+    "versions": "Versionen"
+  },
+  "status": {
+    "edited": "bearbeitet",
+    "error": "Fehler",
+    "installed": "installiert",
+    "updatable": "aktualisierbar"
+  },
+  "upload": {
+    "button": "Hochladen",
+    "choose_file": "Datei auswählen",
+    "choose_file_help": "Wählen Sie ein Content Pack von der Festplatte aus",
+    "title": "Content Pack hochladen"
+  },
+  "value_types": {
+    "boolean": "Boolean",
+    "double": "Double",
+    "integer": "Integer",
+    "string": "String"
+  },
+  "version_item": {
+    "actions": "Aktionen",
+    "create_from_revision": "Neu aus Revision erstellen"
+  },
+  "versions": {
+    "action": "Aktion",
+    "revision": "Revision",
+    "select": "Auswahl"
+  }
 }

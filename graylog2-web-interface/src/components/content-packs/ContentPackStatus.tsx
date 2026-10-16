@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge } from 'components/bootstrap';
 import type { BadgeColor } from 'components/bootstrap/Badge';
@@ -33,11 +34,19 @@ type ContentPackStatusProps = {
   contentPackId?: string;
 };
 
+const STATUS_KEYS: Record<string, string> = {
+  installed: 'status.installed',
+  updatable: 'status.updatable',
+  edited: 'status.edited',
+  error: 'status.error',
+};
+
 const ContentPackStatus = ({ contentPackId = undefined, states = [] }: ContentPackStatusProps) => {
+  const { t } = useTranslation('content_packs');
   const badges = states.map((state) => (
     <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>
       <Badge color={BADGE_COLOR_BY_STATUS[state] ?? 'gray'} variant="light" style={{ marginLeft: 4 }}>
-        {state}
+        {STATUS_KEYS[state] ? t(STATUS_KEYS[state]) : state}
       </Badge>
     </Link>
   ));

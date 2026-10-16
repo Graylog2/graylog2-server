@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import i18n from 'i18n';
 import ContentPack from 'logic/content-packs/ContentPack';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
@@ -26,6 +27,8 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import ContentPackUtils from './ContentPackUtils';
 import ContentPackEntitiesList from './ContentPackEntitiesList';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackInstallProps = {
   contentPack: ContentPackInstallation;
@@ -117,7 +120,7 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, State>
 
       const newResult = result;
 
-      newResult[parameter.name] = 'Needs to be filled.';
+      newResult[parameter.name] = t('install.needs_to_be_filled');
 
       return newResult;
     }, {});
@@ -164,17 +167,17 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, State>
           maxLength={512}
           value={this.state.comment}
           onChange={this._getComment}
-          label="Install Comment"
-          help="This comment will be stored with the content pack installation and can be used to describe the reason for this installation."
+          label={t('install.comment')}
+          help={t('install.comment_help')}
         />
         {parameterInputs.length > 0 && (
           <>
-            <strong>Configure Parameter(s):</strong>
+            <strong>{t('install.configure_parameters')}</strong>
             {parameterInputs}
           </>
         )}
         <EntityCreateShareFormGroup
-          description="Search for a User or Team to add as collaborator on entities of this content pack."
+          description={t('install.share_description')}
           entityType="content pack"
           entityTitle=""
           onSetEntityShare={this._setShareRequest}

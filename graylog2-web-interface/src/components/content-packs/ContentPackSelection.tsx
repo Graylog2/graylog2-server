@@ -17,7 +17,9 @@
 import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled, { css } from 'styled-components';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Icon, SearchForm, Tooltip } from 'components/common';
 import { Button, ButtonToolbar, Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -38,8 +40,7 @@ const SearchRow = styled.div(
   `,
 );
 
-const NO_PAIRS_HINT =
-  'The entities in this version of the content pack were never installed, so there are no installed entities to select.';
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type VersionButtonProps = {
   label: string;
@@ -62,7 +63,7 @@ const VersionButton = ({ label, unavailable, onClick }: VersionButtonProps) => {
   );
 
   return unavailable ? (
-    <Tooltip label={NO_PAIRS_HINT} withArrow multiline w={320} position="top">
+    <Tooltip label={t('selection.no_pairs_hint')} withArrow multiline w={320} position="top">
       {button}
     </Tooltip>
   ) : (
@@ -136,7 +137,7 @@ class ContentPackSelection extends React.Component<
       const newErrors = acc;
 
       if (!contentPack[field] || contentPack[field].length <= 0) {
-        newErrors[field] = 'Must be filled out.';
+        newErrors[field] = t('selection.must_be_filled');
       }
 
       return newErrors;
@@ -145,10 +146,10 @@ class ContentPackSelection extends React.Component<
     if (contentPack.url) {
       try {
         if (!hasAcceptedProtocol(contentPack.url)) {
-          errors.url = 'Must use a URL starting with http or https.';
+          errors.url = t('selection.url_protocol');
         }
       } catch (_e) {
-        errors.url = 'Invalid URL';
+        errors.url = t('selection.url_invalid');
       }
     }
 
@@ -156,7 +157,7 @@ class ContentPackSelection extends React.Component<
       Object.keys(selectedEntities).reduce((acc, entityGroup) => acc + selectedEntities[entityGroup].length, 0) <= 0;
 
     if (selectionEmpty) {
-      errors.selection = 'Select at least one entity.';
+      errors.selection = t('selection.select_entity');
     }
 
     this.setState({ errors });
@@ -279,7 +280,7 @@ class ContentPackSelection extends React.Component<
       <div>
         <Row>
           <Col smOffset={1} lg={8}>
-            <h2>General Information</h2>
+            <h2>{t('selection.general_information')}</h2>
             <br />
             <form
               className="content-selection-form"
@@ -296,8 +297,8 @@ class ContentPackSelection extends React.Component<
                   value={contentPack.name ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('name')}
-                  label="Name"
-                  help="Required. Give a descriptive name for this content pack."
+                  label={t('selection.name')}
+                  help={t('selection.name_help')}
                   error={this._error('name')}
                   required
                 />
@@ -309,8 +310,8 @@ class ContentPackSelection extends React.Component<
                   value={contentPack.summary ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('summary')}
-                  label="Summary"
-                  help="Required. Give a short summary of the content pack."
+                  label={t('selection.summary')}
+                  help={t('selection.summary_help')}
                   error={this._error('summary')}
                   required
                 />
@@ -322,8 +323,8 @@ class ContentPackSelection extends React.Component<
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('description')}
                   rows={6}
-                  label="Description"
-                  help="Give a long description of the content pack in markdown."
+                  label={t('selection.description')}
+                  help={t('selection.description_help')}
                 />
                 <Input
                   name="vendor"
@@ -333,8 +334,8 @@ class ContentPackSelection extends React.Component<
                   value={contentPack.vendor ?? ''}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('vendor')}
-                  label="Vendor"
-                  help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
+                  label={t('selection.vendor')}
+                  help={t('selection.vendor_help')}
                   error={this._error('vendor')}
                   required
                 />
@@ -346,8 +347,8 @@ class ContentPackSelection extends React.Component<
                   value={contentPack.url}
                   onChange={this._bindValue}
                   onBlur={() => this._handleTouched('url')}
-                  label="URL"
-                  help="Where can I find the content pack. e.g. github url"
+                  label={t('selection.url')}
+                  help={t('selection.url_help')}
                   error={this._error('url')}
                 />
               </fieldset>
@@ -356,12 +357,17 @@ class ContentPackSelection extends React.Component<
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <h2>Content Pack selection</h2>
+            <h2>{t('selection.title')}</h2>
             {edit && (
               <HelpBlock>
-                For each entity you can select the latest installed version (<Icon name="dns" />) or the older content
-                pack version (<Icon name="archive" className={style.contentPackEntity} />
-                ).
+                <Trans
+                  i18nKey="selection.version_help"
+                  ns="content_packs"
+                  components={{
+                    latestIcon: <Icon name="dns" />,
+                    olderIcon: <Icon name="archive" className={style.contentPackEntity} />,
+                  }}
+                />
               </HelpBlock>
             )}
           </Col>
@@ -374,12 +380,12 @@ class ContentPackSelection extends React.Component<
               {edit && (
                 <ButtonToolbar>
                   <VersionButton
-                    label="Select latest installed versions"
+                    label={t('selection.select_latest')}
                     unavailable={entityPairs.length === 0}
                     onClick={() => this._switchSource('latest')}
                   />
                   <VersionButton
-                    label="Select older content pack versions"
+                    label={t('selection.select_older')}
                     unavailable={entityPairs.length === 0}
                     onClick={() => this._switchSource('older')}
                   />

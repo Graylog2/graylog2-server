@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
@@ -43,13 +44,14 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = () => {
+  const { t } = useTranslation('content_packs');
   const history = useHistory();
   const params = useParams<{ contentPackId: string }>();
   const onFetchError = (error: FetchError) => {
     if (error.status === 404) {
-      UserNotification.error(`Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`);
+      UserNotification.error(t('show.not_found', { id: params.contentPackId }));
     } else {
-      UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+      UserNotification.error(t('show.server_error'));
     }
 
     history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
@@ -77,10 +79,10 @@ const ShowContentPackPage = () => {
 
   const _deleteContentPackRev = (contentPackId: string, revision?: number) => {
     /* eslint-disable-next-line no-alert */
-    if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
+    if (window.confirm(t('show.delete_revision_confirmation'))) {
       deleteContentPackRev(contentPackId, revision).then(
         () => {
-          UserNotification.success('Content pack revision deleted successfully.', 'Success');
+          UserNotification.success(t('show.delete_revision_success'), t('notifications.success'));
 
           refetchContentPack();
         },
@@ -91,7 +93,7 @@ const ShowContentPackPage = () => {
             errMessage = error.responseMessage;
           }
 
-          UserNotification.error(`Deleting content pack failed: ${errMessage}`, 'Error');
+          UserNotification.error(t('show.delete_revision_error', { error: errMessage }), t('notifications.error'));
         },
       );
     }
@@ -117,12 +119,12 @@ const ShowContentPackPage = () => {
   const _uninstallContentPackRev = () => {
     uninstallContentPack(uninstallContentPackId, uninstallInstallId).then(
       () => {
-        UserNotification.success('Content Pack uninstalled successfully.', 'Success');
+        UserNotification.success(t('show.uninstall_success'), t('notifications.success'));
         refetchInstallations();
         _clearUninstall();
       },
       () => {
-        UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
+        UserNotification.error(t('show.uninstall_error'), t('notifications.error'));
       },
     );
   };
@@ -135,12 +137,11 @@ const ShowContentPackPage = () => {
   ) => {
     installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
       () => {
-        UserNotification.success('Content Pack installed successfully.', 'Success');
+        UserNotification.success(t('overview.install_success'), t('notifications.success'));
         refetchInstallations();
       },
       (error) => {
-        UserNotification.error(`Installing content pack failed with status: ${error}.
-         Could not install content pack with ID: ${contentPackId}`);
+        UserNotification.error(t('show.install_error', { status: error, id: contentPackId }));
       },
     );
   };
@@ -153,22 +154,21 @@ const ShowContentPackPage = () => {
   const { installations } = contentPackInstallations;
 
   return (
-    <DocumentTitle title="Content packs">
+    <DocumentTitle title={t('pages.document_title')}>
       <span>
         <PageHeader
-          title="Content packs"
+          title={t('pages.document_title')}
           topActions={
             <ButtonToolbar>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
+                <Button bsStyle="info">{t('pages.back_button')}</Button>
               </LinkContainer>
             </ButtonToolbar>
           }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include
-            inputs/extractors, streams, and dashboards.
+            {t('pages.description')}
             <br />
-            <MarketplaceLink prefix="Find more content packs in" />
+            <MarketplaceLink prefix={t('pages.marketplace_prefix')} />
           </span>
         </PageHeader>
 
@@ -177,7 +177,7 @@ const ShowContentPackPage = () => {
             <div id="content-pack-versions">
               <Row className={ShowContentPackStyle.leftRow}>
                 <Col>
-                  <h2>Versions</h2>
+                  <h2>{t('show.versions')}</h2>
                   <ContentPackVersions
                     contentPackRevisions={contentPackRevisions}
                     onInstall={_installContentPack}
@@ -188,7 +188,7 @@ const ShowContentPackPage = () => {
               </Row>
               <Row className={ShowContentPackStyle.leftRow}>
                 <Col>
-                  <h2>Installations</h2>
+                  <h2>{t('show.installations')}</h2>
                   <ContentPackInstallations installations={installations} onUninstall={_onUninstallContentPackRev} />
                 </Col>
               </Row>
@@ -206,7 +206,7 @@ const ShowContentPackPage = () => {
       </span>
       <BootstrapModalConfirm
         showModal={showModal}
-        title="Do you really want to uninstall this Content Pack?"
+        title={t('show.uninstall_confirmation')}
         onConfirm={_uninstallContentPackRev}
         onCancel={_clearUninstall}>
         <ContentPackInstallEntityList uninstall entities={uninstallEntities} />

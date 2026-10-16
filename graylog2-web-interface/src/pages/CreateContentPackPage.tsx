@@ -63,12 +63,12 @@ const CreateContentPackPage = () => {
 
     createContentPack(contentPack.toJSON()).then(
       () => {
-        UserNotification.success(t('import_success_message'), t('import_success_title'));
+        UserNotification.success(t('import.success_message'), t('import.success_title'));
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
       },
       (response) => {
-        const message = t('import_error_message', { productName });
-        const title = t('import_error_title');
+        const message = t('import.error_message', { productName });
+        const title = t('import.error_title');
         let smallMessage = '';
 
         if (response.additional && response.additional.body && response.additional.body.message) {
@@ -100,18 +100,19 @@ const CreateContentPackPage = () => {
   };
 
   return (
-    <DocumentTitle title={t('create_page_title')}>
+    <DocumentTitle title={t('pages.document_title')}>
       <span>
         <PageHeader
-          title={t('create_header_title')}
+          title={t('pages.create_title')}
           topActions={
             <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-              <Button bsStyle="info">{t('create_button_text')}</Button>
+              <Button bsStyle="info">{t('pages.back_button')}</Button>
             </LinkContainer>
           }>
           <span>
-            {t('create_description')}
-            <MarketplaceLink prefix={t('marketplace_prefix')} />
+            {t('pages.description')}
+            <br />
+            <MarketplaceLink prefix={t('pages.marketplace_prefix')} />
           </span>
         </PageHeader>
         <ContentPackEdit

@@ -1,19 +1,248 @@
 {
-  "title": "Content Packs",
-  "button_text": "Content Packs",
-  "description": "Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.",
-  "delete_confirmation": "You are about to delete this Content Pack, are you sure?",
-  "delete_success": "Content Pack deleted successfully.",
-  "delete_error_message": "Deleting bundle failed: {{error}}",
-  "install_success": "Content Pack installed successfully.",
-  "install_error_message": "Installing content pack failed with status: {{status}}. Could not install Content Pack with ID: {{id}}",
-  "create_page_title": "Content packs",
-  "create_header_title": "Create content packs",
-  "create_button_text": "Content Packs",
-  "create_description": "Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.",
-  "marketplace_prefix": "Find more content packs in",
-  "import_success_message": "Content pack imported successfully",
-  "import_success_title": "Success!",
-  "import_error_message": "Error importing content pack, please ensure it is a valid JSON file. Check your {{productName}} server logs for more information.",
-  "import_error_title": "Could not import content pack"
+  "apply_parameter": {
+    "action": "Action",
+    "apply": "Apply",
+    "choose": "Choose...",
+    "choose_config_key": "Choose Config Key",
+    "clear": "Clear",
+    "config_key": "Config Key",
+    "create_parameter_first": "Create a parameter first",
+    "no_parameter_of_type": "No parameter from type {{type}}",
+    "parameter": "Parameter"
+  },
+  "constraints": {
+    "fulfilled": "Fulfilled",
+    "name": "Name",
+    "title": "Constraints",
+    "type": "Type",
+    "version": "Version"
+  },
+  "details": {
+    "description": "Description",
+    "entities": "Entities:",
+    "id": "ID:",
+    "name": "Name:",
+    "parameters": "Parameters:",
+    "summary": "Summary:",
+    "title": "Details",
+    "url": "URL:",
+    "vendor": "Vendor:",
+    "version": "Version:"
+  },
+  "download": {
+    "download": "Download",
+    "info": "Please right click the download link below and choose \"Save Link As...\" to download the JSON file.",
+    "title": "Download Content Pack"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parameters",
+      "preview": "Preview",
+      "selection": "Content Selection"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Create parameter",
+    "default_value": "Default value",
+    "default_value_help": "Give a default value if the parameter is not optional.",
+    "description": "Description",
+    "description_help": "Give a description explaining what will be done with this parameter.",
+    "description_required": "Description must be set.",
+    "edit_title": "Edit parameter",
+    "name": "Name",
+    "name_help": "This is used as the parameter reference and must not contain a space.",
+    "name_invalid": "The parameter name must only contain A-Z, a-z, 0-9 and _",
+    "name_not_unique": "The parameter name must be unique.",
+    "name_required": "Name must be set.",
+    "not_boolean": "This is not a boolean value. It must be either true or false.",
+    "not_double": "This is not a double value.",
+    "not_integer": "This is not an integer value.",
+    "title": "Title",
+    "title_help": "Give a descriptive title for this content pack.",
+    "title_required": "Title must be set.",
+    "value_type": "Value Type",
+    "value_type_help": "Give the type of the parameter."
+  },
+  "entities": {
+    "action": "Action",
+    "config_title": "Entity Config",
+    "description": "Description",
+    "edit_title": "Edit",
+    "list_title": "Entity list",
+    "origin": "Origin",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "Server",
+    "show": "Show",
+    "title": "Title",
+    "type": "Type",
+    "used_parameters": "Used Parameters"
+  },
+  "entity_config": {
+    "config_key": "Config Key",
+    "parameter_type": "parameter ({{type}})",
+    "type": "Type",
+    "value": "Value"
+  },
+  "entity_index": {
+    "load_failed": "Loading entity index failed with status",
+    "load_failed_title": "Could not load entity index"
+  },
+  "import": {
+    "error_message": "Error importing content pack, please ensure it is a valid JSON file. Check your {{productName}} server logs for more information.",
+    "error_title": "Could not import content pack",
+    "success_message": "Content pack imported successfully",
+    "success_named": "Content pack \"{{name}}\" imported successfully",
+    "success_title": "Success!"
+  },
+  "install": {
+    "comment": "Install Comment",
+    "comment_help": "This comment will be stored with the content pack installation and can be used to describe the reason for this installation.",
+    "configure_parameters": "Configure Parameter(s):",
+    "needs_to_be_filled": "Needs to be filled.",
+    "share_description": "Search for a User or Team to add as collaborator on entities of this content pack."
+  },
+  "install_entities": {
+    "installed": "Installed Entities",
+    "title": "Title",
+    "to_be_uninstalled": "Entites to be uninstalled",
+    "type": "Type"
+  },
+  "install_view": {
+    "comment": "Comment:",
+    "general_information": "General information",
+    "installed_at": "Installed at:",
+    "installed_by": "Installed by:"
+  },
+  "installations": {
+    "action": "Action",
+    "comment": "Comment",
+    "uninstall": "Uninstall",
+    "version": "Version",
+    "view": "View",
+    "view_title": "View Installation"
+  },
+  "list": {
+    "no_match": "No matching content packs have been found",
+    "none_found": "No content packs found. Please create or upload one"
+  },
+  "list_item": {
+    "create_new_version": "Create New Version",
+    "delete_all_versions": "Delete All Versions",
+    "install": "Install",
+    "install_title": "Install Content Pack",
+    "latest_version": "Latest Version: {{rev}}",
+    "show": "Show",
+    "update": "Update"
+  },
+  "notifications": {
+    "error": "Error",
+    "success": "Success"
+  },
+  "overview": {
+    "button_text": "Content Packs",
+    "delete_confirmation": "You are about to delete this Content Pack, are you sure?",
+    "delete_error_message": "Deleting bundle failed: {{error}}",
+    "delete_success": "Content Pack deleted successfully.",
+    "description": "Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.",
+    "install_error_message": "Installing content pack failed with status: {{status}}. Could not install Content Pack with ID: {{id}}",
+    "install_success": "Content Pack installed successfully.",
+    "title": "Content Packs"
+  },
+  "pages": {
+    "back_button": "Content Packs",
+    "create_title": "Create content packs",
+    "description": "Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.",
+    "document_title": "Content packs",
+    "edit_title": "Edit content pack",
+    "marketplace_prefix": "Find more content packs in"
+  },
+  "parameter_list": {
+    "action": "Action",
+    "default_value": "Default Value",
+    "delete_parameter": "Delete Parameter",
+    "description": "Description",
+    "edit_modal": "Edit Modal",
+    "list_title": "Parameters list",
+    "modal_title": "Parameter",
+    "name": "Name",
+    "no_data": "To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.",
+    "still_in_use": "Still in use",
+    "title": "Title",
+    "used": "Used",
+    "value_type": "Value Type"
+  },
+  "parameters": {
+    "confirm_deletion": "Confirm deletion",
+    "delete_confirmation": "Are you sure you want to do delete this parameter: {{title}}?"
+  },
+  "preview": {
+    "create": "Create",
+    "create_and_download": "Create and Download"
+  },
+  "revisions": {
+    "fetch_error": "Error while fetching content pack revisions: {{error}}",
+    "fetch_error_title": "Unable to fetch content pack"
+  },
+  "selection": {
+    "description": "Description",
+    "description_help": "Give a long description of the content pack in markdown.",
+    "general_information": "General Information",
+    "must_be_filled": "Must be filled out.",
+    "name": "Name",
+    "name_help": "Required. Give a descriptive name for this content pack.",
+    "no_pairs_hint": "The entities in this version of the content pack were never installed, so there are no installed entities to select.",
+    "select_entity": "Select at least one entity.",
+    "select_latest": "Select latest installed versions",
+    "select_older": "Select older content pack versions",
+    "summary": "Summary",
+    "summary_help": "Required. Give a short summary of the content pack.",
+    "title": "Content Pack selection",
+    "url": "URL",
+    "url_help": "Where can I find the content pack. e.g. github url",
+    "url_invalid": "Invalid URL",
+    "url_protocol": "Must use a URL starting with http or https.",
+    "vendor": "Vendor",
+    "vendor_help": "Required. Who did this content pack and how can they be reached, e.g. Name and email.",
+    "version_help": "For each entity you can select the latest installed version (<latestIcon />) or the older content pack version (<olderIcon />)."
+  },
+  "show": {
+    "delete_revision_confirmation": "You are about to delete this content pack revision, are you sure?",
+    "delete_revision_error": "Deleting content pack failed: {{error}}",
+    "delete_revision_success": "Content pack revision deleted successfully.",
+    "install_error": "Installing content pack failed with status: {{status}}. Could not install content pack with ID: {{id}}",
+    "installations": "Installations",
+    "not_found": "Cannot find Content Pack with the id {{id}} and may have been deleted.",
+    "server_error": "An internal server error occurred. Please check your logfiles for more information",
+    "uninstall_confirmation": "Do you really want to uninstall this Content Pack?",
+    "uninstall_error": "Uninstall content pack failed, please check your logs for more information.",
+    "uninstall_success": "Content Pack uninstalled successfully.",
+    "versions": "Versions"
+  },
+  "status": {
+    "edited": "edited",
+    "error": "error",
+    "installed": "installed",
+    "updatable": "updatable"
+  },
+  "upload": {
+    "button": "Upload",
+    "choose_file": "Choose File",
+    "choose_file_help": "Choose Content Pack from disk",
+    "title": "Upload Content Pack"
+  },
+  "value_types": {
+    "boolean": "Boolean",
+    "double": "Double",
+    "integer": "Integer",
+    "string": "String"
+  },
+  "version_item": {
+    "actions": "Actions",
+    "create_from_revision": "Create New From Revision"
+  },
+  "versions": {
+    "action": "Action",
+    "revision": "Revision",
+    "select": "Select"
+  }
 }
