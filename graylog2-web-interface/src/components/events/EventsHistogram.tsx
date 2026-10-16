@@ -226,7 +226,11 @@ const EventsHistogram = ({
   }
 
   if (isError || !data) {
-    return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
+    return (
+      <Alert bsStyle="danger">
+        {t('alerts_list.histogram_failed', { error: error?.message ?? t('common:errors.unknown_error') })}
+      </Alert>
+    );
   }
 
   return (

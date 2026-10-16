@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
@@ -38,20 +39,26 @@ export const commonEventAttributes: Array<Attribute> = [
     searchable: false,
     sliceable: true,
     sortable: true,
-    title: 'Priority',
+    get title() {
+      return i18n.t('alerts_attributes.priority', { ns: 'events' });
+    },
     type: 'STRING',
     slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
   },
   {
     id: 'timestamp',
-    title: 'Timestamp',
+    get title() {
+      return i18n.t('alerts_attributes.timestamp', { ns: 'events' });
+    },
     type: 'DATE',
     sortable: true,
     filterable: true,
   },
   {
     id: 'event_definition_id',
-    title: 'Event Definition',
+    get title() {
+      return i18n.t('alerts_attributes.event_definition', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: false,
     searchable: false,
@@ -60,20 +67,26 @@ export const commonEventAttributes: Array<Attribute> = [
   },
   {
     id: 'event_definition_type',
-    title: 'Event Definition Type',
+    get title() {
+      return i18n.t('alerts_attributes.event_definition_type', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: true,
   },
   {
     id: 'key',
-    title: 'Key',
+    get title() {
+      return i18n.t('alerts_attributes.key', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: true,
     searchable: false,
   },
   {
     id: 'group_by_fields',
-    title: 'Group-By Fields',
+    get title() {
+      return i18n.t('alerts_attributes.group_by_fields', { ns: 'events' });
+    },
     sortable: false,
   },
 ];
@@ -81,20 +94,26 @@ export const detailsAttributes: Array<Attribute> = [
   ...commonEventAttributes,
   {
     id: 'remediation_steps',
-    title: 'Event Procedures',
+    get title() {
+      return i18n.t('alerts_attributes.event_procedures', { ns: 'events' });
+    },
     hidden: true,
     sortable: false,
   },
   {
     id: 'timerange_start',
-    title: 'Aggregation time range',
+    get title() {
+      return i18n.t('alerts_attributes.aggregation_time_range', { ns: 'events' });
+    },
     sortable: true,
     type: 'DATE',
     filterable: true,
   },
   {
     id: 'id',
-    title: 'ID',
+    get title() {
+      return i18n.t('alerts_attributes.id', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: true,
     searchable: true,
@@ -102,7 +121,9 @@ export const detailsAttributes: Array<Attribute> = [
   },
   {
     id: 'fields',
-    title: 'Additional Fields',
+    get title() {
+      return i18n.t('alerts_attributes.additional_fields', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: false,
   },
@@ -110,26 +131,42 @@ export const detailsAttributes: Array<Attribute> = [
 export const eventsTableSpecificAttributes: Array<Attribute> = [
   {
     id: 'message',
-    title: 'Description',
+    get title() {
+      return i18n.t('alerts_attributes.description', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: false,
     searchable: false,
   },
   {
     id: 'alert',
-    title: 'Type',
+    get title() {
+      return i18n.t('alerts_attributes.type', { ns: 'events' });
+    },
     type: 'BOOLEAN',
     sortable: true,
     sliceable: true,
     filterable: true,
     filter_options: [
-      { value: 'false', title: 'Event' },
-      { value: 'true', title: 'Alert' },
+      {
+        value: 'false',
+        get title() {
+          return i18n.t('alerts_types.event', { ns: 'events' });
+        },
+      },
+      {
+        value: 'true',
+        get title() {
+          return i18n.t('alerts_types.alert', { ns: 'events' });
+        },
+      },
     ],
   },
   {
     id: 'tags',
-    title: 'Tags',
+    get title() {
+      return i18n.t('alerts_attributes.tags', { ns: 'events' });
+    },
     type: 'STRING',
     sortable: false,
     filterable: true,
