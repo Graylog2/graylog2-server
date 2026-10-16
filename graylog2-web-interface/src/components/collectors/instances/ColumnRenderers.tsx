@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { RelativeTime } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import FleetReference from '../common/FleetReference';
 import InstanceStatusLabel from '../common/InstanceStatusLabel';
@@ -34,23 +35,26 @@ const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
 
 const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
   attributes: {
+    instance_uid: {
+      staticWidth: 300,
+    },
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
         <InstanceStatusLabel status={instance.status} />
       ),
-      staticWidth: 100,
+      staticWidth: 80,
     },
     has_pending_changes: {
       renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
         <SyncStateIndicator pending={instance.has_pending_changes} />
       ),
-      staticWidth: 60,
+      staticWidth: 'matchHeader',
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (
         <span>{instance.hostname || instance.instance_uid}</span>
       ),
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.title,
     },
     os: {
       renderCell: (_os: string, instance: CollectorInstanceView) => <OsName instance={instance} />,
@@ -60,17 +64,17 @@ const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
       renderCell: (_fleetId: string, instance: CollectorInstanceView) => (
         <FleetReference fleetId={instance.fleet_id} pendingFleetId={instance.pending_fleet_id} />
       ),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     last_seen: {
       renderCell: (_lastSeen: string, instance: CollectorInstanceView) => (
         <RelativeTime dateTime={instance.last_seen} />
       ),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     version: {
       renderCell: (version: string) => <span>{version}</span>,
-      width: 0.1,
+      staticWidth: 120,
     },
   },
 });

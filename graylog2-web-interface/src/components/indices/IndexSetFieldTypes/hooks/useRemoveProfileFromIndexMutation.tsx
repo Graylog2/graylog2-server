@@ -20,20 +20,29 @@ import { SystemFieldTypes } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type {
+  ProfileChangeResponse,
   RemoveProfileFromIndexSetBodyJson,
   RemoveProfileFromIndexSetBody,
 } from 'components/indices/IndexSetFieldTypes/types';
+import {
+  parseProfileChangeResponse,
+  refetchAfterProfileChange,
+  resultsWithProblems,
+} from 'components/indices/IndexSetFieldTypes/profileChangeResult';
 
-const putRemoveProfileFromIndex = async ({ indexSetId, rotated }: RemoveProfileFromIndexSetBody) => {
+const putRemoveProfileFromIndex = async ({ indexSetIds, rotated }: RemoveProfileFromIndexSetBody) => {
   const body: RemoveProfileFromIndexSetBodyJson = {
-    index_sets: [indexSetId],
+    index_sets: indexSetIds,
     rotate: rotated,
   };
 
-  return SystemFieldTypes.removeProfileFromIndexSets(body);
+  return SystemFieldTypes.bulkRemoveProfile(body).then(parseProfileChangeResponse);
 };
 
-const useRemoveProfileFromIndexMutation = () => {
+const useRemoveProfileFromIndexMutation = (): {
+  removeProfileFromIndex: (body: RemoveProfileFromIndexSetBody) => Promise<ProfileChangeResponse>;
+  isLoading: boolean;
+} => {
   const queryClient = useQueryClient();
 
   const put = useMutation({
@@ -46,10 +55,12 @@ const useRemoveProfileFromIndexMutation = () => {
       );
     },
 
-    onSuccess: () => {
-      UserNotification.success('Removed profile from index successfully', 'Success!');
+    onSuccess: (response) => {
+      if (resultsWithProblems(response).length === 0) {
+        UserNotification.success('Removed profile from index successfully', 'Success!');
+      }
 
-      return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' });
+      return refetchAfterProfileChange(queryClient);
     },
   });
 
