@@ -69,5 +69,6 @@ describe('<TelemetryInit>', () => {
 
     expect(result.current.__loaded).toBeTruthy();
     expect(result.current.config.strict_script_versioning).toBe(true);
+    expect(result.current.config.persistence).toBe('localStorage+cookie');
   });
 });

@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Update kinesis-client to 3.5.3 to fix a leak in the discovery thread pool shutdown."
+
+pulls = ["27637"]
