@@ -20,7 +20,9 @@ import { styled } from 'styled-components';
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import { IconButton, Link } from 'components/common';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import Routes from 'routing/Routes';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const Container = styled.div`
   display: flex;
@@ -28,7 +30,11 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const IndexSetProfile = () => {
+type Props = {
+  indexSet: IndexSet;
+};
+
+const IndexSetProfile = ({ indexSet }: Props) => {
   const { name, id, description } = useIndexProfileWithMappingsByField();
   const [showSetModal, setShowSetModal] = useState(false);
   const toggleModal = () => setShowSetModal((cur) => !cur);
@@ -45,7 +51,14 @@ const IndexSetProfile = () => {
         <i>Not set</i>
       )}
       <IconButton name="edit_square" onClick={toggleModal} title="Set field type profile" />
-      {showSetModal && <SetProfileModal show={showSetModal} onClose={toggleModal} currentProfile={id} />}
+      {showSetModal && (
+        <SetProfileModal
+          show={showSetModal}
+          onClose={toggleModal}
+          currentProfile={id}
+          indexSets={[{ ...indexSet, can_have_profile: isIndexFieldTypeChangeAllowed(indexSet) }]}
+        />
+      )}
     </Container>
   );
 };

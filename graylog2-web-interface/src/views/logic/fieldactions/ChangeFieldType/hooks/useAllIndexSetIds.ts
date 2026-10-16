@@ -16,27 +16,23 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemIndexSetsTypes } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type SimpleIndexSet = { id: string; type: string };
 type IndexSetsState = Array<SimpleIndexSet>;
 const INITIAL_DATA: IndexSetsState = [];
 
-const url = qualifyUrl('system/indices/index_sets/types/index_sets_with_field_type_change_support');
-
 const fetchAllIndexSetIds = async (streams: Array<string>): Promise<IndexSetsState> =>
-  fetch<Array<{ index_set_id: string; type: string }>>('POST', url, streams?.length ? streams : undefined).then(
-    (elements) => {
-      const list: Array<SimpleIndexSet> = elements.map((element) => ({
-        id: element.index_set_id,
-        type: element.type,
-      }));
+  SystemIndexSetsTypes.indexSetsWithFieldTypeChangeSupport(streams?.length ? streams : undefined).then((elements) => {
+    const list: Array<SimpleIndexSet> = elements.map((element) => ({
+      id: element.index_set_id,
+      type: element.type,
+    }));
 
-      return list;
-    },
-  );
+    return list;
+  });
 
 const useAllIndexSetIds = (
   streams: Array<string>,

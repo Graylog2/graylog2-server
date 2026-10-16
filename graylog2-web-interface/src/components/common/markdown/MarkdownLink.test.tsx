@@ -58,6 +58,30 @@ describe('MarkdownLink', () => {
     expect(onClick).toHaveBeenCalledWith({ openSidebar });
   });
 
+  it('renders the title a resolver provides for a routed entity', () => {
+    asMock(usePluginEntities).mockImplementation((key) =>
+      key === 'markdown.entityLinkResolvers'
+        ? [
+            {
+              uriSegment: 'streams',
+              resolve: ([id]) => ({
+                grnType: 'stream',
+                id,
+                Title: ({ id: streamId }) => <>Title of {streamId}</>,
+              }),
+            },
+          ]
+        : [],
+    );
+
+    render(<MarkdownLink href="graylog:///streams/5f4dcc3b5aa765d61d8327de">5f4dcc3b5aa765d61d8327de</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: 'Title of 5f4dcc3b5aa765d61d8327de' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/streams/5f4dcc3b5aa765d61d8327de/search'),
+    );
+  });
+
   it('keeps the href for a link no resolver claims', () => {
     render(<MarkdownLink href="https://graylog.org">Docs</MarkdownLink>);
 
