@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+
 /**
  * Rotates index sets whose write index maps a date field numerically.
  * <p>
@@ -141,7 +143,7 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
         int incomplete = 0;
 
         for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
-            if (!indexSetConfig.isWritable()) {
+            if (!indexSetConfig.isWritable() || isImmuneByConstruction(indexSetConfig)) {
                 continue;
             }
             try {
@@ -167,6 +169,19 @@ public class V20261014120000_RotateIndexSetsWithNumericDateFields extends Migrat
         }
 
         clusterConfigService.write(new MigrationCompleted(rotated));
+    }
+
+    /**
+     * Whether this index set cannot have been affected, whatever its indices look like.
+     * <p>
+     * Events are built with {@code objectMapper.convertValue} in {@code EventImpl#toElasticSearchObject}, so what
+     * reaches the storage client is already plain JSON and never carried a live date object for the faulty
+     * serialization to get wrong. Looking at those index sets could therefore only produce false positives.
+     * <p>
+     * Failures are not in this group: they embed the failed message's own field map, live values and all.
+     */
+    private boolean isImmuneByConstruction(IndexSetConfig indexSetConfig) {
+        return indexSetConfig.indexTemplateType().map(EVENT_TEMPLATE_TYPE::equals).orElse(false);
     }
 
     private Outcome rotateIfAffected(IndexSetConfig indexSetConfig) throws Exception {

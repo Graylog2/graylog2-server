@@ -165,11 +165,14 @@ public class NumericDateFieldDetector {
                 dataPeriodRead = true;
             }
             if (dataPeriod == null) {
-                // Not knowing when the index was written is not the same as knowing the field is fine. Failing here
-                // keeps the migration eligible to try again rather than marking the index set as done.
-                throw new IllegalStateException(f(
-                        "Could not determine the period covered by index <%s>, so field <%s> cannot be judged",
-                        writeIndex, field.fieldName()));
+                // The index holds no messages. Nothing in it can have been mapped by the faulty serialization,
+                // which needs a document to happen, so whatever type the remaining fields have comes from the
+                // template and was chosen on purpose. There is nothing to repair and nothing to judge them by.
+                // Carries on rather than stopping, so that the fields the two free signals can still settle are not
+                // lost just because they come later in the mapping than one that needed a value check.
+                LOG.debug("Write index <{}> holds no messages, so field <{}> is left alone.",
+                        writeIndex, field.fieldName());
+                continue;
             }
 
             valuesLookLikeTimestamps(writeIndex, field.fieldName(), type, dataPeriod)
@@ -242,13 +245,23 @@ public class NumericDateFieldDetector {
      * read-only, see {@code MongoIndexSet#addDeflectorIndexRange}. The timestamp field is the one thing every
      * message has, so its own range says when the index was written.
      *
-     * @return the period, or {@code null} if the index holds nothing to go by
+     * @return the period, or {@code null} if the index holds no messages at all
+     * @throws IllegalStateException if the index holds messages but no period can be read from them. Not knowing
+     *                               when an index was written is not the same as knowing its fields are fine, so
+     *                               this has to fail rather than pass the index set as done.
      */
     @Nullable
     private NumericDateFieldClassifier.IndexPeriod dataPeriod(String index) {
         final var stats = fieldStats(index, Message.FIELD_TIMESTAMP);
-        if (stats.count() <= 0 || !Double.isFinite(stats.min()) || !Double.isFinite(stats.max())) {
+        if (stats.count() <= 0) {
+            // An empty index. Every index set has one right after a rotation, and a newly created one has nothing
+            // else, so this is normal and not a failure.
             return null;
+        }
+        if (!Double.isFinite(stats.min()) || !Double.isFinite(stats.max())) {
+            throw new IllegalStateException(f(
+                    "Index <%s> holds %d message(s) but no usable timestamp range, so its numeric fields cannot "
+                            + "be judged", index, stats.count()));
         }
         return new NumericDateFieldClassifier.IndexPeriod((long) stats.min(), (long) stats.max());
     }

@@ -130,6 +130,20 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
     }
 
     @Test
+    void neverLooksAtEventIndexSets() {
+        // events are built with objectMapper.convertValue, so they never carried a live date object and cannot be
+        // affected - examining them could only produce false positives
+        when(indexSetConfig.indexTemplateType()).thenReturn(Optional.of("events"));
+
+        migration.upgrade();
+
+        verify(detector, never()).findNumericDateFields(any(), anyString());
+        verify(indexSet, never()).cycle();
+        verify(clusterConfigService).write(any(
+                V20261014120000_RotateIndexSetsWithNumericDateFields.MigrationCompleted.class));
+    }
+
+    @Test
     void rotatesIndexSetsWhoseFieldTypesCannotBeChangedWithoutPinningThem() {
         // Illuminate index sets take their field types from the bundle's template and reject a custom mapping. They
         // are still affected - their rules write dates into fields the template does not map - so rotating is the
@@ -346,6 +360,8 @@ class V20261014120000_RotateIndexSetsWithNumericDateFieldsTest {
         when(config.title()).thenReturn("Default index set");
         when(config.isWritable()).thenReturn(writable);
         when(config.canHaveCustomFieldMappings()).thenReturn(true);
+        // a regular index set, which carries no template type of its own
+        when(config.indexTemplateType()).thenReturn(Optional.empty());
         return config;
     }
 }

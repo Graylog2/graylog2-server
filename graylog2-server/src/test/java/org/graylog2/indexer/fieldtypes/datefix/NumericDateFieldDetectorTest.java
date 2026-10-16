@@ -260,15 +260,39 @@ class NumericDateFieldDetectorTest {
     }
 
     @Test
-    void failsWhenTheIndexPeriodIsUnknown() {
-        // without the period there is nothing to check a value against, and "cannot tell" must not look like "fine"
+    void treatsAnEmptyWriteIndexAsNothingToDo() {
+        // Every index set has an empty write index right after a rotation, and a newly created one has nothing else.
+        // The faulty serialization needs a document to happen, so an empty index cannot hold a mis-mapped field.
         givenIndices(index(WRITE_INDEX, field("event_start", "long")));
         givenFieldStats(Message.FIELD_TIMESTAMP, 0, Double.NaN);
         givenFieldStats("event_start", 10, EPOCH_MILLIS);
 
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX)).isEmpty();
+    }
+
+    @Test
+    void failsWhenAnIndexWithMessagesHasNoUsableTimestampRange() {
+        // without the period there is nothing to check a value against, and "cannot tell" must not look like "fine"
+        givenIndices(index(WRITE_INDEX, field("event_start", "long")));
+        givenFieldStats(Message.FIELD_TIMESTAMP, 10, Double.NaN);
+        givenFieldStats("event_start", 10, EPOCH_MILLIS);
+
         assertThatThrownBy(() -> detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("event_start");
+                .hasMessageContaining(WRITE_INDEX);
+    }
+
+    @Test
+    void keepsTheFindingsOfTheFreeSignalsWhenTheWriteIndexIsEmpty() {
+        // the older index proves event_start was a date; counter is only a guess and cannot be checked without data
+        givenIndices(
+                index(WRITE_INDEX, field("event_start", "long"), field("counter", "long")),
+                index(OLDER_INDEX, field("event_start", "date")));
+        givenFieldStats(Message.FIELD_TIMESTAMP, 0, Double.NaN);
+
+        assertThat(detector.findNumericDateFields(indexSetConfig(), WRITE_INDEX))
+                .extracting(NumericDateFieldDetector.Finding::fieldName)
+                .containsExactly("event_start");
     }
 
     @Test
