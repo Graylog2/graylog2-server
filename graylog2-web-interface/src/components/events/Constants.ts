@@ -143,7 +143,15 @@ export const eventsTableElements = {
     entityTableId: EVENTS_ENTITY_TABLE_ID,
     defaultPageSize: 20,
     defaultSort: { attributeId: 'timestamp', direction: 'desc' } as Sort,
-    defaultDisplayedAttributes: ['timestamp', 'alert', 'priority', 'message', 'event_definition_id'],
+    defaultDisplayedAttributes: [
+      'timestamp',
+      'alert',
+      'priority',
+      'message',
+      'event_definition_id',
+      'key',
+      'event_definition_type',
+    ],
     defaultColumnOrder: [
       'timestamp',
       'alert',
