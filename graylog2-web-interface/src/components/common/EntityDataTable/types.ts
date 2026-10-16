@@ -41,14 +41,12 @@ export type ColumnSchema = {
   | 'slice_sort_default'
 >;
 
-// A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
   renderCell?: (value: unknown, entity: Entity, meta: Meta, additionalInfo?: unknown) => React.ReactNode;
   renderHeader?: (title: string) => React.ReactNode;
   textAlign?: string;
-  minWidth?: number; // px
-  width?: number; // fraction of unassigned table width, similar to CSS unit fr.
-  // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
+  // Width in px, or `matchHeader` to use the rendered header width. A px value smaller than the header width
+  // will be increased to the header width.
   staticWidth?: number | 'matchHeader';
 };
 

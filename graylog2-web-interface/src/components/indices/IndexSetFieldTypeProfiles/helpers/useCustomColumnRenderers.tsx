@@ -28,7 +28,7 @@ const useCustomColumnRenderers = (normalizedIndexSetsTitles: Record<string, stri
           renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
             <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} />
           ),
-          staticWidth: 200,
+          staticWidth: 'matchHeader' as const,
         },
         index_set_ids: {
           renderCell: (indexSetIds: Array<string>) => (

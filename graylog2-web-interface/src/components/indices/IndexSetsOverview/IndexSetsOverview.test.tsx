@@ -772,9 +772,7 @@ describe('IndexSetsOverview', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(
-            Immutable.List(['indexsets:read', `indexsets:edit:${defaultIndexSet.id}`] as Array<Permission>),
-          )
+          .permissions(Immutable.List(['indexsets:read', `indexsets:edit:${defaultIndexSet.id}`] as Array<Permission>))
           .build(),
       );
       render(<IndexSetsOverview />);
