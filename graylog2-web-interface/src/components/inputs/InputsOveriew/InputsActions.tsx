@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import { ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
@@ -47,6 +48,7 @@ const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
 const GL2_SOURCE_INPUT = 'gl2_source_input';
 
 const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) => {
+  const { t } = useTranslation('inputs');
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
@@ -124,7 +126,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
           to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
           <IconButton
             name="search"
-            title="Received messages"
+            title={t('overview.actions.received_messages')}
             bsStyle="default"
             size="xsmall"
             onClick={() => {
@@ -149,7 +151,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
       <MoreActions>
         <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
           <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
-            Edit input
+            {t('edit_input.edit')}
           </MenuItem>
           <HideOnCloud>
             <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
@@ -166,7 +168,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                       app_action_value: 'manage-extractors',
                     });
                   }}>
-                  Manage extractors
+                  {t('overview.sections.manage_extractors')}
                 </MenuItem>
               </LinkContainer>
             </IfPermitted>
@@ -179,7 +181,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                   app_action_value: 'input-diagnosis',
                 });
               }}>
-              Input Diagnosis
+              {t('overview.actions.input_diagnosis')}
             </MenuItem>
           </LinkContainer>
 
@@ -189,7 +191,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                 key={`remove-setup-mode-${input.id}`}
                 onSelect={exitInputSetupMode}
                 disabled={definition === undefined}>
-                Exit Setup mode
+                {t('overview.actions.exit_setup_mode')}
               </MenuItem>
             ) : (
               !isInputRunning(inputStates, input.id) && (
@@ -197,7 +199,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                   key={`setup-mode-${input.id}`}
                   onSelect={enterInputSetupMode}
                   disabled={definition === undefined}>
-                  Enter Setup mode
+                  {t('overview.actions.enter_setup_mode')}
                 </MenuItem>
               )
             ))}
@@ -212,7 +214,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                   app_action_value: 'show-metrics',
                 });
               }}>
-              Show metrics
+              {t('overview.actions.show_metrics')}
             </MenuItem>
           </LinkContainer>
         )}
@@ -223,7 +225,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
             onSelect={() => {
               setShowStaticFieldForm(true);
             }}>
-            Add static field
+            {t('static_fields.add')}
           </MenuItem>
         </IfPermitted>
 
@@ -232,13 +234,17 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
         </IfPermitted>
         <IfPermitted permissions={['inputs:terminate', `input_types:create:${input.type}`]}>
           <DeleteMenuItem key={`delete-input-${input.id}`} onSelect={onDeleteInput}>
-            Delete input
+            {t('overview.actions.delete_input')}
           </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
       {showConfirmDeleteDialog && (
-        <ConfirmDialog title="Deleting Input" show onConfirm={handleConfirmDelete} onCancel={cancelDelete}>
-          Do you really want to delete input {input.title}?
+        <ConfirmDialog
+          title={t('overview.actions.delete_title')}
+          show
+          onConfirm={handleConfirmDelete}
+          onCancel={cancelDelete}>
+          {t('overview.actions.delete_confirm', { title: input.title })}
         </ConfirmDialog>
       )}
       {inputSetupFeatureFlagIsEnabled && showWizard && (
@@ -253,12 +259,12 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
           nodeValue={input.node}
           configFields={definition.requested_configuration as unknown as any}
           description={definition?.description}
-          title={`Editing Input ${input.title}`}
+          title={t('edit_input.editing', { title: input.title })}
           titleValue={input.title}
           typeName={input.type}
           includeTitleField
           handleSubmit={hanleInputUpdate}
-          submitButtonText="Update input"
+          submitButtonText={t('edit_input.update')}
           values={input.attributes}
         />
       )}

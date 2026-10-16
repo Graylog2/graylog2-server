@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useRef, useCallback } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { useMetric } from 'hooks/useMetrics';
@@ -35,6 +36,7 @@ const StyledSpan = styled.span`
 const METRIC_NAME = 'incomingMessages';
 
 const ThroughputCell = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const metricName = prefixMetric(input, METRIC_NAME);
   const { data: metrics, isLoading } = useMetric(metricName);
   const spanRef = useRef();
@@ -66,9 +68,9 @@ const ThroughputCell = ({ input }: Props) => {
   return (
     <StyledSpan
       ref={spanRef}
-      title={`${throughputSectionIsOpen ? 'Hide' : 'Show'} metrics`}
+      title={t(throughputSectionIsOpen ? 'overview.cells.hide_metrics' : 'overview.cells.show_metrics')}
       onClick={toggleTrafficSection}>
-      {!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s
+      {t('overview.cells.throughput', { value: !isNaN(incomingMessages) ? formatCount(incomingMessages) : 0 })}
     </StyledSpan>
   );
 };

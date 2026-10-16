@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import useEntityTitles from 'hooks/useEntityTitles';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const AssociatedStreamsSection = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
   const messagesPerStream = metrics?.messages_per_stream;
 
@@ -40,18 +42,18 @@ const AssociatedStreamsSection = ({ input }: Props) => {
   }
 
   if (isError) {
-    return <p>Could not load associated streams.</p>;
+    return <p>{t('overview.sections.could_not_load_associated_streams')}</p>;
   }
 
   if (!messagesPerStream || streamIds.length === 0) {
-    return <p>No streams are associated with this input in the last 24 hours.</p>;
+    return <p>{t('overview.sections.no_associated_streams')}</p>;
   }
 
   return (
     <ListGroup componentClass="ul">
       {streamIds.map((streamId) => {
         const title = titlesById[streamId];
-        const label = title ?? (areTitlesLoading ? streamId : `${streamId} (deleted)`);
+        const label = title ?? (areTitlesLoading ? streamId : t('overview.sections.deleted_stream', { streamId }));
 
         return (
           <ListGroupItem key={streamId}>

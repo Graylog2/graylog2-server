@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 import { Icon } from 'components/common';
@@ -60,26 +61,30 @@ type Props = {
   readBytesTotal: number;
 };
 
-const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }: Props) => (
-  <InputIO>
-    <span className="persec">
-      <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
-      <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
+const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }: Props) => {
+  const { t } = useTranslation('inputs');
 
-      <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
-      <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
-    </span>
+  return (
+    <InputIO>
+      <span className="persec">
+        <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
+        <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
-    <span className="total">
-      <span> (total: </span>
-      <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
-      <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
+        <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
+        <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
+      </span>
 
-      <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
-      <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
-      <span>)</span>
-    </span>
-  </InputIO>
-);
+      <span className="total">
+        <span>{t('diagnosis.network_stats.total_prefix')}</span>
+        <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
+        <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
+
+        <Icon name="arrow_drop_up" className="channel-direction channel-direction-up" />
+        <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
+        <span>{t('diagnosis.network_stats.total_suffix')}</span>
+      </span>
+    </InputIO>
+  );
+};
 
 export default NetworkStats;

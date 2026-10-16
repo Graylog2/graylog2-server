@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Input } from 'components/messageloaders/Types';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
@@ -25,7 +26,7 @@ import MessagesPerStreamSection from 'components/inputs/InputsOveriew/expanded-s
 import ExtractorsSection from 'components/inputs/InputsOveriew/expanded-sections/ExtractorsSection';
 import ExtractorsSectionActions from 'components/inputs/InputsOveriew/expanded-sections/ExtractorsSectionActions';
 import AssociatedStreamsSection from 'components/inputs/InputsOveriew/expanded-sections/AssociatedStreamsSection';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/inputs/InputsOveriew/metricColumns';
+import { METRIC_COLUMN_IDS, getMetricColumnTitle } from 'components/inputs/InputsOveriew/metricColumns';
 
 const useTableElements = ({
   inputTypeDescriptions,
@@ -34,6 +35,7 @@ const useTableElements = ({
   inputTypes: InputTypesSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
 }) => {
+  const { t } = useTranslation('inputs');
   const entityActions = useCallback(
     (listItem: Input) => (
       <InputsActions input={listItem} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} />
@@ -51,29 +53,28 @@ const useTableElements = ({
   const expandedSections = useMemo(
     () => ({
       configuration: {
-        title: 'Configuration',
+        title: t('overview.columns.configuration'),
         content: renderExpandedConfigurationDetails,
       },
       [METRIC_COLUMN_IDS.messagesPerStream]: {
-        title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream],
+        title: getMetricColumnTitle(METRIC_COLUMN_IDS.messagesPerStream),
         content: (input: InputSummary) => <MessagesPerStreamSection input={input} />,
       },
       [METRIC_COLUMN_IDS.extractorCount]: {
-        title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount],
+        title: getMetricColumnTitle(METRIC_COLUMN_IDS.extractorCount),
         content: (input: InputSummary) => <ExtractorsSection input={input} />,
         actions: (input: InputSummary) => <ExtractorsSectionActions input={input} />,
       },
       [METRIC_COLUMN_IDS.associatedStreams]: {
-        title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams],
+        title: getMetricColumnTitle(METRIC_COLUMN_IDS.associatedStreams),
         content: (input: InputSummary) => <AssociatedStreamsSection input={input} />,
       },
     }),
-    [renderExpandedConfigurationDetails],
+    [renderExpandedConfigurationDetails, t],
   );
 
   return {
     entityActions,
-    bulkActions: <>bulk</>,
     expandedSections,
   };
 };

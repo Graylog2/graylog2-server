@@ -20,6 +20,7 @@ import { SystemInputs } from '@graylog/server-api';
 
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 import { onError } from 'util/conditional/onError';
 
 export const INPUT_REFERENCES = 'streams_by_index_set_id';
@@ -53,7 +54,9 @@ const useInputReferences = (
     queryFn: () =>
       onError(fetchInputReferences(inputId), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
-          UserNotification.error(`Loading input references failed with: ${errorThrown}`);
+          UserNotification.error(
+            i18n.t('setup_wizard.load_input_references_failed', { ns: 'inputs', error: errorThrown }),
+          );
         }
       }),
 

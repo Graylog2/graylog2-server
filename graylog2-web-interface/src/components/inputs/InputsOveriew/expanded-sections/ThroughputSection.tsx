@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import { Spinner } from 'components/common';
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const ThroughputSection = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const metricNames = getMetricNamesForInput(input);
   const { data: metrics, isLoading } = useMetrics(metricNames);
   const [showDetails, setShowDetails] = useState(false);
@@ -60,7 +62,7 @@ const ThroughputSection = ({ input }: Props) => {
 
   return (
     <span>
-      {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>No metrics available for this input</i>}
+      {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>{t('overview.sections.no_input_metrics')}</i>}
       {!isNaN(writtenBytes1Sec) && (
         <NetworkIOStats
           readBytes1Sec={readBytes1Sec}
@@ -75,13 +77,13 @@ const ThroughputSection = ({ input }: Props) => {
       )}
       {!isNaN(emptyMessages) && (
         <span>
-          Empty messages discarded: {formatCount(emptyMessages)}
+          {t('overview.sections.empty_messages_discarded', { value: formatCount(emptyMessages) })}
           <br />
         </span>
       )}
       {!isNaN(writtenBytes1Sec) && input.global && (
         <Button bsStyle="link" onClick={toggleShowDetails}>
-          {showDetails ? 'Hide' : 'Show'} details
+          {showDetails ? t('overview.sections.hide_details') : t('overview.sections.show_details')}
         </Button>
       )}
       <br />

@@ -124,7 +124,7 @@ const CreateInputControl = () => {
         inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()),
       );
     } else {
-      options.push({ value: 'none', label: 'No inputs available', disabled: true });
+      options.push({ value: 'none', label: t('create_input.no_inputs_available'), disabled: true });
     }
 
     return options;

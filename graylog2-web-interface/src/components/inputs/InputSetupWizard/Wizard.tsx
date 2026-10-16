@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import { Modal } from 'components/bootstrap';
 import { Wizard as CommonWizard } from 'components/common';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const Wizard = ({ show, input, onClose }: Props) => {
+  const { t } = useTranslation('inputs');
   const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, setWizardData, wizardData } = useInputSetupWizard();
   const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(
     (plugin) => !!plugin.EnterpriseInputSetupWizard,
@@ -48,24 +50,24 @@ const Wizard = ({ show, input, onClose }: Props) => {
     () => ({
       [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
         key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
-        title: <>Routing</>,
+        title: <>{t('setup_wizard.steps.routing')}</>,
         component: <SetupRoutingStep />,
         disabled: true,
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
-        title: <>Launch</>,
+        title: <>{t('setup_wizard.steps.launch')}</>,
         component: <StartInputStep />,
         disabled: true,
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-        title: <>Diagnosis</>,
+        title: <>{t('setup_wizard.steps.diagnosis')}</>,
         component: <InputDiagnosisStep onClose={() => onClose()} />,
         disabled: true,
       },
     }),
-    [onClose],
+    [onClose, t],
   );
 
   const setInitialSteps = useCallback(() => {
@@ -86,7 +88,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
 
   return (
     <Modal show onHide={onClose}>
-      <Modal.Header>Input Setup Wizard</Modal.Header>
+      <Modal.Header>{t('setup_wizard.title')}</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>
           {EnterpriseWizard ? (

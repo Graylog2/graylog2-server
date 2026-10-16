@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useInputStateSummary from 'hooks/useInputStateSummary';
 import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const InputsDotBadge = ({ text, hasExternalIssues = false, externalIssuesTitle = '' }: Props) => {
+  const { t } = useTranslation('inputs');
   const { hasProblematicInputs, isLoading } = useInputStateSummary();
 
   if (isLoading) {
@@ -33,7 +35,7 @@ const InputsDotBadge = ({ text, hasExternalIssues = false, externalIssuesTitle =
   }
 
   const showDot = hasProblematicInputs || hasExternalIssues;
-  const title = hasProblematicInputs ? 'Some inputs are in failed state or in setup mode.' : externalIssuesTitle;
+  const title = hasProblematicInputs ? t('dot_badge.problematic_inputs') : externalIssuesTitle;
 
   return <MenuItemDotBadge text={text} title={title} showDot={showDot} />;
 };

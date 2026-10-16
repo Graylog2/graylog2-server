@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Attribute, Sort } from 'stores/PaginationTypes';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/inputs/InputsOveriew/metricColumns';
+import i18n from 'i18n';
+import { METRIC_COLUMN_IDS, getMetricColumnTitle } from 'components/inputs/InputsOveriew/metricColumns';
 
 const getInputsTableElements = () => {
   const tableLayout = {
@@ -50,22 +51,22 @@ const getInputsTableElements = () => {
   };
 
   const additionalAttributes: Array<Attribute> = [
-    { id: 'traffic', title: 'Traffic Last Minute' },
-    { id: 'input_failures', title: 'Input Failures' },
-    { id: 'address', title: 'Address' },
-    { id: 'port', title: 'Port', type: 'INT' },
+    { id: 'traffic', title: i18n.t('overview.columns.traffic', { ns: 'inputs' }) },
+    { id: 'input_failures', title: i18n.t('overview.columns.input_failures', { ns: 'inputs' }) },
+    { id: 'address', title: i18n.t('overview.columns.address', { ns: 'inputs' }) },
+    { id: 'port', title: i18n.t('overview.columns.port', { ns: 'inputs' }), type: 'INT' },
     {
       id: METRIC_COLUMN_IDS.messagesPerStream,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.messagesPerStream),
     },
     {
       id: METRIC_COLUMN_IDS.extractorCount,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.extractorCount),
       type: 'INT',
     },
     {
       id: METRIC_COLUMN_IDS.associatedStreams,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.associatedStreams),
     },
   ];
 

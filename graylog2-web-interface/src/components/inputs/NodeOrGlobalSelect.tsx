@@ -86,7 +86,7 @@ const NodeOrGlobalSelect = ({ global = false, node = undefined, onChange }: Prop
       id="node-select"
       type="select"
       label={t('node_select.node')}
-      placeholder="placeholder"
+      placeholder={t('node_select.select_node')}
       value={node}
       help={t('node_select.node_help')}
       onChange={_onChangeNode}

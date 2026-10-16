@@ -3,7 +3,8 @@
     "select_input": "Input auswählen",
     "launch_new": "Neuen Input starten",
     "launch_new_type": "Neuen <type>{{type}}</type>-Input starten",
-    "launch": "Input starten"
+    "launch": "Input starten",
+    "no_inputs_available": "Keine Inputs verfügbar"
   },
   "edit_input": {
     "edit": "Input bearbeiten",
@@ -12,7 +13,9 @@
   },
   "input_dropdown": {
     "label": "Server-Input-Auswahl",
-    "select": "Input auswählen"
+    "select": "Input auswählen",
+    "unknown_type": "Unbekannter Input-Typ",
+    "option": "{{title}} ({{type}})"
   },
   "input_states": {
     "title": "Input-Status von {{title}}",
@@ -86,5 +89,308 @@
     "node_inputs_hint": "Sie können Inputs in Ihrem Cluster <inputsLink>hier</inputsLink> starten und beenden.",
     "local_inputs": "Lokale Inputs",
     "global_inputs": "Globale Inputs"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "Dieses Input lauscht auf:",
+      "listening_on": "Beachten Sie, dass die Bind-Adresse auf den {{productName}}-Dienst verweisen muss. Beachten Sie, dass der gewählte Port auf jedem Knoten frei von Konflikten mit anderen Inputs sein muss. Denken Sie daran, dass ein lokales Input auf einem einzelnen Knoten mit einem globalen Input, das auf allen Knoten läuft, in Konflikt geraten kann, wodurch das Input auf diesem Knoten fehlschlägt.",
+      "listening_for_title": "Dieses Input erwartet:",
+      "listening_for": "Beachten Sie, dass UDP-Traffic an ein TCP-Input oder TCP-Traffic an ein UDP-Input als Netzwerk-I/O angezeigt wird, aber keine Nachrichten empfangen werden.",
+      "empty_messages_discarded_title": "Verworfene leere Nachrichten:",
+      "empty_messages_discarded": "Nachrichten mit einer Payload-Länge von 0 werden vom Input verworfen.",
+      "network_io_title": "Netzwerk-I/O:",
+      "network_io": "Beachten Sie, dass dieser Wert verwendet werden kann, um Verbindungsversuche und ungültigen Traffic zu einem Input zu erkennen.",
+      "input_state": "Ein Input im Zustand „Running“ ist bereit, Nachrichten zu empfangen. Ein Input im Zustand „Failed“ oder „Failing“ hat ein Problem festgestellt; klicken Sie auf die Schaltfläche unten, um die zugehörige Fehlermeldung anzuzeigen.",
+      "message_error_at_input_title": "Nachrichtenfehler im Input:",
+      "message_error_at_input": "Jeder Input-Typ erwartet Nachrichten in einem bestimmten Format. Nachrichten, die dieses Format verletzen, können vom Input abgelehnt werden und werden dann nicht weiterverarbeitet. Prüfen Sie in diesen Fällen die gesendeten Nachrichten. Ausführlichere Fehlermeldungen finden Sie in der Datei server.log von {{productName}}.",
+      "message_failed_to_process_title": "Verarbeitung der Nachricht fehlgeschlagen:",
+      "message_failed_to_process": "Mit Extractors und Pipelines können Nachrichten verarbeitet werden, z. B. um Felder herauszulösen. Eine Pipeline-Regel, die eine unsinnige Operation ausführt oder die Eigenschaften eines Feldes so ändert, dass sie mit dem Datentyp oder der Längenbegrenzung dieses Feldes in Konflikt stehen, kann bei der Verarbeitung fehlschlagen. Solche Nachrichten können im Stream „Processing and Indexing Failures“ geprüft werden.",
+      "message_failed_to_index_title": "Nachrichtenfehler:",
+      "message_failed_to_index": "Im Such-Cluster kann eine Nachricht nur in einem Index gespeichert werden, wenn sie dem Schema dieses Index entspricht. Jedes Feld in OpenSearch hat einen Feldtyp und eine Zeichenbegrenzung; wird eines davon überschritten, kann die Nachricht nicht indiziert werden. Solche Nachrichten können im Stream „Processing and Indexing Failures“ geprüft werden.",
+      "received_message_count_by_stream": "Diese Ansicht zeigt, wohin Stream- und Pipeline-Regeln die Nachrichten dieses Inputs leiten. Eine Nachricht kann in mehrere Streams dupliziert werden; wird sie dadurch in mehr als einem Index gespeichert, kann sich auch der Lizenzverbrauch vervielfachen. Diese Ansicht hilft, solche Duplikate zu erkennen."
+    },
+    "node": {
+      "node_id": "Knoten-ID:",
+      "message": "Nachricht:",
+      "last_failed": "Zuletzt fehlgeschlagen:",
+      "state_label": "{{state}}:",
+      "state_nodes": "{{count}}/{{total}} Knoten",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "Informationen",
+      "description": "Die Adresse, unter der das Input läuft.",
+      "input_title": "Input-Titel:",
+      "input_type": "Input-Typ:",
+      "running_on": "Dieses Input läuft auf:",
+      "all_nodes": "allen {{productName}}-Knoten",
+      "listening_on": "Dieses Input lauscht auf:",
+      "listening_on_value": "Bind-Adresse {{bindAddress}}, Port {{port}}.",
+      "listening_for": "Dieses Input erwartet:"
+    },
+    "state": {
+      "title": "Zustand",
+      "description": "Anzahl der {{productName}}-Knoten, auf denen das Input laufen soll, und auf wie vielen es läuft. Wenn es auf einigen nicht läuft, klicken Sie, um die zugehörigen Fehlermeldungen anzuzeigen.",
+      "failed_starts": "Fehlgeschlagene Starts (letzte 15 Min.):",
+      "not_running": "Das Input läuft nicht."
+    },
+    "troubleshooting": {
+      "title": "Fehlerbehebung",
+      "failed_title": "Wenn das Input fehlgeschlagen ist.",
+      "failed_message_field": "Wenn ein Input auf einem oder mehreren {{productName}}-Knoten fehlschlägt, zeigt das Feld „Nachricht“ im Bereich „Zustand“ eine kurze Fehlermeldung; die vollständige Fehlermeldung finden Sie in der Datei server.log von {{productName}}.",
+      "failed_port": "Ein Input mit einem festgelegten Port schlägt fehl, wenn dieser Port privilegiert ist (und {{productName}} nicht als root läuft) oder bereits von einem anderen Input oder einer anderen Anwendung verwendet wird.",
+      "failed_route": "Ein Input schlägt fehl, wenn es die angegebene IP nicht erreichen kann.",
+      "failed_internet": "Ein Input, das eine Internetverbindung benötigt, um sich mit einer API zu verbinden, schlägt fehl, wenn keine Internetverbindung besteht oder die API nicht erreichbar ist.",
+      "failed_certificate": "Ein TCP-Input schlägt fehl, wenn es ein ungültiges oder abgelaufenes Zertifikat hat.",
+      "failed_external_api": "Inputs, die sich mit einer externen API verbinden (zum Beispiel das Microsoft Azure Input), erfordern Konfigurationsänderungen an der Quelle, damit {{productName}} Logs sammeln kann. Die nötigen Schritte sind auf der entsprechenden Dokumentationsseite des Inputs beschrieben. Ein Input, das sich mit einer externen API verbindet, schlägt fehl, wenn es auf der Seite von {{productName}} oder (falls zutreffend) auf der Seite der API falsch konfiguriert ist.",
+      "no_messages_title": "Wenn das Input auf allen Knoten läuft, aber keine Nachrichten beim Input ankommen.",
+      "no_messages_network_io": "Prüfen Sie das Feld „Netzwerk-I/O“ im Bereich „Empfangener Traffic“. Wird dort kein Traffic angezeigt, deutet das auf ein Verbindungsproblem hin.",
+      "no_messages_connectivity": "Wenn kein Traffic angezeigt wird, prüfen Sie zuerst die Netzwerkverbindung zwischen den {{productName}}-Servern und der Log-Quelle, z. B. mit ping, telnet oder tracert.",
+      "no_messages_external_api": "Prüfen Sie bei Inputs, die sich mit einer externen API verbinden, die Datei server.log von {{productName}}. Authentifizierungsfehler (ungültige Anmeldungen oder fehlende Berechtigungen für die Aktion in der API) werden dort vollständig protokolliert.",
+      "no_messages_format": "Wenn im Feld „Netzwerk-I/O“ im Bereich „Empfangener Traffic“ Traffic angezeigt wird, aber keine Nachrichten empfangen wurden, werden die Nachrichten vermutlich nicht in einem für das Input passenden Format gesendet.",
+      "no_messages_protocol": "Ein TCP-Input kann keinen UDP-Traffic lesen und umgekehrt.",
+      "no_messages_empty": "Eine Nachricht ohne Inhalt wird verworfen. Das lässt sich über das Feld „Verworfene leere Nachrichten“ überwachen.",
+      "no_messages_listener": "Listener-Inputs erwarten Nachrichten in wenigen Formaten und können Nachrichten in anderen Formaten möglicherweise nicht lesen. Zur Fehlersuche hat das Raw Text Input die geringsten Anforderungen.",
+      "message_errors_title": "Wenn das Input auf allen Knoten läuft und Nachrichten beim Input ankommen, aber einige (oder alle) als Nachrichtenfehler angezeigt werden.",
+      "message_errors_failure_processing": "In lizenzierten Enterprise-Clustern kann die Fehlerverarbeitung aktiviert werden, um Nachrichten zu speichern, die in einer der Stufen fehlschlagen – Input, Verarbeitung und Schreiben in den Such-Cluster – zusammen mit Details zum Fehler (siehe die Felder failure_cause und failure_details). Öffnen Sie den Bereich „Nachrichtenfehler“ und klicken Sie auf die Anzahl der Nachrichten, um einzelne fehlgeschlagene Nachrichten zu untersuchen."
+    },
+    "received_traffic": {
+      "title": "Empfangener Traffic",
+      "description": "Nachrichten und Netzwerk-Traffic, die das Input erreicht haben. Hinweis: Die Metriken zeigen nur die letzten 15 Minuten.",
+      "total_messages": "Vom Input empfangene Nachrichten insgesamt:",
+      "events": "{{count}} Events",
+      "empty_messages": "Verworfene leere Nachrichten:",
+      "active_connections": "Aktive Verbindungen:",
+      "connections_value": "{{open}}  ({{total}} insgesamt)",
+      "network_io": "Netzwerk-I/O:"
+    },
+    "message_count_by_stream": {
+      "title": "Empfangene Nachrichten pro Stream",
+      "description": "Nachrichten, die in den letzten 15 Minuten erfolgreich von diesem Input aufgenommen wurden. Klicken Sie auf den Stream, um die Nachrichten anzusehen.",
+      "stream": "{{streamName}}:",
+      "none": "In den letzten 15 Minuten wurden keine Nachrichten dieses Inputs in Streams geleitet."
+    },
+    "message_errors": {
+      "title": "Nachrichtenfehler",
+      "description": "Nachrichten können im Input, in der Verarbeitungs-Pipeline oder bei der Indizierung im Such-Cluster fehlschlagen.",
+      "at_input": "Nachrichtenfehler im Input:",
+      "failed_to_process": "Verarbeitung der Nachricht fehlgeschlagen:",
+      "failed_to_index": "Indizierung der Nachricht fehlgeschlagen:"
+    },
+    "rules": {
+      "pipeline_rules_title": "Input kommt in Pipeline-Regeln vor",
+      "pipeline_rules_description": "Die unten aufgeführten Pipeline-Regeln verweisen explizit auf dieses Input (z. B. über from_input, from_forwarder_input oder einen Abgleich auf gl2_source_input/gl2_forwarder_input).",
+      "pipeline_rules_human_name": "Pipeline-Regeln",
+      "pipeline_rules_search": "Nach Pipeline-Regel suchen",
+      "stream_rules_title": "Input kommt in Stream-Regeln vor",
+      "stream_rules_description": "Die unten aufgeführten Stream-Regeln enthalten eine „match input“-Funktion, die explizit dieses Input betrifft. Stream-Regeln, die Nachrichten dieses Inputs ohne die „match input“-Funktion erfassen, werden nicht aufgeführt.",
+      "stream_rules_human_name": "Stream-Regeln",
+      "stream_rules_search": "Nach Stream-Regel suchen",
+      "load_pipeline_rules_failed": "Laden der Pipeline-Regeln des Inputs fehlgeschlagen mit Status",
+      "could_not_load_pipeline_rules": "Pipeline-Regeln des Inputs konnten nicht geladen werden",
+      "load_stream_rules_failed": "Laden der Stream-Regeln des Inputs fehlgeschlagen mit Status",
+      "could_not_load_stream_rules": "Stream-Regeln des Inputs konnten nicht geladen werden"
+    },
+    "network_stats": {
+      "total_prefix": " (gesamt: ",
+      "total_suffix": ")"
+    },
+    "show_received_messages": "Empfangene Nachrichten anzeigen",
+    "fetch_failed": "Abrufen der Input-Diagnose fehlgeschlagen mit Status",
+    "could_not_fetch": "Input-Diagnose konnte nicht abgerufen werden"
+  },
+  "setup_wizard": {
+    "title": "Input-Einrichtungsassistent",
+    "back": "Zurück",
+    "finish": "Fertigstellen",
+    "steps": {
+      "routing": "Routing",
+      "launch": "Starten",
+      "diagnosis": "Diagnose"
+    },
+    "diagnosis_step": {
+      "description": "Testen Sie Inputs und das Parsing, ohne Daten in den Such-Cluster zu schreiben.",
+      "go_to_diagnosis": "Zur Input-Diagnose"
+    },
+    "load_streams_failed": "Laden der Streams fehlgeschlagen: {{error}}",
+    "load_input_references_failed": "Laden der Input-Referenzen fehlgeschlagen: {{error}}",
+    "load_streams_by_index_set_failed": "Laden der Streams nach Index-Set fehlgeschlagen: {{error}}",
+    "routing": {
+      "connected_pipelines_title": "Mit dem Ziel-Stream verbundene Pipelines",
+      "connected_pipelines": "Wir empfehlen, deren Auswirkungen zu prüfen, bevor Sie die Input-Einrichtung abschließen. Mit dem Ziel-Stream sind folgende Pipelines verbunden:",
+      "select_destination": "Wählen Sie einen Ziel-Stream, an den die Nachrichten dieses Inputs geleitet werden.",
+      "recommend_new_stream": "<strong>Wir empfehlen, für jedes neue Input einen neuen Stream zu erstellen.</strong> Das hilft, Ihre Nachrichten in ein einfaches Schema einzuordnen.",
+      "default_stream_fallback": "Nachrichten, die an keinen Stream geleitet werden, landen im <strong>Default Stream</strong>.",
+      "pipeline_rules_info": "Dieser Assistent kann Pipeline-Regeln automatisch erstellen und mit dem <strong>Default Stream</strong> verbinden. Diese Regeln werden in der vom System verwalteten Default Routing Pipeline abgelegt und automatisch umbenannt (oder gelöscht), damit sie den Zustand dieses Inputs korrekt widerspiegeln.",
+      "new_stream_heading": "An einen neuen Stream leiten",
+      "recommended": "Empfohlen!",
+      "create_stream": "Stream erstellen",
+      "existing_stream_heading": "An einen bestehenden Stream leiten",
+      "select_stream": "Stream auswählen",
+      "create_new_stream": "Neuen Stream erstellen",
+      "choose_existing_stream": "Bestehenden Stream wählen",
+      "existing_stream_selected": "Die Nachrichten dieses Inputs werden an einen bestehenden Stream geleitet.",
+      "pipeline_rules_created": "Pipeline-Regeln werden erstellt, wenn Sie auf <strong>Input starten</strong> klicken.",
+      "default_stream": "Default Stream",
+      "remove_from_default": "Treffer aus dem ‚Default Stream‘ entfernen",
+      "remove_from_default_help": "Nachrichten, die diesem Stream entsprechen, nicht dem ‚Default Stream‘ zuweisen."
+    },
+    "start": {
+      "description": "Richten Sie das Input gemäß der vorgenommenen Konfiguration ein und starten Sie es.",
+      "rolling_back": "Input wird zurückgesetzt...",
+      "setting_up": "Input wird eingerichtet...",
+      "not_ready": "Ihr Input kann noch nicht eingerichtet werden. Bitte schließen Sie zuerst die vorherigen Schritte ab.",
+      "start_input": "Input starten",
+      "rollback_input": "Input zurücksetzen",
+      "launch_diagnosis": "Input-Diagnose öffnen"
+    },
+    "progress": {
+      "details": "Details:",
+      "loading": {
+        "create_stream": "Stream wird erstellt...",
+        "create_stream_named": "Stream \"{{name}}\" wird erstellt...",
+        "start_stream": "Stream wird gestartet...",
+        "start_stream_named": "Stream \"{{name}}\" wird gestartet...",
+        "create_pipeline": "Pipeline wird erstellt...",
+        "create_pipeline_named": "Pipeline \"{{name}}\" wird erstellt...",
+        "setup_routing": "Routing wird eingerichtet...",
+        "delete_stream": "Stream wird gelöscht...",
+        "delete_stream_named": "Stream \"{{name}}\" wird gelöscht...",
+        "delete_pipeline": "Pipeline wird gelöscht...",
+        "delete_pipeline_named": "Pipeline \"{{name}}\" wird gelöscht...",
+        "delete_routing": "Routing wird entfernt...",
+        "connect_pipeline": "Pipeline wird mit dem Stream verbunden..."
+      },
+      "error": {
+        "create_stream": "Erstellen des Streams fehlgeschlagen!",
+        "create_stream_named": "Erstellen des Streams \"{{name}}\" fehlgeschlagen!",
+        "start_stream": "Starten des Streams fehlgeschlagen!",
+        "start_stream_named": "Starten des Streams \"{{name}}\" fehlgeschlagen!",
+        "create_pipeline": "Erstellen der Pipeline fehlgeschlagen!",
+        "create_pipeline_named": "Erstellen der Pipeline \"{{name}}\" fehlgeschlagen!",
+        "setup_routing": "Einrichten des Routings fehlgeschlagen!",
+        "result": "Das Starten des Inputs ist fehlgeschlagen. Bitte setzen Sie es zurück, um aufzuräumen.",
+        "delete_stream": "Löschen des Streams fehlgeschlagen!",
+        "delete_stream_named": "Löschen des Streams \"{{name}}\" fehlgeschlagen!",
+        "delete_pipeline": "Löschen der Pipeline fehlgeschlagen!",
+        "delete_pipeline_named": "Löschen der Pipeline \"{{name}}\" fehlgeschlagen!",
+        "delete_routing": "Entfernen des Routings fehlgeschlagen!",
+        "connect_pipeline": "Verbinden der Pipeline mit dem Stream fehlgeschlagen!"
+      },
+      "success": {
+        "create_stream": "Stream erstellt!",
+        "create_stream_named": "Stream \"{{name}}\" erstellt!",
+        "start_stream": "Stream gestartet!",
+        "start_stream_named": "Stream \"{{name}}\" gestartet!",
+        "create_pipeline": "Pipeline erstellt!",
+        "create_pipeline_named": "Pipeline \"{{name}}\" erstellt!",
+        "setup_routing": "Routing eingerichtet!",
+        "result": "Input erfolgreich gestartet!",
+        "delete_stream": "Stream gelöscht!",
+        "delete_stream_named": "Stream \"{{name}}\" gelöscht!",
+        "delete_pipeline": "Pipeline gelöscht!",
+        "delete_pipeline_named": "Pipeline \"{{name}}\" gelöscht!",
+        "delete_routing": "Routing entfernt!",
+        "connect_pipeline": "Pipeline erfolgreich mit dem Stream verbunden!"
+      }
+    },
+    "create_stream": {
+      "title": "Titel",
+      "title_help": "Ein aussagekräftiger Name für den neuen Stream",
+      "title_required": "Titel ist erforderlich",
+      "index_set_required": "Index-Set ist erforderlich",
+      "description": "Beschreibung",
+      "description_help": "Welche Art von Nachrichten wird in diesen Stream geleitet?",
+      "create_pipeline": "Eine neue Pipeline für diesen Stream erstellen",
+      "select_index_set": "Index-Set auswählen",
+      "index_set_info": "Nachrichten, die diesem Stream entsprechen, werden in das konfigurierte Index-Set geschrieben. Index-Sets dienen dazu, Daten sinnvoll aufzuteilen und so schnellere Suchen zu ermöglichen.",
+      "index_set_recommendation": "Wir empfehlen, für jeden Input-Typ ein neues Index-Set zu erstellen.",
+      "create_index_set": "Neues Index-Set erstellen"
+    },
+    "input_in_use": {
+      "title": "Input wird bereits verwendet – Risiko doppelter Nachrichten!",
+      "stream_refs": "Dieses Input wird bereits in den Stream-Regeln folgender Streams referenziert:",
+      "pipeline_refs": "Dieses Input wird bereits in den Pipeline-Regeln folgender Pipelines referenziert:",
+      "prevent_duplication": "Entfernen Sie vor dem Fortfahren bestehendes Routing, um mögliche Duplikate zu vermeiden."
+    },
+    "index_set_alert": {
+      "default_title": "Standard-Index-Set ausgewählt",
+      "default_selected": "Sie haben das Standard-Index-Set ausgewählt.",
+      "default_recommendation": "Wir raten davon ab: Da das Standard-Index-Set potenziell Nachrichten in vielen verschiedenen Formaten empfängt (jede Nachricht ohne Routing, über den Default Stream), kann es bei intensiver Nutzung das maximale Feldlimit pro Index des Such-Backends erreichen.",
+      "in_use_title": "Ausgewähltes Index-Set ist bereits einem anderen Stream zugeordnet",
+      "in_use": "Das ausgewählte Index-Set ist bereits einem oder mehreren anderen Streams zugeordnet.",
+      "field_limit": "Beachten Sie, dass jeder Index ein eigenes Feldlimit hat, standardmäßig 1000.",
+      "organise_recommendation": "Daher empfehlen wir, Streams nach Möglichkeit nach Log-Format auf mehrere Index-Sets zu verteilen."
+    }
+  },
+  "overview": {
+    "columns": {
+      "traffic": "Traffic letzte Minute",
+      "input_failures": "Input-Fehler",
+      "address": "Adresse",
+      "port": "Port",
+      "messages_per_stream": "Nachrichtenanzahl (letzte 24 Std.)",
+      "extractor_count": "Extractors",
+      "associated_streams": "Zugeordnete Streams (letzte 24 Std.)",
+      "configuration": "Konfiguration"
+    },
+    "not_available": "k. A.",
+    "show_diagnosis_for": "Input-Diagnose für {{title}} anzeigen",
+    "show_diagnosis_for_capitalized": "Input-Diagnose für {{title}} anzeigen",
+    "cells": {
+      "no_associated_streams": "Keine zugeordneten Streams für Input {{title}} verfügbar",
+      "show_associated_streams": "Zugeordnete Streams für {{title}} einblenden",
+      "hide_associated_streams": "Zugeordnete Streams für {{title}} ausblenden",
+      "no_extractor_count": "Keine Extractor-Anzahl für Input {{title}} verfügbar",
+      "show_extractors": "Extractors für {{title}} einblenden",
+      "hide_extractors": "Extractors für {{title}} ausblenden",
+      "no_message_count": "Keine Nachrichtenanzahl für Input {{title}} verfügbar",
+      "show_messages_per_stream": "Nachrichten pro Stream für {{title}} einblenden",
+      "hide_messages_per_stream": "Nachrichten pro Stream für {{title}} ausblenden",
+      "show_metrics": "Metriken einblenden",
+      "hide_metrics": "Metriken ausblenden",
+      "throughput": "{{value}} Nachr./s"
+    },
+    "sections": {
+      "could_not_load_associated_streams": "Zugeordnete Streams konnten nicht geladen werden.",
+      "no_associated_streams": "Diesem Input waren in den letzten 24 Stunden keine Streams zugeordnet.",
+      "deleted_stream": "{{streamId}} (gelöscht)",
+      "active_connections": "Aktive Verbindungen: <active>{{open}} </active>(<total>{{total}}</total> insgesamt)",
+      "throughput_metrics": "Durchsatz / Metriken",
+      "manage_extractors": "Extractors verwalten",
+      "load_extractors_failed": "Laden der Extractors fehlgeschlagen mit Status",
+      "could_not_load_extractors_title": "Extractors konnten nicht geladen werden",
+      "could_not_load_extractors": "Extractors konnten nicht geladen werden.",
+      "no_extractors": "Für dieses Input sind keine Extractors konfiguriert.",
+      "extractor_title": "Titel",
+      "extractor_type": "Typ",
+      "source_field": "Quellfeld",
+      "target_field": "Zielfeld",
+      "could_not_load_messages_per_stream": "Nachrichten pro Stream konnten nicht geladen werden.",
+      "no_messages_per_stream": "In den letzten 24 Stunden haben keine Streams Nachrichten von diesem Input erhalten.",
+      "stream": "Stream",
+      "messages": "Nachrichten",
+      "network_io": "Netzwerk-IO: ",
+      "total_prefix": " (gesamt: ",
+      "total_suffix": " )",
+      "empty_messages_discarded": "Verworfene leere Nachrichten: {{value}}",
+      "no_node_metrics": "Keine Metriken für diesen Knoten verfügbar",
+      "no_input_metrics": "Keine Metriken für dieses Input verfügbar",
+      "show_details": "Details einblenden",
+      "hide_details": "Details ausblenden"
+    },
+    "actions": {
+      "received_messages": "Empfangene Nachrichten",
+      "input_diagnosis": "Input-Diagnose",
+      "exit_setup_mode": "Setup-Modus verlassen",
+      "enter_setup_mode": "Setup-Modus aktivieren",
+      "show_metrics": "Metriken anzeigen",
+      "delete_input": "Input löschen",
+      "delete_title": "Input löschen",
+      "delete_confirm": "Möchten Sie das Input {{title}} wirklich löschen?"
+    }
+  },
+  "dot_badge": {
+    "problematic_inputs": "Einige Inputs sind fehlgeschlagen oder im Setup-Modus."
   }
 }

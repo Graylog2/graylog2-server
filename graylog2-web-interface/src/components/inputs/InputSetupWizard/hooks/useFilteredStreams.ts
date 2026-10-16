@@ -23,6 +23,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import { onError } from 'util/conditional/onError';
 import type { Stream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 const INITIAL_DATA = {
   total: 0,
@@ -49,7 +50,7 @@ const useStreams = (): {
     queryFn: () =>
       onError(getStreams(), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
-          UserNotification.error(`Loading streams failed with: ${errorThrown}`);
+          UserNotification.error(i18n.t('setup_wizard.load_streams_failed', { ns: 'inputs', error: errorThrown }));
         }
       }),
   });

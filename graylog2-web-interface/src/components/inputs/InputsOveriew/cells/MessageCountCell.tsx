@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { CountBadge, Spinner } from 'components/common';
@@ -31,6 +32,7 @@ const SECTION_NAME = METRIC_COLUMN_IDS.messagesPerStream;
 const sumValues = (counts: Record<string, number>) => Object.values(counts).reduce((sum, value) => sum + value, 0);
 
 const MessageCountCell = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
   const { toggleSection, expandedSections } = useExpandedSections();
 
@@ -39,12 +41,14 @@ const MessageCountCell = ({ input }: Props) => {
   }
 
   if (isError || !metrics?.messages_per_stream) {
-    return <span aria-label={`No message count available for input ${input.title}`}>—</span>;
+    return <span aria-label={t('overview.cells.no_message_count', { title: input.title })}>—</span>;
   }
 
   const total = sumValues(metrics.messages_per_stream);
   const isOpen = expandedSections?.[input.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} messages per stream for ${input.title}`;
+  const title = t(isOpen ? 'overview.cells.hide_messages_per_stream' : 'overview.cells.show_messages_per_stream', {
+    title: input.title,
+  });
 
   return (
     <CountBadge

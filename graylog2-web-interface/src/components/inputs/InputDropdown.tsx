@@ -46,10 +46,11 @@ type InputType = {
 };
 
 const InputOption = ({ input }: { input: InputType }) => {
+  const { t } = useTranslation('inputs');
   const inputTypes = useInputTypes();
-  const inputType = inputTypes?.[input.type] ?? 'Unknown Input Type';
+  const inputType = inputTypes?.[input.type] ?? t('input_dropdown.unknown_type');
 
-  return <option value={input.id}>{`${input.title} (${inputType})`}</option>;
+  return <option value={input.id}>{t('input_dropdown.option', { title: input.title, type: inputType })}</option>;
 };
 
 const _formatInput = (input: InputType) => <InputOption key={input.id} input={input} />;

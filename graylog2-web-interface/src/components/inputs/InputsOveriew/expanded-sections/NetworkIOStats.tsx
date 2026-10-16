@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
@@ -29,28 +30,32 @@ const NetworkIOStats = ({
   writtenBytes1Sec: number;
   readBytesTotal: number;
   writtenBytesTotal: number;
-}) => (
-  <span>
-    <span>Network IO: </span>
+}) => {
+  const { t } = useTranslation('inputs');
+
+  return (
     <span>
-      <Icon name="arrow_drop_down" />
-      <span>{NumberUtils.formatBytes(readBytes1Sec)} </span>
+      <span>{t('overview.sections.network_io')}</span>
+      <span>
+        <Icon name="arrow_drop_down" />
+        <span>{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
-      <Icon name="arrow_drop_up" />
+        <Icon name="arrow_drop_up" />
 
-      <span>{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
+        <span>{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
+      </span>
+
+      <span>
+        <span>{t('overview.sections.total_prefix')}</span>
+        <Icon name="arrow_drop_down" />
+        <span>{NumberUtils.formatBytes(readBytesTotal)} </span>
+
+        <Icon name="arrow_drop_up" />
+        <span>{NumberUtils.formatBytes(writtenBytesTotal)}</span>
+        <span>{t('overview.sections.total_suffix')}</span>
+      </span>
     </span>
-
-    <span>
-      <span> (total: </span>
-      <Icon name="arrow_drop_down" />
-      <span>{NumberUtils.formatBytes(readBytesTotal)} </span>
-
-      <Icon name="arrow_drop_up" />
-      <span>{NumberUtils.formatBytes(writtenBytesTotal)}</span>
-      <span> )</span>
-    </span>
-  </span>
-);
+  );
+};
 
 export default NetworkIOStats;

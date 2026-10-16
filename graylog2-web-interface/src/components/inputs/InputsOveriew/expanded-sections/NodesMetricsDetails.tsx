@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkToNode } from 'components/common';
 import {
@@ -26,6 +27,7 @@ import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Connections, NetworkIOStats } from 'components/inputs/InputsOveriew';
 
 const NodeMetricsDetails = ({ input, metrics }: { metrics: Record<string, any>; input: InputSummary }) => {
+  const { t } = useTranslation('inputs');
   const calculatedMetricsByNode = calculateInputMetricsByNode(input, metrics);
 
   return (
@@ -60,11 +62,11 @@ const NodeMetricsDetails = ({ input, metrics }: { metrics: Record<string, any>; 
             )}
             {!isNaN(emptyMessages) && (
               <span>
-                Empty messages discarded: {formatCount(emptyMessages)}
+                {t('overview.sections.empty_messages_discarded', { value: formatCount(emptyMessages) })}
                 <br />
               </span>
             )}
-            {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>No metrics available for this node</span>}
+            {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>{t('overview.sections.no_node_metrics')}</span>}
           </span>
         );
       })}

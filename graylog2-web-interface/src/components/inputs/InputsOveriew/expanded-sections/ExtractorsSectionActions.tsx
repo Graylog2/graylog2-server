@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Button } from 'components/bootstrap';
@@ -31,16 +32,20 @@ const extractorsLink = (input: InputSummary) =>
     ? Routes.global_input_extractors(input.id)
     : Routes.local_input_extractors(input.node, input.id);
 
-const ExtractorsSectionActions = ({ input }: Props) => (
-  <HideOnCloud>
-    <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
-      <LinkContainer to={extractorsLink(input)}>
-        <Button bsStyle="link" bsSize="xsmall">
-          Manage extractors
-        </Button>
-      </LinkContainer>
-    </IfPermitted>
-  </HideOnCloud>
-);
+const ExtractorsSectionActions = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
+
+  return (
+    <HideOnCloud>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+        <LinkContainer to={extractorsLink(input)}>
+          <Button bsStyle="link" bsSize="xsmall">
+            {t('overview.sections.manage_extractors')}
+          </Button>
+        </LinkContainer>
+      </IfPermitted>
+    </HideOnCloud>
+  );
+};
 
 export default ExtractorsSectionActions;

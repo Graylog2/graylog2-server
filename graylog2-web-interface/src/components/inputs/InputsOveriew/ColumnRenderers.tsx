@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
@@ -44,7 +45,9 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     title: {
       renderCell: (_title: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
-          <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)} title={`show input diagnosis for ${input.title}`}>
+          <Link
+            to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}
+            title={i18n.t('overview.show_diagnosis_for', { ns: 'inputs', title: input.title })}>
             {input.title}
           </Link>
         </ExpandedSectionToggleWrapper>
@@ -94,7 +97,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     address: {
       renderCell: (_address: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
-          {input.attributes?.bind_address || 'N/A'}
+          {input.attributes?.bind_address || i18n.t('overview.not_available', { ns: 'inputs' })}
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 125,
@@ -102,7 +105,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     port: {
       renderCell: (_port: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION} align="right">
-          {input.attributes?.port || 'N/A'}
+          {input.attributes?.port || i18n.t('overview.not_available', { ns: 'inputs' })}
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 'matchHeader',

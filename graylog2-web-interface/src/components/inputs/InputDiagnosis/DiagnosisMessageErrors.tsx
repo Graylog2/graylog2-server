@@ -16,6 +16,7 @@
  */
 import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Section } from 'components/common';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
@@ -23,8 +24,6 @@ import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useProductName from 'brand-customization/useProductName';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
-
-import { DIAGNOSIS_HELP } from './Constants';
 
 type Props = {
   messageErrors: {
@@ -70,6 +69,7 @@ const StyledP = styled.p(
 
 const Component = ({ children }) => children;
 const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
+  const { t } = useTranslation('inputs');
   const productName = useProductName();
   const hasError = Object.keys(messageErrors).some((error) => messageErrors[error] > 0);
   const inputSetupWizards = usePluginEntities('inputSetupWizard');
@@ -84,27 +84,23 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasError ? 'danger' : 'gray'} />}
       headerLeftSection={
         <HelpPopoverButton
-          helpText={`Message Error at Input:
-            ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT(productName)}
+          helpText={`${t('diagnosis.help.message_error_at_input_title')}
+${t('diagnosis.help.message_error_at_input', { productName })}
 
-            Message Failed to Process:
-            ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}
+${t('diagnosis.help.message_failed_to_process_title')}
+${t('diagnosis.help.message_failed_to_process')}
 
-            Message Errors:
-            ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}
-            `}
+${t('diagnosis.help.message_failed_to_index_title')}
+${t('diagnosis.help.message_failed_to_index')}`}
         />
       }
-      title="Message Errors">
-      <StyledP>
-        Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search
-        Cluster.
-      </StyledP>
+      title={t('diagnosis.message_errors.title')}>
+      <StyledP>{t('diagnosis.message_errors.description')}</StyledP>
       <StyledListGroup>
         <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="input" inputId={inputId}>
-              Message Error at Input:
+              {t('diagnosis.message_errors.at_input')}
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_inputs_codecs}
@@ -112,7 +108,7 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="processing" inputId={inputId}>
-              Message failed to process:
+              {t('diagnosis.message_errors.failed_to_process')}
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_processing}
@@ -120,7 +116,7 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="indexing" inputId={inputId}>
-              Message failed to index:
+              {t('diagnosis.message_errors.failed_to_index')}
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_indexing}

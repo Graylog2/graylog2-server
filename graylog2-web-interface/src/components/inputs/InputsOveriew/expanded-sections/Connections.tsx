@@ -15,15 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { formatCount } from 'components/inputs/helpers/InputThroughputUtils';
 
-const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => (
-  <span>
-    Active connections: <span className="active">{formatCount(openConnections)} </span>(
-    <span className="total">{formatCount(totalConnections)}</span> total)
-    <br />
-  </span>
-);
+const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => {
+  const { t } = useTranslation('inputs');
+
+  return (
+    <span>
+      <Trans
+        t={t}
+        i18nKey="overview.sections.active_connections"
+        values={{ open: formatCount(openConnections), total: formatCount(totalConnections) }}
+        components={{ active: <span className="active" />, total: <span className="total" /> }}
+      />
+      <br />
+    </span>
+  );
+};
 
 export default Connections;
