@@ -19,10 +19,11 @@ import styled from 'styled-components';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
-import { hasAdminPermission } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import useFeature from 'hooks/useFeature';
 import SectionHeader from 'components/welcome/SectionHeader';
 import VisuallyHidden from 'components/common/VisuallyHidden';
+import useProductName from 'brand-customization/useProductName';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -32,22 +33,22 @@ import WelcomeMetricsSection from './WelcomeMetricsSection';
 import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
-import useCurrentUser from '../../hooks/useCurrentUser';
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
 const Welcome = () => {
-  const { permissions } = useCurrentUser();
-  const isAdmin = hasAdminPermission(permissions);
+  const { isPermitted } = usePermissions();
+  const isAdmin = isPermitted('*');
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
+  const productName = useProductName();
 
   return (
     <>
       <VisuallyHidden>
-        <h1>Welcome to Graylog!</h1>
+        <h1>Welcome to {productName}!</h1>
       </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
