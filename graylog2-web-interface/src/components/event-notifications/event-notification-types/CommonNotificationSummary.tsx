@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Table, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -34,6 +35,7 @@ const CommonNotificationSummary = ({
   notification,
   children = undefined,
 }: Props) => {
+  const { t } = useTranslation('event_notifications');
   const [displayDetails, setDisplayDetails] = useState(false);
 
   const toggleDisplayDetails = () => {
@@ -51,14 +53,14 @@ const CommonNotificationSummary = ({
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDisplayDetails}>
             <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
             &nbsp;
-            {displayDetails ? 'Less details' : 'More details'}
+            {displayDetails ? t('summary.less_details') : t('summary.more_details')}
           </Button>
           {displayDetails && (
             <Table condensed className={styles.fixedTable}>
               <tbody>
                 <tr>
-                  <td>Description</td>
-                  <td>{notification.description || 'No description given'}</td>
+                  <td>{t('form.description')}</td>
+                  <td>{notification.description || t('summary.no_description')}</td>
                 </tr>
                 {children}
               </tbody>

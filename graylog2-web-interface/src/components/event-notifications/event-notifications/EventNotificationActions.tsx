@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
@@ -41,6 +42,7 @@ type Props = {
 };
 
 const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props) => {
+  const { t } = useTranslation('event_notifications');
   const { refetch: refetchEventNotification } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
   const queryClient = useQueryClient();
@@ -93,7 +95,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
         <MoreActions>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
-              <MenuItem>Edit</MenuItem>
+              <MenuItem>{t('common:actions.edit')}</MenuItem>
             </LinkContainer>
           </IfPermitted>
           <IfPermitted
@@ -101,7 +103,7 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
             anyPermissions>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={() => onTest(notification)}>
-                {isTestLoading ? 'Testing...' : 'Test Notification'}
+                {isTestLoading ? t('form.testing') : t('form.test')}
               </MenuItem>
             </IfPermitted>
             {moreActions}
@@ -113,15 +115,15 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
         </MoreActions>
       </ButtonToolbar>
       {showDialog && (
-        <ConfirmDialog title="Delete Notification" show onConfirm={handleDelete} onCancel={handleClearState}>
-          {`Are you sure you want to delete "${notification.title}"`}
+        <ConfirmDialog title={t('list.delete_title')} show onConfirm={handleDelete} onCancel={handleClearState}>
+          {t('list.delete_confirm', { title: notification.title })}
         </ConfirmDialog>
       )}
       {showShareNotification && (
         <EntityShareModal
           entityId={notification.id}
           entityType="notification"
-          description="Search for a user or team to add as collaborator on this notification."
+          description={t('list.share_description')}
           entityTitle={notification.title}
           onClose={() => setShowShareNotification(undefined)}
         />

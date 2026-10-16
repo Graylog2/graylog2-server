@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ReadOnlyFormGroup } from 'components/common';
@@ -35,18 +36,19 @@ type EventNotificationDetailsProps = {
 };
 
 const EventNotificationDetails = ({ notification }: EventNotificationDetailsProps) => {
+  const { t } = useTranslation('event_notifications');
   const notificationPlugin = _getNotificationPlugin(notification.config.type);
   const DetailsComponent = notificationPlugin?.detailsComponent;
 
   return (
-    <SectionComponent title="Details">
-      <ReadOnlyFormGroup label="Title" value={notification.title} />
-      <ReadOnlyFormGroup label="Description" value={notification.description} />
-      <ReadOnlyFormGroup label="Notification Type" value={notification.config.type} />
+    <SectionComponent title={t('details.title')}>
+      <ReadOnlyFormGroup label={t('form.title')} value={notification.title} />
+      <ReadOnlyFormGroup label={t('form.description')} value={notification.description} />
+      <ReadOnlyFormGroup label={t('form.type')} value={notification.config.type} />
       {DetailsComponent ? (
         <DetailsComponent notification={notification} />
       ) : (
-        <Alert bsStyle="danger">Notification type not supported</Alert>
+        <Alert bsStyle="danger">{t('details.type_not_supported')}</Alert>
       )}
     </SectionComponent>
   );

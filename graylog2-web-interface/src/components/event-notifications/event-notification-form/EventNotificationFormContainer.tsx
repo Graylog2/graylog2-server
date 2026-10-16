@@ -20,6 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import type { QueryClient } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import { ConfirmLeaveDialog } from 'components/common';
 import Routes from 'routing/Routes';
 import {
@@ -184,7 +185,7 @@ class EventNotificationFormContainer extends React.Component<
       .then(
         (response) => {
           testResult.error = false;
-          testResult.message = 'Notification was executed successfully.';
+          testResult.message = i18n.t('test.success', { ns: 'event_notifications' });
 
           return response;
         },
@@ -193,10 +194,11 @@ class EventNotificationFormContainer extends React.Component<
           const { body } = errorResponse.additional;
 
           if (errorResponse.status === 400 && body && body.failed) {
-            testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
+            testResult.message = i18n.t('test.validation_failed', { ns: 'event_notifications' });
             this.setState({ validation: body });
           } else {
-            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your server logs.';
+            testResult.message =
+              errorResponse.responseMessage || i18n.t('test.unknown_error', { ns: 'event_notifications' });
           }
         },
       )
@@ -213,7 +215,7 @@ class EventNotificationFormContainer extends React.Component<
     return (
       <>
         {!embedded && isDirty && (
-          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+          <ConfirmLeaveDialog question={i18n.t('form.confirm_leave', { ns: 'event_notifications' })} />
         )}
         <EventNotificationForm
           action={action}

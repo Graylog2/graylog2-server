@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
@@ -27,128 +28,120 @@ type EmailNotificationDetailsProps = {
 };
 
 const EmailNotificationDetails = ({ notification }: EmailNotificationDetailsProps) => {
+  const { t } = useTranslation('event_notifications');
+  const isSecurityLicenseValid = usePluggableLicenseCheck('/license/security')?.data?.valid;
+  const yesNo = (value: unknown) => (value ? t('summary.yes') : t('summary.no'));
   const recipients = (
     <ReadOnlyFormGroup
-      label="Email Recipients"
-      value={
-        notification.config.email_recipients.join(', ') ||
-        'No email addresses are configured to receive this notification.'
-      }
+      label={t('email_summary.email_recipients')}
+      value={notification.config.email_recipients.join(', ') || t('email_summary.no_email_recipients')}
     />
   );
   const recipientLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="Email Recipients Lookup Table Name" value={notification.config.recipients_lut_name} />
-      <ReadOnlyFormGroup label="Email Recipients Lookup Table Key" value={notification.config.recipients_lut_key} />
+      <ReadOnlyFormGroup
+        label={t('email_summary.recipients_lut_name')}
+        value={notification.config.recipients_lut_name}
+      />
+      <ReadOnlyFormGroup label={t('email_summary.recipients_lut_key')} value={notification.config.recipients_lut_key} />
     </>
   );
   const ccEmails = (
     <ReadOnlyFormGroup
-      label="CC Emails"
-      value={
-        notification.config.cc_emails.join(', ') || "No email addresses are configured to be cc'd on this notification."
-      }
+      label={t('email_summary.cc_emails')}
+      value={notification.config.cc_emails.join(', ') || t('email_summary.no_cc_emails')}
     />
   );
   const ccLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="CC Emails Lookup Table Name" value={notification.config.cc_emails_lut_name} />
-      <ReadOnlyFormGroup label="CC Emails Lookup Table Key" value={notification.config.cc_emails_lut_key} />
+      <ReadOnlyFormGroup label={t('email_summary.cc_lut_name')} value={notification.config.cc_emails_lut_name} />
+      <ReadOnlyFormGroup label={t('email_summary.cc_lut_key')} value={notification.config.cc_emails_lut_key} />
     </>
   );
 
   const bccEmails = (
     <ReadOnlyFormGroup
-      label="BCC Emails"
-      value={
-        notification.config.bcc_emails.join(', ') ||
-        "No email addresses are configured to be bcc'd on this notification."
-      }
+      label={t('email_summary.bcc_emails')}
+      value={notification.config.bcc_emails.join(', ') || t('email_summary.no_bcc_emails')}
     />
   );
   const bccLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="BCC Emails Lookup Table Name" value={notification.config.bcc_emails_lut_name} />
-      <ReadOnlyFormGroup label="BCC Emails Lookup Table Key" value={notification.config.bcc_emails_lut_key} />
+      <ReadOnlyFormGroup label={t('email_summary.bcc_lut_name')} value={notification.config.bcc_emails_lut_name} />
+      <ReadOnlyFormGroup label={t('email_summary.bcc_lut_key')} value={notification.config.bcc_emails_lut_key} />
     </>
   );
-  const sender = <ReadOnlyFormGroup label="Sender" value={notification.config.sender} />;
+  const sender = <ReadOnlyFormGroup label={t('email_summary.sender')} value={notification.config.sender} />;
   const senderLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="Sender Lookup Table Name" value={notification.config.sender_lut_name} />
-      <ReadOnlyFormGroup label="Sender Lookup Table Key" value={notification.config.sender_lut_key} />
+      <ReadOnlyFormGroup label={t('email_details.sender_lut_name')} value={notification.config.sender_lut_name} />
+      <ReadOnlyFormGroup label={t('email_details.sender_lut_key')} value={notification.config.sender_lut_key} />
     </>
   );
-  const replyTo = <ReadOnlyFormGroup label="Reply-To" value={notification.config.reply_to} />;
+  const replyTo = <ReadOnlyFormGroup label={t('email_summary.reply_to')} value={notification.config.reply_to} />;
   const replyToLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="Reply-To Lookup Table Name" value={notification.config.reply_to_lut_name} />
-      <ReadOnlyFormGroup label="Reply-To Lookup Table Key" value={notification.config.reply_to_lut_key} />
+      <ReadOnlyFormGroup label={t('email_details.reply_to_lut_name')} value={notification.config.reply_to_lut_name} />
+      <ReadOnlyFormGroup label={t('email_details.reply_to_lut_key')} value={notification.config.reply_to_lut_key} />
     </>
   );
 
   return (
     <>
-      <ReadOnlyFormGroup label="Send as Single Email" value={notification.config.single_email ? 'Yes' : 'No'} />
+      <ReadOnlyFormGroup label={t('email_summary.single_email')} value={yesNo(notification.config.single_email)} />
       <ReadOnlyFormGroup
-        label="Use Lookup Table for Sender"
-        value={notification.config.lookup_sender_email ? 'Yes' : 'No'}
+        label={t('email_summary.use_lut_sender')}
+        value={yesNo(notification.config.lookup_sender_email)}
       />
       {notification.config.lookup_sender_email ? senderLookupInfo : sender}
-      <ReadOnlyFormGroup label="Subject" value={notification.config.subject} />
+      <ReadOnlyFormGroup label={t('email_summary.subject')} value={notification.config.subject} />
       <ReadOnlyFormGroup
-        label="Use Lookup Table for Reply-To"
-        value={notification.config.lookup_reply_to_email ? 'Yes' : 'No'}
+        label={t('email_summary.use_lut_reply_to')}
+        value={yesNo(notification.config.lookup_reply_to_email)}
       />
       {notification.config.lookup_reply_to_email ? replyToLookupInfo : replyTo}
       <ReadOnlyFormGroup
-        label="User Recipients"
-        value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}
+        label={t('email_summary.user_recipients')}
+        value={notification.config.user_recipients.join(', ') || t('email_summary.no_user_recipients')}
       />
       <ReadOnlyFormGroup
-        label="Use Lookup Table for Email Recipients"
-        value={notification.config.lookup_recipient_emails ? 'Yes' : 'No'}
+        label={t('email_summary.use_lut_recipients')}
+        value={yesNo(notification.config.lookup_recipient_emails)}
       />
       {notification.config.lookup_recipient_emails ? recipientLookupInfo : recipients}
       <ReadOnlyFormGroup
-        label="CC Users"
-        value={notification.config.cc_users.join(', ') || "No users will be cc'd on this notification."}
+        label={t('email_details.cc_users')}
+        value={notification.config.cc_users.join(', ') || t('email_summary.no_cc_users')}
       />
-      <ReadOnlyFormGroup
-        label="Use Lookup Table for CC Emails"
-        value={notification.config.lookup_cc_emails ? 'Yes' : 'No'}
-      />
+      <ReadOnlyFormGroup label={t('email_summary.use_lut_cc')} value={yesNo(notification.config.lookup_cc_emails)} />
       {notification.config.lookup_cc_emails ? ccLookupInfo : ccEmails}
       <ReadOnlyFormGroup
-        label="BCC Users"
-        value={notification.config.bcc_users.join(', ') || "No users will be bcc'd on this notification."}
+        label={t('email_details.bcc_users')}
+        value={notification.config.bcc_users.join(', ') || t('email_summary.no_bcc_users')}
       />
-      <ReadOnlyFormGroup
-        label="Use Lookup Table for BCC Emails"
-        value={notification.config.lookup_bcc_emails ? 'Yes' : 'No'}
-      />
+      <ReadOnlyFormGroup label={t('email_summary.use_lut_bcc')} value={yesNo(notification.config.lookup_bcc_emails)} />
       {notification.config.lookup_bcc_emails ? bccLookupInfo : bccEmails}
-      <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
+      <ReadOnlyFormGroup label={t('email_details.time_zone')} value={notification.config.time_zone} />
       <ReadOnlyFormGroup
-        label="Email Body"
+        label={t('email_summary.body')}
         value={
           <Well bsSize="small" className={styles.bodyPreview}>
-            {notification.config.body_template || <em>Empty body</em>}
+            {notification.config.body_template || <em>{t('email_summary.empty_body')}</em>}
           </Well>
         }
       />
       <ReadOnlyFormGroup
-        label="Email HTML Body"
+        label={t('email_summary.html_body')}
         value={
           <Well bsSize="small" className={styles.bodyPreview}>
-            {notification.config.html_body_template || <em>Empty body</em>}
+            {notification.config.html_body_template || <em>{t('email_summary.empty_body')}</em>}
           </Well>
         }
       />
-      {usePluggableLicenseCheck('/license/security')?.data?.valid && (
+      {isSecurityLicenseValid && (
         <ReadOnlyFormGroup
-          label="Include Event Procedure in Email Body"
-          value={notification.config.include_event_procedure ? 'Yes' : 'No'}
+          label={t('email_summary.include_event_procedure')}
+          value={yesNo(notification.config.include_event_procedure)}
         />
       )}
     </>

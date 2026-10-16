@@ -18,13 +18,13 @@ import * as React from 'react';
 import uniq from 'lodash/uniq';
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { EventsNotifications } from '@graylog/server-api';
 
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import { DeleteMenuItem } from 'components/bootstrap';
-import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -33,11 +33,11 @@ import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import { EVENT_NOTIFICATIONS_QUERY_KEY } from 'components/event-notifications/hooks/useEventNotifications';
 
 const BulkActions = () => {
+  const { t } = useTranslation('event_notifications');
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry('event-notification-bulk');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const selectedItemsAmount = selectedEntities?.length;
-  const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
   const { refetch: refetchEventNotifications } = useTableFetchContext();
 
   const onDelete = useCallback(() => {
@@ -46,7 +46,7 @@ const BulkActions = () => {
     });
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
+    if (window.confirm(t('bulk.delete_confirm', { count: selectedItemsAmount }))) {
       const deleteCalls = selectedEntities.map((notificationId) =>
         EventsNotifications.remove(notificationId).then(() => notificationId),
       );
@@ -76,7 +76,11 @@ const BulkActions = () => {
           }
 
           UserNotification.error(
-            `${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`,
+            t('bulk.delete_failed', {
+              count: selectedItemsAmount,
+              failed: notDeletedNotificationIds.length,
+              status: errorMessages.join(),
+            }),
           );
 
           return;
@@ -87,16 +91,13 @@ const BulkActions = () => {
         });
         setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();
-        UserNotification.success(
-          `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`,
-          'Success',
-        );
+        UserNotification.success(t('bulk.delete_success', { count: selectedItemsAmount }), t('bulk.success_title'));
       });
     }
   }, [
     sendTelemetry,
+    t,
     selectedItemsAmount,
-    descriptor,
     selectedEntities,
     queryClient,
     setSelectedEntities,

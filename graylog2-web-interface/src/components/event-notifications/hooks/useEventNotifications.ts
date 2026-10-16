@@ -20,6 +20,7 @@ import concat from 'lodash/concat';
 
 import { EventsNotifications } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
@@ -115,8 +116,8 @@ export const getEventNotification = (notificationId: string): Promise<EventNotif
     (error: { status?: number }) => {
       if (error.status === 404) {
         UserNotification.error(
-          `Unable to find Event Notification with id <${notificationId}>, please ensure it wasn't deleted.`,
-          'Could not retrieve Event Notification',
+          i18n.t('messages.not_found', { ns: 'event_notifications', id: notificationId }),
+          i18n.t('messages.not_found_title', { ns: 'event_notifications' }),
         );
       }
 
@@ -130,8 +131,8 @@ export const createEventNotification = (notification: EventNotification & Entity
   return fetch('POST', eventNotificationsUrl({}), { entity: rest, share_request }).then(
     (response: unknown) => {
       UserNotification.success(
-        'Notification created successfully',
-        `Notification "${notification.title}" was created successfully.`,
+        i18n.t('messages.created', { ns: 'event_notifications' }),
+        i18n.t('messages.created_title', { ns: 'event_notifications', title: notification.title }),
       );
 
       return response;
@@ -139,8 +140,12 @@ export const createEventNotification = (notification: EventNotification & Entity
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Creating Notification "${notification.title}" failed with status: ${error}`,
-          'Could not save Notification',
+          i18n.t('messages.create_failed', {
+            ns: 'event_notifications',
+            title: notification.title,
+            error: String(error),
+          }),
+          i18n.t('messages.create_failed_title', { ns: 'event_notifications' }),
         );
       }
 
@@ -153,8 +158,8 @@ export const updateEventNotification = (notificationId: string, notification: Ev
   EventsNotifications.update(encodeURIComponent(notificationId), notification).then(
     (response: unknown) => {
       UserNotification.success(
-        'Notification updated successfully',
-        `Notification "${notification.title}" was updated successfully.`,
+        i18n.t('messages.updated', { ns: 'event_notifications' }),
+        i18n.t('messages.updated_title', { ns: 'event_notifications', title: notification.title }),
       );
 
       return response;
@@ -162,8 +167,12 @@ export const updateEventNotification = (notificationId: string, notification: Ev
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Updating Notification "${notification.title}" failed with status: ${error}`,
-          'Could not update Notification',
+          i18n.t('messages.update_failed', {
+            ns: 'event_notifications',
+            title: notification.title,
+            error: String(error),
+          }),
+          i18n.t('messages.update_failed_title', { ns: 'event_notifications' }),
         );
       }
 
@@ -175,16 +184,20 @@ export const deleteEventNotification = (notification: EventNotification): Promis
   EventsNotifications.remove(encodeURIComponent(notification.id)).then(
     (response: unknown) => {
       UserNotification.success(
-        'Notification deleted successfully',
-        `Notification "${notification.title}" was deleted successfully.`,
+        i18n.t('messages.deleted', { ns: 'event_notifications' }),
+        i18n.t('messages.deleted_title', { ns: 'event_notifications', title: notification.title }),
       );
 
       return response;
     },
     (error: SubmitError) => {
       UserNotification.error(
-        `Deleting Notification "${notification.title}" failed with status: ${error}`,
-        'Could not delete Notification',
+        i18n.t('messages.delete_failed', {
+          ns: 'event_notifications',
+          title: notification.title,
+          error: String(error),
+        }),
+        i18n.t('messages.delete_failed_title', { ns: 'event_notifications' }),
       );
 
       throw error;
@@ -227,8 +240,8 @@ export const useEventNotificationsPaginated = (
     queryFn: () =>
       defaultOnError(
         fetchEventNotifications(searchParams),
-        'Loading event notifications failed with status',
-        'Could not load event notifications',
+        i18n.t('messages.load_all_failed', { ns: 'event_notifications' }),
+        i18n.t('messages.load_all_failed_title', { ns: 'event_notifications' }),
       ),
     placeholderData: keepPreviousData,
     retry: false,
@@ -266,8 +279,8 @@ export const useEventNotification = (notificationId: string) =>
     queryFn: () =>
       defaultOnError(
         getEventNotification(notificationId),
-        'Loading event notification failed with status',
-        'Could not load event notification',
+        i18n.t('messages.load_failed', { ns: 'event_notifications' }),
+        i18n.t('messages.load_failed_title', { ns: 'event_notifications' }),
       ),
     retry: false,
   });

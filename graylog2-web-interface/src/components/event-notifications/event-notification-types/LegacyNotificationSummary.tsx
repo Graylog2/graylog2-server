@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const LegacyNotificationSummary = (props: Props) => {
+  const { t } = useTranslation('event_notifications');
   const { notification, legacyTypes } = props;
   const configurationValues = notification.config.configuration;
   const callbackType = notification.config.callback_type;
@@ -55,9 +57,14 @@ const LegacyNotificationSummary = (props: Props) => {
   } else {
     content = (
       <DangerRow>
-        <td>Type</td>
+        <td>{t('legacy.type')}</td>
         <td>
-          Unknown legacy alarm callback type: <code>{callbackType}</code>. Please make sure the plugin is installed.
+          <Trans
+            t={t}
+            i18nKey="legacy.unknown_callback_type"
+            values={{ callbackType }}
+            components={{ code: <code /> }}
+          />
         </td>
       </DangerRow>
     );
@@ -67,8 +74,12 @@ const LegacyNotificationSummary = (props: Props) => {
     <>
       {!typeData && (
         <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
-          ensure the plugin is installed.
+          <Trans
+            t={t}
+            i18nKey="legacy.unknown_type"
+            values={{ title: notification.title || t('legacy.default_title'), callbackType }}
+            components={{ code: <code /> }}
+          />
         </Alert>
       )}
       <CommonNotificationSummary {...props}>

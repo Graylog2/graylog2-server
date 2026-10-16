@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Well } from 'components/bootstrap';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -28,171 +29,168 @@ type EmailNotificationSummaryProps = {
   definitionNotification: any;
 };
 
-const EmailNotificationSummary = ({ notification = {}, ...otherProps }: EmailNotificationSummaryProps) => (
-  <CommonNotificationSummary notification={notification} {...otherProps}>
-    <>
-      <tr>
-        <td>Use Lookup Table for Sender</td>
-        <td>{notification.config.lookup_sender_email ? 'Yes' : 'No'}</td>
-      </tr>
-      {notification.config.lookup_sender_email ? (
-        <>
-          <tr>
-            <td>Sender Email Lookup Table Name</td>
-            <td>{notification.config.sender_lut_name}</td>
-          </tr>
-          <tr>
-            <td>Sender Email Lookup Table Key</td>
-            <td>{notification.config.sender_lut_key}</td>
-          </tr>
-        </>
-      ) : (
-        <tr>
-          <td>Sender</td>
-          <td>{notification.config.sender}</td>
-        </tr>
-      )}
-      <tr>
-        <td>Subject</td>
-        <td>{notification.config.subject}</td>
-      </tr>
-      <tr>
-        <td>Send as Single Email</td>
-        <td>{notification.config.single_email}</td>
-      </tr>
-      <tr>
-        <td>Use Lookup Table for Reply-To</td>
-        <td>{notification.config.lookup_reply_to_email ? 'Yes' : 'No'}</td>
-      </tr>
-      {notification.config.lookup_reply_to_email ? (
-        <>
-          <tr>
-            <td>Reply-To Email Lookup Table Name</td>
-            <td>{notification.config.reply_to_lut_name}</td>
-          </tr>
-          <tr>
-            <td>Reply-To Email Lookup Table Key</td>
-            <td>{notification.config.reply_to_lut_key}</td>
-          </tr>
-        </>
-      ) : (
-        <tr>
-          <td>Reply-To</td>
-          <td>{notification.config.reply_to}</td>
-        </tr>
-      )}
+const EmailNotificationSummary = ({ notification = {}, ...otherProps }: EmailNotificationSummaryProps) => {
+  const { t } = useTranslation('event_notifications');
+  const isSecurityLicenseValid = usePluggableLicenseCheck('/license/security')?.data?.valid;
+  const yesNo = (value: unknown) => (value ? t('summary.yes') : t('summary.no'));
 
-      <tr>
-        <td>User Recipients</td>
-        <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
-      </tr>
-      <tr>
-        <td>Use Lookup Table for Email Recipients</td>
-        <td>{notification.config.lookup_recipient_emails ? 'Yes' : 'No'}</td>
-      </tr>
-      {notification.config.lookup_recipient_emails ? (
-        <>
-          <tr>
-            <td>Email Recipients Lookup Table Name</td>
-            <td>{notification.config.recipients_lut_name}</td>
-          </tr>
-          <tr>
-            <td>Email Recipients Lookup Table Key</td>
-            <td>{notification.config.recipients_lut_key}</td>
-          </tr>
-        </>
-      ) : (
+  return (
+    <CommonNotificationSummary notification={notification} {...otherProps}>
+      <>
         <tr>
-          <td>Email Recipients</td>
+          <td>{t('email_summary.use_lut_sender')}</td>
+          <td>{yesNo(notification.config.lookup_sender_email)}</td>
+        </tr>
+        {notification.config.lookup_sender_email ? (
+          <>
+            <tr>
+              <td>{t('email_summary.sender_lut_name')}</td>
+              <td>{notification.config.sender_lut_name}</td>
+            </tr>
+            <tr>
+              <td>{t('email_summary.sender_lut_key')}</td>
+              <td>{notification.config.sender_lut_key}</td>
+            </tr>
+          </>
+        ) : (
+          <tr>
+            <td>{t('email_summary.sender')}</td>
+            <td>{notification.config.sender}</td>
+          </tr>
+        )}
+        <tr>
+          <td>{t('email_summary.subject')}</td>
+          <td>{notification.config.subject}</td>
+        </tr>
+        <tr>
+          <td>{t('email_summary.single_email')}</td>
+          <td>{notification.config.single_email}</td>
+        </tr>
+        <tr>
+          <td>{t('email_summary.use_lut_reply_to')}</td>
+          <td>{yesNo(notification.config.lookup_reply_to_email)}</td>
+        </tr>
+        {notification.config.lookup_reply_to_email ? (
+          <>
+            <tr>
+              <td>{t('email_summary.reply_to_lut_name')}</td>
+              <td>{notification.config.reply_to_lut_name}</td>
+            </tr>
+            <tr>
+              <td>{t('email_summary.reply_to_lut_key')}</td>
+              <td>{notification.config.reply_to_lut_key}</td>
+            </tr>
+          </>
+        ) : (
+          <tr>
+            <td>{t('email_summary.reply_to')}</td>
+            <td>{notification.config.reply_to}</td>
+          </tr>
+        )}
+
+        <tr>
+          <td>{t('email_summary.user_recipients')}</td>
+          <td>{notification.config.user_recipients.join(', ') || t('email_summary.no_user_recipients')}</td>
+        </tr>
+        <tr>
+          <td>{t('email_summary.use_lut_recipients')}</td>
+          <td>{yesNo(notification.config.lookup_recipient_emails)}</td>
+        </tr>
+        {notification.config.lookup_recipient_emails ? (
+          <>
+            <tr>
+              <td>{t('email_summary.recipients_lut_name')}</td>
+              <td>{notification.config.recipients_lut_name}</td>
+            </tr>
+            <tr>
+              <td>{t('email_summary.recipients_lut_key')}</td>
+              <td>{notification.config.recipients_lut_key}</td>
+            </tr>
+          </>
+        ) : (
+          <tr>
+            <td>{t('email_summary.email_recipients')}</td>
+            <td>{notification.config.email_recipients.join(', ') || t('email_summary.no_email_recipients')}</td>
+          </tr>
+        )}
+
+        <tr>
+          <td>{t('email_summary.cc_users')}</td>
+          <td>{notification.config.cc_users.join(', ') || t('email_summary.no_cc_users')}</td>
+        </tr>
+        <tr>
+          <td>{t('email_summary.use_lut_cc')}</td>
+          <td>{yesNo(notification.config.lookup_cc_emails)}</td>
+        </tr>
+        {notification.config.lookup_cc_emails ? (
+          <>
+            <tr>
+              <td>{t('email_summary.cc_lut_name')}</td>
+              <td>{notification.config.cc_emails_lut_name}</td>
+            </tr>
+            <tr>
+              <td>{t('email_summary.cc_lut_key')}</td>
+              <td>{notification.config.cc_emails_lut_key}</td>
+            </tr>
+          </>
+        ) : (
+          <tr>
+            <td>{t('email_summary.cc_emails')}</td>
+            <td>{notification.config.cc_emails.join(', ') || t('email_summary.no_cc_emails')}</td>
+          </tr>
+        )}
+
+        <tr>
+          <td>{t('email_summary.bcc_users')}</td>
+          <td>{notification.config.bcc_users.join(', ') || t('email_summary.no_bcc_users')}</td>
+        </tr>
+        <tr>
+          <td>{t('email_summary.use_lut_bcc')}</td>
+          <td>{yesNo(notification.config.lookup_bcc_emails)}</td>
+        </tr>
+        {notification.config.lookup_bcc_emails ? (
+          <>
+            <tr>
+              <td>{t('email_summary.bcc_lut_name')}</td>
+              <td>{notification.config.bcc_emails_lut_name}</td>
+            </tr>
+            <tr>
+              <td>{t('email_summary.bcc_lut_key')}</td>
+              <td>{notification.config.bcc_emails_lut_key}</td>
+            </tr>
+          </>
+        ) : (
+          <tr>
+            <td>{t('email_summary.bcc_emails')}</td>
+            <td>{notification.config.bcc_emails.join(', ') || t('email_summary.no_bcc_emails')}</td>
+          </tr>
+        )}
+
+        <tr>
+          <td>{t('email_summary.body')}</td>
           <td>
-            {notification.config.email_recipients.join(', ') ||
-              'No email addresses are configured to receive this notification.'}
+            <Well bsSize="small" className={styles.bodyPreview}>
+              {notification.config.body_template || <em>{t('email_summary.empty_body')}</em>}
+            </Well>
           </td>
         </tr>
-      )}
-
-      <tr>
-        <td>Users to CC</td>
-        <td>{notification.config.cc_users.join(', ') || "No users will be cc'd on this notification."}</td>
-      </tr>
-      <tr>
-        <td>Use Lookup Table for CC Emails</td>
-        <td>{notification.config.lookup_cc_emails ? 'Yes' : 'No'}</td>
-      </tr>
-      {notification.config.lookup_cc_emails ? (
-        <>
-          <tr>
-            <td>CC Emails Lookup Table Name</td>
-            <td>{notification.config.cc_emails_lut_name}</td>
-          </tr>
-          <tr>
-            <td>CC Emails Lookup Table Key</td>
-            <td>{notification.config.cc_emails_lut_key}</td>
-          </tr>
-        </>
-      ) : (
         <tr>
-          <td>CC Emails</td>
+          <td>{t('email_summary.html_body')}</td>
           <td>
-            {notification.config.cc_emails.join(', ') ||
-              "No email addresses are configured to be cc'd on this notification."}
+            <Well bsSize="small" className={styles.bodyPreview}>
+              {notification.config.html_body_template || <em>{t('email_summary.empty_html_body')}</em>}
+            </Well>
           </td>
         </tr>
-      )}
-
-      <tr>
-        <td>Users to BCC</td>
-        <td>{notification.config.bcc_users.join(', ') || "No users will be bcc'd on this notification."}</td>
-      </tr>
-      <tr>
-        <td>Use Lookup Table for BCC Emails</td>
-        <td>{notification.config.lookup_bcc_emails ? 'Yes' : 'No'}</td>
-      </tr>
-      {notification.config.lookup_bcc_emails ? (
-        <>
+        {isSecurityLicenseValid && (
           <tr>
-            <td>BCC Emails Lookup Table Name</td>
-            <td>{notification.config.bcc_emails_lut_name}</td>
+            <td>{t('email_summary.include_event_procedure')}</td>
+            <td>{yesNo(notification.config.include_event_procedure)}</td>
           </tr>
-          <tr>
-            <td>BCC Emails Lookup Table Key</td>
-            <td>{notification.config.bcc_emails_lut_key}</td>
-          </tr>
-        </>
-      ) : (
-        <tr>
-          <td>BCC Emails</td>
-          <td>
-            {notification.config.bcc_emails.join(', ') ||
-              "No email addresses are configured to be bcc'd on this notification."}
-          </td>
-        </tr>
-      )}
-
-      <tr>
-        <td>Email Body</td>
-        <td>
-          <Well bsSize="small" className={styles.bodyPreview}>
-            {notification.config.body_template || <em>Empty body</em>}
-          </Well>
-        </td>
-      </tr>
-      <tr>
-        <td>Email HTML Body</td>
-        <td>
-          <Well bsSize="small" className={styles.bodyPreview}>
-            {notification.config.html_body_template || <em>Empty HTML body</em>}
-          </Well>
-        </td>
-      </tr>
-      {usePluggableLicenseCheck('/license/security')?.data?.valid && (
-        <tr>
-          <td>Include Event Procedure in Email Body</td>
-          <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
-        </tr>
-      )}
-    </>
-  </CommonNotificationSummary>
-);
+        )}
+      </>
+    </CommonNotificationSummary>
+  );
+};
 
 export default EmailNotificationSummary;

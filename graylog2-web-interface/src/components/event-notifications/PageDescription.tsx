@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const PageDescription = () => (
-  <span>
-    Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to
-    other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event
-    Definition.
-  </span>
-);
+const PageDescription = () => {
+  const { t } = useTranslation('event_notifications');
+
+  return <span>{t('pages.description')}</span>;
+};
 
 export default PageDescription;

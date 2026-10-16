@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, IfPermitted } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -24,19 +25,23 @@ type EventNotificationActionLinksProps = {
   notificationId: string;
 };
 
-const EventNotificationActionLinks = ({ notificationId }: EventNotificationActionLinksProps) => (
-  <ButtonToolbar>
-    <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>
-      <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.show(notificationId)}>
-        <Button>View Details</Button>
-      </LinkContainer>
-    </IfPermitted>
-    <IfPermitted permissions={`eventnotifications:edit:${notificationId}`}>
-      <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notificationId)}>
-        <Button bsStyle="primary">Edit Notification</Button>
-      </LinkContainer>
-    </IfPermitted>
-  </ButtonToolbar>
-);
+const EventNotificationActionLinks = ({ notificationId }: EventNotificationActionLinksProps) => {
+  const { t } = useTranslation('event_notifications');
+
+  return (
+    <ButtonToolbar>
+      <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>
+        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.show(notificationId)}>
+          <Button>{t('details.view_details')}</Button>
+        </LinkContainer>
+      </IfPermitted>
+      <IfPermitted permissions={`eventnotifications:edit:${notificationId}`}>
+        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notificationId)}>
+          <Button bsStyle="primary">{t('details.edit_notification')}</Button>
+        </LinkContainer>
+      </IfPermitted>
+    </ButtonToolbar>
+  );
+};
 
 export default EventNotificationActionLinks;

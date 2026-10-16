@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -30,6 +31,7 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import PageDescription from 'components/event-notifications/PageDescription';
 
 const EditEventNotificationPage = () => {
+  const { t } = useTranslation('event_notifications');
   const { notificationId } = useParams<{ notificationId: string }>();
   const history = useHistory();
   const { isPermitted } = usePermissions();
@@ -55,10 +57,10 @@ const EditEventNotificationPage = () => {
 
   if (!notification) {
     return (
-      <DocumentTitle title="Edit Notification">
+      <DocumentTitle title={t('pages.edit')}>
         <span>
-          <PageHeader title="Edit Notification">
-            <Spinner text="Loading Notification information..." />
+          <PageHeader title={t('pages.edit')}>
+            <Spinner text={t('pages.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -66,13 +68,13 @@ const EditEventNotificationPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Edit "${notification.title}" Notification`}>
+    <DocumentTitle title={t('pages.edit_named', { title: notification.title })}>
       <EventsPageNavigation />
       <PageHeader
-        title={`Edit "${notification.title}" Notification`}
+        title={t('pages.edit_named', { title: notification.title })}
         actions={<EventNotificationActionLinks notificationId={notification.id} />}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: t('pages.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
         <PageDescription />

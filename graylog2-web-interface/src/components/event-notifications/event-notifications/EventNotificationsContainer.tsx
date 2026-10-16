@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { QueryHelper, PaginatedEntityTable } from 'components/common';
@@ -57,6 +58,7 @@ const customColumnRenderers = (
 });
 
 const EventNotificationsContainer = () => {
+  const { t } = useTranslation('event_notifications');
   const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry('event-notification');
@@ -103,7 +105,7 @@ const EventNotificationsContainer = () => {
 
   return (
     <PaginatedEntityTable<EventNotification>
-      humanName="event notifications"
+      humanName={t('list.human_name')}
       queryHelpComponent={<QueryHelper entityName="notification" />}
       entityActions={renderEvenNotificationActions}
       tableLayout={defaultLayout}

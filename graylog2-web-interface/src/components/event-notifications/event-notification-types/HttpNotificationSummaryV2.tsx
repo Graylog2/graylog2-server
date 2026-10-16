@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Well } from 'components/bootstrap';
 
@@ -27,47 +28,51 @@ type Props = {
   definitionNotification: any;
 };
 
-const HttpNotificationSummaryV2 = ({ type, notification, definitionNotification }: Props) => (
-  <CommonNotificationSummary type={type} notification={notification} definitionNotification={definitionNotification}>
-    <tr>
-      <td>URL</td>
-      <td>
-        <code>{notification.config.url}</code>
-      </td>
-    </tr>
-    <tr>
-      <td>Method</td>
-      <td>
-        <code>{notification.config.method}</code>
-      </td>
-    </tr>
-    {notification.config.content_type && (
+const HttpNotificationSummaryV2 = ({ type, notification, definitionNotification }: Props) => {
+  const { t } = useTranslation('event_notifications');
+
+  return (
+    <CommonNotificationSummary type={type} notification={notification} definitionNotification={definitionNotification}>
       <tr>
-        <td>Content Type</td>
+        <td>{t('http_details.url')}</td>
         <td>
-          <code>{notification.config.content_type}</code>
+          <code>{notification.config.url}</code>
         </td>
       </tr>
-    )}
-    {notification.config.headers && (
       <tr>
-        <td>Headers</td>
+        <td>{t('http_details.method')}</td>
         <td>
-          <code>{notification.config.headers}</code>
+          <code>{notification.config.method}</code>
         </td>
       </tr>
-    )}
-    {notification.config.body_template && (
-      <tr>
-        <td>Body Template</td>
-        <td>
-          <Well bsSize="small" className={styles.bodyPreview}>
-            {notification.config.body_template}
-          </Well>
-        </td>
-      </tr>
-    )}
-  </CommonNotificationSummary>
-);
+      {notification.config.content_type && (
+        <tr>
+          <td>{t('http_details.content_type')}</td>
+          <td>
+            <code>{notification.config.content_type}</code>
+          </td>
+        </tr>
+      )}
+      {notification.config.headers && (
+        <tr>
+          <td>{t('http_details.headers')}</td>
+          <td>
+            <code>{notification.config.headers}</code>
+          </td>
+        </tr>
+      )}
+      {notification.config.body_template && (
+        <tr>
+          <td>{t('http_details.body_template')}</td>
+          <td>
+            <Well bsSize="small" className={styles.bodyPreview}>
+              {notification.config.body_template}
+            </Well>
+          </td>
+        </tr>
+      )}
+    </CommonNotificationSummary>
+  );
+};
 
 export default HttpNotificationSummaryV2;

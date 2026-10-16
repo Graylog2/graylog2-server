@@ -52,7 +52,7 @@ export type HttpNotificationValidationV2 = {
 export interface EventNotificationTypes {
   type: string;
   displayName: string;
-  /** Translation key of the displayed name, e.g. `events:notifications_types.email`. `displayName` is used without it. */
+  /** Translation key of the displayed name, e.g. `event_notifications:types.email`. `displayName` is used without it. */
   displayNameKey?: string;
   formComponent: React.ComponentType<{
     config: EventNotification['config'];
