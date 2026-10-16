@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
@@ -33,6 +34,7 @@ const EditOutputButton = ({
   getTypeDefinition,
   onUpdate = () => {},
 }: EditOutputButtonProps) => {
+  const { t } = useTranslation('streams');
   const [typeDefinition, setTypeDefinition] = useState<any>(null);
   const onModalClose = () => setTypeDefinition(null);
   const handleClick = () => {
@@ -49,7 +51,7 @@ const EditOutputButton = ({
   return (
     <span>
       <Button disabled={disabled} onClick={handleClick}>
-        Edit
+        {t('outputs.edit')}
       </Button>
       {typeDefinition && (
         <ConfigurationForm
@@ -57,11 +59,11 @@ const EditOutputButton = ({
           cancelAction={() => onModalClose()}
           key={`configuration-form-output-${output.id}`}
           configFields={typeDefinition}
-          title={`Editing Output ${output.title}`}
+          title={t('outputs.edit_title', { title: output.title })}
           typeName={output.type}
-          titleHelpText="Select a name of your new output that describes it."
+          titleHelpText={t('outputs.name_help')}
           submitAction={handleSubmit}
-          submitButtonText="Update output"
+          submitButtonText={t('outputs.update_submit')}
           values={output.configuration}
           titleValue={output.title}
         />

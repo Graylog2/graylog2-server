@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Button } from 'components/bootstrap';
 
 type Props = {
@@ -55,7 +56,7 @@ class AssignOutputDropdown extends React.Component<Props, { selectedOutput: stri
         <div className="form-inline">
           <select value={selectedOutput} name="outputId" className="form-control" onChange={this._handleUpdate}>
             <option value={this.PLACEHOLDER} disabled>
-              Select existing output
+              {i18n.t('outputs.select_existing', { ns: 'streams' })}
             </option>
             {outputs.length > 0 ? (
               outputs.map((output) => (
@@ -64,7 +65,7 @@ class AssignOutputDropdown extends React.Component<Props, { selectedOutput: stri
                 </option>
               ))
             ) : (
-              <option disabled>No outputs available</option>
+              <option disabled>{i18n.t('outputs.none_available', { ns: 'streams' })}</option>
             )}
           </select>
           &nbsp;
@@ -74,7 +75,7 @@ class AssignOutputDropdown extends React.Component<Props, { selectedOutput: stri
             type="button"
             disabled={selectedOutput === this.PLACEHOLDER}
             onClick={this._handleClick}>
-            Assign existing Output
+            {i18n.t('outputs.assign_existing', { ns: 'streams' })}
           </Button>
         </div>
       </div>

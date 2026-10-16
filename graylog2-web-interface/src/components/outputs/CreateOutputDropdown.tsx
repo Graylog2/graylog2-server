@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
@@ -36,6 +37,7 @@ type CreateOutputDropdownProps = {
 const PLACEHOLDER = 'placeholder';
 
 const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutputDropdownProps) => {
+  const { t } = useTranslation('streams');
   const configurationForm = useRef<RefType<{}>>();
   const [typeDefinition, setTypeDefinition] = useState<{
     [key: string]: ConfigurationField;
@@ -72,13 +74,13 @@ const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutp
           onChange={_onTypeChange}
           className="form-control">
           <option value={PLACEHOLDER} disabled>
-            Select Output Type
+            {t('outputs.select_type')}
           </option>
           {outputTypes}
         </select>
         &nbsp;
         <Button bsStyle="primary" disabled={typeName === PLACEHOLDER} onClick={_openModal}>
-          Launch new output
+          {t('outputs.launch_new')}
         </Button>
       </div>
 
@@ -86,10 +88,10 @@ const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutp
         ref={configurationForm}
         key="configuration-form-output"
         configFields={typeDefinition}
-        title="Create new Output"
-        titleHelpText="Select a name of your new output that describes it."
+        title={t('outputs.create_title')}
+        titleHelpText={t('outputs.name_help')}
         typeName={typeName}
-        submitButtonText="Create output"
+        submitButtonText={t('outputs.create_submit')}
         submitAction={onSubmit}
       />
     </div>
