@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 
 import ProductName from 'brand-customization/ProductName';
 import { Row, Col } from 'components/bootstrap';
@@ -23,26 +24,30 @@ import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
-const ClusterCertificateManagementPage = () => (
-  <DocumentTitle title="Certificate Management">
-    <ClusterConfigurationPageNavigation />
-    <PageHeader
-      title="Certificate Management"
-      documentationLink={{
-        title: 'Data Nodes documentation',
-        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-      }}>
-      <span>
-        <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
-        allow you to index and search through all the messages in your <ProductName /> message database.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <DataNodeConfiguration />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const ClusterCertificateManagementPage = () => {
+  const { t } = useTranslation('cluster_certificate_management');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <ClusterConfigurationPageNavigation />
+      <PageHeader
+        title={t('title')}
+        documentationLink={{
+          title: t('documentation_title'),
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}>
+        <Trans i18nKey="description">
+          <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
+          allow you to index and search through all the messages in your <ProductName /> message database.
+        </Trans>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <DataNodeConfiguration />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default ClusterCertificateManagementPage;
