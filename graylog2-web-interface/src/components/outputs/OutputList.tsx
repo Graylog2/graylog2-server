@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Col, Row } from 'components/bootstrap';
@@ -66,7 +67,7 @@ class OutputList extends React.Component<
       return (
         <Row className="content">
           <Col md={12}>
-            <NoEntitiesExist>No outputs configured.</NoEntitiesExist>
+            <NoEntitiesExist>{this.props.t('streams.outputs_none_configured')}</NoEntitiesExist>
           </Col>
         </Row>
       );
@@ -78,4 +79,4 @@ class OutputList extends React.Component<
   }
 }
 
-export default OutputList;
+export default withTranslation(OutputList);

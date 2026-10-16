@@ -28,5 +28,6 @@
   "outputs_delete_from_stream": "Aus Stream löschen",
   "outputs_id_label": "ID: {{id}}",
   "outputs_type_label": "Typ: {{type}}",
-  "outputs_delete_globally": "Global löschen"
+  "outputs_delete_globally": "Global löschen",
+  "outputs_none_configured": "Keine Outputs konfiguriert."
 }

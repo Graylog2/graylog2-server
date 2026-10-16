@@ -28,5 +28,6 @@
   "outputs_delete_from_stream": "Delete from stream",
   "outputs_id_label": "ID: {{id}}",
   "outputs_type_label": "Type: {{type}}",
-  "outputs_delete_globally": "Delete globally"
+  "outputs_delete_globally": "Delete globally",
+  "outputs_none_configured": "No outputs configured."
 }
