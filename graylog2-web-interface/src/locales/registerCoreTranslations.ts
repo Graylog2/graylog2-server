@@ -23,6 +23,7 @@ import enDashboards from 'locales/en/dashboards.json';
 import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enSearch from 'locales/en/search.json';
+import enStreams from 'locales/en/streams.json';
 import enWelcome from 'locales/en/welcome.json';
 import enWidgets from 'locales/en/widgets.json';
 
@@ -48,6 +49,10 @@ registerTranslations('navigation', enNavigation, {
 
 registerTranslations('search', enSearch, {
   de: () => import(/* webpackChunkName: "translations-de-search" */ 'locales/de/search.json'),
+});
+
+registerTranslations('streams', enStreams, {
+  de: () => import(/* webpackChunkName: "translations-de-streams" */ 'locales/de/streams.json'),
 });
 
 registerTranslations('welcome', enWelcome, {
