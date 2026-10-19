@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash on extractor edit page when using converters, caused by checkbox inputs not providing their checked state."
+
+pulls = ["27835"]
