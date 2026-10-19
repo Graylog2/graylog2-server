@@ -295,5 +295,6 @@
     "event_procedure_step": "event procedure step",
     "collection": "collection",
     "collection_entities": "collection entities"
-  }
+  },
+  "marketplace_link": "the {{productName}} Marketplace"
 }

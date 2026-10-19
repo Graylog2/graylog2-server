@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import useResourceCustomization from 'brand-customization/useResourceCustomization';
 
 const MarketplaceLink = ({ prefix = '', suffix = '.' }: { prefix?: React.ReactNode; suffix?: React.ReactNode }) => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
   const { url, enabled } = useResourceCustomization('marketplace');
 
@@ -29,7 +31,7 @@ const MarketplaceLink = ({ prefix = '', suffix = '.' }: { prefix?: React.ReactNo
     <>
       {prefix}{' '}
       <a href={url} rel="noopener noreferrer" target="_blank">
-        the {productName} Marketplace
+        {t('marketplace_link', { productName })}
       </a>
       {suffix}
     </>

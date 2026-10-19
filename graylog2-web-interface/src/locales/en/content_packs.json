@@ -146,7 +146,8 @@
     "description": "Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.",
     "install_error_message": "Installing content pack failed with status: {{status}}. Could not install Content Pack with ID: {{id}}",
     "install_success": "Content Pack installed successfully.",
-    "title": "Content Packs"
+    "title": "Content Packs",
+    "marketplace_prefix": "Find more Content Packs in"
   },
   "pages": {
     "back_button": "Content Packs",

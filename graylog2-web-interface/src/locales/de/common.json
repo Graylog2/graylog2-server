@@ -298,5 +298,6 @@
     "event_procedure_step": "Schritt einer Ereignisprozedur",
     "collection": "Sammlung",
     "collection_entities": "Sammlungseinträge"
-  }
+  },
+  "marketplace_link": "{{productName}} Marketplace"
 }

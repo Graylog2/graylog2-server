@@ -109,7 +109,7 @@ const ContentPacksPage = () => {
           <span>
             {t('overview.description')}
             <br />
-            <MarketplaceLink prefix="Find more Content Packs in" />
+            <MarketplaceLink prefix={t('overview.marketplace_prefix')} />
           </span>
         </PageHeader>
 

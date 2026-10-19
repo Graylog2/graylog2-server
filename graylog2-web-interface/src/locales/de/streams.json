@@ -21,14 +21,14 @@
   },
   "stream_outputs": {
     "description": "{{productName}}-Knoten können Nachrichten von Streams über Outputs weiterleiten. Starten oder beenden Sie hier so viele Outputs, wie Sie möchten. Sie können auch Outputs wiederverwenden, die bereits für andere Streams laufen. Eine globale Übersicht aller konfigurierten Outputs finden Sie <outputsLink>hier</outputsLink>.",
-    "marketplace_prefix": "Output-Plugins finden Sie auf",
+    "marketplace_prefix": "Output-Plugins finden Sie auf dem",
     "removing_description": "Das <emphasis>Entfernen</emphasis> eines Outputs entfernt ihn aus diesem Stream, er bleibt aber in der Liste der verfügbaren Outputs. Das <emphasis>globale</emphasis> Löschen eines Outputs entfernt ihn aus diesem und allen anderen Streams und beendet ihn. Alle definierten Outputs sehen Sie im Detail in der <outputsLink>globalen Output-Liste</outputsLink>.",
     "title": "Outputs für Stream »{{streamTitle}}«"
   },
   "system_outputs": {
     "description": "{{productName}}-Knoten können Nachrichten über Outputs weiterleiten. Starten oder beenden Sie hier so viele Outputs, wie Sie möchten, <highlight>und weisen Sie sie anschließend Streams zu, um alle Nachrichten eines Streams in Echtzeit weiterzuleiten.</highlight>",
     "header_title": "Outputs im Cluster",
-    "marketplace_prefix": "Output-Plugins finden Sie auf",
+    "marketplace_prefix": "Output-Plugins finden Sie auf dem",
     "title": "Outputs"
   }
 }

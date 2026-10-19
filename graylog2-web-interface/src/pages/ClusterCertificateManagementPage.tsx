@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -25,21 +25,19 @@ import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/Dat
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const ClusterCertificateManagementPage = () => {
-  const { t } = useTranslation('cluster_certificate_management');
+  const { t } = useTranslation('datanode');
+  const productName = useProductName();
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.certificate_management_title')}>
       <ClusterConfigurationPageNavigation />
       <PageHeader
-        title={t('title')}
+        title={t('pages.certificate_management_title')}
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
-        <Trans i18nKey="description">
-          <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
-          allow you to index and search through all the messages in your <ProductName /> message database.
-        </Trans>
+        <span>{t('pages.description', { productName })}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

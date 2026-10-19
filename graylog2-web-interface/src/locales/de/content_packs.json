@@ -146,7 +146,8 @@
     "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
     "install_error_message": "Installation des Content Packs fehlgeschlagen mit Status: {{status}}. Das Content Pack mit der ID {{id}} konnte nicht installiert werden.",
     "install_success": "Content Pack erfolgreich installiert.",
-    "title": "Content Packs"
+    "title": "Content Packs",
+    "marketplace_prefix": "Finden Sie weitere Content Packs im"
   },
   "pages": {
     "back_button": "Content Packs",
@@ -154,7 +155,7 @@
     "description": "Content Packs beschleunigen den Einrichtungsprozess für eine bestimmte Datenquelle. Ein Content Pack kann Inputs/Extractors, Streams und Dashboards enthalten.",
     "document_title": "Content Packs",
     "edit_title": "Content Pack bearbeiten",
-    "marketplace_prefix": "Finden Sie weitere Content Packs in"
+    "marketplace_prefix": "Finden Sie weitere Content Packs im"
   },
   "parameter_list": {
     "action": "Aktion",
