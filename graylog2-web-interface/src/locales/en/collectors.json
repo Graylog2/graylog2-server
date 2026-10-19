@@ -1,0 +1,651 @@
+{
+  "pages": {
+    "documentation_title": "Collectors documentation",
+    "deployment": {
+      "title": "Deploy Collectors",
+      "description": "Run the command on any number of hosts — they enroll into the fleet you pick and appear as they check in.",
+      "deploy_tab": "Deploy",
+      "tokens_tab": "Enrollment tokens",
+      "tokens_description": "Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled Collectors."
+    },
+    "fleets": {
+      "document_title": "Collector Fleets",
+      "title": "Fleets",
+      "description": "A fleet is a group of collectors that share the same configuration. All collectors in a fleet collect data from the same sources. Use fleets to organize collectors by environment, team, or purpose."
+    },
+    "fleet_detail": {
+      "title": "Fleet Detail"
+    },
+    "instances": {
+      "document_title": "Collector Instances",
+      "title": "Instances",
+      "description": "A collector instance represents a running collector process on a remote host. Instances enroll into a fleet using an enrollment token and automatically receive their fleet's source configuration."
+    },
+    "onboarding": {
+      "title": "Collector Onboarding",
+      "description": "Status of your newly connected collector.",
+      "load_error": "Could not load collector instance: {{error}}",
+      "not_found": "Collector instance not found. It may have been removed — see all <instancesLink>Instances</instancesLink>."
+    },
+    "overview": {
+      "title": "Collectors Overview",
+      "description": "Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to {{productName}}. They are organized into fleets and configured with sources that define what data to collect."
+    },
+    "settings": {
+      "title": "Collectors Settings",
+      "description": "Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to receive configuration updates and send collected log data."
+    }
+  },
+  "navigation": {
+    "overview": "Overview",
+    "fleets": "Fleets",
+    "instances": "Instances",
+    "deployment": "Deployment",
+    "settings": "Settings"
+  },
+  "activity": {
+    "deleted_target": "[deleted]",
+    "by_actor": "by {{name}}",
+    "by_system": "by System",
+    "config_changed": {
+      "fleet": "Configuration updated for fleet <targetLink />",
+      "fleet_with_others_one": "Configuration updated for fleet <targetLink /> and {{count}} other fleet",
+      "fleet_with_others_other": "Configuration updated for fleet <targetLink /> and {{count}} other fleets",
+      "collector": "Configuration updated for collector <targetLink />",
+      "collector_with_others_one": "Configuration updated for collector <targetLink /> and {{count}} other collector",
+      "collector_with_others_other": "Configuration updated for collector <targetLink /> and {{count}} other collectors"
+    },
+    "ingest_config_changed": {
+      "fleet": "Ingest configuration updated for fleet <targetLink />",
+      "fleet_with_others_one": "Ingest configuration updated for fleet <targetLink /> and {{count}} other fleet",
+      "fleet_with_others_other": "Ingest configuration updated for fleet <targetLink /> and {{count}} other fleets",
+      "collector": "Ingest configuration updated for collector <targetLink />",
+      "collector_with_others_one": "Ingest configuration updated for collector <targetLink /> and {{count}} other collector",
+      "collector_with_others_other": "Ingest configuration updated for collector <targetLink /> and {{count}} other collectors"
+    },
+    "restart": {
+      "fleet": "Restart requested for fleet <targetLink />",
+      "fleet_with_others_one": "Restart requested for fleet <targetLink /> and {{count}} other fleet",
+      "fleet_with_others_other": "Restart requested for fleet <targetLink /> and {{count}} other fleets",
+      "collector": "Restart requested for collector <targetLink />",
+      "collector_with_others_one": "Restart requested for collector <targetLink /> and {{count}} other collector",
+      "collector_with_others_other": "Restart requested for collector <targetLink /> and {{count}} other collectors"
+    },
+    "discovery_run": {
+      "fleet": "Discovery run triggered for fleet <targetLink />",
+      "fleet_with_others_one": "Discovery run triggered for fleet <targetLink /> and {{count}} other fleet",
+      "fleet_with_others_other": "Discovery run triggered for fleet <targetLink /> and {{count}} other fleets",
+      "collector": "Discovery run triggered for collector <targetLink />",
+      "collector_with_others_one": "Discovery run triggered for collector <targetLink /> and {{count}} other collector",
+      "collector_with_others_other": "Discovery run triggered for collector <targetLink /> and {{count}} other collectors"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> reassigned",
+      "collector_with_others_one": "Collector <targetLink /> and {{count}} other collector reassigned",
+      "collector_with_others_other": "Collector <targetLink /> and {{count}} other collectors reassigned"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> reassigned to fleet <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> and {{count}} other collector reassigned to fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> and {{count}} other collectors reassigned to fleet <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "The collector moves to this fleet the next time it checks in.",
+    "moving_from": "(moving from {{fleet}})",
+    "moving_from_removed": "(moving from a removed fleet)",
+    "removed_title": "This fleet has been deleted.",
+    "removed": "Fleet removed ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "Sync pending — changes will apply at the collector's next check-in",
+    "pending": "Sync pending",
+    "in_sync_title": "In sync — all changes applied",
+    "in_sync": "In sync"
+  },
+  "instance_status": {
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "os": {
+    "unknown": "Unknown"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "Delete enrollment tokens",
+    "bulk_delete_confirm_one": "Are you sure you want to delete {{count}} enrollment token? New Collectors will not be able to enroll using the deleted token.",
+    "bulk_delete_confirm_other": "Are you sure you want to delete {{count}} enrollment tokens? New Collectors will not be able to enroll using the deleted tokens.",
+    "never": "Never",
+    "expired": "Expired",
+    "human_name": "enrollment tokens",
+    "delete_title": "Delete enrollment token",
+    "delete_confirm": "Are you sure you want to delete this enrollment token? New Collectors will not be able to enroll using this token. Already-enrolled Collectors will continue to operate normally."
+  },
+  "deployment": {
+    "select_fleet_step": "Select Fleet",
+    "generate_token_step": "Generate Token",
+    "install_step": "Install the Collector",
+    "open_in_search": "Open in search",
+    "generate_token_first": "Generate a token above to see the install command.",
+    "copy_token_only": "Copy token only"
+  },
+  "enrolling_hosts": {
+    "receiving": "Receiving",
+    "listening": "Listening…",
+    "title": "Enrolling Hosts",
+    "connected_one": "{{count}} connected · listening for more…",
+    "connected_other": "{{count}} connected · listening for more…",
+    "listening_subtitle": "listening…",
+    "view_all": "View all in Instances",
+    "host": "Host",
+    "status": "Status",
+    "first_messages": "First messages",
+    "enrolled": "Enrolled",
+    "actions": "Actions",
+    "hide_setup": "Hide setup",
+    "view_setup": "View setup",
+    "empty": "Hosts running the command appear here as they check in.",
+    "connection_problem": "Having trouble reaching the server — retrying automatically"
+  },
+  "token_step": {
+    "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> generated - expires <expiresAt />",
+    "summary_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> generated - expires <expiresAt /> - scoped to fleet <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "Token <emphasis>{{tokenName}}</emphasis> generated - never expires",
+    "summary_never_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> generated - never expires - scoped to fleet <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "Change token",
+    "short_lived": "Short-lived token (expires in 1 day)",
+    "custom": "Custom token",
+    "expiry_24_hours": "24 hours",
+    "expiry_7_days": "7 days",
+    "expiry_30_days": "30 days",
+    "expiry_never": "No expiry",
+    "name": "Name",
+    "name_placeholder": "e.g. web-servers rollout",
+    "custom_hint": "Custom tokens appear on the Enrollment tokens tab and can be revoked any time.",
+    "no_permission": "You do not have permission to create enrollment tokens for this fleet",
+    "generating": "Generating...",
+    "generate": "Generate token",
+    "select_fleet_first": "Select a fleet above first."
+  },
+  "fleet_actions": {
+    "received_messages": "Received messages",
+    "delete": "Delete",
+    "delete_blocked_one": "This fleet has {{count}} assigned instance. Reassign or delete them before deleting the fleet.",
+    "delete_blocked_other": "This fleet has {{count}} assigned instances. Reassign or delete them before deleting the fleet.",
+    "delete_title": "Delete fleet",
+    "delete_confirm": "Are you sure you want to delete fleet <emphasis>{{fleetName}}</emphasis>? Its source configurations and enrollment tokens will be removed."
+  },
+  "fleet_form": {
+    "name_required": "Name is required",
+    "edit_title": "Edit Fleet",
+    "new_title": "New Fleet",
+    "name": "Name",
+    "name_help": "A unique name for this fleet",
+    "description": "Description",
+    "description_help": "Optional description of this fleet's purpose",
+    "update": "Update fleet",
+    "create": "Create fleet",
+    "updating": "Updating...",
+    "creating": "Creating..."
+  },
+  "fleet_settings": {
+    "general": "General Settings",
+    "fleet_name": "Fleet Name",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "information": "Fleet Information",
+    "fleet_id": "Fleet ID:",
+    "created": "Created:",
+    "updated": "Updated:"
+  },
+  "fleets": {
+    "human_name": "fleets"
+  },
+  "fleet_detail": {
+    "tab_sources": "Sources",
+    "tab_instances": "Instances",
+    "tab_settings": "Settings",
+    "edit_source": "Edit",
+    "not_found": "Fleet not found",
+    "deploy_collector": "Deploy a new Collector",
+    "stat_instances": "Instances",
+    "stat_instances_help": "Collector processes enrolled in this fleet.",
+    "stat_online": "Online",
+    "stat_online_help": "Instances that reported a heartbeat within the offline threshold.",
+    "stat_offline": "Offline",
+    "stat_offline_help": "Instances that missed their heartbeat. Check host connectivity or Collector process status.",
+    "stat_sources": "Sources",
+    "stat_sources_help": "Data collection configurations assigned to this fleet.",
+    "sources_description": "Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.",
+    "add_source": "Add Source",
+    "sources_human_name": "sources",
+    "instances_description": "Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances, <deployLink>deploy Collectors</deployLink> using an enrollment token for this fleet.",
+    "instances_human_name": "instances",
+    "delete_source_title": "Delete source",
+    "delete_source_confirm": "Are you sure you want to delete source <emphasis>{{sourceName}}</emphasis>? Collectors in this fleet will stop collecting data from this source within seconds."
+  },
+  "instance_actions": {
+    "reassign": "Reassign to fleet",
+    "view_system_logs": "View System Logs",
+    "details": "Details",
+    "delete_title": "Delete Collector instance",
+    "delete_confirm": "Are you sure you want to delete instance <emphasis>{{instanceName}}</emphasis>?<lineBreak />The Collector will need to be re-enrolled to appear again."
+  },
+  "reassign_fleet": {
+    "fleet_required": "Fleet is required",
+    "title_one": "Reassign {{count}} instance to fleet",
+    "title_other": "Reassign {{count}} instances to fleet",
+    "no_other_fleet_one": "There is no other fleet to assign this Collector to.",
+    "no_other_fleet_other": "There is no other fleet to assign these Collectors to.",
+    "no_permission": "You do not have permission to assign Collectors to any other fleet.",
+    "select_placeholder": "Select a fleet...",
+    "submit_one": "Reassign instance",
+    "submit_other": "Reassign instances",
+    "submitting": "Reassigning..."
+  },
+  "instance_health": {
+    "title": "Health",
+    "unknown": "Unknown",
+    "no_report": "This collector has not reported health information.",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
+    "last_known": "Last known: {{state}}",
+    "since": "for <duration />"
+  },
+  "instance_drawer": {
+    "action_reassign": "Reassign to another fleet",
+    "action_reload_config": "Reload configuration",
+    "action_reload_ingest_config": "Reload ingest configuration",
+    "action_restart": "Restart",
+    "action_discovery": "Run source discovery",
+    "status": "Status:",
+    "sync": "Sync:",
+    "fleet": "Fleet:",
+    "os": "OS:",
+    "last_seen": "Last Seen:",
+    "enrolled": "Enrolled:",
+    "version": "Version:",
+    "logs": "Logs:",
+    "messages": "Messages:",
+    "attributes": "Attributes",
+    "active_sources_one": "Active Sources ({{count}})",
+    "active_sources_other": "Active Sources ({{count}})",
+    "sources_inherited": "Sources are inherited from this instance's fleet configuration.",
+    "no_sources": "No sources configured for this fleet. Add sources in the fleet detail page to start collecting data.",
+    "synchronization": "Synchronization",
+    "pending_load_error": "Could not load pending changes. Please try again later.",
+    "queued_actions": "The following actions are queued until the collector synchronizes:",
+    "hide_transactions": "Hide queued transactions",
+    "show_transactions_one": "Show queued transactions ({{count}})",
+    "show_transactions_other": "Show queued transactions ({{count}})",
+    "changes_queued": "Changes are queued and will be applied at the collector's next check-in.",
+    "all_applied": "The collector has applied all queued actions."
+  },
+  "overview": {
+    "stat_instances_help": "Running Collector processes across all fleets.",
+    "stat_fleets": "Fleets",
+    "stat_fleets_help": "Logical groups of Collectors that share the same source configuration.",
+    "stat_sources_help": "Data collection configurations (file paths, journald, Windows Event Logs) across all fleets.",
+    "fleet_stats_error": "Could not load fleet stats.",
+    "stats_error": "Could not load Collector stats.",
+    "fleets_title": "Fleets",
+    "filter_placeholder": "Filter fleets...",
+    "config_error": "Could not load Collectors config.",
+    "endpoint_missing_title": "Collector ingest endpoint not set up",
+    "endpoint_missing": "Collectors enroll against an ingest endpoint that has not been set up yet. Setting it up requires permission to edit the Collectors configuration and to create or change the Collector Ingest (HTTP) input, which your account does not have. Ask an administrator to set up the endpoint first."
+  },
+  "fleet_card": {
+    "healthy": "All instances in this fleet are online",
+    "degraded": "Some instances in this fleet are offline",
+    "down": "All instances in this fleet are offline",
+    "empty": "No Collector instances have enrolled in this fleet yet",
+    "instances_one": "instances",
+    "instances_other": "instances",
+    "online_one": "● {{count}} online",
+    "online_other": "● {{count}} online",
+    "offline_one": "● {{count}} offline",
+    "offline_other": "● {{count}} offline",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources"
+  },
+  "fleet_cards": {
+    "empty_title": "No Fleets Yet",
+    "contact_admin": "Contact an administrator to set up the first Collectors.",
+    "empty_description": "Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add sources to define what data its Collectors should collect. Once configured, <deployLink>deploy Collectors</deployLink> using an enrollment token.",
+    "create": "Create Fleet",
+    "no_match": "No fleets matching filter"
+  },
+  "recent_activity": {
+    "title": "Recent Activity",
+    "empty": "No recent activity."
+  },
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Host",
+    "os": "OS",
+    "version": "Version",
+    "fleet": "Fleet",
+    "enrolled": "Enrolled",
+    "last_seen": "Last seen",
+    "show_attributes_one": "Show all {{count}} attributes",
+    "show_attributes_other": "Show all {{count}} attributes",
+    "hide_attributes": "Hide attributes"
+  },
+  "connection_success": {
+    "offline": "The collector connected once but hasn't reported in since <lastSeen />.",
+    "receiving": "The collector is connected and delivering messages.",
+    "waiting": "Almost there — the collector is connected and we're listening for its first messages.",
+    "title": "Setting Up {{host}}",
+    "view_instances": "View instances",
+    "check_again": "Check again",
+    "log_preview": "Log Preview",
+    "caption_messages": "Showing messages received since {{duration}}",
+    "caption_messages_checking": "Showing messages received since {{duration}} - checking every few seconds",
+    "caption_system": "Showing Collector system messages received since {{duration}}",
+    "caption_system_checking": "Showing Collector system messages received since {{duration}} - checking every few seconds"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet for This Collector",
+    "change": "Change fleet",
+    "heading": "Choose a Fleet for This Collector",
+    "create_new": "Create new fleet",
+    "or": "or",
+    "select_existing": "Select existing fleet",
+    "select_existing_placeholder": "Select existing fleet..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Setting up Collectors...",
+    "confirm": "Confirm endpoint",
+    "create_input": "Create input",
+    "save": "Save endpoint",
+    "hostname": "External hostname",
+    "hostname_placeholder": "e.g. otlp.example.com",
+    "port": "External port",
+    "cancel": "Cancel",
+    "reachability_hint": "Collectors send their logs to this address. It must be reachable from every Collector host: a load balancer, or this server.",
+    "confirm_title": "Confirm how Collectors send data to this cluster",
+    "change": "Change endpoint",
+    "sending_to": "Collectors send data to this cluster at <endpoint />",
+    "no_input_title": "No ingest input exists",
+    "no_input": "Collectors can enroll, but they will not be able to send data until an input is created.",
+    "not_running_title": "The ingest input on <endpoint /> is not running",
+    "not_running": "Collectors can enroll, but they will not be able to send data until an input is running.",
+    "manage_input": "Manage input"
+  },
+  "install_command": {
+    "title": "Run This on {{platform}}",
+    "copy": "Copy command",
+    "note_expires": "Downloads and installs the collector, enrolls it in the selected fleet, and starts the service. Requires administrator privileges. Token expires in {{duration}}.",
+    "note_never_expires": "Downloads and installs the collector, enrolls it in the selected fleet, and starts the service. Requires administrator privileges. This token never expires."
+  },
+  "log_preview": {
+    "unavailable": "Log preview unavailable — {{error}}",
+    "loading": "Loading log preview...",
+    "empty": "No messages yet — checking every few seconds"
+  },
+  "next_steps": {
+    "explore": "Explore your data",
+    "explore_description": "Open search filtered to this collector",
+    "configure_sources": "Configure sources",
+    "configure_sources_description": "Add or tune what this fleet collects",
+    "manage_fleets": "Manage fleets",
+    "manage_fleets_description": "Move this collector to a permanent fleet",
+    "install_another": "Install another collector",
+    "install_another_description": "Repeat this setup on another host",
+    "offline_title": "Get It Back Online",
+    "check_service": "Check that the collector service is running on the host.",
+    "check_reachability": "Verify the host can reach this {{productName}} server.",
+    "check_logs": "Review the collector's own logs in the preview below for connection errors.",
+    "title": "What's Next"
+  },
+  "timeline": {
+    "connection_lost": "Connection Lost",
+    "last_heartbeat": "Last heartbeat <lastSeen />",
+    "first_messages": "First Messages",
+    "receiving_one": "Receiving - {{count}} message since {{duration}}",
+    "receiving_other": "Receiving - {{count}} messages since {{duration}}",
+    "listening": "Listening... usually under a minute",
+    "enrolled": "Enrolled",
+    "enrolled_detail": "Registered with an enrollment token - <enrolledAt />",
+    "connected": "Connected",
+    "connected_detail": "Heartbeat received - <lastSeen />",
+    "sources_configured": "Sources Configured",
+    "sources_detail_one": "{{count}} source from fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} sources from fleet <fleetLink>{{fleetName}}</fleetLink>"
+  },
+  "platform_picker": {
+    "title": "Get Started with Collectors",
+    "description": "Deploy lightweight collectors across your infrastructure to forward logs into {{productName}}."
+  },
+  "source_status": {
+    "messages_one": "{{formattedCount}} message",
+    "messages_other": "{{formattedCount}} messages",
+    "disabled": "Disabled",
+    "not_applicable": "Not applicable on {{os}}",
+    "unrecognised": "Unrecognised source type",
+    "paused": "Paused — collector offline",
+    "no_messages": "No messages yet",
+    "waiting": "Waiting for first messages...",
+    "title": "Log Sources",
+    "no_sources": "No sources configured for this fleet yet."
+  },
+  "waiting_for_connection": {
+    "status": "Waiting for connection... {{seconds}}s"
+  },
+  "settings": {
+    "getting_started": "Getting started with Collectors",
+    "getting_started_cloud": "Collectors connect to a managed ingest endpoint to send their data. Save your collector settings to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.",
+    "getting_started_self_managed": "Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.",
+    "ingest_endpoint": "Ingest Endpoint",
+    "ingest_endpoint_cloud": "The ingest endpoint is system-managed. Collectors connect here automatically.",
+    "ingest_endpoint_help": "Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.",
+    "hostname_help": "The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts.",
+    "create_input": "Create ingest input",
+    "lifecycle": "Collector Lifecycle",
+    "offline_threshold": "Offline threshold",
+    "offline_threshold_help": "Collectors that haven't reported within this time are shown as offline.",
+    "default_visibility": "Default visibility",
+    "default_visibility_help": "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table.",
+    "expiration_threshold": "Expiration threshold",
+    "expiration_threshold_help": "Collectors that haven't reported within this time are permanently removed.",
+    "confirm": "Confirm settings"
+  },
+  "ingest_inputs": {
+    "title": "Ingest Inputs",
+    "none": "No Collector ingest input exists. Collectors will not be able to send data until an input is created.",
+    "unreadable_one": "{{count}} collector ingest input exists but you do not have permission to view it.",
+    "unreadable_other": "{{count}} collector ingest inputs exist but you do not have permission to view them.",
+    "none_running": "Collector ingest inputs exist but none are currently running. Collectors will not be able to send data.",
+    "name": "Name",
+    "status": "Status",
+    "bind_address": "Bind Address",
+    "port": "Port",
+    "manage": "Manage",
+    "additional_unreadable_one": "{{count}} additional input not visible due to permissions.",
+    "additional_unreadable_other": "{{count}} additional inputs not visible due to permissions."
+  },
+  "port_mismatch": {
+    "message_one": "Collector ingest inputs exist on different port: {{ports}}. If the external port differs from an input port, ensure your network routes traffic correctly.",
+    "message_other": "Collector ingest inputs exist on different ports: {{ports}}. If the external port differs from an input port, ensure your network routes traffic correctly."
+  },
+  "source_types": {
+    "file": "File",
+    "journald": "Journald",
+    "windows_event_log": "Windows Event Log",
+    "macos_unified_logging": "macOS Unified Logging"
+  },
+  "source_columns": {
+    "enabled": "Enabled"
+  },
+  "source_form": {
+    "max_poll_interval_error": "Max poll interval must be at least 1 seconds.",
+    "max_log_age_error": "Max log age must be 0 or a positive value.",
+    "read_mode_end": "From end (tail)",
+    "read_mode_beginning": "From beginning",
+    "file_paths": "File Path(s)",
+    "file_paths_help": "Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines.",
+    "read_mode": "Read Mode",
+    "read_mode_file_help": "From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing.",
+    "read_mode_journald_help": "From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing.",
+    "priority": "Priority",
+    "priority_help": "Minimum severity level to collect. For example, selecting Error also collects Critical, Alert, and Emergency entries.",
+    "priority_emerg": "Emergency",
+    "priority_alert": "Alert",
+    "priority_crit": "Critical",
+    "priority_err": "Error",
+    "priority_warning": "Warning",
+    "priority_notice": "Notice",
+    "priority_info": "Info",
+    "priority_debug": "Debug",
+    "match_pattern": "Match Pattern",
+    "match_pattern_help": "Optional journald match expression to filter entries by unit, process, etc. Example: _SYSTEMD_UNIT=nginx.service",
+    "channels": "Channels",
+    "channels_help": "Comma-separated channel names (e.g., Application, Security, System)",
+    "include_default_channels": "Include default channels",
+    "include_default_channels_help": "Defaults are: {{channels}}",
+    "predicate": "Predicate",
+    "predicate_help": "Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently collected, as they are very noisy and carry very little valuable information. Example: <code>{{example}}</code>",
+    "max_poll_interval": "Max poll interval",
+    "max_poll_interval_help": "How often the Collector checks for new log entries. Must be at least 1 second.",
+    "max_log_age": "Max log age",
+    "max_log_age_help": "On first start, how far back to backfill logs. Set to 0 to disable backfilling.",
+    "edit_title": "Edit Source",
+    "new_title": "New Source",
+    "description": "A source defines what data Collectors in this fleet should collect. Each source type corresponds to a different collection method.",
+    "source_type": "Source Type",
+    "file_type_help": "Collect log lines from files on the host. Supports glob patterns for matching multiple files.",
+    "journald_type_help": "Collect entries from the systemd journal (Linux only).",
+    "windows_type_help": "Collect events from Windows Event Viewer channels.",
+    "macos_type_help": "Collect from the macOS unified logging system via the <code>log</code> command (macOS only).",
+    "enabled_help": "Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source.",
+    "update": "Update source",
+    "create": "Create source"
+  },
+  "load_errors": {
+    "recent_activity": {
+      "message": "Loading recent activity failed with status",
+      "title": "Could not load recent activity"
+    },
+    "input_ids": {
+      "message": "Loading Collector input IDs failed with status",
+      "title": "Could not load Collector input IDs."
+    },
+    "stats": {
+      "message": "Loading Collector stats failed with status",
+      "title": "Could not load Collector stats."
+    },
+    "config": {
+      "message": "Loading collectors config failed with status",
+      "title": "Could not load collectors config."
+    },
+    "enrollment_tokens": {
+      "message": "Loading enrollment tokens failed with status",
+      "title": "Could not load enrollment tokens"
+    },
+    "pending_changes": {
+      "message": "Loading pending changes failed with status",
+      "title": "Could not load pending changes"
+    },
+    "instances": {
+      "message": "Loading instances failed with status",
+      "title": "Could not load instances"
+    },
+    "collector_instances": {
+      "message": "Loading Collector instances failed with status",
+      "title": "Could not load Collector instances"
+    },
+    "fleets": {
+      "message": "Loading fleets failed with status",
+      "title": "Could not load Fleets"
+    },
+    "fleet": {
+      "message": "Loading fleet failed with status",
+      "title": "Could not load Fleet"
+    },
+    "fleet_stats": {
+      "message": "Loading fleet stats failed with status",
+      "title": "Could not load Fleet Stats"
+    },
+    "sources": {
+      "message": "Loading sources failed with status",
+      "title": "Could not load sources"
+    },
+    "input_details": {
+      "message": "Loading Collector input details failed with status: {{error}}",
+      "title": "Could not load Collector input details."
+    }
+  },
+  "mutation_errors": {
+    "create_fleet": {
+      "message": "Creating fleet failed: {{error}}",
+      "title": "Could not create fleet"
+    },
+    "update_fleet": {
+      "message": "Updating fleet failed: {{error}}",
+      "title": "Could not update fleet"
+    },
+    "delete_fleet": {
+      "message": "Deleting fleet failed: {{error}}",
+      "title": "Could not delete fleet"
+    },
+    "create_source": {
+      "message": "Creating source failed: {{error}}",
+      "title": "Could not create source"
+    },
+    "update_source": {
+      "message": "Updating source failed: {{error}}",
+      "title": "Could not update source"
+    },
+    "delete_source": {
+      "message": "Deleting source failed: {{error}}",
+      "title": "Could not delete source"
+    },
+    "create_enrollment_token": {
+      "message": "Creating enrollment token failed: {{error}}",
+      "title": "Could not create enrollment token"
+    },
+    "delete_enrollment_token": {
+      "message": "Deleting enrollment token failed: {{error}}",
+      "title": "Could not delete enrollment token"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Deleting enrollment tokens failed: {{error}}",
+      "title": "Could not delete enrollment tokens"
+    },
+    "reassign_instances": {
+      "message": "Reassigning instances failed: {{error}}",
+      "title": "Could not reassign instances"
+    },
+    "delete_instance": {
+      "message": "Deleting instance failed: {{error}}",
+      "title": "Could not delete instance"
+    },
+    "save_config": {
+      "message": "Saving collectors config failed: {{error}}",
+      "title": "Could not save config"
+    },
+    "create_input": {
+      "message": "Creating Collector ingest input failed: {{error}}",
+      "title": "Could not create Collector ingest input"
+    },
+    "update_input": {
+      "message": "Updating Collector ingest input failed: {{error}}",
+      "title": "Could not update Collector ingest input"
+    }
+  },
+  "notifications": {
+    "success_title": "Success!",
+    "fleet_created": "Fleet \"{{name}}\" has been created.",
+    "fleet_updated": "Fleet \"{{name}}\" has been updated.",
+    "fleet_deleted": "Fleet has been deleted.",
+    "source_created": "Source \"{{name}}\" has been created.",
+    "source_updated": "Source \"{{name}}\" has been updated.",
+    "source_deleted": "Source has been deleted.",
+    "enrollment_token_deleted": "Enrollment token has been deleted.",
+    "enrollment_tokens_deleted": "Enrollment tokens have been deleted.",
+    "instances_reassigned": "Instances have been reassigned.",
+    "instance_deleted": "Instance has been deleted.",
+    "config_saved": "Collectors config saved.",
+    "input_created": "Collector ingest input created.",
+    "input_moved": "Collector ingest input moved to the new port."
+  }
+}

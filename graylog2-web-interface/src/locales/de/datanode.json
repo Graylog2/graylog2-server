@@ -1,0 +1,512 @@
+{
+  "pages": {
+    "description": "{{productName}} Data Nodes bieten eine bessere Integration mit {{productName}} und vereinfachen zukünftige Updates. Mit ihnen können Sie alle Nachrichten in Ihrer {{productName}}-Nachrichtendatenbank indizieren und durchsuchen.",
+    "documentation_title": "Data-Node-Dokumentation",
+    "cluster_management_title": "Data-Node-Dashboard",
+    "certificate_management_title": "Zertifikatsverwaltung",
+    "migration_title": "Data-Node-Migration",
+    "upgrade_title": "Data-Node-Upgrade"
+  },
+  "details_page": {
+    "error": "Fehler: {{message}}",
+    "title": "Data Nodes: {{hostname}}",
+    "details": "Details:",
+    "hostname": "Hostname:",
+    "transport_address": "Transport-Adresse:",
+    "status": "Status:",
+    "not_available": "k. A.",
+    "certificate_valid_until": "Zertifikat gültig bis:",
+    "datanode_version": "Data-Node-Version:",
+    "configuration_warnings": "Konfigurationswarnungen"
+  },
+  "upgrade_page": {
+    "manual_instructions": "Um Ihre Data Nodes manuell zu aktualisieren, folgen Sie bitte den Anweisungen in der <docsLink>Dokumentation</docsLink>.",
+    "manual_upgrade_of_node": "Sobald Sie das manuelle Upgrade von <bold>{{node}}</bold> auf dem System abgeschlossen haben, warten Sie, bis er sich wieder verbindet und im Bereich <bold>Aktualisierte Knoten</bold> erscheint. Klicken Sie dann auf <confirmButton><bold>Upgrade bestätigen</bold></confirmButton> und fahren Sie mit dem nächsten Knoten fort.",
+    "manual_upgrade_of_data_node": "Sobald Sie das manuelle Upgrade Ihres Data Nodes auf dem System abgeschlossen haben, warten Sie, bis er sich wieder verbindet und im Bereich <bold>Aktualisierte Knoten</bold> erscheint. Klicken Sie dann auf <confirmButton><bold>Upgrade bestätigen</bold></confirmButton> und fahren Sie mit dem nächsten Knoten fort.",
+    "select_strategy": "Upgrade-Strategie auswählen",
+    "upgrade_data_node": "Data Node aktualisieren",
+    "manual_upgrade_title": "Manuelles Data-Node-Upgrade"
+  },
+  "cluster_management": {
+    "teaser_hotspot": "Zeigen Sie Performance-Metriken Ihres Data Nodes und des verwalteten OpenSearch-Clusters an.",
+    "teaser_license_warning": "Bitte stellen Sie sicher, dass Sie eine gültige Lizenz besitzen und ein Data Node konfiguriert ist, um die Performance-Metriken Ihres Data Nodes und Ihres verwalteten OpenSearch-Clusters zu sehen."
+  },
+  "migration_wizard": {
+    "loading": "Wird geladen ..."
+  },
+  "ca_configuration": {
+    "title": "Zertifizierungsstelle konfigurieren",
+    "description_upload_or_create": "In diesem Schritt können Sie eine Zertifizierungsstelle (CA) hochladen oder neu erstellen.",
+    "description_provision": "Die Zertifizierungsstelle stellt Zertifikate für Ihre Data Nodes bereit und verwaltet sie, was die Verwaltung vereinfacht.",
+    "reusing_certificates_title": "Zertifikate wiederverwenden",
+    "reusing_certificates": "Wenn Ihr bestehender Cluster Zertifikate verwendet, werden diese standardmäßig bei der Bereitstellung der Data Nodes im nächsten Schritt durch die {{productName}}-CA und automatisch erzeugte Zertifikate ersetzt. Wenn Sie Ihre eigene CA verwenden möchten, können Sie ein bestehendes Zertifikat hochladen. Weitere Informationen finden Sie unter <docsLink>{{productName}} Data Node - Getting Started</docsLink>.",
+    "create_tab": "Neue CA erstellen",
+    "upload_tab": "CA hochladen"
+  },
+  "ca_create": {
+    "success": "CA erfolgreich erstellt",
+    "failed": "Erstellen der CA fehlgeschlagen: {{error}}",
+    "description": "Klicken Sie auf „CA erstellen“, um schnell eine neue Zertifizierungsstelle für Ihre {{productName}} Data Nodes zu erstellen.",
+    "organization_name": "Name der Organisation",
+    "submitting": "CA wird erstellt...",
+    "submit": "CA erstellen"
+  },
+  "ca_upload": {
+    "file_required": "Bitte laden Sie eine Datei hoch.",
+    "single_file": "Bitte laden Sie nur eine einzelne Datei hoch.",
+    "rejected": "Hochladen der CA fehlgeschlagen",
+    "success": "CA erfolgreich hochgeladen",
+    "failed": "Hochladen der CA fehlgeschlagen: {{error}}",
+    "explanation": "Hier können Sie Ihre bestehende CA hochladen. Laden Sie eine einzelne Datei hoch, die den privaten Schlüssel (verschlüsselt oder unverschlüsselt), das CA-Zertifikat sowie alle Zwischenzertifikate enthält. Die Datei kann im PEM- oder PKCS#12-Format vorliegen. Wenn Ihr privater Schlüssel verschlüsselt ist, müssen Sie auch das zugehörige Passwort angeben.",
+    "certificate_authority": "Zertifizierungsstelle",
+    "dropzone": "CA hierher ziehen oder klicken, um eine Datei auszuwählen",
+    "password": "Passwort",
+    "submitting": "CA wird hochgeladen...",
+    "submit": "CA hochladen"
+  },
+  "migration_steps": {
+    "ca_configuration": "Zertifizierungsstelle konfigurieren",
+    "renewal_policy_configuration": "Erneuerungsrichtlinie konfigurieren",
+    "compatibility_check": "OpenSearch-Kompatibilität mit dem Data Node prüfen",
+    "manual_migration_step": "Migrationsschritte.",
+    "migration_finished": "Migration abgeschlossen"
+  },
+  "migration_states": {
+    "new": "Migration",
+    "migration_welcome_page": "Willkommen",
+    "ca_creation_page": "Zertifizierungsstelle",
+    "renewal_policy_creation_page": "Richtlinie zur Zertifikatserneuerung",
+    "migration_selection_page": "Migrationsschritte",
+    "rolling_upgrade_migration_welcome_page": "Willkommen zur In-Place-Migration",
+    "ask_to_shutdown_old_cluster": "Alten Cluster herunterfahren",
+    "manually_remove_old_connection_string_from_config": "Verbindungs-String entfernen",
+    "message_processing_stop": "Nachrichtenverarbeitung stoppen",
+    "replace_cluster": "Bestehenden Cluster ersetzen",
+    "restart_graylog": "Konfigurationsdatei aktualisieren und {{productName}} neu starten",
+    "directory_compatibility_check_page": "Prüfung der Verzeichniskompatibilität",
+    "provision_rolling_upgrade_nodes_with_certificates": "Übersicht der Zertifikatsbereitstellung",
+    "provision_rolling_upgrade_nodes_running": "Zertifikat des Data Nodes bereitstellen.",
+    "journal_size_downtime_warning": "Warnung zu Journal-Größe und Ausfallzeit",
+    "failed": "Migration fehlgeschlagen",
+    "finished": "Migration abgeschlossen"
+  },
+  "migration_actions": {
+    "show_renewal_policy_creation": "Richtlinie zur Zertifikatserneuerung konfigurieren",
+    "show_migration_selection": "Zu den Migrationsschritten",
+    "run_directory_compatibility_check": "Verzeichniskompatibilität prüfen",
+    "provision_datanode_certificates": "Data Nodes mit Zertifikaten versorgen",
+    "next": "Weiter"
+  },
+  "certificate_renewal": {
+    "loading_failed": "Laden der Data Nodes fehlgeschlagen mit Status",
+    "loading_failed_title": "Data Nodes konnten nicht geladen werden",
+    "renew": {
+      "button": "Zertifikat erneuern",
+      "button_loading": "Zertifikat wird erneuert",
+      "success": "Zertifikat erfolgreich erneuert",
+      "failed": "Erneuern des Zertifikats fehlgeschlagen: {{error}}"
+    },
+    "provision": {
+      "button": "Zertifikat bereitstellen",
+      "button_loading": "Zertifikat wird bereitgestellt...",
+      "success": "Zertifikat erfolgreich bereitgestellt",
+      "failed": "Bereitstellen des Zertifikats fehlgeschlagen: {{error}}"
+    },
+    "title": "Zertifikatserneuerung und -bereitstellung",
+    "description": "Hier können Sie die Erneuerung oder Bereitstellung von Zertifikaten für {{productName}} Data Nodes manuell auslösen. Eine manuelle Bereitstellung ist nur nötig, wenn der Modus „Manuell“ der Erneuerungsrichtlinie konfiguriert ist und Data Nodes nach der ersten Zertifikatsbereitstellung gestartet wurden.",
+    "transport_address": "Transport-Adresse",
+    "hostname": "Hostname",
+    "valid_until": "gültig bis {{relativeTime}}",
+    "no_data_nodes": "Es wurden keine Data Nodes gefunden."
+  },
+  "renewal_policy": {
+    "configure": "Richtlinie zur Zertifikatserneuerung konfigurieren",
+    "modes": {
+      "automatic": "Automatisch",
+      "manual": "Manuell"
+    },
+    "update_failed": "Fehler beim Aktualisieren der Richtlinie zur Zertifikatserneuerung: {{error}}",
+    "update_failed_title": "Richtlinie zur Zertifikatserneuerung konnte nicht aktualisiert werden",
+    "mode_explanation": "Mit dem Modus „Automatisch“ werden alle ablaufenden Zertifikate ohne Benutzerinteraktion erneuert. Mit „Manuell“ wird eine Systembenachrichtigung erstellt, wenn ein oder mehrere Zertifikate bald ablaufen, sodass Sie deren Erneuerung bestätigen können.",
+    "lifetime_explanation": "Die Zertifikatslebensdauer bestimmt die Gültigkeitsdauer neu erstellter Zertifikate.",
+    "title": "Konfiguration der Zertifikatserneuerung",
+    "description": "Diese Einstellungen werden verwendet, um ablaufende Zertifikate zu erkennen und/oder sie zu erneuern.",
+    "renewal_mode": "Erneuerungsmodus:",
+    "certificate_lifetime": "Zertifikatslebensdauer:",
+    "edit": "Konfiguration bearbeiten",
+    "renewal_mode_label": "Modus der Zertifikatserneuerung",
+    "select_mode": "Modus der Zertifikatserneuerung auswählen",
+    "certificate_lifetime_label": "Zertifikatslebensdauer",
+    "submitting": "Konfiguration wird aktualisiert",
+    "submit": "Konfiguration aktualisieren"
+  },
+  "data_node_actions": {
+    "rejoin_title": "Data Node wieder aufnehmen",
+    "rejoin_confirm": "Möchten Sie den Data Node „{{hostname}}“ wirklich wieder aufnehmen?",
+    "remove_title": "Data Node entfernen",
+    "remove_confirm": "Möchten Sie den Data Node „{{hostname}}“ wirklich entfernen?",
+    "stop_title": "Data Node stoppen",
+    "stop_confirm": "Möchten Sie den Data Node „{{hostname}}“ wirklich stoppen?",
+    "renew_certificate": "Zertifikat erneuern",
+    "start": "Starten",
+    "stop": "Stoppen",
+    "rejoin": "Wieder aufnehmen",
+    "remove": "Entfernen",
+    "show_logs": "Logs anzeigen"
+  },
+  "data_node_badge": {
+    "short_node_id": "Kurze Node-ID"
+  },
+  "data_node_logs": {
+    "title": "Logs von {{hostname}}",
+    "no_logs": "Keine Logs."
+  },
+  "data_node_status": {
+    "queued_for": "in Warteschlange für {{action}}"
+  },
+  "client_certificate": {
+    "create_title": "Client-Zertifikat erstellen",
+    "principal_placeholder": "Principal",
+    "principal": "Principal",
+    "role_placeholder": "Rolle",
+    "role_help": "Entspricht dem OpenSearch-Rollen-Mapping.",
+    "role": "Rolle",
+    "unencrypted": "Unverschlüsselt",
+    "password": "Passwort",
+    "certificate_lifetime": "Zertifikatslebensdauer",
+    "submit": "Zertifikat erstellen",
+    "submitting": "Zertifikat wird erstellt...",
+    "close": "Schließen",
+    "title": "Client-Zertifikat",
+    "description": "Client-Zertifikate für Drittanbieter-Tools erzeugen",
+    "view_principal": "Principal:",
+    "view_role": "Rolle:",
+    "ca_certificate": "CA-Zertifikat",
+    "private_key": "Privater Schlüssel",
+    "certificate": "Zertifikat",
+    "copy_to_clipboard": "In die Zwischenablage kopieren",
+    "generate": "Client-Zertifikat erzeugen"
+  },
+  "cluster_health": {
+    "state_help": {
+      "question": "Wie ändert sich der Zustand meines Clusters während des Rolling Upgrades?",
+      "red": "ROT - Wenn Sie Indizes ohne Replikation verwenden und den Knoten aktualisieren, der die Shards dieser Indizes hostet, wechselt der Cluster in einen roten Zustand und es werden keine Daten in diese Indizes aufgenommen oder sind darin durchsuchbar.",
+      "yellow": "GELB - Nach dem Start des Upgrades eines Knotens wird die Shard-Zuweisung auf keine Replikation gesetzt, damit OpenSearch nur die verfügbaren Shards verwendet.",
+      "green": "Nachdem ein Knoten aktualisiert wurde und Sie auf <emphasis>Upgrade bestätigen</emphasis> klicken, wird die Shard-Replikation wieder aktiviert, alle Shards, die wegen des Upgrades nicht verfügbar waren, werden neu zugewiesen und der Cluster kehrt in den Zustand GRÜN zurück."
+    },
+    "shard_replication_help": {
+      "start": "Nachdem Sie bei einem Knoten auf <emphasis><bold>Upgrade-Prozess starten</bold></emphasis> geklickt haben, wird die Shard-Zuweisung auf keine Replikation gesetzt, damit OpenSearch nur die verfügbaren Shards verwendet.",
+      "confirm": "Nachdem ein Knoten aktualisiert wurde und Sie auf <emphasis><bold>Upgrade bestätigen</bold></emphasis> klicken, wird die Shard-Replikation wieder aktiviert und alle Shards, die wegen des Upgrades nicht verfügbar waren, werden neu zugewiesen.",
+      "force_disabled": "Deaktivierung erzwingen",
+      "force_enabled": "Aktivierung erzwingen"
+    },
+    "server_version": "Server-Version:",
+    "shard_replication": "Shard-Replikation:",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "cluster_manager": "Cluster-Manager:",
+    "number_of_nodes": "Anzahl der Knoten:",
+    "nodes_summary": "{{total}} ({{outdated}} veraltet, {{upgraded}} aktualisiert)",
+    "number_of_shards": "Anzahl der Shards:",
+    "shards_summary": "{{active}} aktiv, {{initializing}} werden initialisiert, {{relocating}} werden verschoben, {{unassigned}} nicht zugewiesen"
+  },
+  "upgrade_nodes": {
+    "manager": "Manager",
+    "outdated_nodes": "Veraltete Knoten",
+    "start_upgrade": "Upgrade-Prozess starten",
+    "no_outdated_nodes": "Keine veralteten Knoten gefunden.",
+    "upgraded_nodes": "Aktualisierte Knoten",
+    "upgraded": "Aktualisiert",
+    "no_upgraded_nodes": "Keine aktualisierten Knoten gefunden."
+  },
+  "upgrade_method": {
+    "cluster_restart": "Cluster-Neustart",
+    "rolling_upgrade": "Rolling Upgrade",
+    "cluster_restart_description": "Bei der Methode Cluster-Neustart aktualisieren Sie alle Data Nodes gleichzeitig. Währenddessen werden Nachrichten im Journal gepuffert und verarbeitet, sobald der Data-Node-Cluster wieder online ist. So gehen keine Daten verloren, sofern die Journal-Größe für das während der Ausfallzeit der Data Nodes erwartete Nachrichtenvolumen konfiguriert ist.",
+    "cluster_restart_less_than_three": "Wenn Ihr Data-Node-Cluster weniger als drei Knoten hat, ist der Cluster-Neustart die einzige verfügbare Methode.",
+    "cluster_restart_three_or_more": "Wenn Ihr Data-Node-Cluster drei oder mehr Knoten hat, können Sie den Cluster-Neustart nach Abwägung Ihrer Journal-Größe und Ihres Nachrichtendurchsatzes verwenden.",
+    "rolling_upgrade_description": "Rolling Upgrades sind auf einem laufenden Data-Node-Cluster nur mit <bold>drei oder mehr Knoten</bold> möglich und nahezu ohne Ausfallzeit.",
+    "rolling_upgrade_process": "Data Nodes werden einzeln gestoppt und vor Ort aktualisiert. Alternativ können Data Nodes einzeln gestoppt und durch Hosts mit der neuen Version ersetzt werden. Während dieses Vorgangs können Sie weiterhin Daten in Ihrem Cluster indizieren und abfragen."
+  },
+  "upgrade_status": {
+    "checking": "OpenSearch-Status wird geprüft...",
+    "upgrading": "Das Rolling Upgrade von OpenSearch läuft.",
+    "error": "Die Version des eingebetteten OpenSearch der Data Nodes konnte nicht geprüft werden.",
+    "unconfirmed_one": "Der Zustand des eingebetteten OpenSearch der Data Nodes kann nicht bestätigt werden, solange {{count}} Data Node nicht verfügbar ist.",
+    "unconfirmed_other": "Der Zustand des eingebetteten OpenSearch der Data Nodes kann nicht bestätigt werden, solange {{count}} Data Nodes nicht verfügbar sind.",
+    "up_to_date": "Das eingebettete OpenSearch der Data Nodes ist auf dem neuesten Stand.",
+    "up_to_date_with_version": "Das eingebettete OpenSearch der Data Nodes ist auf dem neuesten Stand <bold>({{version}}).</bold>",
+    "outdated": "Das eingebettete OpenSearch der Data Nodes ist nicht auf dem neuesten Stand.",
+    "all_data_nodes_up_to_date": "Alle Ihre Data Nodes sind auf dem neuesten Stand."
+  },
+  "migration_steps_text": {
+    "ca_step_required": "Bitte erstellen Sie eine Zertifizierungsstelle, bevor Sie fortfahren.",
+    "renewal_step_required": "Bitte erstellen Sie eine Richtlinie zur Zertifikatserneuerung, bevor Sie fortfahren.",
+    "finished": "Die Migration ist abgeschlossen!"
+  },
+  "compatibility_check": {
+    "loading": "Ergebnisse der Kompatibilitätsprüfung werden geladen...",
+    "title": "Prüfung der Verzeichniskompatibilität",
+    "compatible": "Ihre bestehenden OpenSearch-Daten können zum Data Node migriert werden.",
+    "incompatible": "Ihre bestehenden OpenSearch-Daten können nicht zum Data Node migriert werden.",
+    "error": "Beim Prüfen der Kompatibilität ist ein Fehler aufgetreten",
+    "version_incompatible": "Ihr OpenSearch-Cluster kann nicht zu dieser Data-Node-Version migriert werden, da er nicht kompatibel ist."
+  },
+  "compatibility_status": {
+    "datanode_opensearch_version": "OpenSearch-Version des Data Nodes",
+    "opensearch_data_location": "Speicherort der OpenSearch-Daten",
+    "node_title_one": "Knoten: {{hostname}}, Version: {{version}}, {{count}} Index",
+    "node_title_other": "Knoten: {{hostname}}, Version: {{version}}, {{count}} Indizes",
+    "indices": "Indizes",
+    "creation_date": "Erstellungsdatum",
+    "index_version": "Index-Version",
+    "shards": "Shards",
+    "shard_count_one": "{{count}} Shard",
+    "shard_count_other": "{{count}} Shards"
+  },
+  "in_place_migration": {
+    "title": "In-Place-Migration",
+    "description": "Folgen Sie diesen Schritten, um Ihren bestehenden OpenSearch-2.x- oder -1.3.x-Cluster zu Data Nodes zu migrieren."
+  },
+  "manual_migration": {
+    "migration_type": "Migrationstyp",
+    "migration_type_help": "Die Art der Migration, die Sie durchführen möchten.",
+    "select_migration_type": "Migrationstyp auswählen"
+  },
+  "migration_data_nodes": {
+    "loading": "Data Nodes werden geladen",
+    "none_found": "Es wurden keine Data Nodes gefunden.",
+    "none_found_title": "Keine Data Nodes gefunden",
+    "start_data_node": "Bitte starten Sie mindestens einen Data Node, um die Migration fortzusetzen. Weitere Informationen zum Starten von Data Nodes finden Sie in unserer <docsLink>Dokumentation</docsLink>.",
+    "looking": "Suche nach Data Nodes...",
+    "found_one": "Gefundene Data Nodes: {{count}}",
+    "found_other": "Gefundene Data Nodes: {{count}}",
+    "incompatible_title": "Inkompatible Data Nodes gefunden",
+    "incompatible": "Es laufen Data Nodes mit Versionen, die mit Ihrer aktuellen {{productName}}-Version nicht kompatibel sind. Bitte verwenden Sie für {{productName}} und Data Node dieselbe Version.",
+    "hostname": "Hostname",
+    "transport_address": "Transport-Adresse",
+    "status": "Status",
+    "certificate_valid_until": "Zertifikat gültig bis",
+    "version": "Version",
+    "no_certificate": "Kein Zertifikat",
+    "version_incompatible": "Diese Version ist mit Ihrer aktuellen {{productName}}-Version nicht kompatibel."
+  },
+  "migration_welcome": {
+    "incompatible_backend": "Inkompatibles Such-Backend. Bitte aktualisieren Sie auf OpenSearch, um den Migrationsassistenten verwenden zu können.",
+    "title": "Data-Nodes-Migration",
+    "intro": "Der {{productName}} Data Node ist eine Verwaltungskomponente, die OpenSearch für die Verwendung mit {{productName}} konfiguriert und optimiert. Das reduziert den Verwaltungsaufwand und vereinfacht zukünftige Updates.",
+    "earlier_deployments": "Installationen vor v5.2 oder ohne Data Node müssen die Nachrichtendatenbanken zu Data Nodes migrieren.",
+    "tool_description": "Dieses Migrationswerkzeug prüft die Kompatibilität Ihrer Komponenten und führt Sie durch die Migration Ihrer bestehenden OpenSearch-Daten zu einem Data Node.",
+    "required_steps": "Für die Migration zum Data Node sind einige Schritte auf dem Betriebssystem, in Ihrem aktuellen OS/ES-Cluster und in Ihren Konfigurationsdateien erforderlich.",
+    "more_information": "Weitere Informationen finden Sie in der <docsLink>Dokumentation</docsLink> zur Data-Node-Migration."
+  },
+  "certificates_provisioning": {
+    "loading": "Migrationsstatus wird geladen.",
+    "ca_configured": "Die Zertifizierungsstelle wurde erfolgreich konfiguriert.",
+    "provision_now": "Sie können jetzt Zertifikate für Ihre Data Nodes bereitstellen.",
+    "provisioning": "Zertifikat wird bereitgestellt",
+    "finished": "Die Bereitstellung des Data Nodes ist abgeschlossen."
+  },
+  "in_place_migration_info": {
+    "configuration": "Stellen Sie bei In-Place-Migrationen sicher, dass die Konfiguration Ihrer Data Nodes in <codeSnippet>datanode.conf</codeSnippet>, insbesondere die Option <codeSnippet>opensearch_data_location</codeSnippet>, auf jedem Knoten auf das richtige bestehende OpenSearch-Datenverzeichnis zeigt.",
+    "permissions": "Während der Migration müssen sowohl der Systembenutzer des Data Nodes als auch der von OpenSearch auf das Datenverzeichnis zugreifen und darin schreiben können. Dazu können Sie zum Beispiel Folgendes ausführen:"
+  },
+  "jwt_authentication": {
+    "title": "JWT-Authentifizierung",
+    "description": "Je nachdem, wie Sie Ihren bestehenden Cluster abgesichert haben, sind vorab einige Änderungen an der Sicherheitskonfiguration nötig. Wir verwenden JWT-Authentifizierung, um von {{productName}} aus auf OpenSearch zuzugreifen. Im nächsten Schritt müssen Sie die JWT-Authentifizierung in Ihrem bestehenden OpenSearch-Cluster manuell aktivieren, damit der Data Node auf die Daten zugreifen kann.",
+    "add_snippet": "Fügen Sie dazu den folgenden Ausschnitt zu Ihrer <codeSnippet>opensearch-security/config.yml</codeSnippet> hinzu",
+    "replace_signing_key": "Bitte ersetzen Sie den Signaturschlüssel durch Ihr <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> in Base64-Kodierung. Zum Kodieren können Sie Folgendes ausführen"
+  },
+  "reset_migration": {
+    "success": "Migrationsstatus erfolgreich zurückgesetzt.",
+    "failed": "Zurücksetzen des Migrationsstatus fehlgeschlagen mit Status: {{error}}",
+    "failed_title": "Der Migrationsstatus konnte nicht zurückgesetzt werden.",
+    "button": "Migration zurücksetzen",
+    "confirm": "Möchten Sie die Migration wirklich zurücksetzen?"
+  },
+  "journal_downtime": {
+    "title": "Warnung zur Journal-Größe während der Ausfallzeit",
+    "processing_stops": "Bitte beachten Sie, dass die Datenverarbeitung auf Ihrem {{productName}}-Knoten während der Migration angehalten wird. Dadurch wächst das Journal.",
+    "increase_size": "Daher müssen Sie möglicherweise die Größe Ihres Journal-Volumes erhöhen.",
+    "current_size": "Ihre aktuelle Journal-Größe beträgt: <bold>{{size}} MB</bold> und Ihr aktueller Journal-Durchsatz: <bold>{{throughput}} KB/min</bold>",
+    "max_downtime": "Ihre aktuelle maximale Ausfallzeit für die Umstellung von {{productName}} auf den Data Node beträgt: <bold>{{duration}}</bold>",
+    "estimation_error": "Beim Schätzen Ihres Journal-Durchsatzes ist ein Fehler aufgetreten: {{message}}",
+    "sufficient_size": "Bitte stellen Sie sicher, dass Ihr Journal-Volume ausreichend groß ist, bevor Sie fortfahren."
+  },
+  "journal_size_warning": {
+    "title": "Warnung zur Journal-Größe",
+    "description": "Bitte beachten Sie, dass Sie die Verarbeitung auf Ihrem {{productName}}-Knoten während der Migration anhalten müssen. Dadurch wächst das Journal. Daher müssen Sie die Größe Ihres Journal-Volumes spätestens im Schritt zur Journal-Größe erhöhen."
+  },
+  "restart_graylog": {
+    "almost_there": "Fast geschafft!",
+    "remove_hosts": "Bitte entfernen Sie die Zeile <codeSnippet>elasticsearch_hosts</codeSnippet> aus Ihrer <codeSnippet>server.conf</codeSnippet>",
+    "example": "Z. B.",
+    "wait_for_available": "Bitte warten Sie, bis alle Data Nodes den Status 'AVAILABLE' haben. Prüfen Sie das Log der Data Nodes, falls sie nicht innerhalb von 1–2 Minuten verfügbar werden.",
+    "restart": "Starten Sie danach {{productName}} neu, um die Migration abzuschließen."
+  },
+  "stop_processing": {
+    "stopped": "Die Verarbeitung von {{productName}} ist angehalten.",
+    "stop_opensearch": "OpenSearch stoppen",
+    "stop_cluster": "Bitte stoppen Sie Ihren OpenSearch-Cluster, bevor Sie fortfahren.",
+    "change_owner": "Wenn Sie bestehende OpenSearch-Daten migrieren, indem Sie den Data Node auf dessen Datenverzeichnis zeigen lassen, ändern Sie den Eigentümer des Datenverzeichnisses auf den Benutzer, unter dem der Data Node läuft (meist graylog-datanode), und setzen Sie die korrekten Berechtigungen, z. B. mit"
+  },
+  "in_place_welcome": {
+    "title": "Willkommen",
+    "description": "Eine In-Place-Migration migriert den Datenordner Ihres bestehenden Clusters in einen Data-Node-Cluster.",
+    "install": "Installieren Sie zunächst auf jedem OS/ES-Knoten Ihrer bisherigen Installation einen Data Node. Weitere Informationen zum Herunterladen und Installieren des Data Nodes finden Sie <docsLink>hier</docsLink>."
+  },
+  "force_start": {
+    "title": "OpenSearch-Upgrade trotzdem starten?",
+    "confirm": "Trotzdem starten",
+    "submitting": "Wird gestartet...",
+    "description": "Das Backend hat gemeldet, dass die regulären Vorabprüfungen nicht bestanden wurden."
+  },
+  "rolling_upgrade_nodes": {
+    "node_status": {
+      "pending": "Wartend",
+      "restarting": "Wird neu gestartet",
+      "started": "Gestartet",
+      "completed": "Aktualisiert",
+      "failed": "Fehlgeschlagen",
+      "skipped": "Übersprungen"
+    },
+    "state": {
+      "preparing_cluster": "Cluster wird vorbereitet",
+      "selecting_next_node": "Nächster Knoten wird ausgewählt",
+      "upgrading_node": "Knoten wird aktualisiert",
+      "waiting_node_joined": "Warten auf erneuten Beitritt des Knotens",
+      "reenabling_allocation": "Zuweisung wird wieder aktiviert",
+      "waiting_green": "Warten auf grünen Cluster",
+      "paused_waiting_green": "Pausiert, warten auf grünen Cluster",
+      "finalizing": "Wird abgeschlossen",
+      "completed": "Abgeschlossen",
+      "aborted": "Abgebrochen",
+      "failed": "Fehlgeschlagen",
+      "in_progress": "In Bearbeitung"
+    },
+    "unknown": "Unbekannt",
+    "manager": "Manager",
+    "current": "aktuell",
+    "data_node": "Data Node",
+    "opensearch_version": "OpenSearch-Version",
+    "status": "Status",
+    "not_started": "Es wurde noch kein Rolling Upgrade von OpenSearch gestartet.",
+    "title": "Rolling Upgrade von OpenSearch",
+    "abort_requested": "Abbruch angefordert. Das Upgrade wird nach dem aktuellen Schritt angehalten.",
+    "waiting_heading": "Warten auf OpenSearch-Upgrade",
+    "no_remaining_nodes": "Keine verbleibenden Knoten.",
+    "upgraded_heading": "Auf Ziel-OpenSearch aktualisiert",
+    "no_upgraded_nodes": "Noch keine aktualisierten Knoten."
+  },
+  "opensearch_upgrade_info": {
+    "loading": "Wird geladen...",
+    "current_version": "Aktuelle OpenSearch-Version:",
+    "target_version": "Ziel-OpenSearch-Version:",
+    "unknown": "Unbekannt",
+    "data_nodes": "Data Nodes:",
+    "data_nodes_summary": "{{total}} ({{available}} verfügbar)"
+  },
+  "opensearch_upgrade": {
+    "before_upgrading": "Vor dem Upgrade",
+    "old_indices_unreadable": "OpenSearch 3 kann keine Indizes lesen, die mit Versionen vor OpenSearch 2 erstellt wurden. Wenn diese Indizes während des Upgrades bestehen bleiben, sind ihre Daten nicht mehr verfügbar.",
+    "use_table": "Verwenden Sie die Tabelle unten, um System-Indizes neu zu indizieren und Daten-Indizes zu archivieren oder zu löschen, bevor Sie fortfahren.",
+    "upgrade_process": "Upgrade-Ablauf",
+    "automatic_upgrade": "Jeder Data Node aktualisiert sein eingebettetes OpenSearch automatisch auf die Zielversion.",
+    "rolling_restart": "Data Nodes werden nacheinander neu gestartet, um die Auswirkungen gering zu halten.",
+    "rolling_search_impaired": "Die Suche kann eingeschränkt sein, während Data Nodes neu starten.",
+    "full_restart": "Alle Data Nodes müssen neu starten, damit das Upgrade wirksam wird.",
+    "full_search_unavailable": "Suche und Indizierung sind nicht verfügbar, während Data Nodes neu starten.",
+    "backup": "Sichern Sie MongoDB, Data Node und Data-Lake-Speicher vor dem Upgrade, um eine reibungslose Wiederherstellung zu ermöglichen.",
+    "start_rolling_upgrade": "Rolling Upgrade von OpenSearch starten",
+    "start_upgrade_and_restart": "OpenSearch-Upgrade starten und neu starten",
+    "starting_rolling_upgrade": "Rolling Upgrade von OpenSearch wird gestartet...",
+    "restarting": "Wird neu gestartet...",
+    "title": "Eingebettetes OpenSearch der Data Nodes aktualisieren",
+    "unconfirmed_one": "Inkompatible Indizes und der Upgrade-Status können nicht geprüft werden, solange {{count}} Data Node nicht verfügbar ist. Sie werden wieder angezeigt, sobald alle Data Nodes verfügbar sind.",
+    "unconfirmed_other": "Inkompatible Indizes und der Upgrade-Status können nicht geprüft werden, solange {{count}} Data Nodes nicht verfügbar sind. Sie werden wieder angezeigt, sobald alle Data Nodes verfügbar sind.",
+    "incompatible_indices": "Inkompatible Indizes",
+    "resuming": "Wird fortgesetzt...",
+    "resume": "Fortsetzen",
+    "resolve_indices_first": "Lösen Sie zuerst alle inkompatiblen Indizes auf.",
+    "check_failed": "Die Verfügbarkeit eines OpenSearch-Upgrades konnte nicht geprüft werden.",
+    "already_up_to_date": "Das eingebettete OpenSearch der Data Nodes ist bereits auf dem neuesten Stand."
+  },
+  "start_upgrade": {
+    "starting": "Wird gestartet...",
+    "no_rollback": "Nach dem Start kann nicht mehr auf die vorherige Version zurückgekehrt werden.",
+    "rolling": {
+      "title": "Rolling Upgrade von OpenSearch starten?",
+      "confirm": "Rolling Upgrade starten",
+      "alert_title": "Dadurch wird jeder Data Node nacheinander neu gestartet",
+      "each_node_with_versions_one": "Ihr {{count}} Data Node wird aktualisiert und neu gestartet, um sein eingebettetes OpenSearch von <strong>{{currentVersion}}</strong> auf <strong>{{targetVersion}}</strong> zu aktualisieren.",
+      "each_node_with_versions_other": "Jeder Ihrer {{count}} Data Nodes wird nacheinander aktualisiert und neu gestartet, um sein eingebettetes OpenSearch von <strong>{{currentVersion}}</strong> auf <strong>{{targetVersion}}</strong> zu aktualisieren.",
+      "each_node_one": "Ihr {{count}} Data Node wird aktualisiert und neu gestartet, um sein eingebettetes OpenSearch auf die Zielversion zu aktualisieren.",
+      "each_node_other": "Jeder Ihrer {{count}} Data Nodes wird nacheinander aktualisiert und neu gestartet, um sein eingebettetes OpenSearch auf die Zielversion zu aktualisieren.",
+      "shard_allocation": "Die Shard-Zuweisung wird bei jedem Neustart pausiert, sodass der Cluster verfügbar bleibt. Indizierung und Suche können jedoch kurzzeitig beeinträchtigt sein, während ein Knoten den Cluster verlässt und wieder beitritt.",
+      "wait_for_green": "Nach jedem Knoten wartet das Upgrade, bis der Cluster wieder grün ist. Dauert das zu lange, pausiert es und wartet, bis Sie es fortsetzen.",
+      "healthy_cluster": "Stellen Sie sicher, dass der Cluster gesund (grün) ist, bevor Sie fortfahren."
+    },
+    "full": {
+      "title": "OpenSearch der Data Nodes neu starten?",
+      "confirm": "Neu starten",
+      "submitting": "Wird neu gestartet...",
+      "alert_title": "Weniger als 3 Data Nodes – dies ist ein vollständiger Neustart, kein Rolling Upgrade",
+      "restart_together_with_versions_one": "Mit weniger als 3 Data Nodes kann OpenSearch nicht verfügbar bleiben, indem Knoten nacheinander neu gestartet werden. Alle Ihre Data Nodes starten gemeinsam neu, um OpenSearch von <strong>{{currentVersion}}</strong> auf <strong>{{targetVersion}}</strong> zu aktualisieren. Das Speicher-Backend ist daher bis zum Abschluss <strong>nicht verfügbar</strong> – Suche und Indizierung sind unterbrochen.",
+      "restart_together_with_versions_other": "Mit weniger als 3 Data Nodes kann OpenSearch nicht verfügbar bleiben, indem Knoten nacheinander neu gestartet werden. Alle Ihre Data Nodes starten gemeinsam neu, um OpenSearch von <strong>{{currentVersion}}</strong> auf <strong>{{targetVersion}}</strong> zu aktualisieren. Das Speicher-Backend ist daher bis zum Abschluss <strong>nicht verfügbar</strong> – Suche und Indizierung sind unterbrochen.",
+      "restart_together_one": "Mit weniger als 3 Data Nodes kann OpenSearch nicht verfügbar bleiben, indem Knoten nacheinander neu gestartet werden. Alle Ihre Data Nodes starten gemeinsam neu, um OpenSearch auf die Zielversion zu aktualisieren. Das Speicher-Backend ist daher bis zum Abschluss <strong>nicht verfügbar</strong> – Suche und Indizierung sind unterbrochen.",
+      "restart_together_other": "Mit weniger als 3 Data Nodes kann OpenSearch nicht verfügbar bleiben, indem Knoten nacheinander neu gestartet werden. Alle Ihre Data Nodes starten gemeinsam neu, um OpenSearch auf die Zielversion zu aktualisieren. Das Speicher-Backend ist daher bis zum Abschluss <strong>nicht verfügbar</strong> – Suche und Indizierung sind unterbrochen.",
+      "journal": "Solange OpenSearch nicht verfügbar ist, sammeln sich eingehende Nachrichten im Festplatten-Journal jedes {{productName}}-Knotens. Dauert der Ausfall länger, als es die Größen- oder Altersgrenze des Journals erlaubt, stockt die Aufnahme und Nachrichten können verloren gehen. Fahren Sie nur fort, wenn das Journal genug Reserve für die erwartete Ausfallzeit hat.",
+      "tolerate_downtime": "Fahren Sie nur fort, wenn Sie die Ausfallzeit in Kauf nehmen können."
+    }
+  },
+  "data_node_notifications": {
+    "remove_failed": "Entfernen des Data Nodes fehlgeschlagen mit Status: {{status}}",
+    "bulk_remove_failed_title": "Data Nodes konnten nicht entfernt werden.",
+    "bulk_remove_success_one": "{{count}} Data Node erfolgreich entfernt.",
+    "bulk_remove_success_other": "{{count}} Data Nodes erfolgreich entfernt.",
+    "remove_success": "Data Node „{{datanodeId}}“ erfolgreich entfernt.",
+    "remove_failed_title": "Der Data Node konnte nicht entfernt werden.",
+    "start_failed": "Starten des Data Nodes fehlgeschlagen mit Status: {{status}}",
+    "bulk_start_failed_title": "Data Nodes konnten nicht gestartet werden.",
+    "bulk_start_success_one": "{{count}} Data Node erfolgreich gestartet.",
+    "bulk_start_success_other": "{{count}} Data Nodes erfolgreich gestartet.",
+    "start_success": "Data Node „{{datanodeId}}“ erfolgreich gestartet.",
+    "start_failed_title": "Der Data Node konnte nicht gestartet werden.",
+    "stop_failed": "Stoppen des Data Nodes fehlgeschlagen mit Status: {{status}}",
+    "bulk_stop_failed_title": "Data Nodes konnten nicht gestoppt werden.",
+    "bulk_stop_success_one": "{{count}} Data Node erfolgreich gestoppt.",
+    "bulk_stop_success_other": "{{count}} Data Nodes erfolgreich gestoppt.",
+    "stop_success": "Data Node „{{datanodeId}}“ erfolgreich gestoppt.",
+    "stop_failed_title": "Der Data Node konnte nicht gestoppt werden.",
+    "rejoin_success": "Data Node „{{datanodeId}}“ erfolgreich wieder aufgenommen.",
+    "rejoin_failed": "Wiederaufnahme des Data Nodes fehlgeschlagen mit Status: {{status}}",
+    "rejoin_failed_title": "Der Data Node konnte nicht wieder aufgenommen werden.",
+    "renew_certificate_success": "Zertifikat erfolgreich erneuert.",
+    "renew_certificate_failed": "Erneuern des Zertifikats fehlgeschlagen: {{error}}",
+    "loading_failed": "Laden der Data Nodes fehlgeschlagen mit Status",
+    "loading_failed_title": "Data Nodes konnten nicht geladen werden.",
+    "loading_node_failed": "Laden des Data Nodes fehlgeschlagen mit Status",
+    "loading_node_failed_title": "Data Node konnte nicht geladen werden",
+    "loading_stdout_failed": "Laden der stdout-Logs des Data Nodes fehlgeschlagen mit Status",
+    "loading_stdout_failed_title": "stdout-Logs des Data Nodes konnten nicht geladen werden",
+    "loading_stderr_failed": "Laden der stderr-Logs des Data Nodes fehlgeschlagen mit Status",
+    "loading_stderr_failed_title": "stderr-Logs des Data Nodes konnten nicht geladen werden",
+    "stop_replication_success": "Shard-Replikation erfolgreich gestoppt",
+    "stop_replication_failed": "Stoppen der Shard-Replikation fehlgeschlagen mit Status: {{status}}",
+    "stop_replication_failed_title": "Shard-Replikation konnte nicht gestoppt werden.",
+    "start_replication_success": "Shard-Replikation erfolgreich gestartet",
+    "start_replication_failed": "Starten der Shard-Replikation fehlgeschlagen mit Status: {{status}}",
+    "start_replication_failed_title": "Shard-Replikation konnte nicht gestartet werden.",
+    "loading_upgrade_status_failed": "Laden des Data-Node-Upgrade-Status fehlgeschlagen",
+    "loading_upgrade_status_failed_title": "Data-Node-Upgrade-Status konnte nicht geladen werden",
+    "loading_journal_estimate_failed": "Laden der Journal-Schätzung für die Data-Node-Migration fehlgeschlagen",
+    "loading_journal_estimate_failed_title": "Schätzung der Journal-Größe konnte nicht geladen werden",
+    "loading_rolling_upgrade_failed": "Laden des Status des OpenSearch-Rolling-Upgrades fehlgeschlagen",
+    "loading_rolling_upgrade_failed_title": "Status des OpenSearch-Rolling-Upgrades konnte nicht geladen werden",
+    "start_rolling_upgrade_failed_title": "Rolling Upgrade von OpenSearch konnte nicht gestartet werden",
+    "resume_rolling_upgrade_success": "Das Rolling Upgrade von OpenSearch wurde fortgesetzt.",
+    "resume_rolling_upgrade_failed_title": "Rolling Upgrade von OpenSearch konnte nicht fortgesetzt werden",
+    "loading_versions_failed": "Laden der OpenSearch-Versionsübersicht fehlgeschlagen",
+    "loading_versions_failed_title": "OpenSearch-Versionsübersicht konnte nicht geladen werden"
+  }
+}

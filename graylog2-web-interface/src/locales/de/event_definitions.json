@@ -1,0 +1,428 @@
+{
+  "add_notification_form": {
+    "add": "Benachrichtigung hinzufügen",
+    "choose": "Benachrichtigung wählen",
+    "create_new": "Neue Benachrichtigung erstellen...",
+    "help": "Wählen Sie eine Benachrichtigung für Alarme dieser Art aus oder erstellen Sie eine neue Benachrichtigung, die Sie später auch für andere Alarme verwenden können.",
+    "select": "Benachrichtigung auswählen",
+    "title": "Benachrichtigung hinzufügen"
+  },
+  "aggregation_form": {
+    "description": "Fassen Sie Log-Nachrichten, die dem oben definierten Filter entsprechen, mit einer Funktion zusammen. Optional können Sie die Filterergebnisse nach identischen Feldwerten gruppieren.",
+    "group_by_example": "Angenommen, Sie haben einen Filter mit allen fehlgeschlagenen Anmeldeversuchen in Ihrem Netzwerk erstellt. Dann könnte ein Alarm ausgelöst werden, wenn es insgesamt mehr als 5 fehlgeschlagene Anmeldeversuche gibt. Fügen Sie nun <code>username</code> als Gruppierungsfeld hinzu, und ein Alarm wird <em>für jeden <code>username</code></em> mit mehr als 5 fehlgeschlagenen Anmeldeversuchen ausgelöst.",
+    "group_by_help": "Wählen Sie Felder aus, um Filterergebnisse mit identischen Werten zu gruppieren. <bold>Beispiel:</bold>",
+    "title": "Aggregation"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_one": "Möchten Sie {{count}} Ereignisdefinition wirklich löschen?",
+      "confirm_other": "Möchten Sie {{count}} Ereignisdefinitionen wirklich löschen?",
+      "error": "Beim Löschen der Ereignisdefinitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Ereignisdefinition konnte nicht gelöscht werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Ereignisdefinitionen konnten nicht gelöscht werden.",
+      "success_one": "{{count}} Ereignisdefinition wurde erfolgreich gelöscht.",
+      "success_other": "{{count}} Ereignisdefinitionen wurden erfolgreich gelöscht.",
+      "title": "Ereignisdefinitionen löschen"
+    },
+    "disable": {
+      "confirm_one": "Möchten Sie {{count}} Ereignisdefinition wirklich deaktivieren?",
+      "confirm_other": "Möchten Sie {{count}} Ereignisdefinitionen wirklich deaktivieren?",
+      "error": "Beim Deaktivieren der Ereignisdefinitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Ereignisdefinition konnte nicht deaktiviert werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Ereignisdefinitionen konnten nicht deaktiviert werden.",
+      "success_one": "{{count}} Ereignisdefinition wurde erfolgreich deaktiviert.",
+      "success_other": "{{count}} Ereignisdefinitionen wurden erfolgreich deaktiviert.",
+      "title": "Ereignisdefinitionen deaktivieren"
+    },
+    "disable_action": "Deaktivieren",
+    "enable": {
+      "confirm_one": "Möchten Sie {{count}} Ereignisdefinition wirklich aktivieren?",
+      "confirm_other": "Möchten Sie {{count}} Ereignisdefinitionen wirklich aktivieren?",
+      "error": "Beim Aktivieren der Ereignisdefinitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Ereignisdefinition konnte nicht aktiviert werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Ereignisdefinitionen konnten nicht aktiviert werden.",
+      "success_one": "{{count}} Ereignisdefinition wurde erfolgreich aktiviert.",
+      "success_other": "{{count}} Ereignisdefinitionen wurden erfolgreich aktiviert.",
+      "title": "Ereignisdefinitionen aktivieren"
+    },
+    "enable_action": "Aktivieren",
+    "success_title": "Erfolg"
+  },
+  "condition_form": {
+    "available_conditions": "Verfügbare Bedingungen",
+    "condition_type": "Bedingungstyp",
+    "condition_type_help": "Wählen Sie den Bedingungstyp für dieses Ereignis.",
+    "description": "Legen Sie fest, wie Ereignisse dieses Typs erstellt werden sollen. Sie können diese Ereignisse später als Eingabe für andere Bedingungen verwenden und so leistungsstarke Bedingungen auf Basis anderer erstellen.",
+    "no_description": "Keine Beschreibung verfügbar.",
+    "not_editable": "Die Bedingungen dieses Ereignisdefinitionstyps können nicht bearbeitet werden.",
+    "select_condition_type": "Bedingungstyp auswählen",
+    "title": "Ereignisbedingung"
+  },
+  "condition_summary": {
+    "and": "UND",
+    "create_events": "Ereignisse für Definition erstellen",
+    "errors_found": "Fehler gefunden",
+    "hide_errors": "Fehler ausblenden",
+    "invalid": "Die Bedingung ist ungültig",
+    "no_condition": "Keine Bedingung konfiguriert",
+    "no_series": "Keine Reihe ausgewählt",
+    "or": "ODER",
+    "preview": "Vorschau:",
+    "show_errors": "Fehler einblenden",
+    "title": "Zusammenfassung der Bedingung",
+    "valid": "Die Bedingung ist gültig"
+  },
+  "conditions": {
+    "add_expression": "Ausdruck hinzufügen",
+    "add_group": "Gruppe hinzufügen",
+    "all": "alle",
+    "any": "eine",
+    "boolean_operator": "Boolescher Operator",
+    "boolean_operator_group": "Boolescher Operator Gruppe {{level}}",
+    "delete_expression": "Ausdruck löschen",
+    "global_boolean_operator": "Globaler boolescher Operator",
+    "if": "Wenn",
+    "is": "Ist",
+    "messages_must_meet": "Nachrichten müssen erfüllen:",
+    "of_the_following_rules": "der folgenden Regeln:",
+    "select_condition": "Bedingung auswählen",
+    "select_field": "Feld auswählen (optional)",
+    "select_function": "Funktion auswählen",
+    "select_percentile": "Perzentil auswählen",
+    "select_strategy": "Strategie auswählen (optional)",
+    "threshold": "Schwellenwert"
+  },
+  "definition_summary": {
+    "details": "Details",
+    "no_description": "Keine Beschreibung angegeben",
+    "no_tags": "Keine Tags",
+    "no_title": "Kein Titel angegeben",
+    "title": "Ereigniszusammenfassung"
+  },
+  "details_form": {
+    "add_event_procedure": "Ereignisprozedur hinzufügen",
+    "description": "Beschreibung",
+    "description_help": "Ausführlichere Beschreibung dieser Ereignisdefinition.",
+    "no_event_procedures": "Diese Ereignisdefinition hat noch keine Ereignisprozeduren.",
+    "priority": "Priorität",
+    "priority_help": "Wählen Sie die Priorität für Ereignisse, die aus dieser Definition erstellt werden.",
+    "summary_template": "Vorlage für die Ereigniszusammenfassung",
+    "summary_template_help": "Vorlage, mit der die Zusammenfassungen von Ereignissen und Alarmen erzeugt werden.",
+    "title": "Ereignisdetails",
+    "title_help": "Titel dieser Ereignisdefinition.",
+    "title_label": "Titel"
+  },
+  "event_key_help": {
+    "event_count": "Um zu steuern, wie viele Ereignisse eine <bold>Filter & Aggregation</bold>-Definition erstellt, verwenden Sie „Ereignisse für Definition erstellen, wenn...“ mit „Aggregation der Ergebnisse erreicht einen Schwellenwert“ und konfigurieren Sie „Gruppieren nach Feld(ern)“.",
+    "example": "<bold>Beispiel:</bold> zwei Definitionen, <em>Login failure</em> und <em>Privilege escalation</em>, beide mit dem Ereignisschlüssel <code>username</code>. Eine Korrelation der beiden wird nur ausgelöst, wenn beide Ereignisse denselben Benutzernamen enthalten.",
+    "intro": "Ereignisschlüssel sind benutzerdefinierte Felder, deren Werte zum Schlüssel des Ereignisses kombiniert werden (Werte verbunden mit <code>|</code>). Der Schlüssel identifiziert die Entität, um die es bei einem Ereignis geht. Er ändert nicht, wie viele Ereignisse erstellt werden.",
+    "where_it_matters": "<bold>Wo der Schlüssel wichtig ist:</bold> <bold>Ereigniskorrelation</bold> berücksichtigt nur Quellereignisse mit demselben Schlüssel und erstellt höchstens ein Ereignis pro Schlüssel innerhalb ihres Suchfensters. Legen Sie Schlüssel auf den Ereignisdefinitionen fest, die Sie korrelieren möchten, nicht auf der Korrelation selbst."
+  },
+  "field_form": {
+    "add": "Benutzerdefiniertes Feld hinzufügen",
+    "data_type": "Datentyp des Felds",
+    "data_type_string": "String",
+    "key_help": "Gibt an, ob dieses Feld ein Schlüssel sein soll, und seine Reihenfolge.",
+    "more_about_keys": "Mehr über Ereignisschlüssel",
+    "name": "Name",
+    "name_help": "Name für dieses Feld.",
+    "provider_unavailable": "Der ausgewählte Provider ist nicht verfügbar.",
+    "select_value_source": "Wertquelle auswählen",
+    "set_value_from": "Wert setzen aus",
+    "title_edit": "Benutzerdefiniertes Feld „{{fieldName}}“",
+    "title_new": "Neues benutzerdefiniertes Feld",
+    "update": "Benutzerdefiniertes Feld aktualisieren",
+    "use_as_key": "Feld als Ereignisschlüssel verwenden",
+    "value_source_help": "Wählen Sie eine Quelle für den Wert dieses Felds aus."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {
+      "title": "Vorlage"
+    }
+  },
+  "fields_form": {
+    "description": "Fügen Sie Ereignissen, die aus dieser Ereignisdefinition erzeugt werden, zusätzliche Informationen hinzu, indem Sie benutzerdefinierte Felder anlegen. Das kann Ihnen helfen, Ereignisse zu durchsuchen oder beim Empfang von Benachrichtigungen mehr Kontext zu haben.",
+    "errors_description": "Bitte korrigieren Sie die folgenden Fehler, bevor Sie diese Ereignisdefinition speichern:",
+    "errors_title": "Felder mit Fehlern",
+    "event_fields": "Ereignisfelder",
+    "no_keys": "Noch keine Schlüssel konfiguriert.",
+    "not_editable": "Die Ereignisfelder dieses Ereignisdefinitionstyps können nicht bearbeitet werden.",
+    "optional": "(optional)",
+    "tags": "Tags",
+    "tags_description": "Versehen Sie diese Ereignisdefinition mit Labels. Tags werden an jedes erzeugte Ereignis weitergegeben und erleichtern das Filtern und Gruppieren in der Liste „Alarme & Ereignisse“."
+  },
+  "fields_list": {
+    "configuration": "Konfiguration",
+    "data_type": "Datentyp",
+    "field_name": "Feldname",
+    "is_key": "Schlüssel?",
+    "no": "Nein",
+    "no_fields": "Dieses Ereignis hat noch keine benutzerdefinierten Felder.",
+    "remove": "Feld entfernen",
+    "value_source": "Wertquelle",
+    "yes": "Ja"
+  },
+  "filter_form": {
+    "cron_expression": "Cron-Ausdruck",
+    "cron_expression_help": "Ein Quartz-Cron-Ausdruck, der bestimmt, wann das Ereignis ausgeführt werden soll.",
+    "cron_time_zone": "Cron-Zeitzone",
+    "declare_missing_parameters": "Bitte deklarieren Sie fehlende Query-Parameter, indem Sie auf die Schaltflächen oben klicken.",
+    "description": "Fügen Sie Informationen hinzu, um die Log-Nachrichten zu filtern, die für diese Ereignisdefinition relevant sind.",
+    "enable": "Aktivieren",
+    "enable_help": "Soll diese Ereignisdefinition automatisch ausgeführt werden?",
+    "execute_every": "Suche ausführen alle",
+    "lookup_table_permission_missing": "Diesem Konto fehlt die Berechtigung, Query-Parameter aus Lookup Tables zu deklarieren.",
+    "optional": "(Optional)",
+    "query_parameters": "Query-Parameter",
+    "search_filters": "Suchfilter",
+    "search_query": "Suchanfrage",
+    "search_query_help": "Suchanfrage, der die Nachrichten entsprechen sollen. Sie können dieselbe Syntax wie auf der Suchseite verwenden, einschließlich der Deklaration von Query-Parametern aus Lookup Tables mit der Syntax <code>{{syntax}}</code>.",
+    "search_within": "Suchen innerhalb der letzten",
+    "streams_and_categories": "Streams und Kategorien",
+    "streams_help": "Wählen Sie die Streams aus, die die Suche einschließen soll.",
+    "title": "Filter",
+    "use_cron": "Cron-Planung verwenden",
+    "use_cron_help": "Planen Sie dieses Ereignis mit einem Quartz-Cron-Ausdruck",
+    "warm_tier_title": "Warm-Tier-Warnung",
+    "warm_tier_warning": "Der ausgewählte Zeitraum enthält Daten, die im Warm Tier gespeichert sind. Ereignisse, die häufig Daten aus dem Warm Tier abrufen müssen, können Performance-Probleme verursachen. Ein Wert für <strong>Suchen innerhalb der letzten</strong>, der die folgende Dauer überschreitet, fällt in den Warm Tier: <timestamp></timestamp>."
+  },
+  "filter_preview": {
+    "help_aggregation": "Ein Ereignis jedes Mal, wenn das Aggregationsergebnis die Bedingung erfüllt",
+    "help_aggregation_groups": "Ein Ereignis pro Gruppe, deren Aggregationsergebnis die Bedingung erfüllt",
+    "help_aggregation_groups_label": "Aggregation mit Gruppen:",
+    "help_aggregation_label": "Aggregation ohne Gruppen:",
+    "help_description": "Die Bedingung „Filter & Aggregation“ erzeugt je nach Konfiguration eine unterschiedliche Anzahl von Ereignissen:",
+    "help_filter": "Ein Ereignis pro Nachricht, die dem Filter entspricht",
+    "help_filter_label": "Filter:",
+    "help_title": "Wie viele Ereignisse erstellt Filter & Aggregation?",
+    "loading": "Filtervorschau wird geladen...",
+    "message": "Nachricht",
+    "no_messages": "Mit den aktuellen Suchkriterien wurden keine Nachrichten gefunden.",
+    "timestamp": "Zeitstempel"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "Die Aggregationsbedingung ist ungültig",
+    "loading": "Ereignisinformationen werden geladen...",
+    "query_parameters_undeclared": "Query-Parameter müssen deklariert werden"
+  },
+  "form_controls": {
+    "create": "Ereignisdefinition erstellen",
+    "creating": "Wird erstellt...",
+    "previous": "Zurück",
+    "update": "Ereignisdefinition aktualisieren",
+    "updating": "Wird aktualisiert..."
+  },
+  "notification_list": {
+    "no_notifications": "Dieses Ereignis ist noch nicht so konfiguriert, dass es Benachrichtigungen auslöst.",
+    "not_found": "Keine Informationen zur Benachrichtigung <em>{{title}}</em> gefunden",
+    "notification": "Benachrichtigung",
+    "type": "Typ"
+  },
+  "notification_settings": {
+    "grace_period": "Karenzzeit",
+    "grace_period_help": "Benachrichtigungen für Alarme werden bei jedem Auftreten gesendet. Legen Sie eine Karenzzeit fest, um zu steuern, wie lange gewartet wird, bevor erneut Benachrichtigungen gesendet werden. Beachten Sie, dass Ereignisse mit Schlüsseln für jeden unterschiedlichen Schlüsselwert eine eigene Karenzzeit haben.",
+    "message_backlog": "Nachrichten-Backlog",
+    "message_backlog_help": "Anzahl der Nachrichten, die in Benachrichtigungen enthalten sein sollen.",
+    "toggle_message_backlog": "Nachrichten-Backlog ein-/ausschalten"
+  },
+  "notifications_form": {
+    "description": "Ist dieses Ereignis so wichtig, dass es Ihre Aufmerksamkeit erfordert? Machen Sie es zu einem Alarm, indem Sie Benachrichtigungen hinzufügen.",
+    "manage": "Benachrichtigungen verwalten"
+  },
+  "page": {
+    "alerts_docs": "Alarm-Dokumentation",
+    "copy_confirm": "Möchten Sie wirklich eine Kopie von \"{{title}}\" erstellen?",
+    "copy_title": "Ereignisdefinition kopieren",
+    "create_multiple": "Ereignisdefinitionen erstellen",
+    "description_alerts": "Mit Ereignisdefinitionen können Sie Alarme aus verschiedenen Bedingungen erstellen und darüber benachrichtigt werden.",
+    "description_events": "Mit Ereignisdefinitionen können Sie Ereignisse aus verschiedenen Bedingungen erstellen und darüber benachrichtigt werden.",
+    "description_list": "Erstellen Sie neue Ereignisdefinitionen, mit denen Sie nach verschiedenen Bedingungen suchen und darüber benachrichtigt werden können.",
+    "duplicate": "Ereignisdefinition duplizieren",
+    "edit": "Ereignisdefinition bearbeiten",
+    "edit_named": "Ereignisdefinition \"{{title}}\" bearbeiten",
+    "file_import": "Ereignisdefinitionen erstellen - Dateiimport",
+    "git_import": "Ereignisdefinitionen erstellen - Git-Import",
+    "loading": "Ereignisdefinition wird geladen...",
+    "new": "Neue Ereignisdefinition",
+    "new_named": "Neue Ereignisdefinition \"{{title}}\"",
+    "title": "Ereignisdefinitionen",
+    "view": "Ereignisdefinition anzeigen",
+    "view_named": "Ereignisdefinition \"{{title}}\" anzeigen"
+  },
+  "priorities": {
+    "critical": "Kritisch",
+    "high": "Hoch",
+    "info": "Info",
+    "low": "Niedrig",
+    "medium": "Mittel"
+  },
+  "provider_summary": {
+    "less_details": "Weniger Details",
+    "lookup_table_key_field": "Schlüsselfeld der Lookup Table",
+    "more_details": "Mehr Details",
+    "validate_template_values": "Prüfen, ob alle Vorlagenwerte gesetzt sind",
+    "value_source": "Wertquelle"
+  },
+  "query_parameter_modal": {
+    "save": "Speichern",
+    "title": "Query-Parameter „{{name}}“ deklarieren",
+    "type": "Typ",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": ": nicht deklariert"
+  },
+  "scheduling": {
+    "clear": "leeren",
+    "clear_confirm": "Möchten Sie die Benachrichtigungen in der Warteschlange für „{{title}}“ wirklich leeren?",
+    "details": "Details zu {{title}}.",
+    "every": "alle {{duration}}",
+    "last_execution": "Letzte Ausführung:",
+    "next_execution": "Nächste Ausführung:",
+    "next_time_range": "Nächster Zeitraum:",
+    "not_scheduled": "Nicht geplant.",
+    "queued_notifications": "Benachrichtigungen in der Warteschlange:",
+    "runs": "Läuft {{schedule}}.",
+    "runs_searching_within": "Läuft {{schedule}} und durchsucht die letzten {{duration}}.",
+    "status": "Status:"
+  },
+  "share": {
+    "collaborators": "Mitwirkende",
+    "description": "Suchen Sie nach einem Benutzer oder Team, das Sie als Mitwirkende zu dieser Ereignisdefinition hinzufügen möchten.",
+    "no_collaborators": "Diese Ereignisdefinition hat keine Mitwirkenden."
+  },
+  "steps": {
+    "additional_details": "Weitere Details",
+    "condition": "Bedingung",
+    "notifications": "Benachrichtigungen",
+    "share": "Teilen",
+    "summary": "Zusammenfassung"
+  },
+  "summary": {
+    "actions": "Aktionen",
+    "condition_invalid": "Bedingung ist ungültig: {{errors}}",
+    "condition_types": {
+      "aggregation": "Aggregation",
+      "filter": "Filter"
+    },
+    "create_events_if": "Ereignisse erstellen, wenn",
+    "cron_description": "Cron-Beschreibung",
+    "cron_expression": "Cron-Ausdruck",
+    "enable_scheduling": "Planung aktivieren",
+    "event_limit": "Ereignislimit",
+    "execute_every": "Suche ausführen alle",
+    "group_by": "Gruppieren nach Feld(ern)",
+    "missing_stream_permissions": "Fehlende Stream-Berechtigungen für:",
+    "no": "nein",
+    "no_cron_expression": "Fehler: kein Cron-Ausdruck angegeben!",
+    "no_filters": "Keine Filter konfiguriert",
+    "no_group_by": "Keine Gruppierung konfiguriert",
+    "no_streams": "Keine Streams ausgewählt, es wird in allen Streams gesucht",
+    "search_filters": "Suchfilter",
+    "search_query": "Suchanfrage",
+    "search_within": "Suchen innerhalb",
+    "stream_categories": "Stream-Kategorien",
+    "streams": "Streams",
+    "time_zone": "Zeitzone",
+    "type": "Typ",
+    "undeclared_parameters": "Es gibt nicht deklarierte Query-Parameter: {{parameters}}",
+    "use_cron": "Cron-Planung verwenden",
+    "yes": "ja"
+  },
+  "summary_renders": {
+    "backlog_included_one": "Benachrichtigungen enthalten {{count}} Nachricht",
+    "backlog_included_other": "Benachrichtigungen enthalten {{count}} Nachrichten",
+    "backlog_none": "Benachrichtigungen enthalten keine Nachrichten.",
+    "condition_plugin_no_summary": "Das Bedingungs-Plugin <em>{{type}}</em> stellt keine Zusammenfassung bereit.",
+    "event_procedure_summary": "Zusammenfassung der Ereignisprozedur",
+    "event_procedure_summary_unavailable": "Die Komponente für die Zusammenfassung der Ereignisprozedur ist nicht verfügbar.",
+    "fields": "Felder",
+    "grace_period_disabled": "Die Karenzzeit ist deaktiviert",
+    "grace_period_set": "Die Karenzzeit beträgt {{duration}}",
+    "keys": "Schlüssel",
+    "missing_notification_permissions": "Fehlende Benachrichtigungsberechtigungen für:",
+    "no_event_procedures": "Dieses Ereignis hat keine Ereignisprozeduren.",
+    "no_field_value_provider": "Kein Feldwert-Provider konfiguriert.",
+    "no_fields": "Für Ereignisse auf Basis dieser Definition sind keine Felder konfiguriert.",
+    "no_keys": "Für Ereignisse auf Basis dieser Definition sind keine Schlüssel konfiguriert.",
+    "no_notifications": "Dieses Ereignis ist nicht so konfiguriert, dass es Benachrichtigungen auslöst.",
+    "no_remediation_steps": "Keine Behebungsschritte angegeben",
+    "notification_not_found": "Keine Informationen zur Benachrichtigung <em>{{id}}</em> gefunden.",
+    "notification_plugin_no_summary": "Das Benachrichtigungs-Plugin <em>{{type}}</em> stellt keine Zusammenfassung bereit.",
+    "notifications": "Benachrichtigungen",
+    "provider_plugin_no_summary": "Das Provider-Plugin <em>{{type}}</em> stellt keine Zusammenfassung bereit.",
+    "remediation_steps": "Behebungsschritte",
+    "settings": "Einstellungen"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Aggregations-Ereignisse: Gruppierungswerte und Aggregationsergebnisse.",
+    "aggregation_example": "Aggregation der fehlgeschlagenen Logins pro Benutzer:",
+    "aggregation_example_template": "<userVariable></userVariable> konnte sich <countVariable></countVariable> Mal nicht anmelden",
+    "button_aria_label": "Hilfe zur Vorlage für die Ereigniszusammenfassung anzeigen",
+    "button_title": "Hilfe zur Zusammenfassungsvorlage",
+    "custom_fields": "Benutzerdefinierte Felder",
+    "custom_fields_description": "Benutzerdefinierte Felder der Ereignisdefinition sind unter <code>fields</code> verfügbar.",
+    "event_definition_variables": "Variablen der Ereignisdefinition",
+    "examples": "Beispiele",
+    "filter_events": "Filter-Ereignisse: Felder der ursprünglichen Log-Nachricht.",
+    "filter_example": "Filter auf eine bestimmte Log-Nachricht:",
+    "filter_example_template": "Fehler auf <hostVariable></hostVariable>: <messageVariable></messageVariable>",
+    "group_by_field": "(Gruppierungsfeld)",
+    "hostname": "(Hostname)",
+    "intro": "Verwenden Sie eine Vorlage, um die Beschreibung anzupassen, die auf der Seite „Alarme & Ereignisse“ angezeigt wird, wenn ein Ereignis erstellt wird. Vorlagen verwenden <jmteLink>JMTE</jmteLink>-Ersetzung – Variablen werden in <variable></variable> eingeschlossen.",
+    "source_context": "Quellkontext",
+    "source_context_description": "Die Variable <code>source</code> enthält Kontext aus den auslösenden Daten. Ihr Inhalt hängt vom Typ der Ereignisdefinition ab:",
+    "title": "Vorlage für die Ereigniszusammenfassung"
+  },
+  "tags_editor": {
+    "aria_label": "Tags der Ereignisdefinition",
+    "duplicate": "Das Tag „{{tag}}“ wurde bereits hinzugefügt.",
+    "help": "Drücken Sie Enter oder Tab zum Hinzufügen. Tags werden in Kleinbuchstaben umgewandelt und Duplikate entfernt. Erlaubt sind nur Kleinbuchstaben, Ziffern, Bindestriche, Unterstriche und Punkte.",
+    "invalid_characters_one": "Das Tag {{tags}} enthält ungültige Zeichen. Erlaubt sind nur Kleinbuchstaben, Ziffern, Bindestriche, Unterstriche und Punkte.",
+    "invalid_characters_other": "Die Tags {{tags}} enthalten ungültige Zeichen. Erlaubt sind nur Kleinbuchstaben, Ziffern, Bindestriche, Unterstriche und Punkte.",
+    "max_reached": "Maximal {{max}} Tags erreicht.",
+    "placeholder": "z. B. authentication, brute-force, compliance",
+    "too_long_one": "Das Tag {{tags}} überschreitet die maximale Länge von {{max}} Zeichen.",
+    "too_long_other": "Die Tags {{tags}} überschreiten die maximale Länge von {{max}} Zeichen."
+  },
+  "template_preview": {
+    "aggregation": "In „Gruppieren nach“ festgelegte Felder mit ihren ursprünglichen Namen",
+    "aggregation_label": "Aggregation:",
+    "available_fields": "Welche Felder in der Vorlage verfügbar sind, hängt von der Bedingung ab, die das Ereignis erstellt hat:",
+    "correlation": "Alle Felder des zuletzt übereinstimmenden, nicht negierten Ereignisses",
+    "correlation_label": "Korrelation:",
+    "description": "Sie können erzeugte Ereignisse mit dynamischen Werten anreichern. Auf Felder aus dem Ereigniskontext greifen Sie mit <code>{{syntax}}</code> zu.",
+    "filter": "Alle Felder der ursprünglichen Log-Nachricht",
+    "filter_label": "Filter:",
+    "title": "Verfügbare Felder in der Vorlage"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Leere Felder ausschließen",
+    "exclude_empty_fields_help": "Aktivieren Sie diese Option, damit das Feld gar nicht zum Ereignis hinzugefügt wird, wenn die Vorlage einen leeren Wert ergibt. Ist sie deaktiviert, wird das Feld mit einem leeren Wert zum Ereignis hinzugefügt. Immer aktiv, wenn alle Vorlagenwerte erforderlich sind.",
+    "require_values": "Alle Vorlagenwerte müssen gesetzt sein",
+    "require_values_help": "Aktivieren Sie diese Option, um zu prüfen, ob alle in der Vorlage verwendeten Variablen Werte haben.",
+    "template": "Vorlage",
+    "template_help": "Geben Sie einen festen Text für dieses Feld ein oder verwenden Sie die <jmteLink>JMTE-Syntax</jmteLink>, um einen dynamischen Wert hinzuzufügen."
+  },
+  "types": {
+    "aggregation": {
+      "description": "Erstellen Sie Ereignisse aus Log-Nachrichten, indem Sie diese filtern und (optional) ihre Ergebnisse aggregieren, um eine bestimmte Bedingung zu erfüllen. Diese Ereignisse können als Eingabe für eine Korrelationsregel verwendet werden.",
+      "title": "Filter & Aggregation"
+    },
+    "system": {
+      "description": "Integrierte Ereignisdefinition, mit der {{productName}} Systembenachrichtigungen als Ereignisse meldet.",
+      "title": "System-Ereignisdefinition"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "Darf nicht leer sein",
+    "field_cannot_be_empty": "Das Feld darf nicht leer sein.",
+    "field_positive_number": "Das Feld muss eine positive Zahl sein."
+  },
+  "validation_summary": {
+    "title": "Es wurden Fehler gefunden!"
+  }
+}

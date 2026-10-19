@@ -1,0 +1,428 @@
+{
+  "add_notification_form": {
+    "add": "Add notification",
+    "choose": "Choose Notification",
+    "create_new": "Create New Notification...",
+    "help": "Select a Notification to use on Alerts of this kind or create a new Notification that you can later use in other Alerts.",
+    "select": "Select Notification",
+    "title": "Add Notification"
+  },
+  "aggregation_form": {
+    "description": "Summarize log messages matching the Filter defined above by using a function. You can optionally group the Filter results by identical field values.",
+    "group_by_example": "Assuming you created a Filter with all failed log-in attempts in your network, an alert could be triggered when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by Field and an alert will be triggered <em>for each <code>username</code></em> with more than 5 failed log-in attempts.",
+    "group_by_help": "Select fields to group filter results when they have identical values. <bold>Example:</bold>",
+    "title": "Aggregation"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_one": "Are you sure you want to delete {{count}} event definition?",
+      "confirm_other": "Are you sure you want to delete {{count}} event definitions?",
+      "error": "An error occurred while deleting event definitions. {{error}}",
+      "failed_one": "{{failed}} out of {{count}} selected event definition could not be deleted.",
+      "failed_other": "{{failed}} out of {{count}} selected event definitions could not be deleted.",
+      "success_one": "{{count}} event definition was deleted successfully.",
+      "success_other": "{{count}} event definitions were deleted successfully.",
+      "title": "Delete Event Definitions"
+    },
+    "disable": {
+      "confirm_one": "Are you sure you want to disable {{count}} event definition?",
+      "confirm_other": "Are you sure you want to disable {{count}} event definitions?",
+      "error": "An error occurred while disabling event definitions. {{error}}",
+      "failed_one": "{{failed}} out of {{count}} selected event definition could not be disabled.",
+      "failed_other": "{{failed}} out of {{count}} selected event definitions could not be disabled.",
+      "success_one": "{{count}} event definition was disabled successfully.",
+      "success_other": "{{count}} event definitions were disabled successfully.",
+      "title": "Disable Event Definitions"
+    },
+    "disable_action": "Disable",
+    "enable": {
+      "confirm_one": "Are you sure you want to enable {{count}} event definition?",
+      "confirm_other": "Are you sure you want to enable {{count}} event definitions?",
+      "error": "An error occurred while enabling event definitions. {{error}}",
+      "failed_one": "{{failed}} out of {{count}} selected event definition could not be enabled.",
+      "failed_other": "{{failed}} out of {{count}} selected event definitions could not be enabled.",
+      "success_one": "{{count}} event definition was enabled successfully.",
+      "success_other": "{{count}} event definitions were enabled successfully.",
+      "title": "Enable Event Definitions"
+    },
+    "enable_action": "Enable",
+    "success_title": "Success"
+  },
+  "condition_form": {
+    "available_conditions": "Available Conditions",
+    "condition_type": "Condition Type",
+    "condition_type_help": "Choose the type of Condition for this Event.",
+    "description": "Define how Events of this type should be created. You can later use those Events as input on other Conditions, making it possible to build powerful Conditions based on others.",
+    "no_description": "No description available.",
+    "not_editable": "The conditions of this event definition type cannot be edited.",
+    "select_condition_type": "Select a Condition Type",
+    "title": "Event Condition"
+  },
+  "condition_summary": {
+    "and": "AND",
+    "create_events": "Create Events for Definition",
+    "errors_found": "Errors found",
+    "hide_errors": "Hide errors",
+    "invalid": "Condition is not valid",
+    "no_condition": "No condition configured",
+    "no_series": "No series selected",
+    "or": "OR",
+    "preview": "Preview:",
+    "show_errors": "Show errors",
+    "title": "Condition summary",
+    "valid": "Condition is valid"
+  },
+  "conditions": {
+    "add_expression": "Add Expression",
+    "add_group": "Add Group",
+    "all": "all",
+    "any": "any",
+    "boolean_operator": "Boolean operator",
+    "boolean_operator_group": "Boolean operator group {{level}}",
+    "delete_expression": "Delete Expression",
+    "global_boolean_operator": "Global boolean operator",
+    "if": "If",
+    "is": "Is",
+    "messages_must_meet": "Messages must meet",
+    "of_the_following_rules": "of the following rules:",
+    "select_condition": "Select Condition",
+    "select_field": "Select Field (Optional)",
+    "select_function": "Select Function",
+    "select_percentile": "Select Percentile",
+    "select_strategy": "Select Strategy (Optional)",
+    "threshold": "Threshold"
+  },
+  "definition_summary": {
+    "details": "Details",
+    "no_description": "No description given",
+    "no_tags": "No tags",
+    "no_title": "No title given",
+    "title": "Event Summary"
+  },
+  "details_form": {
+    "add_event_procedure": "Add Event Procedure",
+    "description": "Description",
+    "description_help": "Longer description for this Event Definition.",
+    "no_event_procedures": "This Event Definition does not have any Event Procedures yet.",
+    "priority": "Priority",
+    "priority_help": "Choose the priority for Events created from this Definition.",
+    "summary_template": "Event Summary Template",
+    "summary_template_help": "Template used to generate the Event and Alert summaries.",
+    "title": "Event Details",
+    "title_help": "Title for this Event Definition.",
+    "title_label": "Title"
+  },
+  "event_key_help": {
+    "event_count": "To control how many Events a <bold>Filter & Aggregation</bold> definition creates, use \"Create Events for Definition if...\" with \"Aggregation of results reaches a threshold\" and configure Group by Field(s).",
+    "example": "<bold>Example:</bold> two definitions, <em>Login failure</em> and <em>Privilege escalation</em>, both with Event Key <code>username</code>. A correlation of the two only fires when both Events carry the same username.",
+    "intro": "Event Keys are custom fields whose values are combined into the Event's key (values joined with <code>|</code>). The key identifies the entity an Event is about. It does not change how many Events are created.",
+    "where_it_matters": "<bold>Where the key matters:</bold> <bold>Event Correlation</bold> only matches source Events that share the same key, and creates at most one Event per key within its search window. Set Keys on the Event Definitions you intend to correlate, not on the correlation itself."
+  },
+  "field_form": {
+    "add": "Add custom field",
+    "data_type": "Field Data Type",
+    "data_type_string": "String",
+    "key_help": "Indicates if this Field should be a Key and its order.",
+    "more_about_keys": "More about Event Keys",
+    "name": "Name",
+    "name_help": "Name for this Field.",
+    "provider_unavailable": "Selected provider is not available.",
+    "select_value_source": "Select Value Source",
+    "set_value_from": "Set Value From",
+    "title_edit": "Custom Field \"{{fieldName}}\"",
+    "title_new": "New Custom Field",
+    "update": "Update custom field",
+    "use_as_key": "Use Field as Event Key",
+    "value_source_help": "Select a source for the value of this Field."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {
+      "title": "Template"
+    }
+  },
+  "fields_form": {
+    "description": "Include additional information in Events generated from this Event Definition by adding custom Fields. That can help you search Events or having more context when receiving Notifications.",
+    "errors_description": "Please correct the following errors before saving this Event Definition:",
+    "errors_title": "Fields with errors",
+    "event_fields": "Event Fields",
+    "no_keys": "No Keys configured yet.",
+    "not_editable": "The event fields of this event definition type cannot be edited.",
+    "optional": "(optional)",
+    "tags": "Tags",
+    "tags_description": "Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and grouping easier on the Alerts & Events list."
+  },
+  "fields_list": {
+    "configuration": "Configuration",
+    "data_type": "Data Type",
+    "field_name": "Field Name",
+    "is_key": "Is Key?",
+    "no": "No",
+    "no_fields": "This Event does not have any custom Fields yet.",
+    "remove": "Remove Field",
+    "value_source": "Value Source",
+    "yes": "Yes"
+  },
+  "filter_form": {
+    "cron_expression": "Cron Expression",
+    "cron_expression_help": "A Quartz cron expression to determine when the event should be run.",
+    "cron_time_zone": "Cron Time Zone",
+    "declare_missing_parameters": "Please declare missing query parameters by clicking on the buttons above.",
+    "description": "Add information to filter the log messages that are relevant for this Event Definition.",
+    "enable": "Enable",
+    "enable_help": "Should this event definition be executed automatically?",
+    "execute_every": "Execute search every",
+    "lookup_table_permission_missing": "This account lacks permission to declare Query Parameters from Lookup Tables.",
+    "optional": "(Optional)",
+    "query_parameters": "Query Parameters",
+    "search_filters": "Search Filters",
+    "search_query": "Search Query",
+    "search_query_help": "Search query that Messages should match. You can use the same syntax as in the Search page, including declaring Query Parameters from Lookup Tables by using the <code>{{syntax}}</code> syntax.",
+    "search_within": "Search within the last",
+    "streams_and_categories": "Streams and Categories",
+    "streams_help": "Select streams the search should include.",
+    "title": "Filter",
+    "use_cron": "Use Cron Scheduling",
+    "use_cron_help": "Schedule this event with a Quartz cron expression",
+    "warm_tier_title": "Warm Tier Warning",
+    "warm_tier_warning": "The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems. A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: <timestamp></timestamp>."
+  },
+  "filter_preview": {
+    "help_aggregation": "One Event every time the aggregation result satisfies the condition",
+    "help_aggregation_groups": "One Event per group whose aggregation result satisfies the condition",
+    "help_aggregation_groups_label": "Aggregation with groups:",
+    "help_aggregation_label": "Aggregation without groups:",
+    "help_description": "The Filter & Aggregation Condition will generate different number of Events, depending on how it is configured:",
+    "help_filter": "One Event per message matching the filter",
+    "help_filter_label": "Filter:",
+    "help_title": "How many Events will Filter & Aggregation create?",
+    "loading": "Loading filter preview...",
+    "message": "Message",
+    "no_messages": "Could not find any messages with the current search criteria.",
+    "timestamp": "Timestamp"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "Aggregation condition is not valid",
+    "loading": "Loading Event information...",
+    "query_parameters_undeclared": "Query parameters must be declared"
+  },
+  "form_controls": {
+    "create": "Create Event Definition",
+    "creating": "Creating...",
+    "previous": "Previous",
+    "update": "Update Event Definition",
+    "updating": "Updating..."
+  },
+  "notification_list": {
+    "no_notifications": "This Event is not configured to trigger any Notifications yet.",
+    "not_found": "Could not find information for Notification <em>{{title}}</em>",
+    "notification": "Notification",
+    "type": "Type"
+  },
+  "notification_settings": {
+    "grace_period": "Grace Period",
+    "grace_period_help": "Notifications for alerts are sent every time they occur. Set a Grace Period to control how long to wait before sending Notifications again. Note that Events with keys will have a Grace Period for each different key value.",
+    "message_backlog": "Message Backlog",
+    "message_backlog_help": "Number of messages to be included in Notifications.",
+    "toggle_message_backlog": "Toggle message backlog"
+  },
+  "notifications_form": {
+    "description": "Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.",
+    "manage": "Manage Notifications"
+  },
+  "page": {
+    "alerts_docs": "Alerts documentation",
+    "copy_confirm": "Are you sure you want to create a copy of \"{{title}}\"?",
+    "copy_title": "Copy Event Definition",
+    "create_multiple": "Create Event Definitions",
+    "description_alerts": "Event Definitions allow you to create Alerts from different Conditions and alert on them.",
+    "description_events": "Event Definitions allow you to create Events from different Conditions and alert on them.",
+    "description_list": "Create new Event Definitions that will allow you to search for different Conditions and alert on them.",
+    "duplicate": "Duplicate Event Definition",
+    "edit": "Edit Event Definition",
+    "edit_named": "Edit \"{{title}}\" Event Definition",
+    "file_import": "Create Event Definitions - File Import",
+    "git_import": "Create Event Definitions - Git Import",
+    "loading": "Loading Event Definition...",
+    "new": "New Event Definition",
+    "new_named": "New Event Definition \"{{title}}\"",
+    "title": "Event Definitions",
+    "view": "View Event Definition",
+    "view_named": "View \"{{title}}\" Event Definition"
+  },
+  "priorities": {
+    "critical": "Critical",
+    "high": "High",
+    "info": "Info",
+    "low": "Low",
+    "medium": "Medium"
+  },
+  "provider_summary": {
+    "less_details": "Less details",
+    "lookup_table_key_field": "Lookup Table Key Field",
+    "more_details": "More details",
+    "validate_template_values": "Validate that all Template values are set",
+    "value_source": "Value source"
+  },
+  "query_parameter_modal": {
+    "save": "Save",
+    "title": "Declare Query Parameter \"{{name}}\"",
+    "type": "Type",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": ": undeclared"
+  },
+  "scheduling": {
+    "clear": "clear",
+    "clear_confirm": "Are you sure you want to clear queued notifications for \"{{title}}\"?",
+    "details": "{{title}} details.",
+    "every": "every {{duration}}",
+    "last_execution": "Last execution:",
+    "next_execution": "Next execution:",
+    "next_time_range": "Next time range:",
+    "not_scheduled": "Not Scheduled.",
+    "queued_notifications": "Queued notifications:",
+    "runs": "Runs {{schedule}}.",
+    "runs_searching_within": "Runs {{schedule}}, searching within the last {{duration}}.",
+    "status": "Status:"
+  },
+  "share": {
+    "collaborators": "Collaborators",
+    "description": "Search for a User or Team to add as collaborator on this event definition.",
+    "no_collaborators": "This Event definition has no collaborators."
+  },
+  "steps": {
+    "additional_details": "Additional Details",
+    "condition": "Condition",
+    "notifications": "Notifications",
+    "share": "Share",
+    "summary": "Summary"
+  },
+  "summary": {
+    "actions": "Actions",
+    "condition_invalid": "Condition is not valid: {{errors}}",
+    "condition_types": {
+      "aggregation": "Aggregation",
+      "filter": "Filter"
+    },
+    "create_events_if": "Create Events if",
+    "cron_description": "Cron Description",
+    "cron_expression": "Cron Expression",
+    "enable_scheduling": "Enable scheduling",
+    "event_limit": "Event limit",
+    "execute_every": "Execute search every",
+    "group_by": "Group by Field(s)",
+    "missing_stream_permissions": "Missing Stream Permissions for:",
+    "no": "no",
+    "no_cron_expression": "Error: no cron expression specified!",
+    "no_filters": "No filters configured",
+    "no_group_by": "No Group by configured",
+    "no_streams": "No Streams selected, searches in all Streams",
+    "search_filters": "Search Filters",
+    "search_query": "Search Query",
+    "search_within": "Search within",
+    "stream_categories": "Stream Categories",
+    "streams": "Streams",
+    "time_zone": "Time Zone",
+    "type": "Type",
+    "undeclared_parameters": "There are undeclared query parameters: {{parameters}}",
+    "use_cron": "Use Cron Scheduling",
+    "yes": "yes"
+  },
+  "summary_renders": {
+    "backlog_included_one": "Notifications will include {{count}} message",
+    "backlog_included_other": "Notifications will include {{count}} messages",
+    "backlog_none": "Notifications will not include any messages.",
+    "condition_plugin_no_summary": "Condition plugin <em>{{type}}</em> does not provide a summary.",
+    "event_procedure_summary": "Event Procedure Summary",
+    "event_procedure_summary_unavailable": "Event Procedure Summary component is not available.",
+    "fields": "Fields",
+    "grace_period_disabled": "Grace Period is disabled",
+    "grace_period_set": "Grace Period is set to {{duration}}",
+    "keys": "Keys",
+    "missing_notification_permissions": "Missing Notifications Permissions for:",
+    "no_event_procedures": "This Event does not have any Event Procedures.",
+    "no_field_value_provider": "No field value provider configured.",
+    "no_fields": "No Fields configured for Events based on this Definition.",
+    "no_keys": "No Keys configured for Events based on this Definition.",
+    "no_notifications": "This Event is not configured to trigger any Notifications.",
+    "no_remediation_steps": "No remediation steps given",
+    "notification_not_found": "Could not find information for Notification <em>{{id}}</em>.",
+    "notification_plugin_no_summary": "Notification plugin <em>{{type}}</em> does not provide a summary.",
+    "notifications": "Notifications",
+    "provider_plugin_no_summary": "Provider plugin <em>{{type}}</em> does not provide a summary.",
+    "remediation_steps": "Remediation Steps",
+    "settings": "Settings"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Aggregation events: group-by values and aggregation results.",
+    "aggregation_example": "Aggregation of failed login count per user:",
+    "aggregation_example_template": "<userVariable></userVariable> failed to login <countVariable></countVariable> times",
+    "button_aria_label": "Show event summary template help",
+    "button_title": "Summary Template Help",
+    "custom_fields": "Custom Fields",
+    "custom_fields_description": "Custom fields defined on the event definition are available under <code>fields</code>.",
+    "event_definition_variables": "Event Definition Variables",
+    "examples": "Examples",
+    "filter_events": "Filter events: original log message fields.",
+    "filter_example": "Filter on a specific log message:",
+    "filter_example_template": "Error on <hostVariable></hostVariable>: <messageVariable></messageVariable>",
+    "group_by_field": "(group-by field)",
+    "hostname": "(hostname)",
+    "intro": "Use a template to customize the description shown on the Alerts & Events page when an event is created. Templates use <jmteLink>JMTE</jmteLink> substitution - variables wrapped in <variable></variable>.",
+    "source_context": "Source Context",
+    "source_context_description": "The <code>source</code> variable contains context from the triggering data. Its contents depend on the event definition type:",
+    "title": "Event Summary Template"
+  },
+  "tags_editor": {
+    "aria_label": "Event Definition Tags",
+    "duplicate": "Tag \"{{tag}}\" has already been added.",
+    "help": "Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.",
+    "invalid_characters_one": "Tag {{tags}} contains invalid characters. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.",
+    "invalid_characters_other": "Tags {{tags}} contain invalid characters. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.",
+    "max_reached": "Maximum of {{max}} tags reached.",
+    "placeholder": "e.g. authentication, brute-force, compliance",
+    "too_long_one": "Tag {{tags}} exceeds the maximum length of {{max}} characters.",
+    "too_long_other": "Tags {{tags}} exceed the maximum length of {{max}} characters."
+  },
+  "template_preview": {
+    "aggregation": "Fields set in Group By with their original names",
+    "aggregation_label": "Aggregation:",
+    "available_fields": "Available Fields in the Template depend on the condition that created the Event:",
+    "correlation": "All Fields in the last matched and non-negated Event",
+    "correlation_label": "Correlation:",
+    "description": "It is possible to enrich generated Events with dynamic values. You can access Fields from the Event context with <code>{{syntax}}</code>.",
+    "filter": "All Fields in the original log message",
+    "filter_label": "Filter:",
+    "title": "Available Fields in Template"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Exclude empty fields",
+    "exclude_empty_fields_help": "Check this option to leave the Field off the Event entirely when the Template renders an empty value. When unchecked, the Field is added to the Event with an empty value. Always on when all Template values are required.",
+    "require_values": "Require all template values to be set",
+    "require_values_help": "Check this option to validate that all variables used in the Template have values.",
+    "template": "Template",
+    "template_help": "Type a literal text to set to this Field or use <jmteLink>JMTE syntax</jmteLink> to add a dynamic Value."
+  },
+  "types": {
+    "aggregation": {
+      "description": "Create Events from log messages by filtering them and (optionally) aggregating their results to match a given condition. These Events can be used as input for a Correlation Rule.",
+      "title": "Filter & Aggregation"
+    },
+    "system": {
+      "description": "Built-in Event Definition {{productName}} uses to report system notifications as Events.",
+      "title": "System Event Definition"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "Cannot be empty",
+    "field_cannot_be_empty": "Field cannot be empty.",
+    "field_positive_number": "Field must be a positive number."
+  },
+  "validation_summary": {
+    "title": "We found some errors!"
+  }
+}
