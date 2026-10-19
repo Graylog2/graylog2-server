@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix dashboard crash and lost page when creating multiple dashboard pages in quick succession."
+
+pulls = ["27840"]
