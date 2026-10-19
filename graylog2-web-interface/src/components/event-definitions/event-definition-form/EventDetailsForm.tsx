@@ -184,7 +184,20 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             rows={2}
           />
-          {showAddEventProcedureForm && (
+          {!validSecurityLicense && (
+            <Input
+              id="event-definition-remediation-steps"
+              name="remediation_steps"
+              label="Remediation Steps"
+              type="textarea"
+              help="Steps to remediate this Event. Markdown formatting is supported."
+              value={eventDefinition.remediation_steps}
+              onChange={handleChange}
+              readOnly={readOnly}
+              rows={5}
+            />
+          )}
+          {validSecurityLicense && showAddEventProcedureForm && (
             <PluggableEventProcedureForm
               eventProcedureId={eventDefinitionEventProcedure}
               remediationSteps={eventDefinition?.remediation_steps}
