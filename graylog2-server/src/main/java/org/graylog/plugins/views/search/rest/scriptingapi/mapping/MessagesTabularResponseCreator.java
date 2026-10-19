@@ -99,22 +99,22 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         final List<RequestedField> fields = searchRequestSpec.requestedFields().isEmpty()
                 ? knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList()
                 : searchRequestSpec.requestedFields();
-        if (!searchRequestSpec.includeUndecorated()) {
+        if (!searchRequestSpec.includeUnresolvedIds()) {
             return fields;
         }
         return fields.stream()
-                .flatMap(field -> undecorated(field)
-                        .filter(undecorated -> !fields.contains(undecorated))
-                        .map(undecorated -> Stream.of(field, undecorated))
+                .flatMap(field -> unresolvedId(field)
+                        .filter(unresolvedId -> !fields.contains(unresolvedId))
+                        .map(unresolvedId -> Stream.of(field, unresolvedId))
                         .orElseGet(() -> Stream.of(field)))
                 .toList();
     }
 
-    // Decorated by default, with the raw value available through the id decorator.
-    private Optional<RequestedField> undecorated(RequestedField field) {
-        final RequestedField undecorated = new RequestedField(field.name(), ID_DECORATOR);
-        return !field.hasDecorator() && isDecorated(field) && isDecorated(undecorated)
-                ? Optional.of(undecorated)
+    // Ids are resolved to titles by default, the unresolved ids are available through the id decorator.
+    private Optional<RequestedField> unresolvedId(RequestedField field) {
+        final RequestedField unresolvedId = new RequestedField(field.name(), ID_DECORATOR);
+        return !field.hasDecorator() && isDecorated(field) && isDecorated(unresolvedId)
+                ? Optional.of(unresolvedId)
                 : Optional.empty();
     }
 

@@ -35,7 +35,7 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("from") int from,
                                   @JsonProperty("size") int size,
                                   @JsonProperty("fields") List<String> fields,
-                                  @JsonProperty("include_undecorated") boolean includeUndecorated) implements SearchRequestSpec {
+                                  @JsonProperty("include_unresolved_ids") boolean includeUnresolvedIds) implements SearchRequestSpec {
 
 
     public static final String DEFAULT_SORT = Message.FIELD_TIMESTAMP;

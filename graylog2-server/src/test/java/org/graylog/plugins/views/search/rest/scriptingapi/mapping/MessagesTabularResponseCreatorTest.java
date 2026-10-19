@@ -74,7 +74,7 @@ class MessagesTabularResponseCreatorTest {
     }
 
     @Test
-    void addsUndecoratedFieldsToAllFields() throws QueryFailedException {
+    void addsUnresolvedIdsToAllFields() throws QueryFailedException {
         final TabularResponse response = creator.mapToResponse(spec(List.of(), true), searchJob(), searchUser);
 
         assertThat(columnNames(response)).containsExactlyInAnyOrder("source", "streams", "streams#id");
@@ -93,7 +93,7 @@ class MessagesTabularResponseCreatorTest {
     }
 
     @Test
-    void addsUndecoratedFieldsNextToRequestedFields() throws QueryFailedException {
+    void addsUnresolvedIdsNextToRequestedFields() throws QueryFailedException {
         final TabularResponse response = creator.mapToResponse(spec(List.of("streams", "source"), true), searchJob(), searchUser);
 
         assertThat(columnNames(response)).containsExactly("streams", "streams#id", "source");
@@ -101,14 +101,14 @@ class MessagesTabularResponseCreatorTest {
     }
 
     @Test
-    void doesNotDuplicateRequestedUndecoratedFields() throws QueryFailedException {
+    void doesNotDuplicateRequestedUnresolvedIds() throws QueryFailedException {
         final TabularResponse response = creator.mapToResponse(spec(List.of("streams", "streams#id"), true), searchJob(), searchUser);
 
         assertThat(columnNames(response)).containsExactly("streams", "streams#id");
     }
 
-    private static MessagesRequestSpec spec(List<String> fields, boolean includeUndecorated) {
-        return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields, includeUndecorated);
+    private static MessagesRequestSpec spec(List<String> fields, boolean includeUnresolvedIds) {
+        return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields, includeUnresolvedIds);
     }
 
     private static SearchJob searchJob() {
