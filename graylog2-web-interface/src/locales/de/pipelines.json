@@ -1,0 +1,17 @@
+{
+  "title": "Pipelines",
+  "overview_header_title": "Pipelines-Übersicht",
+  "documentation_link_title": "Pipelines-Dokumentation",
+  "overview_description": "Pipelines ermöglichen es Ihnen, Nachrichten, die von Streams kommen, zu transformieren und zu verarbeiten. Pipelines bestehen aus Stufen, in denen Regeln ausgewertet und angewendet werden. Nachrichten können eine oder mehrere Stufen durchlaufen.",
+  "new_pipeline": "Neue Pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipelines ermöglichen es Ihnen, Nachrichten, die von Streams kommen, zu transformieren und zu verarbeiten. Pipelines bestehen aus Stufen, in denen Regeln ausgewertet und angewendet werden. Nachrichten können eine oder mehrere Stufen durchlaufen.\nNachdem jede Stufe abgeschlossen ist, können Sie entscheiden, ob Nachrichten, die auf alle oder eine der Regeln zutreffen, zur nächsten Stufe weitergeleitet werden.",
+  "rules_page_title": "Pipeline-Regeln",
+  "rules_page_header_title": "Pipeline-Regeln",
+  "rules_page_documentation_link": "Pipeline-Regeln-Dokumentation",
+  "rules_page_description": "Regeln sind eine Möglichkeit, Änderungen an Nachrichten vorzunehmen. Eine Regel besteht aus einer Bedingung und einer Liste von Aktionen. Die Bedingung wird gegen eine Nachricht ausgewertet, und die Aktionen werden ausgeführt, wenn die Bedingung erfüllt ist.",
+  "rules_delete_confirm": "Möchten Sie die Regel \"{{title}}\" wirklich löschen?",
+  "rule_details_new_title": "Neue Pipeline-Regel",
+  "rule_details_title": "Pipeline-Regel {{title}}",
+  "rule_details_loading": "Pipeline-Regel-Details werden geladen..."
+}

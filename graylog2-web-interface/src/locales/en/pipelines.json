@@ -1,0 +1,17 @@
+{
+  "title": "Pipelines",
+  "overview_header_title": "Pipelines overview",
+  "documentation_link_title": "Pipelines documentation",
+  "overview_description": "Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.",
+  "new_pipeline": "New pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.\nAfter each stage is completed, you can decide if messages matching all or one of the rules continue to the next stage.",
+  "rules_page_title": "Pipeline rules",
+  "rules_page_header_title": "Pipeline Rules",
+  "rules_page_documentation_link": "Pipeline rules documentation",
+  "rules_page_description": "Rules are a way of applying changes to messages. A rule consists of a condition and a list of actions. The condition is evaluated against a message, and the actions are executed if the condition is satisfied.",
+  "rules_delete_confirm": "Do you really want to delete rule \"{{title}}\"?",
+  "rule_details_new_title": "New pipeline rule",
+  "rule_details_title": "Pipeline rule {{title}}",
+  "rule_details_loading": "Loading Rule Details..."
+}
