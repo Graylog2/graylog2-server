@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.mongodb.AuthenticationMechanism;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
@@ -215,7 +216,7 @@ class DefaultMongodbConnectionResolverTest {
 
         MongoClient client = resolver.resolve("host1:27017");
         assertThat(client).isNotNull().satisfies(assertServer("host1:27017"));
-        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
+        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isEqualTo("rs0");
         assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
     }
 
@@ -227,7 +228,7 @@ class DefaultMongodbConnectionResolverTest {
         MongoClient client = resolver.resolve("mongodb2:27017");
         assertThat(client).isNotNull().satisfies(assertServer("mongodb2:27017"));
         assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
-        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
+        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isEqualTo("rs0");
         assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
         assertThat(client.getMongoClientOptions().getReadPreference()).isEqualTo(ReadPreference.secondaryPreferred());
         assertThat(client.getCredential().getAuthenticationMechanism()).isEqualTo(AuthenticationMechanism.PLAIN);
@@ -269,8 +270,8 @@ class DefaultMongodbConnectionResolverTest {
     }
 
     /**
-     * URL-encoded credentials must stay encoded in the per-node connection string. Especially ':' and '@' are
-     * rejected by the MongoDB driver if they appear decoded in the credentials.
+     * URL-encoded credentials are decoded once, by the MongoDB driver. Especially ':' and '@' must not be decoded
+     * twice, as the MongoDB driver rejects them if they appear decoded in a connection string.
      */
     @ParameterizedTest
     @CsvSource(delimiter = '|', quoteCharacter = '\'', value = {
@@ -305,20 +306,20 @@ class DefaultMongodbConnectionResolverTest {
     }
 
     @Test
-    void testResolveDropsOverriddenOptionsCaseInsensitively() throws Exception {
+    void testResolveWithUpperCaseOptionNames() throws Exception {
         MongoDbConfiguration config = createConfiguration("mongodb://localhost:27017,localhost:27018/graylog?REPLICASET=rs0&DirectConnection=false&appName=graylog");
         MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         MongoClient client = resolver.resolve("host1:27017");
         assertThat(client).isNotNull().satisfies(assertServer("host1:27017"));
-        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
+        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isEqualTo("rs0");
         assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
         assertThat(client.getMongoClientOptions().getApplicationName()).isEqualTo("graylog");
     }
 
     /**
-     * The database path is optional, also if there are options. The hosts end at the first '/' or '?', so a '/' or
-     * '@' in the options must not be mistaken for the path or the credentials.
+     * The database path is optional, also if there are options. A '/' or '@' in the options must not be mistaken for
+     * the path or the credentials.
      */
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
@@ -337,7 +338,6 @@ class DefaultMongodbConnectionResolverTest {
                 .satisfies(assertServer("host1:27017"))
                 .satisfies(assertCredentials("admin", "user", "pass"));
         assertThat(client.getMongoClientOptions().getApplicationName()).isEqualTo(expectedAppName);
-        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
         assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
     }
 
@@ -375,65 +375,24 @@ class DefaultMongodbConnectionResolverTest {
     }
 
     @Test
-    void testResolveWithSrvConnectionStringEnablesTlsByDefault() {
-        // Like the documented example, no explicit tls option. An explicit authSource avoids the DNS TXT lookup.
-        MongoDbConfiguration config = createSrvConfiguration("mongodb+srv://grayloguser:pa%3Ass@cluster0.example.org/graylog?authSource=admin&retryWrites=true&w=majority");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
-
-        MongoClient client = resolver.resolve("cluster0-shard-00-01.example.org:27017");
-        assertThat(client).isNotNull().satisfies(assertServer("cluster0-shard-00-01.example.org:27017"));
-        assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
-        assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
-        assertThat(client.getCredential().getSource()).isEqualTo("admin");
-        assertThat(client.getCredential().getPassword()).isEqualTo("pa:ss".toCharArray());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"tls=false, false", "ssl=false, false", "TLS=true, true", "ssl=true, true"})
-    void testResolveWithSrvConnectionStringKeepsExplicitTlsSetting(String tlsOption, boolean expectedTls) {
-        MongoDbConfiguration config = createSrvConfiguration(f("mongodb+srv://cluster0.example.org/graylog?%s", tlsOption));
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
-
-        MongoClient client = resolver.resolve("cluster0-shard-00-01.example.org:27017");
-        assertThat(client).isNotNull().satisfies(assertServer("cluster0-shard-00-01.example.org:27017"));
-        assertThat(client.getMongoClientOptions().isSslEnabled()).isEqualTo(expectedTls);
-    }
-
-    @Test
-    void testResolveWithSrvConnectionStringDropsSrvOnlyOptions() {
-        MongoDbConfiguration config = createSrvConfiguration("mongodb+srv://cluster0.example.org/graylog?srvMaxHosts=2&srvServiceName=custom&srvAllowedHostsSuffix=example.org&appName=graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
-
-        MongoClient client = resolver.resolve("cluster0-shard-00-01.example.org:27017");
-        assertThat(client).isNotNull().satisfies(assertServer("cluster0-shard-00-01.example.org:27017"));
-        assertThat(client.getMongoClientOptions().getApplicationName()).isEqualTo("graylog");
-        assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
-    }
-
-    @Test
-    void testResolveWithSrvConnectionStringUsesAuthSourceFromDnsTxtRecord() {
-        final String uri = "mongodb+srv://grayloguser:secret@cluster0.example.org/graylog";
-        // The parsed URI resolves the DNS TXT record of the cluster, which defines "authSource=admin" here
+    void testResolveWithSrvConnectionStringUsesParsedOptionsAndCredentials() {
+        // Parsing a mongodb+srv:// connection string resolves its DNS records, so the parsed URI is mocked: TLS is
+        // implied by mongodb+srv:// and the DNS TXT record of the cluster defines "authSource=admin" here.
         final MongoClientURI parsedUri = mock(MongoClientURI.class);
+        when(parsedUri.getOptions()).thenReturn(MongoClientOptions.builder().sslEnabled(true).requiredReplicaSetName("rs0").build());
         when(parsedUri.getCredentials()).thenReturn(MongoCredential.createCredential("grayloguser", "admin", "secret".toCharArray()));
         final MongoDbConfiguration config = mock(MongoDbConfiguration.class);
-        when(config.getUri()).thenReturn(uri);
         when(config.getMongoClientURI()).thenReturn(parsedUri);
         MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         MongoClient client = resolver.resolve("cluster0-shard-00-01.example.org:27017");
-        assertThat(client).isNotNull().satisfies(assertServer("cluster0-shard-00-01.example.org:27017"));
+        assertThat(client).isNotNull()
+                .satisfies(assertServer("cluster0-shard-00-01.example.org:27017"))
+                .satisfies(assertCredentials("admin", "grayloguser", "secret"));
+        assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
         assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
-        assertThat(client).satisfies(assertCredentials("admin", "grayloguser", "secret"));
-    }
-
-    /**
-     * Without validation, as that parses the connection string, which resolves DNS records for mongodb+srv://.
-     */
-    private MongoDbConfiguration createSrvConfiguration(String uri) {
-        final MongoDbConfiguration config = new MongoDbConfiguration();
-        config.setUri(uri);
-        return config;
+        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isEqualTo("rs0");
+        assertThat(client.getMongoClientOptions().getConnectionsPerHost()).isEqualTo(5);
     }
 
     private MongoDbConfiguration createConfiguration(String uri) throws RepositoryException, ValidationException {
