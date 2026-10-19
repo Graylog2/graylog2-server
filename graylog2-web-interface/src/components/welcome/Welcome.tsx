@@ -39,8 +39,7 @@ const StyledSectionComponent = styled(SectionComponent)`
 `;
 
 const Welcome = () => {
-  const { isPermitted } = usePermissions();
-  const isAdmin = isPermitted('*');
+  const { isAdmin } = usePermissions();
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
   const productName = useProductName();
