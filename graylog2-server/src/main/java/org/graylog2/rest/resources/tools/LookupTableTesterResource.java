@@ -17,6 +17,19 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.lookup.LookupTableService;
@@ -26,21 +39,8 @@ import org.graylog2.rest.resources.tools.responses.LookupTableTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 @RequiresAuthentication
+@Tag(name = "Tools/LookupTableTester", description = "Test lookup tables")
 @Path("/tools/lookup_table_tester")
 @Produces(MediaType.APPLICATION_JSON)
 public class LookupTableTesterResource extends RestResource {
@@ -53,6 +53,7 @@ public class LookupTableTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Look up a string in a lookup table")
     @Timed
     public LookupTableTesterResponse testLookupTable(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
                                                      @QueryParam("string") @NotEmpty String string) {
@@ -60,6 +61,7 @@ public class LookupTableTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Look up a string in a lookup table")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
