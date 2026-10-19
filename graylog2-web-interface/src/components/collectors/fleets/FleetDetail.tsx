@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
@@ -138,12 +137,11 @@ export const sourceActionsFactory =
   );
 
 const FleetDetail = ({ fleetId }: Props) => {
-  const queryClient = useQueryClient();
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
-  const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
+  const { createSource, updateSource, deleteSource, updateFleet } = useCollectorsMutations();
   const { canCreateSource, canCreateToken, canEditSource, canDeleteSource, canAssignToFleet } =
     useCollectorPermissions();
   const hasBulkActions = useHasBulkActions();
@@ -194,9 +192,7 @@ const FleetDetail = ({ fleetId }: Props) => {
     [fleetId, navigateToTab, sendTelemetry],
   );
 
-  const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
-
-  const instanceRenderers = useMemo(() => instanceColumnRenderers({ fleetNames }), [fleetNames]);
+  const instanceRenderers = useMemo(() => instanceColumnRenderers(), []);
 
   const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
 
@@ -455,13 +451,6 @@ const FleetDetail = ({ fleetId }: Props) => {
           onSave={async (updates) => {
             await updateFleet({ fleetId: fleet.id, updates });
           }}
-          onDelete={async () => {
-            await deleteFleet(fleet.id);
-            history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
-            // Invalidate after navigation so the fleets list refetches.
-            // Fleet-specific queries were already removed by the mutation's onSuccess.
-            queryClient.invalidateQueries({ queryKey: ['collectors'] });
-          }}
         />
       )}
 
@@ -482,7 +471,6 @@ const FleetDetail = ({ fleetId }: Props) => {
         <InstanceDetailDrawer
           instance={selectedInstance}
           sources={getSourcesForInstance(selectedInstance)}
-          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
           onClose={() => setSelectedInstance(null)}
         />
       )}

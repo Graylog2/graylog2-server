@@ -25,13 +25,13 @@ import org.graylog2.plugin.PluginConfigBean;
 @DocumentationSection(heading = "Pipeline configuration", description = "")
 public class PipelineConfig implements PluginConfigBean {
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Cache the stage iterators computed for a set of pipelines instead of recomputing them for every message.")
     @Parameter("cached_stageiterators")
     private boolean cachedStageIterators = true;
 
     @Documentation("""
             Controls how often Graylog records pipeline rule debug timer samples.
-            The default, 100, records roughly one out of every 100 invocations.
+            A value of 100 records roughly one out of every 100 invocations.
             Use 1 to record every invocation.
             Use the same value on every node. Changes require a JVM restart.
             """)

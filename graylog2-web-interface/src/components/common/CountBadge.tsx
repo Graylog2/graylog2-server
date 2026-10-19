@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
 import Icon from 'components/common/Icon';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
 const StyledBadge = styled(Badge)<{ onClick: () => void }>(
   ({ onClick }) => css`
@@ -39,22 +40,27 @@ type Props = {
   title?: string;
   count: React.ReactNode;
   iconName?: React.ComponentProps<typeof Icon>['name'];
+  abbreviate?: boolean;
 };
 
 const CountBadge = (
-  { onClick = undefined, className = '', title = undefined, count, iconName = undefined }: Props,
+  { onClick = undefined, className = '', title = undefined, count, iconName = undefined, abbreviate = false }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
-) => (
-  <StyledBadge bsStyle="default" className={className} onClick={onClick} ref={ref} title={title}>
-    {iconName ? (
-      <BadgeInner>
-        {count}
-        <Icon name={iconName} size="sm" />
-      </BadgeInner>
-    ) : (
-      count
-    )}
-  </StyledBadge>
-);
+) => {
+  const displayCount = abbreviate && typeof count === 'number' ? formatReadableNumber(count) : count;
+
+  return (
+    <StyledBadge bsStyle="default" className={className} onClick={onClick} ref={ref} title={title}>
+      {iconName ? (
+        <BadgeInner>
+          {displayCount}
+          <Icon name={iconName} size="sm" />
+        </BadgeInner>
+      ) : (
+        displayCount
+      )}
+    </StyledBadge>
+  );
+};
 
 export default forwardRef(CountBadge);

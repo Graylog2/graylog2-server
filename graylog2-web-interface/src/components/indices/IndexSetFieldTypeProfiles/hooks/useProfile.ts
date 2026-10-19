@@ -16,8 +16,8 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
@@ -32,17 +32,14 @@ const INITIAL_DATA: IndexSetFieldTypeProfile = {
   indexSetIds: [],
 };
 
-const fetchIndexSetFieldTypeProfile = async (id: string) => {
-  const url = qualifyUrl(`/system/indices/index_sets/profiles/${id}`);
-
-  return fetch('GET', url).then((profile: IndexSetFieldTypeProfileJson) => ({
+const fetchIndexSetFieldTypeProfile = async (id: string) =>
+  SystemIndexSetsFieldTypeProfiles.retrieveById(id).then((profile: IndexSetFieldTypeProfileJson) => ({
     id: profile.id,
     name: profile.name,
     description: profile.description,
     customFieldMappings: profile.custom_field_mappings,
     indexSetIds: profile.index_set_ids,
   }));
-};
 
 const useProfile = (
   id: string,

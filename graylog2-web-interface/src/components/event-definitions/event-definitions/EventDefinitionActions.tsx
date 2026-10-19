@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
+import { IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import {
@@ -35,13 +35,17 @@ import UserNotification from 'util/UserNotification';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
+import EventDefinitionReplaySearchLink from 'components/event-definitions/replay-search/EventDefinitionReplaySearchLink';
 
 import type { EventDefinition } from '../event-definitions-types';
-import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
+import {
+  isAggregationEventDefinition,
+  isIlluminateEventDefinition,
+  isSystemEventDefinition,
+} from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -85,7 +89,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
     usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
   const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
@@ -95,9 +99,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   // Every entry of the "more actions" menu is permission gated, so without any of them the menu would
   // render as an empty dropdown box.
   const hasMoreActions =
-    isPermitted(permissions, `eventdefinitions:edit:${eventDefinition.id}`) ||
-    isPermitted(permissions, 'eventdefinitions:create') ||
-    (showActions() && isPermitted(permissions, `eventdefinitions:delete:${eventDefinition.id}`)) ||
+    isPermitted(`eventdefinitions:edit:${eventDefinition.id}`) ||
+    isPermitted('eventdefinitions:create') ||
+    (showActions() && isPermitted(`eventdefinitions:delete:${eventDefinition.id}`)) ||
     isAggregationEventDefinition(eventDefinition) ||
     pluggableActions.length > 0;
 
@@ -184,6 +188,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const handleConfirm = () => {
     switch (dialogType) {
       case 'copy':
+        if (isIlluminateEventDefinition(currentDefinition)) {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.ILLUMINATE_EVENTDEFINITION_CLONED, {
+            app_section: 'event-definition-row',
+            app_action_value: 'illuminate-event-definition-clone',
+            event_details: { event_definition_title: currentDefinition.title },
+          });
+        }
+
         copyEventDefinition(currentDefinition)
           .catch(() => {
             // Error feedback is handled by `copyEventDefinition` itself.
@@ -308,9 +320,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
                   anyPermissions>
                   <MenuItem divider />
                 </IfPermitted>
-                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                  <MenuItem>Replay Search</MenuItem>
-                </LinkContainer>
+                <EventDefinitionReplaySearchLink eventDefinitionId={eventDefinition.id} isMenuitem />
               </>
             )}
             {moreActions}

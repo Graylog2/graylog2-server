@@ -69,6 +69,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesNormalizer;
 import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
@@ -201,7 +202,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
         // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
         this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
-                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
+                Map.of("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID),
+                       EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
                        EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
@@ -239,24 +241,35 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
-        final List<String> remainingFilters = filterPredicate.filters();
-        final List<String> tagFilters = remainingFilters == null ? List.of() :
-                remainingFilters.stream()
-                        .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
-                        .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
-                        .filter(v -> !v.isBlank())
-                        .toList();
+        final List<String> remainingFilters = filterPredicate.filters() == null ? List.of() : filterPredicate.filters();
+        final List<String> tagFilters = filterValues(remainingFilters, EventDefinitionDto.FIELD_TAGS);
         if (!tagFilters.isEmpty()) {
             predicate = predicate.and(event -> tagFilters.stream().anyMatch(event.tags()::contains));
         }
+        final List<String> tacticsTechniquesFilters = TacticsTechniquesNormalizer.normalize(
+                filterValues(remainingFilters, EventDefinitionDto.FIELD_TACTICS_TECHNIQUES));
+        // Same gate as saving: with validation off, stored IDs may not be canonical, so any value is filterable.
+        if (eventDefinitionConfiguration.isTacticsTechniquesValidationEnabled()) {
+            final List<String> invalidIds = tacticsTechniquesFilters.stream()
+                    .filter(id -> !TacticsTechniquesNormalizer.isValid(id))
+                    .toList();
+            if (!invalidIds.isEmpty()) {
+                throw new BadRequestException("Invalid tactic/technique filter value(s): " + String.join(", ", invalidIds)
+                        + ". Expected format: TA0000, T0000, or T0000.000.");
+            }
+        }
 
-        // Strip tags filters before passing to DbQueryCreator (tags are handled by predicate above)
-        final List<String> dbFilters = remainingFilters == null ? List.of() :
-                remainingFilters.stream()
-                        .filter(f -> f == null || !f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
-                        .toList();
+        // Strip tags and tactics_techniques filters before passing to DbQueryCreator: neither is a
+        // filterable attribute (see the dbQueryCreator comment), so it would reject them.
+        final List<String> dbFilters = remainingFilters.stream()
+                .filter(f -> f == null || !(isFilterFor(f, EventDefinitionDto.FIELD_TAGS)
+                        || isFilterFor(f, EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)))
+                .toList();
 
-        final Bson dbQuery = dbQueryCreator.createDbQuery(dbFilters, query);
+        final Bson baseDbQuery = dbQueryCreator.createDbQuery(dbFilters, query);
+        // Tactics/techniques match in Mongo (any of the selected IDs) rather than in the predicate.
+        final Bson dbQuery = tacticsTechniquesFilters.isEmpty() ? baseDbQuery :
+                Filters.and(baseDbQuery, Filters.in(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, tacticsTechniquesFilters));
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 dbQuery,
@@ -299,6 +312,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }
+
+    private static boolean isFilterFor(String filter, String field) {
+        return filter.startsWith(field + ":");
+    }
+
+    private static List<String> filterValues(List<String> filters, String field) {
+        return filters.stream()
+                .filter(f -> f != null && isFilterFor(f, field))
+                .map(f -> f.substring(field.length() + 1))
+                .filter(v -> !v.isBlank())
+                .toList();
+    }
 
     @GET
     @Operation(summary = "List event definitions")

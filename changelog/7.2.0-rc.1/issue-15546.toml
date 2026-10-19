@@ -1,0 +1,5 @@
+type = "a"
+message = "Add a Color Preference option for the Single Number widget's trend coloring, letting you decide between highlighting just the trend indicator or the entire widget."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15546"]
+pulls = ["27490"]

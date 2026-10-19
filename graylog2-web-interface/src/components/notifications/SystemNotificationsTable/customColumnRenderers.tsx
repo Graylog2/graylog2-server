@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import type { NotificationType } from 'components/notifications/types';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import TitleCell from './cells/TitleCell';
 import DescriptionCell from './cells/DescriptionCell';
@@ -25,17 +26,22 @@ import SeverityCell from './cells/SeverityCell';
 
 const customColumnRenderers = {
   attributes: {
+    node_id: {
+      staticWidth: 300,
+    },
     title: {
       renderCell: (_title: string, row: NotificationType) => <TitleCell row={row} />,
     },
     severity: {
       renderCell: (_severity: string, row: NotificationType) => <SeverityCell row={row} />,
+      staticWidth: 'matchHeader' as const,
     },
     description: {
       renderCell: (_description: string, row: NotificationType) => <DescriptionCell row={row} />,
     },
     timestamp: {
       renderCell: (triggeredAt: string) => <TriggeredAtCell triggeredAt={triggeredAt} />,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
   },
 };

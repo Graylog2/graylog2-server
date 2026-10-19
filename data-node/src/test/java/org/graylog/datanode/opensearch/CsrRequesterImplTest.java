@@ -19,6 +19,7 @@ package org.graylog.datanode.opensearch;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -76,6 +78,33 @@ class CsrRequesterImplTest {
                 });
     }
 
+    @Test
+    void testSANWithPublishHostOverride(@TempDir Path tempDir) throws Exception {
+        final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
+                "node_name", "my-node-name",
+                "hostname", "my-datanode-machine",
+                "opensearch_network_publish_host", "10.100.100.93"
+        ), tempDir);
+
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", new EventBus());
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
+
+        Queue<CertificateSigningRequest> signingRequests = new LinkedList<>();
+        final CsrRequester requester = new CsrRequesterImpl(configuration, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), datanodeKeystore, mockCertificateExchange(signingRequests));
+
+        requester.triggerCertificateSigningRequest();
+
+        Assertions.assertThat(signingRequests.poll())
+                .isNotNull()
+                .satisfies(signingRequest -> {
+                    final PKCS10CertificationRequest req = signingRequest.request();
+                    final List<String> names = getSubjectAlternativeNames(req);
+                    Assertions.assertThat(names)
+                            .isNotNull()
+                            .contains("my-node-name", "my-datanode-machine", "10.100.100.93");
+                });
+    }
+
     public static List<String> getSubjectAlternativeNames(PKCS10CertificationRequest csr) throws IOException {
         List<String> sanList = new ArrayList<>();
 
@@ -93,8 +122,10 @@ class CsrRequesterImplTest {
                 switch (name.getTagNo()) {
                     case GeneralName.dNSName:
                     case GeneralName.rfc822Name:
-                    case GeneralName.iPAddress:
                         sanList.add(name.getName().toString());
+                        break;
+                    case GeneralName.iPAddress:
+                        sanList.add(decodeIPAddress(name));
                         break;
                     // You can handle other tag types as needed
                 }
@@ -102,6 +133,11 @@ class CsrRequesterImplTest {
         }
 
         return sanList;
+    }
+
+    private static String decodeIPAddress(GeneralName name) throws IOException {
+        final byte[] octets = ASN1OctetString.getInstance(name.getName()).getOctets();
+        return InetAddress.getByAddress(octets).getHostAddress();
     }
 
     @Nonnull

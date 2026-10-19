@@ -1,0 +1,4 @@
+type = "changed"
+message = "Raise the default of http_max_header_size from 8192 to 16384 bytes."
+
+pulls = ["27599"]

@@ -194,6 +194,7 @@ export const mockedContexts = {
   parameters: parameters,
   analysisDisabledFields: undefined,
   currentUser: undefined,
+  isPermitted: undefined,
   message: undefined,
   isLocalNode: undefined,
 };

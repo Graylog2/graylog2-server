@@ -18,11 +18,10 @@
 import { useMemo } from 'react';
 
 import type { ColumnSchema } from 'components/common/EntityDataTable';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted, isAnyPermitted } = usePermissions();
 
   return useMemo(
     () =>
@@ -32,14 +31,12 @@ const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
         }
 
         if (permissions?.length) {
-          return anyPermissions
-            ? isAnyPermitted(currentUser.permissions, permissions)
-            : isPermitted(currentUser.permissions, permissions);
+          return anyPermissions ? isAnyPermitted(permissions) : isPermitted(permissions);
         }
 
         return true;
       }),
-    [columnSchemas, currentUser.permissions],
+    [columnSchemas, isPermitted, isAnyPermitted],
   );
 };
 

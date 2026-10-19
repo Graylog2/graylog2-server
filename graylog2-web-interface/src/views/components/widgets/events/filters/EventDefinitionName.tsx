@@ -19,8 +19,7 @@ import * as React from 'react';
 import { Spinner, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 type Props = {
   eventDefinitionId: string;
@@ -28,8 +27,8 @@ type Props = {
 };
 
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink = true }: Props) => {
-  const currentUser = useCurrentUser();
-  const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
+  const { isPermitted } = usePermissions();
+  const canViewDefinition = isPermitted(`eventdefinitions:read:${eventDefinitionId}`);
   const { data: eventDefinition, isFetching, isError } = useEventDefinition(eventDefinitionId, canViewDefinition);
   const title = eventDefinition?.title ?? eventDefinitionId;
 

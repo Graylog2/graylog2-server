@@ -120,6 +120,12 @@ public class DashboardV1Facade extends ViewFacade {
         return resolveViewEntity(entity, viewEntity, parameters, entities);
     }
 
+    // Legacy dashboard entities have no scope field, so no scope can be injected into them.
+    @Override
+    public boolean usesScopedEntities() {
+        return false;
+    }
+
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
         return EntityPermissions.of(RestPermissions.DASHBOARDS_CREATE);

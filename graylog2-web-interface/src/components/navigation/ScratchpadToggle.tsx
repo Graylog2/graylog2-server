@@ -15,47 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import styled, { css } from 'styled-components';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import { Button } from 'components/bootstrap';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
 import NavIcon from 'components/navigation/NavIcon';
-
-import NavItemStateIndicator, { hoverIndicatorStyles } from '../common/NavItemStateIndicator';
-
-const Toggle = styled(Button)(
-  ({ theme }) => css`
-    padding: 0 15px;
-    background: none;
-    border: 0;
-    min-height: ${NAV_ITEM_HEIGHT};
-    color: ${theme.colors.text.primary};
-
-    &:hover,
-    &:focus-visible {
-      ${hoverIndicatorStyles(theme)}
-      background: transparent;
-      color: ${theme.colors.variant.darker.default};
-    }
-  `,
-);
+import NavigationButton from 'components/navigation/NavigationButton';
 
 const ScratchpadToggle = () => {
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
 
   return (
     <li role="presentation">
-      <Toggle
-        bsStyle="link"
-        type="button"
-        aria-label="Scratchpad"
-        id="scratchpad-toggle"
-        onClick={toggleScratchpadVisibility}>
-        <NavItemStateIndicator>
-          <NavIcon type="scratchpad" title="Scratchpad" />
-        </NavItemStateIndicator>
-      </Toggle>
+      <NavigationButton aria-label="Scratchpad" id="scratchpad-toggle" onClick={toggleScratchpadVisibility}>
+        <NavIcon type="scratchpad" title="Scratchpad" />
+      </NavigationButton>
     </li>
   );
 };

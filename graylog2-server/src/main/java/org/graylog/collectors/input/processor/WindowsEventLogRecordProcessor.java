@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog.inputs.otel.OTelValues.asLong;
+import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
 
 /**
  * Processes Windows Event Log receiver messages into GIM format.
@@ -101,11 +102,18 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "computer" -> fields.computer = extractString(bodyFieldValue);
                 // System/Channel: channel to which the event was logged (e.g., Security, Windows PowerShell).
                 case "channel" -> putIfPresent(result, EventFields.EVENT_LOG_NAME, extractString(bodyFieldValue));
-                // System/EventRecordID: channel-local record number assigned when logged.
+                // System/EventRecordID: channel-local record number assigned when logged. Monotonically
+                // increasing within a channel, so it also orders events that share a timestamp.
                 case "record_id" -> {
+                    // The value is unsigned 64-bit, so the UID is rendered as a string to cover the whole
+                    // range without loss.
+                    putIfPresent(result, EventFields.EVENT_UID, unsignedAsString(bodyFieldValue));
+                    // A value above 2^63 reaches us wrapped into a negative long, which would invert the
+                    // sort order the sequence number is meant to establish. The codec's default sequence
+                    // number stays in place for those.
                     final var recordId = asLong(bodyFieldValue);
-                    if (recordId != null) {
-                        result.put(EventFields.EVENT_UID, recordId.toString());
+                    if (recordId != null && recordId > 0) {
+                        result.put(EventFields.EVENT_SEQUENCE, recordId);
                     }
                 }
                 // System/EventID (+ Qualifiers for legacy providers): provider-defined event identifier.

@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.storage.opensearch3.ClusterAdapterOS;
@@ -87,12 +88,18 @@ public class OpensearchProcessImplTest {
     @Mock
     ClusterEventBus clusterEventBus;
 
+    @Mock
+    DatanodeKeystore datanodeKeystore;
+
+    @Mock
+    CertificateReloadVerifier certificateReloadVerifier;
+
     @BeforeEach
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                objectMapper, processState, nodeId, eventBus, clusterEventBus));
+                objectMapper, processState, nodeId, eventBus, clusterEventBus, datanodeKeystore, certificateReloadVerifier));
         when(opensearchProcess.openSearchClient()).thenReturn(Optional.of(client));
         when(opensearchProcess.clusterAdapter()).thenReturn(clusterAdapter);
     }
@@ -261,6 +268,35 @@ public class OpensearchProcessImplTest {
 
     private static long gigabytes(int i) {
         return i * 1024 * 1024 * 1024L;
+    }
+
+    @Test
+    public void testGetOpensearchClusterUrlUsesPublishHostNotNodeName() {
+        // node name is only a local identity label and must not leak into the address other nodes
+        // dial in on: the transport/discovery address has to be built from the publish host instead.
+        when(configuration.getOpensearchNetworkPublishHost()).thenReturn("datanode.example.org");
+        when(configuration.getOpensearchTransportPort()).thenReturn(9300);
+
+        Assertions.assertThat(opensearchProcess.getOpensearchClusterUrl())
+                .isEqualTo("datanode.example.org:9300");
+    }
+
+    @Test
+    public void testGetOpensearchClusterUrlBracketsIPv6PublishHost() {
+        when(configuration.getOpensearchNetworkPublishHost()).thenReturn("2001:db8::1");
+        when(configuration.getOpensearchTransportPort()).thenReturn(9300);
+
+        Assertions.assertThat(opensearchProcess.getOpensearchClusterUrl())
+                .isEqualTo("[2001:db8::1]:9300");
+    }
+
+    @Test
+    public void testGetOpensearchClusterUrlWithIPv4PublishHost() {
+        when(configuration.getOpensearchNetworkPublishHost()).thenReturn("10.0.0.1");
+        when(configuration.getOpensearchTransportPort()).thenReturn(9300);
+
+        Assertions.assertThat(opensearchProcess.getOpensearchClusterUrl())
+                .isEqualTo("10.0.0.1:9300");
     }
 
     @Test

@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -24,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -42,6 +44,7 @@ import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -60,23 +63,29 @@ public class CollectorLogsDestinationService {
 
     public static final String COLLECTOR_LOGS_INDEX_PREFIX = "gl-collector-system-logs";
 
+    static final int INDEX_LIFETIME_MIN_DAYS = 14;
+    static final int INDEX_LIFETIME_MAX_DAYS = 21;
+
     private final IndexSetService indexSetService;
     private final IndexSetConfigFactory indexSetConfigFactory;
     private final IndexSetValidator indexSetValidator;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Inject
     public CollectorLogsDestinationService(IndexSetService indexSetService,
                                            IndexSetConfigFactory indexSetConfigFactory,
                                            IndexSetValidator indexSetValidator,
                                            StreamService streamService,
-                                           StreamRuleService streamRuleService) {
+                                           StreamRuleService streamRuleService,
+                                           ElasticsearchConfiguration elasticsearchConfiguration) {
         this.indexSetService = indexSetService;
         this.indexSetConfigFactory = indexSetConfigFactory;
         this.indexSetValidator = indexSetValidator;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     public void ensureExists() {
@@ -105,10 +114,7 @@ public class CollectorLogsDestinationService {
                 .indexPrefix(COLLECTOR_LOGS_INDEX_PREFIX)
                 .indexTemplateName(COLLECTOR_LOGS_INDEX_PREFIX + "-template")
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategyConfig(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(14))
-                        .indexLifetimeMax(Period.days(21))
-                        .build())
+                .rotationStrategyConfig(rotationStrategyConfig(elasticsearchConfiguration))
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
                 .dataTieringConfig(null)
@@ -123,6 +129,40 @@ public class CollectorLogsDestinationService {
         final IndexSetConfig saved = indexSetService.save(indexSetConfig);
         LOG.info("Created collector system logs index set <{}/{}>", saved.id(), saved.title());
         return requireNonNull(saved.id(), "index set ID cannot be null");
+    }
+
+    /**
+     * Uses 14/21 days of index lifetime, adjusted to what the time-size-optimizing validator accepts with the
+     * current server configuration: the lifetime max must not exceed {@code max_index_retention_period}, and the
+     * duration between min and max must be at least {@code time_size_optimizing_rotation_period} and
+     * {@code time_size_optimizing_retention_fixed_leeway}.
+     */
+    @VisibleForTesting
+    static TimeBasedSizeOptimizingStrategyConfig rotationStrategyConfig(ElasticsearchConfiguration config) {
+        int maxDays = INDEX_LIFETIME_MAX_DAYS;
+        final Period maxRetentionPeriod = config.getMaxIndexRetentionPeriod();
+        if (maxRetentionPeriod != null) {
+            maxDays = Math.min(maxDays, maxRetentionPeriod.toStandardDays().getDays());
+        }
+
+        int leewayDays = Math.max(INDEX_LIFETIME_MAX_DAYS - INDEX_LIFETIME_MIN_DAYS,
+                ceilDays(config.getTimeSizeOptimizingRotationPeriod()));
+        final Period fixedLeeway = config.getTimeSizeOptimizingRetentionFixedLeeway();
+        if (fixedLeeway != null) {
+            leewayDays = Math.max(leewayDays, ceilDays(fixedLeeway));
+        }
+
+        // If the leeway doesn't fit below the max, the index set validation reports the conflicting settings.
+        final int minDays = Math.max(1, maxDays - leewayDays);
+
+        return TimeBasedSizeOptimizingStrategyConfig.builder()
+                .indexLifetimeMin(Period.days(minDays))
+                .indexLifetimeMax(Period.days(maxDays))
+                .build();
+    }
+
+    private static int ceilDays(Period period) {
+        return Math.ceilDiv(period.toStandardSeconds().getSeconds(), DateTimeConstants.SECONDS_PER_DAY);
     }
 
     private void ensureStream(String indexSetId) {

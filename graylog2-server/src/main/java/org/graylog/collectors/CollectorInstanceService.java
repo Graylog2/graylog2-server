@@ -610,6 +610,10 @@ public class CollectorInstanceService {
                         .sort(Sorts.descending(FIELD_LAST_SEEN)));
     }
 
+    private record FleetAssignment(@JsonProperty(FIELD_INSTANCE_UID) String instanceUid,
+                                   @JsonProperty(FIELD_FLEET_ID) String fleetId,
+                                   @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessedTxnSeq) {}
+
     private record DeletedInstance(@Id @JsonProperty(FIELD_ID) String id,
                                    @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT) String previousFingerprint,
                                    @JsonProperty(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT) String activeFingerprint,
@@ -663,6 +667,37 @@ public class CollectorInstanceService {
         return countByFleetGrouped(onlineThreshold).values().stream()
                 .reduce(new InstanceCount(0L, 0L), (a, b) ->
                         new InstanceCount(a.total() + b.total(), a.online() + b.online()));
+    }
+
+    /**
+     * Counts the instances assigned to each fleet, taking pending fleet reassignments into account: an instance
+     * that is being moved to another fleet counts towards that target fleet instead of its current
+     * {@code fleet_id}, because that is where it ends up on its next check-in. See {@link PendingReassignments}.
+     *
+     * @return the number of assigned instances per fleet id; fleets without instances are absent
+     */
+    public Map<String, Long> countAssignedByFleet(PendingReassignments pendingReassignments) {
+        final Map<String, Long> counts = new HashMap<>();
+        // The online threshold is irrelevant here, only the totals are used.
+        countByFleetGrouped(clock.instant()).forEach((fleetId, count) -> counts.put(fleetId, count.total()));
+
+        if (pendingReassignments.instanceUids().isEmpty()) {
+            return counts;
+        }
+
+        mongoCollections.nonEntityCollection(COLLECTION_NAME, FleetAssignment.class)
+                .find(Filters.in(FIELD_INSTANCE_UID, pendingReassignments.instanceUids()))
+                .projection(Projections.fields(
+                        Projections.excludeId(),
+                        Projections.include(FIELD_INSTANCE_UID, FIELD_FLEET_ID, FIELD_LAST_PROCESSED_TXN_SEQ)))
+                .forEach(assignment -> pendingReassignments
+                        .targetFleetId(assignment.instanceUid(), assignment.fleetId(), assignment.lastProcessedTxnSeq())
+                        .ifPresent(targetFleetId -> {
+                            counts.computeIfPresent(assignment.fleetId(), (id, count) -> count > 1 ? count - 1 : null);
+                            counts.merge(targetFleetId, 1L, Long::sum);
+                        }));
+
+        return counts;
     }
 
     public InstanceCount countByFleet(String fleetId, Instant onlineThreshold) {

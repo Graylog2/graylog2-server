@@ -25,11 +25,9 @@ import { FormikInput, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useInputsStates from 'hooks/useInputsStates';
 import AppConfig from 'util/AppConfig';
-import { isPermitted } from 'util/PermissionsMixin';
-import Collapsible from 'components/common/Collapsible';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
 import PortMismatchAlert from './PortMismatchAlert';
@@ -78,7 +76,7 @@ const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 const CollectorsSettings = () => {
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();
   const { updateConfig } = useCollectorsMutations();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const isConfigured = !!config?.signing_cert_id;
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
@@ -87,7 +85,7 @@ const CollectorsSettings = () => {
 
   const isCloud = AppConfig.isCloud();
 
-  const canCreateInputs = isPermitted(currentUser?.permissions, [
+  const canCreateInputs = isPermitted([
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
@@ -305,78 +303,69 @@ const CollectorsSettings = () => {
                 )}
               </Col>
 
-              <Collapsible
-                label="Advanced options"
-                onToggle={(opened) =>
-                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.ADVANCED_TOGGLED, {
-                    app_action_value: 'settings-advanced-toggle',
-                    opened,
-                  })
-                }>
-                <Col md={6}>
-                  <SectionTitle>Collector Lifecycle</SectionTitle>
+              <Col md={6}>
+                <SectionTitle>Collector Lifecycle</SectionTitle>
 
-                  <TimeUnitInput
-                    label="Offline threshold"
-                    update={(value: number, unit: string) => {
-                      setFieldValue('offline_value', value);
-                      setFieldValue('offline_unit', unit);
-                    }}
-                    value={values.offline_value}
-                    unit={values.offline_unit}
-                    units={THRESHOLD_UNITS}
-                    required
-                    hideCheckbox
-                    help={
-                      errors.offline_value ? (
-                        <span className="text-danger">{errors.offline_value}</span>
-                      ) : (
-                        "Collectors that haven't reported within this time are shown as offline."
-                      )
-                    }
-                  />
+                <TimeUnitInput
+                  label="Offline threshold"
+                  update={(value: number, unit: string) => {
+                    setFieldValue('offline_value', value);
+                    setFieldValue('offline_unit', unit);
+                  }}
+                  value={values.offline_value}
+                  unit={values.offline_unit}
+                  units={THRESHOLD_UNITS}
+                  required
+                  hideCheckbox
+                  help={
+                    errors.offline_value ? (
+                      <span className="text-danger">{errors.offline_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are shown as offline."
+                    )
+                  }
+                />
 
-                  <TimeUnitInput
-                    label="Default visibility"
-                    update={(value: number, unit: string) => {
-                      setFieldValue('visibility_value', value);
-                      setFieldValue('visibility_unit', unit);
-                    }}
-                    value={values.visibility_value}
-                    unit={values.visibility_unit}
-                    units={THRESHOLD_UNITS}
-                    required
-                    hideCheckbox
-                    help={
-                      errors.visibility_value ? (
-                        <span className="text-danger">{errors.visibility_value}</span>
-                      ) : (
-                        "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
-                      )
-                    }
-                  />
+                <TimeUnitInput
+                  label="Default visibility"
+                  update={(value: number, unit: string) => {
+                    setFieldValue('visibility_value', value);
+                    setFieldValue('visibility_unit', unit);
+                  }}
+                  value={values.visibility_value}
+                  unit={values.visibility_unit}
+                  units={THRESHOLD_UNITS}
+                  required
+                  hideCheckbox
+                  help={
+                    errors.visibility_value ? (
+                      <span className="text-danger">{errors.visibility_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                    )
+                  }
+                />
 
-                  <TimeUnitInput
-                    label="Expiration threshold"
-                    update={(value: number, unit: string) => {
-                      setFieldValue('expiration_value', value);
-                      setFieldValue('expiration_unit', unit);
-                    }}
-                    value={values.expiration_value}
-                    unit={values.expiration_unit}
-                    units={THRESHOLD_UNITS}
-                    required
-                    hideCheckbox
-                    help={
-                      errors.expiration_value ? (
-                        <span className="text-danger">{errors.expiration_value}</span>
-                      ) : (
-                        "Collectors that haven't reported within this time are permanently removed."
-                      )
-                    }
-                  />
-                </Col>
-              </Collapsible>
+                <TimeUnitInput
+                  label="Expiration threshold"
+                  update={(value: number, unit: string) => {
+                    setFieldValue('expiration_value', value);
+                    setFieldValue('expiration_unit', unit);
+                  }}
+                  value={values.expiration_value}
+                  unit={values.expiration_unit}
+                  units={THRESHOLD_UNITS}
+                  required
+                  hideCheckbox
+                  help={
+                    errors.expiration_value ? (
+                      <span className="text-danger">{errors.expiration_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are permanently removed."
+                    )
+                  }
+                />
+              </Col>
 
               <Col md={12}>
                 {canEditConfig && (

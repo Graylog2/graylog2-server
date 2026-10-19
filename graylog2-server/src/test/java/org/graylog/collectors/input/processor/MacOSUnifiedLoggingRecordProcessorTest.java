@@ -79,6 +79,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 Map.entry("macos_thread_id", "11537025"),
                 Map.entry("macos_boot_uuid", "BOOT-A"),
                 Map.entry("macos_mach_timestamp", "12868010147176"),
+                Map.entry("event_sequence", 12868010147176L),
                 Map.entry("macos_trace_id", "45473881108119556"),
                 Map.entry("macos_activity_id", "0"),
                 Map.entry("macos_parent_activity_id", "0"),
@@ -128,6 +129,8 @@ class MacOSUnifiedLoggingRecordProcessorTest {
         assertThat(result).containsEntry("macos_boot_uuid", "FFEEDDCC-BBAA-9988-7766-554433221100");
         assertThat(result).containsEntry("macos_trace_id", "45473881108119556");
         assertThat(result).containsEntry("macos_mach_timestamp", "18446744073709551614");
+        // The fixture's mach timestamp exceeds a signed long, so it cannot serve as the sequence.
+        assertThat(result).doesNotContainKey("event_sequence");
     }
 
     @Test

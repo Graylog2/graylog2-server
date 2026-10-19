@@ -28,6 +28,7 @@ import type {
   RollingRestartJob,
   RollingRestartState,
 } from 'components/datanode/opensearch-upgrade/rollingRestartTypes';
+import AppConfig from 'util/AppConfig';
 
 import DataNodeUpgradePage from './DataNodeUpgradePage';
 
@@ -112,10 +113,19 @@ const rollingRestartJob = (smState: RollingRestartState): RollingRestartJob => (
 
 describe('DataNodeUpgradePage', () => {
   beforeEach(() => {
+    asMock(AppConfig.branding).mockReturnValue(undefined);
     asMock(getNodeToUpgrade).mockReturnValue(null);
     mockUpgradeStatus();
     mockClusterStats();
     mockRollingRestart();
+  });
+
+  it('uses the customized product name', async () => {
+    asMock(AppConfig.branding).mockReturnValue({ product_name: 'Acme Logs' });
+
+    render(<DataNodeUpgradePage />);
+
+    await screen.findByText(/Acme Logs Data Nodes offer a better integration with Acme Logs/);
   });
 
   it('keeps the Data Node upgrade visible while shard replication is disabled', async () => {

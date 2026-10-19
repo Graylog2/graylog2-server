@@ -51,7 +51,7 @@ class ContentPackParameterList extends React.Component<
     super(props);
 
     this.state = {
-      showModal: false,
+      openModalKey: undefined,
       filteredParameters: props.contentPack.parameters || [],
       filter: undefined,
     };
@@ -64,20 +64,13 @@ class ContentPackParameterList extends React.Component<
   }
 
   _parameterApplied = (paramName) => {
-    const { appliedParameter } = this.props;
+    const { appliedParameter, contentPack } = this.props;
+    // appliedParameter can keep refs for deselected or swapped-out entities, so only count current ones.
+    const currentEntityIds = new Set((contentPack.entities || []).map((entity) => entity.id));
 
-    const entityIds = Object.keys(appliedParameter);
-
-    /* eslint-disable-next-line guard-for-in */
-    for (const i in entityIds) {
-      const params = appliedParameter[entityIds[i]];
-
-      if (findIndex(params, { paramName: paramName }) >= 0) {
-        return true;
-      }
-    }
-
-    return false;
+    return Object.keys(appliedParameter)
+      .filter((id) => currentEntityIds.has(id))
+      .some((id) => findIndex(appliedParameter[id], { paramName: paramName }) >= 0);
   };
 
   _parameterRowFormatter = (parameter) => {
@@ -138,14 +131,16 @@ class ContentPackParameterList extends React.Component<
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;
-    const { showModal } = this.state;
+    const { openModalKey } = this.state;
+    // Parameter names are never empty, so '' identifies the create modal
+    const modalKey = parameter ? parameter.name : '';
 
     const closeModal = () => {
-      this.setState({ showModal: false });
+      this.setState({ openModalKey: undefined });
     };
 
     const openModal = () => {
-      this.setState({ showModal: true });
+      this.setState({ openModalKey: modalKey });
     };
 
     const addParameter = () => {
@@ -157,7 +152,7 @@ class ContentPackParameterList extends React.Component<
     const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (
-      <BootstrapModalWrapper showModal={showModal} onHide={closeModal} bsSize="large">
+      <BootstrapModalWrapper showModal={openModalKey === modalKey} onHide={closeModal} bsSize="large">
         <Modal.Header>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
