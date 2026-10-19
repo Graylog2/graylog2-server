@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.tools;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -47,6 +49,7 @@ import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 @RequiresAuthentication
+@Tag(name = "Tools/RegexReplaceTester", description = "Test regular expression replacements")
 @Path("/tools/regex_replace_tester")
 public class RegexReplaceTesterResource extends RestResource {
 
@@ -58,6 +61,7 @@ public class RegexReplaceTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Test a regular expression replacement on a string")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public RegexReplaceTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
@@ -68,6 +72,7 @@ public class RegexReplaceTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Test a regular expression replacement on a string")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
