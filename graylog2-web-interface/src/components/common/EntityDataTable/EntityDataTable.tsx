@@ -262,16 +262,16 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     scrollContainerWidth,
     tableMinWidth,
   } = useElementWidths<Entity, Meta>({
-      columnRenderersByAttribute,
-      columnSchemas: authorizedColumnSchemas,
-      columnWidthPreferences: internalColumnWidthPreferences,
-      displayBulkSelectCol,
-      entities,
-      hasRowActions,
-      headerMinWidths,
-      scrollContainerRef,
-      visibleColumns: columnOrder,
-    });
+    columnRenderersByAttribute,
+    columnSchemas: authorizedColumnSchemas,
+    columnWidthPreferences: internalColumnWidthPreferences,
+    displayBulkSelectCol,
+    entities,
+    hasRowActions,
+    headerMinWidths,
+    scrollContainerRef,
+    visibleColumns: columnOrder,
+  });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
