@@ -21,5 +21,11 @@ export const SLICING_QUERY_KEY = 'slicing';
 
 export const slicesQueryKeyForColumn = (sliceCol: string | undefined) => [SLICING_QUERY_KEY, sliceCol] as const;
 
-export const slicesQueryKey = (sliceCol: string | undefined, query: string | undefined, filters: UrlQueryFilters) =>
-  [...slicesQueryKeyForColumn(sliceCol), query, filters] as const;
+// The table and layout variant come last, so slices can still be invalidated by column for all tables.
+export const slicesQueryKey = (
+  sliceCol: string | undefined,
+  query: string | undefined,
+  filters: UrlQueryFilters,
+  entityTableId: string | undefined,
+  layoutVariant: string | undefined,
+) => [...slicesQueryKeyForColumn(sliceCol), query, filters, entityTableId, layoutVariant] as const;

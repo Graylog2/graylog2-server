@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.exceptionmappers;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog2.indexer.exceptions.ResultWindowLimitExceededException;
@@ -28,6 +29,7 @@ public class ResultWindowLimitExceededExceptionMapper implements ExceptionMapper
         final SearchError searchError = SearchError.create(exception.getMessage(), exception.getErrorDetails());
 
         return Response.status(Response.Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON_TYPE)
                 .entity(searchError)
                 .build();
     }

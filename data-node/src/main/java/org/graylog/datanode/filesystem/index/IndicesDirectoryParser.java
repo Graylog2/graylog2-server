@@ -112,7 +112,7 @@ public class IndicesDirectoryParser {
             final List<NodeInformation> nodeInformation = nodes.filter(Files::isDirectory)
                     .filter(p -> NUMERIC_DIR.matcher(p.getFileName().toString()).matches())
                     .map(nodePath -> parseNode(nodePath, usedCompatibilityReader))
-                    .filter(node -> !node.isEmpty())
+                    .filter(NodeInformation::isInitialized)
                     .toList();
             return new IndexerDirectoryInformation(path, nodeInformation);
         } catch (IOException e) {
@@ -123,7 +123,12 @@ public class IndicesDirectoryParser {
     private NodeInformation parseNode(Path nodePath, AtomicBoolean usedCompatibilityReader) {
         final Path indicesDir = nodePath.resolve("indices");
         if (!Files.exists(indicesDir)) {
-            return NodeInformation.empty(nodePath);
+            // Dedicated cluster managers, and data nodes that never got a shard assigned, have no indices directory.
+            // Their node state file still tells which opensearch generation initialized this directory.
+            if (!Files.isDirectory(nodePath.resolve(STATE_DIR_NAME))) {
+                return NodeInformation.empty(nodePath);
+            }
+            return new NodeInformation(nodePath, List.of(), getState(nodePath, "node", usedCompatibilityReader));
         }
         try (Stream<Path> indicesDirs = Files.list(indicesDir)) {
             final StateFile state = getState(nodePath, "node", usedCompatibilityReader);

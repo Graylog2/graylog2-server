@@ -24,7 +24,7 @@ import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
 import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
-import mergeNavigationItems from './util/mergeNavigationItems';
+import mergeAndSortNavigationItems from './util/mergeAndSortNavigationItems';
 
 const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
   if (!navigationItems?.length) {
@@ -44,7 +44,7 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
 const useNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
+  const navigationItems = useMemo(() => mergeAndSortNavigationItems(allNavigationItems), [allNavigationItems]);
 
   const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
 
