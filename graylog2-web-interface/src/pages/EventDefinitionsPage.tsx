@@ -40,19 +40,19 @@ const CreateButtonWithSigma = () => {
 };
 
 const EventDefinitionsPage = () => {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation('event_definitions');
 
   return (
-    <DocumentTitle title={t('definitions_page.title')}>
+    <DocumentTitle title={t('page.title')}>
       <EventsPageNavigation />
       <PageHeader
-        title={t('definitions_page.title')}
+        title={t('page.title')}
         actions={<CreateButtonWithSigma />}
         documentationLink={{
-          title: t('definitions_page.alerts_docs'),
+          title: t('page.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>{t('definitions_page.description_list')}</span>
+        <span>{t('page.description_list')}</span>
       </PageHeader>
 
       <Row className="content">

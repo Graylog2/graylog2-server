@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { OverlayTrigger, Icon, ExternalLink } from 'components/common';
@@ -38,22 +39,30 @@ const ExampleWrapper = styled.div`
   }
 `;
 
+const getStringVariable = (content: string) => <code>$&#123;{content}&#125;</code>;
+
+// Ignores the children passed by `<Trans>`, so the variable is always rendered.
+const StringVariable = ({ content }: { content: string; children?: React.ReactNode }) => getStringVariable(content);
+
+const JmteLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <ExternalLink href="https://www.tinymediamanager.org/docs/jmte" target="_blank">
+    {children}
+  </ExternalLink>
+);
+
 function Overlay() {
-  const getStringVariable = (content: string) => <code>$&#123;{content}&#125;</code>;
+  const { t } = useTranslation('event_definitions');
 
   return (
     <div>
       <p>
-        Use a template to customize the description shown on the Alerts & Events page when an event is created.
-        Templates use{' '}
-        {
-          <ExternalLink href="https://www.tinymediamanager.org/docs/jmte" target="_blank">
-            JMTE
-          </ExternalLink>
-        }{' '}
-        substitution - variables wrapped in {getStringVariable('...')}.
+        <Trans
+          t={t}
+          i18nKey="summary_template_help.intro"
+          components={{ jmteLink: <JmteLink />, variable: <StringVariable content="..." /> }}
+        />
       </p>
-      <strong>Event Definition Variables</strong>
+      <strong>{t('summary_template_help.event_definition_variables')}</strong>
       <ExampleWrapper>
         {getStringVariable('event_definition_id')}
         <br />
@@ -63,19 +72,18 @@ function Overlay() {
         <br />
         {getStringVariable('event_definition_description')}
       </ExampleWrapper>
-      <strong>Custom Fields</strong>
+      <strong>{t('summary_template_help.custom_fields')}</strong>
       <p>
-        Custom fields defined on the event definition are available under <code>fields</code>.
+        <Trans t={t} i18nKey="summary_template_help.custom_fields_description" components={{ code: <code /> }} />
       </p>
       <ExampleWrapper>{getStringVariable('fields.my_custom_field')}</ExampleWrapper>
-      <strong>Source Context</strong>
+      <strong>{t('summary_template_help.source_context')}</strong>
       <p>
-        The <code>source</code> variable contains context from the triggering data. Its contents depend on the event
-        definition type:
+        <Trans t={t} i18nKey="summary_template_help.source_context_description" components={{ code: <code /> }} />
       </p>
-      <p>Filter events: original log message fields.</p>
+      <p>{t('summary_template_help.filter_events')}</p>
       <ExampleWrapper>
-        {getStringVariable('source.source')} (hostname)
+        {getStringVariable('source.source')} {t('summary_template_help.hostname')}
         <br />
         {getStringVariable('source.message')}
         <br />
@@ -83,37 +91,56 @@ function Overlay() {
         <br />
         {getStringVariable('source.some_extracted_field')}
       </ExampleWrapper>
-      <p>Aggregation events: group-by values and aggregation results.</p>
+      <p>{t('summary_template_help.aggregation_events')}</p>
       <ExampleWrapper>
-        {getStringVariable('source.username')} (group-by field)
+        {getStringVariable('source.username')} {t('summary_template_help.group_by_field')}
         <br />
         {getStringVariable('source.aggregation_value_count_source_bytes_sent')}
         <br />
         {getStringVariable('source.aggregation_key')}
       </ExampleWrapper>
-      <strong>Examples</strong>
-      <p>Filter on a specific log message:</p>
+      <strong>{t('summary_template_help.examples')}</strong>
+      <p>{t('summary_template_help.filter_example')}</p>
       <ExampleWrapper>
-        Error on {getStringVariable('source.source')}: {getStringVariable('source.message')}
+        <Trans
+          t={t}
+          i18nKey="summary_template_help.filter_example_template"
+          components={{
+            hostVariable: <StringVariable content="source.source" />,
+            messageVariable: <StringVariable content="source.message" />,
+          }}
+        />
       </ExampleWrapper>
-      <p>Aggregation of failed login count per user:</p>
+      <p>{t('summary_template_help.aggregation_example')}</p>
       <ExampleWrapper>
-        {getStringVariable('fields.user')} failed to login {getStringVariable('source.aggregation_value_count')} times
+        <Trans
+          t={t}
+          i18nKey="summary_template_help.aggregation_example_template"
+          components={{
+            userVariable: <StringVariable content="fields.user" />,
+            countVariable: <StringVariable content="source.aggregation_value_count" />,
+          }}
+        />
       </ExampleWrapper>
     </div>
   );
 }
 
 function EventSummaryTemplateHelp() {
+  const { t } = useTranslation('event_definitions');
+
   return (
     <OverlayTrigger
       trigger="click"
       rootClose
       placement="right"
-      title="Event Summary Template"
+      title={t('summary_template_help.title')}
       width={500}
       overlay={<Overlay />}>
-      <QueryHelpButton bsStyle="link" title="Summary Template Help" aria-label="Show event summary template help">
+      <QueryHelpButton
+        bsStyle="link"
+        title={t('summary_template_help.button_title')}
+        aria-label={t('summary_template_help.button_aria_label')}>
         <Icon name="help" />
       </QueryHelpButton>
     </OverlayTrigger>

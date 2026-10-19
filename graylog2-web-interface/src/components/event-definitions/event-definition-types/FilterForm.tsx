@@ -26,6 +26,7 @@ import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { describeExpression } from 'util/CronUtils';
 import usePermissions from 'hooks/usePermissions';
@@ -116,6 +117,7 @@ type QueryParametersProps = {
   userCanViewLookupTables: boolean;
 };
 const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLookupTables }: QueryParametersProps) => {
+  const { t } = useTranslation('event_definitions');
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
@@ -128,7 +130,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
   );
 
   if (!userCanViewLookupTables) {
-    return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
+    return <Alert bsStyle="info">{t('filter_form.lookup_table_permission_missing')}</Alert>;
   }
 
   const parameterButtons = queryParameters.map((queryParam) => {
@@ -161,7 +163,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
 
   return (
     <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
-      <ControlLabel>Query Parameters</ControlLabel>
+      <ControlLabel>{t('filter_form.query_parameters')}</ControlLabel>
       <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
         <ButtonToolbar>{parameterButtons}</ButtonToolbar>
       </Alert>
@@ -169,7 +171,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
         <HelpBlock>
           {validation.errors.query_parameters
             ? validation?.errors.query_parameters[0]
-            : 'Please declare missing query parameters by clicking on the buttons above.'}
+            : t('filter_form.declare_missing_parameters')}
         </HelpBlock>
       )}
     </FormGroup>
@@ -177,6 +179,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
 };
 
 const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { isPermitted } = usePermissions();
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
@@ -513,11 +516,11 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
 
   return (
     <fieldset>
-      <h2 className={commonStyles.title}>Filter</h2>
-      <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
+      <h2 className={commonStyles.title}>{t('filter_form.title')}</h2>
+      <p>{t('filter_form.description')}</p>
       {onlyFilters || (
         <FormGroup controlId="query-string">
-          <ControlLabel>Search Query</ControlLabel>
+          <ControlLabel>{t('filter_form.search_query')}</ControlLabel>
           <InputRow>
             <ViewsQueryInput
               inputId="filter-query"
@@ -535,8 +538,12 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
             <QueryValidationDisplay />
           </InputRow>
           <HelpBlock>
-            Search query that Messages should match. You can use the same syntax as in the Search page, including
-            declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+            <Trans
+              t={t}
+              i18nKey="filter_form.search_query_help"
+              values={{ syntax: '$newParameter$' }}
+              components={{ code: <code /> }}
+            />
           </HelpBlock>
         </FormGroup>
       )}
@@ -561,7 +568,7 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
       {!searchFiltersHidden && (
         <FormGroup controlId="search-filters">
           <ControlLabel>
-            Search Filters <small className="text-muted">(Optional)</small>
+            {t('filter_form.search_filters')} <small className="text-muted">{t('filter_form.optional')}</small>
           </ControlLabel>
           <div style={{ margin: '16px 0' }}>
             <SearchFiltersFormControls
@@ -579,7 +586,8 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
         <>
           <FormGroup controlId="filter-streams-and-categories">
             <ControlLabel>
-              Streams and Categories <small className="text-muted">{isStreamRequired ? '(Optional)' : ''}</small>
+              {t('filter_form.streams_and_categories')}{' '}
+              <small className="text-muted">{isStreamRequired ? t('filter_form.optional') : ''}</small>
             </ControlLabel>
             <StreamsAndCategoriesFilter
               id="filter-streams-and-categories"
@@ -588,19 +596,20 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
               value={currentSelection}
               streams={streamsAndCategories}
             />
-            <HelpBlock>Select streams the search should include.</HelpBlock>
+            <HelpBlock>{t('filter_form.streams_help')}</HelpBlock>
           </FormGroup>
           {isSearchingWarmTier(warmTierRanges) && (
-            <Alert bsStyle="danger" title="Warm Tier Warning">
-              The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
-              data from the Warm Tier may cause performance problems. A value for{' '}
-              <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier:{' '}
-              <WarmTierTimeStamp />.
+            <Alert bsStyle="danger" title={t('filter_form.warm_tier_title')}>
+              <Trans
+                t={t}
+                i18nKey="filter_form.warm_tier_warning"
+                components={{ strong: <strong />, timestamp: <WarmTierTimeStamp /> }}
+              />
             </Alert>
           )}
           <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
             <TimeUnitInput
-              label="Search within the last"
+              label={t('filter_form.search_within')}
               update={handleTimeRangeChange('search_within_ms')}
               value={searchWithinMsDuration}
               unit={searchWithinMsUnit}
@@ -614,8 +623,8 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
             id="is-cron-checkbox"
             type="checkbox"
             name="use_cron_scheduling"
-            label="Use Cron Scheduling"
-            help="Schedule this event with a Quartz cron expression"
+            label={t('filter_form.use_cron')}
+            help={t('filter_form.use_cron_help')}
             checked={eventDefinition.config.use_cron_scheduling ?? false}
             onChange={handleUseCronSchedulingChange}
           />
@@ -627,11 +636,11 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
                 <Input
                   id="cron-expression"
                   name="cron_expression"
-                  label="Cron Expression"
+                  label={t('filter_form.cron_expression')}
                   type="text"
                   help={
                     <span>
-                      {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
+                      {cronDescription || t('filter_form.cron_expression_help')}
                     </span>
                   }
                   value={currentConfig.cron_expression ?? ''}
@@ -641,7 +650,7 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
                 {validation.errors.cron_expression && <HelpBlock>{validation.errors.cron_expression[0]}</HelpBlock>}
               </FormGroup>
               <FormGroup>
-                <ControlLabel>Cron Time Zone</ControlLabel>
+                <ControlLabel>{t('filter_form.cron_time_zone')}</ControlLabel>
                 <TimezoneSelect
                   value={currentConfig.cron_timezone ?? userTimezone}
                   name="cron_timezone"
@@ -653,7 +662,7 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
           ) : (
             <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
               <TimeUnitInput
-                label="Execute search every"
+                label={t('filter_form.execute_every')}
                 update={handleTimeRangeChange('execute_every_ms')}
                 value={executeEveryMsDuration}
                 unit={executeEveryMsUnit}
@@ -668,8 +677,8 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
             id="schedule-checkbox"
             type="checkbox"
             name="_is_scheduled"
-            label="Enable"
-            help="Should this event definition be executed automatically?"
+            label={t('filter_form.enable')}
+            help={t('filter_form.enable_help')}
             checked={eventDefinition.config._is_scheduled ?? true}
             onChange={handleEnabledChange}
           />

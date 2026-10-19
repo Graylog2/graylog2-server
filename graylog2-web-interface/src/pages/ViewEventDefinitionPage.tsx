@@ -44,7 +44,7 @@ import {
 import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
 const ViewEventDefinitionPage = () => {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation('event_definitions');
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
   const [showDialog, setShowDialog] = useState(false);
@@ -103,10 +103,10 @@ const ViewEventDefinitionPage = () => {
 
   if (isFetching || !eventDefinition || !notifications) {
     return (
-      <DocumentTitle title={t('definitions_page.view')}>
+      <DocumentTitle title={t('page.view')}>
         <span>
-          <PageHeader title={t('definitions_page.view')}>
-            <Spinner text={t('definitions_page.loading')} />
+          <PageHeader title={t('page.view')}>
+            <Spinner text={t('page.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -115,29 +115,29 @@ const ViewEventDefinitionPage = () => {
 
   return (
     <>
-      <DocumentTitle title={t('definitions_page.view_named', { title: eventDefinition.title })}>
+      <DocumentTitle title={t('page.view_named', { title: eventDefinition.title })}>
         <EventsPageNavigation />
         <PageHeader
-          title={t('definitions_page.view_named', { title: eventDefinition.title })}
+          title={t('page.view_named', { title: eventDefinition.title })}
           actions={
             <ButtonToolbar>
               <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                 <Button bsStyle="primary" onClick={onEditEventDefinition}>
-                  {t('definitions_page.edit')}
+                  {t('page.edit')}
                 </Button>
               </IfPermitted>
               {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
-                  <Button onClick={() => setShowDialog(true)}>{t('definitions_page.duplicate')}</Button>
+                  <Button onClick={() => setShowDialog(true)}>{t('page.duplicate')}</Button>
                 </IfPermitted>
               )}
             </ButtonToolbar>
           }
           documentationLink={{
-            title: t('definitions_page.alerts_docs'),
+            title: t('page.alerts_docs'),
             path: DocsHelper.PAGES.ALERTS,
           }}>
-          <span>{t('definitions_page.description_events')}</span>
+          <span>{t('page.description_events')}</span>
         </PageHeader>
 
         <Row className="content">
@@ -155,11 +155,11 @@ const ViewEventDefinitionPage = () => {
       </DocumentTitle>
       {showDialog && (
         <ConfirmDialog
-          title={t('definitions_page.copy_title')}
+          title={t('page.copy_title')}
           show
           onConfirm={() => handleDuplicateEvent()}
           onCancel={() => setShowDialog(false)}>
-          {t('definitions_page.copy_confirm', { title: eventDefinition.title })}
+          {t('page.copy_confirm', { title: eventDefinition.title })}
         </ConfirmDialog>
       )}
     </>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { ClearFloat, Select } from 'components/common';
@@ -32,6 +33,7 @@ import styles from './EventConditionForm.css';
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
+import { eventDefinitionTypeDescription, eventDefinitionTypeTitle } from '../pluginTitles';
 
 type Props = {
   action?: 'create' | 'edit';
@@ -49,10 +51,11 @@ type Props = {
 };
 
 const ConditionTypeDescriptions = ({ eventDefinitionTypes }: { eventDefinitionTypes: EventDefinitionType[] }) => {
+  const { t } = useTranslation('event_definitions');
   const typeDescriptions = eventDefinitionTypes.map((type) => (
     <React.Fragment key={type.type}>
-      <dt>{type.displayName}</dt>
-      <dd>{type.description || 'No description available.'}</dd>
+      <dt>{eventDefinitionTypeTitle(type)}</dt>
+      <dd>{eventDefinitionTypeDescription(type) || t('condition_form.no_description')}</dd>
     </React.Fragment>
   ));
 
@@ -68,6 +71,7 @@ const EventConditionForm = ({
   onChange,
   canEdit,
 }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const sendTelemetry = useSendTelemetry('event-definition-condition');
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
@@ -112,10 +116,13 @@ const EventConditionForm = ({
   );
 
   const formattedEventDefinitionTypes = useMemo(() => {
-    const options = sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type }));
+    const options = sortedEventDefinitionTypes.map((type) => ({
+      label: eventDefinitionTypeTitle(type),
+      value: type.type,
+    }));
 
     if (currentConditionPlugin && !options.some((o) => o.value === currentConditionPlugin.type)) {
-      options.push({ label: currentConditionPlugin.displayName, value: currentConditionPlugin.type });
+      options.push({ label: eventDefinitionTypeTitle(currentConditionPlugin), value: currentConditionPlugin.type });
     }
 
     return options;
@@ -165,20 +172,17 @@ const EventConditionForm = ({
   return (
     <Row>
       <Col md={7} lg={6}>
-        <h2 className={commonStyles.title}>Event Condition</h2>
+        <h2 className={commonStyles.title}>{t('condition_form.title')}</h2>
 
         {!canEditCondition ? (
-          <p>The conditions of this event definition type cannot be edited.</p>
+          <p>{t('condition_form.not_editable')}</p>
         ) : (
           <>
-            <p>
-              Define how Events of this type should be created. You can later use those Events as input on other
-              Conditions, making it possible to build powerful Conditions based on others.
-            </p>
+            <p>{t('condition_form.description')}</p>
             <FormGroup validationState={validation.errors.config ? 'error' : null}>
-              <ControlLabel htmlFor="event-condition-type-select">Condition Type</ControlLabel>
+              <ControlLabel htmlFor="event-condition-type-select">{t('condition_form.condition_type')}</ControlLabel>
               <Select
-                placeholder="Select a Condition Type"
+                placeholder={t('condition_form.select_condition_type')}
                 inputId="event-condition-type-select"
                 options={formattedEventDefinitionTypes}
                 value={eventDefinition.config.type}
@@ -187,7 +191,7 @@ const EventConditionForm = ({
                 disabled={disabledSelect || onlyFilters || isNonCreatableType}
                 required
               />
-              <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
+              <HelpBlock>{validation?.errors?.config?.[0] ?? t('condition_form.condition_type_help')}</HelpBlock>
             </FormGroup>
           </>
         )}
@@ -195,7 +199,7 @@ const EventConditionForm = ({
 
       {canEditCondition && !disabledSelect && (
         <Col md={5} lg={5} lgOffset={1}>
-          <HelpPanel className={styles.conditionTypesInfo} title="Available Conditions">
+          <HelpPanel className={styles.conditionTypesInfo} title={t('condition_form.available_conditions')}>
             <ConditionTypeDescriptions eventDefinitionTypes={sortedEventDefinitionTypes} />
           </HelpPanel>
         </Col>

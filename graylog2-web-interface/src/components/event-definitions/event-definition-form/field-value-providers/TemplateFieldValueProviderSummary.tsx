@@ -16,32 +16,34 @@
  */
 import React from 'react';
 import type { FieldValueProvider } from 'graylog-web-plugin';
+import { useTranslation } from 'react-i18next';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
 type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
 const TemplateFieldValueProviderSummary = ({ ...props }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { config } = props;
 
   return (
     <CommonFieldValueProviderSummary {...props}>
       <>
         <tr>
-          <td>Value source</td>
-          <td>Template</td>
+          <td>{t('provider_summary.value_source')}</td>
+          <td>{t('field_value_providers.template.title')}</td>
         </tr>
         <tr>
-          <td>Template</td>
+          <td>{t('field_value_providers.template.title')}</td>
           <td>{config.providers[0].template}</td>
         </tr>
         <tr>
-          <td>Validate that all Template values are set</td>
-          <td>{config.providers[0].require_values ? 'Yes' : 'No'}</td>
+          <td>{t('provider_summary.validate_template_values')}</td>
+          <td>{config.providers[0].require_values ? t('fields_list.yes') : t('fields_list.no')}</td>
         </tr>
         <tr>
-          <td>Exclude empty fields</td>
-          <td>{config.providers[0].exclude_empty_fields ? 'Yes' : 'No'}</td>
+          <td>{t('template_provider_form.exclude_empty_fields')}</td>
+          <td>{config.providers[0].exclude_empty_fields ? t('fields_list.yes') : t('fields_list.no')}</td>
         </tr>
       </>
     </CommonFieldValueProviderSummary>

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col, FormControl, FormGroup } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -44,8 +45,11 @@ const BooleanOperatorSelector = ({
   initialText = '',
   operator,
   onOperatorChange,
-  placeholder = 'Boolean operator',
-}: BooleanOperatorSelectorProps) => (
+  placeholder = undefined,
+}: BooleanOperatorSelectorProps) => {
+  const { t } = useTranslation('event_definitions');
+
+  return (
   <Col md={12}>
     <OperatorSelector className="form-inline">
       {initialText && (
@@ -56,22 +60,23 @@ const BooleanOperatorSelector = ({
       <BooleanOperatorSelect isFirstElement={!initialText}>
         <Select
           className="boolean-operator"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('conditions.boolean_operator')}
           size="small"
           onChange={onOperatorChange}
           options={[
-            { label: 'all', value: '&&' },
-            { label: 'any', value: '||' },
+            { label: t('conditions.all'), value: '&&' },
+            { label: t('conditions.any'), value: '||' },
           ]}
           value={operator}
           clearable={false}
         />
       </BooleanOperatorSelect>
       <FormGroup>
-        <FormControl.Static> of the following rules:</FormControl.Static>
+        <FormControl.Static> {t('conditions.of_the_following_rules')}</FormControl.Static>
       </FormGroup>
     </OperatorSelector>
   </Col>
-);
+  );
+};
 
 export default BooleanOperatorSelector;

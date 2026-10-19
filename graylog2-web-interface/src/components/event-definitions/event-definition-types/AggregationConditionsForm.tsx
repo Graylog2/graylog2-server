@@ -115,9 +115,11 @@ class AggregationConditionsForm extends React.Component<
 
     return (
       <>
-        <h3 className={commonStyles.title}>Create Events for Definition</h3>
+        <h3 className={commonStyles.title}>
+          {i18n.t('condition_summary.create_events', { ns: 'event_definitions' })}
+        </h3>
         {validation.errors.conditions && (
-          <StyledAlert bsStyle="danger" title="Errors found">
+          <StyledAlert bsStyle="danger" title={i18n.t('condition_summary.errors_found', { ns: 'event_definitions' })}>
             <p>{validation?.errors?.conditions[0]}</p>
           </StyledAlert>
         )}

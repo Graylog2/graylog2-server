@@ -16,6 +16,10 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
+
 type ExpressionProps = {
   expression?: any;
   series: any[];
@@ -23,7 +27,7 @@ type ExpressionProps = {
 
 const Expression = ({ expression = null, series }: ExpressionProps) => {
   if (!expression) {
-    return 'No condition configured';
+    return t('condition_summary.no_condition');
   }
 
   switch (expression.expr) {
@@ -40,14 +44,14 @@ const Expression = ({ expression = null, series }: ExpressionProps) => {
           {selectedSeries.percentile ? `, ${selectedSeries.percentile}` : null})
         </var>
       ) : (
-        <span>No series selected</span>
+        <span>{t('condition_summary.no_series')}</span>
       );
     case '&&':
     case '||':
       return (
         <>
           <Expression expression={expression.left} series={series} />{' '}
-          <strong className="text-info">{expression.expr === '&&' ? 'AND' : 'OR'}</strong>{' '}
+          <strong className="text-info">{expression.expr === '&&' ? t('condition_summary.and') : t('condition_summary.or')}</strong>{' '}
           <Expression expression={expression.right} series={series} />
         </>
       );
@@ -70,7 +74,7 @@ const Expression = ({ expression = null, series }: ExpressionProps) => {
         </>
       );
     default:
-      return 'No condition configured';
+      return t('condition_summary.no_condition');
   }
 };
 

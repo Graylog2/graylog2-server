@@ -17,12 +17,21 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import type { FieldValueProvider } from 'graylog-web-plugin';
+import { Trans } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import { ExternalLink } from 'components/common';
 import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPreview';
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
+
+const JmteLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <ExternalLink href="https://cdn.rawgit.com/DJCordhose/jmte/master/doc/index.html">{children}</ExternalLink>
+);
 
 type TemplateFieldValueProviderFormProps = React.ComponentProps<FieldValueProvider['formComponent']>;
 
@@ -64,9 +73,12 @@ class TemplateFieldValueProviderForm extends React.Component<
 
     const helpText = (
       <span>
-        Type a literal text to set to this Field or use{' '}
-        <ExternalLink href="https://cdn.rawgit.com/DJCordhose/jmte/master/doc/index.html">JMTE syntax</ExternalLink> to
-        add a dynamic Value.
+        <Trans
+          i18n={i18n}
+          ns="event_definitions"
+          i18nKey="template_provider_form.template_help"
+          components={{ jmteLink: <JmteLink /> }}
+        />
       </span>
     );
 
@@ -77,7 +89,7 @@ class TemplateFieldValueProviderForm extends React.Component<
             id="template-provider-template"
             name="template"
             type="text"
-            label="Template"
+            label={t('template_provider_form.template')}
             onChange={this.handleChange}
             value={provider.template || ''}
             bsStyle={validation.errors.template ? 'error' : null}
@@ -90,9 +102,9 @@ class TemplateFieldValueProviderForm extends React.Component<
               name="require_values"
               checked={provider.require_values}
               onChange={this.handleChange}>
-              Require all template values to be set
+              {t('template_provider_form.require_values')}
             </Checkbox>
-            <HelpBlock>Check this option to validate that all variables used in the Template have values.</HelpBlock>
+            <HelpBlock>{t('template_provider_form.require_values_help')}</HelpBlock>
           </FormGroup>
 
           <FormGroup>
@@ -102,13 +114,9 @@ class TemplateFieldValueProviderForm extends React.Component<
               disabled={provider.require_values}
               checked={provider.exclude_empty_fields ?? true}
               onChange={this.handleChange}>
-              Exclude empty fields
+              {t('template_provider_form.exclude_empty_fields')}
             </Checkbox>
-            <HelpBlock>
-              Check this option to leave the Field off the Event entirely when the Template renders an empty value. When
-              unchecked, the Field is added to the Event with an empty value. Always on when all Template values are
-              required.
-            </HelpBlock>
+            <HelpBlock>{t('template_provider_form.exclude_empty_fields_help')}</HelpBlock>
           </FormGroup>
         </Col>
         <Col md={5} lgOffset={1}>

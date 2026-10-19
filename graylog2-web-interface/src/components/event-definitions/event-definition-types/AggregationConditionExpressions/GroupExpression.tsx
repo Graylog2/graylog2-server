@@ -17,6 +17,7 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ClearFloat } from 'components/common';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
@@ -50,6 +51,7 @@ const GroupExpression = ({
   validation = {},
   ...props
 }: GroupExpressionProps) => {
+  const { t } = useTranslation('event_definitions');
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
 
@@ -63,7 +65,7 @@ const GroupExpression = ({
       <BooleanOperatorSelector
         operator={expression.operator}
         onOperatorChange={handleOperatorChange}
-        placeholder={`Boolean operator group ${level + 1}`}
+        placeholder={t('conditions.boolean_operator_group', { level: level + 1 })}
       />
       <ClearFloat />
       <Group>

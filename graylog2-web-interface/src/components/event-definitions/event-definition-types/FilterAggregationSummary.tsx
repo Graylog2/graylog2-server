@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import upperFirst from 'lodash/upperFirst';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { describeExpression } from 'util/CronUtils';
 import { Link } from 'components/common';
@@ -77,13 +77,15 @@ const getConditionType = (config: EventDefinition['config']) => {
 };
 
 const QueryParameters = ({ queryParameters }: { queryParameters: Array<ParameterJson & { embryonic?: boolean }> }) => {
+  const { t } = useTranslation('event_definitions');
+
   if (queryParameters.some((p) => p.embryonic)) {
     const undeclaredParameters = queryParameters
       .filter((p) => p.embryonic)
       .map((p) => p.name)
       .join(', ');
 
-    return <Alert bsStyle="danger">There are undeclared query parameters: {undeclaredParameters}</Alert>;
+    return <Alert bsStyle="danger">{t('summary.undeclared_parameters', { parameters: undeclaredParameters })}</Alert>;
   }
 
   return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
@@ -95,8 +97,10 @@ type Props = {
 };
 
 const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters'] }) => {
+  const { t } = useTranslation('event_definitions');
+
   if (!filters || filters?.length === 0) {
-    return <dd>No filters configured</dd>;
+    return <dd>{t('summary.no_filters')}</dd>;
   }
 
   return (
@@ -118,14 +122,16 @@ type StreamsProps = {
 };
 
 const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: StreamsProps) => {
+  const { t } = useTranslation('event_definitions');
+
   if ((!streamIds || streamIds?.length === 0) && streamIdsWithMissingPermission?.length <= 0) {
-    return <>No Streams selected, searches in all Streams</>;
+    return <>{t('summary.no_streams')}</>;
   }
 
   const warning =
     streamIdsWithMissingPermission?.length > 0 ? (
       <Alert bsStyle="warning">
-        Missing Stream Permissions for:
+        {t('summary.missing_stream_permissions')}
         <br />
         {streamIdsWithMissingPermission.join(', ')}
       </Alert>
@@ -147,6 +153,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
 };
 
 const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const streams = useContext(StreamsContext);
   const { isPermitted } = usePermissions();
   const {
@@ -181,7 +188,7 @@ const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) =
       return describeExpression(expression);
     }
 
-    return 'Error: no cron expression specified!';
+    return t('summary.no_cron_expression');
   };
 
   const renderStreamCategories = () => {
@@ -191,7 +198,7 @@ const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) =
 
     return (
       <>
-        <dt>Stream Categories</dt>
+        <dt>{t('summary.stream_categories')}</dt>
         <dd className={styles.streamList}>{renderedCategories}</dd>
       </>
     );
@@ -199,16 +206,16 @@ const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) =
 
   return (
     <dl>
-      <dt>Type</dt>
-      <dd>{upperFirst(conditionType)}</dd>
-      <dt>Search Query</dt>
+      <dt>{t('summary.type')}</dt>
+      <dd>{t(`summary.condition_types.${conditionType}`)}</dd>
+      <dt>{t('summary.search_query')}</dt>
       <dd>
         <StyledDataWell>{query || '*'}</StyledDataWell>
       </dd>
       {queryParameters?.length > 0 && <QueryParameters queryParameters={queryParameters} />}
-      <dt>Search Filters</dt>
+      <dt>{t('summary.search_filters')}</dt>
       <SearchFilters filters={config.filters} />
-      <dt>Streams</dt>
+      <dt>{t('summary.streams')}</dt>
       <dd className={styles.streamList}>
         <Streams
           streams={streams}
@@ -217,52 +224,50 @@ const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) =
         />
       </dd>
       {renderStreamCategories()}
-      <dt>Search within</dt>
-      <dd>
-        {searchWithin.duration} {searchWithin.unit.toLowerCase()}
-      </dd>
-      <dt>Use Cron Scheduling</dt>
-      <dd>{useCronScheduling ? 'yes' : 'no'}</dd>
+      <dt>{t('summary.search_within')}</dt>
+      <dd>{t(`common:duration.${searchWithin.unit.toLowerCase()}`, { count: searchWithin.duration })}</dd>
+      <dt>{t('summary.use_cron')}</dt>
+      <dd>{useCronScheduling ? t('summary.yes') : t('summary.no')}</dd>
       {useCronScheduling ? (
         <>
-          <dt>Cron Expression</dt>
+          <dt>{t('summary.cron_expression')}</dt>
           <dd>{cronExpression}</dd>
-          <dt>Cron Description</dt>
+          <dt>{t('summary.cron_description')}</dt>
           <dd>{renderCronExpression(cronExpression)}</dd>
-          <dt>Time Zone</dt>
+          <dt>{t('summary.time_zone')}</dt>
           <dd>{cronTimezone}</dd>
         </>
       ) : (
         <>
-          <dt>Execute search every</dt>
-          <dd>
-            {executeEvery.duration} {executeEvery.unit.toLowerCase()}
-          </dd>
+          <dt>{t('summary.execute_every')}</dt>
+          <dd>{t(`common:duration.${executeEvery.unit.toLowerCase()}`, { count: executeEvery.duration })}</dd>
         </>
       )}
-      <dt>Enable scheduling</dt>
-      <dd>{isScheduled ? 'yes' : 'no'}</dd>
+      <dt>{t('summary.enable_scheduling')}</dt>
+      <dd>{isScheduled ? t('summary.yes') : t('summary.no')}</dd>
       {conditionType === 'filter' && (
         <>
-          <dt>Event limit</dt>
+          <dt>{t('summary.event_limit')}</dt>
           <dd>{event_limit}</dd>
         </>
       )}
       {conditionType === 'aggregation' && (
         <>
-          <dt>Group by Field(s)</dt>
-          <dd>{groupBy && groupBy?.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
-          <dt>Create Events if</dt>
+          <dt>{t('summary.group_by')}</dt>
+          <dd>{groupBy && groupBy?.length > 0 ? groupBy.join(', ') : t('summary.no_group_by')}</dd>
+          <dt>{t('summary.create_events_if')}</dt>
           <dd>
             {validationResults.isValid ? (
               <AggregationConditionSummary series={series} conditions={conditions} />
             ) : (
-              <Alert bsStyle="danger">Condition is not valid: {validationResults.errors.join(', ')}</Alert>
+              <Alert bsStyle="danger">
+                {t('summary.condition_invalid', { errors: validationResults.errors.join(', ') })}
+              </Alert>
             )}
           </dd>
         </>
       )}
-      <dt>Actions</dt>
+      <dt>{t('summary.actions')}</dt>
       <dd>
         <EventDefinitionReplaySearchLink eventDefinitionId={definitionId} />
       </dd>

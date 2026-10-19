@@ -19,6 +19,7 @@ import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
@@ -50,6 +51,7 @@ type Props = {
 };
 
 const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdit }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const [editField, setEditField] = useState<string | undefined>(undefined);
   const [showFieldForm, setShowFieldForm] = useState<boolean>(false);
 
@@ -117,12 +119,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
     <Row>
       <Col md={12}>
         <h2 className={commonStyles.title}>
-          Tags <small>(optional)</small>
+          {t('fields_form.tags')} <small>{t('fields_form.optional')}</small>
         </h2>
-        <p>
-          Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and
-          grouping easier on the Alerts &amp; Events list.
-        </p>
+        <p>{t('fields_form.tags_description')}</p>
         <TagsEditor
           tags={eventDefinition.tags ?? []}
           onChange={(next) => onChange('tags', next)}
@@ -148,21 +147,18 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
         ) : null}
 
         <h2 className={commonStyles.title}>
-          Event Fields <small>(optional)</small>
+          {t('fields_form.event_fields')} <small>{t('fields_form.optional')}</small>
         </h2>
 
         {!canEditCondition ? (
-          <p>The event fields of this event definition type cannot be edited.</p>
+          <p>{t('fields_form.not_editable')}</p>
         ) : (
           <>
-            <p>
-              Include additional information in Events generated from this Event Definition by adding custom Fields.
-              That can help you search Events or having more context when receiving Notifications.
-            </p>
+            <p>{t('fields_form.description')}</p>
 
             {errors.length > 0 && (
-              <Alert bsStyle="danger" className={commonStyles.validationSummary} title="Fields with errors">
-                <p>Please correct the following errors before saving this Event Definition:</p>
+              <Alert bsStyle="danger" className={commonStyles.validationSummary} title={t('fields_form.errors_title')}>
+                <p>{t('fields_form.errors_description')}</p>
                 <ul>
                   {errors.map((error) => (
                     <li key={error}>{error}</li>
@@ -174,9 +170,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
             {Object.keys(eventDefinition.field_spec).length > 0 && (
               <dl>
                 <dt>
-                  Keys
+                  {t('summary_renders.keys')}
                   <HoverForHelp
-                    title="More about Event Keys"
+                    title={t('field_form.more_about_keys')}
                     trigger={['click', 'hover']}
                     placement="right"
                     width={400}>
@@ -186,7 +182,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
                 <dd>
                   {eventDefinition.key_spec.length > 0
                     ? eventDefinition.key_spec.join(', ')
-                    : 'No Keys configured yet.'}
+                    : t('fields_form.no_keys')}
                 </dd>
               </dl>
             )}

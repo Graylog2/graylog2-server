@@ -20,12 +20,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
+import i18n from 'i18n';
+
 import { ControlLabel, FormControl, FormGroup, InputGroup } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import * as FormsUtils from 'util/FormsUtils';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -104,7 +108,7 @@ class NotificationSettingsForm extends React.Component<
       <Container>
         <FormGroup controlId="grace-period">
           <TimeUnitInput
-            label="Grace Period"
+            label={t('notification_settings.grace_period')}
             update={this.handleGracePeriodChange}
             defaultEnabled={gracePeriodDuration !== 0}
             value={gracePeriodDuration}
@@ -112,21 +116,17 @@ class NotificationSettingsForm extends React.Component<
             units={TIME_UNITS}
             clearable
           />
-          <p>
-            Notifications for alerts are sent every time they occur. Set a Grace Period to control how long to wait
-            before sending Notifications again. Note that Events with keys will have a Grace Period for each different
-            key value.
-          </p>
+          <p>{t('notification_settings.grace_period_help')}</p>
         </FormGroup>
 
         <FormGroup>
-          <ControlLabel>Message Backlog</ControlLabel>
+          <ControlLabel>{t('notification_settings.message_backlog')}</ControlLabel>
           <InputGroup>
             <InputGroup.Addon>
               <input
                 id="toggle_backlog_size"
                 type="checkbox"
-                aria-label="Toggle message backlog"
+                aria-label={t('notification_settings.toggle_message_backlog')}
                 checked={isBacklogSizeEnabled}
                 onChange={this.toggleBacklogSize}
               />
@@ -140,7 +140,7 @@ class NotificationSettingsForm extends React.Component<
               disabled={!isBacklogSizeEnabled}
             />
           </InputGroup>
-          <p>Number of messages to be included in Notifications.</p>
+          <p>{t('notification_settings.message_backlog_help')}</p>
         </FormGroup>
       </Container>
     );

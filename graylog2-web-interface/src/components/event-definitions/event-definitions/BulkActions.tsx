@@ -44,7 +44,7 @@ const BULK_ACTIONS = {
 };
 
 const BulkActions = () => {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation('event_definitions');
   const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showDialog, setShowDialog] = useState(false);
@@ -107,7 +107,7 @@ const BulkActions = () => {
           const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
           setSelectedEntities(notUpdatedDefinitionIds);
           UserNotification.error(
-            t(`definitions_bulk.${actionType}.failed`, {
+            t(`bulk_actions.${actionType}.failed`, {
               count: selectedItemsAmount,
               failed: notUpdatedDefinitionIds.length,
             }),
@@ -115,13 +115,13 @@ const BulkActions = () => {
         } else {
           setSelectedEntities([]);
           UserNotification.success(
-            t(`definitions_bulk.${actionType}.success`, { count: selectedItemsAmount }),
-            t('definitions_bulk.success_title'),
+            t(`bulk_actions.${actionType}.success`, { count: selectedItemsAmount }),
+            t('bulk_actions.success_title'),
           );
         }
       })
       .catch((error) => {
-        UserNotification.error(t(`definitions_bulk.${actionType}.error`, { error }));
+        UserNotification.error(t(`bulk_actions.${actionType}.error`, { error }));
       })
       .finally(() => {
         refetchEventDefinitions();
@@ -136,17 +136,17 @@ const BulkActions = () => {
   return (
     <>
       <BulkActionsDropdown>
-        <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>{t('definitions_list.enable')}</MenuItem>
-        <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>{t('definitions_list.disable')}</MenuItem>
+        <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>{t('bulk_actions.enable_action')}</MenuItem>
+        <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>{t('bulk_actions.disable_action')}</MenuItem>
         <DeleteMenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)} />
       </BulkActionsDropdown>
       {showDialog && (
         <ConfirmDialog
-          title={actionType ? t(`definitions_bulk.${actionType}.title`) : undefined}
+          title={actionType ? t(`bulk_actions.${actionType}.title`) : undefined}
           show
           onConfirm={handleConfirm}
           onCancel={handleClearState}>
-          {actionType ? t(`definitions_bulk.${actionType}.confirm`, { count: selectedItemsAmount }) : null}
+          {actionType ? t(`bulk_actions.${actionType}.confirm`, { count: selectedItemsAmount }) : null}
         </ConfirmDialog>
       )}
     </>

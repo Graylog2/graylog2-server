@@ -29,7 +29,7 @@ import usePermissions from 'hooks/usePermissions';
 import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation('event_definitions');
   const { isPermitted } = usePermissions();
   const { push } = useHistory();
 
@@ -46,10 +46,7 @@ const CreateEventDefinitionPage = () => {
   );
 
   const pageTitle = useMemo(
-    () =>
-      eventDefinitionTitle
-        ? t('definitions_page.new_named', { title: eventDefinitionTitle })
-        : t('definitions_page.new'),
+    () => (eventDefinitionTitle ? t('page.new_named', { title: eventDefinitionTitle }) : t('page.new')),
     [eventDefinitionTitle, t],
   );
 
@@ -70,10 +67,10 @@ const CreateEventDefinitionPage = () => {
       <PageHeader
         title={pageTitle}
         documentationLink={{
-          title: t('definitions_page.alerts_docs'),
+          title: t('page.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>{t('definitions_page.description_alerts')}</span>
+        <span>{t('page.description_alerts')}</span>
       </PageHeader>
 
       <Row className="content">

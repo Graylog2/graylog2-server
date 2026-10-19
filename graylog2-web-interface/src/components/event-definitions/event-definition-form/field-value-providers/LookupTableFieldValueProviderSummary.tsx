@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import type { FieldValueProvider } from 'graylog-web-plugin';
+import { useTranslation } from 'react-i18next';
 
 import { IfPermitted } from 'components/common';
 
@@ -24,6 +25,7 @@ import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 type Props = React.ComponentProps<FieldValueProvider['summaryComponent']>;
 
 const LookupTableFieldValueProviderSummary = ({ ...props }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const provider = props.config.providers[0];
 
   return (
@@ -31,15 +33,15 @@ const LookupTableFieldValueProviderSummary = ({ ...props }: Props) => {
       <IfPermitted permissions="lookuptables:read">
         <>
           <tr>
-            <td>Value source</td>
-            <td>Lookup Table</td>
+            <td>{t('provider_summary.value_source')}</td>
+            <td>{t('field_value_providers.lookup_table.title')}</td>
           </tr>
           <tr>
-            <td>Lookup Table</td>
+            <td>{t('field_value_providers.lookup_table.title')}</td>
             <td>{provider.table_name}</td>
           </tr>
           <tr>
-            <td>Lookup Table Key Field</td>
+            <td>{t('provider_summary.lookup_table_key_field')}</td>
             <td>{provider.key_field}</td>
           </tr>
         </>

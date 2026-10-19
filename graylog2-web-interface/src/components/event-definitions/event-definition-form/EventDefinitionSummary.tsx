@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { TagList } from 'components/common';
-import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import usePermissions from 'hooks/usePermissions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
@@ -38,6 +38,7 @@ import {
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
+import { priorityTitle } from '../pluginTitles';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -56,6 +57,7 @@ const EventDefinitionSummary = ({
   validation = { errors: {} },
   currentUser,
 }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { isPermitted } = usePermissions();
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const { label: eventProcedureSummaryLabel, Component: EventProcedureSummaryComponent } =
@@ -78,22 +80,22 @@ const EventDefinitionSummary = ({
 
   const renderDetails = () => (
     <>
-      <h3 className={commonStyles.title}>Details</h3>
+      <h3 className={commonStyles.title}>{t('definition_summary.details')}</h3>
       <dl>
-        <dt>Title</dt>
-        <dd>{eventDefinition.title || 'No title given'}</dd>
-        <dt>Description</dt>
-        <dd>{eventDefinition.description || 'No description given'}</dd>
-        <dt>Priority</dt>
-        <dd>{getPriorityName(eventDefinition.priority)}</dd>
-        <dt>Tags</dt>
+        <dt>{t('details_form.title_label')}</dt>
+        <dd>{eventDefinition.title || t('definition_summary.no_title')}</dd>
+        <dt>{t('details_form.description')}</dt>
+        <dd>{eventDefinition.description || t('definition_summary.no_description')}</dd>
+        <dt>{t('details_form.priority')}</dt>
+        <dd>{priorityTitle(eventDefinition.priority)}</dd>
+        <dt>{t('fields_form.tags')}</dt>
         <dd>
-          <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
+          <TagList tags={eventDefinition.tags} emptyFallback={<em>{t('definition_summary.no_tags')}</em>} />
         </dd>
         {techniquesSummaryComponent}
         {eventDefinition.event_summary_template && (
           <>
-            <dt>Event Summary Template</dt>
+            <dt>{t('details_form.summary_template')}</dt>
             <dd>{eventDefinition.event_summary_template}</dd>
           </>
         )}
@@ -112,7 +114,7 @@ const EventDefinitionSummary = ({
   return (
     <Row className={styles.eventSummary}>
       <Col md={12}>
-        <h2 className={commonStyles.title}>Event Summary</h2>
+        <h2 className={commonStyles.title}>{t('definition_summary.title')}</h2>
         {showValidation && <EventDefinitionValidationSummary validation={validation} />}
         <Row>
           <Col md={5}>{renderDetails()}</Col>

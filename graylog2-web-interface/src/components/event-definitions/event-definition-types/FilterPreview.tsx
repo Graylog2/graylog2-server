@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo, useContext } from 'react';
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { Table } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -66,18 +67,20 @@ const SearchResult = ({
   isFetchingData: boolean;
   searchResult: { messages?: Array<Message> };
 }) => {
-  if (isFetchingData) return <Spinner text="Loading filter preview..." />;
+  const { t } = useTranslation('event_definitions');
+
+  if (isFetchingData) return <Spinner text={t('filter_preview.loading')} />;
 
   if (!searchResult.messages || searchResult.messages.length === 0) {
-    return <p>Could not find any messages with the current search criteria.</p>;
+    return <p>{t('filter_preview.no_messages')}</p>;
   }
 
   return (
     <Table condensed bordered>
       <thead>
         <tr>
-          <th>Timestamp</th>
-          <th>Message</th>
+          <th>{t('filter_preview.timestamp')}</th>
+          <th>{t('filter_preview.message')}</th>
         </tr>
       </thead>
       <tbody>
@@ -179,6 +182,7 @@ const useExecutePreview = (config: EventDefinition['config']) => {
 };
 
 const FilterPreview = ({ config }: FilterPreviewProps) => {
+  const { t } = useTranslation('event_definitions');
   const { isPermitted } = usePermissions();
   const displayPreview = isPermittedToSeePreview(isPermitted, config);
   const { isFetching, result: searchResult = {}, errors = [] } = useExecutePreview(config);
@@ -190,20 +194,17 @@ const FilterPreview = ({ config }: FilterPreviewProps) => {
       <HelpPanel
         collapsible
         defaultExpanded={!displayPreview}
-        title="How many Events will Filter & Aggregation create?">
-        <p>
-          The Filter & Aggregation Condition will generate different number of Events, depending on how it is
-          configured:
-        </p>
+        title={t('filter_preview.help_title')}>
+        <p>{t('filter_preview.help_description')}</p>
         <ul>
           <li>
-            <b>Filter:</b>&emsp;One Event per message matching the filter
+            <b>{t('filter_preview.help_filter_label')}</b>&emsp;{t('filter_preview.help_filter')}
           </li>
           <li>
-            <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies the condition
+            <b>{t('filter_preview.help_aggregation_label')}</b>&emsp;{t('filter_preview.help_aggregation')}
           </li>
           <li>
-            <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies the condition
+            <b>{t('filter_preview.help_aggregation_groups_label')}</b>&emsp;{t('filter_preview.help_aggregation_groups')}
           </li>
         </ul>
       </HelpPanel>

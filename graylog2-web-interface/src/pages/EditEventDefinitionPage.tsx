@@ -35,7 +35,7 @@ import useQuery from 'routing/useQuery';
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation('event_definitions');
   const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
   const { isPermitted } = usePermissions();
@@ -93,10 +93,10 @@ const EditEventDefinitionPage = () => {
 
   if (!eventDefinition) {
     return (
-      <DocumentTitle title={t('definitions_page.edit')}>
+      <DocumentTitle title={t('page.edit')}>
         <span>
-          <PageHeader title={t('definitions_page.edit')}>
-            <Spinner text={t('definitions_page.loading')} />
+          <PageHeader title={t('page.edit')}>
+            <Spinner text={t('page.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -104,15 +104,15 @@ const EditEventDefinitionPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('definitions_page.edit_named', { title: eventDefinition.title })}>
+    <DocumentTitle title={t('page.edit_named', { title: eventDefinition.title })}>
       <EventsPageNavigation />
       <PageHeader
-        title={t('definitions_page.edit_named', { title: eventDefinition.title })}
+        title={t('page.edit_named', { title: eventDefinition.title })}
         documentationLink={{
-          title: t('definitions_page.alerts_docs'),
+          title: t('page.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>{t('definitions_page.description_events')}</span>
+        <span>{t('page.description_events')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

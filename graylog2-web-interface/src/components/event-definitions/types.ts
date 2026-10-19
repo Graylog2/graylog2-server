@@ -37,9 +37,12 @@ export interface EventDefinitionValidation {
 }
 export interface EventDefinitionType {
   type: string;
+  // English name, also used for sorting. Set `displayNameKey` (e.g. `event_definitions:types.aggregation.title`) to translate it.
   displayName: string;
+  displayNameKey?: string;
   sortOrder: number;
   description: string;
+  descriptionKey?: string;
   defaultConfig: EventDefinition['config'];
   // Optional so types with no editable/viewable representation (e.g. system-generated types
   // that are never created or edited through the wizard) can still be registered as filter

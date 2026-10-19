@@ -16,6 +16,8 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
+
 import { Select } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
@@ -23,6 +25,8 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import commonStyles from '../common/commonStyles.css';
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
 
 type AddNotificationFormProps = {
   notifications: any[];
@@ -104,7 +108,7 @@ class AddNotificationForm extends React.Component<
 
     if (hasCreationPermissions) {
       formattedNotifications.unshift({
-        label: 'Create New Notification...',
+        label: t('add_notification_form.create_new'),
         value: 'create',
       });
     }
@@ -117,34 +121,31 @@ class AddNotificationForm extends React.Component<
     const { displayNewNotificationForm, selectedNotification } = this.state;
     const doneButton = displayNewNotificationForm ? (
       <Button bsStyle="primary" type="submit" form="new-notification-form">
-        Add notification
+        {t('add_notification_form.add')}
       </Button>
     ) : (
       <Button bsStyle="primary" onClick={this.handleSubmit} disabled={!selectedNotification}>
-        Add notification
+        {t('add_notification_form.add')}
       </Button>
     );
 
     return (
       <Row>
         <Col md={7} lg={6}>
-          <h2 className={commonStyles.title}>Add Notification</h2>
+          <h2 className={commonStyles.title}>{t('add_notification_form.title')}</h2>
 
           <fieldset>
             <FormGroup controlId="notification-select">
-              <ControlLabel>Choose Notification</ControlLabel>
+              <ControlLabel>{t('add_notification_form.choose')}</ControlLabel>
               <Select
                 id="notification-select"
-                placeholder="Select Notification"
+                placeholder={t('add_notification_form.select')}
                 onChange={this.handleSelectNotificationChange}
                 options={this.formatNotifications(notifications)}
                 value={selectedNotification}
                 menuPlacement="bottom"
               />
-              <HelpBlock>
-                Select a Notification to use on Alerts of this kind or create a new Notification that you can later use
-                in other Alerts.
-              </HelpBlock>
+              <HelpBlock>{t('add_notification_form.help')}</HelpBlock>
             </FormGroup>
 
             {displayNewNotificationForm && (
@@ -159,7 +160,7 @@ class AddNotificationForm extends React.Component<
 
           <ButtonToolbar>
             {doneButton}
-            <Button onClick={this.handleCancel}>Cancel</Button>
+            <Button onClick={this.handleCancel}>{i18n.t('common:actions.cancel')}</Button>
           </ButtonToolbar>
         </Col>
       </Row>

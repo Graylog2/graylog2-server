@@ -18,6 +18,8 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import isNumber from 'lodash/isNumber';
 
+import i18n from 'i18n';
+
 import { Select, HoverForHelp } from 'components/common';
 import {
   Button,
@@ -37,6 +39,9 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import commonStyles from '../common/commonStyles.css';
+import { fieldValueProviderTitle } from '../pluginTitles';
+
+const t = (key: string, options = {}) => i18n.t(key, { ns: 'event_definitions', ...options });
 
 const requiredFields = ['fieldName'];
 
@@ -51,7 +56,7 @@ const getProviderPlugin = (type) => {
 const getConfigProviderType = (config, defaultValue?) => config?.providers?.[0]?.type ?? defaultValue;
 
 const formatFieldValueProviders = () =>
-  PluginStore.exports('fieldValueProviders').map((type) => ({ label: type.displayName, value: type.type }));
+  PluginStore.exports('fieldValueProviders').map((type) => ({ label: fieldValueProviderTitle(type), value: type.type }));
 
 type FieldFormProps = {
   fieldName?: string;
@@ -102,21 +107,21 @@ class FieldForm extends React.Component<
 
     requiredFields.forEach((requiredField) => {
       if (!this.state[requiredField]) {
-        errors[requiredField] = 'Field cannot be empty.';
+        errors[requiredField] = t('validation.field_cannot_be_empty');
       }
     });
 
     if (!config.providers[0]?.type) {
-      errors['config.providers[0].type'] = 'Field cannot be empty.';
+      errors['config.providers[0].type'] = t('validation.field_cannot_be_empty');
     }
 
     if (isKey && (!isNumber(keyPosition) || Number(keyPosition) < 1)) {
-      errors.key_position = 'Field must be a positive number.';
+      errors.key_position = t('validation.field_positive_number');
     }
 
     pluginRequiredFields.forEach((requiredField) => {
       if (!config?.providers?.[0]?.[requiredField]) {
-        errors[requiredField] = 'Field cannot be empty.';
+        errors[requiredField] = t('validation.field_cannot_be_empty');
       }
     });
 
@@ -225,7 +230,7 @@ class FieldForm extends React.Component<
         currentUser: currentUser,
       })
     ) : (
-      <div>Selected provider is not available.</div>
+      <div>{t('field_form.provider_unavailable')}</div>
     );
   };
 
@@ -237,24 +242,26 @@ class FieldForm extends React.Component<
     return (
       <Row>
         <Col md={7} lg={6}>
-          <h2 className={commonStyles.title}>{isEditingField ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
+          <h2 className={commonStyles.title}>
+            {isEditingField ? t('field_form.title_edit', { fieldName }) : t('field_form.title_new')}
+          </h2>
 
           <Input
             id="field-name"
             name="name"
-            label="Name"
+            label={t('field_form.name')}
             type="text"
             value={fieldName}
             onChange={this.handleFieldNameChange}
             bsStyle={validation.errors.fieldName ? 'error' : null}
-            help={validation.errors.fieldName || 'Name for this Field.'}
+            help={validation.errors.fieldName || t('field_form.name_help')}
             required
           />
 
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
-              Use Field as Event Key&emsp;
-              <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right" width={400}>
+              {t('field_form.use_as_key')}&emsp;
+              <HoverForHelp title={t('field_form.more_about_keys')} trigger={['click', 'hover']} placement="right" width={400}>
                 <EventKeyHelpPopover />
               </HoverForHelp>
             </ControlLabel>
@@ -264,7 +271,7 @@ class FieldForm extends React.Component<
                   id="is-key"
                   name="is-key"
                   type="checkbox"
-                  aria-label="Use Field as Event Key"
+                  aria-label={t('field_form.use_as_key')}
                   onChange={this.toggleKey}
                   checked={isKey}
                 />
@@ -279,30 +286,30 @@ class FieldForm extends React.Component<
               />
             </InputGroup>
             <HelpBlock>
-              {validation.errors.key_position || 'Indicates if this Field should be a Key and its order.'}
+              {validation.errors.key_position || t('field_form.key_help')}
             </HelpBlock>
           </FormGroup>
 
           <FormGroup>
-            <ControlLabel>Field Data Type</ControlLabel>
-            <FormControl.Static>String</FormControl.Static>
+            <ControlLabel>{t('field_form.data_type')}</ControlLabel>
+            <FormControl.Static>{t('field_form.data_type_string')}</FormControl.Static>
           </FormGroup>
 
           <FormGroup
             controlId="event-field-provider"
             validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
-            <ControlLabel>Set Value From</ControlLabel>
+            <ControlLabel>{t('field_form.set_value_from')}</ControlLabel>
             <Select
               name="event-field-provider"
               ignoreAccents={false}
-              placeholder="Select Value Source"
+              placeholder={t('field_form.select_value_source')}
               onChange={this.handleProviderTypeChange}
               options={formatFieldValueProviders()}
               value={getConfigProviderType(config, '')}
               required
             />
             <HelpBlock>
-              {validation.errors['config.providers[0].type'] || 'Select a source for the value of this Field.'}
+              {validation.errors['config.providers[0].type'] || t('field_form.value_source_help')}
             </HelpBlock>
           </FormGroup>
         </Col>
@@ -312,9 +319,9 @@ class FieldForm extends React.Component<
         <Col md={12}>
           <ButtonToolbar>
             <Button bsStyle="primary" onClick={this.handleSubmit}>
-              {isEditingField ? 'Update custom field' : 'Add custom field'}
+              {isEditingField ? t('field_form.update') : t('field_form.add')}
             </Button>
-            <Button onClick={this.handleCancel}>Cancel</Button>
+            <Button onClick={this.handleCancel}>{t('common:actions.cancel')}</Button>
           </ButtonToolbar>
         </Col>
       </Row>

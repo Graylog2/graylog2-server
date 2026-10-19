@@ -16,9 +16,15 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { Trans } from 'react-i18next';
+
+import i18n from 'i18n';
 
 import { Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
+import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
 
 const getNotificationPlugin = (type) => {
   if (type === undefined) {
@@ -53,11 +59,17 @@ class NotificationList extends React.Component<
       return (
         <tr>
           <td colSpan={2}>
-            Could not find information for Notification <em>{notification.title}</em>
+            <Trans
+              i18n={i18n}
+              ns="event_definitions"
+              i18nKey="notification_list.not_found"
+              values={{ title: notification.title }}
+              components={{ em: <em /> }}
+            />
           </td>
           <td className="actions">
             <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
-              Delete
+              {i18n.t('common:actions.delete')}
             </Button>
           </td>
         </tr>
@@ -69,10 +81,10 @@ class NotificationList extends React.Component<
     return (
       <tr key={notification.id}>
         <td>{notification.title}</td>
-        <td>{plugin?.displayName || notification.config.type}</td>
+        <td>{notificationTypeTitle(plugin) || notification.config.type}</td>
         <td className="actions">
           <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
-            Delete
+            {i18n.t('common:actions.delete')}
           </Button>
         </td>
       </tr>
@@ -91,14 +103,14 @@ class NotificationList extends React.Component<
     );
     const addNotificationButton = (
       <Button bsStyle="primary" onClick={onAddNotificationClick}>
-        Add notification
+        {t('add_notification_form.add')}
       </Button>
     );
 
     if (definitionNotifications.length === 0) {
       return (
         <>
-          <p>This Event is not configured to trigger any Notifications yet.</p>
+          <p>{t('notification_list.no_notifications')}</p>
           {addNotificationButton}
         </>
       );
@@ -108,7 +120,7 @@ class NotificationList extends React.Component<
       <>
         <DataTable
           id="event-definition-notifications"
-          headers={['Notification', 'Type', 'Actions']}
+          headers={[t('notification_list.notification'), t('notification_list.type'), t('summary.actions')]}
           sortByKey="title"
           rows={definitionNotifications}
           dataRowFormatter={this.notificationFormatter}

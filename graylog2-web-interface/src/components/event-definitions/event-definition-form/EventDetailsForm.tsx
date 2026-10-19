@@ -21,6 +21,7 @@ import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 import { useMantineTheme } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import useMediaQuery from 'util/hooks/useMediaQuery';
 import { Select } from 'components/common';
@@ -65,10 +66,11 @@ const InputFeedback = styled.div`
   padding-right: 3px;
 `;
 
-const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
+// `name` stays English, it is sent as telemetry.
+const priorities = Object.entries(EventDefinitionPriorityEnum.properties)
   .map(([key, value]) => ({
     value: key,
-    label: upperFirst(value.name),
+    name: value.name,
   }))
   .sort((a, b) => Number(b.value) - Number(a.value));
 
@@ -85,6 +87,8 @@ type Props = {
 };
 
 const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
+  const { t } = useTranslation('event_definitions');
+  const priorityOptions = priorities.map(({ value, name }) => ({ value, label: t(`priorities.${name}`) }));
   const theme = useMantineTheme();
   const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
   const sendTelemetry = useSendTelemetry('event-definition-details');
@@ -112,7 +116,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const handlePriorityChange = (nextPriority: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.PRIORITY_CHANGED, {
       app_action_value: 'priority-select',
-      priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
+      priority: upperFirst(priorities.find((opt) => opt.value === nextPriority)?.name),
     });
 
     onChange('priority', toNumber(nextPriority));
@@ -124,16 +128,16 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   return (
     <Row>
       <Col md={12} lg={6}>
-        <h2 className={commonStyles.title}>Event Details</h2>
+        <h2 className={commonStyles.title}>{t('details_form.title')}</h2>
         <fieldset>
           <StyledRow>
             <Input
               id="event-definition-title"
               name="title"
-              label="Title"
+              label={t('details_form.title_label')}
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={validation?.errors?.title?.[0] ?? 'Title for this Event Definition.'}
+              help={validation?.errors?.title?.[0] ?? t('details_form.title_help')}
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
@@ -141,7 +145,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             />
 
             <FormGroup controlId="event-definition-priority">
-              <ControlLabel>Priority</ControlLabel>
+              <ControlLabel>{t('details_form.priority')}</ControlLabel>
               <Select
                 options={priorityOptions}
                 value={toString(eventDefinition.priority)}
@@ -150,7 +154,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
                 disabled={readOnly}
                 required
               />
-              <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
+              <HelpBlock>{t('details_form.priority_help')}</HelpBlock>
             </FormGroup>
           </StyledRow>
 
@@ -158,9 +162,9 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             <Input
               id="event-definition-event-summary-template"
               name="event_summary_template"
-              label="Event Summary Template"
+              label={t('details_form.summary_template')}
               type="text"
-              help="Template used to generate the Event and Alert summaries."
+              help={t('details_form.summary_template_help')}
               value={eventDefinition.event_summary_template}
               onChange={handleChange}
               readOnly={readOnly}
@@ -175,11 +179,11 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             name="description"
             label={
               <span>
-                Description <small className="text-muted">(Optional)</small>
+                {t('details_form.description')} <small className="text-muted">{t('filter_form.optional')}</small>
               </span>
             }
             type="textarea"
-            help="Longer description for this Event Definition."
+            help={t('details_form.description_help')}
             value={eventDefinition.description}
             onChange={handleChange}
             readOnly={readOnly}
@@ -225,7 +229,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           )}
           {showEventProcedureSummary && (
             <Col>
-              <ControlLabel>Event Procedure Summary</ControlLabel>
+              <ControlLabel>{t('summary_renders.event_procedure_summary')}</ControlLabel>
               <PluggableEventProcedureSummary
                 eventProcedureId={eventDefinitionEventProcedure}
                 canEdit={!readOnly}
@@ -237,10 +241,10 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           )}
           {showAddNewEventProcedure && (
             <>
-              <ControlLabel>Event Procedure Summary</ControlLabel>
-              <p>This Event Definition does not have any Event Procedures yet.</p>
+              <ControlLabel>{t('summary_renders.event_procedure_summary')}</ControlLabel>
+              <p>{t('details_form.no_event_procedures')}</p>
               <Button bsStyle="primary" onClick={() => setShowAddEventProcedureForm(true)}>
-                Add Event Procedure
+                {t('details_form.add_event_procedure')}
               </Button>
             </>
           )}

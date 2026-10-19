@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -45,6 +46,7 @@ const ComparisonExpression = ({
   validation = {},
   ...props
 }: ComparisonExpressionProps) => {
+  const { t } = useTranslation('event_definitions');
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
 
@@ -66,10 +68,10 @@ const ComparisonExpression = ({
 
         <Col md={3}>
           <FormGroup controlId="aggregation-condition" validationState={validation.message ? 'error' : null}>
-            {renderLabel && <ControlLabel>Is</ControlLabel>}
+            {renderLabel && <ControlLabel>{t('conditions.is')}</ControlLabel>}
             <Select
               id="aggregation-condition"
-              placeholder="Select Condition"
+              placeholder={t('conditions.select_condition')}
               onChange={handleExpressionOperatorChange}
               options={[
                 { label: '<', value: '<' },

@@ -17,6 +17,8 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
+
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import LookupTableQueryParameterEdit from 'components/lookup-table-parameters/LookupTableQueryParameterEdit';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
@@ -32,8 +34,8 @@ const bindings: PluginExports = {
       title: 'Lookup Table',
       fromJSON: LookupTableParameter.fromJSON.bind(LookupTableParameter),
       validate: (param: any) => ({
-        lookupTable: !param.lookupTable ? 'Cannot be empty' : undefined,
-        key: !param.key ? 'Cannot be empty' : undefined,
+        lookupTable: !param.lookupTable ? i18n.t('validation.cannot_be_empty', { ns: 'event_definitions' }) : undefined,
+        key: !param.key ? i18n.t('validation.cannot_be_empty', { ns: 'event_definitions' }) : undefined,
       }),
       editComponent: LookupTableQueryParameterEdit,
     },
@@ -42,10 +44,12 @@ const bindings: PluginExports = {
     {
       type: 'aggregation-v1',
       displayName: 'Filter & Aggregation',
+      displayNameKey: 'event_definitions:types.aggregation.title',
       sortOrder: 0, // Sort before conditions working on events
       description:
         'Create Events from log messages by filtering them and (optionally) ' +
         'aggregating their results to match a given condition. These Events can be used as input for a Correlation Rule.',
+      descriptionKey: 'event_definitions:types.aggregation.description',
       formComponent: FilterAggregationFormContainer,
       summaryComponent: FilterAggregationSummary,
       defaultConfig: FilterAggregationForm.defaultConfig,
@@ -54,8 +58,10 @@ const bindings: PluginExports = {
     {
       type: SYSTEM_EVENT_DEFINITION_TYPE,
       displayName: 'System Event Definition',
+      displayNameKey: 'event_definitions:types.system.title',
       sortOrder: 6,
       description: 'Built-in Event Definition Graylog uses to report system notifications as Events.',
+      descriptionKey: 'event_definitions:types.system.description',
       defaultConfig: { type: SYSTEM_EVENT_DEFINITION_TYPE },
       // Only ever created by Graylog itself, never through the wizard, so it has no
       // form/summary component and is hidden from the creation dropdown. It's registered here

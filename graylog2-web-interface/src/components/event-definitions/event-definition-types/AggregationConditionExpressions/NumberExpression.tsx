@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -28,6 +29,7 @@ type NumberExpressionProps = {
 };
 
 const NumberExpression = ({ expression, onChange, renderLabel, validation = {} }: NumberExpressionProps) => {
+  const { t } = useTranslation('event_definitions');
   const handleChange = (event) => {
     const nextExpression = cloneDeep(expression);
 
@@ -40,7 +42,7 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation = {} }
       <Input
         id="aggregation-threshold"
         name="threshold"
-        label={renderLabel ? 'Threshold' : ''}
+        label={renderLabel ? t('conditions.threshold') : ''}
         type="number"
         value={expression?.value}
         bsStyle={validation.message ? 'error' : null}

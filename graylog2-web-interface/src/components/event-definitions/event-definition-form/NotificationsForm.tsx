@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import without from 'lodash/without';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const sendTelemetry = useSendTelemetry('event-definition-notifications');
   const { isPermitted } = usePermissions();
   const [showAddNotificationForm, setShowAddNotificationForm] = useState(false);
@@ -78,7 +80,7 @@ const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange 
       <Row>
         <Col md={6} lg={5}>
           <Alert bsStyle="warning">
-            Missing Notifications Permissions for: <br /> {missingPermissions.join(', ')}
+            {t('summary_renders.missing_notification_permissions')} <br /> {missingPermissions.join(', ')}
           </Alert>
         </Col>
       </Row>
@@ -102,16 +104,14 @@ const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange 
         <span className={styles.manageNotifications}>
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
             <Button bsStyle="link" bsSize="small">
-              Manage Notifications <Icon name="open_in_new" />
+              {t('notifications_form.manage')} <Icon name="open_in_new" />
             </Button>
           </LinkContainer>
         </span>
         <h2 className={commonStyles.title}>
-          Notifications <small>(optional)</small>
+          {t('summary_renders.notifications')} <small>{t('fields_form.optional')}</small>
         </h2>
-        <p>
-          Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.
-        </p>
+        <p>{t('notifications_form.description')}</p>
 
         <NotificationList
           eventDefinition={eventDefinition}
