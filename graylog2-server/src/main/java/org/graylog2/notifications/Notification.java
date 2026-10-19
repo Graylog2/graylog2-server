@@ -127,7 +127,8 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
         DATA_TIERING_ROLLOVER_ERROR,
-        DATA_NODE_HEAP_WARNING;
+        DATA_NODE_HEAP_WARNING,
+        KINESIS_SINGLE_TABLE_MIGRATION;
 
         @JsonValue
         public String json() {
