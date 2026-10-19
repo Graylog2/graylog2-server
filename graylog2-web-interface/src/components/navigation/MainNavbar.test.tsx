@@ -76,7 +76,14 @@ describe('MainNavbar', () => {
           {
             description: 'Merged dropdown test',
             path: '/',
-            children: [{ path: '/another-route', description: 'Dropdown menu item 1' }],
+            children: [
+              {
+                path: '/positioned-route',
+                description: 'Positioned dropdown item',
+                position: { after: 'Dropdown menu item 2' },
+              },
+              { path: '/another-route', description: 'Dropdown menu item 1' },
+            ],
           },
           {
             description: 'Merged dropdown test',
@@ -240,6 +247,17 @@ describe('MainNavbar', () => {
 
         const targetItem = await screen.findByRole('link', { name: ARCHIVES_LINK_TITLE });
         const itemWithPosition = await screen.findByRole('link', { name: /After specified item/i });
+
+        expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
+      });
+
+      it('should render a dropdown item after a specified item of a merged dropdown', async () => {
+        render(<SUT />);
+
+        await userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
+
+        const targetItem = await screen.findByRole('menuitem', { name: /Dropdown menu item 2/i });
+        const itemWithPosition = await screen.findByRole('menuitem', { name: /Positioned dropdown item/i });
 
         expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
       });

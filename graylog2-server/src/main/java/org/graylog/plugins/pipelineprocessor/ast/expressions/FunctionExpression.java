@@ -61,9 +61,9 @@ public class FunctionExpression extends BaseExpression {
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
         try {
-            if (Boolean.TRUE.equals(function.descriptor().deprecated())) {
+            if (Boolean.TRUE.equals(descriptor.deprecated())) {
                 final Rule rule = context.getRule();
-                RATE_LIMITED_LOG.warn("Using deprecated function {} in rule {}", function.descriptor().name(), rule == null ? "[unknown]" : rule.name());
+                RATE_LIMITED_LOG.warn("Using deprecated function {} in rule {}", descriptor.name(), rule == null ? "[unknown]" : rule.name());
             }
             return descriptor.returnType().cast(function.evaluate(args, context));
         } catch (LocationAwareEvalException laee) {

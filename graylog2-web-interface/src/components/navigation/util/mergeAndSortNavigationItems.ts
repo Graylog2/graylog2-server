@@ -16,6 +16,8 @@
  */
 import type { PluginNavigation } from 'graylog-web-plugin';
 
+import sortNavigationItems from './sortNavigationItems';
+
 const _existingDropdownItemIndex = (
   existingNavigationItems: Array<PluginNavigation>,
   newNavigationItem: PluginNavigation,
@@ -49,4 +51,10 @@ const mergeNavigationItems = (navigationItems: Array<PluginNavigation>): Array<P
     return [...result, current];
   }, []);
 
-export default mergeNavigationItems;
+// Sorting only once after merging, because sorting multiple times changes the order of items positioned after the same item.
+const mergeAndSortNavigationItems = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> =>
+  mergeNavigationItems(navigationItems).map((item) =>
+    'children' in item ? { ...item, children: sortNavigationItems(item.children) } : item,
+  );
+
+export default mergeAndSortNavigationItems;

@@ -30,6 +30,7 @@ import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const EXPANDED_SECTION = 'configuration';
 
@@ -48,7 +49,6 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           </Link>
         </ExpandedSectionToggleWrapper>
       ),
-      width: 0.5,
     },
     type: {
       renderCell: (type: string, input: InputSummary) => (
@@ -56,7 +56,6 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <TypeCell type={type} inputTypes={inputTypes} />
         </ExpandedSectionToggleWrapper>
       ),
-      width: 0.5,
     },
     desired_state: {
       renderCell: (_state: string, input: InputSummary) => (
@@ -72,7 +71,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 150,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
@@ -80,7 +79,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 180,
+      staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     input_failures: {
@@ -89,7 +88,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <FailuresCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 130,
+      staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     address: {
@@ -110,16 +109,16 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     [METRIC_COLUMN_IDS.messagesPerStream]: {
       renderCell: (_value: unknown, input: InputSummary) => <MessageCountCell input={input} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.extractorCount]: {
       renderCell: (_value: unknown, input: InputSummary) => <ExtractorCountCell input={input} />,
-      staticWidth: 130,
+      staticWidth: 'matchHeader',
     },
     [METRIC_COLUMN_IDS.associatedStreams]: {
       renderCell: (_value: unknown, input: InputSummary) => <AssociatedStreamsCell input={input} />,
-      staticWidth: 180,
+      staticWidth: 'matchHeader',
       textAlign: 'right',
     },
   },
