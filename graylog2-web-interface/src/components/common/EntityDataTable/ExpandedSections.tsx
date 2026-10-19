@@ -73,9 +73,11 @@ const HideSectionButton = styled(IconButton)`
 const ExpandedSections = <Entity extends EntityBase>({
   expandedSectionRenderers,
   entity,
+  visibleCellCount,
 }: {
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   entity: Entity;
+  visibleCellCount: number;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
   const expandedEntitySections = expandedSections?.[entity.id];
@@ -86,7 +88,7 @@ const ExpandedSections = <Entity extends EntityBase>({
 
   return (
     <Container>
-      <ContentCell colSpan={1000}>
+      <ContentCell colSpan={visibleCellCount}>
         <Content>
           {Object.entries(expandedSectionRenderers ?? {})
             .filter(([sectionName]) => expandedEntitySections.includes(sectionName))

@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { useEffect } from 'react';
 import { Space } from '@mantine/core';
 
+import useProductName from 'brand-customization/useProductName';
 import Spinner from 'components/common/Spinner';
 import { Section } from 'preflight/components/common';
 import useServerAvailability from 'preflight/hooks/useServerAvailability';
@@ -30,6 +31,7 @@ const P = styled.p`
 `;
 
 const WaitingForStartup = () => {
+  const productName = useProductName();
   const { data: serverIsAvailable } = useServerAvailability();
 
   useEffect(() => {
@@ -41,14 +43,14 @@ const WaitingForStartup = () => {
   return (
     <Section title="Configuration successful">
       <P>
-        The Graylog server is currently starting. Depending on your setup it may take a few minutes. This page will
-        automatically refresh once the Graylog server is reachable. You can always refresh manually, please be aware
-        that this page will not be visible afterwards.
+        The {productName} server is currently starting. Depending on your setup it may take a few minutes. This page
+        will automatically refresh once the {productName} server is reachable. You can always refresh manually, please
+        be aware that this page will not be visible afterwards.
       </P>
 
       <Space h="md" />
       <b>
-        <Spinner delay={0} text="Waiting for Graylog server ..." />
+        <Spinner delay={0} text={`Waiting for ${productName} server ...`} />
       </b>
     </Section>
   );

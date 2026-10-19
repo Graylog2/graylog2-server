@@ -29,8 +29,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @DocumentationSection(heading = "Azure repository configuration for searchable snapshots", description = "")
 public class AzureRepositoryConfiguration implements RepositoryConfiguration {
+
+    private final String clientName;
 
     @Documentation("Azure client default account for searchable snapshots")
     @Parameter(value = "azure_client_default_account")
@@ -43,6 +47,20 @@ public class AzureRepositoryConfiguration implements RepositoryConfiguration {
     @Documentation("Azure client default account for searchable snapshots")
     @Parameter(value = "azure_client_default_sas_token")
     private String azureClientDefaultSasToken;
+
+    /**
+     * Configuration of the default Azure client, populated from the datanode configuration file.
+     */
+    public AzureRepositoryConfiguration() {
+        this.clientName = DEFAULT_CLIENT_NAME;
+    }
+
+    public AzureRepositoryConfiguration(String clientName, String account, String key, String sasToken) {
+        this.clientName = clientName;
+        this.azureClientDefaultAccount = account;
+        this.azureClientDefaultKey = key;
+        this.azureClientDefaultSasToken = sasToken;
+    }
 
     @Override
     public boolean isRepositoryEnabled() {
@@ -69,12 +87,16 @@ public class AzureRepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
         final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
-        builder.add(new OpensearchKeystoreStringItem("azure.client.default.account", azureClientDefaultAccount));
+        builder.add(new OpensearchKeystoreStringItem(clientProperty("account"), azureClientDefaultAccount));
         if (!StringUtils.isEmpty(azureClientDefaultKey)) {
-            builder.add(new OpensearchKeystoreStringItem("azure.client.default.key", azureClientDefaultKey));
+            builder.add(new OpensearchKeystoreStringItem(clientProperty("key"), azureClientDefaultKey));
         } else if (!StringUtils.isEmpty(azureClientDefaultSasToken)) {
-            builder.add(new OpensearchKeystoreStringItem("azure.client.default.sas_token", azureClientDefaultSasToken));
+            builder.add(new OpensearchKeystoreStringItem(clientProperty("sas_token"), azureClientDefaultSasToken));
         }
         return builder.build();
+    }
+
+    private String clientProperty(String property) {
+        return f("azure.client.%s.%s", clientName, property);
     }
 }

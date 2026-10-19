@@ -32,6 +32,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import useView from 'views/hooks/useView';
 import useIsDirty from 'views/hooks/useIsDirty';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -55,6 +56,7 @@ jest.mock('formik', () => ({
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 jest.mock('api/entity-share', () => ({
@@ -144,6 +146,11 @@ describe('SearchActionsMenu', () => {
     asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
     // @ts-expect-error context return type is not complete
     asMock(useFormikContext).mockReturnValue({ dirty: false });
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   useViewsPlugin();
@@ -311,6 +318,44 @@ describe('SearchActionsMenu', () => {
         const savedView = asMock(OnSaveViewAction).mock.calls[0][0];
 
         expect(savedView.title).toBe('title');
+      });
+    });
+
+    describe('with an immutable scope', () => {
+      beforeEach(() => {
+        asMock(OnSaveViewAction).mockClear();
+        asMock(useView).mockReturnValue(_createView('some-id').toBuilder().scope('ILLUMINATE').build());
+        asMock(useScopePermissions).mockReturnValue({
+          loadingScopePermissions: false,
+          scopePermissions: { is_mutable: false, is_deletable: false },
+          checkPermissions: () => false,
+        });
+      });
+
+      it('only offers saving as a new search', async () => {
+        render(<SimpleSearchActionsMenu />);
+
+        await userEvent.click(await screen.findByTitle('Saved search'));
+
+        await findCreateNewButton();
+
+        expect(screen.queryByRole('button', { name: /^save$/i })).not.toBeInTheDocument();
+      });
+
+      it('disables editing metadata', async () => {
+        render(<SimpleSearchActionsMenu />);
+        await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+
+        expect(await screen.findByRole('menuitem', { name: /edit metadata/i })).toBeDisabled();
+      });
+
+      it('opens the save form instead of saving when pressing related keyboard shortcut', async () => {
+        render(<SimpleSearchActionsMenu />);
+        await userEvent.keyboard('{Meta>}s{/Meta}');
+
+        await findCreateNewButton();
+
+        expect(OnSaveViewAction).not.toHaveBeenCalled();
       });
     });
 

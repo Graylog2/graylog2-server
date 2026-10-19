@@ -31,7 +31,8 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.SourcedScopedEntity;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
@@ -67,7 +68,7 @@ import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ,
           readableFields = {ID_FIELD, FIELD_TITLE, FIELD_SUMMARY, FIELD_DESCRIPTION, FIELD_TYPE,
                   FIELD_OWNER, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_SEARCH_ID})
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedScopedEntity<ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
 
     public enum Type {
@@ -195,11 +196,16 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     @AutoValue.Builder
-    public static abstract class Builder implements SourcedMongoEntity.Builder<ViewDTO, Builder> {
+    public static abstract class Builder implements SourcedScopedEntity.Builder<Builder> {
+        @Override
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_ENTITY_SOURCE)
         public abstract Builder entitySource(Optional<EntitySource> source);
@@ -249,6 +255,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .type(Type.DASHBOARD)
                     .summary("")
                     .description("")
@@ -272,6 +279,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         }
 
         final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
+                .scope(ValueReference.of(this.scope()))
                 .type(this.type())
                 .title(ValueReference.of(this.title()))
                 .summary(ValueReference.of(this.summary()))

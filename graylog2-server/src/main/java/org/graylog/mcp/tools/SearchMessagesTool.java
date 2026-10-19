@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -33,9 +34,15 @@ import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.web.customization.CustomizationConfig;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +50,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, TabularResponse> {
     private static final Logger LOG = LoggerFactory.getLogger(SearchMessagesTool.class);
 
     public static String NAME = "search_messages";
+
+    private static final DateTimeFormatter ISO_8601 = ISODateTimeFormat.dateTimeParser().withZoneUTC();
 
     private final ScriptingApiService scriptingApiService;
 
@@ -66,8 +77,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
                         It's more efficient to scope by streams.
                         This call supports pagination through offset and limit, but avoid deep pagination as that becomes expensive.
-                        Pass the timerange as a parameter, never put it into the query itself.
-                        List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
+                        Pass the timerange as a parameter, never put it into the query itself: either range_seconds, or an absolute window with from and to.
+                        Messages are sorted by timestamp, newest first unless sort_order asks for the oldest first.
+                        List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves. An empty list returns all fields.
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
                         """.formatted(customizationConfig.productName()),
                 objectMapper,
@@ -89,9 +101,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    RelativeRange.create(parameters.rangeSeconds()),
+                    timerange(parameters),
                     null,
-                    null,
+                    parameters.sortOrder(),
                     parameters.offset(),
                     parameters.limit(),
                     parameters.fields()
@@ -103,6 +115,25 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
         } catch (NoSuchElementException | QueryFailedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static TimeRange timerange(Parameters parameters) {
+        if (parameters.from() == null && parameters.to() == null) {
+            return RelativeRange.create(parameters.rangeSeconds());
+        }
+        if (parameters.from() == null || parameters.to() == null) {
+            throw new IllegalArgumentException("Pass both from and to for an absolute time range, or neither");
+        }
+        return AbsoluteRange.create(parseTimestamp("from", parameters.from()), parseTimestamp("to", parameters.to()));
+    }
+
+    // Accepts ISO 8601 with or without fractional seconds, which callers often omit.
+    private static DateTime parseTimestamp(String name, String value) {
+        try {
+            return ISO_8601.parseDateTime(value);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(f("%s must be an ISO 8601 timestamp, got <%s>", name, value), e);
         }
     }
 
@@ -122,7 +153,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         public abstract Set<String> streamCategories();
 
         @JsonProperty
-        @JsonPropertyDescription("The list of fields to return for this search. Field names can vary per stream and over time. Defaults to \"source\" and \"timestamp\".")
+        @JsonPropertyDescription("The list of fields to return for this search. Field names can vary per stream and over time. Defaults to \"source\" and \"timestamp\"; an empty list returns all fields.")
         public abstract List<String> fields();
 
         @JsonProperty("limit")
@@ -138,10 +169,25 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         public abstract int offset();
 
         @JsonProperty("range_seconds")
-        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past.")
+        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past. Ignored when from and to are given.")
         @DefaultValue("3600")
         @Positive
         public abstract int rangeSeconds();
+
+        @Nullable
+        @JsonProperty("from")
+        @JsonPropertyDescription("Start of an absolute time range, ISO 8601, e.g. 2026-10-05T14:00:00.000Z. Requires to.")
+        public abstract String from();
+
+        @Nullable
+        @JsonProperty("to")
+        @JsonPropertyDescription("End of an absolute time range, ISO 8601. Requires from.")
+        public abstract String to();
+
+        @JsonProperty("sort_order")
+        @JsonPropertyDescription("Sort by timestamp: desc (newest first, the default) or asc (oldest first).")
+        @DefaultValue("desc")
+        public abstract SortSpec.Direction sortOrder();
 
         public static Builder builder() {
             return Builder.create();
@@ -159,7 +205,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .fields(List.of("source", "timestamp"))
                         .limit(50)
                         .offset(0)
-                        .rangeSeconds(3600);
+                        .rangeSeconds(3600)
+                        .sortOrder(SortSpec.Direction.Descending);
             }
 
             @JsonProperty("query")
@@ -184,6 +231,15 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("fields")
             public abstract Builder fields(final List<String> fields);
+
+            @JsonProperty("from")
+            public abstract Builder from(@Nullable final String from);
+
+            @JsonProperty("to")
+            public abstract Builder to(@Nullable final String to);
+
+            @JsonProperty("sort_order")
+            public abstract Builder sortOrder(final SortSpec.Direction sortOrder);
 
             public abstract Parameters build();
         }

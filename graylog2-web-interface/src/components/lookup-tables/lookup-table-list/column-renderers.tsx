@@ -24,6 +24,7 @@ import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContex
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 import type { LookupTableEntity, CachesMap, AdaptersMap } from 'components/lookup-tables/types';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const TitleRow = styled.div`
   display: flex;
@@ -106,23 +107,21 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
 const columnRenderers: ColumnRenderers<LookupTableEntity, { adapters: AdaptersMap; caches: CachesMap }> = {
   attributes: {
     title: {
-      width: 0.1,
       renderCell: (title: string, lut) => <TitleCol lut={lut}>{title}</TitleCol>,
     },
     description: {
-      width: 0.2,
       renderCell: (description: string) => <span>{description}</span>,
     },
     name: {
-      width: 0.1,
+      staticWidth: 200,
       renderCell: (name: string) => <span>{name}</span>,
     },
     cache_id: {
-      width: 0.1,
+      staticWidth: COLUMN_WIDTH.reference,
       renderCell: (cache_id: string, _c, meta) => <CacheCol cacheId={cache_id} caches={meta.caches} />,
     },
     data_adapter_id: {
-      width: 0.1,
+      staticWidth: COLUMN_WIDTH.reference,
       renderCell: (data_adapter_id: string, _c, meta) => (
         <DataAdapterCol dataAdapterId={data_adapter_id} dataAdapters={meta.adapters} />
       ),

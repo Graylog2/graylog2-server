@@ -40,6 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
+import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
+
 /**
  * Processes Windows Event Log receiver messages into GIM format.
  *
@@ -99,11 +102,18 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "computer" -> fields.computer = extractString(bodyFieldValue);
                 // System/Channel: channel to which the event was logged (e.g., Security, Windows PowerShell).
                 case "channel" -> putIfPresent(result, EventFields.EVENT_LOG_NAME, extractString(bodyFieldValue));
-                // System/EventRecordID: channel-local record number assigned when logged.
+                // System/EventRecordID: channel-local record number assigned when logged. Monotonically
+                // increasing within a channel, so it also orders events that share a timestamp.
                 case "record_id" -> {
-                    final var recordId = extractNumber(bodyFieldValue);
-                    if (recordId != null) {
-                        result.put(EventFields.EVENT_UID, recordId.toString());
+                    // The value is unsigned 64-bit, so the UID is rendered as a string to cover the whole
+                    // range without loss.
+                    putIfPresent(result, EventFields.EVENT_UID, unsignedAsString(bodyFieldValue));
+                    // A value above 2^63 reaches us wrapped into a negative long, which would invert the
+                    // sort order the sequence number is meant to establish. The codec's default sequence
+                    // number stays in place for those.
+                    final var recordId = asLong(bodyFieldValue);
+                    if (recordId != null && recordId > 0) {
+                        result.put(EventFields.EVENT_SEQUENCE, recordId);
                     }
                 }
                 // System/EventID (+ Qualifiers for legacy providers): provider-defined event identifier.
@@ -118,7 +128,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "opcode" -> putIfPresent(result, VENDOR_OPCODE, extractString(bodyFieldValue));
                 // System/Version: version of the event definition.
                 case "version" ->
-                        putNumericAsStringIfPresent(result, VendorFields.VENDOR_VERSION, extractNumber(bodyFieldValue));
+                        putNumericAsStringIfPresent(result, VendorFields.VENDOR_VERSION, asLong(bodyFieldValue));
                 // System/Correlation/ActivityID: activity correlation GUID for related events.
                 case "correlation" -> extractCorrelation(bodyFieldValue, fields);
                 // System/Execution: process/thread context that generated the event.
@@ -194,7 +204,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
-                case "id" -> fields.eventCode = extractNumber(kv.getValue());
+                case "id" -> fields.eventCode = asLong(kv.getValue());
             }
         }
     }
@@ -341,27 +351,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         }
 
         return stringValue;
-    }
-
-    private static Long extractNumber(AnyValue value) {
-        if (value.getValueCase() == AnyValue.ValueCase.INT_VALUE) {
-            return value.getIntValue();
-        }
-
-        if (value.getValueCase() != AnyValue.ValueCase.STRING_VALUE) {
-            return null;
-        }
-
-        final var stringValue = value.getStringValue();
-        if (stringValue.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return Long.parseLong(stringValue);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
     }
 
     private static Long extractFlexibleNumber(AnyValue value) {

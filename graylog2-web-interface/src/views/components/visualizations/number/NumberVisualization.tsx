@@ -142,9 +142,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const trend = visualizationConfig.trend
     ? trendDirection(value, previousValue, visualizationConfig.trendPreference)
     : undefined;
+  const highlightEntireWidget = visualizationConfig.colorPreference !== 'TREND_ONLY';
 
   return (
-    <ContainerComponent $height={heightProp} $trend={trend} data-testid="trend-background">
+    <ContainerComponent
+      $height={heightProp}
+      $trend={highlightEntireWidget ? trend : undefined}
+      data-testid="trend-background">
       <NumberBox resizeDelay={50}>
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} alignment={alignment}>
@@ -164,7 +168,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef} alignment={alignment}>
-              <Trend ref={targetRef} current={value} previous={previousValue} unit={unit} />
+              <Trend
+                ref={targetRef}
+                current={value}
+                previous={previousValue}
+                unit={unit}
+                trend={highlightEntireWidget ? undefined : trend}
+              />
             </AutoFontSizer>
           )}
         </TrendBox>

@@ -29,6 +29,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
+import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
+
 /**
  * Processes macOS unified logging records into GIM fields.
  * <p>
@@ -37,6 +40,11 @@ import java.util.Map;
  * structured {@code macos.*} attributes. This processor maps only those attributes: well-fitting
  * ones to GIM fields, and macOS-specific identifiers (boot session, activity/trace IDs, sender
  * image) preserved under a {@code macos_*} prefix.
+ * <p>
+ * The macOS identifiers are unsigned 64-bit values, so the receiver emits them as OTLP integers
+ * while they fit in a signed long and as decimal strings above that, per OpenTelemetry's AnyValue
+ * mapping. They are mapped to strings here; see
+ * {@link org.graylog.inputs.otel.OTelValues#unsignedAsString}.
  *
  * @see <a href="https://developer.apple.com/documentation/os/logging">Apple Unified Logging</a>
  */
@@ -65,17 +73,26 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
                 case "macos.processID" -> result.put(ProcessFields.PROCESS_ID, Long.toString(value.getIntValue()));
                 case "macos.userID" -> result.put(UserFields.USER_ID, Long.toString(value.getIntValue()));
                 // macOS-specific identifiers preserved under a macos_* prefix.
-                case "macos.threadID" -> result.put("macos_thread_id", value.getIntValue());
+                case "macos.threadID" -> putStr(result, "macos_thread_id", unsignedAsString(value));
                 case "macos.bootUUID" -> putStr(result, "macos_boot_uuid", value.getStringValue());
-                case "macos.machTimestamp" -> result.put("macos_mach_timestamp", value.getIntValue());
-                case "macos.traceID" -> result.put("macos_trace_id", value.getIntValue());
-                case "macos.activityIdentifier" -> result.put("macos_activity_id", value.getIntValue());
-                case "macos.parentActivityIdentifier" -> result.put("macos_parent_activity_id", value.getIntValue());
-                case "macos.creatorActivityID" -> result.put("macos_creator_activity_id", value.getIntValue());
+                case "macos.machTimestamp" -> {
+                    putStr(result, "macos_mach_timestamp", unsignedAsString(value));
+                    // The mach absolute time counter increases monotonically within a boot session
+                    // (see macos_boot_uuid), so it orders records that share a timestamp. Values that
+                    // don't fit a signed long are skipped, leaving the codec's default in place.
+                    final var sequence = asLong(value);
+                    if (sequence != null && sequence > 0) {
+                        result.put(EventFields.EVENT_SEQUENCE, sequence);
+                    }
+                }
+                case "macos.traceID" -> putStr(result, "macos_trace_id", unsignedAsString(value));
+                case "macos.activityIdentifier" -> putStr(result, "macos_activity_id", unsignedAsString(value));
+                case "macos.parentActivityIdentifier" -> putStr(result, "macos_parent_activity_id", unsignedAsString(value));
+                case "macos.creatorActivityID" -> putStr(result, "macos_creator_activity_id", unsignedAsString(value));
                 case "macos.processImageUUID" -> putStr(result, "macos_process_image_uuid", value.getStringValue());
                 case "macos.senderImagePath" -> putStr(result, "macos_sender_image_path", value.getStringValue());
                 case "macos.senderImageUUID" -> putStr(result, "macos_sender_image_uuid", value.getStringValue());
-                case "macos.senderProgramCounter" -> result.put("macos_sender_program_counter", value.getIntValue());
+                case "macos.senderProgramCounter" -> putStr(result, "macos_sender_program_counter", unsignedAsString(value));
                 default -> {
                     // Ignore non-macos attributes.
                 }

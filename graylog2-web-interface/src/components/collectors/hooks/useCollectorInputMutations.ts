@@ -16,11 +16,21 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
+import { CollectorsConfig as CollectorsConfigApi, SystemInputs } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 
 import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from './useCollectorInputIds';
+
+// The parts of an input summary needed to send it back as an update request.
+type MovableInput = {
+  id: string;
+  title: string;
+  type: string;
+  global: boolean;
+  node?: string;
+  attributes?: Record<string, unknown>;
+};
 
 const useCollectorInputMutations = () => {
   const queryClient = useQueryClient();
@@ -40,9 +50,41 @@ const useCollectorInputMutations = () => {
     },
   });
 
+  // Moves an existing collector ingest input to another port. The rest of the input's configuration is kept
+  // as-is; the server restarts the input on update.
+  const updateInputPortMutation = useMutation({
+    mutationFn: ({ input, port }: { input: MovableInput; port: number }) =>
+      SystemInputs.update(
+        {
+          title: input.title,
+          type: input.type,
+          global: input.global,
+          node: input.node,
+          configuration: { ...input.attributes, port },
+        },
+        input.id,
+      ),
+    onError: (errorThrown: unknown) => {
+      UserNotification.error(
+        `Updating Collector ingest input failed: ${errorThrown}`,
+        'Could not update Collector ingest input',
+      );
+    },
+    onSuccess: () => {
+      UserNotification.success('Collector ingest input moved to the new port.', 'Success!');
+
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['inputs'] }),
+        queryClient.invalidateQueries({ queryKey: COLLECTOR_INPUT_IDS_KEY_PREFIX }),
+      ]);
+    },
+  });
+
   return {
     createCollectorInput: createInputMutation.mutateAsync,
     isCreatingCollectorInput: createInputMutation.isPending,
+    updateCollectorInputPort: updateInputPortMutation.mutateAsync,
+    isUpdatingCollectorInputPort: updateInputPortMutation.isPending,
   };
 };
 

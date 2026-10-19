@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix idle sessions never timing out because the inputs status badge in the navigation kept extending the session."
+
+pulls = ["27537"]

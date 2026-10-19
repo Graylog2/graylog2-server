@@ -1,0 +1,5 @@
+type = "f"
+message = "Show container-scoped cpu/memory values in cluster configuration page instead of host's."
+
+issues = ["27264"]
+pulls = ["27425"]

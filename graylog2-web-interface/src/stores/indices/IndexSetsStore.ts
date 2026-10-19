@@ -101,17 +101,6 @@ const _errorMessage = (error) => {
 export const fetchIndexSets = (stats: boolean, only_open: boolean = false): Promise<IndexSetsResponseType> =>
   fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats, only_open).url));
 
-export const fetchIndexSetsPaginated = (skip: number, limit: number, stats: boolean): Promise<IndexSetsResponseType> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url));
-
-export const searchIndexSetsPaginated = (
-  searchTerm: string,
-  skip: number,
-  limit: number,
-  stats: boolean,
-): Promise<IndexSetsResponseType> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.searchPaginated(searchTerm, skip, limit, stats).url));
-
 export const fetchIndexSet = (indexSetId: string): Promise<IndexSet> =>
   fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url));
 
@@ -154,46 +143,3 @@ export const updateIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
     },
   );
 };
-
-export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
-
-  return fetch('DELETE', url).then(
-    () => {
-      UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
-    },
-    (error) => {
-      UserNotification.error(
-        `Deleting index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
-        'Could not delete index set.',
-      );
-
-      throw error;
-    },
-  );
-};
-
-export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
-
-  return fetch('PUT', url).then(
-    () => {
-      UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
-    },
-    (error) => {
-      UserNotification.error(
-        `Setting index set '${indexSet.title}' as default failed with status: ${_errorMessage(error)}`,
-        'Could not set default index set.',
-      );
-
-      throw error;
-    },
-  );
-};
-
-export const fetchIndexSetsStats = (): Promise<IndexSetStats> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url)).then((response) => ({
-    indices: response.indices,
-    documents: response.documents,
-    size: response.size,
-  }));

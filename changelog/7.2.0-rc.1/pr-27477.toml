@@ -1,0 +1,5 @@
+type = "added"
+message = "Making events index refresh interval configurable through `events_index_refresh_interval` configuration setting"
+
+pulls = ["27477"]
+issues = ["7800"]

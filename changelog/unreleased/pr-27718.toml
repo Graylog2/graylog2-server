@@ -1,0 +1,4 @@
+type = "changed"
+message = "Remove flexible column widths in entity tables. All columns have a static width now, so resizing a column no longer changes the width of other columns."
+
+pulls = ["27718"]

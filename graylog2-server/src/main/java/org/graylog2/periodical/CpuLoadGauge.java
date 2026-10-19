@@ -17,16 +17,24 @@
 package org.graylog2.periodical;
 
 import com.codahale.metrics.Gauge;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
+import oshi.software.os.CgroupInfo;
 
 public class CpuLoadGauge implements Gauge<Double> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CpuLoadGauge.class);
 
+    private final Supplier<CentralProcessor> processorSupplier = Suppliers.memoize(this::processor);
+    private final Supplier<CgroupInfo> containerCgroupSupplier = Suppliers.memoize(this::detectContainerCgroup);
+
     private long[] lastTicks;
+    private long lastContainerUsage = -1L;
+    private long lastContainerTime = -1L;
     private volatile Double cpuLoad;
     private boolean disabled = false;
 
@@ -40,7 +48,30 @@ public class CpuLoadGauge implements Gauge<Double> {
             return;
         }
         try {
-            final CentralProcessor processor = processor();
+            final CgroupInfo cgroup = containerCgroupSupplier.get();
+            if (cgroup != null) {
+                final long newUsage = cgroup.getCpuUsage();
+                final long newTime = System.nanoTime();
+                if (newUsage > 0) {
+                    if (lastContainerUsage >= 0 && lastContainerTime > 0) {
+                        final long deltaUsage = newUsage - lastContainerUsage;
+                        final long deltaTime = newTime - lastContainerTime;
+                        if (deltaTime > 0 && deltaUsage >= 0) {
+                            final double effectiveCpus = cgroup.getEffectiveCpus();
+                            final CentralProcessor processor = processorSupplier.get();
+                            final double cpus = effectiveCpus > 0 ? effectiveCpus : processor.getLogicalProcessorCount();
+                            if (cpus > 0) {
+                                cpuLoad = Math.min(100.0d, Math.max(0.0d, (double) deltaUsage / (deltaTime * cpus) * 100.0d));
+                            }
+                        }
+                    }
+                    lastContainerUsage = newUsage;
+                    lastContainerTime = newTime;
+                    return;
+                }
+            }
+
+            final CentralProcessor processor = processorSupplier.get();
             final long[] newTicks = processor.getSystemCpuLoadTicks();
             if (lastTicks == null) {
                 // First run: there is no previous sample to compare against yet, so just seed the baseline.
@@ -63,8 +94,18 @@ public class CpuLoadGauge implements Gauge<Double> {
         }
     }
 
+    private CgroupInfo detectContainerCgroup() {
+        final CgroupInfo cgroup = cgroupInfo();
+        return cgroup != null && cgroup.isContainerized() ? cgroup : null;
+    }
+
     protected CentralProcessor processor() {
         final SystemInfo si = new SystemInfo();
         return si.getHardware().getProcessor();
+    }
+
+    protected CgroupInfo cgroupInfo() {
+        final SystemInfo si = new SystemInfo();
+        return si.getOperatingSystem().getCgroupInfo();
     }
 }

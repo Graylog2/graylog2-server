@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Entries in Quick Jump model could show up although their feature flag was disabled or their condition (e.g. a valid license) was not met."
+
+pulls = ["27639"]

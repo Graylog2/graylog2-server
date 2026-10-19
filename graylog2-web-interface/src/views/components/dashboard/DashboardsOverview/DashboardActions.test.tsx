@@ -26,6 +26,7 @@ import { asMock } from 'helpers/mocking';
 import OriginalDashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { simpleView } from 'views/test/ViewFixtures';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import { adminUser } from 'fixtures/users';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
@@ -34,6 +35,7 @@ import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 import { deleteView } from 'views/api/views';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('views/api/views', () => ({
@@ -71,6 +73,11 @@ describe('DashboardActions', () => {
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
 
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: [],
@@ -119,6 +126,20 @@ describe('DashboardActions', () => {
     await screen.findByRole('button', { name: /share/i });
 
     expect(screen.queryByRole('button', { name: /'more'/i })).not.toBeInTheDocument();
+  });
+
+  it('does not offer deletion for dashboards with an immutable scope', async () => {
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: false, is_deletable: false },
+      checkPermissions: () => false,
+    });
+
+    renderSUT({ dashboard: simpleDashboard.toBuilder().scope('ILLUMINATE').build() });
+
+    await userEvent.click(await screen.findByRole('button', { name: /more/i }));
+
+    expect(screen.queryByRole('menuitem', { name: /delete/i })).not.toBeInTheDocument();
   });
 
   describe('supports dashboard deletion hook', () => {

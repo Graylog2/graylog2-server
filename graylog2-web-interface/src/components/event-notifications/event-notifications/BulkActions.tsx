@@ -19,10 +19,9 @@ import uniq from 'lodash/uniq';
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import ApiRoutes from 'routing/ApiRoutes';
+import { EventsNotifications } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { DeleteMenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
@@ -49,9 +48,7 @@ const BulkActions = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
       const deleteCalls = selectedEntities.map((notificationId) =>
-        fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(
-          () => notificationId,
-        ),
+        EventsNotifications.remove(notificationId).then(() => notificationId),
       );
 
       Promise.allSettled(deleteCalls).then((result) => {

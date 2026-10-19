@@ -101,7 +101,7 @@ const OverlayTrigger = (
             ref={setControl}
             role="button"
             aria-label={triggerTitle ?? (typeof title === 'string' ? title : undefined)}
-            title={triggerTitle}
+            title={hover ? undefined : triggerTitle}
             onClick={click ? toggle : undefined}
             onMouseEnter={hover ? open : undefined}
             onMouseLeave={hover ? close : undefined}

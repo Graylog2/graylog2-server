@@ -68,17 +68,26 @@ public class CollectorIngestInputService {
                 .toList();
     }
 
-    public void createInput(Subject subject, String userName, int port) throws ValidationException {
-        if (configuration.isCloud()) {
-            throw new BadRequestException("Creating collector ingest inputs is not supported in cloud environments");
-        }
-
+    /**
+     * Throws if the subject may not create the collector ingest input. Callers that persist other state alongside
+     * the input creation (see {@code CollectorsConfigResource#put}) check this first so a forbidden request fails
+     * before anything is saved.
+     */
+    public void ensureCanCreateInput(Subject subject) {
         if (!subject.isPermitted(RestPermissions.INPUTS_CREATE)) {
             throw new ForbiddenException("Not permitted to create inputs");
         }
         if (!subject.isPermitted(f("%s:%s", RestPermissions.INPUT_TYPES_CREATE, CollectorIngestHttpInput.class.getCanonicalName()))) {
             throw new ForbiddenException(f("Not permitted to create input type %s", CollectorIngestHttpInput.class.getCanonicalName()));
         }
+    }
+
+    public void createInput(Subject subject, String userName, int port) throws ValidationException {
+        if (configuration.isCloud()) {
+            throw new BadRequestException("Creating collector ingest inputs is not supported in cloud environments");
+        }
+
+        ensureCanCreateInput(subject);
 
         final var inputType = CollectorIngestHttpInput.class.getCanonicalName();
         final var inputDescription = messageInputFactory.getAvailableInputs().get(inputType);

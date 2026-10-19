@@ -87,7 +87,7 @@ describe('CollectorsDeploymentPage', () => {
     it('shows both tabs when the user can create and read enrollment tokens', async () => {
       render(<CollectorsDeploymentPage />);
 
-      expect(await screen.findByRole('tab', { name: /deploy/i })).toBeInTheDocument();
+      await screen.findByRole('tab', { name: /deploy/i });
       expect(screen.getByRole('tab', { name: /enrollment tokens/i })).toBeInTheDocument();
     });
 
@@ -98,7 +98,7 @@ describe('CollectorsDeploymentPage', () => {
 
       render(<CollectorsDeploymentPage />);
 
-      expect(await screen.findByRole('tab', { name: /enrollment tokens/i })).toBeInTheDocument();
+      await screen.findByRole('tab', { name: /enrollment tokens/i });
       expect(screen.queryByRole('tab', { name: /deploy/i })).not.toBeInTheDocument();
       // The surviving tab must be the one selected, or the page opens on nothing.
       expect(screen.getByText('token list content')).toBeInTheDocument();
@@ -111,8 +111,20 @@ describe('CollectorsDeploymentPage', () => {
 
       render(<CollectorsDeploymentPage />);
 
-      expect(await screen.findByRole('tab', { name: /deploy/i })).toBeInTheDocument();
+      await screen.findByRole('tab', { name: /deploy/i });
       expect(screen.queryByRole('tab', { name: /enrollment tokens/i })).not.toBeInTheDocument();
+    });
+
+    it('redirects to the overview wizard when collectors are not configured', () => {
+      asMock(useCollectorsConfig).mockReturnValue({
+        data: { signing_cert_id: null },
+        isLoading: false,
+      } as ReturnType<typeof useCollectorsConfig>);
+
+      render(<CollectorsDeploymentPage />);
+
+      expect(navigateTo).toHaveBeenCalledWith('/system/collectors');
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
     });
 
     it('redirects away when the user holds no enrollment token permissions', () => {

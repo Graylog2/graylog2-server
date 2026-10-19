@@ -80,7 +80,7 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
         return new AutoValue_MacOSUnifiedLoggingReceiverConfig.Builder()
                 .name(f("macos_unified_logging/%s", id))
                 .maxPollInterval(Duration.ofSeconds(30))
-                .maxLogAge(Duration.ofHours(24))
+                .maxLogAge(Duration.ZERO)
                 .storage(FileStorageExtensionConfig.defaultInstance().name());
     }
 

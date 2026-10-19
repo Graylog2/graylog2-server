@@ -49,6 +49,8 @@ const iconName = (type: string) => {
       return 'edit_document';
     case 'associated-assets':
       return 'quick_reference';
+    case 'priority':
+      return 'emergency_home';
     default:
       return 'help';
   }

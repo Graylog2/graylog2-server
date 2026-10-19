@@ -19,6 +19,7 @@ package org.graylog2.rest;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.ApiError;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -28,6 +29,9 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
     @Override
     public Response toResponse(NotFoundException exception) {
         final ApiError apiError = ApiError.create(exception.getMessage());
-        return Response.status(Response.Status.NOT_FOUND).entity(apiError).build();
+        return Response.status(Response.Status.NOT_FOUND)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(apiError)
+                .build();
     }
 }
