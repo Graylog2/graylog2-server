@@ -21,18 +21,20 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
+import { useTranslation } from 'react-i18next';
 
 function LUTTablesPage() {
   const { push } = useHistory();
+  const { t } = useTranslation('lookup-tables');
 
   return (
     <LUTPageLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
+      documentTitle={t('title')}
+      pageTitle={t('title')}
+      pageDescription={t('description')}
       actions={
         <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.CREATE)}>
-          Create lookup table
+          {t('create_button')}
         </Button>
       }>
       <LookupTablesOverview />

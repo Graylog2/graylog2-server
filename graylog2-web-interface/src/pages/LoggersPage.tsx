@@ -18,20 +18,24 @@ import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { LoggerOverview, ClusterSupportBundleOverview } from 'components/loggers';
+import { useTranslation } from 'react-i18next';
 
-const LoggersPage = () => (
-  <DocumentTitle title="Logging">
-    <span>
-      <PageHeader title="Logging">
-        <span>
-          This section controls logging of the Graylog architecture and allows you to change log levels on the fly. Note
-          that log levels are reset to their defaults after you restart the affected service.
-        </span>
-      </PageHeader>
-      <LoggerOverview />
-      <ClusterSupportBundleOverview />
-    </span>
-  </DocumentTitle>
-);
+const LoggersPage = () => {
+  const { t } = useTranslation('loggers');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <span>
+        <PageHeader title={t('title')}>
+          <span>
+            {t('description')}
+          </span>
+        </PageHeader>
+        <LoggerOverview />
+        <ClusterSupportBundleOverview />
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default LoggersPage;

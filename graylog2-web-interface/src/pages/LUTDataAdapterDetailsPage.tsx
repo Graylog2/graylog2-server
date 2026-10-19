@@ -21,6 +21,7 @@ import useHistory from 'routing/useHistory';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { DataAdapterView } from 'components/lookup-tables';
+import { useTranslation } from 'react-i18next';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -44,16 +45,17 @@ const FlexCol = styled(Col)`
 
 function LUTDataAdapterDetailsPage() {
   const { goBack } = useHistory();
+  const { t } = useTranslation('lookup-tables');
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Tables - Data Adapter Details"
-        pageTitle="Data Adapter Details for Lookup Tables"
-        pageDescription="Data adapters provide the actual values for lookup tables."
+        documentTitle={t('adapter_details_document_title')}
+        pageTitle={t('adapter_details_page_title')}
+        pageDescription={t('adapter_description')}
         actions={
           <Button bsStyle="primary" onClick={() => goBack()}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>

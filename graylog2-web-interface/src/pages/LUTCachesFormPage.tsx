@@ -25,6 +25,7 @@ import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { CacheFormView } from 'components/lookup-tables';
+import { useTranslation } from 'react-i18next';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -42,23 +43,24 @@ function LUTDataAdaptersFormPage() {
   const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
   const { cache, loadingCache } = useFetchCache(cacheIdOrName);
   const { push } = useHistory();
+  const { t } = useTranslation('lookup-tables');
   const navigateBack = () => push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Tables - Caches Create"
-        pageTitle="Create Caches for Lookup Tables"
-        pageDescription="Caches provide the actual values for lookup tables."
+        documentTitle={t('cache_create_document_title')}
+        pageTitle={t('cache_create_page_title')}
+        pageDescription={t('cache_create_description')}
         actions={
           <Button bsStyle="primary" onClick={navigateBack}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
           <FlexCol md={12}>
             {loadingCache ? (
-              <Spinner text="Loading Cache" />
+              <Spinner text={t('loading_cache')} />
             ) : (
               <CacheFormView onCancel={navigateBack} saved={navigateBack} cache={cache} />
             )}

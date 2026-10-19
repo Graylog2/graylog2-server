@@ -22,6 +22,7 @@ import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { LookupTableWizard } from 'components/lookup-tables';
+import { useTranslation } from 'react-i18next';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -45,16 +46,17 @@ const FlexCol = styled(Col)`
 
 function LUTFormPage() {
   const { push } = useHistory();
+  const { t } = useTranslation('lookup-tables');
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Tables Create"
-        pageTitle="Lookup Tables Create"
-        pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
+        documentTitle={t('create_document_title')}
+        pageTitle={t('create_page_title')}
+        pageDescription={t('create_description')}
         actions={
           <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW)}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>

@@ -84,6 +84,8 @@ const TRANSLATED_FILES = [
   'src/pages/InputsPage.tsx',
   'src/pages/LoginPage.tsx',
   'src/pages/NodeInputsPage.tsx',
+  'src/pages/LoggersPage.tsx',
+  'src/pages/*LUT*.tsx',
   'src/pages/WelcomePage.tsx',
   'src/pages/useEventDefinitionDetailSections.tsx',
   'src/views/**',

@@ -1,0 +1,4 @@
+{
+  "title": "Protokollierung",
+  "description": "Dieser Bereich steuert die Protokollierung der Graylog-Architektur und ermöglicht es Ihnen, die Protokollierungsebenen während des Betriebs zu ändern. Beachten Sie, dass die Protokollierungsebenen nach einem Neustart des betroffenen Dienstes auf ihre Standardwerte zurückgesetzt werden."
+}
