@@ -18,8 +18,8 @@
 import React, { useCallback, useState } from 'react';
 
 import useHotkey from 'hooks/useHotkey';
-import { NavItem } from 'components/bootstrap';
 import NavIcon from 'components/navigation/NavIcon';
+import NavigationButton from 'components/navigation/NavigationButton';
 
 import QuickJumpModal from './QuickJumpModal';
 
@@ -35,9 +35,9 @@ const QuickJumpModalContainer = () => {
 
   return (
     <>
-      <NavItem id="quickjump-search-nav" onClick={toggleModal}>
-        <NavIcon type="search" title="Search" />
-      </NavItem>
+      <NavigationButton aria-label="Open Quick Jump" id="quickjump-search-nav" onClick={toggleModal}>
+        <NavIcon type="search" title="Open Quick Jump" />
+      </NavigationButton>
       {showQuickJumpModal && <QuickJumpModal onToggle={() => toggleModal()} />}
     </>
   );

@@ -21,6 +21,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 // eslint-disable-next-line no-restricted-imports
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 
+export type IsPermitted = (permissions: Array<Permission> | Permission) => boolean;
+
 const usePermissions = () => {
   const currentUser = useCurrentUser();
   const _isPermitted = useCallback(

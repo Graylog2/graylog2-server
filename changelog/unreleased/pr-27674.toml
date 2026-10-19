@@ -1,0 +1,5 @@
+type = "c"
+message = "Look up closed indices through the resolve index API instead of `_cat/indices`."
+
+pulls = ["27674"]
+issues = ["Graylog2/graylog-plugin-enterprise#15953"]

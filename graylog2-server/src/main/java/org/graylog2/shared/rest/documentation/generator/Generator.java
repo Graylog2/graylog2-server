@@ -38,6 +38,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.FormParam;
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -693,6 +695,12 @@ public class Generator {
 
         int i = 0;
         for (Annotation[] annotations : method.getParameterAnnotations()) {
+            if (isAnnotationPresent(annotations, BeanParam.class)) {
+                params.addAll(determineBeanParameters(method.getParameterTypes()[i]));
+                i++;
+                continue;
+            }
+
             final Parameter param = new Parameter();
 
             Parameter.Kind paramKind = Parameter.Kind.BODY;
@@ -765,6 +773,14 @@ public class Generator {
 
             param.setKind(paramKind);
 
+            if (param.getTypeSchema() == null && isUndocumentedRequestParameter(paramKind, annotations)) {
+                if (paramKind == Parameter.Kind.BODY) {
+                    param.setName("JSON body");
+                }
+                param.setIsRequired(paramKind != Parameter.Kind.QUERY);
+                param.setTypeSchema(typeSchema(method.getGenericParameterTypes()[i]));
+            }
+
             if (param.getTypeSchema() != null) {
                 params.add(param);
             }
@@ -772,6 +788,52 @@ public class Generator {
             i++;
         }
 
+        return params;
+    }
+
+    // Path and query parameters, and the entity parameter (the one without any JAX-RS annotation).
+    private static boolean isUndocumentedRequestParameter(Parameter.Kind kind, Annotation[] annotations) {
+        return switch (kind) {
+            case PATH, QUERY -> true;
+            case BODY -> Arrays.stream(annotations).noneMatch(Generator::isInjectionAnnotation);
+            default -> false;
+        };
+    }
+
+    private static boolean isInjectionAnnotation(Annotation annotation) {
+        final String packageName = annotation.annotationType().getPackageName();
+        return packageName.startsWith("jakarta.ws.rs") || packageName.startsWith("org.glassfish.jersey");
+    }
+
+    private static boolean isAnnotationPresent(Annotation[] annotations, Class<? extends Annotation> annotationClass) {
+        return Arrays.stream(annotations).anyMatch(annotationClass::isInstance);
+    }
+
+    private List<Parameter> determineBeanParameters(Class<?> beanClass) {
+        final List<Parameter> params = Lists.newArrayList();
+        for (Class<?> clazz = beanClass; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Field field : clazz.getDeclaredFields()) {
+                final QueryParam queryParam = field.getAnnotation(QueryParam.class);
+                if (queryParam == null) {
+                    continue;
+                }
+                final Parameter param = new Parameter();
+                param.setName(queryParam.value());
+                param.setKind(Parameter.Kind.QUERY);
+                param.setIsRequired(false);
+                param.setTypeSchema(typeSchema(field.getGenericType()));
+
+                final DefaultValue defaultValue = field.getAnnotation(DefaultValue.class);
+                if (defaultValue != null && !isNullOrEmpty(defaultValue.value())) {
+                    param.setDefaultValue(defaultValue.value());
+                }
+                final var paramAnnotation = field.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+                if (paramAnnotation != null) {
+                    param.setDescription(paramAnnotation.description());
+                }
+                params.add(param);
+            }
+        }
         return params;
     }
 
@@ -910,7 +972,7 @@ public class Generator {
 
     public static class Parameter {
         private String name;
-        private String description;
+        private String description = "";
         private boolean isRequired;
         private TypeSchema typeSchema;
         private Kind kind;

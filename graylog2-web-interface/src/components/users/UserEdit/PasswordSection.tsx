@@ -22,10 +22,10 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import AppConfig from 'util/AppConfig';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import { Button, Row, Col } from 'components/bootstrap';
 import { FormikFormGroup } from 'components/common';
 import type User from 'logic/users/User';
-import { isPermitted } from 'util/PermissionsMixin';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
@@ -116,11 +116,12 @@ const InvisibleInput = styled.input`
 
 const PasswordSection = ({ user: { id } }: Props) => {
   const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const passwordComplexityConfig = usePasswordComplexityConfig();
   const validate = createValidator(passwordComplexityConfig);
   let requiresOldPassword = true;
 
-  if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {
+  if (isPermitted('users:passwordchange:*')) {
     // Ask for old password if user is editing their own account
     requiresOldPassword = id === currentUser?.id;
   }

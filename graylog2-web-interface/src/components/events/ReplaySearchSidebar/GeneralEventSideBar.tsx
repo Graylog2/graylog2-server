@@ -49,7 +49,7 @@ const WordBreak = styled.span`
   word-break: break-all;
 `;
 
-export const WordBreakRenderer = (val: string) => <WordBreak>{val}</WordBreak>;
+const WordBreakRenderer = (val: string) => <WordBreak>{val}</WordBreak>;
 
 const attributesRenderers = {
   alert: eventTypeAttribute,
