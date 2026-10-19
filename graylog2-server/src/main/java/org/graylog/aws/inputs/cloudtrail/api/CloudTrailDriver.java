@@ -23,6 +23,7 @@ import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequest;
+import org.graylog.aws.inputs.cloudtrail.api.responses.CheckCredentialsResponse;
 import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
@@ -87,7 +88,7 @@ public class CloudTrailDriver {
 
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailDriver.class);
 
-    public String checkCredentials(CloudTrailRequest request) throws Exception {
+    public CheckCredentialsResponse checkCredentials(CloudTrailRequest request) throws Exception {
         // Get AWS Plugin configuration for fallback
         final AWSPluginConfiguration pluginConfig = clusterConfigService.getOrDefault(
                 AWSPluginConfiguration.class,

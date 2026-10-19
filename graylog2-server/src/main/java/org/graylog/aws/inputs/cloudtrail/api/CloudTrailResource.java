@@ -39,6 +39,7 @@ import org.graylog.aws.AWS;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequestImpl;
+import org.graylog.aws.inputs.cloudtrail.api.responses.CheckCredentialsResponse;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -74,8 +75,8 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
     @Operation(summary = "Validate input credentials")
     @NoAuditEvent("This does not change any data")
     @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + CloudTrailInput.TYPE})
-    public String checkCredentials(@RequestBody(required = true)
-                                   @Valid @NotNull CloudTrailRequestImpl request) throws Exception {
+    public CheckCredentialsResponse checkCredentials(@RequestBody(required = true)
+                                                     @Valid @NotNull CloudTrailRequestImpl request) throws Exception {
         return cloudTrailDriver.checkCredentials(request);
     }
 
