@@ -417,6 +417,7 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginNavigationDropdownItem {
     description: string;
     path: QualifiedUrl<string>;
+    position?: PluginNavigation['position'];
     permissions?: Permission | Array<Permission>;
     requiredFeatureFlag?: string;
     useCondition?: () => boolean;

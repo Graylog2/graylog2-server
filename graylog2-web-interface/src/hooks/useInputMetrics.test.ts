@@ -17,13 +17,14 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
+import { SystemInputsMetrics } from '@graylog/server-api';
+
 import { asMock } from 'helpers/mocking';
-import fetch from 'logic/rest/FetchProvider';
 import suppressConsole from 'helpers/suppressConsole';
 
 import useInputMetrics from './useInputMetrics';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ SystemInputsMetrics: { getMetrics: jest.fn() } }));
 
 describe('useInputMetrics', () => {
   beforeEach(() => {
@@ -31,7 +32,7 @@ describe('useInputMetrics', () => {
   });
 
   it('returns metrics keyed by input id', async () => {
-    asMock(fetch).mockResolvedValue({
+    asMock(SystemInputsMetrics.getMetrics).mockResolvedValue({
       metrics: {
         'input-1': { extractor_count: 2, messages_per_stream: { 'stream-a': 10 } },
         'input-2': { extractor_count: 0, messages_per_stream: {} },
@@ -50,32 +51,33 @@ describe('useInputMetrics', () => {
     });
   });
 
-  it('requests repeated query params with sorted ids and fields', async () => {
-    asMock(fetch).mockResolvedValue({ metrics: {} });
+  it('requests sorted ids and fields', async () => {
+    asMock(SystemInputsMetrics.getMetrics).mockResolvedValue({ metrics: {} });
 
     renderHook(() => useInputMetrics(['b', 'a'], ['extractor_count', 'messages_per_stream']));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalled());
-
-    const url = asMock(fetch).mock.calls[0][1] as string;
-    expect(url).toContain('input_ids=a&input_ids=b');
-    expect(url).toContain('fields=extractor_count&fields=messages_per_stream');
+    await waitFor(() =>
+      expect(SystemInputsMetrics.getMetrics).toHaveBeenCalledWith(
+        ['a', 'b'],
+        ['extractor_count', 'messages_per_stream'],
+      ),
+    );
   });
 
   it('does not fetch when input ids are empty', () => {
     renderHook(() => useInputMetrics([], ['extractor_count']));
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(SystemInputsMetrics.getMetrics).not.toHaveBeenCalled();
   });
 
   it('does not fetch when fields are empty', () => {
     renderHook(() => useInputMetrics(['input-1'], []));
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(SystemInputsMetrics.getMetrics).not.toHaveBeenCalled();
   });
 
   it('returns an empty map and isError when the request fails', async () => {
-    asMock(fetch).mockRejectedValue(new Error('boom'));
+    asMock(SystemInputsMetrics.getMetrics).mockRejectedValue(new Error('boom'));
 
     await suppressConsole(async () => {
       const { result } = renderHook(() => useInputMetrics(['input-1'], ['extractor_count']));

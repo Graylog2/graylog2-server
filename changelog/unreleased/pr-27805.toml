@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix missing client host on sessions created during SSO login."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16065"]
+pulls = ["27805"]
