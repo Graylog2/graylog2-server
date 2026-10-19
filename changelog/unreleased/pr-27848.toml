@@ -1,0 +1,4 @@
+type = "s"
+message = "Update lz4-java to version 1.11.4 to fix [several CVEs](https://github.com/yawkat/lz4-java/releases/tag/v1.11.4)."
+
+pulls = ["27848"]
