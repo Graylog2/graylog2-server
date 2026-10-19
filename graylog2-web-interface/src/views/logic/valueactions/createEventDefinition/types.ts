@@ -66,6 +66,6 @@ export type AggregationHandler = (args: {
   widget?: Widget;
   field: string;
   value: QueryValue | Array<QueryValue>;
-  type?: FieldType;
+  type: FieldType;
   valuePath?: Array<{ [name: string]: string }>;
 }) => MappedData;

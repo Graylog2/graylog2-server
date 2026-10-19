@@ -41,7 +41,7 @@ type HookProps = {
   contexts: ActionContexts;
   field: FieldName;
   queryId: string;
-  type?: FieldType;
+  type: FieldType;
   value: FieldValue;
 };
 const useMappedData = ({ contexts, field, queryId, type, value }: HookProps) =>

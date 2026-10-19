@@ -46,6 +46,7 @@ import {
   valuePath,
 } from 'fixtures/createEventDefinitionFromValue';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
 describe('useMappedData helper function', () => {
   describe('transformValuePathToQuery', () => {
@@ -103,6 +104,7 @@ describe('useMappedData helper function', () => {
       valuePath: testWidgetMetricValuePath,
       field: 'count(field5)',
       value: 999,
+      type: FieldTypes.LONG(),
     });
 
     expect(result).toEqual({
@@ -122,6 +124,7 @@ describe('useMappedData helper function', () => {
       valuePath: testWidgetValueValuePath,
       field: 'field4',
       value: 'value4',
+      type: FieldTypes.STRING(),
     });
 
     expect(result).toEqual({
@@ -136,6 +139,7 @@ describe('useMappedData helper function', () => {
       valuePath: testWidgetValueValuePath,
       field: 'associated_assets',
       value: ['id1', 'id2', 'id3'],
+      type: new FieldType('associated-assets', [], []),
     });
 
     expect(result).toEqual({
@@ -148,6 +152,7 @@ describe('useMappedData helper function', () => {
     const result = messagesValueHandler({
       field: 'field4',
       value: 'value4',
+      type: FieldTypes.STRING(),
     });
 
     expect(result).toEqual({
@@ -159,6 +164,7 @@ describe('useMappedData helper function', () => {
     const result = messagesValueHandler({
       field: 'associated_assets',
       value: ['id1', 'id2', 'id3'],
+      type: new FieldType('associated-assets', [], []),
     });
 
     expect(result).toEqual({
@@ -170,6 +176,7 @@ describe('useMappedData helper function', () => {
     const result = logsValueHandler({
       field: 'field4',
       value: 'value4',
+      type: FieldTypes.STRING(),
     });
 
     expect(result).toEqual({
