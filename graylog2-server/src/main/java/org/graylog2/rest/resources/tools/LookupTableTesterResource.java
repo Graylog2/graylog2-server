@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
@@ -55,8 +54,8 @@ public class LookupTableTesterResource extends RestResource {
 
     @GET
     @Timed
-    public LookupTableTesterResponse grokTest(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
-                                              @QueryParam("string") @NotEmpty String string) {
+    public LookupTableTesterResponse testLookupTable(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
+                                                     @QueryParam("string") @NotEmpty String string) {
         return doTestLookupTable(string, lookupTableName);
     }
 
@@ -65,12 +64,12 @@ public class LookupTableTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test lookup tables")
-    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public LookupTableTesterResponse testLookupTable(@Valid @NotNull LookupTableTestRequest lookupTableTestRequest) {
         return doTestLookupTable(lookupTableTestRequest.string(), lookupTableTestRequest.lookupTableName());
     }
 
     private LookupTableTesterResponse doTestLookupTable(String string, String lookupTableName) {
+        validateUserHasAccessToLookupTable(lookupTableName);
         if (!lookupTableService.hasTable(lookupTableName)) {
             return LookupTableTesterResponse.error("Lookup table <" + lookupTableName + "> doesn't exist");
         }
@@ -83,5 +82,12 @@ public class LookupTableTesterResource extends RestResource {
         }
 
         return LookupTableTesterResponse.result(string, result);
+    }
+
+    private void validateUserHasAccessToLookupTable(@NotEmpty String lookupTableName) {
+        final var table = lookupTableService.getTable(lookupTableName);
+        if (table != null) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, table.id());
+        }
     }
 }
