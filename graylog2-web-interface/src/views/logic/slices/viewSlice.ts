@@ -181,22 +181,30 @@ export const updateQueries =
     return dispatch(updateView(newView));
   };
 
-export const addQuery =
-  (query: Query, viewState: ViewStateType) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
-    const state = getState();
-    const view = selectView(state);
-    const { search } = view;
-    const newQueries = search.queries.add(query);
-    const newViewStates = view.state.set(query.id, viewState);
-    const newView = view
-      .toBuilder()
-      .search(search.toBuilder().queries(newQueries).build())
-      .state(newViewStates)
-      .build();
+// Serialized, so concurrent additions do not build on a stale view and drop each other's queries.
+let pendingQueryAddition: Promise<unknown> = Promise.resolve();
 
-    return dispatch(updateView(newView, true))
-      .then(() => dispatch(selectQuery(query.id)))
-      .then(() => query.id);
+export const addQuery =
+  (query: Query, viewState: ViewStateType) => (dispatch: ViewsDispatch, getState: () => RootState) => {
+    const queryAddition = pendingQueryAddition.then(() => {
+      const view = selectView(getState());
+      const { search } = view;
+      const newQueries = search.queries.add(query);
+      const newViewStates = view.state.set(query.id, viewState);
+      const newView = view
+        .toBuilder()
+        .search(search.toBuilder().queries(newQueries).build())
+        .state(newViewStates)
+        .build();
+
+      return dispatch(updateView(newView, true))
+        .then(() => dispatch(selectQuery(query.id)))
+        .then(() => query.id);
+    });
+
+    pendingQueryAddition = queryAddition.catch(() => {});
+
+    return queryAddition;
   };
 
 export const updateQuery =
