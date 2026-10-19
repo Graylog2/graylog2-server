@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -43,6 +44,7 @@ public class PivotSeriesFunctionsResource extends RestResource implements Plugin
     }
 
     @GET
+    @Operation(summary = "Get available aggregation functions")
     public Map<String, SeriesDescription> functions() {
         return this.availableFunctions;
     }

@@ -21,7 +21,6 @@ import concat from 'lodash/concat';
 import { EventsNotifications } from '@graylog/server-api';
 
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CancellablePromise from 'logic/rest/CancellablePromise';
@@ -44,7 +43,7 @@ export type EventNotification = {
   id: string;
   title: string;
   description: string;
-  config: Record<string, any | any[]>;
+  config: { type: string; [key: string]: any };
 };
 
 export type LegacyEventNotification = {
@@ -81,13 +80,14 @@ type EventNotificationsResult = {
 };
 
 // Port of the old EventNotificationsStore `searchPaginated` action.
-export const fetchEventNotifications = (searchParams: SearchParams): Promise<EventNotificationsResult> => {
-  const url = PaginationURL(`${sourceUrl}/paginated`, searchParams.page, searchParams.pageSize, searchParams.query, {
-    sort: searchParams?.sort.attributeId,
-    order: searchParams?.sort.direction,
-  });
-
-  return fetch('GET', qualifyUrl(url)).then(({ elements, query, attributes, pagination }) => ({
+export const fetchEventNotifications = (searchParams: SearchParams): Promise<EventNotificationsResult> =>
+  EventsNotifications.getPage(
+    searchParams.sort.attributeId as Parameters<typeof EventsNotifications.getPage>[0],
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query || undefined,
+    searchParams.sort.direction,
+  ).then(({ elements, query, attributes, pagination }) => ({
     list: elements,
     pagination: {
       count: pagination.count,
@@ -98,7 +98,6 @@ export const fetchEventNotifications = (searchParams: SearchParams): Promise<Eve
     },
     attributes,
   }));
-};
 
 // Port of the old EventNotificationsStore `listAll` action: fetches all event notifications (unpaginated).
 // Does not notify on failure, matching the old store's behavior.
@@ -151,7 +150,7 @@ export const createEventNotification = (notification: EventNotification & Entity
 };
 
 export const updateEventNotification = (notificationId: string, notification: EventNotification): Promise<unknown> =>
-  fetch('PUT', eventNotificationsUrl({ segments: [notificationId] }), notification).then(
+  EventsNotifications.update(encodeURIComponent(notificationId), notification).then(
     (response: unknown) => {
       UserNotification.success(
         'Notification updated successfully',
@@ -195,7 +194,7 @@ export const deleteEventNotification = (notification: EventNotification): Promis
 // Port of the old `test` action. Returns a CancellablePromise so callers can cancel the
 // (potentially long-running) test request before navigating away.
 export const testEventNotification = (notification: EventNotification): CancellablePromise<unknown> =>
-  CancellablePromise.of(fetch('POST', eventNotificationsUrl({ segments: ['test'] }), notification));
+  CancellablePromise.of(EventsNotifications.test(notification));
 
 // Port of the old `testPersisted` action.
 export const testPersistedEventNotification = (notification: EventNotification): Promise<unknown> =>
