@@ -171,8 +171,7 @@ export const updateConfiguration = (configuration: Configuration): Promise<unkno
 };
 
 export const copyConfiguration = (configurationId: string, name: string): Promise<unknown> => {
-  const url = URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/${configurationId}/${name}`);
-  const promise = fetch('POST', url);
+  const promise = SidecarConfigurations.copyConfiguration(configurationId, name);
 
   promise.then(
     () => UserNotification.success('', `Configuration "${name}" successfully copied`),

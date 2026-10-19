@@ -24,7 +24,6 @@ import { Radio } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
-import type User from 'logic/users/User';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
 import FilterForm from './FilterForm';
@@ -62,11 +61,10 @@ type Props = {
     aggregation_functions: Array<{}>;
   };
   streams: Array<Stream>;
-  currentUser: User;
   validation: EventDefinitionValidation;
 };
 
-const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, currentUser, onChange }: Props) => {
+const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, onChange }: Props) => {
   const { group_by, series, conditions } = eventDefinition.config;
   const expression = conditions?.expression ?? {};
   const [conditionType, setConditionType] = useState(
@@ -126,7 +124,6 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
             eventDefinition={eventDefinition}
             validation={validation}
             streams={streams.filter((s) => s.is_editable)}
-            currentUser={currentUser}
             onChange={onChange}
           />
 
