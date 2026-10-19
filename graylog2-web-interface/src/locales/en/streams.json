@@ -30,5 +30,32 @@
     "header_title": "Outputs in Cluster",
     "marketplace_prefix": "You can find output plugins in",
     "title": "Outputs"
+  },
+  "streams_page": {
+    "title": "Streams",
+    "documentation_link_title": "Streams documentation",
+    "description": "You can route incoming messages into streams by applying rules against them. Messages matching the rules of a stream are routed into it. A message can also be routed into multiple streams.",
+    "create_title": "Create stream",
+    "create_submit": "Create stream",
+    "create_loading": "Creating stream...",
+    "create_success_message": "Stream has been successfully created.",
+    "create_success_title": "Success"
+  },
+  "stream_edit_page": {
+    "title": "Rules of Stream {{title}}",
+    "title_span": "Rules of Stream \"{{title}}\"",
+    "documentation_link_title": "Streams documentation",
+    "description": "This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see the effect configured stream rules have on message matching here.",
+    "default_stream_error": "The default stream cannot be edited."
+  },
+  "stream_permission_error_page": {
+    "title": "Missing Stream Permissions",
+    "description_p1": "This resource includes streams you do not have permissions for.",
+    "description_p2": "Please contact your administrator and provide the error details which include a list of streams you need access to.",
+    "error_details": "You need permissions for streams with the id: {{ids}}."
+  },
+  "user_no_stream_access": {
+    "title": "No stream permissions.",
+    "alert": "We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an error, please contact your administrator."
   }
 }

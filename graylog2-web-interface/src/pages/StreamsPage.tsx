@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import StreamsOverview from 'components/streams/StreamsOverview';
@@ -35,6 +36,7 @@ import StreamModal from 'components/streams/StreamModal';
 import useHistory from 'routing/useHistory';
 
 const StreamsPage = () => {
+  const { t } = useTranslation('streams');
   const {
     data: { indexSets },
     isInitialLoading: isLoadingIndexSets,
@@ -52,7 +54,7 @@ const StreamsPage = () => {
     });
 
     return createStream(stream).then(() => {
-      UserNotification.success('Stream has been successfully created.', 'Success');
+      UserNotification.success(t('streams_page.create_success_message'), t('streams_page.create_success_title'));
     });
   };
 
@@ -63,18 +65,15 @@ const StreamsPage = () => {
   }
 
   return (
-    <DocumentTitle title="Streams">
+    <DocumentTitle title={t('streams_page.title')}>
       <PageHeader
-        title="Streams"
+        title={t('streams_page.title')}
         documentationLink={{
-          title: 'Streams documentation',
+          title: t('streams_page.documentation_link_title'),
           path: DocsHelper.PAGES.STREAMS,
         }}
         actions={<CreateButton entityKey="Stream" />}>
-        <span>
-          You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
-          stream are routed into it. A message can also be routed into multiple streams.
-        </span>
+        <span>{t('streams_page.description')}</span>
       </PageHeader>
 
       <Row className="content">
@@ -84,9 +83,9 @@ const StreamsPage = () => {
       </Row>
       {showCreateModal && (
         <StreamModal
-          title="Create stream"
-          submitButtonText="Create stream"
-          submitLoadingText="Creating stream..."
+          title={t('streams_page.create_title')}
+          submitButtonText={t('streams_page.create_submit')}
+          submitLoadingText={t('streams_page.create_loading')}
           indexSets={indexSets}
           onSubmit={onCreate}
           onClose={closeCreateModal}

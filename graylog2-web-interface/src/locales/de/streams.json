@@ -30,5 +30,32 @@
     "header_title": "Outputs im Cluster",
     "marketplace_prefix": "Output-Plugins finden Sie auf dem",
     "title": "Outputs"
+  },
+  "streams_page": {
+    "title": "Streams",
+    "documentation_link_title": "Streams-Dokumentation",
+    "description": "Sie können eingehende Nachrichten mithilfe von Regeln an Streams weiterleiten. Nachrichten, die den Regeln eines Streams entsprechen, werden dorthin geleitet. Eine Nachricht kann auch an mehrere Streams weitergeleitet werden.",
+    "create_title": "Stream erstellen",
+    "create_submit": "Stream erstellen",
+    "create_loading": "Stream wird erstellt...",
+    "create_success_message": "Stream wurde erfolgreich erstellt.",
+    "create_success_title": "Erfolg"
+  },
+  "stream_edit_page": {
+    "title": "Regeln des Streams {{title}}",
+    "title_span": "Regeln des Streams \"{{title}}\"",
+    "documentation_link_title": "Streams-Dokumentation",
+    "description": "Dieser Bildschirm ist der einfachen und komfortablen Erstellung und Manipulation von Stream-Regeln gewidmet. Hier können Sie die Auswirkungen sehen, die die konfigurierten Stream-Regeln auf das Nachrichten-Matching haben.",
+    "default_stream_error": "Der Standard-Stream kann nicht bearbeitet werden."
+  },
+  "stream_permission_error_page": {
+    "title": "Fehlende Stream-Berechtigungen",
+    "description_p1": "Diese Ressource enthält Streams, für die Sie keine Berechtigungen haben.",
+    "description_p2": "Bitte kontaktieren Sie Ihren Administrator und geben Sie die Fehlerdetails an, die eine Liste der Streams enthalten, auf die Sie Zugriff benötigen.",
+    "error_details": "Sie benötigen Berechtigungen für Streams mit den IDs: {{ids}}."
+  },
+  "user_no_stream_access": {
+    "title": "Keine Stream-Berechtigungen.",
+    "alert": "Wir können im Moment keine Suche starten, da Sie keinen Zugriff auf einen Stream haben. Wenn dies ein Fehler ist, wenden Sie sich bitte an Ihren Administrator."
   }
 }

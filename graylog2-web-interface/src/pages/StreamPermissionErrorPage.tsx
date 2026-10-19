@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type FetchError from 'logic/errors/FetchError';
 
@@ -26,24 +27,22 @@ type Props = {
 };
 
 const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
+  const { t } = useTranslation('streams');
   const description = (
     <>
-      <p>This resource includes streams you do not have permissions for.</p>
-      <p>
-        Please contact your administrator and provide the error details which include a list of streams you need access
-        to.
-      </p>
+      <p>{t('stream_permission_error_page.description_p1')}</p>
+      <p>{t('stream_permission_error_page.description_p2')}</p>
     </>
   );
   const streamIds = missingStreamIds.length > 0 ? missingStreamIds : error?.additional?.body?.streams;
   const errorDetails =
-    streamIds?.length > 0 ? `You need permissions for streams with the id: ${streamIds.join(', ')}.` : undefined;
+    streamIds?.length > 0 ? t('stream_permission_error_page.error_details', { ids: streamIds.join(', ') }) : undefined;
 
   return (
     <UnauthorizedErrorPage
       error={error}
       description={description}
-      title="Missing Stream Permissions"
+      title={t('stream_permission_error_page.title')}
       errorDetails={errorDetails}
     />
   );

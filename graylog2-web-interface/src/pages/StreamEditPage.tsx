@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import { Alert } from 'components/bootstrap';
@@ -26,6 +27,7 @@ import DocsHelper from 'util/DocsHelper';
 import useStream from 'components/streams/hooks/useStream';
 
 const StreamEditPage = () => {
+  const { t } = useTranslation('streams');
   const params = useParams<{ streamId: string }>();
   const query = useQuery() as { index: string; message_id: string };
   const { data: stream } = useStream(params.streamId);
@@ -35,18 +37,15 @@ const StreamEditPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Rules of Stream ${stream.title}`}>
+    <DocumentTitle title={t('stream_edit_page.title', { title: stream.title })}>
       <div>
         <PageHeader
-          title={<span>Rules of Stream &quot;{stream.title}&quot;</span>}
+          title={<span>{t('stream_edit_page.title_span', { title: stream.title })}</span>}
           documentationLink={{
-            title: 'Streams documentation',
+            title: t('stream_edit_page.documentation_link_title'),
             path: DocsHelper.PAGES.STREAMS,
           }}>
-          <span>
-            This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see
-            the effect configured stream rules have on message matching here.
-          </span>
+          <span>{t('stream_edit_page.description')}</span>
         </PageHeader>
 
         {!stream.is_default && (
@@ -56,7 +55,7 @@ const StreamEditPage = () => {
         {stream.is_default && (
           <div className="row content">
             <div className="col-md-12">
-              <Alert bsStyle="danger">The default stream cannot be edited.</Alert>
+              <Alert bsStyle="danger">{t('stream_edit_page.default_stream_error')}</Alert>
             </div>
           </div>
         )}

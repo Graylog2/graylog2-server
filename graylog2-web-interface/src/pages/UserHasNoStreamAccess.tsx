@@ -15,26 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import { Alert, Row, Col } from 'components/bootstrap';
 import PageHeader from 'components/common/PageHeader';
 import PageContentLayout from 'components/layout/PageContentLayout';
 
-const UserHasNoStreamAccess = () => (
-  <DocumentTitle title="No stream permissions.">
-    <PageContentLayout>
-      <PageHeader title="No stream permissions." />
-      <Row className="content">
-        <Col md={12}>
-          <Alert bsStyle="warning">
-            We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an
-            error, please contact your administrator.
-          </Alert>
-        </Col>
-      </Row>
-    </PageContentLayout>
-  </DocumentTitle>
-);
+const UserHasNoStreamAccess = () => {
+  const { t } = useTranslation('streams');
+  return (
+    <DocumentTitle title={t('user_no_stream_access.title')}>
+      <PageContentLayout>
+        <PageHeader title={t('user_no_stream_access.title')} />
+        <Row className="content">
+          <Col md={12}>
+            <Alert bsStyle="warning">
+              {t('user_no_stream_access.alert')}
+            </Alert>
+          </Col>
+        </Row>
+      </PageContentLayout>
+    </DocumentTitle>
+  );
+};
 
 export default UserHasNoStreamAccess;
