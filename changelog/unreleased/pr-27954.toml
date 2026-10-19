@@ -1,0 +1,5 @@
+type = "f"
+message = "Clarify that the drop message action permanently deletes the message in the pipeline rule builder."
+
+issues = ["27797"]
+pulls = ["27954"]
