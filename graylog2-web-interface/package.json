@@ -106,6 +106,7 @@
     "react-window": "^2.2.5",
     "react-window-infinite-loader": "^2.0.1",
     "toposort": "^2.0.2",
+    "uri-js": "^4.4.1",
     "urijs": "^1.19.6",
     "uuid": "14.0.1",
     "wicg-inert": "^3.1.2"
