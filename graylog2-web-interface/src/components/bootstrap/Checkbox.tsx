@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 
+import useMergedRef from 'util/hooks/useMergedRef';
+
 type Props = {
   checked?: boolean;
   children?: React.ReactNode;
@@ -57,16 +59,16 @@ const Checkbox = (
     'aria-labelledby': ariaLabelledBy = undefined,
     'aria-label': ariaLabel = undefined,
   }: Props,
-  forwardedRef: React.MutableRefObject<HTMLInputElement>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) => {
   const internalRef = useRef<HTMLInputElement>(null);
-  const checkboxRef = forwardedRef || internalRef;
+  const checkboxRef = useMergedRef(internalRef, forwardedRef);
 
   useEffect(() => {
-    if (checkboxRef.current && checkboxRef.current.indeterminate !== indeterminate) {
-      checkboxRef.current.indeterminate = indeterminate;
+    if (internalRef.current && internalRef.current.indeterminate !== indeterminate) {
+      internalRef.current.indeterminate = indeterminate;
     }
-  }, [checkboxRef, indeterminate]);
+  }, [indeterminate]);
 
   const label = (
     <label className={inline ? `checkbox-inline ${className ?? ''}` : undefined} title={title} htmlFor={id}>

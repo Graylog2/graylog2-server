@@ -75,4 +75,17 @@ describe('Input', () => {
     await screen.findByText('The error message');
     await screen.findByText('The help text');
   });
+
+  it.each([
+    ['without', undefined],
+    ['with', <Button key="button" />],
+  ])('provides checked state of checkbox %s buttonAfter', async (_description, buttonAfter) => {
+    const ref = React.createRef<Input>();
+    render(<Input ref={ref} id="checkbox" type="checkbox" label="Enabled" defaultChecked buttonAfter={buttonAfter} />);
+
+    await screen.findByRole('checkbox');
+
+    expect(ref.current.getChecked()).toBe(true);
+    expect(ref.current.getValue()).toBe(true);
+  });
 });

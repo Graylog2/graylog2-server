@@ -92,6 +92,10 @@ class Input extends React.Component<
 
   getInputDOMNode = () => this.input;
 
+  _setInputRef = (ref: HTMLInputElement) => {
+    this.input = ref;
+  };
+
   // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
     const { type } = this.props;
@@ -183,13 +187,13 @@ class Input extends React.Component<
         <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           {buttonAfter ? (
             <InputGroup>
-              <Checkbox ref={this.input} {...controlProps}>
+              <Checkbox ref={this._setInputRef} {...controlProps}>
                 {label}
               </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
             </InputGroup>
           ) : (
-            <Checkbox ref={this.input} {...controlProps}>
+            <Checkbox ref={this._setInputRef} {...controlProps}>
               {label}
             </Checkbox>
           )}
