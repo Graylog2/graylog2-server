@@ -107,6 +107,7 @@ public class Generator {
 
     private static final Map<String, Object> overviewResult = Maps.newHashMap();
     private static final String PROPERTIES = "properties";
+    private static final String REQUIRED = "required";
     private static final String ADDITIONAL_PROPERTIES = "additional_properties";
     private static final String ITEMS = "items";
     private static final String REF = "$ref";
@@ -519,6 +520,16 @@ public class Generator {
         return createTypeSchema(modelName, inlineSchema.type(), inlineSchema.models());
     }
 
+    // Model references replace the property schema, so its optionality has to be carried over.
+    private static Map<String, Object> withOptionality(Map<String, Object> type, Map<String, Object> property) {
+        if (!Boolean.FALSE.equals(property.get(REQUIRED))) {
+            return type;
+        }
+        final Map<String, Object> result = new HashMap<>(type);
+        result.put(REQUIRED, false);
+        return result;
+    }
+
     private String uniqueModelName(Type genericType, Class<?> returnType) {
         final var simpleName = nestedNames(returnType).collect(Collectors.joining(INNER_CLASSES_SEPARATOR));
         if (genericType instanceof ParameterizedType parameterizedType) {
@@ -549,12 +560,12 @@ public class Generator {
                             models.putAll(propertySchema.models());
                             final Map<String, Object> type = reuseTypeRef(propertySchema.type());
                             if (propertySchema.name() == null) {
-                                return new AbstractMap.SimpleEntry<>(entry.getKey(), type);
+                                return new AbstractMap.SimpleEntry<>(entry.getKey(), withOptionality(type, property));
                             }
                             if (propertySchema.type() != null) {
                                 models.put(propertySchema.name(), type);
                             }
-                            return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap(REF, propertySchema.name()));
+                            return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), withOptionality(Collections.singletonMap(REF, propertySchema.name()), property));
                         })
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 newGenericTypeSchema.put(PROPERTIES, newProperties);
@@ -1032,7 +1043,7 @@ public class Generator {
             final HashMap<String, Object> result = new HashMap<>();
             result.put("name", name);
             result.put("description", description);
-            result.put("required", isRequired);
+            result.put(REQUIRED, isRequired);
             result.put("paramType", getKind());
 
             if (defaultValue != null) {
