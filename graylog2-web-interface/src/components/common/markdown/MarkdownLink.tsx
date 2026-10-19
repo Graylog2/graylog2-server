@@ -36,6 +36,8 @@ type Props = {
 type OnClickHandler = Extract<EntityLinkResolution, { onClick: unknown }>['onClick'];
 type ResolvedLink = { to: string } | { onClick: OnClickHandler };
 
+const isRelativeUrl = (href: string) => href.startsWith('/') && !href.startsWith('//');
+
 const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   const resolvers = usePluginEntities('markdown.entityLinkResolvers');
   const getEntityRoute = useGetEntityRoute();
@@ -92,6 +94,10 @@ const MarkdownLink = ({ href, children = null }: Props) => {
 
   if (resolved && 'onClick' in resolved) {
     return <OnClickLink handler={resolved.onClick}>{children}</OnClickLink>;
+  }
+
+  if (isRelativeUrl(href)) {
+    return <Link to={href}>{children}</Link>;
   }
 
   return <ExternalLink href={href}>{children}</ExternalLink>;

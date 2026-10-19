@@ -63,4 +63,16 @@ describe('MarkdownLink', () => {
 
     expect(screen.getByRole('link', { name: /Docs/ })).toHaveAttribute('href', 'https://graylog.org');
   });
+
+  it('renders a relative URL as internal link', () => {
+    render(<MarkdownLink href="/streams?foo=bar#baz">Streams</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: 'Streams' })).toHaveAttribute('href', '/streams?foo=bar#baz');
+  });
+
+  it('keeps links to other origins external', () => {
+    render(<MarkdownLink href="https://example.org/streams">Other</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: /Other/ })).toHaveAttribute('target', '_blank');
+  });
 });
