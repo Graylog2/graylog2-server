@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ClipboardButton } from 'components/common';
 import { formatDuration } from 'util/ISODurationUtils';
@@ -86,22 +87,26 @@ const InstallCommand = ({
   tokenDuration,
   actions = undefined,
   onCopySuccess = undefined,
-}: Props) => (
-  <Container>
-    <Header>
-      <Title>Run This on {platformLabel}</Title>
-      <HeaderActions>
-        {actions}
-        <ClipboardButton text={command} title="Copy command" bsSize="sm" onSuccess={onCopySuccess} />
-      </HeaderActions>
-    </Header>
-    <CommandBlock>{command}</CommandBlock>
-    <Note>
-      Downloads and installs the collector, enrolls it in the selected fleet, and starts the service. Requires
-      administrator privileges.{' '}
-      {tokenDuration ? <>Token expires in {formatDuration(tokenDuration, () => true)}.</> : 'This token never expires.'}
-    </Note>
-  </Container>
-);
+}: Props) => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <Container>
+      <Header>
+        <Title>{t('install_command.title', { platform: platformLabel })}</Title>
+        <HeaderActions>
+          {actions}
+          <ClipboardButton text={command} title={t('install_command.copy')} bsSize="sm" onSuccess={onCopySuccess} />
+        </HeaderActions>
+      </Header>
+      <CommandBlock>{command}</CommandBlock>
+      <Note>
+        {tokenDuration
+          ? t('install_command.note_expires', { duration: formatDuration(tokenDuration, () => true) })
+          : t('install_command.note_never_expires')}
+      </Note>
+    </Container>
+  );
+};
 
 export default InstallCommand;

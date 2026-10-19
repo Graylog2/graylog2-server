@@ -23,6 +23,7 @@ import usePermissions from 'hooks/usePermissions';
 import AppConfig from 'util/AppConfig';
 import { onError } from 'util/conditional/onError';
 import FetchError from 'logic/errors/FetchError';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 import { useCollectorInputIds } from './useCollectorInputIds';
@@ -44,8 +45,8 @@ export const useCollectorInputDetails = () => {
           if (error instanceof FetchError && error.status === 404) return;
 
           UserNotification.error(
-            `Loading Collector input details failed with status: ${error}`,
-            'Could not load Collector input details.',
+            i18n.t('load_errors.input_details.message', { ns: 'collectors', error: String(error) }),
+            i18n.t('load_errors.input_details.title', { ns: 'collectors' }),
           );
         }),
       retry: false,

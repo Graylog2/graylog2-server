@@ -26,7 +26,7 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsFleetDetailPage = () => {
-  const { t } = useTranslation('collectors_fleets');
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading } = useCollectorsConfig();
   const { fleetId } = useParams<{ fleetId: string }>();
 
@@ -40,7 +40,7 @@ const CollectorsFleetDetailPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('fleet_detail')}>
+    <DocumentTitle title={t('pages.fleet_detail.title')}>
       <CollectorsPageNavigation />
       <Row className="content">
         <Col md={12}>{fleetId && <FleetDetail fleetId={fleetId} />}</Col>

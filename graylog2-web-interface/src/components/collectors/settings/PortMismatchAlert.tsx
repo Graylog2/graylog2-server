@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: Props) => {
+  const { t } = useTranslation('collectors');
   const [debouncedPort, setDebouncedPort] = useState(formPort);
 
   useEffect(() => {
@@ -54,9 +56,7 @@ const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: Props) => {
 
   return (
     <Alert bsStyle="info">
-      Collector ingest inputs exist on different {mismatchedPorts.length === 1 ? 'port' : 'ports'}:{' '}
-      {mismatchedPorts.join(', ')}. If the external port differs from an input port, ensure your network routes traffic
-      correctly.
+      {t('port_mismatch.message', { count: mismatchedPorts.length, ports: mismatchedPorts.join(', ') })}
     </Alert>
   );
 };

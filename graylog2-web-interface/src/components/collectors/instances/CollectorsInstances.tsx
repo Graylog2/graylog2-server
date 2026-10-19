@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
@@ -36,6 +37,7 @@ import {
 } from '../hooks';
 
 const CollectorsInstances = () => {
+  const { t } = useTranslation('collectors');
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
@@ -60,7 +62,7 @@ const CollectorsInstances = () => {
   return (
     <>
       <PaginatedEntityTable<CollectorInstanceView>
-        humanName="instances"
+        humanName={t('fleet_detail.instances_human_name')}
         entityActions={entityActions}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchPaginatedInstances}

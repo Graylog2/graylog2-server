@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import AppConfig from 'util/AppConfig';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -31,8 +32,8 @@ export const useCollectorInputIds = (): { data: string[] | undefined; isLoading:
     queryFn: () =>
       defaultOnError(
         CollectorsConfigApi.getInputIds(),
-        'Loading Collector input IDs failed with status',
-        'Could not load Collector input IDs.',
+        i18n.t('load_errors.input_ids.message', { ns: 'collectors' }),
+        i18n.t('load_errors.input_ids.title', { ns: 'collectors' }),
       ),
     enabled: !AppConfig.isCloud(),
     refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab

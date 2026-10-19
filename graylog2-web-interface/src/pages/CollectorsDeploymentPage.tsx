@@ -46,7 +46,7 @@ const SoftBorderTabs = styled(Tabs)(
 );
 
 const CollectorsDeploymentPage = () => {
-  const { t } = useTranslation('collectors_deployment');
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading } = useCollectorsConfig();
   const tokenCount = useEnrollmentTokenCount();
   const { canDeployCollectors, canViewEnrollmentTokens } = useCollectorPermissions();
@@ -78,30 +78,28 @@ const CollectorsDeploymentPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.deployment.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('deployment_title')} <PreviewBadge />
+            {t('pages.deployment.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          {t('deployment_description')}
-        </span>
+        <span>{t('pages.deployment.description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
           <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'} onChange={handleTabChange}>
             <Tabs.List>
-              {canDeployCollectors && <Tabs.Tab value="deploy">{t('deploy_tab')}</Tabs.Tab>}
+              {canDeployCollectors && <Tabs.Tab value="deploy">{t('pages.deployment.deploy_tab')}</Tabs.Tab>}
               {canViewEnrollmentTokens && (
                 <Tabs.Tab value="tokens">
-                  {t('tokens_tab')}
+                  {t('pages.deployment.tokens_tab')}
                   {tokenCount !== undefined && (
                     <>
                       {' '}
@@ -118,9 +116,7 @@ const CollectorsDeploymentPage = () => {
             )}
             {canViewEnrollmentTokens && (
               <Tabs.Panel value="tokens">
-                <p className="description">
-                  {t('tokens_description')}
-                </p>
+                <p className="description">{t('pages.deployment.tokens_description')}</p>
                 <EnrollmentTokenList />
               </Tabs.Panel>
             )}

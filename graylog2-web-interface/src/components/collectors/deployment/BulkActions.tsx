@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DeleteMenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -47,6 +48,7 @@ export const useHasBulkActions = () => {
 };
 
 const BulkActions = () => {
+  const { t } = useTranslation('collectors');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { bulkDeleteEnrollmentTokens } = useCollectorsMutations();
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -72,12 +74,11 @@ const BulkActions = () => {
       )}
       {showConfirm && (
         <ConfirmDialog
-          title="Delete enrollment tokens"
+          title={t('enrollment_tokens.bulk_delete_title')}
           show
           onConfirm={handleConfirm}
           onCancel={() => setShowConfirm(false)}>
-          Are you sure you want to delete {selectedEntities.length} enrollment tokens? New Collectors will not be able
-          to enroll using the deleted tokens.
+          {t('enrollment_tokens.bulk_delete_confirm', { count: selectedEntities.length })}
         </ConfirmDialog>
       )}
     </>

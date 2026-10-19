@@ -29,17 +29,29 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
       pageNavigation: [
         {
           description: PAGE_NAV_TITLE,
+          titleKey: 'navigation:system.collectors',
           children: [
-            { description: 'Overview', path: Routes.SYSTEM.COLLECTORS.OVERVIEW, exactPathMatch: true },
-            { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
-            { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
+            {
+              description: 'Overview',
+              titleKey: 'collectors:navigation.overview',
+              path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
+              exactPathMatch: true,
+            },
+            { description: 'Fleets', titleKey: 'collectors:navigation.fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
+            {
+              description: 'Instances',
+              titleKey: 'collectors:navigation.instances',
+              path: Routes.SYSTEM.COLLECTORS.INSTANCES,
+            },
             {
               description: 'Deployment',
+              titleKey: 'collectors:navigation.deployment',
               path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT,
               useCondition: useCanAccessDeployment,
             },
             {
               description: 'Settings',
+              titleKey: 'collectors:navigation.settings',
               path: Routes.SYSTEM.COLLECTORS.SETTINGS,
               permissions: [COLLECTOR_PERMISSIONS.CONFIGURATION_READ],
             },

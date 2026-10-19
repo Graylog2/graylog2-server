@@ -18,7 +18,9 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Card, FormikInput, RelativeTime } from 'components/common';
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -70,13 +72,14 @@ const validate = (values: FormValues) => {
   const errors: Partial<Record<keyof FormValues, string>> = {};
 
   if (!values.name) {
-    errors.name = 'Name is required';
+    errors.name = i18n.t('fleet_form.name_required', { ns: 'collectors' });
   }
 
   return errors;
 };
 
 const FleetSettings = ({ fleet, onSave }: Props) => {
+  const { t } = useTranslation('collectors');
   const sendTelemetry = useSendCollectorsTelemetry();
   const { canEditFleet } = useCollectorPermissions();
   const canEdit = canEditFleet(fleet.id);
@@ -105,21 +108,27 @@ const FleetSettings = ({ fleet, onSave }: Props) => {
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} enableReinitialize>
         {({ isSubmitting, isValidating, dirty, resetForm }) => (
           <Section>
-            <SectionTitle>General Settings</SectionTitle>
+            <SectionTitle>{t('fleet_settings.general')}</SectionTitle>
             <Form>
-              <FormikInput id="fleet-name" label="Fleet Name" name="name" required disabled={!canEdit} />
+              <FormikInput
+                id="fleet-name"
+                label={t('fleet_settings.fleet_name')}
+                name="name"
+                required
+                disabled={!canEdit}
+              />
               <FormikInput
                 id="fleet-description"
                 type="textarea"
-                label="Description"
+                label={t('fleet_form.description')}
                 name="description"
                 disabled={!canEdit}
               />
               {canEdit && (
                 <FormSubmit
                   isAsyncSubmit
-                  submitButtonText="Save changes"
-                  submitLoadingText="Saving..."
+                  submitButtonText={t('fleet_settings.save')}
+                  submitLoadingText={t('fleet_settings.saving')}
                   isSubmitting={isSubmitting}
                   disabledSubmit={!dirty || isValidating}
                   onCancel={resetForm}
@@ -132,18 +141,18 @@ const FleetSettings = ({ fleet, onSave }: Props) => {
       </Formik>
 
       <Section>
-        <SectionTitle>Fleet Information</SectionTitle>
+        <SectionTitle>{t('fleet_settings.information')}</SectionTitle>
         <div>
           <InfoRow>
-            <InfoLabel>Fleet ID:</InfoLabel>
+            <InfoLabel>{t('fleet_settings.fleet_id')}</InfoLabel>
             <InfoValue>{fleet.id}</InfoValue>
           </InfoRow>
           <InfoRow>
-            <InfoLabel>Created:</InfoLabel>
+            <InfoLabel>{t('fleet_settings.created')}</InfoLabel>
             <RelativeTime dateTime={fleet.created_at} />
           </InfoRow>
           <InfoRow>
-            <InfoLabel>Updated:</InfoLabel>
+            <InfoLabel>{t('fleet_settings.updated')}</InfoLabel>
             <RelativeTime dateTime={fleet.updated_at} />
           </InfoRow>
         </div>

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 import { OS_LABELS } from './Constants';
 
 import type { CollectorInstanceView } from '../types';
@@ -34,7 +36,7 @@ const collectorOsName = (instance: CollectorInstanceView, useDescription: boolea
     return OS_LABELS[instance.os] ?? instance.os;
   }
 
-  return 'Unknown';
+  return i18n.t('os.unknown', { ns: 'collectors' });
 };
 
 export default collectorOsName;

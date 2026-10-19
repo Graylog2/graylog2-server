@@ -18,7 +18,9 @@ import * as React from 'react';
 import { useCallback, useRef } from 'react';
 import { Formik, Form } from 'formik';
 import type { FormikTouched } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Modal } from 'components/bootstrap';
 import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
@@ -42,13 +44,14 @@ const validate = (values: FormValues) => {
   const errors: Partial<Record<keyof FormValues, string>> = {};
 
   if (!values.name) {
-    errors.name = 'Name is required';
+    errors.name = i18n.t('fleet_form.name_required', { ns: 'collectors' });
   }
 
   return errors;
 };
 
 const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
+  const { t } = useTranslation('collectors');
   const isEdit = !!fleet;
   const sendTelemetry = useSendCollectorsTelemetry();
 
@@ -105,22 +108,28 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
           return (
             <Form>
               <Modal.Header>
-                <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
+                <Modal.Title>{isEdit ? t('fleet_form.edit_title') : t('fleet_form.new_title')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <FormikInput id="fleet-name" label="Name" name="name" help="A unique name for this fleet" required />
+                <FormikInput
+                  id="fleet-name"
+                  label={t('fleet_form.name')}
+                  name="name"
+                  help={t('fleet_form.name_help')}
+                  required
+                />
                 <FormikInput
                   id="fleet-description"
-                  label="Description"
+                  label={t('fleet_form.description')}
                   name="description"
                   type="textarea"
-                  help="Optional description of this fleet's purpose"
+                  help={t('fleet_form.description_help')}
                 />
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit
-                  submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
-                  submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                  submitButtonText={isEdit ? t('fleet_form.update') : t('fleet_form.create')}
+                  submitLoadingText={isEdit ? t('fleet_form.updating') : t('fleet_form.creating')}
                   onCancel={handleClose}
                   disabledSubmit={isValidating || !isValid}
                   isSubmitting={isSubmitting}

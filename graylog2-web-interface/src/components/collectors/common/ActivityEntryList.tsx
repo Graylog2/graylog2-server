@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Icon, Link, RelativeTime } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
@@ -26,7 +27,7 @@ import { DividedIconRow, IconRowList } from './IconRowList';
 
 import type { ActivityEntry, TargetInfo } from '../types';
 
-const Description = styled.span`
+const DescriptionText = styled.span`
   flex: 1;
 `;
 
@@ -83,9 +84,11 @@ const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
   FLEET_REASSIGNED: 'shuffle',
 };
 
-const targetLink = (target: TargetInfo) => {
+const TargetLink = ({ target }: { target: TargetInfo }) => {
+  const { t } = useTranslation('collectors');
+
   if (!target.id) {
-    return <MutedText>[deleted]</MutedText>;
+    return <MutedText>{t('activity.deleted_target')}</MutedText>;
   }
 
   if (target.type === 'fleet') {
@@ -95,25 +98,24 @@ const targetLink = (target: TargetInfo) => {
   return <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>{target.name}</Link>;
 };
 
-const additionalTargetText = (targets: TargetInfo[]) => {
-  if (targets.length <= 1) {
-    return null;
-  }
-  if (targets.length === 2) {
-    return <span> and 1 other {targets[0].type}</span>;
-  }
-
-  return (
-    <span>
-      {' '}
-      and {targets.length - 1} other {targets[0].type}s
-    </span>
-  );
+const DESCRIPTION_KEYS: Record<ActivityEntry['type'], string> = {
+  CONFIG_CHANGED: 'activity.config_changed',
+  INGEST_CONFIG_CHANGED: 'activity.ingest_config_changed',
+  RESTART: 'activity.restart',
+  DISCOVERY_RUN: 'activity.discovery_run',
+  FLEET_REASSIGNED: 'activity.reassigned',
 };
 
 const byName = (a: TargetInfo, b: TargetInfo) => naturalSortIgnoreCase(a.name, b.name);
 
-const renderDescription = (entry: ActivityEntry, compareTargets: (a: TargetInfo, b: TargetInfo) => number) => {
+const Description = ({
+  entry,
+  compareTargets,
+}: {
+  entry: ActivityEntry;
+  compareTargets: (a: TargetInfo, b: TargetInfo) => number;
+}) => {
+  const { t } = useTranslation('collectors');
   const sortedTargets = entry.targets.toSorted(compareTargets);
   const target = sortedTargets[0];
 
@@ -121,45 +123,30 @@ const renderDescription = (entry: ActivityEntry, compareTargets: (a: TargetInfo,
     return <span>{entry.type}</span>;
   }
 
-  switch (entry.type) {
-    case 'CONFIG_CHANGED':
-      return (
-        <span>
-          Configuration updated for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'INGEST_CONFIG_CHANGED':
-      return (
-        <span>
-          Ingest configuration updated for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'RESTART':
-      return (
-        <span>
-          Restart requested for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'DISCOVERY_RUN':
-      return (
-        <span>
-          Discovery run triggered for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'FLEET_REASSIGNED': {
-      return (
-        <span>
-          Collector {targetLink(target)}
-          {additionalTargetText(sortedTargets)} reassigned
-          {entry.details && <> to fleet {targetLink(entry.details.destination_fleet)}</>}
-        </span>
-      );
-    }
-  }
+  const otherTargets = sortedTargets.length - 1;
+  const destination = entry.type === 'FLEET_REASSIGNED' ? entry.details?.destination_fleet : undefined;
+  // Fleet reassignments always target collectors.
+  const targetType = entry.type === 'FLEET_REASSIGNED' ? 'collector' : target.type;
+  const key = [
+    DESCRIPTION_KEYS[entry.type],
+    destination ? '_to_fleet' : '',
+    `.${targetType}`,
+    otherTargets > 0 ? '_with_others' : '',
+  ].join('');
+
+  return (
+    <span>
+      <Trans
+        t={t}
+        i18nKey={key}
+        count={otherTargets > 0 ? otherTargets : undefined}
+        components={{
+          targetLink: <TargetLink target={target} />,
+          destinationLink: destination ? <TargetLink target={destination} /> : <span />,
+        }}
+      />
+    </span>
+  );
 };
 
 type Props = {
@@ -175,25 +162,33 @@ type Props = {
  * shared `ActivityEntryMapper` on the backend. The actor/timestamp stack below the description in
  * narrow containers (see {@link Content}).
  */
-const ActivityEntryList = ({ entries, compareTargets = byName }: Props) => (
-  <ActivityList>
-    {entries.map((entry) => (
-      <Row key={entry.seq}>
-        <Icon name={ICON_MAP[entry.type] ?? 'info'} />
-        <Content>
-          <Description>{renderDescription(entry, compareTargets)}</Description>
-          <Meta>
-            <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
-            {entry.timestamp && (
+const ActivityEntryList = ({ entries, compareTargets = byName }: Props) => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <ActivityList>
+      {entries.map((entry) => (
+        <Row key={entry.seq}>
+          <Icon name={ICON_MAP[entry.type] ?? 'info'} />
+          <Content>
+            <DescriptionText>
+              <Description entry={entry} compareTargets={compareTargets} />
+            </DescriptionText>
+            <Meta>
               <MutedText>
-                <RelativeTime dateTime={entry.timestamp} />
+                {entry.actor ? t('activity.by_actor', { name: entry.actor.full_name }) : t('activity.by_system')}
               </MutedText>
-            )}
-          </Meta>
-        </Content>
-      </Row>
-    ))}
-  </ActivityList>
-);
+              {entry.timestamp && (
+                <MutedText>
+                  <RelativeTime dateTime={entry.timestamp} />
+                </MutedText>
+              )}
+            </Meta>
+          </Content>
+        </Row>
+      ))}
+    </ActivityList>
+  );
+};
 
 export default ActivityEntryList;

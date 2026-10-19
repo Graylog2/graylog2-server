@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { CollectorsConfig } from '../types';
@@ -30,7 +31,7 @@ export const useCollectorsConfig = (): { data: CollectorsConfig | undefined; isL
     queryFn: () =>
       defaultOnError(
         CollectorsConfigApi.get(),
-        'Loading collectors config failed with status',
-        'Could not load collectors config.',
+        i18n.t('load_errors.config.message', { ns: 'collectors' }),
+        i18n.t('load_errors.config.title', { ns: 'collectors' }),
       ),
   });

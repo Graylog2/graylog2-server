@@ -21,13 +21,12 @@ import type { CollectorInstanceView } from '../types';
 type InstanceStatus = CollectorInstanceView['status'];
 
 /**
- * How a collector's online/offline state is worded and coloured. Render via `InstanceStatusLabel`
- * rather than reading this directly, unless you need the raw wording (sorting, export, a title
- * attribute).
+ * How a collector's online/offline state is worded (translation key in the `collectors` namespace) and coloured.
+ * Render via `InstanceStatusLabel` rather than reading this directly.
  */
-export const INSTANCE_STATUS_LABELS: Record<InstanceStatus, { label: string; style: ColorVariant }> = {
-  online: { label: 'Online', style: 'success' },
-  offline: { label: 'Offline', style: 'default' },
+export const INSTANCE_STATUS_LABELS: Record<InstanceStatus, { labelKey: string; style: ColorVariant }> = {
+  online: { labelKey: 'instance_status.online', style: 'success' },
+  offline: { labelKey: 'instance_status.offline', style: 'default' },
 };
 
 /**

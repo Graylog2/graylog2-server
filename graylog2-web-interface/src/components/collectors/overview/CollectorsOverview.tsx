@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -60,6 +61,7 @@ const SectionTitle = styled.h3(
 );
 
 const StatsSection = ({ stats }: { stats: CollectorStats }) => {
+  const { t } = useTranslation('collectors');
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
 
@@ -91,8 +93,8 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
     <StatsRow>
       <StatCard
         value={stats?.total_instances ?? 0}
-        label="Instances"
-        helpText="Running Collector processes across all fleets."
+        label={t('fleet_detail.stat_instances')}
+        helpText={t('overview.stat_instances_help')}
         onClick={() => {
           emitStatCard('instances', stats?.total_instances ?? 0, 'default', 'instances');
           history.push(Routes.SYSTEM.COLLECTORS.INSTANCES);
@@ -100,8 +102,8 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
       />
       <StatCard
         value={stats?.online_instances ?? 0}
-        label="Online"
-        helpText="Instances that reported a heartbeat within the offline threshold."
+        label={t('fleet_detail.stat_online')}
+        helpText={t('fleet_detail.stat_online_help')}
         variant="success"
         onClick={() => {
           emitStatCard('online', stats?.online_instances ?? 0, 'success', 'instances-online');
@@ -110,8 +112,8 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
       />
       <StatCard
         value={stats?.offline_instances ?? 0}
-        label="Offline"
-        helpText="Instances that missed their heartbeat. Check host connectivity or Collector process status."
+        label={t('fleet_detail.stat_offline')}
+        helpText={t('fleet_detail.stat_offline_help')}
         variant="warning"
         onClick={() => {
           emitStatCard('offline', stats?.offline_instances ?? 0, 'warning', 'instances-offline');
@@ -120,8 +122,8 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
       />
       <StatCard
         value={stats?.total_fleets ?? 0}
-        label="Fleets"
-        helpText="Logical groups of Collectors that share the same source configuration."
+        label={t('overview.stat_fleets')}
+        helpText={t('overview.stat_fleets_help')}
         onClick={() => {
           emitStatCard('fleets', stats?.total_fleets ?? 0, 'default', 'fleets');
           history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
@@ -129,31 +131,33 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
       />
       <StatCard
         value={stats?.total_sources ?? 0}
-        label="Sources"
-        helpText="Data collection configurations (file paths, journald, Windows Event Logs) across all fleets."
+        label={t('fleet_detail.stat_sources')}
+        helpText={t('overview.stat_sources_help')}
       />
     </StatsRow>
   );
 };
 
 const FleetsSection = ({ filter }: { filter: string }) => {
+  const { t } = useTranslation('collectors');
   const { data: bulkStats, isLoading, isError } = useFleetsBulkStats();
 
   if (isLoading) return <Spinner />;
 
-  if (isError) return <Alert bsStyle="danger">Could not load fleet stats.</Alert>;
+  if (isError) return <Alert bsStyle="danger">{t('overview.fleet_stats_error')}</Alert>;
 
   return <FleetCardsGrid fleets={bulkStats?.fleets ?? []} filter={filter} />;
 };
 
 const CollectorsOverview = () => {
+  const { t } = useTranslation('collectors');
   const [filter, setFilter] = useState('');
   const { data: stats, isLoading, isError } = useCollectorStats();
   const { canCreateFleet } = useCollectorPermissions();
 
   if (isLoading) return <Spinner />;
 
-  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
+  if (isError) return <Alert bsStyle="danger">{t('overview.stats_error')}</Alert>;
 
   // A user who can't create a fleet has no path forward in the wizard (its every write —
   // create fleet, create source, mint an enrollment token — requires it). Falling through to the
@@ -165,10 +169,10 @@ const CollectorsOverview = () => {
       <StatsSection stats={stats} />
 
       <SectionHeader>
-        <SectionTitle>Fleets</SectionTitle>
+        <SectionTitle>{t('overview.fleets_title')}</SectionTitle>
         <Input
           type="text"
-          placeholder="Filter fleets..."
+          placeholder={t('overview.filter_placeholder')}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           style={{ width: 200, marginBottom: 0 }}

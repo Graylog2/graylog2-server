@@ -16,6 +16,7 @@
  */
 import { OpAMPEnrollment } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
@@ -52,6 +53,6 @@ export const fetchPaginatedEnrollmentTokens = async (
       pagination: response.pagination,
       attributes: response.attributes,
     })),
-    'Loading enrollment tokens failed with status',
-    'Could not load enrollment tokens',
+    i18n.t('load_errors.enrollment_tokens.message', { ns: 'collectors' }),
+    i18n.t('load_errors.enrollment_tokens.title', { ns: 'collectors' }),
   );

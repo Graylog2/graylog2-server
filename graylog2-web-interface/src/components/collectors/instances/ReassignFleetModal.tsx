@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Modal } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
@@ -49,7 +51,7 @@ const validate = (values: FormValues) => {
   const errors: Partial<Record<keyof FormValues, string>> = {};
 
   if (!values.fleetId) {
-    errors.fleetId = 'Fleet is required';
+    errors.fleetId = i18n.t('reassign_fleet.fleet_required', { ns: 'collectors' });
   }
 
   return errors;
@@ -62,6 +64,7 @@ const ReassignFleetModal = ({
   onClose,
   onSuccess = () => {},
 }: Props) => {
+  const { t } = useTranslation('collectors');
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
   const { canAssignToFleet } = useCollectorPermissions();
@@ -109,7 +112,6 @@ const ReassignFleetModal = ({
   );
 
   const instanceCount = instanceUids.length;
-  const descriptor = instanceCount === 1 ? 'instance' : 'instances';
 
   return (
     <Modal onHide={onClose} show>
@@ -117,9 +119,7 @@ const ReassignFleetModal = ({
         {({ isSubmitting, isValidating, values, setFieldValue }) => (
           <Form>
             <Modal.Header showCloseButton>
-              <Modal.Title>
-                Reassign {instanceCount} {descriptor} to fleet
-              </Modal.Title>
+              <Modal.Title>{t('reassign_fleet.title', { count: instanceCount })}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               {fleetsLoading ? (
@@ -129,12 +129,12 @@ const ReassignFleetModal = ({
                   {fleetOptions.length === 0 ? (
                     <p>
                       {otherFleets.length === 0
-                        ? `There is no other fleet to assign ${instanceCount === 1 ? 'this Collector' : 'these Collectors'} to.`
-                        : 'You do not have permission to assign Collectors to any other fleet.'}
+                        ? t('reassign_fleet.no_other_fleet', { count: instanceCount })
+                        : t('reassign_fleet.no_permission')}
                     </p>
                   ) : (
                     <Select
-                      placeholder="Select a fleet..."
+                      placeholder={t('reassign_fleet.select_placeholder')}
                       options={fleetOptions}
                       value={values.fleetId}
                       onChange={(value: string) => setFieldValue('fleetId', value)}
@@ -146,8 +146,8 @@ const ReassignFleetModal = ({
             </Modal.Body>
             <Modal.Footer>
               <ModalSubmit
-                submitButtonText={`Reassign ${descriptor}`}
-                submitLoadingText="Reassigning..."
+                submitButtonText={t('reassign_fleet.submit', { count: instanceCount })}
+                submitLoadingText={t('reassign_fleet.submitting')}
                 onCancel={onClose}
                 disabledSubmit={!values.fleetId || isValidating}
                 isSubmitting={isSubmitting}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge, Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -23,21 +24,33 @@ import { SOURCE_TYPE_LABELS } from './Constants';
 
 import type { Source } from '../types';
 
+const SourceTypeLabel = ({ type }: { type: string }) => {
+  const { t } = useTranslation('collectors');
+
+  return <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ? t(SOURCE_TYPE_LABELS[type]) : type}</Label>;
+};
+
+const EnabledBadge = ({ enabled }: { enabled: boolean }) => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <Badge color={enabled ? 'success' : 'warning'} variant="light">
+      {enabled ? t('source_columns.enabled') : t('source_status.disabled')}
+    </Badge>
+  );
+};
+
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
   attributes: {
     name: {
       renderCell: (name: string) => <strong>{name}</strong>,
     },
     type: {
-      renderCell: (type: string) => <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ?? type}</Label>,
-      staticWidth: 170,
+      renderCell: (type: string) => <SourceTypeLabel type={type} />,
+      staticWidth: 190,
     },
     enabled: {
-      renderCell: (_enabled: boolean, source: Source) => (
-        <Badge color={source.enabled ? 'success' : 'warning'} variant="light">
-          {source.enabled ? 'Enabled' : 'Disabled'}
-        </Badge>
-      ),
+      renderCell: (_enabled: boolean, source: Source) => <EnabledBadge enabled={source.enabled} />,
       staticWidth: 110,
     },
     description: {

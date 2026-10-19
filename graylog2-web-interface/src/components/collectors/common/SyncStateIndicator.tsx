@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 
@@ -50,17 +51,20 @@ type Props = {
  * The collector's sync state — whether it still has queued changes to apply. Shared between the
  * instances table column (icon-only, hover text) and the instance detail drawer (icon + label).
  */
-const SyncStateIndicator = ({ pending, withLabel = false }: Props) =>
-  pending ? (
-    <Wrapper title="Sync pending — changes will apply at the collector's next check-in">
+const SyncStateIndicator = ({ pending, withLabel = false }: Props) => {
+  const { t } = useTranslation('collectors');
+
+  return pending ? (
+    <Wrapper title={t('sync_state.pending_title')}>
       <SyncPendingIcon name="update" />
-      {withLabel && <StatusLabel>Sync pending</StatusLabel>}
+      {withLabel && <StatusLabel>{t('sync_state.pending')}</StatusLabel>}
     </Wrapper>
   ) : (
-    <Wrapper title="In sync — all changes applied">
+    <Wrapper title={t('sync_state.in_sync_title')}>
       <InSyncIcon name="check_circle" />
-      {withLabel && <StatusLabel>In sync</StatusLabel>}
+      {withLabel && <StatusLabel>{t('sync_state.in_sync')}</StatusLabel>}
     </Wrapper>
   );
+};
 
 export default SyncStateIndicator;

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import { AccessibleCard, BrandIcon, Icon } from 'components/common';
@@ -122,12 +123,13 @@ const renderPlatformIcon = (icon: PlatformIcon) => {
 };
 
 const PlatformPicker = ({ onSelect, selectedPlatform, disabled }: Props) => {
+  const { t } = useTranslation('collectors');
   const productName = useProductName();
 
   return (
     <Container>
-      <Heading>Get Started with Collectors</Heading>
-      <Subtitle>Deploy lightweight collectors across your infrastructure to forward logs into {productName}.</Subtitle>
+      <Heading>{t('platform_picker.title')}</Heading>
+      <Subtitle>{t('platform_picker.description', { productName })}</Subtitle>
       <Grid>
         {PLATFORMS.map((platform) => (
           <PlatformCard

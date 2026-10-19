@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Link, RelativeTime, SimpleGrid, Spoiler } from 'components/common';
 import Routes from 'routing/Routes';
@@ -81,26 +82,27 @@ const Fact = ({ label, children = undefined }: React.PropsWithChildren<{ label: 
  * stay scannable while everything the agent reported remains one click away.
  */
 const CollectorFactsSection = ({ instance, fleetName, onFleetLinkClick = undefined }: Props) => {
+  const { t } = useTranslation('collectors');
   const attributes = [
     ...Object.entries(instance.identifying_attributes ?? {}),
     ...Object.entries(instance.non_identifying_attributes ?? {}),
   ].sort((attr1, attr2) => defaultCompare(attr1[0], attr2[0]));
 
   return (
-    <QuietSection title="Collector" titleAs="h3">
+    <QuietSection title={t('collector_facts.title')} titleAs="h3">
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
-        <Fact label="Host">{instance.hostname ?? instance.instance_uid}</Fact>
-        <Fact label="OS">{collectorOsName(instance, true)}</Fact>
-        <Fact label="Version">{instance.version ?? 'Unknown'}</Fact>
-        <Fact label="Fleet">
+        <Fact label={t('collector_facts.host')}>{instance.hostname ?? instance.instance_uid}</Fact>
+        <Fact label={t('collector_facts.os')}>{collectorOsName(instance, true)}</Fact>
+        <Fact label={t('collector_facts.version')}>{instance.version ?? t('os.unknown')}</Fact>
+        <Fact label={t('collector_facts.fleet')}>
           <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={onFleetLinkClick}>
-            {fleetName ?? 'Unknown'}
+            {fleetName ?? t('os.unknown')}
           </Link>
         </Fact>
-        <Fact label="Enrolled">
+        <Fact label={t('collector_facts.enrolled')}>
           <RelativeTime dateTime={instance.enrolled_at} />
         </Fact>
-        <Fact label="Last seen">
+        <Fact label={t('collector_facts.last_seen')}>
           <StatusDot $online={instance.status === 'online'} />
           <RelativeTime dateTime={instance.last_seen} />
         </Fact>
@@ -108,8 +110,8 @@ const CollectorFactsSection = ({ instance, fleetName, onFleetLinkClick = undefin
       {attributes.length > 0 && (
         <AttributesSpoiler
           maxHeight={0}
-          showLabel={`Show all ${attributes.length} attributes`}
-          hideLabel="Hide attributes">
+          showLabel={t('collector_facts.show_attributes', { count: attributes.length })}
+          hideLabel={t('collector_facts.hide_attributes')}>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
             {attributes.map(([key, value]) => (
               <Fact key={key} label={key}>

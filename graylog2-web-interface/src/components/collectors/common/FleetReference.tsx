@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -44,6 +45,7 @@ type Props = {
  * has been deleted. A pending target may be a fleet the user cannot read, so it is never labelled as removed.
  */
 const FleetReference = ({ fleetId, pendingFleetId = null, onClick = undefined }: Props) => {
+  const { t } = useTranslation('collectors');
   const { data: fleets } = useFleets();
   const fleetNames = useMemo(() => new Map((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
   // Until the fleets have loaded, assume a fleet exists instead of flashing a "removed" placeholder.
@@ -56,18 +58,22 @@ const FleetReference = ({ fleetId, pendingFleetId = null, onClick = undefined }:
   );
 
   if (pendingFleetId) {
-    const origin = isKnown(fleetId) ? (fleetNames.get(fleetId) ?? fleetId) : 'a removed fleet';
+    const origin = isKnown(fleetId) ? (fleetNames.get(fleetId) ?? fleetId) : undefined;
 
     return (
       <span>
         {isKnown(pendingFleetId) ? fleetLink(pendingFleetId) : pendingFleetId}{' '}
-        <Hint title="The collector moves to this fleet the next time it checks in.">(moving from {origin})</Hint>
+        <Hint title={t('fleet_reference.moving_title')}>
+          {origin === undefined
+            ? t('fleet_reference.moving_from_removed')
+            : t('fleet_reference.moving_from', { fleet: origin })}
+        </Hint>
       </span>
     );
   }
 
   if (!isKnown(fleetId)) {
-    return <Hint title="This fleet has been deleted.">Fleet removed ({fleetId})</Hint>;
+    return <Hint title={t('fleet_reference.removed_title')}>{t('fleet_reference.removed', { fleetId })}</Hint>;
   }
 
   return fleetLink(fleetId);

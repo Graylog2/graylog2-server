@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, LinkContainer, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
@@ -131,22 +132,22 @@ const isRecognised = (type: SourceType) => Object.hasOwn(SOURCE_TYPE_LABELS, typ
 
 const NO_COUNT = '—';
 
-const countLabel = (count: number | undefined) => {
+/** The count for a source, or an em dash when a number would be meaningless or unknown. */
+const SourceCountCell = ({ count }: { count: number | undefined }) => {
+  const { t } = useTranslation('collectors');
+
   if (count === undefined) {
-    return NO_COUNT;
+    return <SourceCount>{NO_COUNT}</SourceCount>;
   }
 
   // A zero would sit right next to "No messages yet" or "Waiting for first messages...", which
   // already say it; the digit only adds noise.
   if (count === 0) {
-    return '';
+    return <SourceCount />;
   }
 
-  return `${formatNumber(count)} messages`;
+  return <SourceCount>{t('source_status.messages', { count, formattedCount: formatNumber(count) })}</SourceCount>;
 };
-
-/** The count for a source, or an em dash when a number would be meaningless or unknown. */
-const SourceCountCell = ({ count }: { count: number | undefined }) => <SourceCount>{countLabel(count)}</SourceCount>;
 
 const SourceStatus = ({
   source,
@@ -154,30 +155,31 @@ const SourceStatus = ({
   receiving,
   count,
 }: { source: Source; count: number | undefined } & Omit<Props, 'sources' | 'sourceCounts'>) => {
+  const { t } = useTranslation('collectors');
   const requiredPlatform = SOURCE_PLATFORM[source.type];
 
   if (!source.enabled) {
-    return <RowStatus>Disabled</RowStatus>;
+    return <RowStatus>{t('source_status.disabled')}</RowStatus>;
   }
 
   if (instance.os && requiredPlatform && requiredPlatform !== instance.os) {
-    return <RowStatus>Not applicable on {OS_LABELS[instance.os] ?? instance.os}</RowStatus>;
+    return <RowStatus>{t('source_status.not_applicable', { os: OS_LABELS[instance.os] ?? instance.os })}</RowStatus>;
   }
 
   // Deliberately not "Not applicable": that asserts a definite incompatibility, whereas an
   // unrecognised type may well be collecting perfectly well server-side. We only decline to guess.
   if (!isRecognised(source.type)) {
-    return <RowStatus>Unrecognised source type</RowStatus>;
+    return <RowStatus>{t('source_status.unrecognised')}</RowStatus>;
   }
 
   if (instance.status !== 'online') {
-    return <RowStatus $variant="warning">Paused &mdash; collector offline</RowStatus>;
+    return <RowStatus $variant="warning">{t('source_status.paused')}</RowStatus>;
   }
 
   if (count === undefined ? receiving : count > 0) {
     return (
       <RowStatus $variant="success">
-        <Icon name="check_circle" /> Receiving
+        <Icon name="check_circle" /> {t('enrolling_hosts.receiving')}
       </RowStatus>
     );
   }
@@ -185,12 +187,12 @@ const SourceStatus = ({
   // Once the collector is proven to be delivering, a silent source is a steady state rather than a
   // pending one, so it gets no spinner.
   if (receiving) {
-    return <RowStatus>No messages yet</RowStatus>;
+    return <RowStatus>{t('source_status.no_messages')}</RowStatus>;
   }
 
   return (
     <RowStatus>
-      <Spinner text="Waiting for first messages..." delay={0} />
+      <Spinner text={t('source_status.waiting')} delay={0} />
     </RowStatus>
   );
 };
@@ -206,21 +208,23 @@ const SourceStatusSection = ({
   sourceCounts = undefined,
   onConfigureSources = undefined,
 }: Props) => {
+  const { t } = useTranslation('collectors');
   const online = instance.status === 'online';
+  const duration = moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize();
 
   return (
     <QuietSection
-      title="Log Sources"
+      title={t('source_status.title')}
       titleAs="h3"
       actions={
         <LinkContainer to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
           <Button bsSize="xsmall" onClick={onConfigureSources}>
-            Configure sources
+            {t('next_steps.configure_sources')}
           </Button>
         </LinkContainer>
       }>
       {!sources?.length ? (
-        <Footer>No sources configured for this fleet yet.</Footer>
+        <Footer>{t('source_status.no_sources')}</Footer>
       ) : (
         <SourceList>
           {sources.map((source) => {
@@ -247,8 +251,9 @@ const SourceStatusSection = ({
       )}
       {online && (
         <Footer>
-          Showing messages received since {moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}
-          {!receiving && ' - checking every few seconds'}
+          {receiving
+            ? t('connection_success.caption_messages', { duration })
+            : t('connection_success.caption_messages_checking', { duration })}
         </Footer>
       )}
     </QuietSection>

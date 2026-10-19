@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { CollectorStats } from '../types';
@@ -30,7 +31,7 @@ export const useCollectorStats = () =>
     queryFn: () =>
       defaultOnError(
         Collectors.stats(),
-        'Loading Collector stats failed with status',
-        'Could not load Collector stats.',
+        i18n.t('load_errors.stats.message', { ns: 'collectors' }),
+        i18n.t('load_errors.stats.title', { ns: 'collectors' }),
       ),
   });

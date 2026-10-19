@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsFleets } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -33,8 +34,8 @@ export const useFleets = (): { data: Fleet[] | undefined; isLoading: boolean } =
     queryFn: () =>
       defaultOnError(
         CollectorsFleets.list(1, 0).then((response) => response.elements),
-        'Loading fleets failed with status',
-        'Could not load Fleets',
+        i18n.t('load_errors.fleets.message', { ns: 'collectors' }),
+        i18n.t('load_errors.fleets.title', { ns: 'collectors' }),
       ),
   });
 
@@ -42,7 +43,11 @@ export const useFleet = (fleetId: string) =>
   useQuery<Fleet>({
     queryKey: [...FLEETS_KEY_PREFIX, fleetId],
     queryFn: () =>
-      defaultOnError(CollectorsFleets.get(fleetId), 'Loading fleet failed with status', 'Could not load Fleet'),
+      defaultOnError(
+        CollectorsFleets.get(fleetId),
+        i18n.t('load_errors.fleet.message', { ns: 'collectors' }),
+        i18n.t('load_errors.fleet.title', { ns: 'collectors' }),
+      ),
     enabled: !!fleetId,
   });
 
@@ -52,8 +57,8 @@ export const useFleetStats = (fleetId: string) =>
     queryFn: () =>
       defaultOnError(
         CollectorsFleets.stats(fleetId),
-        'Loading fleet stats failed with status',
-        'Could not load Fleet Stats',
+        i18n.t('load_errors.fleet_stats.message', { ns: 'collectors' }),
+        i18n.t('load_errors.fleet_stats.title', { ns: 'collectors' }),
       ),
     enabled: !!fleetId,
   });
@@ -66,7 +71,11 @@ export const useFleetsBulkStats = () =>
   useQuery<BulkFleetStatsResponse>({
     queryKey: FLEETS_BULK_STATS_KEY,
     queryFn: () =>
-      defaultOnError(fetchBulkFleetStats(), 'Loading fleet stats failed with status', 'Could not load Fleet Stats'),
+      defaultOnError(
+        fetchBulkFleetStats(),
+        i18n.t('load_errors.fleet_stats.message', { ns: 'collectors' }),
+        i18n.t('load_errors.fleet_stats.title', { ns: 'collectors' }),
+      ),
   });
 
 export const fetchPaginatedFleets = async (searchParams: SearchParams): Promise<PaginatedResponse<Fleet>> =>
@@ -82,6 +91,6 @@ export const fetchPaginatedFleets = async (searchParams: SearchParams): Promise<
       pagination: response.pagination,
       attributes: response.attributes,
     })),
-    'Loading fleets failed with status',
-    'Could not load Fleets',
+    i18n.t('load_errors.fleets.message', { ns: 'collectors' }),
+    i18n.t('load_errors.fleets.title', { ns: 'collectors' }),
   );

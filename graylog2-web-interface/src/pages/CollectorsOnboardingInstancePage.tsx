@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -33,7 +33,7 @@ import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
-  const { t } = useTranslation('collectors_onboarding');
+  const { t } = useTranslation('collectors');
   const { instanceUid } = useParams<{ instanceUid: string }>();
   const location = useLocation<{ fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
@@ -65,13 +65,17 @@ const CollectorsOnboardingInstancePage = () => {
     if (isLoading) return <Spinner />;
 
     if (error) {
-      return <Alert bsStyle="danger">{t('load_error', { error: extractErrorMessage(error) })}</Alert>;
+      return <Alert bsStyle="danger">{t('pages.onboarding.load_error', { error: extractErrorMessage(error) })}</Alert>;
     }
 
     if (!instance) {
       return (
         <Alert bsStyle="warning">
-          {t('not_found_message')} <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>{t('instances')}</Link>.
+          <Trans
+            t={t}
+            i18nKey="pages.onboarding.not_found"
+            components={{ instancesLink: <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES} /> }}
+          />
         </Alert>
       );
     }
@@ -80,19 +84,19 @@ const CollectorsOnboardingInstancePage = () => {
   };
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.onboarding.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('title')} <PreviewBadge />
+            {t('pages.onboarding.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>{t('status_description')}</span>
+        <span>{t('pages.onboarding.description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>{content()}</Col>

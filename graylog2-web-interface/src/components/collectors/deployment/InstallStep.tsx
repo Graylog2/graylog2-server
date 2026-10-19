@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Tabs } from 'components/bootstrap';
 import { ClipboardButton } from 'components/common';
@@ -36,10 +37,11 @@ type Props = {
 };
 
 const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
+  const { t } = useTranslation('collectors');
   const sendTelemetry = useSendCollectorsTelemetry();
 
   if (!token) {
-    return <MutedText>Generate a token above to see the install command.</MutedText>;
+    return <MutedText>{t('deployment.generate_token_first')}</MutedText>;
   }
 
   const handlePlatformChange = (value: string | null) => {
@@ -77,7 +79,7 @@ const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
             actions={
               <ClipboardButton
                 text={token.token}
-                title="Copy token only"
+                title={t('deployment.copy_token_only')}
                 bsSize="sm"
                 onSuccess={() =>
                   sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {

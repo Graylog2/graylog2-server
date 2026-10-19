@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsSources } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -49,8 +50,8 @@ export const fetchPaginatedSources = async (
       pagination: response.pagination,
       attributes: response.attributes,
     })),
-    'Loading sources failed with status',
-    'Could not load sources',
+    i18n.t('load_errors.sources.message', { ns: 'collectors' }),
+    i18n.t('load_errors.sources.title', { ns: 'collectors' }),
   );
 
 export const useSources = (fleetId?: string) =>
@@ -61,8 +62,8 @@ export const useSources = (fleetId?: string) =>
 
       return defaultOnError(
         CollectorsSources.list(fleetId, 1, 0).then((response) => toSources(response.elements)),
-        'Loading sources failed with status',
-        'Could not load sources',
+        i18n.t('load_errors.sources.message', { ns: 'collectors' }),
+        i18n.t('load_errors.sources.title', { ns: 'collectors' }),
       );
     },
     enabled: !!fleetId,

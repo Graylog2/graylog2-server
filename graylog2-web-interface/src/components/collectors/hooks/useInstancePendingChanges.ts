@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import useCollectorRefetchInterval from './useCollectorRefetchInterval';
@@ -43,8 +44,8 @@ const useInstancePendingChanges = (
     queryFn: () =>
       defaultOnError(
         fetchPendingChanges(instanceUid),
-        'Loading pending changes failed with status',
-        'Could not load pending changes',
+        i18n.t('load_errors.pending_changes.message', { ns: 'collectors' }),
+        i18n.t('load_errors.pending_changes.title', { ns: 'collectors' }),
       ),
     refetchInterval,
   });

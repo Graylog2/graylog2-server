@@ -24,24 +24,22 @@ import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
 const CollectorsSettingsPage = () => {
-  const { t } = useTranslation('collectors_settings');
+  const { t } = useTranslation('collectors');
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.settings.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('settings_title')} <PreviewBadge />
+            {t('pages.settings.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          {t('description')}
-        </span>
+        <span>{t('pages.settings.description')}</span>
       </PageHeader>
       <CollectorsSettings />
     </DocumentTitle>

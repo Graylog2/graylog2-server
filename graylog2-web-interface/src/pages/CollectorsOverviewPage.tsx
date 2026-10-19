@@ -26,25 +26,23 @@ import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsOverviewPage = () => {
-  const { t } = useTranslation('collectors_overview');
+  const { t } = useTranslation('collectors');
   const productName = useProductName();
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.overview.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('overview_title')} <PreviewBadge />
+            {t('pages.overview.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          {t('description', { productName })}
-        </span>
+        <span>{t('pages.overview.description', { productName })}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
@@ -74,6 +75,7 @@ type FormValues = {
 const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 
 const CollectorsSettings = () => {
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();
   const { updateConfig } = useCollectorsMutations();
   const { isPermitted } = usePermissions();
@@ -253,12 +255,8 @@ const CollectorsSettings = () => {
         {!isConfigured && (
           <Col md={12}>
             <Alert bsStyle="info">
-              <strong>Getting started with Collectors</strong>
-              <p>
-                {isCloud
-                  ? 'Collectors connect to a managed ingest endpoint to send their data. Save your collector settings to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'
-                  : 'Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'}
-              </p>
+              <strong>{t('settings.getting_started')}</strong>
+              <p>{isCloud ? t('settings.getting_started_cloud') : t('settings.getting_started_self_managed')}</p>
             </Alert>
           </Col>
         )}
@@ -266,27 +264,27 @@ const CollectorsSettings = () => {
           {({ isSubmitting, setFieldValue, values, errors }) => (
             <Form>
               <Col md={6}>
-                <SectionTitle>Ingest Endpoint</SectionTitle>
+                <SectionTitle>{t('settings.ingest_endpoint')}</SectionTitle>
                 <HelpText>
-                  {isCloud
-                    ? 'The ingest endpoint is system-managed. Collectors connect here automatically.'
-                    : 'Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.'}
+                  {isCloud ? t('settings.ingest_endpoint_cloud') : t('settings.ingest_endpoint_help')}
                 </HelpText>
 
                 <FormikInput
                   id="http-hostname"
                   type="text"
-                  label="External hostname"
+                  label={t('ingest_endpoint.hostname')}
                   name="http_hostname"
                   disabled={isCloud}
-                  placeholder="e.g. otlp.example.com"
-                  help={
-                    isCloud
-                      ? undefined
-                      : 'The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts.'
-                  }
+                  placeholder={t('ingest_endpoint.hostname_placeholder')}
+                  help={isCloud ? undefined : t('settings.hostname_help')}
                 />
-                <FormikInput id="http-port" type="number" label="External port" name="http_port" disabled={isCloud} />
+                <FormikInput
+                  id="http-port"
+                  type="number"
+                  label={t('ingest_endpoint.port')}
+                  name="http_port"
+                  disabled={isCloud}
+                />
 
                 {!isCloud && (
                   <>
@@ -297,17 +295,22 @@ const CollectorsSettings = () => {
                     />
 
                     {showCreateInputCheckbox && (
-                      <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
+                      <FormikInput
+                        id="create-input"
+                        type="checkbox"
+                        label={t('settings.create_input')}
+                        name="create_input"
+                      />
                     )}
                   </>
                 )}
               </Col>
 
               <Col md={6}>
-                <SectionTitle>Collector Lifecycle</SectionTitle>
+                <SectionTitle>{t('settings.lifecycle')}</SectionTitle>
 
                 <TimeUnitInput
-                  label="Offline threshold"
+                  label={t('settings.offline_threshold')}
                   update={(value: number, unit: string) => {
                     setFieldValue('offline_value', value);
                     setFieldValue('offline_unit', unit);
@@ -321,13 +324,13 @@ const CollectorsSettings = () => {
                     errors.offline_value ? (
                       <span className="text-danger">{errors.offline_value}</span>
                     ) : (
-                      "Collectors that haven't reported within this time are shown as offline."
+                      t('settings.offline_threshold_help')
                     )
                   }
                 />
 
                 <TimeUnitInput
-                  label="Default visibility"
+                  label={t('settings.default_visibility')}
                   update={(value: number, unit: string) => {
                     setFieldValue('visibility_value', value);
                     setFieldValue('visibility_unit', unit);
@@ -341,13 +344,13 @@ const CollectorsSettings = () => {
                     errors.visibility_value ? (
                       <span className="text-danger">{errors.visibility_value}</span>
                     ) : (
-                      "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                      t('settings.default_visibility_help')
                     )
                   }
                 />
 
                 <TimeUnitInput
-                  label="Expiration threshold"
+                  label={t('settings.expiration_threshold')}
                   update={(value: number, unit: string) => {
                     setFieldValue('expiration_value', value);
                     setFieldValue('expiration_unit', unit);
@@ -361,7 +364,7 @@ const CollectorsSettings = () => {
                     errors.expiration_value ? (
                       <span className="text-danger">{errors.expiration_value}</span>
                     ) : (
-                      "Collectors that haven't reported within this time are permanently removed."
+                      t('settings.expiration_threshold_help')
                     )
                   }
                 />
@@ -371,8 +374,8 @@ const CollectorsSettings = () => {
                 {canEditConfig && (
                   <FormSubmit
                     isAsyncSubmit
-                    submitButtonText="Confirm settings"
-                    submitLoadingText="Saving..."
+                    submitButtonText={t('settings.confirm')}
+                    submitLoadingText={t('fleet_settings.saving')}
                     isSubmitting={isSubmitting}
                     displayCancel={false}
                   />

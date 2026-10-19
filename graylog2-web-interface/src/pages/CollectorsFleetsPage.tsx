@@ -29,7 +29,7 @@ import CreateButton from 'components/common/CreateButton';
 import Routes from 'routing/Routes';
 
 const CollectorsFleetsPage = () => {
-  const { t } = useTranslation('collectors_fleets');
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
@@ -42,22 +42,20 @@ const CollectorsFleetsPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.fleets.document_title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('fleets_title')} <PreviewBadge />
+            {t('pages.fleets.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}
-        actions={<CreateButton entityKey={t('entity_key')} />}>
-        <span>
-          {t('description')}
-        </span>
+        actions={<CreateButton entityKey="Fleet" />}>
+        <span>{t('pages.fleets.description')}</span>
       </PageHeader>
 
       <Row className="content">

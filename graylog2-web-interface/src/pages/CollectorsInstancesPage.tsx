@@ -28,7 +28,7 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsInstancesPage = () => {
-  const { t } = useTranslation('collectors_instances');
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
@@ -41,21 +41,19 @@ const CollectorsInstancesPage = () => {
   }
 
   return (
-    <DocumentTitle title={t('title')}>
+    <DocumentTitle title={t('pages.instances.document_title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            {t('instances_title')} <PreviewBadge />
+            {t('pages.instances.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: t('documentation_title'),
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          {t('description')}
-        </span>
+        <span>{t('pages.instances.description')}</span>
       </PageHeader>
 
       <Row className="content">

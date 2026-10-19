@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import { ConfirmDialog, IconButton, LinkContainer } from 'components/common';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const InstanceActions = ({ instance, onDetailsClick }: Props) => {
+  const { t } = useTranslation('collectors');
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteInstance } = useCollectorsMutations();
@@ -61,7 +63,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
         <LinkContainer to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}>
           <IconButton
             name="search"
-            title="Received messages"
+            title={t('fleet_actions.received_messages')}
             bsStyle="default"
             size="xsmall"
             onClick={() =>
@@ -85,7 +87,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
                   origin: 'row',
                 })
               }>
-              View System Logs
+              {t('instance_actions.view_system_logs')}
             </Button>
           </LinkContainer>
         )}
@@ -98,11 +100,13 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
             });
             onDetailsClick(instance);
           }}>
-          Details
+          {t('instance_actions.details')}
         </Button>
         {(canReassign || canDelete) && (
           <MoreActions>
-            {canReassign && <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>}
+            {canReassign && (
+              <MenuItem onSelect={() => setShowReassignModal(true)}>{t('instance_actions.reassign')}</MenuItem>
+            )}
             {canReassign && canDelete && <MenuItem divider />}
             {canDelete && <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />}
           </MoreActions>
@@ -118,12 +122,16 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
       )}
       {showDeleteConfirm && (
         <ConfirmDialog
-          title="Delete Collector instance"
+          title={t('instance_actions.delete_title')}
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete instance <strong>{instance.hostname || instance.instance_uid}</strong>?<br />
-          The Collector will need to be re-enrolled to appear again.
+          <Trans
+            t={t}
+            i18nKey="instance_actions.delete_confirm"
+            values={{ instanceName: instance.hostname || instance.instance_uid }}
+            components={{ emphasis: <strong />, lineBreak: <br /> }}
+          />
         </ConfirmDialog>
       )}
     </>

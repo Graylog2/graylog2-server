@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsActivity } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import useCollectorRefetchInterval from './useCollectorRefetchInterval';
@@ -42,8 +43,8 @@ export const useRecentActivity = (): { data: RecentActivityResponse | undefined;
     queryFn: () =>
       defaultOnError(
         fetchRecentActivity(),
-        'Loading recent activity failed with status',
-        'Could not load recent activity',
+        i18n.t('load_errors.recent_activity.message', { ns: 'collectors' }),
+        i18n.t('load_errors.recent_activity.title', { ns: 'collectors' }),
       ),
     refetchInterval,
     // A 403 here would be reported by FetchProvider and replace the whole Overview page

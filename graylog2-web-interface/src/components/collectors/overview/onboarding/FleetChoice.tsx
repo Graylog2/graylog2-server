@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -115,19 +116,20 @@ const FleetDescription = styled.div(
 const FLEET_SELECT_ID = 'onboarding-fleet-select';
 
 const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = false, inline = false }: Props) => {
+  const { t } = useTranslation('collectors');
   const { canCreateFleet } = useCollectorPermissions();
 
   if (selectedFleet) {
     return (
       <Container $inline={inline}>
-        {!inline && <Heading>Fleet for This Collector</Heading>}
+        {!inline && <Heading>{t('fleet_choice.selected_heading')}</Heading>}
         <SelectedBox>
           <div>
             <FleetName>{selectedFleet.name}</FleetName>
             {selectedFleet.description && <FleetDescription>{selectedFleet.description}</FleetDescription>}
           </div>
           <Button onClick={onChange} disabled={disabled}>
-            Change fleet
+            {t('fleet_choice.change')}
           </Button>
         </SelectedBox>
       </Container>
@@ -138,28 +140,28 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = fal
 
   return (
     <Container $inline={inline}>
-      {!inline && <Heading>Choose a Fleet for This Collector</Heading>}
+      {!inline && <Heading>{t('fleet_choice.heading')}</Heading>}
       <Row $inline={inline}>
         {canCreateFleet && (
           <>
             <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
-              Create new fleet
+              {t('fleet_choice.create_new')}
             </Button>
-            {options.length > 0 && <Separator>or</Separator>}
+            {options.length > 0 && <Separator>{t('fleet_choice.or')}</Separator>}
           </>
         )}
         {options.length > 0 && (
           <SelectField>
-            <HiddenLabel htmlFor={FLEET_SELECT_ID}>Select existing fleet</HiddenLabel>
+            <HiddenLabel htmlFor={FLEET_SELECT_ID}>{t('fleet_choice.select_existing')}</HiddenLabel>
             <Select
               inputId={FLEET_SELECT_ID}
-              aria-label="Select existing fleet"
+              aria-label={t('fleet_choice.select_existing')}
               options={options}
               value={null}
               onChange={(value: string) => onSelect({ kind: 'existing', fleetId: value })}
               clearable={false}
               disabled={disabled}
-              placeholder="Select existing fleet..."
+              placeholder={t('fleet_choice.select_existing_placeholder')}
             />
           </SelectField>
         )}

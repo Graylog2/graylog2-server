@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Formik, Form } from 'formik';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert, Button, Table } from 'components/bootstrap';
 import { FormikInput, Group, Link, Section, Spinner, Stack, Text } from 'components/common';
@@ -70,6 +71,7 @@ const buildRequest = (config: CollectorsConfig, values: FormValues, createInput:
  * while no input exists the address is edited inline in the warning and saving it creates the input.
  */
 const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
+  const { t } = useTranslation('collectors');
   const { updateConfig } = useCollectorsMutations();
   const { updateCollectorInputPort } = useCollectorInputMutations();
   const { canCreateIngestInput, canEditIngestInput } = useCollectorPermissions();
@@ -156,15 +158,15 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   }, [isCloud, isConfigured, config, submit]);
 
   if (isCloud && !isConfigured) {
-    return <Spinner text="Setting up Collectors..." />;
+    return <Spinner text={t('ingest_endpoint.setting_up')} />;
   }
 
   // The label says what saving does: the first save bootstraps the config, a later one moves an existing input,
   // and in the "no input" alert it creates the missing input. A bare "Confirm" hid that last effect.
   const submitLabel = (() => {
-    if (!isConfigured) return 'Confirm endpoint';
+    if (!isConfigured) return t('ingest_endpoint.confirm');
 
-    return needsInput ? 'Create input' : 'Save endpoint';
+    return needsInput ? t('ingest_endpoint.create_input') : t('ingest_endpoint.save');
   })();
 
   const formikProps = {
@@ -184,10 +186,10 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
           id="ingest-hostname"
           type="text"
           name="http_hostname"
-          label="External hostname"
+          label={t('ingest_endpoint.hostname')}
           labelClassName="sr-only"
           formGroupClassName="no-bm"
-          placeholder="e.g. otlp.example.com"
+          placeholder={t('ingest_endpoint.hostname_placeholder')}
           disabled={isSubmitting}
         />
       </div>
@@ -199,18 +201,18 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
           id="ingest-port"
           type="number"
           name="http_port"
-          label="External port"
+          label={t('ingest_endpoint.port')}
           labelClassName="sr-only"
           formGroupClassName="no-bm"
           disabled={isSubmitting}
         />
       </div>
       <Button type="submit" bsStyle="primary" disabled={isSubmitting}>
-        {isSubmitting ? 'Saving...' : submitLabel}
+        {isSubmitting ? t('fleet_settings.saving') : submitLabel}
       </Button>
       {onCancel && (
         <Button bsStyle="link" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {t('ingest_endpoint.cancel')}
         </Button>
       )}
     </Group>
@@ -218,8 +220,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
 
   const reachabilityHint = (
     <Text size="sm" c="dimmed">
-      Collectors send their logs to this address. It must be reachable from every Collector host: a load balancer, or
-      this server.
+      {t('ingest_endpoint.reachability_hint')}
     </Text>
   );
 
@@ -229,7 +230,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
         {({ isSubmitting }) => (
           <Form>
             <Section
-              title="Confirm how Collectors send data to this cluster"
+              title={t('ingest_endpoint.confirm_title')}
               titleAs="h4"
               actions={endpointFields(isSubmitting, editing ? () => setEditing(false) : undefined)}>
               <Stack gap="xs">{reachabilityHint}</Stack>
@@ -242,7 +243,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
 
   const changeButton = canChangeEndpoint ? (
     <Button bsStyle="link" onClick={() => setEditing(true)}>
-      Change endpoint
+      {t('ingest_endpoint.change')}
     </Button>
   ) : null;
 
@@ -261,7 +262,11 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   );
 
   if (isCloud) {
-    return <Alert bsStyle="success">Collectors send data to this cluster at {endpointText}</Alert>;
+    return (
+      <Alert bsStyle="success">
+        <Trans t={t} i18nKey="ingest_endpoint.sending_to" components={{ endpoint: endpointText }} />
+      </Alert>
+    );
   }
 
   if (isLoadingInputIds || isLoadingInputDetails || (hasInputs && isLoadingInputStates)) {
@@ -273,12 +278,12 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   // here and saving creates the input.
   if (!hasInputs) {
     return (
-      <Alert bsStyle="warning" title="No ingest input exists">
+      <Alert bsStyle="warning" title={t('ingest_endpoint.no_input_title')}>
         <Formik<FormValues> {...formikProps}>
           {({ isSubmitting }) => (
             <Form>
               <Stack gap="xs" align="flex-start">
-                <Text>Collectors can enroll, but they will not be able to send data until an input is created.</Text>
+                <Text>{t('ingest_endpoint.no_input')}</Text>
                 {endpointFields(isSubmitting)}
                 {reachabilityHint}
               </Stack>
@@ -291,9 +296,13 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
 
   if (!hasRunningInput) {
     return (
-      <Alert bsStyle="warning" title={headline(<>The ingest input on {endpointText} is not running</>)}>
+      <Alert
+        bsStyle="warning"
+        title={headline(
+          <Trans t={t} i18nKey="ingest_endpoint.not_running_title" components={{ endpoint: endpointText }} />,
+        )}>
         <Stack gap="xs">
-          <Text>Collectors can enroll, but they will not be able to send data until an input is running.</Text>
+          <Text>{t('ingest_endpoint.not_running')}</Text>
           <Table condensed>
             <tbody>
               {loadedInputs.map((input) => (
@@ -306,7 +315,9 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
                     {String(input.attributes?.bind_address ?? '')}:{String(input.attributes?.port ?? '')}
                   </td>
                   <td>
-                    <Link to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}>Manage input</Link>
+                    <Link to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}>
+                      {t('ingest_endpoint.manage_input')}
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -317,7 +328,11 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
     );
   }
 
-  return <Alert bsStyle="success">{headline(<>Collectors send data to this cluster at {endpointText}</>)}</Alert>;
+  return (
+    <Alert bsStyle="success">
+      {headline(<Trans t={t} i18nKey="ingest_endpoint.sending_to" components={{ endpoint: endpointText }} />)}
+    </Alert>
+  );
 };
 
 export default IngestEndpointStrip;

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, IconButton, Link, LinkContainer, Spinner } from 'components/common';
@@ -96,11 +97,11 @@ type FleetTab = 'sources' | 'instances' | 'settings';
 const DEFAULT_TAB: FleetTab = 'sources';
 const VALID_TABS: ReadonlyArray<FleetTab> = ['sources', 'instances', 'settings'];
 
-const SEGMENTS = [
-  { value: 'sources' as const, label: 'Sources' },
-  { value: 'instances' as const, label: 'Instances' },
-  { value: 'settings' as const, label: 'Settings' },
-];
+const SEGMENT_LABEL_KEYS: Record<FleetTab, string> = {
+  sources: 'fleet_detail.tab_sources',
+  instances: 'fleet_detail.tab_instances',
+  settings: 'fleet_detail.tab_settings',
+};
 
 type SourceActionsHandlers = {
   onEdit: (source: Source) => void;
@@ -110,14 +111,22 @@ type SourceActionsHandlers = {
   canDelete: boolean;
 };
 
-export const sourceActionsFactory =
-  ({ onEdit, onDelete, onViewMessages, canEdit, canDelete }: SourceActionsHandlers) =>
-  (source: Source) => (
+const SourceActions = ({
+  source,
+  onEdit,
+  onDelete,
+  onViewMessages,
+  canEdit,
+  canDelete,
+}: SourceActionsHandlers & { source: Source }) => {
+  const { t } = useTranslation('collectors');
+
+  return (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(AGENT_SOURCE_ID_FIELD, source.id)}>
         <IconButton
           name="search"
-          title="Received messages"
+          title={t('fleet_actions.received_messages')}
           bsStyle="default"
           size="xsmall"
           onClick={() => onViewMessages(source)}
@@ -125,7 +134,7 @@ export const sourceActionsFactory =
       </LinkContainer>
       {canEdit && (
         <Button bsSize="xsmall" onClick={() => onEdit(source)}>
-          Edit
+          {t('fleet_detail.edit_source')}
         </Button>
       )}
       {canDelete && (
@@ -135,8 +144,14 @@ export const sourceActionsFactory =
       )}
     </ButtonToolbar>
   );
+};
+
+export const sourceActionsFactory = (handlers: SourceActionsHandlers) => (source: Source) => (
+  <SourceActions source={source} {...handlers} />
+);
 
 const FleetDetail = ({ fleetId }: Props) => {
+  const { t } = useTranslation('collectors');
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
@@ -281,7 +296,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   }
 
   if (!fleet) {
-    return <div>Fleet not found</div>;
+    return <div>{t('fleet_detail.not_found')}</div>;
   }
 
   // Deep link into the deployment wizard with this fleet preselected.
@@ -304,7 +319,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         <HeaderActions>
           {canCreateToken(fleet.id) && (
             <LinkContainer to={deployCollectorUrl}>
-              <Button bsStyle="primary">Deploy a new Collector</Button>
+              <Button bsStyle="primary">{t('fleet_detail.deploy_collector')}</Button>
             </LinkContainer>
           )}
         </HeaderActions>
@@ -313,8 +328,8 @@ const FleetDetail = ({ fleetId }: Props) => {
       <StatsRow>
         <StatCard
           value={stats?.total_instances ?? 0}
-          label="Instances"
-          helpText="Collector processes enrolled in this fleet."
+          label={t('fleet_detail.stat_instances')}
+          helpText={t('fleet_detail.stat_instances_help')}
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
               app_action_value: 'stat-card-instances',
@@ -333,8 +348,8 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
         <StatCard
           value={stats?.online_instances ?? 0}
-          label="Online"
-          helpText="Instances that reported a heartbeat within the offline threshold."
+          label={t('fleet_detail.stat_online')}
+          helpText={t('fleet_detail.stat_online_help')}
           variant="success"
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
@@ -354,8 +369,8 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
         <StatCard
           value={stats?.offline_instances ?? 0}
-          label="Offline"
-          helpText="Instances that missed their heartbeat. Check host connectivity or Collector process status."
+          label={t('fleet_detail.stat_offline')}
+          helpText={t('fleet_detail.stat_offline_help')}
           variant="warning"
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
@@ -375,8 +390,8 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
         <StatCard
           value={stats?.total_sources ?? 0}
-          label="Sources"
-          helpText="Data collection configurations assigned to this fleet."
+          label={t('fleet_detail.stat_sources')}
+          helpText={t('fleet_detail.stat_sources_help')}
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
               app_action_value: 'stat-card-sources',
@@ -395,23 +410,27 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
       </StatsRow>
 
-      <SegmentedControl<FleetTab> data={SEGMENTS} value={activeTab} onChange={onTabChange} />
+      <SegmentedControl<FleetTab>
+        data={VALID_TABS.map((value) => ({ value, label: t(SEGMENT_LABEL_KEYS[value]) }))}
+        value={activeTab}
+        onChange={onTabChange}
+      />
 
       {activeTab === 'sources' && (
         <>
-          <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
+          <p>{t('fleet_detail.sources_description')}</p>
           <ActionsRow>
             <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
-              <Button>Received messages</Button>
+              <Button>{t('fleet_actions.received_messages')}</Button>
             </LinkContainer>
             {canCreateSource(fleetId) && (
               <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
-                Add Source
+                {t('fleet_detail.add_source')}
               </Button>
             )}
           </ActionsRow>
           <PaginatedEntityTable<Source>
-            humanName="sources"
+            humanName={t('fleet_detail.sources_human_name')}
             tableLayout={SOURCES_LAYOUT}
             fetchEntities={fetchSources}
             keyFn={(params) => [...sourcesKeyFn(params), fleetId]}
@@ -425,12 +444,14 @@ const FleetDetail = ({ fleetId }: Props) => {
       {activeTab === 'instances' && (
         <>
           <p>
-            Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances,{' '}
-            <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token for this
-            fleet.
+            <Trans
+              t={t}
+              i18nKey="fleet_detail.instances_description"
+              components={{ deployLink: <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT} /> }}
+            />
           </p>
           <PaginatedEntityTable<CollectorInstanceView>
-            humanName="instances"
+            humanName={t('fleet_detail.instances_human_name')}
             entityActions={instanceActions}
             tableLayout={INSTANCES_LAYOUT}
             fetchEntities={fetchInstances}
@@ -477,12 +498,16 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {deletingSource && (
         <ConfirmDialog
-          title="Delete source"
+          title={t('fleet_detail.delete_source_title')}
           show
           onConfirm={handleConfirmDeleteSource}
           onCancel={() => setDeletingSource(null)}>
-          Are you sure you want to delete source <strong>{deletingSource.name}</strong>? Collectors in this fleet will
-          stop collecting data from this source within seconds.
+          <Trans
+            t={t}
+            i18nKey="fleet_detail.delete_source_confirm"
+            values={{ sourceName: deletingSource.name }}
+            components={{ emphasis: <strong /> }}
+          />
         </ConfirmDialog>
       )}
     </div>
