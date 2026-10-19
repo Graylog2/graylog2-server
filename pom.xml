@@ -161,7 +161,7 @@
         <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
         <hk2.version>4.0.3</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.22.3</jackson.version>
-        <jadconfig.version>1.2.0</jadconfig.version>
+        <jadconfig.version>1.2.1</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javassist.version>3.33.0-GA</javassist.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
