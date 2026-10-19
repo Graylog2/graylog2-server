@@ -22,6 +22,7 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
+import { withTranslation } from 'react-i18next';
 import {
   searchGrokPatternsPaginated,
   testGrokPattern,
@@ -157,9 +158,7 @@ class GrokPatterns extends React.Component<
   confirmedRemove = (pattern) => {
     if (
       // eslint-disable-next-line no-alert
-      window.confirm(
-        `Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`,
-      )
+      window.confirm(this.props.t('delete_confirmation', { name: pattern.name }))
     ) {
       deleteGrokPattern(pattern, () => {
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
@@ -198,7 +197,7 @@ class GrokPatterns extends React.Component<
                 bsStyle="danger"
                 bsSize="xs"
                 onClick={() => this.confirmedRemove(pattern)}>
-                Delete
+                {this.props.t('delete')}
               </Button>
             </IfPermitted>
           </ButtonToolbar>
@@ -208,7 +207,7 @@ class GrokPatterns extends React.Component<
   };
 
   render() {
-    const headers = ['Name', 'Pattern', 'Actions'];
+    const headers = [this.props.t('header_name'), this.props.t('header_pattern'), this.props.t('header_actions')];
     const { pagination, patterns } = this.state;
 
     const queryHelperComponent = <GrokPatternQueryHelper />;
@@ -216,7 +215,7 @@ class GrokPatterns extends React.Component<
     return (
       <div>
         <PageHeader
-          title="Grok patterns"
+          title={this.props.t('title')}
           actions={
             <IfPermitted permissions="inputs:edit">
               <ButtonToolbar>
@@ -236,8 +235,7 @@ class GrokPatterns extends React.Component<
             </IfPermitted>
           }>
           <span>
-            This is a list of grok patterns you can use in your grok extractors. You can add your own manually or import
-            a whole list of patterns from a so called pattern file.
+            {this.props.t('description')}
           </span>
         </PageHeader>
 
@@ -263,7 +261,7 @@ class GrokPatterns extends React.Component<
                       headerCellFormatter={_headerCellFormatter}
                       sortByKey="name"
                       rows={patterns}
-                      noDataText="No grok patterns have been found."
+                      noDataText={this.props.t('no_data')}
                       dataRowFormatter={this._patternFormatter}
                     />
                   </PaginatedList>
@@ -277,4 +275,4 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withPaginationQueryParameter(GrokPatterns), 'grokpatterns');
+export default withTelemetry(withPaginationQueryParameter(withTranslation(GrokPatterns), 'grokpatterns'), 'grokpatterns');

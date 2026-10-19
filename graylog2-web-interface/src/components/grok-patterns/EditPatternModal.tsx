@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
 import withTelemetry from 'logic/telemetry/withTelemetry';
@@ -80,7 +81,7 @@ class EditPatternModal extends React.Component<
     const name = event.target.value;
 
     if (!validPatternName(name)) {
-      this.setState({ name: name, error: true, error_message: 'Pattern with that name already exists!' });
+      this.setState({ name: name, error: true, error_message: this.props.t('error_name_exists') });
     } else {
       this.setState({ name: name, error: false, error_message: '' });
     }
@@ -134,7 +135,7 @@ class EditPatternModal extends React.Component<
     const { testPattern } = this.props;
 
     if (name === '' || pattern === '') {
-      this.setState({ error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
+      this.setState({ error: true, error_message: this.props.t('error_test_missing') });
 
       return;
     }
@@ -170,9 +171,9 @@ class EditPatternModal extends React.Component<
     let triggerButtonContent;
 
     if (create) {
-      triggerButtonContent = 'Create pattern';
+      triggerButtonContent = this.props.t('create_pattern');
     } else {
-      triggerButtonContent = <span>Edit</span>;
+      triggerButtonContent = <span>{this.props.t('edit_pattern')}</span>;
     }
 
     return (
@@ -182,44 +183,44 @@ class EditPatternModal extends React.Component<
         </Button>
         <BootstrapModalForm
           show={showModal}
-          title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
-          data-telemetry-title={`${create ? 'Create' : 'Edit'} Grok Pattern`}
+          title={this.props.t(create ? 'modal_title_create' : 'modal_title_edit', { name })}
+          data-telemetry-title={this.props.t(create ? 'modal_title_create' : 'modal_title_edit', { name })}
           bsSize="large"
           onSubmitForm={this._save}
           onCancel={this._closeModal}
-          submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
+          submitButtonText={this.props.t(create ? 'submit_button_create' : 'submit_button_edit')}>
           <fieldset>
             <Input
               type="text"
               id={this._getId('pattern-name')}
-              label="Name"
+              label={this.props.t('input_name_label')}
               onChange={this._onNameChange}
               value={name}
               bsStyle={error ? 'error' : null}
               help={
                 error
                   ? errorMessage
-                  : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "
+                  : this.props.t('input_name_help')
               }
               autoFocus
               required
             />
             <GrokPatternInput onPatternChange={this._onPatternChange} pattern={pattern} patterns={patterns} />
             {testError && (
-              <Panel bsStyle="danger" header="Grok Error">
+              <Panel bsStyle="danger" header={this.props.t('error_grok')}>
                 <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>
               </Panel>
             )}
             <Input
               type="textarea"
               id={this._getId('sampleData')}
-              label="Sample Data"
-              help="Here you can add sample data to test your pattern"
+              label={this.props.t('input_sample_data_label')}
+              help={this.props.t('input_sample_data_help')}
               onChange={this._onSampleDataChange}
               value={sampleData}
             />
             <Button bsStyle="info" onClick={this._testPattern}>
-              Test with Sample Data
+              {this.props.t('button_test_sample')}
             </Button>
             <br />
             <br />
@@ -228,8 +229,8 @@ class EditPatternModal extends React.Component<
               id={this._getId('test_result')}
               readOnly
               rows={8}
-              help="Will contain the result of your test in a JSON format"
-              label="Test Result"
+              help={this.props.t('input_test_result_help')}
+              label={this.props.t('input_test_result_label')}
               value={testResult}
             />
           </fieldset>
@@ -239,4 +240,4 @@ class EditPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(EditPatternModal, 'grokpatterns');
+export default withTelemetry(withTranslation(EditPatternModal, 'grokpatterns'), 'grokpatterns');

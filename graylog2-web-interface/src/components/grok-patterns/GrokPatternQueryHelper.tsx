@@ -15,23 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
-const fieldMap = {
-  pattern: 'The pattern of the grok pattern',
-};
+const GrokPatternQueryHelper = () => {
+  const { t } = useTranslation('grokpatterns');
 
-const queryExample = (
-  <p>
-    Find grok patterns containing COMMON in the pattern:
-    <br />
-    <kbd>pattern:COMMON</kbd>
-    <br />
-  </p>
-);
-const GrokPatternQueryHelper = () => (
-  <QueryHelper entityName="grok pattern" commonFields={['name']} fieldMap={fieldMap} example={queryExample} />
-);
+  const fieldMap = {
+    pattern: t('query_helper_field_pattern'),
+  };
+
+  const queryExample = (
+    <p>
+      {t('query_helper_example')}
+      <br />
+      <kbd>pattern:COMMON</kbd>
+      <br />
+    </p>
+  );
+
+  return (
+    <QueryHelper
+      entityName={t('query_helper_entity_name')}
+      commonFields={['name']}
+      fieldMap={fieldMap}
+      example={queryExample}
+    />
+  );
+};
 
 export default GrokPatternQueryHelper;
