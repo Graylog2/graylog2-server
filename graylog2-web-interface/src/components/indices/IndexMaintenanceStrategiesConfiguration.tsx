@@ -56,7 +56,6 @@ interface ConfigComponentProps extends SystemConfigurationComponentProps {
   updateConfig: (update: StrategyConfig) => void;
   useMaxNumberOfIndices?: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
   disabled?: boolean;
-  /** Restrictions on single fields of this strategy, keyed as they are on the index set, e.g. retention_strategy.foo. */
   hiddenFields?: string[];
   immutableFields?: string[];
   ignoreFieldRestrictions?: boolean;

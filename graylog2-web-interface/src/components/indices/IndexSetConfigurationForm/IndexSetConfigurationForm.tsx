@@ -136,8 +136,6 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
-      // A copy, because this also runs before the confirmation dialog. Deleting keys from the Formik values
-      // themselves would leave a cancelled form missing fields.
       const indexSetValues = { ...values };
 
       if (!create) {
@@ -190,17 +188,11 @@ const IndexSetConfigurationForm = ({
     ],
   );
 
-  // What the user is being asked about, together with the values waiting for their answer.
   const [confirmation, setConfirmation] = useState<{ title: string; message: string; values: IndexSet } | null>(null);
-  // A confirmed save bypasses Formik's submit cycle, so its submitting state has to be tracked here to keep the
-  // submit button from starting a second request.
   const [savingConfirmed, setSavingConfirmed] = useState(false);
 
-  // Plugins may need the user to confirm a change before it is saved. The hook runs here so it can load what it
-  // needs, and hands back a check the submit handler calls. Resolving it this way keeps the hook call count stable.
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
   const useSubmitConfirmation = dataTieringPlugin?.useIndexSetSubmitConfirmation ?? (() => () => null);
-  // A new index set has nothing to lose yet, so nothing has to be loaded to decide about it.
   const submitConfirmation = useSubmitConfirmation({ enabled: !create });
 
   const onFieldTypeRefreshIntervalChange = (
@@ -261,18 +253,12 @@ const IndexSetConfigurationForm = ({
   };
 
   const saveConfiguration = (values: IndexSetFormValues, { setSubmitting }: FormikHelpers<IndexSetFormValues>) => {
-    // Checking the prepared values rather than the raw ones matters: a form that switched rotation mode still
-    // holds values for the mode it left behind, and only the prepared config says what will be stored.
     const preparedValues = prepareRetentionConfigBeforeSubmit(values);
 
-    // A plugin may need the user to confirm a change that cannot be undone, such as shortening how long
-    // archives are kept. On a new index set the check is switched off above and never asks for anything.
     const required = submitConfirmation(prepareInitialValues(), preparedValues);
 
     if (required) {
       setConfirmation({ ...required, values: preparedValues });
-      // Nothing is being submitted while the dialog is open, so the form has to leave its submitting state.
-      // Otherwise the submit button stays disabled after the dialog is cancelled.
       setSubmitting(false);
 
       return undefined;
@@ -288,8 +274,6 @@ const IndexSetConfigurationForm = ({
     cancelConfirmation();
     setSavingConfirmed(true);
 
-    // Starting the call inside the chain keeps a synchronous failure from skipping the reset below, which would
-    // leave the submit button disabled for good.
     return Promise.resolve()
       .then(() => onUpdate(values))
       .finally(() => setSavingConfirmed(false));

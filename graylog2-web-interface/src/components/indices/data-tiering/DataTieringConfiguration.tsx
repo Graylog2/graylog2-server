@@ -111,10 +111,6 @@ export const prepareDataTieringConfig = (
       delete config[field];
     });
   } else if (!config.archive_before_deletion) {
-    // An index set that does not archive stores no archive retention. The form keeps the values while it is
-    // open, so switching archiving off and on again does not lose them, but storing them would be wrong twice
-    // over: the server ignores them, and an override without a retention time would be rejected over a field
-    // that is no longer on screen.
     config = { ...config, archive_retention_override_enabled: false, archive_retention_time: null };
   }
 
