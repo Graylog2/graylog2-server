@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Data Node upgrading OpenSearch to the newest major version on existing nodes without indices, such as dedicated cluster managers."
+
+issues = ["27820"]
+pulls = []
