@@ -161,7 +161,7 @@ class DefaultMongodbConnectionResolverTest {
     @Test
     void testResolvePreservesQueryParameters() throws Exception {
         // Original connection string has query parameters
-        MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog?ssl=true&authSource=admin&maxPoolSize=50");
+        MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog?ssl=true&authSource=admin&connectTimeoutMS=1234");
         MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         MongoClient client = resolver.resolve("host1:27017");
@@ -169,7 +169,7 @@ class DefaultMongodbConnectionResolverTest {
 
         // Verify the MongoClientOptions reflect the query parameters from the original connection string
         assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
-        assertThat(client.getMongoClientOptions().getConnectionsPerHost()).isEqualTo(50); // maxPoolSize
+        assertThat(client.getMongoClientOptions().getConnectTimeout()).isEqualTo(1234);
 
         // Verify credentials use the authSource from query params
         assertThat(client.getCredential().getSource()).isEqualTo("admin");
@@ -314,6 +314,53 @@ class DefaultMongodbConnectionResolverTest {
         assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
         assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
         assertThat(client.getMongoClientOptions().getApplicationName()).isEqualTo("graylog");
+    }
+
+    /**
+     * The database path is optional, also if there are options. The hosts end at the first '/' or '?', so a '/' or
+     * '@' in the options must not be mistaken for the path or the credentials.
+     */
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "mongodb://user:pass@localhost:27017?authSource=admin&appName=graylog | graylog",
+            "mongodb://user:pass@localhost:27017/?authSource=admin&appName=graylog | graylog",
+            "mongodb://user:pass@localhost:27017,localhost:27018?replicaSet=rs0&authSource=admin&appName=graylog | graylog",
+            "mongodb://user:pass@localhost:27017?authSource=admin&appName=graylog/prod@dc1 | graylog/prod@dc1",
+            "mongodb://user:pass@localhost:27017?appName=graylog/prod&authSource=admin | graylog/prod",
+    })
+    void testResolveWithoutDatabasePath(String uri, String expectedAppName) throws Exception {
+        MongoDbConfiguration config = createConfiguration(uri);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
+
+        MongoClient client = resolver.resolve("host1:27017");
+        assertThat(client).isNotNull()
+                .satisfies(assertServer("host1:27017"))
+                .satisfies(assertCredentials("admin", "user", "pass"));
+        assertThat(client.getMongoClientOptions().getApplicationName()).isEqualTo(expectedAppName);
+        assertThat(client.getMongoClientOptions().getRequiredReplicaSetName()).isNull();
+        assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"mongodb://localhost:27017", "mongodb://localhost:27017/", "mongodb://user:pass@localhost:27017"})
+    void testResolveWithoutDatabasePathAndOptions(String uri) throws Exception {
+        MongoDbConfiguration config = createConfiguration(uri);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
+
+        MongoClient client = resolver.resolve("host1:27017");
+        assertThat(client).isNotNull().satisfies(assertServer("host1:27017"));
+        assertThat(client.getClusterDescription().getConnectionMode()).isEqualTo(ClusterConnectionMode.SINGLE);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"''", "?maxPoolSize=50", "?MAXPOOLSIZE=50&appName=graylog"})
+    void testResolveOverridesMaxPoolSize(String options) throws Exception {
+        MongoDbConfiguration config = createConfiguration(f("mongodb://localhost:27017/graylog%s", options));
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
+
+        MongoClient client = resolver.resolve("host1:27017");
+        assertThat(client).isNotNull().satisfies(assertServer("host1:27017"));
+        assertThat(client.getMongoClientOptions().getConnectionsPerHost()).isEqualTo(5);
     }
 
     @Test

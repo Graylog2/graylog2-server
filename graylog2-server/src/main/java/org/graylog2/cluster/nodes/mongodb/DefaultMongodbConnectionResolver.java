@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
@@ -48,10 +49,14 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
 
     private static final String SRV_SCHEME_PREFIX = "mongodb+srv://";
 
-    // Lower-cased, as MongoDB connection string option names are case-insensitive. Besides the options a direct
+    // The per-node clients only run occasional cluster overview commands, so they don't need the configured pool size,
+    // which is sized for the main connection.
+    private static final int PER_NODE_MAX_POOL_SIZE = 5;
+
+    // Lower-cased, as MongoDB connection string option names are case-insensitive. Besides the options the per-node
     // connection overrides, these are the options only allowed in mongodb+srv:// connection strings, as the per-node
     // connection strings are mongodb:// ones.
-    private static final Set<String> OPTIONS_DROPPED_PER_NODE = Set.of("replicaset", "directconnection",
+    private static final Set<String> OPTIONS_DROPPED_PER_NODE = Set.of("replicaset", "directconnection", "maxpoolsize",
             "srvmaxhosts", "srvservicename", "srvallowedhostssuffix");
 
     private final MongoDbConfiguration configuration;
@@ -81,15 +86,17 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
      * Credentials, database and options are copied verbatim (still URL-encoded), as the MongoDB driver already
      * accepted them for the main connection. Decoding and re-encoding them is not safe: e.g. a ':' in the password
      * must stay encoded, values may contain an encoded '=' and options like readPreferenceTags may be repeated.
-     * The original string is split the same way the MongoDB driver does it: hosts end at the first '/' after the
-     * scheme, credentials end at the last '@' before it and the options follow the next '?'.
+     * The original string is split the same way the MongoDB driver does it: hosts end at the first '/' or '?' after
+     * the scheme, as the database path is optional even with options, credentials end at the last '@' before it and
+     * the options follow the next '?'.
      */
     private String buildConnectionString(String nodeName) {
         final String uri = configuration.getUri();
         final String withoutScheme = uri.substring(uri.indexOf("://") + 3);
-        final int pathStart = withoutScheme.indexOf('/');
-        final String userAndHosts = pathStart < 0 ? withoutScheme : withoutScheme.substring(0, pathStart);
-        final String pathAndOptions = pathStart < 0 ? "" : withoutScheme.substring(pathStart + 1);
+        final int hostsEnd = CharMatcher.anyOf("/?").indexIn(withoutScheme);
+        final String userAndHosts = hostsEnd < 0 ? withoutScheme : withoutScheme.substring(0, hostsEnd);
+        // Without the '/' separating the hosts from the database, but with the '?' of the options, if there's no path
+        final String pathAndOptions = hostsEnd < 0 ? "" : withoutScheme.substring(withoutScheme.charAt(hostsEnd) == '/' ? hostsEnd + 1 : hostsEnd);
 
         // Includes the trailing '@', if there are credentials at all
         final String userInfo = userAndHosts.substring(0, userAndHosts.lastIndexOf('@') + 1);
@@ -109,7 +116,7 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
         final String perNodeOptions = Stream.of(
                         configuredOptions.stream().filter(option -> !OPTIONS_DROPPED_PER_NODE.contains(optionName(option))),
                         srvImpliedOptions,
-                        Stream.of("directConnection=true"))
+                        Stream.of("directConnection=true", f("maxPoolSize=%d", PER_NODE_MAX_POOL_SIZE)))
                 .flatMap(Function.identity())
                 .collect(Collectors.joining("&"));
 

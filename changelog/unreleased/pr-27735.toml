@@ -2,7 +2,7 @@ type = "f"
 message = "Fix the MongoDB nodes overview on the cluster configuration page for connection strings with special characters."
 
 details.user = """
-The MongoDB nodes overview connects to each replica set member using the configured `mongodb_uri`. Some valid connection strings broke these connections, while the main MongoDB connection kept working. Affected were URL-encoded special characters in credentials (e.g. `%3A` for `:` in the password), encoded `=` in option values, repeated options like `readPreferenceTags`, and characters such as `^` or `\\` in credentials. The overview then showed no node details. Failures on individual nodes are now also logged.
+The MongoDB nodes overview connects to each replica set member using the configured `mongodb_uri`. Some valid connection strings broke these connections, while the main MongoDB connection kept working. Affected were URL-encoded special characters in credentials (e.g. `%3A` for `:` in the password), encoded `=` in option values, repeated options like `readPreferenceTags`, and characters such as `^` or `\\` in credentials. The overview then showed no node details. Failures on individual nodes are now also logged. The connections to individual nodes now use a connection pool of at most 5 connections, regardless of `maxPoolSize` in `mongodb_uri`.
 """
 
 pulls = ["27735"]
