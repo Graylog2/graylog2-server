@@ -34,7 +34,8 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("sort_order") SortSpec.Direction sortOrder,
                                   @JsonProperty("from") int from,
                                   @JsonProperty("size") int size,
-                                  @JsonProperty("fields") List<String> fields) implements SearchRequestSpec {
+                                  @JsonProperty("fields") List<String> fields,
+                                  @JsonProperty("include_undecorated") boolean includeUndecorated) implements SearchRequestSpec {
 
 
     public static final String DEFAULT_SORT = Message.FIELD_TIMESTAMP;

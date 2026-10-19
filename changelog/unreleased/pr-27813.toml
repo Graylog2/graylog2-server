@@ -1,4 +1,4 @@
 type = "a"
-message = "Include stream ids in Scripting API message searches that request all fields."
+message = "Add `include_undecorated` to Scripting API message searches to also return the undecorated values of decorated fields, like stream ids next to stream titles."
 
 pulls = ["27813"]

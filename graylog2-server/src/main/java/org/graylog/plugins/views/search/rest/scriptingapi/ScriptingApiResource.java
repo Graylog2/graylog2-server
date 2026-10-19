@@ -102,6 +102,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @Parameter(name = "from", description = "For paging results. Starting from result") @QueryParam("from") int from,
                                         @Parameter(name = "size", description = "Page size") @QueryParam("size") int size,
+                                        @Parameter(name = "include_undecorated", description = "Additionally return the undecorated values of decorated fields, e.g. stream ids next to stream titles")
+                                        @QueryParam("include_undecorated") boolean includeUndecorated,
                                         @Context SearchUser searchUser) {
 
         try {
@@ -113,7 +115,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     sort,
                     sortOrder,
                     from,
-                    size);
+                    size,
+                    includeUndecorated);
             return service.executeQuery(messagesRequestSpec, searchUser);
         } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);

@@ -58,15 +58,24 @@ class MessagesTabularResponseCreatorTest {
     @BeforeEach
     void setUp() {
         creator = new MessagesTabularResponseCreator(mappedFieldTypesService, Set.of(new IdDecorator(), new StreamTitleDecorator()));
+        when(mappedFieldTypesService.fieldTypesByStreamIds(any(), any())).thenReturn(Set.of(
+                MappedFieldTypeDTO.create("source", STRING_TYPE),
+                MappedFieldTypeDTO.create(Message.FIELD_STREAMS, STREAMS_TYPE)));
     }
 
     @Test
-    void returnsAllFieldsWithStreamIdsWhenNoFieldsAreRequested() throws QueryFailedException {
-        mappedFields(Set.of(
-                MappedFieldTypeDTO.create("source", STRING_TYPE),
-                MappedFieldTypeDTO.create(Message.FIELD_STREAMS, STREAMS_TYPE)));
+    void returnsAllDecoratedFieldsWhenNoFieldsAreRequested() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of(), false), searchJob(), searchUser);
 
-        final TabularResponse response = creator.mapToResponse(spec(List.of()), searchJob(), searchUser);
+        assertThat(columnNames(response)).containsExactlyInAnyOrder("source", "streams");
+        assertThat(firstRow(response))
+                .containsEntry("source", "example.org")
+                .containsEntry("streams", "Title of stream-1");
+    }
+
+    @Test
+    void addsUndecoratedFieldsToAllFields() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of(), true), searchJob(), searchUser);
 
         assertThat(columnNames(response)).containsExactlyInAnyOrder("source", "streams", "streams#id");
         assertThat(firstRow(response))
@@ -76,32 +85,30 @@ class MessagesTabularResponseCreatorTest {
     }
 
     @Test
-    void omitsStreamIdsWhenStreamsAreNotMapped() throws QueryFailedException {
-        mappedFields(Set.of(MappedFieldTypeDTO.create("source", STRING_TYPE)));
-
-        final TabularResponse response = creator.mapToResponse(spec(List.of()), searchJob(), searchUser);
-
-        assertThat(columnNames(response)).containsExactly("source");
-    }
-
-    @Test
     void returnsOnlyRequestedFields() throws QueryFailedException {
-        mappedFields(Set.of(
-                MappedFieldTypeDTO.create("source", STRING_TYPE),
-                MappedFieldTypeDTO.create(Message.FIELD_STREAMS, STREAMS_TYPE)));
-
-        final TabularResponse response = creator.mapToResponse(spec(List.of("streams")), searchJob(), searchUser);
+        final TabularResponse response = creator.mapToResponse(spec(List.of("streams"), false), searchJob(), searchUser);
 
         assertThat(columnNames(response)).containsExactly("streams");
         assertThat(response.datarows()).containsExactly(List.of("Title of stream-1"));
     }
 
-    private void mappedFields(Set<MappedFieldTypeDTO> fields) {
-        when(mappedFieldTypesService.fieldTypesByStreamIds(any(), any())).thenReturn(fields);
+    @Test
+    void addsUndecoratedFieldsNextToRequestedFields() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of("streams", "source"), true), searchJob(), searchUser);
+
+        assertThat(columnNames(response)).containsExactly("streams", "streams#id", "source");
+        assertThat(response.datarows()).containsExactly(List.of("Title of stream-1", List.of(STREAM_ID), "example.org"));
     }
 
-    private static MessagesRequestSpec spec(List<String> fields) {
-        return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields);
+    @Test
+    void doesNotDuplicateRequestedUndecoratedFields() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of("streams", "streams#id"), true), searchJob(), searchUser);
+
+        assertThat(columnNames(response)).containsExactly("streams", "streams#id");
+    }
+
+    private static MessagesRequestSpec spec(List<String> fields, boolean includeUndecorated) {
+        return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields, includeUndecorated);
     }
 
     private static SearchJob searchJob() {

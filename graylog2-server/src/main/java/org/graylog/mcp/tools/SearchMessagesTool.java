@@ -106,7 +106,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.sortOrder(),
                     parameters.offset(),
                     parameters.limit(),
-                    parameters.fields()
+                    parameters.fields(),
+                    parameters.includeUndecorated()
             );
             // the query engine performs permission checks, so we don't have to do that here.
             final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec, permissionHelper.getSearchUser());
@@ -189,6 +190,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         @DefaultValue("desc")
         public abstract SortSpec.Direction sortOrder();
 
+        @JsonProperty("include_undecorated")
+        @JsonPropertyDescription("Additionally return the undecorated values of decorated fields, e.g. stream ids next to stream titles.")
+        @DefaultValue("false")
+        public abstract boolean includeUndecorated();
+
         public static Builder builder() {
             return Builder.create();
         }
@@ -206,7 +212,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .limit(50)
                         .offset(0)
                         .rangeSeconds(3600)
-                        .sortOrder(SortSpec.Direction.Descending);
+                        .sortOrder(SortSpec.Direction.Descending)
+                        .includeUndecorated(false);
             }
 
             @JsonProperty("query")
@@ -240,6 +247,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("sort_order")
             public abstract Builder sortOrder(final SortSpec.Direction sortOrder);
+
+            @JsonProperty("include_undecorated")
+            public abstract Builder includeUndecorated(final boolean includeUndecorated);
 
             public abstract Parameters build();
         }
