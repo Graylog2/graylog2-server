@@ -152,6 +152,9 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             if (config.enabledFeatureFlags().length > 0) {
                 throw new IllegalArgumentException("Feature flags cannot be used with VM lifecycle");
             }
+            if (config.mongoDBFixtures().length > 0) {
+                throw new IllegalArgumentException("MongoDB fixtures cannot be used with VM lifecycle");
+            }
         }
 
         // remember the lifecycle, we need it when deciding which value to inject into parameters
@@ -165,7 +168,7 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 // this backend will be re-used and only shut down at the very end
                 LOG.info("Creating VM-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
                 final var sw = Stopwatch.createStarted();
-                final var backend = createBackend(config);
+                final var backend = createBackend(config, context.getRequiredTestClass());
                 LOG.info("Created VM-lifecycle server backend for class {} in {}",
                         context.getRequiredTestClass().getName(), sw.stop().elapsed());
                 rootStore.put(VM_LIFECYCLE_BACKEND_KEY, backend);
@@ -177,14 +180,14 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
             // class lifecycle means we have to create a new backend
             LOG.info("Creating class-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
             final var sw = Stopwatch.createStarted();
-            final var backend = createBackend(config);
+            final var backend = createBackend(config, context.getRequiredTestClass());
             LOG.info("Created class-lifecycle server backend for class {} in {}",
                     context.getRequiredTestClass().getName(), sw.stop().elapsed());
             store.put(CLASS_LIFECYCLE_BACKEND_KEY, backend);
         }
     }
 
-    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config) {
+    private static ContainerizedGraylogBackend createBackend(GraylogBackendConfiguration config, Class<?> testClass) {
         final Map<String, String> env = Arrays.stream(config.env())
                 .collect(Collectors.toMap(
                         GraylogBackendConfiguration.Env::key,
@@ -200,6 +203,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                 .enabledFeatureFlags(List.of(config.enabledFeatureFlags()))
                 .env(env)
                 .importLicenses(config.importLicenses())
+                .mongoDBFixtures(List.of(config.mongoDBFixtures()))
+                .mongoDBFixtureClass(testClass)
                 .build();
 
         return ContainerizedGraylogBackend.createStarted(backendConfig);
