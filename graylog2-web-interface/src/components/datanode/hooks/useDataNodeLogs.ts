@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchDataNodeLogsStdout = async (hostname: string) =>
@@ -38,8 +39,8 @@ const useDataNodeLogs = (
     queryFn: () =>
       defaultOnError(
         fetchDataNodeLogsStdout(hostname),
-        'Loading Data Node stdout logs failed with status',
-        'Could not load Data Node stdout logs',
+        i18n.t('data_node_notifications.loading_stdout_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_stdout_failed_title', { ns: 'datanode' }),
       ),
 
     enabled,
@@ -51,8 +52,8 @@ const useDataNodeLogs = (
     queryFn: () =>
       defaultOnError(
         fetchDataNodeLogsStderr(hostname),
-        'Loading Data Node stderr logs failed with status',
-        'Could not load Data Node stderr logs',
+        i18n.t('data_node_notifications.loading_stderr_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_stderr_failed_title', { ns: 'datanode' }),
       ),
 
     enabled,

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { MigrationActions, MigrationStateItem, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -34,7 +35,7 @@ const StyledButtonToolbar = styled(ButtonToolbar)(
 
 const getSortedNextSteps = (nextSteps: MigrationActions[]) =>
   nextSteps.reduce((sortedNextSteps, step) => {
-    if (!MIGRATION_ACTIONS[step]?.label) {
+    if (!MIGRATION_ACTIONS[step]?.labelKey) {
       return [step, ...sortedNextSteps];
     }
 
@@ -96,6 +97,7 @@ const MigrationStepTriggerButtonToolbar = ({
   hidden = false,
   children = undefined,
 }: Props) => {
+  const { t } = useTranslation('datanode');
   const sendTelemetry = useSendTelemetry('migration');
   const { currentStep } = useMigrationState();
 
@@ -124,7 +126,7 @@ const MigrationStepTriggerButtonToolbar = ({
           bsSize="small"
           disabled={disabled}
           onClick={() => handleButtonClick(step)}>
-          {MIGRATION_ACTIONS[step]?.label || 'Next'}
+          {MIGRATION_ACTIONS[step]?.labelKey ? t(MIGRATION_ACTIONS[step].labelKey) : t('migration_actions.next')}
         </Button>
       ))}
       {children}

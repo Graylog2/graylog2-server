@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import useCompatibilityCheck from 'components/datanode/hooks/useCompatibilityCheck';
@@ -30,10 +31,11 @@ const CompatibilityAlert = styled(Alert)`
 `;
 
 const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {
-    return <Spinner text="Loading compatibility check results..." />;
+    return <Spinner text={t('compatibility_check.loading')} />;
   }
 
   const errors = Object.values(data || {}).flatMap((value) => value?.compatibility_errors || []);
@@ -42,17 +44,17 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: Mig
 
   return (
     <>
-      <h3>Directory compatibility check</h3>
+      <h3>{t('compatibility_check.title')}</h3>
       {isCompatible && !warnings.length && (
         <CompatibilityAlert bsStyle="success">
-          <h4>Your existing OpenSearch data can be migrated to Data Node.</h4>
+          <h4>{t('compatibility_check.compatible')}</h4>
         </CompatibilityAlert>
       )}
       {(!isCompatible || isError) && (
         <CompatibilityAlert bsStyle="danger">
           {!isError && !isCompatible && (
             <>
-              <h4>Your existing OpenSearch data cannot be migrated to Data Node.</h4>
+              <h4>{t('compatibility_check.incompatible')}</h4>
               <br />
               {errors.map((error) => (
                 <dd key={error}>{error}</dd>
@@ -61,7 +63,7 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: Mig
           )}
           {isError && (
             <>
-              <h4>There was an error checking the compatibility</h4>
+              <h4>{t('compatibility_check.error')}</h4>
               <p>{requestError.message}</p>
             </>
           )}
@@ -75,9 +77,7 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: Mig
         </CompatibilityAlert>
       )}
       <br />
-      {!isCompatible && (
-        <p>Your OpenSearch cluster cannot be migrated to this Data Node version because it&apos;s not compatible.</p>
-      )}
+      {!isCompatible && <p>{t('compatibility_check.version_incompatible')}</p>}
       {isCompatible &&
         data &&
         Object.keys(data).map((hostname) => (

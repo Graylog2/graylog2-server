@@ -19,8 +19,10 @@ import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { FormikInput, Icon, Dropzone } from 'components/common';
 import { Button, Alert } from 'components/bootstrap';
@@ -81,11 +83,11 @@ const validate = (formValues: FormValues) => {
   let errors = {};
 
   if (!formValues.files?.length) {
-    errors = { ...errors, files: 'Please upload a file.' };
+    errors = { ...errors, files: i18n.t('ca_upload.file_required', { ns: 'datanode' }) };
   }
 
   if (formValues.files?.length > 1) {
-    errors = { ...errors, files: 'Please upload only a single file.' };
+    errors = { ...errors, files: i18n.t('ca_upload.single_file', { ns: 'datanode' }) };
   }
 
   return errors;
@@ -96,23 +98,24 @@ const Explanation = styled.p`
 `;
 
 const CAUpload = () => {
+  const { t } = useTranslation('datanode');
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry('migration');
   const onRejectUpload = useCallback(() => {
-    UserNotification.error('CA upload failed');
-  }, []);
+    UserNotification.error(t('ca_upload.rejected'));
+  }, [t]);
 
   const { mutateAsync: onProcessUpload, isPending: isLoading } = useMutation({
     mutationFn: submitUpload,
 
     onSuccess: () => {
-      UserNotification.success('CA uploaded successfully');
+      UserNotification.success(t('ca_upload.success'));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
     onError: (error) => {
-      UserNotification.error(`CA upload failed with error: ${error}`);
+      UserNotification.error(t('ca_upload.failed', { error }));
     },
   });
 
@@ -131,15 +134,11 @@ const CAUpload = () => {
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
-          <Explanation>
-            Here you can upload your existing CA. You need to upload a single file containing both private key
-            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in
-            PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
-          </Explanation>
+          <Explanation>{t('ca_upload.explanation')}</Explanation>
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <label htmlFor="ca-dropzone">Certificate Authority</label>
+                <label htmlFor="ca-dropzone">{t('ca_upload.certificate_authority')}</label>
                 <CADropzone
                   onDrop={(files) => onChange({ target: { name, value: files } })}
                   onReject={onRejectUpload}
@@ -155,7 +154,7 @@ const CAUpload = () => {
                     <Dropzone.Idle>
                       <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
-                    <div>Drag CA here or click to select file</div>
+                    <div>{t('ca_upload.dropzone')}</div>
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
@@ -179,10 +178,16 @@ const CAUpload = () => {
             )}
           </Field>
 
-          <FormikInput id="password" placeholder="Password" name="password" type="password" label="Password" />
+          <FormikInput
+            id="password"
+            placeholder={t('ca_upload.password')}
+            name="password"
+            type="password"
+            label={t('ca_upload.password')}
+          />
           <UnsecureConnectionAlert renderIfSecure={<br />} />
           <Button bsStyle="primary" bsSize="small" disabled={!isValid} type="submit">
-            {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
+            {isSubmitting ? t('ca_upload.submitting') : t('ca_upload.submit')}
           </Button>
         </Form>
       )}

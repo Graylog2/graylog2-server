@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
@@ -22,30 +23,26 @@ import { Space } from 'preflight/components/common';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import useProductName from 'brand-customization/useProductName';
 
+const EXAMPLE_HOSTS_CONFIGURATION =
+  'elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200';
+
 const RestartGraylog = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
   const productName = useProductName();
 
   return (
     <>
-      <p>Almost there!</p>
+      <p>{t('restart_graylog.almost_there')}</p>
       <p>
-        Please remove the <code>elasticsearch_hosts</code> line from your <code>server.conf</code>
+        <Trans t={t} i18nKey="restart_graylog.remove_hosts" components={{ codeSnippet: <code /> }} />
       </p>
       <p>
-        E.g.,{' '}
-        <code>
-          elasticsearch_hosts =
-          https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200
-        </code>
+        {t('restart_graylog.example')} <code>{EXAMPLE_HOSTS_CONFIGURATION}</code>
       </p>
       <Space h="md" />
       <MigrationDatanodeList showProvisioningState={false} />
-      <p>
-        Please wait for all data nodes to become &apos;AVAILABLE&apos;. Please check the data node&apos;s log if they do
-        not become available within 1-2 minutes.
-      </p>
-      {/* eslint-disable-next-line react/no-unescaped-entities */}
-      <p>Once that's done, please restart {productName} to finish the migration.</p>
+      <p>{t('restart_graylog.wait_for_available')}</p>
+      <p>{t('restart_graylog.restart', { productName })}</p>
       <MigrationStepTriggerButtonToolbar
         hidden={hideActions}
         nextSteps={currentStep.next_steps}

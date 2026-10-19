@@ -15,6 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const MigrationFinishedStep = () => <p>The migration is finished !</p>;
+const MigrationFinishedStep = () => {
+  const { t } = useTranslation('datanode');
+
+  return <p>{t('migration_steps_text.finished')}</p>;
+};
 export default MigrationFinishedStep;

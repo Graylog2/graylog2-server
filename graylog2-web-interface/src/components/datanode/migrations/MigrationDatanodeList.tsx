@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Icon, Spinner, Timestamp } from 'components/common';
 import { Alert, Table } from 'components/bootstrap';
@@ -31,12 +32,17 @@ const StyledIcon = styled(Icon)`
   margin-right: 0.5em;
 `;
 
+const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page="graylog-data-node" text={children} />
+);
+
 const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
+  const { t } = useTranslation('datanode');
   const { data: dataNodes, isLoading } = useDataNodes();
   const productName = useProductName();
 
   if (isLoading) {
-    return <Spinner text="Loading Data Nodes" />;
+    return <Spinner text={t('migration_data_nodes.loading')} />;
   }
 
   return (
@@ -45,34 +51,36 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
         <>
           <p>
             <StyledIcon name="info" />
-            There are no Data Nodes found.
+            {t('migration_data_nodes.none_found')}
           </p>
-          <Alert bsStyle="warning" title="No Data Nodes found">
-            Please start at least a Data Node to continue the migration process. You can find more information on how to
-            start a Data Nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
+          <Alert bsStyle="warning" title={t('migration_data_nodes.none_found_title')}>
+            <Trans
+              t={t}
+              i18nKey="migration_data_nodes.start_data_node"
+              components={{ docsLink: <DataNodeDocsLink /> }}
+            />
           </Alert>
           <p>
-            <Spinner text="Looking for Data Nodes..." />
+            <Spinner text={t('migration_data_nodes.looking')} />
           </p>
         </>
       ) : (
         <>
-          <h4>Data Nodes found: {dataNodes?.list.length}</h4>
+          <h4>{t('migration_data_nodes.found', { count: dataNodes?.list.length })}</h4>
           {dataNodes.list.find((datanode) => !datanode.version_compatible) && (
-            <Alert bsStyle="warning" title="Incompatible Data Nodes found">
-              There are Data Nodes running with versions incompatible to your current {productName} version. Please make
-              sure to use the same version for both {productName} and Data Node.
+            <Alert bsStyle="warning" title={t('migration_data_nodes.incompatible_title')}>
+              {t('migration_data_nodes.incompatible', { productName })}
             </Alert>
           )}
           <br />
           <Table bordered condensed>
             <thead>
               <tr>
-                <th>Hostname</th>
-                <th>Transport address</th>
-                <th>Status</th>
-                <th>Certificate valid until</th>
-                <th>Version</th>
+                <th>{t('migration_data_nodes.hostname')}</th>
+                <th>{t('migration_data_nodes.transport_address')}</th>
+                <th>{t('migration_data_nodes.status')}</th>
+                <th>{t('migration_data_nodes.certificate_valid_until')}</th>
+                <th>{t('migration_data_nodes.version')}</th>
               </tr>
             </thead>
             <tbody>
@@ -82,14 +90,15 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
                   <td>{datanode.transport_address}</td>
                   <td>{showProvisioningState ? datanode.status : datanode.datanode_status}</td>
                   <td>
-                    {datanode.cert_valid_until ? <Timestamp dateTime={datanode.cert_valid_until} /> : 'No certificate'}
+                    {datanode.cert_valid_until ? (
+                      <Timestamp dateTime={datanode.cert_valid_until} />
+                    ) : (
+                      t('migration_data_nodes.no_certificate')
+                    )}
                   </td>
                   <td>
                     {!datanode.version_compatible && (
-                      <Icon
-                        name="warning"
-                        title={`This version is incompatible with your current ${productName} version.`}
-                      />
+                      <Icon name="warning" title={t('migration_data_nodes.version_incompatible', { productName })} />
                     )}
                     {datanode.datanode_version}
                   </td>

@@ -19,6 +19,7 @@ import moment from 'moment';
 
 import { Migration } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchJournalDowntimeSize = async () => Migration.getJournalEstimate();
@@ -40,8 +41,8 @@ const useJournalDowntimeSize = (): {
     queryFn: () =>
       defaultOnError(
         fetchJournalDowntimeSize(),
-        'Loading Data Node migration journal estimate',
-        'Could not load Data Node journal size estimate',
+        i18n.t('data_node_notifications.loading_journal_estimate_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_journal_estimate_failed_title', { ns: 'datanode' }),
       ),
 
     notifyOnChangeProps: ['data', 'error'],

@@ -101,7 +101,7 @@ export type MigrationActions =
   | 'CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED'
   | 'SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER';
 type RemoveDescriptionField<T> = {
-  [K in keyof T as Exclude<K, 'description'>]: T[K];
+  [K in keyof T as Exclude<K, 'descriptionKey'>]: T[K];
 };
 
 type ExtractKeyValues<T extends object> = {

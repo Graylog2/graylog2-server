@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Col, Label, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -51,17 +52,17 @@ const ProgressSpinner = styled(Icon)(
 );
 
 const STATE_LABELS: Record<RollingRestartState, string> = {
-  PREPARING_CLUSTER: 'Preparing cluster',
-  SELECTING_NEXT_NODE: 'Selecting next node',
-  UPGRADING_NODE: 'Upgrading node',
-  WAITING_NODE_JOINED: 'Waiting for node to rejoin',
-  REENABLING_ALLOCATION: 'Re-enabling allocation',
-  WAITING_GREEN: 'Waiting for green cluster',
-  PAUSED_WAITING_GREEN: 'Paused waiting for green cluster',
-  FINALIZING: 'Finalizing',
-  COMPLETED: 'Completed',
-  ABORTED: 'Aborted',
-  FAILED: 'Failed',
+  PREPARING_CLUSTER: 'rolling_upgrade_nodes.state.preparing_cluster',
+  SELECTING_NEXT_NODE: 'rolling_upgrade_nodes.state.selecting_next_node',
+  UPGRADING_NODE: 'rolling_upgrade_nodes.state.upgrading_node',
+  WAITING_NODE_JOINED: 'rolling_upgrade_nodes.state.waiting_node_joined',
+  REENABLING_ALLOCATION: 'rolling_upgrade_nodes.state.reenabling_allocation',
+  WAITING_GREEN: 'rolling_upgrade_nodes.state.waiting_green',
+  PAUSED_WAITING_GREEN: 'rolling_upgrade_nodes.state.paused_waiting_green',
+  FINALIZING: 'rolling_upgrade_nodes.state.finalizing',
+  COMPLETED: 'rolling_upgrade_nodes.state.completed',
+  ABORTED: 'rolling_upgrade_nodes.state.aborted',
+  FAILED: 'rolling_upgrade_nodes.state.failed',
 };
 
 const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
@@ -79,10 +80,11 @@ const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 
 };
 
 const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
+  const { t } = useTranslation('datanode');
   const data = job?.data;
 
   if (!data) {
-    return <Alert bsStyle="info">No OpenSearch rolling upgrade has been started yet.</Alert>;
+    return <Alert bsStyle="info">{t('rolling_upgrade_nodes.not_started')}</Alert>;
   }
 
   const versionNodeById = new Map(versionNodes.map((versionNode) => [versionNode.node_id, versionNode]));
@@ -97,13 +99,13 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   const currentNodeIndex = isTerminal ? -1 : data.current_node_index;
   // Fallbacks cover backend states the UI doesn't know yet.
   const stateStyle = STATE_STYLE[data.sm_state] ?? 'info';
-  const stateLabel = STATE_LABELS[data.sm_state] ?? 'In progress';
+  const stateLabel = t(STATE_LABELS[data.sm_state] ?? 'rolling_upgrade_nodes.state.in_progress');
   const showProgress = !isTerminal && !isRollingRestartPaused(data.sm_state);
 
   return (
     <>
       <SectionHeading>
-        OpenSearch rolling upgrade&nbsp;
+        {t('rolling_upgrade_nodes.title')}&nbsp;
         <Label bsStyle={stateStyle}>
           {stateLabel}
           {showProgress && <ProgressSpinner name="progress_activity" spin data-testid="rolling-upgrade-progress" />}
@@ -111,25 +113,23 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
       </SectionHeading>
       {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
       {data.last_error && <Alert bsStyle="danger">{data.last_error}</Alert>}
-      {data.abort_requested && (
-        <Alert bsStyle="warning">Abort requested. The upgrade will stop after the current step.</Alert>
-      )}
+      {data.abort_requested && <Alert bsStyle="warning">{t('rolling_upgrade_nodes.abort_requested')}</Alert>}
       <Row>
         <Col sm={6}>
-          <NodesHeading>Waiting for OpenSearch upgrade</NodesHeading>
+          <NodesHeading>{t('rolling_upgrade_nodes.waiting_heading')}</NodesHeading>
           <OpenSearchRollingUpgradeNodeTable
             nodes={remainingNodes}
             currentNodeIndex={currentNodeIndex}
-            emptyMessage="No remaining nodes."
+            emptyMessage={t('rolling_upgrade_nodes.no_remaining_nodes')}
             showProgress={showProgress}
           />
         </Col>
         <Col sm={6}>
-          <NodesHeading>Upgraded to target OpenSearch</NodesHeading>
+          <NodesHeading>{t('rolling_upgrade_nodes.upgraded_heading')}</NodesHeading>
           <OpenSearchRollingUpgradeNodeTable
             nodes={completedNodes}
             currentNodeIndex={currentNodeIndex}
-            emptyMessage="No upgraded nodes yet."
+            emptyMessage={t('rolling_upgrade_nodes.no_upgraded_nodes')}
             showProgress={showProgress}
           />
         </Col>

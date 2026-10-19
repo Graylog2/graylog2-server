@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
@@ -34,24 +35,21 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
 );
 
 const JwtAuthenticationInfo = () => {
+  const { t } = useTranslation('datanode');
   const productName = useProductName();
 
   return (
     <StyledPanel bsStyle="info">
       <Panel.Heading>
-        <Panel.Title componentClass="h3">JWT authentication</Panel.Title>
+        <Panel.Title componentClass="h3">{t('jwt_authentication.title')}</Panel.Title>
       </Panel.Heading>
       <Panel.Body>
+        <p>{t('jwt_authentication.description', { productName })}</p>
         <p>
-          Depending on how you secured your existing cluster, some preliminary changes are needed to the security
-          configuration. We use JWT authentication to access OpenSearch from ${productName}. In the next step, you have
-          to manually enable JWT authentication in your existing OpenSearch cluster to make sure the data can be
-          accessed in the data node.
-        </p>
-        <p>
-          To do this, you should add the following snippet to your <code>opensearch-security/config.yml</code>
+          <Trans t={t} i18nKey="jwt_authentication.add_snippet" components={{ codeSnippet: <code /> }} />
         </p>
         <pre>
+          {/* eslint-disable-next-line graylog/no-untranslated-text -- configuration snippet */}
           {`jwt_auth_domain:
           description: "Authenticate via Json Web Token"
           http_enabled: true
@@ -70,9 +68,9 @@ const JwtAuthenticationInfo = () => {
             type: noop`}
         </pre>
         <p>
-          Please replace the signing key with your <code>GRAYLOG_PASSWORD_SECRET</code> in base64 encoding. To encode
-          it, you can run
+          <Trans t={t} i18nKey="jwt_authentication.replace_signing_key" components={{ codeSnippet: <code /> }} />
         </p>
+        {/* eslint-disable-next-line graylog/no-untranslated-text -- shell command */}
         <pre>echo &quot;YOUR SECRET&quot; | base64</pre>
       </Panel.Body>
     </StyledPanel>

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 
@@ -49,21 +50,27 @@ const OpenSearchUpgradeInfo = ({
   isLoading: boolean;
   availableDataNodes: number;
   unavailableDataNodes: number;
-}) => (
-  <InfoList>
-    <dt>Current OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : (currentVersion ?? 'Unknown')}</dd>
-    <dt>Target OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : (targetVersion ?? currentVersion ?? 'Unknown')}</dd>
-    <dt>Data Nodes:</dt>
-    <dd>
-      {isLoading ? (
-        <Spinner text="Loading..." />
-      ) : (
-        `${availableDataNodes + unavailableDataNodes} (${availableDataNodes} available)`
-      )}
-    </dd>
-  </InfoList>
-);
+}) => {
+  const { t } = useTranslation('datanode');
+  const loading = <Spinner text={t('opensearch_upgrade_info.loading')} />;
+
+  return (
+    <InfoList>
+      <dt>{t('opensearch_upgrade_info.current_version')}</dt>
+      <dd>{isLoading ? loading : (currentVersion ?? t('opensearch_upgrade_info.unknown'))}</dd>
+      <dt>{t('opensearch_upgrade_info.target_version')}</dt>
+      <dd>{isLoading ? loading : (targetVersion ?? currentVersion ?? t('opensearch_upgrade_info.unknown'))}</dd>
+      <dt>{t('opensearch_upgrade_info.data_nodes')}</dt>
+      <dd>
+        {isLoading
+          ? loading
+          : t('opensearch_upgrade_info.data_nodes_summary', {
+              total: availableDataNodes + unavailableDataNodes,
+              available: availableDataNodes,
+            })}
+      </dd>
+    </InfoList>
+  );
+};
 
 export default OpenSearchUpgradeInfo;

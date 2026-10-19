@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BootstrapModalWrapper, Button } from 'components/bootstrap';
 import ClientCertForm from 'components/datanode/client-certificate/ClientCertForm';
 
 const CreateClientCertificateButton = () => {
+  const { t } = useTranslation('datanode');
   const [showCertificateForm, setShowCertificateForm] = useState(false);
   const onCancel = () => setShowCertificateForm(false);
 
   return (
     <>
       <Button bsStyle="primary" bsSize="small" onClick={() => setShowCertificateForm(true)}>
-        Generate client certificate
+        {t('client_certificate.generate')}
       </Button>
       {showCertificateForm && (
         <BootstrapModalWrapper showModal={showCertificateForm} onHide={() => onCancel()} bsSize="lg">

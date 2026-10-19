@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import type { DataNode } from 'components/datanode/Types';
 import fetch from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
@@ -34,7 +35,11 @@ const useDataNode = (
   const { data, refetch, isInitialLoading, error } = useQuery({
     queryKey: ['datanode'],
     queryFn: () =>
-      defaultOnError(fetchDataNode(datanodeId), 'Loading Data Node failed with status', 'Could not load Data Node'),
+      defaultOnError(
+        fetchDataNode(datanodeId),
+        i18n.t('data_node_notifications.loading_node_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_node_failed_title', { ns: 'datanode' }),
+      ),
     notifyOnChangeProps: ['data', 'error'],
     refetchInterval: 5000,
   });

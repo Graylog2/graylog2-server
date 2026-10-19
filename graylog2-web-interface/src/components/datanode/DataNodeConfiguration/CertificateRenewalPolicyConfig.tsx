@@ -20,8 +20,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Field, Form, Formik } from 'formik';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import capitalize from 'lodash/capitalize';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 import UserNotification from 'util/UserNotification';
@@ -91,13 +91,20 @@ const smallestUnit = (duration: string) => {
 const fetchCurrentConfig = () =>
   ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
-const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <Button onClick={createPolicy} bsSize="small" bsStyle="primary">
-    Configure Certificate Renewal Policy
-  </Button>
-);
+const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => {
+  const { t } = useTranslation('datanode');
 
-const certicateRenewalModes = ['AUTOMATIC', 'MANUAL'].map((mode) => ({ label: capitalize(mode), value: mode }));
+  return (
+    <Button onClick={createPolicy} bsSize="small" bsStyle="primary">
+      {t('renewal_policy.configure')}
+    </Button>
+  );
+};
+
+const RENEWAL_MODE_KEYS = {
+  AUTOMATIC: 'renewal_policy.modes.automatic',
+  MANUAL: 'renewal_policy.modes.manual',
+} as const;
 
 const DEFAULT_CONFIG = {
   mode: 'AUTOMATIC',
@@ -107,18 +114,12 @@ const DEFAULT_CONFIG = {
 
 const queryKey = ['config', 'certificate-renewal-policy'];
 
-const renewalModeExplanation =
-  'Setting the renewal policy to "Automatic" will ' +
-  'renew all expiring certificates without any user interaction. Setting it to "Manual" will create a system ' +
-  'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
-const lifetimeExplanation =
-  'The certificate lifetime will be used for the length of the validity of newly created certificates.';
-
 type Props = {
   className?: string;
 };
 
 const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
+  const { t } = useTranslation('datanode');
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery({
     queryKey: queryKey,
@@ -141,8 +142,8 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
 
     onError: (err: Error) => {
       UserNotification.error(
-        `Error Updating Detector Definition: ${err.toString()}`,
-        'Unable to update detector definition',
+        t('renewal_policy.update_failed', { error: err.toString() }),
+        t('renewal_policy.update_failed_title'),
       );
     },
   });
@@ -171,7 +172,13 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
     return <Spinner />;
   }
 
-  const modalTitle = 'Configure Certificate Renewal Policy';
+  const modalTitle = t('renewal_policy.configure');
+  const renewalModeExplanation = t('renewal_policy.mode_explanation');
+  const lifetimeExplanation = t('renewal_policy.lifetime_explanation');
+  const certificateRenewalModes = (['AUTOMATIC', 'MANUAL'] as const).map((mode) => ({
+    label: t(RENEWAL_MODE_KEYS[mode]),
+    value: mode,
+  }));
 
   const resetConfig = () => {
     setShowModal(false);
@@ -192,22 +199,20 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
 
   return (
     <div className={className}>
-      <h2>Certificate Renewal Policy Configuration</h2>
-      <p>These settings will be used when detecting expiration of certificates and/or when renewing them.</p>
+      <h2>{t('renewal_policy.title')}</h2>
+      <p>{t('renewal_policy.description')}</p>
       {!currentConfig ? (
         <NoExistingPolicy createPolicy={() => setShowModal(true)} />
       ) : (
         <>
           <StyledDefList>
-            <dt>Renewal Mode:</dt>
-            <dd>{capitalize(currentConfig.mode)}</dd>
+            <dt>{t('renewal_policy.renewal_mode')}</dt>
+            <dd>{t(RENEWAL_MODE_KEYS[currentConfig.mode])}</dd>
             <dd>
               <i>{renewalModeExplanation}</i>
             </dd>
-            <dt>Certificate Lifetime:</dt>
-            <dd>
-              {formConfig.lifetimeValue} {formConfig.lifetimeUnit}
-            </dd>
+            <dt>{t('renewal_policy.certificate_lifetime')}</dt>
+            <dd>{t(`common:duration.${formConfig.lifetimeUnit}`, { count: formConfig.lifetimeValue })}</dd>
             <dd>
               <i>{lifetimeExplanation}</i>
             </dd>
@@ -225,7 +230,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
 
                   setShowModal(true);
                 }}>
-                Edit configuration
+                {t('renewal_policy.edit')}
               </Button>
             </IfPermitted>
           </p>
@@ -246,13 +251,13 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
                     <Col md={12}>
                       <Field name="mode">
                         {({ field: { name, value, onChange } }) => (
-                          <Input id={name} label="Certificate Renewal Mode" help={renewalModeExplanation}>
+                          <Input id={name} label={t('renewal_policy.renewal_mode_label')} help={renewalModeExplanation}>
                             <Select
-                              options={certicateRenewalModes}
+                              options={certificateRenewalModes}
                               clearable={false}
                               name={name}
                               value={value ?? 'AUTOMATIC'}
-                              aria-label="Select certificate renewal mode"
+                              aria-label={t('renewal_policy.select_mode')}
                               size="small"
                               onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                             />
@@ -260,7 +265,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
                         )}
                       </Field>
                       <TimeUnitInput
-                        label="Certificate Lifetime"
+                        label={t('renewal_policy.certificate_lifetime_label')}
                         help={lifetimeExplanation}
                         update={(value, unit) => {
                           setFieldValue('lifetimeValue', value);
@@ -283,8 +288,8 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
                   disabledSubmit={isValidating || !isValid}
                   isSubmitting={isSubmitting}
                   isAsyncSubmit
-                  submitLoadingText="Updating configuration"
-                  submitButtonText="Update configuration"
+                  submitLoadingText={t('renewal_policy.submitting')}
+                  submitButtonText={t('renewal_policy.submit')}
                 />
               </Modal.Footer>
             </Form>

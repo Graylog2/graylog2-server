@@ -16,10 +16,12 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Panel, PanelGroup } from 'components/bootstrap';
 import type { MigrationState, MigrationStateItem } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
+import useProductName from 'brand-customization/useProductName';
 
 import { MIGRATION_STATE } from '../../Constants';
 
@@ -72,13 +74,15 @@ type Props = {
 };
 
 const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComponent }: Props) => {
+  const { t } = useTranslation('datanode');
+  const productName = useProductName();
   const { state: activeStep } = currentStep;
   const activeStepIndex = sortedMigrationSteps.indexOf(activeStep);
 
   return (
     <StyledPanelGroup accordion={false} id="first" activeKey={activeStep} onSelect={() => {}}>
       {sortedMigrationSteps.map((migrationStep, index) => {
-        const { description } = MIGRATION_STATE[migrationStep];
+        const description = t(MIGRATION_STATE[migrationStep].descriptionKey, { productName });
         const isCurrentStep = migrationStep === activeStep;
         const isPreviousStep = index < activeStepIndex;
 

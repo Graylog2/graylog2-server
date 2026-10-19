@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CertificateRenewalPolicyConfig from 'components/datanode/DataNodeConfiguration/CertificateRenewalPolicyConfig';
 import { Space } from 'preflight/components/common';
@@ -22,17 +23,21 @@ import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
-const CertificateRenewalStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
-  <>
-    <MigrationError errorMessage={currentStep.error_message} />
-    <CertificateRenewalPolicyConfig />
-    <Space h="xs" />
-    {currentStep.next_steps.length <= 0 && <p>Please create a certificate renewal policy before proceeding.</p>}
-    <MigrationStepTriggerButtonToolbar
-      hidden={hideActions}
-      nextSteps={currentStep.next_steps}
-      onTriggerStep={onTriggerStep}
-    />
-  </>
-);
+const CertificateRenewalStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
+
+  return (
+    <>
+      <MigrationError errorMessage={currentStep.error_message} />
+      <CertificateRenewalPolicyConfig />
+      <Space h="xs" />
+      {currentStep.next_steps.length <= 0 && <p>{t('migration_steps_text.renewal_step_required')}</p>}
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
+    </>
+  );
+};
 export default CertificateRenewalStep;

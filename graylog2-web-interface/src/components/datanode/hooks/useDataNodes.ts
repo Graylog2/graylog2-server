@@ -20,6 +20,7 @@ import { CertificateRenewal, Datanode } from '@graylog/server-api';
 
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
@@ -43,18 +44,21 @@ export const bulkRemoveDataNode = async (
 
     if (failures?.length === entity_ids.length) {
       UserNotification.error(
-        `Removing Data Node failed with status: ${JSON.stringify(failures)}`,
-        'Could not remove Data Nodes.',
+        i18n.t('data_node_notifications.remove_failed', { ns: 'datanode', status: JSON.stringify(failures) }),
+        i18n.t('data_node_notifications.bulk_remove_failed_title', { ns: 'datanode' }),
       );
     }
 
     if (successfully_performed) {
       UserNotification.success(
-        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully.`,
+        i18n.t('data_node_notifications.bulk_remove_success', { ns: 'datanode', count: successfully_performed }),
       );
     }
   } catch (errorThrown) {
-    UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove Data Nodes.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.remove_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.bulk_remove_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -75,18 +79,21 @@ export const bulkStartDataNode = async (
 
     if (failures?.length === entity_ids.length) {
       UserNotification.error(
-        `Starting Data Node failed with status: ${JSON.stringify(failures)}`,
-        'Could not start Data Nodes.',
+        i18n.t('data_node_notifications.start_failed', { ns: 'datanode', status: JSON.stringify(failures) }),
+        i18n.t('data_node_notifications.bulk_start_failed_title', { ns: 'datanode' }),
       );
     }
 
     if (successfully_performed) {
       UserNotification.success(
-        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully.`,
+        i18n.t('data_node_notifications.bulk_start_success', { ns: 'datanode', count: successfully_performed }),
       );
     }
   } catch (errorThrown) {
-    UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start Data Nodes.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.start_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.bulk_start_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -105,18 +112,21 @@ export const bulkStopDataNode = async (
 
     if (failures?.length === entity_ids.length) {
       UserNotification.error(
-        `Stopping Data Node failed with status: ${JSON.stringify(failures)}`,
-        'Could not stop Data Nodes.',
+        i18n.t('data_node_notifications.stop_failed', { ns: 'datanode', status: JSON.stringify(failures) }),
+        i18n.t('data_node_notifications.bulk_stop_failed_title', { ns: 'datanode' }),
       );
     }
 
     if (successfully_performed) {
       UserNotification.success(
-        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully.`,
+        i18n.t('data_node_notifications.bulk_stop_success', { ns: 'datanode', count: successfully_performed }),
       );
     }
   } catch (errorThrown) {
-    UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop Data Nodes.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.stop_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.bulk_stop_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -124,9 +134,12 @@ export const removeDataNode = async (datanodeId: string) => {
   try {
     await Datanode.removeNode(datanodeId);
 
-    UserNotification.success(`Data Node "${datanodeId}" removed successfully.`);
+    UserNotification.success(i18n.t('data_node_notifications.remove_success', { ns: 'datanode', datanodeId }));
   } catch (errorThrown) {
-    UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove the Data Node.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.remove_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.remove_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -134,9 +147,12 @@ export const startDataNode = async (datanodeId: string) => {
   try {
     await Datanode.startNode(datanodeId);
 
-    UserNotification.success(`Data Node "${datanodeId}" started successfully.`);
+    UserNotification.success(i18n.t('data_node_notifications.start_success', { ns: 'datanode', datanodeId }));
   } catch (errorThrown) {
-    UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start the Data Node.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.start_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.start_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -144,9 +160,12 @@ export const stopDataNode = async (datanodeId: string) => {
   try {
     await Datanode.stopNode(datanodeId);
 
-    UserNotification.success(`Data Node "${datanodeId}" stopped successfully.`);
+    UserNotification.success(i18n.t('data_node_notifications.stop_success', { ns: 'datanode', datanodeId }));
   } catch (errorThrown) {
-    UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop the Data Node.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.stop_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.stop_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -154,9 +173,12 @@ export const rejoinDataNode = async (datanodeId: string) => {
   try {
     await Datanode.resetNode(datanodeId);
 
-    UserNotification.success(`Data Node "${datanodeId}" rejoined successfully.`);
+    UserNotification.success(i18n.t('data_node_notifications.rejoin_success', { ns: 'datanode', datanodeId }));
   } catch (errorThrown) {
-    UserNotification.error(`Rejoining Data Node failed with status: ${errorThrown}`, 'Could not rejoin the Data Node.');
+    UserNotification.error(
+      i18n.t('data_node_notifications.rejoin_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.rejoin_failed_title', { ns: 'datanode' }),
+    );
   }
 };
 
@@ -167,10 +189,10 @@ export type UseDataNodesOptions = {
 export const renewDatanodeCertificate = (nodeId: string) =>
   CertificateRenewal.initiateCertRenewalForNode(nodeId)
     .then(() => {
-      UserNotification.success('Certificate renewed successfully.');
+      UserNotification.success(i18n.t('data_node_notifications.renew_certificate_success', { ns: 'datanode' }));
     })
     .catch((error) => {
-      UserNotification.error(`Certificate renewal failed with error: ${error}`);
+      UserNotification.error(i18n.t('data_node_notifications.renew_certificate_failed', { ns: 'datanode', error }));
     });
 
 export const fetchDataNodes = async (params: SearchParams): Promise<DataNodeResponse> => {
@@ -210,8 +232,8 @@ const useDataNodes = (
     queryFn: () =>
       defaultOnError(
         fetchDataNodes(searchParams),
-        'Loading Data Nodes failed with status',
-        'Could not load Data Nodes.',
+        i18n.t('data_node_notifications.loading_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_failed_title', { ns: 'datanode' }),
       ),
     notifyOnChangeProps: ['data', 'error'],
     refetchInterval,

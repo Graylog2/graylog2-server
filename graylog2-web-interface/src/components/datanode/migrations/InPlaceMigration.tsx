@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col } from 'components/bootstrap';
 import type {
@@ -43,6 +44,7 @@ const StyledTitle = styled.h3`
 `;
 
 const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
   const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
 
   const renderStepComponent = (step: MigrationStateItem, hideActions: boolean) => {
@@ -78,8 +80,8 @@ const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponent
 
   return (
     <Col>
-      <StyledTitle>In-Place migration</StyledTitle>
-      <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
+      <StyledTitle>{t('in_place_migration.title')}</StyledTitle>
+      <p>{t('in_place_migration.description')}</p>
       <MigrationStepsPanel
         currentStep={currentStep}
         sortedMigrationSteps={IN_PLACE_MIGRATION_STEPS}

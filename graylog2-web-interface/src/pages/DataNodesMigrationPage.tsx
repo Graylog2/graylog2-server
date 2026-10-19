@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -39,6 +40,7 @@ const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
   const productName = useProductName();
+  const { t } = useTranslation('datanode');
 
   useEffect(() => {
     if (!isLoading && currentStep.state === MIGRATION_STATE.NEW.key) {
@@ -47,19 +49,16 @@ const DataNodesMigrationPage = () => {
   }, [currentStep.next_steps, currentStep.state, isLoading, onTriggerNextState]);
 
   return (
-    <DocumentTitle title="Data Node Migration">
+    <DocumentTitle title={t('pages.migration_title')}>
       <ClusterConfigurationPageNavigation />
       <PageHeader
-        title="Data Node Migration"
+        title={t('pages.migration_title')}
         actions={<ResetMigrationButton />}
         documentationLink={{
-          title: 'Data Nodes documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
-        <span>
-          {productName} Data Nodes offer a better integration with {productName} and simplify future updates. They allow
-          you to index and search through all the messages in your {productName} message database.
-        </span>
+        <span>{t('pages.description', { productName })}</span>
       </PageHeader>
       <Row className="content">
         <WizardContainer md={12}>

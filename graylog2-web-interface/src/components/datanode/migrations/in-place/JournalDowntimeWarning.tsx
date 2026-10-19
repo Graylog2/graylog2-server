@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
@@ -31,33 +32,33 @@ const DownsizeWarning = styled(Alert)`
 `;
 
 const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
   const productName = useProductName();
   const { data, error, isError } = useJournalDowntimeSize();
 
   return (
     <>
-      <h3>Journal downtime size warning</h3>
+      <h3>{t('journal_downtime.title')}</h3>
+      <p>{t('journal_downtime.processing_stops', { productName })}</p>
+      <p>{t('journal_downtime.increase_size')}</p>
       <p>
-        Please note that during migration data processing will stop on your {productName} node, this will result in the
-        journal growing in size.
-      </p>
-      <p>Therefore you might need to increase your journal volume size.</p>
-      <p>
-        Your current journal size is: <b>{data.journal_size_MB} MB</b> and your current journal throughput is:{' '}
-        <b>{data.KBs_per_minute} KB/min</b>
-      </p>
-      <p>
-        Your current maximum downtime for reconfiguring {productName} to point to the data node is:{' '}
-        <b>{data.max_downtime_duration}</b>
-      </p>
-      {isError && (
-        <MigrationError
-          errorMessage={`There was an error while estimating your journal throughput: ${error?.message}`}
+        <Trans
+          t={t}
+          i18nKey="journal_downtime.current_size"
+          values={{ size: data.journal_size_MB, throughput: data.KBs_per_minute }}
+          components={{ bold: <b /> }}
         />
-      )}
-      <DownsizeWarning bsStyle="warning">
-        Please make sure your journal volume size is sufficient before proceeding.
-      </DownsizeWarning>
+      </p>
+      <p>
+        <Trans
+          t={t}
+          i18nKey="journal_downtime.max_downtime"
+          values={{ productName, duration: data.max_downtime_duration }}
+          components={{ bold: <b /> }}
+        />
+      </p>
+      {isError && <MigrationError errorMessage={t('journal_downtime.estimation_error', { message: error?.message })} />}
+      <DownsizeWarning bsStyle="warning">{t('journal_downtime.sufficient_size')}</DownsizeWarning>
       <MigrationStepTriggerButtonToolbar
         hidden={hideActions}
         nextSteps={currentStep.next_steps}

@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import type { NodeInfo } from 'components/datanode/Types';
-import { Accordion, AccordionItem, Pluralize, Timestamp } from 'components/common';
+import { Accordion, AccordionItem, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
 
 type Props = {
@@ -44,6 +45,7 @@ const StyledSpan = styled.span`
 `;
 
 const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) => {
+  const { t } = useTranslation('datanode');
   const { opensearch_data_location: opensearchLocation, nodes } = nodeInfo;
   const [activeAccordion, setActiveAccordion] = useState<string | undefined>(
     `Node: 1, Version: ${nodes[0]?.node_version}, ${nodes[0]?.indices.length} indices`,
@@ -57,10 +59,10 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
     <Grid>
       <div>
         <StyledSpan>
-          <strong>Datanode OpenSearch version</strong>: {opensearchVersion}
+          <strong>{t('compatibility_status.datanode_opensearch_version')}</strong>: {opensearchVersion}
         </StyledSpan>
         <StyledSpan>
-          <strong>OpenSearch data location</strong>: {opensearchLocation}
+          <strong>{t('compatibility_status.opensearch_data_location')}</strong>: {opensearchLocation}
         </StyledSpan>
       </div>
       <div>
@@ -73,14 +75,19 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
           {nodes.map((node) => (
             <AccordionItem
               key={`${node.node_version}${node.indices.length}`}
-              name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}>
+              id={`node-${hostname}-${node.node_version}-${node.indices.length}`}
+              name={t('compatibility_status.node_title', {
+                hostname,
+                version: node.node_version,
+                count: node.indices.length,
+              })}>
               <Table bordered condensed>
                 <thead>
                   <tr>
-                    <th>Indices</th>
-                    <th>Creation date</th>
-                    <th>Index version</th>
-                    <th>Shards</th>
+                    <th>{t('compatibility_status.indices')}</th>
+                    <th>{t('compatibility_status.creation_date')}</th>
+                    <th>{t('compatibility_status.index_version')}</th>
+                    <th>{t('compatibility_status.shards')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -91,10 +98,7 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
                         <Timestamp dateTime={indice.creation_date} />
                       </td>
                       <td>{indice.index_version_created}</td>
-                      <td>
-                        {indice.shards.length}{' '}
-                        <Pluralize singular="shard" plural="shards" value={indice.shards.length} />{' '}
-                      </td>
+                      <td>{t('compatibility_status.shard_count', { count: indice.shards.length })}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { DataNodeStatus } from 'preflight/types';
 import { Badge } from 'preflight/components/common';
@@ -58,17 +59,21 @@ const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'lock_open')
 const isConnecting = (status: DataNodeStatus) => status === 'STARTING';
 const ConnectingSpinner = () => <Spinner text="" />;
 
-const DataNodeBadge = ({ nodeId, transportAddress, status }: NodeProps) => (
-  <NodeId color={colorByState(status, transportAddress)} title="Short node id">
-    <SecureIcon name={lockIcon(transportAddress)} />
-    {nodeId}
-    {isConnecting(status) ? (
-      <>
-        {' '}
-        <ConnectingSpinner />
-      </>
-    ) : null}
-  </NodeId>
-);
+const DataNodeBadge = ({ nodeId, transportAddress, status }: NodeProps) => {
+  const { t } = useTranslation('datanode');
+
+  return (
+    <NodeId color={colorByState(status, transportAddress)} title={t('data_node_badge.short_node_id')}>
+      <SecureIcon name={lockIcon(transportAddress)} />
+      {nodeId}
+      {isConnecting(status) ? (
+        <>
+          {' '}
+          <ConnectingSpinner />
+        </>
+      ) : null}
+    </NodeId>
+  );
+};
 
 export default DataNodeBadge;

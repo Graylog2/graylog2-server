@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DatanodeUpgrade } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
@@ -87,13 +88,13 @@ export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
     const response = await DatanodeUpgrade.stopReplication();
 
-    UserNotification.success(`Shard replication stopped successfully`);
+    UserNotification.success(i18n.t('data_node_notifications.stop_replication_success', { ns: 'datanode' }));
 
     return response;
   } catch (errorThrown) {
     UserNotification.error(
-      `Stopping shard replication failed with status: ${errorThrown}`,
-      'Could not stop shard replication.',
+      i18n.t('data_node_notifications.stop_replication_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.stop_replication_failed_title', { ns: 'datanode' }),
     );
 
     return { total: 0, failed: 0, successful: 0 };
@@ -105,13 +106,13 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
     const response = await DatanodeUpgrade.startReplication();
 
     removeSavedNodeToUpgrade();
-    UserNotification.success(`Shard replication started successfully`);
+    UserNotification.success(i18n.t('data_node_notifications.start_replication_success', { ns: 'datanode' }));
 
     return response;
   } catch (errorThrown) {
     UserNotification.error(
-      `Starting shard replication failed with status: ${errorThrown}`,
-      'Could not start shard replication.',
+      i18n.t('data_node_notifications.start_replication_failed', { ns: 'datanode', status: errorThrown }),
+      i18n.t('data_node_notifications.start_replication_failed_title', { ns: 'datanode' }),
     );
 
     return { total: 0, failed: 0, successful: 0 };
@@ -141,8 +142,8 @@ const useDataNodeUpgradeStatus = (): {
     queryFn: () =>
       defaultOnError(
         fetchDataNodeUpgradeStatus(),
-        'Loading Data Node upgrade status failed',
-        'Could not load Data Node upgrade status',
+        i18n.t('data_node_notifications.loading_upgrade_status_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_upgrade_status_failed_title', { ns: 'datanode' }),
       ),
 
     notifyOnChangeProps: ['data', 'error'],

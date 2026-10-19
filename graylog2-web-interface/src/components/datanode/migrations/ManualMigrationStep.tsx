@@ -16,6 +16,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -29,6 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ManualMigrationStep = () => {
+  const { t } = useTranslation('datanode');
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
   const sendTelemetry = useSendTelemetry('migration');
@@ -48,8 +50,8 @@ const ManualMigrationStep = () => {
     return onTriggerNextState({ step, args });
   };
 
-  const migrationTypeOptions = [{ label: 'In-Place migration', value: inPlaceMigrationAction }].filter((path) =>
-    currentStep.next_steps.includes(path.value),
+  const migrationTypeOptions = [{ label: t('in_place_migration.title'), value: inPlaceMigrationAction }].filter(
+    (path) => currentStep.next_steps.includes(path.value),
   );
 
   return (
@@ -59,14 +61,14 @@ const ManualMigrationStep = () => {
           <form className="form form-horizontal" onSubmit={() => {}}>
             <Input
               id="datanode-migration-type-select"
-              label="Migration type"
+              label={t('manual_migration.migration_type')}
               required
               autoFocus
-              help="The type of migration you want to do."
+              help={t('manual_migration.migration_type_help')}
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9">
               <Select
-                placeholder="Select migration type"
+                placeholder={t('manual_migration.select_migration_type')}
                 clearable={false}
                 inputId="datanode-migration-type-select"
                 options={migrationTypeOptions}

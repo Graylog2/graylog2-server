@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
@@ -52,6 +53,7 @@ const ActionsCol = styled(Col)`
 `;
 
 const DataNodePage = () => {
+  const { t } = useTranslation('datanode');
   const { dataNodeId } = useParams();
   const { data, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
 
@@ -60,47 +62,47 @@ const DataNodePage = () => {
   }
 
   if (!isInitialLoading && (!data || error)) {
-    return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
+    return <NoSearchResult>{t('details_page.error', { message: error?.message })}</NoSearchResult>;
   }
 
   const datanode = data as DataNode;
   const datanodeDisabled = datanode.datanode_status !== 'AVAILABLE';
 
   return (
-    <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
+    <DocumentTitle title={t('details_page.title', { hostname: datanode.hostname })}>
       <ClusterConfigurationPageNavigation />
       <PageHeader
-        title={`Data Nodes: ${datanode.hostname}`}
+        title={t('details_page.title', { hostname: datanode.hostname })}
         documentationLink={{
-          title: 'Data Nodes documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}
       />
       <Row className="content">
         <Col xs={12}>
           <Col xs={9}>
-            <h2>Details:</h2>
+            <h2>{t('details_page.details')}</h2>
             <StyledHorizontalDl>
-              <dt>Hostname:</dt>
+              <dt>{t('details_page.hostname')}</dt>
               <dd>{datanode.hostname}</dd>
-              <dt>Transport address:</dt>
+              <dt>{t('details_page.transport_address')}</dt>
               <dd>{datanode.transport_address || '-'}</dd>
-              <dt>Status:</dt>
+              <dt>{t('details_page.status')}</dt>
               <dd>
                 <Label
                   bsStyle={datanodeDisabled ? 'warning' : 'success'}
                   title={datanode.datanode_status}
                   aria-label={datanode.datanode_status}
                   role="button">
-                  {datanode.datanode_status || 'N/A'}
+                  {datanode.datanode_status || t('details_page.not_available')}
                 </Label>
               </dd>
-              <dt>Certificate valid until:</dt>
+              <dt>{t('details_page.certificate_valid_until')}</dt>
               <dd>
                 <RelativeTime dateTime={datanode.cert_valid_until} />{' '}
                 <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} />
               </dd>
-              <dt>Datanode version:</dt>
+              <dt>{t('details_page.datanode_version')}</dt>
               <dd>{datanode.datanode_version}</dd>
             </StyledHorizontalDl>
           </Col>
@@ -110,7 +112,7 @@ const DataNodePage = () => {
         </Col>
         {datanode.configuration_warnings?.length > 0 && (
           <Col xs={12}>
-            <Alert bsStyle="warning" title="Configuration warnings">
+            <Alert bsStyle="warning" title={t('details_page.configuration_warnings')}>
               <ul>
                 {datanode.configuration_warnings.map((warning) => (
                   <li key={warning}>{warning}</li>

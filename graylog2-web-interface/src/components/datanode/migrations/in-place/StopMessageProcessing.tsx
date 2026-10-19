@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
@@ -29,28 +30,27 @@ const StyledHelpPanel = styled(StyledPanel)`
 `;
 
 const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
   const productName = useProductName();
 
   return (
     <>
-      <p>{productName} processing is stopped.</p>
+      <p>{t('stop_processing.stopped', { productName })}</p>
       <StyledHelpPanel bsStyle="warning">
         <Panel.Heading>
           <Panel.Title componentClass="h3">
             <Icon name="warning" />
-            Stop OpenSearch
+            {t('stop_processing.stop_opensearch')}
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body>
-          <p>Please stop your OpenSearch cluster before proceeding.</p>
+          <p>{t('stop_processing.stop_cluster')}</p>
+          <p>{t('stop_processing.change_owner')}</p>
           <p>
-            If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure to
-            change the owner of the data directory to the user running the data node (usually graylog-datanode) and
-            reset the correct permissions, e.g. by running
-          </p>
-          <p>
+            {/* eslint-disable-next-line graylog/no-untranslated-text -- shell command */}
             <code>sudo chown -R graylog-datanode:graylog-datanode &lt;your_data_directory&gt;</code>
             <br />
+            {/* eslint-disable-next-line graylog/no-untranslated-text -- shell command */}
             <code>sudo chmod -R 750 &lt;your_data_directory&gt;</code>
           </p>
         </Panel.Body>

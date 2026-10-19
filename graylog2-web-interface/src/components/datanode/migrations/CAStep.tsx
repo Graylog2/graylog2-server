@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CAConfiguration from 'components/datanode/DataNodeConfiguration/CAConfiguration';
 import { Space } from 'preflight/components/common';
@@ -22,17 +23,21 @@ import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
-const CaStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
-  <>
-    <MigrationError errorMessage={currentStep.error_message} />
-    <CAConfiguration />
-    <Space h="xs" />
-    {currentStep.next_steps.length <= 0 && <p>Please create a certificate Authority before proceeding.</p>}
-    <MigrationStepTriggerButtonToolbar
-      hidden={hideActions}
-      nextSteps={currentStep.next_steps}
-      onTriggerStep={onTriggerStep}
-    />
-  </>
-);
+const CaStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('datanode');
+
+  return (
+    <>
+      <MigrationError errorMessage={currentStep.error_message} />
+      <CAConfiguration />
+      <Space h="xs" />
+      {currentStep.next_steps.length <= 0 && <p>{t('migration_steps_text.ca_step_required')}</p>}
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
+    </>
+  );
+};
 export default CaStep;

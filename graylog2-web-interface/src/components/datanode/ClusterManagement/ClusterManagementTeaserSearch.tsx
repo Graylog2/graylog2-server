@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import { Alert } from 'components/bootstrap';
@@ -29,27 +30,27 @@ const StyledAlert = styled(Alert)`
   margin-top: 0;
 `;
 
-const hotspots = [
-  {
-    positionX: '50%',
-    positionY: '120px',
-    description: 'Show performance metrics of your Data Node and managed OpenSearch cluster.',
-  },
-];
+const ClusterManagementTeaserSearch = () => {
+  const { t } = useTranslation('datanode');
+  const hotspots = [
+    {
+      positionX: '50%',
+      positionY: '120px',
+      description: t('cluster_management.teaser_hotspot'),
+    },
+  ];
 
-const ClusterManagementTeaserSearch = () => (
-  <>
-    <StyledAlert bsStyle="warning">
-      Please make sure you have a valid license and Data Node configured to see the performance metrics of your Data
-      Node and your managed OpenSearch cluster.
-    </StyledAlert>
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </>
-);
+  return (
+    <>
+      <StyledAlert bsStyle="warning">{t('cluster_management.teaser_license_warning')}</StyledAlert>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </>
+  );
+};
 
 export default ClusterManagementTeaserSearch;

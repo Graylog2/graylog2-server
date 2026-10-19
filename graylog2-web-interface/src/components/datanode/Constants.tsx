@@ -14,108 +14,100 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import ProductName from 'brand-customization/ProductName';
-
 export const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
 export const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
 
 export const MIGRATION_STEP = {
   CA_CONFIGURATION: {
     key: 'CA_CONFIGURATION',
-    description: 'Configure a certificate authority',
+    descriptionKey: 'migration_steps.ca_configuration',
   },
   RENEWAL_POLICY_CONFIGURATION: {
     key: 'RENEWAL_POLICY_CONFIGURATION',
-    description: 'Configure a renewal policy',
+    descriptionKey: 'migration_steps.renewal_policy_configuration',
   },
   COMPATIBILITY_CHECK: {
     key: 'COMPATIBILITY_CHECK',
-    description: 'Check OpenSearch compatibility with datanode',
+    descriptionKey: 'migration_steps.compatibility_check',
   },
   MANUAL_MIGRATION_STEP: {
     key: 'MANUAL_MIGRATION_STEP',
-    description: 'Migration steps.',
+    descriptionKey: 'migration_steps.manual_migration_step',
   },
   MIGRATION_FINISHED: {
     key: 'MIGRATION_FINISHED',
-    description: 'Migration finished',
+    descriptionKey: 'migration_steps.migration_finished',
   },
 } as const;
 
 export const MIGRATION_STATE = {
   NEW: {
     key: 'NEW',
-    description: 'Migration',
+    descriptionKey: 'migration_states.new',
   },
   MIGRATION_WELCOME_PAGE: {
     key: 'MIGRATION_WELCOME_PAGE',
-    description: 'Welcome',
+    descriptionKey: 'migration_states.migration_welcome_page',
   },
   CA_CREATION_PAGE: {
     key: 'CA_CREATION_PAGE',
-    description: 'Certificate authority',
+    descriptionKey: 'migration_states.ca_creation_page',
   },
   RENEWAL_POLICY_CREATION_PAGE: {
     key: 'RENEWAL_POLICY_CREATION_PAGE',
-    description: 'Certificate renewal policy',
+    descriptionKey: 'migration_states.renewal_policy_creation_page',
   },
   MIGRATION_SELECTION_PAGE: {
     key: 'MIGRATION_SELECTION_PAGE',
-    description: 'Migration steps',
+    descriptionKey: 'migration_states.migration_selection_page',
   },
   ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE: {
     key: 'ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE',
-    description: 'Welcome to In-Place migration',
+    descriptionKey: 'migration_states.rolling_upgrade_migration_welcome_page',
   },
   ASK_TO_SHUTDOWN_OLD_CLUSTER: {
     key: 'ASK_TO_SHUTDOWN_OLD_CLUSTER',
-    description: 'Shut down old cluster',
+    descriptionKey: 'migration_states.ask_to_shutdown_old_cluster',
   },
   MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG: {
     key: 'MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG',
-    description: 'Remove connection string',
+    descriptionKey: 'migration_states.manually_remove_old_connection_string_from_config',
   },
   MESSAGE_PROCESSING_STOP: {
     key: 'MESSAGE_PROCESSING_STOP',
-    description: 'Stop message processing',
+    descriptionKey: 'migration_states.message_processing_stop',
   },
   REPLACE_CLUSTER: {
     key: 'REPLACE_CLUSTER',
-    description: 'Replace existing cluster',
+    descriptionKey: 'migration_states.replace_cluster',
   },
   RESTART_GRAYLOG: {
     key: 'RESTART_GRAYLOG',
-    description: (
-      <>
-        Update configuration file and restart <ProductName />
-      </>
-    ),
+    descriptionKey: 'migration_states.restart_graylog',
   },
   DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
     key: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
-    description: 'Directory compatibility check',
+    descriptionKey: 'migration_states.directory_compatibility_check_page',
   },
   PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES',
-    description: 'Certificate provisioning overview',
+    descriptionKey: 'migration_states.provision_rolling_upgrade_nodes_with_certificates',
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: "Provision the Data Node's certificate.",
+    descriptionKey: 'migration_states.provision_rolling_upgrade_nodes_running',
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
-    description: 'Journal size downtime warning',
+    descriptionKey: 'migration_states.journal_size_downtime_warning',
   },
   FAILED: {
     key: 'FAILED',
-    description: 'Migration failed',
+    descriptionKey: 'migration_states.failed',
   },
   FINISHED: {
     key: 'FINISHED',
-    description: 'Migration finished',
+    descriptionKey: 'migration_states.finished',
   },
 } as const;
 
@@ -140,19 +132,19 @@ export const MIGRATION_WIZARD_STEPS = [
 export const MIGRATION_ACTIONS = {
   SHOW_RENEWAL_POLICY_CREATION: {
     key: 'SHOW_RENEWAL_POLICY_CREATION',
-    label: 'Configure certificate renewal policy',
+    labelKey: 'migration_actions.show_renewal_policy_creation',
   },
   SHOW_MIGRATION_SELECTION: {
     key: 'SHOW_MIGRATION_SELECTION',
-    label: 'Go to migration steps',
+    labelKey: 'migration_actions.show_migration_selection',
   },
   RUN_DIRECTORY_COMPATIBILITY_CHECK: {
     key: 'INSTALL_DATANODES_ON_EVERY_NODE',
-    label: 'Run directory compatibilty check',
+    labelKey: 'migration_actions.run_directory_compatibility_check',
   },
   PROVISION_DATANODE_CERTIFICATES: {
     key: 'PROVISION_DATANODE_CERTIFICATES',
-    label: 'Provision Data Nodes with certificates',
+    labelKey: 'migration_actions.provision_datanode_certificates',
   },
 };
 export default MIGRATION_STEP;

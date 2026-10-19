@@ -15,58 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert, SegmentedControl } from 'components/bootstrap';
 
 export type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
-
-const UpgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: string }> = [
-  { value: 'cluster-restart', label: 'Cluster Restart' },
-  { value: 'rolling-upgrade', label: 'Rolling Upgrade' },
-];
 
 type Props = {
   upgradeMethod: DataNodeUpgradeMethodType;
   onChange: (value: DataNodeUpgradeMethodType) => void;
 };
 
-const UpgradeMethodSelector = ({ upgradeMethod, onChange }: Props) => (
-  <>
-    <SegmentedControl data={UpgradeMethodSegments} value={upgradeMethod} onChange={onChange} />
-    <Alert bsStyle="info">
-      {upgradeMethod === 'cluster-restart' && (
-        <>
-          <p>
-            When using the cluster restart method, you will upgrade all Data Nodes at once. During this time, messages
-            will be buffered in the journal and processed as the Data Node cluster comes back online, leading to no data
-            loss provided your journal size is configured for the message volume which is expected during the Data Node
-            downtime.
-          </p>
-          <p>
-            If you are running a Data Node cluster with less than three nodes, the cluster restart method is the only
-            method available.
-          </p>
-          <p>
-            If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster restart
-            method after consideration of your journal size and your message throughput.
-          </p>
-        </>
-      )}
-      {upgradeMethod === 'rolling-upgrade' && (
-        <>
-          <p>
-            Rolling upgrades can be performed on a running Data Node cluster only with <b>three or more nodes</b>, with
-            virtually no downtime.
-          </p>
-          <p>
-            Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and
-            replaced, one at a time, by hosts running the new version. During this process you can continue to index and
-            query data in your cluster.
-          </p>
-        </>
-      )}
-    </Alert>
-  </>
-);
+const UpgradeMethodSelector = ({ upgradeMethod, onChange }: Props) => {
+  const { t } = useTranslation('datanode');
+  const upgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: string }> = [
+    { value: 'cluster-restart', label: t('upgrade_method.cluster_restart') },
+    { value: 'rolling-upgrade', label: t('upgrade_method.rolling_upgrade') },
+  ];
+
+  return (
+    <>
+      <SegmentedControl data={upgradeMethodSegments} value={upgradeMethod} onChange={onChange} />
+      <Alert bsStyle="info">
+        {upgradeMethod === 'cluster-restart' && (
+          <>
+            <p>{t('upgrade_method.cluster_restart_description')}</p>
+            <p>{t('upgrade_method.cluster_restart_less_than_three')}</p>
+            <p>{t('upgrade_method.cluster_restart_three_or_more')}</p>
+          </>
+        )}
+        {upgradeMethod === 'rolling-upgrade' && (
+          <>
+            <p>
+              <Trans t={t} i18nKey="upgrade_method.rolling_upgrade_description" components={{ bold: <b /> }} />
+            </p>
+            <p>{t('upgrade_method.rolling_upgrade_process')}</p>
+          </>
+        )}
+      </Alert>
+    </>
+  );
+};
 
 export default UpgradeMethodSelector;

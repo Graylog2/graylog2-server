@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Form, Formik } from 'formik';
 import { useState } from 'react';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { FormikInput, TimeUnitInput } from 'components/common';
 import { Button, ButtonToolbar, Checkbox, Modal } from 'components/bootstrap';
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const ClientCertForm = ({ onCancel }: Props) => {
+  const { t } = useTranslation('datanode');
   const [clientCerts, setClientCerts] = useState(null);
   const [isUnencrypted, setIsUnencrypted] = useState(false);
   const { onCreateClientCert } = useCreateDataNodeClientCert();
@@ -59,7 +61,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
   return (
     <>
       <Modal.Header>
-        <Modal.Title>Create client certificate</Modal.Title>
+        <Modal.Title>{t('client_certificate.create_title')}</Modal.Title>
       </Modal.Header>
       {!clientCerts && (
         <Formik
@@ -76,13 +78,19 @@ const ClientCertForm = ({ onCancel }: Props) => {
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>
-                <FormikInput id="principal" placeholder="principal" name="principal" label="Principal" required />
+                <FormikInput
+                  id="principal"
+                  placeholder={t('client_certificate.principal_placeholder')}
+                  name="principal"
+                  label={t('client_certificate.principal')}
+                  required
+                />
                 <FormikInput
                   id="role"
-                  placeholder="role"
+                  placeholder={t('client_certificate.role_placeholder')}
                   name="role"
-                  help="Represent OpenSearch roles mapping."
-                  label="Role"
+                  help={t('client_certificate.role_help')}
+                  label={t('client_certificate.role')}
                   required
                 />
                 <Checkbox
@@ -90,19 +98,19 @@ const ClientCertForm = ({ onCancel }: Props) => {
                   name="client_certificate_unencrypted"
                   checked={isUnencrypted}
                   onChange={() => onToggleUnencrypted(setFieldValue)}>
-                  Unencrypted
+                  {t('client_certificate.unencrypted')}
                 </Checkbox>
                 <FormikInput
                   id="password"
                   placeholder="*******"
                   name="password"
                   type="password"
-                  label="Password"
+                  label={t('client_certificate.password')}
                   disabled={isUnencrypted}
                   required={!isUnencrypted}
                 />
                 <TimeUnitInput
-                  label="Certificate Lifetime"
+                  label={t('client_certificate.certificate_lifetime')}
                   update={(value, unit) => {
                     setFieldValue('lifetimeValue', value);
                     setFieldValue('lifetimeUnit', unit);
@@ -119,8 +127,8 @@ const ClientCertForm = ({ onCancel }: Props) => {
                   onCancel={() => onCancel()}
                   isSubmitting={isSubmitting}
                   isAsyncSubmit
-                  submitButtonText="Create Certificate"
-                  submitLoadingText="Creating certificate..."
+                  submitButtonText={t('client_certificate.submit')}
+                  submitLoadingText={t('client_certificate.submitting')}
                 />
               </Modal.Footer>
             </Form>
@@ -135,7 +143,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
           <Modal.Footer>
             <ButtonToolbar>
               <Button bsStyle="primary" onClick={() => onCancel()}>
-                Close
+                {t('client_certificate.close')}
               </Button>
             </ButtonToolbar>
           </Modal.Footer>
