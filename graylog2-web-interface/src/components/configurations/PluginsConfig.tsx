@@ -28,6 +28,7 @@ import { Col, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common';
 import useLocation from 'routing/useLocation';
+import AppRoutes from 'routing/Routes';
 import usePermissions from 'hooks/usePermissions';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 
@@ -97,6 +98,15 @@ const PluginsConfig = () => {
       <Col md={8} lg={5}>
         <Routes>
           <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} replace />} />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={AppRoutes.SYSTEM.configurationsSection('Plugins', pluginSystemConfigs[0].configType)}
+                replace
+              />
+            }
+          />
           {pluginSystemConfigs.map(({ component: SystemConfigComponent, configType }) => (
             <Route
               path={configType}

@@ -27,6 +27,8 @@ import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { isTelemetryDebugEnabled, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
+import useRuntimeTunables from 'components/configurations/runtime-tunables/useRuntimeTunables';
+import buildSections from 'components/configurations/runtime-tunables/buildSections';
 
 const isFeatureEnabled = (featureFlag?: string) => {
   if (!featureFlag) return true;
@@ -48,14 +50,15 @@ const useConfigurationPages = () => {
   const { isPermitted } = usePermissions();
   const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
   const pluginSystemConfigurations = usePluginEntities('systemConfigurations');
+  const { features } = useRuntimeTunables();
 
-  const coreNavItems = coreSystemConfigurations
-    .filter(({ permissions }) => isPermitted(permissions))
-    .map((page) => ({
+  const coreNavItems = buildSections({ features, coreConfigurations: coreSystemConfigurations, isPermitted }).map(
+    (page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
       title: `Configurations / ${page.name}`,
-    }));
+    }),
+  );
 
   const pluginNavItems = pluginSystemConfigurations
     // eslint-disable-next-line react-hooks/rules-of-hooks

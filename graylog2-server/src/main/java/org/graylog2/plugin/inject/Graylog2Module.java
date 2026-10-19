@@ -38,6 +38,9 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
+import org.graylog2.configuration.tunables.RuntimeTunable;
+import org.graylog2.configuration.tunables.RuntimeTunableFeature;
+import org.graylog2.configuration.tunables.RuntimeTunables;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
@@ -70,6 +73,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.Set;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
@@ -524,6 +529,26 @@ public abstract class Graylog2Module extends AbstractModule {
         TypeLiteral<Class<?>> keyType = new TypeLiteral<Class<?>>() {};
         TypeLiteral<ClusterConfigValidator> valueType = new TypeLiteral<ClusterConfigValidator>() {};
         return MapBinder.newMapBinder(binder(), keyType, valueType);
+    }
+
+    protected Multibinder<Class<?>> runtimeTunableBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<Class<?>>() {}, RuntimeTunables.class);
+    }
+
+    protected void addRuntimeTunable(Class<?> tunableClass) {
+        if (!tunableClass.isAnnotationPresent(RuntimeTunable.class)) {
+            throw new IllegalArgumentException(f("Runtime tunable class %s is missing the @RuntimeTunable annotation",
+                    tunableClass.getCanonicalName()));
+        }
+        runtimeTunableBinder().addBinding().toInstance(tunableClass);
+    }
+
+    protected Multibinder<RuntimeTunableFeature> runtimeTunableFeatureBinder() {
+        return Multibinder.newSetBinder(binder(), RuntimeTunableFeature.class);
+    }
+
+    protected void addRuntimeTunableFeature(RuntimeTunableFeature feature) {
+        runtimeTunableFeatureBinder().addBinding().toInstance(feature);
     }
 
     protected MapBinder<String, ViewResolver> viewResolverBinder() {

@@ -60,6 +60,7 @@ public class ThreatIntelPluginModule extends PluginModule {
     protected void configure() {
 
         bind(PluginConfigService.class).in(Scopes.SINGLETON);
+        addRuntimeTunable(ThreatIntelPluginConfiguration.class);
 
         // AlienVault OTX threat intel lookup.
         addMessageProcessorFunction(OTXDomainLookupFunction.NAME, OTXDomainLookupFunction.class);
