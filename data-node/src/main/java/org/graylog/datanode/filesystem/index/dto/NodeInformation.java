@@ -38,6 +38,15 @@ public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<Inde
         return indices.isEmpty();
     }
 
+    /**
+     * Whether opensearch has ever run on this node directory. Unlike {@link #isEmpty()}, this is also true for nodes
+     * without any indices, e.g. dedicated cluster managers, as long as they left a node state file behind.
+     */
+    @JsonIgnore
+    public boolean isInitialized() {
+        return stateFile != null || !indices.isEmpty();
+    }
+
     @JsonProperty
     public String nodeVersion() {
         return Optional.ofNullable(stateFile).map(sf -> (Integer) sf.document().get("node_version"))

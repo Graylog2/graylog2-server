@@ -18,19 +18,27 @@ import type { PluginNavigation } from 'graylog-web-plugin';
 
 type Item = { position?: PluginNavigation['position']; description: string };
 
-const sortInAfterItems = <T extends Item>(targetList: Array<T>, afterItems: Array<T>) => {
+// Items whose target is not inserted yet are retried, so an item can be positioned after another positioned item,
+// independent of the registration order.
+const sortInAfterItems = <T extends Item>(targetList: Array<T>, afterItems: Array<T>): Array<T> => {
   const result = [...targetList];
+  const remainingItems: Array<T> = [];
 
   afterItems.forEach((afterItem) => {
     const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
+
     if (index !== -1) {
       result.splice(index + 1, 0, afterItem);
     } else {
-      result.push(afterItem);
+      remainingItems.push(afterItem);
     }
   });
 
-  return result;
+  if (remainingItems.length > 0 && remainingItems.length < afterItems.length) {
+    return sortInAfterItems(result, remainingItems);
+  }
+
+  return [...result, ...remainingItems];
 };
 
 const sortNavigationItems = <T extends Item>(navigationItems: Array<T>) => {

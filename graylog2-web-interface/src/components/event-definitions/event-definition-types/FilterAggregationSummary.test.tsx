@@ -15,16 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+import StreamsContext from 'contexts/StreamsContext';
+import { simpleEventDefinition } from 'fixtures/eventDefinition';
 
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
-);
+import FilterAggregationSummary from './FilterAggregationSummary';
 
-export default EventDefinitionSideBar;
+describe('FilterAggregationSummary', () => {
+  const config = { ...simpleEventDefinition.config, streams: ['stream-1'] };
+
+  it('shows stream ids while streams are not loaded yet', async () => {
+    render(
+      <StreamsContext.Provider value={undefined}>
+        <FilterAggregationSummary config={config} />
+      </StreamsContext.Provider>,
+    );
+
+    await screen.findByText('stream-1');
+  });
+});
