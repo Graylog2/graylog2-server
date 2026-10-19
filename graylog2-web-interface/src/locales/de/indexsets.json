@@ -1,0 +1,19 @@
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "Übersicht der Indizes nicht verfügbar",
+      "description": "Wir konnten die Informationen zur Indexübersicht nicht abrufen. Dies bedeutet in der Regel, dass es ein Problem bei der Verbindung zum Indexer gab, und <strong>Sie sollten sicherstellen, dass der Indexer bereit und von {{productName}} aus erreichbar ist</strong>.",
+      "journal_info": "Nachrichten werden weiterhin im Journal gespeichert, aber eine Suche nach ihnen wird erst möglich sein, wenn der Indexer wieder erreichbar ist."
+    },
+    "header": {
+      "index_set_title": "Index-Set: {{title}}",
+      "documentation_link": "Dokumentation des Index-Modells",
+      "edit_button": "Index-Set bearbeiten",
+      "description": "Dies ist eine Übersicht über alle Indizes (Nachrichtenspeicher) in diesem Index-Set, die derzeit für Suchanfragen und Analysen berücksichtigt werden."
+    },
+    "indices_info": {
+      "summary": "{{count}} Indizes mit insgesamt {{messageCount}} verwalteten Nachrichten, der aktuell beschreibbare Index ist <i>{{currentTarget}}</i>."
+    },
+    "document_title": "Index-Set - {{title}}"
+  }
+}

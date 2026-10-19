@@ -1,0 +1,19 @@
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "Indices overview unavailable",
+      "description": "We could not get the indices overview information. This usually means there was a problem connecting to the indexer, and <strong>you should ensure the indexer is up and reachable from {{productName}}</strong>.",
+      "journal_info": "Messages will continue to be stored in the journal, but searching on them will not be possible until the indexer is reachable again."
+    },
+    "header": {
+      "index_set_title": "Index Set: {{title}}",
+      "documentation_link": "Index model documentation",
+      "edit_button": "Edit Index Set",
+      "description": "This is an overview of all indices (message stores) in this index set currently being considered for searches and analysis."
+    },
+    "indices_info": {
+      "summary": "{{count}} indices with a total of {{messageCount}} messages under management, current write-active index is <i>{{currentTarget}}</i>."
+    },
+    "document_title": "Index Set - {{title}}"
+  }
+}
