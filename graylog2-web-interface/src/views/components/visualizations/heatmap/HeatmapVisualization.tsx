@@ -32,6 +32,8 @@ import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlot
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { keySeparator } from 'views/Constants';
 import { isValidDate, toDateObject } from 'util/DateTime';
 
@@ -123,14 +125,14 @@ const _sortedColumnKeys = (valuesBySeries: ValuesBySeries, config: AggregationWi
   const keys = Object.keys(valuesBySeries);
   const [firstColumnPivot] = config.columnPivots;
 
-  if (firstColumnPivot?.type !== 'time') {
+  if (firstColumnPivot?.type !== DateType) {
     return keys;
   }
 
   const timeSort = config.sort.find(
     (sort) => sort.type === SortConfig.PIVOT_TYPE && firstColumnPivot.fields.includes(sort.field),
   );
-  const isDescending = timeSort?.direction.direction === 'Descending';
+  const isDescending = Direction.Descending.equals(timeSort?.direction);
 
   return keys.sort((key1, key2) => {
     const timestamp1 = _timestampOfKey(key1);
