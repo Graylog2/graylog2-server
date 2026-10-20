@@ -16,10 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import * as URLUtils from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-
-const functionsUrl = URLUtils.qualifyUrl('/views/functions');
+import { SearchFunctions } from '@graylog/server-api';
 
 type AggregationFunction = { type: string; description: string };
 
@@ -27,7 +24,7 @@ type AggregationFunctions = {
   [functionName: string]: AggregationFunction | undefined;
 };
 
-const fetchAggregationFunctions = (): Promise<AggregationFunctions> => fetch('GET', functionsUrl);
+const fetchAggregationFunctions = (): Promise<AggregationFunctions> => SearchFunctions.functions();
 const useAggregationFunctions = () =>
   useQuery({
     queryKey: ['aggregationFunctions'],

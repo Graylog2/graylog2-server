@@ -39,6 +39,7 @@ import {
   valueParameterJSON,
 } from 'fixtures/createEventDefinitionFromValue';
 import asMock from 'helpers/mocking/AsMock';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/hookHelpers', () => ({
   ...jest.requireActual('views/logic/valueactions/createEventDefinition/hooks/hookHelpers'),
@@ -67,6 +68,7 @@ describe('useMappedData', () => {
           field: 'action',
           value: 'show',
           queryId: 'query-id',
+          type: FieldTypes.STRING(),
         }),
       { wrapper },
     );
