@@ -102,7 +102,28 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
     @Override
     public FlushResponse enableShardReplication() {
         LOG.info("Enabling shard replication for opensearch cluster");
+        cleanupArchivedIsmSettings();
         return configureShardReplication(REPLICATION_ALL);
+    }
+
+    private void cleanupArchivedIsmSettings() {
+        try {
+            final Request req = Requests.builder()
+                    .method("PUT")
+                    .endpoint("/_cluster/settings")
+                    .json("{\"persistent\":{" +
+                            "\"archived.plugins.index_state_management.metadata_migration.status\":null," +
+                            "\"archived.plugins.index_state_management.template_migration.control\":null" +
+                            "}}")
+                    .build();
+            officialOpensearchClient.sync(c -> {
+                try (final Response response = c.generic().execute(req)) {
+                    return null;
+                }
+            }, "Failed to clean up archived ISM settings");
+        } catch (Exception e) {
+            LOG.warn("Failed to clean up archived ISM settings, proceeding: {}", e.getMessage());
+        }
     }
 
     private String queryShardReplication() {
