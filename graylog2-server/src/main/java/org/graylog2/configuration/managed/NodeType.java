@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration.overrides;
+package org.graylog2.configuration.managed;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -25,7 +25,7 @@ import java.util.Locale;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * The type of node a configuration override applies to.
+ * The type of node a configuration parameter belongs to.
  */
 public enum NodeType {
     SERVER("server"),
