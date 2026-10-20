@@ -144,16 +144,21 @@ const ListWithOwnState = ({
 }: Required<Props> & { activePage: number; pageSize: number }) => {
   const [currentPage, setCurrentPage] = useState<number>(Math.max(activePage, INITIAL_PAGE));
   const [currentPageSize, setCurrentPageSize] = useState<number>(propPageSize);
+  const [prevActivePage, setPrevActivePage] = useState<number>(activePage);
+  const [prevPropPageSize, setPrevPropPageSize] = useState<number>(propPageSize);
 
-  useEffect(() => {
+  if (activePage !== prevActivePage) {
+    setPrevActivePage(activePage);
+
     if (activePage > 0) {
       setCurrentPage(activePage);
     }
-  }, [activePage]);
+  }
 
-  useEffect(() => {
+  if (propPageSize !== prevPropPageSize) {
+    setPrevPropPageSize(propPageSize);
     setCurrentPageSize(propPageSize);
-  }, [propPageSize]);
+  }
 
   const setPagination = useCallback(({ page, pageSize }) => {
     setCurrentPageSize(pageSize);
