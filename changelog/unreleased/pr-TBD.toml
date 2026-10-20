@@ -1,5 +1,4 @@
 type = "fixed"
-message = "Sort time columns of heatmaps chronologically."
+message = "Always sort time columns of heatmaps chronologically."
 
-issues = ["TBD"]
-pulls = ["TBD"]
+pulls = ["27861"]
