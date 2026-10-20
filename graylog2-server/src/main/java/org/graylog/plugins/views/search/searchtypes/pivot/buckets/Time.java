@@ -36,7 +36,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @JsonDeserialize(builder = Time.Builder.class)
 public abstract class Time implements BucketSpec {
     public static final String NAME = "time";
-    private static final String FIELD_SKIP_EMPTY_BUCKETS = "skip_empty_buckets";
+    private static final String FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS = "null_values_for_empty_buckets";
 
     @Override
     public abstract String type();
@@ -48,13 +48,13 @@ public abstract class Time implements BucketSpec {
     @JsonProperty
     public abstract Interval interval();
 
-    @JsonProperty(FIELD_SKIP_EMPTY_BUCKETS)
-    public abstract boolean skipEmptyBuckets();
+    @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+    public abstract boolean nullValuesForEmptyBuckets();
 
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
                 .type(NAME)
-                .skipEmptyBuckets(false);
+                .nullValuesForEmptyBuckets(false);
     }
 
     @AutoValue.Builder
@@ -77,11 +77,11 @@ public abstract class Time implements BucketSpec {
         @JsonProperty
         public abstract Builder interval(Interval interval);
 
-        public abstract Builder skipEmptyBuckets(Boolean skipEmptyBuckets);
+        public abstract Builder nullValuesForEmptyBuckets(Boolean nullValuesForEmptyBuckets);
 
-        @JsonProperty(FIELD_SKIP_EMPTY_BUCKETS)
-        public Builder setSkipEmptyBuckets(@Nullable Boolean skipEmptyBuckets) {
-            return skipEmptyBuckets(firstNonNull(skipEmptyBuckets, false));
+        @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+        public Builder setNullValuesForEmptyBuckets(@Nullable Boolean nullValuesForEmptyBuckets) {
+            return nullValuesForEmptyBuckets(firstNonNull(nullValuesForEmptyBuckets, false));
         }
     }
 }

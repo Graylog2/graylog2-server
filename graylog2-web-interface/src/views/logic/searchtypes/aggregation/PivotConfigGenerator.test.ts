@@ -37,7 +37,7 @@ describe('PivotConfigGenerator', () => {
     });
   });
 
-  it('should skip empty time buckets for heatmaps', () => {
+  it('should return empty time buckets without values for heatmaps', () => {
     const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
     const widgetConfig = widgetConfigBuilder
       .rowPivots([Pivot.createValues(['action'])])
@@ -46,16 +46,16 @@ describe('PivotConfigGenerator', () => {
       .build();
     const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
 
-    expect(config.row_groups[0].skip_empty_buckets).toBeUndefined();
-    expect(config.column_groups[0].skip_empty_buckets).toBe(true);
+    expect(config.row_groups[0].null_values_for_empty_buckets).toBeUndefined();
+    expect(config.column_groups[0].null_values_for_empty_buckets).toBe(true);
   });
 
-  it('should not skip empty time buckets for other visualizations', () => {
+  it('should return values for empty time buckets of other visualizations', () => {
     const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
     const widgetConfig = widgetConfigBuilder.rowPivots([timePivot]).visualization('line').build();
     const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
 
-    expect(config.row_groups[0].skip_empty_buckets).toBeUndefined();
+    expect(config.row_groups[0].null_values_for_empty_buckets).toBeUndefined();
   });
 
   it('should generate a number config with trend', () => {

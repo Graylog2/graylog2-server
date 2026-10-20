@@ -36,24 +36,25 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Enables {@code skip_empty_buckets} on the time groupings of the search types backing existing heatmap widgets.
+ * Enables {@code null_values_for_empty_buckets} on the time groupings of the search types backing existing heatmap widgets.
  * <p>
  * Date histograms return empty buckets with a value of 0 between the first and the last bucket, which heatmaps
- * display like actual data. The frontend sets the option when it creates the search types of a heatmap,
+ * display like actual data. With the option, these buckets are returned without values, so heatmaps leave them empty
+ * but keep their timestamps on the axis. The frontend sets the option when it creates the search types of a heatmap,
  * but stored searches keep their search types until the widget is changed.
  */
-public class V20261020120000_SkipEmptyTimeBucketsInHeatmaps extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20261020120000_SkipEmptyTimeBucketsInHeatmaps.class);
+public class V20261020120000_NullValuesForEmptyHeatmapBuckets extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20261020120000_NullValuesForEmptyHeatmapBuckets.class);
 
     private static final String HEATMAP = "heatmap";
-    private static final String FIELD_SKIP_EMPTY_BUCKETS = "skip_empty_buckets";
+    private static final String FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS = "null_values_for_empty_buckets";
 
     private final MongoCollection<Document> views;
     private final MongoCollection<Document> searches;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20261020120000_SkipEmptyTimeBucketsInHeatmaps(MongoConnection mongoConnection,
+    public V20261020120000_NullValuesForEmptyHeatmapBuckets(MongoConnection mongoConnection,
                                                          ClusterConfigService clusterConfigService) {
         this.views = mongoConnection.getMongoDatabase().getCollection("views");
         this.searches = mongoConnection.getMongoDatabase().getCollection("searches");
@@ -87,7 +88,7 @@ public class V20261020120000_SkipEmptyTimeBucketsInHeatmaps extends Migration {
 
                 final List<Document> queries = search.getList("queries", Document.class);
 
-                if (queries != null && skipEmptyTimeBuckets(queries, entry.getValue())) {
+                if (queries != null && nullValuesForEmptyTimeBuckets(queries, entry.getValue())) {
                     searches.updateOne(Filters.eq("_id", search.get("_id")), Updates.set("queries", queries));
                     modified++;
                 }
@@ -98,7 +99,7 @@ public class V20261020120000_SkipEmptyTimeBucketsInHeatmaps extends Migration {
             }
         }
 
-        LOG.info("Enabled <{}> for heatmaps in {} search(es), skipped {}.", FIELD_SKIP_EMPTY_BUCKETS, modified, skipped);
+        LOG.info("Enabled <{}> for heatmaps in {} search(es), skipped {}.", FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS, modified, skipped);
 
         clusterConfigService.write(new MigrationCompleted(modified, skipped));
     }
@@ -145,7 +146,7 @@ public class V20261020120000_SkipEmptyTimeBucketsInHeatmaps extends Migration {
         return result;
     }
 
-    private boolean skipEmptyTimeBuckets(List<Document> queries, Set<String> searchTypeIds) {
+    private boolean nullValuesForEmptyTimeBuckets(List<Document> queries, Set<String> searchTypeIds) {
         boolean changed = false;
 
         for (final Document query : queries) {
@@ -154,20 +155,20 @@ public class V20261020120000_SkipEmptyTimeBucketsInHeatmaps extends Migration {
                     continue;
                 }
 
-                changed |= skipEmptyTimeBuckets(searchType.getList("row_groups", Document.class, List.of()));
-                changed |= skipEmptyTimeBuckets(searchType.getList("column_groups", Document.class, List.of()));
+                changed |= nullValuesForEmptyTimeBuckets(searchType.getList("row_groups", Document.class, List.of()));
+                changed |= nullValuesForEmptyTimeBuckets(searchType.getList("column_groups", Document.class, List.of()));
             }
         }
 
         return changed;
     }
 
-    private boolean skipEmptyTimeBuckets(Collection<Document> groups) {
+    private boolean nullValuesForEmptyTimeBuckets(Collection<Document> groups) {
         boolean changed = false;
 
         for (final Document group : groups) {
-            if ("time".equals(group.getString("type")) && !group.getBoolean(FIELD_SKIP_EMPTY_BUCKETS, false)) {
-                group.put(FIELD_SKIP_EMPTY_BUCKETS, true);
+            if ("time".equals(group.getString("type")) && !group.getBoolean(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS, false)) {
+                group.put(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS, true);
                 changed = true;
             }
         }

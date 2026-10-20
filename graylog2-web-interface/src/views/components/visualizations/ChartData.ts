@@ -128,7 +128,11 @@ export const getLeafsFromRows = (rows: Rows): Array<Leaf> => rows.filter(isLeaf)
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
 export const extractSeries =
-  (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) =>
+  (
+    keyJoiner: KeyJoiner = _defaultKeyJoiner,
+    leafValueMatcher: (value: Value) => boolean = undefined,
+    keepSeriesWithoutValues: boolean = false,
+  ) =>
   (results: Rows) => {
     const leafs = getLeafsFromRows(results);
     const xLabels = getXLabelsFromLeafs(leafs);
@@ -142,6 +146,9 @@ export const extractSeries =
 
       if (value.value !== null && value.value !== undefined) {
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
+        seriesFullTracePathMapper[joinedKey] = _defaultKeyJoiner(value.key);
+      } else if (keepSeriesWithoutValues && !valuesBySeries[joinedKey]) {
+        valuesBySeries[joinedKey] = [];
         seriesFullTracePathMapper[joinedKey] = _defaultKeyJoiner(value.key);
       }
     });
@@ -196,6 +203,7 @@ export type ChartDataConfig = {
   generator?: Generator;
   seriesFormatter?: (values: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }) => ExtractedSeries;
   leafValueMatcher?: (value: Value) => boolean;
+  keepSeriesWithoutValues?: boolean;
   formatTime: (time: DateTime, format?: DateTimeFormats) => string;
   mapKeys?: (key: Key, field: string) => Key;
 };
@@ -208,6 +216,7 @@ export const chartData = (
     generator = _defaultChartGenerator,
     seriesFormatter: customSeriesFormatter = formatSeries,
     leafValueMatcher,
+    keepSeriesWithoutValues,
     formatTime,
     mapKeys,
   }: ChartDataConfig,
@@ -216,7 +225,11 @@ export const chartData = (
 
   return flow([
     transformKeys(rowPivots, columnPivots, formatTime),
-    extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
+    extractSeries(
+      series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined,
+      leafValueMatcher,
+      keepSeriesWithoutValues,
+    ),
     customSeriesFormatter,
     removeNulls(),
     generateChart(chartType, generator, config, mapKeys),

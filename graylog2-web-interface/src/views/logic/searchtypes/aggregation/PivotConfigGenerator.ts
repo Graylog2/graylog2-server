@@ -56,10 +56,10 @@ type FormattedPivot = {
   type: string;
   fields: Array<string>;
   interval: FormattedInterval;
-  skip_empty_buckets?: boolean;
+  null_values_for_empty_buckets?: boolean;
 };
 
-const formatPivot = (pivot: Pivot, skipEmptyBuckets: boolean): FormattedPivot => {
+const formatPivot = (pivot: Pivot, nullValuesForEmptyBuckets: boolean): FormattedPivot => {
   const { type, fields, config } = pivot;
   const newConfig = { ...config } as unknown;
 
@@ -76,8 +76,8 @@ const formatPivot = (pivot: Pivot, skipEmptyBuckets: boolean): FormattedPivot =>
         };
       }
 
-      if (skipEmptyBuckets) {
-        (newConfig as { skip_empty_buckets: boolean }).skip_empty_buckets = true;
+      if (nullValuesForEmptyBuckets) {
+        (newConfig as { null_values_for_empty_buckets: boolean }).null_values_for_empty_buckets = true;
       }
 
       break;
@@ -103,7 +103,7 @@ const generateConfig = (
   { rollupForBackendQuery, rowPivots, columnPivots, series, sort, visualization }: AggregationWidgetConfig,
 ) => {
   // Empty time buckets have a value of 0, which heatmaps would display like actual data.
-  const skipEmptyBuckets = visualization === 'heatmap';
+  const nullValuesForEmptyBuckets = visualization === 'heatmap';
 
   return {
     id,
@@ -112,8 +112,8 @@ const generateConfig = (
     config: {
       id: 'vals',
       rollup: rollupForBackendQuery,
-      row_groups: rowPivots.map((pivot) => formatPivot(pivot, skipEmptyBuckets)),
-      column_groups: columnPivots.map((pivot) => formatPivot(pivot, skipEmptyBuckets)),
+      row_groups: rowPivots.map((pivot) => formatPivot(pivot, nullValuesForEmptyBuckets)),
+      column_groups: columnPivots.map((pivot) => formatPivot(pivot, nullValuesForEmptyBuckets)),
       series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
       sort,
     },

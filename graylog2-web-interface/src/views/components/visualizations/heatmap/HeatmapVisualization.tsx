@@ -20,6 +20,7 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import min from 'lodash/min';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
 
@@ -103,11 +104,7 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
   return z[0].map((_, c) => z.map((r) => r[c]));
 };
 
-const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
-  valuesFound.reduce(
-    (result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result),
-    (valuesFound[0] || [])[0],
-  );
+const _findSmallestValue = (valuesFound: Array<Array<number>>) => min(valuesFound.flat());
 
 const _formatSeries =
   (visualizationConfig: HeatmapVisualizationConfig) =>
@@ -117,7 +114,7 @@ const _formatSeries =
     // Otherwise, plotly would throw errors when hovering over a field.
     // We need to transpose the z matrix, because we are changing the x and y label in the generator function
     const defaultValue = visualizationConfig.useSmallestAsDefault
-      ? _findSmallestValue(valuesFoundBySeries)
+      ? (_findSmallestValue(valuesFoundBySeries) ?? 'None')
       : (visualizationConfig.defaultValue ?? 'None');
     const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
     const yLabels = Object.keys(valuesBySeries);
@@ -166,6 +163,8 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
     generator: _generateSeries(visualizationConfig, mapKeys, theme),
     seriesFormatter: _formatSeries(visualizationConfig),
     leafValueMatcher: _leafSourceMatcher,
+    // Empty time buckets are returned without values. Keeping them retains their timestamps on the axis.
+    keepSeriesWithoutValues: true,
   });
   const layout = _chartLayout(heatmapData);
   const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...heatmapOnClickPopover, config });

@@ -44,4 +44,25 @@ const validData: { [key: string]: Rows } = {
   ],
 };
 
-export { validData };
+const dataWithEmptyBuckets: { [key: string]: Rows } = {
+  chart: [
+    {
+      key: ['00'],
+      values: [
+        { key: ['100', 'count()'], value: 217, rollup: false, source: 'col-leaf' },
+        { key: ['201', 'count()'], value: null, rollup: false, source: 'col-leaf' },
+      ],
+      source: 'leaf',
+    },
+    {
+      key: ['01'],
+      values: [
+        { key: ['100', 'count()'], value: 230, rollup: false, source: 'col-leaf' },
+        { key: ['201', 'count()'], value: null, rollup: false, source: 'col-leaf' },
+      ],
+      source: 'leaf',
+    },
+  ],
+};
+
+export { validData, dataWithEmptyBuckets };

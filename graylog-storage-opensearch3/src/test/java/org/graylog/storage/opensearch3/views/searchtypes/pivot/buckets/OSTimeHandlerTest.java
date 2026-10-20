@@ -178,17 +178,21 @@ class OSTimeHandlerTest {
     }
 
     @Test
-    public void emptyBucketsAreSkippedIfConfigured() {
-        when(time.skipEmptyBuckets()).thenReturn(true);
+    public void emptyBucketsAreMarkedIfConfigured() {
+        when(time.nullValuesForEmptyBuckets()).thenReturn(true);
 
-        assertThat(osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).map(PivotBucket::keys))
-                .containsExactly(ImmutableList.of("0"), ImmutableList.of("2"));
+        final List<PivotBucket> buckets = osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).toList();
+
+        assertThat(buckets).extracting(PivotBucket::keys)
+                .containsExactly(ImmutableList.of("0"), ImmutableList.of("1"), ImmutableList.of("2"));
+        assertThat(buckets).extracting(PivotBucket::emptyBucket).containsExactly(false, true, false);
     }
 
     @Test
-    public void emptyBucketsAreReturnedByDefault() {
-        assertThat(osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).map(PivotBucket::keys))
-                .containsExactly(ImmutableList.of("0"), ImmutableList.of("1"), ImmutableList.of("2"));
+    public void emptyBucketsAreNotMarkedByDefault() {
+        assertThat(osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)))
+                .extracting(PivotBucket::emptyBucket)
+                .containsExactly(false, false, false);
     }
 
     private PivotBucket initialBucket(long... docCounts) {

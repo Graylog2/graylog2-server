@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Do not show empty time buckets in heatmaps, so time ranges without data are no longer displayed as a value of 0."
+message = "Show time ranges without data as empty cells in heatmaps instead of a value of 0."
 
 issues = ["TBD"]
 pulls = ["TBD"]

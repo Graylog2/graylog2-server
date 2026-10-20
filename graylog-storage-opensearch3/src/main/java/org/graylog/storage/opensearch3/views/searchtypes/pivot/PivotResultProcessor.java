@@ -92,7 +92,7 @@ class PivotResultProcessor {
                 .key(rowKeys)
                 .source("leaf");
         if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, tuple.emptyBucket(), true, "row-leaf");
         }
         if (!pivot.columnGroups().isEmpty()) {
             final var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
@@ -103,7 +103,7 @@ class PivotResultProcessor {
 
                         final MultiBucketBase columnBucket = columnBucketTuple.bucket();
 
-                        processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                        processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, columnBucketTuple.emptyBucket(), false, "col-leaf");
                     });
         }
         return rowBuilder.build();
@@ -114,7 +114,7 @@ class PivotResultProcessor {
                                            OSGeneratedQueryContext queryContext,
                                            InitialBucket initialBucket) {
         final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
+        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, false, true, "row-inner");
         return rowBuilder.source("non-leaf").build();
     }
 
@@ -137,6 +137,7 @@ class PivotResultProcessor {
                                Pivot pivot,
                                ArrayDeque<String> columnKeys,
                                MultiBucketBase aggregation,
+                               boolean emptyBucket,
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
@@ -145,7 +146,7 @@ class PivotResultProcessor {
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
-                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, emptyBucket ? null : value.value(), rollup, source);
                         columnKeys.removeLast();
                         return v;
                     })

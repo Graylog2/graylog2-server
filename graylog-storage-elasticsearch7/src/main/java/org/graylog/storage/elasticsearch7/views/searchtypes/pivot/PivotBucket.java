@@ -19,8 +19,14 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
+public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket,
+                          boolean emptyBucket) {
     public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
-        return new PivotBucket(keys, bucket, isMissingBucket);
+        return create(keys, bucket, isMissingBucket, false);
+    }
+
+    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket,
+                                     boolean emptyBucket) {
+        return new PivotBucket(keys, bucket, isMissingBucket, emptyBucket);
     }
 }

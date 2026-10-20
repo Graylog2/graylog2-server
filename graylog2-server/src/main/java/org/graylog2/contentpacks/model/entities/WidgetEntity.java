@@ -281,7 +281,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 return Time.builder()
                         .fields(rowPivot.fields())
                         .interval(AutoInterval.create())
-                        .skipEmptyBuckets(HeatmapVisualizationConfigDTO.NAME.equals(config.visualization()))
+                        .nullValuesForEmptyBuckets(HeatmapVisualizationConfigDTO.NAME.equals(config.visualization()))
                         .build();
             } else {
                 return Values.builder()

@@ -40,14 +40,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
-class V20261020120000_SkipEmptyTimeBucketsInHeatmapsTest {
-    private final V20261020120000_SkipEmptyTimeBucketsInHeatmaps migration;
+class V20261020120000_NullValuesForEmptyHeatmapBucketsTest {
+    private final V20261020120000_NullValuesForEmptyHeatmapBuckets migration;
     private final MongoCollection<Document> searches;
     private final ClusterConfigService clusterConfigService;
 
-    V20261020120000_SkipEmptyTimeBucketsInHeatmapsTest(MongoDBTestService mongoDBTestService, @Mock ClusterConfigService clusterConfigService) {
+    V20261020120000_NullValuesForEmptyHeatmapBucketsTest(MongoDBTestService mongoDBTestService, @Mock ClusterConfigService clusterConfigService) {
         this.searches = mongoDBTestService.mongoConnection().getMongoDatabase().getCollection("searches");
-        this.migration = new V20261020120000_SkipEmptyTimeBucketsInHeatmaps(mongoDBTestService.mongoConnection(), clusterConfigService);
+        this.migration = new V20261020120000_NullValuesForEmptyHeatmapBuckets(mongoDBTestService.mongoConnection(), clusterConfigService);
         this.clusterConfigService = clusterConfigService;
     }
 
@@ -59,28 +59,28 @@ class V20261020120000_SkipEmptyTimeBucketsInHeatmapsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20261020120000_SkipEmptyTimeBucketsInHeatmapsTest.json")
-    void skipsEmptyTimeBucketsOfHeatmapsOnly() {
+    @MongoDBFixtures("V20261020120000_NullValuesForEmptyHeatmapBucketsTest.json")
+    void enablesNullValuesForHeatmapsOnly() {
         migration.upgrade();
 
         assertThat(migrationCompleted().modifiedSearches()).isEqualTo(1);
 
         final List<Document> searchTypes = searchTypes("6714c0a1c87c8c15c478fb10");
         final Document heatmap = searchTypes.get(0);
-        assertThat(heatmap.getList("column_groups", Document.class).get(0).getBoolean("skip_empty_buckets")).isTrue();
-        assertThat(heatmap.getList("row_groups", Document.class).get(0).containsKey("skip_empty_buckets")).isFalse();
+        assertThat(heatmap.getList("column_groups", Document.class).get(0).getBoolean("null_values_for_empty_buckets")).isTrue();
+        assertThat(heatmap.getList("row_groups", Document.class).get(0).containsKey("null_values_for_empty_buckets")).isFalse();
 
         final Document barChart = searchTypes.get(1);
-        assertThat(barChart.getList("row_groups", Document.class).get(0).containsKey("skip_empty_buckets")).isFalse();
+        assertThat(barChart.getList("row_groups", Document.class).get(0).containsKey("null_values_for_empty_buckets")).isFalse();
 
         final Document lineChart = searchTypes("6714c0a1c87c8c15c478fb11").get(0);
-        assertThat(lineChart.getList("row_groups", Document.class).get(0).containsKey("skip_empty_buckets")).isFalse();
+        assertThat(lineChart.getList("row_groups", Document.class).get(0).containsKey("null_values_for_empty_buckets")).isFalse();
     }
 
     @Test
     void doesNotRunTwice() {
-        when(clusterConfigService.get(V20261020120000_SkipEmptyTimeBucketsInHeatmaps.MigrationCompleted.class))
-                .thenReturn(new V20261020120000_SkipEmptyTimeBucketsInHeatmaps.MigrationCompleted(1, 0));
+        when(clusterConfigService.get(V20261020120000_NullValuesForEmptyHeatmapBuckets.MigrationCompleted.class))
+                .thenReturn(new V20261020120000_NullValuesForEmptyHeatmapBuckets.MigrationCompleted(1, 0));
 
         migration.upgrade();
 
@@ -94,9 +94,9 @@ class V20261020120000_SkipEmptyTimeBucketsInHeatmapsTest {
         return search.getList("queries", Document.class).get(0).getList("search_types", Document.class);
     }
 
-    private V20261020120000_SkipEmptyTimeBucketsInHeatmaps.MigrationCompleted migrationCompleted() {
-        final ArgumentCaptor<V20261020120000_SkipEmptyTimeBucketsInHeatmaps.MigrationCompleted> captor =
-                ArgumentCaptor.forClass(V20261020120000_SkipEmptyTimeBucketsInHeatmaps.MigrationCompleted.class);
+    private V20261020120000_NullValuesForEmptyHeatmapBuckets.MigrationCompleted migrationCompleted() {
+        final ArgumentCaptor<V20261020120000_NullValuesForEmptyHeatmapBuckets.MigrationCompleted> captor =
+                ArgumentCaptor.forClass(V20261020120000_NullValuesForEmptyHeatmapBuckets.MigrationCompleted.class);
         verify(clusterConfigService).write(captor.capture());
 
         return captor.getValue();
