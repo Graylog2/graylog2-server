@@ -25,6 +25,7 @@ import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.PendingChangesLookup;
+import org.graylog.collectors.PendingReassignments;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -57,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,6 +100,7 @@ class CollectorInstancesResourceTest {
                 auditEventSender,
                 activityEntryMapper
         );
+        lenient().when(txnLogService.pendingReassignments()).thenReturn(PendingReassignments.none());
     }
 
     @Test
@@ -259,6 +262,30 @@ class CollectorInstancesResourceTest {
         assertThat(result.status()).isEqualTo("online");
         assertThat(result.identifyingAttributes()).containsEntry("host.name", "host-1");
         assertThat(result.nonIdentifyingAttributes()).containsEntry("os.type", "linux");
+    }
+
+    @Test
+    void getInstanceReportsThePendingFleetOfAnUnprocessedReassignment() {
+        stubOfflineThreshold();
+        when(collectorInstanceService.findByInstanceUid("uid-1"))
+                .thenReturn(Optional.of(instance("uid-1", "fleet-1", Instant.now())));
+        when(txnLogService.pendingReassignments()).thenReturn(PendingReassignments.of(List.of(
+                new TransactionMarker(6L, TransactionMarker.TARGET_COLLECTOR, Set.of("uid-1"),
+                        MarkerType.FLEET_REASSIGNED, new FleetReassignedPayload("fleet-2"), null, null, null))));
+
+        final var result = resource.getInstance("uid-1");
+
+        assertThat(result.fleetId()).isEqualTo("fleet-1");
+        assertThat(result.pendingFleetId()).isEqualTo("fleet-2");
+    }
+
+    @Test
+    void getInstanceReportsNoPendingFleetWithoutReassignment() {
+        stubOfflineThreshold();
+        when(collectorInstanceService.findByInstanceUid("uid-1"))
+                .thenReturn(Optional.of(instance("uid-1", "fleet-1", Instant.now())));
+
+        assertThat(resource.getInstance("uid-1").pendingFleetId()).isNull();
     }
 
     @Test

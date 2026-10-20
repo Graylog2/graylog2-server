@@ -25,10 +25,14 @@ import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.PendingChangesLookup;
+import org.graylog.collectors.PendingReassignments;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.ComponentHealthDTO;
+import org.graylog.collectors.db.FleetReassignedPayload;
+import org.graylog.collectors.db.MarkerType;
+import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
@@ -162,6 +166,83 @@ class CollectorInstanceServiceTest {
 
         // absent fleet should not be in the map
         assertThat(grouped).doesNotContainKey("507f1f77bcf86cd799439099");
+    }
+
+    @Test
+    void countAssignedByFleetWithoutReassignmentsCountsCurrentFleet() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+        insertInstance("uid-a2", "fleet-a", 0L);
+        insertInstance("uid-b1", "fleet-b", 0L);
+
+        assertThat(collectorInstanceService.countAssignedByFleet(PendingReassignments.none()))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("fleet-a", 2L, "fleet-b", 1L));
+    }
+
+    @Test
+    void countAssignedByFleetMovesPendingReassignmentsToTheirTargetFleet() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+        insertInstance("uid-a2", "fleet-a", 0L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(PendingReassignments.of(List.of(reassignment(5L, "fleet-b", "uid-a1"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-a", 1L, "fleet-b", 1L));
+    }
+
+    @Test
+    void countAssignedByFleetDropsFleetsWhoseInstancesAreAllMovingAway() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+        insertInstance("uid-a2", "fleet-a", 0L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(
+                PendingReassignments.of(List.of(reassignment(5L, "fleet-b", "uid-a1", "uid-a2"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-b", 2L));
+    }
+
+    @Test
+    void countAssignedByFleetIgnoresProcessedReassignments() {
+        // The collector processed the marker, but its fleet_id is authoritative either way.
+        insertInstance("uid-a1", "fleet-a", 5L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(PendingReassignments.of(List.of(reassignment(5L, "fleet-b", "uid-a1"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-a", 1L));
+    }
+
+    @Test
+    void countAssignedByFleetUsesTheLatestPendingReassignment() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(PendingReassignments.of(List.of(
+                reassignment(5L, "fleet-b", "uid-a1"),
+                reassignment(7L, "fleet-c", "uid-a1"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-c", 1L));
+    }
+
+    @Test
+    void countAssignedByFleetIgnoresReassignmentsBackToTheCurrentFleet() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(PendingReassignments.of(List.of(
+                reassignment(5L, "fleet-b", "uid-a1"),
+                reassignment(7L, "fleet-a", "uid-a1"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-a", 1L));
+    }
+
+    @Test
+    void countAssignedByFleetIgnoresMarkersForUnknownInstances() {
+        insertInstance("uid-a1", "fleet-a", 0L);
+
+        final var counts = collectorInstanceService.countAssignedByFleet(PendingReassignments.of(List.of(reassignment(5L, "fleet-b", "uid-gone"))));
+
+        assertThat(counts).containsExactlyInAnyOrderEntriesOf(Map.of("fleet-a", 1L));
+    }
+
+    private static TransactionMarker reassignment(long seq, String targetFleetId, String... instanceUids) {
+        return new TransactionMarker(seq, TransactionMarker.TARGET_COLLECTOR, Set.of(instanceUids),
+                MarkerType.FLEET_REASSIGNED, new FleetReassignedPayload(targetFleetId), null, null, null);
     }
 
     @Test

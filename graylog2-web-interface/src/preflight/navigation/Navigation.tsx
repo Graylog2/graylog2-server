@@ -18,6 +18,7 @@ import React from 'react';
 import type { TextProps } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+import ProductName from 'brand-customization/ProductName';
 import HelpMenu from 'preflight/navigation/HelpMenu';
 import { Group, AppShell, Text } from 'preflight/components/common';
 import NavigationBrand from 'components/navigation/NavigationBrand';
@@ -50,7 +51,7 @@ const Navigation = () => (
       <Group gap="xs">
         <NavigationBrand />
         <StyledText fw={500} size="xs" mr={1}>
-          Graylog Initial Setup
+          <ProductName /> Initial Setup
         </StyledText>
       </Group>
       <Group justify="flex-end">

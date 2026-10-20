@@ -36,6 +36,9 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -53,16 +56,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
+    private EntityRegistrar entityRegistrar;
     private MongoCollection<FavoritesForUserDTO> favoritesCollection;
     private GRNRegistry grnRegistry;
 
@@ -81,13 +89,15 @@ public class ViewServiceTest {
                         new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()
         );
+        this.entityRegistrar = mock(EntityRegistrar.class);
         this.dbService = new ViewService(
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
-                mock(EntityRegistrar.class),
+                entityRegistrar,
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
                 mongoCollections,
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
                 new IgnoreSearchFilters());
 
         // Set up favorites collection using MongoCollections to ensure proper serialization
@@ -337,6 +347,62 @@ public class ViewServiceTest {
 
         assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").state(Collections.emptyMap()).build()))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void saveAssignsDefaultScope() {
+        final ViewDTO saved = dbService.save(ViewDTO.builder().title("View").searchId("abc123").state(Collections.emptyMap()).build());
+
+        assertThat(dbService.get(saved.id())).hasValueSatisfying(view -> assertThat(view.scope()).isEqualTo(DefaultEntityScope.NAME));
+    }
+
+    @Test
+    public void saveRejectsUnknownScope() {
+        final ViewDTO dto = ViewDTO.builder().scope("UNKNOWN_SCOPE").title("View").searchId("abc123").state(Collections.emptyMap()).build();
+
+        assertThatThrownBy(() -> dbService.save(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid Entity Scope");
+    }
+
+    @Test
+    public void updateRejectsScopeChange() {
+        final ViewDTO saved = dbService.save(ViewDTO.builder().title("View").searchId("abc123").state(Collections.emptyMap()).build());
+
+        assertThatThrownBy(() -> dbService.update(saved.toBuilder().scope(ImmutableSystemScope.NAME).build()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("scope cannot be modified");
+    }
+
+    @Test
+    public void immutableViewRejectsUpdateAndDelete() {
+        final ViewDTO saved = dbService.save(ViewDTO.builder().scope(ImmutableSystemScope.NAME).title("View").searchId("abc123").state(Collections.emptyMap()).build());
+
+        assertThatThrownBy(() -> dbService.update(saved.toBuilder().title("Changed").build()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> dbService.delete(saved.id()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(dbService.get(saved.id())).hasValueSatisfying(view -> assertThat(view.title()).isEqualTo("View"));
+        verify(entityRegistrar, never()).unregisterDashboard(saved.id());
+    }
+
+    @Test
+    public void deletingMissingViewIsNoOp() {
+        dbService.delete("5def958063303ae5f68eccae");
+
+        verify(entityRegistrar, never()).unregisterDashboard(any());
+        verify(entityRegistrar, never()).unregisterSearch(any());
+    }
+
+    @Test
+    public void immutableViewAllowsForceUpdateAndForceDelete() {
+        final ViewDTO saved = dbService.save(ViewDTO.builder().scope(ImmutableSystemScope.NAME).title("View").searchId("abc123").state(Collections.emptyMap()).build());
+
+        dbService.forceUpdate(saved.toBuilder().title("Changed").build());
+        assertThat(dbService.get(saved.id())).hasValueSatisfying(view -> assertThat(view.title()).isEqualTo("Changed"));
+
+        dbService.forceDelete(saved.id());
+        assertThat(dbService.get(saved.id())).isEmpty();
     }
 
     @Test

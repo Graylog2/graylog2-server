@@ -151,6 +151,12 @@ public class CollectorsConfigResource extends RestResource {
     public CollectorsConfig put(@Context ContainerRequestContext requestContext,
                                 @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
 
+        // Fail before persisting anything: a saved config without the requested input would leave the caller
+        // half-configured (see CollectorsConfigResourceTest#putWithCreateInputChecksInputPermissionBeforeSavingConfig).
+        if (!isCloud && request.createInput()) {
+            collectorIngestInputService.ensureCanCreateInput(getSubject());
+        }
+
         final var existing = collectorsConfigService.get();
 
         final CollectorsConfig.Builder configBuilder;
@@ -194,9 +200,8 @@ public class CollectorsConfigResource extends RestResource {
 
     private String derivedHostname(ContainerRequestContext requestContext) {
         final var host = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
-        // In Cloud the ingest endpoint is exposed under an "ingest-"-prefixed hostname (same scheme the forwarder
-        // ingest endpoint uses).
-        return isCloud ? "ingest-" + host : host;
+        // In Cloud the ingest endpoint is exposed under a "collector-ingest-"-prefixed hostname
+        return isCloud ? "collector-ingest-" + host : host;
     }
 
     private CollectorsConfig validateThresholds(CollectorsConfig config) throws ValidationException {

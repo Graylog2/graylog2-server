@@ -57,4 +57,12 @@ describe('CoreKeyMappers', () => {
     expect(result.current('node-1')).toBe('abc123 / graylog-01');
     expect(result.current('missing')).toBe('missing');
   });
+
+  it('resolves priority values to their name', () => {
+    const { result } = renderHook(() => mapperFor('priority')([]));
+
+    expect(result.current(0)).toBe('Info');
+    expect(result.current(4)).toBe('Critical');
+    expect(result.current(99)).toBe('99');
+  });
 });

@@ -17,8 +17,7 @@
 import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -29,9 +28,9 @@ type Props = {
 };
 
 const IndexSetCell = ({ stream, indexSets }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  if (!isPermitted(currentUser.permissions, ['indexsets:read'])) {
+  if (!isPermitted(['indexsets:read'])) {
     return null;
   }
 

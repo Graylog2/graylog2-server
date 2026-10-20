@@ -22,8 +22,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { BootstrapModalForm, Button, ControlLabel, HelpBlock, FormGroup } from 'components/bootstrap';
 import { SelectableList, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import type { PipelineType } from 'components/pipelines/types';
 import useStreamPipelinesConnectionMutation from 'components/streams/hooks/useStreamPipelinesConnections';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -45,7 +44,7 @@ const formatPipelines = (pipelines: Array<Partial<PipelineType>>): Array<Formatt
 
 const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const queryClient = useQueryClient();
   const { onSaveStreamPipelinesConnection } = useStreamPipelinesConnectionMutation();
   const formattedConnectedPipelines = formatPipelines(connectedPipelines);
@@ -97,10 +96,7 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
 
   return (
     <>
-      <Button
-        disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')}
-        onClick={openModal}
-        bsStyle="info">
+      <Button disabled={!isPermitted('pipeline_connection:edit')} onClick={openModal} bsStyle="info">
         Edit pipelines connection
       </Button>
       {showModal && (

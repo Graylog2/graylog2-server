@@ -49,9 +49,10 @@ export const useSendWidgetConfigUpdateTelemetry = () => {
   const sendTelemetry = useSendTelemetry('search-widget');
 
   return useCallback(
-    () =>
+    (eventDetails: Record<string, unknown> = {}) =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
         app_action_value: 'widget-edit-update-button',
+        event_details: eventDetails,
       }),
     [sendTelemetry],
   );

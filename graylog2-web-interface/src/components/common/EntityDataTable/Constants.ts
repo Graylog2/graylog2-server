@@ -18,8 +18,18 @@
 export const CELL_PADDING_HORIZONTAL = 8; // px, left/right cell padding
 export const CELL_PADDING_VERTICAL = 6; // px, top/bottom cell padding
 export const CELL_PADDING_HEADER = `${CELL_PADDING_HORIZONTAL}px ${CELL_PADDING_HORIZONTAL}px ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px`;
-export const DEFAULT_COL_MIN_WIDTH = 150; // px
-export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
+export const DEFAULT_COL_WIDTH = 200; // px
+// Widths in px for common column content. Use them for columns with a custom attribute name,
+// e.g. a `hostname` column which is the title of the entity.
+export const COLUMN_WIDTH = {
+  title: 300,
+  description: 350,
+  reference: 200, // title of a related entity, e.g. a stream or index set
+  tags: 200, // list of badges, e.g. tags or categories
+  user: 150,
+  date: 160,
+  relativeTime: 140, // e.g. "a few seconds ago"
+} as const;
 export const MORE_ACTIONS_TITLE = 'More';
 export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
 

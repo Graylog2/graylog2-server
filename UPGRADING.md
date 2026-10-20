@@ -98,6 +98,67 @@ Per default, we now export all fields in a message on export. Prior to this chan
 fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
 Now you can export with all fields and limit the results by specifying the fields wanted.
 
+### System CPU and Memory Metrics Now Reflect Container Limits When Containerized
+
+When Graylog Server or Data Node runs in a container with cgroup CPU/memory limits configured (e.g. Docker 
+`--memory`/`--cpus`, Kubernetes `resources.limits`), the `org.graylog2.system.cpu.percent` metric and the Data Node 
+metrics `mem_total`, `mem_free`, `mem_total_used_bytes`, and `mem_total_used` now reflect the container's 
+cgroup-scoped limits and usage instead of the underlying host's.
+
+Previously, these metrics always reported host-level values, so a container with a memory limit well below the host's 
+total RAM would show a low, misleadingly small "used" percentage. After upgrading, the same metrics scale to the 
+container's actual limit, so used-percentage values can jump significantly even though nothing about the node's real 
+memory or CPU pressure has changed. Review and, if necessary, adjust any dashboards or alert thresholds built against 
+the old host-scaled values.
+
+### `stream_aware_field_types` Is Now Enabled by Default
+
+The `stream_aware_field_types` option now defaults to `true`. Graylog then tracks which fields are used in which streams,
+so field lists and field types match the streams you are searching in. We enabled it because more and more features rely on accurate, stream-specific field types.
+
+If your `graylog.conf` still contains `stream_aware_field_types=false` from a previous version, the option stays disabled.
+If you don't configure it (e.g. Docker setups using only environment variables), it will be enabled after the upgrade.
+
+Enabling this option can decrease performance on systems with many streams and fields. To disable it, set
+`stream_aware_field_types = false` (or `GRAYLOG_STREAM_AWARE_FIELD_TYPES=false`).
+
+### Index Sets With Numerically Mapped Date Fields Are Rotated On Startup
+
+Graylog 7.1 wrote date values as numbers until that was fixed, so indices written in the meantime mapped such fields
+as `long` or `float`. Now that date values are written again, those mappings reject every message that carries the
+field. The type of a field cannot be changed in an existing index, so the only way back to a date mapping is a new
+index.
+
+On the first start after the upgrade, Graylog checks the write index of every writable index set. An index set whose
+write index holds no messages is left alone, because an empty index cannot hold a wrongly mapped value. A field counts
+as affected when it is mapped as a date in an older index of the same index set, or when the values it holds are epoch
+timestamps that fall within a month of the period the index itself covers. For an affected index set, those fields are
+set to the type `date`, keeping any custom field types that are already configured, and **the index set is rotated
+once**. Graylog raises one notification per repaired index set, naming the fields it changed.
+
+Index sets whose field types come from their index template - events, failures, Illuminate and collector logs - do
+not accept a custom field type. An affected one of those is rotated without it, so that its new index maps the field
+the way a new installation of this version would. For Illuminate that is a `keyword` rather than a `date`, because
+its templates turn date detection off, but it stops the messages from failing.
+
+After the upgrade:
+
+- Older indices keep their numeric mapping and their numeric values. Until they are removed by their retention
+  strategy, a search covering both the old and the new indices reports a field type conflict for those fields. That
+  resolves itself once the older indices are gone; reindexing them clears it sooner.
+- Index sets that are rotated hold one more index than they otherwise would at that point. With a retention strategy
+  based on the number of indices, this brings the next deletion forward accordingly.
+- If an index set cannot be checked or rotated, for example because the search backend is not ready yet, this is
+  logged and retried on the next start. It does not prevent the server from starting.
+
+Every rotation sets the previous write index to read-only and, unless index optimization is disabled for that index
+set, optimizes it. Optimization is the expensive part: it is a force merge, and the search backend does the work. This
+is the same thing that happens after any rotation, but an upgrade that repairs several index sets at once starts a
+batch of them instead of the single one a regular rotation produces. They do not all run at the same time - the number
+of concurrent optimizations is limited by `elasticsearch_index_optimization_jobs` (default `10`), and the remaining
+ones wait for a free slot. If many of your index sets are affected and your search backend has little headroom, lower
+that value before the upgrade, or disable index optimization for the index sets in question.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
@@ -255,7 +316,7 @@ There are two things to know about how this applies to your inputs:
 - **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
     "Migrate to single DynamoDB table for state tracking" input option.  
 
-To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+To let you migrate existing inputs on your own schedule, the input's **Edit input** dialog exposes a
 **Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
 Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
@@ -271,7 +332,7 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
    attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
    readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
    to fail to start.
-3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+3. Enable the **Migrate to single DynamoDB table for state tracking** option in the input's **Edit input** dialog and save. The
    migration begins.
 4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
    `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
@@ -280,8 +341,10 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
 
-For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
-now-unused legacy tables afterward, see AWS's documentation:
+For how to monitor the migration, along with the migration steps and how to remove the now-unused legacy tables
+afterward, see AWS's documentation. Use the KCL 3.x to 3.5 guide for inputs that were already running KCL 3.x, and the
+KCL 2.x to 3.x guide for inputs that were running KCL 2.x:
 
 - [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 3.x to KCL 3.5](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html)
 - [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

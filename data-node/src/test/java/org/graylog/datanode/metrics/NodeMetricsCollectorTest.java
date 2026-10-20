@@ -21,25 +21,37 @@ import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchC
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import oshi.software.os.CgroupInfo;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.LongSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NodeMetricsCollectorTest {
 
     private static final String NODENAME = "datanode1";
 
     NodeMetricsCollector collector;
+    OfficialOpensearchClient client;
+
+    @TempDir
+    Path cgroupRoot;
 
     @BeforeEach
     public void setUp() throws IOException {
-        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+        this.client = ServerlessOpenSearchClient.builder()
                 .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
                 .build();
-        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
+        this.collector = collectorWithCgroup(null, System::nanoTime);
     }
 
     @Test
@@ -56,6 +68,101 @@ public class NodeMetricsCollectorTest {
         assertThat(nodeMetrics).containsKeys(allMetrics);
     }
 
+    @Test
+    public void getNodeMetricsWithCgroupMemory() {
+        final CgroupInfo cgroup = mockCgroup(2, 4294967296L, 2147483648L);
+
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(4294967296L);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_free")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_total_used")).isEqualTo(50);
+    }
+
+    @Test
+    public void getNodeMetricsWithUnlimitedCgroupMemory() {
+        final CgroupInfo cgroup = mockCgroup(2, CgroupInfo.UNLIMITED_MEMORY, 2147483648L);
+
+        // Without a limit, the host memory stays the total, but the used memory is the cgroup's
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_free")).isEqualTo(32212254720L);
+        assertThat(nodeMetrics.get("mem_total_used")).isEqualTo(6);
+    }
+
+    @Test
+    public void getNodeMetricsExcludesInactivePageCacheCgroupV2() throws IOException {
+        Files.writeString(cgroupRoot.resolve("memory.stat"), "anon 1073741824\nfile 3221225472\nactive_file 1073741824\ninactive_file 2147483648\n");
+        final CgroupInfo cgroup = mockCgroup(2, 4294967296L, 4294967296L);
+
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(4294967296L);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_free")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_total_used")).isEqualTo(50);
+    }
+
+    @Test
+    public void getNodeMetricsExcludesInactivePageCacheCgroupV1() throws IOException {
+        Files.createDirectories(cgroupRoot.resolve("memory"));
+        Files.writeString(cgroupRoot.resolve("memory").resolve("memory.stat"), "cache 3221225472\ninactive_file 1\ntotal_cache 3221225472\ntotal_inactive_file 2147483648\n");
+        final CgroupInfo cgroup = mockCgroup(1, 4294967296L, 4294967296L);
+
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
+        assertThat(nodeMetrics.get("mem_total_used")).isEqualTo(50);
+    }
+
+    @Test
+    public void getNodeMetricsIgnoresInactivePageCacheLargerThanUsage() throws IOException {
+        // memory.stat of another cgroup (e.g. the host's) must not be subtracted from the container's usage
+        Files.writeString(cgroupRoot.resolve("memory.stat"), "inactive_file 8589934592\n");
+        final CgroupInfo cgroup = mockCgroup(2, 4294967296L, 2147483648L);
+
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(2147483648L);
+    }
+
+    @Test
+    public void getNodeMetricsWithCgroupCpu() {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getCpuUsage()).thenReturn(1_000_000_000L, 2_000_000_000L);
+        when(cgroup.getEffectiveCpus()).thenReturn(2.0);
+        final LongSupplier nanoTime = mock(LongSupplier.class);
+        when(nanoTime.getAsLong()).thenReturn(5_000_000_000L, 6_000_000_000L);
+        final NodeMetricsCollector cgroupCollector = collectorWithCgroup(cgroup, nanoTime);
+
+        // First sample: only 1 data point, falls back to OpenSearch host CPU percent (37)
+        assertThat(cgroupCollector.getNodeMetrics(NODENAME).get("cpu_percent")).isEqualTo(37);
+
+        // Second sample: 1s elapsed, 1s cpu used across 2.0 cpus -> 50%
+        assertThat(cgroupCollector.getNodeMetrics(NODENAME).get("cpu_percent")).isEqualTo(50);
+    }
+
+    @Test
+    public void getNodeMetricsWithoutCgroupValues() {
+        // e.g. the root cgroup, which has no memory/cpu accounting files
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getMemoryLimit()).thenReturn(CgroupInfo.UNLIMITED_MEMORY);
+
+        final Map<String, Object> nodeMetrics = collectorWithCgroup(cgroup, System::nanoTime).getNodeMetrics(NODENAME);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
+        assertThat(nodeMetrics.get("mem_total_used_bytes")).isEqualTo(34306146304L);
+        assertThat(nodeMetrics.get("cpu_percent")).isEqualTo(37);
+    }
+
+    private CgroupInfo mockCgroup(int version, long memoryLimit, long memoryUsage) {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.getVersion()).thenReturn(version);
+        when(cgroup.getMemoryLimit()).thenReturn(memoryLimit);
+        when(cgroup.getMemoryUsage()).thenReturn(memoryUsage);
+        return cgroup;
+    }
+
+    private NodeMetricsCollector collectorWithCgroup(CgroupInfo cgroup, LongSupplier nanoTime) {
+        return new NodeMetricsCollector(client, new ObjectMapperProvider().get(), () -> Optional.ofNullable(cgroup), nanoTime, cgroupRoot);
+    }
 
     private final static String nodeStatResponse = """
             {

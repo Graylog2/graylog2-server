@@ -97,7 +97,6 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
             GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                     GeoIpResolverConfig.defaultConfig());
-            boolean moveTemporaryFiles = false;
             if (config.useS3() && config.isGcsCloud()) {
                 throw new ConfigValidationException("Cannot use both S3 and GCS at the same time. Please choose at most one.");
             }
@@ -106,33 +105,19 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 //Throws ConfigValidationException if the config is invalid:
                 geoIpFileService.validateConfiguration(config);
 
-                boolean asnFileExists = !config.asnDbPath().isBlank();
-
-                //Configuration seems to be valid, let's check if we need to download the files:
+                // Configuration seems to be valid. Force a download if the buckets changed, since in that case the files
+                // on disk are stale no matter what their timestamps say.
                 boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
-                if (bucketsChanged || geoIpFileService.fileRefreshRequired(config)) {
-                    geoIpFileService.downloadFilesToTempLocation(config);
-                    config = config.toBuilder()
-                            .cityDbPath(geoIpFileService.getTempCityFile())
-                            .asnDbPath(asnFileExists ? geoIpFileService.getTempAsnFile() : "")
-                            .build();
-                    moveTemporaryFiles = true;
-                } else {
-                    config = config.toBuilder()
-                            .cityDbPath(geoIpFileService.getActiveCityFile())
-                            .asnDbPath(asnFileExists ? geoIpFileService.getActiveAsnFile() : "")
-                            .build();
-                }
+                geoIpFileService.refreshFiles(config, bucketsChanged, tempConfig -> {
+                    validateGeoIpLocationResolver(tempConfig, timer);
+                    validateGeoIpAsnResolver(tempConfig, timer);
+                });
+                config = geoIpFileService.toActiveConfig(config);
             }
 
             // Validate the DB files
             validateGeoIpLocationResolver(config, timer);
             validateGeoIpAsnResolver(config, timer);
-
-            // If the files were downloaded from the cloud and validated successfully, move the temporary files to be active
-            if (moveTemporaryFiles) {
-                geoIpFileService.moveTempFilesToActive();
-            }
         } catch (IllegalArgumentException | IllegalStateException | CloudDownloadException | IOException e) {
             throw new ConfigValidationException(e.getMessage());
         }

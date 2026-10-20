@@ -77,6 +77,7 @@ class NodePingPeriodicalTest {
                     Assertions.assertThat(nodeDto.getLastSeen()).isNotNull();
                     Assertions.assertThat(nodeDto.getProvisioningInformation().certValidUntil()).isNotNull();
                     Assertions.assertThat(nodeDto.getOpensearchRoles().containsAll(List.of("search", "ingest"))).isTrue();
+                    Assertions.assertThat(nodeDto.getOpensearchNodeName()).isEqualTo(nodeDto.getHostname());
                 });
     }
 

@@ -1,0 +1,5 @@
+type = "c"
+message = "Ask for the Collector ingest endpoint inside the onboarding wizard instead of forcing the Settings page, and show a notice up front to users who lack the permissions to complete the setup."
+
+issues = []
+pulls = ["27252"]

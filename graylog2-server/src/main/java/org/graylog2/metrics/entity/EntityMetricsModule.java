@@ -23,6 +23,10 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.metrics.IndexSetDeflectorHealthDescriptor;
+import org.graylog2.indexer.indexset.metrics.IndexSetFieldCountDescriptor;
+import org.graylog2.indexer.indexset.metrics.IndexSetStatsDescriptor;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessagesPerStreamDescriptor;
@@ -54,6 +58,7 @@ public class EntityMetricsModule extends AbstractModule {
 
     public static final String ENTITY_TYPE_INPUTS = InputServiceImpl.COLLECTION_NAME;
     public static final String ENTITY_TYPE_STREAMS = StreamServiceImpl.COLLECTION_NAME;
+    public static final String ENTITY_TYPE_INDEX_SETS = MongoIndexSetService.COLLECTION_NAME;
 
     @Override
     protected void configure() {
@@ -70,6 +75,14 @@ public class EntityMetricsModule extends AbstractModule {
         streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
         streamDescriptors.addBinding().to(StreamPipelinesDescriptor.class);
         streamDescriptors.addBinding().to(StreamRoutingPipelinesDescriptor.class);
+
+        final Multibinder<EntityMetricDescriptor> indexSetDescriptors =
+                Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INDEX_SETS));
+        indexSetDescriptors.addBinding().to(IndexSetStatsDescriptor.IndexCount.class);
+        indexSetDescriptors.addBinding().to(IndexSetStatsDescriptor.DocumentCount.class);
+        indexSetDescriptors.addBinding().to(IndexSetStatsDescriptor.SizeBytes.class);
+        indexSetDescriptors.addBinding().to(IndexSetFieldCountDescriptor.class);
+        indexSetDescriptors.addBinding().to(IndexSetDeflectorHealthDescriptor.class);
 
         final Multibinder<InputType> inputTypes = Multibinder.newSetBinder(binder(), InputType.class);
         inputTypes.addBinding().to(RegularInputType.class);
@@ -93,5 +106,15 @@ public class EntityMetricsModule extends AbstractModule {
                                               MetricsCacheService cacheService,
                                               ObjectMapper objectMapper) {
         return new EntityMetricsService(ENTITY_TYPE_STREAMS, descriptors, cacheService, objectMapper);
+    }
+
+    @SuppressWarnings("unused")
+    @Provides
+    @Singleton
+    @Named(ENTITY_TYPE_INDEX_SETS)
+    EntityMetricsService indexSetMetricsService(@Named(ENTITY_TYPE_INDEX_SETS) Set<EntityMetricDescriptor> descriptors,
+                                                MetricsCacheService cacheService,
+                                                ObjectMapper objectMapper) {
+        return new EntityMetricsService(ENTITY_TYPE_INDEX_SETS, descriptors, cacheService, objectMapper);
     }
 }

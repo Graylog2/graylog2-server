@@ -33,6 +33,10 @@ export type StreamsAndCategoriesSelection = {
   categories: string[];
 };
 
+const StyledFormGroup = styled(FormGroup)`
+  margin-bottom: 0;
+`;
+
 const StyledIcon = styled(Icon)`
   width: 24px;
   vertical-align: middle;
@@ -121,7 +125,7 @@ const StreamsAndCategoriesFilter = ({
   };
 
   return (
-    <FormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
+    <StyledFormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <Select
         {...rest}
@@ -137,7 +141,7 @@ const StreamsAndCategoriesFilter = ({
         multi={multi}
       />
       <InputDescription error={error} help={help} />
-    </FormGroup>
+    </StyledFormGroup>
   );
 };
 

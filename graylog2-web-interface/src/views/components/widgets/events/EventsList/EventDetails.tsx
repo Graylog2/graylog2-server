@@ -17,13 +17,12 @@
 
 import * as React from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 import { Spinner } from 'components/common';
 import DefaultDetails from 'views/components/widgets/events/EventsList/DefaultDetails';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 export const usePluggableEventDetails = (eventId: string) => {
   const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
@@ -35,8 +34,8 @@ export const usePluggableEventDetails = (eventId: string) => {
 
 export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
-  const currentUser = useCurrentUser();
-  const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${event?.event_definition_id}`);
+  const { isPermitted } = usePermissions();
+  const canViewDefinition = isPermitted(`eventdefinitions:read:${event?.event_definition_id}`);
   const { data: eventDefinition, isFetching } = useEventDefinition(event?.event_definition_id, canViewDefinition);
 
   if (isFetching) {

@@ -54,6 +54,7 @@ import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -79,7 +80,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -494,6 +497,81 @@ public class ViewsResourceTest {
         final DashboardDeletedEvent dashboardDeletedEvent = eventCaptor.getValue();
 
         assertThat(dashboardDeletedEvent.dashboardId()).isEqualTo("foobar");
+    }
+
+    @Test
+    public void creatingViewIgnoresClientSuppliedScope() {
+        final ViewService viewService = mock(ViewService.class);
+        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
+        when(viewService.saveWithOwner(any(), any())).thenReturn(dto);
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW.toBuilder().scope("ILLUMINATE").build(), null), mockUserContext(), SEARCH_USER);
+
+        final ArgumentCaptor<ViewDTO> viewCaptor = ArgumentCaptor.forClass(ViewDTO.class);
+        verify(viewService).saveWithOwner(viewCaptor.capture(), any());
+        assertThat(viewCaptor.getValue().scope()).isEqualTo(DefaultEntityScope.NAME);
+    }
+
+    @Test
+    public void updatingImmutableViewReturnsBadRequest() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+        when(viewService.update(any())).thenThrow(new IllegalArgumentException("Immutable entity cannot be modified"));
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Immutable entity cannot be modified");
+    }
+
+    @Test
+    public void deletingImmutableViewReturnsBadRequestAndDoesNotTriggerEvent() {
+        final ViewService viewService = mock(ViewService.class);
+        final ClusterEventBus clusterEventBus = mock(ClusterEventBus.class);
+        final ViewDTO view = ViewDTO.builder()
+                .id("foobar")
+                .type(ViewDTO.Type.DASHBOARD)
+                .searchId(SEARCH_ID)
+                .title("my-dashboard")
+                .state(Collections.emptyMap())
+                .build();
+        when(viewService.get("foobar")).thenReturn(Optional.of(view));
+        doThrow(new IllegalArgumentException("Immutable entity cannot be modified")).when(viewService).delete("foobar");
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                clusterEventBus,
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS
+        );
+
+        assertThatThrownBy(() -> viewsResource.delete("foobar", SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Immutable entity cannot be modified");
+        verify(clusterEventBus, never()).post(any());
     }
 
     @Test

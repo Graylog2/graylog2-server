@@ -29,7 +29,6 @@ import type { CollectorInstanceView } from '../types';
 import {
   fetchPaginatedInstances,
   instancesKeyFn,
-  useFleets,
   useSources,
   useDefaultInstanceFilters,
   useCollectorRefetchInterval,
@@ -38,16 +37,13 @@ import {
 
 const CollectorsInstances = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
-  const { data: fleets } = useFleets();
   const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
   const refetchInterval = useCollectorRefetchInterval();
   const { canAssignToFleet } = useCollectorPermissions();
   const hasBulkActions = useHasBulkActions();
 
-  const fleetNames = useMemo(() => Object.fromEntries((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
-
-  const columnRenderers = useMemo(() => customColumnRenderers({ fleetNames }), [fleetNames]);
+  const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />,
@@ -82,7 +78,6 @@ const CollectorsInstances = () => {
         <InstanceDetailDrawer
           instance={selectedInstance}
           sources={sources ?? []}
-          fleetName={fleetNames[selectedInstance.fleet_id] ?? selectedInstance.fleet_id}
           onClose={() => setSelectedInstance(null)}
         />
       )}

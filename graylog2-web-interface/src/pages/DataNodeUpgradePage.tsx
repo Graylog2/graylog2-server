@@ -16,6 +16,7 @@
  */
 import React, { useState, useRef } from 'react';
 
+import ProductName from 'brand-customization/ProductName';
 import { Row, Col, Button, Alert, Modal } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Title } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -110,8 +111,8 @@ const DataNodeUpgradePage = () => {
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
         <span>
-          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to
-          index and search through all the messages in your Graylog message database.
+          <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
+          allow you to index and search through all the messages in your <ProductName /> message database.
         </span>
       </PageHeader>
       {isInitialLoading ? (

@@ -17,8 +17,11 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+
 import customColumnRenderers from './ColumnRenderers';
 
+import { useFleets } from '../hooks';
 import type { CollectorInstanceView } from '../types';
 
 const baseInstance: CollectorInstanceView = {
@@ -39,16 +42,27 @@ const baseInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  pending_fleet_id: null,
   health: null,
 };
 
-const fleetNames: Record<string, string> = {
-  'fleet-1': 'Production',
-  'fleet-2': 'Staging',
-};
+jest.mock('../hooks/useFleetQueries', () => ({
+  ...jest.requireActual('../hooks/useFleetQueries'),
+  useFleets: jest.fn(),
+}));
 
 describe('Instance ColumnRenderers', () => {
-  const renderers = customColumnRenderers({ fleetNames });
+  const renderers = customColumnRenderers();
+
+  beforeEach(() => {
+    asMock(useFleets).mockReturnValue({
+      data: [
+        { id: 'fleet-1', name: 'Production', description: '', created_at: '', updated_at: '' },
+        { id: 'fleet-2', name: 'Staging', description: '', created_at: '', updated_at: '' },
+      ],
+      isLoading: false,
+    });
+  });
 
   describe('status', () => {
     it('renders Online label for online instances', async () => {
@@ -117,11 +131,19 @@ describe('Instance ColumnRenderers', () => {
       await screen.findByText('Production');
     });
 
-    it('falls back to fleet_id when name not found', async () => {
+    it('renders a removed fleet without a link', async () => {
       const unknownFleet = { ...baseInstance, fleet_id: 'fleet-unknown' };
       render(<>{renderers.attributes.fleet_id.renderCell('fleet-unknown', unknownFleet, {})}</>);
 
-      await screen.findByText('fleet-unknown');
+      await screen.findByText('Fleet removed (fleet-unknown)');
+    });
+
+    it('renders the target fleet of a pending reassignment', async () => {
+      const movingInstance = { ...baseInstance, pending_fleet_id: 'fleet-2' };
+      render(<>{renderers.attributes.fleet_id.renderCell('fleet-1', movingInstance, {})}</>);
+
+      await screen.findByRole('link', { name: 'Staging' });
+      await screen.findByText('(moving from Production)');
     });
   });
 });

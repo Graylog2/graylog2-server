@@ -103,9 +103,9 @@ const StartUpgradeConfirmDialog = ({
           backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.
         </Paragraph>
         <Paragraph>
-          While OpenSearch is down, incoming messages pile up in the disk journal on each <ProductName /> node. If the outage
-          outlasts the journal&apos;s size or age limit, ingestion stalls and messages can be dropped — only proceed if
-          the journal has enough headroom for the expected downtime.
+          While OpenSearch is down, incoming messages pile up in the disk journal on each <ProductName /> node. If the
+          outage outlasts the journal&apos;s size or age limit, ingestion stalls and messages can be dropped — only
+          proceed if the journal has enough headroom for the expected downtime.
         </Paragraph>
         <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
       </Alert>

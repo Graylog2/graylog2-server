@@ -26,11 +26,11 @@ import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 describe('fetchEvents', () => {
-  const THIRTY_DAYS_IN_SECONDS = 30 * 86400;
+  const SEVEN_DAYS_IN_SECONDS = 7 * 86400;
 
   describe('defaultTimeRange', () => {
-    it('should be 30 days', () => {
-      expect(defaultTimeRange).toEqual({ type: 'relative', range: THIRTY_DAYS_IN_SECONDS });
+    it('should be 7 days', () => {
+      expect(defaultTimeRange).toEqual({ type: 'relative', range: SEVEN_DAYS_IN_SECONDS });
     });
   });
 
@@ -57,7 +57,7 @@ describe('fetchEvents', () => {
       const filters: UrlQueryFilters = OrderedMap();
       const result = parseFilters(filters, defaultTimeRange);
 
-      expect(result.timerange).toEqual({ type: 'relative', range: THIRTY_DAYS_IN_SECONDS });
+      expect(result.timerange).toEqual({ type: 'relative', range: SEVEN_DAYS_IN_SECONDS });
     });
 
     it('falls back to allTime when no defaultTimerange is provided', () => {
@@ -177,14 +177,14 @@ describe('fetchEvents', () => {
       });
     });
 
-    it('sends 30 days timerange when no timestamp filter is provided', async () => {
+    it('sends 7 days timerange when no timestamp filter is provided', async () => {
       await fetchEvents(baseSearchParams, undefined);
 
       expect(fetch).toHaveBeenCalledWith(
         'POST',
         expect.any(String),
         expect.objectContaining({
-          timerange: { type: 'relative', range: THIRTY_DAYS_IN_SECONDS },
+          timerange: { type: 'relative', range: SEVEN_DAYS_IN_SECONDS },
         }),
       );
     });

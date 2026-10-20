@@ -25,7 +25,6 @@ import org.graylog.datanode.process.configuration.files.InputStreamConfigFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -123,8 +122,8 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
                 // to create configuration files on a local file system.
                 final Path relativePathWithoutProvider = Path.of(relativePath.toString());
                 try {
-                    final ByteArrayInputStream stream = copyToMemory(sourceFile);
-                    configFiles.add(new InputStreamConfigFile(relativePathWithoutProvider, stream));
+                    final byte[] content = copyToMemory(sourceFile);
+                    configFiles.add(new InputStreamConfigFile(relativePathWithoutProvider, content));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -135,11 +134,11 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
     }
 
     @Nonnull
-    private static ByteArrayInputStream copyToMemory(Path sourceFile) throws IOException {
+    private static byte[] copyToMemory(Path sourceFile) throws IOException {
         try (final InputStream inputStream = Files.newInputStream(sourceFile)) {
             ByteArrayOutputStream memory = new ByteArrayOutputStream();
             inputStream.transferTo(memory);
-            return new ByteArrayInputStream(memory.toByteArray());
+            return memory.toByteArray();
         }
     }
 }

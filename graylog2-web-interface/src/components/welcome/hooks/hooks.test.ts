@@ -18,6 +18,8 @@
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
+import { StartPage } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -82,6 +84,7 @@ const mockedRecentActivity = {
 };
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({ StartPage: { getRecentActivity: jest.fn() } }));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 
 describe('Hooks for welcome page', () => {
@@ -165,7 +168,7 @@ describe('Hooks for welcome page', () => {
     });
 
     it('Test return initial data and take from fetch', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve(mockedRecentActivityResponse));
+      asMock(StartPage.getRecentActivity).mockImplementation(() => Promise.resolve(mockedRecentActivityResponse));
       const { result } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,
       });
@@ -173,12 +176,12 @@ describe('Hooks for welcome page', () => {
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
 
-      expect(fetch).toHaveBeenCalledWith('GET', getUrl('recentActivity'));
+      expect(StartPage.getRecentActivity).toHaveBeenCalledWith(1, 5);
       expect(result.current.data).toEqual(mockedRecentActivity);
     });
 
     it('Test trigger notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(StartPage.getRecentActivity).mockImplementation(() => Promise.reject(new Error('Error')));
 
       const { result } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
         wrapper: DefaultQueryClientProvider,

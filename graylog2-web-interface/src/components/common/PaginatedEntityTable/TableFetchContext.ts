@@ -23,6 +23,7 @@ export type ContextValue = {
   refetch: () => void;
   attributes: Array<Attribute>;
   entityTableId: string;
+  layoutVariant?: string;
 };
 
 const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
