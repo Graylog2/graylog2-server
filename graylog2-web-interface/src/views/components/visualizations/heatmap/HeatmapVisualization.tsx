@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import _values from 'lodash/values';
 import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
@@ -31,6 +30,10 @@ import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import { keySeparator } from 'views/Constants';
+import { isValidDate, toDateObject } from 'util/DateTime';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
@@ -109,10 +112,43 @@ const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
     (valuesFound[0] || [])[0],
   );
 
+const _timestampOfKey = (key: string) => {
+  const [time] = key.split(keySeparator);
+
+  return isValidDate(time) ? toDateObject(time).valueOf() : undefined;
+};
+
+// Rows can contain different timestamps, so the columns are in the order in which they first appear, not in chronological order.
+const _sortedColumnKeys = (valuesBySeries: ValuesBySeries, config: AggregationWidgetConfig) => {
+  const keys = Object.keys(valuesBySeries);
+  const [firstColumnPivot] = config.columnPivots;
+
+  if (firstColumnPivot?.type !== 'time') {
+    return keys;
+  }
+
+  const timeSort = config.sort.find(
+    (sort) => sort.type === SortConfig.PIVOT_TYPE && firstColumnPivot.fields.includes(sort.field),
+  );
+  const isDescending = timeSort?.direction.direction === 'Descending';
+
+  return keys.sort((key1, key2) => {
+    const timestamp1 = _timestampOfKey(key1);
+    const timestamp2 = _timestampOfKey(key2);
+
+    if (timestamp1 === undefined || timestamp2 === undefined) {
+      return Number(timestamp1 === undefined) - Number(timestamp2 === undefined);
+    }
+
+    return isDescending ? timestamp2 - timestamp1 : timestamp1 - timestamp2;
+  });
+};
+
 const _formatSeries =
-  (visualizationConfig: HeatmapVisualizationConfig) =>
+  (visualizationConfig: HeatmapVisualizationConfig, config: AggregationWidgetConfig) =>
   ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }): ExtractedSeries => {
-    const valuesFoundBySeries = _values(valuesBySeries);
+    const yLabels = _sortedColumnKeys(valuesBySeries, config);
+    const valuesFoundBySeries = yLabels.map((key) => valuesBySeries[key]);
     // When using the hovertemplate, we need to provide a value for empty z values.
     // Otherwise, plotly would throw errors when hovering over a field.
     // We need to transpose the z matrix, because we are changing the x and y label in the generator function
@@ -120,7 +156,6 @@ const _formatSeries =
       ? _findSmallestValue(valuesFoundBySeries)
       : (visualizationConfig.defaultValue ?? 'None');
     const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
-    const yLabels = Object.keys(valuesBySeries);
 
     return [['Heatmap Chart', xLabels, yLabels, z]];
   };
@@ -164,7 +199,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
     widgetConfig: config,
     chartType: 'heatmap',
     generator: _generateSeries(visualizationConfig, mapKeys, theme),
-    seriesFormatter: _formatSeries(visualizationConfig),
+    seriesFormatter: _formatSeries(visualizationConfig, config),
     leafValueMatcher: _leafSourceMatcher,
   });
   const layout = _chartLayout(heatmapData);

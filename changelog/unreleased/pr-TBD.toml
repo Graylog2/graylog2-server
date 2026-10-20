@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Sort time columns of heatmaps chronologically."
+
+issues = ["TBD"]
+pulls = ["TBD"]
