@@ -17,7 +17,7 @@
 import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Checkbox as BootstrapCheckbox } from 'react-bootstrap';
-import { useEffect, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef } from 'react';
 
 type BootstrapCheckboxProps = React.ComponentProps<typeof BootstrapCheckbox>;
 
@@ -27,10 +27,11 @@ type Props = Omit<BootstrapCheckboxProps, 'onChange' | 'inputRef'> & {
 };
 const Checkbox = (
   { onChange, indeterminate = false, ...props }: Props,
-  forwardedRef: React.MutableRefObject<HTMLInputElement>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) => {
-  const internalRef = useRef<HTMLInputElement>(null);
-  const checkboxRef = forwardedRef || internalRef;
+  const checkboxRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(forwardedRef, () => checkboxRef.current);
 
   useEffect(() => {
     if (checkboxRef.current && checkboxRef.current.indeterminate !== indeterminate) {
