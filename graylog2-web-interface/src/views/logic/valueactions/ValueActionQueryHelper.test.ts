@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import { fieldValueOrClause, orValuesClause } from './ValueActionQueryHelper';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+describe('ValueActionQueryHelper', () => {
+  const values = ['id1', 'id2', 'id3'].map((value) => ({ value }));
 
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
-);
+  it('joins values in an OR clause', () => {
+    expect(orValuesClause(values)).toEqual('(id1 OR id2 OR id3)');
+  });
 
-export default EventDefinitionSideBar;
+  it('joins field values in a field scoped OR clause', () => {
+    expect(fieldValueOrClause('associated_assets', values)).toEqual('(associated_assets:(id1 OR id2 OR id3))');
+  });
+
+  it('escapes values', () => {
+    expect(orValuesClause(['a b', 'c:d'].map((value) => ({ value })))).toEqual('("a b" OR c\\:d)');
+  });
+});
