@@ -1,0 +1,5 @@
+type = "changed"
+message = "Do not display zero values in heatmaps by default, so empty time buckets are no longer shown as data. Zero values can be shown again with the new \"Show zero values\" option."
+
+issues = ["TBD"]
+pulls = ["TBD"]

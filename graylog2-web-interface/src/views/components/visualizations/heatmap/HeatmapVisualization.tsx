@@ -104,20 +104,26 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
 };
 
 const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
-  valuesFound.reduce(
-    (result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result),
-    (valuesFound[0] || [])[0],
-  );
+  valuesFound
+    .flat()
+    .reduce((acc, value) => (value !== undefined && (acc === undefined || acc > value) ? value : acc), undefined);
+
+// Time groupings return empty buckets with a value of 0, which would otherwise look like actual data.
+// Zero values are treated like missing values, so they still receive the configured default value.
+const _removeZeroValues = (valuesBySeries: Array<Array<any>>) =>
+  valuesBySeries.map((series) => series.map((value) => (value === 0 ? undefined : value)));
 
 const _formatSeries =
   (visualizationConfig: HeatmapVisualizationConfig) =>
   ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }): ExtractedSeries => {
-    const valuesFoundBySeries = _values(valuesBySeries);
+    const valuesFoundBySeries = visualizationConfig.showZeroValues
+      ? _values(valuesBySeries)
+      : _removeZeroValues(_values(valuesBySeries));
     // When using the hovertemplate, we need to provide a value for empty z values.
     // Otherwise, plotly would throw errors when hovering over a field.
     // We need to transpose the z matrix, because we are changing the x and y label in the generator function
     const defaultValue = visualizationConfig.useSmallestAsDefault
-      ? _findSmallestValue(valuesFoundBySeries)
+      ? (_findSmallestValue(valuesFoundBySeries) ?? 'None')
       : (visualizationConfig.defaultValue ?? 'None');
     const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
     const yLabels = Object.keys(valuesBySeries);
