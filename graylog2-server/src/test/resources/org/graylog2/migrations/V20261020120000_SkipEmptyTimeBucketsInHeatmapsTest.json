@@ -1,0 +1,112 @@
+{
+  "views": [
+    {
+      "_id": { "$oid": "6714c0a1c87c8c15c478fb01" },
+      "type": "DASHBOARD",
+      "title": "Heatmap and bar chart",
+      "search_id": "6714c0a1c87c8c15c478fb10",
+      "state": {
+        "query-1": {
+          "widgets": [
+            {
+              "id": "heatmap-widget",
+              "type": "aggregation",
+              "config": {
+                "visualization": "heatmap",
+                "row_pivots": [{ "type": "values", "fields": ["category"] }],
+                "column_pivots": [{ "type": "time", "fields": ["timestamp"] }]
+              }
+            },
+            {
+              "id": "bar-widget",
+              "type": "aggregation",
+              "config": {
+                "visualization": "bar",
+                "row_pivots": [{ "type": "time", "fields": ["timestamp"] }],
+                "column_pivots": []
+              }
+            },
+            {
+              "id": "messages-widget",
+              "type": "messages",
+              "config": {}
+            }
+          ],
+          "widget_mapping": {
+            "heatmap-widget": ["heatmap-search-type"],
+            "bar-widget": ["bar-search-type"],
+            "messages-widget": ["messages-search-type"]
+          }
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "6714c0a1c87c8c15c478fb02" },
+      "type": "SEARCH",
+      "title": "Without heatmap",
+      "search_id": "6714c0a1c87c8c15c478fb11",
+      "state": {
+        "query-1": {
+          "widgets": [
+            {
+              "id": "line-widget",
+              "type": "aggregation",
+              "config": {
+                "visualization": "line",
+                "row_pivots": [{ "type": "time", "fields": ["timestamp"] }],
+                "column_pivots": []
+              }
+            }
+          ],
+          "widget_mapping": {
+            "line-widget": ["line-search-type"]
+          }
+        }
+      }
+    }
+  ],
+  "searches": [
+    {
+      "_id": { "$oid": "6714c0a1c87c8c15c478fb10" },
+      "queries": [
+        {
+          "id": "query-1",
+          "search_types": [
+            {
+              "id": "heatmap-search-type",
+              "type": "pivot",
+              "row_groups": [{ "type": "values", "fields": ["category"], "limit": 15 }],
+              "column_groups": [{ "type": "time", "fields": ["timestamp"], "interval": { "type": "auto", "scaling": 1.0 } }]
+            },
+            {
+              "id": "bar-search-type",
+              "type": "pivot",
+              "row_groups": [{ "type": "time", "fields": ["timestamp"], "interval": { "type": "auto", "scaling": 1.0 } }],
+              "column_groups": []
+            },
+            {
+              "id": "messages-search-type",
+              "type": "messages"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": { "$oid": "6714c0a1c87c8c15c478fb11" },
+      "queries": [
+        {
+          "id": "query-1",
+          "search_types": [
+            {
+              "id": "line-search-type",
+              "type": "pivot",
+              "row_groups": [{ "type": "time", "fields": ["timestamp"], "interval": { "type": "auto", "scaling": 1.0 } }],
+              "column_groups": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

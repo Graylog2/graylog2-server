@@ -177,6 +177,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+        final boolean skipEmptyBuckets = ((Time) bucketSpecs).skipEmptyBuckets();
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketBase previousBucket = initialBucket.bucket();
         final Aggregate aggregation = previousBucket.aggregations().get(AGG_NAME);
@@ -184,6 +185,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                 aggregation.isDateHistogram() ?
                         aggregation.dateHistogram() : aggregation.autoDateHistogram();
         return dateHistogramAggregation.buckets().array().stream()
+                .filter(bucket -> !skipEmptyBuckets || bucket.docCount() > 0)
                 .flatMap(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
@@ -30,6 +31,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -38,11 +40,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.DateHistogramBucket;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSTimeHandler.DATE_TIME_FORMAT;
@@ -172,4 +177,27 @@ class OSTimeHandlerTest {
         assertThat(agg.aggregations()).doesNotContainKey("bucket_sort_order");
     }
 
+    @Test
+    public void emptyBucketsAreSkippedIfConfigured() {
+        when(time.skipEmptyBuckets()).thenReturn(true);
+
+        assertThat(osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).map(PivotBucket::keys))
+                .containsExactly(ImmutableList.of("0"), ImmutableList.of("2"));
+    }
+
+    @Test
+    public void emptyBucketsAreReturnedByDefault() {
+        assertThat(osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).map(PivotBucket::keys))
+                .containsExactly(ImmutableList.of("0"), ImmutableList.of("1"), ImmutableList.of("2"));
+    }
+
+    private PivotBucket initialBucket(long... docCounts) {
+        final List<DateHistogramBucket> buckets = IntStream.range(0, docCounts.length)
+                .mapToObj(i -> DateHistogramBucket.of(b -> b.key(i).keyAsString(String.valueOf(i)).docCount(docCounts[i])))
+                .toList();
+        final Aggregate aggregation = Aggregate.of(a -> a.dateHistogram(h -> h.buckets(bb -> bb.array(buckets))));
+        final DateHistogramBucket initialBucket = DateHistogramBucket.of(b -> b.key(0).docCount(8).aggregations("agg", aggregation));
+
+        return PivotBucket.create(ImmutableList.of(), initialBucket);
+    }
 }

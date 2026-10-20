@@ -49,7 +49,6 @@ type InternalState = {
   zMax: number | undefined | null;
   useSmallestAsDefault: boolean;
   defaultValue: number | undefined | null;
-  showZeroValues: boolean;
 };
 
 export type HeatmapVisualizationConfigJSON = {
@@ -60,7 +59,6 @@ export type HeatmapVisualizationConfigJSON = {
   z_max: number | undefined | null;
   use_smallest_as_default: boolean;
   default_value: number | undefined | null;
-  show_zero_values: boolean;
 };
 
 export default class HeatmapVisualizationConfig extends VisualizationConfig {
@@ -74,7 +72,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     zMax: InternalState['zMax'],
     useSmallestAsDefault: InternalState['useSmallestAsDefault'],
     defaultValue: InternalState['defaultValue'],
-    showZeroValues: InternalState['showZeroValues'],
   ) {
     super();
 
@@ -86,7 +83,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       zMin,
       useSmallestAsDefault,
       defaultValue,
-      showZeroValues,
     };
   }
 
@@ -118,10 +114,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     return this._value.useSmallestAsDefault;
   }
 
-  get showZeroValues() {
-    return this._value.showZeroValues;
-  }
-
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
@@ -135,7 +127,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     zMax: InternalState['zMax'],
     useSmallestAsDefault: InternalState['useSmallestAsDefault'],
     defaultValue: InternalState['defaultValue'],
-    showZeroValues: InternalState['showZeroValues'],
   ) {
     return new HeatmapVisualizationConfig(
       colorScale,
@@ -145,12 +136,11 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       zMax,
       useSmallestAsDefault,
       defaultValue,
-      showZeroValues,
     );
   }
 
   static empty() {
-    return new HeatmapVisualizationConfig('Viridis', false, true, undefined, undefined, false, undefined, false);
+    return new HeatmapVisualizationConfig('Viridis', false, true, undefined, undefined, false, undefined);
   }
 
   toJSON(): HeatmapVisualizationConfigJSON {
@@ -162,7 +152,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       zMax: z_max,
       useSmallestAsDefault: use_smallest_as_default,
       defaultValue: default_value,
-      showZeroValues: show_zero_values,
     } = this._value;
 
     return {
@@ -173,7 +162,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       z_max,
       use_smallest_as_default,
       default_value,
-      show_zero_values,
     };
   }
 
@@ -187,7 +175,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       z_max: undefined,
       use_smallest_as_default: false,
       default_value: undefined,
-      show_zero_values: false,
     },
   ) {
     const {
@@ -198,7 +185,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       z_max: zMax,
       use_smallest_as_default: useSmallestAsDefault,
       default_value: defaultValue,
-      show_zero_values: showZeroValues = false,
     } = value;
 
     return HeatmapVisualizationConfig.create(
@@ -209,7 +195,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       zMax,
       useSmallestAsDefault,
       defaultValue,
-      showZeroValues,
     );
   }
 }
@@ -251,12 +236,8 @@ export class Builder {
     return new Builder(this.value.set('defaultValue', value));
   }
 
-  showZeroValues(value: InternalState['showZeroValues']) {
-    return new Builder(this.value.set('showZeroValues', value));
-  }
-
   build() {
-    const { colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue, showZeroValues } =
+    const { colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue } =
       this.value.toObject();
 
     return new HeatmapVisualizationConfig(
@@ -267,7 +248,6 @@ export class Builder {
       zMax,
       useSmallestAsDefault,
       defaultValue,
-      showZeroValues,
     );
   }
 }

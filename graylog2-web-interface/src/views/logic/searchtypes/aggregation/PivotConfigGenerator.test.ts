@@ -37,6 +37,27 @@ describe('PivotConfigGenerator', () => {
     });
   });
 
+  it('should skip empty time buckets for heatmaps', () => {
+    const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+    const widgetConfig = widgetConfigBuilder
+      .rowPivots([Pivot.createValues(['action'])])
+      .columnPivots([timePivot])
+      .visualization('heatmap')
+      .build();
+    const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
+
+    expect(config.row_groups[0].skip_empty_buckets).toBeUndefined();
+    expect(config.column_groups[0].skip_empty_buckets).toBe(true);
+  });
+
+  it('should not skip empty time buckets for other visualizations', () => {
+    const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+    const widgetConfig = widgetConfigBuilder.rowPivots([timePivot]).visualization('line').build();
+    const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
+
+    expect(config.row_groups[0].skip_empty_buckets).toBeUndefined();
+  });
+
   it('should generate a number config with trend', () => {
     const widgetConfig = widgetConfigBuilder
       .visualization('numeric')

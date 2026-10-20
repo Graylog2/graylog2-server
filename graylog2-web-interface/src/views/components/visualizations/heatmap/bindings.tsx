@@ -34,7 +34,6 @@ type HeatMapVisualizationConfigFormValues = {
   zMax: number;
   useSmallestAsDefault: boolean;
   defaultValue: number;
-  showZeroValues: boolean;
 };
 
 const validate = (formValues: WidgetConfigFormValues) => {
@@ -75,7 +74,6 @@ const heatmap: VisualizationType<
         useSmallestAsDefault,
         zMax,
         zMin,
-        showZeroValues,
       }: HeatmapVisualizationConfig = HeatmapVisualizationConfig.empty(),
     ) => ({
       autoScale,
@@ -85,7 +83,6 @@ const heatmap: VisualizationType<
       useSmallestAsDefault,
       zMax,
       zMin,
-      showZeroValues,
     }),
     toConfig: ({
       autoScale = false,
@@ -95,7 +92,6 @@ const heatmap: VisualizationType<
       zMax,
       zMin,
       defaultValue,
-      showZeroValues = false,
     }: HeatMapVisualizationConfigFormValues) => {
       const [finalZMin, finalZMax] = autoScale ? [undefined, undefined] : [zMin, zMax];
 
@@ -107,7 +103,6 @@ const heatmap: VisualizationType<
         finalZMax,
         useSmallestAsDefault,
         defaultValue,
-        showZeroValues,
       );
     },
     createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
@@ -154,12 +149,6 @@ const heatmap: VisualizationType<
         title: 'Default Value',
         isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
         required: false,
-      },
-      {
-        name: 'showZeroValues',
-        type: 'boolean',
-        title: 'Show zero values',
-        description: 'Display cells with a value of 0. By default they are left empty, like cells without data.',
       },
     ],
   },

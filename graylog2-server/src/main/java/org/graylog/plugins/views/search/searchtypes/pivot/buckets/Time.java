@@ -25,14 +25,18 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonTypeName(Time.NAME)
 @JsonDeserialize(builder = Time.Builder.class)
 public abstract class Time implements BucketSpec {
     public static final String NAME = "time";
+    private static final String FIELD_SKIP_EMPTY_BUCKETS = "skip_empty_buckets";
 
     @Override
     public abstract String type();
@@ -44,9 +48,13 @@ public abstract class Time implements BucketSpec {
     @JsonProperty
     public abstract Interval interval();
 
+    @JsonProperty(FIELD_SKIP_EMPTY_BUCKETS)
+    public abstract boolean skipEmptyBuckets();
+
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
-                .type(NAME);
+                .type(NAME)
+                .skipEmptyBuckets(false);
     }
 
     @AutoValue.Builder
@@ -68,6 +76,13 @@ public abstract class Time implements BucketSpec {
 
         @JsonProperty
         public abstract Builder interval(Interval interval);
+
+        public abstract Builder skipEmptyBuckets(Boolean skipEmptyBuckets);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_BUCKETS)
+        public Builder setSkipEmptyBuckets(@Nullable Boolean skipEmptyBuckets) {
+            return skipEmptyBuckets(firstNonNull(skipEmptyBuckets, false));
+        }
     }
 }
 

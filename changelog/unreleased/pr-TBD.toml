@@ -1,5 +1,5 @@
-type = "changed"
-message = "Do not display zero values in heatmaps by default, so empty time buckets are no longer shown as data. Zero values can be shown again with the new \"Show zero values\" option."
+type = "fixed"
+message = "Do not show empty time buckets in heatmaps, so time ranges without data are no longer displayed as a value of 0."
 
 issues = ["TBD"]
 pulls = ["TBD"]
