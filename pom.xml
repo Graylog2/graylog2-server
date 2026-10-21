@@ -96,6 +96,9 @@
         <common.surefire.args>-javaagent:@{org.mockito:mockito-core:jar} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</common.surefire.args>
         <common.failsafe.args>-Djava.awt.headless=true</common.failsafe.args>
 
+        <skipUnitTests>false</skipUnitTests>
+        <skipIntegrationTests>false</skipIntegrationTests>
+
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.9.0</opensearch.client.version>
@@ -1085,6 +1088,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <skipTests>${skipUnitTests}</skipTests>
                     <trimStackTrace>false</trimStackTrace>
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
@@ -1103,6 +1107,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <skipTests>${skipIntegrationTests}</skipTests>
                     <forkCount>1</forkCount>
                     <skip>false</skip>
                     <argLine>${common.failsafe.args}</argLine>
