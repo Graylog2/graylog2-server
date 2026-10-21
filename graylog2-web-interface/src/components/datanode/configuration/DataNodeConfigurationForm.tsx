@@ -22,34 +22,27 @@ import { ConfirmLeaveDialog, FormSubmit } from 'components/common';
 import usePermissions from 'hooks/usePermissions';
 import UserNotification from 'util/UserNotification';
 
-import type {
-  ConfigurationFormValues,
-  ConfigurationGroup,
-  ConfigurationOverrides,
-  ConfigurationOverrideValue,
-} from './types';
-import getConfigurationFields, {
+import type { ConfigurationCategory, ConfigurationFormValues } from './types';
+import {
   buildConfigurationFormValues,
-  buildConfigurationOverridesPatch,
+  buildConfigurationValuesPatch,
   validateConfigurationFormValues,
 } from './configurationFields';
-import { useUpdateConfigurationOverrides } from './useConfigurationOverrides';
+import { useUpdateManagedConfiguration } from './useManagedConfiguration';
 import ConfigurationFieldInput from './ConfigurationFieldInput';
 
 type Props = {
-  configuration: ConfigurationOverrides;
-  group: ConfigurationGroup;
-  inheritedOverrides?: Record<string, ConfigurationOverrideValue>;
+  category: ConfigurationCategory;
+  nodeId: string | null;
 };
 
-const DataNodeConfigurationForm = ({ configuration, group, inheritedOverrides = {} }: Props) => {
+const DataNodeConfigurationForm = ({ category, nodeId }: Props) => {
   const { isPermitted } = usePermissions();
-  const { updateOverrides } = useUpdateConfigurationOverrides(configuration.node_id);
-  const fields = getConfigurationFields(configuration.node_id).filter((field) => field.group === group.id);
-  const initialValues = buildConfigurationFormValues(configuration.overrides, fields);
-  const inheritedValues = buildConfigurationFormValues(inheritedOverrides, fields);
+  const { updateConfiguration } = useUpdateManagedConfiguration(nodeId);
+  const parameters = category.parameters;
+  const initialValues = buildConfigurationFormValues(parameters);
   const restartDescription =
-    configuration.node_id === null
+    nodeId === null
       ? 'Changing this setting requires restarting the Data Nodes for the change to take effect.'
       : 'Changing this setting requires restarting this Data Node for the change to take effect.';
   const canDelete = isPermitted('clusterconfigentry:delete');
@@ -58,13 +51,15 @@ const DataNodeConfigurationForm = ({ configuration, group, inheritedOverrides = 
   const formik = useFormik<ConfigurationFormValues>({
     initialValues,
     validateOnChange: false,
-    validate: (values) => validateConfigurationFormValues(values, fields),
+    validate: (values) => validateConfigurationFormValues(values, parameters),
     onSubmit: async (values, { resetForm, setStatus }) => {
       setStatus(undefined);
+
       try {
-        const saved = await updateOverrides(buildConfigurationOverridesPatch(formik.initialValues, values));
-        resetForm({ values: buildConfigurationFormValues(saved.overrides, fields) });
-        UserNotification.success('Configuration overrides saved.');
+        const saved = await updateConfiguration(buildConfigurationValuesPatch(formik.initialValues, values));
+        const savedParameters = saved.parameters.filter(({ category: it }) => it === category.label);
+        resetForm({ values: buildConfigurationFormValues(savedParameters) });
+        UserNotification.success('Configuration saved.');
       } catch {
         setStatus('Could not save Data Node configuration. Your changes have been kept. Please try again.');
       }
@@ -77,23 +72,20 @@ const DataNodeConfigurationForm = ({ configuration, group, inheritedOverrides = 
       <Form noValidate>
         {dirty && !isSubmitting && <ConfirmLeaveDialog question="Discard your unsaved configuration changes?" />}
         {status && <Alert bsStyle="danger">{status}</Alert>}
-        <section aria-labelledby={`data-node-configuration-${group.id}`}>
-          <h3 id={`data-node-configuration-${group.id}`}>{group.label}</h3>
+        <section aria-labelledby={`data-node-configuration-${category.id}`}>
+          <h3 id={`data-node-configuration-${category.id}`}>{category.label}</h3>
           <hr />
-          <p>{group.description}</p>
-          <p>Only saved overrides are shown. Values from configuration files and running nodes are unavailable.</p>
-          {fields.map((field) => (
+          {parameters.map((parameter) => (
             <ConfigurationFieldInput
-              key={field.key}
-              field={field}
+              key={parameter.name}
+              parameter={parameter}
               canEdit={canEdit}
-              canDelete={canDelete || !Object.hasOwn(formik.initialValues, field.key)}
-              inheritedValue={inheritedValues[field.key]}
+              canDelete={canDelete}
               restartDescription={restartDescription}
             />
           ))}
         </section>
-        <p>Saving stores overrides. Applying changes and restarting Data Nodes are not available yet.</p>
+        <p>Saving stores the values. Applying them to running Data Nodes is not available yet.</p>
         {canEdit && (
           <FormSubmit
             submitButtonText="Save changes"

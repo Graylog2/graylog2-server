@@ -17,27 +17,28 @@
 import React from 'react';
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
 
-import { Col, NavItem } from 'components/bootstrap';
-import { LinkContainer } from 'components/common';
+import { Alert, Col, NavItem } from 'components/bootstrap';
+import { LinkContainer, Spinner } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import RoutePaths from 'routing/Routes';
 
 import DataNodeConfiguration from './DataNodeConfiguration';
-import { getConfigurationGroups } from './configurationFields';
-import type { ConfigurationGroup } from './types';
+import { getConfigurationCategories } from './configurationFields';
+import useManagedConfiguration from './useManagedConfiguration';
+import type { ConfigurationCategory } from './types';
 
-type SectionLinkProps = { group: ConfigurationGroup; basePath: string };
+type SectionLinkProps = { category: ConfigurationCategory; basePath: string };
 
-const SectionLink = ({ group, basePath }: SectionLinkProps) => {
-  const path = `${basePath}/${group.id}`;
+const SectionLink = ({ category, basePath }: SectionLinkProps) => {
+  const path = `${basePath}/${category.id}`;
   const isActive = !!useMatch(path);
 
   return (
     <SectionNavItem className={isActive ? 'active' : undefined}>
       <LinkContainer to={path}>
-        <NavItem title={group.label} withMinHeight={false} aria-current={isActive ? 'page' : undefined}>
-          {group.label}
+        <NavItem title={category.label} withMinHeight={false} aria-current={isActive ? 'page' : undefined}>
+          {category.label}
         </NavItem>
       </LinkContainer>
     </SectionNavItem>
@@ -47,7 +48,16 @@ const SectionLink = ({ group, basePath }: SectionLinkProps) => {
 type Props = React.PropsWithChildren<{ basePath: string; nodeId?: string | null }>;
 
 const DataNodeConfigurationEditor = ({ basePath, nodeId = null, children = undefined }: Props) => {
-  const configurationGroups = getConfigurationGroups(nodeId);
+  const { data, isLoading, error } = useManagedConfiguration(nodeId);
+
+  if (isLoading) return <Spinner text="Loading Data Node configuration..." />;
+  if (error) return <Alert bsStyle="danger">Could not load Data Node configuration. Please try again.</Alert>;
+
+  const categories = getConfigurationCategories(data?.parameters ?? []);
+
+  if (categories.length === 0) {
+    return <Alert bsStyle="info">No Data Node configuration parameters are available here.</Alert>;
+  }
 
   return (
     <ConfigletRow className="content">
@@ -55,17 +65,21 @@ const DataNodeConfigurationEditor = ({ basePath, nodeId = null, children = undef
       <Col md={2}>
         <nav aria-label="Data Node configuration sections">
           <SectionNav>
-            {configurationGroups.map((group) => (
-              <SectionLink key={group.id} group={group} basePath={basePath} />
+            {categories.map((category) => (
+              <SectionLink key={category.id} category={category} basePath={basePath} />
             ))}
           </SectionNav>
         </nav>
       </Col>
       <Col md={10}>
         <Routes>
-          <Route index element={<Navigate to={configurationGroups[0].id} replace />} />
-          {configurationGroups.map((group) => (
-            <Route key={group.id} path={group.id} element={<DataNodeConfiguration group={group} nodeId={nodeId} />} />
+          <Route index element={<Navigate to={categories[0].id} replace />} />
+          {categories.map((category) => (
+            <Route
+              key={category.id}
+              path={category.id}
+              element={<DataNodeConfiguration category={category} nodeId={nodeId} />}
+            />
           ))}
           <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
         </Routes>

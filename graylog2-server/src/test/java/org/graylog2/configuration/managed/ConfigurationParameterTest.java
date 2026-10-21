@@ -18,6 +18,8 @@ package org.graylog2.configuration.managed;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ConfigurationParameterTest {
@@ -70,7 +72,7 @@ class ConfigurationParameterTest {
 
     @Test
     void checksEveryElementOfAList() {
-        final var parameter = parameter(ParameterType.LIST, ParameterConstraints.allowedValues("data", "search"));
+        final var parameter = parameter(ParameterType.LIST, ParameterConstraints.values(Map.of("data", "Data", "search", "Search")));
 
         assertThat(parameter.validate("data")).isEmpty();
         assertThat(parameter.validate("data, search")).isEmpty();

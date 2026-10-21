@@ -14,42 +14,44 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SystemConfigurationOverrides } from '@graylog/server-api';
+import type { SystemManagedConfiguration } from '@graylog/server-api';
 
-type ApiConfigurationOverrides = Awaited<ReturnType<typeof SystemConfigurationOverrides.get>>;
+type ApiManagedConfiguration = Awaited<ReturnType<typeof SystemManagedConfiguration.get>>;
+type ApiConfigurationParameter = ApiManagedConfiguration['parameters'][number];
 
-export type ConfigurationOverrideValue = ApiConfigurationOverrides['overrides'][string];
+/** Selectable values mapped to the label shown for them, like the values of an input dropdown field. */
+export type ParameterValues = Record<string, string>;
 
-// The generated API types currently omit nullability for node IDs and removal values.
-export type ConfigurationOverrides = Omit<ApiConfigurationOverrides, 'node_type' | 'node_id'> & {
-  node_type: 'datanode';
-  node_id: string | null;
+export type ConfigurationSource = ApiConfigurationParameter['source'];
+
+// The generated types mark every property as present, while the API omits the ones it has no value for.
+export type ConfigurationParameter = Omit<
+  ApiConfigurationParameter,
+  'value' | 'source' | 'set_value' | 'set_at' | 'set_by' | 'node_value' | 'node_source'
+> & {
+  value: string | null;
+  source: ConfigurationSource | null;
+  set_value: string | null;
+  set_at: string | null;
+  set_by: string | null;
+  node_value: string | null;
+  node_source: ConfigurationSource | null;
 };
 
-export type ConfigurationOverridesPatch = Record<string, string | null>;
+export type ManagedConfiguration = Omit<ApiManagedConfiguration, 'node_id' | 'parameters'> & {
+  node_id: string | null;
+  parameters: Array<ConfigurationParameter>;
+};
 
+/** The values to change, keyed by parameter name. A null value removes the stored value. */
+export type ConfigurationValuesPatch = Record<string, string | null>;
+
+/** The values currently shown in the form, keyed by parameter name. */
 export type ConfigurationFormValues = Record<string, string>;
 
-export type ConfigurationQuantityKind = 'disk' | 'memory' | 'bandwidth' | 'heap';
-
-type ConfigurationFieldBase = {
-  key: string;
-  group: string;
-  label: string;
-  description: string;
-  requiresRestart: boolean;
-  validate: (value: string) => string | undefined;
-};
-
-export type ConfigurationField = ConfigurationFieldBase &
-  (
-    | { type: 'number' | 'heap' }
-    | { type: 'quantity'; quantityKind: ConfigurationQuantityKind }
-    | { type: 'roles'; options: Array<{ value: string; label: string }> }
-  );
-
-export type ConfigurationGroup = {
+/** Parameters of one category, which is what a single section of the page shows. */
+export type ConfigurationCategory = {
   id: string;
   label: string;
-  description: string;
+  parameters: Array<ConfigurationParameter>;
 };

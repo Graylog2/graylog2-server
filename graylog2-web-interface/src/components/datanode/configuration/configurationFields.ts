@@ -15,48 +15,120 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type {
-  ConfigurationField,
+  ConfigurationCategory,
   ConfigurationFormValues,
-  ConfigurationGroup,
-  ConfigurationOverridesPatch,
-  ConfigurationOverrideValue,
+  ConfigurationParameter,
+  ConfigurationValuesPatch,
 } from './types';
-import { nodeConfigurationFields, nodeSettingsGroup } from './nodeConfigurationFields';
 
-const validateInteger = (value: string) =>
-  /^-?\d+$/.test(value) && Number.isSafeInteger(Number(value)) ? undefined : 'Enter a whole number.';
+export const categoryId = (category: string) =>
+  category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 
-const validatePositiveInteger = (value: string) => {
-  const error = validateInteger(value);
+/** Groups the parameters of a response into the sections the page shows, keeping the order the API returned. */
+export const getConfigurationCategories = (
+  parameters: Array<ConfigurationParameter>,
+): Array<ConfigurationCategory> => {
+  const categories: Array<ConfigurationCategory> = [];
 
-  return error ?? (Number(value) > 0 ? undefined : 'Enter a whole number greater than zero.');
+  parameters.forEach((parameter) => {
+    const existing = categories.find(({ label }) => label === parameter.category);
+
+    if (existing) {
+      existing.parameters.push(parameter);
+    } else {
+      categories.push({ id: categoryId(parameter.category), label: parameter.category, parameters: [parameter] });
+    }
+  });
+
+  return categories;
 };
 
-const isPercentage = (value: string) => /^\d+(?:\.\d+)?%$/.test(value) && Number(value.slice(0, -1)) <= 100;
+/** The form starts from the value which applies, so the user edits what the node actually uses. */
+export const buildConfigurationFormValues = (parameters: Array<ConfigurationParameter>): ConfigurationFormValues =>
+  Object.fromEntries(
+    parameters.filter(({ value }) => value !== null && value !== undefined).map(({ name, value }) => [name, value]),
+  );
 
-const isByteSize = (value: string) => /^\d+(?:\.\d+)?(?:b|kb|mb|gb|tb|pb)$/i.test(value);
+/** Only changed parameters are sent, a removed value as null, so unchanged ones keep their timestamps. */
+export const buildConfigurationValuesPatch = (
+  initialValues: ConfigurationFormValues,
+  values: ConfigurationFormValues,
+): ConfigurationValuesPatch => {
+  const names = new Set([...Object.keys(initialValues), ...Object.keys(values)]);
 
-const validateWatermark = (value: string) => {
-  const isRatio = /^\d+(?:\.\d+)?$/.test(value) && Number(value) <= 1;
-
-  return isPercentage(value) || isRatio || isByteSize(value)
-    ? undefined
-    : 'Enter a percentage from 0 to 100, a ratio from 0 to 1, or a non-negative free-space size.';
+  return Object.fromEntries(
+    [...names]
+      .filter((name) => initialValues[name] !== values[name])
+      .map((name) => [name, Object.hasOwn(values, name) ? values[name] : null]),
+  );
 };
 
-const validateMemorySize = (value: string) =>
-  isPercentage(value) || isByteSize(value)
-    ? undefined
-    : 'Enter a percentage from 0 to 100 or a non-negative memory size.';
+const matchesPattern = (pattern: string, value: string) => {
+  try {
+    // Patterns are anchored on the server, where Pattern#matches has to match the whole value
+    return new RegExp(`^(?:${pattern})$`).test(value);
+  } catch {
+    // A pattern the browser can't parse shouldn't block the form, the server rejects the value anyway
+    return true;
+  }
+};
 
-const validateRecoverySize = (value: string) =>
-  isByteSize(value) ? undefined : 'Enter a non-negative bandwidth limit. Use 0 to disable throttling.';
+const validateElement = (parameter: ConfigurationParameter, value: string): string | undefined => {
+  const { constraints, type } = parameter;
+  const selectableValues = constraints?.values ?? {};
 
-const watermarkKeys = [
+  if (value === '') return 'Enter a value.';
+
+  if (Object.keys(selectableValues).length > 0 && !Object.hasOwn(selectableValues, value)) {
+    return `Choose one of ${Object.values(selectableValues).join(', ')}.`;
+  }
+
+  if (constraints?.pattern && !matchesPattern(constraints.pattern, value)) {
+    return 'Enter a value in a supported format.';
+  }
+
+  if (type === 'integer') {
+    if (!/^-?\d+$/.test(value) || !Number.isSafeInteger(Number(value))) return 'Enter a whole number.';
+    if (constraints?.min !== undefined && constraints?.min !== null && Number(value) < constraints.min) {
+      return `Enter a number of at least ${constraints.min}.`;
+    }
+    if (constraints?.max !== undefined && constraints?.max !== null && Number(value) > constraints.max) {
+      return `Enter a number of at most ${constraints.max}.`;
+    }
+  }
+
+  if (type === 'boolean' && !['true', 'false'].includes(value.toLowerCase())) {
+    return 'Enter true or false.';
+  }
+
+  return undefined;
+};
+
+/** Applies the constraints the API provides. The server checks the same rules again when the form is saved. */
+export const validateParameter = (parameter: ConfigurationParameter, value: string): string | undefined => {
+  if (value === undefined || value.trim() === '') return 'Enter a value.';
+
+  if (parameter.type === 'list') {
+    return value
+      .split(',')
+      .map((element) => validateElement(parameter, element.trim()))
+      .find((error) => error !== undefined);
+  }
+
+  return validateElement(parameter, value.trim());
+};
+
+// The watermarks have to be consistent with each other, which no single parameter can express.
+const watermarkNames = [
   'cluster.routing.allocation.disk.watermark.low',
   'cluster.routing.allocation.disk.watermark.high',
   'cluster.routing.allocation.disk.watermark.flood_stage',
 ] as const;
+
+const isByteSize = (value: string) => /^\d+(?:\.\d+)?(?:b|kb|mb|gb|tb|pb)$/i.test(value);
 
 const parseWatermark = (value: string) => {
   if (value.endsWith('%')) return { kind: 'usage', amount: Number(value.slice(0, -1)) / 100 };
@@ -72,11 +144,9 @@ const parseWatermark = (value: string) => {
 };
 
 const validateWatermarks = (values: ConfigurationFormValues) => {
-  if (watermarkKeys.some((key) => values[key] === undefined || validateWatermark(values[key]))) return undefined;
+  if (watermarkNames.some((name) => values[name] === undefined)) return undefined;
 
-  const low = parseWatermark(values[watermarkKeys[0]]);
-  const high = parseWatermark(values[watermarkKeys[1]]);
-  const flood = parseWatermark(values[watermarkKeys[2]]);
+  const [low, high, flood] = watermarkNames.map((name) => parseWatermark(values[name]));
 
   if (low.kind !== high.kind || high.kind !== flood.kind) {
     return 'Use disk usage units for all three watermarks, or use free-space units for all three.';
@@ -93,191 +163,24 @@ const validateWatermarks = (values: ConfigurationFormValues) => {
     : 'Set free-space watermarks in descending order: low, high, then flood stage.';
 };
 
-const configurationGroups: Array<ConfigurationGroup> = [
-  {
-    id: 'storage',
-    label: 'Storage and Capacity',
-    description: 'Control disk safeguards and the number of shards your cluster can hold.',
-  },
-  {
-    id: 'search',
-    label: 'Search',
-    description: 'Set query limits and the memory reserved for the query cache.',
-  },
-  {
-    id: 'indexing',
-    label: 'Indexing and Recovery',
-    description: 'Set the memory reserved for indexing and the bandwidth used to recover shards.',
-  },
-];
-
-// Candidate settings and restart rules; the override API does not expose a supported-field catalog.
-const configurationFields: Array<ConfigurationField> = [
-  {
-    key: 'cluster.routing.allocation.disk.watermark.low',
-    group: 'storage',
-    label: 'Stop allocating shards at',
-    description:
-      'Stop assigning new shards when disk usage reaches this percentage, or free space falls below a byte threshold.',
-    type: 'quantity',
-    quantityKind: 'disk',
-    requiresRestart: false,
-    validate: validateWatermark,
-  },
-  {
-    key: 'cluster.routing.allocation.disk.watermark.high',
-    group: 'storage',
-    label: 'Move shards away at',
-    description:
-      'Move shards to other nodes when disk usage reaches this percentage, or free space falls below a byte threshold.',
-    type: 'quantity',
-    quantityKind: 'disk',
-    requiresRestart: false,
-    validate: validateWatermark,
-  },
-  {
-    key: 'cluster.routing.allocation.disk.watermark.flood_stage',
-    group: 'storage',
-    label: 'Protect indexes at',
-    description:
-      'Block writes to affected indexes when disk usage reaches this percentage, or free space falls below a byte threshold.',
-    type: 'quantity',
-    quantityKind: 'disk',
-    requiresRestart: false,
-    validate: validateWatermark,
-  },
-  {
-    key: 'indices.query.bool.max_clause_count',
-    group: 'search',
-    label: 'Maximum query clauses',
-    description: 'Maximum number of clauses allowed in a Boolean query.',
-    type: 'number',
-    requiresRestart: false,
-    validate: validatePositiveInteger,
-  },
-  {
-    key: 'indices.queries.cache.size',
-    group: 'search',
-    label: 'Query cache size',
-    description: 'Memory reserved for the query cache, measured as a percentage of the heap or a fixed memory size.',
-    type: 'quantity',
-    quantityKind: 'memory',
-    requiresRestart: true,
-    validate: validateMemorySize,
-  },
-  {
-    key: 'indices.memory.index_buffer_size',
-    group: 'indexing',
-    label: 'Indexing buffer size',
-    description: 'Memory reserved for indexing buffers, measured as a percentage of the heap or a fixed memory size.',
-    type: 'quantity',
-    quantityKind: 'memory',
-    requiresRestart: true,
-    validate: validateMemorySize,
-  },
-  {
-    key: 'cluster.max_shards_per_node',
-    group: 'storage',
-    label: 'Shard limit per data node',
-    description:
-      'Cluster-wide limit on primary and replica shards, calculated as this value multiplied by the number of non-frozen Data Nodes.',
-    type: 'number',
-    requiresRestart: false,
-    validate: validatePositiveInteger,
-  },
-  {
-    key: 'indices.recovery.max_bytes_per_sec',
-    group: 'indexing',
-    label: 'Recovery bandwidth limit',
-    description: 'Maximum incoming and outgoing recovery traffic per node. Set the limit to 0 to disable throttling.',
-    type: 'quantity',
-    quantityKind: 'bandwidth',
-    requiresRestart: false,
-    validate: validateRecoverySize,
-  },
-];
-
-// Cluster-wide safeguards and query limits stay on the global configuration page.
-const nodeSettingKeys = new Set([
-  'indices.queries.cache.size',
-  'indices.memory.index_buffer_size',
-  'indices.recovery.max_bytes_per_sec',
-]);
-
-export const getConfigurationGroups = (nodeId: string | null = null) =>
-  nodeId === null
-    ? configurationGroups
-    : [
-        nodeSettingsGroup,
-        {
-          id: 'search',
-          label: 'Search',
-          description: 'Set the memory reserved for the query cache on this Data Node.',
-        },
-        {
-          id: 'indexing',
-          label: 'Indexing and Recovery',
-          description: 'Set indexing memory and recovery bandwidth for this Data Node.',
-        },
-      ];
-
-const getConfigurationFields = (nodeId: string | null = null) =>
-  nodeId === null
-    ? configurationFields
-    : [
-        ...nodeConfigurationFields,
-        // A dynamic cluster settings update affects every node; per-node YAML edits need a node restart.
-        ...configurationFields
-          .filter(({ key }) => nodeSettingKeys.has(key))
-          .map((field) => ({ ...field, requiresRestart: true })),
-      ];
-
-export const buildConfigurationFormValues = (
-  overrides: Record<string, ConfigurationOverrideValue>,
-  fields: Array<ConfigurationField>,
-): ConfigurationFormValues => {
-  const fieldKeys = new Set(fields.map(({ key }) => key));
-
-  return Object.fromEntries(
-    Object.entries(overrides)
-      .filter(([key]) => fieldKeys.has(key))
-      .map(([key, { value }]) => [key, value]),
-  );
-};
-
-export const buildConfigurationOverridesPatch = (
-  initialValues: ConfigurationFormValues,
-  values: ConfigurationFormValues,
-): ConfigurationOverridesPatch => {
-  const keys = new Set([...Object.keys(initialValues), ...Object.keys(values)]);
-
-  return Object.fromEntries(
-    [...keys]
-      .filter((key) => initialValues[key] !== values[key])
-      .map((key) => [key, Object.hasOwn(values, key) ? values[key] : null]),
-  );
-};
-
 export const validateConfigurationFormValues = (
   values: ConfigurationFormValues,
-  fields: Array<ConfigurationField>,
+  parameters: Array<ConfigurationParameter>,
 ): Record<string, string> => {
   const errors: Array<[string, string]> = [];
 
-  fields.forEach((field) => {
-    if (!Object.hasOwn(values, field.key)) return;
+  parameters.forEach((parameter) => {
+    if (!Object.hasOwn(values, parameter.name)) return;
 
-    const value = values[field.key];
-    const error = field.validate(value);
+    const error = validateParameter(parameter, values[parameter.name]);
 
-    if (error) errors.push([field.key, error]);
+    if (error) errors.push([parameter.name, error]);
   });
 
-  const watermarkError = validateWatermarks(values);
+  const hasWatermarks = watermarkNames.every((name) => parameters.some(({ name: it }) => it === name));
+  const watermarkError = hasWatermarks && errors.length === 0 ? validateWatermarks(values) : undefined;
 
-  if (watermarkError) errors.push([watermarkKeys[0], watermarkError]);
+  if (watermarkError) errors.push([watermarkNames[0], watermarkError]);
 
   return Object.fromEntries(errors);
 };
-
-export default getConfigurationFields;

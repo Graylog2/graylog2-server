@@ -19,8 +19,8 @@ import styled from 'styled-components';
 
 import { DropdownButton, FormControl, InputGroup, MenuItem } from 'components/bootstrap';
 
-import type { ConfigurationQuantityKind } from './types';
-import { formatQuantityValue, getQuantityUnits, parseQuantityValue } from './configurationQuantities';
+import type { ParameterValues } from './types';
+import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
 
 // Follow the attached numeric field and unit dropdown pattern used by TimeUnitInput.
 const QuantityInputGroup = styled(InputGroup)`
@@ -35,7 +35,7 @@ const QuantityControl = styled(FormControl)`
 type Props = {
   id: string;
   label: string;
-  kind: ConfigurationQuantityKind;
+  units: ParameterValues;
   value: string;
   disabled: boolean;
   invalid?: boolean;
@@ -48,7 +48,7 @@ type Props = {
 const ConfigurationQuantityInput = ({
   id,
   label,
-  kind,
+  units,
   value,
   disabled,
   invalid = false,
@@ -57,10 +57,10 @@ const ConfigurationQuantityInput = ({
   onChange,
   onBlur,
 }: Props) => {
-  const { amount, unit } = parseQuantityValue(value, kind);
-  const units = getQuantityUnits(kind);
-  const maxByUnit: Record<string, number> = { '%': 100, ratio: 1 };
-  const selectedUnit = units.find((option) => option.value === unit);
+  const { amount, unit } = parseQuantityValue(value, units);
+  // A percentage cannot exceed 100, and a unitless quantity is a ratio from 0 to 1
+  const maxByUnit: Record<string, number> = { '%': 100, '': 1 };
+  const unitOptions = Object.entries(units);
 
   return (
     <QuantityInputGroup>
@@ -70,9 +70,9 @@ const ConfigurationQuantityInput = ({
         type="number"
         value={amount}
         placeholder="No override set"
-        min={kind === 'heap' ? 1 : 0}
+        min={0}
         max={maxByUnit[unit]}
-        step={kind === 'heap' ? 1 : 'any'}
+        step="any"
         aria-invalid={invalid}
         aria-describedby={describedBy}
         aria-labelledby={labelledBy}
@@ -83,15 +83,15 @@ const ConfigurationQuantityInput = ({
       <DropdownButton
         id={`${id}-unit`}
         buttonTitle={`${label} unit`}
-        title={selectedUnit?.label}
+        title={units[unit]}
         disabled={disabled}
         onBlur={onBlur}>
-        {units.map((option) => (
+        {unitOptions.map(([suffix, unitLabel]) => (
           <MenuItem
-            key={option.value}
-            active={unit === option.value}
-            onSelect={() => onChange(formatQuantityValue(amount, option.value))}>
-            {option.label}
+            key={suffix}
+            active={unit === suffix}
+            onSelect={() => onChange(formatQuantityValue(amount, suffix))}>
+            {unitLabel}
           </MenuItem>
         ))}
       </DropdownButton>

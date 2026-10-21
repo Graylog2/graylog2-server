@@ -22,7 +22,7 @@ import { Badge, Button, Input } from 'components/bootstrap';
 import { Icon, Select, Tooltip } from 'components/common';
 import VisuallyHidden from 'components/common/VisuallyHidden';
 
-import type { ConfigurationField, ConfigurationFormValues } from './types';
+import type { ConfigurationFormValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
 import { getQuantityUnitLabel } from './configurationQuantities';
 
@@ -38,72 +38,72 @@ const FieldLabel = styled.span`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-const getControlProps = (type: ConfigurationField['type'], value: string) => {
-  switch (type) {
-    case 'heap':
-      if (value === 'automatic') return { type: 'select', value };
-
-      return { type: 'select', value: value === '' ? '' : 'custom' };
-    case 'roles':
-    case 'quantity':
-      return { type: undefined, value: undefined };
-    default:
-      return { type, value };
-  }
+const sourceDescriptions: Record<ConfigurationSource, string> = {
+  default: 'the built-in default',
+  config_file: 'the configuration file',
+  environment: 'an environment variable',
+  system_property: 'a system property',
+  database: 'a stored value',
+  unknown: 'an unknown source',
 };
 
 type Props = {
-  field: ConfigurationField;
+  parameter: ConfigurationParameter;
   canEdit: boolean;
   canDelete: boolean;
-  inheritedValue?: string;
   restartDescription: string;
 };
 
-const ConfigurationFieldInput = ({
-  field,
-  canEdit,
-  canDelete,
-  inheritedValue = undefined,
-  restartDescription,
-}: Props) => {
+const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescription }: Props) => {
   const { values, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
     useFormikContext<ConfigurationFormValues>();
-  const error = touched[field.key] || submitCount > 0 ? errors[field.key] : undefined;
-  const isHeap = field.type === 'heap';
-  const usesGlobalValue = !Object.hasOwn(values, field.key) && inheritedValue !== undefined;
-  const value = values[field.key] ?? inheritedValue ?? '';
+  const { name, label, description, type, units, constraints } = parameter;
+  const selectableValues = Object.entries(constraints?.values ?? {});
+  const error = touched[name] || submitCount > 0 ? errors[name] : undefined;
+  const value = values[name] ?? '';
   const disabled = !canEdit || isSubmitting;
-  const label =
-    field.type === 'quantity' ? `${field.label} (${getQuantityUnitLabel(value, field.quantityKind)})` : field.label;
-  const labelId = `${field.key}-label`;
-  const restartId = `${field.key}-restart`;
-  const helpId = `${field.key}-help`;
-  const errorId = `${field.key}-error`;
-  const describedBy = [helpId, field.requiresRestart && restartId, error && !isHeap && errorId]
-    .filter(Boolean)
-    .join(' ');
-  const customHeapDescribedBy = [helpId, restartId, error && errorId].filter(Boolean).join(' ');
-  const onBlur = () => setTouched({ ...touched, [field.key]: true });
-  // Configuration keys contain dots; keep literal keys instead of Formik object paths.
+  const hasUnits = Object.keys(units ?? {}).length > 0;
+  const isQuantity = hasUnits && (type === 'size' || type === 'duration');
+  const unitLabel = isQuantity ? getQuantityUnitLabel(value, units) : undefined;
+  const labelId = `${name}-label`;
+  const restartId = `${name}-restart`;
+  const helpId = `${name}-help`;
+  const errorId = `${name}-error`;
+  const describedBy = [helpId, parameter.requires_restart && restartId, error && errorId].filter(Boolean).join(' ');
+  const onBlur = () => setTouched({ ...touched, [name]: true });
+  // Parameter names contain dots; keep literal keys instead of Formik object paths.
   const setValue = (nextValue: string) =>
-    setValues((currentValues) => ({ ...currentValues, [field.key]: nextValue }), submitCount > 0);
+    setValues((currentValues) => ({ ...currentValues, [name]: nextValue }), submitCount > 0);
 
-  const removeOverride = () =>
+  const removeStoredValue = () =>
     setValues((currentValues) => {
       const nextValues = { ...currentValues };
-      delete nextValues[field.key];
+      delete nextValues[name];
 
       return nextValues;
     }, submitCount > 0);
 
-  const renderOptions = () => {
-    if (field.type === 'quantity') {
+  const isPendingRestart =
+    parameter.set_value !== null &&
+    parameter.node_value !== null &&
+    parameter.set_value !== parameter.node_value &&
+    parameter.requires_restart;
+
+  const getControlProps = () => {
+    if (isQuantity || selectableValues.length > 0) return { type: undefined, value: undefined };
+    if (type === 'integer') return { type: 'number', value };
+    if (type === 'boolean') return { type: 'select', value };
+
+    return { type: 'text', value };
+  };
+
+  const renderControl = () => {
+    if (isQuantity) {
       return (
         <ConfigurationQuantityInput
-          id={field.key}
-          label={field.label}
-          kind={field.quantityKind}
+          id={name}
+          label={label}
+          units={units}
           value={value}
           disabled={disabled}
           labelledBy={labelId}
@@ -115,16 +115,16 @@ const ConfigurationFieldInput = ({
       );
     }
 
-    if (field.type === 'roles') {
+    if (selectableValues.length > 0) {
       return (
         <Select
-          inputId={field.key}
-          name={field.key}
-          aria-label={field.label}
+          inputId={name}
+          name={name}
+          aria-label={label}
           inputProps={{ 'aria-describedby': describedBy, 'aria-invalid': !!error }}
-          multi
-          options={field.options}
-          placeholder="No override set"
+          multi={type === 'list'}
+          options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
+          placeholder="No value set"
           value={value}
           onChange={setValue}
           onBlur={onBlur}
@@ -133,16 +133,14 @@ const ConfigurationFieldInput = ({
       );
     }
 
-    if (isHeap) {
+    if (type === 'boolean') {
       return (
         <>
           <option value="" disabled>
-            No override set
+            No value set
           </option>
-          <option value="automatic" disabled>
-            Automatic (50% of available RAM; not available yet)
-          </option>
-          <option value="custom">Custom size</option>
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
         </>
       );
     }
@@ -151,106 +149,80 @@ const ConfigurationFieldInput = ({
   };
 
   return (
-    <>
-      <Input
-        id={field.key}
-        name={field.key}
-        label={
-          <FieldLabel>
-            <span id={labelId}>{label}</span>
-            {field.requiresRestart && (
-              <Tooltip label={restartDescription} withArrow>
-                <span role="note" aria-label={restartDescription}>
-                  <Badge color="warning" variant="light" size="sm">
-                    <Icon name="restart_alt" size="sm" />
-                    Restart required
-                  </Badge>
-                  <VisuallyHidden id={restartId}>{restartDescription}</VisuallyHidden>
-                </span>
-              </Tooltip>
-            )}
-          </FieldLabel>
-        }
-        aria-labelledby={labelId}
-        aria-describedby={describedBy}
-        aria-invalid={!!error && !isHeap}
-        {...getControlProps(field.type, value)}
-        disabled={disabled}
-        placeholder="No override set"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          if (isHeap && event.target.value === 'custom') return setValue('g');
-
-          return setValue(event.target.value);
-        }}
-        onBlur={onBlur}
-        error={
-          error && !isHeap ? (
-            <span id={errorId} role="alert">
-              {error}
-            </span>
-          ) : undefined
-        }
-        help={
-          <span id={helpId}>
-            {field.description}
-            <FieldDetail>
-              <code>{field.key}</code>
-            </FieldDetail>
-            {inheritedValue !== undefined && (
-              <FieldDetail>
-                {usesGlobalValue ? 'Using global value: ' : 'Global value: '}
-                <code>{inheritedValue}</code>
-                {!usesGlobalValue && (
-                  <>
-                    {' '}
-                    <Button bsSize="xsmall" disabled={disabled || !canDelete} onClick={removeOverride}>
-                      Use global value
-                    </Button>
-                  </>
-                )}
-              </FieldDetail>
-            )}
-            {inheritedValue === undefined && Object.hasOwn(values, field.key) && (
-              <FieldDetail>
-                <Button
-                  bsSize="xsmall"
-                  aria-label={`Remove override for ${field.label}`}
-                  disabled={disabled || !canDelete}
-                  onClick={removeOverride}>
-                  Remove override
-                </Button>
-              </FieldDetail>
-            )}
-          </span>
-        }>
-        {renderOptions()}
-      </Input>
-      {isHeap && value !== '' && value !== 'automatic' && (
-        <Input
-          id={`${field.key}-custom`}
-          label={`Custom heap size (${getQuantityUnitLabel(value, 'heap')})`}
-          error={
-            error ? (
-              <span id={errorId} role="alert">
-                {error}
+    <Input
+      id={name}
+      name={name}
+      label={
+        <FieldLabel>
+          <span id={labelId}>{unitLabel ? `${label} (${unitLabel})` : label}</span>
+          {parameter.requires_restart && (
+            <Tooltip label={restartDescription} withArrow>
+              <span role="note" aria-label={restartDescription}>
+                <Badge color="warning" variant="light" size="sm">
+                  <Icon name="restart_alt" size="sm" />
+                  Restart required
+                </Badge>
+                <VisuallyHidden id={restartId}>{restartDescription}</VisuallyHidden>
               </span>
-            ) : undefined
-          }
-          help="Set the initial and maximum OpenSearch JVM heap to the same size.">
-          <ConfigurationQuantityInput
-            id={`${field.key}-custom`}
-            label="Custom heap size"
-            kind="heap"
-            value={value}
-            disabled={disabled}
-            describedBy={customHeapDescribedBy}
-            invalid={!!error}
-            onChange={setValue}
-            onBlur={onBlur}
-          />
-        </Input>
-      )}
-    </>
+            </Tooltip>
+          )}
+        </FieldLabel>
+      }
+      aria-labelledby={labelId}
+      aria-describedby={describedBy}
+      aria-invalid={!!error}
+      {...getControlProps()}
+      disabled={disabled}
+      placeholder="No value set"
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
+      onBlur={onBlur}
+      error={
+        error ? (
+          <span id={errorId} role="alert">
+            {error}
+          </span>
+        ) : undefined
+      }
+      help={
+        <span id={helpId}>
+          {description}
+          <FieldDetail>
+            <code>{name}</code>
+          </FieldDetail>
+          {parameter.source && (
+            <FieldDetail>
+              {parameter.set_value === null
+                ? `Currently taken from ${sourceDescriptions[parameter.source]}.`
+                : `Stored value${parameter.set_by ? `, set by ${parameter.set_by}` : ''}.`}
+            </FieldDetail>
+          )}
+          {isPendingRestart && (
+            <FieldDetail>
+              This Data Node still runs <code>{parameter.node_value}</code> and picks the stored value up when it
+              restarts.
+            </FieldDetail>
+          )}
+          {parameter.set_value !== null && (
+            <FieldDetail>
+              <Button
+                bsSize="xsmall"
+                aria-label={`Remove stored value for ${label}`}
+                disabled={disabled || !canDelete}
+                onClick={removeStoredValue}>
+                Remove stored value
+              </Button>
+              {parameter.node_value !== null && (
+                <>
+                  {' '}
+                  Falls back to <code>{parameter.node_value}</code>.
+                </>
+              )}
+            </FieldDetail>
+          )}
+        </span>
+      }>
+      {renderControl()}
+    </Input>
   );
 };
 

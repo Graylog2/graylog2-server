@@ -32,7 +32,7 @@ import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-import mockConfigurationOverridesApi from 'components/datanode/configuration/__tests__/mockConfigurationOverridesApi';
+import mockManagedConfigurationApi from 'components/datanode/configuration/__tests__/mockManagedConfigurationApi';
 
 import AppRouter from './AppRouter';
 import RoutePaths from './Routes';
@@ -85,7 +85,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   beforeEach(() => {
-    mockConfigurationOverridesApi();
+    mockManagedConfigurationApi();
     asMock(AppConfig.isCloud).mockReturnValue(false);
     asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
@@ -108,12 +108,12 @@ describe('AppRouter', () => {
   });
 
   it('routes the Data Node Configuration tab under Cluster and preserves its selected section', async () => {
-    setInitialPath(`${RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION}/search`);
+    setInitialPath(`${RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION}/storage-and-capacity`);
     render(<AppRouterWithContext />);
 
     await screen.findByRole('heading', { name: 'Data Node Configuration' });
-    await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' });
-    expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('aria-current', 'page');
+    await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
+    expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('does not expose Data Node Configuration in Cloud', async () => {

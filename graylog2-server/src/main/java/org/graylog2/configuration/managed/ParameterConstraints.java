@@ -19,7 +19,9 @@ package org.graylog2.configuration.managed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * The validation rules of a configuration parameter.
@@ -28,33 +30,37 @@ import java.util.List;
  * {@link com.github.joschi.jadconfig.Validator}: a rule written in Java can only run in the process which declares it,
  * while these rules are serialized to the user interface and enforced by the API from a single definition.
  *
- * @param min           Smallest accepted value of an {@link ParameterType#INTEGER} parameter
- * @param max           Largest accepted value of an {@link ParameterType#INTEGER} parameter
- * @param pattern       Regular expression the raw value has to match
- * @param allowedValues The accepted values, or the accepted elements of a {@link ParameterType#LIST} parameter
+ * @param min     Smallest accepted value of an {@link ParameterType#INTEGER} parameter
+ * @param max     Largest accepted value of an {@link ParameterType#INTEGER} parameter
+ * @param pattern Regular expression the raw value has to match. The user interface applies it as well, so it has to
+ *                stay portable between Java and JavaScript: no inline flags such as {@code (?i)}.
+ * @param values  The values to choose from, mapped to the label the user interface shows, like the values of an input
+ *                {@link org.graylog2.plugin.configuration.fields.DropdownField}. Empty if the value isn't picked from
+ *                a list. Iteration order is the order the user interface offers them in.
  */
 public record ParameterConstraints(@JsonProperty("min") @Nullable Long min,
                                    @JsonProperty("max") @Nullable Long max,
                                    @JsonProperty("pattern") @Nullable String pattern,
-                                   @JsonProperty("allowed_values") List<String> allowedValues) {
+                                   @JsonProperty("values") Map<String, String> values) {
 
     public ParameterConstraints {
-        allowedValues = allowedValues == null ? List.of() : List.copyOf(allowedValues);
+        // Map#copyOf doesn't keep the iteration order, which decides the order of the options
+        values = values == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(values));
     }
 
     public static ParameterConstraints none() {
-        return new ParameterConstraints(null, null, null, List.of());
+        return new ParameterConstraints(null, null, null, Map.of());
     }
 
     public static ParameterConstraints range(@Nullable Long min, @Nullable Long max) {
-        return new ParameterConstraints(min, max, null, List.of());
+        return new ParameterConstraints(min, max, null, Map.of());
     }
 
     public static ParameterConstraints pattern(String pattern) {
-        return new ParameterConstraints(null, null, pattern, List.of());
+        return new ParameterConstraints(null, null, pattern, Map.of());
     }
 
-    public static ParameterConstraints allowedValues(String... allowedValues) {
-        return new ParameterConstraints(null, null, null, List.of(allowedValues));
+    public static ParameterConstraints values(Map<String, String> values) {
+        return new ParameterConstraints(null, null, null, values);
     }
 }

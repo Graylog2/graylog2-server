@@ -16,41 +16,41 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import configurationOverridesApi from './configurationOverridesApi';
-import type { ConfigurationOverrides, ConfigurationOverridesPatch } from './types';
+import managedConfigurationApi from './managedConfigurationApi';
+import type { ManagedConfiguration, ConfigurationValuesPatch } from './types';
 
-const getQueryKey = (nodeId: string | null) => ['datanode', 'configuration-overrides', nodeId];
+const getQueryKey = (nodeId: string | null) => ['datanode', 'managed-configuration', nodeId];
 
-type ConfigurationOverridesResult = {
-  data: ConfigurationOverrides | undefined;
+type ManagedConfigurationResult = {
+  data: ManagedConfiguration | undefined;
   isLoading: boolean;
   error: Error | null;
 };
 
-type UpdateConfigurationOverridesResult = {
-  updateOverrides: (changes: ConfigurationOverridesPatch) => Promise<ConfigurationOverrides>;
+type UpdateManagedConfigurationResult = {
+  updateConfiguration: (values: ConfigurationValuesPatch) => Promise<ManagedConfiguration>;
 };
 
-const useConfigurationOverrides = (nodeId: string | null = null, enabled = true): ConfigurationOverridesResult => {
+const useManagedConfiguration = (nodeId: string | null = null, enabled = true): ManagedConfigurationResult => {
   const { data, isLoading, error } = useQuery({
     queryKey: getQueryKey(nodeId),
-    queryFn: () => configurationOverridesApi.get(nodeId),
+    queryFn: () => managedConfigurationApi.get(nodeId),
     enabled,
   });
 
   return { data, isLoading, error };
 };
 
-export const useUpdateConfigurationOverrides = (nodeId: string | null = null): UpdateConfigurationOverridesResult => {
+export const useUpdateManagedConfiguration = (nodeId: string | null = null): UpdateManagedConfigurationResult => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
-    mutationFn: (changes: ConfigurationOverridesPatch) => configurationOverridesApi.update(changes, nodeId),
+    mutationFn: (values: ConfigurationValuesPatch) => managedConfigurationApi.update(values, nodeId),
     onSuccess: (data) => {
       queryClient.setQueryData(getQueryKey(nodeId), data);
     },
   });
 
-  return { updateOverrides: mutateAsync };
+  return { updateConfiguration: mutateAsync };
 };
 
-export default useConfigurationOverrides;
+export default useManagedConfiguration;

@@ -14,57 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ConfigurationQuantityKind } from './types';
+import type { ParameterValues } from './types';
 
-type QuantityUnit = { value: string; label: string };
+/**
+ * Splits a stored value into the amount and the unit it is given in. Units are the suffixes the API provides, so the
+ * longest matching one wins: "mb" has to be preferred over "b".
+ */
+export const parseQuantityValue = (value: string, units: ParameterValues) => {
+  const suffixes = Object.keys(units);
+  const suffix = suffixes
+    .filter((it) => it !== '')
+    .sort((left, right) => right.length - left.length)
+    .find((it) => value.toLowerCase().endsWith(it.toLowerCase()));
 
-const byteUnits = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
+  if (suffix !== undefined) return { amount: value.slice(0, -suffix.length), unit: suffix };
 
-export const getQuantityUnits = (kind: ConfigurationQuantityKind): Array<QuantityUnit> => {
-  if (kind === 'heap') {
-    return [
-      { value: 'g', label: 'GB' },
-      { value: 'm', label: 'MB' },
-      { value: 'k', label: 'KB' },
-    ];
-  }
+  // A unit without a suffix, such as a plain ratio, accepts the bare amount
+  if (suffixes.includes('') && /^-?\d+(?:\.\d+)?$/.test(value)) return { amount: value, unit: '' };
 
-  const sizes = byteUnits.map((value) => {
-    let label = value.toUpperCase();
-
-    if (kind === 'bandwidth') label += '/s';
-    if (kind === 'disk') label += ' free';
-
-    return { value, label };
-  });
-
-  if (kind === 'bandwidth') return sizes;
-
-  if (kind === 'disk') {
-    return [{ value: '%', label: '% disk used' }, { value: 'ratio', label: 'Ratio (0–1)' }, ...sizes];
-  }
-
-  return [{ value: '%', label: '% of heap' }, ...sizes];
+  return { amount: value, unit: suffixes[0] ?? '' };
 };
 
-export const parseQuantityValue = (value: string, kind: ConfigurationQuantityKind) => {
-  const defaultUnit = kind === 'bandwidth' ? 'mb' : getQuantityUnits(kind)[0].value;
-  const unit = getQuantityUnits(kind)
-    .sort((left, right) => right.value.length - left.value.length)
-    .find(({ value: suffix }) => value.toLowerCase().endsWith(suffix));
+export const getQuantityUnitLabel = (value: string, units: ParameterValues) => {
+  const { unit } = parseQuantityValue(value, units);
 
-  if (unit) return { amount: value.slice(0, -unit.value.length), unit: unit.value };
-  if (kind === 'disk' && /^-?\d+(?:\.\d+)?$/.test(value)) return { amount: value, unit: 'ratio' };
-
-  return { amount: value, unit: defaultUnit };
-};
-
-export const getQuantityUnitLabel = (value: string, kind: ConfigurationQuantityKind) => {
-  const { unit } = parseQuantityValue(value, kind);
-
-  if (unit === 'ratio') return 'ratio';
-
-  return getQuantityUnits(kind).find((option) => option.value === unit)?.label;
+  return units[unit];
 };
 
 export const formatQuantityValue = (amount: string, unit: string) => {
@@ -72,7 +46,6 @@ export const formatQuantityValue = (amount: string, unit: string) => {
   let normalizedAmount = amount.startsWith('.') ? `0${amount}` : amount;
 
   if (/[eE]/.test(amount) && Number.isFinite(Number(amount))) normalizedAmount = String(Number(amount));
-  if (unit === 'ratio') return normalizedAmount || 'ratio';
 
   return `${normalizedAmount}${unit}`;
 };

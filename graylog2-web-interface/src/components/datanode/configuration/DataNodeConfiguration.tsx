@@ -16,37 +16,19 @@
  */
 import React from 'react';
 
-import { Alert, Col, Row } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 
-import useConfigurationOverrides from './useConfigurationOverrides';
 import DataNodeConfigurationForm from './DataNodeConfigurationForm';
-import type { ConfigurationGroup } from './types';
+import type { ConfigurationCategory } from './types';
 
-type Props = { group: ConfigurationGroup; nodeId?: string | null };
+type Props = { category: ConfigurationCategory; nodeId?: string | null };
 
-const DataNodeConfiguration = ({ group, nodeId = null }: Props) => {
-  const { data, isLoading, error } = useConfigurationOverrides(nodeId);
-  const globalConfiguration = useConfigurationOverrides(null, nodeId !== null);
-
-  if (isLoading || (nodeId !== null && globalConfiguration.isLoading))
-    return <Spinner text="Loading Data Node configuration..." />;
-  if (error || (nodeId !== null && globalConfiguration.error))
-    return <Alert bsStyle="danger">Could not load Data Node configuration. Please try again.</Alert>;
-  if (!data) return null;
-
-  return (
-    <Row>
-      <Col md={8}>
-        <DataNodeConfigurationForm
-          key={`${nodeId ?? 'global'}:${group.id}`}
-          configuration={data}
-          group={group}
-          inheritedOverrides={nodeId === null ? undefined : globalConfiguration.data?.overrides}
-        />
-      </Col>
-    </Row>
-  );
-};
+const DataNodeConfiguration = ({ category, nodeId = null }: Props) => (
+  <Row>
+    <Col md={8}>
+      <DataNodeConfigurationForm key={`${nodeId ?? 'cluster'}:${category.id}`} category={category} nodeId={nodeId} />
+    </Col>
+  </Row>
+);
 
 export default DataNodeConfiguration;

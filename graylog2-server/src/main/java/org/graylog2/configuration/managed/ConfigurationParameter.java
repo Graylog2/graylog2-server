@@ -19,6 +19,9 @@ package org.graylog2.configuration.managed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -33,6 +36,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * described here without the data node classes being available.
  *
  * @param order Position of the parameter within its category, lower values first
+ * @param units The units the value can be given in, mapping the suffix appended to the amount to the label the user
+ *              interface shows. Empty when the value has no unit, and in the order the options are offered in.
  */
 public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeType,
                                      @JsonProperty("name") String name,
@@ -41,6 +46,7 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
                                      @JsonProperty("category") String category,
                                      @JsonProperty("order") int order,
                                      @JsonProperty("type") ParameterType type,
+                                     @JsonProperty("units") Map<String, String> units,
                                      @JsonProperty("constraints") ParameterConstraints constraints,
                                      @JsonProperty("requires_restart") boolean requiresRestart,
                                      @JsonProperty("backing") ParameterBacking backing,
@@ -55,6 +61,8 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         Objects.requireNonNull(scope, "scope");
         description = description == null ? "" : description;
         category = category == null ? "" : category;
+        // Map#copyOf doesn't keep the iteration order, which decides the order of the unit options
+        units = units == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(units));
         constraints = constraints == null ? ParameterConstraints.none() : constraints;
     }
 
@@ -82,9 +90,9 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         if (value.isEmpty()) {
             return Optional.of(f("Parameter <%s> must not contain empty values.", name));
         }
-        if (!constraints.allowedValues().isEmpty() && !constraints.allowedValues().contains(value)) {
+        if (!constraints.values().isEmpty() && !constraints.values().containsKey(value)) {
             return Optional.of(f("Value <%s> of parameter <%s> is not one of %s.",
-                    value, name, constraints.allowedValues()));
+                    value, name, constraints.values().keySet()));
         }
         if (constraints.pattern() != null && !Pattern.matches(constraints.pattern(), value)) {
             return Optional.of(f("Value <%s> of parameter <%s> doesn't match <%s>.",
@@ -127,6 +135,7 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         private String category = "";
         private int order = 100;
         private ParameterType type = ParameterType.STRING;
+        private Map<String, String> units = Map.of();
         private ParameterConstraints constraints = ParameterConstraints.none();
         private boolean requiresRestart = true;
         private ParameterBacking backing = ParameterBacking.CONFIG_FILE;
@@ -158,6 +167,14 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
             return this;
         }
 
+        /**
+         * The units the value can be given in, mapping each suffix to its label. Empty when the value has no unit.
+         */
+        public Builder units(Map<String, String> units) {
+            this.units = units;
+            return this;
+        }
+
         public Builder constraints(ParameterConstraints constraints) {
             this.constraints = constraints;
             return this;
@@ -179,8 +196,8 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         }
 
         public ConfigurationParameter build() {
-            return new ConfigurationParameter(nodeType, name, label, description, category, order, type, constraints,
-                    requiresRestart, backing, scope);
+            return new ConfigurationParameter(nodeType, name, label, description, category, order, type, units,
+                    constraints, requiresRestart, backing, scope);
         }
     }
 }
