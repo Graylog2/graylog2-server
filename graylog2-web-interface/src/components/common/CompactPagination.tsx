@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
+import { IconButton } from 'components/common';
 import Select from 'components/common/Select';
 
 type Props = {
@@ -33,7 +32,7 @@ const Container = styled.div(
   ({ theme }) => css`
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: ${theme.spacings.xs};
     margin-top: 10px;
     overflow: hidden;
@@ -43,6 +42,10 @@ const Container = styled.div(
 
 const PageSelectWrapper = styled.div`
   min-width: 80px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  border: 1px solid ${({ theme }) => theme.colors.input.border};
 `;
 
 /**
@@ -61,6 +64,12 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
 
   return (
     <Container data-testid="graylog-compact-pagination">
+      <StyledIconButton
+        name="chevron_left"
+        title="Previous page"
+        disabled={disabled || currentPage <= 1}
+        onClick={() => onChange(currentPage - 1)}
+      />
       <span>Page:</span>
       <PageSelectWrapper>
         <Select
@@ -73,22 +82,13 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
           size="small"
         />
       </PageSelectWrapper>
-      <Button
-        bsSize="small"
-        aria-label="Open previous page"
-        title="Previous page"
-        disabled={disabled || currentPage <= 1}
-        onClick={() => onChange(currentPage - 1)}>
-        <Icon name="chevron_left" />
-      </Button>
-      <Button
-        bsSize="small"
-        aria-label="Open next page"
+      of {totalPages}
+      <StyledIconButton
+        name="chevron_right"
+        onClick={() => onChange(currentPage + 1)}
         title="Next page"
         disabled={disabled || currentPage >= totalPages}
-        onClick={() => onChange(currentPage + 1)}>
-        <Icon name="chevron_right" />
-      </Button>
+      />
     </Container>
   );
 };
