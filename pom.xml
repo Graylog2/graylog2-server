@@ -116,7 +116,7 @@
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
-        <caffeine.version>3.3.0</caffeine.version>
+        <caffeine.version>3.3.1</caffeine.version>
         <classgraph.version>4.8.198</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
@@ -151,14 +151,14 @@
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.84.1</grpc.version>
+        <grpc.version>1.84.3</grpc.version>
         <gson.version>2.14.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.7.2-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.5.Final</hibernate-validator.version>
         <hk2.version>4.0.3</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.22.3</jackson.version>
         <jadconfig.version>1.2.1</jadconfig.version>
