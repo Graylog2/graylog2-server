@@ -28,13 +28,18 @@ import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { FiltersType } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { concatQueryStrings, escape, formatValueForQuery} from 'views/logic/queries/QueryHelper';
+import { concatQueryStrings, escape, formatValueForQuery } from 'views/logic/queries/QueryHelper';
 import { fieldValueOrClause } from 'views/logic/valueactions/ValueActionQueryHelper';
 import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
-const scalarValue = (value: QueryValue | Array<QueryValue>): QueryValue => (Array.isArray(value) ? value.join(',') : value);
+const scalarValue = (value: QueryValue | Array<QueryValue>): QueryValue =>
+  Array.isArray(value) ? value.join(',') : value;
 
-const searchFromValue = ({ field, value, type }: Pick<Parameters<AggregationHandler>[0], 'field' | 'value' | 'type'>) => {
+const searchFromValue = ({
+  field,
+  value,
+  type,
+}: Pick<Parameters<AggregationHandler>[0], 'field' | 'value' | 'type'>) => {
   if (!Array.isArray(value)) {
     return `${field}:${formatValueForQuery(value, type)}`;
   }

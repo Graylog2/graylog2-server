@@ -58,11 +58,12 @@ type Arguments = {
   contexts?: Partial<ActionContexts>;
 };
 
-const valuesFromPath = (contexts: Partial<ActionContexts>) => contexts.valuePath.map((path) => {
-  const [pathField, pathValue] = Object.entries(path)[0];
+const valuesFromPath = (contexts: Partial<ActionContexts>) =>
+  contexts.valuePath.map((path) => {
+    const [pathField, pathValue] = Object.entries(path)[0];
 
-  return { field: pathField, value: pathValue, type: fieldTypeFor(pathField, contexts?.fieldTypes) };
-});
+    return { field: pathField, value: pathValue, type: fieldTypeFor(pathField, contexts?.fieldTypes) };
+  });
 
 const valuesFromArray = (field: string, value: Array<QueryValue>, type: FieldType): Array<ValueToAdd> =>
   value.map((arrayValue) => ({ field, value: arrayValue, type }));
