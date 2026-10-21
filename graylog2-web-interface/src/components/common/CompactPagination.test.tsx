@@ -23,12 +23,11 @@ import selectEvent from 'helpers/selectEvent';
 import CompactPagination from './CompactPagination';
 
 describe('<CompactPagination />', () => {
-  it('displays the page label and the current page', async () => {
+  it('displays the current page and the total pages', async () => {
     render(<CompactPagination currentPage={3} totalPages={5} />);
 
-    await screen.findByText('Page:');
-
-    expect(screen.getByText('3')).toBeInTheDocument();
+    await screen.findByText('3');
+    await screen.findByText('of 5');
   });
 
   it('does not render when there is only one page', () => {
@@ -71,5 +70,14 @@ describe('<CompactPagination />', () => {
     await selectEvent.chooseOption('Select page', '4');
 
     expect(onChange).toHaveBeenLastCalledWith(4);
+  });
+
+  it('calls `onChange` with the page typed into the select', async () => {
+    const onChange = jest.fn();
+    render(<CompactPagination currentPage={1} totalPages={50} onChange={onChange} />);
+
+    await userEvent.type(await screen.findByRole('combobox', { name: /select page/i }), '25{enter}');
+
+    expect(onChange).toHaveBeenLastCalledWith(25);
   });
 });

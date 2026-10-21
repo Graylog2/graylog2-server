@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import styled, { css } from 'styled-components';
+import { Pagination as MantinePagination } from '@mantine/core';
+import styled, { css, useTheme } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
-import Select from 'components/common/Select';
+import Select, { CONTROL_CLASS } from 'components/common/Select';
 
 type Props = {
   currentPage: number;
@@ -29,27 +29,51 @@ type Props = {
   onChange?: (nextPage: number) => void;
 };
 
-const Container = styled.div(
+const CONTROL_HEIGHT = '26px';
+
+const PrevIcon = () => <Icon name="chevron_left" />;
+const NextIcon = () => <Icon name="chevron_right" />;
+
+const Container = styled(MantinePagination.Root)(
   ({ theme }) => css`
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: ${theme.spacings.xs};
+    font-size: ${theme.fonts.size.small};
+
+    /* PaginatedList centers its pagination, which would also center the select value and options. */
+    text-align: left;
+
+    /* Matches the line height of the Mantine pagination controls, so the text is centered like their icons. */
+    line-height: 1;
     margin-top: 10px;
     overflow: hidden;
     padding: 2px;
+
+    .mantine-Pagination-control {
+      border-color: ${theme.colors.input.border};
+      background-color: transparent;
+    }
   `,
 );
 
+/* The small select is 29px high, this aligns it with the 26px high pagination controls. */
 const PageSelectWrapper = styled.div`
-  min-width: 80px;
+  min-width: 50px;
+
+  .${CONTROL_CLASS} {
+    min-height: ${CONTROL_HEIGHT};
+    height: ${CONTROL_HEIGHT};
+  }
 `;
 
 /**
  * Space-saving alternative to `Pagination`, meant for narrow views.
- * Renders a page select with previous/next buttons instead of a list of page buttons.
+ * Renders a page select between previous/next buttons instead of a list of page buttons.
  */
 const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange = () => {} }: Props) => {
+  const theme = useTheme();
   const pageOptions = useMemo(
     () => Array.from({ length: totalPages }, (_, index) => ({ label: String(index + 1), value: index + 1 })),
     [totalPages],
@@ -60,8 +84,14 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
   }
 
   return (
-    <Container data-testid="graylog-compact-pagination">
-      <span>Page:</span>
+    <Container
+      total={totalPages}
+      value={currentPage}
+      onChange={onChange}
+      disabled={disabled}
+      size="sm"
+      data-testid="graylog-compact-pagination">
+      <MantinePagination.Previous icon={PrevIcon} aria-label="Open previous page" title="Previous page" />
       <PageSelectWrapper>
         <Select
           aria-label="Select page"
@@ -71,24 +101,21 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
           clearable={false}
           disabled={disabled}
           size="small"
+          styles={{
+            singleValue: (base) => ({ ...base, lineHeight: CONTROL_HEIGHT }),
+            valueContainer: (base) => ({ ...base, padding: '0 2px' }),
+            dropdownIndicator: (base, state) => ({
+              ...base,
+              padding: 0,
+              fontSize: '150%',
+              marginRight: theme.spacings.xs,
+              transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+            }),
+          }}
         />
       </PageSelectWrapper>
-      <Button
-        bsSize="small"
-        aria-label="Open previous page"
-        title="Previous page"
-        disabled={disabled || currentPage <= 1}
-        onClick={() => onChange(currentPage - 1)}>
-        <Icon name="chevron_left" />
-      </Button>
-      <Button
-        bsSize="small"
-        aria-label="Open next page"
-        title="Next page"
-        disabled={disabled || currentPage >= totalPages}
-        onClick={() => onChange(currentPage + 1)}>
-        <Icon name="chevron_right" />
-      </Button>
+      <span>of {totalPages}</span>
+      <MantinePagination.Next icon={NextIcon} aria-label="Open next page" title="Next page" />
     </Container>
   );
 };

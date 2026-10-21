@@ -99,6 +99,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     <StreamMetricsProvider streamIds={visibleStreamIds} fields={requestedFields}>
       <PaginatedEntityTable<Stream>
         humanName="streams"
+        compactView
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName="stream" />}
         entityActions={entityActions}
