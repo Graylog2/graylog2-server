@@ -117,7 +117,7 @@
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <caffeine.version>3.3.0</caffeine.version>
-        <classgraph.version>4.8.197</classgraph.version>
+        <classgraph.version>4.8.198</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -180,7 +180,7 @@
         <jsoup.version>1.23.2</jsoup.version>
         <jspecify.version>1.0.1</jspecify.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <kafka.version>4.3.1</kafka.version>
+        <kafka.version>4.4.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
@@ -978,7 +978,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.10.4.1</version>
+                    <version>4.10.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
