@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import { IconButton } from 'components/common';
+import IconButton from 'components/common/IconButton';
 import Select from 'components/common/Select';
 
 type Props = {
