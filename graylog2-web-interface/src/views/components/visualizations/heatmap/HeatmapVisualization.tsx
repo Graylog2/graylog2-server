@@ -19,6 +19,7 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
 
@@ -35,7 +36,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { keySeparator } from 'views/Constants';
-import { isValidDate, toDateObject } from 'util/DateTime';
+import { toDateObject } from 'util/DateTime';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
@@ -114,15 +115,8 @@ const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
     (valuesFound[0] || [])[0],
   );
 
-const _timestampOfKey = (key: string) => {
-  const [time] = key.split(keySeparator);
-
-  return isValidDate(time) ? toDateObject(time).valueOf() : undefined;
-};
-
 // Rows can contain different timestamps, so the columns are in the order in which they first appear, not in chronological order.
-const _sortedColumnKeys = (valuesBySeries: ValuesBySeries, config: AggregationWidgetConfig) => {
-  const keys = Object.keys(valuesBySeries);
+const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) => {
   const [firstColumnPivot] = config.columnPivots;
 
   if (firstColumnPivot?.type !== DateType) {
@@ -132,24 +126,18 @@ const _sortedColumnKeys = (valuesBySeries: ValuesBySeries, config: AggregationWi
   const timeSort = config.sort.find(
     (sort) => sort.type === SortConfig.PIVOT_TYPE && firstColumnPivot.fields.includes(sort.field),
   );
-  const isDescending = Direction.Descending.equals(timeSort?.direction);
 
-  return keys.sort((key1, key2) => {
-    const timestamp1 = _timestampOfKey(key1);
-    const timestamp2 = _timestampOfKey(key2);
-
-    if (timestamp1 === undefined || timestamp2 === undefined) {
-      return Number(timestamp1 === undefined) - Number(timestamp2 === undefined);
-    }
-
-    return isDescending ? timestamp2 - timestamp1 : timestamp1 - timestamp2;
-  });
+  return orderBy(
+    keys,
+    (key) => toDateObject(key.split(keySeparator)[0]).valueOf(),
+    Direction.Descending.equals(timeSort?.direction) ? 'desc' : 'asc',
+  );
 };
 
 const _formatSeries =
   (visualizationConfig: HeatmapVisualizationConfig, config: AggregationWidgetConfig) =>
   ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }): ExtractedSeries => {
-    const yLabels = _sortedColumnKeys(valuesBySeries, config);
+    const yLabels = _sortColumnKeys(Object.keys(valuesBySeries), config);
     const valuesFoundBySeries = yLabels.map((key) => valuesBySeries[key]);
     // When using the hovertemplate, we need to provide a value for empty z values.
     // Otherwise, plotly would throw errors when hovering over a field.
