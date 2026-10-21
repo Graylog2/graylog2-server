@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import Qs from 'qs';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemInputsMetrics } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type InputMetricField = 'messages_per_stream' | 'extractor_count';
@@ -39,11 +38,7 @@ const POLL_INTERVAL_MS = 60_000;
 export const fetchInputMetrics = (
   inputIds: Array<string>,
   fields: Array<InputMetricField>,
-): Promise<InputMetricsResponse> => {
-  const query = Qs.stringify({ input_ids: inputIds, fields }, { indices: false });
-
-  return fetch('GET', qualifyUrl(`/system/inputs/metrics?${query}`));
-};
+): Promise<InputMetricsResponse> => SystemInputsMetrics.getMetrics(inputIds, fields);
 
 const sortedUnique = <T extends string>(values: Array<T>): Array<T> => Array.from(new Set(values)).sort();
 

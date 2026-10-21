@@ -17,6 +17,8 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -40,6 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
 @RequiresAuthentication
+@Tag(name = "Tools/RegexTester", description = "Test regular expressions")
 @Path("/tools/regex_tester")
 public class RegexTesterResource extends RestResource {
 
@@ -51,6 +54,7 @@ public class RegexTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Test a regular expression against a string")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public RegexTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
@@ -59,6 +63,7 @@ public class RegexTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Test a regular expression against a string")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -68,6 +73,7 @@ public class RegexTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Validate a regular expression")
     @Path("/validate")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)

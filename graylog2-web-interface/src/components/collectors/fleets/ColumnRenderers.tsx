@@ -19,6 +19,7 @@ import * as React from 'react';
 import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { Fleet } from '../types';
 
@@ -28,15 +29,13 @@ const customColumnRenderers = (): ColumnRenderers<Fleet> => ({
       renderCell: (_name: string, fleet: Fleet) => (
         <Link to={Routes.SYSTEM.COLLECTORS.FLEET(fleet.id)}>{fleet.name}</Link>
       ),
-      width: 0.25,
     },
     description: {
       renderCell: (description: string) => <span>{description || '—'}</span>,
-      width: 0.4,
     },
     created_at: {
       renderCell: (_createdAt: string, fleet: Fleet) => <RelativeTime dateTime={fleet.created_at} />,
-      width: 0.15,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
   },
 });
