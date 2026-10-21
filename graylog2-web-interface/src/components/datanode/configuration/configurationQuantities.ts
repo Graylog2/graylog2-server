@@ -20,8 +20,12 @@ import type { ParameterValues } from './types';
  * Splits a stored value into the amount and the unit it is given in. Units are the suffixes the API provides, so the
  * longest matching one wins: "mb" has to be preferred over "b".
  */
-export const parseQuantityValue = (value: string, units: ParameterValues) => {
+export const parseQuantityValue = (value: string | undefined, units: ParameterValues) => {
   const suffixes = Object.keys(units);
+
+  // An unset field starts with the first offered unit; an empty draft can have an empty suffix.
+  if (value === undefined) return { amount: '', unit: suffixes[0] ?? '' };
+
   const suffix = suffixes
     .filter((it) => it !== '')
     .sort((left, right) => right.length - left.length)
@@ -29,13 +33,10 @@ export const parseQuantityValue = (value: string, units: ParameterValues) => {
 
   if (suffix !== undefined) return { amount: value.slice(0, -suffix.length), unit: suffix };
 
-  // A unit without a suffix, such as a plain ratio, accepts the bare amount
-  if (suffixes.includes('') && /^-?\d+(?:\.\d+)?$/.test(value)) return { amount: value, unit: '' };
-
-  return { amount: value, unit: suffixes[0] ?? '' };
+  return { amount: value, unit: suffixes.includes('') ? '' : (suffixes[0] ?? '') };
 };
 
-export const getQuantityUnitLabel = (value: string, units: ParameterValues) => {
+export const getQuantityUnitLabel = (value: string | undefined, units: ParameterValues) => {
   const { unit } = parseQuantityValue(value, units);
 
   return units[unit];

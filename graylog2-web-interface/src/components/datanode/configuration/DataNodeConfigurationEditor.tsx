@@ -15,35 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
 
-import { Alert, Col, NavItem } from 'components/bootstrap';
-import { LinkContainer, Spinner } from 'components/common';
-import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
-import ConfigletRow from 'pages/configurations/ConfigletRow';
-import RoutePaths from 'routing/Routes';
+import { Alert } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 
-import DataNodeConfiguration from './DataNodeConfiguration';
+import DataNodeConfigurationForm from './DataNodeConfigurationForm';
 import { getConfigurationCategories } from './configurationFields';
 import useManagedConfiguration from './useManagedConfiguration';
-import type { ConfigurationCategory } from './types';
-
-type SectionLinkProps = { category: ConfigurationCategory; basePath: string };
-
-const SectionLink = ({ category, basePath }: SectionLinkProps) => {
-  const path = `${basePath}/${category.id}`;
-  const isActive = !!useMatch(path);
-
-  return (
-    <SectionNavItem className={isActive ? 'active' : undefined}>
-      <LinkContainer to={path}>
-        <NavItem title={category.label} withMinHeight={false} aria-current={isActive ? 'page' : undefined}>
-          {category.label}
-        </NavItem>
-      </LinkContainer>
-    </SectionNavItem>
-  );
-};
 
 type Props = React.PropsWithChildren<{ basePath: string; nodeId?: string | null }>;
 
@@ -60,31 +38,9 @@ const DataNodeConfigurationEditor = ({ basePath, nodeId = null, children = undef
   }
 
   return (
-    <ConfigletRow className="content">
-      {children && <Col xs={12}>{children}</Col>}
-      <Col md={2}>
-        <nav aria-label="Data Node configuration sections">
-          <SectionNav>
-            {categories.map((category) => (
-              <SectionLink key={category.id} category={category} basePath={basePath} />
-            ))}
-          </SectionNav>
-        </nav>
-      </Col>
-      <Col md={10}>
-        <Routes>
-          <Route index element={<Navigate to={categories[0].id} replace />} />
-          {categories.map((category) => (
-            <Route
-              key={category.id}
-              path={category.id}
-              element={<DataNodeConfiguration category={category} nodeId={nodeId} />}
-            />
-          ))}
-          <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
-        </Routes>
-      </Col>
-    </ConfigletRow>
+    <DataNodeConfigurationForm key={nodeId ?? 'cluster'} categories={categories} nodeId={nodeId} basePath={basePath}>
+      {children}
+    </DataNodeConfigurationForm>
   );
 };
 

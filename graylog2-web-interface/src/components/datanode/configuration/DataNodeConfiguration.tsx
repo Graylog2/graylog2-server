@@ -16,19 +16,30 @@
  */
 import React from 'react';
 
-import { Col, Row } from 'components/bootstrap';
-
-import DataNodeConfigurationForm from './DataNodeConfigurationForm';
+import ConfigurationFieldInput from './ConfigurationFieldInput';
 import type { ConfigurationCategory } from './types';
 
-type Props = { category: ConfigurationCategory; nodeId?: string | null };
+type Props = {
+  category: ConfigurationCategory;
+  canEdit: boolean;
+  canDelete: boolean;
+  restartDescription: string;
+};
 
-const DataNodeConfiguration = ({ category, nodeId = null }: Props) => (
-  <Row>
-    <Col md={8}>
-      <DataNodeConfigurationForm key={`${nodeId ?? 'cluster'}:${category.id}`} category={category} nodeId={nodeId} />
-    </Col>
-  </Row>
+const DataNodeConfiguration = ({ category, canEdit, canDelete, restartDescription }: Props) => (
+  <section aria-labelledby={`data-node-configuration-${category.id}`}>
+    <h3 id={`data-node-configuration-${category.id}`}>{category.label}</h3>
+    <hr />
+    {category.parameters.map((parameter) => (
+      <ConfigurationFieldInput
+        key={parameter.name}
+        parameter={parameter}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        restartDescription={restartDescription}
+      />
+    ))}
+  </section>
 );
 
 export default DataNodeConfiguration;

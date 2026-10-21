@@ -32,6 +32,7 @@ import AppConfig from 'util/AppConfig';
 import UserNotification from 'util/UserNotification';
 import mockManagedConfigurationApi, {
   managedConfigurationResponse,
+  configurationParameter,
   sampleClusterConfiguration,
 } from 'components/datanode/configuration/__tests__/mockManagedConfigurationApi';
 import changeSetting from 'components/datanode/configuration/__tests__/changeConfigurationField';
@@ -139,7 +140,7 @@ describe('DataNodeConfigurationPage', () => {
     jest.clearAllMocks();
   });
 
-  it('opens the only cluster wide section by default with section navigation', async () => {
+  it('opens the only cluster wide section without redundant navigation', async () => {
     const { router } = renderPage('');
     const lowWatermark = await screen.findByLabelText(/^Stop allocating shards at \(/);
 
@@ -151,8 +152,7 @@ describe('DataNodeConfigurationPage', () => {
     expect(configurationTab).toHaveAttribute('href', settingsPath);
     expect(configurationTab).toHaveClass('active');
     expect(clusterTab).not.toHaveClass('active');
-    expect(screen.getByRole('navigation', { name: 'Data Node configuration sections' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.queryByRole('navigation', { name: 'Data Node configuration sections' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Storage and Capacity' })).toBeInTheDocument();
     expect(lowWatermark).toHaveValue(85);
     expect(lowWatermark).not.toBeDisabled();
@@ -165,6 +165,30 @@ describe('DataNodeConfigurationPage', () => {
     expect(screen.queryByRole('link', { name: 'Node Settings' })).not.toBeInTheDocument();
     expect(screen.queryByText('Restart required')).not.toBeInTheDocument();
     expect(getSaveButton()).toBeDisabled();
+  });
+
+  it('adds section navigation when the backend supplies another category', async () => {
+    jest.spyOn(managedConfigurationApi, 'get').mockResolvedValue({
+      ...sampleClusterConfiguration,
+      parameters: [
+        ...sampleClusterConfiguration.parameters,
+        configurationParameter({
+          name: 'additional_setting',
+          label: 'Additional setting',
+          category: 'Additional Settings',
+          scope: 'cluster',
+        }),
+      ],
+    });
+    renderPage();
+    await screen.findByRole('navigation', { name: 'Data Node configuration sections' });
+    expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
+    await changeSetting('Shard limit per Data Node', '1200');
+    await userEvent.click(screen.getByRole('link', { name: 'Additional Settings' }));
+    await screen.findByLabelText('Additional setting');
+    expect(getSaveButton()).toBeEnabled();
+    await userEvent.click(screen.getByRole('link', { name: 'Storage and Capacity' }));
+    expect(await screen.findByLabelText('Shard limit per Data Node')).toHaveValue(1200);
   });
 
   it('redirects unknown sections to the not-found page', async () => {
@@ -210,21 +234,48 @@ describe('DataNodeConfigurationPage', () => {
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '88%' }, null));
   });
 
-  it('keeps the chosen unit when clearing the number and restores the saved value on cancel', async () => {
+  it.each([
+    { unitLabel: 'GB free', amount: '20' },
+    { unitLabel: 'Ratio (0–1)', amount: '0.8' },
+  ])(
+    'keeps $unitLabel when clearing the number and restores the saved unit on cancel',
+    async ({ unitLabel, amount }) => {
+      renderPage();
+      const input = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
+      expect(input).toHaveValue(85);
+      await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit' }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: unitLabel }));
+      await userEvent.clear(input);
+      expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent(unitLabel);
+      expect(screen.getByRole('spinbutton', { name: `Stop allocating shards at (${unitLabel})` })).toHaveValue(null);
+      await userEvent.type(input, amount);
+      expect(screen.getByRole('spinbutton', { name: `Stop allocating shards at (${unitLabel})` })).toHaveValue(
+        Number(amount),
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(85);
+      expect(getSaveButton()).toBeDisabled();
+    },
+  );
+
+  it('selects a unit without a suffix on an empty field and saves a bare numeric value', async () => {
+    mockManagedConfigurationApi();
+    const update = jest.spyOn(managedConfigurationApi, 'update');
     renderPage();
-    const input = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
-    expect(input).toHaveValue(85);
+    await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
     await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit' }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'GB free' }));
-    await userEvent.clear(input);
-    expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent('GB free');
-    await userEvent.type(input, '20');
-    expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (GB free)' })).toHaveValue(20);
-
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(85);
-    expect(getSaveButton()).toBeDisabled();
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Ratio (0–1)' }));
+    const input = screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' });
+    expect(input).toHaveValue(null);
+    expect(input).toHaveAttribute('min', '0');
+    expect(input).toHaveAttribute('max', '1');
+    await userEvent.type(input, '0.85');
+    await userEvent.click(getSaveButton());
+    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '0.85' }, null);
+    expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' })).toHaveValue(0.85);
   });
 
   it('loads saved ratios without changing them and saves only edited fields', async () => {
@@ -236,7 +287,13 @@ describe('DataNodeConfigurationPage', () => {
     const update = jest.spyOn(managedConfigurationApi, 'update');
     renderPage();
 
-    expect(await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' })).toHaveValue(0.85);
+    expect(await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' })).toHaveValue(
+      0.85,
+    );
+    const input = screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' });
+    await userEvent.clear(input);
+    expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent('Ratio (0–1)');
+    await userEvent.type(input, '0.85');
     expect(getSaveButton()).toBeDisabled();
 
     await changeSetting('Shard limit per Data Node', '1200');
@@ -453,8 +510,10 @@ describe('DataNodeConfigurationPage', () => {
     );
   });
 
-  it('keeps the draft when saving changes fails', async () => {
-    jest.spyOn(managedConfigurationApi, 'update').mockRejectedValueOnce(new Error('Applying is unavailable.'));
+  it('keeps a failed-save draft and restores the saved value on cancel', async () => {
+    const update = jest
+      .spyOn(managedConfigurationApi, 'update')
+      .mockRejectedValueOnce(new Error('Applying is unavailable.'));
     renderPage();
 
     await changeSetting('Shard limit per Data Node', '1200');
@@ -464,6 +523,12 @@ describe('DataNodeConfigurationPage', () => {
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
     expect(getSaveButton()).toBeEnabled();
     expect(await savedValueOf(shardLimitName)).toBe('1000');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1000);
+    expect(getSaveButton()).toBeDisabled();
+    expect(update).toHaveBeenCalledTimes(1);
   });
 
   it('preserves a dirty draft when leaving the page is declined', async () => {
@@ -568,22 +633,6 @@ describe('DataNodeConfigurationPage', () => {
 
     expect(await screen.findByRole('button', { name: /^Remove stored value/ })).toBeDisabled();
     expect(screen.getByLabelText('Shard limit per Data Node')).not.toBeDisabled();
-  });
-
-  it('keeps a failed-save draft and supports cancel', async () => {
-    const transport = mockManagedConfigurationApi();
-    renderPage();
-
-    await changeSetting('Shard limit per Data Node', '1200');
-    transport.mockRejectedValueOnce(new Error('Save failed'));
-    await userEvent.click(getSaveButton());
-
-    await screen.findByText(/Your changes have been kept/);
-    expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
-
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(null);
   });
 
   it('shows a loading error without falling back to samples', async () => {

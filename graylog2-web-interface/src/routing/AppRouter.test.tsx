@@ -113,7 +113,7 @@ describe('AppRouter', () => {
 
     await screen.findByRole('heading', { name: 'Data Node Configuration' });
     await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
-    expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('heading', { name: 'Storage and Capacity' })).toBeInTheDocument();
   });
 
   it('does not expose Data Node Configuration in Cloud', async () => {
@@ -141,7 +141,7 @@ describe('AppRouter', () => {
 
       await findByText('Hey there!');
 
-      expect(queryByTitle('Graylog Logo')).toBeNull();
+      expect(queryByTitle(/ Logo$/)).toBeNull();
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {

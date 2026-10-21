@@ -36,7 +36,7 @@ type Props = {
   id: string;
   label: string;
   units: ParameterValues;
-  value: string;
+  value: string | undefined;
   disabled: boolean;
   invalid?: boolean;
   describedBy?: string;

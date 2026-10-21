@@ -241,21 +241,6 @@ describe('DataNodePage configuration', () => {
     expect(await savedValueOf('indices.recovery.max_bytes_per_sec', otherNodeId)).toBe('40mb');
   });
 
-  it('keeps drafts when saving fails and supports cancel', async () => {
-    jest.spyOn(managedConfigurationApi, 'update').mockRejectedValueOnce(new Error('Save failed'));
-    renderPage('search');
-
-    await changeSetting('Query cache size', '15%');
-    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await screen.findByRole('alert');
-    expect(screen.getByLabelText(/^Query cache size \(/)).toHaveValue(15);
-
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(screen.getByLabelText(/^Query cache size \(/)).toHaveValue(10);
-  });
-
   it('requires deletion permission to remove a stored node setting', async () => {
     asMock(useCurrentUser).mockReturnValue(
       defaultUser
@@ -331,5 +316,107 @@ describe('DataNodePage configuration', () => {
       {},
       { Accept: ['application/json'] },
     );
+  });
+  it('keeps edits across categories and saves all of them in one request', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const update = jest.spyOn(managedConfigurationApi, 'update');
+    renderPage();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+    await changeSetting('Query cache size', '15%');
+    await userEvent.click(screen.getByRole('link', { name: 'Node Settings' }));
+    expect(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' })).toHaveValue(4);
+    expect(screen.getAllByRole('form', { name: 'Data Node configuration' })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: 'Save changes' })).toHaveLength(1);
+    expect(confirm).not.toHaveBeenCalled();
+    await save();
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledWith({ opensearch_heap: '4g', [cacheSizeName]: '15%' }, nodeId);
+    await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+    expect(await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' })).toHaveValue(15);
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it('cancels edits in every category without saving or warning on subsequent navigation', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const update = jest.spyOn(managedConfigurationApi, 'update');
+    renderPage();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+    await changeSetting('Query cache size', '15%');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.getByRole('spinbutton', { name: 'Query cache size (% of heap)' })).toHaveValue(10);
+    await userEvent.click(screen.getByRole('link', { name: 'Node Settings' }));
+    expect(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' })).toHaveValue(2);
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(update).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('link', { name: 'Other Data Node' }));
+    await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' });
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it('opens the category containing the first invalid field and focuses it on save', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const update = jest.spyOn(managedConfigurationApi, 'update');
+    const router = renderPage();
+    await changeSetting('OpenSearch JVM heap', '0g');
+    await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+    await changeSetting('Query cache size', '15%');
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    const heap = await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' });
+    await waitFor(() => expect(heap).toHaveFocus());
+    expect(heap).toHaveValue(0);
+    expect(router.state.location.pathname).toBe(`${nodePath}/${nodeSettingsSection}`);
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a value in a supported format.');
+    expect(update).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await save();
+    expect(update).toHaveBeenCalledWith({ opensearch_heap: '4g', [cacheSizeName]: '15%' }, nodeId);
+  });
+
+  it('keeps drafts in every category after a failed save and saves them together on retry', async () => {
+    const update = jest.spyOn(managedConfigurationApi, 'update').mockRejectedValueOnce(new Error('Save failed'));
+    renderPage();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+    await changeSetting('Query cache size', '15%');
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText(/Your changes have been kept/);
+    expect(screen.getByRole('spinbutton', { name: 'Query cache size (% of heap)' })).toHaveValue(15);
+    await userEvent.click(screen.getByRole('link', { name: 'Node Settings' }));
+    expect(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' })).toHaveValue(4);
+    await save();
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(update).toHaveBeenLastCalledWith({ opensearch_heap: '4g', [cacheSizeName]: '15%' }, nodeId);
+  });
+
+  it('keeps the current node and its draft when switching nodes is declined', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const update = jest.spyOn(managedConfigurationApi, 'update');
+    const router = renderPage();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await userEvent.click(screen.getByRole('link', { name: 'Other Data Node' }));
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(router.state.location.pathname).toBe(`${nodePath}/${nodeSettingsSection}`);
+    expect(screen.getByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' })).toHaveValue(4);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('discards the current draft when switching nodes is confirmed', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
+    const update = jest.spyOn(managedConfigurationApi, 'update');
+    const router = renderPage();
+    await changeSetting('OpenSearch JVM heap', '4g');
+    await userEvent.click(screen.getByRole('link', { name: 'Other Data Node' }));
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' })).toHaveValue(10);
+    expect(router.state.location.pathname).toBe(`${otherNodePath}/search`);
+    await userEvent.click(screen.getByRole('link', { name: 'First Data Node' }));
+    await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' });
+    await userEvent.click(screen.getByRole('link', { name: 'Node Settings' }));
+    expect(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' })).toHaveValue(2);
+    expect(update).not.toHaveBeenCalled();
   });
 });
