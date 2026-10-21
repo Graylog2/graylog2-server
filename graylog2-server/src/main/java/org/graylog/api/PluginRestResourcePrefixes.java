@@ -49,8 +49,9 @@ public final class PluginRestResourcePrefixes {
 
     public static Map<Class<?>, String> forResources(Set<Class<?>> resourceClasses, String... packageNames) {
         final Map<String, Set<String>> registeringPackages = new HashMap<>();
-        try (final ScanResult scanResult = new ClassGraph().enableClassInfo().acceptPackages(packageNames).scan()) {
-            for (final ClassInfo module : scanResult.getSubclasses(PluginModule.class.getName())) {
+        try (final ScanResult scanResult = new ClassGraph().enableClasspath().enableNonSystemModules()
+                .enableClassInfo().acceptPackages(packageNames).scan()) {
+            for (final ClassInfo module : scanResult.getAllSubclasses(PluginModule.class.getName())) {
                 if (module.isAbstract()) {
                     continue;
                 }
