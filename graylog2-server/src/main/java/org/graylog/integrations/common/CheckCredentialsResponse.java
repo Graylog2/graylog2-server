@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.inputs.cloudtrail.api.responses;
+package org.graylog.integrations.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
