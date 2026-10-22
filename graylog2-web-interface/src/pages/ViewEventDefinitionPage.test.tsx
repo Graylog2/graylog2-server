@@ -30,6 +30,7 @@ import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
+import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -57,7 +58,7 @@ jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
 }));
 
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>
-  mockComponent('EventDefinitionSummary'),
+  jest.fn(mockComponent('EventDefinitionSummary')),
 );
 jest.mock('hooks/usePluginEntities');
 jest.mock('logic/telemetry/useSendTelemetry');
@@ -72,6 +73,7 @@ describe('<ViewEventDefinitionPage />', () => {
 
   beforeEach(() => {
     sendTelemetry.mockClear();
+    asMock(EventDefinitionSummary).mockClear();
     asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useEventDefinitionWithContext).mockReturnValue({
@@ -102,6 +104,44 @@ describe('<ViewEventDefinitionPage />', () => {
     render(<ViewEventDefinitionPage />);
 
     await screen.findByText(/View "Event Definition 1" Event Definition/);
+  });
+
+  it('shows an enabled event definition as scheduled when it has no scheduler job', async () => {
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: { ...mockEventDefinition, state: 'ENABLED' },
+        context: { scheduler: { is_scheduled: false } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
+
+    render(<ViewEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionSummary).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionSummary).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(true);
+  });
+
+  it('shows a disabled event definition as unscheduled', async () => {
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: { ...mockEventDefinition, state: 'DISABLED' },
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
+
+    render(<ViewEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionSummary).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionSummary).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(false);
   });
 
   it('should display event details when permitted', async () => {
