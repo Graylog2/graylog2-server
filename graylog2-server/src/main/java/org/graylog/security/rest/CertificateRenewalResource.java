@@ -16,6 +16,7 @@
  */
 package org.graylog.security.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -47,6 +48,7 @@ public class CertificateRenewalResource implements PluginRestResource {
     }
 
     @POST
+    @Operation(summary = "Initiate certificate renewal for a data node")
     @Path("{nodeID}")
     @AuditEvent(type = AuditEventTypes.CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
