@@ -25,7 +25,7 @@ import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/Dat
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const ClusterCertificateManagementPage = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
 
   return (

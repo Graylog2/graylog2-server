@@ -44,7 +44,7 @@ const StyledTitle = styled.h3`
 `;
 
 const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
 
   const renderStepComponent = (step: MigrationStateItem, hideActions: boolean) => {

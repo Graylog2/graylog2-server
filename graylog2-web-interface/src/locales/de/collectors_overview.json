@@ -1,6 +1,0 @@
-{
-  "title": "Collectors Übersicht",
-  "overview_title": "Collectors Übersicht",
-  "documentation_title": "Collectors-Dokumentation",
-  "description": "Collectors sind leichtgewichtige Dienste, die über Ihre Infrastruktur verteilt sind, um Protokolle zu sammeln und an {{productName}} weiterzuleiten. Sie sind in Fleets organisiert und werden mit Quellen konfiguriert, die definieren, welche Daten gesammelt werden sollen."
-}

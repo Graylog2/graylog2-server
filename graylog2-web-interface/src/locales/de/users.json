@@ -1,0 +1,55 @@
+{
+  "users_overview": {
+    "title": "Benutzerübersicht",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Übersicht über alle registrierten Benutzer."
+  },
+  "user_create": {
+    "title": "Neuen Benutzer erstellen",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Verwenden Sie diese Seite, um neue Benutzer für die Web-Oberfläche oder die REST-API zu erstellen.",
+    "submit_button": "Benutzer erstellen"
+  },
+  "user_edit": {
+    "title": "Benutzer {{username}} bearbeiten",
+    "title_prefix": "Benutzer bearbeiten",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Sie können die Benutzerdetails und das Passwort hier ändern und Rollen und Teams zuweisen."
+  },
+  "roles_overview": {
+    "title": "Rollenübersicht",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Übersicht über alle verfügbaren Rollen in {{productName}}. Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder Ereignisdefinitionen.",
+    "alert_title": "Berechtigungen vergeben",
+    "alert_body_prefix": "Die integrierten Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder das Anzeigen des Archivkatalogs. Sie gewähren jedoch keine Berechtigungen für ein bestimmtes Dashboard oder einen bestimmten Stream. Es ist auch nicht möglich, eine eigene Rolle zu erstellen. Das Gewähren von Berechtigungen für eine bestimmte Entität kann über deren ",
+    "share_text": "Teilen",
+    "alert_body_suffix": "-Schaltfläche erfolgen. Sie finden die Schaltfläche z. B. auf der Übersicht der Entitäten. Wenn Sie Berechtigungen für eine Entität für mehrere Benutzer gleichzeitig vergeben möchten, Sie können Teams verwenden. Erfahren Sie mehr in der ",
+    "documentation_text": "Dokumentation"
+  },
+  "role_details": {
+    "title": "Details zur Rolle {{name}}",
+    "title_prefix": "Details zur Rolle",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Übersicht über Details wie Name, Beschreibung und zugewiesene Benutzer."
+  },
+  "role_edit": {
+    "title": "Rolle {{name}} bearbeiten",
+    "title_prefix": "Rolle bearbeiten",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Sie können die Rolle Benutzern zuweisen."
+  },
+  "user_tokens_edit": {
+    "title": "Token bearbeiten für Benutzer {{username}}",
+    "title_prefix": "Token bearbeiten für Benutzer",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Sie können neue Token erstellen oder alte löschen."
+  },
+  "token_management": {
+    "title": "Token-Verwaltung",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Übersicht über die für {{productName}} konfigurierten Zugriffstoken."
+  }
+}

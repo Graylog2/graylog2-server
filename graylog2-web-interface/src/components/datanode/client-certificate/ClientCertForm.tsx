@@ -34,7 +34,7 @@ type Props = {
 };
 
 const ClientCertForm = ({ onCancel }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [clientCerts, setClientCerts] = useState(null);
   const [isUnencrypted, setIsUnencrypted] = useState(false);
   const { onCreateClientCert } = useCreateDataNodeClientCert();

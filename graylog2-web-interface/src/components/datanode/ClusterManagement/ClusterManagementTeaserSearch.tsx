@@ -31,7 +31,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const ClusterManagementTeaserSearch = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const hotspots = [
     {
       positionX: '50%',

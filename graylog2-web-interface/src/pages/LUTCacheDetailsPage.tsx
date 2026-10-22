@@ -45,7 +45,7 @@ const FlexCol = styled(Col)`
 
 function LUTCacheDetailsPage() {
   const { goBack } = useHistory();
-  const { t } = useTranslation('lookup-tables');
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <FlexContainer>

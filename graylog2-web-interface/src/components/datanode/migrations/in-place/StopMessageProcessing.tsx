@@ -30,7 +30,7 @@ const StyledHelpPanel = styled(StyledPanel)`
 `;
 
 const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
 
   return (

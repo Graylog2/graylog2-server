@@ -98,7 +98,7 @@ const Explanation = styled.p`
 `;
 
 const CAUpload = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry('migration');
   const onRejectUpload = useCallback(() => {

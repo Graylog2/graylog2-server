@@ -51,7 +51,7 @@ const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => 
 );
 
 const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const isElasticsearch = useIsElasticsearch();
   const productName = useProductName();
   const { data: dataNodes } = useDataNodes();

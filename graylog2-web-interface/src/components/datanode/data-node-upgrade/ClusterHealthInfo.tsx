@@ -71,7 +71,7 @@ const getClusterHealthStyle = (status: string) => {
 };
 
 const ClusterStateHelp = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>
@@ -86,7 +86,7 @@ const ClusterStateHelp = () => {
 };
 
 const ShardReplicationHelp = ({ shardReplicationEnabled }: { shardReplicationEnabled: boolean }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>
@@ -124,7 +124,7 @@ type Props = {
 };
 
 const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>

@@ -38,7 +38,7 @@ const GettingStartedLink = ({ children = undefined }: React.PropsWithChildren) =
 );
 
 const CAConfiguration = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();
 

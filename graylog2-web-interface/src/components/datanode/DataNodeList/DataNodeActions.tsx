@@ -69,7 +69,7 @@ const DIALOG_TEXT = {
 };
 
 const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown' }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);

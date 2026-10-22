@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import CreateClientCertificateButton from 'components/datanode/client-certificate/CreateClientCertificateButton';
 
 const ClientCertificateConfig = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <div>

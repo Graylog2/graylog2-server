@@ -20,12 +20,7 @@ import { registerTranslations } from 'i18n';
 import enAggregation from 'locales/en/aggregation.json';
 import enAuthentication from 'locales/en/authentication.json';
 import enClusterCertificateManagement from 'locales/en/cluster_certificate_management.json';
-import enCollectorsDeployment from 'locales/en/collectors_deployment.json';
-import enCollectorsFleets from 'locales/en/collectors_fleets.json';
-import enCollectorsInstances from 'locales/en/collectors_instances.json';
-import enCollectorsOnboarding from 'locales/en/collectors_onboarding.json';
-import enCollectorsOverview from 'locales/en/collectors_overview.json';
-import enCollectorsSettings from 'locales/en/collectors_settings.json';
+
 import enCommon from 'locales/en/common.json';
 import enContentPacks from 'locales/en/content_packs.json';
 import enDashboards from 'locales/en/dashboards.json';
@@ -40,6 +35,14 @@ import enSearch from 'locales/en/search.json';
 import enStreams from 'locales/en/streams.json';
 import enWelcome from 'locales/en/welcome.json';
 import enWidgets from 'locales/en/widgets.json';
+import enCollectors from 'locales/en/collectors.json';
+import enEventDefinitions from 'locales/en/event_definitions.json';
+import enGrokpatterns from 'locales/en/grokpatterns.json';
+import enIndexsets from 'locales/en/indexsets.json';
+import enLoggers from 'locales/en/loggers.json';
+import enLookup_tables from 'locales/en/lookup_tables.json';
+import enPipelines from 'locales/en/pipelines.json';
+import enUsers from 'locales/en/users.json';
 
 registerTranslations('aggregation', enAggregation, {
   de: () => import(/* webpackChunkName: "translations-de-aggregation" */ 'locales/de/aggregation.json'),
@@ -51,30 +54,6 @@ registerTranslations('authentication', enAuthentication, {
 
 registerTranslations('cluster_certificate_management', enClusterCertificateManagement, {
   de: () => import(/* webpackChunkName: "translations-de-cluster-certificate-management" */ 'locales/de/cluster_certificate_management.json'),
-});
-
-registerTranslations('collectors_deployment', enCollectorsDeployment, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-deployment" */ 'locales/de/collectors_deployment.json'),
-});
-
-registerTranslations('collectors_fleets', enCollectorsFleets, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-fleets" */ 'locales/de/collectors_fleets.json'),
-});
-
-registerTranslations('collectors_instances', enCollectorsInstances, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-instances" */ 'locales/de/collectors_instances.json'),
-});
-
-registerTranslations('collectors_onboarding', enCollectorsOnboarding, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-onboarding" */ 'locales/de/collectors_onboarding.json'),
-});
-
-registerTranslations('collectors_overview', enCollectorsOverview, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-overview" */ 'locales/de/collectors_overview.json'),
-});
-
-registerTranslations('collectors_settings', enCollectorsSettings, {
-  de: () => import(/* webpackChunkName: "translations-de-collectors-settings" */ 'locales/de/collectors_settings.json'),
 });
 
 registerTranslations('common', enCommon, {
@@ -131,4 +110,36 @@ registerTranslations('welcome', enWelcome, {
 
 registerTranslations('widgets', enWidgets, {
   de: () => import(/* webpackChunkName: "translations-de-widgets" */ 'locales/de/widgets.json'),
+});
+
+registerTranslations('collectors', enCollectors, {
+  de: () => import(/* webpackChunkName: "translations-de-collectors" */ 'locales/de/collectors.json'),
+});
+
+registerTranslations('event_definitions', enEventDefinitions, {
+  de: () => import(/* webpackChunkName: "translations-de-event_definitions" */ 'locales/de/event_definitions.json'),
+});
+
+registerTranslations('grokpatterns', enGrokpatterns, {
+  de: () => import(/* webpackChunkName: "translations-de-grokpatterns" */ 'locales/de/grokpatterns.json'),
+});
+
+registerTranslations('indexsets', enIndexsets, {
+  de: () => import(/* webpackChunkName: "translations-de-indexsets" */ 'locales/de/indexsets.json'),
+});
+
+registerTranslations('loggers', enLoggers, {
+  de: () => import(/* webpackChunkName: "translations-de-loggers" */ 'locales/de/loggers.json'),
+});
+
+registerTranslations('lookup_tables', enLookup_tables, {
+  de: () => import(/* webpackChunkName: "translations-de-lookup_tables" */ 'locales/de/lookup_tables.json'),
+});
+
+registerTranslations('pipelines', enPipelines, {
+  de: () => import(/* webpackChunkName: "translations-de-pipelines" */ 'locales/de/pipelines.json'),
+});
+
+registerTranslations('users', enUsers, {
+  de: () => import(/* webpackChunkName: "translations-de-users" */ 'locales/de/users.json'),
 });

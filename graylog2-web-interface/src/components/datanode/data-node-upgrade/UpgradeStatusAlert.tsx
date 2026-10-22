@@ -38,7 +38,7 @@ const ALERT_STYLE: Record<OpenSearchUpgradeStatus, 'info' | 'success' | 'warning
 };
 
 const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   switch (status) {
     case 'checking':
@@ -94,7 +94,7 @@ const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDat
 };
 
 const UpgradeStatusAlert = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <Alert bsStyle={ALERT_STYLE[status]} noIcon>

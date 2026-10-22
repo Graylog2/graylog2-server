@@ -1,6 +1,0 @@
-{
-  "title": "Collectors Settings",
-  "settings_title": "Collectors Settings",
-  "documentation_title": "Collectors documentation",
-  "description": "Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to receive configuration updates and send collected log data."
-}

@@ -31,7 +31,7 @@ import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinis
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   if (isLoading) {
     return <Spinner text={t('migration_wizard.loading')} />;

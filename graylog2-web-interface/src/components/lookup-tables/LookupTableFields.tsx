@@ -57,7 +57,7 @@ const LookupTableFields = ({
   const hasPermission = isPermitted(LOOKUP_PERMISSIONS);
 
   const { data: tables } = useQuery({
-    queryKey: ['lookup-tables', 'all'],
+    queryKey: ['lookup_tables', 'all'],
     queryFn: () => fetchAllLookupTables(),
     enabled: hasPermission,
   });

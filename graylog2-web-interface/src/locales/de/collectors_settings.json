@@ -1,6 +1,0 @@
-{
-  "title": "Collectors-Einstellungen",
-  "settings_title": "Collectors-Einstellungen",
-  "documentation_title": "Collectors-Dokumentation",
-  "description": "Konfigurieren Sie die Endpunkte und Lebenszyklus-Einstellungen für verwaltete Collectoren. Collectoren verbinden sich mit diesen Endpunkten, um Konfigurationsaktualisierungen zu erhalten und gesammelte Protokolldaten zu senden."
-}

@@ -1,6 +1,0 @@
-{
-  "title": "Collectors Overview",
-  "overview_title": "Collectors Overview",
-  "documentation_title": "Collectors documentation",
-  "description": "Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to {{productName}}. They are organized into fleets and configured with sources that define what data to collect."
-}

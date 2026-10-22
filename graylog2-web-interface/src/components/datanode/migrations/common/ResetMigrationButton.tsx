@@ -32,7 +32,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const resetMigration = async () => Migration.resetState();
 
 const ResetMigrationButton = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const sendTelemetry = useSendTelemetry('migration');

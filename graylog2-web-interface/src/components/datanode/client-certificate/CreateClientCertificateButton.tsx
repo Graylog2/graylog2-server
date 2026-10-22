@@ -21,7 +21,7 @@ import { BootstrapModalWrapper, Button } from 'components/bootstrap';
 import ClientCertForm from 'components/datanode/client-certificate/ClientCertForm';
 
 const CreateClientCertificateButton = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [showCertificateForm, setShowCertificateForm] = useState(false);
   const onCancel = () => setShowCertificateForm(false);
 

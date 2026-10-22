@@ -24,7 +24,7 @@ import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/co
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 const CertificateRenewalStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>

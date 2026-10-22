@@ -50,7 +50,7 @@ type Props = {
 };
 
 const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [logsType, setLogsType] = useState<LogsType>('stdout');
 
   const logs = useDataNodeLogs(hostname, show && !!hostname);

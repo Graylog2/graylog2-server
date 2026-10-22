@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 import { ListGroup, ListGroupItem, Button, Input } from 'components/bootstrap';
 
@@ -25,7 +25,7 @@ import GrokPatternFilterStyle from './GrokPatternFilter.css';
 type GrokPatternFilterProps = {
   addToPattern: (...args: any[]) => void;
   patterns: any[];
-};
+} & WithTranslation;
 
 class GrokPatternFilter extends React.Component<
   GrokPatternFilterProps,
@@ -180,4 +180,4 @@ class GrokPatternFilter extends React.Component<
   }
 }
 
-export default withTranslation(GrokPatternFilter, 'grokpatterns');
+export default withTranslation('grokpatterns')(GrokPatternFilter);

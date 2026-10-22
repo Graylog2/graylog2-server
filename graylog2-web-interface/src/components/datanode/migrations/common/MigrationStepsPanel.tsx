@@ -74,7 +74,7 @@ type Props = {
 };
 
 const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComponent }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
   const { state: activeStep } = currentStep;
   const activeStepIndex = sortedMigrationSteps.indexOf(activeStep);

@@ -92,7 +92,7 @@ const fetchCurrentConfig = () =>
   ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <Button onClick={createPolicy} bsSize="small" bsStyle="primary">
@@ -119,7 +119,7 @@ type Props = {
 };
 
 const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery({
     queryKey: queryKey,

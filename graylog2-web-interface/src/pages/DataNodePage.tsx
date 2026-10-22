@@ -53,7 +53,7 @@ const ActionsCol = styled(Col)`
 `;
 
 const DataNodePage = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { dataNodeId } = useParams();
   const { data, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
 

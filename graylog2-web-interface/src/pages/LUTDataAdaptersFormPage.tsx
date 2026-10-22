@@ -43,7 +43,7 @@ function LUTDataAdaptersFormPage() {
   const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
   const { push } = useHistory();
-  const { t } = useTranslation('lookup-tables');
+  const { t } = useTranslation('lookup_tables');
   const navigateBack = () => push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 
   return (

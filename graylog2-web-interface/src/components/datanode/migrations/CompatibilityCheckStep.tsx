@@ -31,7 +31,7 @@ const CompatibilityAlert = styled(Alert)`
 `;
 
 const CompatibilityCheckStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {

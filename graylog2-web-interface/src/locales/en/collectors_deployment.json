@@ -1,9 +1,0 @@
-{
-  "title": "Deploy Collectors",
-  "deployment_title": "Deploy Collectors",
-  "documentation_title": "Collectors documentation",
-  "deployment_description": "Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear as they check in.",
-  "deploy_tab": "Deploy",
-  "tokens_tab": "Enrollment tokens",
-  "tokens_description": "Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled Collectors."
-}

@@ -105,7 +105,7 @@ const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 
 const IncompatibleIndicesInfo = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <HelpText>
@@ -119,7 +119,7 @@ const IncompatibleIndicesInfo = () => {
 };
 
 const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <Row>
@@ -148,7 +148,7 @@ const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean })
 };
 
 const OpenSearchUpgradeSection = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const {
     currentVersion,
     targetVersion,

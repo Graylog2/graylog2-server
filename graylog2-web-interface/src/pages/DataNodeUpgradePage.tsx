@@ -47,7 +47,7 @@ const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => 
 );
 
 const UpgradeInstructionsDocumentationMessage = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <p>
@@ -57,7 +57,7 @@ const UpgradeInstructionsDocumentationMessage = () => {
 };
 
 const DataNodeUpgradePage = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
   const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 

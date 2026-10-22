@@ -46,7 +46,7 @@ const StyledCol = styled(Col)`
 `;
 
 const DataNodesClusterManagementPage = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
 
   return (

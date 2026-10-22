@@ -45,7 +45,7 @@ const Textarea = styled.textarea(
 );
 
 const ClientCertificateView = ({ clientCerts }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>

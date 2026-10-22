@@ -37,7 +37,7 @@ const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => 
 );
 
 const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { data: dataNodes, isLoading } = useDataNodes();
   const productName = useProductName();
 

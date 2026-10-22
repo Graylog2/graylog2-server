@@ -30,7 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ManualMigrationStep = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
   const sendTelemetry = useSendTelemetry('migration');

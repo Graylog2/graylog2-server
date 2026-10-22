@@ -45,7 +45,7 @@ const StyledSpan = styled.span`
 `;
 
 const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { opensearch_data_location: opensearchLocation, nodes } = nodeInfo;
   const [activeAccordion, setActiveAccordion] = useState<string | undefined>(
     `Node: 1, Version: ${nodes[0]?.node_version}, ${nodes[0]?.indices.length} indices`,

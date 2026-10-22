@@ -1,6 +1,0 @@
-{
-  "title": "Collector-Instanzen",
-  "instances_title": "Instanzen",
-  "documentation_title": "Collectors-Dokumentation",
-  "description": "Eine Collector-Instanz stellt einen laufenden Collector-Prozess auf einem Remote-Host dar. Instanzen melden sich mit einem Enrollment-Token bei einem Fleet an und erhalten automatisch die Quellkonfiguration ihres Fleets."
-}

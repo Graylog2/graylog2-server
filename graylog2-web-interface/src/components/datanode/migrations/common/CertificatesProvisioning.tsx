@@ -26,7 +26,7 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import { Alert } from 'components/bootstrap';
 
 const CertificatesProvisioning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { currentStep: step, isLoading } = useMigrationState({ refetchInterval: 3000 });
 
   if (isLoading) {

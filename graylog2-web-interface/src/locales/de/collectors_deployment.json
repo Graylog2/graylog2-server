@@ -1,9 +1,0 @@
-{
-  "title": "Deploy Collectors",
-  "deployment_title": "Deploy Collectors",
-  "documentation_title": "Collectors-Dokumentation",
-  "deployment_description": "Führen Sie den Befehl auf beliebig vielen Hosts aus &mdash; sie melden sich bei dem von Ihnen gewählten Fleet an und erscheinen, sobald sie sich melden.",
-  "deploy_tab": "Deploy",
-  "tokens_tab": "Enrollment-Token",
-  "tokens_description": "Token berechtigen neue Collectoren, sich in einem Fleet anzumelden. Das Löschen eines Tokens hat keine Auswirkungen auf bereits angemeldete Collectoren."
-}

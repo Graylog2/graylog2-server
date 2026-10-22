@@ -40,7 +40,7 @@ const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
   const productName = useProductName();
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   useEffect(() => {
     if (!isLoading && currentStep.state === MIGRATION_STATE.NEW.key) {

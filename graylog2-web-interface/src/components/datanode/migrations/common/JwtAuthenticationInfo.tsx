@@ -35,7 +35,7 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
 );
 
 const JwtAuthenticationInfo = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
 
   return (

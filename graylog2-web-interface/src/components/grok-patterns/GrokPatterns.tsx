@@ -22,7 +22,7 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, WithTranslation } from 'react-i18next';
 import {
   searchGrokPatternsPaginated,
   testGrokPattern,
@@ -68,7 +68,7 @@ const _headerCellFormatter = (header) => {
 type GrokPatternsProps = {
   paginationQueryParameter: any;
   sendTelemetry?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class GrokPatterns extends React.Component<
   GrokPatternsProps,
@@ -275,4 +275,4 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withPaginationQueryParameter(withTranslation(GrokPatterns), 'grokpatterns'), 'grokpatterns');
+export default withTelemetry(withPaginationQueryParameter(withTranslation('grokpatterns')(GrokPatterns), 'grokpatterns'), 'grokpatterns');

@@ -25,7 +25,7 @@ type Props = {
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const datanodeDisabled = dataNode.datanode_status !== 'AVAILABLE';
 
   return (

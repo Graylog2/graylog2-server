@@ -30,7 +30,7 @@ type Props = {
 };
 
 const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <td>
@@ -54,7 +54,7 @@ const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => {
 };
 
 const DataNodeUpgradeNodes = ({ outdatedNodes, upToDateNodes, upgradedListRef, onStartNodeUpgrade }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <>

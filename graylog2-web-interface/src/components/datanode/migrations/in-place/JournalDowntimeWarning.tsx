@@ -32,7 +32,7 @@ const DownsizeWarning = styled(Alert)`
 `;
 
 const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
   const { data, error, isError } = useJournalDowntimeSize();
 

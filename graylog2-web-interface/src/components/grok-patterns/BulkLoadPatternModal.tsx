@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -27,7 +27,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 type BulkLoadPatternModalProps = {
   onSuccess: (...args: any[]) => void;
   sendTelemetry?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class BulkLoadPatternModal extends React.Component<
   BulkLoadPatternModalProps,
@@ -140,4 +140,4 @@ class BulkLoadPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(withTranslation(BulkLoadPatternModal, 'grokpatterns'), 'grokpatterns');
+export default withTelemetry(withTranslation('grokpatterns')(BulkLoadPatternModal), 'grokpatterns');

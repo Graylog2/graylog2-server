@@ -1,0 +1,55 @@
+{
+  "users_overview": {
+    "title": "Users Overview",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Overview of all registered users."
+  },
+  "user_create": {
+    "title": "Create New User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Use this page to create new users for the web interface or the REST API.",
+    "submit_button": "Create user"
+  },
+  "user_edit": {
+    "title": "Edit User {{username}}",
+    "title_prefix": "Edit User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "You can change the user details and password here and assign roles and teams."
+  },
+  "roles_overview": {
+    "title": "Roles Overview",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "Overview of all roles available in {{productName}}. Roles allow granting capabilities to users, like creating dashboards or event definitions.",
+    "alert_title": "Granting Permissions",
+    "alert_body_prefix": "The built-in roles allow granting capabilities to users, like creating dashboards or viewing the archive catalog. But they do not grant permissions for a specific dashboard or stream. It is also not possible to create an own role. Granting permissions for a specific entity can be done by using its ",
+    "share_text": "Share",
+    "alert_body_suffix": " button. You can find the button e.g. on the entities overview page. If you want to grant permissions for an entity to multiple users at once, you can use teams. Learn more in the ",
+    "documentation_text": "documentation"
+  },
+  "role_details": {
+    "title": "Role Details {{name}}",
+    "title_prefix": "Role Details",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "Overview of details like name, description and assigned users."
+  },
+  "role_edit": {
+    "title": "Edit Role {{name}}",
+    "title_prefix": "Edit Role",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "You can assign the role to users."
+  },
+  "user_tokens_edit": {
+    "title": "Edit Tokens Of User {{username}}",
+    "title_prefix": "Edit Tokens Of User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "You can create new tokens or delete old ones."
+  },
+  "token_management": {
+    "title": "Token Management",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Access tokens overview configured for {{productName}}."
+  }
+}

@@ -27,7 +27,7 @@ type Props = {
 };
 
 const UpgradeMethodSelector = ({ upgradeMethod, onChange }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const upgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: string }> = [
     { value: 'cluster-restart', label: t('upgrade_method.cluster_restart') },
     { value: 'rolling-upgrade', label: t('upgrade_method.rolling_upgrade') },

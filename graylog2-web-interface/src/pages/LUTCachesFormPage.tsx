@@ -43,7 +43,7 @@ function LUTDataAdaptersFormPage() {
   const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
   const { cache, loadingCache } = useFetchCache(cacheIdOrName);
   const { push } = useHistory();
-  const { t } = useTranslation('lookup-tables');
+  const { t } = useTranslation('lookup_tables');
   const navigateBack = () => push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 
   return (

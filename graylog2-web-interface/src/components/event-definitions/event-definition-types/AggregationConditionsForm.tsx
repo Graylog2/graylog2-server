@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { withTranslation } from 'react-i18next';
 
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -116,10 +117,10 @@ class AggregationConditionsForm extends React.Component<
     return (
       <>
         <h3 className={commonStyles.title}>
-          {i18n.t('condition_summary.create_events', { ns: 'event_definitions' })}
+          {this.props.t('condition_summary.create_events')}
         </h3>
         {validation.errors.conditions && (
-          <StyledAlert bsStyle="danger" title={i18n.t('condition_summary.errors_found', { ns: 'event_definitions' })}>
+          <StyledAlert bsStyle="danger" title={this.props.t('condition_summary.errors_found')}>
             <p>{validation?.errors?.conditions[0]}</p>
           </StyledAlert>
         )}
@@ -145,4 +146,4 @@ class AggregationConditionsForm extends React.Component<
   }
 }
 
-export default AggregationConditionsForm;
+export default withTranslation(AggregationConditionsForm, 'event_definitions');

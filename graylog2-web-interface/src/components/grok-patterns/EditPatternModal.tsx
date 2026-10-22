@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
 import withTelemetry from 'logic/telemetry/withTelemetry';
@@ -34,7 +34,7 @@ type EditPatternModalProps = {
   testPattern: (...args: any[]) => void;
   validPatternName: (...args: any[]) => boolean;
   sendTelemetry?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class EditPatternModal extends React.Component<
   EditPatternModalProps,
@@ -240,4 +240,4 @@ class EditPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(withTranslation(EditPatternModal, 'grokpatterns'), 'grokpatterns');
+export default withTelemetry(withTranslation('grokpatterns')(EditPatternModal), 'grokpatterns');

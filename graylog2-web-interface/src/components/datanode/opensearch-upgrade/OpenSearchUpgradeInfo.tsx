@@ -51,7 +51,7 @@ const OpenSearchUpgradeInfo = ({
   availableDataNodes: number;
   unavailableDataNodes: number;
 }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const loading = <Spinner text={t('opensearch_upgrade_info.loading')} />;
 
   return (

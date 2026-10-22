@@ -32,7 +32,7 @@ type Props = {
 
 const LookupTableQueryParameterEdit = ({ parameter, onChange, identifier, validationState = undefined }: Props) => {
   const { data: tables = [] } = useQuery({
-    queryKey: ['lookup-tables', 'all'],
+    queryKey: ['lookup_tables', 'all'],
     queryFn: () => fetchAllLookupTables(),
   });
 

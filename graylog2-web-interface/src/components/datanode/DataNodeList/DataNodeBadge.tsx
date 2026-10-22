@@ -60,7 +60,7 @@ const isConnecting = (status: DataNodeStatus) => status === 'STARTING';
 const ConnectingSpinner = () => <Spinner text="" />;
 
 const DataNodeBadge = ({ nodeId, transportAddress, status }: NodeProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <NodeId color={colorByState(status, transportAddress)} title={t('data_node_badge.short_node_id')}>

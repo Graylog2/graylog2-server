@@ -50,7 +50,7 @@ import {
 } from './api/lookupTablesAPI';
 
 export { fetchPaginatedLookupTables };
-export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup_tables', 'search', searchParams];
 
 export function useFetchLookupTable(idOrName: string) {
   const { data, isLoading } = useQuery({
@@ -76,7 +76,7 @@ export function useCreateLookupTable() {
     onSuccess: () => {
       UserNotification.success('Lookup Table created successfully');
       queryClient.invalidateQueries({
-        queryKey: ['lookup-tables'],
+        queryKey: ['lookup_tables'],
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
@@ -101,7 +101,7 @@ export function useUpdateLookupTable() {
     onSuccess: () => {
       UserNotification.success('Lookup Table updated successfully');
       queryClient.invalidateQueries({
-        queryKey: ['lookup-tables'],
+        queryKey: ['lookup_tables'],
         refetchType: 'active',
       });
       queryClient.invalidateQueries({

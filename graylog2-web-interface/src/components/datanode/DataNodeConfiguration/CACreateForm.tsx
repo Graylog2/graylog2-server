@@ -37,7 +37,7 @@ type FormValues = {
 const createCA = (caData: FormValues) => CA.createCA(caData);
 
 const CaCreateForm = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();

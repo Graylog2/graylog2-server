@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 
 function LUTDataAdaptersPage() {
   const { push } = useHistory();
-  const { t } = useTranslation('lookup-tables');
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <LUTPageLayout

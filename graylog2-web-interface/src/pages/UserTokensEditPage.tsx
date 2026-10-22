@@ -1,21 +1,6 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
@@ -33,16 +18,19 @@ type Props = {
   };
 };
 
-const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
-  <>
-    Edit Tokens Of User{' '}
-    {fullName && (
-      <>
-        - <i>{fullName}</i>
-      </>
-    )}
-  </>
-);
+const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => {
+  const { t } = useTranslation('users');
+  return (
+    <>
+      {t('user_tokens_edit.title_prefix')}{' '}
+      {fullName && (
+        <>
+          - <i>{fullName}</i>
+        </>
+      )}
+    </>
+  );
+};
 
 const _loadTokens = (loadedUser, setTokens) => {
   if (loadedUser) {
@@ -67,6 +55,7 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 };
 
 const UserEditPage = ({ params }: Props) => {
+  const { t } = useTranslation('users');
   const [tokens, setTokens] = useState([]);
   const [creatingToken, setCreatingToken] = useState(false);
 
@@ -83,7 +72,7 @@ const UserEditPage = ({ params }: Props) => {
   }, [loadTokens, loadedUser]);
 
   return (
-    <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
+    <DocumentTitle title={t('user_tokens_edit.title', { username: loadedUser?.fullName ?? '' })}>
       <UsersPageNavigation />
       <PageHeader
         title={<PageTitle fullName={loadedUser?.fullName} />}
@@ -95,10 +84,10 @@ const UserEditPage = ({ params }: Props) => {
           />
         }
         documentationLink={{
-          title: 'Permissions documentation',
+          title: t('user_tokens_edit.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>You can create new tokens or delete old ones.</span>
+        <span>{t('user_tokens_edit.description')}</span>
       </PageHeader>
 
       <Row className="content">

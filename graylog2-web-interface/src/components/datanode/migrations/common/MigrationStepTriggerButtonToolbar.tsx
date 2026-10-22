@@ -97,7 +97,7 @@ const MigrationStepTriggerButtonToolbar = ({
   hidden = false,
   children = undefined,
 }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const sendTelemetry = useSendTelemetry('migration');
   const { currentStep } = useMigrationState();
 

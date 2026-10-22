@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
@@ -22,21 +23,25 @@ import UsersOverview from 'components/users/UsersOverview';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import CreateButton from 'components/common/CreateButton';
 
-const UsersOverviewPage = () => (
-  <DocumentTitle title="Users Overview">
-    <UsersPageNavigation />
-    <PageHeader
-      title="Users Overview"
-      actions={<CreateButton entityKey="User" />}
-      documentationLink={{
-        title: 'Permissions documentation',
-        path: DocsHelper.PAGES.USERS_ROLES,
-      }}>
-      <span>Overview of all registered users.</span>
-    </PageHeader>
+const UsersOverviewPage = () => {
+  const { t } = useTranslation('users');
 
-    <UsersOverview />
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('users_overview.title')}>
+      <UsersPageNavigation />
+      <PageHeader
+        title={t('users_overview.title')}
+        actions={<CreateButton entityKey="User" />}
+        documentationLink={{
+          title: t('users_overview.documentation_link_title'),
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}>
+        <span>{t('users_overview.description')}</span>
+      </PageHeader>
+
+      <UsersOverview />
+    </DocumentTitle>
+  );
+};
 
 export default UsersOverviewPage;

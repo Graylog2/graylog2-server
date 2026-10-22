@@ -46,7 +46,7 @@ const FlexCol = styled(Col)`
 
 function LUTFormPage() {
   const { push } = useHistory();
-  const { t } = useTranslation('lookup-tables');
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <FlexContainer>

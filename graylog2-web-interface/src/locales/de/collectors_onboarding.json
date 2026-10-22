@@ -1,8 +1,0 @@
-{
-  "load_error": "Konnte Collector-Instanz nicht laden: {{error}}",
-  "not_found_message": "Collector-Instanz nicht gefunden. Sie wurde möglicherweise entfernt &mdash; siehe alle",
-  "instances": "Instanzen",
-  "title": "Collector Onboarding",
-  "documentation_title": "Collectors-Dokumentation",
-  "status_description": "Status Ihres neu verbundenen Collectors."
-}

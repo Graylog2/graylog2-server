@@ -51,7 +51,7 @@ const StartUpgradeConfirmDialog = ({
   onCancel,
   onConfirm,
 }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
   const hasVersions = !!(currentVersion && targetVersion);
   const versionValues = { count: numberOfDataNodes, currentVersion, targetVersion };

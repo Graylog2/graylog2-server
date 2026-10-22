@@ -80,7 +80,7 @@ const NodeIdentityCell = ({
   node: RollingRestartNode;
   versionNode?: OpenSearchVersionNode;
 }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const ip = versionNode?.datanode?.ip;
   const isManagerNode = versionNode?.datanode?.manager_node;
 
@@ -113,13 +113,13 @@ const OpenSearchVersionCell = ({
   node: RollingRestartNode;
   versionNode?: OpenSearchVersionNode;
 }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return <td>{opensearchVersion(node, versionNode) ?? t('rolling_upgrade_nodes.unknown')}</td>;
 };
 
 const NodeStatusCell = ({ node, showProgress }: { node: RollingRestartNode; showProgress: boolean }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <td align="right">
@@ -146,7 +146,7 @@ const OpenSearchRollingUpgradeNodeTable = ({
   currentNodeIndex: number;
   showProgress: boolean;
 }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <Table>

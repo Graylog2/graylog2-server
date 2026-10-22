@@ -80,7 +80,7 @@ const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 
 };
 
 const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const data = job?.data;
 
   if (!data) {

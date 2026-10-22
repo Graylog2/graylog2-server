@@ -32,7 +32,7 @@ const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => 
 );
 
 const Welcome = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { data: dataNodes } = useDataNodes();
 
   return (

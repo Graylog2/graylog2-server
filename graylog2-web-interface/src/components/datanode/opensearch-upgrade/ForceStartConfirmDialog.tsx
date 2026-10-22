@@ -30,7 +30,7 @@ const ForceStartConfirmDialog = ({
   onCancel: () => void;
   onConfirm: () => void;
 }) => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <ConfirmDialog

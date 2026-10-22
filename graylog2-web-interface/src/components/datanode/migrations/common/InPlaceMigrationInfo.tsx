@@ -34,7 +34,7 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
 );
 
 const InPlaceMigrationInfo = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return (
     <StyledPanel bsStyle="info">

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const MigrationFinishedStep = () => {
-  const { t } = useTranslation('datanode');
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   return <p>{t('migration_steps_text.finished')}</p>;
 };
