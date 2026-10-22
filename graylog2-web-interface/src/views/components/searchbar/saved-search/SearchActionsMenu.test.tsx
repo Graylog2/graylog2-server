@@ -61,6 +61,7 @@ jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
+  prepareEntityCreateShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() =>
     Promise.resolve({
