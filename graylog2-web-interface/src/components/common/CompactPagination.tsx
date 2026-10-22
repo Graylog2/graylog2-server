@@ -70,7 +70,6 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
         disabled={disabled || currentPage <= 1}
         onClick={() => onChange(currentPage - 1)}
       />
-      <span>Page:</span>
       <PageSelectWrapper>
         <Select
           aria-label="Select page"
