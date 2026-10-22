@@ -46,6 +46,8 @@ const PageSelectWrapper = styled.div`
 
 const StyledIconButton = styled(IconButton)`
   border: 1px solid ${({ theme }) => theme.colors.input.border};
+  height: 29px;
+  width: 29px;
 `;
 
 /**
