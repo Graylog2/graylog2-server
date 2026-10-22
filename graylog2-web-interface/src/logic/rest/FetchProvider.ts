@@ -96,6 +96,8 @@ export class Builder {
 
   private errorHandler: (error: unknown) => unknown;
 
+  private signal: AbortSignal;
+
   constructor(method: Method, url: string) {
     this.method = method;
     this.url = url.replace(/([^:])\/\//, '$1/');
@@ -187,6 +189,27 @@ export class Builder {
     return this;
   }
 
+  // Resolves with the body as it arrives. Aborting rejects with the abort's error, not as a server error.
+  ndjsonStream(body: any, signal?: AbortSignal) {
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = 'application/x-ndjson';
+    this.signal = signal;
+
+    this.responseHandler = (resp: Response) => {
+      if (resp.ok) {
+        reportServerSuccess();
+
+        return resp.body;
+      }
+
+      throw resp;
+    };
+
+    this.errorHandler = (error: Response) => (signal?.aborted ? Promise.reject(error) : onServerError(error));
+
+    return this;
+  }
+
   plaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
@@ -236,6 +259,7 @@ export class Builder {
         method: this.method,
         headers,
         body: this.body ? this.body.body : undefined,
+        signal: this.signal,
       }),
     )
       .then(this.responseHandler, this.errorHandler)
@@ -290,6 +314,17 @@ export function fetchStreamingPlainText(method: Method, url: string, body?: any)
 
 export function fetchPeriodically<T = unknown>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url).noSessionExtension().json(body).build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchStream(
+  method: Method,
+  url: string,
+  body: any,
+  signal?: AbortSignal,
+): Promise<ReadableStream<Uint8Array>> {
+  const promise = () => new Builder(method, url).ndjsonStream(body, signal).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }

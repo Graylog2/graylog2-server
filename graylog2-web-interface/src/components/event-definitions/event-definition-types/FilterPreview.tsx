@@ -138,10 +138,7 @@ const constructSearch = (
     .build();
 };
 
-const isPermittedToSeePreview = (
-  isPermitted: IsPermitted,
-  config: EventDefinition['config'],
-) => {
+const isPermittedToSeePreview = (isPermitted: IsPermitted, config: EventDefinition['config']) => {
   const missingPermissions = config?.streams?.some((stream) => !isPermitted(`streams:read:${stream}`));
 
   return !missingPermissions;

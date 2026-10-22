@@ -16,7 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { Datanode } from '@graylog/server-api';
+import { CertificateRenewal, Datanode } from '@graylog/server-api';
 
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
@@ -165,7 +165,7 @@ export type UseDataNodesOptions = {
 };
 
 export const renewDatanodeCertificate = (nodeId: string) =>
-  fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+  CertificateRenewal.initiateCertRenewalForNode(nodeId)
     .then(() => {
       UserNotification.success('Certificate renewed successfully.');
     })

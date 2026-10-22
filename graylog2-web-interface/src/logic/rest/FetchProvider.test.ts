@@ -23,8 +23,9 @@ import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
 import Session from 'logic/session/Session';
+import { reportError as reportServerError } from 'api/server-availability';
 
-import fetch, { Builder, fetchFile } from './FetchProvider';
+import fetch, { Builder, fetchFile, fetchStream } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 jest.mock('api/server-availability', () => ({
@@ -81,6 +82,18 @@ const setUpServer = () => {
     res.status(401).end();
   });
 
+  app.post('/simulatesSessionExpiration', (_req, res) => {
+    res.status(401).end();
+  });
+
+  app.post('/stream', (req, res) => {
+    if (req.accepts().includes('application/x-ndjson')) {
+      res.send('{"type":"answer"}\n');
+    } else {
+      res.status(406).end();
+    }
+  });
+
   app.get('/simulatesUnauthorized', (_req, res) => {
     res.status(403).end();
   });
@@ -118,6 +131,7 @@ describe('FetchProvider', () => {
 
   beforeEach(() => {
     asMock(ErrorsActions.report).mockClear();
+    asMock(reportServerError).mockClear();
     Session.setUsername('alice');
   });
 
@@ -231,5 +245,33 @@ describe('FetchProvider', () => {
     );
 
     expect(ErrorsActions.report).not.toHaveBeenCalled();
+  });
+
+  it('streams the body of a response it accepts', async () => {
+    const body = await fetchStream('POST', `${baseUrl}/stream`, {});
+
+    expect(body).toBeTruthy();
+  });
+
+  it('removes local session if a stream returns 401', async () => {
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
+    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch((e) => e);
+
+    expect(error.status).toEqual(401);
+    expect(Session.isLoggedIn()).toBe(false);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+  });
+
+  it('rejects an aborted stream with its abort error, not as a server error', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch((e) => e);
+
+    expect(error.name).toEqual('AbortError');
+    expect(reportServerError).not.toHaveBeenCalled();
   });
 });

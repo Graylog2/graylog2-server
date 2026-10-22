@@ -104,7 +104,7 @@
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.9</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
-        <apache-httpclient5.version>5.6.4</apache-httpclient5.version>
+        <apache-httpclient5.version>5.6.5</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <apache-httpcore5.version>5.4.4</apache-httpcore5.version>
         <asm.version>9.11</asm.version>
@@ -116,13 +116,13 @@
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
-        <caffeine.version>3.3.0</caffeine.version>
-        <classgraph.version>4.8.196</classgraph.version>
+        <caffeine.version>3.3.1</caffeine.version>
+        <classgraph.version>5.0.0</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.6.0</commons-exec.version>
-        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <commons-lang3.version>3.21.0</commons-lang3.version>
         <commons-net.version>3.13.0</commons-net.version>
         <commons-validator.version>1.11.0</commons-validator.version>
         <commons-io.version>2.22.0</commons-io.version>
@@ -130,10 +130,11 @@
         <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.75.0</gcs.version>
-        <azure-blob-storage.version>12.35.1</azure-blob-storage.version>
+        <azure-blob-storage.version>12.36.0</azure-blob-storage.version>
         <azure-core.version>1.60.0</azure-core.version>
+        <azure-identity.version>1.18.7</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
-        <azure-messaging-eventhubs.version>5.21.6</azure-messaging-eventhubs.version>
+        <azure-messaging-eventhubs.version>5.21.7</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
         <google-api-client.version>2.9.1</google-api-client.version>
@@ -150,17 +151,17 @@
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.84.0</grpc.version>
+        <grpc.version>1.84.3</grpc.version>
         <gson.version>2.14.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.7.2-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.5.Final</hibernate-validator.version>
         <hk2.version>4.0.3</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.22.3</jackson.version>
-        <jadconfig.version>1.1.0</jadconfig.version>
+        <jadconfig.version>1.2.1</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javassist.version>3.33.0-GA</javassist.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -179,7 +180,7 @@
         <jsoup.version>1.23.2</jsoup.version>
         <jspecify.version>1.0.1</jspecify.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <kafka.version>4.3.1</kafka.version>
+        <kafka.version>4.4.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
@@ -189,11 +190,11 @@
         <mongodb-driver.version>5.13.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.18.Final</netty.version>
+        <netty.version>4.2.19.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.84.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.66.0</opentelemetry.version>
+        <opentelemetry.version>1.67.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.32.0</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.44.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
@@ -207,8 +208,8 @@
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
-        <snappy-java.version>1.1.10.10</snappy-java.version>
-        <oshi.version>7.7.0</oshi.version>
+        <snappy-java.version>1.1.10.12</snappy-java.version>
+        <oshi.version>7.7.1</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
@@ -220,7 +221,7 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-21</zstd.version>
+        <zstd.version>1.5.7-23</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -238,7 +239,7 @@
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.1.3</junit-jupiter.version>
         <mockito.version>5.24.0</mockito.version>
-        <restassured.version>6.0.1</restassured.version>
+        <restassured.version>6.1.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
         <graalvm.version>25.4.4.1.1</graalvm.version>
@@ -366,6 +367,24 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-messaging-eventhubs</artifactId>
                 <version>${azure-messaging-eventhubs.version}</version>
+            </dependency>
+            <!-- Used by the enterprise plugin. Managed here so it is bumped together with azure-core -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
+                <exclusions>
+                    <!-- Keeps a second JNA off the classpath next to oshi's jna-jpms. Only the IntelliJ and VS Code credentials need it. -->
+                    <exclusion>
+                        <groupId>com.microsoft.azure</groupId>
+                        <artifactId>msal4j-persistence-extension</artifactId>
+                    </exclusion>
+                    <!-- Use the HTTP client that azure-storage-blob brings -->
+                    <exclusion>
+                        <groupId>com.azure</groupId>
+                        <artifactId>azure-core-http-netty</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- msal4j pulls in an older azure-json than azure-core requires -->
             <dependency>
@@ -954,12 +973,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.22.0</version>
+                    <version>2.23.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.10.4.1</version>
+                    <version>4.10.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

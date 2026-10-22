@@ -17,17 +17,11 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.Tools;
-import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
-import org.graylog2.rest.models.tools.responses.SubstringTesterResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -35,11 +29,19 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
+import org.graylog2.rest.models.tools.responses.SubstringTesterResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 
 @RequiresAuthentication
+@Tag(name = "Tools/SubstringTester", description = "Test the substring converter")
 @Path("/tools/substring_tester")
 public class SubstringTesterResource extends RestResource {
     @GET
+    @Operation(summary = "Extract a substring")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public SubstringTesterResponse substringTester(@QueryParam("begin_index") @Min(0) int beginIndex,
@@ -49,6 +51,7 @@ public class SubstringTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Extract a substring")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

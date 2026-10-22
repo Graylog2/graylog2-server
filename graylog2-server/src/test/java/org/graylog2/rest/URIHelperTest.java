@@ -42,6 +42,22 @@ class URIHelperTest {
     }
 
     @Test
+    void relativePathIncludesConfiguredPathPrefix() {
+        final var helper = new URIHelper(URI.create("https://example.com/graylog/"));
+
+        assertThat(helper.relativePath("system/cluster/datanode-upgrade"))
+                .isEqualTo("/graylog/system/cluster/datanode-upgrade");
+    }
+
+    @Test
+    void relativePathWithoutConfiguredPrefix() {
+        final var helper = new URIHelper(URI.create("https://example.com/"));
+
+        assertThat(helper.relativePath("system/cluster/datanode-upgrade"))
+                .isEqualTo("/system/cluster/datanode-upgrade");
+    }
+
+    @Test
     void exposesBaseUri() {
         final var base = URI.create("https://example.com/graylog/");
         final var helper = new URIHelper(base);

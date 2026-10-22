@@ -379,4 +379,47 @@ public class LenientLineBasedFrameDecoderTest {
         buf.release();
         buf2.release();
     }
+
+    @Test
+    public void testOffsetResetWhileDiscardingTooLongLine() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientLineBasedFrameDecoder(4, true, true, false));
+
+        try {
+            ch.writeInbound(copiedBuffer("abcdefgh", CharsetUtil.US_ASCII));
+            fail();
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(TooLongFrameException.class)));
+        }
+        assertFalse(ch.writeInbound(copiedBuffer("xy", CharsetUtil.US_ASCII)));
+        assertTrue(ch.writeInbound(copiedBuffer("\nok\n", CharsetUtil.US_ASCII)));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("ok", buf.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        assertFalse(ch.finish());
+
+        buf.release();
+    }
+
+    @Test
+    public void testOffsetResetWhileDiscardingTooLongLineWithShortChunk() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientLineBasedFrameDecoder(4, true, true, false));
+
+        try {
+            ch.writeInbound(copiedBuffer("abcdefgh", CharsetUtil.US_ASCII));
+            fail();
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(TooLongFrameException.class)));
+        }
+        assertFalse(ch.writeInbound(copiedBuffer("xyz", CharsetUtil.US_ASCII)));
+        assertFalse(ch.writeInbound(copiedBuffer("\n", CharsetUtil.US_ASCII)));
+        assertTrue(ch.writeInbound(copiedBuffer("ok\n", CharsetUtil.US_ASCII)));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("ok", buf.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        assertFalse(ch.finish());
+
+        buf.release();
+    }
 }
