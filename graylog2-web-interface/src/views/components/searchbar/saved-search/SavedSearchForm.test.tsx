@@ -34,6 +34,7 @@ jest.mock('formik', () => ({
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
+  prepareEntityCreateShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() =>
     Promise.resolve({
