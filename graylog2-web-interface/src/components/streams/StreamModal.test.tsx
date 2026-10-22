@@ -40,6 +40,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
   default: {
     prepare: jest.fn(() => Promise.resolve()),
+    prepareCreate: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
@@ -162,10 +163,10 @@ describe('StreamModal', () => {
     await userEvent.click(addCollaborator);
 
     await waitFor(() => {
-      const prepareCalls = asMock(EntityShareDomain.prepare).mock.calls;
+      const prepareCalls = asMock(EntityShareDomain.prepareCreate).mock.calls;
       expect(prepareCalls).toHaveLength(2);
 
-      const lastCallPayload = prepareCalls[1][3];
+      const lastCallPayload = prepareCalls[1][2];
       expect(lastCallPayload.selected_grantee_capabilities.toJS()).toEqual(
         createEntityShareState.selectedGranteeCapabilities
           .merge({
