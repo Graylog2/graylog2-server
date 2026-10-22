@@ -34,3 +34,19 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 | Submit | Absenden |
 | Time range | Zeitraum |
 | Update (save changes) | Aktualisieren |
+
+## Enterprise
+
+Enterprise texts live in `graylog-plugin-enterprise/enterprise/src/web/locales` (namespaces `enterprise_*`) and use the same rules.
+
+- Keep in English: Security, Investigation, Asset, Sigma, Detection Chain, Data Lake, Data Tiering, Forwarder, Input Profile, Illuminate, Content Hub, Watchlist, MITRE ATT&CK.
+
+| English | German |
+| --- | --- |
+| Anomaly | Anomalie |
+| Archive | Archiv |
+| Audit log | Audit-Log |
+| Report | Bericht |
+| Retention | Aufbewahrung |
+| Risk score | Risikobewertung |
+| Warm / hot tier | Warm- / Hot-Tier |
