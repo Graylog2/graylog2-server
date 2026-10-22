@@ -21,6 +21,8 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 import Select from 'components/common/Select';
 
+import { ICON_NAMES } from './Pagination';
+
 type Props = {
   currentPage: number;
   totalPages: number;
@@ -67,7 +69,7 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
   return (
     <Container data-testid="graylog-compact-pagination">
       <StyledIconButton
-        name="chevron_left"
+        name={ICON_NAMES.PREVIOUS}
         title="Previous page"
         disabled={disabled || currentPage <= 1}
         onClick={() => onChange(currentPage - 1)}
@@ -85,7 +87,7 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
       </PageSelectWrapper>
       of {totalPages}
       <StyledIconButton
-        name="chevron_right"
+        name={ICON_NAMES.NEXT}
         onClick={() => onChange(currentPage + 1)}
         title="Next page"
         disabled={disabled || currentPage >= totalPages}
