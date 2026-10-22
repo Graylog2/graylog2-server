@@ -213,7 +213,8 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   default: {
     prepare: jest.fn(() => Promise.resolve()),
     prepareCreate: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()) },
+    update: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 // Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
