@@ -1,0 +1,10 @@
+type = "fixed"
+message = "Fix lookup table caches keeping frequently read entries past their TTL or the cache's expire-after-write setting."
+
+details.user = """
+Cache hits with expire-after-access enabled no longer extend an entry past its TTL or expire-after-write. A result's TTL now only shortens expire-after-write, never lengthens it.
+
+Cached DNS adapter results now expire at the record TTL, or at expire-after-write if shorter, even when read often. Use the DNS adapter's cache TTL override to cache them longer. Cached error results now expire after their 5 second TTL, so a failing adapter is retried more often.
+"""
+
+pulls = ["27903"]
