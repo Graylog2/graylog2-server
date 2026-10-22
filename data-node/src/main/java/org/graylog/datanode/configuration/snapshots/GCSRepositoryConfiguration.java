@@ -18,12 +18,15 @@ package org.graylog.datanode.configuration.snapshots;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
+import jakarta.annotation.Nullable;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileContentItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +41,9 @@ public class GCSRepositoryConfiguration implements RepositoryConfiguration {
 
     private final String clientName;
 
+    @Nullable
+    private final String credentials;
+
     @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
     @Parameter(value = "gcs_credentials_file")
     private Path gcsCredentialsFile;
@@ -47,16 +53,21 @@ public class GCSRepositoryConfiguration implements RepositoryConfiguration {
      */
     public GCSRepositoryConfiguration() {
         this.clientName = DEFAULT_CLIENT_NAME;
+        this.credentials = null;
     }
 
-    public GCSRepositoryConfiguration(String clientName, Path credentialsFile) {
+    /**
+     * Configuration of a GCS client with the given service account key in JSON format. The key is added to the
+     * opensearch keystore directly, it's never written to disk.
+     */
+    public GCSRepositoryConfiguration(String clientName, String credentials) {
         this.clientName = clientName;
-        this.gcsCredentialsFile = credentialsFile;
+        this.credentials = credentials;
     }
 
     @Override
     public boolean isRepositoryEnabled() {
-        return gcsCredentialsFile != null;
+        return gcsCredentialsFile != null || credentials != null;
     }
 
     @Override
@@ -67,8 +78,12 @@ public class GCSRepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
         LOG.info("Google Cloud Storage repository configured, adding credentials file of client {} to opensearch keystore", clientName);
+        final String key = f("gcs.client.%s.credentials_file", clientName);
+        if (credentials != null) {
+            return List.of(new OpensearchKeystoreFileContentItem(key, credentials.getBytes(StandardCharsets.UTF_8)));
+        }
         return List.of(datanodeDirectories.resolveConfigurationSourceFile(gcsCredentialsFile)
-                .map(credentialsFile -> new OpensearchKeystoreFileItem(f("gcs.client.%s.credentials_file", clientName), credentialsFile))
+                .map(credentialsFile -> new OpensearchKeystoreFileItem(key, credentialsFile))
                 .orElseThrow(() -> new IllegalArgumentException("Failed to resolve Google Cloud Storage credentials file. File not found: " + gcsCredentialsFile))
         );
     }
