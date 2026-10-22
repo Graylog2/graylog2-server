@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Data Node upgrade link in the version mismatch notification not respecting a configured HTTP path prefix."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13940"]
+pulls = ["27310"]
