@@ -19,34 +19,31 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import type { CollectorsConfig } from 'components/collectors/types';
+import { configuredCollectorsConfig } from 'components/collectors/testing/fixtures';
 
 import CollectorsOverviewPage from './CollectorsOverviewPage';
 
 jest.mock('components/collectors/hooks');
-jest.mock('./CollectorsSettingsPage', () => () => <div>collectors settings page</div>);
 jest.mock('components/collectors/overview', () => ({ CollectorsOverview: () => <div>collectors overview</div> }));
-jest.mock('components/collectors/common', () => ({ CollectorsPageNavigation: () => <div>collectors nav</div> }));
 
 describe('CollectorsOverviewPage', () => {
-  it('renders the settings page instead of the overview when the config is missing', () => {
+  // The overview owns the unconfigured state: its onboarding wizard starts with the ingest setup step.
+  it('renders the overview when the config is missing', () => {
     asMock(useCollectorsConfig).mockReturnValue({ data: undefined, isLoading: false });
 
     render(<CollectorsOverviewPage />);
 
-    expect(screen.getByText('collectors settings page')).toBeInTheDocument();
-    expect(screen.queryByText('collectors overview')).not.toBeInTheDocument();
+    expect(screen.getByText('collectors overview')).toBeInTheDocument();
   });
 
   it('renders the overview once the config exists', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: { signing_cert_id: 'signing-id' } as unknown as CollectorsConfig,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
 
     render(<CollectorsOverviewPage />);
 
     expect(screen.getByText('collectors overview')).toBeInTheDocument();
-    expect(screen.queryByText('collectors settings page')).not.toBeInTheDocument();
   });
 });

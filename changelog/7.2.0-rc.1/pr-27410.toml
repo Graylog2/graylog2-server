@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix the browser's native tooltip covering the help popover on stat cards."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15615"]
+pulls = ["27410"]

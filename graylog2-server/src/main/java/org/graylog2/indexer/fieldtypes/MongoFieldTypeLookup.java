@@ -160,7 +160,8 @@ public class MongoFieldTypeLookup implements FieldTypeLookup {
                         final FieldTypeDTO physicalType = entry.getKey();
                         final Set<String> indices = ImmutableSet.copyOf(entry.getValue());
 
-                        return typeMapper.mapType(physicalType).map(t -> t.withIndexNames(indices));
+                        // This lookup isn't scoped to a query/search, so there are no stream ids to pass along.
+                        return typeMapper.mapType(physicalType, Set.of()).map(t -> t.withIndexNames(indices));
                     })
                     .filter(Optional::isPresent)
                     .map(Optional::get)

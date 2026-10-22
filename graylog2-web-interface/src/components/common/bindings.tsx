@@ -18,6 +18,7 @@ import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Timestamp from 'components/common/Timestamp';
+import entityLinkResolvers from 'components/common/markdown/entityLinkResolvers';
 
 const pluginExports: PluginExports = {
   'markdown.augment.components': [
@@ -30,6 +31,7 @@ const pluginExports: PluginExports = {
       ),
     },
   ],
+  'markdown.entityLinkResolvers': entityLinkResolvers,
 };
 
 export default pluginExports;

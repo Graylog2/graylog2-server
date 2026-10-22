@@ -90,16 +90,15 @@ class ContentPackInstall extends React.Component<ContentPackInstallProps, State>
     }
   };
 
-  _convertedParameters = (): { [parameterName: string]: string } =>
-    Object.keys(this.state.parameterInput).reduce((result, paramName) => {
-      const newResult = result;
-      const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
-      const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
+  _convertedParameters = (): { [parameterName: string]: ReturnType<typeof ValueRefHelper.createValueRef> } =>
+    Object.fromEntries(
+      Object.keys(this.state.parameterInput).map((paramName) => {
+        const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
+        const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
 
-      newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
-
-      return newResult;
-    }, {});
+        return [paramName, ValueRefHelper.createValueRef(paramType, value)];
+      }),
+    );
 
   _getValue = (name: string, value: string) => {
     this.setState(({ parameterInput }) => ({ parameterInput: { ...parameterInput, [name]: value } }));

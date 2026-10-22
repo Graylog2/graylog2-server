@@ -91,6 +91,7 @@ import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexFieldTypeProfileResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetMetricsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetTemplateResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
@@ -230,6 +231,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexFieldTypeProfileResource.class);
         addSystemRestResource(IndexSetTemplateResource.class);
         addSystemRestResource(IndexSetsResource.class);
+        addSystemRestResource(IndexSetMetricsResource.class);
         addSystemRestResource(IndexSetsMappingResource.class);
         addSystemRestResource(IndexSetDefaultsResource.class);
         addSystemRestResource(IndexTemplatesResource.class);

@@ -216,6 +216,17 @@ public class FleetTransactionLogService {
         return null;
     }
 
+    /**
+     * Resolves pending fleet reassignments from all collector-targeted {@code FLEET_REASSIGNED} markers still in
+     * the log. Their number is bounded by transaction-log truncation.
+     */
+    public PendingReassignments pendingReassignments() {
+        return PendingReassignments.of(collection.find(Filters.and(
+                        Filters.eq(FIELD_TARGET, TARGET_COLLECTOR),
+                        Filters.eq(FIELD_TYPE, MarkerType.FLEET_REASSIGNED.name())))
+                .into(new ArrayList<>()));
+    }
+
     public List<TransactionMarker> getRecentMarkers(int limit) {
         // Exclude UNKNOWN by filtering for known types only
         final Bson filter = Filters.in(FIELD_TYPE,

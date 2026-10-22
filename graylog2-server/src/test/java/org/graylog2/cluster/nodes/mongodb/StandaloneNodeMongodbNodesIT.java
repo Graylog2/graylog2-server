@@ -21,23 +21,26 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.mongodb.MongoDBContainer;
+import org.testcontainers.containers.Network;
 
 import java.util.List;
 
 class StandaloneNodeMongodbNodesIT {
 
+    private Network network;
     private MongoDBContainer mongoDBContainer;
     private StandaloneNodeMongodbNodes standaloneNodes;
 
     @BeforeEach
     void setUp() {
-        mongoDBContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version());
+        network = Network.newNetwork();
+        mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, network);
         mongoDBContainer.start();
         standaloneNodes = new StandaloneNodeMongodbNodes(createMongoConnection());
     }
@@ -45,6 +48,7 @@ class StandaloneNodeMongodbNodesIT {
     @AfterEach
     void tearDown() {
         mongoDBContainer.stop();
+        network.close();
     }
 
 
@@ -65,7 +69,7 @@ class StandaloneNodeMongodbNodesIT {
         return new MongoConnection() {
             @Override
             public MongoClient connect() {
-                return new MongoClient(mongoDBContainer.getConnectionString());
+                return new MongoClient(mongoDBContainer.getHost(), mongoDBContainer.getFirstMappedPort());
             }
 
             @Override

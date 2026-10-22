@@ -18,11 +18,12 @@ import type * as Immutable from 'immutable';
 import * as ImmutableLib from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
+import { AuthorizationRoles } from '@graylog/server-api';
+
 import type { PaginatedUsersResponse } from 'hooks/useUsers';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
 import UserOverview from 'logic/users/UserOverview';
@@ -99,11 +100,7 @@ export const loadRole = (roleId: string): Promise<Role> => {
   return fetch('GET', url).then(Role.fromJSON);
 };
 
-export const deleteRole = (roleId: string): Promise<void> => {
-  const url = qualifyUrl(encodeApiUrl(ApiRoutes.AuthzRolesController.delete, [roleId]));
-
-  return fetch('DELETE', url);
-};
+export const deleteRole = (roleId: string): Promise<void> => AuthorizationRoles.remove(encodeURIComponent(roleId));
 
 export const addMembersToRole = (roleId: string, usernames: Immutable.Set<string>): Promise<Role> => {
   const url = encodeApiUrl(ApiRoutes.AuthzRolesController.addMembers, [roleId]);
@@ -117,26 +114,18 @@ export const removeMemberFromRole = (roleId: string, username: string): Promise<
   return fetch('DELETE', qualifyUrl(url));
 };
 
-export const loadUsersForRole = (roleId: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> => {
-  const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
-  const url = PaginationURL(apiUrl, page, perPage, query);
+export const loadUsersForRole = (roleId: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> =>
+  AuthorizationRoles.getUsersForRole(undefined, encodeURIComponent(roleId), page, perPage, query).then(
+    _responseToPaginatedUserList,
+  );
 
-  return fetch('GET', qualifyUrl(url)).then(_responseToPaginatedUserList);
-};
+export const loadRolesForUser = (username: string, { page, perPage, query }: Pagination): Promise<PaginatedRoles> =>
+  AuthorizationRoles.getListForUser(undefined, encodeURIComponent(username), page, perPage, query).then(
+    _responseToPaginatedList,
+  );
 
-export const loadRolesForUser = (username: string, { page, perPage, query }: Pagination): Promise<PaginatedRoles> => {
-  const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadRolesForUser, [username]);
-  const url = PaginationURL(apiUrl, page, perPage, query);
-
-  return fetch('GET', qualifyUrl(url)).then(_responseToPaginatedList);
-};
-
-export const loadRolesPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedRoles> => {
-  const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.list);
-  const url = PaginationURL(apiUrl, page, perPage, query);
-
-  return fetch('GET', qualifyUrl(url)).then(_responseToPaginatedList);
-};
+export const loadRolesPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedRoles> =>
+  AuthorizationRoles.getList(undefined, page, perPage, query).then(_responseToPaginatedList);
 
 export const useAuthzRolesPaginated = (pagination: Pagination) =>
   useQuery({

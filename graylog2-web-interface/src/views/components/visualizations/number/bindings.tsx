@@ -18,11 +18,14 @@ import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import NumberVisualizationConfig, {
+  DEFAULT_COLOR_PREFERENCE,
+} from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 type NumberVisualizationConfigFormValues = {
   trend: boolean;
   trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER';
+  color_preference: 'TREND_ONLY' | 'FULL_WIDGET';
 };
 
 const singleNumber: VisualizationType<
@@ -34,12 +37,18 @@ const singleNumber: VisualizationType<
   displayName: 'Single Number',
   component: NumberVisualization,
   config: {
+    createConfig: () => ({ color_preference: DEFAULT_COLOR_PREFERENCE }),
     fromConfig: (config: NumberVisualizationConfig | undefined) => ({
       trend: config?.trend,
       trend_preference: config?.trendPreference,
+      color_preference: config?.colorPreference ?? DEFAULT_COLOR_PREFERENCE,
     }),
-    toConfig: ({ trend = false, trend_preference }: NumberVisualizationConfigFormValues) =>
-      NumberVisualizationConfig.create(trend, trend_preference),
+    toConfig: ({
+      trend = false,
+      trend_preference,
+      color_preference = DEFAULT_COLOR_PREFERENCE,
+    }: NumberVisualizationConfigFormValues) =>
+      NumberVisualizationConfig.create(trend, trend_preference, undefined, color_preference),
     fields: [
       {
         name: 'trend',
@@ -74,6 +83,19 @@ const singleNumber: VisualizationType<
         ],
         required: true,
         isShown: (formValues: NumberVisualizationConfigFormValues) => formValues?.trend === true,
+      },
+      {
+        name: 'color_preference',
+        title: 'Highlight',
+        type: 'select',
+        options: [
+          ['Trend info only', 'TREND_ONLY'],
+          ['Entire widget', 'FULL_WIDGET'],
+        ],
+        required: true,
+        isShown: (formValues: NumberVisualizationConfigFormValues) =>
+          formValues?.trend === true &&
+          (formValues?.trend_preference === 'HIGHER' || formValues?.trend_preference === 'LOWER'),
       },
     ],
   },

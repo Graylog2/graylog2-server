@@ -92,9 +92,7 @@ export const NodesStore = singletonStore('core.Nodes', () =>
             this.nodes = {};
 
             if (response.nodes) {
-              this.nodes = response.nodes
-                .map<[string, NodeInfo]>((node) => [node.node_id, node])
-                .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+              this.nodes = Object.fromEntries(response.nodes.map<[string, NodeInfo]>((node) => [node.node_id, node]));
 
               this.clusterId = this._clusterId();
               this.nodeCount = this._nodeCount();

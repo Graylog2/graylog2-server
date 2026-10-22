@@ -26,6 +26,7 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useScopePermissions from 'hooks/useScopePermissions';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 import { fetchSavedSearches } from 'views/hooks/useSavedSearches';
 
@@ -77,6 +78,7 @@ jest.mock('views/hooks/useSavedSearches', () => ({
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useScopePermissions');
 
 describe('SavedSearchesModal', () => {
   useWindowConfirmMock();
@@ -89,6 +91,11 @@ describe('SavedSearchesModal', () => {
       resetAsync: () => Promise.resolve(),
     });
     asMock(useCurrentUser).mockReturnValue(adminUser);
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
   });
 
   describe('render the SavedSearchesModal', () => {
@@ -183,6 +190,22 @@ describe('SavedSearchesModal', () => {
         .permissions(Immutable.List<Permission>([`view:read:${defaultPaginatedSearches.list[0].id}`]))
         .build();
       asMock(useCurrentUser).mockReturnValue(currentUser);
+
+      render(
+        <SavedSearchesModal toggleModal={() => {}} deleteSavedSearch={jest.fn()} activeSavedSearchId="search-id-0" />,
+      );
+
+      await screen.findByText('search-title-0');
+
+      expect(screen.queryByTitle('Delete search search-title-0')).not.toBeInTheDocument();
+    });
+
+    it('should not display delete action for saved search with an immutable scope', async () => {
+      asMock(useScopePermissions).mockReturnValue({
+        loadingScopePermissions: false,
+        scopePermissions: { is_mutable: false, is_deletable: false },
+        checkPermissions: () => false,
+      });
 
       render(
         <SavedSearchesModal toggleModal={() => {}} deleteSavedSearch={jest.fn()} activeSavedSearchId="search-id-0" />,

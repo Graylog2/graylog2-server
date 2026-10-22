@@ -21,6 +21,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 
+import { EventsEntityTypes } from '@graylog/server-api';
+
 import selectEvent from 'helpers/selectEvent';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
@@ -36,7 +38,6 @@ import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
-import fetch from 'logic/rest/FetchProvider';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -105,6 +106,11 @@ jest.mock('logic/rest/FetchProvider', () => {
 
   return { __esModule: true, default: mockFetch, Builder: MockBuilder };
 });
+
+jest.mock('@graylog/server-api', () => ({
+  ...jest.requireActual('@graylog/server-api'),
+  EventsEntityTypes: { all: jest.fn() },
+}));
 
 const mockEntityTypes = {
   aggregation_functions: [
@@ -204,7 +210,11 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
 
 jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
-  default: { prepare: jest.fn(() => Promise.resolve()), update: jest.fn(() => Promise.resolve()) },
+  default: {
+    prepare: jest.fn(() => Promise.resolve()),
+    prepareCreate: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 // Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
@@ -219,7 +229,7 @@ jest.mock('hooks/usePluginEntities');
 
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
-    asMock(fetch).mockResolvedValue(mockEntityTypes);
+    asMock(EventsEntityTypes.all).mockResolvedValue(mockEntityTypes);
 
     asMock(useLocation).mockImplementation(() => ({
       pathname: '/event-definitions',
@@ -373,7 +383,7 @@ describe('EventDefinitionFormContainer', () => {
 
   it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
     // Mirrors the server: the prepared state reflects exactly the capabilities that were sent.
-    asMock(EntityShareDomain.prepare).mockImplementation((_type, _title, _grn, payload?: any) =>
+    asMock(EntityShareDomain.prepareCreate).mockImplementation((_type, _title, payload?: any) =>
       Promise.resolve(
         createEntityShareState
           .toBuilder()

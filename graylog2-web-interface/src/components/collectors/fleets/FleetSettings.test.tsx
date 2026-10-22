@@ -68,26 +68,6 @@ describe('FleetSettings telemetry', () => {
       expect.objectContaining({ fleet_id: 'f-1', app_action_value: 'fleet-settings-save' }),
     );
   });
-
-  it('emits FLEET.DELETED on confirmed delete', async () => {
-    const onDelete = jest.fn().mockResolvedValue(undefined);
-    render(<FleetSettings fleet={fleet as never} onSave={jest.fn()} onDelete={onDelete} />);
-
-    const deleteButton = screen.getByRole('button', { name: /Delete Fleet/i });
-    await userEvent.click(deleteButton);
-
-    const confirmButton = screen.getByRole('button', { name: /Confirm/i });
-    fireEvent.click(confirmButton);
-
-    await waitFor(() => {
-      expect(onDelete).toHaveBeenCalled();
-    });
-
-    expect(sendTelemetry).toHaveBeenCalledWith(
-      'Fleet Deleted',
-      expect.objectContaining({ fleet_id: 'f-1', app_action_value: 'fleet-delete' }),
-    );
-  });
 });
 
 describe('FleetSettings permissions', () => {
@@ -106,26 +86,10 @@ describe('FleetSettings permissions', () => {
       .permissions(Immutable.List(permissions as Array<Permission>))
       .build();
 
-  it('hides the Danger Zone without delete permission', () => {
-    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:edit:f-1']));
-
-    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
-
-    expect(screen.queryByRole('button', { name: /delete fleet/i })).not.toBeInTheDocument();
-  });
-
-  it('shows the Danger Zone with delete scoped to this fleet', () => {
-    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:delete:f-1']));
-
-    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
-
-    expect(screen.getByRole('button', { name: /delete fleet/i })).toBeInTheDocument();
-  });
-
   it('hides the save controls without edit permission', () => {
     asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
 
-    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} />);
 
     expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
   });
@@ -133,7 +97,7 @@ describe('FleetSettings permissions', () => {
   it('shows the save controls with edit scoped to this fleet', () => {
     asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:edit:f-1']));
 
-    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} />);
 
     expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
   });

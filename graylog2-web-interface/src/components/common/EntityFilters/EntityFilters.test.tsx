@@ -63,6 +63,13 @@ const CustomFilterInput = ({ filter, onSubmit }: FilterComponentProps) => (
   </div>
 );
 
+// Asks to keep the dropdown open after submitting, like a component that allows adding several values.
+const KeepOpenFilterInput = ({ onSubmit }: FilterComponentProps) => (
+  <button type="button" onClick={() => onSubmit({ title: 'first', value: 'first' }, false)}>
+    Add value
+  </button>
+);
+
 describe('<EntityFilters />', () => {
   const onChangeFiltersWithTitle = jest.fn();
   const setUrlQueryFilters = jest.fn();
@@ -121,6 +128,14 @@ describe('<EntityFilters />', () => {
       title: 'Custom Component Attribute',
       type: 'STRING',
       filter_component: CustomFilterInput,
+    },
+    {
+      id: 'singleFilter',
+      filterable: true,
+      title: 'Single Filter Attribute',
+      type: 'STRING',
+      filter_component: KeepOpenFilterInput,
+      single_filter: true,
     },
   ];
 
@@ -238,6 +253,46 @@ describe('<EntityFilters />', () => {
       const statusElement = await screen.findByRole('menuitem', { name: /status/i });
 
       await waitFor(() => expect(statusElement).toBeDisabled());
+    });
+  });
+
+  describe('single filter attribute', () => {
+    it('should prevent creating a second filter', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ singleFilter: [{ title: 'first', value: 'first' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(<EntityFilters urlQueryFilters={OrderedMap({ singleFilter: ['first'] })} />);
+
+      await screen.findByTestId('singleFilter-filter-first');
+
+      await setupUser().click(
+        await screen.findByRole('button', {
+          name: /create filter/i,
+        }),
+      );
+
+      const singleFilterElement = await screen.findByRole('menuitem', { name: /single filter attribute/i });
+
+      await waitFor(() => expect(singleFilterElement).toBeDisabled());
+    });
+
+    it('should close the dropdown after creating the filter', async () => {
+      render(<EntityFilters urlQueryFilters={OrderedMap()} />);
+
+      await setupUser().click(await screen.findByRole('button', { name: /create filter/i }));
+
+      const singleFilterElement = await screen.findByRole('menuitem', { name: /single filter attribute/i });
+
+      expect(singleFilterElement).toBeEnabled();
+
+      await setupUser().click(singleFilterElement);
+      await setupUser().click(await screen.findByRole('button', { name: /add value/i }));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ singleFilter: ['first'] })));
+      await waitFor(() => dropdownIsHidden('create single filter attribute filter'));
     });
   });
 

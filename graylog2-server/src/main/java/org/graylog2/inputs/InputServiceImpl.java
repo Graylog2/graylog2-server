@@ -321,7 +321,7 @@ public class InputServiceImpl implements InputService {
         final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal);
         final InputImpl input = collection.find(query).first();
         if (input == null) {
-            throw new NotFoundException("Couldn't find input " + id + " on Graylog node " + nodeId);
+            throw new NotFoundException("Couldn't find input " + id + " on node " + nodeId);
         } else {
             return input;
         }

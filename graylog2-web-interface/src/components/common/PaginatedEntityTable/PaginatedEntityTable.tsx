@@ -262,7 +262,11 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} attributes={attributes} entityTableId={tableLayout.entityTableId}>
+    <TableFetchContextProvider
+      refetch={refetch}
+      attributes={attributes}
+      entityTableId={tableLayout.entityTableId}
+      layoutVariant={tableLayout.layoutVariant}>
       <Container>
         {TopSection ? <TopSection /> : null}
         <RowContainer>

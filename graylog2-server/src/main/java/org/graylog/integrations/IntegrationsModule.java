@@ -46,6 +46,7 @@ import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
 import org.graylog.integrations.migrations.V20220622071600_MigratePagerDutyV1;
 import org.graylog.integrations.migrations.V20260313163300_MigrateTeamsNotificationV2;
+import org.graylog.integrations.migrations.V20260929120000_NotifyKinesisSingleTableMigration;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfigEntity;
@@ -169,6 +170,9 @@ public class IntegrationsModule extends PluginModule {
             addRestResource(CloudTrailResource.class);
             bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
             addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
+
+            // Kinesis KCL 3.5 single-table migration notice
+            addMigration(V20260929120000_NotifyKinesisSingleTableMigration.class);
         }
     }
 

@@ -71,7 +71,7 @@ const defaultConfigs: Record<
       "'com.apple.syspolicyd',\n" +
       "'com.apple.launchd'\n" +
       '} AND messageType >= error',
-    max_log_age: 'PT24H',
+    max_log_age: 'PT0S',
     max_poll_interval: 'PT30S',
   },
 };

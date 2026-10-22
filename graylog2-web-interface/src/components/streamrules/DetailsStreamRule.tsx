@@ -19,7 +19,6 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import UserNotification from 'util/UserNotification';
-import { isPermitted } from 'util/PermissionsMixin';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import { ConfirmDialog, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -27,8 +26,7 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'logic/streams/types';
-
-import useCurrentUser from '../../hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 const ActionButtonsWrap = styled.span(
   ({ theme }) => css`
@@ -51,7 +49,7 @@ type Props = {
 };
 
 const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { data: inputs } = useStreamRulesInputs();
@@ -86,7 +84,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
     </ActionButtonsWrap>
   );
 
-  const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
+  const actionItems = isPermitted([`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small> ({streamRule.description})</small> : null;
 
   return (

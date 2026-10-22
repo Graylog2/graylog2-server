@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 
-import { Link, RelativeTime } from 'components/common';
-import Routes from 'routing/Routes';
+import { RelativeTime } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
+import FleetReference from '../common/FleetReference';
 import InstanceStatusLabel from '../common/InstanceStatusLabel';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorOsName from '../common/collectorOsName';
@@ -32,29 +33,28 @@ const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
   return <span title={label}>{label}</span>;
 };
 
-type Props = {
-  fleetNames: Record<string, string>;
-};
-
-const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<CollectorInstanceView> => ({
+const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
   attributes: {
+    instance_uid: {
+      staticWidth: 300,
+    },
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
         <InstanceStatusLabel status={instance.status} />
       ),
-      staticWidth: 100,
+      staticWidth: 80,
     },
     has_pending_changes: {
       renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
         <SyncStateIndicator pending={instance.has_pending_changes} />
       ),
-      staticWidth: 60,
+      staticWidth: 'matchHeader',
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (
         <span>{instance.hostname || instance.instance_uid}</span>
       ),
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.title,
     },
     os: {
       renderCell: (_os: string, instance: CollectorInstanceView) => <OsName instance={instance} />,
@@ -62,21 +62,19 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
     },
     fleet_id: {
       renderCell: (_fleetId: string, instance: CollectorInstanceView) => (
-        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
-          {fleetNames[instance.fleet_id] || instance.fleet_id}
-        </Link>
+        <FleetReference fleetId={instance.fleet_id} pendingFleetId={instance.pending_fleet_id} />
       ),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     last_seen: {
       renderCell: (_lastSeen: string, instance: CollectorInstanceView) => (
         <RelativeTime dateTime={instance.last_seen} />
       ),
-      width: 0.2,
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     version: {
       renderCell: (version: string) => <span>{version}</span>,
-      width: 0.1,
+      staticWidth: 120,
     },
   },
 });

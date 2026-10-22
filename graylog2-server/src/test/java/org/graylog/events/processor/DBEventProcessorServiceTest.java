@@ -143,7 +143,28 @@ public class DBEventProcessorServiceTest {
 
         assertThat(counts).isEqualTo(Map.of(
                 "illuminate_event_definitions", 1L,
-                "user_event_definitions", 1L
+                "user_event_definitions", 1L,
+                "user_event_definitions_with_tags", 0L,
+                "user_event_definitions_with_mitre", 0L,
+                "user_event_definitions_unique_tags", 0L,
+                "user_event_definitions_type___test_event_processor_config__", 1L
+        ));
+    }
+
+    @Test
+    @MongoDBFixtures("user-event-definition-counts.json")
+    public void testCountBySourceIncludesUserEventDefinitionUsage() {
+        final Map<String, Long> counts = dbService.countBySource();
+
+        assertThat(counts).isEqualTo(Map.of(
+                "illuminate_event_definitions", 1L,
+                "user_event_definitions", 4L,
+                "user_event_definitions_with_tags", 2L,
+                "user_event_definitions_with_mitre", 1L,
+                "user_event_definitions_unique_tags", 3L,
+                "user_event_definitions_type_filter", 2L,
+                "user_event_definitions_type_aggregation", 1L,
+                "user_event_definitions_type_sigma-v1", 1L
         ));
     }
 }

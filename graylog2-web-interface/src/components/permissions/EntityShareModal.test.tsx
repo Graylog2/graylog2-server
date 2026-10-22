@@ -46,6 +46,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
   default: {
     prepare: jest.fn(() => Promise.resolve()),
+    prepareCreate: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({

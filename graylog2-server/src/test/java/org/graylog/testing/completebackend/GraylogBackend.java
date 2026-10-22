@@ -16,6 +16,8 @@
  */
 package org.graylog.testing.completebackend;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.testcontainers.containers.Network;
 
@@ -33,6 +35,9 @@ public interface GraylogBackend {
     void importMongoDBFixture(String resourcePath, Class<?> testClass);
 
     long countDocumentsInMongoDBCollection(String collection);
+
+    /** Direct collection access, for tests that generate many documents instead of shipping a fixture. */
+    MongoCollection<Document> mongoCollection(String collection);
 
     void dropCollection(String collectionName);
 

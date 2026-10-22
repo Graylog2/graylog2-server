@@ -18,6 +18,10 @@ package org.graylog.collectors.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog.collectors.input.CollectorIngestCodec;
+import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
+import org.graylog.schema.EventFields;
+import org.graylog.schema.ServiceFields;
+import org.graylog.schema.VendorFields;
 import org.graylog2.indexer.ConstantsES7;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
@@ -27,9 +31,6 @@ import java.util.Map;
 
 /**
  * Index mapping for the collector self-logs index set.
- * <p>
- * TODO: Finalize the schema once we can inspect real collector self-log payloads.
- *  The current mapping is preliminary.
  */
 public class CollectorLogsIndexMapping extends AbstractMapping {
     @Override
@@ -73,27 +74,37 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                         .build())
                 .put("source", map().put("type", "keyword").build())
                 .put("streams", map().put("type", "keyword").build())
+                .putAll(gl2ProcessingFields())
                 // Collector identification fields
                 .put(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_AGENT_ID, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_AGENT_FLEET_ID, map().put("type", "keyword").build())
-                .put("gl2_source_collector", map().put("type", "keyword").build())
-                // Severity fields
-                .put("vendor_event_severity", map().put("type", "keyword").build())
-                .put("vendor_event_severity_level", map().put("type", "long").build())
-                // Timestamp fields
-                .put("event_created", map()
-                        .put("type", "date")
-                        .put("format", dateFormat())
-                        .build())
-                .put("event_received_time", map()
-                        .put("type", "date")
-                        .put("format", dateFormat())
-                        .build())
-                // Collector-specific fields from CollectorLogRecordProcessor
-                .put("collector_service_name", map().put("type", "keyword").build())
-                .put("collector_service_version", map().put("type", "keyword").build())
+                // Codec extracted fields
+                .put(VendorFields.VENDOR_EVENT_SEVERITY, map().put("type", "keyword").build())
+                .put(VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, map().put("type", "long").build())
+                .put(EventFields.EVENT_CREATED, map().put("type", "date").build())
+                .put(EventFields.EVENT_RECEIVED_TIME, map().put("type", "date").build())
+                .put(EventFields.EVENT_SEQUENCE, map().put("type", "long").build())
+                // Collector log record attributes
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_CERT_FINGERPRINT, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_COMPONENT_ID, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_COMPONENT_KIND, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_CRASH_COUNT, map().put("type", "long").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_DROPPED_RECORDS, map().put("type", "long").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_ENDPOINT, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_EXIT_CODE, map().put("type", "long").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_PATH, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_REJECTED_RECORDS, map().put("type", "long").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_RETRY_INTERVAL, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_SCOPE, map().put("type", "keyword").build())
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_STATUS, map().put("type", "keyword").build())
+                .put(EventFields.EVENT_COMPONENT, map().put("type", "keyword").build())
+                .put(EventFields.EVENT_ERROR_DESCRIPTION, map().put("type", "keyword").build())
+                .put(ServiceFields.SERVICE_NAME, map().put("type", "keyword").build())
+                .put(ServiceFields.SERVICE_VERSION, map().put("type", "keyword").build())
+                // All unpromoted log record attributes as an unparsed object
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_LOG_ATTRIBUTES, map().put("enabled", false).build())
                 .build();
     }
 

@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.fields.EventFieldNames;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -150,6 +151,7 @@ public abstract class EventDto {
             return new AutoValue_EventDto.Builder()
                     .streams(ImmutableSet.of())
                     .sourceStreams(ImmutableSet.of())
+                    .fields(ImmutableMap.of())
                     .groupByFields(ImmutableMap.of())
                     .aggregationConditions(ImmutableMap.of())
                     .scores(ImmutableMap.of())
@@ -234,6 +236,17 @@ public abstract class EventDto {
         @JsonProperty(FIELD_TACTICS_TECHNIQUES)
         public abstract Builder tacticsTechniques(List<String> tacticsTechniques);
 
-        public abstract EventDto build();
+        abstract Map<String, String> fields();
+
+        abstract Map<String, String> groupByFields();
+
+        abstract EventDto autoBuild();
+
+        public EventDto build() {
+            fields(EventFieldNames.sorted(fields()));
+            groupByFields(EventFieldNames.sorted(groupByFields()));
+
+            return autoBuild();
+        }
     }
 }

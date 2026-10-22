@@ -65,7 +65,8 @@ class SourceServiceTest {
         );
         txnLogService = new FleetTransactionLogService(mongoCollections, sequenceService, NODE_ID);
         sourceService = new SourceService(mongoCollections, txnLogService);
-        fleetService = new FleetService(mongoCollections, txnLogService, sourceService, mock(EnrollmentTokenService.class));
+        fleetService = new FleetService(mongoCollections, txnLogService, sourceService, mock(EnrollmentTokenService.class),
+                mock(CollectorInstanceService.class));
     }
 
     private SourceConfig validFileConfig() {

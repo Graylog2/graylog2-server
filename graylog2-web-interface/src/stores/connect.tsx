@@ -57,6 +57,7 @@ export function useStore(store, propsMapper = id) {
         storeStateRef.current = newState;
       }
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStoreState(store.getInitialState?.());
 
     return unsub;
@@ -133,8 +134,8 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
       super(props);
 
       // Retrieving initial state from each configured store
-      const storeStates = Object.keys(stores)
-        .map((key) => {
+      const storeStates = Object.fromEntries(
+        Object.keys(stores).map((key) => {
           const store = stores[key];
 
           if (store === undefined || !isFunction(store.getInitialState)) {
@@ -149,8 +150,8 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
           const state = store.getInitialState();
 
           return [key, state];
-        })
-        .reduce((prev, [key, state]) => ({ ...prev, [key as string]: state }), {});
+        }),
+      );
 
       this.state = { ...this.state, ...storeStates };
     }

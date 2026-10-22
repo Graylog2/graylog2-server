@@ -48,6 +48,33 @@ class FilelogRecordProcessorTest {
     }
 
     @Test
+    void prefersRecordNumberOverRecordOffsetForEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .addAttributes(intAttribute("log.file.record_number", 42))
+                .addAttributes(intAttribute("log.file.record_offset", 1024))
+                .build();
+
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
+                EventFields.EVENT_SEQUENCE, 42L
+        ));
+    }
+
+    @Test
+    void fallsBackToRecordOffsetForEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .addAttributes(intAttribute("log.file.record_offset", 1024))
+                .build();
+
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
+                EventFields.EVENT_SEQUENCE, 1024L
+        ));
+    }
+
+    @Test
     void returnsEmptyMapWhenNoSupportedAttributesExist() {
         final var logRecord = LogRecord.newBuilder()
                 .addAttributes(stringAttribute("log.file.owner.name", "graylog"))
@@ -60,6 +87,13 @@ class FilelogRecordProcessorTest {
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
         return OTelJournal.Log.newBuilder().setLogRecord(logRecord).build();
+    }
+
+    private static KeyValue intAttribute(String key, long value) {
+        return KeyValue.newBuilder()
+                .setKey(key)
+                .setValue(AnyValue.newBuilder().setIntValue(value).build())
+                .build();
     }
 
     private static KeyValue stringAttribute(String key, String value) {

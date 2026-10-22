@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Default the macOS unified logging collector source to start at the end of the log instead of backfilling 24 hours, matching the other collector sources."
+
+issues = ["27195"]
+pulls = ["27512"]

@@ -175,7 +175,11 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
               <dl>
                 <dt>
                   Keys
-                  <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+                  <HoverForHelp
+                    title="More about Event Keys"
+                    trigger={['click', 'hover']}
+                    placement="right"
+                    width={400}>
                     <EventKeyHelpPopover />
                   </HoverForHelp>
                 </dt>

@@ -25,14 +25,13 @@ import { Link } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import { DataWell } from 'components/lookup-tables/layout-componets';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'logic/streams/types';
 import streamCategoryName from 'logic/streams/streamCategoryName';
-import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import StreamsContext from 'contexts/StreamsContext';
@@ -41,7 +40,7 @@ import AggregationConditionSummary from './AggregationConditionSummary';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
-import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from '../replay-search/EventDefinitionReplaySearchLink';
 
 const StyledDataWell = styled(DataWell)`
   line-height: 1.8;
@@ -91,9 +90,7 @@ const QueryParameters = ({ queryParameters }: { queryParameters: Array<Parameter
 };
 
 type Props = {
-  streams: Array<Stream>;
   config: EventDefinition['config'];
-  currentUser: User;
   definitionId?: string;
 };
 
@@ -135,7 +132,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
     ) : null;
 
   const renderedStreams = streamIds
-    .map((id) => streams.find((s) => s.id === id) || id)
+    .map((id) => streams?.find((s) => s.id === id) ?? id)
     .sort((s1, s2) =>
       naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
     )
@@ -149,8 +146,9 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
   );
 };
 
-const FilterAggregationSummary = ({ config, currentUser, definitionId = undefined }: Props) => {
+const FilterAggregationSummary = ({ config, definitionId = undefined }: Props) => {
   const streams = useContext(StreamsContext);
+  const { isPermitted } = usePermissions();
   const {
     query,
     query_parameters: queryParameters,
@@ -173,7 +171,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-  const effectiveStreamIds = configStreams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
+  const effectiveStreamIds = configStreams?.filter((s) => isPermitted(`streams:read:${s}`));
   const streamIdsWithMissingPermission = configStreams?.filter((s) => !effectiveStreamIds.includes(s));
 
   const validationResults = validateExpression(conditions?.expression as Expression | null, series);
@@ -266,7 +264,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch id={definitionId} />
+        <EventDefinitionReplaySearchLink eventDefinitionId={definitionId} />
       </dd>
     </dl>
   );

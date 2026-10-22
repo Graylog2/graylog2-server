@@ -76,6 +76,7 @@ type Props = {
   testId?: string;
   trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'];
   type?: 'info' | 'error';
+  width?: number;
 };
 
 const HoverForHelp = ({
@@ -91,6 +92,7 @@ const HoverForHelp = ({
   type = 'info',
   iconSize = undefined,
   trigger = ['hover', 'focus'],
+  width = undefined,
 }: Props) => (
   <OverlayTrigger
     trigger={trigger}
@@ -98,7 +100,8 @@ const HoverForHelp = ({
     overlay={<StyledPopover id={id}>{children}</StyledPopover>}
     triggerTitle={triggerTitle}
     title={title}
-    testId={testId}>
+    testId={testId}
+    width={width}>
     <StyledIcon
       className={`${className} ${pullRight ? 'pull-right' : ''}`}
       name={iconName(type)}

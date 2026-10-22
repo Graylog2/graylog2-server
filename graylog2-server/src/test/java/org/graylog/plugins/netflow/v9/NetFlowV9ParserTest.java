@@ -26,14 +26,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -191,6 +194,35 @@ public class NetFlowV9ParserTest {
 
         assertThatExceptionOfType(CorruptFlowPacketException.class)
                 .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), typeRegistry));
+    }
+
+    @Test
+    public void parsePacket_skipFieldIsNotIncludedInRecord() throws Exception {
+        // Build a registry where field 235 (0x00EB) is marked :skip
+        final String yaml = "---\n235:\n- :skip\n1:\n- 4\n- :in_bytes\n";
+        final NetFlowV9FieldTypeRegistry skipRegistry = NetFlowV9FieldTypeRegistry.create(
+                new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8)));
+
+        // Template FlowSet: two fields — field 235 (skip, 4 bytes) and field 1 (in_bytes, 4 bytes)
+        // Data FlowSet: one record — 4 bytes for the skip field and 4 bytes for in_bytes
+        final byte[] packet = hexToBytes(HEADER_TWO_FLOWSETS
+                // Template FlowSet: flowSetId=0, length=16 (4 header + 4 tmpl header + 2*4 fields)
+                + "0000" + "0010"
+                + "0100" + "0002"   // templateId=256, fieldCount=2
+                + "00EB" + "0004"   // field 235 (skip), length 4
+                + "0001" + "0004"   // field 1 (in_bytes), length 4
+                // Data FlowSet: flowSetId=256, length=12 (4 header + 8 data)
+                + "0100" + "000C"
+                + "DEADBEEF"        // 4 bytes consumed by skip field
+                + "000000FF");      // in_bytes = 255
+
+        final NetFlowV9Packet result = NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(packet), skipRegistry);
+
+        assertThat(result.records()).hasSize(1);
+        final Map<String, Object> fields = result.records().getFirst().fields();
+        assertThat(fields).doesNotContainKey("skip_235");
+        assertThat(fields).doesNotContainKey("field_235");
+        assertThat(fields).containsEntry("in_bytes", 255L);
     }
 
     private static byte[] hexToBytes(String hex) {

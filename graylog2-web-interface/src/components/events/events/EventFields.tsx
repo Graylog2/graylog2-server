@@ -16,21 +16,25 @@
  */
 import React from 'react';
 
+import { DefinitionList } from 'components/common';
+import { defaultCompare } from 'logic/DefaultCompare';
+
 type Props = {
   fields: Record<string, string>;
 };
 
 const EventFields = ({ fields }: Props) => {
-  const fieldNames = Object.keys(fields);
+  const fieldNames = Object.keys(fields).sort(defaultCompare);
 
   return (
-    <>
+    <DefinitionList>
       {fieldNames.map((fieldName) => (
-        <div key={fieldName}>
-          <b>{fieldName}</b> {fields[fieldName]}
-        </div>
+        <React.Fragment key={fieldName}>
+          <dt>{fieldName}</dt>
+          <dd>{fields[fieldName]}</dd>
+        </React.Fragment>
       ))}
-    </>
+    </DefinitionList>
   );
 };
 

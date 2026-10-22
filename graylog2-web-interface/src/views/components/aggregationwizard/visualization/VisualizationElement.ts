@@ -76,12 +76,13 @@ const hasErrors = (errors: {}) => Object.values(errors).filter((value) => value 
 const validateConfig = (visualizationType: VisualizationType<any>, config: VisualizationConfigFormValues) => {
   const { fields = [] } = visualizationType.config;
 
-  return fields
-    .filter((field) => 'required' in field && field.required)
-    .filter((field) => !field.isShown || field.isShown(config))
-    .filter(({ name }) => config[name] === undefined || config[name] === '')
-    .map(({ name, title }) => ({ [name]: `${title} is required.` }))
-    .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+  return Object.fromEntries(
+    fields
+      .filter((field) => 'required' in field && field.required)
+      .filter((field) => !field.isShown || field.isShown(config))
+      .filter(({ name }) => config[name] === undefined || config[name] === '')
+      .map(({ name, title }) => [name, `${title} is required.`]),
+  );
 };
 
 const validate = (formValues: WidgetConfigFormValues) => {
