@@ -120,7 +120,7 @@ const renderPage = (section = storageSection, children?: React.ReactNode) => {
   return { router, queryClient };
 };
 
-const getSaveButton = () => screen.getByRole('button', { name: 'Save changes' });
+const getApplyButton = () => screen.getByRole('button', { name: /apply changes/i });
 
 describe('DataNodeConfigurationPage', () => {
   beforeEach(() => {
@@ -164,7 +164,7 @@ describe('DataNodeConfigurationPage', () => {
     expect(screen.queryByLabelText(/^OpenSearch JVM heap \(/)).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Node Settings' })).not.toBeInTheDocument();
     expect(screen.queryByText('Restart required')).not.toBeInTheDocument();
-    expect(getSaveButton()).toBeDisabled();
+    expect(getApplyButton()).toBeDisabled();
   });
 
   it('adds section navigation when the backend supplies another category', async () => {
@@ -177,6 +177,7 @@ describe('DataNodeConfigurationPage', () => {
           label: 'Additional setting',
           category: 'Additional Settings',
           scope: 'cluster',
+          requires_restart: true,
         }),
       ],
     });
@@ -184,11 +185,22 @@ describe('DataNodeConfigurationPage', () => {
     await screen.findByRole('navigation', { name: 'Data Node configuration sections' });
     expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
     await changeSetting('Shard limit per Data Node', '1200');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(getApplyButton()).toHaveAccessibleName('Apply changes');
     await userEvent.click(screen.getByRole('link', { name: 'Additional Settings' }));
-    await screen.findByLabelText('Additional setting');
-    expect(getSaveButton()).toBeEnabled();
+    await userEvent.type(await screen.findByLabelText('Additional setting'), 'enabled');
+    expect(getApplyButton()).toBeEnabled();
     await userEvent.click(screen.getByRole('link', { name: 'Storage and Capacity' }));
     expect(await screen.findByLabelText('Shard limit per Data Node')).toHaveValue(1200);
+    const restartWarning = screen.getByRole('alert', { name: 'Restart required after saving' });
+    expect(restartWarning).toHaveTextContent(
+      'Changes to the following settings require restarting the Data Nodes to take effect:',
+    );
+    expect(restartWarning).not.toHaveTextContent('Shard limit per Data Node');
+    await userEvent.click(screen.getByRole('link', { name: 'Additional setting' }));
+    expect(await screen.findByRole('textbox', { name: 'Additional setting' })).toHaveFocus();
+    expect(getApplyButton()).toBeEnabled();
+    expect(getApplyButton()).toHaveAccessibleName('Apply changes and restart Data Nodes');
   });
 
   it('redirects unknown sections to the not-found page', async () => {
@@ -230,7 +242,7 @@ describe('DataNodeConfigurationPage', () => {
     await userEvent.clear(input);
     await userEvent.type(input, '88%');
     expect(input).toHaveValue(88);
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '88%' }, null));
   });
 
@@ -256,7 +268,7 @@ describe('DataNodeConfigurationPage', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(85);
-      expect(getSaveButton()).toBeDisabled();
+      expect(getApplyButton()).toBeDisabled();
     },
   );
 
@@ -272,8 +284,8 @@ describe('DataNodeConfigurationPage', () => {
     expect(input).toHaveAttribute('min', '0');
     expect(input).toHaveAttribute('max', '1');
     await userEvent.type(input, '0.85');
-    await userEvent.click(getSaveButton());
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await userEvent.click(getApplyButton());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
     expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '0.85' }, null);
     expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' })).toHaveValue(0.85);
   });
@@ -294,10 +306,10 @@ describe('DataNodeConfigurationPage', () => {
     await userEvent.clear(input);
     expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent('Ratio (0–1)');
     await userEvent.type(input, '0.85');
-    expect(getSaveButton()).toBeDisabled();
+    expect(getApplyButton()).toBeDisabled();
 
     await changeSetting('Shard limit per Data Node', '1200');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
     expect(await savedValueOf(lowWatermarkName)).toBe('0.85');
@@ -308,10 +320,10 @@ describe('DataNodeConfigurationPage', () => {
     renderPage();
 
     await changeSetting('Stop allocating shards at', '80%');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '80%' }, null));
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
 
     const saved = await managedConfigurationApi.get();
     expect(saved.node_type).toBe('datanode');
@@ -335,7 +347,7 @@ describe('DataNodeConfigurationPage', () => {
     expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(80);
 
     const update = jest.spyOn(managedConfigurationApi, 'update');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '80%' }, null));
   });
@@ -347,7 +359,7 @@ describe('DataNodeConfigurationPage', () => {
     await userEvent.clear(input);
     await userEvent.type(input, '.5');
     expect(input).toHaveValue(0.5);
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '0.5%' }, null));
   });
 
@@ -356,17 +368,17 @@ describe('DataNodeConfigurationPage', () => {
     renderPage();
 
     await changeSetting('Shard limit per Data Node', '1200');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
 
     await changeSetting('Shard limit per Data Node', '1300');
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
-    expect(getSaveButton()).toBeDisabled();
+    expect(getApplyButton()).toBeDisabled();
   });
 
   it('saves several changed settings in one patch', async () => {
@@ -375,12 +387,12 @@ describe('DataNodeConfigurationPage', () => {
 
     await changeSetting('Stop allocating shards at', '80%');
     await changeSetting('Shard limit per Data Node', '1200');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() =>
       expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '80%', [shardLimitName]: '1200' }, null),
     );
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
   });
 
   it('cancels all draft changes without saving', async () => {
@@ -393,7 +405,7 @@ describe('DataNodeConfigurationPage', () => {
 
     expect(screen.getByLabelText(/^Stop allocating shards at \(/)).toHaveValue(85);
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1000);
-    expect(getSaveButton()).toBeDisabled();
+    expect(getApplyButton()).toBeDisabled();
     expect(update).not.toHaveBeenCalled();
   });
 
@@ -403,7 +415,7 @@ describe('DataNodeConfigurationPage', () => {
     renderPage();
 
     await changeSetting('Shard limit per Data Node', '0');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await screen.findByText(error);
     const invalidInput = screen.getByRole('spinbutton', { name: 'Shard limit per Data Node' });
@@ -413,7 +425,7 @@ describe('DataNodeConfigurationPage', () => {
 
     await changeSetting('Shard limit per Data Node', '1200');
     await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
   });
@@ -425,14 +437,14 @@ describe('DataNodeConfigurationPage', () => {
 
     const input = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
     await userEvent.clear(input);
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await screen.findByText(error);
     expect(update).not.toHaveBeenCalled();
 
     await userEvent.type(input, '80');
     await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '80%' }, null));
   });
@@ -469,14 +481,14 @@ describe('DataNodeConfigurationPage', () => {
       await changeSetting('Stop allocating shards at', low);
       await changeSetting('Move shards away at', high);
       await changeSetting('Protect indexes at', flood);
-      await userEvent.click(getSaveButton());
+      await userEvent.click(getApplyButton());
 
       await screen.findByText(error);
       expect(update).not.toHaveBeenCalled();
 
       await changeSetting('Stop allocating shards at', correctedLow);
       await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
-      await userEvent.click(getSaveButton());
+      await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(update).toHaveBeenCalledWith(expectedPatch, null));
     },
@@ -487,7 +499,7 @@ describe('DataNodeConfigurationPage', () => {
     renderPage();
 
     await changeSetting('Stop allocating shards at', '20gb');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     const error = 'Use disk usage units for all three watermarks, or use free-space units for all three.';
     await screen.findByText(error);
@@ -496,7 +508,7 @@ describe('DataNodeConfigurationPage', () => {
     await changeSetting('Move shards away at', '10gb');
     await changeSetting('Protect indexes at', '5gb');
     await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await waitFor(() =>
       expect(update).toHaveBeenCalledWith(
@@ -517,17 +529,17 @@ describe('DataNodeConfigurationPage', () => {
     renderPage();
 
     await changeSetting('Shard limit per Data Node', '1200');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
     await screen.findByText(/Your changes have been kept/);
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
-    expect(getSaveButton()).toBeEnabled();
+    expect(getApplyButton()).toBeEnabled();
     expect(await savedValueOf(shardLimitName)).toBe('1000');
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1000);
-    expect(getSaveButton()).toBeDisabled();
+    expect(getApplyButton()).toBeDisabled();
     expect(update).toHaveBeenCalledTimes(1);
   });
 
@@ -565,7 +577,7 @@ describe('DataNodeConfigurationPage', () => {
     expect(input).toBeDisabled();
     expect(input).toHaveValue(85);
     expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toBeDisabled();
-    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /apply changes/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
   });
 
@@ -576,7 +588,9 @@ describe('DataNodeConfigurationPage', () => {
 
     expect(await screen.findByLabelText('Shard limit per Data Node')).toHaveValue(null);
     expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(null);
-    expect(getSaveButton()).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^Remove stored value/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Falls back to/)).not.toBeInTheDocument();
+    expect(getApplyButton()).toBeDisabled();
     expect(transport).toHaveBeenCalledWith(
       'GET',
       '/system/managed_configuration',
@@ -587,9 +601,9 @@ describe('DataNodeConfigurationPage', () => {
     );
 
     await changeSetting('Shard limit per Data Node', '1200');
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
     expect(transport).toHaveBeenCalledWith(
       'PUT',
       '/system/managed_configuration',
@@ -608,9 +622,9 @@ describe('DataNodeConfigurationPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Remove stored value for Shard limit per Data Node' }));
     expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(null);
 
-    await userEvent.click(getSaveButton());
+    await userEvent.click(getApplyButton());
 
-    await waitFor(() => expect(getSaveButton()).toBeDisabled());
+    await waitFor(() => expect(getApplyButton()).toBeDisabled());
     expect(transport).toHaveBeenLastCalledWith(
       'PUT',
       '/system/managed_configuration',

@@ -18,9 +18,8 @@ import React from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { Badge, Button, Input } from 'components/bootstrap';
-import { Icon, Select, Tooltip } from 'components/common';
-import VisuallyHidden from 'components/common/VisuallyHidden';
+import { Button, Input } from 'components/bootstrap';
+import { Select } from 'components/common';
 
 import type { ConfigurationFormValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
@@ -31,30 +30,22 @@ const FieldDetail = styled.span`
   margin-top: ${({ theme }) => theme.spacings.xs};
 `;
 
-const FieldLabel = styled.span`
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacings.xs};
-`;
-
 const sourceDescriptions: Record<ConfigurationSource, string> = {
-  default: 'the built-in default',
-  config_file: 'the configuration file',
-  environment: 'an environment variable',
-  system_property: 'a system property',
-  database: 'a stored value',
-  unknown: 'an unknown source',
+  default: 'Built-in default',
+  config_file: 'Configuration file',
+  environment: 'Environment variable',
+  system_property: 'System property',
+  database: 'Saved value',
+  unknown: 'Unknown',
 };
 
 type Props = {
   parameter: ConfigurationParameter;
   canEdit: boolean;
   canDelete: boolean;
-  restartDescription: string;
 };
 
-const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescription }: Props) => {
+const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   const { values, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
     useFormikContext<ConfigurationFormValues>();
   const { name, label, description, type, units, constraints } = parameter;
@@ -67,10 +58,9 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescrip
   const isQuantity = hasUnits && (type === 'size' || type === 'duration');
   const unitLabel = isQuantity ? getQuantityUnitLabel(rawValue, units) : undefined;
   const labelId = `${name}-label`;
-  const restartId = `${name}-restart`;
   const helpId = `${name}-help`;
   const errorId = `${name}-error`;
-  const describedBy = [helpId, parameter.requires_restart && restartId, error && errorId].filter(Boolean).join(' ');
+  const describedBy = [helpId, error && errorId].filter(Boolean).join(' ');
   const onBlur = () => setTouched({ ...touched, [name]: true });
   // Parameter names contain dots; keep literal keys instead of Formik object paths.
   const setValue = (nextValue: string) =>
@@ -83,12 +73,6 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescrip
 
       return nextValues;
     }, submitCount > 0);
-
-  const isPendingRestart =
-    parameter.set_value !== null &&
-    parameter.node_value !== null &&
-    parameter.set_value !== parameter.node_value &&
-    parameter.requires_restart;
 
   const getControlProps = () => {
     if (isQuantity || selectableValues.length > 0) return { type: undefined, value: undefined };
@@ -153,22 +137,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescrip
     <Input
       id={name}
       name={name}
-      label={
-        <FieldLabel>
-          <span id={labelId}>{unitLabel ? `${label} (${unitLabel})` : label}</span>
-          {parameter.requires_restart && (
-            <Tooltip label={restartDescription} withArrow>
-              <span role="note" aria-label={restartDescription}>
-                <Badge color="warning" variant="light" size="sm">
-                  <Icon name="restart_alt" size="sm" />
-                  Restart required
-                </Badge>
-                <VisuallyHidden id={restartId}>{restartDescription}</VisuallyHidden>
-              </span>
-            </Tooltip>
-          )}
-        </FieldLabel>
-      }
+      label={<span id={labelId}>{unitLabel ? `${label} (${unitLabel})` : label}</span>}
       aria-labelledby={labelId}
       aria-describedby={describedBy}
       aria-invalid={!!error}
@@ -190,20 +159,8 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescrip
           <FieldDetail>
             <code>{name}</code>
           </FieldDetail>
-          {parameter.source && (
-            <FieldDetail>
-              {parameter.set_value === null
-                ? `Currently taken from ${sourceDescriptions[parameter.source]}.`
-                : `Stored value${parameter.set_by ? `, set by ${parameter.set_by}` : ''}.`}
-            </FieldDetail>
-          )}
-          {isPendingRestart && (
-            <FieldDetail>
-              This Data Node still runs <code>{parameter.node_value}</code> and picks the stored value up when it
-              restarts.
-            </FieldDetail>
-          )}
-          {parameter.set_value !== null && (
+          {parameter.source && <FieldDetail>Source: {sourceDescriptions[parameter.source]}</FieldDetail>}
+          {parameter.set_value != null && (
             <FieldDetail>
               <Button
                 bsSize="xsmall"
@@ -212,7 +169,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, restartDescrip
                 onClick={removeStoredValue}>
                 Remove stored value
               </Button>
-              {parameter.node_value !== null && (
+              {parameter.node_value != null && (
                 <>
                   {' '}
                   Falls back to <code>{parameter.node_value}</code>.

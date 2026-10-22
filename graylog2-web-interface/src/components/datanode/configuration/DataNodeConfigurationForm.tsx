@@ -17,9 +17,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Form, FormikProvider, useFormik } from 'formik';
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { Alert, Col, NavItem, Row } from 'components/bootstrap';
-import { ConfirmLeaveDialog, FormSubmit, LinkContainer } from 'components/common';
+import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import usePermissions from 'hooks/usePermissions';
@@ -32,10 +33,20 @@ import type { ConfigurationCategory, ConfigurationFormValues } from './types';
 import {
   buildConfigurationFormValues,
   buildConfigurationValuesPatch,
+  categoryId,
   validateConfigurationFormValues,
 } from './configurationFields';
 import { useUpdateManagedConfiguration } from './useManagedConfiguration';
 import DataNodeConfiguration from './DataNodeConfiguration';
+
+const RestartSettingsList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacings.xs};
+  margin-top: ${({ theme }) => theme.spacings.sm};
+  padding-left: ${({ theme }) => theme.spacings.lg};
+  list-style-type: disc;
+`;
 
 type SectionLinkProps = { category: ConfigurationCategory; basePath: string };
 
@@ -64,14 +75,10 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
   const { isPermitted } = usePermissions();
   const { updateConfiguration } = useUpdateManagedConfiguration(nodeId);
   const { push } = useHistory();
-  const { pathname } = useLocation();
+  const { pathname, hash, key: locationKey } = useLocation();
   const focusedSubmit = useRef(0);
   const parameters = categories.flatMap((category) => category.parameters);
   const initialValues = buildConfigurationFormValues(parameters);
-  const restartDescription =
-    nodeId === null
-      ? 'Changing this setting requires restarting the Data Nodes for the change to take effect.'
-      : 'Changing this setting requires restarting this Data Node for the change to take effect.';
   const canDelete = isPermitted('clusterconfigentry:delete');
   const canEdit = isPermitted(['clusterconfigentry:create', 'clusterconfigentry:edit']);
   const showNavigation = categories.length > 1;
@@ -97,6 +104,14 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
     },
   });
   const { dirty, errors, isSubmitting, isValidating, resetForm, status, submitCount } = formik;
+  const changedValues = buildConfigurationValuesPatch(formik.initialValues, formik.values);
+  const restartParameters = parameters.filter(
+    ({ name, requires_restart }) => requires_restart && Object.hasOwn(changedValues, name),
+  );
+
+  useEffect(() => {
+    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.focus();
+  }, [hash, locationKey, pathname]);
 
   useEffect(() => {
     if (submitCount === 0) focusedSubmit.current = 0;
@@ -147,22 +162,31 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                     <Route
                       key={category.id}
                       path={category.id}
-                      element={
-                        <DataNodeConfiguration
-                          category={category}
-                          canEdit={canEdit}
-                          canDelete={canDelete}
-                          restartDescription={restartDescription}
-                        />
-                      }
+                      element={<DataNodeConfiguration category={category} canEdit={canEdit} canDelete={canDelete} />}
                     />
                   ))}
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
                 </Routes>
-                <p>Saving stores the values. Applying them to running Data Nodes is not available yet.</p>
+                {canEdit && restartParameters.length > 0 && (
+                  <Alert bsStyle="warning" title="Restart required after saving">
+                    Changes to the following settings require restarting{' '}
+                    {nodeId === null ? 'the Data Nodes' : 'this Data Node'} to take effect:
+                    <RestartSettingsList>
+                      {restartParameters.map(({ name, label, category }) => (
+                        <li key={name}>
+                          <Link to={`${basePath}/${categoryId(category)}#${encodeURIComponent(name)}`}>{label}</Link>
+                        </li>
+                      ))}
+                    </RestartSettingsList>
+                  </Alert>
+                )}
                 {canEdit && (
                   <FormSubmit
-                    submitButtonText="Save changes"
+                    submitButtonText={
+                      restartParameters.length > 0
+                        ? `Apply changes and restart ${nodeId === null ? 'Data Nodes' : 'Data Node'}`
+                        : 'Apply changes'
+                    }
                     isAsyncSubmit
                     isSubmitting={isSubmitting}
                     submitLoadingText="Saving changes..."

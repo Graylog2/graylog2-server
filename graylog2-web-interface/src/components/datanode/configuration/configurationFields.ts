@@ -28,9 +28,7 @@ export const categoryId = (category: string) =>
     .replace(/^-|-$/g, '');
 
 /** Groups the parameters of a response into the sections the page shows, keeping the order the API returned. */
-export const getConfigurationCategories = (
-  parameters: Array<ConfigurationParameter>,
-): Array<ConfigurationCategory> => {
+export const getConfigurationCategories = (parameters: Array<ConfigurationParameter>): Array<ConfigurationCategory> => {
   const categories: Array<ConfigurationCategory> = [];
 
   parameters.forEach((parameter) => {
@@ -46,7 +44,7 @@ export const getConfigurationCategories = (
   return categories;
 };
 
-/** The form starts from the value which applies, so the user edits what the node actually uses. */
+/** The form starts from the effective configuration values returned by the API. */
 export const buildConfigurationFormValues = (parameters: Array<ConfigurationParameter>): ConfigurationFormValues =>
   Object.fromEntries(
     parameters.filter(({ value }) => value !== null && value !== undefined).map(({ name, value }) => [name, value]),
