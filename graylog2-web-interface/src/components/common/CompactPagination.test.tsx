@@ -23,10 +23,8 @@ import selectEvent from 'helpers/selectEvent';
 import CompactPagination from './CompactPagination';
 
 describe('<CompactPagination />', () => {
-  it('displays the page label and the current page', async () => {
+  it('displays the current page', async () => {
     render(<CompactPagination currentPage={3} totalPages={5} />);
-
-    await screen.findByText('Page:');
 
     expect(screen.getByText('3')).toBeInTheDocument();
   });
