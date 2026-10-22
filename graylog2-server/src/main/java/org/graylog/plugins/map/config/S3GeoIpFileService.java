@@ -155,7 +155,9 @@ public class S3GeoIpFileService extends GeoIpFileService {
     private S3Client getS3Client() {
         if (s3Client == null) {
             try {
-                s3Client = S3Client.create();
+                s3Client = S3Client.builder()
+                        .crossRegionAccessEnabled(true)
+                        .build();
             } catch (Exception e) {
                 LOG.warn(NULL_S3_CLIENT_MESSAGE);
                 LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
