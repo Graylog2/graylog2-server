@@ -1,0 +1,8 @@
+{
+  "title": "Data Nodes",
+  "node_name": "Name",
+  "node_status": "Status",
+  "node_ip": "IP-Adresse",
+  "node_details": "Details",
+  "error_loading_nodes": "Fehler beim Laden der Data Nodes."
+}
