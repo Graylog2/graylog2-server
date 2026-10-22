@@ -25,6 +25,7 @@ import SettingsSection from './SettingsSection';
 
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
+  prepareEntityCreateShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() =>
     Promise.resolve({
