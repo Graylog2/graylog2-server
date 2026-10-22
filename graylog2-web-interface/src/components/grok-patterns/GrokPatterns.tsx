@@ -275,4 +275,4 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withPaginationQueryParameter(withTranslation('grokpatterns')(GrokPatterns), 'grokpatterns'), 'grokpatterns');
+export default withTelemetry(withTranslation('grokpatterns')(withPaginationQueryParameter(GrokPatterns)), 'grokpatterns');

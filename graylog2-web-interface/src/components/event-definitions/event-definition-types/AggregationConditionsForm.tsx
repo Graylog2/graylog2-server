@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -56,7 +56,7 @@ type AggregationConditionsFormProps = {
   formattedFields: FieldTypeMapping[];
   aggregationFunctions: any[];
   onChange: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class AggregationConditionsForm extends React.Component<
   AggregationConditionsFormProps,
@@ -146,4 +146,4 @@ class AggregationConditionsForm extends React.Component<
   }
 }
 
-export default withTranslation(AggregationConditionsForm, 'event_definitions');
+export default withTranslation('event_definitions')(AggregationConditionsForm);
