@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchem
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.IdDecorator;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.TitleDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.Message;
@@ -107,6 +108,21 @@ class MessagesTabularResponseCreatorTest {
         assertThat(columnNames(response)).containsExactly("streams", "streams#id");
     }
 
+    @Test
+    void addsUnresolvedIdsNextToFieldsRequestedWithTitles() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of("streams#title"), true), searchJob(), searchUser);
+
+        assertThat(columnNames(response)).containsExactly("streams#title", "streams#id");
+        assertThat(response.datarows()).containsExactly(List.of("Title of stream-1", List.of(STREAM_ID)));
+    }
+
+    @Test
+    void addsUnresolvedIdsOnlyOnceForRepeatedFields() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(spec(List.of("streams", "streams"), true), searchJob(), searchUser);
+
+        assertThat(columnNames(response)).containsExactly("streams", "streams#id", "streams");
+    }
+
     private static MessagesRequestSpec spec(List<String> fields, boolean includeUnresolvedIds) {
         return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields, includeUnresolvedIds);
     }
@@ -143,7 +159,7 @@ class MessagesTabularResponseCreatorTest {
     private static class StreamTitleDecorator implements FieldDecorator {
         @Override
         public boolean accept(RequestedField field) {
-            return Message.FIELD_STREAMS.equals(field.name()) && !field.hasDecorator();
+            return Message.FIELD_STREAMS.equals(field.name()) && (!field.hasDecorator() || field.hasDecorator(TitleDecorator.DECORATOR));
         }
 
         @Override

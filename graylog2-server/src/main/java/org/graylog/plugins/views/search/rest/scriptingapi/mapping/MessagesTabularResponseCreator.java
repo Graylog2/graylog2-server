@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchem
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.CachingDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.IdDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -37,16 +38,16 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesTabularResponseCreator.class);
-    private static final String ID_DECORATOR = "id";
 
     private final MappedFieldTypesService mappedFieldTypesService;
     private final Set<FieldDecorator> decorators;
@@ -102,18 +103,21 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         if (!searchRequestSpec.includeUnresolvedIds()) {
             return fields;
         }
-        return fields.stream()
-                .flatMap(field -> unresolvedId(field)
-                        .filter(unresolvedId -> !fields.contains(unresolvedId))
-                        .map(unresolvedId -> Stream.of(field, unresolvedId))
-                        .orElseGet(() -> Stream.of(field)))
-                .toList();
+        final List<RequestedField> fieldsWithUnresolvedIds = new ArrayList<>();
+        final Set<RequestedField> addedUnresolvedIds = new HashSet<>();
+        for (RequestedField field : fields) {
+            fieldsWithUnresolvedIds.add(field);
+            unresolvedId(field)
+                    .filter(unresolvedId -> !fields.contains(unresolvedId) && addedUnresolvedIds.add(unresolvedId))
+                    .ifPresent(fieldsWithUnresolvedIds::add);
+        }
+        return fieldsWithUnresolvedIds;
     }
 
     // Ids are resolved to titles by default, the unresolved ids are available through the id decorator.
     private Optional<RequestedField> unresolvedId(RequestedField field) {
-        final RequestedField unresolvedId = new RequestedField(field.name(), ID_DECORATOR);
-        return !field.hasDecorator() && isDecorated(field) && isDecorated(unresolvedId)
+        final RequestedField unresolvedId = new RequestedField(field.name(), IdDecorator.DECORATOR);
+        return !field.hasDecorator(IdDecorator.DECORATOR) && isDecorated(field) && isDecorated(unresolvedId)
                 ? Optional.of(unresolvedId)
                 : Optional.empty();
     }
