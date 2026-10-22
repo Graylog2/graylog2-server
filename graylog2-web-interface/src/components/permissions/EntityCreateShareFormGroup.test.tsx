@@ -32,6 +32,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
   default: {
     prepare: jest.fn(() => Promise.resolve()),
+    prepareCreate: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
@@ -91,7 +92,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         prepare_request: null,
       });
     });
@@ -105,7 +106,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         selected_grantee_capabilities,
         prepare_request: null,
       });
@@ -121,11 +122,33 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} dependenciesGRN={dependenciesGRN} />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         selected_grantee_capabilities,
         prepare_request: dependenciesGRN,
       });
     });
+  });
+
+  it('prepares shares of an existing entity without dependencies', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+
+    render(
+      <SUT
+        entityId="stream-id"
+        defaultSharePayload={{ selected_grantee_capabilities }}
+        dependenciesGRN={['grn::::stream:stream-id']}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', 'grn::::stream:stream-id', {
+        selected_grantee_capabilities,
+      });
+    });
+
+    expect(EntityShareDomain.prepareCreate).not.toHaveBeenCalled();
   });
 
   it('updates entity share state on submit', async () => {
@@ -146,7 +169,7 @@ describe('EntityCreateShareFormGroup', () => {
     await setupUser().click(addCollaborator);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith('stream', '', null, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith('stream', '', {
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),

@@ -17,32 +17,34 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.rest.models.tools.requests.ContainsStringTestRequest;
-import org.graylog2.rest.models.tools.responses.ContainsStringTesterResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.rest.models.tools.requests.ContainsStringTestRequest;
+import org.graylog2.rest.models.tools.responses.ContainsStringTesterResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RequiresAuthentication
+@Tag(name = "Tools/ContainsStringTester", description = "Test the contains string converter")
 @Path("/tools/contains_string_tester")
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
 public class ContainsStringTesterResource extends RestResource {
 
     @GET
+    @Operation(summary = "Test whether a string contains a search string")
     @Timed
     public ContainsStringTesterResponse containsStringTest(@QueryParam("string") @NotEmpty String string,
                                                            @QueryParam("search_string") @NotEmpty String searchString) {
@@ -51,6 +53,7 @@ public class ContainsStringTesterResource extends RestResource {
 
 
     @POST
+    @Operation(summary = "Test whether a string contains a search string")
     @Timed
     @NoAuditEvent("only used to test if field contains a string")
     public ContainsStringTesterResponse testContainsString(@Valid @NotNull ContainsStringTestRequest request) {

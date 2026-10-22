@@ -74,6 +74,31 @@ class OpensearchVersionSelectorImplTest {
     }
 
     /**
+     * A dedicated cluster manager of an existing cluster holds no indices, only its node state. Taking the newest
+     * distribution there upgrades the cluster manager ahead of the data nodes, which then can't join the cluster
+     * anymore. See https://github.com/Graylog2/graylog2-server/issues/27820
+     */
+    @Test
+    void testClusterManagerWithoutIndicesStaysOnTheOldestDistribution(@TempDir Path dataDir) throws Exception {
+        final Path stateDir = Files.createDirectories(dataDir.resolve("nodes/0/_state"));
+        Files.copy(fixture("opensearch2").resolve("nodes/0/_state/node-1.st"), stateDir.resolve("node-1.st"));
+
+        Assertions.assertThat(select(dataDir, null, false).version()).isEqualTo(COMPAT);
+    }
+
+    /**
+     * Same for a data node that has its indices directory but no shard assigned to it yet.
+     */
+    @Test
+    void testNodeWithEmptyIndicesDirectoryStaysOnTheOldestDistribution(@TempDir Path dataDir) throws Exception {
+        final Path stateDir = Files.createDirectories(dataDir.resolve("nodes/0/_state"));
+        Files.createDirectories(dataDir.resolve("nodes/0/indices"));
+        Files.copy(fixture("opensearch2").resolve("nodes/0/_state/node-1.st"), stateDir.resolve("node-1.st"));
+
+        Assertions.assertThat(select(dataDir, null, false).version()).isEqualTo(COMPAT);
+    }
+
+    /**
      * The recorded version wins even though a newer distribution is available.
      */
     @Test
