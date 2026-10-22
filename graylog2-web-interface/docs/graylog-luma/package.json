@@ -16,7 +16,7 @@
     "@storybook/react-webpack5": "^10.6.1",
     "eslint-plugin-storybook": "^10.6.1",
     "mermaid": "^12.2.0",
-    "storybook": "^10.6.1",
+    "storybook": "^10.6.2",
     "storybook-dark-mode": "^5.0.0",
     "typescript": "^5.8.2"
   },
