@@ -34,6 +34,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
+import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ public class SlackEventNotification implements EventNotification {
     private final SlackClient slackClient;
     private final TemplateModelProvider templateModelProvider;
     private final EventProcedureProvider eventProcedureProvider;
+    private final UrlAllowlistValidator urlAllowlistValidator;
 
     @Inject
     public SlackEventNotification(EventNotificationService notificationCallbackService,
@@ -64,7 +66,8 @@ public class SlackEventNotification implements EventNotification {
                                   NotificationService notificationService,
                                   NodeId nodeId, SlackClient slackClient,
                                   TemplateModelProvider templateModelProvider,
-                                  EventProcedureProvider eventProcedureProvider) {
+                                  EventProcedureProvider eventProcedureProvider,
+                                  UrlAllowlistValidator urlAllowlistValidator) {
         this.notificationCallbackService = notificationCallbackService;
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
@@ -72,6 +75,7 @@ public class SlackEventNotification implements EventNotification {
         this.slackClient = requireNonNull(slackClient);
         this.templateModelProvider = templateModelProvider;
         this.eventProcedureProvider = eventProcedureProvider;
+        this.urlAllowlistValidator = requireNonNull(urlAllowlistValidator);
     }
 
     /**
@@ -84,6 +88,7 @@ public class SlackEventNotification implements EventNotification {
         LOG.debug("SlackEventNotification backlog size in method execute is [{}]", config.backlogSize());
 
         try {
+            urlAllowlistValidator.validateUrl(config.webhookUrl(), ctx);
             SlackMessage slackMessage = createSlackMessage(ctx, config);
             slackClient.send(slackMessage, config.webhookUrl());
         } catch (JsonProcessingException ex) {
