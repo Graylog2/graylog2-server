@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix error when saving an existing search under a new title, which prevented the share settings from being displayed in the save dialog."
+
+issues = ["27482"]
+pulls = ["27880"]
