@@ -57,7 +57,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private ContainerizedGraylogBackend(final ContainerizedGraylogBackendConfig config) {
         // We don't want services for tests with custom flags or config params to be re-used, so we stop them
         // when the backend is closed.
-        this.stopServicesOnClose = !config.enabledFeatureFlags().isEmpty() || !config.env().isEmpty();
+        this.stopServicesOnClose = !config.enabledFeatureFlags().isEmpty() || !config.env().isEmpty()
+                || !config.mongoDBFixtures().isEmpty();
 
         // Create services. These are usually cached and re-used between tests.
         this.services = createServices(config);
@@ -71,6 +72,9 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         if (config.importLicenses()) {
             createLicenses(mongoDB.mongoConnection().getMongoDatabase(), "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
+
+        // Before the server starts, so data it reads or caches during startup is already there.
+        config.mongoDBFixtures().forEach(fixture -> mongoDB.importFixture(fixture, config.mongoDBFixtureClass()));
 
         LOG.info("Creating server instance \"{}\"", config.serverProduct().name());
         final Stopwatch sw = Stopwatch.createStarted();

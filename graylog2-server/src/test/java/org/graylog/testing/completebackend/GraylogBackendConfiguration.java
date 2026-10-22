@@ -79,6 +79,14 @@ public @interface GraylogBackendConfiguration {
     String[] enabledFeatureFlags() default {};
 
     /**
+     * MongoDB fixture resources to import before the Graylog server starts, for data that the server reads or
+     * caches during startup and that therefore cannot be created through the API afterwards. Paths are resolved
+     * relative to the test class, or from the classpath root if absolute. Note: can't be used with Lifecycle.VM,
+     * as the backend is reused between tests.
+     */
+    String[] mongoDBFixtures() default {};
+
+    /**
      * Automatically import licenses on server startup. Note: can't be used with Lifecycle.VM.
      */
     boolean importLicenses() default GraylogBackendExtension.IMPORT_LICENSES_DEFAULT;
