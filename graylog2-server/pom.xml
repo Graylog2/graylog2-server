@@ -999,14 +999,6 @@
         <finalName>graylog</finalName>
         <resources>
             <resource>
-                <directory>${webInterface.path}/target/web/build</directory>
-                <targetPath>web-interface/assets</targetPath>
-            </resource>
-            <resource>
-                <directory>${webInterface.path}/target/preflight/build</directory>
-                <targetPath>preflight/assets</targetPath>
-            </resource>
-            <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>**/*.properties</exclude>
@@ -1066,7 +1058,16 @@
                             </manifestEntries>
                         </transformer>
                     </transformers>
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <!-- Using outputFile prevents the shaded JAR from being attached and deployed to Maven Central.
+                         It's only used for the distribution assembly and the API integration tests. -->
+                    <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</outputFile>
+                    <!-- The web interface assets are excluded from the main JAR, so we add them back here. -->
+                    <extraJars>
+                        <extraJar>${project.build.directory}/${project.artifactId}-${project.version}-web-assets.jar</extraJar>
+                    </extraJars>
+                    <!-- The shaded JAR isn't deployed, so the published POM must keep all dependencies for
+                         plugin authors that depend on the main JAR. -->
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                     <minimizeJar>false</minimizeJar>
                     <filters>
                         <!-- Exclude all signature files from the shaded JARs to avoid server startup failure. -->
@@ -1098,6 +1099,12 @@
                             <mainClass>${mainClass}</mainClass>
                         </manifest>
                     </archive>
+                    <!-- Plugin authors only need the Java code. The web interface assets are only needed in the
+                         shaded JAR, which gets them from the web-assets JAR. (see maven-shade-plugin config) -->
+                    <excludes>
+                        <exclude>web-interface/assets/**</exclude>
+                        <exclude>preflight/assets/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -1249,6 +1256,9 @@
                     <outputName>graylog-server-${project.version}-backend-sbom</outputName>
                     <outputDirectory>${project.build.directory}/sbom</outputDirectory>
                     <skipNotDeployed>false</skipNotDeployed>
+                    <!-- Don't publish the SBOM files to Maven Central. The distribution assemblies use the files
+                         from the output directory. -->
+                    <skipAttach>true</skipAttach>
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
@@ -1282,6 +1292,74 @@
                         <configuration>
                             <clearOutputDirectory>false</clearOutputDirectory>
                             <protoSourceRoot>${project.basedir}/src/main/proto/opamp/proto</protoSourceRoot>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Keep the maven-resources-plugin and maven-antrun-plugin entries at the end! They are also used in the
+              ~  web-interface-build profile. Declaring them earlier changes the plugin order after merging the profile
+              ~  and runs the frontend build before generate-swagger-api-definition in the compile phase. -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <!-- Copy existing web interface assets (e.g., when using -Dskip.web.build=true) to the output
+                      ~  directory. We don't use regular <resources> for this because the assets would end up in the
+                      ~  sources JAR otherwise. -->
+                    <execution>
+                        <id>copy-existing-web-ui-assets</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/web-interface/assets</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${webInterface.path}/target/web/build</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-existing-preflight-ui-assets</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/preflight/assets</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${webInterface.path}/target/preflight/build</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- Package the web interface assets into a separate, non-attached JAR that gets
+                          ~  included in the shaded JAR. The JAR is created even if the assets don't exist
+                          ~  (e.g., with -Dskip.web.build=true) because the shade plugin requires it. -->
+                        <id>create-web-assets-jar</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-web-assets.jar"
+                                     whenmanifestonly="create">
+                                    <fileset dir="${project.build.outputDirectory}">
+                                        <include name="web-interface/assets/**"/>
+                                        <include name="preflight/assets/**"/>
+                                    </fileset>
+                                </jar>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -1347,16 +1425,23 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <quiet>true</quiet>
-                        </configuration>
+                        <artifactId>maven-jar-plugin</artifactId>
                         <executions>
+                            <!-- Maven Central requires a Javadoc JAR but accepts a placeholder. We publish a JAR
+                                 with a README instead of the generated Javadoc to reduce the publishing size.
+                                 The Javadoc comments are still available in the sources JAR. -->
                             <execution>
-                                <id>attach-javadocs</id>
+                                <id>attach-javadoc-stub</id>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <configuration>
+                                    <classifier>javadoc</classifier>
+                                    <classesDirectory>${project.basedir}/src/main/javadoc-stub</classesDirectory>
+                                    <!-- Don't inherit the Main-Class manifest entry from the main JAR config -->
+                                    <archive combine.self="override"/>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
