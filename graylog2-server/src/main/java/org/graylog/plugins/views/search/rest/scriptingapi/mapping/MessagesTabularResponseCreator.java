@@ -38,12 +38,12 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
@@ -103,15 +103,13 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         if (!searchRequestSpec.includeUnresolvedIds()) {
             return fields;
         }
-        final List<RequestedField> fieldsWithUnresolvedIds = new ArrayList<>();
         final Set<RequestedField> addedUnresolvedIds = new HashSet<>();
-        for (RequestedField field : fields) {
-            fieldsWithUnresolvedIds.add(field);
-            unresolvedId(field)
-                    .filter(unresolvedId -> !fields.contains(unresolvedId) && addedUnresolvedIds.add(unresolvedId))
-                    .ifPresent(fieldsWithUnresolvedIds::add);
-        }
-        return fieldsWithUnresolvedIds;
+        return fields.stream()
+                .flatMap(field -> unresolvedId(field)
+                        .filter(unresolvedId -> !fields.contains(unresolvedId) && addedUnresolvedIds.add(unresolvedId))
+                        .map(unresolvedId -> Stream.of(field, unresolvedId))
+                        .orElseGet(() -> Stream.of(field)))
+                .toList();
     }
 
     // Ids are resolved to titles by default, the unresolved ids are available through the id decorator.
