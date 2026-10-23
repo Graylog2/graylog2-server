@@ -67,6 +67,7 @@ import org.graylog2.rest.resources.system.ClusterStatsResource;
 import org.graylog2.rest.resources.system.ConfigurationResource;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.GettingStartedResource;
+import org.graylog2.rest.resources.system.ManagedConfigurationResource;
 import org.graylog2.rest.resources.system.GrokResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
 import org.graylog2.rest.resources.system.JournalResource;
@@ -153,6 +154,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ClusterResource.class);
         addSystemRestResource(ClusterStatsResource.class);
         addSystemRestResource(ConfigurationResource.class);
+        addSystemRestResource(ManagedConfigurationResource.class);
         addSystemRestResource(DebugEventsResource.class);
         addSystemRestResource(SupportBundleResource.class);
         addSystemRestResource(SupportBundleClusterResource.class);

@@ -17,14 +17,15 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
 import { Alert, Row, Col, Label } from 'components/bootstrap';
-import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
+import { DocumentTitle, IfPermitted, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import DataNodeConfigurationEditor from 'components/datanode/configuration/DataNodeConfigurationEditor';
+import RoutePaths from 'routing/Routes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
@@ -63,7 +64,7 @@ const DataNodePage = () => {
     return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
   }
 
-  const datanode = data as DataNode;
+  const datanode = data;
   const datanodeDisabled = datanode.datanode_status !== 'AVAILABLE';
 
   return (
@@ -120,6 +121,14 @@ const DataNodePage = () => {
           </Col>
         )}
       </Row>
+      <IfPermitted permissions="clusterconfigentry:read">
+        <DataNodeConfigurationEditor
+          basePath={RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(dataNodeId)}
+          nodeId={datanode.node_id}>
+          <h2>Configuration</h2>
+          <p>Configure settings for {datanode.hostname}. Changes apply only to this Data Node.</p>
+        </DataNodeConfigurationEditor>
+      </IfPermitted>
     </DocumentTitle>
   );
 };

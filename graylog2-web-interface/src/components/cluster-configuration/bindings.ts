@@ -28,7 +28,13 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+        { description: 'Cluster Nodes', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+        {
+          description: 'Data Node Configuration',
+          path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+          permissions: ['clusterconfigentry:read'],
+          position: { after: 'Cluster Nodes' },
+        },
         {
           description: 'Certificate Management',
           path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
