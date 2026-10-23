@@ -17,13 +17,36 @@
 package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.ObjectVisitor;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.VisitorContext;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.WrapperFactory;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
 
 public class CustomSchemaFactoryWrapper extends SchemaFactoryWrapper {
+    // Makes nested object schemas use this wrapper as well, not only the top-level one.
+    private static final WrapperFactory WRAPPER_FACTORY = new WrapperFactory() {
+        @Override
+        public SchemaFactoryWrapper getWrapper(SerializerProvider provider) {
+            final SchemaFactoryWrapper wrapper = new CustomSchemaFactoryWrapper();
+            wrapper.setProvider(provider);
+            return wrapper;
+        }
+
+        @Override
+        public SchemaFactoryWrapper getWrapper(SerializerProvider provider, VisitorContext visitorContext) {
+            final SchemaFactoryWrapper wrapper = getWrapper(provider);
+            wrapper.setVisitorContext(visitorContext);
+            return wrapper;
+        }
+    };
+
+    public CustomSchemaFactoryWrapper() {
+        super(WRAPPER_FACTORY);
+    }
+
     @Override
     public JsonObjectFormatVisitor expectObjectFormat(JavaType convertedType) {
         ObjectSchema s = new ObjectSchemaWithOptionalSupport();
