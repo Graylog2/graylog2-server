@@ -42,16 +42,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     ),
   },
 }));
-jest.mock('hooks/useEntityShareState', () => {
-  const mockSetEntityShareState = jest.fn();
-
-  return {
-    __esModule: true,
-    default: jest.fn(() => ({ data: undefined })),
-    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
-    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-  };
-});
+jest.mock('hooks/useEntityShareState');
 
 const mockEntity = {
   description: 'Search for a User or Team to add as collaborator on this stream.',
