@@ -175,6 +175,20 @@ public class CIDRPatriciaTrieTest {
     }
 
     @Test
+    public void testLongestPrefixMatchReturnsExpiry() {
+        final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+        final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 60_000L;
+        trie.insertCIDR("192.168.1.0/24", "Expiring Range", expireAt);
+        trie.insertCIDR("10.0.0.0/8", "Permanent Range");
+
+        assertThat(trie.longestPrefixMatch("192.168.1.100"))
+                .isEqualTo(new CIDRPatriciaTrie.RangeMatch("Expiring Range", expireAt));
+        assertThat(trie.longestPrefixMatch("10.0.5.1"))
+                .isEqualTo(new CIDRPatriciaTrie.RangeMatch("Permanent Range", 0L));
+        assertThat(trie.longestPrefixMatch("172.16.0.1")).isNull();
+    }
+
+    @Test
     public void testLookupFallsBackToLiveEnclosingRangeWhenLongestPrefixExpired() {
         try {
             final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();

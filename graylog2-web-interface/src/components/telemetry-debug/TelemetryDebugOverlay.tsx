@@ -22,6 +22,7 @@ import { Button, Table } from 'components/bootstrap';
 import copyToClipboard from 'util/copyToClipboard';
 import type { TelemetryDebugEntry } from 'logic/telemetry/debug/TelemetryDebugStore';
 import { telemetryDebugStore, isTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
+import zIndices from 'theme/z-indices';
 
 import TelemetryDebugEntryRow from './TelemetryDebugEntryRow';
 
@@ -30,7 +31,7 @@ const Badge = styled.button(
     position: fixed;
     right: ${theme.spacings.md};
     bottom: ${theme.spacings.md};
-    z-index: 1050;
+    z-index: ${zIndices.modalBody};
     border: 1px solid ${theme.colors.cards.border};
     border-radius: ${theme.spacings.xs};
     background: ${theme.colors.global.contentBackground};
@@ -47,7 +48,7 @@ const Drawer = styled.div(
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1050;
+    z-index: ${zIndices.modalBody};
     display: flex;
     flex-direction: column;
     background: ${theme.colors.global.contentBackground};
