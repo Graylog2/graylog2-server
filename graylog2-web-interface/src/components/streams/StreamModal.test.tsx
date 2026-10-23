@@ -66,7 +66,7 @@ jest.setTimeout(10000);
 
 describe('StreamModal', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
   });
 
   it('should render without provided stream', async () => {

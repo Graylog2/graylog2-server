@@ -125,7 +125,7 @@ describe('SearchActionsMenu', () => {
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
     // @ts-expect-error context return type is not complete
     asMock(useFormikContext).mockReturnValue({ dirty: false });
     asMock(useScopePermissions).mockReturnValue({

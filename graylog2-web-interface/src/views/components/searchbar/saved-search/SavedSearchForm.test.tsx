@@ -64,7 +64,7 @@ const mockFormDirtyState = (dirty: boolean) =>
 
 describe('SavedSearchForm', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
   });
 
   beforeAll(() => {

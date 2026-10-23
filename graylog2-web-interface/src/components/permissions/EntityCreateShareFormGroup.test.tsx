@@ -67,7 +67,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
     asMock(usePluggableEntityShareFormGroup).mockReturnValue(() => <span />);
   });
 

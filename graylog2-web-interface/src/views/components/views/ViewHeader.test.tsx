@@ -56,7 +56,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
     asMock(useScopePermissions).mockReturnValue({
       loadingScopePermissions: false,
       scopePermissions: { is_mutable: true, is_deletable: true },
