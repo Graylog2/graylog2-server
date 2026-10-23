@@ -102,6 +102,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @Parameter(name = "from", description = "For paging results. Starting from result") @QueryParam("from") int from,
                                         @Parameter(name = "size", description = "Page size") @QueryParam("size") int size,
+                                        @Parameter(name = "include_unresolved_ids", description = "Additionally return the unresolved ids of fields resolved to titles, e.g. `streams#id` next to the stream titles in `streams`")
+                                        @QueryParam("include_unresolved_ids") boolean includeUnresolvedIds,
                                         @Context SearchUser searchUser) {
 
         try {
@@ -113,7 +115,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     sort,
                     sortOrder,
                     from,
-                    size);
+                    size,
+                    includeUnresolvedIds);
             return service.executeQuery(messagesRequestSpec, searchUser);
         } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
