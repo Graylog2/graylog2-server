@@ -1,0 +1,5 @@
+type = "f"
+message = "Restore the Remediation Steps Markdown editor in the Event Definition form for installations without a Security license."
+
+issues = ["25054"]
+pulls = [""]
