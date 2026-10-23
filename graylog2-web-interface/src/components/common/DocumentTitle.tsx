@@ -15,12 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
 
-import useProductName from 'brand-customization/useProductName';
-
-import DocumentTitleContext from './DocumentTitleContext';
-import { registerDocumentTitle, unregisterDocumentTitle } from './documentTitleRegistry';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 
 type Props = {
   title: React.ReactNode;
@@ -30,7 +26,7 @@ type Props = {
 /**
  * React component that modifies the page `document.title` dynamically. Nested instances append their title
  * to the one of their parent (e.g. `Graylog - Alerts - Event Definitions`). When the component is unmounted,
- * the title of the remaining instances is restored, or the default (`Graylog`) if there is none.
+ * its title is removed again.
  *
  * Example:
  *
@@ -41,20 +37,9 @@ type Props = {
  * ```
  */
 const DocumentTitle = ({ children, title }: Props) => {
-  const productName = useProductName();
-  const parentTitles = useContext(DocumentTitleContext);
-  const titles = [...parentTitles, `${title}`];
-  const fullTitle = [productName, ...titles].join(' - ');
-  const depth = titles.length;
+  useDocumentTitle(`${title}`);
 
-  useEffect(() => {
-    const id = Symbol('document-title');
-    registerDocumentTitle(id, { depth, title: fullTitle }, productName);
-
-    return () => unregisterDocumentTitle(id, productName);
-  }, [depth, fullTitle, productName]);
-
-  return <DocumentTitleContext.Provider value={titles}>{children}</DocumentTitleContext.Provider>;
+  return <>{children}</>;
 };
 
 export default DocumentTitle;

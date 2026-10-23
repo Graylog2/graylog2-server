@@ -15,9 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
-import { singleton } from 'logic/singleton';
+import useProductName from 'brand-customization/useProductName';
+import createDocumentTitleRegistry from 'contexts/createDocumentTitleRegistry';
 
-const DocumentTitleContext = React.createContext<Array<string>>([]);
+import DocumentTitleContext from './DocumentTitleContext';
 
-export default singleton('contexts.DocumentTitleContext', () => DocumentTitleContext);
+type Props = {
+  children: React.ReactNode;
+};
+
+const DocumentTitleContextProvider = ({ children }: Props) => {
+  const productName = useProductName();
+  const [registry] = useState(() => createDocumentTitleRegistry(productName));
+
+  return <DocumentTitleContext.Provider value={registry}>{children}</DocumentTitleContext.Provider>;
+};
+
+export default DocumentTitleContextProvider;

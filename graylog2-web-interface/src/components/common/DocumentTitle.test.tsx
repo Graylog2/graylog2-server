@@ -29,17 +29,7 @@ const PageTitle = ({ title }: { title: string }) => (
   </DocumentTitle>
 );
 
-const TwoPages = ({ showFirst, showSecond, firstTitle, secondTitle }: {
-  showFirst: boolean;
-  showSecond: boolean;
-  firstTitle: string;
-  secondTitle: string;
-}) => (
-  <>
-    {showFirst && <PageTitle title={firstTitle} />}
-    {showSecond && <PageTitle title={secondTitle} />}
-  </>
-);
+const CurrentPage = ({ page, title }: { page: string; title: string }) => <PageTitle key={page} title={title} />;
 
 const NestedPages = ({ showChild, parentTitle = 'Alerts' }: { showChild: boolean; parentTitle?: string }) => (
   <DocumentTitle title={parentTitle}>
@@ -69,43 +59,21 @@ describe('DocumentTitle', () => {
     expect(document.title).toBe(DEFAULT_PRODUCT_NAME);
   });
 
-  it('replaces the title instead of appending to it when a second page mounts', async () => {
-    const { rerender } = render(
-      <TwoPages showFirst showSecond={false} firstTitle="Streams" secondTitle="Alerts" />,
-    );
+  it('replaces the title when navigating to another page', async () => {
+    const { rerender } = render(<CurrentPage page="streams" title="Streams" />);
     await flushEffects();
 
-    rerender(<TwoPages showFirst showSecond firstTitle="Streams" secondTitle="Alerts" />);
-    await flushEffects();
-
-    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts`);
-  });
-
-  it('does not reset the title when an outgoing page unmounts after the incoming one mounted', async () => {
-    const { rerender } = render(
-      <TwoPages showFirst showSecond={false} firstTitle="Streams" secondTitle="Alerts" />,
-    );
-    await flushEffects();
-
-    rerender(<TwoPages showFirst showSecond firstTitle="Streams" secondTitle="Alerts" />);
-    await flushEffects();
-
-    rerender(<TwoPages showFirst={false} showSecond firstTitle="Streams" secondTitle="Alerts" />);
+    rerender(<CurrentPage page="alerts" title="Alerts" />);
     await flushEffects();
 
     expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts`);
   });
 
-  it('keeps the title when the outgoing and incoming pages share the same title', async () => {
-    const { rerender } = render(
-      <TwoPages showFirst showSecond={false} firstTitle="Sidecars" secondTitle="Sidecars" />,
-    );
+  it('keeps the title when navigating between pages sharing the same title', async () => {
+    const { rerender } = render(<CurrentPage page="first" title="Sidecars" />);
     await flushEffects();
 
-    rerender(<TwoPages showFirst showSecond firstTitle="Sidecars" secondTitle="Sidecars" />);
-    await flushEffects();
-
-    rerender(<TwoPages showFirst={false} showSecond firstTitle="Sidecars" secondTitle="Sidecars" />);
+    rerender(<CurrentPage page="second" title="Sidecars" />);
     await flushEffects();
 
     expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Sidecars`);
@@ -156,5 +124,26 @@ describe('DocumentTitle', () => {
     await flushEffects();
 
     expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Events - Event Definitions`);
+  });
+
+  it('keeps the title of a nested instance when its parent sets its title after mounting', async () => {
+    const { rerender } = render(<NestedPages showChild parentTitle="" />);
+    await flushEffects();
+
+    rerender(<NestedPages showChild parentTitle="Security" />);
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Security - Event Definitions`);
+  });
+
+  it('skips empty titles', async () => {
+    render(
+      <DocumentTitle title="">
+        <PageTitle title="Activity" />
+      </DocumentTitle>,
+    );
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Activity`);
   });
 });
