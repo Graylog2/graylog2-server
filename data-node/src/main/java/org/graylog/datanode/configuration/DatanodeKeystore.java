@@ -39,13 +39,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -59,7 +61,9 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -195,18 +199,61 @@ public class DatanodeKeystore {
     }
 
     /**
-     * Write to a temporary file first and atomically replace the keystore, so a failure during writing can't
-     * leave a corrupted keystore (and lost private key) behind.
+     * Write to a temporary file first and then replace the keystore, so a failure during writing can't
+     * leave a corrupted keystore (and lost private key) behind. The temporary file gets the same permissions
+     * as the existing keystore, so replacing it doesn't change who can access it.
      */
     private void writeKeystoreFile(KeyStore keystore) throws DatanodeKeystoreException {
         final Path tmpFile = keystoreFile.resolveSibling(keystoreFile.getFileName() + ".tmp");
         try {
-            try (FileOutputStream fos = new FileOutputStream(tmpFile.toFile())) {
-                keystore.store(fos, keystorePassword);
+            final Optional<Set<PosixFilePermission>> originalPermissions = readPosixPermissions(keystoreFile);
+            Files.deleteIfExists(tmpFile);
+            Files.createFile(tmpFile);
+            if (originalPermissions.isPresent()) {
+                // make sure we can write the content even if the original keystore is read-only
+                final Set<PosixFilePermission> writablePermissions = EnumSet.copyOf(originalPermissions.get());
+                writablePermissions.add(PosixFilePermission.OWNER_WRITE);
+                Files.setPosixFilePermissions(tmpFile, writablePermissions);
             }
-            Files.move(tmpFile, keystoreFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            try (OutputStream os = Files.newOutputStream(tmpFile)) {
+                keystore.store(os, keystorePassword);
+            }
+            if (originalPermissions.isPresent()) {
+                Files.setPosixFilePermissions(tmpFile, originalPermissions.get());
+            }
+            replaceFile(tmpFile, keystoreFile);
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            deleteQuietly(tmpFile, e);
             throw new DatanodeKeystoreException(e);
+        }
+    }
+
+    private static Optional<Set<PosixFilePermission>> readPosixPermissions(Path file) throws IOException {
+        if (Files.exists(file) && file.getFileSystem().supportedFileAttributeViews().contains("posix")) {
+            final Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(file);
+            return Optional.of(permissions.isEmpty() ? EnumSet.noneOf(PosixFilePermission.class) : EnumSet.copyOf(permissions));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Prefer an atomic move, but fall back to a regular one on file systems that don't support it (e.g. some
+     * network or volume mounts).
+     */
+    private static void replaceFile(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            LOG.debug("Atomic move of {} not supported, falling back to non-atomic move", target);
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private static void deleteQuietly(Path file, Exception originalException) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            originalException.addSuppressed(e);
         }
     }
 

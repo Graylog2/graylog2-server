@@ -30,17 +30,23 @@ import org.graylog.security.certutil.csr.CsrSigner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -249,6 +255,25 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(safeCopy.loadKeystore().getKey(DatanodeKeystore.DATANODE_KEY_ALIAS, safeCopy.password()))
                 .isEqualTo(keyPair.privateKey());
         Assertions.assertThat(this.receivedEvents).isEmpty();
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void testKeystorePermissionsArePreserved(@TempDir Path tempDir) throws Exception {
+        final DatanodeDirectories directories = DatanodeTestUtils.tempDirectories(tempDir);
+        final Path keystoreFile = directories.getConfigurationTargetDir().resolve("keystore.jks");
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(directories, "foobar", this.eventBus);
+        datanodeKeystore.initWithSelfSignedCertificate();
+
+        // read-only for the owner, to also verify the keystore can still be replaced
+        final Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("r--------");
+        Files.setPosixFilePermissions(keystoreFile, permissions);
+
+        datanodeKeystore.revokeSignedCertificate();
+
+        Assertions.assertThat(Files.getPosixFilePermissions(keystoreFile)).isEqualTo(permissions);
+        Assertions.assertThat(keystoreFile.resolveSibling("keystore.jks.tmp")).doesNotExist();
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
     }
 
     private static KeyStore readKeystore(Path file, char[] password) throws Exception {
