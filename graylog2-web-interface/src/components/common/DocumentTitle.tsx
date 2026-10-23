@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
 import useProductName from 'brand-customization/useProductName';
+
+import DocumentTitleContext from './DocumentTitleContext';
+import { registerDocumentTitle, unregisterDocumentTitle } from './documentTitleRegistry';
 
 type Props = {
   title: React.ReactNode;
   children: React.ReactNode;
 };
 
-let titleOwner: symbol | null = null;
-
 /**
- * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
- * resets the title to the default (`Graylog`), unless another instance has taken over the title in the
- * meantime. During a route change React may mount the incoming page before unmounting the outgoing one, so
- * the outgoing cleanup must not clobber a title it no longer owns.
+ * React component that modifies the page `document.title` dynamically. Nested instances append their title
+ * to the one of their parent (e.g. `Graylog - Alerts - Event Definitions`). When the component is unmounted,
+ * the title of the remaining instances is restored, or the default (`Graylog`) if there is none.
  *
  * Example:
  *
@@ -42,21 +42,19 @@ let titleOwner: symbol | null = null;
  */
 const DocumentTitle = ({ children, title }: Props) => {
   const productName = useProductName();
+  const parentTitles = useContext(DocumentTitleContext);
+  const titles = [...parentTitles, `${title}`];
+  const fullTitle = [productName, ...titles].join(' - ');
+  const depth = titles.length;
 
   useEffect(() => {
-    const owner = Symbol('document-title');
-    titleOwner = owner;
-    document.title = `${productName} - ${title}`;
+    const id = Symbol('document-title');
+    registerDocumentTitle(id, { depth, title: fullTitle }, productName);
 
-    return () => {
-      if (titleOwner === owner) {
-        titleOwner = null;
-        document.title = productName;
-      }
-    };
-  }, [productName, title]);
+    return () => unregisterDocumentTitle(id, productName);
+  }, [depth, fullTitle, productName]);
 
-  return <>{children}</>;
+  return <DocumentTitleContext.Provider value={titles}>{children}</DocumentTitleContext.Provider>;
 };
 
 export default DocumentTitle;

@@ -41,6 +41,12 @@ const TwoPages = ({ showFirst, showSecond, firstTitle, secondTitle }: {
   </>
 );
 
+const NestedPages = ({ showChild, parentTitle = 'Alerts' }: { showChild: boolean; parentTitle?: string }) => (
+  <DocumentTitle title={parentTitle}>
+    {showChild && <PageTitle title="Event Definitions" />}
+  </DocumentTitle>
+);
+
 describe('DocumentTitle', () => {
   beforeEach(() => {
     document.title = DEFAULT_PRODUCT_NAME;
@@ -50,7 +56,7 @@ describe('DocumentTitle', () => {
     render(<PageTitle title="Streams" />);
     await flushEffects();
 
-    expect(document.title).toBe('Graylog - Streams');
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Streams`);
   });
 
   it('resets the document title to the product name on unmount', async () => {
@@ -60,7 +66,7 @@ describe('DocumentTitle', () => {
     unmount();
     await flushEffects();
 
-    expect(document.title).toBe('Graylog');
+    expect(document.title).toBe(DEFAULT_PRODUCT_NAME);
   });
 
   it('replaces the title instead of appending to it when a second page mounts', async () => {
@@ -72,7 +78,7 @@ describe('DocumentTitle', () => {
     rerender(<TwoPages showFirst showSecond firstTitle="Streams" secondTitle="Alerts" />);
     await flushEffects();
 
-    expect(document.title).toBe('Graylog - Alerts');
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts`);
   });
 
   it('does not reset the title when an outgoing page unmounts after the incoming one mounted', async () => {
@@ -87,7 +93,7 @@ describe('DocumentTitle', () => {
     rerender(<TwoPages showFirst={false} showSecond firstTitle="Streams" secondTitle="Alerts" />);
     await flushEffects();
 
-    expect(document.title).toBe('Graylog - Alerts');
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts`);
   });
 
   it('keeps the title when the outgoing and incoming pages share the same title', async () => {
@@ -102,7 +108,7 @@ describe('DocumentTitle', () => {
     rerender(<TwoPages showFirst={false} showSecond firstTitle="Sidecars" secondTitle="Sidecars" />);
     await flushEffects();
 
-    expect(document.title).toBe('Graylog - Sidecars');
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Sidecars`);
   });
 
   it('updates the title when the title prop changes', async () => {
@@ -112,6 +118,43 @@ describe('DocumentTitle', () => {
     rerender(<PageTitle title="Edit Role Admin" />);
     await flushEffects();
 
-    expect(document.title).toBe('Graylog - Edit Role Admin');
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Edit Role Admin`);
+  });
+
+  it('appends the title of a nested instance to the title of its parent', async () => {
+    render(<NestedPages showChild />);
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts - Event Definitions`);
+  });
+
+  it('appends the title of a nested instance mounted after its parent', async () => {
+    const { rerender } = render(<NestedPages showChild={false} />);
+    await flushEffects();
+
+    rerender(<NestedPages showChild />);
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts - Event Definitions`);
+  });
+
+  it('restores the title of the parent when a nested instance unmounts', async () => {
+    const { rerender } = render(<NestedPages showChild />);
+    await flushEffects();
+
+    rerender(<NestedPages showChild={false} />);
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Alerts`);
+  });
+
+  it('updates the title of a nested instance when the title of its parent changes', async () => {
+    const { rerender } = render(<NestedPages showChild />);
+    await flushEffects();
+
+    rerender(<NestedPages showChild parentTitle="Events" />);
+    await flushEffects();
+
+    expect(document.title).toBe(`${DEFAULT_PRODUCT_NAME} - Events - Event Definitions`);
   });
 });
