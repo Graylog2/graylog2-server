@@ -113,7 +113,8 @@ const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
     (valuesFound[0] || [])[0],
   );
 
-// Rows can contain different timestamps, so the columns are in the order in which they first appear, not in chronological order.
+// The columns are collected from all rows in the order in which they first appear. Rows can cover different time ranges,
+// and a configured sort also reorders the time buckets within each row, so time columns are not chronological without sorting.
 const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) => {
   const [firstColumnPivot] = config.columnPivots;
 
