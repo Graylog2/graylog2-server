@@ -348,3 +348,13 @@ KCL 2.x to 3.x guide for inputs that were running KCL 2.x:
 - [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
 - [Migrate from KCL 3.x to KCL 3.5](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-3-3-5.html)
 - [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)
+
+## Reporting: Leftover Chrome Profile Directories Can Be Deleted
+
+Earlier versions created a Chrome profile directory named `reporting-<uuid>` in `<data_dir>/reports/headless` for
+each report render. These directories were not removed when Chrome failed to start, so they could accumulate over
+time. Report rendering no longer creates them, and directories left behind by earlier versions are not removed
+automatically.
+
+To reclaim the disk space, delete the `<data_dir>/reports/headless` directory on each Graylog node after the upgrade.
+You can do this while the node is stopped, or while it is running as long as no report is being rendered.
