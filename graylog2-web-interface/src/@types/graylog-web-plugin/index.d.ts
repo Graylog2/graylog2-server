@@ -141,6 +141,17 @@ type DataTiering = {
     eventKey: string;
     indexSetId: string;
   }>;
+  ArchiveRetentionFields?: React.ComponentType<{
+    valuesPrefix?: string;
+    archivingEnabled: boolean;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
+  useIndexSetSubmitConfirmation?: (options?: { enabled?: boolean }) => (
+    initialValues: unknown,
+    values: unknown,
+  ) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {

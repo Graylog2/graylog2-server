@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 import Icon from 'components/common/Icon';
+import zIndices from 'theme/z-indices';
 
 const HINT_VISIBILITY_DURATION_MS = 2000;
 const HINT_WIDTH_PX = 200;
@@ -32,7 +33,7 @@ const ScrollHint = styled.button(
     color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
     font-size: ${theme.fonts.size.huge};
     padding: 20px;
-    z-index: 2000;
+    z-index: ${zIndices.indicator};
     width: ${HINT_WIDTH_PX}px;
     border-radius: 10px;
     border: 0;
