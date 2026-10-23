@@ -283,9 +283,13 @@ public class DatanodeKeystore {
         try {
             return readKeystoreFile(keystorePassword);
         } catch (IOException e) {
-            // Wrong password is reported as an IOException. The keystore may still be encrypted with the
-            // password_secret, created before the HKDF derivation was introduced.
-            return migrateLegacyKeystore(e);
+            // Wrong password is reported as an IOException caused by an UnrecoverableKeyException. The keystore
+            // may still be encrypted with the password_secret, created before the HKDF derivation was introduced.
+            // Other IO errors (e.g. a missing or truncated file) are not related to the password.
+            if (e.getCause() instanceof UnrecoverableKeyException) {
+                return migrateLegacyKeystore(e);
+            }
+            throw new DatanodeKeystoreException(e);
         } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }

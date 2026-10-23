@@ -44,6 +44,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -274,6 +275,25 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(Files.getPosixFilePermissions(keystoreFile)).isEqualTo(permissions);
         Assertions.assertThat(keystoreFile.resolveSibling("keystore.jks.tmp")).doesNotExist();
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
+    }
+
+    @Test
+    void testCorruptedKeystoreIsNotTreatedAsLegacy(@TempDir Path tempDir) throws Exception {
+        final DatanodeDirectories directories = DatanodeTestUtils.tempDirectories(tempDir);
+        final Path keystoreFile = directories.getConfigurationTargetDir().resolve("keystore.jks");
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(directories, "foobar", this.eventBus);
+        datanodeKeystore.initWithSelfSignedCertificate();
+
+        // simulate a truncated keystore file
+        final byte[] content = Files.readAllBytes(keystoreFile);
+        final byte[] truncated = Arrays.copyOf(content, content.length / 2);
+        Files.write(keystoreFile, truncated);
+
+        // fails directly, without attempting to read the keystore with the legacy password
+        Assertions.assertThatThrownBy(datanodeKeystore::hasSignedCertificate)
+                .isInstanceOf(DatanodeKeystoreException.class)
+                .satisfies(e -> Assertions.assertThat(e.getCause().getSuppressed()).isEmpty());
+        Assertions.assertThat(Files.readAllBytes(keystoreFile)).isEqualTo(truncated);
     }
 
     private static KeyStore readKeystore(Path file, char[] password) throws Exception {
