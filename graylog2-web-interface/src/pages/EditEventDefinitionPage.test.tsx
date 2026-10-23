@@ -17,7 +17,7 @@
 
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
@@ -30,6 +30,8 @@ import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import EditEventDefinitionPage from 'pages/EditEventDefinitionPage';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { getEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
+import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 
 const exampleEntityScopeMutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
@@ -58,12 +60,13 @@ jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
 jest.mock('hooks/useScopePermissions', () => jest.fn());
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionFormContainer', () =>
-  mockComponent('EventDefinitionFormContainer'),
+  jest.fn(mockComponent('EventDefinitionFormContainer')),
 );
 jest.mock('hooks/usePluginEntities');
 
 describe('<EditEventDefinitionPage />', () => {
   beforeEach(() => {
+    asMock(EventDefinitionFormContainer).mockClear();
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(usePluginEntities).mockImplementation(
       (entityKey) =>
@@ -87,5 +90,51 @@ describe('<EditEventDefinitionPage />', () => {
     render(<EditEventDefinitionPage />);
 
     await screen.findByText(/Event Definition 1/);
+  });
+
+  it('keeps an enabled event definition scheduled when it has no scheduler job', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']))
+        .build(),
+    );
+    asMock(getEventDefinition).mockResolvedValueOnce({
+      eventDefinition: { ...mockEventDefinition, state: 'ENABLED' },
+      context: { scheduler: { is_scheduled: false } },
+      is_mutable: true,
+    });
+
+    render(<EditEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionFormContainer).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionFormContainer).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(true);
+  });
+
+  it('keeps a disabled event definition unscheduled', async () => {
+    asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']))
+        .build(),
+    );
+    asMock(getEventDefinition).mockResolvedValueOnce({
+      eventDefinition: { ...mockEventDefinition, state: 'DISABLED' },
+      context: { scheduler: { is_scheduled: true } },
+      is_mutable: true,
+    });
+
+    render(<EditEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionFormContainer).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionFormContainer).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(false);
   });
 });
