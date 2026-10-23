@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import camelCase from 'lodash/camelCase';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -28,7 +28,7 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import Store from 'logic/local-storage/Store';
@@ -47,7 +47,6 @@ import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type User from 'logic/users/User';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
@@ -90,7 +89,6 @@ type EventDefinitionConfig = EventDefinition['config'];
 type EventDefinitionConfigKeys = keyof EventDefinitionConfig;
 
 type Props = {
-  currentUser: User;
   eventDefinition: EventDefinition;
   onChange: (name: string, config: EventDefinitionConfig) => void;
   streams: Array<Stream>;
@@ -178,7 +176,8 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
   );
 };
 
-const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
+const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) => {
+  const { isPermitted } = usePermissions();
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
   const searchQueryPreviews = usePluginEntities('eventDefinitions.components.searchQueryPreview') ?? [];
@@ -201,15 +200,8 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const [searchWithinMsDuration, setSearchWithinMsDuration] = useState<number>(searchWithin.duration);
   const [executeEveryMsDuration, setExecuteEveryMsDuration] = useState<number>(executeEvery.duration);
 
-  const userCanViewLookupTables = useMemo(
-    () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
-    [currentUser.permissions],
-  );
-
-  const isStreamRequired = useMemo(
-    () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
-    [currentUser.permissions],
-  );
+  const userCanViewLookupTables = isPermitted(LOOKUP_PERMISSIONS);
+  const isStreamRequired = !isPermitted(STREAM_PERMISSIONS);
 
   const [cronDescription, setCronDescription] = useState<string>(
     currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '',

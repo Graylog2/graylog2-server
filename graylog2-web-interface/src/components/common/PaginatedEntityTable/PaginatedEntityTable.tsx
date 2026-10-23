@@ -57,13 +57,32 @@ import {
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 import useTableFilterContext from './useTableFilterContext';
 
-const SearchRow = styled.div`
-  margin-bottom: 5px;
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-`;
+const SearchRow = styled.div<{ $compactView: boolean }>(
+  ({ $compactView }) => css`
+    margin-bottom: 5px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    ${$compactView &&
+    css`
+      flex-wrap: wrap;
+
+      .compact-search-form {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .compact-search-form .form-group,
+      .compact-search-form .input-container,
+      .compact-search-form .query {
+        display: block;
+        width: 100%;
+      }
+    `}
+  `,
+);
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -83,12 +102,15 @@ const RowContainer = styled.div(
   `,
 );
 
-const TableWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-x: auto;
-  width: 100%;
-`;
+const TableWrapper = styled.div<{ $compactView: boolean }>(
+  ({ $compactView }) => css`
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    width: 100%;
+    ${$compactView && 'min-width: 0;'}
+  `,
+);
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
 type ExternalSearch = {
@@ -168,6 +190,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   withoutURLParams = false,
   noPageSizeSelect = false,
   noColumnReordering = false,
+  compactView = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
   const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
@@ -262,7 +285,11 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} attributes={attributes} entityTableId={tableLayout.entityTableId}>
+    <TableFetchContextProvider
+      refetch={refetch}
+      attributes={attributes}
+      entityTableId={tableLayout.entityTableId}
+      layoutVariant={tableLayout.layoutVariant}>
       <Container>
         {TopSection ? <TopSection /> : null}
         <RowContainer>
@@ -277,10 +304,11 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
               slicingPreferences={layoutConfig.slicing}
             />
           )}
-          <TableWrapper>
+          <TableWrapper $compactView={compactView}>
             {!externalSearch && (
-              <SearchRow>
+              <SearchRow $compactView={compactView}>
                 <SearchForm
+                  className={compactView ? 'compact-search-form' : undefined}
                   focusAfterMount={focusSearchAfterMount}
                   onSearch={onSearch}
                   onReset={onSearchReset}
@@ -312,6 +340,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
               <PaginatedList
                 pageSize={layoutConfig.pageSize}
                 showPageSizeSelect={false}
+                compactPagination={compactView}
                 totalItems={total}
                 useQueryParameter={!withoutURLParams}
                 onChange={onPaginationChange}>
@@ -412,6 +441,8 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   withoutURLParams?: boolean;
   noPageSizeSelect?: boolean;
   noColumnReordering?: boolean;
+  /** Fits the table into narrow views: the table does not grow beyond its parent and uses the compact pagination. */
+  compactView?: boolean;
 };
 
 /*

@@ -53,12 +53,14 @@ describe('CreateEventDefinition', () => {
   it('runs hooks with correct params and shows modal', async () => {
     asMock(useMappedData).mockReturnValue(mappedDataResult);
     asMock(useModalData).mockReturnValue(modalDataResult);
-    renderCreateDefinitionAction({});
+    const type = FieldType.create('STRING');
+    renderCreateDefinitionAction({ type });
 
     expect(useMappedData).toHaveBeenCalledWith({
       contexts: mockedContexts,
       field: 'field',
       queryId: 'query-id',
+      type,
       value: 'value',
     });
 

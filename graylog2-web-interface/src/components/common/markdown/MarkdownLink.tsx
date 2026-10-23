@@ -35,7 +35,8 @@ type Props = {
 };
 
 type OnClickHandler = Extract<EntityLinkResolution, { onClick: unknown }>['onClick'];
-type ResolvedLink = { to: string } | { onClick: OnClickHandler };
+type TitleComponent = Extract<EntityLinkResolution, { grnType: string }>['Title'];
+type ResolvedLink = { to: string; id: string; Title?: TitleComponent } | { onClick: OnClickHandler };
 
 const isRelativeUrl = (href: string) => new URI(href).is('relative');
 
@@ -57,7 +58,7 @@ const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
     return { onClick: resolved.onClick };
   }
 
-  return { to: getEntityRoute(resolved.id, resolved.grnType) };
+  return { to: getEntityRoute(resolved.id, resolved.grnType), id: resolved.id, Title: resolved.Title };
 };
 
 // No `href`: the target is a `graylog:///` URI the browser cannot resolve, so exposing it would
@@ -90,7 +91,9 @@ const MarkdownLink = ({ href, children = null }: Props) => {
   const resolved = useResolvedGraylogLink(href);
 
   if (resolved && 'to' in resolved) {
-    return <Link to={resolved.to}>{children}</Link>;
+    const { to, id, Title } = resolved;
+
+    return <Link to={to}>{Title ? <Title id={id}>{children}</Title> : children}</Link>;
   }
 
   if (resolved && 'onClick' in resolved) {

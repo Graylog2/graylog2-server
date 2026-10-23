@@ -23,8 +23,9 @@ import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
 import { SessionStore } from 'stores/sessions/SessionStore';
+import { reportError as reportServerError } from 'api/server-availability';
 
-import fetch, { Builder, fetchFile } from './FetchProvider';
+import fetch, { Builder, fetchFile, fetchStream } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 const mockLogout = jest.fn();
@@ -103,6 +104,18 @@ const setUpServer = () => {
     res.status(401).end();
   });
 
+  app.post('/simulatesSessionExpiration', (_req, res) => {
+    res.status(401).end();
+  });
+
+  app.post('/stream', (req, res) => {
+    if (req.accepts().includes('application/x-ndjson')) {
+      res.send('{"type":"answer"}\n');
+    } else {
+      res.status(406).end();
+    }
+  });
+
   app.get('/simulatesUnauthorized', (_req, res) => {
     res.status(403).end();
   });
@@ -140,6 +153,7 @@ describe('FetchProvider', () => {
 
   beforeEach(() => {
     asMock(ErrorsActions.report).mockClear();
+    asMock(reportServerError).mockClear();
   });
 
   afterAll(() => {
@@ -244,5 +258,28 @@ describe('FetchProvider', () => {
     );
 
     expect(ErrorsActions.report).not.toHaveBeenCalled();
+  });
+
+  it('streams the body of a response it accepts', async () => {
+    const body = await fetchStream('POST', `${baseUrl}/stream`, {});
+
+    expect(body).toBeTruthy();
+  });
+
+  it('removes local session if a stream returns 401', async () => {
+    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch((e) => e);
+
+    expect(error.status).toEqual(401);
+    expect(mockLogout).toHaveBeenCalled();
+  });
+
+  it('rejects an aborted stream with its abort error, not as a server error', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch((e) => e);
+
+    expect(error.name).toEqual('AbortError');
+    expect(reportServerError).not.toHaveBeenCalled();
   });
 });

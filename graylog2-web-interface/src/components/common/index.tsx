@@ -30,6 +30,7 @@ export { default as BrandIcon } from './BrandIcon';
 export { default as Breadcrumbs } from './Breadcrumbs';
 export { default as Card } from './Card';
 export { default as Center } from './Center';
+export { default as ChartLegend } from './ChartLegend';
 export { default as ClearFloat } from './ClearFloat';
 export { default as Carousel } from './Carousel';
 export { default as ClipboardButton } from './ClipboardButton';

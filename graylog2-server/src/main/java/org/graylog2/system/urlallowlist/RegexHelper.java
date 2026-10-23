@@ -41,7 +41,12 @@ public class RegexHelper {
      * </p>
      */
     public String createRegexForUrlTemplate(String url, String placeholder) {
-        String transformedUrl = Arrays.stream(StringUtils.splitByWholeSeparator(url, placeholder))
+        if (StringUtils.isEmpty(placeholder)) {
+            return createRegexForUrl(url);
+        }
+        // Use a negative limit to keep leading and trailing empty parts, so that placeholders at the start or end of
+        // the URL are replaced with a wildcard as well.
+        String transformedUrl = Arrays.stream(url.split(Pattern.quote(placeholder), -1))
                 .map(part -> StringUtils.isBlank(part) ? part : Pattern.quote(part))
                 .collect(Collectors.joining(".*?"));
         return "^" + transformedUrl + "$";

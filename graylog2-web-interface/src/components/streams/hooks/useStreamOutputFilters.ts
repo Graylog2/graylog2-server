@@ -17,11 +17,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as Immutable from 'immutable';
 
-import PaginationURL from 'util/PaginationURL';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { StreamDestinationsFilters } from '@graylog/server-api';
+
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
-import fetch from 'logic/rest/FetchProvider';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -42,15 +40,13 @@ export const keyFn = (streamId: string, destinationType?: string, pagination?: P
 ];
 const defaultParams = { page: 1, perPage: 10, query: '' };
 
-export const fetchStreamOutputFilters = async (streamId: string, pagination: Pagination) => {
-  const url = PaginationURL(
-    ApiRoutes.StreamOutputFilterRuleApiController.get(streamId).url,
+export const fetchStreamOutputFilters = async (streamId: string, pagination: Pagination) =>
+  StreamDestinationsFilters.getPaginatedFiltersForStream(
+    streamId,
+    pagination.query || undefined,
     pagination.page,
     pagination.perPage,
-    pagination.query,
-  );
-
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
+  ).then((response: PaginatedResponse) => {
     const { elements, query, total, page, per_page: perPage, count } = response;
 
     return {
@@ -65,7 +61,6 @@ export const fetchStreamOutputFilters = async (streamId: string, pagination: Pag
       },
     };
   });
-};
 
 const useStreamOutputFilters = (
   streamId: string,

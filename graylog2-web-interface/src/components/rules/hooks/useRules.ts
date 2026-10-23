@@ -298,10 +298,8 @@ export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> =>
     },
   );
 
-export const updateRuleMetricsConfig = (nextConfig: MetricsConfigType): Promise<MetricsConfigType> => {
-  const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
-
-  return fetch('PUT', url, nextConfig).then(
+export const updateRuleMetricsConfig = (nextConfig: MetricsConfigType): Promise<MetricsConfigType> =>
+  PipelinesRules.updateMetricsConfig(nextConfig).then(
     (response: MetricsConfigType) => {
       UserNotification.success('Successfully updated rule metrics config');
 
@@ -316,7 +314,6 @@ export const updateRuleMetricsConfig = (nextConfig: MetricsConfigType): Promise<
       throw error;
     },
   );
-};
 
 export const useRules = () =>
   useQuery({
