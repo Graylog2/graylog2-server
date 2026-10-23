@@ -19,6 +19,7 @@ package org.graylog.datanode.configuration.snapshots;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import jakarta.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileContentItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileItem;
