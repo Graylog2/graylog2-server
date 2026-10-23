@@ -72,6 +72,18 @@ public class IsmApi {
                 "Unable to add policy to index");
     }
 
+    /**
+     * Returns the ISM explain output for the given index, which reports whether the index is managed and by which
+     * policy. The response is keyed by index name, with the policy id below the (literal, dotted) key
+     * {@code index.plugins.index_state_management.policy_id}.
+     */
+    public Optional<JsonNode> explainIndex(String index) {
+        final Request request = os3request("GET", "explain/" + index, null);
+        return perform(request,
+                new TypeReference<JsonNode>() {},
+                "Unable to explain index");
+    }
+
     public void removePolicyFromIndex(String index) {
         final Request request = os3request("POST", "remove/" + index, null);
         perform(request,
