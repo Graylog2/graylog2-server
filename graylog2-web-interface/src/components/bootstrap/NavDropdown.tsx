@@ -23,9 +23,10 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import zIndices from 'theme/z-indices';
 
 const StyledMenuDropdown = styled(Menu.Dropdown)`
-  z-index: 1032 !important;
+  z-index: ${zIndices.navigationDropdown} !important;
 `;
 
 const DropdownTrigger = styled.button<{ $active: boolean }>(
