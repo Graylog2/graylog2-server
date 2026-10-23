@@ -35,6 +35,14 @@ jest.mock('components/common', () => ({
   Select: jest.requireActual('components/common/Select').default,
 }));
 
+// The real editor is backed by Ace, which does not expose a labelled textbox in jsdom.
+jest.mock('components/common/MarkdownEditor', () => ({
+  MarkdownEditor: ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
+    <textarea aria-label="Remediation Steps" value={value} onChange={(e) => onChange(e.target.value)} />
+  ),
+  MarkdownPreview: ({ value }: { value: string }) => <div data-testid="markdown-preview">{value}</div>,
+}));
+
 const licenseCheck = (valid: boolean): ReturnType<typeof usePluggableLicenseCheck> => ({
   data: { valid, expired: false, violated: false },
   isInitialLoading: false,
@@ -104,7 +112,7 @@ describe('EventDetailsForm', () => {
       const input = screen.getByRole('textbox', { name: 'Remediation Steps' });
 
       expect(input).toHaveValue('Restart the service.');
-      expect(input).not.toHaveAttribute('readonly');
+      expect(screen.queryByTestId('markdown-preview')).not.toBeInTheDocument();
       expect(screen.queryByText('Event Procedure Summary')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Add Event Procedure' })).not.toBeInTheDocument();
       expect(screen.queryByText(`Procedure: ${procedureId}`)).not.toBeInTheDocument();
@@ -125,19 +133,26 @@ describe('EventDetailsForm', () => {
     },
   );
 
-  it('keeps remediation steps read-only without edit permission', async () => {
+  it('shows a remediation steps preview without edit permission', () => {
     render(<EventDetailsForm {...defaultProps} canEdit={false} />);
 
-    const input = screen.getByRole('textbox', { name: 'Remediation Steps' });
-
-    expect(input).toHaveAttribute('readonly');
-
-    await userEvent.type(input, 'Changed');
-
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('Restart the service.');
+    expect(screen.queryByRole('textbox', { name: 'Remediation Steps' })).not.toBeInTheDocument();
   });
 
-  it('keeps remediation steps read-only for system event definitions', () => {
+  it('shows a placeholder preview when there are no remediation steps', () => {
+    render(
+      <EventDetailsForm
+        {...defaultProps}
+        eventDefinition={{ ...defaultProps.eventDefinition, remediation_steps: '' }}
+        canEdit={false}
+      />,
+    );
+
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('No remediation steps given');
+  });
+
+  it('shows a remediation steps preview for system event definitions', () => {
     render(
       <EventDetailsForm
         {...defaultProps}
@@ -148,7 +163,8 @@ describe('EventDetailsForm', () => {
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Remediation Steps' })).toHaveAttribute('readonly');
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('Restart the service.');
+    expect(screen.queryByRole('textbox', { name: 'Remediation Steps' })).not.toBeInTheDocument();
   });
 
   it('allows licensed users to add an event procedure instead of editing remediation steps', async () => {
@@ -156,6 +172,7 @@ describe('EventDetailsForm', () => {
     render(<EventDetailsForm {...defaultProps} />);
 
     expect(screen.queryByRole('textbox', { name: 'Remediation Steps' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('markdown-preview')).not.toBeInTheDocument();
     expect(screen.getByText('Event Procedure Summary')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Add Event Procedure' }));
