@@ -24,8 +24,6 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import Direction from 'views/logic/aggregationbuilder/Direction';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
@@ -179,59 +177,38 @@ describe('HeatmapVisualization', () => {
     );
   });
 
-  describe('time columns', () => {
-    const renderHeatmap = (sort: Array<SortConfig> = []) => {
-      const config = AggregationWidgetConfig.builder()
-        .rowPivots([Pivot.createValues(['category'])])
-        .columnPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } })])
-        .series([new Series('count()')])
-        .sort(sort)
-        .visualization('heatmap')
-        .build();
+  it('sorts time columns chronologically', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['category'])])
+      .columnPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .series([new Series('count()')])
+      .visualization('heatmap')
+      .build();
 
-      render(
-        <WrappedHeatMap
-          data={fixtures.dataWithTimeColumns}
-          config={config}
-          setLoadingState={() => {}}
-          effectiveTimerange={{ type: 'absolute', from: '2026-08-31T19:00:00.000Z', to: '2026-08-31T19:10:00.000Z' }}
-          fields={Immutable.List()}
-          height={1024}
-          onChange={() => {}}
-          toggleEdit={() => {}}
-          width={800}
-        />,
-      );
-    };
+    render(
+      <WrappedHeatMap
+        data={fixtures.dataWithTimeColumns}
+        config={config}
+        setLoadingState={() => {}}
+        effectiveTimerange={{ type: 'absolute', from: '2026-08-31T19:00:00.000Z', to: '2026-08-31T19:10:00.000Z' }}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
 
-    const lastChartData = () => asMock(GenericPlot).mock.calls.at(-1)[0].chartData[0];
+    const { x, z } = asMock(GenericPlot).mock.calls.at(-1)[0].chartData[0];
 
-    it('sorts columns chronologically', () => {
-      renderHeatmap();
-
-      const { x, z } = lastChartData();
-
-      expect(x.map((time: string) => new Date(time).toISOString())).toEqual([
-        '2026-08-31T19:02:00.000Z',
-        '2026-08-31T19:02:40.000Z',
-        '2026-08-31T19:03:00.000Z',
-      ]);
-      expect(z).toEqual([
-        ['None', 6, 2],
-        [1, 5, 'None'],
-      ]);
-    });
-
-    it('sorts columns in descending order when configured', () => {
-      renderHeatmap([new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending)]);
-
-      const { x } = lastChartData();
-
-      expect(x.map((time: string) => new Date(time).toISOString())).toEqual([
-        '2026-08-31T19:03:00.000Z',
-        '2026-08-31T19:02:40.000Z',
-        '2026-08-31T19:02:00.000Z',
-      ]);
-    });
+    expect(x.map((time: string) => new Date(time).toISOString())).toEqual([
+      '2026-08-31T19:02:00.000Z',
+      '2026-08-31T19:02:40.000Z',
+      '2026-08-31T19:03:00.000Z',
+    ]);
+    expect(z).toEqual([
+      ['None', 6, 2],
+      [1, 5, 'None'],
+    ]);
   });
 });

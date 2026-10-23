@@ -19,7 +19,7 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
+import sortBy from 'lodash/sortBy';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
 
@@ -32,8 +32,6 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import Direction from 'views/logic/aggregationbuilder/Direction';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { keySeparator } from 'views/Constants';
 import { toDateObject } from 'util/DateTime';
@@ -123,15 +121,7 @@ const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) =
     return keys;
   }
 
-  const timeSort = config.sort.find(
-    (sort) => sort.type === SortConfig.PIVOT_TYPE && firstColumnPivot.fields.includes(sort.field),
-  );
-
-  return orderBy(
-    keys,
-    (key) => toDateObject(key.split(keySeparator)[0]).valueOf(),
-    Direction.Descending.equals(timeSort?.direction) ? 'desc' : 'asc',
-  );
+  return sortBy(keys, (key) => toDateObject(key.split(keySeparator)[0]).valueOf());
 };
 
 const _formatSeries =
