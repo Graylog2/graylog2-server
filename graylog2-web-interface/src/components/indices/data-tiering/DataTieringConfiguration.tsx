@@ -24,7 +24,13 @@ import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import type { DataTieringConfig, DataTieringFormValues } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
-const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'warm_tier_repository_name'];
+const hotWarmOnlyFormFields = [
+  'index_hot_lifetime_min',
+  'warm_tier_enabled',
+  'warm_tier_repository_name',
+  'archive_retention_override_enabled',
+  'archive_retention_time',
+];
 
 const DATA_TIERING_HOT_ONLY_DEFAULTS = {
   index_lifetime_max: 40,
@@ -33,6 +39,7 @@ const DATA_TIERING_HOT_ONLY_DEFAULTS = {
 
 const DATA_TIERING_HOT_WARM_DEFAULTS = {
   archive_before_deletion: false,
+  archive_retention_override_enabled: false,
   warm_tier_enabled: false,
   index_hot_lifetime_min: 10,
   warm_tier_repository_name: null,
@@ -103,6 +110,8 @@ export const prepareDataTieringConfig = (
     hotWarmOnlyFormFields.forEach((field) => {
       delete config[field];
     });
+  } else if (!config.archive_before_deletion) {
+    config = { ...config, archive_retention_override_enabled: false, archive_retention_time: null };
   }
 
   dayFields.forEach((field) => {
@@ -233,6 +242,15 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
                 (immutableFields.includes('data_tiering.archive_before_deletion') || sectionDisabled) &&
                 !ignoreFieldRestrictions
               }
+            />
+          )}
+          {dataTieringPlugin.ArchiveRetentionFields && (
+            <dataTieringPlugin.ArchiveRetentionFields
+              valuesPrefix={valuesPrefix}
+              archivingEnabled={!!formValue('archive_before_deletion')}
+              hiddenFields={hiddenFields}
+              immutableFields={immutableFields}
+              ignoreFieldRestrictions={ignoreFieldRestrictions}
             />
           )}
           <dataTieringPlugin.TiersConfigurationFields

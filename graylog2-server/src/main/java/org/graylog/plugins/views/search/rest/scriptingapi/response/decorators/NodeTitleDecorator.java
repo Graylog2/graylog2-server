@@ -44,7 +44,7 @@ public class NodeTitleDecorator implements FieldDecorator {
     }
 
     private boolean acceptsDecorator(@Nullable String decorator) {
-        return decorator == null || decorator.equals("title");
+        return decorator == null || decorator.equals(TitleDecorator.DECORATOR);
     }
 
     @Override
