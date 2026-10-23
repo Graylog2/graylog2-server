@@ -24,14 +24,17 @@ export const ENTITY_SHARE_QUERY_KEY = ['entity-share'] as const;
 
 export const entityShareQueryKey = (entityGRN: GRN | null) => [...ENTITY_SHARE_QUERY_KEY, entityGRN ?? 'new'];
 
-const useEntityShareState = (entityGRN: GRN | null) =>
-  useQuery<EntityShareState | undefined>({
+const useEntityShareState = (entityGRN: GRN | null) => {
+  const { data } = useQuery<EntityShareState | undefined>({
     queryKey: entityShareQueryKey(entityGRN),
     // queryFn is a noop because consumers populate the cache via the setEntityShareState helper below
     queryFn: () => undefined,
     enabled: false,
     initialData: undefined,
   });
+
+  return { data };
+};
 
 export const useSetEntityShareState = () => {
   const queryClient = useQueryClient();

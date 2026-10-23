@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as Immutable from 'immutable';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
@@ -23,6 +25,7 @@ import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 import { createEntityShareState } from 'fixtures/entityShareState';
 import { createView } from 'views/api/views';
 import useEntityShareState from 'hooks/useEntityShareState';
+import { loadUserSharesPaginated } from 'api/entity-share';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
@@ -35,12 +38,7 @@ jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
   prepareEntityCreateShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() =>
-    Promise.resolve({
-      list: require('immutable').List(),
-      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-    }),
-  ),
+  loadUserSharesPaginated: jest.fn(),
 }));
 jest.mock('hooks/useEntityShareState', () => {
   const mockSetEntityShareState = jest.fn();
@@ -67,7 +65,12 @@ const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, hist
 
 describe('OnSaveNewDashboard', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
+    asMock(loadUserSharesPaginated).mockResolvedValue({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      context: { granteeCapabilities: {} },
+    });
   });
 
   afterEach(() => {
