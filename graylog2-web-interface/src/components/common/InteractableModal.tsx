@@ -21,6 +21,7 @@ import debounce from 'lodash/debounce';
 
 import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
+import zIndices from 'theme/z-indices';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
 const DEFAULT_STRING_SIZE = { width: DEFAULT_SIZE.width.toString(), height: DEFAULT_SIZE.height.toString() };
@@ -35,7 +36,7 @@ const DEFAULT_POSITION = {
 const InteractableModalWrapper = styled.div`
   position: fixed;
   inset: 0;
-  z-index: 1030;
+  z-index: ${zIndices.modalBody};
   pointer-events: none;
 `;
 

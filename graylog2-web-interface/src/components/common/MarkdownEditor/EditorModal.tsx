@@ -21,6 +21,7 @@ import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
@@ -31,7 +32,7 @@ const Backdrop = styled.div`
   flex-direction: column;
   align-items: center;
   inset: 0;
-  z-index: 1051;
+  z-index: ${zIndices.confirmModalOverlay};
 
   background-color: rgb(0 0 0 / 50%);
 `;
