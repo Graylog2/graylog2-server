@@ -67,7 +67,7 @@ public class GCSRepositoryConfiguration implements RepositoryConfiguration {
 
     @Override
     public boolean isRepositoryEnabled() {
-        return gcsCredentialsFile != null || credentials != null;
+        return gcsCredentialsFile != null || StringUtils.isNotBlank(credentials);
     }
 
     @Override
