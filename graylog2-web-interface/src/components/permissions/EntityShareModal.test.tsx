@@ -42,20 +42,7 @@ import EntityShareModal from './EntityShareModal';
 const mockEmptyResult = { data: undefined };
 const mockFailedResult = { data: failedEntityShareState };
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: {
-    prepare: jest.fn(() => Promise.resolve()),
-    prepareCreate: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-    loadUserSharesPaginated: jest.fn(() =>
-      Promise.resolve({
-        list: Immutable.List(),
-        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-      }),
-    ),
-  },
-}));
+jest.mock('domainActions/permissions/EntityShareDomain');
 jest.mock('hooks/useEntityShareState');
 
 jest.setTimeout(10000);

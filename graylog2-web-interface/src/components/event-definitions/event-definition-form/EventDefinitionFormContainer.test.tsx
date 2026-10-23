@@ -208,14 +208,7 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
   ),
 }));
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: {
-    prepare: jest.fn(() => Promise.resolve()),
-    prepareCreate: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-}));
+jest.mock('domainActions/permissions/EntityShareDomain');
 
 // Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
 jest.mock('components/common/ConfirmLeaveDialog', () => () => null);

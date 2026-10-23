@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as mockImmutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -36,20 +35,7 @@ const exampleStream = {
   index_set_id: indexSets[0].id,
 };
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: {
-    prepare: jest.fn(() => Promise.resolve()),
-    prepareCreate: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-    loadUserSharesPaginated: jest.fn(() =>
-      Promise.resolve({
-        list: mockImmutable.List(),
-        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-      }),
-    ),
-  },
-}));
+jest.mock('domainActions/permissions/EntityShareDomain');
 jest.mock('hooks/useEntityShareState');
 const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
   <StreamModal
