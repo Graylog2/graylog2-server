@@ -24,6 +24,7 @@ import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationPaginationService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationSummaryDto;
+import org.graylog2.rest.URIHelper;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +57,8 @@ class NotificationsResourceTest {
 
     @Mock
     private SystemNotificationRenderService renderService;
+
+    private final URIHelper uriHelper = new URIHelper(URI.create("http://localhost:9000/"));
 
     private TestResource resource;
     private TestResource cloudResource;
@@ -103,10 +107,10 @@ class NotificationsResourceTest {
                 new NotificationSummaryDto("id1", "es_unavailable", null, "urgent", "node-1",
                         "Title", "Desc", Map.of(), "2026-01-01T00:00:00.000Z")
         );
-        when(paginationService.searchPaginated(any(), any(), eq(1), eq(50)))
+        when(paginationService.searchPaginated(any(), any(), eq(1), eq(50), any()))
                 .thenReturn(new PaginatedList<>(dtos, 1, 1, 50));
 
-        final var response = resource.getPaginated(1, 50, "", List.of(), "timestamp", SortOrder.DESCENDING);
+        final var response = resource.getPaginated(uriHelper, 1, 50, "", List.of(), "timestamp", SortOrder.DESCENDING);
 
         assertThat(response.elements()).hasSize(1);
         assertThat(response.elements().get(0).type()).isEqualTo("es_unavailable");
@@ -117,10 +121,10 @@ class NotificationsResourceTest {
 
     @Test
     void getPaginatedPassesSortOrder() {
-        when(paginationService.searchPaginated(any(), any(), anyInt(), anyInt()))
+        when(paginationService.searchPaginated(any(), any(), anyInt(), anyInt(), any()))
                 .thenReturn(new PaginatedList<>(List.of(), 0, 1, 10));
 
-        final var response = resource.getPaginated(1, 10, "", List.of(), "timestamp", SortOrder.ASCENDING);
+        final var response = resource.getPaginated(uriHelper, 1, 10, "", List.of(), "timestamp", SortOrder.ASCENDING);
 
         assertThat(response.order()).isEqualTo(SortOrder.ASCENDING);
     }
