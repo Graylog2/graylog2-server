@@ -142,6 +142,28 @@ public class CaffeineLookupCacheTest {
     }
 
     @Test
+    public void readsDoNotExtendPastResultTtlAcrossTickerRollover() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        ticker.advance(Long.MAX_VALUE - Duration.ofSeconds(2).toNanos());
+        LookupCache cache = buildCache(ticker, 60, 0, 10);
+        LookupResult lr1 = LookupResult.builder().single("x1").cacheTTL(TimeUnit.SECONDS.toMillis(5)).build();
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        // Reads on both sides of the ticker wrapping past Long.MAX_VALUE stay within the 5s TTL.
+        for (int i = 0; i < 4; i++) {
+            ticker.advance(Duration.ofSeconds(1));
+            Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+        }
+
+        ticker.advance(Duration.ofSeconds(2));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
     public void readsDoNotExtendPastExpireAfterWrite() throws Exception {
         FakeTicker ticker = new FakeTicker(Duration.ZERO);
         LookupCache cache = buildCache(ticker, 60, 30, 10);

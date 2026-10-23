@@ -30,7 +30,6 @@ import com.github.benmanes.caffeine.cache.Ticker;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
-import com.google.common.math.LongMath;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -67,10 +66,12 @@ public class CaffeineLookupCache extends LookupCache {
     private final Ticker ticker;
 
     /**
-     * A cached result plus the ticker time its TTL (or expire-after-write) runs out, so reads extending the
-     * expiry for expire-after-access can't push it past that point. Long.MAX_VALUE means no deadline.
+     * A cached result plus when it was loaded and how long its TTL (or expire-after-write) lasts, so reads
+     * extending the expiry for expire-after-access can't push it past that point. An expiry of Long.MAX_VALUE
+     * means unlimited. Ticker values have an arbitrary origin and can wrap, so only differences between them
+     * are meaningful; no absolute deadline is stored.
      */
-    private record CachedResult(LookupResult result, long deadlineNanos) {
+    private record CachedResult(LookupResult result, long loadedAtNanos, long expiryNanos) {
     }
 
     @Inject
@@ -100,7 +101,6 @@ public class CaffeineLookupCache extends LookupCache {
 
     private long writeDurationNanos(LookupResult lookupResult) {
         final long expireAfterWriteNanos = config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null
-                //noinspection ConstantConditions
                 ? config.expireAfterWriteUnit().toNanos(config.expireAfterWrite())
                 : Long.MAX_VALUE;
         if (lookupResult.hasTTL()) {
@@ -112,16 +112,14 @@ public class CaffeineLookupCache extends LookupCache {
     }
 
     private CachedResult toCachedResult(LookupResult lookupResult) {
-        final long duration = writeDurationNanos(lookupResult);
-        final long deadline = duration == Long.MAX_VALUE ? Long.MAX_VALUE : LongMath.saturatedAdd(ticker.read(), duration);
-        return new CachedResult(lookupResult, deadline);
+        return new CachedResult(lookupResult, ticker.read(), writeDurationNanos(lookupResult));
     }
 
     private Expiry<LookupCacheKey, CachedResult> buildExpiry(Config config) {
         return new Expiry<>() {
             @Override
             public long expireAfterCreate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull CachedResult cachedResult, long currentTime) {
-                return writeDurationNanos(cachedResult.result());
+                return cachedResult.expiryNanos();
             }
 
             @Override
@@ -140,13 +138,15 @@ public class CaffeineLookupCache extends LookupCache {
                 if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
                     //noinspection ConstantConditions
                     final long accessDuration = config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
-                    if (cachedResult.deadlineNanos() == Long.MAX_VALUE) {
+                    if (cachedResult.expiryNanos() == Long.MAX_VALUE) {
                         LOG.trace("afterRead: config: {}", accessDuration);
                         return accessDuration;
                     }
-                    final long untilDeadline = Math.max(0, LongMath.saturatedSubtract(cachedResult.deadlineNanos(), currentTime));
-                    LOG.trace("afterRead: config: {}, until deadline: {}", accessDuration, untilDeadline);
-                    return Math.min(accessDuration, untilDeadline);
+                    // Plain subtraction is correct across ticker wraparound, like System.nanoTime() differences.
+                    final long elapsed = currentTime - cachedResult.loadedAtNanos();
+                    final long remaining = Math.max(0, cachedResult.expiryNanos() - elapsed);
+                    LOG.trace("afterRead: config: {}, remaining: {}", accessDuration, remaining);
+                    return Math.min(accessDuration, remaining);
                 }
                 LOG.trace("afterRead: {}", currentDuration);
                 return currentDuration;
