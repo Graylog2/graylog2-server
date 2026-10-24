@@ -23,6 +23,8 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.graylog.security.permissions.NoPermission;
+import org.graylog.security.permissions.PermissionInstances;
 
 import java.util.Map;
 
@@ -78,6 +80,11 @@ record DomainActionPermission(String domain,
 
     @Override
     public org.apache.shiro.authz.Permission toShiroPermission(GRN target) {
+        if (!PermissionInstances.isSafe(target.entity())) {
+            // Appending this would turn the grant into a wildcard covering entities it was never meant to cover.
+            // Fail closed instead. See PermissionInstances#isSafe.
+            return NoPermission.INSTANCE;
+        }
         return new CaseSensitiveWildcardPermission(permission() + ":" + target.entity());
     }
 
