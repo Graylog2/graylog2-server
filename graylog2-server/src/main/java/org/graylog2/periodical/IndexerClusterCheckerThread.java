@@ -48,6 +48,8 @@ public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
     private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
     public static final float SHARD_USAGE_THRESHOLD = 0.9f;
+    // The _cat/allocation API reports unassigned shards under this pseudo node name.
+    private static final String UNASSIGNED_NODE = "UNASSIGNED";
 
     private final NotificationService notificationService;
     private final Cluster cluster;
@@ -205,6 +207,7 @@ public class IndexerClusterCheckerThread extends Periodical {
         ClusterShardAllocation clusterShardAllocation = cluster.clusterShardAllocation();
         int maxShardsPerNode = clusterShardAllocation.maxShardsPerNode();
         clusterShardAllocation.nodeShardAllocations().stream()
+                .filter(nodeShardAllocation -> !UNASSIGNED_NODE.equals(nodeShardAllocation.node()))
                 .filter(nodeShardAllocation -> ((float) nodeShardAllocation.shards() / maxShardsPerNode) > SHARD_USAGE_THRESHOLD)
                 .forEach(nodeShardAllocation -> {
                     String node = nodeShardAllocation.node();
