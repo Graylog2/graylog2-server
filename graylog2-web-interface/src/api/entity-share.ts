@@ -58,11 +58,13 @@ export const prepareEntityShare = (
   entityGRN: GRN | null,
   payload: Optional<EntitySharePayload> = DEFAULT_PREPARE_PAYLOAD,
 ): Promise<EntityShareState> => {
-  const url = entityGRN
-    ? ApiRoutes.EntityShareController.prepare(entityGRN).url
-    : ApiRoutes.EntityShareController.prepareEntityCreate().url;
+  // The endpoint for existing entities rejects `prepare_request`, it only supports dependency checks for new entities.
+  const { prepare_request: _prepareRequest, ...existingEntityPayload } = payload;
+  const [url, body] = entityGRN
+    ? [ApiRoutes.EntityShareController.prepare(entityGRN).url, existingEntityPayload]
+    : [ApiRoutes.EntityShareController.prepareEntityCreate().url, payload];
 
-  return fetch('POST', qualifyUrl(url), JSON.stringify(payload)).then((response: EntityShareStateJson) =>
+  return fetch('POST', qualifyUrl(url), JSON.stringify(body)).then((response: EntityShareStateJson) =>
     EntityShareState.fromJSON(response),
   );
 };
