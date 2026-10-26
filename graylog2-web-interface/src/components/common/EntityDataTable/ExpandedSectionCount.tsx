@@ -31,7 +31,6 @@ type Props = {
 
 /**
  * Count of the items in an expanded section. Clicking it opens the row on that section.
- * Like the row expand column, it uses a chevron, which in entity tables always means "details below the row".
  */
 const ExpandedSectionCount = (
   { entityId, section, count, label, abbreviate = false }: Props,

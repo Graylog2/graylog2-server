@@ -89,7 +89,6 @@ type Props<ItemType> = {
 /**
  * Standard way to display a list in an entity data table cell: the first item(s) and the number of
  * remaining items. Expanding the list reveals the rest in the same cell.
- * The toggle has no chevron, since chevrons in entity tables open the details below a row.
  */
 const ExpandableCellList = <ItemType,>({
   items,
@@ -131,7 +130,13 @@ const ExpandableCellList = <ItemType,>({
         {items.slice(0, collapsedCount).map((item) => (
           <CollapsedItem key={getItemKey(item)}>{renderItem(item)}</CollapsedItem>
         ))}
-        <ToggleBadge color="gray" size="sm" onClick={toggle} title={title} aria-label={title}>
+        <ToggleBadge
+          color="gray"
+          size="sm"
+          rightIcon="keyboard_arrow_down"
+          onClick={toggle}
+          title={title}
+          aria-label={title}>
           +{hiddenCount}
         </ToggleBadge>
       </CollapsedRow>
@@ -141,7 +146,7 @@ const ExpandableCellList = <ItemType,>({
   return (
     <Expanded>
       {allItems}
-      <ToggleBadge color="gray" size="sm" onClick={toggle}>
+      <ToggleBadge color="gray" size="sm" rightIcon="keyboard_arrow_up" onClick={toggle}>
         Show less
       </ToggleBadge>
     </Expanded>
