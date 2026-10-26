@@ -35,6 +35,10 @@ jest.mock('logic/rest/FetchProvider', () => {
 
   return { ...jest.requireActual('logic/rest/FetchProvider'), __esModule: true, default: jest.fn() };
 });
+jest.mock('@graylog/server-api', () => ({
+  ...jest.requireActual('@graylog/server-api'),
+  SearchJobs: { cancelAsyncSearchJob: jest.fn(() => Promise.resolve()) },
+}));
 
 const SEARCH_ID = 'welcome-search-id';
 
