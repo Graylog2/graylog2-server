@@ -19,11 +19,19 @@ import styled, { css } from 'styled-components';
 import { FlatContentRow } from 'components/common';
 
 export const SEARCH_BAR_GAP = '10px';
+export const SEARCH_BAR_CONTAINER_NAME = 'search-bar';
 
-export const SearchBarContainer = styled(FlatContentRow)`
+// The rows adapt to the width of the search bar instead of the viewport,
+// e.g. they also stack when the sidebar is pinned on a wide screen.
+export const searchBarContainerStyles = css`
+  container: ${SEARCH_BAR_CONTAINER_NAME} / inline-size;
   display: flex;
   flex-direction: column;
   gap: ${SEARCH_BAR_GAP};
+`;
+
+export const SearchBarContainer = styled(FlatContentRow)`
+  ${searchBarContainerStyles}
 `;
 
 export const SearchQueryRow = styled.div(
@@ -32,7 +40,7 @@ export const SearchQueryRow = styled.div(
     gap: ${SEARCH_BAR_GAP};
     align-items: flex-start;
 
-    @media (max-width: ${theme.breakpoints.max.sm}) {
+    @container ${SEARCH_BAR_CONTAINER_NAME} (max-width: ${theme.breakpoints.max.sm}) {
       flex-direction: column;
 
       > div {
@@ -60,7 +68,7 @@ export const TimeRangeRow = styled.div(
     gap: ${SEARCH_BAR_GAP};
     align-items: flex-start;
 
-    @media (max-width: ${theme.breakpoints.max.md}) {
+    @container ${SEARCH_BAR_CONTAINER_NAME} (max-width: ${theme.breakpoints.max.md}) {
       flex-direction: column;
 
       > div {
