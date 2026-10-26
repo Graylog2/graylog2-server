@@ -352,16 +352,14 @@ declare module 'graylog-web-plugin/plugin' {
     StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
     fetchStreamDataLakeStatus: (streamId: string) => Promise<{
       id: string;
-      archive_name: string;
       enabled: boolean;
       stream_id: string;
-      retention_time: number;
+      retention_time: string;
     }>;
     fetchStreamDataLake: (streamId: string) => Promise<{
       id: string;
       archive_config_id: string;
       message_count: number;
-      archive_name: string;
       timestamp_from: string;
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
