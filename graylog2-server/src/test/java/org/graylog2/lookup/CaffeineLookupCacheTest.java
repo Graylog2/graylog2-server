@@ -120,6 +120,104 @@ public class CaffeineLookupCacheTest {
     }
 
     @Test
+    public void readsDoNotExtendPastResultTtl() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        LookupCache cache = buildCache(ticker, 60, 0, 10);
+        LookupResult lr1 = LookupResult.builder().single("x1").cacheTTL(TimeUnit.SECONDS.toMillis(10)).build();
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(5));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(4));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        // Each read above would have reset expiry to the 60s access window; the 10s TTL must still win.
+        ticker.advance(Duration.ofSeconds(2));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
+    public void readsDoNotExtendPastResultTtlAcrossTickerRollover() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        ticker.advance(Long.MAX_VALUE - Duration.ofSeconds(2).toNanos());
+        LookupCache cache = buildCache(ticker, 60, 0, 10);
+        LookupResult lr1 = LookupResult.builder().single("x1").cacheTTL(TimeUnit.SECONDS.toMillis(5)).build();
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        // Reads on both sides of the ticker wrapping past Long.MAX_VALUE stay within the 5s TTL.
+        for (int i = 0; i < 4; i++) {
+            ticker.advance(Duration.ofSeconds(1));
+            Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+        }
+
+        ticker.advance(Duration.ofSeconds(2));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
+    public void readsDoNotExtendPastExpireAfterWrite() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        LookupCache cache = buildCache(ticker, 60, 30, 10);
+        LookupResult lr1 = LookupResult.single("x1");
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(20));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(20));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
+    public void resultTtlDoesNotExtendPastExpireAfterWrite() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        LookupCache cache = buildCache(ticker, 0, 30, 10);
+        LookupResult lr1 = LookupResult.builder().single("x1").cacheTTL(TimeUnit.HOURS.toMillis(1)).build();
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(29));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(2));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
+    public void expireAfterAccessStillEvictsIdleTtlResults() throws Exception {
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        LookupCache cache = buildCache(ticker, 60, 0, 10);
+        LookupResult lr1 = LookupResult.builder().single("x1").cacheTTL(TimeUnit.HOURS.toMillis(1)).build();
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+        final LookupCacheKey key = LookupCacheKey.createFromJSON("x", "y");
+
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(1));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x1");
+
+        ticker.advance(Duration.ofSeconds(61));
+        Assertions.assertThat(cache.get(key, loader).singleValue()).isEqualTo("x2");
+    }
+
+    @Test
     public void ttlError() throws Exception {
         LookupCache cache = buildCache(false);
         LookupResult lr1 = LookupResult.empty();
@@ -165,6 +263,7 @@ public class CaffeineLookupCacheTest {
                 .expireAfterAccess(expireAfterAccess)
                 .expireAfterAccessUnit(TimeUnit.SECONDS)
                 .expireAfterWrite(expireAfterWrite)
+                .expireAfterWriteUnit(TimeUnit.SECONDS)
                 .ignoreNull(false)
                 .ttlEmpty(ttlEmpty)
                 .ttlEmptyUnit(TimeUnit.SECONDS)
