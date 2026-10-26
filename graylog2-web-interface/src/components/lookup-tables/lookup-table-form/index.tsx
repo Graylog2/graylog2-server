@@ -34,6 +34,7 @@ import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
 import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
+import validateDefaultValue from './validate-default-value';
 
 export type LookupTableType = LookupTable & {
   enable_single_value: boolean;
@@ -63,6 +64,12 @@ const validations = (values: LookupTableType) => {
   if (!values.name) errors.name = 'Name is required';
   if (!values.cache_id) errors.cache_id = 'Cache is required';
   if (!values.data_adapter_id) errors.data_adapter_id = 'Data Adapter is required';
+
+  const singleValueError = validateDefaultValue(values.default_single_value, values.default_single_value_type);
+  if (singleValueError) errors.default_single_value = singleValueError;
+
+  const multiValueError = validateDefaultValue(values.default_multi_value, values.default_multi_value_type);
+  if (multiValueError) errors.default_multi_value = multiValueError;
 
   return errors;
 };

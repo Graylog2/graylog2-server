@@ -123,6 +123,8 @@ function LookupTableFormFields() {
             validationState={touched.default_single_value && errors.default_single_value ? 'error' : undefined}
             onBlur={() => setFieldTouched('default_single_value', true)}
             update={(value, valueType) => {
+              // A type change can invalidate the value without the field ever being blurred.
+              if (valueType !== values.default_single_value_type) setFieldTouched('default_single_value', true, false);
               setFieldValue('default_single_value', value);
               setFieldValue('default_single_value_type', valueType);
             }}
@@ -165,6 +167,8 @@ function LookupTableFormFields() {
             validationState={touched.default_multi_value && errors.default_multi_value ? 'error' : undefined}
             onBlur={() => setFieldTouched('default_multi_value', true)}
             update={(value, valueType) => {
+              // A type change can invalidate the value without the field ever being blurred.
+              if (valueType !== values.default_multi_value_type) setFieldTouched('default_multi_value', true, false);
               setFieldValue('default_multi_value', value);
               setFieldValue('default_multi_value_type', valueType);
             }}

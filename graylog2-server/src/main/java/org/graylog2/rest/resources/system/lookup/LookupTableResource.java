@@ -343,6 +343,7 @@ public class LookupTableResource extends RestResource {
     @Operation(summary = "Create a new lookup table")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public LookupTableApi createTable(@RequestBody(required = true) LookupTableApi lookupTable) {
+        checkDefaultValues(lookupTable);
         try {
             LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
@@ -363,6 +364,7 @@ public class LookupTableResource extends RestResource {
                                       @Valid @RequestBody(required = true) LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
+        checkDefaultValues(toUpdate);
         LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
 
         return LookupTableApi.fromDto(saved);
@@ -406,18 +408,34 @@ public class LookupTableResource extends RestResource {
             }
         }
 
+        validation.addAll(validateDefaultValues(toValidate));
+
+        return validation;
+    }
+
+    private static ValidationResult validateDefaultValues(LookupTableApi lookupTable) {
+        final ValidationResult validation = new ValidationResult();
         try {
-            LookupDefaultSingleValue.create(toValidate.defaultSingleValue(), toValidate.defaultSingleValueType());
+            LookupDefaultSingleValue.create(lookupTable.defaultSingleValue(), lookupTable.defaultSingleValueType());
         } catch (Exception e) {
             validation.addError(LookupTableApi.FIELD_DEFAULT_SINGLE_VALUE, e.getMessage());
         }
         try {
-            LookupDefaultMultiValue.create(toValidate.defaultMultiValue(), toValidate.defaultMultiValueType());
+            LookupDefaultMultiValue.create(lookupTable.defaultMultiValue(), lookupTable.defaultMultiValueType());
         } catch (Exception e) {
             validation.addError(LookupTableApi.FIELD_DEFAULT_MULTI_VALUE, e.getMessage());
         }
-
         return validation;
+    }
+
+    // An unparseable default stops the table from loading at all, so reject it instead of saving it.
+    private static void checkDefaultValues(LookupTableApi lookupTable) {
+        final ValidationResult validation = validateDefaultValues(lookupTable);
+        if (validation.failed()) {
+            throw new BadRequestException(validation.getErrors().values().stream()
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.joining(" ")));
+        }
     }
 
     @GET

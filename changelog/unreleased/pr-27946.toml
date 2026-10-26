@@ -1,0 +1,4 @@
+type = "f"
+message = "Validate lookup table default values against their type when saving, instead of storing values that prevent the table from loading."
+
+pulls = ["27946"]
