@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const navigation = 1030;
 const modalBase = 1040;
 const sidebar = 6;
 const tableHeaderCell = 100;
@@ -24,11 +25,15 @@ const zIndices = {
   sidebarOverlay: sidebar - 1,
   tableHeaderCell: tableHeaderCell,
   tableHeaderCellPinned: tableHeaderCell + 100,
+  expandButton: 10,
+  resizeHandle: 100,
+  navigationDropdown: navigation + 2,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
   confirmModalOverlay: modalBase + 11,
   confirmModalBody: modalBase + 12,
   notifications: modalBase + 13,
   dropdownMenu: modalBase + 13,
+  indicator: 2000,
 } as const;
 export default zIndices;
