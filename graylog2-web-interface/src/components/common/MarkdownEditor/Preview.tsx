@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 import PreviewModal from './PreviewModal';
 
@@ -58,7 +59,7 @@ const ExpandIconButton = styled(IconButton)`
   right: 0;
   padding: 8px 16px;
   cursor: pointer;
-  z-index: 10;
+  z-index: ${zIndices.expandButton};
 `;
 
 const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`

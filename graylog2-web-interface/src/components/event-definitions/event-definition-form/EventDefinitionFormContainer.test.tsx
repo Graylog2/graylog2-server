@@ -208,10 +208,7 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
   ),
 }));
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: { prepare: jest.fn(() => Promise.resolve()), update: jest.fn(() => Promise.resolve()) },
-}));
+jest.mock('domainActions/permissions/EntityShareDomain');
 
 // Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
 jest.mock('components/common/ConfirmLeaveDialog', () => () => null);
@@ -379,7 +376,7 @@ describe('EventDefinitionFormContainer', () => {
 
   it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
     // Mirrors the server: the prepared state reflects exactly the capabilities that were sent.
-    asMock(EntityShareDomain.prepare).mockImplementation((_type, _title, _grn, payload?: any) =>
+    asMock(EntityShareDomain.prepareCreate).mockImplementation((_type, _title, payload?: any) =>
       Promise.resolve(
         createEntityShareState
           .toBuilder()

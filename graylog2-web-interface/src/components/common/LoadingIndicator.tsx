@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+import zIndices from 'theme/z-indices';
 
 import Delayed from './Delayed';
 
@@ -32,7 +33,7 @@ const Container = styled.div(
     left: 50%;
     transform: translateX(-50%);
     box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
-    z-index: 2000;
+    z-index: ${zIndices.indicator};
   `,
 );
 
