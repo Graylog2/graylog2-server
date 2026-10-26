@@ -16,6 +16,8 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
+import { EntityLists } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
@@ -86,7 +88,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?
   const url = preferencesUrl(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch('POST', url, preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }));
-  const resetMutationFn = () => fetch('DELETE', url);
+  const resetMutationFn = () => EntityLists.remove(entityTableId, layoutVariant || undefined);
   const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {

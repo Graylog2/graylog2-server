@@ -17,12 +17,15 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
+import { EntityScope } from '@graylog/server-api';
+
 import { asMock } from 'helpers/mocking';
-import fetch from 'logic/rest/FetchProvider';
 
 import useScopePermissions from './useScopePermissions';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({
+  EntityScope: { getAllEntityScopes: jest.fn() },
+}));
 
 const entityScopes = {
   entity_scopes: {
@@ -37,7 +40,7 @@ describe('useScopePermissions', () => {
   });
 
   it('returns the permissions of the entity scope', async () => {
-    asMock(fetch).mockResolvedValue(entityScopes);
+    asMock(EntityScope.getAllEntityScopes).mockResolvedValue(entityScopes);
 
     const { result } = renderHook(() => useScopePermissions({ _scope: 'illuminate' }));
 
@@ -48,7 +51,7 @@ describe('useScopePermissions', () => {
   });
 
   it('uses the default scope for entities without a scope', async () => {
-    asMock(fetch).mockResolvedValue(entityScopes);
+    asMock(EntityScope.getAllEntityScopes).mockResolvedValue(entityScopes);
 
     const { result } = renderHook(() => useScopePermissions({}));
 
@@ -58,7 +61,7 @@ describe('useScopePermissions', () => {
   });
 
   it('treats unknown scopes as not mutable', async () => {
-    asMock(fetch).mockResolvedValue(entityScopes);
+    asMock(EntityScope.getAllEntityScopes).mockResolvedValue(entityScopes);
 
     const { result } = renderHook(() => useScopePermissions({ _scope: 'UNKNOWN' }));
 
@@ -69,7 +72,7 @@ describe('useScopePermissions', () => {
   });
 
   it('treats a response without scopes as not mutable', async () => {
-    asMock(fetch).mockResolvedValue({});
+    asMock(EntityScope.getAllEntityScopes).mockResolvedValue({ entity_scopes: undefined });
 
     const { result } = renderHook(() => useScopePermissions({ _scope: 'DEFAULT' }));
 

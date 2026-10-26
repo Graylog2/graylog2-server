@@ -55,22 +55,9 @@ export type UserUpdate = Partial<
   }
 >;
 
-export type Token = {
-  id: string;
-  name: string;
-  token: string;
-  last_access: string;
-  expires_at: string;
-};
+export type Token = Awaited<ReturnType<typeof Users.generateNewToken>>;
 
-export type TokenSummary = {
-  id: string;
-  name: string;
-  last_access: string;
-  created_at: string;
-  expires_at: string;
-  tokenTtl: string;
-};
+export type TokenSummary = Awaited<ReturnType<typeof Users.listTokens>>['tokens'][number];
 
 export type ChangePasswordRequest = {
   old_password: string;
@@ -125,19 +112,11 @@ export const deleteUser = (userId: string): Promise<void> => Users.deleteUserByI
 export const changeUserPassword = (userId: string, request: ChangePasswordRequest): Promise<void> =>
   Users.changePassword(encodeURIComponent(userId), request);
 
-export const createUserToken = (userId: string, tokenName: string, tokenTtl: string): Promise<Token> => {
-  const url = qualifyUrl(
-    ApiRoutes.UsersApiController.create_token(encodeURIComponent(userId), encodeURIComponent(tokenName)).url,
-  );
+export const createUserToken = (userId: string, tokenName: string, tokenTtl: string): Promise<Token> =>
+  Users.generateNewToken(encodeURIComponent(userId), encodeURIComponent(tokenName), { token_ttl: tokenTtl });
 
-  return fetch('POST', url, { token_ttl: tokenTtl });
-};
-
-export const loadUserTokens = (userId: string): Promise<TokenSummary[]> => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(userId)).url);
-
-  return fetch('GET', url).then((response) => response.tokens);
-};
+export const loadUserTokens = (userId: string): Promise<TokenSummary[]> =>
+  Users.listTokens(encodeURIComponent(userId)).then((response) => response.tokens);
 
 export const deleteUserToken = (userId: string, tokenId: string): Promise<void> =>
   Users.revokeToken(encodeURIComponent(userId), encodeURIComponent(tokenId));
@@ -163,11 +142,8 @@ export const loadUsersPaginated = ({ page, perPage, query }: Pagination): Promis
     },
   }));
 
-export const setUserStatus = (userId: string, accountStatus: AccountStatus): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.setStatus(userId, accountStatus).url);
-
-  return fetch('PUT', url);
-};
+export const setUserStatus = (userId: string, accountStatus: AccountStatus): Promise<unknown> =>
+  Users.updateAccountStatus(userId, accountStatus);
 
 export const useUsers = (query: Query = {}) =>
   useQuery({

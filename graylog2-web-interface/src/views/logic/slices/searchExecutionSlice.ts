@@ -153,7 +153,7 @@ export type SearchExecutors = {
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) => Promise<SearchExecutionResult>;
-  cancelJob: (jobIds: JobIds) => Promise<null>;
+  cancelJob: (jobIds: JobIds) => Promise<void>;
 };
 
 export const cancelExecutedJob =

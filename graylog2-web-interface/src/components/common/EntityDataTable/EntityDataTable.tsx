@@ -185,7 +185,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Function to handle page size changes */
   onPageSizeChange?: (newPageSize: number) => void;
   /** Function to handle layout preferences reset */
-  onResetLayoutPreferences: () => Promise<void>;
+  onResetLayoutPreferences: () => Promise<unknown>;
   /** Active page size */
   pageSize?: number;
   appSection?: string;
