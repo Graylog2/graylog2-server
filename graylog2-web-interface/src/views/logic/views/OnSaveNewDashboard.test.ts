@@ -26,7 +26,7 @@ import useEntityShareState from 'hooks/useEntityShareState';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
-import { loadDashboard } from './Actions';
+import { loadDashboardWithSearch } from './Actions';
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
@@ -71,7 +71,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).toHaveBeenCalled();
+    expect(loadDashboardWithSearch).toHaveBeenCalled();
   });
 
   it('sets dirty flag to false', async () => {
@@ -98,7 +98,17 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).toHaveBeenCalledWith(expect.anything(), 'deadbeef');
+    expect(loadDashboardWithSearch).toHaveBeenCalledWith(expect.anything(), 'deadbeef', undefined);
+  });
+
+  it('keeps query parameters when redirecting to saved view', async () => {
+    const view = View.create().toBuilder().id('deadbeef').build();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
+    const search = '?page=query-id&rangetype=relative&relative=3600';
+
+    await dispatch(OriginalOnSaveNewDashboard(view, history, undefined, 'existing-id', search));
+
+    expect(loadDashboardWithSearch).toHaveBeenCalledWith(expect.anything(), 'deadbeef', search);
   });
 
   it('shows notification upon success', async () => {
@@ -119,7 +129,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).not.toHaveBeenCalled();
+    expect(loadDashboardWithSearch).not.toHaveBeenCalled();
     expect(UserNotification.success).not.toHaveBeenCalled();
     expect(UserNotification.error).toHaveBeenCalledTimes(1);
     expect(UserNotification.error).toHaveBeenCalledWith('Saving view failed: Error: Something bad happened!', 'Error!');
