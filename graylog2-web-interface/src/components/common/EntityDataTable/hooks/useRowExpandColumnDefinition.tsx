@@ -37,6 +37,7 @@ const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> })
   return (
     <Container>
       <IconButton
+        bsStyle="default"
         name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
         title={isExpanded ? 'Collapse row' : 'Expand row'}
         onClick={() => toggleRow(row.id)}
