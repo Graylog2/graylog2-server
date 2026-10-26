@@ -72,7 +72,7 @@ public class IndexFieldTypePollerAdapterOS implements IndexFieldTypePollerAdapte
                 .stream()
                 // The "type" value is "object" if we deal with a nested data type
                 // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
-                .filter(field -> !field.getValue().type().equalsIgnoreCase(Property.Kind.Object.name()))
+                .filter(field -> !field.getValue().type().equals(Property.Kind.Object.jsonValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (!streamAwareFieldTypes) {

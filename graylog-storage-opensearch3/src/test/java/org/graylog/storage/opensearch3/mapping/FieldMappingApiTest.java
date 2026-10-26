@@ -118,5 +118,31 @@ class FieldMappingApiTest {
         assertEquals(expectedResult, result);
     }
 
+    @Test
+    void testGeoPointTypeIsCorrectlyMapped() {
+        String mappingResponse = """
+                {
+                  "graylog_42": {
+                    "mappings": {
+                      "properties": {
+                        "location": {
+                          "type": "geo_point"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
+                .build();
+
+        final FieldMappingApi api = new FieldMappingApi(opensearchClient);
+
+        final Map<String, FieldMappingApi.FieldMapping> result = api.fieldTypes("graylog_42");
+        assertEquals(Map.of("location", new FieldMappingApi.FieldMapping("geo_point", false)), result);
+    }
+
 
 }
