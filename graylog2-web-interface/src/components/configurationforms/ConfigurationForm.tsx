@@ -63,7 +63,7 @@ export type RefType<Configuration extends object> = {
 };
 
 const defaultConfigFields = {};
-const defaultCancelAction = () => {};
+const defaultCancelAction = () => { };
 const defaultInitialValues = {};
 
 const ConfigurationForm = <Configuration extends object>(
@@ -123,19 +123,12 @@ const ConfigurationForm = <Configuration extends object>(
     return data;
   };
 
-  const sortByPosOrOptionality = (x1, x2) => {
+  const sortByPosition = (x1, x2) => {
     const DEFAULT_POSITION = 100; // corresponds to ConfigurationField.java
     const x1pos = configFields[x1.name].position || DEFAULT_POSITION;
     const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
 
     let diff = x1pos - x2pos;
-
-    if (!diff) {
-      const isOptionalToNumber = (optional: boolean): number => (optional ? 1 : 0);
-
-      diff =
-        isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
-    }
 
     if (!diff) {
       // Sort equal fields stably
@@ -250,7 +243,7 @@ const ConfigurationForm = <Configuration extends object>(
 
   const sortedConfigFieldKeys = Object.keys(configFields)
     .map((name, pos) => ({ name, pos }))
-    .sort(sortByPosOrOptionality);
+    .sort(sortByPosition);
 
   const renderedConfigFields = sortedConfigFieldKeys.map((key) => {
     const configField = renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
