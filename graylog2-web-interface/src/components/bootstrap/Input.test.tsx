@@ -75,4 +75,15 @@ describe('Input', () => {
     await screen.findByText('The error message');
     await screen.findByText('The help text');
   });
+
+  it('exposes the checkbox DOM state through getChecked()', async () => {
+    const ref = React.createRef<Input>();
+    render(<Input ref={ref} id="testCheckbox" type="checkbox" label="Test" defaultChecked onChange={() => {}} />);
+
+    await screen.findByRole('checkbox');
+
+    expect(ref.current).not.toBeNull();
+    expect(() => ref.current.getChecked()).not.toThrow();
+    expect(ref.current.getChecked()).toBe(true);
+  });
 });

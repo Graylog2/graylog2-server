@@ -86,7 +86,9 @@ class Input extends React.Component<
 
   private input: HTMLInputElement;
 
-  getInputDOMNode = () => this.input;
+  private checkboxRef = React.createRef<HTMLInputElement>();
+
+  getInputDOMNode = () => this.input ?? this.checkboxRef.current;
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
@@ -168,13 +170,13 @@ class Input extends React.Component<
         <InputWrapper className={wrapperClassName}>
           {buttonAfter ? (
             <InputGroup>
-              <Checkbox ref={this.input} {...controlProps}>
+              <Checkbox ref={this.checkboxRef} {...controlProps}>
                 {label}
               </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
             </InputGroup>
           ) : (
-            <Checkbox ref={this.input} {...controlProps}>
+            <Checkbox ref={this.checkboxRef} {...controlProps}>
               {label}
             </Checkbox>
           )}
