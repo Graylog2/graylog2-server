@@ -18,11 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { System } from '@graylog/server-api';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-
-export type Locales = { language_tag: string; display_name: string };
+export type Locales = Awaited<ReturnType<typeof System.locales>>['locales'];
 
 type SystemInfo = {
   cluster_id: string;
@@ -42,10 +38,9 @@ type SystemInfo = {
 
 export const fetchSystemInfo = (): Promise<SystemInfo> => System.system();
 
-export const fetchSystemJvm = () => fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.jvm().url));
+export const fetchSystemJvm = () => System.jvm();
 
-export const fetchSystemLocales = (): Promise<{ locales: Array<Locales> }> =>
-  fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.locales().url));
+export const fetchSystemLocales = () => System.locales();
 
 const useSystemInfo = () => useQuery({ queryKey: ['system', 'info'], queryFn: fetchSystemInfo });
 

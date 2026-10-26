@@ -55,7 +55,15 @@ describe('Footer', () => {
       isLoading: false,
     } as ReturnType<typeof useSystemInfo>);
 
-    asMock(fetchSystemJvm).mockResolvedValue({ info: 'SomeJDK v12.0.0' });
+    asMock(fetchSystemJvm).mockResolvedValue({
+      info: 'SomeJDK v12.0.0',
+      pid: '1',
+      node_id: 'deadbeef',
+      total_memory: {},
+      free_memory: {},
+      used_memory: {},
+      max_memory: {},
+    });
   });
 
   it('includes Graylog version', async () => {

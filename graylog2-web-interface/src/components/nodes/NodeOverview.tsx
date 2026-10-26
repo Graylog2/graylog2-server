@@ -17,6 +17,8 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type { Cluster } from '@graylog/server-api';
+
 import { LinkContainer } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -52,21 +54,7 @@ type InputState = {
   started_at: string;
   state: string;
 };
-type Memory = {
-  bytes: number;
-  kilobytes: number;
-  megabytes: number;
-};
-
-type JvmInformation = {
-  free_memory: Memory;
-  max_memory: Memory;
-  total_memory: Memory;
-  used_memory: Memory;
-  node_id: string;
-  pid: string;
-  info: string;
-};
+type JvmInformation = Awaited<ReturnType<typeof Cluster.jvm>>;
 
 type Props = {
   node: NodeInfo;

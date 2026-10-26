@@ -17,19 +17,15 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { ConfigurationField } from 'components/configurationforms';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemOutputs } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type Output = {
   id: string;
   title: string;
   type: string;
-  configuration: {
-    [key: string]: ConfigurationField;
-  };
+  configuration: Awaited<ReturnType<typeof SystemOutputs.get>>['outputs'][number]['configuration'];
 };
 
 type OutputRequestResponse = {
@@ -39,11 +35,7 @@ type OutputRequestResponse = {
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = () => [...KEY_PREFIX];
 
-export const fetchOutputs = () => {
-  const url = qualifyUrl(ApiRoutes.OutputsApiController.index().url);
-
-  return fetch('GET', url);
-};
+export const fetchOutputs = () => SystemOutputs.get();
 
 type Options = {
   enabled: boolean;

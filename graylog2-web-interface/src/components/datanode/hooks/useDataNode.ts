@@ -16,12 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
+import { Datanode } from '@graylog/server-api';
+
 import type { DataNode } from 'components/datanode/Types';
-import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
+const fetchDataNode = async (datanodeId: string) => Datanode.getDataNode(datanodeId);
 
 const useDataNode = (
   datanodeId: string,
@@ -32,7 +32,7 @@ const useDataNode = (
   error: any;
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery({
-    queryKey: ['datanode'],
+    queryKey: ['datanode', datanodeId],
     queryFn: () =>
       defaultOnError(fetchDataNode(datanodeId), 'Loading Data Node failed with status', 'Could not load Data Node'),
     notifyOnChangeProps: ['data', 'error'],

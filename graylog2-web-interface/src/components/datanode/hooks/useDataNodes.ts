@@ -16,13 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { CertificateRenewal, Datanode } from '@graylog/server-api';
+import { CertificateRenewal, Datanode, SystemDatanodes } from '@graylog/server-api';
 
-import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
-import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { DataNodes } from 'components/datanode/Types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -173,24 +170,24 @@ export const renewDatanodeCertificate = (nodeId: string) =>
       UserNotification.error(`Certificate renewal failed with error: ${error}`);
     });
 
-export const fetchDataNodes = async (params: SearchParams): Promise<DataNodeResponse> => {
-  const url = PaginationURL('/system/cluster/datanodes', params.page, params.pageSize, params.query, {
-    sort: params.sort?.attributeId,
-    order: params.sort?.direction,
-  });
-
-  return fetch('GET', qualifyUrl(url)).then(({ attributes, pagination, elements }) => ({
+export const fetchDataNodes = async (params: SearchParams): Promise<DataNodeResponse> =>
+  SystemDatanodes.dataNodes(
+    params.sort?.attributeId as Parameters<typeof SystemDatanodes.dataNodes>[0],
+    params.page,
+    params.pageSize,
+    params.query || undefined,
+    params.sort?.direction,
+  ).then(({ attributes, pagination, elements }) => ({
     attributes,
     list: elements,
     pagination,
   }));
-};
 
 export const keyFn = (searchParams: SearchParams) => ['datanodes', searchParams];
 
 export type DataNodeResponse = {
   list: DataNodes;
-  pagination: PaginatedResponseType;
+  pagination: Awaited<ReturnType<typeof SystemDatanodes.dataNodes>>['pagination'];
   attributes: Array<Attribute>;
 };
 

@@ -45,7 +45,7 @@ const baseInput: Input = {
   node: 'node-1',
   created_at: '2024-01-01T00:00:00.000Z',
   creator_user_id: 'user',
-  content_pack: false,
+  content_pack: '',
   static_fields: {},
   attributes: {},
 };
