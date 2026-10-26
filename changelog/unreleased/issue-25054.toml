@@ -1,5 +1,5 @@
 type = "f"
-message = "Restore the Remediation Steps Markdown editor in the Event Definition form for installations without a Security license."
+message = "Restore ability to create and modify Remediation Steps for Event Definitions on installations without a Security license."
 
 contributors = ["@r-buc"]
 
