@@ -26,7 +26,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import EditProfile from 'components/indices/IndexSetFieldTypeProfiles/EditProfile';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
-import { profile1 } from 'fixtures/indexSetFieldTypeProfiles';
+import { profile1, requestBodyProfile1JSON } from 'fixtures/indexSetFieldTypeProfiles';
 
 const renderEditProfile = () => render(<EditProfile profile={profile1} />);
 
@@ -36,7 +36,7 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
 describe('EditProfile', () => {
-  const createMock = jest.fn(() => Promise.resolve());
+  const createMock = jest.fn(() => Promise.resolve(requestBodyProfile1JSON));
   const editMock = jest.fn(() => Promise.resolve());
   const deleteMock = jest.fn(() => Promise.resolve());
 

@@ -18,10 +18,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { IndexerIndices } from '@graylog/server-api';
 
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-
 export const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
 export const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
 export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY =
@@ -90,20 +86,9 @@ export type IndexInfo = {
 
 export type Indices = Array<IndexInfo>;
 
-type IndicesListResponse = {
-  all: {
-    indices: Indices;
-  };
-  closed: {
-    indices: Indices;
-  };
-};
+export const fetchIndices = (indexSetId: string) => IndexerIndices.indexSetList(indexSetId);
 
-export const fetchIndices = (indexSetId: string): Promise<IndicesListResponse> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url));
-
-export const fetchAllIndices = (): Promise<IndicesListResponse> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndicesApiController.listAll().url));
+export const fetchAllIndices = () => IndexerIndices.all();
 
 export const fetchMultipleIndices = (indexNames: string[]): Promise<Indices> =>
   IndexerIndices.multiple({ indices: indexNames }, { requestShouldExtendSession: false });
@@ -116,7 +101,7 @@ export const reopenIndex = (indexName: string): Promise<unknown> => IndexerIndic
 
 type ListResult = {
   indices: Indices | undefined;
-  closedIndices: Indices | undefined;
+  closedIndices: Array<string> | undefined;
 };
 
 export const useIndices = (indexSetId: string) =>

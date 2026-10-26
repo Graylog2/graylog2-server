@@ -16,12 +16,11 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemIndexSetsTypes } from '@graylog/server-api';
+
 import type { SearchParams } from 'stores/PaginationTypes';
-import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-import type { IndexSetFieldTypeJson, IndexSetFieldTypesQueryData } from 'components/indices/IndexSetFieldTypes/types';
+import type { IndexSetFieldTypesQueryData } from 'components/indices/IndexSetFieldTypes/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
@@ -35,16 +34,17 @@ export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypes', sear
 export const fetchIndexSetFieldTypes = async (
   indexSetId: string,
   searchParams: SearchParams,
-): Promise<IndexSetFieldTypesQueryData> => {
-  const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
-  const url = PaginationURL(indexSetFieldTypeUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
-    filters: FiltersForQueryParams(searchParams.filters),
-    sort: searchParams.sort.attributeId,
-    order: searchParams.sort.direction,
-  });
-
-  return fetch('GET', url).then(({ elements, total, attributes }) => ({
-    list: elements.map((fieldType: IndexSetFieldTypeJson) => ({
+): Promise<IndexSetFieldTypesQueryData> =>
+  SystemIndexSetsTypes.indexSetFieldTypesList(
+    searchParams.sort.attributeId as Parameters<typeof SystemIndexSetsTypes.indexSetFieldTypesList>[0],
+    indexSetId,
+    searchParams.query || undefined,
+    FiltersForQueryParams(searchParams.filters),
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.sort.direction,
+  ).then(({ elements, total, attributes }) => ({
+    list: elements.map((fieldType) => ({
       id: fieldType.field_name,
       fieldName: fieldType.field_name,
       type: fieldType.type,
@@ -54,7 +54,6 @@ export const fetchIndexSetFieldTypes = async (
     pagination: { total },
     attributes,
   }));
-};
 
 const useIndexSetFieldTypes = (
   indexSetId: string,

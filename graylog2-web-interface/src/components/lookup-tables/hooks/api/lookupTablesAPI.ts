@@ -18,12 +18,10 @@ import { ClusterLookupTable, SystemLookup } from '@graylog/server-api';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import PaginationURL from 'util/PaginationURL';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { LookupPreviewType } from 'components/lookup-tables/types';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
 const _url = (path: string) => qualifyUrl(`/system/lookup/${path}`);
@@ -58,11 +56,14 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const url = _url(
-    PaginationURL('tables', page, pageSize, query, { resolve: true, sort: sortField, order: sortOrder }),
-  );
-
-  return fetch('GET', url).then(deserializeLookupTables);
+  return SystemLookup.tables(
+    sortField as Parameters<typeof SystemLookup.tables>[0],
+    page,
+    pageSize,
+    sortOrder,
+    query || undefined,
+    true,
+  ).then(deserializeLookupTables);
 };
 
 export const fetchLookupTable = async (idOrName: string): Promise<{ lookup_tables: Array<LookupTable> }> =>
@@ -81,8 +82,7 @@ export const purgeAllLookupTableKey = async (table: LookupTable) => ClusterLooku
 export const testLookupTableKey = async ({ tableName, key }: { tableName: string; key: string }) =>
   SystemLookup.performLookup(tableName, key);
 
-export const fetchLookupPreview = async (idOrName: string, size: number): Promise<LookupPreviewType> =>
-  fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));
+export const fetchLookupPreview = async (idOrName: string, size: number) => SystemLookup.getPreview(idOrName, size);
 
 // Caches
 
@@ -91,9 +91,13 @@ export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const url = _url(PaginationURL('caches', page, pageSize, query, { sort: sortField, order: sortOrder }));
-
-  return fetch('GET', url).then(deserializeCaches);
+  return SystemLookup.caches(
+    sortField as Parameters<typeof SystemLookup.caches>[0],
+    page,
+    pageSize,
+    sortOrder,
+    query || undefined,
+  ).then(deserializeCaches);
 };
 
 export const fetchCache = async (idOrName: string): Promise<LookupTableCache> => SystemLookup.getCache(idOrName);
@@ -116,9 +120,13 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const url = _url(PaginationURL('adapters', page, pageSize, query, { sort: sortField, order: sortOrder }));
-
-  return fetch('GET', url).then(deserializeDataAdapters);
+  return SystemLookup.adapters(
+    sortField as Parameters<typeof SystemLookup.adapters>[0],
+    page,
+    pageSize,
+    sortOrder,
+    query || undefined,
+  ).then(deserializeDataAdapters);
 };
 
 export const fetchDataAdapter = async (idOrName: string): Promise<LookupTableAdapter> =>
@@ -137,4 +145,4 @@ export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
 export const deleteDataAdapter = async (adapterId: string) => SystemLookup.deleteAdapter(adapterId);
 
 export const lookupDataAdapter = async (adapterName: string, key: string) =>
-  fetch('GET', _url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));
+  SystemLookup.performAdapterLookup(adapterName, key);

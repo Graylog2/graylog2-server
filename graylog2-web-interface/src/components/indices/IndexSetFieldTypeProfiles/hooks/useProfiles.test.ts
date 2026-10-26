@@ -17,15 +17,15 @@
 
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { profile1JSON, profile2JSON, profile1, profile2, indexSetsAttribute } from 'fixtures/indexSetFieldTypeProfiles';
 
-const mockData = {
+const mockData: Awaited<ReturnType<typeof SystemIndexSetsFieldTypeProfiles.getPage>> = {
   attributes: [],
   query: '',
   pagination: {
@@ -38,7 +38,7 @@ const mockData = {
     sort: {
       id: 'name',
       direction: 'ASC',
-    } as { id: string; direction: 'ASC' | 'DESC' },
+    },
   },
   total: 1,
   sort: 'name',
@@ -54,11 +54,12 @@ const expectedState = {
   },
 };
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-
 jest.mock('@graylog/server-api', () => ({
   SystemFieldTypes: {
     getAllFieldTypes: jest.fn(() => Promise.resolve()),
+  },
+  SystemIndexSetsFieldTypeProfiles: {
+    getPage: jest.fn(),
   },
 }));
 
@@ -76,22 +77,19 @@ describe('useProfiles custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
+    asMock(SystemIndexSetsFieldTypeProfiles.getPage).mockResolvedValue(mockData);
     const { result } = renderUseProfilesHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith(
-      'GET',
-      qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'),
-    );
+    expect(SystemIndexSetsFieldTypeProfiles.getPage).toHaveBeenCalledWith('name', 1, 10, undefined, undefined, 'asc');
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemIndexSetsFieldTypeProfiles.getPage).mockRejectedValue(new Error('Error'));
 
     const { result } = renderUseProfilesHook();
 

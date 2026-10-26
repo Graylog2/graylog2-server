@@ -17,15 +17,15 @@
 
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemIndexSetsTypes } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useIndexSetFieldType from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { defaultField } from 'fixtures/indexSetFieldTypes';
 
-const mockData = {
+const mockData: Awaited<ReturnType<typeof SystemIndexSetsTypes.indexSetFieldTypesList>> = {
   attributes: [],
   query: '',
   pagination: {
@@ -38,7 +38,7 @@ const mockData = {
     sort: {
       id: 'field_name',
       direction: 'ASC',
-    } as { id: string; direction: 'ASC' | 'DESC' },
+    },
   },
   total: 1,
   sort: 'field_name',
@@ -61,11 +61,12 @@ const expectedState = {
   },
 };
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-
 jest.mock('@graylog/server-api', () => ({
   SystemFieldTypes: {
     getAllFieldTypes: jest.fn(() => Promise.resolve()),
+  },
+  SystemIndexSetsTypes: {
+    indexSetFieldTypesList: jest.fn(),
   },
 }));
 
@@ -84,22 +85,27 @@ describe('useIndexSetFieldType custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
+    asMock(SystemIndexSetsTypes.indexSetFieldTypesList).mockResolvedValue(mockData);
     const { result } = renderUseIndexSetFieldTypeHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith(
-      'GET',
-      qualifyUrl('/system/indices/index_sets/types/id-1?page=1&per_page=10&sort=field_name&order=asc'),
+    expect(SystemIndexSetsTypes.indexSetFieldTypesList).toHaveBeenCalledWith(
+      'field_name',
+      'id-1',
+      undefined,
+      undefined,
+      1,
+      10,
+      'asc',
     );
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemIndexSetsTypes.indexSetFieldTypesList).mockRejectedValue(new Error('Error'));
 
     const { result } = renderUseIndexSetFieldTypeHook();
 
