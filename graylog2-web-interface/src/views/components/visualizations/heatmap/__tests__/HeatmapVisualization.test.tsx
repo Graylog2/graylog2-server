@@ -214,4 +214,39 @@ describe('HeatmapVisualization', () => {
       {},
     );
   });
+
+  it('sorts time columns chronologically', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['category'])])
+      .columnPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .series([new Series('count()')])
+      .visualization('heatmap')
+      .build();
+
+    render(
+      <WrappedHeatMap
+        data={fixtures.dataWithTimeColumns}
+        config={config}
+        setLoadingState={() => {}}
+        effectiveTimerange={{ type: 'absolute', from: '2026-08-31T19:00:00.000Z', to: '2026-08-31T19:10:00.000Z' }}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
+
+    const { x, z } = asMock(GenericPlot).mock.calls.at(-1)[0].chartData[0];
+
+    expect(x.map((time: string) => new Date(time).toISOString())).toEqual([
+      '2026-08-31T19:02:00.000Z',
+      '2026-08-31T19:02:40.000Z',
+      '2026-08-31T19:03:00.000Z',
+    ]);
+    expect(z).toEqual([
+      ['None', 6, 2],
+      [1, 5, 'None'],
+    ]);
+  });
 });

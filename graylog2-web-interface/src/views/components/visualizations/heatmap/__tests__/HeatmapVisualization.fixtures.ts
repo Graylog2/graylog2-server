@@ -65,4 +65,25 @@ const dataWithEmptyBuckets: { [key: string]: Rows } = {
   ],
 };
 
-export { validData, dataWithEmptyBuckets };
+const dataWithTimeColumns: { [key: string]: Rows } = {
+  chart: [
+    {
+      key: ['Execution'],
+      values: [
+        { key: ['2026-08-31T19:02:40.000Z', 'count()'], value: 6, rollup: false, source: 'col-leaf' },
+        { key: ['2026-08-31T19:03:00.000Z', 'count()'], value: 2, rollup: false, source: 'col-leaf' },
+      ],
+      source: 'leaf',
+    },
+    {
+      key: ['Collection'],
+      values: [
+        { key: ['2026-08-31T19:02:00.000Z', 'count()'], value: 1, rollup: false, source: 'col-leaf' },
+        { key: ['2026-08-31T19:02:40.000Z', 'count()'], value: 5, rollup: false, source: 'col-leaf' },
+      ],
+      source: 'leaf',
+    },
+  ],
+};
+
+export { validData, dataWithEmptyBuckets, dataWithTimeColumns };

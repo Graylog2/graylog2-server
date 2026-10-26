@@ -1,0 +1,4 @@
+type = "f"
+message = "Keep time range/query overrides and selected tab in URL after saving a dashboard as new."
+
+pulls = ["27914"]

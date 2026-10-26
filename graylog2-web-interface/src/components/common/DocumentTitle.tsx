@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import useProductName from 'brand-customization/useProductName';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 
 type Props = {
   title: React.ReactNode;
@@ -25,8 +24,9 @@ type Props = {
 };
 
 /**
- * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
- * resets the title to the default (`Graylog`).
+ * React component that modifies the page `document.title` dynamically. Nested instances append their title
+ * to the one of their parent (e.g. `Graylog - Alerts - Event Definitions`). When the component is unmounted,
+ * its title is removed again.
  *
  * Example:
  *
@@ -37,15 +37,7 @@ type Props = {
  * ```
  */
 const DocumentTitle = ({ children, title }: Props) => {
-  const productName = useProductName();
-
-  useEffect(() => {
-    document.title = `${document.title} - ${title}`;
-
-    return () => {
-      document.title = productName;
-    };
-  }, [productName, title]);
+  useDocumentTitle(`${title}`);
 
   return <>{children}</>;
 };
