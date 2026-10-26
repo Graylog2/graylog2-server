@@ -1,5 +1,5 @@
 type = "fixed"
 message = "Show time ranges without data as empty cells in heatmaps instead of a value of 0."
 
-issues = ["TBD"]
-pulls = ["TBD"]
+issues = ["Graylog2/graylog-plugin-enterprise#15527"]
+pulls = ["27932"]
