@@ -17,6 +17,7 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 
 import useHistory from 'routing/useHistory';
+import useLocation from 'routing/useLocation';
 import AppConfig from 'util/AppConfig';
 import { MenuItem, ButtonGroup } from 'components/bootstrap';
 import { ShareButton } from 'components/common';
@@ -90,6 +91,7 @@ const DashboardActionsMenu = () => {
 
   const dispatch = useViewsDispatch();
   const history = useHistory();
+  const { search } = useLocation();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
   const dashboardActions = useMemo(
@@ -141,15 +143,16 @@ const DashboardActionsMenu = () => {
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id, search));
       }
 
-      return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
+      return dispatch(onSaveNewDashboard(newDashboard, history, entityShare, undefined, search));
     },
     [
       isPermitted,
       dispatch,
       history,
+      search,
       pluggableSaveViewControls,
       sendTelemetry,
       view.id,
