@@ -22,6 +22,9 @@ import Badge from 'components/bootstrap/Badge';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
+// Points to the details below the row. A chevron would suggest the cell itself expands.
+const DETAILS_ICON = 'table_rows';
+
 // Static count badges are gray. This one is blue like a link, so it reads as clickable.
 const CountButton = styled(Badge)`
   &:hover,
@@ -56,6 +59,7 @@ const ExpandedSectionCount = (
       ref={ref}
       color="primary"
       variant={isActive ? 'filled' : 'light'}
+      rightIcon={DETAILS_ICON}
       onClick={() => toggleSection(entityId, section)}
       title={title}
       aria-label={title}>
