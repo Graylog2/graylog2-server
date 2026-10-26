@@ -28,6 +28,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { UserJSON } from 'logic/users/User';
 import User from 'logic/users/User';
 import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;
@@ -55,9 +56,9 @@ export type UserUpdate = Partial<
   }
 >;
 
-export type Token = Awaited<ReturnType<typeof Users.generateNewToken>>;
+export type Token = StubResponse<typeof Users.generateNewToken>;
 
-export type TokenSummary = Awaited<ReturnType<typeof Users.listTokens>>['tokens'][number];
+export type TokenSummary = StubResponse<typeof Users.listTokens>['tokens'][number];
 
 export type ChangePasswordRequest = {
   old_password: string;

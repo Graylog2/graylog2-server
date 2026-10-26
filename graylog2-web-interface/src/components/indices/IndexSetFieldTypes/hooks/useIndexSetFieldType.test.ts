@@ -24,8 +24,9 @@ import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useIndexSetFieldType from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import { defaultField } from 'fixtures/indexSetFieldTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
-const mockData: Awaited<ReturnType<typeof SystemIndexSetsTypes.indexSetFieldTypesList>> = {
+const mockData: StubResponse<typeof SystemIndexSetsTypes.indexSetFieldTypesList> = {
   attributes: [],
   query: '',
   pagination: {

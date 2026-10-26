@@ -21,13 +21,14 @@ import { Streams } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
 import { onError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
+import type { StubResponse } from 'util/UtilityTypes';
 
 const INITIAL_DATA = {
   total: 0,
   streams: [],
 };
 
-type StreamsResponse = Awaited<ReturnType<typeof Streams.getNoSecurity>>;
+type StreamsResponse = StubResponse<typeof Streams.getNoSecurity>;
 
 export const STREAMS_NO_SECURITY_ID = ['streams_without_security', 'overview'];
 

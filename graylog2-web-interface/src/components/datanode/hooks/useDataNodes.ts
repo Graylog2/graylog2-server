@@ -22,6 +22,7 @@ import UserNotification from 'util/UserNotification';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { DataNodes } from 'components/datanode/Types';
 import { defaultOnError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export const bulkRemoveDataNode = async (
   entity_ids: string[],
@@ -187,7 +188,7 @@ export const keyFn = (searchParams: SearchParams) => ['datanodes', searchParams]
 
 export type DataNodeResponse = {
   list: DataNodes;
-  pagination: Awaited<ReturnType<typeof SystemDatanodes.dataNodes>>['pagination'];
+  pagination: StubResponse<typeof SystemDatanodes.dataNodes>['pagination'];
   attributes: Array<Attribute>;
 };
 

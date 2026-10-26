@@ -35,6 +35,7 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'hooks/useInputType';
 import type { SystemOverview } from 'stores/cluster/types';
+import type { StubResponse } from 'util/UtilityTypes';
 
 type Plugin = {
   unique_id: string;
@@ -54,7 +55,7 @@ type InputState = {
   started_at: string;
   state: string;
 };
-type JvmInformation = Awaited<ReturnType<typeof Cluster.jvm>>;
+type JvmInformation = StubResponse<typeof Cluster.jvm>;
 
 type Props = {
   node: NodeInfo;

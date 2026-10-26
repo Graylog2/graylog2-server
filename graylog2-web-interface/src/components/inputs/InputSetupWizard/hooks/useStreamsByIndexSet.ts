@@ -21,10 +21,11 @@ import { Streams } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import { onError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export const STREAMS_BY_INDEX_SET_ID = 'streams_by_index_set_id';
 
-type ResponseData = Awaited<ReturnType<typeof Streams.getByIndexSet>>;
+type ResponseData = StubResponse<typeof Streams.getByIndexSet>;
 
 const useStreamsByIndexSet = (
   indexSetId: string,

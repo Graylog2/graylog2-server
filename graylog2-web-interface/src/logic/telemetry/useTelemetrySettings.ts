@@ -19,8 +19,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Telemetry } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import type { StubResponse } from 'util/UtilityTypes';
 
-export type UserTelemetrySettings = Awaited<ReturnType<typeof Telemetry.getTelemetryUserSettings>>;
+export type UserTelemetrySettings = StubResponse<typeof Telemetry.getTelemetryUserSettings>;
 
 const TELEMETRY_SETTINGS_QUERY_KEY = ['telemetry', 'settings'] as const;
 

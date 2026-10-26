@@ -19,10 +19,11 @@ import { useQuery } from '@tanstack/react-query';
 import { SystemIndexSets } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 import { KEY_PREFIX } from '../fetchIndexSets';
 
-export type IndexSetCategoryCounts = Awaited<ReturnType<typeof SystemIndexSets.getCategoryCounts>>;
+export type IndexSetCategoryCounts = StubResponse<typeof SystemIndexSets.getCategoryCounts>;
 
 const CATEGORY_COUNTS_KEY = [...KEY_PREFIX, 'category-counts'];
 

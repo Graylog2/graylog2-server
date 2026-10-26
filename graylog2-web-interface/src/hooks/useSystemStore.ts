@@ -18,7 +18,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import { System } from '@graylog/server-api';
 
-export type Locales = Awaited<ReturnType<typeof System.locales>>['locales'];
+import type { StubResponse } from 'util/UtilityTypes';
+
+export type Locales = StubResponse<typeof System.locales>['locales'];
 
 type SystemInfo = {
   cluster_id: string;

@@ -20,12 +20,13 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SystemOutputs } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export type Output = {
   id: string;
   title: string;
   type: string;
-  configuration: Awaited<ReturnType<typeof SystemOutputs.get>>['outputs'][number]['configuration'];
+  configuration: StubResponse<typeof SystemOutputs.get>['outputs'][number]['configuration'];
 };
 
 type OutputRequestResponse = {

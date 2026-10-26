@@ -17,8 +17,9 @@
 import { TokenUsage } from '@graylog/server-api';
 
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
-type TokenUsageDTO = Awaited<ReturnType<typeof TokenUsage.getPage>>['elements'][number];
+type TokenUsageDTO = StubResponse<typeof TokenUsage.getPage>['elements'][number];
 
 export type Token = TokenUsageDTO & { id: string };
 

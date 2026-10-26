@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { Metric, NodeMetric } from 'types/metrics';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export const GRAYLOG_NODE_METRIC_NAMES = {
   journalSize: 'org.graylog2.journal.size',
@@ -77,7 +78,7 @@ export type ClusterGraylogNode = GraylogNode & { metrics: GraylogNodeMetrics };
 
 export type GraylogNodesResponse = {
   list: GraylogNodes;
-  pagination: Awaited<ReturnType<typeof SystemCluster.nodesBypageAndper_pageAndqueryAndsortAndorder>>['pagination'];
+  pagination: StubResponse<typeof SystemCluster.nodesBypageAndper_pageAndqueryAndsortAndorder>['pagination'];
   attributes: Array<Attribute>;
 };
 

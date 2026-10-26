@@ -24,8 +24,9 @@ import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import { profile1JSON, profile2JSON, profile1, profile2, indexSetsAttribute } from 'fixtures/indexSetFieldTypeProfiles';
+import type { StubResponse } from 'util/UtilityTypes';
 
-const mockData: Awaited<ReturnType<typeof SystemIndexSetsFieldTypeProfiles.getPage>> = {
+const mockData: StubResponse<typeof SystemIndexSetsFieldTypeProfiles.getPage> = {
   attributes: [],
   query: '',
   pagination: {
