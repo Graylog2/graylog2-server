@@ -61,13 +61,17 @@ public class ShiroRequestHeadersBinder implements ContainerRequestFilter, Contai
     }
 
     /**
-     * Runs the supplier with only the given X-Request-Id header bound to the thread context and restores the
-     * previous headers afterwards. {@link org.graylog2.security.realm.MongoDbAuthorizationRealm} scopes its
-     * authorization cache by this header, so code running outside of REST requests needs to provide one.
+     * Runs the supplier with the given X-Request-Id header added to a copy of the headers bound to the thread context
+     * and restores the previous headers afterwards. {@link org.graylog2.security.realm.MongoDbAuthorizationRealm}
+     * scopes its authorization cache by this header, so code running outside of REST requests needs to provide one.
      */
     public static <T> T withRequestId(String requestId, Supplier<T> supplier) {
-        final Object previousHeaders = ThreadContext.get(REQUEST_HEADERS);
+        @SuppressWarnings("unchecked")
+        final MultivaluedMap<String, String> previousHeaders = (MultivaluedMap<String, String>) ThreadContext.get(REQUEST_HEADERS);
         final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        if (previousHeaders != null) {
+            headers.putAll(previousHeaders);
+        }
         headers.putSingle(X_REQUEST_ID, requestId);
         ThreadContext.put(REQUEST_HEADERS, headers);
         try {

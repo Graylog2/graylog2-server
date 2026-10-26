@@ -58,6 +58,19 @@ class ShiroRequestHeadersBinderTest {
     }
 
     @Test
+    void keepsOtherHeadersWhileRunning() {
+        final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle("X-Other", "value");
+        ThreadContext.put(REQUEST_HEADERS, headers);
+
+        final Optional<String> otherHeader = withRequestId("request-id", () -> getHeaderFromThreadContext("X-Other"));
+
+        assertThat(otherHeader).hasValue("value");
+        assertThat(headers).doesNotContainKey(X_REQUEST_ID);
+        assertThat(ThreadContext.get(REQUEST_HEADERS)).isSameAs(headers);
+    }
+
+    @Test
     void restoresPreviousHeadersOnException() {
         assertThatThrownBy(() -> withRequestId("request-id", () -> {
             throw new IllegalStateException("boom");
