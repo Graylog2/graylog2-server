@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import IconButton from 'components/common/IconButton';
-import { ButtonToolbar } from 'components/bootstrap';
+import { ButtonToolbar, SegmentedControl } from 'components/bootstrap';
 import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
 import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
@@ -57,6 +56,7 @@ const Header = styled.div(
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: ${theme.spacings.sm};
     margin-bottom: ${theme.spacings.sm};
   `,
 );
@@ -64,10 +64,6 @@ const Header = styled.div(
 const Actions = styled(ButtonToolbar)`
   display: flex;
   align-items: center;
-`;
-
-const HideSectionButton = styled(IconButton)`
-  margin-left: 5px;
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
@@ -80,37 +76,39 @@ const ExpandedSections = <Entity extends EntityBase>({
   visibleCellCount: number;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
-  const expandedEntitySections = expandedSections?.[entity.id];
+  const activeSectionName = expandedSections?.[entity.id]?.[0];
+  const activeSection = activeSectionName ? expandedSectionRenderers?.[activeSectionName] : undefined;
 
-  if (!expandedEntitySections?.length) {
+  if (!activeSection) {
     return null;
   }
+
+  const sectionNames = Object.keys(expandedSectionRenderers);
+  const hasMultipleSections = sectionNames.length > 1;
+  const actions = activeSection.actions?.(entity);
 
   return (
     <Container>
       <ContentCell colSpan={visibleCellCount}>
         <Content>
-          {Object.entries(expandedSectionRenderers ?? {})
-            .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
-            .map(([sectionName, section]) => {
-              const hideSection = () => toggleSection(entity.id, sectionName);
-              const actions = section.actions?.(entity);
-
-              return (
-                <div key={`${sectionName}-${entity.id}`}>
-                  {section.disableHeader !== true ? (
-                    <Header>
-                      <h3>{section.title}</h3>
-                      <Actions>
-                        {actions}
-                        <HideSectionButton name="keyboard_arrow_up" onClick={hideSection} title="Collapse section" />
-                      </Actions>
-                    </Header>
-                  ) : null}
-                  {section.content(entity)}
-                </div>
-              );
-            })}
+          {(hasMultipleSections || activeSection.disableHeader !== true) && (
+            <Header>
+              {hasMultipleSections ? (
+                <SegmentedControl<string>
+                  data={sectionNames.map((sectionName) => ({
+                    value: sectionName,
+                    label: expandedSectionRenderers[sectionName].title,
+                  }))}
+                  value={activeSectionName}
+                  onChange={(sectionName) => toggleSection(entity.id, sectionName)}
+                />
+              ) : (
+                <h3>{activeSection.title}</h3>
+              )}
+              {actions && <Actions>{actions}</Actions>}
+            </Header>
+          )}
+          {activeSection.content(entity)}
         </Content>
       </ContentCell>
     </Container>

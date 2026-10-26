@@ -22,9 +22,10 @@ import { useMemo } from 'react';
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ROW_EXPAND_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import useRowExpandColumnDefinition from 'components/common/EntityDataTable/hooks/useRowExpandColumnDefinition';
 
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   actionsColMinWidth,
@@ -32,6 +33,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidths,
   displayBulkSelectCol,
+  displayRowExpandCol,
   enableSlicing,
   entityActions,
   entityAttributesAreCamelCase,
@@ -47,6 +49,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
   displayBulkSelectCol: boolean;
+  displayRowExpandCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   enableSlicing: boolean;
   entityAttributesAreCamelCase: boolean;
@@ -58,6 +61,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
+  const rowExpandCol = useRowExpandColumnDefinition<Entity>(displayRowExpandCol, columnWidths[ROW_EXPAND_COL_ID]);
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
   // Always include the actions column as the trailing "tail" column, even when there are no row actions.
   // This lets the table use it to fill remaining space in fully-static layouts.
@@ -83,10 +87,13 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 
   return useMemo(
     () =>
-      [...(bulkSelectCol ? [bulkSelectCol] : []), ...attributeCols, actionsTailCol] as Array<
-        ColumnDef<Entity, unknown>
-      >,
-    [bulkSelectCol, attributeCols, actionsTailCol],
+      [
+        ...(rowExpandCol ? [rowExpandCol] : []),
+        ...(bulkSelectCol ? [bulkSelectCol] : []),
+        ...attributeCols,
+        actionsTailCol,
+      ] as Array<ColumnDef<Entity, unknown>>,
+    [rowExpandCol, bulkSelectCol, attributeCols, actionsTailCol],
   );
 };
 

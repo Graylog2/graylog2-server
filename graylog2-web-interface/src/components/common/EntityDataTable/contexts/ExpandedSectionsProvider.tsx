@@ -19,37 +19,47 @@ import { useState, useCallback, useMemo } from 'react';
 
 import ExpandedEntitiesSectionsContext from './ExpandedSectionsContext';
 
-const ExpandedSectionsProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
-  const [expandedSections, setExpandedSections] = useState<{ [entityId: string]: Array<string> } | undefined>();
+type ExpandedSections = { [entityId: string]: Array<string> };
 
+const collapseRow = (cur: ExpandedSections | undefined, entityId: string) =>
+  Object.fromEntries(Object.entries(cur ?? {}).filter(([id]) => id !== entityId));
+
+type Props = React.PropsWithChildren<{
+  defaultSection?: string;
+}>;
+
+const ExpandedSectionsProvider = ({ children, defaultSection = undefined }: Props): React.ReactElement => {
+  const [expandedSections, setExpandedSections] = useState<ExpandedSections | undefined>();
+
+  // Opens the row on the given section, switches to it when the row shows another section,
+  // or collapses the row when the section is already shown.
   const toggleSection = useCallback(
     (entityId: string, sectionName: string) =>
-      setExpandedSections((cur) => {
-        const newCur = { ...(cur ?? {}) };
-
-        if (newCur[entityId]?.includes(sectionName)) {
-          const newSections = newCur[entityId].filter((section) => section !== sectionName);
-
-          if (newSections.length === 0) {
-            delete newCur[entityId];
-
-            return newCur;
-          }
-
-          return { ...newCur, [entityId]: newSections };
-        }
-
-        return { ...newCur, [entityId]: [...(newCur[entityId] ?? []), sectionName] };
-      }),
+      setExpandedSections((cur) =>
+        cur?.[entityId]?.includes(sectionName)
+          ? collapseRow(cur, entityId)
+          : { ...(cur ?? {}), [entityId]: [sectionName] },
+      ),
     [],
+  );
+
+  const toggleRow = useCallback(
+    (entityId: string) =>
+      setExpandedSections((cur) =>
+        cur?.[entityId] || !defaultSection
+          ? collapseRow(cur, entityId)
+          : { ...(cur ?? {}), [entityId]: [defaultSection] },
+      ),
+    [defaultSection],
   );
 
   const contextValue = useMemo(
     () => ({
       expandedSections,
       toggleSection,
+      toggleRow,
     }),
-    [expandedSections, toggleSection],
+    [expandedSections, toggleSection, toggleRow],
   );
 
   return (
