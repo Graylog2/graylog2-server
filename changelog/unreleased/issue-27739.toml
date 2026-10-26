@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix lookup table default value input dropping typed characters."
+
+issues = ["27739"]
+pulls = []
