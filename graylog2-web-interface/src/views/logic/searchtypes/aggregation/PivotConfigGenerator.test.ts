@@ -18,10 +18,13 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import PivotConfigGenerator from './PivotConfigGenerator';
 
 describe('PivotConfigGenerator', () => {
+  useViewsPlugin();
+
   const widgetConfigBuilder = AggregationWidgetConfig.builder()
     .rollup(true)
     .rowPivots([Pivot.create(['field'], 'type')])

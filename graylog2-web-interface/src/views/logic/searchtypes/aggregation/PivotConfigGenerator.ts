@@ -16,6 +16,7 @@
  */
 import { Set } from 'immutable';
 import type { $Shape } from 'utility-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
@@ -97,13 +98,15 @@ type FormattedSeries = $Shape<
   } & Definition
 >;
 
+const visualizationDefinition = (visualization: string) =>
+  PluginStore.exports('visualizationTypes').find(({ type }) => type === visualization);
+
 const generateConfig = (
   id: string,
   name: string,
   { rollupForBackendQuery, rowPivots, columnPivots, series, sort, visualization }: AggregationWidgetConfig,
 ) => {
-  // Empty time buckets have a value of 0, which heatmaps would display like actual data.
-  const nullValuesForEmptyBuckets = visualization === 'heatmap';
+  const nullValuesForEmptyBuckets = visualizationDefinition(visualization)?.nullValuesForEmptyBuckets ?? false;
 
   return {
     id,
