@@ -17,7 +17,7 @@
 import { flushSync } from 'react-dom';
 
 import UserNotification from 'util/UserNotification';
-import { loadDashboard } from 'views/logic/views/Actions';
+import { loadDashboardWithSearch } from 'views/logic/views/Actions';
 import type { HistoryFunction } from 'routing/useHistory';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
@@ -26,7 +26,13 @@ import { createView } from 'views/api/views';
 
 import type View from './View';
 
-export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload, existingViewId?: string) =>
+export default (
+  view: View,
+  history: HistoryFunction,
+  entityShare?: EntitySharePayload,
+  existingViewId?: string,
+  search?: string,
+) =>
   async (dispatch: ViewsDispatch) => {
     try {
       const savedView = await createView(view, entityShare, existingViewId);
@@ -36,7 +42,7 @@ export default (view: View, history: HistoryFunction, entityShare?: EntityShareP
         dispatch(setIsNew(false));
       });
 
-      loadDashboard(history, savedView.id);
+      loadDashboardWithSearch(history, savedView.id, search);
       UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
     } catch (error) {
       UserNotification.error(`Saving view failed: ${error}`, 'Error!');

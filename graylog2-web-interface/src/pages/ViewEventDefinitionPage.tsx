@@ -62,7 +62,7 @@ const ViewEventDefinitionPage = () => {
       ...data.eventDefinition,
       config: {
         ...data.eventDefinition.config,
-        _is_scheduled: data.context?.scheduler?.is_scheduled,
+        _is_scheduled: data.eventDefinition.state === 'ENABLED',
       },
     };
   }, [data]);

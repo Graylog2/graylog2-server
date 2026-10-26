@@ -27,6 +27,7 @@ import fetch from 'logic/rest/FetchProvider';
 import OverlayTrigger from 'components/common/OverlayTrigger';
 import { Button, ButtonGroup, ButtonToolbar } from 'components/bootstrap';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
+import zIndices from 'theme/z-indices';
 
 import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
@@ -40,7 +41,7 @@ type ContainerProps = {
 const SourceCodeContainer = styled.div<ContainerProps>(
   ({ $resizable, theme }) => css`
     .react-resizable-handle {
-      z-index: 100; /* Ensure resize handle is over text editor */
+      z-index: ${zIndices.resizeHandle}; /* Ensure resize handle is over text editor */
       display: ${$resizable ? 'block' : 'none'};
     }
 

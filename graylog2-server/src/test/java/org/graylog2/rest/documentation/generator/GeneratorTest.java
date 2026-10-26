@@ -66,6 +66,23 @@ public class GeneratorTest {
                                  @JsonProperty("entity") SampleEntity entity,
                                  @JsonProperty("another_entity") SampleEntity anotherEntity) {}
 
+    public record OptionalProperties(@JsonProperty("required_value") String requiredValue,
+                                     @JsonProperty("optional_map") Optional<Map<String, String>> optionalMap,
+                                     @JsonProperty("optional_list") Optional<List<String>> optionalList,
+                                     @JsonProperty("optional_entity") Optional<SampleEntity> optionalEntity) {}
+
+    public record NestedOptionalProperties(@JsonProperty("nested") OptionalProperties nested) {}
+
+    @Tag(name = "Nested", description = "Returns nested objects")
+    @Path("/nested")
+    public class NestedResource {
+        @GET
+        @Operation(summary = "Nested optional properties")
+        public NestedOptionalProperties nested() {
+            return null;
+        }
+    }
+
     @Tag(name = "Sample", description = "An example REST resource")
     @Path("/sample")
     public class SampleResource {
@@ -74,6 +91,13 @@ public class GeneratorTest {
         @Operation(summary = "A few details about the Graylog node.")
         @Produces(MediaType.APPLICATION_JSON)
         public SampleResponse sample() {
+            return null;
+        }
+
+        @GET
+        @Path("/optional")
+        @Operation(summary = "Optional properties")
+        public OptionalProperties optional() {
             return null;
         }
     }
@@ -138,6 +162,24 @@ public class GeneratorTest {
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.foo.required", String.class)).isEqualTo("false");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.another_entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
+    }
+
+    @Test
+    public void marksOptionalPropertiesAsNotRequired() throws Exception {
+        final var result = jsonPath(createGenerator(SampleResource.class).generateForRoute("/sample", "http://localhost:12900/"));
+        final Map<String, Map<String, Object>> properties = result.read("$.models.GeneratorTest__OptionalProperties.properties");
+
+        assertThat(properties.get("required_value")).doesNotContainKey("required");
+        assertThat(properties).extractingByKeys("optional_map", "optional_list", "optional_entity")
+                .allSatisfy(property -> assertThat(property).containsEntry("required", false));
+    }
+
+    @Test
+    public void marksOptionalPropertiesOfNestedObjectsAsNotRequired() throws Exception {
+        final var result = jsonPath(createGenerator(NestedResource.class).generateForRoute("/nested", "http://localhost:12900/"));
+
+        assertThat(result.read("$.models.GeneratorTest__OptionalProperties.properties.optional_map.required", Boolean.class)).isFalse();
+        assertThat(result.read("$.models.GeneratorTest__OptionalProperties.properties.optional_entity.required", Boolean.class)).isFalse();
     }
 
     @Test
