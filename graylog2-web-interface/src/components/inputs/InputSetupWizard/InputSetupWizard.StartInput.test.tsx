@@ -83,7 +83,7 @@ const renderWizard = () =>
   );
 
 const useStreamsResult = {
-  data: { streams, total: 1 },
+  data: { streams: streams.map((stream) => ({ ...stream, rules: [], favorite_fields: [] })), total: 1 },
   isLoading: false,
   isFetching: false,
   error: undefined,

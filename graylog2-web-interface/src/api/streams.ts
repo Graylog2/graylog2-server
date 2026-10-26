@@ -60,12 +60,7 @@ type SearchStreamsAdditional = {
   filters: Array<string> | undefined;
 };
 
-export type CloneStreamRequest = {
-  title: string;
-  description: string;
-  index_set_id?: string;
-  remove_matches_from_default_stream?: boolean;
-};
+export type CloneStreamRequest = Parameters<typeof Streams.cloneStream>[1];
 
 type TestMatchMessage = {
   message: { [field: string]: unknown };
@@ -135,7 +130,7 @@ export const resumeStream = (streamId: string): Promise<unknown> =>
   });
 
 export const cloneStream = (streamId: string, data: CloneStreamRequest): Promise<unknown> =>
-  fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.cloneStream(streamId).url), data)
+  Streams.cloneStream(streamId, data)
     .catch((errorThrown): never => {
       UserNotification.error(`Cloning Stream failed with status: ${errorThrown}`, 'Could not clone Stream');
 
@@ -144,13 +139,11 @@ export const cloneStream = (streamId: string, data: CloneStreamRequest): Promise
     .then(() => CurrentUserStore.reload());
 
 export const testMatch = (streamId: string, message: TestMatchMessage): Promise<MatchData> =>
-  fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.testMatch(streamId).url), message).catch(
-    (error: Error): never => {
-      UserNotification.error(
-        `Testing stream rules of stream failed with status: ${error.message}`,
-        'Could not test stream rules of stream',
-      );
+  Streams.testMatch(streamId, message).catch((error: Error): never => {
+    UserNotification.error(
+      `Testing stream rules of stream failed with status: ${error.message}`,
+      'Could not test stream rules of stream',
+    );
 
-      throw error;
-    },
-  );
+    throw error;
+  });

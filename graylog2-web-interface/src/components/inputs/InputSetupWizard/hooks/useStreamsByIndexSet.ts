@@ -16,26 +16,15 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { Streams } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
-import type { Stream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 import { onError } from 'util/conditional/onError';
 
 export const STREAMS_BY_INDEX_SET_ID = 'streams_by_index_set_id';
 
-type ResponseData = {
-  total: number;
-  streams: Array<Stream>;
-};
-
-const fetchStreamsByIndexSet = async (indexSetId: string): Promise<ResponseData> => {
-  const url = qualifyUrl(ApiRoutes.StreamsApiController.byIndexSet(indexSetId).url);
-
-  return fetch('GET', url);
-};
+type ResponseData = Awaited<ReturnType<typeof Streams.getByIndexSet>>;
 
 const useStreamsByIndexSet = (
   indexSetId: string,
@@ -48,7 +37,7 @@ const useStreamsByIndexSet = (
     queryKey: [STREAMS_BY_INDEX_SET_ID],
 
     queryFn: () =>
-      onError(fetchStreamsByIndexSet(indexSetId), (errorThrown: FetchError) => {
+      onError(Streams.getByIndexSet(indexSetId), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
           UserNotification.error(`Loading streams by index set failed with: ${errorThrown}`);
         }

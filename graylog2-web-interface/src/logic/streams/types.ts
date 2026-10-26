@@ -111,5 +111,5 @@ export type StreamResponse = {
 
 export type MatchData = {
   matches: boolean;
-  rules: { [id: string]: false };
+  rules: { [id: string]: boolean };
 };
