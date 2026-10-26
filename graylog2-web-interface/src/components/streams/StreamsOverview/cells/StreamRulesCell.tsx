@@ -16,22 +16,15 @@
  */
 
 import * as React from 'react';
-import { useRef, useCallback } from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { CountBadge } from 'components/common';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 type Props = {
   stream: Stream;
 };
 
 const StreamRulesCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-  const { toggleSection, expandedSections } = useExpandedSections();
-
-  const toggleRulesSection = useCallback(() => toggleSection(stream.id, 'rules'), [stream.id, toggleSection]);
-
   if (stream.is_default || !stream.is_editable) {
     return null;
   }
@@ -41,18 +34,7 @@ const StreamRulesCell = ({ stream }: Props) => {
     return null;
   }
 
-  const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
-  const streamRulesSectionTitle = `${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`;
-
-  return (
-    <CountBadge
-      count={streamRulesCount}
-      iconName={streamRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={toggleRulesSection}
-      ref={buttonRef}
-      title={streamRulesSectionTitle}
-    />
-  );
+  return <ExpandedSectionCount entityId={stream.id} section="rules" count={streamRulesCount} label="stream rules" />;
 };
 
 export default StreamRulesCell;
