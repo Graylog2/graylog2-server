@@ -16,7 +16,6 @@
  */
 import { Set } from 'immutable';
 import type { $Shape } from 'utility-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
@@ -57,10 +56,9 @@ type FormattedPivot = {
   type: string;
   fields: Array<string>;
   interval: FormattedInterval;
-  null_values_for_empty_buckets?: boolean;
 };
 
-const formatPivot = (pivot: Pivot, nullValuesForEmptyBuckets: boolean): FormattedPivot => {
+const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, fields, config } = pivot;
   const newConfig = { ...config } as unknown;
 
@@ -75,10 +73,6 @@ const formatPivot = (pivot: Pivot, nullValuesForEmptyBuckets: boolean): Formatte
           type: 'timeunit',
           timeunit: `${value}${mapTimeunit(unit)}`,
         };
-      }
-
-      if (nullValuesForEmptyBuckets) {
-        (newConfig as { null_values_for_empty_buckets: boolean }).null_values_for_empty_buckets = true;
       }
 
       break;
@@ -98,30 +92,23 @@ type FormattedSeries = $Shape<
   } & Definition
 >;
 
-const visualizationDefinition = (visualization: string) =>
-  PluginStore.exports('visualizationTypes').find(({ type }) => type === visualization);
-
 const generateConfig = (
   id: string,
   name: string,
-  { rollupForBackendQuery, rowPivots, columnPivots, series, sort, visualization }: AggregationWidgetConfig,
-) => {
-  const nullValuesForEmptyBuckets = visualizationDefinition(visualization)?.nullValuesForEmptyBuckets ?? false;
-
-  return {
-    id,
-    name,
-    type: 'pivot',
-    config: {
-      id: 'vals',
-      rollup: rollupForBackendQuery,
-      row_groups: rowPivots.map((pivot) => formatPivot(pivot, nullValuesForEmptyBuckets)),
-      column_groups: columnPivots.map((pivot) => formatPivot(pivot, nullValuesForEmptyBuckets)),
-      series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
-      sort,
-    },
-  };
-};
+  { rollupForBackendQuery, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig,
+) => ({
+  id,
+  name,
+  type: 'pivot',
+  config: {
+    id: 'vals',
+    rollup: rollupForBackendQuery,
+    row_groups: rowPivots.map(formatPivot),
+    column_groups: columnPivots.map(formatPivot),
+    series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
+    sort,
+  },
+});
 
 export default ({ config }: { config: AggregationWidgetConfig }) => {
   const chartConfig = generateConfig(generateId(), 'chart', config);

@@ -110,7 +110,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
-        final boolean nullValuesForEmptyBuckets = ((Time) bucketSpec).nullValuesForEmptyBuckets();
+        final boolean nullValuesForEmptyBuckets = pivot.nullValuesForEmptyBuckets();
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);

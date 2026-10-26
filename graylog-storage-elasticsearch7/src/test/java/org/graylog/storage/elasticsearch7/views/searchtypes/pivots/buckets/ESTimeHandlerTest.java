@@ -136,7 +136,7 @@ class ESTimeHandlerTest {
 
     @Test
     public void emptyBucketsAreMarkedIfConfigured() {
-        when(time.nullValuesForEmptyBuckets()).thenReturn(true);
+        when(pivot.nullValuesForEmptyBuckets()).thenReturn(true);
 
         final List<PivotBucket> buckets = esTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).toList();
 

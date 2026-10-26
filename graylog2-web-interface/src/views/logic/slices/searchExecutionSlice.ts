@@ -32,7 +32,8 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectParameters } from 'views/logic/slices/viewSelectors';
+import { selectParameters, selectView } from 'views/logic/slices/viewSelectors';
+import withVisualizationSearchTypeOptions from 'views/logic/search/withVisualizationSearchTypeOptions';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -225,14 +226,15 @@ export const executeWithExecutionState =
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) =>
-  async (dispatch: ViewsDispatch) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     dispatch(loading());
 
     return dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
         dispatch(cancelExecutedJob());
+        const executionStateWithOptions = withVisualizationSearchTypeOptions(executionState, selectView(getState()));
 
-        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
+        return searchExecutors.startJob(search, searchTypesToSearch, executionStateWithOptions, [activeQuery]);
       })
       .then((jobIds: JobIds) =>
         dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),

@@ -29,6 +29,7 @@ import java.util.Optional;
 @AutoValue
 @JsonDeserialize(builder = SearchTypeExecutionState.Builder.class)
 public abstract class SearchTypeExecutionState {
+    private static final String FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS = "null_values_for_empty_buckets";
 
     public static SearchTypeExecutionState from(ExecutionStateGlobalOverride globalOverride) {
         final Builder builder = builder();
@@ -52,6 +53,9 @@ public abstract class SearchTypeExecutionState {
     @JsonProperty("after")
     public abstract List<Object> searchAfter();
 
+    @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+    public abstract Optional<Boolean> nullValuesForEmptyBuckets();
+
     public static SearchTypeExecutionState.Builder builder() {
         return new AutoValue_SearchTypeExecutionState.Builder();
     }
@@ -71,6 +75,9 @@ public abstract class SearchTypeExecutionState {
         public abstract Builder perPage(Integer perPage);
         @JsonProperty("after")
         public abstract Builder searchAfter(@Nullable List<Object> searchAfter);
+
+        @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+        public abstract Builder nullValuesForEmptyBuckets(Boolean nullValuesForEmptyBuckets);
 
         @JsonCreator
         public static Builder create() {

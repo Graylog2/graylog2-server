@@ -179,7 +179,7 @@ class OSTimeHandlerTest {
 
     @Test
     public void emptyBucketsAreMarkedIfConfigured() {
-        when(time.nullValuesForEmptyBuckets()).thenReturn(true);
+        when(pivot.nullValuesForEmptyBuckets()).thenReturn(true);
 
         final List<PivotBucket> buckets = osTimeHandler.extractBuckets(pivot, time, initialBucket(5, 0, 3)).toList();
 

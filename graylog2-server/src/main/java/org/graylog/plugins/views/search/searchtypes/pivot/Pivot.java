@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -86,16 +87,23 @@ public abstract class Pivot implements SearchEngineSearchType {
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
 
+    // Only set for a single execution, so it is not part of the stored search.
+    @JsonIgnore
+    public abstract boolean nullValuesForEmptyBuckets();
+
     public abstract Builder toBuilder();
 
     @Override
     public SearchType applyExecutionContext(SearchTypeExecutionState state) {
-        return this;
+        return state.nullValuesForEmptyBuckets()
+                .map(nullValuesForEmptyBuckets -> (SearchType) toBuilder().nullValuesForEmptyBuckets(nullValuesForEmptyBuckets).build())
+                .orElse(this);
     }
 
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
+                .nullValuesForEmptyBuckets(false)
                 .rowGroups(of())
                 .columnGroups(of())
                 .sort(of())
@@ -156,6 +164,8 @@ public abstract class Pivot implements SearchEngineSearchType {
 
         @JsonProperty
         public abstract Builder rollup(boolean rollup);
+
+        public abstract Builder nullValuesForEmptyBuckets(boolean nullValuesForEmptyBuckets);
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
