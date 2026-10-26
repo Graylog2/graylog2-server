@@ -233,7 +233,8 @@ type StreamsOverviewTableElement = {
 type IndexSetsOverviewTableElement = {
   attributeName: string;
   group?: 'configuration';
-  attributes: Array<Attribute>;
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 
