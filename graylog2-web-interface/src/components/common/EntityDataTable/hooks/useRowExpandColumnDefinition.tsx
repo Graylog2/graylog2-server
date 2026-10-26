@@ -20,7 +20,8 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
-import IconButton from 'components/common/IconButton';
+import { Button } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ROW_EXPAND_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
@@ -30,18 +31,22 @@ const Container = styled.div`
   justify-content: center;
 `;
 
+// Without a block box the glyph sits on the inline line box of the button and ends up off-center.
+const ToggleIcon = styled(Icon)`
+  display: block;
+  line-height: 1;
+`;
+
 const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => {
   const { expandedSections, toggleRow } = useExpandedSections();
   const isExpanded = !!expandedSections?.[row.id];
+  const title = isExpanded ? 'Collapse row' : 'Expand row';
 
   return (
     <Container>
-      <IconButton
-        bsStyle="default"
-        name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-        title={isExpanded ? 'Collapse row' : 'Expand row'}
-        onClick={() => toggleRow(row.id)}
-      />
+      <Button bsStyle="default" bsSize="xs" onClick={() => toggleRow(row.id)} title={title} aria-label={title}>
+        <ToggleIcon name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+      </Button>
     </Container>
   );
 };
