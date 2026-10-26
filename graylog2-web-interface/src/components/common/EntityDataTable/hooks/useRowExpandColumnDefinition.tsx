@@ -31,6 +31,13 @@ const Container = styled.div`
   justify-content: center;
 `;
 
+const ToggleButton = styled(Button)`
+  && {
+    aspect-ratio: 1;
+    padding: 0;
+  }
+`;
+
 // Without a block box the glyph sits on the inline line box of the button and ends up off-center.
 const ToggleIcon = styled(Icon)`
   display: block;
@@ -44,9 +51,9 @@ const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> })
 
   return (
     <Container>
-      <Button bsStyle="default" bsSize="xs" onClick={() => toggleRow(row.id)} title={title} aria-label={title}>
+      <ToggleButton bsStyle="default" bsSize="xs" onClick={() => toggleRow(row.id)} title={title} aria-label={title}>
         <ToggleIcon name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-      </Button>
+      </ToggleButton>
     </Container>
   );
 };

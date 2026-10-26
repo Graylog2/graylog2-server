@@ -36,7 +36,7 @@ export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
 export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING_HORIZONTAL * 2; // px
 export const BULK_SELECT_COL_ID = 'bulk-select';
 
-export const ROW_EXPAND_COLUMN_WIDTH = 26 + CELL_PADDING_HORIZONTAL * 2; // px
+export const ROW_EXPAND_COLUMN_WIDTH = 22 + CELL_PADDING_HORIZONTAL * 2; // px
 export const ROW_EXPAND_COL_ID = 'row-expand';
 
 export const ACTIONS_COL_ID = 'actions';
