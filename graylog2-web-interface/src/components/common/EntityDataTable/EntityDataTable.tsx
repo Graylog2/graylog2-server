@@ -232,6 +232,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
+  const expandedSectionNames = Object.keys(expandedSectionRenderers ?? {});
+  const displayRowExpandCol = expandedSectionNames.length > 0;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
@@ -252,6 +254,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayBulkSelectCol,
+    displayRowExpandCol,
   );
 
   const {
@@ -266,6 +269,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidthPreferences: internalColumnWidthPreferences,
     displayBulkSelectCol,
+    displayRowExpandCol,
     entities,
     hasRowActions,
     headerMinWidths,
@@ -279,6 +283,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
     displayBulkSelectCol,
+    displayRowExpandCol,
     enableSlicing,
     entityActions,
     entityAttributesAreCamelCase,
@@ -337,7 +342,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider>
+          <ExpandedSectionsProvider defaultSection={expandedSectionNames[0]}>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
               {noColumnReordering && noPageSizeSelect ? null : (
