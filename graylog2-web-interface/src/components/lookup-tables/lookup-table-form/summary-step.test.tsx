@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
+import type { FormikErrors } from 'formik';
 
 import type { LookupTable } from 'logic/lookup-tables/types';
 import { UNSUPPORTED_PREVIEW } from 'components/lookup-tables/fixtures';
@@ -54,9 +55,9 @@ const NEW_TABLE_VALUES = {
   content_pack: null,
 } as unknown as LookupTable;
 
-function renderWithValues(values: LookupTable) {
+function renderWithValues(values: LookupTable, errors: FormikErrors<LookupTable> = {}) {
   return render(
-    <Formik initialValues={values} onSubmit={() => {}}>
+    <Formik initialValues={values} onSubmit={() => {}} validate={() => errors} validateOnMount>
       <SummaryStep />
     </Formik>,
   );
@@ -77,5 +78,20 @@ describe('SummaryStep', () => {
     renderWithValues({ ...NEW_TABLE_VALUES, id: 'existing-table-id' });
 
     expect(mockErrorsConsumer).toHaveBeenCalledWith(expect.objectContaining({ lutNames: ['new-table-name'] }));
+  });
+
+  it('shows invalid default values', async () => {
+    renderWithValues(NEW_TABLE_VALUES, { default_multi_value: 'Must be a JSON object.' });
+
+    expect(await screen.findByText(/invalid default values/i)).toBeInTheDocument();
+    expect(screen.getByText(/default multi value: must be a json object/i)).toBeInTheDocument();
+    expect(screen.queryByText(/default single value:/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show a default value alert when the defaults are valid', async () => {
+    renderWithValues(NEW_TABLE_VALUES);
+
+    expect(await screen.findByText(/lookup table details/i)).toBeInTheDocument();
+    expect(screen.queryByText(/invalid default values/i)).not.toBeInTheDocument();
   });
 });
