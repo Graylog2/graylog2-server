@@ -22,7 +22,6 @@ import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch._types.mapping.TextProperty;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +45,7 @@ public class FieldMappingApi {
         if (kind == Property.Kind.Alias) {
             return resolveAlias(mapping, properties);
         } else {
-            return new FieldMapping(kind.name().toLowerCase(Locale.ROOT), hasFieldData(mapping));
+            return new FieldMapping(kind.jsonValue(), hasFieldData(mapping));
         }
     }
 
