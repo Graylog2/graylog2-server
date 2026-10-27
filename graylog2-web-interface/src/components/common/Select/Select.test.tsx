@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
@@ -145,6 +146,48 @@ describe('Select', () => {
       const select = await selectEvent.findSelectInput('Select value');
 
       expect(select).toHaveAttribute('id', 'myId');
+    });
+  });
+
+  describe('searchable', () => {
+    it('does not filter options while typing when searchable is false', async () => {
+      render(<SimpleSelect searchable={false} />);
+
+      const select = await screen.findByLabelText('Select value');
+      await userEvent.type(select, 'label1');
+      selectEvent.openMenu(select);
+
+      await screen.findByRole('option', { name: 'label1' });
+      await screen.findByRole('option', { name: 'label2' });
+    });
+
+    it('supports selecting an option when searchable is false', async () => {
+      const onChange = jest.fn();
+      render(<SimpleSelect onChange={onChange} searchable={false} />);
+
+      await selectEvent.select(await screen.findByLabelText('Select value'), 'label1');
+
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1', expect.any(Object)));
+    });
+  });
+
+  describe('compact', () => {
+    it('trims the dropdown indicator gutter in compact mode', async () => {
+      render(<SimpleSelect compact />);
+
+      // eslint-disable-next-line testing-library/no-node-access
+      const indicator = (await screen.findByText('arrow_drop_down')).parentElement;
+
+      expect(indicator).toHaveStyle({ marginRight: '4px' });
+    });
+
+    it('keeps the roomy dropdown indicator gutter by default', async () => {
+      render(<SimpleSelect />);
+
+      // eslint-disable-next-line testing-library/no-node-access
+      const indicator = (await screen.findByText('arrow_drop_down')).parentElement;
+
+      expect(indicator).toHaveStyle({ marginRight: '1rem' });
     });
   });
 });

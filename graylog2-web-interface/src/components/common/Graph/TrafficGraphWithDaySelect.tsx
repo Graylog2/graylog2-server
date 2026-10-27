@@ -19,14 +19,15 @@ import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 
-import { Input } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import Select from 'components/common/Select';
 import { formatTrafficData } from 'util/TrafficUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { TrafficGraph, useGraphWidth } from 'components/common/Graph';
-import type { Traffic } from 'components/common/Graph/types';
-import { DAYS } from 'components/common/Graph/types';
+import { TrafficGraph, useGraphWidth, useTrafficGraphZoom } from 'components/common/Graph';
+import type { Traffic, TrafficType } from 'components/common/Graph/types';
+import { DAYS, TRAFFIC_TYPE_APP_SECTIONS, TRAFFIC_TYPE_LABELS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
@@ -39,44 +40,60 @@ const StyledH3 = styled.h3(
 
 const Wrapper = styled.div(
   ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.sm};
     margin-bottom: ${theme.spacings.xs};
-
-    .control-label {
-      padding-top: 0;
-    }
-
-    .graph-days-select {
-      display: flex;
-      align-items: baseline;
-
-      select {
-        padding-top: ${theme.spacings.xxs};
-      }
-    }
   `,
 );
 
+const SelectGroup = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+  `,
+);
+
+const SelectLabel = styled.label`
+  margin: 0;
+`;
+
+const TRAFFIC_TYPE_OPTIONS = Object.entries(TRAFFIC_TYPE_LABELS).map(([value, label]) => ({ value, label }));
+const DAY_OPTIONS = DAYS.map((days) => ({ value: days, label: String(days) }));
+
 type Props = {
-  traffic: Traffic;
+  traffic?: Traffic;
   trafficLimit?: number;
   title?: string;
-  trafficType?: 'input-indexed' | 'output';
+  trafficType?: TrafficType;
+  onTrafficTypeChange?: (trafficType: TrafficType) => void;
 };
 
 const TrafficGraphWithDaySelect = ({
-  traffic,
+  traffic = undefined,
   trafficLimit = undefined,
   title = undefined,
   trafficType = 'output',
+  onTrafficTypeChange = undefined,
 }: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
 
-  const sendTelemetry = useSendTelemetry(trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic');
+  const bytesOut = useMemo(() => (traffic ? reduce(traffic, (result, value) => result + value) : null), [traffic]);
+  const unixTraffic = useMemo(() => (traffic ? formatTrafficData(traffic) : null), [traffic]);
 
-  const onGraphDaysChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    event.preventDefault();
-    const newDays = Number(event.target.value);
+  const { zoomedToData, uiRevision, canZoomOrReset, onZoomReset, onUserZoom, onUserZoomReset } = useTrafficGraphZoom(
+    unixTraffic,
+    trafficLimit,
+  );
+
+  const sendTelemetry = useSendTelemetry(TRAFFIC_TYPE_APP_SECTIONS[trafficType]);
+
+  const onGraphDaysChange = (newDays: number) => {
+    if (newDays === graphDays) {
+      return;
+    }
 
     setGraphDays(newDays);
 
@@ -86,8 +103,19 @@ const TrafficGraphWithDaySelect = ({
     });
   };
 
-  const bytesOut = useMemo(() => (traffic ? reduce(traffic, (result, value) => result + value) : null), [traffic]);
-  const unixTraffic = useMemo(() => (traffic ? formatTrafficData(traffic) : null), [traffic]);
+  const onTrafficTypeSelect = (newTrafficType: TrafficType) => {
+    if (newTrafficType === trafficType) {
+      return;
+    }
+
+    onTrafficTypeChange(newTrafficType);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_TYPE_CHANGED, {
+      app_section: TRAFFIC_TYPE_APP_SECTIONS[newTrafficType],
+      app_action_value: 'trafficgraph-type-select',
+      event_details: { value: newTrafficType },
+    });
+  };
 
   const formattedTotalTraffic = useMemo(() => {
     const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
@@ -98,32 +126,59 @@ const TrafficGraphWithDaySelect = ({
   return (
     <>
       <Wrapper className="form-inline graph-days pull-right">
-        <Input
-          id="graph-days"
-          type="select"
-          bsSize="small"
-          label="Days"
-          value={graphDays}
-          onChange={onGraphDaysChange}
-          formGroupClassName="graph-days-select">
-          {DAYS.map((size) => (
-            <option key={`option-${size}`} value={size}>
-              {size}
-            </option>
-          ))}
-        </Input>
+        {onTrafficTypeChange && (
+          <SelectGroup>
+            <SelectLabel htmlFor="traffic-type">Show</SelectLabel>
+            <Select
+              inputId="traffic-type"
+              aria-label="Show traffic type"
+              size="small"
+              compact
+              clearable={false}
+              searchable={false}
+              options={TRAFFIC_TYPE_OPTIONS}
+              value={trafficType}
+              onChange={onTrafficTypeSelect}
+            />
+          </SelectGroup>
+        )}
+        <SelectGroup>
+          <SelectLabel htmlFor="graph-days">Days</SelectLabel>
+          <Select
+            inputId="graph-days"
+            aria-label="Days"
+            size="small"
+            compact
+            clearable={false}
+            searchable={false}
+            options={DAY_OPTIONS}
+            value={graphDays}
+            onChange={onGraphDaysChange}
+          />
+        </SelectGroup>
+        <Button type="button" bsSize="small" onClick={onZoomReset} disabled={!canZoomOrReset}>
+          Zoom/Reset
+        </Button>
       </Wrapper>
 
       <StyledH3 ref={graphContainerRef}>
-        {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
-        {bytesOut && (
+        {title ?? TRAFFIC_TYPE_LABELS[trafficType]}{' '}
+        {bytesOut != null && (
           <small>
             Last {graphDays} days: {formattedTotalTraffic}
           </small>
         )}
       </StyledH3>
       {unixTraffic ? (
-        <TrafficGraph trafficLimit={trafficLimit} traffic={unixTraffic} width={graphWidth} />
+        <TrafficGraph
+          trafficLimit={trafficLimit}
+          traffic={unixTraffic}
+          width={graphWidth}
+          zoomedToData={zoomedToData}
+          uiRevision={uiRevision}
+          onUserZoom={onUserZoom}
+          onUserZoomReset={onUserZoomReset}
+        />
       ) : (
         <Spinner />
       )}
