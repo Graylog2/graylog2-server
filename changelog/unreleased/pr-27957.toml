@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixes sorting on percentile and percentage metrics in the aggregation wizard. Before this change, the sort was not applied and disappeared after updating the widget."
+
+pulls = ["27957"]
