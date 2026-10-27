@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 
-import { CountBadge } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 import { STREAMS_SECTION } from '../Constants';
 import type { IndexSetEntity } from '../types';
@@ -26,18 +25,13 @@ type Props = {
   indexSet: IndexSetEntity;
 };
 
-const StreamCountCell = ({ indexSet }: Props) => {
-  const { toggleSection, expandedSections } = useExpandedSections();
-  const isOpen = expandedSections?.[indexSet.id]?.includes(STREAMS_SECTION) ?? false;
-
-  return (
-    <CountBadge
-      count={indexSet.stream_count}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(indexSet.id, STREAMS_SECTION)}
-      title={`${isOpen ? 'Hide' : 'Show'} associated streams for ${indexSet.title}`}
-    />
-  );
-};
+const StreamCountCell = ({ indexSet }: Props) => (
+  <ExpandedSectionCount
+    entityId={indexSet.id}
+    section={STREAMS_SECTION}
+    count={indexSet.stream_count}
+    label={`associated streams for ${indexSet.title}`}
+  />
+);
 
 export default StreamCountCell;

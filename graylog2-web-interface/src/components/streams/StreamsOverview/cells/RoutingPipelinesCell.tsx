@@ -17,8 +17,8 @@
 import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import { CountBadge, Spinner } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { Spinner } from 'components/common';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 import { METRIC_COLUMN_IDS } from 'components/streams/StreamsOverview/metricColumns';
 
@@ -30,7 +30,6 @@ const SECTION_NAME = METRIC_COLUMN_IDS.routingPipelines;
 
 const RoutingPipelinesCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
-  const { toggleSection, expandedSections } = useExpandedSections();
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
@@ -40,17 +39,12 @@ const RoutingPipelinesCell = ({ stream }: Props) => {
     return null;
   }
 
-  const count = metrics.routing_pipelines.length;
-
-  const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} routing pipelines for ${stream.title}`;
-
   return (
-    <CountBadge
-      count={count}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(stream.id, SECTION_NAME)}
-      title={title}
+    <ExpandedSectionCount
+      entityId={stream.id}
+      section={SECTION_NAME}
+      count={metrics.routing_pipelines.length}
+      label={`routing pipelines for ${stream.title}`}
     />
   );
 };
