@@ -17,7 +17,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import managedConfigurationApi from './managedConfigurationApi';
-import type { ManagedConfiguration, ConfigurationValuesPatch } from './types';
+import type { ManagedConfiguration, ConfigurationValues } from './types';
 
 const getQueryKey = (nodeId: string | null) => ['datanode', 'managed-configuration', nodeId];
 
@@ -30,7 +30,7 @@ type ManagedConfigurationResult = {
 };
 
 type UpdateManagedConfigurationResult = {
-  updateConfiguration: (values: ConfigurationValuesPatch) => Promise<ManagedConfiguration>;
+  updateConfiguration: (values: ConfigurationValues) => Promise<ManagedConfiguration>;
 };
 
 const useManagedConfiguration = (nodeId: string | null = null): ManagedConfigurationResult => {
@@ -45,7 +45,7 @@ const useManagedConfiguration = (nodeId: string | null = null): ManagedConfigura
 export const useUpdateManagedConfiguration = (nodeId: string | null = null): UpdateManagedConfigurationResult => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
-    mutationFn: (values: ConfigurationValuesPatch) => managedConfigurationApi.update(values, nodeId),
+    mutationFn: (values: ConfigurationValues) => managedConfigurationApi.update(values, nodeId),
     onSuccess: async (data) => {
       await queryClient.cancelQueries({ queryKey: getQueryKey(nodeId), exact: true });
       queryClient.setQueryData(getQueryKey(nodeId), data);

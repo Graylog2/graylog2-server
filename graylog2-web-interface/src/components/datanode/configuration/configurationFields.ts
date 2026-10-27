@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type {
-  ConfigurationCategory,
-  ConfigurationFormValues,
-  ConfigurationParameter,
-  ConfigurationValuesPatch,
-} from './types';
+import type { ConfigurationCategory, ConfigurationParameter, ConfigurationValues } from './types';
 
 export const categoryId = (category: string) =>
   category
@@ -43,21 +38,29 @@ export const getConfigurationCategories = (parameters: Array<ConfigurationParame
   return categories;
 };
 
-export const buildConfigurationFormValues = (parameters: Array<ConfigurationParameter>): ConfigurationFormValues =>
-  Object.fromEntries(
-    parameters.filter(({ value }) => value !== null && value !== undefined).map(({ name, value }) => [name, value]),
-  );
+export const buildConfigurationValues = (parameters: Array<ConfigurationParameter>): ConfigurationValues =>
+  Object.fromEntries(parameters.filter(({ value }) => value != null).map(({ name, value }) => [name, value]));
 
 export const getDisplayedConfigurationValue = (
   parameter: ConfigurationParameter,
   draftValue: string | null | undefined,
 ) => (draftValue === null ? (parameter.node_value ?? undefined) : draftValue);
 
+export const getConfigurationValueSource = (
+  parameter: ConfigurationParameter,
+  draftValue: string | null | undefined,
+  initialValue: string | null | undefined,
+) => {
+  if (draftValue === null) return parameter.node_source;
+
+  return draftValue === initialValue && draftValue === parameter.value ? parameter.source : undefined;
+};
+
 export const buildConfigurationValuesPatch = (
-  initialValues: ConfigurationFormValues,
-  values: ConfigurationFormValues,
+  initialValues: ConfigurationValues,
+  values: ConfigurationValues,
   parameters: Array<ConfigurationParameter>,
-): ConfigurationValuesPatch =>
+): ConfigurationValues =>
   Object.fromEntries(
     parameters
       .filter(({ name }) => initialValues[name] !== values[name])
@@ -104,7 +107,7 @@ const validateElement = (parameter: ConfigurationParameter, value: string): stri
 };
 
 const validateParameter = (parameter: ConfigurationParameter, value: string): string | undefined => {
-  if (value === undefined || value.trim() === '') return 'Enter a value.';
+  if (value.trim() === '') return 'Enter a value.';
 
   if (parameter.type === 'list') {
     return value
@@ -157,8 +160,8 @@ const validateWatermarks = (values: Record<string, string>) => {
     : 'Set free-space watermarks in descending order: low, high, then flood stage.';
 };
 
-export const validateConfigurationFormValues = (
-  values: ConfigurationFormValues,
+export const validateConfigurationValues = (
+  values: ConfigurationValues,
   parameters: Array<ConfigurationParameter>,
 ): Record<string, string> => {
   const errors: Array<[string, string]> = [];

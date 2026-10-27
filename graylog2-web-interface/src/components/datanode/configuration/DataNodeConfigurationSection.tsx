@@ -25,7 +25,7 @@ type Props = {
   canDelete: boolean;
 };
 
-const DataNodeConfiguration = ({ category, canEdit, canDelete }: Props) => (
+const DataNodeConfigurationSection = ({ category, canEdit, canDelete }: Props) => (
   <section aria-labelledby={`data-node-configuration-${category.id}`}>
     <h3 id={`data-node-configuration-${category.id}`}>{category.label}</h3>
     <hr />
@@ -35,4 +35,4 @@ const DataNodeConfiguration = ({ category, canEdit, canDelete }: Props) => (
   </section>
 );
 
-export default DataNodeConfiguration;
+export default DataNodeConfigurationSection;

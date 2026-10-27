@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { DropdownButton, FormControl, InputGroup, MenuItem } from 'components/bootstrap';
 
-import type { ParameterValues } from './types';
+import type { ConfigurationUnits } from './types';
 import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
 
 const QuantityInputGroup = styled(InputGroup)`
@@ -36,6 +36,8 @@ const QuantityActions = styled(InputGroup.Button)`
   width: auto;
 `;
 
+const maxByUnit: Record<string, number> = { '%': 100, '': 1 };
+
 const UnitDropdown = styled(DropdownButton)`
   border-color: ${({ theme }) => theme.colors.input.border};
 `;
@@ -43,13 +45,12 @@ const UnitDropdown = styled(DropdownButton)`
 type Props = {
   id: string;
   label: string;
-  units: ParameterValues;
+  units: ConfigurationUnits;
   value: string | undefined;
   placeholder: string;
   disabled: boolean;
   invalid?: boolean;
   describedBy?: string;
-  labelledBy?: string;
   onChange: (value: string) => void;
   onBlur: () => void;
   buttonAfter?: React.ReactNode;
@@ -64,13 +65,11 @@ const ConfigurationQuantityInput = ({
   disabled,
   invalid = false,
   describedBy = undefined,
-  labelledBy = undefined,
   onChange,
   onBlur,
   buttonAfter = undefined,
 }: Props) => {
   const { amount, unit } = parseQuantityValue(value, units);
-  const maxByUnit: Record<string, number> = { '%': 100, '': 1 };
   const unitOptions = Object.entries(units);
 
   return (
@@ -86,7 +85,6 @@ const ConfigurationQuantityInput = ({
         step="any"
         aria-invalid={invalid}
         aria-describedby={describedBy}
-        aria-labelledby={labelledBy}
         disabled={disabled}
         onChange={(event) => onChange(formatQuantityValue((event.target as HTMLInputElement).value, unit))}
         onBlur={onBlur}

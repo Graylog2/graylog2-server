@@ -21,17 +21,17 @@ import styled from 'styled-components';
 import { Button, Input } from 'components/bootstrap';
 import { Icon, Select, Tooltip } from 'components/common';
 
-import type { ConfigurationFormValues, ConfigurationParameter, ConfigurationSource } from './types';
+import type { ConfigurationValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
 import { getQuantityUnitLabel } from './configurationQuantities';
-import { getDisplayedConfigurationValue } from './configurationFields';
+import { getConfigurationValueSource, getDisplayedConfigurationValue } from './configurationFields';
 
 const FieldDetail = styled.span`
   display: block;
   margin-top: ${({ theme }) => theme.spacings.xs};
 `;
 
-const sourceDescriptions: Record<ConfigurationSource, { label: string; description: string } | undefined> = {
+const sourceDescriptions: Partial<Record<ConfigurationSource, { label: string; description: string }>> = {
   default: {
     label: 'Built-in default',
     description: 'This is the built-in default, used when no value has been explicitly configured.',
@@ -53,7 +53,6 @@ const sourceDescriptions: Record<ConfigurationSource, { label: string; descripti
     description:
       'This value is saved in the application and takes precedence over configuration files, environment variables, and Java system properties.',
   },
-  unknown: undefined,
 };
 
 type Props = {
@@ -64,7 +63,7 @@ type Props = {
 
 const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   const { values, initialValues, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
-    useFormikContext<ConfigurationFormValues>();
+    useFormikContext<ConfigurationValues>();
   const { name, label, description, type, units, constraints } = parameter;
   const draftValue = values[name];
   const selectableValues = Object.entries(constraints?.values ?? {});
@@ -73,14 +72,12 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   const displayedValue = getDisplayedConfigurationValue(parameter, draftValue);
   const value = displayedValue ?? '';
   const placeholder = selectableValues.length > 0 || type === 'boolean' ? 'Select a value' : 'Enter a value';
-  const source = isResetPending ? parameter.node_source : parameter.source;
-  const hasMatchingSource = isResetPending || (draftValue === initialValues[name] && draftValue === parameter.value);
-  const sourceDescription = value !== '' && hasMatchingSource && source ? sourceDescriptions[source] : undefined;
+  const source = value !== '' ? getConfigurationValueSource(parameter, draftValue, initialValues[name]) : undefined;
+  const sourceDescription = source ? sourceDescriptions[source] : undefined;
   const disabled = !canEdit || isSubmitting;
   const hasUnits = Object.keys(units ?? {}).length > 0;
   const isQuantity = hasUnits && (type === 'size' || type === 'duration');
   const unitLabel = isQuantity ? getQuantityUnitLabel(displayedValue, units) : undefined;
-  const labelId = `${name}-label`;
   const helpId = `${name}-help`;
   const errorId = `${name}-error`;
   const describedBy = [helpId, error && errorId].filter(Boolean).join(' ');
@@ -128,7 +125,6 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           value={displayedValue}
           placeholder={placeholder}
           disabled={disabled}
-          labelledBy={labelId}
           describedBy={describedBy}
           invalid={!!error}
           onChange={setValue}
@@ -175,8 +171,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
     <Input
       id={name}
       name={name}
-      label={<span id={labelId}>{unitLabel ? `${label} (${unitLabel})` : label}</span>}
-      aria-labelledby={labelId}
+      label={unitLabel ? `${label} (${unitLabel})` : label}
       aria-describedby={describedBy}
       aria-invalid={!!error}
       {...getControlProps()}

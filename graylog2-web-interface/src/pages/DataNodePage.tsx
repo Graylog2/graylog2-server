@@ -18,14 +18,14 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import useParams from 'routing/useParams';
+import RoutePaths from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { Alert, Button, Row, Col, Label } from 'components/bootstrap';
+import { Alert, Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 import DataNodeConfigurationEditor from 'components/datanode/configuration/DataNodeConfigurationEditor';
-import RoutePaths from 'routing/Routes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
@@ -54,17 +54,16 @@ const ActionsCol = styled(Col)`
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
-  const { data, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
+  const { data: datanode, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  if (!data) {
+  if (!datanode) {
     return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
   }
 
-  const datanode = data;
   const datanodeDisabled = datanode.datanode_status !== 'AVAILABLE';
 
   return (
@@ -78,16 +77,6 @@ const DataNodePage = () => {
         }}
       />
       <Row className="content">
-        {error && (
-          <Col xs={12}>
-            <Alert bsStyle="danger">
-              <p>Could not refresh Data Node details. Your changes have been kept. Please try again.</p>
-              <Button type="button" bsSize="small" onClick={() => refetch()}>
-                Retry
-              </Button>
-            </Alert>
-          </Col>
-        )}
         <Col xs={12}>
           <Col xs={9}>
             <h2>Details:</h2>

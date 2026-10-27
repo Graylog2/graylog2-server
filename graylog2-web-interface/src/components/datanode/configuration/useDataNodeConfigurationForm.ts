@@ -23,11 +23,11 @@ import useHistory from 'routing/useHistory';
 import UserNotification from 'util/UserNotification';
 import extractErrorMessage from 'util/extractErrorMessage';
 
-import type { ConfigurationCategory, ConfigurationFormValues } from './types';
+import type { ConfigurationCategory, ConfigurationValues } from './types';
 import {
-  buildConfigurationFormValues,
+  buildConfigurationValues,
   buildConfigurationValuesPatch,
-  validateConfigurationFormValues,
+  validateConfigurationValues,
 } from './configurationFields';
 import { useUpdateManagedConfiguration } from './useManagedConfiguration';
 
@@ -45,13 +45,12 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
   const saveOnlyRequested = useRef(false);
   const [savedRestartNames, setSavedRestartNames] = useState<Array<string>>([]);
   const parameters = categories.flatMap((category) => category.parameters);
-  const serverValues = buildConfigurationFormValues(parameters);
-  const latestServerSnapshot = useRef({ values: serverValues, hasDeferredRefresh: false });
+  const serverValues = buildConfigurationValues(parameters);
 
-  const formik = useFormik<ConfigurationFormValues>({
+  const formik = useFormik<ConfigurationValues>({
     initialValues: serverValues,
     validateOnChange: false,
-    validate: (values) => validateConfigurationFormValues(values, parameters),
+    validate: (values) => validateConfigurationValues(values, parameters),
     onSubmit: async (draftValues, { resetForm, setStatus }) => {
       setStatus(undefined);
       const saveOnly = saveOnlyRequested.current;
@@ -62,9 +61,8 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
 
       try {
         const saved = await updateConfiguration(changes);
-        latestServerSnapshot.current.hasDeferredRefresh = false;
         setSavedRestartNames((pending) => (saveOnly ? [...new Set([...pending, ...changedRestartNames])] : []));
-        resetForm({ values: buildConfigurationFormValues(saved.parameters) });
+        resetForm({ values: buildConfigurationValues(saved.parameters) });
         UserNotification.success('Configuration saved.');
       } catch (error) {
         const details =
@@ -77,8 +75,8 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
       }
     },
   });
-  const { dirty: hasDraftChanges, errors, isSubmitting, isValidating, resetForm, submitCount } = formik;
-  const changedValues = buildConfigurationValuesPatch(formik.initialValues, formik.values, parameters);
+  const { values, errors, isSubmitting, isValidating, resetForm, submitCount } = formik;
+  const changedValues = buildConfigurationValuesPatch(formik.initialValues, values, parameters);
   const hasUnsavedChanges = Object.keys(changedValues).length > 0;
   const restartParameters = parameters.filter(
     ({ name, requires_restart }) =>
@@ -96,17 +94,10 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
   };
 
   useEffect(() => {
-    const snapshot = latestServerSnapshot.current;
-
-    if (!isEqual(snapshot.values, serverValues)) {
-      snapshot.values = serverValues;
-      snapshot.hasDeferredRefresh = true;
+    if (!hasUnsavedChanges && !isSubmitting && !isEqual(values, serverValues)) {
+      resetForm({ values: serverValues });
     }
-    if ((snapshot.hasDeferredRefresh || hasDraftChanges) && !hasUnsavedChanges && !isSubmitting) {
-      snapshot.hasDeferredRefresh = false;
-      resetForm({ values: snapshot.values });
-    }
-  }, [hasUnsavedChanges, hasDraftChanges, serverValues, isSubmitting, resetForm]);
+  }, [hasUnsavedChanges, isSubmitting, values, serverValues, resetForm]);
 
   useEffect(() => {
     if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.focus();

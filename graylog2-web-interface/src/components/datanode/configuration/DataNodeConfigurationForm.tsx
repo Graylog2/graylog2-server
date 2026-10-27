@@ -22,14 +22,13 @@ import styled from 'styled-components';
 import { Alert, Button, Col, NavItem, Row } from 'components/bootstrap';
 import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
-import ConfigletRow from 'pages/configurations/ConfigletRow';
 import usePermissions from 'hooks/usePermissions';
 import RoutePaths from 'routing/Routes';
 
 import type { ConfigurationCategory } from './types';
 import { categoryId } from './configurationFields';
 import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
-import DataNodeConfiguration from './DataNodeConfiguration';
+import DataNodeConfigurationSection from './DataNodeConfigurationSection';
 
 const RestartSettingsList = styled.ul`
   display: flex;
@@ -84,7 +83,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
         {hasUnsavedChanges && !isSubmitting && (
           <ConfirmLeaveDialog question="Discard your unsaved configuration changes?" ignoredRoutes={ignoredRoutes} />
         )}
-        <ConfigletRow className="content">
+        <Row className="content">
           {children && <Col xs={12}>{children}</Col>}
           {showNavigation && (
             <Col md={2}>
@@ -107,7 +106,9 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                     <Route
                       key={category.id}
                       path={category.id}
-                      element={<DataNodeConfiguration category={category} canEdit={canEdit} canDelete={canDelete} />}
+                      element={
+                        <DataNodeConfigurationSection category={category} canEdit={canEdit} canDelete={canDelete} />
+                      }
                     />
                   ))}
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
@@ -158,7 +159,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
               </Col>
             </Row>
           </Col>
-        </ConfigletRow>
+        </Row>
       </Form>
     </FormikProvider>
   );

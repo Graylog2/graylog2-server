@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ParameterValues } from './types';
+import type { ConfigurationUnits } from './types';
 
-export const parseQuantityValue = (value: string | undefined, units: ParameterValues) => {
+export const parseQuantityValue = (value: string | undefined, units: ConfigurationUnits) => {
   const suffixes = Object.keys(units);
 
   if (value === undefined) return { amount: '', unit: suffixes[0] ?? '' };
@@ -31,7 +31,7 @@ export const parseQuantityValue = (value: string | undefined, units: ParameterVa
   return { amount: value, unit: suffixes.includes('') ? '' : (suffixes[0] ?? '') };
 };
 
-export const getQuantityUnitLabel = (value: string | undefined, units: ParameterValues) => {
+export const getQuantityUnitLabel = (value: string | undefined, units: ConfigurationUnits) => {
   const { unit } = parseQuantityValue(value, units);
 
   return units[unit];

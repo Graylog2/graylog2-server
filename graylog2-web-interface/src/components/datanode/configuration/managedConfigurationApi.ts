@@ -16,44 +16,15 @@
  */
 import { SystemManagedConfiguration } from '@graylog/server-api';
 
-import request from 'routing/request';
-
-import type { ApiManagedConfiguration, ManagedConfiguration, ConfigurationValuesPatch } from './types';
+import type { ManagedConfiguration, ConfigurationValues } from './types';
 
 const NODE_TYPE = 'datanode';
 
-const normalizeConfiguration = (response: ApiManagedConfiguration): ManagedConfiguration => ({
-  ...response,
-  node_id: response.node_id ?? null,
-  parameters: response.parameters.map((parameter) => ({
-    ...parameter,
-    value: parameter.value ?? null,
-    source: parameter.source ?? null,
-    set_value: parameter.set_value ?? null,
-    set_at: parameter.set_at ?? null,
-    set_by: parameter.set_by ?? null,
-    node_value: parameter.node_value ?? null,
-    node_source: parameter.node_source ?? null,
-  })),
-});
-
 const managedConfigurationApi = {
-  get: async (nodeId: string | null = null): Promise<ManagedConfiguration> => {
-    const response = await SystemManagedConfiguration.get(NODE_TYPE, nodeId ?? undefined);
-
-    return normalizeConfiguration(response);
-  },
-  update: async (values: ConfigurationValuesPatch, nodeId: string | null = null): Promise<ManagedConfiguration> => {
-    const response = await request(
-      'PUT',
-      '/system/managed_configuration',
-      { node_type: NODE_TYPE, node_id: nodeId, values },
-      {},
-      { Accept: ['application/json'] },
-    );
-
-    return normalizeConfiguration(response);
-  },
+  get: (nodeId: string | null = null): Promise<ManagedConfiguration> =>
+    SystemManagedConfiguration.get(NODE_TYPE, nodeId ?? undefined),
+  update: (values: ConfigurationValues, nodeId: string | null = null): Promise<ManagedConfiguration> =>
+    SystemManagedConfiguration.update({ node_type: NODE_TYPE, node_id: nodeId, values }),
 };
 
 export default managedConfigurationApi;

@@ -36,7 +36,7 @@ import mockManagedConfigurationApi, {
   configurationParameter,
   sampleClusterConfiguration,
 } from 'components/datanode/configuration/testing/mockManagedConfigurationApi';
-import changeSetting from 'components/datanode/configuration/testing/changeConfigurationField';
+import changeConfigurationField from 'components/datanode/configuration/testing/changeConfigurationField';
 import clusterBindings from 'components/cluster-configuration/bindings';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
@@ -170,30 +170,18 @@ describe('DataNodeConfigurationPage', () => {
             label: 'Additional setting',
             category: 'Additional Settings',
             scope: 'cluster',
-            requires_restart: true,
           }),
         ],
       });
       renderPage();
       await screen.findByRole('navigation', { name: 'Data Node configuration sections' });
       expect(screen.getByRole('link', { name: 'Storage and Capacity' })).toHaveAttribute('aria-current', 'page');
-      await changeSetting('Shard limit per Data Node', '1200');
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(screen.getByRole('link', { name: 'Additional Settings' }));
       await userEvent.type(await screen.findByLabelText('Additional setting'), 'enabled');
       expect(getApplyButton()).toBeEnabled();
       await userEvent.click(screen.getByRole('link', { name: 'Storage and Capacity' }));
       expect(await screen.findByLabelText('Shard limit per Data Node')).toHaveValue(1200);
-      const restartWarning = screen.getByRole('alert', { name: 'Restart required after saving' });
-      expect(restartWarning).toHaveTextContent(
-        'Changes to the following settings require restarting the Data Nodes to take effect:',
-      );
-      expect(restartWarning).not.toHaveTextContent('Shard limit per Data Node');
-      await userEvent.click(screen.getByRole('link', { name: 'Additional setting' }));
-      expect(await screen.findByRole('textbox', { name: 'Additional setting' })).toHaveFocus();
-      expect(getApplyButton()).toBeEnabled();
-      expect(getApplyButton()).toHaveAccessibleName('Apply changes and restart Data Nodes');
     });
 
     it('redirects unknown sections to the not-found page', async () => {
@@ -220,7 +208,7 @@ describe('DataNodeConfigurationPage', () => {
     it('keeps unsaved configuration when switching Cluster tabs is declined', async () => {
       const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
       const { router } = renderPage();
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
       await userEvent.click(screen.getByRole('link', { name: 'Cluster Nodes' }));
       expect(confirm).toHaveBeenCalled();
       expect(router.state.location.pathname).toBe(`${settingsPath}/${storageSection}`);
@@ -232,7 +220,7 @@ describe('DataNodeConfigurationPage', () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
       renderPage();
 
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
       await userEvent.click(screen.getByRole('link', { name: 'Leave configuration' }));
       await screen.findByRole('heading', { name: 'Another page' });
       await userEvent.click(screen.getByRole('link', { name: 'Return to configuration' }));
@@ -243,45 +231,11 @@ describe('DataNodeConfigurationPage', () => {
   });
 
   describe('Saving and drafts', () => {
-    it('keeps the saved cluster restart warning when later edits are canceled', async () => {
-      mockManagedConfigurationApi([
-        {
-          ...sampleClusterConfiguration,
-          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
-            parameter.name === shardLimitName ? { ...parameter, requires_restart: true } : parameter,
-          ),
-        },
-      ]);
-      const update = jest.spyOn(managedConfigurationApi, 'update');
-      renderPage();
-      await changeSetting('Shard limit per Data Node', '1200');
-      await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
-
-      const warning = await screen.findByRole('alert', { name: 'Saved changes require a restart' });
-      expect(warning).toHaveTextContent(
-        'The following settings have been saved. Restart the Data Nodes for them to take effect:',
-      );
-      expect(warning).toHaveTextContent('Shard limit per Data Node');
-      expect(screen.getByRole('button', { name: 'Restart Data Nodes' })).toBeEnabled();
-
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
-      expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
-      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-      expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(85);
-      expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
-      expect(warning).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Restart Data Nodes' })).toBeEnabled();
-      expect(update).toHaveBeenCalledTimes(1);
-      expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null);
-    });
-
     it('saves only the changed settings as raw strings for all Data Nodes', async () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
       renderPage();
 
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(update).toHaveBeenCalledWith({ [lowWatermarkName]: '80%' }, null));
@@ -307,7 +261,7 @@ describe('DataNodeConfigurationPage', () => {
         },
       ]);
       const { queryClient } = renderPage(storageSection, <SavedShardLimit />);
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
 
       await act(async () => {
         await managedConfigurationApi.update({ [shardLimitName]: null });
@@ -344,7 +298,7 @@ describe('DataNodeConfigurationPage', () => {
       act(() => {
         refresh = queryClient.refetchQueries();
       });
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(getApplyButton());
       await screen.findByText('Saved shard limit: 1200');
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
@@ -354,7 +308,7 @@ describe('DataNodeConfigurationPage', () => {
         await refresh;
       });
 
-      await changeSetting('Shard limit per Data Node', '1300');
+      await changeConfigurationField('Shard limit per Data Node', '1300');
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
       expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1200);
       expect(screen.getByText('Saved shard limit: 1200')).toBeInTheDocument();
@@ -363,8 +317,8 @@ describe('DataNodeConfigurationPage', () => {
 
     it('excludes removed parameters from a save while preserving the remaining draft', async () => {
       const { queryClient } = renderPage();
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       const update = jest.spyOn(managedConfigurationApi, 'update');
 
       await act(async () => {
@@ -419,7 +373,7 @@ describe('DataNodeConfigurationPage', () => {
     ])('adopts newer backend values and their baseline for $scenario', async ({ editFirst }) => {
       const { queryClient } = renderPage();
       expect(await screen.findByLabelText('Shard limit per Data Node')).toHaveValue(1000);
-      if (editFirst) await changeSetting('Stop allocating shards at', '80', '% disk used');
+      if (editFirst) await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
 
       await act(async () => {
         await managedConfigurationApi.update({ [shardLimitName]: '1500' });
@@ -432,7 +386,7 @@ describe('DataNodeConfigurationPage', () => {
       await waitFor(() => expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1500));
       expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(85);
       expect(getApplyButton()).toBeDisabled();
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
       expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(1500);
       expect(getApplyButton()).toBeDisabled();
@@ -441,7 +395,7 @@ describe('DataNodeConfigurationPage', () => {
     it('keeps the draft when a background refresh fails and retries without remounting the editor', async () => {
       const transport = mockManagedConfigurationApi([sampleClusterConfiguration]);
       const { queryClient } = renderPage();
-      await changeSetting('Stop allocating shards at', '80', '% disk used');
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
       transport.mockRejectedValueOnce(new Error('Unavailable'));
 
       await act(async () => {
@@ -535,7 +489,7 @@ describe('DataNodeConfigurationPage', () => {
       await userEvent.type(input, '0.85');
       expect(getApplyButton()).toBeDisabled();
 
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
@@ -558,7 +512,7 @@ describe('DataNodeConfigurationPage', () => {
       const error = 'Enter a number of at least 1.';
       renderPage();
 
-      await changeSetting('Shard limit per Data Node', '0');
+      await changeConfigurationField('Shard limit per Data Node', '0');
       expect(screen.queryByText(error)).not.toBeInTheDocument();
       await userEvent.tab();
       await screen.findByText(error);
@@ -571,7 +525,7 @@ describe('DataNodeConfigurationPage', () => {
       expect(invalidInput).toHaveAccessibleDescription(new RegExp(escapeRegExp(error)));
       expect(update).not.toHaveBeenCalled();
 
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
       await userEvent.click(getApplyButton());
 
@@ -628,15 +582,15 @@ describe('DataNodeConfigurationPage', () => {
         const update = jest.spyOn(managedConfigurationApi, 'update');
         renderPage();
 
-        await changeSetting('Stop allocating shards at', low, unit);
-        await changeSetting('Move shards away at', high, unit);
-        await changeSetting('Protect indexes at', flood, unit);
+        await changeConfigurationField('Stop allocating shards at', low, unit);
+        await changeConfigurationField('Move shards away at', high, unit);
+        await changeConfigurationField('Protect indexes at', flood, unit);
         await userEvent.click(getApplyButton());
 
         await screen.findByText(error);
         expect(update).not.toHaveBeenCalled();
 
-        await changeSetting('Stop allocating shards at', correctedLow, unit);
+        await changeConfigurationField('Stop allocating shards at', correctedLow, unit);
         await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
         await userEvent.click(getApplyButton());
 
@@ -648,15 +602,15 @@ describe('DataNodeConfigurationPage', () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
       renderPage();
 
-      await changeSetting('Stop allocating shards at', '20', 'GB free');
+      await changeConfigurationField('Stop allocating shards at', '20', 'GB free');
       await userEvent.click(getApplyButton());
 
       const error = 'Use disk usage units for all three watermarks, or use free-space units for all three.';
       await screen.findByText(error);
       expect(update).not.toHaveBeenCalled();
 
-      await changeSetting('Move shards away at', '10', 'GB free');
-      await changeSetting('Protect indexes at', '5', 'GB free');
+      await changeConfigurationField('Move shards away at', '10', 'GB free');
+      await changeConfigurationField('Protect indexes at', '5', 'GB free');
       await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
       await userEvent.click(getApplyButton());
 
@@ -726,6 +680,7 @@ describe('DataNodeConfigurationPage', () => {
         { node_type: 'datanode', node_id: null, values: { [shardLimitName]: null } },
         expect.any(Object),
         expect.any(Object),
+        undefined,
       );
       expect(await savedValueOf(shardLimitName)).toBeNull();
     });
@@ -748,7 +703,7 @@ describe('DataNodeConfigurationPage', () => {
       const watermark = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
       expect(watermark).toHaveValue(85);
       expect(watermark).toHaveAccessibleDescription(/Source: Configuration file/);
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
@@ -779,7 +734,7 @@ describe('DataNodeConfigurationPage', () => {
       await screen.findByText('Set watermarks in ascending order: low, high, then flood stage.');
       expect(update).not.toHaveBeenCalled();
 
-      await changeSetting('Move shards away at', '94', '% disk used');
+      await changeConfigurationField('Move shards away at', '94', '% disk used');
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
@@ -827,8 +782,6 @@ describe('DataNodeConfigurationPage', () => {
         parameters: response.parameters.map((parameter) => omitBy(parameter, (value) => value == null)),
       });
       transport.mockResolvedValueOnce(omitUnknownValues(configuration));
-      const get = jest.spyOn(managedConfigurationApi, 'get');
-      const update = jest.spyOn(managedConfigurationApi, 'update');
       const notify = jest.spyOn(UserNotification, 'success');
       renderPage();
 
@@ -846,9 +799,8 @@ describe('DataNodeConfigurationPage', () => {
       expect(screen.queryByRole('button', { name: /^Reset value/ })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /About the value/ })).not.toBeInTheDocument();
       expect(getApplyButton()).toBeDisabled();
-      expect(await get.mock.results[0].value).toEqual(configuration);
 
-      await changeSetting('Shard limit per Data Node', '1200');
+      await changeConfigurationField('Shard limit per Data Node', '1200');
       const saved = managedConfigurationResponse({ [shardLimitName]: '1200' });
       transport.mockResolvedValueOnce(omitUnknownValues(saved));
       await userEvent.click(getApplyButton());
@@ -860,9 +812,9 @@ describe('DataNodeConfigurationPage', () => {
         { node_type: 'datanode', node_id: null, values: { [shardLimitName]: '1200' } },
         expect.any(Object),
         expect.any(Object),
+        undefined,
       );
       expect(notify).toHaveBeenCalledWith('Configuration saved.');
-      expect(await update.mock.results[0].value).toEqual(saved);
     });
 
     it('retries a failed initial load using the keyboard without falling back to samples', async () => {

@@ -17,14 +17,14 @@
 import asMock from 'helpers/mocking/AsMock';
 import request from 'routing/request';
 
-import type { ConfigurationParameter, ManagedConfiguration, ParameterValues } from '../types';
+import type { ConfigurationParameter, ManagedConfiguration, ConfigurationUnits } from '../types';
 
-const byteUnits = (labelSuffix: string): ParameterValues =>
+const byteUnits = (labelSuffix: string): ConfigurationUnits =>
   Object.fromEntries(['b', 'kb', 'mb', 'gb', 'tb', 'pb'].map((unit) => [unit, `${unit.toUpperCase()}${labelSuffix}`]));
 
-const diskUnits: ParameterValues = { '%': '% disk used', '': 'Ratio (0–1)', ...byteUnits(' free') };
+const diskUnits: ConfigurationUnits = { '%': '% disk used', '': 'Ratio (0–1)', ...byteUnits(' free') };
 
-const memoryUnits: ParameterValues = { '%': '% of heap', ...byteUnits('') };
+const memoryUnits: ConfigurationUnits = { '%': '% of heap', ...byteUnits('') };
 
 const PERCENTAGE = '(100(\\.0+)?|[0-9]{1,2}(\\.[0-9]+)?)%';
 const BYTE_SIZE = '[0-9]+(\\.[0-9]+)?([bB]|[kK][bB]|[mM][bB]|[gG][bB]|[tT][bB]|[pP][bB])';

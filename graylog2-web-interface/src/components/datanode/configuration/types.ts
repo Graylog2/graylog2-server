@@ -16,34 +16,15 @@
  */
 import type { SystemManagedConfiguration } from '@graylog/server-api';
 
-export type ApiManagedConfiguration = Awaited<ReturnType<typeof SystemManagedConfiguration.get>>;
-type ApiConfigurationParameter = ApiManagedConfiguration['parameters'][number];
+export type ManagedConfiguration = Awaited<ReturnType<typeof SystemManagedConfiguration.get>>;
 
-export type ParameterValues = Record<string, string>;
+export type ConfigurationParameter = ManagedConfiguration['parameters'][number];
 
-export type ConfigurationSource = ApiConfigurationParameter['source'];
+export type ConfigurationSource = ConfigurationParameter['source'];
 
-export type ConfigurationParameter = Omit<
-  ApiConfigurationParameter,
-  'value' | 'source' | 'set_value' | 'set_at' | 'set_by' | 'node_value' | 'node_source'
-> & {
-  value: string | null;
-  source: ConfigurationSource | null;
-  set_value: string | null;
-  set_at: string | null;
-  set_by: string | null;
-  node_value: string | null;
-  node_source: ConfigurationSource | null;
-};
+export type ConfigurationUnits = ConfigurationParameter['units'];
 
-export type ManagedConfiguration = Omit<ApiManagedConfiguration, 'node_id' | 'parameters'> & {
-  node_id: string | null;
-  parameters: Array<ConfigurationParameter>;
-};
-
-export type ConfigurationValuesPatch = Record<string, string | null>;
-
-export type ConfigurationFormValues = Record<string, string | null>;
+export type ConfigurationValues = Record<string, string | null>;
 
 export type ConfigurationCategory = {
   id: string;
