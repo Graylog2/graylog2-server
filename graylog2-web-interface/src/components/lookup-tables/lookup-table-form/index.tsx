@@ -34,12 +34,8 @@ import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
 import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
-import validateDefaultValue from './validate-default-value';
 
-export type LookupTableType = LookupTable & {
-  enable_single_value: boolean;
-  enable_multi_value: boolean;
-};
+export type LookupTableType = LookupTable;
 
 export const INIT_TABLE_VALUES: LookupTableType = {
   id: undefined,
@@ -48,10 +44,8 @@ export const INIT_TABLE_VALUES: LookupTableType = {
   name: '',
   cache_id: undefined,
   data_adapter_id: undefined,
-  enable_single_value: false,
   default_single_value: '',
   default_single_value_type: 'NULL',
-  enable_multi_value: false,
   default_multi_value: '',
   default_multi_value_type: 'NULL',
   content_pack: null,
@@ -64,12 +58,6 @@ const validations = (values: LookupTableType) => {
   if (!values.name) errors.name = 'Name is required';
   if (!values.cache_id) errors.cache_id = 'Cache is required';
   if (!values.data_adapter_id) errors.data_adapter_id = 'Data Adapter is required';
-
-  const singleValueError = validateDefaultValue(values.default_single_value, values.default_single_value_type);
-  if (singleValueError) errors.default_single_value = singleValueError;
-
-  const multiValueError = validateDefaultValue(values.default_multi_value, values.default_multi_value_type);
-  if (multiValueError) errors.default_multi_value = multiValueError;
 
   return errors;
 };
@@ -91,10 +79,11 @@ function LookupTableWizard() {
   };
 
   const handleSubmit = async (values: LookupTableType) => {
-    const payload = { ...values };
-
-    delete payload.enable_multi_value;
-    delete payload.enable_single_value;
+    const payload = {
+      ...values,
+      default_single_value: values.default_single_value?.trim(),
+      default_multi_value: values.default_multi_value?.trim(),
+    };
 
     const promise = isCreate ? createLookupTable(payload) : updateLookupTable(payload);
 

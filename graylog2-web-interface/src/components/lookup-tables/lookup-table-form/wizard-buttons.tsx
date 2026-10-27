@@ -27,6 +27,8 @@ import { Spinner } from 'components/common';
 import { Row } from 'components/lookup-tables/layout-componets';
 import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
 
+import useDefaultValueValidation from './use-default-value-validation';
+
 const ButtonsRow = styled(Row)`
   margin-top: ${({ theme }) => theme.spacings.lg};
 `;
@@ -41,6 +43,7 @@ type Props = {
 
 function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoading }: Props) {
   const { values, submitForm, resetForm, isValid } = useFormikContext<LookupTableType>();
+  const { hasDefaultValueErrors } = useDefaultValueValidation();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { push } = useHistory();
   const onFirstStep = useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
@@ -76,7 +79,7 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
     return (
       <ButtonsRow $align="center" $justify="flex-end" $width="100%">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading || !canModify}>
+        <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || hasDefaultValueErrors || isLoading || !canModify}>
           {isLoading ? (
             <Row $gap="xs" $align="center">
               <Spinner text="" /> <span>{isCreate ? 'Creating' : 'Updating'} Lookup Table...</span>

@@ -1,4 +1,4 @@
 type = "f"
-message = "Validate lookup table default values against their type when saving, instead of storing values that prevent the table from loading."
+message = "Validate lookup table default values against their type when saving, instead of storing values that prevent the table from loading. The lookup table create and update REST endpoints now reject unparseable or empty default values with a 400, and trim surrounding whitespace from default values."
 
 pulls = ["27946"]
