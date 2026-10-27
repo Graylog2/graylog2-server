@@ -51,7 +51,14 @@ const EventDefinitionNotificationsCell = ({ eventDefinition }: Props) => {
     ...notPermittedIds.map((id) => ({ id, title: undefined, isPermitted: false })),
   ];
 
-  return <ExpandableCellList items={items} renderItem={renderNotification} getItemKey={({ id }) => id} />;
+  return (
+    <ExpandableCellList
+      items={items}
+      renderItem={renderNotification}
+      getItemKey={({ id }) => id}
+      getItemTitle={({ id, title }) => title ?? id}
+    />
+  );
 };
 
 export default EventDefinitionNotificationsCell;

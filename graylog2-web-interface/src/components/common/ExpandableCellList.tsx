@@ -21,6 +21,8 @@ import styled, { css } from 'styled-components';
 import { Badge } from 'components/bootstrap';
 
 const DEFAULT_COLLAPSED_COUNT = 1;
+// About ten one-line items. Longer lists scroll, so the row doesn't grow with the list.
+const EXPANDED_MAX_HEIGHT = 240; // px
 
 type Layout = 'stacked' | 'inline';
 
@@ -49,8 +51,8 @@ const Expanded = styled.div(
   `,
 );
 
-const Items = styled.div<{ $layout: Layout }>(
-  ({ theme, $layout }) => css`
+const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
+  ({ theme, $layout, $scrollable }) => css`
     display: flex;
     min-width: 0;
     ${$layout === 'stacked'
@@ -63,13 +65,27 @@ const Items = styled.div<{ $layout: Layout }>(
           flex-wrap: wrap;
           gap: ${theme.spacings.xs};
         `}
+    ${$scrollable &&
+    css`
+      max-height: ${EXPANDED_MAX_HEIGHT}px;
+      overflow: hidden auto;
+    `}
   `,
 );
 
-const Item = styled.div`
-  min-width: 0;
-  max-width: 100%;
-`;
+// Chips truncate themselves; stacked items get one line each, so every item has the same height.
+const Item = styled.div<{ $layout: Layout }>(
+  ({ $layout }) => css`
+    min-width: 0;
+    max-width: 100%;
+    ${$layout === 'stacked' &&
+    css`
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    `}
+  `,
+);
 
 const ToggleBadge = styled(Badge)`
   flex-shrink: 0;
@@ -80,6 +96,8 @@ type Props<ItemType> = {
   items: ReadonlyArray<ItemType> | undefined | null;
   renderItem: (item: ItemType) => React.ReactNode;
   getItemKey: (item: ItemType) => string;
+  // Shown on hover, since long items are cut off.
+  getItemTitle?: (item: ItemType) => string;
   collapsedCount?: number;
   emptyFallback?: React.ReactNode;
   // `stacked` lists one item per line (e.g. entity links), `inline` wraps items next to each other (e.g. chips).
@@ -94,6 +112,7 @@ const ExpandableCellList = <ItemType,>({
   items,
   renderItem,
   getItemKey,
+  getItemTitle = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   emptyFallback = null,
   layout = 'stacked',
@@ -105,16 +124,18 @@ const ExpandableCellList = <ItemType,>({
   }
 
   const hiddenCount = items.length - collapsedCount;
-  const allItems = (
-    <Items $layout={layout}>
+  const renderAllItems = (scrollable: boolean) => (
+    <Items $layout={layout} $scrollable={scrollable}>
       {items.map((item) => (
-        <Item key={getItemKey(item)}>{renderItem(item)}</Item>
+        <Item key={getItemKey(item)} $layout={layout} title={getItemTitle?.(item)}>
+          {renderItem(item)}
+        </Item>
       ))}
     </Items>
   );
 
   if (hiddenCount <= 0) {
-    return allItems;
+    return renderAllItems(false);
   }
 
   const toggle = (e: React.MouseEvent) => {
@@ -128,7 +149,9 @@ const ExpandableCellList = <ItemType,>({
     return (
       <CollapsedRow>
         {items.slice(0, collapsedCount).map((item) => (
-          <CollapsedItem key={getItemKey(item)}>{renderItem(item)}</CollapsedItem>
+          <CollapsedItem key={getItemKey(item)} title={getItemTitle?.(item)}>
+            {renderItem(item)}
+          </CollapsedItem>
         ))}
         <ToggleBadge
           color="gray"
@@ -145,7 +168,7 @@ const ExpandableCellList = <ItemType,>({
 
   return (
     <Expanded>
-      {allItems}
+      {renderAllItems(true)}
       <ToggleBadge color="gray" size="sm" rightIcon="keyboard_arrow_up" onClick={toggle}>
         Show less
       </ToggleBadge>
