@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
 
@@ -157,5 +158,42 @@ describe('LookupTableFormFields', () => {
 
     await screen.findByDisplayValue('abcd');
     await waitFor(() => expect(screen.queryByText('Not a number')).not.toBeInTheDocument());
+  });
+
+  it('drops a validation response that arrives after the step unmounted', async () => {
+    let resolveValidation: (result: ReturnType<typeof validationResult>) => void;
+    mockValidateLookupTable.mockReturnValue(
+      new Promise((resolve) => {
+        resolveValidation = resolve;
+      }),
+    );
+    const ToggleableFields = () => {
+      const [shown, setShown] = useState(true);
+
+      return (
+        <>
+          <button type="button" onClick={() => setShown(!shown)}>
+            Toggle step
+          </button>
+          {shown && <LookupTableFormFields />}
+        </>
+      );
+    };
+    render(
+      <Formik
+        initialValues={{ ...TABLE_VALUES, default_single_value: 'abc', default_single_value_type: 'NUMBER' }}
+        onSubmit={() => {}}>
+        <ToggleableFields />
+      </Formik>,
+    );
+
+    await userEvent.click(await screen.findByDisplayValue('abc'));
+    await userEvent.tab();
+    await userEvent.click(screen.getByRole('button', { name: /toggle step/i }));
+    await act(async () => resolveValidation(validationResult({ default_single_value: ['Not a number'] })));
+    await userEvent.click(screen.getByRole('button', { name: /toggle step/i }));
+
+    await screen.findByDisplayValue('abc');
+    expect(screen.queryByText('Not a number')).not.toBeInTheDocument();
   });
 });

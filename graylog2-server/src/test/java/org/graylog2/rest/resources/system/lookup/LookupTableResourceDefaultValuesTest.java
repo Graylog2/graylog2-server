@@ -112,12 +112,18 @@ class LookupTableResourceDefaultValuesTest {
     }
 
     @Test
-    void rejectsEmptyStringOnceTrimmed() {
+    void rejectsEmptyNumberOnceTrimmed() {
         final LookupTableApi lookupTable = LookupTableResource.trimDefaultValues(
-                table("   ", LookupDefaultSingleValue.Type.STRING, "", LookupDefaultSingleValue.Type.NULL));
+                table("   ", LookupDefaultSingleValue.Type.NUMBER, "", LookupDefaultSingleValue.Type.NULL));
 
         assertThatThrownBy(() -> LookupTableResource.checkDefaultValues(lookupTable))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("default_single_value: Must not be empty.");
+    }
+
+    @Test
+    void acceptsEmptyString() {
+        assertThat(LookupTableResource.validateDefaultValues(
+                table("", LookupDefaultSingleValue.Type.STRING, "", LookupDefaultSingleValue.Type.NULL)).failed()).isFalse();
     }
 }

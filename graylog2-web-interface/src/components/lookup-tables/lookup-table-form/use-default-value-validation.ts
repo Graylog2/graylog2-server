@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFormikContext } from 'formik';
 
 import { useValidateLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
@@ -31,6 +31,14 @@ const useDefaultValueValidation = () => {
   const { values, status, setStatus } = useFormikContext<LookupTableType>();
   const { validateLookupTable } = useValidateLookupTable();
   const latestRequest = useRef(0);
+
+  // Steps unmount when the wizard moves on, so their pending responses must not overwrite a later step's result.
+  useEffect(
+    () => () => {
+      latestRequest.current += 1;
+    },
+    [],
+  );
 
   const defaultValueErrors: DefaultValueErrors = status?.defaultValueErrors ?? {};
 

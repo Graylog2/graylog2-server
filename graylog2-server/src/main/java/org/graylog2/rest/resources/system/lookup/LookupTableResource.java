@@ -435,7 +435,8 @@ public class LookupTableResource extends RestResource {
         if (type == LookupDefaultSingleValue.Type.NULL) {
             return Optional.empty();
         }
-        if (value.isEmpty()) {
+        // An empty string is a deliberate default, e.g. in shipped content, so only empty numbers and booleans fail.
+        if (value.isEmpty() && type != LookupDefaultSingleValue.Type.STRING) {
             return Optional.of("Must not be empty.");
         }
         if (type == LookupDefaultSingleValue.Type.BOOLEAN && !value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) {
