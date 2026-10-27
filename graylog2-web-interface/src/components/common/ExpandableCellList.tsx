@@ -19,6 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Badge } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 
 const DEFAULT_COLLAPSED_COUNT = 1;
@@ -159,14 +160,9 @@ const ExpandableCellList = <ItemType,>({
             {renderItem(item)}
           </CollapsedItem>
         ))}
-        <ToggleBadge
-          color="gray"
-          size="sm"
-          rightIcon="keyboard_arrow_down"
-          onClick={toggle}
-          title={title}
-          aria-label={title}>
+        <ToggleBadge color="gray" size="sm" onClick={toggle} title={title} aria-label={title}>
           +{hiddenCount}
+          <Icon name="keyboard_arrow_down" size="sm" />
         </ToggleBadge>
       </CollapsedRow>
     );
@@ -175,8 +171,9 @@ const ExpandableCellList = <ItemType,>({
   return (
     <Expanded>
       {renderAllItems(true)}
-      <ToggleBadge color="gray" size="sm" rightIcon="keyboard_arrow_up" onClick={toggle}>
+      <ToggleBadge color="gray" size="sm" onClick={toggle}>
         Show less
+        <Icon name="keyboard_arrow_up" size="sm" />
       </ToggleBadge>
     </Expanded>
   );
