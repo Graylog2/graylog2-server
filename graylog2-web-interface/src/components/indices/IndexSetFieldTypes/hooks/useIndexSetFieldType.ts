@@ -29,7 +29,11 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypes', searchParams];
+export const keyFn = (indexSetId: string, searchParams: SearchParams) => [
+  'indexSetFieldTypes',
+  indexSetId,
+  searchParams,
+];
 
 export const fetchIndexSetFieldTypes = async (
   indexSetId: string,
@@ -65,7 +69,7 @@ const useIndexSetFieldTypes = (
   refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: keyFn(searchParams),
+    queryKey: keyFn(indexSetId, searchParams),
 
     queryFn: () =>
       defaultOnError(

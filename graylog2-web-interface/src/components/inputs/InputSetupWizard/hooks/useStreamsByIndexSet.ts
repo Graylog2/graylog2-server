@@ -35,7 +35,7 @@ const useStreamsByIndexSet = (
   isLoading: boolean;
 } => {
   const { data, isLoading } = useQuery({
-    queryKey: [STREAMS_BY_INDEX_SET_ID],
+    queryKey: [STREAMS_BY_INDEX_SET_ID, indexSetId],
 
     queryFn: () =>
       onError(Streams.getByIndexSet(indexSetId), (errorThrown: FetchError) => {
