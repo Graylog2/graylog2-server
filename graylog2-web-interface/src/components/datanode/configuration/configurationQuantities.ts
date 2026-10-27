@@ -16,14 +16,9 @@
  */
 import type { ParameterValues } from './types';
 
-/**
- * Splits a stored value into the amount and the unit it is given in. Units are the suffixes the API provides, so the
- * longest matching one wins: "mb" has to be preferred over "b".
- */
 export const parseQuantityValue = (value: string | undefined, units: ParameterValues) => {
   const suffixes = Object.keys(units);
 
-  // An unset field starts with the first offered unit; an empty draft can have an empty suffix.
   if (value === undefined) return { amount: '', unit: suffixes[0] ?? '' };
 
   const suffix = suffixes
@@ -43,7 +38,6 @@ export const getQuantityUnitLabel = (value: string | undefined, units: Parameter
 };
 
 export const formatQuantityValue = (amount: string, unit: string) => {
-  // Retain the selected unit while the numeric field is empty; validation prevents saving an empty amount.
   let normalizedAmount = amount.startsWith('.') ? `0${amount}` : amount;
 
   if (/[eE]/.test(amount) && Number.isFinite(Number(amount))) normalizedAmount = String(Number(amount));

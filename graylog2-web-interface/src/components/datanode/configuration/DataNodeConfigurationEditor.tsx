@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Alert } from 'components/bootstrap';
+import { Alert, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import DataNodeConfigurationForm from './DataNodeConfigurationForm';
@@ -26,21 +26,42 @@ import useManagedConfiguration from './useManagedConfiguration';
 type Props = React.PropsWithChildren<{ basePath: string; nodeId?: string | null }>;
 
 const DataNodeConfigurationEditor = ({ basePath, nodeId = null, children = undefined }: Props) => {
-  const { data, isLoading, error } = useManagedConfiguration(nodeId);
+  const { data, isLoading, isFetching, error, refetch } = useManagedConfiguration(nodeId);
 
   if (isLoading) return <Spinner text="Loading Data Node configuration..." />;
-  if (error) return <Alert bsStyle="danger">Could not load Data Node configuration. Please try again.</Alert>;
+
+  const loadError = error && (
+    <Alert bsStyle="danger">
+      <p>
+        {data
+          ? 'Could not refresh Data Node configuration. Your changes have been kept. Please try again.'
+          : 'Could not load Data Node configuration. Please try again.'}
+      </p>
+      <Button type="button" bsSize="small" disabled={isFetching} onClick={() => refetch()}>
+        Retry
+      </Button>
+    </Alert>
+  );
+
+  if (error && !data) return loadError;
 
   const categories = getConfigurationCategories(data?.parameters ?? []);
 
-  if (categories.length === 0) {
-    return <Alert bsStyle="info">No Data Node configuration parameters are available here.</Alert>;
-  }
-
   return (
-    <DataNodeConfigurationForm key={nodeId ?? 'cluster'} categories={categories} nodeId={nodeId} basePath={basePath}>
-      {children}
-    </DataNodeConfigurationForm>
+    <>
+      {loadError}
+      {categories.length === 0 ? (
+        <Alert bsStyle="info">No Data Node configuration parameters are available here.</Alert>
+      ) : (
+        <DataNodeConfigurationForm
+          key={nodeId ?? 'cluster'}
+          categories={categories}
+          nodeId={nodeId}
+          basePath={basePath}>
+          {children}
+        </DataNodeConfigurationForm>
+      )}
+    </>
   );
 };
 

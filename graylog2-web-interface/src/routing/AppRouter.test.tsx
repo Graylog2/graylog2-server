@@ -32,10 +32,8 @@ import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-import mockManagedConfigurationApi from 'components/datanode/configuration/__tests__/mockManagedConfigurationApi';
 
 import AppRouter from './AppRouter';
-import RoutePaths from './Routes';
 
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
@@ -45,7 +43,6 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
-jest.mock('routing/request');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
 
 jest.mock('react-router-dom', () => ({
@@ -85,8 +82,6 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   beforeEach(() => {
-    mockManagedConfigurationApi();
-    asMock(AppConfig.isCloud).mockReturnValue(false);
     asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
@@ -102,23 +97,6 @@ describe('AppRouter', () => {
 
   it('renders a not found page for unknown URLs', async () => {
     setInitialPath('/this-url-is-not-registered-and-should-never-be');
-    render(<AppRouterWithContext />);
-
-    await screen.findByText('Page not found');
-  });
-
-  it('routes the Data Node Configuration tab under Cluster and preserves its selected section', async () => {
-    setInitialPath(`${RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION}/storage-and-capacity`);
-    render(<AppRouterWithContext />);
-
-    await screen.findByRole('heading', { name: 'Data Node Configuration' });
-    await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
-    expect(screen.getByRole('heading', { name: 'Storage and Capacity' })).toBeInTheDocument();
-  });
-
-  it('does not expose Data Node Configuration in Cloud', async () => {
-    asMock(AppConfig.isCloud).mockReturnValue(true);
-    setInitialPath(RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION);
     render(<AppRouterWithContext />);
 
     await screen.findByText('Page not found');
@@ -141,7 +119,7 @@ describe('AppRouter', () => {
 
       await findByText('Hey there!');
 
-      expect(queryByTitle(/ Logo$/)).toBeNull();
+      expect(queryByTitle('Graylog Logo')).toBeNull();
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {

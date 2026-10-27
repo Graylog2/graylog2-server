@@ -22,7 +22,6 @@ import { DropdownButton, FormControl, InputGroup, MenuItem } from 'components/bo
 import type { ParameterValues } from './types';
 import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
 
-// Follow the attached numeric field and unit dropdown pattern used by TimeUnitInput.
 const QuantityInputGroup = styled(InputGroup)`
   display: flex;
 `;
@@ -32,17 +31,28 @@ const QuantityControl = styled(FormControl)`
   min-width: 0;
 `;
 
+const QuantityActions = styled(InputGroup.Button)`
+  display: flex;
+  width: auto;
+`;
+
+const UnitDropdown = styled(DropdownButton)`
+  border-color: ${({ theme }) => theme.colors.input.border};
+`;
+
 type Props = {
   id: string;
   label: string;
   units: ParameterValues;
   value: string | undefined;
+  placeholder: string;
   disabled: boolean;
   invalid?: boolean;
   describedBy?: string;
   labelledBy?: string;
   onChange: (value: string) => void;
   onBlur: () => void;
+  buttonAfter?: React.ReactNode;
 };
 
 const ConfigurationQuantityInput = ({
@@ -50,15 +60,16 @@ const ConfigurationQuantityInput = ({
   label,
   units,
   value,
+  placeholder,
   disabled,
   invalid = false,
   describedBy = undefined,
   labelledBy = undefined,
   onChange,
   onBlur,
+  buttonAfter = undefined,
 }: Props) => {
   const { amount, unit } = parseQuantityValue(value, units);
-  // A percentage cannot exceed 100, and a unitless quantity is a ratio from 0 to 1
   const maxByUnit: Record<string, number> = { '%': 100, '': 1 };
   const unitOptions = Object.entries(units);
 
@@ -69,7 +80,7 @@ const ConfigurationQuantityInput = ({
         name={id}
         type="number"
         value={amount}
-        placeholder="No value set"
+        placeholder={placeholder}
         min={0}
         max={maxByUnit[unit]}
         step="any"
@@ -80,21 +91,25 @@ const ConfigurationQuantityInput = ({
         onChange={(event) => onChange(formatQuantityValue((event.target as HTMLInputElement).value, unit))}
         onBlur={onBlur}
       />
-      <DropdownButton
-        id={`${id}-unit`}
-        buttonTitle={`${label} unit`}
-        title={units[unit]}
-        disabled={disabled}
-        onBlur={onBlur}>
-        {unitOptions.map(([suffix, unitLabel]) => (
-          <MenuItem
-            key={suffix}
-            active={unit === suffix}
-            onSelect={() => onChange(formatQuantityValue(amount, suffix))}>
-            {unitLabel}
-          </MenuItem>
-        ))}
-      </DropdownButton>
+      <QuantityActions>
+        <UnitDropdown
+          id={`${id}-unit`}
+          bsStyle="transparent"
+          buttonTitle={`${label} unit`}
+          title={units[unit]}
+          disabled={disabled}
+          onBlur={onBlur}>
+          {unitOptions.map(([suffix, unitLabel]) => (
+            <MenuItem
+              key={suffix}
+              active={unit === suffix}
+              onSelect={() => onChange(formatQuantityValue(amount, suffix))}>
+              {unitLabel}
+            </MenuItem>
+          ))}
+        </UnitDropdown>
+        {buttonAfter}
+      </QuantityActions>
     </QuantityInputGroup>
   );
 };

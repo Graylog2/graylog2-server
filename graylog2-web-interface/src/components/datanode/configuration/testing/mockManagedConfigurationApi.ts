@@ -32,7 +32,6 @@ const RATIO = '0(\\.[0-9]+)?|1(\\.0+)?';
 
 type ParameterOverrides = Partial<ConfigurationParameter> & Pick<ConfigurationParameter, 'name' | 'label'>;
 
-/** Mirrors what the server's catalog returns, so tests exercise the metadata the real API provides. */
 export const configurationParameter = (parameter: ParameterOverrides): ConfigurationParameter => ({
   description: `Description of ${parameter.label}.`,
   category: 'Node Settings',
@@ -53,7 +52,6 @@ export const configurationParameter = (parameter: ParameterOverrides): Configura
   ...parameter,
 });
 
-/** Applies a stored value the way the server derives the effective value from it. */
 const withStoredValue = (parameter: ConfigurationParameter, value: string | null): ConfigurationParameter => {
   if (value === null) {
     return {
@@ -196,7 +194,6 @@ const nodeParameters = (): Array<ConfigurationParameter> => [
   }),
 ];
 
-/** A configuration response with the given stored values applied, keyed by parameter name. */
 export const managedConfigurationResponse = (
   storedValues: Record<string, string> = {},
   nodeId: string | null = null,
@@ -228,7 +225,6 @@ export const sampleNodeConfiguration = (nodeId: string) =>
     nodeId,
   );
 
-/** Mocks the transport so a saved value is returned by the next read, like the real API does. */
 const mockManagedConfigurationApi = (initialConfigurations: Array<ManagedConfiguration> = []) => {
   const storedValues = new Map<string | null, Record<string, string>>(
     initialConfigurations.map((configuration) => [
@@ -246,15 +242,23 @@ const mockManagedConfigurationApi = (initialConfigurations: Array<ManagedConfigu
     const nodeId: string | null = (method === 'GET' ? query.node_id : body.node_id) ?? null;
     const values = { ...(storedValues.get(nodeId) ?? {}) };
 
-    if (method === 'GET') return managedConfigurationResponse(values, nodeId);
+    if (method !== 'GET') {
+      Object.entries(body.values as Record<string, string | null>).forEach(([name, value]) => {
+        if (value === null) delete values[name];
+        else values[name] = value;
+      });
+      storedValues.set(nodeId, values);
+    }
 
-    Object.entries(body.values as Record<string, string | null>).forEach(([name, value]) => {
-      if (value === null) delete values[name];
-      else values[name] = value;
-    });
-    storedValues.set(nodeId, values);
+    const configuration =
+      initialConfigurations.find(({ node_id: id }) => id === nodeId) ?? managedConfigurationResponse({}, nodeId);
 
-    return managedConfigurationResponse(values, nodeId);
+    return {
+      ...configuration,
+      parameters: configuration.parameters.map((parameter) =>
+        withStoredValue(parameter, values[parameter.name] ?? null),
+      ),
+    };
   });
 
   return transport;

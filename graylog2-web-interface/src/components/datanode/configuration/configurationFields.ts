@@ -27,7 +27,6 @@ export const categoryId = (category: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-/** Groups the parameters of a response into the sections the page shows, keeping the order the API returned. */
 export const getConfigurationCategories = (parameters: Array<ConfigurationParameter>): Array<ConfigurationCategory> => {
   const categories: Array<ConfigurationCategory> = [];
 
@@ -44,32 +43,31 @@ export const getConfigurationCategories = (parameters: Array<ConfigurationParame
   return categories;
 };
 
-/** The form starts from the effective configuration values returned by the API. */
 export const buildConfigurationFormValues = (parameters: Array<ConfigurationParameter>): ConfigurationFormValues =>
   Object.fromEntries(
     parameters.filter(({ value }) => value !== null && value !== undefined).map(({ name, value }) => [name, value]),
   );
 
-/** Only changed parameters are sent, a removed value as null, so unchanged ones keep their timestamps. */
+export const getDisplayedConfigurationValue = (
+  parameter: ConfigurationParameter,
+  draftValue: string | null | undefined,
+) => (draftValue === null ? (parameter.node_value ?? undefined) : draftValue);
+
 export const buildConfigurationValuesPatch = (
   initialValues: ConfigurationFormValues,
   values: ConfigurationFormValues,
-): ConfigurationValuesPatch => {
-  const names = new Set([...Object.keys(initialValues), ...Object.keys(values)]);
-
-  return Object.fromEntries(
-    [...names]
-      .filter((name) => initialValues[name] !== values[name])
-      .map((name) => [name, Object.hasOwn(values, name) ? values[name] : null]),
+  parameters: Array<ConfigurationParameter>,
+): ConfigurationValuesPatch =>
+  Object.fromEntries(
+    parameters
+      .filter(({ name }) => initialValues[name] !== values[name])
+      .map(({ name }) => [name, Object.hasOwn(values, name) ? values[name] : null]),
   );
-};
 
-const matchesPattern = (pattern: string, value: string) => {
+const matchesPatternIfSupported = (pattern: string, value: string) => {
   try {
-    // Patterns are anchored on the server, where Pattern#matches has to match the whole value
     return new RegExp(`^(?:${pattern})$`).test(value);
   } catch {
-    // A pattern the browser can't parse shouldn't block the form, the server rejects the value anyway
     return true;
   }
 };
@@ -84,7 +82,7 @@ const validateElement = (parameter: ConfigurationParameter, value: string): stri
     return `Choose one of ${Object.values(selectableValues).join(', ')}.`;
   }
 
-  if (constraints?.pattern && !matchesPattern(constraints.pattern, value)) {
+  if (constraints?.pattern && !matchesPatternIfSupported(constraints.pattern, value)) {
     return 'Enter a value in a supported format.';
   }
 
@@ -105,8 +103,7 @@ const validateElement = (parameter: ConfigurationParameter, value: string): stri
   return undefined;
 };
 
-/** Applies the constraints the API provides. The server checks the same rules again when the form is saved. */
-export const validateParameter = (parameter: ConfigurationParameter, value: string): string | undefined => {
+const validateParameter = (parameter: ConfigurationParameter, value: string): string | undefined => {
   if (value === undefined || value.trim() === '') return 'Enter a value.';
 
   if (parameter.type === 'list') {
@@ -119,7 +116,6 @@ export const validateParameter = (parameter: ConfigurationParameter, value: stri
   return validateElement(parameter, value.trim());
 };
 
-// The watermarks have to be consistent with each other, which no single parameter can express.
 const watermarkNames = [
   'cluster.routing.allocation.disk.watermark.low',
   'cluster.routing.allocation.disk.watermark.high',
@@ -141,7 +137,7 @@ const parseWatermark = (value: string) => {
   return { kind: 'usage', amount: Number(value) };
 };
 
-const validateWatermarks = (values: ConfigurationFormValues) => {
+const validateWatermarks = (values: Record<string, string>) => {
   if (watermarkNames.some((name) => values[name] === undefined)) return undefined;
 
   const [low, high, flood] = watermarkNames.map((name) => parseWatermark(values[name]));
@@ -168,15 +164,23 @@ export const validateConfigurationFormValues = (
   const errors: Array<[string, string]> = [];
 
   parameters.forEach((parameter) => {
-    if (!Object.hasOwn(values, parameter.name)) return;
+    const value = values[parameter.name];
+    if (value == null) return;
 
-    const error = validateParameter(parameter, values[parameter.name]);
+    const error = validateParameter(parameter, value);
 
     if (error) errors.push([parameter.name, error]);
   });
 
   const hasWatermarks = watermarkNames.every((name) => parameters.some(({ name: it }) => it === name));
-  const watermarkError = hasWatermarks && errors.length === 0 ? validateWatermarks(values) : undefined;
+  const displayedValues: Record<string, string> = Object.fromEntries(
+    parameters.flatMap((parameter) => {
+      const value = getDisplayedConfigurationValue(parameter, values[parameter.name]);
+
+      return value === undefined ? [] : [[parameter.name, value]];
+    }),
+  );
+  const watermarkError = hasWatermarks && errors.length === 0 ? validateWatermarks(displayedValues) : undefined;
 
   if (watermarkError) errors.push([watermarkNames[0], watermarkError]);
 

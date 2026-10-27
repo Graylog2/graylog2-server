@@ -24,28 +24,30 @@ const getQueryKey = (nodeId: string | null) => ['datanode', 'managed-configurati
 type ManagedConfigurationResult = {
   data: ManagedConfiguration | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   error: Error | null;
+  refetch: () => void;
 };
 
 type UpdateManagedConfigurationResult = {
   updateConfiguration: (values: ConfigurationValuesPatch) => Promise<ManagedConfiguration>;
 };
 
-const useManagedConfiguration = (nodeId: string | null = null, enabled = true): ManagedConfigurationResult => {
-  const { data, isLoading, error } = useQuery({
+const useManagedConfiguration = (nodeId: string | null = null): ManagedConfigurationResult => {
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: getQueryKey(nodeId),
     queryFn: () => managedConfigurationApi.get(nodeId),
-    enabled,
   });
 
-  return { data, isLoading, error };
+  return { data, isLoading, isFetching, error, refetch };
 };
 
 export const useUpdateManagedConfiguration = (nodeId: string | null = null): UpdateManagedConfigurationResult => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: (values: ConfigurationValuesPatch) => managedConfigurationApi.update(values, nodeId),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await queryClient.cancelQueries({ queryKey: getQueryKey(nodeId), exact: true });
       queryClient.setQueryData(getQueryKey(nodeId), data);
     },
   });

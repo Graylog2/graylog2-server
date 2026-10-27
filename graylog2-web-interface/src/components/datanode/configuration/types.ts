@@ -16,15 +16,13 @@
  */
 import type { SystemManagedConfiguration } from '@graylog/server-api';
 
-type ApiManagedConfiguration = Awaited<ReturnType<typeof SystemManagedConfiguration.get>>;
+export type ApiManagedConfiguration = Awaited<ReturnType<typeof SystemManagedConfiguration.get>>;
 type ApiConfigurationParameter = ApiManagedConfiguration['parameters'][number];
 
-/** Selectable values mapped to the label shown for them, like the values of an input dropdown field. */
 export type ParameterValues = Record<string, string>;
 
 export type ConfigurationSource = ApiConfigurationParameter['source'];
 
-// The generated types mark every property as present, while the API omits the ones it has no value for.
 export type ConfigurationParameter = Omit<
   ApiConfigurationParameter,
   'value' | 'source' | 'set_value' | 'set_at' | 'set_by' | 'node_value' | 'node_source'
@@ -43,13 +41,10 @@ export type ManagedConfiguration = Omit<ApiManagedConfiguration, 'node_id' | 'pa
   parameters: Array<ConfigurationParameter>;
 };
 
-/** The values to change, keyed by parameter name. A null value removes the stored value. */
 export type ConfigurationValuesPatch = Record<string, string | null>;
 
-/** The values currently shown in the form, keyed by parameter name. */
-export type ConfigurationFormValues = Record<string, string>;
+export type ConfigurationFormValues = Record<string, string | null>;
 
-/** Parameters of one category, which is what a single section of the page shows. */
 export type ConfigurationCategory = {
   id: string;
   label: string;

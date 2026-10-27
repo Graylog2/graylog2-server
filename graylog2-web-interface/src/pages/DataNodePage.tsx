@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
-import { Alert, Row, Col, Label } from 'components/bootstrap';
+import { Alert, Button, Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
@@ -60,7 +60,7 @@ const DataNodePage = () => {
     return <Spinner />;
   }
 
-  if (!isInitialLoading && (!data || error)) {
+  if (!data) {
     return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
   }
 
@@ -78,6 +78,16 @@ const DataNodePage = () => {
         }}
       />
       <Row className="content">
+        {error && (
+          <Col xs={12}>
+            <Alert bsStyle="danger">
+              <p>Could not refresh Data Node details. Your changes have been kept. Please try again.</p>
+              <Button type="button" bsSize="small" onClick={() => refetch()}>
+                Retry
+              </Button>
+            </Alert>
+          </Col>
+        )}
         <Col xs={12}>
           <Col xs={9}>
             <h2>Details:</h2>

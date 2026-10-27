@@ -19,24 +19,41 @@ import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Icon, Select, Tooltip } from 'components/common';
 
 import type { ConfigurationFormValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
 import { getQuantityUnitLabel } from './configurationQuantities';
+import { getDisplayedConfigurationValue } from './configurationFields';
 
 const FieldDetail = styled.span`
   display: block;
   margin-top: ${({ theme }) => theme.spacings.xs};
 `;
 
-const sourceDescriptions: Record<ConfigurationSource, string> = {
-  default: 'Built-in default',
-  config_file: 'Configuration file',
-  environment: 'Environment variable',
-  system_property: 'System property',
-  database: 'Saved value',
-  unknown: 'Unknown',
+const sourceDescriptions: Record<ConfigurationSource, { label: string; description: string } | undefined> = {
+  default: {
+    label: 'Built-in default',
+    description: 'This is the built-in default, used when no value has been explicitly configured.',
+  },
+  config_file: {
+    label: 'Configuration file',
+    description: 'This value was read from a configuration file on the Data Node.',
+  },
+  environment: {
+    label: 'Environment variable',
+    description: 'This value was read from an environment variable set for the Data Node process.',
+  },
+  system_property: {
+    label: 'System property',
+    description: 'This value was read from a Java system property (-D...) passed to the Data Node process at startup.',
+  },
+  database: {
+    label: 'Saved value',
+    description:
+      'This value is saved in the application and takes precedence over configuration files, environment variables, and Java system properties.',
+  },
+  unknown: undefined,
 };
 
 type Props = {
@@ -46,33 +63,52 @@ type Props = {
 };
 
 const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
-  const { values, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
+  const { values, initialValues, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
     useFormikContext<ConfigurationFormValues>();
   const { name, label, description, type, units, constraints } = parameter;
+  const draftValue = values[name];
   const selectableValues = Object.entries(constraints?.values ?? {});
   const error = touched[name] || submitCount > 0 ? errors[name] : undefined;
-  const rawValue = values[name];
-  const value = rawValue ?? '';
+  const isResetPending = draftValue === null;
+  const displayedValue = getDisplayedConfigurationValue(parameter, draftValue);
+  const value = displayedValue ?? '';
+  const placeholder = selectableValues.length > 0 || type === 'boolean' ? 'Select a value' : 'Enter a value';
+  const source = isResetPending ? parameter.node_source : parameter.source;
+  const hasMatchingSource = isResetPending || (draftValue === initialValues[name] && draftValue === parameter.value);
+  const sourceDescription = value !== '' && hasMatchingSource && source ? sourceDescriptions[source] : undefined;
   const disabled = !canEdit || isSubmitting;
   const hasUnits = Object.keys(units ?? {}).length > 0;
   const isQuantity = hasUnits && (type === 'size' || type === 'duration');
-  const unitLabel = isQuantity ? getQuantityUnitLabel(rawValue, units) : undefined;
+  const unitLabel = isQuantity ? getQuantityUnitLabel(displayedValue, units) : undefined;
   const labelId = `${name}-label`;
   const helpId = `${name}-help`;
   const errorId = `${name}-error`;
   const describedBy = [helpId, error && errorId].filter(Boolean).join(' ');
   const onBlur = () => setTouched({ ...touched, [name]: true });
-  // Parameter names contain dots; keep literal keys instead of Formik object paths.
   const setValue = (nextValue: string) =>
-    setValues((currentValues) => ({ ...currentValues, [name]: nextValue }), submitCount > 0);
+    setValues(
+      (currentValues) =>
+        nextValue === getDisplayedConfigurationValue(parameter, currentValues[name])
+          ? currentValues
+          : { ...currentValues, [name]: nextValue },
+      submitCount > 0,
+    );
 
-  const removeStoredValue = () =>
-    setValues((currentValues) => {
-      const nextValues = { ...currentValues };
-      delete nextValues[name];
+  const resetValue = async () => {
+    await setValues((currentValues) => ({ ...currentValues, [name]: null }), true);
+    document.getElementById(name)?.focus();
+  };
 
-      return nextValues;
-    }, submitCount > 0);
+  const resetButton =
+    parameter.set_value != null ? (
+      <Button
+        type="button"
+        aria-label={`Reset value for ${label}`}
+        disabled={disabled || !canDelete || isResetPending}
+        onClick={resetValue}>
+        Reset value
+      </Button>
+    ) : undefined;
 
   const getControlProps = () => {
     if (isQuantity || selectableValues.length > 0) return { type: undefined, value: undefined };
@@ -89,13 +125,15 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           id={name}
           label={label}
           units={units}
-          value={rawValue}
+          value={displayedValue}
+          placeholder={placeholder}
           disabled={disabled}
           labelledBy={labelId}
           describedBy={describedBy}
           invalid={!!error}
           onChange={setValue}
           onBlur={onBlur}
+          buttonAfter={resetButton}
         />
       );
     }
@@ -109,7 +147,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           inputProps={{ 'aria-describedby': describedBy, 'aria-invalid': !!error }}
           multi={type === 'list'}
           options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
-          placeholder="No value set"
+          placeholder={placeholder}
           value={value}
           onChange={setValue}
           onBlur={onBlur}
@@ -122,7 +160,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
       return (
         <>
           <option value="" disabled>
-            No value set
+            {placeholder}
           </option>
           <option value="true">Enabled</option>
           <option value="false">Disabled</option>
@@ -143,7 +181,8 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
       aria-invalid={!!error}
       {...getControlProps()}
       disabled={disabled}
-      placeholder="No value set"
+      buttonAfter={isQuantity ? undefined : resetButton}
+      placeholder={placeholder}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
       onBlur={onBlur}
       error={
@@ -158,25 +197,22 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           {description}
           <FieldDetail>
             <code>{name}</code>
+            {sourceDescription && (
+              <>
+                {' · Source: '}
+                {sourceDescription.label}
+                <Tooltip label={sourceDescription.description} multiline maw={400}>
+                  <Button
+                    type="button"
+                    bsStyle="transparent"
+                    bsSize="xsmall"
+                    aria-label={`About the value for ${label}`}>
+                    <Icon name="help" type="regular" />
+                  </Button>
+                </Tooltip>
+              </>
+            )}
           </FieldDetail>
-          {parameter.source && <FieldDetail>Source: {sourceDescriptions[parameter.source]}</FieldDetail>}
-          {parameter.set_value != null && (
-            <FieldDetail>
-              <Button
-                bsSize="xsmall"
-                aria-label={`Remove stored value for ${label}`}
-                disabled={disabled || !canDelete}
-                onClick={removeStoredValue}>
-                Remove stored value
-              </Button>
-              {parameter.node_value != null && (
-                <>
-                  {' '}
-                  Falls back to <code>{parameter.node_value}</code>.
-                </>
-              )}
-            </FieldDetail>
-          )}
         </span>
       }>
       {renderControl()}

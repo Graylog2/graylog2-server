@@ -14,29 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef } from 'react';
-import { Form, FormikProvider, useFormik } from 'formik';
+import React from 'react';
+import { Form, FormikProvider } from 'formik';
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Alert, Col, NavItem, Row } from 'components/bootstrap';
+import { Alert, Button, Col, NavItem, Row } from 'components/bootstrap';
 import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import usePermissions from 'hooks/usePermissions';
 import RoutePaths from 'routing/Routes';
-import useLocation from 'routing/useLocation';
-import useHistory from 'routing/useHistory';
-import UserNotification from 'util/UserNotification';
 
-import type { ConfigurationCategory, ConfigurationFormValues } from './types';
-import {
-  buildConfigurationFormValues,
-  buildConfigurationValuesPatch,
-  categoryId,
-  validateConfigurationFormValues,
-} from './configurationFields';
-import { useUpdateManagedConfiguration } from './useManagedConfiguration';
+import type { ConfigurationCategory } from './types';
+import { categoryId } from './configurationFields';
+import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
 import DataNodeConfiguration from './DataNodeConfiguration';
 
 const RestartSettingsList = styled.ul`
@@ -73,70 +65,23 @@ type Props = React.PropsWithChildren<{
 
 const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = undefined }: Props) => {
   const { isPermitted } = usePermissions();
-  const { updateConfiguration } = useUpdateManagedConfiguration(nodeId);
-  const { push } = useHistory();
-  const { pathname, hash, key: locationKey } = useLocation();
-  const focusedSubmit = useRef(0);
-  const parameters = categories.flatMap((category) => category.parameters);
-  const initialValues = buildConfigurationFormValues(parameters);
+  const { formik, hasUnsavedChanges, restartParameters, hasUnsavedRestartChanges, saveChangesWithoutRestart } =
+    useDataNodeConfigurationForm({ categories, nodeId, basePath });
+  const { isSubmitting, resetForm, status } = formik;
   const canDelete = isPermitted('clusterconfigentry:delete');
   const canEdit = isPermitted(['clusterconfigentry:create', 'clusterconfigentry:edit']);
   const showNavigation = categories.length > 1;
+  const nodeLabel = nodeId === null ? 'Data Nodes' : 'Data Node';
+  const restartTarget = nodeId === null ? 'the Data Nodes' : 'this Data Node';
   const ignoredRoutes = [basePath, ...categories.map(({ id }) => `${basePath}/${id}`)].flatMap((path) => [
     path,
     `${path}/`,
   ]);
 
-  const formik = useFormik<ConfigurationFormValues>({
-    initialValues,
-    validateOnChange: false,
-    validate: (values) => validateConfigurationFormValues(values, parameters),
-    onSubmit: async (values, { resetForm, setStatus }) => {
-      setStatus(undefined);
-
-      try {
-        const saved = await updateConfiguration(buildConfigurationValuesPatch(formik.initialValues, values));
-        resetForm({ values: buildConfigurationFormValues(saved.parameters) });
-        UserNotification.success('Configuration saved.');
-      } catch {
-        setStatus('Could not save Data Node configuration. Your changes have been kept. Please try again.');
-      }
-    },
-  });
-  const { dirty, errors, isSubmitting, isValidating, resetForm, status, submitCount } = formik;
-  const changedValues = buildConfigurationValuesPatch(formik.initialValues, formik.values);
-  const restartParameters = parameters.filter(
-    ({ name, requires_restart }) => requires_restart && Object.hasOwn(changedValues, name),
-  );
-
-  useEffect(() => {
-    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.focus();
-  }, [hash, locationKey, pathname]);
-
-  useEffect(() => {
-    if (submitCount === 0) focusedSubmit.current = 0;
-    if (submitCount <= focusedSubmit.current || isSubmitting || isValidating) return;
-
-    const invalidCategory = categories.find((category) => category.parameters.some(({ name }) => errors[name]));
-    const invalidParameter = invalidCategory?.parameters.find(({ name }) => errors[name]);
-
-    if (invalidCategory && invalidParameter) {
-      const path = `${basePath}/${invalidCategory.id}`;
-
-      if (pathname.replace(/\/$/, '') !== path) {
-        push(path);
-
-        return;
-      }
-      document.getElementById(invalidParameter.name)?.focus();
-    }
-    focusedSubmit.current = submitCount;
-  }, [basePath, categories, errors, isSubmitting, isValidating, pathname, push, submitCount]);
-
   return (
     <FormikProvider value={formik}>
       <Form noValidate aria-label="Data Node configuration">
-        {dirty && !isSubmitting && (
+        {hasUnsavedChanges && !isSubmitting && (
           <ConfirmLeaveDialog question="Discard your unsaved configuration changes?" ignoredRoutes={ignoredRoutes} />
         )}
         <ConfigletRow className="content">
@@ -168,9 +113,14 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
                 </Routes>
                 {canEdit && restartParameters.length > 0 && (
-                  <Alert bsStyle="warning" title="Restart required after saving">
-                    Changes to the following settings require restarting{' '}
-                    {nodeId === null ? 'the Data Nodes' : 'this Data Node'} to take effect:
+                  <Alert
+                    bsStyle="warning"
+                    title={
+                      hasUnsavedRestartChanges ? 'Restart required after saving' : 'Saved changes require a restart'
+                    }>
+                    {hasUnsavedRestartChanges
+                      ? `Changes to the following settings require restarting ${restartTarget} to take effect:`
+                      : `The following settings have been saved. Restart ${restartTarget} for them to take effect:`}
                     <RestartSettingsList>
                       {restartParameters.map(({ name, label, category }) => (
                         <li key={name}>
@@ -184,14 +134,24 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                   <FormSubmit
                     submitButtonText={
                       restartParameters.length > 0
-                        ? `Apply changes and restart ${nodeId === null ? 'Data Nodes' : 'Data Node'}`
+                        ? `${hasUnsavedChanges ? 'Apply changes and restart' : 'Restart'} ${nodeLabel}`
                         : 'Apply changes'
+                    }
+                    centerCol={
+                      restartParameters.length > 0 && (
+                        <Button
+                          type="button"
+                          disabled={!hasUnsavedChanges || isSubmitting}
+                          onClick={saveChangesWithoutRestart}>
+                          Save changes
+                        </Button>
+                      )
                     }
                     isAsyncSubmit
                     isSubmitting={isSubmitting}
                     submitLoadingText="Saving changes..."
-                    disabledSubmit={!dirty}
-                    disabledCancel={!dirty}
+                    disabledSubmit={!hasUnsavedChanges && restartParameters.length === 0}
+                    disabledCancel={!hasUnsavedChanges}
                     onCancel={() => resetForm()}
                   />
                 )}
