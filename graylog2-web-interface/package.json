@@ -169,6 +169,7 @@
     "whatwg-fetch": "^3.6.20"
   },
   "resolutions": {
+    "@types/react": "18.3.12",
     "@types/plotly.js": "3.0.10",
     "maplibre-gl": "^6.4.1",
     "gopd": "^1.2.0",
