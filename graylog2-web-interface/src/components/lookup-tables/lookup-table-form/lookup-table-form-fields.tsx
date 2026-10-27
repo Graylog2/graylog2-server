@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import useScopePermissions from 'hooks/useScopePermissions';
 import { Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
-import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
 import useDefaultValueValidation from './use-default-value-validation';
 
@@ -42,7 +42,7 @@ const StyledDefaultValueSection = styled.div(
 );
 
 function LookupTableFormFields() {
-  const { setValues, values, touched, errors } = useFormikContext<LookupTableType>();
+  const { setValues, values, touched, errors } = useFormikContext<LookupTable>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { defaultValueErrors, validateDefaultValues, clearDefaultValueError } = useDefaultValueValidation();
 
@@ -53,7 +53,7 @@ function LookupTableFormFields() {
 
   // Formik validates each setFieldValue call against the values of the last render, so a handler that sets
   // several fields must use one setValues call, or the last validation runs on stale values and its errors stick.
-  const updateValues = (changes: Partial<LookupTableType>) => setValues((current) => ({ ...current, ...changes }));
+  const updateValues = (changes: Partial<LookupTable>) => setValues((current) => ({ ...current, ...changes }));
 
   // Derived from the type rather than kept as separate state, so an empty value cannot hide a field that fails validation.
   const singleValueEnabled = !!values.default_single_value_type && values.default_single_value_type !== 'NULL';

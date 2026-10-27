@@ -46,7 +46,7 @@ type JSONValueInputProps = {
   validationState?: 'error' | 'success' | 'warning';
   value?: string;
   valueType?: string;
-  allowedTypes?: any;
+  allowedTypes?: Array<string>;
   labelClassName?: string;
   wrapperClassName?: string;
   disabled?: boolean;

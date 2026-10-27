@@ -18,7 +18,7 @@ import { useEffect, useRef } from 'react';
 import { useFormikContext } from 'formik';
 
 import { useValidateLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
 const DEFAULT_VALUE_FIELDS = ['default_single_value', 'default_multi_value'] as const;
 
@@ -28,7 +28,7 @@ export type DefaultValueErrors = Partial<Record<DefaultValueField, string>>;
 // Validated by the server, so the form accepts exactly what the table can load. The errors live in Formik's
 // status because the form's validate function replaces `errors` on every change and would drop them.
 const useDefaultValueValidation = () => {
-  const { values, status, setStatus } = useFormikContext<LookupTableType>();
+  const { values, status, setStatus } = useFormikContext<LookupTable>();
   const { validateLookupTable } = useValidateLookupTable();
   const latestRequest = useRef(0);
 
@@ -42,7 +42,7 @@ const useDefaultValueValidation = () => {
 
   const defaultValueErrors: DefaultValueErrors = status?.defaultValueErrors ?? {};
 
-  const validateDefaultValues = (table: LookupTableType = values) => {
+  const validateDefaultValues = (table: LookupTable = values) => {
     latestRequest.current += 1;
     const request = latestRequest.current;
 

@@ -35,9 +35,7 @@ import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
 
-export type LookupTableType = LookupTable;
-
-export const INIT_TABLE_VALUES: LookupTableType = {
+export const INIT_TABLE_VALUES: LookupTable = {
   id: undefined,
   title: '',
   description: '',
@@ -51,8 +49,8 @@ export const INIT_TABLE_VALUES: LookupTableType = {
   content_pack: null,
 };
 
-const validations = (values: LookupTableType) => {
-  const errors: FormikErrors<LookupTableType> = {};
+const validations = (values: LookupTable) => {
+  const errors: FormikErrors<LookupTable> = {};
 
   if (!values.title) errors.title = 'Title is required';
   if (!values.name) errors.name = 'Name is required';
@@ -78,7 +76,7 @@ function LookupTableWizard() {
     setActiveStep(newStepKey);
   };
 
-  const handleSubmit = async (values: LookupTableType) => {
+  const handleSubmit = async (values: LookupTable) => {
     const payload = {
       ...values,
       default_single_value: values.default_single_value?.trim(),

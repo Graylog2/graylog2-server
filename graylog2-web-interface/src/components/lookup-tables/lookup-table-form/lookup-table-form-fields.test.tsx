@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
 import LookupTableFormFields from './lookup-table-form-fields';
 
@@ -45,7 +45,7 @@ const TABLE_VALUES = {
   default_single_value_type: 'NULL',
   default_multi_value: '',
   default_multi_value_type: 'NULL',
-} as LookupTableType;
+} as LookupTable;
 
 const validationResult = (errors: { [field: string]: Array<string> } = {}) => ({
   failed: Object.keys(errors).length > 0,
@@ -53,7 +53,7 @@ const validationResult = (errors: { [field: string]: Array<string> } = {}) => ({
   error_context: {},
 });
 
-const renderWithValues = (values: Partial<LookupTableType>) =>
+const renderWithValues = (values: Partial<LookupTable>) =>
   render(
     <Formik initialValues={{ ...TABLE_VALUES, ...values }} onSubmit={() => {}}>
       <LookupTableFormFields />
