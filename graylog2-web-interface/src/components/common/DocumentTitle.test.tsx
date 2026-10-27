@@ -21,7 +21,13 @@ import { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 import DocumentTitle from './DocumentTitle';
 
-const flushEffects = () => act(() => new Promise<void>((resolve) => { setTimeout(resolve, 0); }));
+const flushEffects = () =>
+  act(
+    () =>
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, 0);
+      }),
+  );
 
 const PageTitle = ({ title }: { title: string }) => (
   <DocumentTitle title={title}>
@@ -32,9 +38,7 @@ const PageTitle = ({ title }: { title: string }) => (
 const CurrentPage = ({ page, title }: { page: string; title: string }) => <PageTitle key={page} title={title} />;
 
 const NestedPages = ({ showChild, parentTitle = 'Alerts' }: { showChild: boolean; parentTitle?: string }) => (
-  <DocumentTitle title={parentTitle}>
-    {showChild && <PageTitle title="Event Definitions" />}
-  </DocumentTitle>
+  <DocumentTitle title={parentTitle}>{showChild && <PageTitle title="Event Definitions" />}</DocumentTitle>
 );
 
 describe('DocumentTitle', () => {
