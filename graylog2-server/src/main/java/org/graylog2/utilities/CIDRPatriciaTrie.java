@@ -42,6 +42,15 @@ public class CIDRPatriciaTrie {
             long expireAfter) {
     }
 
+    /**
+     * A live range matched by a lookup.
+     *
+     * @param rangeName   the name of the matched range
+     * @param expireAfter epoch time in millis after which the range expires, or 0 if it never does
+     */
+    public record RangeMatch(String rangeName, long expireAfter) {
+    }
+
     private PatriciaTrie<Node> trie = new PatriciaTrie<>();
     private int shortestV4Prefix = -1;
     private int shortestV6Prefix = -1;
@@ -138,6 +147,28 @@ public class CIDRPatriciaTrie {
      * @return the name of the range with the longest prefix that contains the IP if it exists, null otherwise
      */
     public String longestPrefixRangeLookupWithTtl(String ip, long lookupTimeMillis) {
+        final RangeMatch match = longestPrefixMatch(ip, lookupTimeMillis);
+        return match == null ? null : match.rangeName();
+    }
+
+    /**
+     * Like {@link #longestPrefixRangeLookup(String)}, but also returns the matched range's expiry.
+     *
+     * @param ip IP address to check against the collection of ranges
+     * @return the longest-prefix live range containing the IP if one exists, null otherwise
+     */
+    public RangeMatch longestPrefixMatch(String ip) {
+        return longestPrefixMatch(ip, DateTime.now(DateTimeZone.UTC).getMillis());
+    }
+
+    /**
+     * Like {@link #longestPrefixRangeLookupWithTtl(String, long)}, but also returns the matched range's expiry.
+     *
+     * @param ip               IP address to check against the collection of ranges
+     * @param lookupTimeMillis time lookup was performed in epoch time milliseconds or 0 if node expiry is not a concern
+     * @return the longest-prefix range containing the IP if one exists, null otherwise
+     */
+    public RangeMatch longestPrefixMatch(String ip, long lookupTimeMillis) {
         if (isEmpty()) {
             return null;
         }
@@ -158,7 +189,7 @@ public class CIDRPatriciaTrie {
                 if (lookupIsIPv6 == rangeData.rangeIsIPv6 &&
                         (rangeData.expireAfter == 0L || rangeData.expireAfter > lookupTimeMillis) &&
                         binaryIP.startsWith(binaryCidr)) {
-                    return rangeData.rangeName;
+                    return new RangeMatch(rangeData.rangeName, rangeData.expireAfter);
                 }
             }
         }

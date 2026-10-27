@@ -26,32 +26,13 @@ import useEntityShareState from 'hooks/useEntityShareState';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
-import { loadDashboard } from './Actions';
+import { loadDashboardWithSearch } from './Actions';
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
-jest.mock('api/entity-share', () => ({
-  prepareEntityShare: jest.fn(() => Promise.resolve()),
-  prepareEntityCreateShare: jest.fn(() => Promise.resolve()),
-  updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() =>
-    Promise.resolve({
-      list: require('immutable').List(),
-      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-    }),
-  ),
-}));
-jest.mock('hooks/useEntityShareState', () => {
-  const mockSetEntityShareState = jest.fn();
-
-  return {
-    __esModule: true,
-    default: jest.fn(() => ({ data: undefined })),
-    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
-    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-  };
-});
+jest.mock('api/entity-share');
+jest.mock('hooks/useEntityShareState');
 
 jest.mock('util/UserNotification');
 jest.mock('views/logic/views/Actions');
@@ -67,7 +48,7 @@ const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, hist
 
 describe('OnSaveNewDashboard', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
   });
 
   afterEach(() => {
@@ -90,7 +71,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).toHaveBeenCalled();
+    expect(loadDashboardWithSearch).toHaveBeenCalled();
   });
 
   it('sets dirty flag to false', async () => {
@@ -117,7 +98,17 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).toHaveBeenCalledWith(expect.anything(), 'deadbeef');
+    expect(loadDashboardWithSearch).toHaveBeenCalledWith(expect.anything(), 'deadbeef', undefined);
+  });
+
+  it('keeps query parameters when redirecting to saved view', async () => {
+    const view = View.create().toBuilder().id('deadbeef').build();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
+    const search = '?page=query-id&rangetype=relative&relative=3600';
+
+    await dispatch(OriginalOnSaveNewDashboard(view, history, undefined, 'existing-id', search));
+
+    expect(loadDashboardWithSearch).toHaveBeenCalledWith(expect.anything(), 'deadbeef', search);
   });
 
   it('shows notification upon success', async () => {
@@ -138,7 +129,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).not.toHaveBeenCalled();
+    expect(loadDashboardWithSearch).not.toHaveBeenCalled();
     expect(UserNotification.success).not.toHaveBeenCalled();
     expect(UserNotification.error).toHaveBeenCalledTimes(1);
     expect(UserNotification.error).toHaveBeenCalledWith('Saving view failed: Error: Something bad happened!', 'Error!');

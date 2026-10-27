@@ -148,10 +148,9 @@ type DataTiering = {
     immutableFields?: string[];
     ignoreFieldRestrictions?: boolean;
   }>;
-  useIndexSetSubmitConfirmation?: (options?: { enabled?: boolean }) => (
-    initialValues: unknown,
-    values: unknown,
-  ) => { title: string; message: string } | null;
+  useIndexSetSubmitConfirmation?: (options?: {
+    enabled?: boolean;
+  }) => (initialValues: unknown, values: unknown) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {
