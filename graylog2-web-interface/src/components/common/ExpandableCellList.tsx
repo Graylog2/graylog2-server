@@ -19,6 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Badge } from 'components/bootstrap';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 
 const DEFAULT_COLLAPSED_COUNT = 1;
 // About ten one-line items. Longer lists scroll, so the row doesn't grow with the list.
@@ -69,6 +70,9 @@ const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
     css`
       max-height: ${EXPANDED_MAX_HEIGHT}px;
       overflow: hidden auto;
+      /* Extends into the cell padding, so the scrollbar sits at the cell border. */
+      margin-right: -${CELL_PADDING_HORIZONTAL}px;
+      padding-right: ${CELL_PADDING_HORIZONTAL}px;
     `}
   `,
 );
