@@ -150,6 +150,7 @@ public class StreamRuleResource extends RestResource {
     // TODO Remove after all consumers have been updated
     @POST
     @Path("/{streamRuleId}")
+    @Operation(summary = "Update a stream rule (deprecated, use PUT instead)")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
