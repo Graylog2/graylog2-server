@@ -92,7 +92,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@Parameter(name = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-                                        @Parameter(name = "streams", description = "Comma separated list of streams to search in") Set<String> streams,
+                                        @Parameter(name = "streams", description = "Comma separated list of streams to search in") @QueryParam("streams") Set<String> streams,
                                         @Parameter(name = "stream_categories", description = "Comma separated list of streams categories to search in") @QueryParam("stream_categories") Set<String> streamCategories,
                                         @Parameter(name = "timerange", description = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
                                         @Parameter(name = "fields", description = "Fields from the message to show as columns in result") @QueryParam("fields") List<String> fields,
@@ -102,6 +102,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @Parameter(name = "from", description = "For paging results. Starting from result") @QueryParam("from") int from,
                                         @Parameter(name = "size", description = "Page size") @QueryParam("size") int size,
+                                        @Parameter(name = "include_unresolved_ids", description = "Additionally return the unresolved ids of fields resolved to titles, e.g. `streams#id` next to the stream titles in `streams`")
+                                        @QueryParam("include_unresolved_ids") boolean includeUnresolvedIds,
                                         @Context SearchUser searchUser) {
 
         try {
@@ -113,7 +115,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     sort,
                     sortOrder,
                     from,
-                    size);
+                    size,
+                    includeUnresolvedIds);
             return service.executeQuery(messagesRequestSpec, searchUser);
         } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
