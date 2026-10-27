@@ -83,6 +83,8 @@ const Item = styled.div<{ $layout: Layout }>(
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      /* With overflow: hidden the item may shrink below its content height, so a capped list would squeeze it. */
+      flex-shrink: 0;
     `}
   `,
 );
