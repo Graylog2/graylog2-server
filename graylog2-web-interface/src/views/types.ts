@@ -200,6 +200,7 @@ export interface VisualizationType<
   component: VisualizationComponent<Type>;
   config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
   capabilities?: Array<VisualizationCapability>;
+  nullValuesForEmptyBuckets?: boolean;
   validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }
 

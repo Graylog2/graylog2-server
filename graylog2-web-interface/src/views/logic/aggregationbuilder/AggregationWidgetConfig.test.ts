@@ -37,6 +37,12 @@ describe('AggregationWidgetConfig', () => {
     expect(config.sort).toEqual([]);
   });
 
+  it('is not equal for search when the visualization differs', () => {
+    const config = AggregationWidgetConfig.builder().visualization('line').build();
+
+    expect(config.equalsForSearch(config.toBuilder().visualization('heatmap').build())).toBe(false);
+  });
+
   describe('isTimeline', () => {
     it('non-date row pivot fields are not timelines', () => {
       const config = AggregationWidgetConfig.builder()

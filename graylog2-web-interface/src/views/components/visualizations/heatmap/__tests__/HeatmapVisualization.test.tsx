@@ -177,6 +177,44 @@ describe('HeatmapVisualization', () => {
     );
   });
 
+  it('keeps columns which only contain empty buckets', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['hour'])])
+      .columnPivots([Pivot.createValues(['http_status'])])
+      .series([new Series('count()')])
+      .visualization('heatmap')
+      .build();
+
+    render(
+      <WrappedHeatMap
+        data={fixtures.dataWithEmptyBuckets}
+        config={config}
+        setLoadingState={() => {}}
+        effectiveTimerange={{ type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' }}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
+
+    expect(GenericPlot).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chartData: [
+          expect.objectContaining({
+            x: ['100', '201'],
+            z: [
+              [217, 'None'],
+              [230, 'None'],
+            ],
+          }),
+        ],
+      }),
+      {},
+    );
+  });
+
   it('sorts time columns chronologically', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['category'])])

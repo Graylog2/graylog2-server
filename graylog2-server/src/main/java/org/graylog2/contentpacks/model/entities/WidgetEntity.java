@@ -44,6 +44,7 @@ import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
@@ -279,7 +280,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             if (rowPivot.type().matches("time")) {
                 return Time.builder()
                         .fields(rowPivot.fields())
-                        .interval(AutoInterval.create()).build();
+                        .interval(AutoInterval.create())
+                        .nullValuesForEmptyBuckets(HeatmapVisualizationConfigDTO.NAME.equals(config.visualization()))
+                        .build();
             } else {
                 return Values.builder()
                         .fields(rowPivot.fields())

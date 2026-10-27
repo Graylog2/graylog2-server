@@ -19,8 +19,12 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
+public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean emptyBucket) {
     public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
-        return new PivotBucket(keys, bucket);
+        return create(keys, bucket, false);
+    }
+
+    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean emptyBucket) {
+        return new PivotBucket(keys, bucket, emptyBucket);
     }
 }

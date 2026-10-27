@@ -25,14 +25,18 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonTypeName(Time.NAME)
 @JsonDeserialize(builder = Time.Builder.class)
 public abstract class Time implements BucketSpec {
     public static final String NAME = "time";
+    private static final String FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS = "null_values_for_empty_buckets";
 
     @Override
     public abstract String type();
@@ -44,9 +48,13 @@ public abstract class Time implements BucketSpec {
     @JsonProperty
     public abstract Interval interval();
 
+    @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+    public abstract boolean nullValuesForEmptyBuckets();
+
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
-                .type(NAME);
+                .type(NAME)
+                .nullValuesForEmptyBuckets(false);
     }
 
     @AutoValue.Builder
@@ -68,6 +76,13 @@ public abstract class Time implements BucketSpec {
 
         @JsonProperty
         public abstract Builder interval(Interval interval);
+
+        public abstract Builder nullValuesForEmptyBuckets(Boolean nullValuesForEmptyBuckets);
+
+        @JsonProperty(FIELD_NULL_VALUES_FOR_EMPTY_BUCKETS)
+        public Builder setNullValuesForEmptyBuckets(@Nullable Boolean nullValuesForEmptyBuckets) {
+            return nullValuesForEmptyBuckets(firstNonNull(nullValuesForEmptyBuckets, false));
+        }
     }
 }
 

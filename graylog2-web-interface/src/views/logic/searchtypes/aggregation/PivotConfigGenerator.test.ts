@@ -18,10 +18,13 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import PivotConfigGenerator from './PivotConfigGenerator';
 
 describe('PivotConfigGenerator', () => {
+  useViewsPlugin();
+
   const widgetConfigBuilder = AggregationWidgetConfig.builder()
     .rollup(true)
     .rowPivots([Pivot.create(['field'], 'type')])
@@ -35,6 +38,27 @@ describe('PivotConfigGenerator', () => {
     expect(result[0].config).toMatchSnapshot({
       id: expect.any(String),
     });
+  });
+
+  it('should return empty time buckets without values for heatmaps', () => {
+    const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+    const widgetConfig = widgetConfigBuilder
+      .rowPivots([Pivot.createValues(['action'])])
+      .columnPivots([timePivot])
+      .visualization('heatmap')
+      .build();
+    const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
+
+    expect(config.row_groups[0].null_values_for_empty_buckets).toBeUndefined();
+    expect(config.column_groups[0].null_values_for_empty_buckets).toBe(true);
+  });
+
+  it('should return values for empty time buckets of other visualizations', () => {
+    const timePivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+    const widgetConfig = widgetConfigBuilder.rowPivots([timePivot]).visualization('line').build();
+    const [{ config }] = PivotConfigGenerator({ config: widgetConfig });
+
+    expect(config.row_groups[0].null_values_for_empty_buckets).toBeUndefined();
   });
 
   it('should generate a number config with trend', () => {

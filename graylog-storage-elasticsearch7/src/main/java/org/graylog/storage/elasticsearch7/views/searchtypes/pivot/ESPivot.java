@@ -196,7 +196,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                             .key(rowKeys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, tuple.emptyBucket(), true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()) {
                         var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
@@ -207,7 +207,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, columnBucketTuple.emptyBucket(), false, "col-leaf");
                                 });
                     }
                     resultBuilder.addRow(rowBuilder.build());
@@ -215,7 +215,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, false, true, "row-inner");
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
@@ -245,6 +245,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                Pivot pivot,
                                ArrayDeque<String> columnKeys,
                                HasAggregations aggregation,
+                               boolean emptyBucket,
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
@@ -253,7 +254,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
-                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, emptyBucket ? null : value.value(), rollup, source);
                         columnKeys.removeLast();
                         return v;
                     })

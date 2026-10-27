@@ -152,6 +152,8 @@ const heatmap: VisualizationType<
       },
     ],
   },
+  // Empty time buckets have a value of 0, which the heatmap would display like actual data.
+  nullValuesForEmptyBuckets: true,
   validate,
 };
 

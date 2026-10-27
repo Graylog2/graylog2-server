@@ -113,6 +113,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+        final boolean nullValuesForEmptyBuckets = ((Time) bucketSpecs).nullValuesForEmptyBuckets();
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -123,7 +124,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                             .add(bucket.getKeyAsString())
                             .build();
 
-                    return Stream.of(PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket, nullValuesForEmptyBuckets && bucket.getDocCount() == 0));
                 });
     }
 }
