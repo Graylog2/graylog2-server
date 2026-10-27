@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader, Spinner } from 'components/common';
 import { Row, Col, Button, BootstrapModalConfirm, Alert } from 'components/bootstrap';
@@ -39,6 +40,7 @@ type Props = {
 };
 
 const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
+  const { t } = useTranslation('pipelines');
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
   const { rule } = useContext(PipelineRulesContext);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
@@ -47,17 +49,17 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const sendTelemetry = useSendTelemetry('pipeline-rules');
 
   if (loadingScopePermissions) {
-    return <Spinner text="Loading Rule" />;
+    return <Spinner text={t('loading_rule')} />;
   }
 
   let pageTitle;
 
   if (create) {
-    pageTitle = 'Create pipeline rule';
+    pageTitle = t('create_pipeline_rule');
   } else {
     pageTitle = (
       <span>
-        Pipeline rule <em>{title}</em>
+        {t('pipeline_rule', { title })}
       </span>
     );
   }
@@ -79,17 +81,16 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
 
                 setShowConfirmSourceCodeEditor(true);
               }}>
-              Use Source Code Editor
+              {t('use_source_code_editor')}
             </Button>
           ) : undefined
         }
         documentationLink={{
-          title: 'Pipeline rules documentation',
+          title: t('rules_page_documentation_link'),
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
         <span>
-          Rules are a way of applying changes to messages. A rule consists of a condition and a list of actions. The
-          condition is evaluated against a message, and the actions are executed if the condition is satisfied.
+          {t('rules_page_description')}
         </span>
       </PageHeader>
       {isRuleBuilder ? (
@@ -97,7 +98,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
       ) : (
         <Row className="content">
           <Col md={6}>
-            {isManaged && <Alert bsStyle="warning">This rule is managed by Application. You cannot edit it.</Alert>}
+            {isManaged && <Alert bsStyle="warning">{t('rule_is_managed_warning')}</Alert>}
             <RuleForm create={create} isManaged={isManaged} />
           </Col>
           <Col md={6}>
@@ -109,7 +110,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
       {showConfirmSourceCodeEditor && (
         <BootstrapModalConfirm
           showModal
-          title="Switch to Source Code Editor"
+          title={t('switch_to_source_code_editor')}
           onConfirm={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
               app_action_value: 'confirm-button',
@@ -125,8 +126,8 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
 
             setShowConfirmSourceCodeEditor(false);
           }}>
-          <div>You are about to leave this page and go to the Source Code Editor.</div>
-          <div>Make sure you have no unsaved changes.</div>
+          <div>{t('switch_to_source_code_editor_confirm_text')}</div>
+          <div>{t('switch_to_source_code_editor_confirm_warning')}</div>
         </BootstrapModalConfirm>
       )}
     </div>

@@ -17,6 +17,7 @@
 import React from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Link, MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
 import { ButtonGroup, Col, Label, Row } from 'components/bootstrap';
@@ -43,9 +44,10 @@ const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | un
 );
 
 const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> | undefined; inputId: string }) => {
+  const { t } = useTranslation('search');
   const input = inputs?.get(inputId);
 
-  return input ? <Span>{input.title}</Span> : <>deleted input</>;
+  return input ? <Span>{input.title}</Span> : <>{t('message_details.deleted_input')}</>;
 };
 
 const StreamLinks = ({
@@ -99,10 +101,11 @@ const MessageDetail = ({
   message,
   customFieldActions = undefined,
 }: Props) => {
+  const { t } = useTranslation('search');
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
-    <dt key={`dt-${rawTimestamp}`}>Timestamp</dt>,
+    <dt key={`dt-${rawTimestamp}`}>{t('message_details.timestamp')}</dt>,
     <dd key={`dd-${rawTimestamp}`}>
       <Timestamp dateTime={rawTimestamp} />
     </dd>,
@@ -124,7 +127,7 @@ const MessageDetail = ({
               <Link to={Routes.message_show(message.index, message.id)}>{message.id}</Link>
             ) : (
               <span>
-                {message.id} <Label bsStyle="warning">Not stored</Label>
+                {message.id} <Label bsStyle="warning">{t('message_details.not_stored')}</Label>
               </span>
             )}
           </MessageDetailsTitle>
@@ -136,7 +139,7 @@ const MessageDetail = ({
             {timestamp}
             {message.source_input_id && message.source_node_id && (
               <div>
-                <dt>Received by</dt>
+                <dt>{t('message_details.received_by')}</dt>
                 <dd>
                   <em>
                     <InputName inputs={inputs} inputId={message.source_input_id} />
@@ -159,12 +162,12 @@ const MessageDetail = ({
               </div>
             )}
 
-            <dt>Stored in index</dt>
-            <dd>{message.index ? message.index : 'Message is not stored'}</dd>
+            <dt>{t('message_details.stored_in_index')}</dt>
+            <dd>{message.index ? message.index : t('message_details.not_stored_message')}</dd>
 
             {streamIds.size > 0 && (
               <>
-                <dt>Routed into streams</dt>
+                <dt>{t('message_details.routed_into_streams')}</dt>
                 <dd className="stream-list">
                   <ul>
                     <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />

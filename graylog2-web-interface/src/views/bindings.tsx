@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import i18n from 'i18n';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
@@ -198,7 +199,7 @@ const exports: PluginExports = {
   enterpriseWidgets: [
     {
       type: 'MESSAGES',
-      displayName: 'Message List',
+      displayName: i18n.t('widgets:enterprise_widgets.message_list'),
       defaultHeight: 5,
       defaultWidth: 6,
       // TODO: Subtyping needs to be taken into account
@@ -212,7 +213,7 @@ const exports: PluginExports = {
     },
     {
       type: 'AGGREGATION',
-      displayName: 'Results',
+      displayName: i18n.t('widgets:enterprise_widgets.results'),
       defaultHeight: 4,
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
@@ -228,11 +229,16 @@ const exports: PluginExports = {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.flatMap(({ fields }) => fields).join(', ')}`;
+          return i18n.t('search:aggregation.summary_by', {
+            series: widget.config.series.map((s) => s.effectiveName).join(', '),
+            fields: widget.config.rowPivots.flatMap(({ fields }) => fields).join(', '),
+          });
         }
 
         if (widget.config.series.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')}`;
+          return i18n.t('search:aggregation.summary_only', {
+            series: widget.config.series.map((s) => s.effectiveName).join(', '),
+          });
         }
 
         return AggregationWidget.defaultTitle;
@@ -240,7 +246,7 @@ const exports: PluginExports = {
     },
     {
       type: 'EVENTS',
-      displayName: 'Events',
+      displayName: i18n.t('widgets:enterprise_widgets.events'),
       defaultHeight: 4,
       defaultWidth: 6,
       hasEditSubmitButton: true,
@@ -253,7 +259,7 @@ const exports: PluginExports = {
     },
     {
       type: 'TEXT',
-      displayName: 'Text/Markdown',
+      displayName: i18n.t('widgets:enterprise_widgets.text_markdown'),
       defaultHeight: 3,
       defaultWidth: 3,
       hasEditSubmitButton: false,
@@ -505,14 +511,14 @@ const exports: PluginExports = {
   'views.export.formats': [
     {
       type: 'csv',
-      displayName: () => 'Comma-Separated Values (CSV)',
+      displayName: () => i18n.t('widgets:comma_separated_values_csv'),
       mimeType: 'text/csv',
       fileExtension: 'csv',
     },
   ],
   'views.components.widgets.messageTable.previewOptions': [
     {
-      title: 'Show message in new row',
+      title: i18n.t('widgets:message_table.show_message_in_new_row'),
       isChecked: (config) => config.showMessageRow,
       isDisabled: () => false,
       onChange: (config, onConfigChange) => {

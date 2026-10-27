@@ -16,6 +16,7 @@
  */
 
 import type { VisualizationType } from 'views/types';
+import i18n from 'i18n';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 
@@ -27,7 +28,7 @@ type DataTableVisualizationConfigFormValues = {
 };
 const dataTable: VisualizationType<typeof DataTable.type> = {
   type: DataTable.type,
-  displayName: 'Data Table',
+  displayName: i18n.t('widgets:data_table.display_name'),
   component: DataTable,
   config: {
     createConfig: () => ({ pinnedColumns: [] }),
@@ -40,7 +41,7 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
     fields: [
       {
         name: 'pinnedColumns',
-        title: 'Pinned Columns',
+        title: i18n.t('widgets:data_table.pinned_columns_title'),
         type: 'multi-select',
         options: ({ formValues }: { formValues: WidgetConfigFormValues }) =>
           formValues?.groupBy?.groupings
@@ -50,7 +51,7 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       },
       {
         name: 'showRowNumbers',
-        title: 'Show Row Numbers',
+        title: i18n.t('widgets:data_table.show_row_numbers_title'),
         type: 'boolean',
       },
     ],

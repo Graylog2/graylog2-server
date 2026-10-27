@@ -18,6 +18,7 @@
 import React, { useState } from 'react';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
+import { useTranslation } from 'react-i18next';
 
 import { Messages } from '@graylog/server-api';
 
@@ -48,13 +49,14 @@ type InputSelectProps = {
 };
 
 const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<InputSelectProps, { show }>) => {
+  const { t } = useTranslation('messageloaders');
   const _formatInputSelectOptions = () => {
     if (!inputs) {
-      return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
+      return [{ value: 'none', label: t('loading_inputs'), disabled: true }];
     }
 
     if (inputs.size === 0) {
-      return [{ value: 'none', label: 'No inputs available' }];
+      return [{ value: 'none', label: t('no_inputs_available') }];
     }
 
     const formattedInputs = [];
@@ -76,15 +78,15 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
       name="inputSelect"
       label={
         <>
-          Message input <small>(optional)</small>
+          {t('message_input_label')} <small>{t('message_input_optional')}</small>
         </>
       }
-      help="Select the message input ID that should be assigned to the parsed message.">
+      help={t('message_input_help')}>
       <Select
         inputId="inputSelect"
         name="inputSelect"
-        aria-label="Message input"
-        placeholder="Select input"
+        aria-label={t('message_input_aria_label')}
+        placeholder={t('select_input_placeholder')}
         options={_formatInputSelectOptions()}
         onChange={onInputSelect}
         value={selectedInputId}
@@ -94,21 +96,23 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
 };
 
 const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInputSelect'>) => {
+  const { t } = useTranslation('messageloaders');
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
   return (
     <>
       <ForwarderInputDropdown
         onLoadMessage={onInputSelect}
-        label="Forwarder Input selection (optional)"
+        label={`${t('forwarder_input_selection_label')} ${t('forwarder_input_selection_optional')}`}
         autoLoadMessage
       />
-      <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
+      <p className="description">{t('forwarder_input_selection_description')}</p>
     </>
   );
 };
 
 const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSelectProps) => {
+  const { t } = useTranslation('messageloaders');
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
   const [selectedInputType, setSelectedInputType] = useState<'server' | 'forwarder' | undefined>();
 
@@ -122,19 +126,19 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
 
   return ForwarderInputDropdown ? (
     <fieldset>
-      <legend>Input selection (optional)</legend>
+      <legend>{`${t('input_selection_legend')} ${t('input_selection_optional')}`}</legend>
       <Input
         id="inputTypeSelect"
         type="select"
-        label="Select an Input type (optional)"
-        help="Select the Input type you want to load the message from."
+        label={`${t('select_input_type_label')} ${t('select_input_type_optional')}`}
+        help={t('select_input_type_help')}
         value={selectedInputType ?? 'placeholder'}
         onChange={(e) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}>
         <option value="placeholder" disabled>
-          Select an Input type
+          {t('select_input_type_placeholder')}
         </option>
-        <option value="server">Server Input</option>
-        <option value="forwarder">Forwarder Input</option>
+        <option value="server">{t('server_input')}</option>
+        <option value="forwarder">{t('forwarder_input')}</option>
       </Input>
 
       {selectedInputType === 'server' && (
@@ -168,6 +172,7 @@ const parseRawMessage = (
   remoteAddress: string,
   codec: string,
   codecConfiguration: { [key: string]: {} },
+  t: any,
 ) => {
   const payload = {
     message,
@@ -181,15 +186,14 @@ const parseRawMessage = (
     (error): undefined => {
       if (error.additional && error.additional.status === 400) {
         UserNotification.error(
-          'Please ensure the selected codec and its configuration are right. ' +
-            'Check your server logs for more information.',
-          'Could not load raw message',
+          t('load_raw_message_error_description'),
+          t('load_raw_message_error_title'),
         );
 
         return undefined;
       }
 
-      UserNotification.error(`Loading raw message failed with status: ${error}`, 'Could not load raw message');
+      UserNotification.error(t('load_raw_message_failed_status', { error }), t('load_raw_message_error_title'));
 
       return undefined;
     },
@@ -197,6 +201,7 @@ const parseRawMessage = (
 };
 
 const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = undefined }: Props) => {
+  const { t } = useTranslation('messageloaders');
   const productName = useProductName();
   const { data: codecTypes } = useCodecTypes();
   const [loading, setLoading] = useState<boolean>(false);
@@ -212,7 +217,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
 
     setLoading(true);
 
-    parseRawMessage(message, remoteAddress, codec, codecConfiguration)
+    parseRawMessage(message, remoteAddress, codec, codecConfiguration, t)
       .then((loadedMessage) => {
         onMessageLoaded(loadedMessage, {
           message: message,
@@ -227,13 +232,13 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
 
   const _formatSelectOptions = () => {
     if (!codecTypes) {
-      return [{ value: 'none', label: 'Loading codec types...', disabled: true }];
+      return [{ value: 'none', label: t('loading_codec_types'), disabled: true }];
     }
 
     const codecTypesIds = Object.keys(codecTypes);
 
     if (codecTypesIds.length === 0) {
-      return [{ value: 'none', label: 'No codecs available' }];
+      return [{ value: 'none', label: t('no_codecs_available') }];
     }
 
     return codecTypesIds
@@ -345,7 +350,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
               id="message"
               name="message"
               type="textarea"
-              label="Raw message"
+              label={t('raw_message_label')}
               value={message}
               onChange={_onMessageChange}
               rows={3}
@@ -357,10 +362,10 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
               type="text"
               label={
                 <span>
-                  Source IP address <small>(optional)</small>
+                  {t('source_ip_address_label')} <small>{t('source_ip_address_optional')}</small>
                 </span>
               }
-              help={`Remote IP address to use as message source. ${productName} will use ${DEFAULT_REMOTE_ADDRESS} by default.`}
+              help={t('source_ip_address_help', { productName, defaultRemoteAddress: DEFAULT_REMOTE_ADDRESS })}
               value={remoteAddress}
               onChange={_onRemoteAddressChange}
             />
@@ -372,17 +377,17 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
             show={inputIdSelector}
           />
           <fieldset>
-            <legend>Codec configuration</legend>
+            <legend>{t('codec_configuration_legend')}</legend>
             <Input
               id="codec"
               name="codec"
-              label="Message codec"
-              help="Select the codec that should be used to decode the message."
+              label={t('message_codec_label')}
+              help={t('message_codec_help')}
               required>
               <Select
                 id="codec"
-                aria-label="Message codec"
-                placeholder="Select codec"
+                aria-label={t('message_codec_label')}
+                placeholder={t('select_codec_placeholder')}
                 options={_formatSelectOptions()}
                 onChange={_onCodecSelect}
                 value={codec}
@@ -391,8 +396,8 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
             {codecConfigurationOptions}
           </fieldset>
           <FormSubmit
-            submitButtonText="Load message"
-            submitLoadingText="Loading message..."
+            submitButtonText={t('load_message_button')}
+            submitLoadingText={t('loading_message_button')}
             isSubmitting={loading}
             isAsyncSubmit
             disabledSubmit={_isSubmitDisabled}
@@ -412,3 +417,4 @@ const RawMessageLoaderWrapper = (props: Omit<Props, 'inputs'>) => {
 };
 
 export default RawMessageLoaderWrapper;
+```

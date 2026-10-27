@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, Center } from 'components/common';
 
@@ -48,23 +49,28 @@ const Row = styled.div`
 
 const ErrorWidget = ({
   errors,
-  title = 'While retrieving data for this widget, the following error(s) occurred:',
-}: Props) => (
-  <Center>
-    <Icon name="warning" size="3x" className={styles.iconMargin} />
-    <Description>
-      <Row>
-        <strong>{title}</strong>
-      </Row>
-      <ErrorList>
-        {errors.map((e) => (
-          <Row as="li" key={e.description}>
-            {e.description}
-          </Row>
-        ))}
-      </ErrorList>
-    </Description>
-  </Center>
-);
+  title,
+}: Props) => {
+  const { t } = useTranslation('widgets');
+  const displayTitle = title || t('error_widget.title');
+
+  return (
+    <Center>
+      <Icon name="warning" size="3x" className={styles.iconMargin} />
+      <Description>
+        <Row>
+          <strong>{displayTitle}</strong>
+        </Row>
+        <ErrorList>
+          {errors.map((e) => (
+            <Row as="li" key={e.description}>
+              {e.description}
+            </Row>
+          ))}
+        </ErrorList>
+      </Description>
+    </Center>
+  );
+};
 
 export default ErrorWidget;
