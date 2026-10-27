@@ -13,5 +13,13 @@
   "rules_delete_confirm": "Möchten Sie die Regel \"{{title}}\" wirklich löschen?",
   "rule_details_new_title": "Neue Pipeline-Regel",
   "rule_details_title": "Pipeline-Regel {{title}}",
-  "rule_details_loading": "Pipeline-Regel-Details werden geladen..."
+  "rule_details_loading": "Pipeline-Regel-Details werden geladen...",
+  "loading_rule": "Regel wird geladen",
+  "create_pipeline_rule": "Pipeline-Regel erstellen",
+  "pipeline_rule": "Pipeline-Regel {{title}}",
+  "use_source_code_editor": "Source-Code-Editor verwenden",
+  "rule_is_managed_warning": "Diese Regel wird von der Anwendung verwaltet. Sie können sie nicht bearbeiten.",
+  "switch_to_source_code_editor": "Zum Source-Code-Editor wechseln",
+  "switch_to_source_code_editor_confirm_text": "Sie sind im Begriff, diese Seite zu verlassen und zum Source-Code-Editor zu wechseln.",
+  "switch_to_source_code_editor_confirm_warning": "Stellen Sie sicher, dass Sie keine ungespeicherten Änderungen haben."
 }

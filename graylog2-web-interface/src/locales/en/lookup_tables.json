@@ -28,5 +28,9 @@
   "cache_create_button": "Create cache",
   "adapter_document_title": "Lookup Tables - Data Adapters",
   "adapter_page_title": "Data Adapters for Lookup Tables",
-  "adapter_create_button": "Create data adapter"
+  "adapter_create_button": "Create data adapter",
+  "max_entries": "Maximum entries:",
+  "expire_after_access": "Expire after access:",
+  "expire_after_write": "Expire after write:",
+  "ttl_empty_results": "TTL for empty results:"
 }

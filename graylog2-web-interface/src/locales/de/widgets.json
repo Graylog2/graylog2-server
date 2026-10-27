@@ -172,10 +172,14 @@
       "help_description": "Decorators können Nachrichten in den Suchergebnissen direkt verändern. Diese Änderungen werden nicht gespeichert, sondern nur in den Suchergebnissen angezeigt. Die Decorator-Konfiguration wird <strong>pro Stream</strong> gespeichert.",
       "help_order": "Ändern Sie per Drag & Drop die Reihenfolge, in der Decorators angewendet werden.",
       "help_docs": "Weitere Informationen zu Message Decorators finden Sie in der <docsLink>Dokumentation</docsLink>."
-    }
+    },
+    "show_message_in_new_row": "Nachricht in neuer Zeile einblenden"
   },
   "data_table": {
-    "spacer": "Platzhalter"
+    "spacer": "Platzhalter",
+    "display_name": "Datentabelle",
+    "pinned_columns_title": "Angepinnte Spalten",
+    "show_row_numbers_title": "Zeilennummern einblenden"
   },
   "field_types": {
     "missing_event_definition": "Fehlende Ereignisdefinition: {{id}}"
@@ -202,5 +206,15 @@
     "no_message_table": "Sie müssen ein Nachrichtentabellen-Widget erstellen, um dessen Ergebnis zu exportieren.",
     "output_format": "Ausgabeformat",
     "untitled_view": "{{type}} ohne Titel"
-  }
+  },
+  "enterprise_widgets": {
+    "message_list": "Nachrichtenliste",
+    "results": "Ergebnisse",
+    "events": "Events",
+    "text_markdown": "Text/Markdown"
+  },
+  "error_widget": {
+    "title": "Beim Abrufen der Daten für dieses Widget sind die folgenden Fehler(s) aufgetreten:"
+  },
+  "comma_separated_values_csv": "Kommagetrennte Werte (CSV)"
 }

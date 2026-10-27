@@ -51,5 +51,21 @@
     "title": "Token Management",
     "documentation_link_title": "Permissions documentation",
     "description": "Access tokens overview configured for {{productName}}."
+  },
+  "token_list": {
+    "title": "Create And Edit Tokens",
+    "token_created": "Token {{name}} created!",
+    "token_created_description": "This is your new token. Make sure to copy it now, you will not be able to see it again.",
+    "done_button": "Done",
+    "title_list": "Tokens",
+    "filter_label": "Filter",
+    "no_tokens_to_display": "No tokens to display.",
+    "no_tokens_match_filter": "No tokens match the filter.",
+    "column_name": "Token Name",
+    "column_created": "Created",
+    "column_last_access": "Last Access",
+    "column_expires_at": "Expires At",
+    "column_actions": "Actions",
+    "never_used": "Never used"
   }
 }

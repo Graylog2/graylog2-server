@@ -172,10 +172,14 @@
       "help_description": "Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only shown in the search results. Decorator config is stored <strong>per stream</strong>.",
       "help_order": "Use drag and drop to modify the order in which decorators are processed.",
       "help_docs": "Read more about message decorators in the <docsLink>documentation</docsLink>."
-    }
+    },
+    "show_message_in_new_row": "Show message in new row"
   },
   "data_table": {
-    "spacer": "spacer"
+    "spacer": "spacer",
+    "display_name": "Data Table",
+    "pinned_columns_title": "Pinned Columns",
+    "show_row_numbers_title": "Show Row Numbers"
   },
   "field_types": {
     "missing_event_definition": "Missing Event Definition: {{id}}"
@@ -202,5 +206,15 @@
     "no_message_table": "You need to create a message table widget to export its result.",
     "output_format": "Output Format",
     "untitled_view": "Untitled {{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "Message List",
+    "results": "Results",
+    "events": "Events",
+    "text_markdown": "Text/Markdown"
+  },
+  "comma_separated_values_csv": "Comma-Separated Values (CSV)",
+  "error_widget": {
+    "title": "While retrieving data for this widget, the following error(s) occurred:"
   }
 }

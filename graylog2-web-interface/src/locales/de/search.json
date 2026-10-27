@@ -530,6 +530,10 @@
     "add_to_favorites": "Feld zu den Favoriten hinzufügen",
     "remove_from_favorites": "Feld aus den Favoriten entfernen"
   },
+  "aggregation": {
+    "summary_by": "Aggregieren nach {{series}} nach {{fields}}",
+    "summary_only": "Aggregieren nach {{series}}"
+  },
   "widget_creators": {
     "message_count": "Nachrichtenanzahl",
     "message_table": "Nachrichtentabelle",
@@ -538,8 +542,13 @@
     "events_overview": "Ereignisübersicht",
     "text_markdown": "Text/Markdown"
   },
-  "views_logic": {
-    "result_window_limit": "Elasticsearch begrenzt das Suchergebnis auf {{limit}} Nachrichten. Bei einer Seitengröße von {{pageSize}} Nachrichten können Sie die ersten {{validPages}} Seiten verwenden.",
-    "confirm_delete_dashboard_page": "Möchten Sie diese Dashboard-Seite wirklich löschen?"
+  "message_details": {
+    "deleted_input": "gelöschter Input",
+    "timestamp": "Zeitstempel",
+    "not_stored": "Nicht gespeichert",
+    "not_stored_message": "Nachricht ist nicht gespeichert",
+    "received_by": "Empfangen von",
+    "stored_in_index": "In Index gespeichert",
+    "routed_into_streams": "In Streams geroutet"
   }
 }

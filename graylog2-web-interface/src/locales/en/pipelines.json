@@ -13,5 +13,13 @@
   "rules_delete_confirm": "Do you really want to delete rule \"{{title}}\"?",
   "rule_details_new_title": "New pipeline rule",
   "rule_details_title": "Pipeline rule {{title}}",
-  "rule_details_loading": "Loading Rule Details..."
+  "rule_details_loading": "Loading Rule Details...",
+  "loading_rule": "Loading Rule",
+  "create_pipeline_rule": "Create pipeline rule",
+  "pipeline_rule": "Pipeline rule {{title}}",
+  "use_source_code_editor": "Use Source Code Editor",
+  "rule_is_managed_warning": "This rule is managed by Application. You cannot edit it.",
+  "switch_to_source_code_editor": "Switch to Source Code Editor",
+  "switch_to_source_code_editor_confirm_text": "You are about to leave this page and go to the Source Code Editor.",
+  "switch_to_source_code_editor_confirm_warning": "Make sure you have no unsaved changes."
 }

@@ -51,5 +51,21 @@
     "title": "Token-Verwaltung",
     "documentation_link_title": "Berechtigungsdokumentation",
     "description": "Übersicht über die für {{productName}} konfigurierten Zugriffstoken."
+  },
+  "token_list": {
+    "title": "Token erstellen und bearbeiten",
+    "token_created": "Token <em>{{name}}</em> wurde erstellt!",
+    "token_created_description": "Dies ist Ihr neues Token. Stellen Sie sicher, dass Sie es jetzt kopieren, da Sie es nicht mehr sehen können.",
+    "done_button": "Fertig",
+    "title_list": "Token",
+    "filter_label": "Filter",
+    "no_tokens_to_display": "Keine Token zum Anzeigen.",
+    "no_tokens_match_filter": "Keine Token entsprechen dem Filter.",
+    "column_name": "Token-Name",
+    "column_created": "Erstellt",
+    "column_last_access": "Letzter Zugriff",
+    "column_expires_at": "Läuft ab am",
+    "column_actions": "Aktionen",
+    "never_used": "Nie verwendet"
   }
 }

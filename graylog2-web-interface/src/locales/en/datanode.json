@@ -1,0 +1,39 @@
+{
+  "pages": {
+    "description": "{{productName}} Data Nodes offer a better integration with {{productName}} and simplify future updates. They allow you to index and search through all the messages in your {{productName}} message database.",
+    "documentation_title": "Data Nodes documentation",
+    "cluster_management_title": "Data Node Dashboard",
+    "certificate_management_title": "Certificate Management",
+    "migration_title": "Data Node Migration",
+    "upgrade_title": "Data Node Upgrade"
+  },
+  "details_page": {
+    "error": "Error: {{message}}",
+    "title": "Data Nodes: {{hostname}}",
+    "details": "Details:",
+    "hostname": "Hostname:",
+    "transport_address": "Transport address:",
+    "status": "Status:",
+    "not_available": "N/A",
+    "certificate_valid_until": "Certificate valid until:",
+    "datanode_version": "Datanode version:",
+    "configuration_warnings": "Configuration warnings"
+  },
+  "upgrade_status": {
+    "title": "Upgrade status",
+    "message": "Nodes are upgrading..."
+  },
+  "upgrade_complete": {
+    "title": "Upgrade complete",
+    "message": "All nodes are up to date."
+  },
+  "data_node_notifications": {
+    "start_replication_success": "Replication started successfully.",
+    "start_replication_failure": "Failed to start replication.",
+    "replication_in_progress": "Replication in progress...",
+    "replication_complete": "Replication complete.",
+    "replication_failed": "Replication failed.",
+    "replication_error": "Replication error: {{error}}",
+    "status_unknown": "Unknown status"
+  }
+}

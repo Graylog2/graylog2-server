@@ -43,8 +43,13 @@ import enLoggers from 'locales/en/loggers.json';
 import enLookup_tables from 'locales/en/lookup_tables.json';
 import enPipelines from 'locales/en/pipelines.json';
 import enUsers from 'locales/en/users.json';
+import enDataNode from 'locales/en/datanode.json';
+import enApiBrowser from 'locales/en/api_browser.json';
+import enCertificates from 'locales/en/certificates.json';
+import enMessageloaders from 'locales/en/messageloaders.json';
 
 registerTranslations('aggregation', enAggregation, {
+
   de: () => import(/* webpackChunkName: "translations-de-aggregation" */ 'locales/de/aggregation.json'),
 });
 
@@ -143,3 +148,20 @@ registerTranslations('pipelines', enPipelines, {
 registerTranslations('users', enUsers, {
   de: () => import(/* webpackChunkName: "translations-de-users" */ 'locales/de/users.json'),
 });
+
+registerTranslations('datanode', enDataNode, {
+  de: () => import(/* webpackChunkName: "translations-de-datanode" */ 'locales/de/datanode.json'),
+});
+
+registerTranslations('api_browser', enApiBrowser, {
+  de: () => import(/* webpackChunkName: "translations-de-api_browser" */ 'locales/de/api_browser.json'),
+});
+
+registerTranslations('certificates', enCertificates, {
+  de: () => import(/* webpackChunkName: "translations-de-certificates" */ 'locales/de/certificates.json'),
+});
+
+registerTranslations('messageloaders', enMessageloaders, {
+  de: () => import(/* webpackChunkName: "translations-de-messageloaders" */ 'locales/de/messageloaders.json'),
+});
+

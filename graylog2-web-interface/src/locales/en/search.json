@@ -530,6 +530,10 @@
     "add_to_favorites": "Add field to favorites",
     "remove_from_favorites": "Remove field from favorites"
   },
+  "aggregation": {
+    "summary_by": "Aggregating {{series}} by {{fields}}",
+    "summary_only": "Aggregating {{series}}"
+  },
   "widget_creators": {
     "message_count": "Message Count",
     "message_table": "Message Table",
@@ -538,8 +542,13 @@
     "events_overview": "Events Overview",
     "text_markdown": "Text/Markdown"
   },
-  "views_logic": {
-    "result_window_limit": "Elasticsearch limits the search result to {{limit}} messages. With a page size of {{pageSize}} messages, you can use the first {{validPages}} pages.",
-    "confirm_delete_dashboard_page": "Do you really want to delete this dashboard page?"
+  "message_details": {
+    "deleted_input": "deleted input",
+    "timestamp": "Timestamp",
+    "not_stored": "Not stored",
+    "not_stored_message": "Message is not stored",
+    "received_by": "Received by",
+    "stored_in_index": "Stored in index",
+    "routed_into_streams": "Routed into streams"
   }
 }
