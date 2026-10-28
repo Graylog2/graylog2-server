@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { forwardRef } from 'react';
 
 import { Badge } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -33,12 +34,17 @@ type Props = {
 /**
  * Count of the items in an expanded section. Clicking it opens the row on that section.
  */
-const ExpandedSectionCount = ({ entityId, section, count, label, abbreviate = false }: Props) => {
+// Forwards the ref, since cells wrap the count in a tooltip.
+const ExpandedSectionCount = (
+  { entityId, section, count, label, abbreviate = false }: Props,
+  ref: React.ForwardedRef<HTMLElement>,
+) => {
   const { expandedSections, toggleSection } = useExpandedSections();
   const isActive = expandedSections?.[entityId]?.includes(section) ?? false;
 
   return (
     <Badge
+      ref={ref}
       color={isActive ? 'primary' : undefined}
       variant={isActive ? 'filled' : undefined}
       onClick={() => toggleSection(entityId, section)}
@@ -49,4 +55,4 @@ const ExpandedSectionCount = ({ entityId, section, count, label, abbreviate = fa
   );
 };
 
-export default ExpandedSectionCount;
+export default forwardRef(ExpandedSectionCount);
