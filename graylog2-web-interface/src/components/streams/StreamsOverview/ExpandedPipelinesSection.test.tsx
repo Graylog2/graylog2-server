@@ -19,13 +19,11 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import useEntityTitles from 'hooks/useEntityTitles';
-import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+import useStreamMetrics from 'hooks/useStreamMetrics';
 
 import ExpandedPipelinesSection from './ExpandedPipelinesSection';
 
-jest.mock('components/streams/StreamsOverview/StreamMetricsContext', () => ({
-  useStreamMetricsFor: jest.fn(),
-}));
+jest.mock('hooks/useStreamMetrics');
 jest.mock('hooks/useEntityTitles', () => jest.fn());
 
 const stream = { id: 'stream-1', title: 'Test Stream' } as any;
@@ -43,8 +41,8 @@ describe('ExpandedPipelinesSection', () => {
   });
 
   it('renders linked pipeline titles', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['pipeline-1'] },
+    asMock(useStreamMetrics).mockReturnValue({
+      metricsByStreamId: { [stream.id]: { pipelines: ['pipeline-1'] } },
       isInitialLoading: false,
       isError: false,
     });
@@ -56,8 +54,8 @@ describe('ExpandedPipelinesSection', () => {
   });
 
   it('marks deleted pipelines as "<id> (deleted)"', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['pipeline-deleted'] },
+    asMock(useStreamMetrics).mockReturnValue({
+      metricsByStreamId: { [stream.id]: { pipelines: ['pipeline-deleted'] } },
       isInitialLoading: false,
       isError: false,
     });
@@ -68,8 +66,8 @@ describe('ExpandedPipelinesSection', () => {
   });
 
   it('renders empty-state when no pipelines are connected', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: [] },
+    asMock(useStreamMetrics).mockReturnValue({
+      metricsByStreamId: { [stream.id]: { pipelines: [] } },
       isInitialLoading: false,
       isError: false,
     });

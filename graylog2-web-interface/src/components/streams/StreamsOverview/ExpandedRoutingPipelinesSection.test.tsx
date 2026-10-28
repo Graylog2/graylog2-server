@@ -19,13 +19,11 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import useEntityTitles from 'hooks/useEntityTitles';
-import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+import useStreamMetrics from 'hooks/useStreamMetrics';
 
 import ExpandedRoutingPipelinesSection from './ExpandedRoutingPipelinesSection';
 
-jest.mock('components/streams/StreamsOverview/StreamMetricsContext', () => ({
-  useStreamMetricsFor: jest.fn(),
-}));
+jest.mock('hooks/useStreamMetrics');
 jest.mock('hooks/useEntityTitles', () => jest.fn());
 
 const stream = { id: 'stream-1', title: 'Test Stream' } as any;
@@ -43,8 +41,8 @@ describe('ExpandedRoutingPipelinesSection', () => {
   });
 
   it('renders linked routing pipeline titles', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { routing_pipelines: ['pipeline-1'] },
+    asMock(useStreamMetrics).mockReturnValue({
+      metricsByStreamId: { [stream.id]: { routing_pipelines: ['pipeline-1'] } },
       isInitialLoading: false,
       isError: false,
     });
@@ -55,8 +53,8 @@ describe('ExpandedRoutingPipelinesSection', () => {
   });
 
   it('renders empty-state when there are no routing pipelines', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { routing_pipelines: [] },
+    asMock(useStreamMetrics).mockReturnValue({
+      metricsByStreamId: { [stream.id]: { routing_pipelines: [] } },
       isInitialLoading: false,
       isError: false,
     });

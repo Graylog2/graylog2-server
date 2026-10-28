@@ -20,7 +20,7 @@ import type { Stream } from 'logic/streams/types';
 import useInputDetails from 'hooks/useInputDetails';
 import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
-import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+import useStreamMetrics from 'hooks/useStreamMetrics';
 import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inputTitleLinks';
 
 type Props = {
@@ -28,8 +28,8 @@ type Props = {
 };
 
 const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
-  const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id, ['associated_inputs']);
-  const typedInputs = metrics?.associated_inputs;
+  const { metricsByStreamId, isInitialLoading, isError } = useStreamMetrics([stream.id], ['associated_inputs']);
+  const typedInputs = metricsByStreamId[stream.id]?.associated_inputs;
 
   const { resolvedById, isFetching: areDetailsFetching, isError: isDetailsError } = useInputDetails(typedInputs ?? []);
   const buildLink = useInputTitleLinkBuilder();

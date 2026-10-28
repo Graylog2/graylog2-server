@@ -57,26 +57,14 @@ export const InputMetricsProvider = ({ inputIds, fields, children = undefined }:
 
 export const useInputMetricsContext = (): InputMetricsContextValue => useContext(InputMetricsContext);
 
-// Loads the `fields` for this input only when the provider didn't request them, e.g. because their column is hidden.
 export const useInputMetricsFor = (
   inputId: string,
-  fields: Array<InputMetricField> = [],
 ): {
   metrics: InputMetrics | undefined;
   isInitialLoading: boolean;
   isError: boolean;
 } => {
-  const { metricsByInputId, isInitialLoading, isError, isFieldRequested } = useContext(InputMetricsContext);
-  const isProvided = fields.every(isFieldRequested);
-  const ownMetrics = useInputMetrics([inputId], isProvided ? [] : fields);
-
-  if (!isProvided) {
-    return {
-      metrics: ownMetrics.metricsByInputId[inputId],
-      isInitialLoading: ownMetrics.isInitialLoading,
-      isError: ownMetrics.isError,
-    };
-  }
+  const { metricsByInputId, isInitialLoading, isError } = useContext(InputMetricsContext);
 
   return {
     metrics: metricsByInputId[inputId],

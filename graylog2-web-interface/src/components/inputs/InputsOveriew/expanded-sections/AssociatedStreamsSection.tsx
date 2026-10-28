@@ -20,7 +20,7 @@ import type { InputSummary } from 'hooks/usePaginatedInputs';
 import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
-import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import useInputMetrics from 'hooks/useInputMetrics';
 import Routes from 'routing/Routes';
 
 type Props = {
@@ -28,8 +28,8 @@ type Props = {
 };
 
 const AssociatedStreamsSection = ({ input }: Props) => {
-  const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id, ['messages_per_stream']);
-  const messagesPerStream = metrics?.messages_per_stream;
+  const { metricsByInputId, isInitialLoading, isError } = useInputMetrics([input.id], ['messages_per_stream']);
+  const messagesPerStream = metricsByInputId[input.id]?.messages_per_stream;
 
   const streamIds = messagesPerStream ? Object.keys(messagesPerStream) : [];
   const titleEntities = streamIds.map((id) => ({ id, type: 'streams' }));
