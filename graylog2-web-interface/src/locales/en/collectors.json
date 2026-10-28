@@ -3,7 +3,7 @@
     "documentation_title": "Collectors documentation",
     "deployment": {
       "title": "Deploy Collectors",
-      "description": "Run the command on any number of hosts \u2014 they enroll into the fleet you pick and appear as they check in.",
+      "description": "Run the command on any number of hosts — they enroll into the fleet you pick and appear as they check in.",
       "deploy_tab": "Deploy",
       "tokens_tab": "Enrollment tokens",
       "tokens_description": "Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled Collectors."
@@ -25,7 +25,7 @@
       "title": "Collector Onboarding",
       "description": "Status of your newly connected collector.",
       "load_error": "Could not load collector instance: {{error}}",
-      "not_found": "Collector instance not found. It may have been removed \u2014 see all <instancesLink>Instances</instancesLink>."
+      "not_found": "Collector instance not found. It may have been removed — see all <instancesLink>Instances</instancesLink>."
     },
     "overview": {
       "title": "Collectors Overview",
@@ -98,9 +98,9 @@
     "removed": "Fleet removed ({{fleetId}})"
   },
   "sync_state": {
-    "pending_title": "Sync pending \u2014 changes will apply at the collector's next check-in",
+    "pending_title": "Sync pending — changes will apply at the collector's next check-in",
     "pending": "Sync pending",
-    "in_sync_title": "In sync \u2014 all changes applied",
+    "in_sync_title": "In sync — all changes applied",
     "in_sync": "In sync"
   },
   "instance_status": {
@@ -130,11 +130,11 @@
   },
   "enrolling_hosts": {
     "receiving": "Receiving",
-    "listening": "Listening\u2026",
+    "listening": "Listening…",
     "title": "Enrolling Hosts",
-    "connected_one": "{{count}} connected \u00b7 listening for more\u2026",
-    "connected_other": "{{count}} connected \u00b7 listening for more\u2026",
-    "listening_subtitle": "listening\u2026",
+    "connected_one": "{{count}} connected · listening for more…",
+    "connected_other": "{{count}} connected · listening for more…",
+    "listening_subtitle": "listening…",
     "view_all": "View all in Instances",
     "host": "Host",
     "status": "Status",
@@ -144,7 +144,7 @@
     "hide_setup": "Hide setup",
     "view_setup": "View setup",
     "empty": "Hosts running the command appear here as they check in.",
-    "connection_problem": "Having trouble reaching the server \u2014 retrying automatically"
+    "connection_problem": "Having trouble reaching the server — retrying automatically"
   },
   "token_step": {
     "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> generated - expires <expiresAt />",
@@ -300,10 +300,10 @@
     "empty": "No Collector instances have enrolled in this fleet yet",
     "instances_one": "instances",
     "instances_other": "instances",
-    "online_one": "\u25cf {{count}} online",
-    "online_other": "\u25cf {{count}} online",
-    "offline_one": "\u25cf {{count}} offline",
-    "offline_other": "\u25cf {{count}} offline",
+    "online_one": "● {{count}} online",
+    "online_other": "● {{count}} online",
+    "offline_one": "● {{count}} offline",
+    "offline_other": "● {{count}} offline",
     "sources_one": "{{count}} source",
     "sources_other": "{{count}} sources"
   },
@@ -333,7 +333,7 @@
   "connection_success": {
     "offline": "The collector connected once but hasn't reported in since <lastSeen />.",
     "receiving": "The collector is connected and delivering messages.",
-    "waiting": "Almost there \u2014 the collector is connected and we're listening for its first messages.",
+    "waiting": "Almost there — the collector is connected and we're listening for its first messages.",
     "title": "Setting Up {{host}}",
     "view_instances": "View instances",
     "check_again": "Check again",
@@ -378,9 +378,9 @@
     "note_never_expires": "Downloads and installs the collector, enrolls it in the selected fleet, and starts the service. Requires administrator privileges. This token never expires."
   },
   "log_preview": {
-    "unavailable": "Log preview unavailable \u2014 {{error}}",
+    "unavailable": "Log preview unavailable — {{error}}",
     "loading": "Loading log preview...",
-    "empty": "No messages yet \u2014 checking every few seconds"
+    "empty": "No messages yet — checking every few seconds"
   },
   "next_steps": {
     "explore": "Explore your data",
@@ -422,7 +422,7 @@
     "disabled": "Disabled",
     "not_applicable": "Not applicable on {{os}}",
     "unrecognised": "Unrecognised source type",
-    "paused": "Paused \u2014 collector offline",
+    "paused": "Paused — collector offline",
     "no_messages": "No messages yet",
     "waiting": "Waiting for first messages...",
     "title": "Log Sources",
@@ -647,5 +647,465 @@
     "config_saved": "Collectors config saved.",
     "input_created": "Collector ingest input created.",
     "input_moved": "Collector ingest input moved to the new port."
+  },
+  "datanode": {
+    "compatibility_check": {
+      "compatible": "Your existing OpenSearch data can be migrated to Data Node.",
+      "error": "There was an error checking the compatibility",
+      "incompatible": "Your existing OpenSearch data cannot be migrated to Data Node.",
+      "loading": "Loading compatibility check results...",
+      "title": "Directory compatibility check",
+      "version_incompatible": "Your OpenSearch cluster cannot be migrated to this Data Node version because it's not compatible."
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "Please create a certificate renewal policy before proceeding.",
+      "finished": "The migration is finished !",
+      "ca_step_required": "Please create a certificate Authority before proceeding."
+    },
+    "migration_welcome": {
+      "earlier_deployments": "Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message databases to Data Nodes.",
+      "incompatible_backend": "Incompatible search backend. Please upgrade to OpenSearch to be able to use the migration wizard.",
+      "intro": "The {{productName}} Data Node is a management component designed to configure and optimize OpenSearch for use with {{productName}}, reducing administrative overhead and simplifying future updates.",
+      "more_information": "You can get more information on the Data Node migration <docsLink>documentation</docsLink>.",
+      "required_steps": "Migrating to Data Node will require some steps to be performed on the OS, within your current OS/ES cluster, and in your configuration files.",
+      "title": "Data Nodes Migration",
+      "tool_description": "This migration tool will check the compatibility of your components and guide you through to migrate your existing OpenSearch data to a Data Node."
+    },
+    "migration_wizard": {
+      "loading": "Loading ..."
+    },
+    "compatibility_status": {
+      "creation_date": "Creation date",
+      "datanode_opensearch_version": "Datanode OpenSearch version",
+      "index_version": "Index version",
+      "indices": "Indices",
+      "node_title_one": "Node: {{hostname}}, Version: {{version}}, {{count}} index",
+      "node_title_other": "Node: {{hostname}}, Version: {{version}}, {{count}} indices",
+      "opensearch_data_location": "OpenSearch data location",
+      "shard_count_one": "{{count}} shard",
+      "shard_count_other": "{{count}} shards",
+      "shards": "Shards"
+    },
+    "in_place_migration": {
+      "description": "Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.",
+      "title": "In-Place migration"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "Certificate valid until",
+      "found_one": "Data Nodes found: {{count}}",
+      "found_other": "Data Nodes found: {{count}}",
+      "hostname": "Hostname",
+      "incompatible": "There are Data Nodes running with versions incompatible to your current {{productName}} version. Please make sure to use the same version for both {{productName}} and Data Node.",
+      "incompatible_title": "Incompatible Data Nodes found",
+      "loading": "Loading Data Nodes",
+      "looking": "Looking for Data Nodes...",
+      "no_certificate": "No certificate",
+      "none_found": "There are no Data Nodes found.",
+      "none_found_title": "No Data Nodes found",
+      "start_data_node": "Please start at least a Data Node to continue the migration process. You can find more information on how to start a Data Nodes in our <docsLink>documentation</docsLink>.",
+      "status": "Status",
+      "transport_address": "Transport address",
+      "version": "Version",
+      "version_incompatible": "This version is incompatible with your current {{productName}} version."
+    },
+    "manual_migration": {
+      "migration_type": "Migration type",
+      "migration_type_help": "The type of migration you want to do.",
+      "select_migration_type": "Select migration type"
+    },
+    "stop_processing": {
+      "change_owner": "If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure to change the owner of the data directory to the user running the data node (usually graylog-datanode) and reset the correct permissions, e.g. by running",
+      "stop_cluster": "Please stop your OpenSearch cluster before proceeding.",
+      "stop_opensearch": "Stop OpenSearch",
+      "stopped": "{{productName}} processing is stopped."
+    },
+    "journal_size_warning": {
+      "description": "Please note that during migration you will have to stop processing on your {{productName}} node, this will result in the journal growing in size. Therefore you will have to increase your journal volume size during the Journal size downsize step or earlier.",
+      "title": "Journal size warning"
+    },
+    "journal_downtime": {
+      "current_size": "Your current journal size is: <bold>{{size}} MB</bold> and your current journal throughput is: <bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "There was an error while estimating your journal throughput: {{message}}",
+      "increase_size": "Therefore you might need to increase your journal volume size.",
+      "max_downtime": "Your current maximum downtime for reconfiguring {{productName}} to point to the data node is: <bold>{{duration}}</bold>",
+      "processing_stops": "Please note that during migration data processing will stop on your {{productName}} node, this will result in the journal growing in size.",
+      "sufficient_size": "Please make sure your journal volume size is sufficient before proceeding.",
+      "title": "Journal downtime size warning"
+    },
+    "in_place_welcome": {
+      "description": "An In-Place migration will migrate the data folder of your existing cluster to a Data Node cluster.",
+      "install": "To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node <docsLink>here</docsLink>.",
+      "title": "Welcome"
+    },
+    "restart_graylog": {
+      "almost_there": "Almost there!",
+      "example": "E.g.,",
+      "remove_hosts": "Please remove the <codeSnippet>elasticsearch_hosts</codeSnippet> line from your <codeSnippet>server.conf</codeSnippet>",
+      "restart": "Once that's done, please restart {{productName}} to finish the migration.",
+      "wait_for_available": "Please wait for all data nodes to become 'AVAILABLE'. Please check the data node's log if they do not become available within 1-2 minutes."
+    },
+    "in_place_migration_info": {
+      "configuration": "For In-Place migrations, please ensure the configuration of your Data Nodes in <codeSnippet>datanode.conf</codeSnippet>, specifically the <codeSnippet>opensearch_data_location</codeSnippet> configuration option, points to the correct existing OpenSearch data directory on every node.",
+      "permissions": "During the time of the migration, both the Data Node's and the OpenSearch's system user will need to be able to access and write to the data directory. To ensure this, you can run for example"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "Certificate authority has been configured successfully.",
+      "finished": "Provisioning the Data Node finished.",
+      "loading": "Loading migration state.",
+      "provision_now": "You can now provision certificate for your Data Nodes.",
+      "provisioning": "Provisioning certificate"
+    },
+    "jwt_authentication": {
+      "add_snippet": "To do this, you should add the following snippet to your <codeSnippet>opensearch-security/config.yml</codeSnippet>",
+      "description": "Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication to access OpenSearch from {{productName}}. In the next step, you have to manually enable JWT authentication in your existing OpenSearch cluster to make sure the data can be accessed in the data node.",
+      "replace_signing_key": "Please replace the signing key with your <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> in base64 encoding. To encode it, you can run",
+      "title": "JWT authentication"
+    },
+    "reset_migration": {
+      "button": "Reset Migration",
+      "confirm": "Are you sure you want to reset the migration?",
+      "failed": "Resetting migration state failed with status: {{error}}",
+      "failed_title": "Could not reset the migration state.",
+      "success": "Migration state reset successful."
+    },
+    "migration_actions": {
+      "next": "Next",
+      "show_renewal_policy_creation": "Configure certificate renewal policy",
+      "show_migration_selection": "Go to migration steps",
+      "run_directory_compatibility_check": "Run directory compatibility check",
+      "provision_datanode_certificates": "Provision Data Nodes with certificates"
+    },
+    "force_start": {
+      "confirm": "Start anyway",
+      "description": "The backend reported that the normal preflight checks did not pass.",
+      "submitting": "Starting...",
+      "title": "Start OpenSearch upgrade anyway?"
+    },
+    "rolling_upgrade_nodes": {
+      "abort_requested": "Abort requested. The upgrade will stop after the current step.",
+      "no_remaining_nodes": "No remaining nodes.",
+      "no_upgraded_nodes": "No upgraded nodes yet.",
+      "not_started": "No OpenSearch rolling upgrade has been started yet.",
+      "title": "OpenSearch rolling upgrade",
+      "upgraded_heading": "Upgraded to target OpenSearch",
+      "waiting_heading": "Waiting for OpenSearch upgrade",
+      "current": "current",
+      "data_node": "Data Node",
+      "manager": "manager",
+      "opensearch_version": "OpenSearch version",
+      "status": "Status",
+      "unknown": "Unknown",
+      "node_status": {
+        "pending": "Waiting",
+        "restarting": "Restarting",
+        "started": "Started",
+        "completed": "Upgraded",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      },
+      "state": {
+        "preparing_cluster": "Preparing cluster",
+        "selecting_next_node": "Selecting next node",
+        "upgrading_node": "Upgrading node",
+        "waiting_node_joined": "Waiting for node to rejoin",
+        "reenabling_allocation": "Re-enabling allocation",
+        "waiting_green": "Waiting for green cluster",
+        "paused_waiting_green": "Paused waiting for green cluster",
+        "finalizing": "Finalizing",
+        "completed": "Completed",
+        "aborted": "Aborted",
+        "failed": "Failed",
+        "in_progress": "In progress"
+      }
+    },
+    "opensearch_upgrade_info": {
+      "current_version": "Current OpenSearch version:",
+      "data_nodes": "Data Nodes:",
+      "data_nodes_summary": "{{total}} ({{available}} available)",
+      "loading": "Loading...",
+      "target_version": "Target OpenSearch version:",
+      "unknown": "Unknown"
+    },
+    "start_upgrade": {
+      "full": {
+        "alert_title": "Fewer than 3 Data Nodes — this is a full restart, not a rolling one",
+        "confirm": "Restart",
+        "journal": "While OpenSearch is down, incoming messages pile up in the disk journal on each {{productName}} node. If the outage outlasts the journal's size or age limit, ingestion stalls and messages can be dropped — only proceed if the journal has enough headroom for the expected downtime.",
+        "submitting": "Restarting...",
+        "title": "Restart Data Nodes' OpenSearch?",
+        "tolerate_downtime": "Proceed only if you can tolerate the downtime.",
+        "restart_together_with_versions_one": "With fewer than 3 Data Nodes, OpenSearch can't stay available by restarting one node at a time. All your Data Nodes restart together to move OpenSearch from <strong>{{currentVersion}}</strong> to <strong>{{targetVersion}}</strong>, so the storage backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.",
+        "restart_together_with_versions_other": "With fewer than 3 Data Nodes, OpenSearch can't stay available by restarting one node at a time. All your Data Nodes restart together to move OpenSearch from <strong>{{currentVersion}}</strong> to <strong>{{targetVersion}}</strong>, so the storage backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.",
+        "restart_together_one": "With fewer than 3 Data Nodes, OpenSearch can't stay available by restarting one node at a time. All your Data Nodes restart together to move OpenSearch to the target version, so the storage backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.",
+        "restart_together_other": "With fewer than 3 Data Nodes, OpenSearch can't stay available by restarting one node at a time. All your Data Nodes restart together to move OpenSearch to the target version, so the storage backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted."
+      },
+      "no_rollback": "Once started, it cannot be rolled back to the previous version.",
+      "rolling": {
+        "alert_title": "This restarts every Data Node, one at a time",
+        "confirm": "Start rolling upgrade",
+        "healthy_cluster": "Make sure the cluster is healthy (green) before proceeding.",
+        "shard_allocation": "Shard allocation is paused during each restart, so the cluster stays available — but indexing and search may be briefly degraded while a node leaves and rejoins.",
+        "title": "Start OpenSearch rolling upgrade?",
+        "wait_for_green": "After each node the upgrade waits for the cluster to return to green before continuing. If that takes too long it pauses and waits for you to resume.",
+        "each_node_with_versions_one": "Each of your {{count}} Data Nodes will be upgraded and restarted one at a time to move its embedded OpenSearch from <strong>{{currentVersion}}</strong> to <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Each of your {{count}} Data Nodes will be upgraded and restarted one at a time to move its embedded OpenSearch from <strong>{{currentVersion}}</strong> to <strong>{{targetVersion}}</strong>.",
+        "each_node_one": "Each of your {{count}} Data Nodes will be upgraded and restarted one at a time to move its embedded OpenSearch to the target version.",
+        "each_node_other": "Each of your {{count}} Data Nodes will be upgraded and restarted one at a time to move its embedded OpenSearch to the target version."
+      },
+      "starting": "Starting..."
+    },
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Nodes' embedded OpenSearch is already up to date.",
+      "automatic_upgrade": "Each Data Node automatically upgrades its embedded OpenSearch to the target version.",
+      "backup": "Back up MongoDB, Data Node, and Data Lake storage before upgrading to ensure a smooth rollback path.",
+      "before_upgrading": "Before upgrading",
+      "check_failed": "Could not check OpenSearch upgrade availability.",
+      "full_restart": "All Data Nodes must restart for the upgrade to take effect.",
+      "full_search_unavailable": "Search and indexing are unavailable while Data Nodes restart.",
+      "incompatible_indices": "Incompatible indices",
+      "old_indices_unreadable": "OpenSearch 3 cannot read indices created with versions earlier than OpenSearch 2. If these indices remain during the upgrade, their data will become unavailable.",
+      "resolve_indices_first": "Resolve all incompatible indices first.",
+      "restarting": "Restarting...",
+      "resume": "Resume",
+      "resuming": "Resuming...",
+      "rolling_restart": "Data Nodes restart one at a time to minimize the impact.",
+      "rolling_search_impaired": "Search functionality may be impaired while Data Nodes restart.",
+      "start_rolling_upgrade": "Start OpenSearch Rolling Upgrade",
+      "start_upgrade_and_restart": "Start OpenSearch Upgrade and Restart",
+      "starting_rolling_upgrade": "Starting OpenSearch Rolling Upgrade...",
+      "title": "Upgrade Data Nodes' embedded OpenSearch",
+      "unconfirmed_one": "Incompatible indices and upgrade status cannot be checked while {{count}} Data Node is unavailable — they will show again once all Data Nodes are available.",
+      "unconfirmed_other": "Incompatible indices and upgrade status cannot be checked while {{count}} Data Nodes are unavailable — they will show again once all Data Nodes are available.",
+      "upgrade_process": "Upgrade process",
+      "use_table": "Use the table below to reindex system indices and archive or delete data indices before continuing."
+    },
+    "client_certificate": {
+      "certificate_lifetime": "Certificate Lifetime",
+      "close": "Close",
+      "create_title": "Create client certificate",
+      "password": "Password",
+      "principal": "Principal",
+      "principal_placeholder": "principal",
+      "role": "Role",
+      "role_help": "Represent OpenSearch roles mapping.",
+      "role_placeholder": "role",
+      "submit": "Create Certificate",
+      "submitting": "Creating certificate...",
+      "unencrypted": "Unencrypted",
+      "ca_certificate": "CA certificate",
+      "certificate": "Certificate",
+      "copy_to_clipboard": "Copy to clipboard",
+      "private_key": "Private key",
+      "view_principal": "Principal:",
+      "view_role": "Role:",
+      "generate": "Generate client certificate",
+      "description": "Generate client certificates for 3rd party tool",
+      "title": "Client Certificate"
+    },
+    "cluster_health": {
+      "cluster_manager": "Cluster Manager:",
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "nodes_summary": "{{total}} ({{outdated}} outdated, {{upgraded}} upgraded)",
+      "number_of_nodes": "Number of Nodes:",
+      "number_of_shards": "Number of Shards:",
+      "server_version": "Server Version:",
+      "shard_replication": "Shard Replication:",
+      "shard_replication_help": {
+        "confirm": "After a node has been upgraded and you click on <emphasis><bold>Confirm Upgrade</bold></emphasis>, shard replication will be re-enabled and all shards that were unavailable due to the node being upgraded will be re-allocated.",
+        "force_disabled": "Force Disabled",
+        "force_enabled": "Force Enabled",
+        "start": "After you click on <emphasis><bold>Start Upgrade Process</bold></emphasis> of a node, shard allocation will be set to no replication to allow OpenSearch to use only the available shards."
+      },
+      "shards_summary": "{{active}} active, {{initializing}} initializing, {{relocating}} relocating, {{unassigned}} unassigned",
+      "state_help": {
+        "green": "After a node has been upgraded and you click on <emphasis>Confirm Upgrade</emphasis>, shard replication will be re-enabled and all shards that were unavailable due to the node being upgraded will be re-allocated and the cluster will return to a GREEN state.",
+        "question": "How does my cluster change state during the rolling upgrade?",
+        "red": "RED - if you are using indices with no replication and upgrade the node hosting the shards of these indices, the cluster will go to a red state and no data will be ingested into or searchable from these indices.",
+        "yellow": "YELLOW - after starting the upgrade of a node, shard allocation will be set to no replication to allow OpenSearch to use only the available shards."
+      }
+    },
+    "upgrade_method": {
+      "cluster_restart": "Cluster Restart",
+      "cluster_restart_description": "When using the cluster restart method, you will upgrade all Data Nodes at once. During this time, messages will be buffered in the journal and processed as the Data Node cluster comes back online, leading to no data loss provided your journal size is configured for the message volume which is expected during the Data Node downtime.",
+      "cluster_restart_less_than_three": "If you are running a Data Node cluster with less than three nodes, the cluster restart method is the only method available.",
+      "cluster_restart_three_or_more": "If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster restart method after consideration of your journal size and your message throughput.",
+      "rolling_upgrade": "Rolling Upgrade",
+      "rolling_upgrade_description": "Rolling upgrades can be performed on a running Data Node cluster only with <bold>three or more nodes</bold>, with virtually no downtime.",
+      "rolling_upgrade_process": "Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and replaced, one at a time, by hosts running the new version. During this process you can continue to index and query data in your cluster."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "All your Data Nodes are up to date.",
+      "checking": "Checking OpenSearch status...",
+      "error": "Could not check Data Nodes' embedded OpenSearch version.",
+      "outdated": "Data Nodes' embedded OpenSearch is not up to date.",
+      "unconfirmed_one": "Data Nodes' embedded OpenSearch state cannot be confirmed while {{count}} Data Node is unavailable.",
+      "unconfirmed_other": "Data Nodes' embedded OpenSearch state cannot be confirmed while {{count}} Data Nodes are unavailable.",
+      "up_to_date": "Data Nodes' embedded OpenSearch is up to date.",
+      "up_to_date_with_version": "Data Nodes' embedded OpenSearch is up to date <bold>({{version}}).</bold>",
+      "upgrading": "OpenSearch rolling upgrade is in progress."
+    },
+    "upgrade_nodes": {
+      "manager": "manager",
+      "no_outdated_nodes": "No outdated nodes found.",
+      "no_upgraded_nodes": "No upgraded nodes found.",
+      "outdated_nodes": "Outdated Nodes",
+      "start_upgrade": "Start Upgrade Process",
+      "upgraded": "Upgraded",
+      "upgraded_nodes": "Upgraded Nodes"
+    },
+    "data_node_actions": {
+      "rejoin": "Rejoin",
+      "remove": "Remove",
+      "renew_certificate": "Renew certificate",
+      "show_logs": "Show logs",
+      "start": "Start",
+      "stop": "Stop",
+      "rejoin_title": "Rejoin Data Node",
+      "rejoin_confirm": "Are you sure you want to rejoin Data Node \"{{hostname}}\"?",
+      "remove_title": "Remove Data Node",
+      "remove_confirm": "Are you sure you want to remove Data Node \"{{hostname}}\"?",
+      "stop_title": "Stop Data Node",
+      "stop_confirm": "Are you sure you want to stop Data Node \"{{hostname}}\"?"
+    },
+    "data_node_badge": {
+      "short_node_id": "Short node id"
+    },
+    "data_node_status": {
+      "queued_for": "queued for {{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "No logs.",
+      "title": "{{hostname}} logs"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Show performance metrics of your Data Node and managed OpenSearch cluster.",
+      "teaser_license_warning": "Please make sure you have a valid license and Data Node configured to see the performance metrics of your Data Node and your managed OpenSearch cluster."
+    },
+    "ca_configuration": {
+      "create_tab": "Create new CA",
+      "description_provision": "The certificate authority will provision and manage certificates for your Data Nodes more easily.",
+      "description_upload_or_create": "In this step you can either upload or create a new certificate authority.",
+      "reusing_certificates": "If your existing cluster uses certificates, by default these will get replaced with the {{productName}} CA and automatically generated certificates during provisioning of the data nodes in the next step. If you want to include your own CA, you can upload an existing certificate. Please see <docsLink>{{productName}} Data Node - Getting Started</docsLink> for more information.",
+      "reusing_certificates_title": "Reusing certificates",
+      "title": "Configure Certificate Authority",
+      "upload_tab": "Upload CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "Certificate Authority",
+      "dropzone": "Drag CA here or click to select file",
+      "explanation": "Here you can upload your existing CA. You need to upload a single file containing both private key (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.",
+      "failed": "CA upload failed with error: {{error}}",
+      "password": "Password",
+      "rejected": "CA upload failed",
+      "submit": "Upload CA",
+      "submitting": "Uploading CA...",
+      "success": "CA uploaded successfully"
+    },
+    "ca_create": {
+      "description": "Click on the “Create CA” button to quickly create a new certificate authority for your {{productName}} Data Nodes.",
+      "failed": "CA creation failed with error: {{error}}",
+      "organization_name": "Organization Name",
+      "submit": "Create CA",
+      "submitting": "Creating CA...",
+      "success": "CA created successfully"
+    },
+    "renewal_policy": {
+      "certificate_lifetime": "Certificate Lifetime:",
+      "certificate_lifetime_label": "Certificate Lifetime",
+      "configure": "Configure Certificate Renewal Policy",
+      "description": "These settings will be used when detecting expiration of certificates and/or when renewing them.",
+      "edit": "Edit configuration",
+      "lifetime_explanation": "The certificate lifetime will be used for the length of the validity of newly created certificates.",
+      "mode_explanation": "Setting the renewal policy to \"Automatic\" will renew all expiring certificates without any user interaction. Setting it to \"Manual\" will create a system notification when one or more certificates are about to expire, allowing you to confirm their renewal.",
+      "renewal_mode": "Renewal Mode:",
+      "renewal_mode_label": "Certificate Renewal Mode",
+      "select_mode": "Select certificate renewal mode",
+      "submit": "Update configuration",
+      "submitting": "Updating configuration",
+      "title": "Certificate Renewal Policy Configuration",
+      "update_failed": "Error updating certificate renewal policy: {{error}}",
+      "update_failed_title": "Unable to update certificate renewal policy",
+      "modes": {
+        "automatic": "Automatic",
+        "manual": "Manual"
+      }
+    },
+    "details_page": {
+      "certificate_valid_until": "Certificate valid until:",
+      "configuration_warnings": "Configuration warnings",
+      "datanode_version": "Datanode version:",
+      "details": "Details:",
+      "error": "Error: {{message}}",
+      "hostname": "Hostname:",
+      "not_available": "N/A",
+      "status": "Status:",
+      "title": "Data Nodes: {{hostname}}",
+      "transport_address": "Transport address:"
+    },
+    "pages": {
+      "description": "{{productName}} Data Nodes offer a better integration with {{productName}} and simplify future updates. They allow you to index and search through all the messages in your {{productName}} message database.",
+      "upgrade_title": "Data Node Upgrade",
+      "cluster_management_title": "Data Node Dashboard",
+      "certificate_management_title": "Certificate Management",
+      "migration_title": "Data Node Migration",
+      "documentation_title": "Data Nodes documentation"
+    },
+    "upgrade_page": {
+      "manual_instructions": "To upgrade your Data Nodes manually, please follow the instructions in the <docsLink>documentation</docsLink>.",
+      "manual_upgrade_title": "Data Node Manual Upgrade",
+      "select_strategy": "Select Upgrade Strategy",
+      "upgrade_data_node": "Upgrade Data Node",
+      "manual_upgrade_of_node": "Once you have completed the manual upgrade of <bold>{{node}}</bold> on the system, wait until it reconnects and appears in the <bold>Upgraded Nodes</bold> panel, then click on <confirmButton><bold>Confirm Upgrade</bold></confirmButton> and continue with next node.",
+      "manual_upgrade_of_data_node": "Once you have completed the manual upgrade of your Data Node on the system, wait until it reconnects and appears in the <bold>Upgraded Nodes</bold> panel, then click on <confirmButton><bold>Confirm Upgrade</bold></confirmButton> and continue with next node."
+    },
+    "migration_steps": {
+      "ca_configuration": "Configure a certificate authority",
+      "renewal_policy_configuration": "Configure a renewal policy",
+      "compatibility_check": "Check OpenSearch compatibility with datanode",
+      "manual_migration_step": "Migration steps.",
+      "migration_finished": "Migration finished"
+    },
+    "migration_states": {
+      "new": "Migration",
+      "migration_welcome_page": "Welcome",
+      "ca_creation_page": "Certificate authority",
+      "renewal_policy_creation_page": "Certificate renewal policy",
+      "migration_selection_page": "Migration steps",
+      "rolling_upgrade_migration_welcome_page": "Welcome to In-Place migration",
+      "ask_to_shutdown_old_cluster": "Shut down old cluster",
+      "manually_remove_old_connection_string_from_config": "Remove connection string",
+      "message_processing_stop": "Stop message processing",
+      "replace_cluster": "Replace existing cluster",
+      "restart_graylog": "Update configuration file and restart {{productName}}",
+      "directory_compatibility_check_page": "Directory compatibility check",
+      "provision_rolling_upgrade_nodes_with_certificates": "Certificate provisioning overview",
+      "provision_rolling_upgrade_nodes_running": "Provision the Data Node's certificate.",
+      "journal_size_downtime_warning": "Journal size downtime warning",
+      "failed": "Migration failed",
+      "finished": "Migration finished"
+    },
+    "certificate_renewal": {
+      "loading_failed": "Loading Data Nodes failed with status",
+      "loading_failed_title": "Could not load data nodes",
+      "renew": {
+        "button": "Renew certificate",
+        "button_loading": "Renewing certificate",
+        "success": "Certificate renewed successfully",
+        "failed": "Certificate renewal failed with error: {{error}}"
+      },
+      "provision": {
+        "button": "Provision certificate",
+        "button_loading": "Provisioning certificate...",
+        "success": "Certificate provisioned successfully",
+        "failed": "Certificate provisioning failed with error: {{error}}"
+      },
+      "title": "Certificate Renewal & Provisioning",
+      "description": "Here you can manually trigger the certificate renewal or provisioning for {{productName}} Data Nodes. It is only necessary to manually provision certificates when the renewal policy mode \"Manual\" is configured and Data Nodes have been started after the initial certificate provisioning.",
+      "transport_address": "Transport address",
+      "hostname": "Hostname",
+      "valid_until": "valid until {{relativeTime}}",
+      "no_data_nodes": "No Data Nodes have been found."
+    }
   }
 }

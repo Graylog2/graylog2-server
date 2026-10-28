@@ -649,26 +649,6 @@
     "input_moved": "Collector-Ingest-Input wurde auf den neuen Port verschoben."
   },
   "datanode": {
-    "pages": {
-      "description": "{{productName}} Data Nodes bieten eine bessere Integration mit {{productName}} und vereinfachen zukünftige Updates. Mit ihnen können Sie alle Nachrichten in Ihrer {{productName}}-Nachrichtendatenbank indizieren und durchsuchen.",
-      "documentation_title": "Data-Node-Dokumentation",
-      "cluster_management_title": "Data-Node-Dashboard",
-      "certificate_management_title": "Zertifikatsverwaltung",
-      "migration_title": "Data-Node-Migration",
-      "upgrade_title": "Data-Node-Upgrade"
-    },
-    "details_page": {
-      "error": "Fehler: {{message}}",
-      "title": "Data Nodes: {{hostname}}",
-      "details": "Details:",
-      "hostname": "Hostname:",
-      "transport_address": "Transport-Adresse:",
-      "status": "Status:",
-      "not_available": "k. A.",
-      "certificate_valid_until": "Zertifikat gültig bis:",
-      "datanode_version": "Data-Node-Version:",
-      "configuration_warnings": "Konfigurationswarnungen"
-    },
     "upgrade_page": {
       "manual_instructions": "Um Ihre Data Nodes manuell zu aktualisieren, folgen Sie bitte den Anweisungen in der <docsLink>Dokumentation</docsLink>.",
       "manual_upgrade_of_node": "Sobald Sie das manuelle Upgrade von <bold>{{node}}</bold> auf dem System abgeschlossen haben, warten Sie, bis er sich wieder verbindet und im Bereich <bold>Aktualisierte Knoten</bold> erscheint. Klicken Sie dann auf <confirmButton><bold>Upgrade bestätigen</bold></confirmButton> und fahren Sie mit dem nächsten Knoten fort.",
@@ -702,8 +682,6 @@
       "submit": "CA erstellen"
     },
     "ca_upload": {
-      "file_required": "Bitte laden Sie eine Datei hoch.",
-      "single_file": "Bitte laden Sie nur eine einzelne Datei hoch.",
       "rejected": "Hochladen der CA fehlgeschlagen",
       "success": "CA erfolgreich hochgeladen",
       "failed": "Hochladen der CA fehlgeschlagen: {{error}}",
@@ -1109,55 +1087,25 @@
         "tolerate_downtime": "Fahren Sie nur fort, wenn Sie die Ausfallzeit in Kauf nehmen können."
       }
     },
-    "data_node_notifications": {
-      "remove_failed": "Entfernen des Data Nodes fehlgeschlagen mit Status: {{status}}",
-      "bulk_remove_failed_title": "Data Nodes konnten nicht entfernt werden.",
-      "bulk_remove_success_one": "{{count}} Data Node erfolgreich entfernt.",
-      "bulk_remove_success_other": "{{count}} Data Nodes erfolgreich entfernt.",
-      "remove_success": "Data Node „{{datanodeId}}“ erfolgreich entfernt.",
-      "remove_failed_title": "Der Data Node konnte nicht entfernt werden.",
-      "start_failed": "Starten des Data Nodes fehlgeschlagen mit Status: {{status}}",
-      "bulk_start_failed_title": "Data Nodes konnten nicht gestartet werden.",
-      "bulk_start_success_one": "{{count}} Data Node erfolgreich gestartet.",
-      "bulk_start_success_other": "{{count}} Data Nodes erfolgreich gestartet.",
-      "start_success": "Data Node „{{datanodeId}}“ erfolgreich gestartet.",
-      "start_failed_title": "Der Data Node konnte nicht gestartet werden.",
-      "stop_failed": "Stoppen des Data Nodes fehlgeschlagen mit Status: {{status}}",
-      "bulk_stop_failed_title": "Data Nodes konnten nicht gestoppt werden.",
-      "bulk_stop_success_one": "{{count}} Data Node erfolgreich gestoppt.",
-      "bulk_stop_success_other": "{{count}} Data Nodes erfolgreich gestoppt.",
-      "stop_success": "Data Node „{{datanodeId}}“ erfolgreich gestoppt.",
-      "stop_failed_title": "Der Data Node konnte nicht gestoppt werden.",
-      "rejoin_success": "Data Node „{{datanodeId}}“ erfolgreich wieder aufgenommen.",
-      "rejoin_failed": "Wiederaufnahme des Data Nodes fehlgeschlagen mit Status: {{status}}",
-      "rejoin_failed_title": "Der Data Node konnte nicht wieder aufgenommen werden.",
-      "renew_certificate_success": "Zertifikat erfolgreich erneuert.",
-      "renew_certificate_failed": "Erneuern des Zertifikats fehlgeschlagen: {{error}}",
-      "loading_failed": "Laden der Data Nodes fehlgeschlagen mit Status",
-      "loading_failed_title": "Data Nodes konnten nicht geladen werden.",
-      "loading_node_failed": "Laden des Data Nodes fehlgeschlagen mit Status",
-      "loading_node_failed_title": "Data Node konnte nicht geladen werden",
-      "loading_stdout_failed": "Laden der stdout-Logs des Data Nodes fehlgeschlagen mit Status",
-      "loading_stdout_failed_title": "stdout-Logs des Data Nodes konnten nicht geladen werden",
-      "loading_stderr_failed": "Laden der stderr-Logs des Data Nodes fehlgeschlagen mit Status",
-      "loading_stderr_failed_title": "stderr-Logs des Data Nodes konnten nicht geladen werden",
-      "stop_replication_success": "Shard-Replikation erfolgreich gestoppt",
-      "stop_replication_failed": "Stoppen der Shard-Replikation fehlgeschlagen mit Status: {{status}}",
-      "stop_replication_failed_title": "Shard-Replikation konnte nicht gestoppt werden.",
-      "start_replication_success": "Shard-Replikation erfolgreich gestartet",
-      "start_replication_failed": "Starten der Shard-Replikation fehlgeschlagen mit Status: {{status}}",
-      "start_replication_failed_title": "Shard-Replikation konnte nicht gestartet werden.",
-      "loading_upgrade_status_failed": "Laden des Data-Node-Upgrade-Status fehlgeschlagen",
-      "loading_upgrade_status_failed_title": "Data-Node-Upgrade-Status konnte nicht geladen werden",
-      "loading_journal_estimate_failed": "Laden der Journal-Schätzung für die Data-Node-Migration fehlgeschlagen",
-      "loading_journal_estimate_failed_title": "Schätzung der Journal-Größe konnte nicht geladen werden",
-      "loading_rolling_upgrade_failed": "Laden des Status des OpenSearch-Rolling-Upgrades fehlgeschlagen",
-      "loading_rolling_upgrade_failed_title": "Status des OpenSearch-Rolling-Upgrades konnte nicht geladen werden",
-      "start_rolling_upgrade_failed_title": "Rolling Upgrade von OpenSearch konnte nicht gestartet werden",
-      "resume_rolling_upgrade_success": "Das Rolling Upgrade von OpenSearch wurde fortgesetzt.",
-      "resume_rolling_upgrade_failed_title": "Rolling Upgrade von OpenSearch konnte nicht fortgesetzt werden",
-      "loading_versions_failed": "Laden der OpenSearch-Versionsübersicht fehlgeschlagen",
-      "loading_versions_failed_title": "OpenSearch-Versionsübersicht konnte nicht geladen werden"
+    "details_page": {
+      "certificate_valid_until": "Zertifikat gültig bis:",
+      "configuration_warnings": "Konfigurationswarnungen",
+      "datanode_version": "Data-Node-Version:",
+      "details": "Details:",
+      "error": "Fehler: {{message}}",
+      "hostname": "Hostname:",
+      "not_available": "k. A.",
+      "status": "Status:",
+      "title": "Data Nodes: {{hostname}}",
+      "transport_address": "Transport-Adresse:"
+    },
+    "pages": {
+      "description": "{{productName}} Data Nodes bieten eine bessere Integration mit {{productName}} und vereinfachen zukünftige Updates. Mit ihnen können Sie alle Nachrichten in Ihrer {{productName}}-Nachrichtendatenbank indizieren und durchsuchen.",
+      "upgrade_title": "Data-Node-Upgrade",
+      "cluster_management_title": "Data-Node-Dashboard",
+      "certificate_management_title": "Zertifikatsverwaltung",
+      "migration_title": "Data-Node-Migration",
+      "documentation_title": "Data-Nodes-Dokumentation"
     }
   }
 }
