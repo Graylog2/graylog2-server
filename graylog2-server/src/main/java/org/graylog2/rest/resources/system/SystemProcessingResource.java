@@ -83,6 +83,7 @@ public class SystemProcessingResource extends RestResource {
 
     @PUT
     @Timed
+    @Operation(summary = "Manually unlock a locked message processing pause")
     @Path("pause/unlock")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSING_UNLOCK)
     public void unlockProcessingPause() {
