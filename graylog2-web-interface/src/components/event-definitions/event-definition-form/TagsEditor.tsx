@@ -46,7 +46,6 @@ type Props = {
   error?: React.ReactNode;
 };
 
-
 const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
 const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
 

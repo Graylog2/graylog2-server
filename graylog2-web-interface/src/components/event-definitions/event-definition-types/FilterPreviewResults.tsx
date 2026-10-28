@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 
@@ -23,13 +24,17 @@ import styles from './FilterPreview.css';
 type Props = React.PropsWithChildren<{
   hasError?: boolean;
 }>;
-const FilterPreviewResults = ({ children = undefined, hasError = false }: Props) => (
-  <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
-    <Panel.Heading>
-      <Panel.Title>Filter Preview</Panel.Title>
-    </Panel.Heading>
-    <Panel.Body>{children}</Panel.Body>
-  </Panel>
-);
+const FilterPreviewResults = ({ children = undefined, hasError = false }: Props) => {
+  const { t } = useTranslation('event_definitions');
+
+  return (
+    <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
+      <Panel.Heading>
+        <Panel.Title>{t('filter_preview.title')}</Panel.Title>
+      </Panel.Heading>
+      <Panel.Body>{children}</Panel.Body>
+    </Panel>
+  );
+};
 
 export default FilterPreviewResults;

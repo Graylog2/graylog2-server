@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Button } from 'components/bootstrap';
@@ -25,14 +26,18 @@ type Props = {
   stream: Stream;
 };
 
-const ExpandedOutputsActions = ({ stream }: Props) => (
-  <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-    <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
-      <Button bsStyle="link" bsSize="xsmall" disabled={!stream.is_editable}>
-        Manage Outputs
-      </Button>
-    </LinkContainer>
-  </IfPermitted>
-);
+const ExpandedOutputsActions = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+      <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
+        <Button bsStyle="link" bsSize="xsmall" disabled={!stream.is_editable}>
+          {t('streams_overview.expanded.manage_outputs')}
+        </Button>
+      </LinkContainer>
+    </IfPermitted>
+  );
+};
 
 export default ExpandedOutputsActions;

@@ -192,8 +192,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           {!validSecurityLicense && (
             <FormGroup>
               <ControlLabel>
-                {t('details_form.remediation_steps')}{' '}
-                <small className="text-muted">{t('details_form.optional')}</small>
+                {t('details_form.remediation_steps')} <small className="text-muted">{t('details_form.optional')}</small>
               </ControlLabel>
               {readOnly ? (
                 <MarkdownPreview

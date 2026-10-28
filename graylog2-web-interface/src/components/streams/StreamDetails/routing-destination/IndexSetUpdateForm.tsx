@@ -18,7 +18,9 @@ import * as React from 'react';
 import type { SyntheticEvent } from 'react';
 import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Button, Modal } from 'components/bootstrap';
 import usePermissions from 'hooks/usePermissions';
 import type { Stream } from 'logic/streams/types';
@@ -45,13 +47,14 @@ const validate = (values: FormValues) => {
   let errors = {};
 
   if (!values.index_set_id) {
-    errors = { index_set_id: 'Index set is required' };
+    errors = { index_set_id: i18n.t('stream_modal.index_set_required', { ns: 'streams' }) };
   }
 
   return errors;
 };
 
 const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { updateStream } = useStreamMutations();
   const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -75,7 +78,10 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
     // The api fn handles the error toast on rejection, so we only run the success path on resolve.
     updateStream({ streamId: stream.id, data: values })
       .then(() => {
-        UserNotification.success(`IndexSet of stream'${stream.title}' was updated successfully.`, 'Success');
+        UserNotification.success(
+          t('routing_destination.index_set_update.updated', { title: stream.title }),
+          t('routing_destination.index_set_update.success_title'),
+        );
         setShowModal(false);
       })
       .catch(() => {});
@@ -87,8 +93,8 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
         disabled={!isPermitted(`streams:edit:${stream.id}`)}
         bsSize="sm"
         onClick={openModal}
-        title="Edit index set">
-        <Icon name="add" /> Edit Index Set
+        title={t('routing_destination.index_set_update.tooltip')}>
+        <Icon name="add" /> {t('routing_destination.index_set_update.button')}
       </Button>
 
       {showModal && (
@@ -97,15 +103,15 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
             {({ isSubmitting, isValidating }) => (
               <Form>
                 <Modal.Header>
-                  <Modal.Title>Edit Stream IndexSet</Modal.Title>
+                  <Modal.Title>{t('routing_destination.index_set_update.modal_title')}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <IndexSetSelect indexSets={indexSets} />
                 </Modal.Body>
                 <Modal.Footer>
                   <ModalSubmit
-                    submitButtonText="Update"
-                    submitLoadingText="Saving stream"
+                    submitButtonText={t('routing_destination.index_set_update.submit')}
+                    submitLoadingText={t('routing_destination.index_set_update.saving')}
                     onCancel={onCloseModal}
                     disabledSubmit={isValidating}
                     isSubmitting={isSubmitting}

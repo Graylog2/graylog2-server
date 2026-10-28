@@ -16,6 +16,7 @@
  */
 import { useCallback } from 'react';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Streams } from '@graylog/server-api';
 
@@ -24,13 +25,13 @@ import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  descriptor: string;
-  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void;
+  handleFailures: (failures: Array<{ entity_id: string }>, action: 'deleted' | 'started' | 'stopped') => void;
   onSelect?: () => void;
   refetchStreams: () => void;
 };
 
-const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelect = undefined }: Props) => {
+const StopStreamsAction = ({ handleFailures, refetchStreams, onSelect = undefined }: Props) => {
+  const { t } = useTranslation('streams');
   const { selectedEntities } = useSelectedEntities();
   const onStopStreams = useCallback(() => {
     if (typeof onSelect === 'function') {
@@ -40,14 +41,18 @@ const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelec
     Streams.bulkPause({ entity_ids: selectedEntities })
       .then(({ failures }) => handleFailures(failures, 'stopped'))
       .catch((error) => {
-        UserNotification.error(`An error occurred while stopping streams. ${error}`);
+        UserNotification.error(t('streams_overview.bulk.stop_error', { error }));
       })
       .finally(() => {
         refetchStreams();
       });
-  }, [handleFailures, onSelect, refetchStreams, selectedEntities]);
+  }, [handleFailures, onSelect, refetchStreams, selectedEntities, t]);
 
-  return <MenuItem onSelect={onStopStreams}>Stop {descriptor}</MenuItem>;
+  return (
+    <MenuItem onSelect={onStopStreams}>
+      {t('streams_overview.bulk.stop_streams', { count: selectedEntities.length })}
+    </MenuItem>
+  );
 };
 
 export default StopStreamsAction;

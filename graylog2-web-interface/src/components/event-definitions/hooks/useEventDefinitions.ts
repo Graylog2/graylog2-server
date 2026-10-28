@@ -23,6 +23,7 @@ import omit from 'lodash/omit';
 
 import { EventsDefinitions, EventsEntityTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
@@ -190,8 +191,8 @@ export const getEventDefinition = (
     (error: { status?: number }) => {
       if (error.status === 404) {
         UserNotification.error(
-          `Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
-          'Could not retrieve Event Definition',
+          i18n.t('hook_notifications.not_found', { ns: 'event_definitions', id: eventDefinitionId }),
+          i18n.t('hook_notifications.not_found_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -205,8 +206,8 @@ export const createEventDefinition = (newEventDefinition: EventDefinition): Prom
   return fetch('POST', eventDefinitionsUrl({ query: { schedule: isScheduled } }), setAlertFlag(eventDefinition)).then(
     (response: unknown) => {
       UserNotification.success(
-        'Event Definition created successfully',
-        `Event Definition "${eventDefinition.title}" was created successfully.`,
+        i18n.t('hook_notifications.create_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.create_success', { ns: 'event_definitions', title: eventDefinition.title }),
       );
 
       return response;
@@ -214,8 +215,8 @@ export const createEventDefinition = (newEventDefinition: EventDefinition): Prom
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not save Event Definition',
+          i18n.t('hook_notifications.create_failed', { ns: 'event_definitions', title: eventDefinition.title, error }),
+          i18n.t('hook_notifications.create_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -228,8 +229,8 @@ export const copyEventDefinition = (eventDefinition: EventDefinition): Promise<E
   EventsDefinitions.duplicate(encodeURIComponent(eventDefinition.id)).then(
     (response) => {
       UserNotification.success(
-        'Event Definition duplicated successfully',
-        `Event Definition "${response.title}" was created successfully.`,
+        i18n.t('hook_notifications.duplicate_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.duplicate_success', { ns: 'event_definitions', title: response.title }),
       );
 
       return response;
@@ -237,8 +238,12 @@ export const copyEventDefinition = (eventDefinition: EventDefinition): Promise<E
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Duplicating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not duplicate Event Definition',
+          i18n.t('hook_notifications.duplicate_failed', {
+            ns: 'event_definitions',
+            title: eventDefinition.title,
+            error,
+          }),
+          i18n.t('hook_notifications.duplicate_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -259,8 +264,8 @@ export const updateEventDefinition = (
   ).then(
     (response: unknown) => {
       UserNotification.success(
-        'Event Definition updated successfully',
-        `Event Definition "${eventDefinition.title}" was updated successfully.`,
+        i18n.t('hook_notifications.update_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.update_success', { ns: 'event_definitions', title: eventDefinition.title }),
       );
 
       return response;
@@ -268,8 +273,8 @@ export const updateEventDefinition = (
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Updating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not update Event Definition',
+          i18n.t('hook_notifications.update_failed', { ns: 'event_definitions', title: eventDefinition.title, error }),
+          i18n.t('hook_notifications.update_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -285,8 +290,8 @@ export const enableEventDefinition = (eventDefinition: EventDefinition): Promise
   EventsDefinitions.schedule(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
       UserNotification.success(
-        'Event Definition successfully enabled',
-        `Event Definition "${eventDefinition.title}" was successfully enabled.`,
+        i18n.t('hook_notifications.enable_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.enable_success', { ns: 'event_definitions', title: eventDefinition.title }),
       );
 
       return response;
@@ -294,8 +299,8 @@ export const enableEventDefinition = (eventDefinition: EventDefinition): Promise
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Enabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not enable Event Definition',
+          i18n.t('hook_notifications.enable_failed', { ns: 'event_definitions', title: eventDefinition.title, error }),
+          i18n.t('hook_notifications.enable_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -307,8 +312,8 @@ export const disableEventDefinition = (eventDefinition: EventDefinition): Promis
   EventsDefinitions.unschedule(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
       UserNotification.success(
-        'Event Definition successfully disabled',
-        `Event Definition "${eventDefinition.title}" was successfully disabled.`,
+        i18n.t('hook_notifications.disable_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.disable_success', { ns: 'event_definitions', title: eventDefinition.title }),
       );
 
       return response;
@@ -316,8 +321,8 @@ export const disableEventDefinition = (eventDefinition: EventDefinition): Promis
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Disabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not disable Event Definition',
+          i18n.t('hook_notifications.disable_failed', { ns: 'event_definitions', title: eventDefinition.title, error }),
+          i18n.t('hook_notifications.disable_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -328,15 +333,18 @@ export const disableEventDefinition = (eventDefinition: EventDefinition): Promis
 export const clearNotificationQueue = (eventDefinition: EventDefinition): Promise<unknown> =>
   EventsDefinitions.clearNotificationQueue(encodeURIComponent(eventDefinition.id)).then(
     (response: unknown) => {
-      UserNotification.success('Queued notifications cleared.', 'Queued notifications were successfully cleared.');
+      UserNotification.success(
+        i18n.t('hook_notifications.clear_queue_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.clear_queue_success', { ns: 'event_definitions' }),
+      );
 
       return response;
     },
     (error: SubmitError) => {
       if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
         UserNotification.error(
-          `Clearing queued notifications failed with status: ${error}`,
-          'Could not clear queued notifications',
+          i18n.t('hook_notifications.clear_queue_failed', { ns: 'event_definitions', error }),
+          i18n.t('hook_notifications.clear_queue_failed_title', { ns: 'event_definitions' }),
         );
       }
 
@@ -360,8 +368,8 @@ export const useEventDefinitionWithContext = (eventDefinitionId: string) => {
     queryFn: () =>
       defaultOnError(
         getEventDefinition(eventDefinitionId),
-        'Loading Event Definition failed with status',
-        'Could not load Event definition',
+        i18n.t('hook_notifications.load_one_failed', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.load_failed_title', { ns: 'event_definitions' }),
       ),
     retry: false,
   });
@@ -387,8 +395,8 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
     queryFn: () =>
       defaultOnError(
         fetchEventDefinitions(searchParams),
-        'Loading Event Definitions failed with status',
-        'Could not load Event definition',
+        i18n.t('hook_notifications.load_list_failed', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.load_failed_title', { ns: 'event_definitions' }),
       ),
     placeholderData: keepPreviousData,
     retry: false,
@@ -412,8 +420,8 @@ export function useGetEntityTypes() {
     queryFn: () =>
       defaultOnError(
         EventsEntityTypes.all(),
-        'Loading event definition entity types failed with status',
-        'Could not load event definition entity types',
+        i18n.t('hook_notifications.entity_types_failed', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.entity_types_failed_title', { ns: 'event_definitions' }),
       ),
   });
 
@@ -434,8 +442,8 @@ export function useGetListEventsClusterConfig(): {
     queryFn: () =>
       defaultOnError(
         ConfigurationsActions.listEventsClusterConfig(),
-        'Loading event definition list events cluster config failed with status',
-        'Could not load event definition list events cluster config',
+        i18n.t('hook_notifications.cluster_config_failed', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.cluster_config_failed_title', { ns: 'event_definitions' }),
       ),
   });
 

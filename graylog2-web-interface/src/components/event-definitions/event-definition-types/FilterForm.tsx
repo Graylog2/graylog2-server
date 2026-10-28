@@ -638,11 +638,7 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
                   name="cron_expression"
                   label={t('filter_form.cron_expression')}
                   type="text"
-                  help={
-                    <span>
-                      {cronDescription || t('filter_form.cron_expression_help')}
-                    </span>
-                  }
+                  help={<span>{cronDescription || t('filter_form.cron_expression_help')}</span>}
                   value={currentConfig.cron_expression ?? ''}
                   onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
                   onChange={handleCronExpressionChange}

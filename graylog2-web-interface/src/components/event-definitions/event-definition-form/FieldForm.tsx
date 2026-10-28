@@ -55,7 +55,10 @@ const getProviderPlugin = (type) => {
 const getConfigProviderType = (config, defaultValue?) => config?.providers?.[0]?.type ?? defaultValue;
 
 const formatFieldValueProviders = () =>
-  PluginStore.exports('fieldValueProviders').map((type) => ({ label: fieldValueProviderTitle(type), value: type.type }));
+  PluginStore.exports('fieldValueProviders').map((type) => ({
+    label: fieldValueProviderTitle(type),
+    value: type.type,
+  }));
 
 type FieldFormProps = {
   fieldName?: string;
@@ -260,7 +263,11 @@ class FieldForm extends React.Component<
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
               {t('field_form.use_as_key')}&emsp;
-              <HoverForHelp title={t('field_form.more_about_keys')} trigger={['click', 'hover']} placement="right" width={400}>
+              <HoverForHelp
+                title={t('field_form.more_about_keys')}
+                trigger={['click', 'hover']}
+                placement="right"
+                width={400}>
                 <EventKeyHelpPopover />
               </HoverForHelp>
             </ControlLabel>
@@ -284,9 +291,7 @@ class FieldForm extends React.Component<
                 disabled={!isKey}
               />
             </InputGroup>
-            <HelpBlock>
-              {validation.errors.key_position || t('field_form.key_help')}
-            </HelpBlock>
+            <HelpBlock>{validation.errors.key_position || t('field_form.key_help')}</HelpBlock>
           </FormGroup>
 
           <FormGroup>
@@ -307,9 +312,7 @@ class FieldForm extends React.Component<
               value={getConfigProviderType(config, '')}
               required
             />
-            <HelpBlock>
-              {validation.errors['config.providers[0].type'] || t('field_form.value_source_help')}
-            </HelpBlock>
+            <HelpBlock>{validation.errors['config.providers[0].type'] || t('field_form.value_source_help')}</HelpBlock>
           </FormGroup>
         </Col>
 

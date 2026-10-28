@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip, StatusIcon } from 'components/common';
 
@@ -30,11 +31,17 @@ const StyledDiv = styled.div`
 `;
 
 const IndexSetArchivingCell = ({ isArchivingEnabled, streamId }: Props) => {
+  const { t } = useTranslation('streams');
   const StreamIndexSetDataLakeWarning = PluginStore.exports('dataLake')?.[0]?.StreamIndexSetDataLakeWarning;
 
   return (
     <StyledDiv>
-      <Tooltip withArrow position="right" label={`Archiving is ${isArchivingEnabled ? 'enabled' : 'disabled'}`}>
+      <Tooltip
+        withArrow
+        position="right"
+        label={
+          isArchivingEnabled ? t('routing_destination.archiving.enabled') : t('routing_destination.archiving.disabled')
+        }>
         <StatusIcon active={isArchivingEnabled} />
       </Tooltip>
       {StreamIndexSetDataLakeWarning && (

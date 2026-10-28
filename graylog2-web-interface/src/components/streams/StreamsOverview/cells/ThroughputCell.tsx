@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const ThroughputCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const metricName = `org.graylog2.plugin.streams.Stream.${stream.id}.incomingMessages.1-sec-rate`;
   const { data: metrics, isLoading } = useMetric(metricName);
 
@@ -40,7 +42,7 @@ const ThroughputCell = ({ stream }: Props) => {
     })
     .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
 
-  return <>{throughput} msg/s</>;
+  return <>{t('streams_overview.cells.throughput', { throughput })}</>;
 };
 
 export default ThroughputCell;

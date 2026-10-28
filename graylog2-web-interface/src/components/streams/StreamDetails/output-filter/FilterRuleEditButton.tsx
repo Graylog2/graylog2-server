@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import camelCase from 'lodash/camelCase';
 import upperCase from 'lodash/upperCase';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
+  const { t } = useTranslation('streams');
   const [showForm, setShowForm] = useState(false);
   const { createStreamOutputRule, updateStreamOutputRule } = useStreamOutputRuleMutation();
   const sendTelemetry = useSendTelemetry();
@@ -66,14 +68,18 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
     });
   };
 
-  const title = isNew ? 'Create Filter Rule' : 'Edit Filter Rule';
+  const title = isNew ? t('output_filter.create_title') : t('output_filter.edit_title');
 
   return (
     <>
-      <Button bsStyle={isNew ? 'default' : 'default'} bsSize={isNew ? 'sm' : 'xs'} onClick={onClick} title="Edit">
+      <Button
+        bsStyle={isNew ? 'default' : 'default'}
+        bsSize={isNew ? 'sm' : 'xs'}
+        onClick={onClick}
+        title={t('output_filter.edit_tooltip')}>
         {isNew ? (
           <>
-            <Icon name="add" size="sm" /> Create rule
+            <Icon name="add" size="sm" /> {t('output_filter.create_button')}
           </>
         ) : (
           <Icon name="edit_square" />

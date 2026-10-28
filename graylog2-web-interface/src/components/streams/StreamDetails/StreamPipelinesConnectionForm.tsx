@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -43,6 +44,7 @@ const formatPipelines = (pipelines: Array<Partial<PipelineType>>): Array<Formatt
   pipelines.map((s) => ({ value: s.id, label: s.title })).sort((s1, s2) => naturalSort(s1.label, s2.label));
 
 const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines }: Props) => {
+  const { t } = useTranslation('streams');
   const [showModal, setShowModal] = useState<boolean>(false);
   const { isPermitted } = usePermissions();
   const queryClient = useQueryClient();
@@ -89,30 +91,33 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
 
   const pipelinesHelp = (
     <span>
-      Select the pipelines you want to connect to this stream, or create one in the{' '}
-      <Link to={Routes.SYSTEM.PIPELINES.OVERVIEW}>Pipelines page</Link>.
+      <Trans
+        t={t}
+        i18nKey="pipelines_connection_form.help"
+        components={{ pipelinesLink: <Link to={Routes.SYSTEM.PIPELINES.OVERVIEW} /> }}
+      />
     </span>
   );
 
   return (
     <>
       <Button disabled={!isPermitted('pipeline_connection:edit')} onClick={openModal} bsStyle="info">
-        Edit pipelines connection
+        {t('pipelines_connection_form.edit_button')}
       </Button>
       {showModal && (
         <BootstrapModalForm
           show={showModal}
           title={
             <span>
-              Edit connections for <em>stream</em>
+              <Trans t={t} i18nKey="pipelines_connection_form.modal_title" components={{ streamLabel: <em /> }} />
             </span>
           }
           onSubmitForm={onSave}
           onCancel={onCancel}
-          submitButtonText="Update connections">
+          submitButtonText={t('pipelines_connection_form.submit')}>
           <fieldset>
             <FormGroup id="pipelinesConnections">
-              <ControlLabel>Pipelines</ControlLabel>
+              <ControlLabel>{t('pipelines_connection_form.label')}</ControlLabel>
               <SelectableList
                 options={formatPipelines(notConnectedPipelines)}
                 onChange={onPipelineChange}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
@@ -44,6 +45,7 @@ type Props = {
 };
 
 const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
+  const { t } = useTranslation('streams');
   const { isPermitted } = usePermissions();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { data: inputs } = useStreamRulesInputs();
@@ -59,13 +61,13 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
 
     /* TODO: Replace with custom confirmation dialog */
     // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to delete this stream rule?')) {
+    if (window.confirm(t('stream_rules.delete_confirm'))) {
       removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
         if (onDelete) {
           onDelete(streamRule.id);
         }
 
-        UserNotification.success('Stream rule has been successfully deleted.', 'Success');
+        UserNotification.success(t('stream_rules.deleted'), t('stream_rules.success_title'));
       });
     }
   };
@@ -76,15 +78,15 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
         onSubmit(streamRuleId, data);
       }
 
-      UserNotification.success('Stream rule has been successfully updated.', 'Success');
+      UserNotification.success(t('stream_rules.updated'), t('stream_rules.success_title'));
     });
 
   const _formatActionItems = () => (
     <ActionButtonsWrap>
-      <Button bsStyle="link" bsSize="xsmall" onClick={_onDelete} title="Delete stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onDelete} title={t('stream_rules.delete_tooltip')}>
         <Icon name="delete" type="regular" />
       </Button>
-      <Button bsStyle="link" bsSize="xsmall" onClick={_onEdit} title="Edit stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onEdit} title={t('stream_rules.edit_tooltip')}>
         <Icon name="edit_square" />
       </Button>
     </ActionButtonsWrap>
@@ -103,9 +105,9 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
         <StreamRuleModal
           initialValues={streamRule}
           onClose={() => setShowStreamRuleForm(false)}
-          title="Edit Stream Rule"
-          submitButtonText="Update Rule"
-          submitLoadingText="Updating Rule..."
+          title={t('stream_rules.edit_title')}
+          submitButtonText={t('stream_rules.update_button')}
+          submitLoadingText={t('stream_rules.updating')}
           onSubmit={_onSubmit}
         />
       )}

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import usePermissions from 'hooks/usePermissions';
 import { Badge } from 'components/bootstrap';
@@ -29,11 +30,16 @@ type Props = {
 };
 
 const StatusCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { isAnyPermitted } = usePermissions();
   const userHasPermissions = isAnyPermitted([`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]);
   const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
-  const statusLabel = stream.disabled ? 'Paused' : 'Running';
-  const toggleLabel = stream.disabled ? 'Start stream' : 'Pause stream';
+  const statusLabel = stream.disabled
+    ? t('streams_overview.actions.status_paused')
+    : t('streams_overview.actions.status_running');
+  const toggleLabel = stream.disabled
+    ? t('streams_overview.actions.status_start')
+    : t('streams_overview.actions.status_pause');
   const toggleIcon = stream.disabled ? 'play_arrow' : 'pause';
   const title = disableChange ? statusLabel : toggleLabel;
   const sendTelemetry = useSendTelemetry();
@@ -54,10 +60,10 @@ const StatusCell = ({ stream }: Props) => {
     }
 
     // eslint-disable-next-line no-alert
-    if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
+    if (!stream.disabled && window.confirm(t('streams_overview.actions.pause_confirm', { title: stream.title }))) {
       await pauseStream(stream.id).catch(() => {});
     }
-  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream, t]);
 
   return (
     <Badge

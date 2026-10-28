@@ -50,32 +50,32 @@ const BooleanOperatorSelector = ({
   const { t } = useTranslation('event_definitions');
 
   return (
-  <Col md={12}>
-    <OperatorSelector className="form-inline">
-      {initialText && (
+    <Col md={12}>
+      <OperatorSelector className="form-inline">
+        {initialText && (
+          <FormGroup>
+            <FormControl.Static>{initialText} </FormControl.Static>
+          </FormGroup>
+        )}
+        <BooleanOperatorSelect isFirstElement={!initialText}>
+          <Select
+            className="boolean-operator"
+            placeholder={placeholder ?? t('conditions.boolean_operator')}
+            size="small"
+            onChange={onOperatorChange}
+            options={[
+              { label: t('conditions.all'), value: '&&' },
+              { label: t('conditions.any'), value: '||' },
+            ]}
+            value={operator}
+            clearable={false}
+          />
+        </BooleanOperatorSelect>
         <FormGroup>
-          <FormControl.Static>{initialText} </FormControl.Static>
+          <FormControl.Static> {t('conditions.of_the_following_rules')}</FormControl.Static>
         </FormGroup>
-      )}
-      <BooleanOperatorSelect isFirstElement={!initialText}>
-        <Select
-          className="boolean-operator"
-          placeholder={placeholder ?? t('conditions.boolean_operator')}
-          size="small"
-          onChange={onOperatorChange}
-          options={[
-            { label: t('conditions.all'), value: '&&' },
-            { label: t('conditions.any'), value: '||' },
-          ]}
-          value={operator}
-          clearable={false}
-        />
-      </BooleanOperatorSelect>
-      <FormGroup>
-        <FormControl.Static> {t('conditions.of_the_following_rules')}</FormControl.Static>
-      </FormGroup>
-    </OperatorSelector>
-  </Col>
+      </OperatorSelector>
+    </Col>
   );
 };
 

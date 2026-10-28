@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const MessageCountCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
 
   if (isInitialLoading && !metrics) {
@@ -37,7 +39,9 @@ const MessageCountCell = ({ stream }: Props) => {
   }
 
   return (
-    <span title={`${metrics.message_count} messages in the last 24 hours`}>{formatCount(metrics.message_count)}</span>
+    <span title={t('streams_overview.cells.message_count', { count: metrics.message_count })}>
+      {formatCount(metrics.message_count)}
+    </span>
   );
 };
 

@@ -51,7 +51,9 @@ const Expression = ({ expression = null, series }: ExpressionProps) => {
       return (
         <>
           <Expression expression={expression.left} series={series} />{' '}
-          <strong className="text-info">{expression.expr === '&&' ? t('condition_summary.and') : t('condition_summary.or')}</strong>{' '}
+          <strong className="text-info">
+            {expression.expr === '&&' ? t('condition_summary.and') : t('condition_summary.or')}
+          </strong>{' '}
           <Expression expression={expression.right} series={series} />
         </>
       );

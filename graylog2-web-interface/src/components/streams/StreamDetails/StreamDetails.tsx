@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
@@ -48,27 +49,6 @@ type Props = {
 const INTAKE_SEGMENT = 'intake';
 const PROCESSING_SEGMENT = 'processing';
 const DESTINATIONS_SEGMENT = 'destinations';
-const INTAKE_DESCRIPTION =
-  'Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.';
-const PROCESSING_DESCRIPTION =
-  'Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.';
-const DESTINATION_DESCRIPTION =
-  'The Destinations page lets you define where messages in this stream should be routed. A stream may have multiple destinations. Note that messages routed to only Data Lake will not count towards License usage, unless subsequently retrieved. On a per-destination basis, filters may be applied to limit the subset of messages that destination receives.';
-
-const SEGMENTS_DETAILS = [
-  {
-    value: 'intake' as const,
-    label: '1: Intake',
-  },
-  {
-    value: 'processing' as const,
-    label: '2: Processing',
-  },
-  {
-    value: 'destinations' as const,
-    label: '3: Destinations',
-  },
-];
 
 type DetailsSegment = 'intake' | 'processing' | 'destinations';
 
@@ -145,15 +125,18 @@ const ThroughputCol = styled(Col)`
   place-content: flex-end space-evenly;
 `;
 
-const getPageDescription = (segment: DetailsSegment) => (
-  <span>
-    {segment === INTAKE_SEGMENT && INTAKE_DESCRIPTION}
-    {segment === PROCESSING_SEGMENT && PROCESSING_DESCRIPTION}
-    {segment === DESTINATIONS_SEGMENT && DESTINATION_DESCRIPTION}
-  </span>
-);
-
 const StreamDetails = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+  const segmentsDetails = [
+    { value: 'intake' as const, label: t('stream_details.segment_intake') },
+    { value: 'processing' as const, label: t('stream_details.segment_processing') },
+    { value: 'destinations' as const, label: t('stream_details.segment_destinations') },
+  ];
+  const pageDescriptionKeys = {
+    [INTAKE_SEGMENT]: 'stream_details.intake_description',
+    [PROCESSING_SEGMENT]: 'stream_details.processing_description',
+    [DESTINATIONS_SEGMENT]: 'stream_details.destination_description',
+  };
   const { segment } = useQuery();
   const [currentSegment, setCurrentSegment] = useState<DetailsSegment>((segment as DetailsSegment) || INTAKE_SEGMENT);
   const DataLakeJobComponent = PluginStore.exports('dataLake')?.[0]?.DataLakeJobs;
@@ -189,9 +172,12 @@ const StreamDetails = ({ stream }: Props) => {
   const onUpdate = useCallback(
     (newStream: Stream) =>
       updateStream({ streamId: stream.id, data: newStream }).then(() => {
-        UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+        UserNotification.success(
+          t('stream_details.updated', { title: newStream.title }),
+          t('stream_details.success_title'),
+        );
       }),
-    [stream.id, updateStream],
+    [stream.id, updateStream, t],
   );
 
   return (
@@ -201,14 +187,14 @@ const StreamDetails = ({ stream }: Props) => {
         <Header>
           <LeftCol>
             <Button onClick={() => history.push(Routes.STREAMS)}>
-              <Icon name="arrow_left_alt" size="sm" /> Back
+              <Icon name="arrow_left_alt" size="sm" /> {t('stream_details.back')}
             </Button>
 
-            <h1>Stream: {stream.title}</h1>
+            <h1>{t('stream_details.heading', { title: stream.title })}</h1>
 
             <IfPermitted permissions={`streams:edit:${stream.id}`}>
               <MoreActionsMenu id="stream-actions">
-                <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
+                <MenuItem onClick={() => toggleUpdateModal()}>{t('stream_details.edit')}</MenuItem>
               </MoreActionsMenu>
             </IfPermitted>
           </LeftCol>
@@ -218,20 +204,22 @@ const StreamDetails = ({ stream }: Props) => {
         <Row className="content no-bm">
           <Col xs={10}>
             <StyledSectionGrid>
-              <h3>Data Routing</h3>
+              <h3>{t('stream_details.data_routing')}</h3>
               <MainDetailsRow>
                 <StyledSegmentedControl<DetailsSegment>
-                  data={SEGMENTS_DETAILS}
+                  data={segmentsDetails}
                   radius="sm"
                   value={currentSegment}
                   onChange={onSegmentChange}
                 />
               </MainDetailsRow>
             </StyledSectionGrid>
-            <p className="description">{getPageDescription(currentSegment)}</p>
+            <p className="description">
+              <span>{t(pageDescriptionKeys[currentSegment])}</span>
+            </p>
           </Col>
           <ThroughputCol xs={2}>
-            <strong>Throughput</strong>
+            <strong>{t('stream_details.throughput')}</strong>
             <ThroughputCell stream={stream} />
           </ThroughputCol>
         </Row>
@@ -244,11 +232,11 @@ const StreamDetails = ({ stream }: Props) => {
         </SegmentContainer>
         {showUpdateModal && (
           <StreamModal
-            title="Editing Stream"
+            title={t('stream_details.edit_modal_title')}
             onSubmit={onUpdate}
             onClose={toggleUpdateModal}
-            submitButtonText="Update stream"
-            submitLoadingText="Updating stream..."
+            submitButtonText={t('stream_details.update_button')}
+            submitLoadingText={t('stream_details.updating')}
             initialValues={stream}
             indexSets={indexSets}
           />

@@ -45,12 +45,12 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
   const destinationIndexset = isPermitted(['indexsets:read']) ? (
     <DestinationIndexSetSection stream={stream} />
   ) : (
-    <DestinationPermissionAlert sectionName="Index Set" />
+    <DestinationPermissionAlert section="index_set" />
   );
   const destinationOutput = isPermitted(['outputs:read', 'stream_outputs:read']) ? (
     <DestinationOutputs stream={stream} />
   ) : (
-    <DestinationPermissionAlert sectionName="Outputs" />
+    <DestinationPermissionAlert section="outputs" />
   );
 
   return (

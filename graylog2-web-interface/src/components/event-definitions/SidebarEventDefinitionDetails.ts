@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 const SidebarEventDefinitionDetails = (id: string) =>
   ({
     id: 'event-definition-details',
-    title: 'Definition Details',
+    title: i18n.t('sidebar.details_title', { ns: 'event_definitions' }),
     componentKey: 'replay-search-sidebar',
     props: { alertId: undefined, definitionId: id },
   }) as const;

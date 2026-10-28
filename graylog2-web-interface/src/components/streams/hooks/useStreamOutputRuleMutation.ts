@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { StreamDestinationsFilters } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -49,13 +50,16 @@ const useStreamOutputRuleMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Creating stream output filter rule failed with status: ${errorThrown}`,
-        'Could not create stream output filter rule',
+        i18n.t('stream_hooks.create_rule_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('stream_hooks.create_rule_failed_title', { ns: 'streams' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Stream Output filter rule has been successfully created.', 'Success!');
+      UserNotification.success(
+        i18n.t('stream_hooks.create_rule_success', { ns: 'streams' }),
+        i18n.t('stream_hooks.success_title', { ns: 'streams' }),
+      );
       invalidateStreamQueries();
     },
   });
@@ -64,13 +68,16 @@ const useStreamOutputRuleMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Updating stream output filter rule failed with status: ${errorThrown}`,
-        'Could not update stream output filter rule',
+        i18n.t('stream_hooks.update_rule_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('stream_hooks.update_rule_failed_title', { ns: 'streams' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Stream Output filter rule has been successfully updated.', 'Success!');
+      UserNotification.success(
+        i18n.t('stream_hooks.update_rule_success', { ns: 'streams' }),
+        i18n.t('stream_hooks.success_title', { ns: 'streams' }),
+      );
       invalidateStreamQueries();
     },
   });
@@ -79,13 +86,16 @@ const useStreamOutputRuleMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Deleting stream output filter rule failed with status: ${errorThrown}`,
-        'Could not delete stream output filter rule',
+        i18n.t('stream_hooks.delete_rule_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('stream_hooks.delete_rule_failed_title', { ns: 'streams' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Stream Output filter rule has been successfully removed.', 'Success!');
+      UserNotification.success(
+        i18n.t('stream_hooks.delete_rule_success', { ns: 'streams' }),
+        i18n.t('stream_hooks.success_title', { ns: 'streams' }),
+      );
       invalidateStreamQueries();
     },
   });

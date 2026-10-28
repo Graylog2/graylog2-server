@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Button } from 'components/bootstrap';
@@ -25,14 +26,18 @@ type Props = {
   stream: Stream;
 };
 
-const ExpandedDestinationFilterRulesActions = ({ stream }: Props) => (
-  <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-    <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
-      <Button bsStyle="link" bsSize="xsmall" disabled={stream.is_default || !stream.is_editable}>
-        Manage Filter Rules
-      </Button>
-    </LinkContainer>
-  </IfPermitted>
-);
+const ExpandedDestinationFilterRulesActions = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+      <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
+        <Button bsStyle="link" bsSize="xsmall" disabled={stream.is_default || !stream.is_editable}>
+          {t('streams_overview.expanded.manage_filter_rules')}
+        </Button>
+      </LinkContainer>
+    </IfPermitted>
+  );
+};
 
 export default ExpandedDestinationFilterRulesActions;

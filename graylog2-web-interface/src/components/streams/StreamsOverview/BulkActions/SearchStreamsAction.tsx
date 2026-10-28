@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MenuItem } from 'components/bootstrap';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
@@ -32,12 +33,13 @@ const buildSearchLink = (streamIds: Array<string>) =>
     .toURL();
 
 const SearchStreamsAction = () => {
+  const { t } = useTranslation('streams');
   const { selectedEntities } = useSelectedEntities();
   const link = buildSearchLink(selectedEntities);
 
   return (
     <MenuItem href={link} target="_blank">
-      Search in streams
+      {t('streams_overview.bulk.search_in_streams')}
     </MenuItem>
   );
 };

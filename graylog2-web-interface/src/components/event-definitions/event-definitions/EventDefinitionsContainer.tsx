@@ -16,9 +16,11 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import startCase from 'lodash/startCase';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
@@ -91,7 +93,7 @@ const getCustomColumnRenderers = (
         <span>
           {eventDefinition._entity_source
             ? startCase(eventDefinition._entity_source.source.toString().toLowerCase())
-            : 'User Defined'}
+            : i18n.t('overview.user_defined', { ns: 'event_definitions' })}
         </span>
       ),
       staticWidth: 110,
@@ -127,12 +129,13 @@ const renderExpandedNotifications = (eventDefinition: EventDefinition) => (
   <ExpandedNotificationsSection eventDefinition={eventDefinition} />
 );
 
-const notificationsExpandedSection = {
-  title: 'Notifications',
+const createNotificationsExpandedSection = (title: string) => ({
+  title,
   content: renderExpandedNotifications,
-};
+});
 
 const EventDefinitionsContainer = () => {
+  const { t } = useTranslation('event_definitions');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
 
@@ -159,10 +162,10 @@ const EventDefinitionsContainer = () => {
     : FilterValueRenderers;
   const expandedSections = useMemo(
     () => ({
-      notifications: notificationsExpandedSection,
+      notifications: createNotificationsExpandedSection(t('replay_search.attributes.notifications')),
       ...pluggableExpandedSections,
     }),
-    [pluggableExpandedSections],
+    [pluggableExpandedSections, t],
   );
   const overviewSections = useEventDefinitionOverviewSections();
 
@@ -172,7 +175,7 @@ const EventDefinitionsContainer = () => {
         <Component key={key} />
       ))}
       <PaginatedEntityTable<EventDefinition>
-        humanName="event definitions"
+        humanName={t('overview.human_name')}
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName="event definition" />}
         tableLayout={defaultLayout}

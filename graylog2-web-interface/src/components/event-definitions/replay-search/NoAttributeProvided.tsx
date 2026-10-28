@@ -15,7 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const NoAttributeProvided = () => <i>Not provided</i>;
+const NoAttributeProvided = () => {
+  const { t } = useTranslation('event_definitions');
+
+  return <i>{t('replay_search.not_provided')}</i>;
+};
 
 export default NoAttributeProvided;

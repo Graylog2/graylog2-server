@@ -19,6 +19,9 @@ import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
+// Query syntax, so it stays untranslated.
+const QUERY_EXAMPLE = 'pattern:COMMON';
+
 const GrokPatternQueryHelper = () => {
   const { t } = useTranslation('grokpatterns');
 
@@ -30,7 +33,7 @@ const GrokPatternQueryHelper = () => {
     <p>
       {t('query_helper_example')}
       <br />
-      <kbd>pattern:COMMON</kbd>
+      <kbd>{QUERY_EXAMPLE}</kbd>
       <br />
     </p>
   );

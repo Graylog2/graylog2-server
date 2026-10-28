@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import useEntityTitles from 'hooks/useEntityTitles';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const ExpandedRoutingPipelinesSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const pipelineIds = metrics?.routing_pipelines;
 
@@ -39,18 +41,19 @@ const ExpandedRoutingPipelinesSection = ({ stream }: Props) => {
   }
 
   if (isError) {
-    return <p>Could not load routing pipelines.</p>;
+    return <p>{t('streams_overview.expanded.routing_pipelines_load_failed')}</p>;
   }
 
   if (!pipelineIds || pipelineIds.length === 0) {
-    return <p>No routing pipelines route messages to this stream.</p>;
+    return <p>{t('streams_overview.expanded.routing_pipelines_none')}</p>;
   }
 
   return (
     <ListGroup componentClass="ul">
       {pipelineIds.map((pipelineId) => {
         const title = titlesById[pipelineId];
-        const label = title ?? (areTitlesLoading ? pipelineId : `${pipelineId} (deleted)`);
+        const label =
+          title ?? (areTitlesLoading ? pipelineId : t('streams_overview.expanded.deleted', { id: pipelineId }));
 
         return (
           <ListGroupItem key={pipelineId}>

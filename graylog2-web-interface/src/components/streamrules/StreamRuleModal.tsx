@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import type { StreamRule } from 'logic/streams/types';
 import {
   Icon,
@@ -49,15 +51,15 @@ const validate = (values: FormValues) => {
   let errors = {};
 
   if (!values.type) {
-    errors = { ...errors, type: 'Type is required' };
+    errors = { ...errors, type: i18n.t('stream_rules.modal.type_required', { ns: 'streams' }) };
   }
 
   if (shouldDisplayValueInput(values.type) && !values.value) {
-    errors = { ...errors, value: 'Value is required' };
+    errors = { ...errors, value: i18n.t('stream_rules.modal.value_required', { ns: 'streams' }) };
   }
 
   if (shouldDisplayFieldInput(values.type) && !values.field) {
-    errors = { ...errors, field: 'Field is required' };
+    errors = { ...errors, field: i18n.t('stream_rules.modal.field_required', { ns: 'streams' }) };
   }
 
   return errors;
@@ -86,6 +88,7 @@ const StreamRuleModal = ({
     description: '',
   },
 }: Props) => {
+  const { t } = useTranslation('streams');
   const { enabled, url } = useResourceCustomization('stream_rule_matcher_code');
   const { data: inputs } = useStreamRulesInputs();
   const { data: streamRuleTypes } = useStreamRuleTypes();
@@ -130,7 +133,7 @@ const StreamRuleModal = ({
                           <TypeAheadFieldInput
                             id={name}
                             onBlur={onBlur}
-                            label="Field"
+                            label={t('stream_rules.modal.field')}
                             name={name}
                             error={error && touched ? error : undefined}
                             defaultValue={value}
@@ -142,7 +145,10 @@ const StreamRuleModal = ({
 
                     <Field name="type">
                       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                        <Input label="Type" id="type" error={error && touched ? error : undefined}>
+                        <Input
+                          label={t('stream_rules.modal.type')}
+                          id="type"
+                          error={error && touched ? error : undefined}>
                           <Select
                             onBlur={onBlur}
                             onChange={(newValue: number) => {
@@ -160,7 +166,7 @@ const StreamRuleModal = ({
                             }}
                             options={streamRuleTypesOptions}
                             inputId={name}
-                            placeholder="Select a type"
+                            placeholder={t('stream_rules.modal.select_type')}
                             value={value}
                           />
                         </Input>
@@ -171,7 +177,10 @@ const StreamRuleModal = ({
                       (values.type === STREAM_RULE_TYPES.MATCH_INPUT ? (
                         <Field name="value">
                           {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                            <Input id="value" label="Input" error={error && touched ? error : undefined}>
+                            <Input
+                              id="value"
+                              label={t('stream_rules.modal.input')}
+                              error={error && touched ? error : undefined}>
                               <Select
                                 onBlur={onBlur}
                                 onChange={(newValue: string) => {
@@ -179,23 +188,28 @@ const StreamRuleModal = ({
                                 }}
                                 options={inputOptions}
                                 inputId={name}
-                                placeholder="Select an input"
-                                aria-label="Select an input"
+                                placeholder={t('stream_rules.modal.select_input')}
+                                aria-label={t('stream_rules.modal.select_input')}
                                 value={value}
                               />
                             </Input>
                           )}
                         </Field>
                       ) : (
-                        <FormikInput id="value" label="Value" name="value" />
+                        <FormikInput id="value" label={t('stream_rules.modal.value')} name="value" />
                       ))}
 
-                    <FormikInput id="inverted" label="Inverted" name="inverted" type="checkbox" />
+                    <FormikInput
+                      id="inverted"
+                      label={t('stream_rules.modal.inverted')}
+                      name="inverted"
+                      type="checkbox"
+                    />
                     <FormikInput
                       id="description"
                       label={
                         <>
-                          Description <InputOptionalInfo />
+                          {t('stream_rules.modal.description')} <InputOptionalInfo />
                         </>
                       }
                       name="description"
@@ -203,12 +217,13 @@ const StreamRuleModal = ({
                     />
 
                     <p>
-                      <strong>Result:</strong> <HumanReadableStreamRule streamRule={values} inputs={inputs} />
+                      <strong>{t('stream_rules.modal.result')}</strong>{' '}
+                      <HumanReadableStreamRule streamRule={values} inputs={inputs} />
                     </p>
                   </Col>
                   <Col md={4}>
                     <Well bsSize="small" className="matcher-github">
-                      The server will try to convert to strings or numbers based on the matcher type as well as it can.
+                      {t('stream_rules.modal.matcher_info')}
                       {enabled && (
                         <>
                           <br />
@@ -217,16 +232,16 @@ const StreamRuleModal = ({
                           &nbsp;
                           <a href={url} target="_blank" rel="noopener noreferrer">
                             {' '}
-                            Take a look at the matcher code on GitHub
+                            {t('stream_rules.modal.matcher_code_link')}
                           </a>
                         </>
                       )}
                       <br />
                       <br />
-                      Regular expressions use Java syntax.{' '}
+                      {t('stream_rules.modal.regex_info')}{' '}
                       <DocumentationLink
                         page={DocsHelper.PAGES.STREAMS}
-                        title="More information"
+                        title={t('stream_rules.modal.more_information')}
                         text={<Icon name="lightbulb_circle" type="regular" />}
                       />
                     </Well>

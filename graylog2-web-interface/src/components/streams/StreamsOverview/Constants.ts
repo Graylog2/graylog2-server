@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 import type { ExtensionColumnGroups } from './hooks/useStreamsOverviewExtensions';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
+import { METRIC_COLUMN_IDS, getMetricColumnTitle } from './metricColumns';
 
 export const STREAM_VIEW_VARIANTS = {
   default: '' as const,
@@ -99,39 +100,46 @@ const getStreamTableElements = (
   };
 
   const additionalAttributes: Array<Attribute> = [
-    { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-    { id: 'throughput', title: 'Throughput' },
-    { id: 'rules', title: 'Stream Rules' },
-    ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
-    { id: 'destination_filters', title: 'Filter Rules' },
+    {
+      id: 'index_set_title',
+      title: i18n.t('streams_overview.columns.index_set_title', { ns: 'streams' }),
+      sortable: true,
+      permissions: ['indexsets:read'],
+    },
+    { id: 'throughput', title: i18n.t('streams_overview.columns.throughput', { ns: 'streams' }) },
+    { id: 'rules', title: i18n.t('streams_overview.columns.rules', { ns: 'streams' }) },
+    ...(isPipelineColumnPermitted
+      ? [{ id: 'pipelines', title: i18n.t('streams_overview.columns.pipelines', { ns: 'streams' }) }]
+      : []),
+    { id: 'destination_filters', title: i18n.t('streams_overview.columns.destination_filters', { ns: 'streams' }) },
     {
       id: METRIC_COLUMN_IDS.associatedInputs,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.associatedInputs),
     },
     ...(isPipelineColumnPermitted
       ? [
           {
             id: METRIC_COLUMN_IDS.routingPipelines,
-            title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.routingPipelines],
+            title: getMetricColumnTitle(METRIC_COLUMN_IDS.routingPipelines),
           },
         ]
       : []),
-    { id: 'outputs', title: 'Outputs' },
+    { id: 'outputs', title: i18n.t('streams_overview.columns.outputs', { ns: 'streams' }) },
     ...(extensionAttributes?.attributes || []),
-    { id: 'archiving', title: 'Archiving' },
+    { id: 'archiving', title: i18n.t('streams_overview.columns.archiving', { ns: 'streams' }) },
     {
       id: METRIC_COLUMN_IDS.messageCount,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.messageCount),
       type: 'LONG' as const,
     },
     {
       id: METRIC_COLUMN_IDS.avgProcessingTime,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.avgProcessingTime],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.avgProcessingTime),
       type: 'DOUBLE' as const,
     },
     {
       id: METRIC_COLUMN_IDS.maxProcessingTime,
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.maxProcessingTime],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.maxProcessingTime),
       type: 'LONG' as const,
     },
   ];

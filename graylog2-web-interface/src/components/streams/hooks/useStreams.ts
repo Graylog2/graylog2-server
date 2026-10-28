@@ -20,6 +20,7 @@ import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { Stream } from 'logic/streams/types';
 import { searchStreamsPaginated } from 'api/streams';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
@@ -62,8 +63,8 @@ const useStreams = (
     queryFn: () =>
       defaultOnError<StreamsResponse>(
         fetchStreams(searchParams),
-        'Loading streams failed with status',
-        'Could not load streams',
+        i18n.t('stream_hooks.load_streams_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_streams_failed_title', { ns: 'streams' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

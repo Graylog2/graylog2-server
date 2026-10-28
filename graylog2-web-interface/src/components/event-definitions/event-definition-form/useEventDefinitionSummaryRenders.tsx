@@ -136,7 +136,9 @@ export function renderField(
   currentUser: User,
 ) {
   if (!config.providers || config.providers.length === 0) {
-    return <span key={fieldName}>{i18n.t('summary_renders.no_field_value_provider', { ns: 'event_definitions' })}</span>;
+    return (
+      <span key={fieldName}>{i18n.t('summary_renders.no_field_value_provider', { ns: 'event_definitions' })}</span>
+    );
   }
 
   const provider = config.providers[0];
@@ -173,9 +175,7 @@ function renderFieldList(
     <>
       <dl>
         <dt>{i18n.t('summary_renders.keys', { ns: 'event_definitions' })}</dt>
-        <dd>
-          {keys.length > 0 ? keys.join(', ') : i18n.t('summary_renders.no_keys', { ns: 'event_definitions' })}
-        </dd>
+        <dd>{keys.length > 0 ? keys.join(', ') : i18n.t('summary_renders.no_keys', { ns: 'event_definitions' })}</dd>
       </dl>
       {fieldNames.sort(naturalSort).map((fieldName) => renderField(fieldName, fields[fieldName], keys, currentUser))}
     </>

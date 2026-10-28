@@ -101,11 +101,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             <HelpBlock>
               <Trans t={t} i18nKey="aggregation_form.group_by_help" components={{ bold: <b /> }} />
               <br />
-              <Trans
-                t={t}
-                i18nKey="aggregation_form.group_by_example"
-                components={{ code: <code />, em: <em /> }}
-              />
+              <Trans t={t} i18nKey="aggregation_form.group_by_example" components={{ code: <code />, em: <em /> }} />
             </HelpBlock>
           </FormGroup>
         </Col>

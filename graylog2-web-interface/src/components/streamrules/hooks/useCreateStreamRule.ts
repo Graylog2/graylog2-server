@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useStreamMutations from 'hooks/useStreamMutations';
@@ -40,6 +41,7 @@ type Result = {
 };
 
 const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
+  const { t } = useTranslation('streams');
   const [showStartStreamDialog, setShowStartStreamDialog] = useState(false);
   const [isStartingStream, setIsStartingStream] = useState(false);
   const queryClient = useQueryClient();
@@ -52,7 +54,7 @@ const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
       app_pathname: 'streams',
       app_action_value: 'stream-item-rule',
     });
-    UserNotification.success('Stream rule was created successfully.', 'Success');
+    UserNotification.success(t('stream_rules.created'), t('stream_rules.success_title'));
     queryClient.invalidateQueries({
       queryKey: ['stream', streamId],
     });
@@ -60,7 +62,7 @@ const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
     if (streamIsPaused) {
       setShowStartStreamDialog(true);
     }
-  }, [queryClient, sendTelemetry, streamId, streamIsPaused]);
+  }, [queryClient, sendTelemetry, streamId, streamIsPaused, t]);
 
   const onCreateStreamRule = useCallback<CreateStreamRuleHandler>(
     (_streamRuleId, streamRule) => createStreamRule({ streamId, data: streamRule }).then(() => onStreamRuleCreated()),

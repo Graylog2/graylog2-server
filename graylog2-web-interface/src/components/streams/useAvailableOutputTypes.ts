@@ -21,6 +21,7 @@ import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const KEY_PREFIX = ['outputs', 'types'];
@@ -72,7 +73,11 @@ const useAvailableOutputTypes = (
     queryKey: keyFn(),
 
     queryFn: () =>
-      defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+      defaultOnError(
+        fetchOutputsTypes(),
+        i18n.t('stream_hooks.load_output_types_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_output_types_failed_title', { ns: 'streams' }),
+      ),
     placeholderData: keepPreviousData,
     enabled,
   });

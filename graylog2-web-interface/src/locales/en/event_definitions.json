@@ -122,6 +122,11 @@
     "intro": "Event Keys are custom fields whose values are combined into the Event's key (values joined with <code>|</code>). The key identifies the entity an Event is about. It does not change how many Events are created.",
     "where_it_matters": "<bold>Where the key matters:</bold> <bold>Event Correlation</bold> only matches source Events that share the same key, and creates at most one Event per key within its search window. Set Keys on the Event Definitions you intend to correlate, not on the correlation itself."
   },
+  "expanded_notifications": {
+    "description": "Notifications fired when this event definition triggers.",
+    "loading": "Loading notifications...",
+    "missing_permissions": "Missing Notifications Permissions for:"
+  },
   "field_form": {
     "add": "Add custom field",
     "data_type": "Field Data Type",
@@ -169,6 +174,13 @@
     "value_source": "Value Source",
     "yes": "Yes"
   },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "Aggregation of results reaches a threshold",
+    "create_events_if": "Create Events for Definition if...",
+    "event_limit": "Event Limit",
+    "event_limit_help": "Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.",
+    "filter_has_results": "Filter has results"
+  },
   "filter_form": {
     "cron_expression": "Cron Expression",
     "cron_expression_help": "A Quartz cron expression to determine when the event should be run.",
@@ -205,7 +217,9 @@
     "loading": "Loading filter preview...",
     "message": "Message",
     "no_messages": "Could not find any messages with the current search criteria.",
-    "timestamp": "Timestamp"
+    "no_streams_access": "Unable to preview filter, user does not have access to any streams.",
+    "timestamp": "Timestamp",
+    "title": "Filter Preview"
   },
   "form_container": {
     "aggregation_condition_invalid": "Aggregation condition is not valid",
@@ -218,6 +232,43 @@
     "previous": "Previous",
     "update": "Update Event Definition",
     "updating": "Updating..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "Clearing queued notifications failed with status: {{error}}",
+    "clear_queue_failed_title": "Could not clear queued notifications",
+    "clear_queue_success": "Queued notifications were successfully cleared.",
+    "clear_queue_success_title": "Queued notifications cleared.",
+    "cluster_config_failed": "Loading event definition list events cluster config failed with status",
+    "cluster_config_failed_title": "Could not load event definition list events cluster config",
+    "create_failed": "Creating Event Definition \"{{title}}\" failed with status: {{error}}",
+    "create_failed_title": "Could not save Event Definition",
+    "create_success": "Event Definition \"{{title}}\" was created successfully.",
+    "create_success_title": "Event Definition created successfully",
+    "disable_failed": "Disabling Event Definition \"{{title}}\" failed with status: {{error}}",
+    "disable_failed_title": "Could not disable Event Definition",
+    "disable_success": "Event Definition \"{{title}}\" was successfully disabled.",
+    "disable_success_title": "Event Definition successfully disabled",
+    "duplicate_failed": "Duplicating Event Definition \"{{title}}\" failed with status: {{error}}",
+    "duplicate_failed_title": "Could not duplicate Event Definition",
+    "duplicate_success": "Event Definition \"{{title}}\" was created successfully.",
+    "duplicate_success_title": "Event Definition duplicated successfully",
+    "enable_failed": "Enabling Event Definition \"{{title}}\" failed with status: {{error}}",
+    "enable_failed_title": "Could not enable Event Definition",
+    "enable_success": "Event Definition \"{{title}}\" was successfully enabled.",
+    "enable_success_title": "Event Definition successfully enabled",
+    "entity_types_failed": "Loading event definition entity types failed with status",
+    "entity_types_failed_title": "Could not load event definition entity types",
+    "load_failed_title": "Could not load Event definition",
+    "load_list_failed": "Loading Event Definitions failed with status",
+    "load_one_failed": "Loading Event Definition failed with status",
+    "not_found": "Unable to find Event Definition with id <{{id}}>, please ensure it wasn't deleted.",
+    "not_found_title": "Could not retrieve Event Definition",
+    "save_failed": "Saving EventDefinition failed with status: {{error}}",
+    "save_failed_title": "Could not save EventDefinition",
+    "update_failed": "Updating Event Definition \"{{title}}\" failed with status: {{error}}",
+    "update_failed_title": "Could not update Event Definition",
+    "update_success": "Event Definition \"{{title}}\" was updated successfully.",
+    "update_success_title": "Event Definition updated successfully"
   },
   "notification_list": {
     "no_notifications": "This Event is not configured to trigger any Notifications yet.",
@@ -235,6 +286,10 @@
   "notifications_form": {
     "description": "Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.",
     "manage": "Manage Notifications"
+  },
+  "overview": {
+    "human_name": "event definitions",
+    "user_defined": "User Defined"
   },
   "page": {
     "alerts_docs": "Alerts documentation",
@@ -279,6 +334,41 @@
     },
     "undeclared": ": undeclared"
   },
+  "replay_search": {
+    "attributes": {
+      "description": "Description",
+      "edited_after_event": "Event definition <definitionTitle>{{title}}</definitionTitle> was edited after this event happened. Some of aggregations widgets might not be representative for this event.",
+      "event_definition": "Event definition",
+      "execute_every": "Execute search every",
+      "notifications": "Notifications",
+      "priority": "Priority",
+      "search_within": "Search within",
+      "timestamp": "Timestamp",
+      "updated_at": "Event definition updated at"
+    },
+    "not_provided": "Not provided",
+    "replay_link": "Replay search"
+  },
+  "row_actions": {
+    "delete_confirm": "Are you sure you want to delete \"{{title}}\"?",
+    "delete_failed": "Deleting Event Definition \"{{title}}\" failed with status: {{status}}",
+    "delete_failed_title": "Could not delete Event Definition",
+    "delete_success": "Event Definition \"{{title}}\" was deleted successfully.",
+    "delete_success_title": "Event Definition deleted successfully",
+    "delete_title": "Delete Event Definition",
+    "disable": "Disable",
+    "disable_confirm": "Are you sure you want to disable \"{{title}}\"?",
+    "disable_title": "Disable Event Definition",
+    "duplicate": "Duplicate",
+    "edit": "Edit",
+    "enable": "Enable",
+    "enable_confirm": "Are you sure you want to enable \"{{title}}\"?",
+    "enable_title": "Enable Event Definition",
+    "entity_type_title": "event definition",
+    "share_description": "Search for a User or Team to add as collaborator on this event definition.",
+    "system_cannot_be_deleted": "System Event Definition cannot be deleted",
+    "system_cannot_be_disabled": "System Event Definition cannot be disabled"
+  },
   "scheduling": {
     "clear": "clear",
     "clear_confirm": "Are you sure you want to clear queued notifications for \"{{title}}\"?",
@@ -297,6 +387,17 @@
     "collaborators": "Collaborators",
     "description": "Search for a User or Team to add as collaborator on this event definition.",
     "no_collaborators": "This Event definition has no collaborators."
+  },
+  "sidebar": {
+    "details_title": "Definition Details"
+  },
+  "status_cell": {
+    "disable": "Disable",
+    "disable_confirm": "Do you really want to disable event definition '{{title}}'?",
+    "disable_title": "Disable event definition",
+    "disabled": "Disabled",
+    "enable": "Enable",
+    "enabled": "Enabled"
   },
   "steps": {
     "additional_details": "Additional Details",

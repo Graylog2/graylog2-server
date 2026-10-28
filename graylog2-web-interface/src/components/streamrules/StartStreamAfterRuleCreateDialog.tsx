@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from 'components/common';
 
@@ -32,26 +33,32 @@ const StartStreamAfterRuleCreateDialog = ({
   onConfirm,
   onCancel,
   isSubmitting = false,
-}: Props) => (
-  <ConfirmDialog
-    show={show}
-    title="Start stream?"
-    btnConfirmText="Start Stream"
-    submitLoadingText="Starting Stream..."
-    isAsyncSubmit
-    isSubmitting={isSubmitting}
-    onConfirm={onConfirm}
-    onCancel={onCancel}>
-    Stream Rules on this stream are currently paused and will not take effect.
-    {streamTitle ? (
-      <>
-        {' '}
-        Would you like to start stream <strong>{streamTitle}</strong>?
-      </>
-    ) : (
-      ' Would you like to start this stream?'
-    )}
-  </ConfirmDialog>
-);
+}: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <ConfirmDialog
+      show={show}
+      title={t('stream_rules.start_dialog.title')}
+      btnConfirmText={t('stream_rules.start_dialog.confirm')}
+      submitLoadingText={t('stream_rules.start_dialog.loading')}
+      isAsyncSubmit
+      isSubmitting={isSubmitting}
+      onConfirm={onConfirm}
+      onCancel={onCancel}>
+      {t('stream_rules.start_dialog.paused')}{' '}
+      {streamTitle ? (
+        <Trans
+          t={t}
+          i18nKey="stream_rules.start_dialog.ask_named"
+          values={{ title: streamTitle }}
+          components={{ streamTitle: <strong /> }}
+        />
+      ) : (
+        t('stream_rules.start_dialog.ask_unnamed')
+      )}
+    </ConfirmDialog>
+  );
+};
 
 export default StartStreamAfterRuleCreateDialog;

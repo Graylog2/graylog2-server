@@ -180,9 +180,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
                   </HoverForHelp>
                 </dt>
                 <dd>
-                  {eventDefinition.key_spec.length > 0
-                    ? eventDefinition.key_spec.join(', ')
-                    : t('fields_form.no_keys')}
+                  {eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : t('fields_form.no_keys')}
                 </dd>
               </dl>
             )}

@@ -191,10 +191,7 @@ const FilterPreview = ({ config }: FilterPreviewProps) => {
 
   return (
     <>
-      <HelpPanel
-        collapsible
-        defaultExpanded={!displayPreview}
-        title={t('filter_preview.help_title')}>
+      <HelpPanel collapsible defaultExpanded={!displayPreview} title={t('filter_preview.help_title')}>
         <p>{t('filter_preview.help_description')}</p>
         <ul>
           <li>
@@ -204,7 +201,8 @@ const FilterPreview = ({ config }: FilterPreviewProps) => {
             <b>{t('filter_preview.help_aggregation_label')}</b>&emsp;{t('filter_preview.help_aggregation')}
           </li>
           <li>
-            <b>{t('filter_preview.help_aggregation_groups_label')}</b>&emsp;{t('filter_preview.help_aggregation_groups')}
+            <b>{t('filter_preview.help_aggregation_groups_label')}</b>&emsp;
+            {t('filter_preview.help_aggregation_groups')}
           </li>
         </ul>
       </HelpPanel>

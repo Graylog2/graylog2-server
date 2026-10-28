@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import URI from 'urijs';
 
 import type { ConfigurationFormData } from 'components/configurationforms';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
+  const { t } = useTranslation('streams');
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
   const { edit_output: editOutputParam } = useQuery();
@@ -66,16 +68,22 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
 
   return (
     <IfPermitted permissions={`outputs:edit:${output.id}`}>
-      <IconButton name="edit_square" title="Edit Output" bsStyle="default" disabled={disabled} onClick={onClick} />
+      <IconButton
+        name="edit_square"
+        title={t('routing_destination.edit_output.tooltip')}
+        bsStyle="default"
+        disabled={disabled}
+        onClick={onClick}
+      />
       <ConfigurationForm<Output['configuration']>
         ref={configFormRef}
         key={`configuration-form-output-${output.id}`}
         configFields={typeDefinition}
-        title={`Editing Output ${output.title}`}
+        title={t('outputs.edit_title', { title: output.title })}
         typeName={output.type}
-        titleHelpText="Select a name of your new output that describes it."
+        titleHelpText={t('outputs.name_help')}
         submitAction={handleUpdate}
-        submitButtonText="Update output"
+        submitButtonText={t('outputs.update_submit')}
         values={output.configuration}
         titleValue={output.title}
       />

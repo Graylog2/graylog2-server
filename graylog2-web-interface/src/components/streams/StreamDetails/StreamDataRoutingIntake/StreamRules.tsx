@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { Stream } from 'logic/streams/types';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const StreamRules = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const queryClient = useQueryClient();
 
   const hasStreamRules = !!stream.rules?.length;
@@ -43,13 +45,10 @@ const StreamRules = ({ stream }: Props) => {
 
   return (
     <>
-      <Alert bsStyle="default">
-        Stream Rules take effect first in the default processing order, and are used to direct messages from Inputs into
-        Streams. Any message that meets the criteria of the Stream Rule(s) will be directed into this Stream.
-      </Alert>
+      <Alert bsStyle="default">{t('stream_details.rules_info')}</Alert>
 
       <Section
-        title="Stream rules"
+        title={t('stream_details.rules_title')}
         collapsible
         actions={
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -66,7 +65,7 @@ const StreamRules = ({ stream }: Props) => {
         <Table condensed>
           <thead>
             <tr>
-              <th colSpan={2}>Rule</th>
+              <th colSpan={2}>{t('stream_details.rule_header')}</th>
             </tr>
           </thead>
           <tbody>
@@ -77,7 +76,7 @@ const StreamRules = ({ stream }: Props) => {
 
             {!hasStreamRules && (
               <tr>
-                <td>No rules defined.</td>
+                <td>{t('stream_rules.no_rules')}</td>
               </tr>
             )}
           </tbody>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const StreamDataRoutingProcessing = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { id: streamId } = stream;
   const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } =
     usePipelinesConnectedStream(streamId);
@@ -44,7 +46,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
     <>
       {StreamIlluminateProcessingSection && <StreamIlluminateProcessingSection stream={stream} />}
       <Section
-        title="Pipelines"
+        title={t('stream_details.processing_title')}
         actions={
           <IfPermitted permissions={`streams:edit:${streamId}`}>
             <StreamPipelinesConnectionForm
@@ -57,7 +59,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
         <Table condensed>
           <thead>
             <tr>
-              <th>Pipeline</th>
+              <th>{t('stream_details.pipeline_header')}</th>
             </tr>
           </thead>
           <tbody>
@@ -71,7 +73,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
               ))}
             {!hasConnectedPipelines && (
               <tr>
-                <td>This stream is not connected to any Pipeline.</td>
+                <td>{t('stream_details.no_pipelines')}</td>
               </tr>
             )}
           </tbody>

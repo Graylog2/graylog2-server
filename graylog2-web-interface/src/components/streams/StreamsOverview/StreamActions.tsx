@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ShareButton, IfPermitted, HoverForHelp, LinkContainer, IconButton } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
@@ -39,11 +40,14 @@ import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActio
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
-const DefaultStreamHelp = () => (
-  <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>
-);
+const DefaultStreamHelp = () => {
+  const { t } = useTranslation('streams');
+
+  return <HoverForHelp displayLeftMargin>{t('streams_overview.actions.not_available_default')}</HoverForHelp>;
+};
 
 const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array<IndexSet> }) => {
+  const { t } = useTranslation('streams');
   const currentUser = useCurrentUser();
   const { pauseStream, resumeStream, updateStream, removeStream, cloneStream } = useStreamMutations();
   const { deselectEntity } = useSelectedEntities();
@@ -83,12 +87,12 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
     }
 
     // eslint-disable-next-line no-alert
-    if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
+    if (!stream.disabled && window.confirm(t('streams_overview.actions.pause_confirm', { title: stream.title }))) {
       await pauseStream(stream.id).catch(() => {});
     }
 
     setChangingStatus(false);
-  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream, t]);
 
   const toggleEntityShareModal = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_SHARE_MODAL_OPENED, {
@@ -123,13 +127,16 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
     removeStream(stream.id)
       .then(() => {
         deselectEntity(stream.id);
-        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+        UserNotification.success(
+          t('streams_overview.actions.deleted', { title: stream.title }),
+          t('streams_overview.actions.success_title'),
+        );
         toggleDeleteModal();
       })
       .catch((error) => {
-        UserNotification.error(`An error occurred while deleting the stream. ${error}`);
+        UserNotification.error(t('streams_overview.actions.delete_failed', { error }));
       });
-  }, [deselectEntity, removeStream, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
+  }, [deselectEntity, removeStream, sendTelemetry, stream.id, stream.title, toggleDeleteModal, t]);
 
   const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
     useCreateStreamRule({
@@ -144,9 +151,12 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           app_pathname: 'streams',
         });
 
-        UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+        UserNotification.success(
+          t('streams_overview.actions.updated', { title: newStream.title }),
+          t('streams_overview.actions.success_title'),
+        );
       }),
-    [sendTelemetry, stream.id, updateStream],
+    [sendTelemetry, stream.id, updateStream, t],
   );
 
   const onCloneSubmit = useCallback(
@@ -164,10 +174,13 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           remove_matches_from_default_stream: newStream.remove_matches_from_default_stream,
         },
       }).then(() => {
-        UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+        UserNotification.success(
+          t('streams_overview.actions.cloned', { title: newStream.title }),
+          t('streams_overview.actions.success_title'),
+        );
       });
     },
-    [sendTelemetry, stream.id, cloneStream],
+    [sendTelemetry, stream.id, cloneStream, t],
   );
 
   return (
@@ -176,7 +189,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         <LinkContainer to={Routes.stream_view(stream.id)}>
           <IconButton
             name="call_split"
-            title="Data routing"
+            title={t('streams_overview.actions.data_routing')}
             bsStyle="default"
             disabled={isNotEditable}
             onClick={() => {
@@ -192,21 +205,23 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem onSelect={onToggleStreamStatus} disabled={isDefaultStream || isNotEditable}>
             {changingStatus ? (
-              <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
+              <span>
+                {stream.disabled ? t('streams_overview.actions.starting') : t('streams_overview.actions.stopping')}
+              </span>
             ) : (
-              <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>
+              <span>{stream.disabled ? t('streams_overview.actions.start') : t('streams_overview.actions.stop')}</span>
             )}
             {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleStreamRuleModal} disabled={isDefaultStream}>
-            Quick Add Rule {isDefaultStream && <DefaultStreamHelp />}
+            {t('streams_overview.actions.quick_add_rule')} {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
-            Edit Stream {isDefaultStream && <DefaultStreamHelp />}
+            {t('streams_overview.actions.edit_stream')} {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
 
@@ -216,16 +231,16 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
 
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
           <MenuItem disabled={isDefaultStream || isNotEditable} href={Routes.stream_edit(stream.id)}>
-            Manage Rules {isDefaultStream && <DefaultStreamHelp />}
+            {t('streams_overview.actions.manage_rules')} {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
-            <MenuItem href={Routes.stream_outputs(stream.id)}>Manage Outputs</MenuItem>
+            <MenuItem href={Routes.stream_outputs(stream.id)}>{t('streams_overview.actions.manage_outputs')}</MenuItem>
           </IfPermitted>
         </HideOnCloud>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem href={Routes.stream_alerts(stream.id)}>Manage Alerts</MenuItem>
+          <MenuItem href={Routes.stream_alerts(stream.id)}>{t('streams_overview.actions.manage_alerts')}</MenuItem>
         </IfPermitted>
         {moreActions}
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -233,49 +248,49 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         </IfPermitted>
 
         <MenuItem onSelect={handleSetStartpage} disabled={currentUser.readOnly}>
-          Set as Start Page
+          {t('streams_overview.actions.set_start_page')}
         </MenuItem>
 
         <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
           <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
-            Clone Stream {isDefaultStream && <DefaultStreamHelp />}
+            {t('streams_overview.actions.clone_stream')} {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <DeleteMenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
-            Delete Stream {isDefaultStream && <DefaultStreamHelp />}
+            {t('streams_overview.actions.delete_stream')} {isDefaultStream && <DefaultStreamHelp />}
           </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
       {showUpdateModal && (
         <StreamModal
-          title="Editing Stream"
+          title={t('streams_overview.actions.edit_title')}
           onSubmit={onUpdate}
           onClose={toggleUpdateModal}
-          submitButtonText="Update stream"
-          submitLoadingText="Updating stream..."
+          submitButtonText={t('streams_overview.actions.update_button')}
+          submitLoadingText={t('streams_overview.actions.updating')}
           initialValues={stream}
           indexSets={indexSets}
         />
       )}
       {showCloneModal && (
         <StreamModal
-          title="Cloning Stream"
+          title={t('streams_overview.actions.clone_title')}
           initialValues={stream}
           onSubmit={onCloneSubmit}
           onClose={toggleCloneModal}
-          submitButtonText="Clone stream"
-          submitLoadingText="Cloning stream..."
+          submitButtonText={t('streams_overview.actions.clone_button')}
+          submitLoadingText={t('streams_overview.actions.cloning')}
           indexSets={indexSets}
         />
       )}
       {showStreamRuleModal && (
         <StreamRuleModal
           onClose={toggleStreamRuleModal}
-          title="New Stream Rule"
-          submitButtonText="Create Rule"
-          submitLoadingText="Creating Rule..."
+          title={t('stream_rules.new_title')}
+          submitButtonText={t('stream_rules.create_button')}
+          submitLoadingText={t('stream_rules.creating')}
           onSubmit={onCreateStreamRule}
         />
       )}
@@ -284,7 +299,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           entityId={stream.id}
           entityType="stream"
           entityTitle={stream.title}
-          description="Search for a User or Team to add as collaborator on this stream."
+          description={t('stream_modal.share_description')}
           onClose={toggleEntityShareModal}
         />
       )}

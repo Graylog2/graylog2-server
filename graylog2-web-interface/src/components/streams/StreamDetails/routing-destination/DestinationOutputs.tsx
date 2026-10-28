@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useOutputs from 'hooks/useOutputs';
 import { IfPermitted, Section, Spinner } from 'components/common';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const DestinationOutputs = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { data, isInitialLoading } = useStreamOutputs(stream.id);
   const { data: outputs, isInitialLoading: isLoadingOutput } = useOutputs();
   const { data: availableOutputTypes, isInitialLoading: isLoadingOutputTypes } = useAvailableOutputTypes();
@@ -54,7 +56,9 @@ const DestinationOutputs = ({ stream }: Props) => {
   }
 
   const hasAssignedOutput = data.outputs.length > 0;
-  const title = hasAssignedOutput ? 'Enabled' : 'Disabled';
+  const title = hasAssignedOutput
+    ? t('routing_destination.index_set.enabled')
+    : t('routing_destination.index_set.disabled');
 
   const streamOutputIds = data.outputs.map((output) => output.id);
   const assignableOutputs = outputs.outputs
@@ -63,21 +67,23 @@ const DestinationOutputs = ({ stream }: Props) => {
 
   return (
     <Section
-      title="Outputs"
+      title={t('routing_destination.outputs.title')}
       collapsible
       defaultClosed
       disableCollapseButton={!hasAssignedOutput}
       headerLeftSection={
         <>
           <DestinationSwitch
-            aria-label="Toggle Output"
+            aria-label={t('routing_destination.outputs.toggle_aria')}
             name="toggle-indexset"
             checked={hasAssignedOutput}
             disabled
             onChange={(e) => e.preventDefault()}
             label={title}
           />
-          <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
+          <SectionCountLabel>
+            {t('routing_destination.outputs.count', { count: data.outputs.length })}
+          </SectionCountLabel>
         </>
       }
       actions={

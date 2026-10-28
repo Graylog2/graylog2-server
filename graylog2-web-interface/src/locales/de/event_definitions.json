@@ -122,6 +122,11 @@
     "intro": "Ereignisschlüssel sind benutzerdefinierte Felder, deren Werte zum Schlüssel des Ereignisses kombiniert werden (Werte verbunden mit <code>|</code>). Der Schlüssel identifiziert die Entität, um die es bei einem Ereignis geht. Er ändert nicht, wie viele Ereignisse erstellt werden.",
     "where_it_matters": "<bold>Wo der Schlüssel wichtig ist:</bold> <bold>Ereigniskorrelation</bold> berücksichtigt nur Quellereignisse mit demselben Schlüssel und erstellt höchstens ein Ereignis pro Schlüssel innerhalb ihres Suchfensters. Legen Sie Schlüssel auf den Ereignisdefinitionen fest, die Sie korrelieren möchten, nicht auf der Korrelation selbst."
   },
+  "expanded_notifications": {
+    "description": "Benachrichtigungen, die ausgelöst werden, wenn diese Ereignisdefinition auslöst.",
+    "loading": "Benachrichtigungen werden geladen...",
+    "missing_permissions": "Fehlende Berechtigungen für Benachrichtigungen:"
+  },
   "field_form": {
     "add": "Benutzerdefiniertes Feld hinzufügen",
     "data_type": "Datentyp des Felds",
@@ -169,6 +174,13 @@
     "value_source": "Wertquelle",
     "yes": "Ja"
   },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "Die Aggregation der Ergebnisse einen Schwellenwert erreicht",
+    "create_events_if": "Ereignisse für die Definition erstellen, wenn...",
+    "event_limit": "Ereignislimit",
+    "event_limit_help": "Maximale Anzahl an Ereignissen, die pro Ausführung dieser Ereignisdefinition erstellt werden. Überzählige Ereignisse werden unterdrückt.",
+    "filter_has_results": "Der Filter Ergebnisse liefert"
+  },
   "filter_form": {
     "cron_expression": "Cron-Ausdruck",
     "cron_expression_help": "Ein Quartz-Cron-Ausdruck, der bestimmt, wann das Ereignis ausgeführt werden soll.",
@@ -205,7 +217,9 @@
     "loading": "Filtervorschau wird geladen...",
     "message": "Nachricht",
     "no_messages": "Mit den aktuellen Suchkriterien wurden keine Nachrichten gefunden.",
-    "timestamp": "Zeitstempel"
+    "no_streams_access": "Die Filtervorschau ist nicht möglich, da der Benutzer keinen Zugriff auf Streams hat.",
+    "timestamp": "Zeitstempel",
+    "title": "Filtervorschau"
   },
   "form_container": {
     "aggregation_condition_invalid": "Die Aggregationsbedingung ist ungültig",
@@ -218,6 +232,43 @@
     "previous": "Zurück",
     "update": "Ereignisdefinition aktualisieren",
     "updating": "Wird aktualisiert..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "Das Leeren der Benachrichtigungswarteschlange ist fehlgeschlagen. Status: {{error}}",
+    "clear_queue_failed_title": "Benachrichtigungswarteschlange konnte nicht geleert werden",
+    "clear_queue_success": "Die Benachrichtigungen in der Warteschlange wurden erfolgreich gelöscht.",
+    "clear_queue_success_title": "Benachrichtigungswarteschlange geleert.",
+    "cluster_config_failed": "Das Laden der Cluster-Konfiguration für Ereignislisten ist fehlgeschlagen. Status",
+    "cluster_config_failed_title": "Cluster-Konfiguration für Ereignislisten konnte nicht geladen werden",
+    "create_failed": "Das Erstellen der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{error}}",
+    "create_failed_title": "Ereignisdefinition konnte nicht gespeichert werden",
+    "create_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich erstellt.",
+    "create_success_title": "Ereignisdefinition erfolgreich erstellt",
+    "disable_failed": "Das Deaktivieren der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{error}}",
+    "disable_failed_title": "Ereignisdefinition konnte nicht deaktiviert werden",
+    "disable_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich deaktiviert.",
+    "disable_success_title": "Ereignisdefinition erfolgreich deaktiviert",
+    "duplicate_failed": "Das Duplizieren der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{error}}",
+    "duplicate_failed_title": "Ereignisdefinition konnte nicht dupliziert werden",
+    "duplicate_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich erstellt.",
+    "duplicate_success_title": "Ereignisdefinition erfolgreich dupliziert",
+    "enable_failed": "Das Aktivieren der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{error}}",
+    "enable_failed_title": "Ereignisdefinition konnte nicht aktiviert werden",
+    "enable_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich aktiviert.",
+    "enable_success_title": "Ereignisdefinition erfolgreich aktiviert",
+    "entity_types_failed": "Das Laden der Entitätstypen der Ereignisdefinition ist fehlgeschlagen. Status",
+    "entity_types_failed_title": "Entitätstypen der Ereignisdefinition konnten nicht geladen werden",
+    "load_failed_title": "Ereignisdefinition konnte nicht geladen werden",
+    "load_list_failed": "Das Laden der Ereignisdefinitionen ist fehlgeschlagen. Status",
+    "load_one_failed": "Das Laden der Ereignisdefinition ist fehlgeschlagen. Status",
+    "not_found": "Die Ereignisdefinition mit der ID <{{id}}> wurde nicht gefunden. Bitte stellen Sie sicher, dass sie nicht gelöscht wurde.",
+    "not_found_title": "Ereignisdefinition konnte nicht abgerufen werden",
+    "save_failed": "Das Speichern der Ereignisdefinition ist fehlgeschlagen. Status: {{error}}",
+    "save_failed_title": "Ereignisdefinition konnte nicht gespeichert werden",
+    "update_failed": "Das Aktualisieren der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{error}}",
+    "update_failed_title": "Ereignisdefinition konnte nicht aktualisiert werden",
+    "update_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich aktualisiert.",
+    "update_success_title": "Ereignisdefinition erfolgreich aktualisiert"
   },
   "notification_list": {
     "no_notifications": "Dieses Ereignis ist noch nicht so konfiguriert, dass es Benachrichtigungen auslöst.",
@@ -235,6 +286,10 @@
   "notifications_form": {
     "description": "Ist dieses Ereignis so wichtig, dass es Ihre Aufmerksamkeit erfordert? Machen Sie es zu einem Alarm, indem Sie Benachrichtigungen hinzufügen.",
     "manage": "Benachrichtigungen verwalten"
+  },
+  "overview": {
+    "human_name": "Ereignisdefinitionen",
+    "user_defined": "Benutzerdefiniert"
   },
   "page": {
     "alerts_docs": "Alarm-Dokumentation",
@@ -279,6 +334,41 @@
     },
     "undeclared": ": nicht deklariert"
   },
+  "replay_search": {
+    "attributes": {
+      "description": "Beschreibung",
+      "edited_after_event": "Die Ereignisdefinition <definitionTitle>{{title}}</definitionTitle> wurde bearbeitet, nachdem dieses Ereignis aufgetreten ist. Einige Aggregations-Widgets sind möglicherweise nicht repräsentativ für dieses Ereignis.",
+      "event_definition": "Ereignisdefinition",
+      "execute_every": "Suche ausführen alle",
+      "notifications": "Benachrichtigungen",
+      "priority": "Priorität",
+      "search_within": "Suche innerhalb von",
+      "timestamp": "Zeitstempel",
+      "updated_at": "Ereignisdefinition aktualisiert am"
+    },
+    "not_provided": "Nicht angegeben",
+    "replay_link": "Suche wiederholen"
+  },
+  "row_actions": {
+    "delete_confirm": "Möchten Sie „{{title}}“ wirklich löschen?",
+    "delete_failed": "Das Löschen der Ereignisdefinition „{{title}}“ ist fehlgeschlagen. Status: {{status}}",
+    "delete_failed_title": "Ereignisdefinition konnte nicht gelöscht werden",
+    "delete_success": "Die Ereignisdefinition „{{title}}“ wurde erfolgreich gelöscht.",
+    "delete_success_title": "Ereignisdefinition erfolgreich gelöscht",
+    "delete_title": "Ereignisdefinition löschen",
+    "disable": "Deaktivieren",
+    "disable_confirm": "Möchten Sie „{{title}}“ wirklich deaktivieren?",
+    "disable_title": "Ereignisdefinition deaktivieren",
+    "duplicate": "Duplizieren",
+    "edit": "Bearbeiten",
+    "enable": "Aktivieren",
+    "enable_confirm": "Möchten Sie „{{title}}“ wirklich aktivieren?",
+    "enable_title": "Ereignisdefinition aktivieren",
+    "entity_type_title": "Ereignisdefinition",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, das als Mitarbeiter an dieser Ereignisdefinition hinzugefügt werden soll.",
+    "system_cannot_be_deleted": "Systemereignisdefinitionen können nicht gelöscht werden",
+    "system_cannot_be_disabled": "Systemereignisdefinitionen können nicht deaktiviert werden"
+  },
   "scheduling": {
     "clear": "leeren",
     "clear_confirm": "Möchten Sie die Benachrichtigungen in der Warteschlange für „{{title}}“ wirklich leeren?",
@@ -297,6 +387,17 @@
     "collaborators": "Mitwirkende",
     "description": "Suchen Sie nach einem Benutzer oder Team, das Sie als Mitwirkende zu dieser Ereignisdefinition hinzufügen möchten.",
     "no_collaborators": "Diese Ereignisdefinition hat keine Mitwirkenden."
+  },
+  "sidebar": {
+    "details_title": "Definitionsdetails"
+  },
+  "status_cell": {
+    "disable": "Deaktivieren",
+    "disable_confirm": "Möchten Sie die Ereignisdefinition „{{title}}“ wirklich deaktivieren?",
+    "disable_title": "Ereignisdefinition deaktivieren",
+    "disabled": "Deaktiviert",
+    "enable": "Aktivieren",
+    "enabled": "Aktiviert"
   },
   "steps": {
     "additional_details": "Weitere Details",

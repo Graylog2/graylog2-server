@@ -1,4 +1,69 @@
 {
+  "destination_permission_alert": {
+    "index_set": "You currently do not have the permissions to view or manage Index Set destination.",
+    "outputs": "You currently do not have the permissions to view or manage Outputs destination."
+  },
+  "index_set_select": {
+    "help": "Messages that match this stream will be written to the configured index set.",
+    "label": "Index Set",
+    "placeholder": "Select an index set"
+  },
+  "matching_type": {
+    "all": "A message must match all of the following rules",
+    "any": "A message must match at least one of the following rules",
+    "confirm": "You are about to change how rules are applied to this stream, do you want to continue? Changes will take effect immediately.",
+    "success_all": "Messages will now be routed into the stream when all rules are matched",
+    "success_any": "Messages will now be routed into the stream when any rules are matched",
+    "success_title": "Success",
+    "switch_title_all": "Switch matching type to ALL",
+    "switch_title_any": "Switch matching type to ANY"
+  },
+  "output_filter": {
+    "create_button": "Create rule",
+    "create_title": "Create Filter Rule",
+    "delete_confirm": "Are you sure you want to delete {{title}} rule?",
+    "delete_title": "Delete Rule",
+    "delete_tooltip": "Delete",
+    "edit_title": "Edit Filter Rule",
+    "edit_tooltip": "Edit",
+    "fields": {
+      "and": "and",
+      "block_action": "action",
+      "block_condition": "condition",
+      "delete_confirm": "Are you sure you want to delete <blockLabel>{{blockType}} N° {{number}}</blockLabel>?",
+      "delete_title": "Delete {{blockType}}",
+      "or": "or",
+      "then": "Then",
+      "when": "When"
+    },
+    "form": {
+      "condition_required": "Rule needs to contain at least one condition.",
+      "create": "Create",
+      "description": "Description",
+      "description_help": "Rule description",
+      "enabled": "Enabled",
+      "rule_builder": "Rule Builder",
+      "saving": "Saving filter",
+      "title": "Title",
+      "title_help": "Rule title",
+      "title_required": "The \"Title\" field is required.",
+      "update": "Update",
+      "updating": "Updating filter"
+    },
+    "item": {
+      "enabled": "enabled",
+      "errors": "errors",
+      "throughput": "throughput"
+    },
+    "list": {
+      "header_status": "Status",
+      "header_title": "Title",
+      "info_data_lake": "Messages which meet the criteria of the following filter rule(s) will not be routed to the Data Lake.",
+      "info_indexer": "Messages which meet the criteria of the following filter rule(s) will not be routed to the Index Set.",
+      "no_filters": "No filter have been found.",
+      "title": "Filter Rules"
+    }
+  },
   "outputs": {
     "assign_existing": "Assign existing Output",
     "content_pack_title": "Created from content pack",
@@ -19,11 +84,357 @@
     "type_label": "Type: {{type}}",
     "update_submit": "Update output"
   },
+  "pipelines_connection_form": {
+    "edit_button": "Edit pipelines connection",
+    "help": "Select the pipelines you want to connect to this stream, or create one in the <pipelinesLink>Pipelines page</pipelinesLink>.",
+    "label": "Pipelines",
+    "modal_title": "Edit connections for <streamLabel>stream</streamLabel>",
+    "save_failed": "Saving stream pipelines connection failed with status: {{error}}",
+    "save_success": "Saving stream pipelines connection was successful.",
+    "save_title": "Saving stream pipeline connection.",
+    "submit": "Update connections"
+  },
+  "routing_destination": {
+    "add_output": {
+      "assign_segment": "Assign existing output",
+      "button": "Add output",
+      "create_segment": "Create new output",
+      "modal_title": "Add output to stream",
+      "tooltip": "Edit Output"
+    },
+    "archiving": {
+      "disabled": "Archiving is disabled",
+      "enabled": "Archiving is enabled"
+    },
+    "edit_output": {
+      "tooltip": "Edit Output"
+    },
+    "index_set": {
+      "col_archiving": "Archiving",
+      "col_name": "Name",
+      "col_oldest": "Oldest Message (date)",
+      "col_size": "Total size",
+      "disabled": "Disabled",
+      "enabled": "Enabled",
+      "filters": "FILTERS {{count}}",
+      "info": "Messages routed to the <boldText>Search Cluster</boldText> will be searchable and count towards the {{productName}} License usage. These messages will be stored in the defined Index Set until the retention policy criteria is met. Note: Messages not routed to the <boldText>Search Cluster</boldText> will not be searchable.",
+      "title": "Index Set",
+      "toggle_aria": "Toggle index set"
+    },
+    "index_set_update": {
+      "button": "Edit Index Set",
+      "modal_title": "Edit Stream IndexSet",
+      "saving": "Saving stream",
+      "submit": "Update",
+      "success_title": "Success",
+      "tooltip": "Edit index set",
+      "updated": "IndexSet of stream '{{title}}' was updated successfully."
+    },
+    "output_item": {
+      "type": "(Type: {{type}})"
+    },
+    "outputs": {
+      "count": "OUTPUTS {{count}}",
+      "title": "Outputs",
+      "toggle_aria": "Toggle Output"
+    },
+    "outputs_list": {
+      "name": "Name",
+      "none": "No output defined."
+    },
+    "remove_output": {
+      "confirm": "Do you really want to remove this output from the stream?",
+      "title": "Remove Output"
+    }
+  },
+  "stream_details": {
+    "back": "Back",
+    "connected_pipelines_human_name": "pipelines",
+    "connected_pipelines_title": "Routing from other Streams",
+    "data_routing": "Data Routing",
+    "destination_description": "The Destinations page lets you define where messages in this stream should be routed. A stream may have multiple destinations. Note that messages routed to only Data Lake will not count towards License usage, unless subsequently retrieved. On a per-destination basis, filters may be applied to limit the subset of messages that destination receives.",
+    "edit": "Edit",
+    "edit_modal_title": "Editing Stream",
+    "heading": "Stream: {{title}}",
+    "intake_description": "Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.",
+    "no_pipelines": "This stream is not connected to any Pipeline.",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.",
+    "processing_title": "Pipelines",
+    "rule_header": "Rule",
+    "rules_info": "Stream Rules take effect first in the default processing order, and are used to direct messages from Inputs into Streams. Any message that meets the criteria of the Stream Rule(s) will be directed into this Stream.",
+    "rules_title": "Stream rules",
+    "segment_destinations": "3: Destinations",
+    "segment_intake": "1: Intake",
+    "segment_processing": "2: Processing",
+    "success_title": "Success",
+    "throughput": "Throughput",
+    "update_button": "Update stream",
+    "updated": "Stream '{{title}}' was updated successfully.",
+    "updating": "Updating stream..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "The default stream cannot be edited.",
+    "description": "This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see the effect configured stream rules have on message matching here.",
+    "documentation_link_title": "Streams documentation",
+    "title": "Rules of Stream {{title}}",
+    "title_span": "Rules of Stream \"{{title}}\""
+  },
+  "stream_hooks": {
+    "create_rule_failed": "Creating stream output filter rule failed with status: {{error}}",
+    "create_rule_failed_title": "Could not create stream output filter rule",
+    "create_rule_success": "Stream Output filter rule has been successfully created.",
+    "delete_rule_failed": "Deleting stream output filter rule failed with status: {{error}}",
+    "delete_rule_failed_title": "Could not delete stream output filter rule",
+    "delete_rule_success": "Stream Output filter rule has been successfully removed.",
+    "load_connected_pipelines_failed": "Loading connected Pipelines failed with status",
+    "load_connected_pipelines_failed_title": "Could not load connected Pipelines",
+    "load_output_filters_failed": "Loading stream output filters failed with status",
+    "load_output_filters_failed_title": "Could not load stream output filters",
+    "load_output_types_failed": "Loading stream outputs failed with status",
+    "load_output_types_failed_title": "Could not load stream outputs",
+    "load_rule_builder_failed": "Loading Stream Output Filter Rule Builder Conditions list failed with status",
+    "load_rule_builder_failed_title": "Could not load Stream Output Filter Rule Builder Conditions list.",
+    "load_rule_types_failed": "Loading stream rule types failed with status",
+    "load_rule_types_failed_title": "Could not load stream rule types",
+    "load_stream_failed": "Loading stream failed with status",
+    "load_stream_failed_title": "Could not load Stream",
+    "load_streams_failed": "Loading streams failed with status",
+    "load_streams_failed_title": "Could not load streams",
+    "success_title": "Success!",
+    "update_rule_failed": "Updating stream output filter rule failed with status: {{error}}",
+    "update_rule_failed_title": "Could not update stream output filter rule",
+    "update_rule_success": "Stream Output filter rule has been successfully updated."
+  },
+  "stream_modal": {
+    "description": "Description",
+    "description_help": "What kind of messages are routed into this stream?",
+    "index_set_required": "Index set is required",
+    "remove_matches_help": "Don't assign messages that match this stream to the ‘Default Stream’.",
+    "remove_matches_label": "Remove matches from ‘Default Stream’",
+    "share_description": "Search for a User or Team to add as collaborator on this stream.",
+    "title": "Title",
+    "title_help": "A descriptive name of the new stream",
+    "title_required": "Title is required"
+  },
   "stream_outputs": {
     "description": "{{productName}} nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here. You can also reuse outputs that are already running for other streams. A global view of all configured outputs is available <outputsLink>here</outputsLink>.",
     "marketplace_prefix": "You can find output plugins on",
     "removing_description": "<emphasis>Removing</emphasis> an output removes it from this stream but it will still be in the list of available outputs. Deleting an output <emphasis>globally</emphasis> will remove it from this and all other streams and terminate it. You can see all defined outputs in details at the <outputsLink>global output list</outputsLink>.",
     "title": "Outputs for Stream »{{streamTitle}}«"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "This resource includes streams you do not have permissions for.",
+    "description_p2": "Please contact your administrator and provide the error details which include a list of streams you need access to.",
+    "error_details": "You need permissions for streams with the id: {{ids}}.",
+    "title": "Missing Stream Permissions"
+  },
+  "stream_rules": {
+    "create_button": "Create Rule",
+    "created": "Stream rule was created successfully.",
+    "creating": "Creating Rule...",
+    "delete_confirm": "Do you really want to delete this stream rule?",
+    "delete_ok": "Ok",
+    "delete_title": "Delete stream rule.",
+    "delete_tooltip": "Delete stream rule",
+    "deleted": "Stream rule has been successfully deleted.",
+    "edit_title": "Edit Stream Rule",
+    "edit_tooltip": "Edit stream rule",
+    "editor": {
+      "add_rule": "Add stream rule",
+      "done": "I'm done!",
+      "load_message_hint": "Please load a message in Step 1 above to check if it would match against these rules.",
+      "load_message_title": "1. Load a message to test rules",
+      "manage_title": "2. Manage stream rules",
+      "would_match": "This message would be routed to this stream!",
+      "would_not_match": "This message would not be routed to this stream."
+    },
+    "human": {
+      "always_matches": "Rule always matches",
+      "deleted_input": "<deleted input>: {{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> <mustPart>must </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>",
+      "must_not": "<ruleField>{{field}}</ruleField> <mustPart>must not </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>"
+    },
+    "modal": {
+      "description": "Description",
+      "field": "Field",
+      "field_required": "Field is required",
+      "input": "Input",
+      "inverted": "Inverted",
+      "matcher_code_link": "Take a look at the matcher code on GitHub",
+      "matcher_info": "The server will try to convert to strings or numbers based on the matcher type as well as it can.",
+      "more_information": "More information",
+      "regex_info": "Regular expressions use Java syntax.",
+      "result": "Result:",
+      "select_input": "Select an input",
+      "select_type": "Select a type",
+      "type": "Type",
+      "type_required": "Type is required",
+      "value": "Value",
+      "value_required": "Value is required"
+    },
+    "new_title": "New Stream Rule",
+    "no_rules": "No rules defined.",
+    "start_dialog": {
+      "ask_named": "Would you like to start stream <streamTitle>{{title}}</streamTitle>?",
+      "ask_unnamed": "Would you like to start this stream?",
+      "confirm": "Start Stream",
+      "loading": "Starting Stream...",
+      "paused": "Stream Rules on this stream are currently paused and will not take effect.",
+      "title": "Start stream?"
+    },
+    "success_title": "Success",
+    "update_button": "Update Rule",
+    "updated": "Stream rule has been successfully updated.",
+    "updating": "Updating Rule..."
+  },
+  "streams_overview": {
+    "actions": {
+      "clone_button": "Clone stream",
+      "clone_stream": "Clone Stream",
+      "clone_title": "Cloning Stream",
+      "cloned": "Stream was successfully cloned as '{{title}}'.",
+      "cloning": "Cloning stream...",
+      "data_routing": "Data routing",
+      "delete_failed": "An error occurred while deleting the stream. {{error}}",
+      "delete_modal_confirm": "Do you really want to remove stream:  {{title}}?",
+      "delete_modal_title": "Delete Stream",
+      "delete_stream": "Delete Stream",
+      "deleted": "Stream '{{title}}' was deleted successfully.",
+      "edit_stream": "Edit Stream",
+      "edit_title": "Editing Stream",
+      "manage_alerts": "Manage Alerts",
+      "manage_outputs": "Manage Outputs",
+      "manage_rules": "Manage Rules",
+      "not_available_default": "Action not available for the default stream",
+      "pause_confirm": "Do you really want to pause stream '{{title}}'?",
+      "quick_add_rule": "Quick Add Rule",
+      "set_start_page": "Set as Start Page",
+      "start": "Start Stream",
+      "starting": "Starting Stream...",
+      "status_pause": "Pause stream",
+      "status_paused": "Paused",
+      "status_running": "Running",
+      "status_start": "Start stream",
+      "stop": "Stop Stream",
+      "stopping": "Stopping Stream...",
+      "success_title": "Success",
+      "update_button": "Update stream",
+      "updated": "Stream '{{title}}' was updated successfully.",
+      "updating": "Updating stream...",
+      "view_default": "Default",
+      "view_label": "View:",
+      "view_performance": "Performance",
+      "view_routing": "Routing"
+    },
+    "bulk": {
+      "assign_failed": "Assigning index set failed with status: {{error}}",
+      "assign_failed_title": "Error",
+      "assign_help": "Messages that match the selected streams will be written to the configured index set.",
+      "assign_index_set": "Assign index set",
+      "assign_loading": "Assigning index set...",
+      "assign_submit": "Assign index set",
+      "assign_success_one": "Index set was assigned to {{count}} stream successfully.",
+      "assign_success_other": "Index set was assigned to {{count}} streams successfully.",
+      "assign_title_one": "Assign Index Set To {{count}} Stream",
+      "assign_title_other": "Assign Index Set To {{count}} Streams",
+      "delete_confirm_one": "Do you really want to remove {{count}} stream? This action cannot be undone.",
+      "delete_confirm_other": "Do you really want to remove {{count}} streams? This action cannot be undone.",
+      "delete_error": "An error occurred while deleting streams. {{error}}",
+      "failed_deleted_one": "{{failed}} out of {{count}} selected stream could not be deleted.",
+      "failed_deleted_other": "{{failed}} out of {{count}} selected streams could not be deleted.",
+      "failed_started_one": "{{failed}} out of {{count}} selected stream could not be started.",
+      "failed_started_other": "{{failed}} out of {{count}} selected streams could not be started.",
+      "failed_stopped_one": "{{failed}} out of {{count}} selected stream could not be stopped.",
+      "failed_stopped_other": "{{failed}} out of {{count}} selected streams could not be stopped.",
+      "index_set_required": "Index set is required",
+      "search_in_streams": "Search in streams",
+      "start_error": "An error occurred while starting streams. {{error}}",
+      "start_streams_one": "Start stream",
+      "start_streams_other": "Start streams",
+      "stop_error": "An error occurred while stopping streams. {{error}}",
+      "stop_streams_one": "Stop stream",
+      "stop_streams_other": "Stop streams",
+      "success_deleted_one": "{{count}} stream was deleted successfully.",
+      "success_deleted_other": "{{count}} streams were deleted successfully.",
+      "success_started_one": "{{count}} stream was started successfully.",
+      "success_started_other": "{{count}} streams were started successfully.",
+      "success_stopped_one": "{{count}} stream was stopped successfully.",
+      "success_stopped_other": "{{count}} streams were stopped successfully.",
+      "success_title": "Success"
+    },
+    "cells": {
+      "archiving_enabled": "Archiving is enabled",
+      "avg_processing_time": "Average processing time: {{ms}} ms (last 15 minutes)",
+      "index_set_not_found": "not found",
+      "max_processing_time": "Max processing time: {{ms}} ms (last 15 minutes)",
+      "message_count_one": "{{count}} message in the last 24 hours",
+      "message_count_other": "{{count}} messages in the last 24 hours",
+      "throughput": "{{throughput}} msg/s"
+    },
+    "columns": {
+      "archiving": "Archiving",
+      "destination_filters": "Filter Rules",
+      "index_set_title": "Index Set",
+      "outputs": "Outputs",
+      "pipelines": "Pipelines",
+      "rules": "Stream Rules",
+      "throughput": "Throughput"
+    },
+    "expanded": {
+      "associated_inputs_load_failed": "Could not load associated inputs.",
+      "associated_inputs_none": "No inputs have sent messages to this stream in the last 24 hours.",
+      "deleted": "{{id}} (deleted)",
+      "destination_data_lake": "Data Lake",
+      "destination_index_set": "Index Set",
+      "destination_output": "Output",
+      "filter_rules_header_destination": "Destination",
+      "filter_rules_header_status": "Status",
+      "filter_rules_header_title": "Title",
+      "filter_rules_summary_one": "Showing {{count}} configured filter rule across all destinations.",
+      "filter_rules_summary_other": "Showing {{count}} configured filter rules across all destinations.",
+      "manage_filter_rules": "Manage Filter Rules",
+      "manage_outputs": "Manage Outputs",
+      "manage_pipelines": "Manage Pipelines",
+      "manage_rules": "Manage Rules",
+      "no_filter_rules": "No filter rules have been found.",
+      "outputs_summary_one": "{{count}} connected output.",
+      "outputs_summary_other": "{{count}} connected outputs.",
+      "pipelines_load_failed": "Could not load connected pipelines.",
+      "pipelines_none": "No pipelines are connected to this stream.",
+      "quick_add_rule": "Quick Add Rule",
+      "routing_pipelines_load_failed": "Could not load routing pipelines.",
+      "routing_pipelines_none": "No routing pipelines route messages to this stream.",
+      "rules_summary_and_one": "Must match all of the {{count}} configured stream rule.",
+      "rules_summary_and_other": "Must match all of the {{count}} configured stream rules.",
+      "rules_summary_or_one": "Must match at least one of the {{count}} configured stream rule.",
+      "rules_summary_or_other": "Must match at least one of the {{count}} configured stream rules."
+    },
+    "expanded_titles": {
+      "destination_filters": "Filter Rules",
+      "outputs": "Outputs",
+      "rules": "Rules"
+    },
+    "human_name": "streams",
+    "metric_columns": {
+      "associated_inputs": "Associated Inputs (Last 24H)",
+      "avg_processing_time_ms": "Avg Processing Time (Last 15min)",
+      "max_processing_time_ms": "Max Processing Time (Last 15min)",
+      "message_count": "Message Count (Last 24H)",
+      "pipelines": "Pipelines",
+      "routing_pipelines": "Routing Pipelines"
+    }
+  },
+  "streams_page": {
+    "create_loading": "Creating stream...",
+    "create_submit": "Create stream",
+    "create_success_message": "Stream has been successfully created.",
+    "create_success_title": "Success",
+    "create_title": "Create stream",
+    "description": "You can route incoming messages into streams by applying rules against them. Messages matching the rules of a stream are routed into it. A message can also be routed into multiple streams.",
+    "documentation_link_title": "Streams documentation",
+    "title": "Streams"
   },
   "system_outputs": {
     "description": "{{productName}} nodes can forward messages via outputs. Launch or terminate as many outputs as you want here <highlight>and then assign them to streams to forward all messages of a stream in real-time.</highlight>",
@@ -31,31 +442,8 @@
     "marketplace_prefix": "You can find output plugins in",
     "title": "Outputs"
   },
-  "streams_page": {
-    "title": "Streams",
-    "documentation_link_title": "Streams documentation",
-    "description": "You can route incoming messages into streams by applying rules against them. Messages matching the rules of a stream are routed into it. A message can also be routed into multiple streams.",
-    "create_title": "Create stream",
-    "create_submit": "Create stream",
-    "create_loading": "Creating stream...",
-    "create_success_message": "Stream has been successfully created.",
-    "create_success_title": "Success"
-  },
-  "stream_edit_page": {
-    "title": "Rules of Stream {{title}}",
-    "title_span": "Rules of Stream \"{{title}}\"",
-    "documentation_link_title": "Streams documentation",
-    "description": "This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see the effect configured stream rules have on message matching here.",
-    "default_stream_error": "The default stream cannot be edited."
-  },
-  "stream_permission_error_page": {
-    "title": "Missing Stream Permissions",
-    "description_p1": "This resource includes streams you do not have permissions for.",
-    "description_p2": "Please contact your administrator and provide the error details which include a list of streams you need access to.",
-    "error_details": "You need permissions for streams with the id: {{ids}}."
-  },
   "user_no_stream_access": {
-    "title": "No stream permissions.",
-    "alert": "We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an error, please contact your administrator."
+    "alert": "We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an error, please contact your administrator.",
+    "title": "No stream permissions."
   }
 }

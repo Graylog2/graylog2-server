@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SegmentedControl from 'components/bootstrap/SegmentedControl';
@@ -42,15 +43,15 @@ const NarrowSegmentedControl = styled(SegmentedControl)`
   width: fit-content;
 `;
 
-const SEGMENTS = [
-  { label: 'Default', value: STREAM_VIEW_VARIANTS.default },
-  { label: 'Routing', value: STREAM_VIEW_VARIANTS.routing },
-  { label: 'Performance', value: STREAM_VIEW_VARIANTS.performance },
-];
-
 type VariantValue = (typeof STREAM_VIEW_VARIANTS)[keyof typeof STREAM_VIEW_VARIANTS];
 
 const StreamViewButtons = () => {
+  const { t } = useTranslation('streams');
+  const segments = [
+    { label: t('streams_overview.actions.view_default'), value: STREAM_VIEW_VARIANTS.default },
+    { label: t('streams_overview.actions.view_routing'), value: STREAM_VIEW_VARIANTS.routing },
+    { label: t('streams_overview.actions.view_performance'), value: STREAM_VIEW_VARIANTS.performance },
+  ];
   const { activeLayoutVariant, selectLayoutVariant } = useLayoutVariant();
 
   const onChange = useCallback(
@@ -66,9 +67,9 @@ const StreamViewButtons = () => {
 
   return (
     <Container>
-      <Label>View:</Label>
+      <Label>{t('streams_overview.actions.view_label')}</Label>
       <NarrowSegmentedControl<VariantValue>
-        data={SEGMENTS}
+        data={segments}
         value={activeLayoutVariant as VariantValue}
         onChange={onChange}
       />

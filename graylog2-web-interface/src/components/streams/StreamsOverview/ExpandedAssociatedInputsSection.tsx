@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import useInputDetails from 'hooks/useInputDetails';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const typedInputs = metrics?.associated_inputs;
 
@@ -39,18 +41,20 @@ const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
   }
 
   if (isError) {
-    return <p>Could not load associated inputs.</p>;
+    return <p>{t('streams_overview.expanded.associated_inputs_load_failed')}</p>;
   }
 
   if (!typedInputs || typedInputs.length === 0) {
-    return <p>No inputs have sent messages to this stream in the last 24 hours.</p>;
+    return <p>{t('streams_overview.expanded.associated_inputs_none')}</p>;
   }
 
   return (
     <ListGroup componentClass="ul">
       {typedInputs.map(({ id: inputId }) => {
         const resolved = resolvedById[inputId];
-        const label = resolved?.title ?? (areDetailsFetching || isDetailsError ? inputId : `${inputId} (deleted)`);
+        const label =
+          resolved?.title ??
+          (areDetailsFetching || isDetailsError ? inputId : t('streams_overview.expanded.deleted', { id: inputId }));
         const path = resolved ? buildLink(resolved) : null;
 
         return <ListGroupItem key={inputId}>{path ? <Link to={path}>{label}</Link> : label}</ListGroupItem>;

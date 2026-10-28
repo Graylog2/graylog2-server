@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Alert, ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { resolved, notPermittedIds, isLoading } = useResolvedNotifications(eventDefinition);
 
   const notificationList = resolved.map(({ id, title }) => (
@@ -46,16 +48,16 @@ const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
 
   return (
     <>
-      <Description>Notifications fired when this event definition triggers.</Description>
+      <Description>{t('expanded_notifications.description')}</Description>
       {notPermittedIds.length > 0 && (
         <Alert bsStyle="warning">
-          Missing Notifications Permissions for:
+          {t('expanded_notifications.missing_permissions')}
           <br />
           {notPermittedIds.join(', ')}
         </Alert>
       )}
       {isLoading ? (
-        <Spinner text="Loading notifications..." />
+        <Spinner text={t('expanded_notifications.loading')} />
       ) : (
         <ListGroup componentClass="ul">{notificationList}</ListGroup>
       )}
