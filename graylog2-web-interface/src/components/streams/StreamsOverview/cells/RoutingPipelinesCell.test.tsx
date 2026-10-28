@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import useEntityTitles from 'hooks/useEntityTitles';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 
 import RoutingPipelinesCell from './RoutingPipelinesCell';
@@ -27,53 +26,45 @@ import RoutingPipelinesCell from './RoutingPipelinesCell';
 jest.mock('components/streams/StreamsOverview/StreamMetricsContext', () => ({
   useStreamMetricsFor: jest.fn(),
 }));
-jest.mock('components/common/EntityDataTable/hooks/useExpandedSections', () => jest.fn());
+jest.mock('hooks/useEntityTitles');
 
 const stream = { id: 'stream-1', title: 'Test Stream' } as any;
 
-describe('RoutingPipelinesCell (Streams)', () => {
-  const toggleSection = jest.fn();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
+const mockRoutingPipelines = (pipelineIds: Array<string>) =>
+  asMock(useStreamMetricsFor).mockReturnValue({
+    metrics: { routing_pipelines: pipelineIds },
+    isInitialLoading: false,
+    isError: false,
   });
 
-  it('renders the count of routing pipelines', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { routing_pipelines: ['p-1', 'p-2', 'p-3'] },
+describe('RoutingPipelinesCell', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useEntityTitles).mockReturnValue({
+      titlesById: { 'p-1': 'Alpha Routing', 'p-2': 'Beta Routing', 'p-3': 'Gamma Routing' },
+      notPermittedIds: new Set(),
       isInitialLoading: false,
+      isFetching: false,
       isError: false,
     });
+  });
+
+  it('renders the first routing pipeline and the number of the others', async () => {
+    mockRoutingPipelines(['p-3', 'p-1', 'p-2']);
 
     render(<RoutingPipelinesCell stream={stream} />);
 
-    expect(screen.getByText('3')).toBeInTheDocument();
+    await screen.findByRole('link', { name: 'Alpha Routing' });
+
+    expect(await screen.findByRole('button', { name: /show 2 more/i })).toHaveTextContent('+2');
   });
 
   it('renders an empty cell when there are no routing pipelines', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { routing_pipelines: [] },
-      isInitialLoading: false,
-      isError: false,
-    });
+    mockRoutingPipelines([]);
 
     render(<RoutingPipelinesCell stream={stream} />);
 
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(screen.queryByTitle(/routing pipelines/i)).not.toBeInTheDocument();
-  });
-
-  it('toggles the routing_pipelines section on click', async () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { routing_pipelines: ['p-1'] },
-      isInitialLoading: false,
-      isError: false,
-    });
-
-    render(<RoutingPipelinesCell stream={stream} />);
-    await userEvent.click(screen.getByText('1'));
-
-    expect(toggleSection).toHaveBeenCalledWith('stream-1', 'routing_pipelines');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
