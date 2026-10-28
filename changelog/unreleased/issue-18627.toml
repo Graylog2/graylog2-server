@@ -1,0 +1,5 @@
+type = "f"
+message = "Resolve forwarder input and node titles in aggregation chart labels for `gl2_source_input` and `gl2_source_node`."
+
+issues = ["18627"]
+pulls = []
