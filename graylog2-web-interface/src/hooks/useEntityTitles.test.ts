@@ -72,6 +72,36 @@ describe('useEntityTitles', () => {
     });
   });
 
+  it('resolves the titles of hooks rendered together with one request', async () => {
+    asMock(SystemCatalog.getTitles).mockResolvedValue({
+      entities: [
+        { id: 'pipeline-a', type: 'pipeline_processor_pipelines', title: 'Pipeline A' },
+        { id: 'pipeline-b', type: 'pipeline_processor_pipelines', title: 'Pipeline B' },
+      ],
+      not_permitted_to_view: [],
+    });
+
+    const { result } = renderHook(() => [
+      useEntityTitles([{ id: 'pipeline-a', type: 'pipeline_processor_pipelines' }]),
+      useEntityTitles([
+        { id: 'pipeline-a', type: 'pipeline_processor_pipelines' },
+        { id: 'pipeline-b', type: 'pipeline_processor_pipelines' },
+      ]),
+    ]);
+
+    await waitFor(() => expect(result.current.every(({ isInitialLoading }) => !isInitialLoading)).toBe(true));
+
+    expect(SystemCatalog.getTitles).toHaveBeenCalledTimes(1);
+    expect(SystemCatalog.getTitles).toHaveBeenCalledWith({
+      entities: [
+        { id: 'pipeline-a', type: 'pipeline_processor_pipelines' },
+        { id: 'pipeline-b', type: 'pipeline_processor_pipelines' },
+      ],
+    });
+    expect(result.current[0].titlesById).toEqual({ 'pipeline-a': 'Pipeline A' });
+    expect(result.current[1].titlesById).toEqual({ 'pipeline-a': 'Pipeline A', 'pipeline-b': 'Pipeline B' });
+  });
+
   it('does not call the API when the entities list is empty', () => {
     renderHook(() => useEntityTitles([]));
 

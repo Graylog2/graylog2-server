@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { create, windowScheduler } from '@yornaath/batshit';
+import uniqBy from 'lodash/uniqBy';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -23,6 +25,19 @@ import { defaultOnError } from 'util/conditional/onError';
 export type EntityRef = { id: string; type: string };
 
 const fetchEntityTitles = (entities: Array<EntityRef>) => SystemCatalog.getTitles({ entities: entities as any });
+
+type TitlesResponse = Awaited<ReturnType<typeof fetchEntityTitles>>;
+
+// Batches the requests of components rendered together, e.g. the cells of a table page.
+const entityTitles = create({
+  fetcher: (entities: Array<EntityRef>) => fetchEntityTitles(uniqBy(entities, ({ id, type }) => `${type}:${id}`)),
+  resolver: (response: TitlesResponse, { id }: EntityRef) => ({
+    id,
+    title: response.entities?.find((entity) => entity.id === id)?.title,
+    isPermitted: !response.not_permitted_to_view?.includes(id),
+  }),
+  scheduler: windowScheduler(10),
+});
 
 const useEntityTitles = (
   entities: Array<EntityRef>,
@@ -40,7 +55,7 @@ const useEntityTitles = (
     queryKey: ['entity_titles', stableEntities],
     queryFn: () =>
       defaultOnError(
-        fetchEntityTitles(stableEntities),
+        Promise.all(stableEntities.map((entity) => entityTitles.fetch(entity))),
         'Loading entity titles failed with status',
         'Could not load entity titles',
       ),
@@ -48,12 +63,10 @@ const useEntityTitles = (
     placeholderData: keepPreviousData,
   });
 
-  const titlesById: Record<string, string> = {};
-  (data?.entities ?? []).forEach((entry) => {
-    titlesById[entry.id] = entry.title;
-  });
-
-  const notPermittedIds = new Set(data?.not_permitted_to_view ?? []);
+  const titlesById: Record<string, string> = Object.fromEntries(
+    (data ?? []).filter(({ title }) => title !== undefined).map(({ id, title }) => [id, title]),
+  );
+  const notPermittedIds = new Set((data ?? []).filter(({ isPermitted }) => !isPermitted).map(({ id }) => id));
 
   return {
     titlesById,
