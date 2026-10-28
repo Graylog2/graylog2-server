@@ -20,7 +20,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 LOCALES = os.path.join(ROOT, 'src', 'locales', 'en')
 PLURAL_SUFFIXES = ('_zero', '_one', '_two', '_few', '_many', '_other')
 
-USE_TRANSLATION = re.compile(r"useTranslation\(\s*['\"]([\w-]+)['\"]")
+USE_TRANSLATION = re.compile(r"useTranslation\(\s*['\"]([\w-]+)['\"](?P<rest>[^)]*)")
+KEY_PREFIX = re.compile(r"keyPrefix:\s*['\"]([\w.]+)['\"]")
 T_CALL = re.compile(r"(?<![\w.])t\(\s*['\"]([^'\"]+)['\"](?P<rest>[^)]*)")
 I18N_T_CALL = re.compile(r"i18n\.t\(\s*['\"]([^'\"]+)['\"](?P<rest>[^)]*)")
 NS_OPTION = re.compile(r"ns:\s*['\"]([\w-]+)['\"]")
@@ -83,15 +84,22 @@ def main():
     for path in files_to_check(sys.argv[1:]):
         with open(path, encoding='utf-8') as f:
             source = f.read()
-        default_namespace = (USE_TRANSLATION.search(source) or [None, None])[1]
+        use_translation = USE_TRANSLATION.search(source)
+        default_namespace = use_translation.group(1) if use_translation else None
+        prefix_match = KEY_PREFIX.search(use_translation.group('rest')) if use_translation else None
+        key_prefix = f'{prefix_match.group(1)}.' if prefix_match else ''
         missing = []
         for match in T_CALL.finditer(source):
             ns_match = NS_OPTION.search(match.group('rest'))
             namespace, key = split(match.group(1), ns_match.group(1) if ns_match else default_namespace)
+            if namespace == default_namespace and not ns_match:
+                key = f'{key_prefix}{key}'
             if namespace and not exists(keys, namespace, key):
                 missing.append(f'{namespace}:{key}')
         for match in I18N_KEY.finditer(source):
             namespace, key = split(match.group(1), default_namespace)
+            if namespace == default_namespace:
+                key = f'{key_prefix}{key}'
             if namespace and not exists(keys, namespace, key):
                 missing.append(f'{namespace}:{key}')
         for match in I18N_T_CALL.finditer(source):
