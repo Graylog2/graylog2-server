@@ -200,6 +200,14 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MCP_PROMPT_GET = MCP_PREFIX + "prompt:get";
     public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
     public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
+    public static final String MCP_OAUTH_CLIENT_REGISTER = MCP_PREFIX + "oauth_client:register";
+    public static final String MCP_OAUTH_AUTHORIZATION_GRANT = MCP_PREFIX + "oauth_authorization:grant";
+    public static final String MCP_OAUTH_AUTHORIZATION_DENY = MCP_PREFIX + "oauth_authorization:deny";
+    public static final String MCP_OAUTH_AUTHORIZATION_REVOKE = MCP_PREFIX + "oauth_authorization:revoke";
+    public static final String MCP_OAUTH_TOKEN_ISSUE = MCP_PREFIX + "oauth_token:issue";
+    public static final String MCP_OAUTH_TOKEN_REFRESH = MCP_PREFIX + "oauth_token:refresh";
+    public static final String MCP_OAUTH_TOKEN_REVOKE = MCP_PREFIX + "oauth_token:revoke";
+    public static final String MCP_OAUTH_REFRESH_TOKEN_REUSE = MCP_PREFIX + "oauth_token:refresh_token_reuse";
 
     public static final String OPAMP_ENROLLMENT_TOKEN_CREATE = PREFIX + "collector_enrollment_token:create";
     public static final String OPAMP_ENROLLMENT_TOKEN_DELETE = PREFIX + "collector_enrollment_token:delete";
@@ -385,6 +393,14 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MCP_TOOL_CALL)
             .add(MCP_PROMPT_LIST)
             .add(MCP_PROMPT_GET)
+            .add(MCP_OAUTH_CLIENT_REGISTER)
+            .add(MCP_OAUTH_AUTHORIZATION_GRANT)
+            .add(MCP_OAUTH_AUTHORIZATION_DENY)
+            .add(MCP_OAUTH_AUTHORIZATION_REVOKE)
+            .add(MCP_OAUTH_TOKEN_ISSUE)
+            .add(MCP_OAUTH_TOKEN_REFRESH)
+            .add(MCP_OAUTH_TOKEN_REVOKE)
+            .add(MCP_OAUTH_REFRESH_TOKEN_REUSE)
             .add(MONGODB_CHANGE_PROFILING)
             .add(OPAMP_ENROLLMENT_TOKEN_CREATE)
             .add(OPAMP_ENROLLMENT_TOKEN_DELETE)
