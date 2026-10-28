@@ -417,4 +417,3 @@ const RawMessageLoaderWrapper = (props: Omit<Props, 'inputs'>) => {
 };
 
 export default RawMessageLoaderWrapper;
-```
