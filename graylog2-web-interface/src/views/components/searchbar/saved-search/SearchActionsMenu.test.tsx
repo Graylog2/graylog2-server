@@ -282,7 +282,7 @@ describe('SearchActionsMenu', () => {
     it('should save search when pressing related keyboard shortcut', async () => {
       asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      await userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Control>}s{/Control}');
 
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });
@@ -292,7 +292,7 @@ describe('SearchActionsMenu', () => {
       asMock(useView).mockReturnValue(_createView('some-id'));
       asMock(useIsDirty).mockReturnValue(true);
       render(<SimpleSearchActionsMenu />);
-      await userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Control>}s{/Control}');
 
       await waitFor(() => {
         expect(OnSaveViewAction).toHaveBeenCalledTimes(1);
@@ -333,7 +333,7 @@ describe('SearchActionsMenu', () => {
 
       it('opens the save form instead of saving when pressing related keyboard shortcut', async () => {
         render(<SimpleSearchActionsMenu />);
-        await userEvent.keyboard('{Meta>}s{/Meta}');
+        await userEvent.keyboard('{Control>}s{/Control}');
 
         await findCreateNewButton();
 
