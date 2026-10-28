@@ -23,7 +23,6 @@ type ContextValue =
       // A row shows one section at a time, so each array contains at most one section name.
       expandedSections: { [entityId: string]: Array<string> };
       toggleSection: (entityId: string, sectionName: string) => void;
-      toggleRow: (entityId: string) => void;
     }
   | undefined;
 

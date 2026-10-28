@@ -282,8 +282,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
+    defaultExpandedSection: expandedSectionNames[0],
     displayBulkSelectCol,
-    displayRowExpandCol,
     enableSlicing,
     entityActions,
     entityAttributesAreCamelCase,
@@ -342,7 +342,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider defaultSection={expandedSectionNames[0]}>
+          <ExpandedSectionsProvider>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
               {noColumnReordering && noPageSizeSelect ? null : (

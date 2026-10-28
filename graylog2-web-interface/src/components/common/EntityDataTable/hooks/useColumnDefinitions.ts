@@ -32,8 +32,8 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnRenderersByAttribute,
   columnSchemas,
   columnWidths,
+  defaultExpandedSection,
   displayBulkSelectCol,
-  displayRowExpandCol,
   enableSlicing,
   entityActions,
   entityAttributesAreCamelCase,
@@ -48,8 +48,9 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
+  // Opened by the row expand toggle. Without expanded sections, there is no toggle column.
+  defaultExpandedSection: string | undefined;
   displayBulkSelectCol: boolean;
-  displayRowExpandCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   enableSlicing: boolean;
   entityAttributesAreCamelCase: boolean;
@@ -61,7 +62,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
-  const rowExpandCol = useRowExpandColumnDefinition<Entity>(displayRowExpandCol, columnWidths[ROW_EXPAND_COL_ID]);
+  const rowExpandCol = useRowExpandColumnDefinition<Entity>(defaultExpandedSection, columnWidths[ROW_EXPAND_COL_ID]);
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
   // Always include the actions column as the trailing "tail" column, even when there are no row actions.
   // This lets the table use it to fill remaining space in fully-static layouts.
