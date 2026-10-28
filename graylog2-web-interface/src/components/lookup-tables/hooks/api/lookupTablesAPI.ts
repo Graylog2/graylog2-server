@@ -73,6 +73,24 @@ export const createLookupTable = async (payload: LookupTableCache) => fetch('POS
 export const updateLookupTable = async (payload: LookupTableCache) =>
   fetch('PUT', _url(`tables/${(payload as any).id}`), payload);
 
+// The server builds the request body with required fields, so unset ones are sent empty and reported as such.
+export const validateLookupTable = async (table: LookupTable) =>
+  SystemLookup.validateTable({
+    ...table,
+    id: table.id ?? null,
+    _scope: table._scope ?? null,
+    content_pack: table.content_pack ?? null,
+    title: table.title ?? '',
+    description: table.description ?? '',
+    name: table.name ?? '',
+    cache_id: table.cache_id ?? '',
+    data_adapter_id: table.data_adapter_id ?? '',
+    default_single_value: table.default_single_value ?? '',
+    default_single_value_type: table.default_single_value_type ?? 'NULL',
+    default_multi_value: table.default_multi_value ?? '',
+    default_multi_value_type: table.default_multi_value_type ?? 'NULL',
+  });
+
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
   ClusterLookupTable.performPurge(table.id, key);
 

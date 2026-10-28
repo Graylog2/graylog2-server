@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
 import useScopePermissions from 'hooks/useScopePermissions';
 import { Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
-import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
+import type { LookupTable } from 'logic/lookup-tables/types';
+
+import useDefaultValueValidation from './use-default-value-validation';
 
 const StyledJSONValueInput = styled(JSONValueInput)`
   margin: 0;
@@ -40,18 +42,22 @@ const StyledDefaultValueSection = styled.div(
 );
 
 function LookupTableFormFields() {
-  const { setFieldValue, setFieldTouched, touched, values, errors } = useFormikContext<LookupTableType>();
+  const { setValues, values, touched, errors } = useFormikContext<LookupTable>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
+  const { defaultValueErrors, validateDefaultValues, clearDefaultValueError } = useDefaultValueValidation();
 
   const canModify = useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
   );
 
-  useEffect(() => {
-    setFieldValue('enable_single_value', !!values.default_single_value);
-    setFieldValue('enable_multi_value', !!values.default_multi_value);
-  }, [values.default_single_value, values.default_multi_value, setFieldValue]);
+  // Formik validates each setFieldValue call against the values of the last render, so a handler that sets
+  // several fields must use one setValues call, or the last validation runs on stale values and its errors stick.
+  const updateValues = (changes: Partial<LookupTable>) => setValues((current) => ({ ...current, ...changes }));
+
+  // Derived from the type rather than kept as separate state, so an empty value cannot hide a field that fails validation.
+  const singleValueEnabled = !!values.default_single_value_type && values.default_single_value_type !== 'NULL';
+  const multiValueEnabled = !!values.default_multi_value_type && values.default_multi_value_type !== 'NULL';
 
   return (
     <fieldset>
@@ -103,32 +109,36 @@ function LookupTableFormFields() {
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
           disabled={!canModify}
-          checked={values.enable_single_value}
+          checked={singleValueEnabled}
           onChange={() => {
-            setFieldValue('enable_single_value', !values.enable_single_value);
-
-            if (values.enable_single_value) {
-              setFieldValue('default_single_value', '');
-              setFieldValue('default_single_value_type', 'NULL');
-            }
+            clearDefaultValueError('default_single_value');
+            updateValues(
+              singleValueEnabled
+                ? { default_single_value: '', default_single_value_type: 'NULL' }
+                : { default_single_value_type: 'STRING' },
+            );
           }}
         />
-        {values.enable_single_value && (
+        {singleValueEnabled && (
           <StyledJSONValueInput
             label="Default single value *"
             help={
-              (touched.default_single_value && errors.default_single_value) ||
+              defaultValueErrors.default_single_value ||
               'The single value that is being used as lookup result if the data adapter or cache does not find a value.'
             }
-            validationState={touched.default_single_value && errors.default_single_value ? 'error' : undefined}
-            onBlur={() => setFieldTouched('default_single_value', true)}
+            validationState={defaultValueErrors.default_single_value ? 'error' : undefined}
+            onBlur={() => validateDefaultValues()}
             update={(value, valueType) => {
-              setFieldValue('default_single_value', value);
-              setFieldValue('default_single_value_type', valueType);
+              const changes = { default_single_value: value, default_single_value_type: valueType };
+
+              clearDefaultValueError('default_single_value');
+              updateValues(changes);
+              // A type change can invalidate the value without the field ever being blurred.
+              if (valueType !== values.default_single_value_type) validateDefaultValues({ ...values, ...changes });
             }}
             value={values.default_single_value}
-            valueType={values.default_single_value_type || 'NULL'}
-            allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
+            valueType={values.default_single_value_type}
+            allowedTypes={['STRING', 'NUMBER', 'BOOLEAN']}
             disabled={!canModify}
           />
         )}
@@ -145,32 +155,36 @@ function LookupTableFormFields() {
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
           disabled={!canModify}
-          checked={values.enable_multi_value}
+          checked={multiValueEnabled}
           onChange={() => {
-            setFieldValue('enable_multi_value', !values.enable_multi_value);
-
-            if (values.enable_multi_value) {
-              setFieldValue('default_multi_value', '');
-              setFieldValue('default_multi_value_type', 'NULL');
-            }
+            clearDefaultValueError('default_multi_value');
+            updateValues(
+              multiValueEnabled
+                ? { default_multi_value: '', default_multi_value_type: 'NULL' }
+                : { default_multi_value_type: 'OBJECT' },
+            );
           }}
         />
-        {values.enable_multi_value && (
+        {multiValueEnabled && (
           <StyledJSONValueInput
             label="Default multi value *"
             help={
-              (touched.default_multi_value && errors.default_multi_value) ||
+              defaultValueErrors.default_multi_value ||
               'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'
             }
-            validationState={touched.default_multi_value && errors.default_multi_value ? 'error' : undefined}
-            onBlur={() => setFieldTouched('default_multi_value', true)}
+            validationState={defaultValueErrors.default_multi_value ? 'error' : undefined}
+            onBlur={() => validateDefaultValues()}
             update={(value, valueType) => {
-              setFieldValue('default_multi_value', value);
-              setFieldValue('default_multi_value_type', valueType);
+              const changes = { default_multi_value: value, default_multi_value_type: valueType };
+
+              clearDefaultValueError('default_multi_value');
+              updateValues(changes);
+              // A type change can invalidate the value without the field ever being blurred.
+              if (valueType !== values.default_multi_value_type) validateDefaultValues({ ...values, ...changes });
             }}
             value={values.default_multi_value}
-            valueType={values.default_multi_value_type || 'NULL'}
-            allowedTypes={['OBJECT', 'NULL']}
+            valueType={values.default_multi_value_type}
+            allowedTypes={['OBJECT']}
             disabled={!canModify}
           />
         )}
