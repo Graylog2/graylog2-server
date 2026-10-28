@@ -55,7 +55,6 @@ type BaseProps = {
   items: ReadonlyArray<string> | undefined | null;
   collapsedCount?: number;
   truncate?: boolean;
-  emptyFallback?: React.ReactNode;
   // Renders the chip's label content in place of the raw item; the chip itself (and its click
   // handling) stays owned by ChipsCell. Plain chips drop their raw-item title, so content that can be
   // cut off needs its own title; clickable chips already carry a "Filter by ..." title, so skip it there.
@@ -74,7 +73,6 @@ const ChipsCell = ({
   onItemClick = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   truncate = true,
-  emptyFallback = null,
   renderItemContent = undefined,
   itemLabel,
   itemTitle = undefined,
@@ -114,7 +112,6 @@ const ChipsCell = ({
       renderItem={renderChip}
       getItemKey={(item) => item}
       collapsedCount={truncate ? collapsedCount : sorted.length}
-      emptyFallback={emptyFallback}
       layout="inline"
     />
   );

@@ -106,7 +106,6 @@ type Props<ItemType> = {
   // Shown on hover, since long items are cut off.
   getItemTitle?: (item: ItemType) => string;
   collapsedCount?: number;
-  emptyFallback?: React.ReactNode;
   // `stacked` lists one item per line (e.g. entity links), `inline` wraps items next to each other (e.g. chips).
   layout?: Layout;
 };
@@ -121,13 +120,12 @@ const ExpandableCellList = <ItemType,>({
   getItemKey,
   getItemTitle = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
-  emptyFallback = null,
   layout = 'stacked',
 }: Props<ItemType>) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items?.length) {
-    return <>{emptyFallback}</>;
+    return null;
   }
 
   const hiddenCount = items.length - collapsedCount;
