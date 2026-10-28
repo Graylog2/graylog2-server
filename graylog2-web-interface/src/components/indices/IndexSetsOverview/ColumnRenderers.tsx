@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
@@ -25,7 +26,7 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import NumberUtils from 'util/NumberUtils';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
-import { DETAILS_SECTION, INDEX_SET_CATEGORY_TITLES } from './Constants';
+import { DETAILS_SECTION, getIndexSetCategoryTitle } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
@@ -78,7 +79,7 @@ const customColumnRenderers = (
     },
     category: {
       renderCell: (category: IndexSetCategory, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>{INDEX_SET_CATEGORY_TITLES[category] ?? category}</DetailsToggle>
+        <DetailsToggle indexSet={indexSet}>{getIndexSetCategoryTitle(category)}</DetailsToggle>
       ),
       staticWidth: 'matchHeader',
     },
@@ -115,7 +116,7 @@ const customColumnRenderers = (
     field_type_refresh_interval: {
       renderCell: (_interval: unknown, indexSet: IndexSetEntity) => (
         <DetailsToggle indexSet={indexSet} align="right">
-          {indexSet.field_type_refresh_interval / 1000.0} seconds
+          {i18n.t('set_details.seconds', { ns: 'indexsets', count: indexSet.field_type_refresh_interval / 1000.0 })}
         </DetailsToggle>
       ),
       staticWidth: 'matchHeader',

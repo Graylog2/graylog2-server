@@ -21,6 +21,7 @@ import { Spinner } from 'components/common';
 import { Alert, Row, Col, Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { fetchStreams } from 'api/streams';
+import i18n from 'i18n';
 
 type IndexSetDeletionFormProps = {
   indexSet: any;
@@ -76,14 +77,14 @@ class IndexSetDeletionForm extends React.Component<
 
   _modalContent = () => {
     if (this._isLoading()) {
-      return <Spinner text="Loading assigned streams..." />;
+      return <Spinner text={i18n.t('deletion_form.loading_streams', { ns: 'indexsets' })} />;
     }
 
     if (this.props.indexSet.default) {
       return (
         <Row>
           <Col md={12}>
-            <Alert bsStyle="danger">Unable to delete the index set because it is the default index set!</Alert>
+            <Alert bsStyle="danger">{i18n.t('deletion_form.default_index_set', { ns: 'indexsets' })}</Alert>
           </Col>
         </Row>
       );
@@ -98,15 +99,12 @@ class IndexSetDeletionForm extends React.Component<
         <div>
           <Row>
             <Col md={12}>
-              <Alert bsStyle="danger">
-                Unable to delete the index set because it has assigned streams. Remove stream assignments to be able to
-                delete this index set.
-              </Alert>
+              <Alert bsStyle="danger">{i18n.t('deletion_form.has_streams', { ns: 'indexsets' })}</Alert>
             </Col>
           </Row>
           <Row>
             <Col md={12}>
-              <h4>Assigned streams:</h4>
+              <h4>{i18n.t('deletion_form.assigned_streams', { ns: 'indexsets' })}</h4>
               <ul>{assignedStreams}</ul>
             </Col>
           </Row>
@@ -120,8 +118,8 @@ class IndexSetDeletionForm extends React.Component<
           <Input
             id="remove-data-checkbox"
             type="checkbox"
-            label="Remove all data for this index set?"
-            help={<span>All indices related to this index set will be deleted.</span>}
+            label={i18n.t('deletion_form.remove_data_label', { ns: 'indexsets' })}
+            help={<span>{i18n.t('deletion_form.remove_data_help', { ns: 'indexsets' })}</span>}
             checked={this.state.deleteIndices}
             onChange={this._onRemoveClick}
           />
@@ -143,11 +141,11 @@ class IndexSetDeletionForm extends React.Component<
     return (
       <BootstrapModalForm
         show={this.state.showModal}
-        title={`Delete index set "${this.props.indexSet.title}"?`}
+        title={i18n.t('deletion_form.title', { ns: 'indexsets', title: this.props.indexSet.title })}
         data-telemetry-title="Delete index set"
         onCancel={this.close}
         onSubmitForm={this._onDelete}
-        submitButtonText="Delete"
+        submitButtonText={i18n.t('deletion_form.delete', { ns: 'indexsets' })}
         submitButtonDisabled={!this._isDeletable()}>
         {this._modalContent()}
       </BootstrapModalForm>

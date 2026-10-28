@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OrderedMap } from 'immutable';
 
 import { Table } from 'components/bootstrap';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const AssociatedStreamsSection = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
   const [page, setPage] = useState(1);
   const {
     data: { list: streams, pagination },
@@ -49,17 +51,12 @@ const AssociatedStreamsSection = ({ indexSet }: Props) => {
   }
 
   const hiddenCount = indexSet.stream_count - pagination.total;
-  const hiddenNote = hiddenCount > 0 && (
-    <p>
-      {hiddenCount} more {hiddenCount === 1 ? 'stream is' : 'streams are'} routed to this index set, but you do not have
-      permission to view {hiddenCount === 1 ? 'it' : 'them'}.
-    </p>
-  );
+  const hiddenNote = hiddenCount > 0 && <p>{t('overview_table.hidden_streams', { count: hiddenCount })}</p>;
 
   if (pagination.total === 0) {
     return (
       <>
-        <p>No streams you can view are routed to this index set.</p>
+        <p>{t('overview_table.no_streams')}</p>
         {hiddenNote}
       </>
     );
@@ -77,8 +74,8 @@ const AssociatedStreamsSection = ({ indexSet }: Props) => {
         <Table bordered condensed>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Status</th>
+              <th>{t('overview_table.streams_title')}</th>
+              <th>{t('overview_table.streams_status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -88,7 +85,7 @@ const AssociatedStreamsSection = ({ indexSet }: Props) => {
                   <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>
                   {stream.is_default && <DefaultLabel />}
                 </td>
-                <td>{stream.disabled ? 'Paused' : 'Running'}</td>
+                <td>{stream.disabled ? t('overview_table.stream_paused') : t('overview_table.stream_running')}</td>
               </tr>
             ))}
           </tbody>

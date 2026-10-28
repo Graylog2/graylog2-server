@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
@@ -29,6 +30,7 @@ const DeletionRetentionStrategyConfiguration = ({
   updateConfig,
   disabled = false,
 }: DeletionRetentionStrategyConfigurationProps) => {
+  const { t } = useTranslation('indexsets');
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 
   const _onInputUpdate = (field) => (e) => {
@@ -46,13 +48,13 @@ const DeletionRetentionStrategyConfiguration = ({
         disabled={disabled}
         type="number"
         id="max-number-of-indices"
-        label="Max number of indices"
+        label={t('strategies.retention_max_indices_label')}
         onChange={_onInputUpdate('max_number_of_indices')}
         value={maxNumberOfIndices}
         min={1}
         help={
           <span>
-            Maximum number of indices to keep before <strong>deleting</strong> the oldest ones
+            <Trans t={t} i18nKey="strategies.retention_deleting_help" components={{ strong: <strong /> }} />
           </span>
         }
         required

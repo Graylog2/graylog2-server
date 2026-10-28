@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppConfig from 'util/AppConfig';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -24,24 +25,26 @@ import DocsHelper from 'util/DocsHelper';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
 
 const SelectTemplateButton = ({ onClick }: { onClick: () => void }) => {
+  const { t } = useTranslation('indexsets');
   const isCloud = AppConfig.isCloud();
   if (isCloud) return null;
 
-  return <Button onClick={onClick}>Select Template</Button>;
+  return <Button onClick={onClick}>{t('pages.select_template')}</Button>;
 };
 
 const IndexSetCreationPage = () => {
+  const { t } = useTranslation('indexsets');
   const [showSelectTemplateModal, setShowSelectTemplateModal] = useState<boolean>(true);
 
   return (
     <SelectIndexSetTemplateProvider>
-      <DocumentTitle title="Create Index Set">
+      <DocumentTitle title={t('pages.create_index_set')}>
         <IndicesPageNavigation />
         <div>
           <PageHeader
-            title="Create Index Set"
+            title={t('pages.create_index_set')}
             documentationLink={{
-              title: 'Index model documentation',
+              title: t('overview.header.documentation_link'),
               path: DocsHelper.PAGES.INDEX_MODEL,
             }}
             actions={
@@ -49,10 +52,7 @@ const IndexSetCreationPage = () => {
                 <SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />
               </IfPermitted>
             }>
-            <span>
-              Create a new index set that will let you configure the retention, sharding, and replication of messages
-              coming from one or more streams.
-            </span>
+            <span>{t('pages.create_description')}</span>
           </PageHeader>
 
           <Row className="content">

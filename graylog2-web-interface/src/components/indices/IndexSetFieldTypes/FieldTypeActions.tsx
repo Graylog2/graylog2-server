@@ -16,6 +16,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { refetch: refetchFieldTypes } = useTableFetchContext();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -49,19 +51,23 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
         role="button"
         bsSize="xsmall"
         disabled={fieldType.isReserved}
-        title={`Edit field type for ${fieldType.fieldName}`}
+        title={t('field_types.edit_title', { fieldName: fieldType.fieldName })}
         tabIndex={0}>
-        Edit{' '}
+        {t('common:actions.edit')}{' '}
         {fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for
-            reserved fields might impact the stability of {productName}
+          <HoverForHelp displayLeftMargin title={t('field_types.reserved_title')} pullRight={false}>
+            {t('field_types.reserved_help', { productName })}
           </HoverForHelp>
         )}
       </Button>
       {showResetButton && (
-        <Button onClick={toggleResetModal} role="button" bsSize="xsmall" title="Reset custom type" tabIndex={0}>
-          Reset
+        <Button
+          onClick={toggleResetModal}
+          role="button"
+          bsSize="xsmall"
+          title={t('field_types.reset_custom_type')}
+          tabIndex={0}>
+          {t('field_types.reset')}
         </Button>
       )}
       {showResetModal && (

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { IndexerFailures } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INDEXER_FAILURES_LIST_QUERY_KEY = 'indexer_failures_list';
@@ -34,8 +35,8 @@ const useIndexerFailuresList = (
     queryFn: () =>
       defaultOnError(
         IndexerFailures.single(limit, offset),
-        'Loading indexer failures list failed with status',
-        'Could not load indexer failures list',
+        i18n.t('hooks.failures_list_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.failures_list_load_failed_title', { ns: 'indexsets' }),
       ),
   });
 

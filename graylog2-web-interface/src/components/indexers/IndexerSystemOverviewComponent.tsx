@@ -16,6 +16,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Enterprise } from '@graylog/server-api';
 
@@ -26,8 +27,9 @@ import { defaultOnError } from 'util/conditional/onError';
 import IndexerFailuresComponent from './IndexerFailuresComponent';
 
 const IndexerSystemOverviewComponent = () => {
+  const { t } = useTranslation('indexsets');
   const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(
-    <Spinner text="Looking for Index Failures..." />,
+    <Spinner text={t('indexers.system_overview.looking_for_failures')} />,
   );
 
   const pluginSystemOverview = usePluginEntities('systemOverview');
@@ -35,7 +37,11 @@ const IndexerSystemOverviewComponent = () => {
 
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
-      defaultOnError(Enterprise.licenseInfo(), "Couldn't load license information", 'Error').then((response: any) => {
+      defaultOnError(
+        Enterprise.licenseInfo(),
+        t('indexers.system_overview.license_load_failed'),
+        t('indexers.system_overview.error_title'),
+      ).then((response: any) => {
         setLoadIndexerFailuresComponent(
           response.license_info.license_status === 'installed' ? (
             <EnterpriseIndexerFailures />
@@ -48,7 +54,7 @@ const IndexerSystemOverviewComponent = () => {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);
     }
-  }, [EnterpriseIndexerFailures, setLoadIndexerFailuresComponent]);
+  }, [EnterpriseIndexerFailures, setLoadIndexerFailuresComponent, t]);
 
   return loadIndexerFailuresComponent;
 };

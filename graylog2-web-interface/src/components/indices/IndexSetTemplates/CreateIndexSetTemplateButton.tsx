@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -24,6 +25,7 @@ import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 const CreateIndexSetTemplateButton = () => {
+  const { t } = useTranslation('indexsets');
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
 
@@ -37,7 +39,7 @@ const CreateIndexSetTemplateButton = () => {
 
   return (
     <Button bsStyle="primary" onClick={handleClick}>
-      Create template
+      {t('templates.create')}
     </Button>
   );
 };

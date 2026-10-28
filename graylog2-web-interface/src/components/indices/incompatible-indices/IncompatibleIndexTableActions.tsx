@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Button, ButtonToolbar, Label } from 'components/bootstrap';
@@ -58,6 +59,7 @@ type Props = {
 };
 
 const IncompatibleIndexTableActions = ({ index }: Props) => {
+  const { t } = useTranslation('indexsets');
   const {
     archiveActionsAvailable,
     reindexActionsAvailable,
@@ -93,7 +95,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
             ]}
           />
         ) : (
-          <Label bsStyle="warning">Archiving...</Label>
+          <Label bsStyle="warning">{t('incompatible.archiving')}</Label>
         )}
       </PendingIndicator>
     );
@@ -102,7 +104,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
   if (pendingStatus?.state === 'reindexing') {
     return (
       <PendingIndicator>
-        <Label bsStyle="primary">Reindexing...</Label>
+        <Label bsStyle="primary">{t('incompatible.reindexing')}</Label>
       </PendingIndicator>
     );
   }
@@ -148,14 +150,11 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
       const errorMessage = extractErrorMessage(errorThrown);
 
       if (actionDefinition.isArchiveJobConflict?.(errorMessage)) {
-        UserNotification.warning(
-          'Another archive job is already running. New archive jobs can be started after it finishes.',
-          'Archive job already running',
-        );
+        UserNotification.warning(t('incompatible.archive_conflict'), t('incompatible.archive_conflict_title'));
         refetchClusterJobs?.();
         setConfirmedAction(undefined);
       } else {
-        UserNotification.error(errorMessage, `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
+        UserNotification.error(errorMessage, actionDefinition.errorTitle);
       }
     } finally {
       setIsSubmitting(false);
@@ -193,7 +192,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
           isSubmitting={isSubmitting}
           onCancel={() => setConfirmedAction(undefined)}
           onConfirm={handleConfirm}
-          submitLoadingText="Working...">
+          submitLoadingText={t('incompatible.working')}>
           {confirmDefinition.confirmationBody(index)}
         </ConfirmDialog>
       )}

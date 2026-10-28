@@ -24,6 +24,7 @@ export const PAGE_NAV_TITLE = 'Indices';
 const PREM_ONLY_NAV_ITEMS = [
   {
     description: 'Index Set Templates',
+    titleKey: 'indexsets:navigation.index_set_templates',
     path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW,
     exactPathMatch: false,
     permissions: 'indexset_templates:read' as const,
@@ -31,9 +32,15 @@ const PREM_ONLY_NAV_ITEMS = [
 ];
 
 const NAV_ITEMS = [
-  { description: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
+  {
+    description: 'Indices & Index Sets',
+    titleKey: 'indexsets:navigation.indices_and_index_sets',
+    path: Routes.SYSTEM.INDICES.LIST,
+    exactPathMatch: true,
+  },
   {
     description: 'Field Type Profiles',
+    titleKey: 'indexsets:navigation.field_type_profiles',
     path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
     exactPathMatch: false,
     permissions: 'mappingprofiles:read' as const,
@@ -44,6 +51,7 @@ const bindings: PluginExports = {
   pageNavigation: [
     {
       description: PAGE_NAV_TITLE,
+      titleKey: 'indexsets:navigation.indices',
       children: AppConfig.isCloud() ? NAV_ITEMS : [...NAV_ITEMS, ...PREM_ONLY_NAV_ITEMS],
     },
   ],

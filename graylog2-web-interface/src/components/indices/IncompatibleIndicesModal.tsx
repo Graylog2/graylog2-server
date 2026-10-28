@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Alert, Button, Modal } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
 import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
@@ -26,12 +27,29 @@ import IncompatibleIndicesTable from 'components/indices/incompatible-indices/In
 import useSearchVersionCheck from 'hooks/useSearchVersionCheck';
 import DocsHelper from 'util/DocsHelper';
 
+const MigrationLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <DataNodeMigrationLink text={children} />
+);
+
+const DocsLink = ({ children = undefined }: React.PropsWithChildren<{}>) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <ExternalLink href={DocsHelper.toString(DocsHelper.PAGES.DATA_NODE_MIGRATION)}>
+      {children}
+      <span className="sr-only">{t('indices.incompatible_modal.opens_in_new_tab')}</span>
+    </ExternalLink>
+  );
+};
+
 type Props = {
   show: boolean;
   onClose: () => void;
 };
 
 const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
+  const { t } = useTranslation('indexsets');
+  const productName = useProductName();
   const { data: runsWithDataNode } = useRunsWithDataNode();
   const { data: incompatibleIndices } = useIncompatibleIndices();
   const { data: openSearchVersionCheck } = useSearchVersionCheck('opensearch', '^2.0.0');
@@ -41,41 +59,28 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
   return (
     <Modal show={show} onHide={onClose} bsSize="xl">
       <Modal.Header>
-        <Modal.Title>Index Versions</Modal.Title>
+        <Modal.Title>{t('indices.incompatible_modal.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {showUnsupportedUpgradeWarning && (
           <Alert bsStyle="warning">
+            <p>{t('indices.incompatible_modal.upgrade_blocked')}</p>
             <p>
-              The presence of incompatible indices prevents this cluster from upgrading to OpenSearch 3.x at this time -
-              doing so would be a destructive action.
+              <Trans
+                t={t}
+                i18nKey="indices.incompatible_modal.upgrade_path"
+                components={{ migrationLink: <MigrationLink />, docsLink: <DocsLink /> }}
+              />
             </p>
-            <p>
-              The recommended upgrade path is to <DataNodeMigrationLink text="migrate from OpenSearch to Data Node" />{' '}
-              using the provided wizard (
-              <ExternalLink href={DocsHelper.toString(DocsHelper.PAGES.DATA_NODE_MIGRATION)}>
-                documentation
-                <span className="sr-only"> (opens in a new tab)</span>
-              </ExternalLink>
-              ), and then use the built-in Data Node upgrade automation to proceed.
-            </p>
-            <p>
-              <ProductName /> does not currently support the direct OpenSearch 2.x to 3.x upgrade process where
-              incompatible indices are present, due to the risks involved. A subsequent release will add support for
-              this path, or if it is urgent, please reach out to <ProductName /> to discuss a Professional Services
-              engagement.
-            </p>
-            <p>OpenSearch 2.x remains in support until November 2027.</p>
+            <p>{t('indices.incompatible_modal.unsupported_direct_upgrade', { productName })}</p>
+            <p>{t('indices.incompatible_modal.support_until')}</p>
           </Alert>
         )}
-        <Alert bsStyle="info">
-          Any indices created with an incompatible, previous major version of OpenSearch need to be archived, deleted or
-          reindexed before the search backend can be upgraded to the next major version.
-        </Alert>
+        <Alert bsStyle="info">{t('indices.incompatible_modal.info')}</Alert>
         <IncompatibleIndicesTable withoutURLParams />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('indices.incompatible_modal.close')}</Button>
       </Modal.Footer>
     </Modal>
   );

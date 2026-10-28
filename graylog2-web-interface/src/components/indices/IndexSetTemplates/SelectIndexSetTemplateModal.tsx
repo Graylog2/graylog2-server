@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -46,6 +47,7 @@ const FlexWrapper = styled.div(
 );
 
 const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { selectedIndexSetTemplate, setSelectedIndexSetTemplate } = useSelectedIndexSetTemplate();
   const [tempSelectedTemplate, setTempSelectedTemplate] = useState<IndexSetTemplate | undefined>(
     selectedIndexSetTemplate,
@@ -61,8 +63,8 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const [showBuiltInWarmTier, setShowBuiltInWarmTier] = useState<boolean>(!!dataTieringPlugin);
 
   const templateCategorySegments: Array<{ value: TemplateCategorySegment; label: string }> = [
-    { value: 'built_in', label: 'Built-in Templates' },
-    { value: 'custom', label: 'Custom Templates' },
+    { value: 'built_in', label: t('templates.segment_built_in') },
+    { value: 'custom', label: t('templates.segment_custom') },
   ];
 
   const { isLoading: isLoadingBuiltIn, data: builtInList } = useBuiltInTemplates(showBuiltInWarmTier);
@@ -129,13 +131,13 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   return (
     <Modal show={show} bsSize="large" onHide={handleClose}>
       <Modal.Header>
-        <Modal.Title>Index Set Templates</Modal.Title>
+        <Modal.Title>{t('templates.modal_title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <FlexWrapper>
           <Row>
             <Col md={12}>
-              Select a template appropriate to the requirements for this data (and available storage).
+              {t('templates.modal_intro')}
               {tempSelectedTemplate?.index_set_config.data_tiering?.warm_tier_enabled && dataTieringPlugin && (
                 <dataTieringPlugin.WarmTierReadinessInfo />
               )}
@@ -157,7 +159,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
                   <Input
                     id="built-in-data-tiering"
                     type="checkbox"
-                    label="Warm Tier (Enterprise)"
+                    label={t('templates.warm_tier')}
                     checked={showBuiltInWarmTier}
                     onChange={() => setShowBuiltInWarmTier(!showBuiltInWarmTier)}
                   />
@@ -188,7 +190,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
                           clearable={false}
                           onChange={handleCustomSelect}
                           options={customList.map((template) => ({ label: template.title, value: template.id }))}
-                          placeholder="Select a template"
+                          placeholder={t('templates.select_template_placeholder')}
                           value={selectedCustomTemplate?.id}
                         />
                       </Col>
@@ -206,7 +208,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
           onSubmit={handleSubmit}
           submitButtonType="button"
           disabledSubmit={!tempSelectedTemplate}
-          submitButtonText="Apply template"
+          submitButtonText={t('templates.apply')}
           displayCancel={false}
         />
       </Modal.Footer>

@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const NoopRetentionStrategySummary = () => (
-  <div>
-    <dl>
-      <dt>Index retention strategy:</dt>
-      <dd>Do nothing</dd>
-    </dl>
-  </div>
-);
+const NoopRetentionStrategySummary = () => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <div>
+      <dl>
+        <dt>{t('strategies.retention_summary_strategy')}</dt>
+        <dd>{t('strategies.retention_summary_noop')}</dd>
+      </dl>
+    </div>
+  );
+};
 
 export default NoopRetentionStrategySummary;

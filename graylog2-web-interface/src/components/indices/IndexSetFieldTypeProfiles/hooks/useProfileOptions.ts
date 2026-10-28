@@ -18,6 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { ProfileOptions } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -39,8 +40,8 @@ const useProfileOptions = (): {
     queryFn: () =>
       defaultOnError(
         fetchProfileOptions(),
-        'Loading index field type profile options failed with status',
-        'Could not load index field type profile options',
+        i18n.t('hooks.profile_options_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.profile_options_load_failed_title', { ns: 'indexsets' }),
       ),
 
     placeholderData: keepPreviousData,

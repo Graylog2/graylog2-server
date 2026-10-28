@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -59,6 +60,7 @@ const Description = styled.p`
 `;
 
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
+  const { t } = useTranslation('indexsets');
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
@@ -84,7 +86,7 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
       {template.enabled && (
         <ButtonWrapper>
           <Button onClick={() => handleCardClick(template)} disabled={isSelected}>
-            {isSelected ? 'Selected' : 'Select'}
+            {isSelected ? t('templates.selected') : t('templates.select')}
           </Button>
         </ButtonWrapper>
       )}

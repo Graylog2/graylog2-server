@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
@@ -27,6 +28,7 @@ import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
 const CreateProfile = () => {
+  const { t } = useTranslation('indexsets');
   const sendTelemetry = useSendTelemetry();
   const { createProfile } = useProfileMutations();
   const location = useLocation<{ customFieldMappings: any }>();
@@ -73,8 +75,8 @@ const CreateProfile = () => {
     <ProfileForm
       initialValues={initialValues}
       onCancel={onCancel}
-      submitButtonText="Create profile"
-      submitLoadingText="Creating profile..."
+      submitButtonText={t('profiles.create')}
+      submitLoadingText={t('profiles.creating')}
       onSubmit={onSubmit}
     />
   );

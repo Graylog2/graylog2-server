@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
@@ -72,15 +73,17 @@ const RotationStrategies = ({
   indexSetRotationStrategyClass,
   disabled = false,
 }: RotationStrategiesProps) => {
+  const { t } = useTranslation('indexsets');
+
   if (!rotationStrategies) return <Spinner />;
 
   return (
     <IndexMaintenanceStrategiesConfiguration
-      title="Index Rotation Configuration"
+      title={t('index_set_form.rotation_title')}
       name="rotation"
-      description="Multiple indices are used to store documents, and you can configure the strategy to determine when to rotate the currently active write index."
-      selectPlaceholder="Select rotation strategy"
-      label="Rotation strategy"
+      description={t('index_set_form.rotation_description')}
+      selectPlaceholder={t('index_set_form.rotation_placeholder')}
+      label={t('index_set_form.rotation_label')}
       pluginExports={PluginStore.exports('indexRotationConfig')}
       strategies={rotationStrategies}
       activeConfig={{
@@ -103,15 +106,17 @@ const RetentionConfig = ({
   immutableFields = [],
   ignoreFieldRestrictions = false,
 }: RetentionConfigProps) => {
+  const { t } = useTranslation('indexsets');
+
   if (!retentionStrategies) return <Spinner />;
 
   return (
     <IndexMaintenanceStrategiesConfiguration
-      title="Index Retention Configuration"
+      title={t('index_set_form.retention_title')}
       name="retention"
-      description="A retention strategy is used to clean up old indices"
-      selectPlaceholder="Select retention strategy"
-      label="Retention strategy"
+      description={t('index_set_form.retention_description')}
+      selectPlaceholder={t('index_set_form.retention_placeholder')}
+      label={t('index_set_form.retention_label')}
       pluginExports={PluginStore.exports('indexRetentionConfig')}
       strategies={retentionStrategies}
       retentionStrategiesContext={retentionStrategiesContext}

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { IndexerIndices } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { IndexInfo } from 'hooks/useIndices';
 
@@ -41,8 +42,8 @@ const useIndexerIndicesMultiple = (
     queryFn: () =>
       defaultOnError(
         getMultiple(indices),
-        `Loading Indexer multiple indices failed with status`,
-        `Could not load Indexer multiple indices `,
+        i18n.t('hooks.indices_multiple_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.indices_multiple_load_failed_title', { ns: 'indexsets' }),
       ),
     enabled,
   });

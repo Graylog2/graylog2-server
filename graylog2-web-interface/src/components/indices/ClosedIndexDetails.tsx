@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Alert, Button } from 'components/bootstrap';
@@ -27,6 +28,7 @@ type ClosedIndexDetailsProps = {
 };
 
 const ClosedIndexDetails = ({ indexName, indexRange = undefined }: ClosedIndexDetailsProps) => {
+  const { t } = useTranslation('indexsets');
   const queryClient = useQueryClient();
 
   const _invalidate = () => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY });
@@ -36,7 +38,7 @@ const ClosedIndexDetails = ({ indexName, indexRange = undefined }: ClosedIndexDe
   };
 
   const _onDeleteIndex = () => {
-    if (window.confirm(`Really delete index ${indexName}?`)) {
+    if (window.confirm(t('indices.closed_index.confirm_delete', { indexName }))) {
       deleteIndex(indexName).then(_invalidate);
     }
   };
@@ -44,15 +46,13 @@ const ClosedIndexDetails = ({ indexName, indexRange = undefined }: ClosedIndexDe
   return (
     <div className="index-info">
       <IndexRangeSummary indexRange={indexRange} />
-      <Alert bsStyle="info">
-        This index is closed. Index information is not available at the moment, please reopen the index and try again.
-      </Alert>
+      <Alert bsStyle="info">{t('indices.closed_index.info')}</Alert>
       <hr style={{ marginBottom: '5', marginTop: '10' }} />
       <Button bsStyle="warning" bsSize="xs" onClick={_onReopen}>
-        Reopen index
+        {t('indices.closed_index.reopen')}
       </Button>{' '}
       <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>
-        Delete index
+        {t('indices.closed_index.delete')}
       </Button>
     </div>
   );

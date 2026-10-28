@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
+import type { TFunction } from 'i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
@@ -35,16 +37,18 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
 };
 
-const expandedSections = {
+const getExpandedSections = (t: TFunction) => ({
   customFieldMapping: {
-    title: 'Custom Field Mappings',
+    title: t('hooks.profiles_custom_field_mappings'),
     content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
       <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
     ),
   },
-};
+});
 
 const ProfilesList = () => {
+  const { t } = useTranslation('indexsets');
+  const expandedSections = useMemo(() => getExpandedSections(t), [t]);
   const {
     data: { indexSets },
   } = useIndexSetsList(false);
@@ -53,7 +57,7 @@ const ProfilesList = () => {
 
   return (
     <PaginatedEntityTable<IndexSetFieldTypeProfile>
-      humanName="index set profiles"
+      humanName={t('hooks.profiles_human_name')}
       entityActions={profileActions}
       tableLayout={DEFAULT_LAYOUT}
       fetchEntities={fetchIndexSetFieldTypeProfiles}
@@ -61,7 +65,7 @@ const ProfilesList = () => {
       entityAttributesAreCamelCase
       expandedSectionRenderers={expandedSections}
       columnRenderers={customColumnRenderers}
-      searchPlaceholder="Search for profile name"
+      searchPlaceholder={t('hooks.profiles_search_placeholder')}
     />
   );
 };

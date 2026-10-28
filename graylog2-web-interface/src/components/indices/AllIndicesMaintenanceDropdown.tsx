@@ -16,30 +16,32 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { SystemIndexRanges } from '@graylog/server-api';
 
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import IncompatibleIndicesModal from 'components/indices/IncompatibleIndicesModal';
 
-const _onRecalculateAllIndexRange = () => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm('This will cleanup & recalculate all index ranges existing. Do you want to proceed?')) {
-    SystemIndexRanges.rebuild();
-  }
-};
-
 const AllIndicesMaintenanceDropdown = () => {
+  const { t } = useTranslation('indexsets');
   const [showIncompatibleModal, setShowIncompatibleModal] = useState(false);
+
+  const _onRecalculateAllIndexRange = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(t('indices.maintenance.confirm_recalculate_all'))) {
+      SystemIndexRanges.rebuild();
+    }
+  };
 
   return (
     <ButtonGroup>
-      <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+      <DropdownButton bsStyle="info" title={t('indices.maintenance.title')} id="indices-maintenance-actions" pullRight>
         <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>
-          Cleanup & recalculate all index ranges
+          {t('indices.maintenance.recalculate_all')}
         </MenuItem>
         <MenuItem eventKey="4" onClick={() => setShowIncompatibleModal(true)}>
-          Check index versions
+          {t('indices.maintenance.check_versions')}
         </MenuItem>
       </DropdownButton>
       {showIncompatibleModal && <IncompatibleIndicesModal show onClose={() => setShowIncompatibleModal(false)} />}

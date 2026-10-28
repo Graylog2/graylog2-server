@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 import { Icon } from 'components/common';
@@ -24,6 +25,7 @@ import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable'
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const useCustomColumnRenderers = () => {
+  const { t } = useTranslation('indexsets');
   const {
     data: { fieldTypes },
   } = useFieldTypesForMappings();
@@ -47,12 +49,12 @@ const useCustomColumnRenderers = () => {
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>
-            isReserved ? <Icon title="Field has reserved field type" name="check" /> : null,
+            isReserved ? <Icon title={t('field_types.reserved_icon')} name="check" /> : null,
           staticWidth: 'matchHeader' as const,
         },
       },
     }),
-    [fieldTypes],
+    [fieldTypes, t],
   );
 };
 

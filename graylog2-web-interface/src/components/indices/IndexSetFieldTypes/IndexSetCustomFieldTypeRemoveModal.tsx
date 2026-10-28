@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
@@ -77,6 +78,7 @@ const IndexSetCustomFieldTypeRemoveContent = ({
   rotated,
   indexSetIds,
 }: ContentProps) => {
+  const { t } = useTranslation('indexsets');
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
   const { customFieldMappingsByField, name: profileName, id: profileId } = useIndexProfileWithMappingsByField();
@@ -92,37 +94,54 @@ const IndexSetCustomFieldTypeRemoveContent = ({
     [customFieldMappingsByField, fields],
   );
 
+  let removalKey = 'field_types.removal_basic';
+
+  if (overriddenIndexFieldsStr && overriddenProfilesFieldsWithType.length) {
+    removalKey = 'field_types.removal_engine_and_profile';
+  } else if (overriddenIndexFieldsStr) {
+    removalKey = 'field_types.removal_engine';
+  } else if (overriddenProfilesFieldsWithType.length) {
+    removalKey = 'field_types.removal_profile';
+  }
+
   return (
     <div>
       <Alert>
-        After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
-        {overriddenIndexFieldsStr && (
-          <>
-            , the settings of your <i>search engine</i> will be applied for fields: <b>{overriddenIndexFieldsStr}</b>
-          </>
-        )}
-        {!!overriddenProfilesFieldsWithType.length && (
-          <>
-            {', '}
-            the settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
-              {profileName}
-            </Link>{' '}
-            ( namely{' '}
-            <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
-            ) will be applied.
-          </>
-        )}
+        <Trans
+          t={t}
+          i18nKey={removalKey}
+          values={{
+            fields: fieldsStr,
+            indexSets: indexSetsStr,
+            engineFields: overriddenIndexFieldsStr,
+            profileName,
+          }}
+          components={{
+            b: <b />,
+            i: <i />,
+            profileLink: <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)} />,
+            mappings: (
+              <OverriddenProfilesFieldsWithTypeList
+                overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType}
+              />
+            ),
+          }}
+        />
       </Alert>
-      <StyledLabel>Select Rotation Strategy</StyledLabel>
+      <StyledLabel>{t('field_types.select_rotation_strategy')}</StyledLabel>
       <p>
-        To see and use field type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically
-        rotate affected indices after submitting this form or do that manually later.
+        <Trans
+          t={t}
+          i18nKey="field_types.rotate_hint_fields"
+          values={{ fields: fieldsStr }}
+          components={{ b: <b /> }}
+        />
       </p>
       <Input
         type="checkbox"
         id="rotate"
         name="rotate"
-        label="Rotate affected indices after change"
+        label={t('field_types.rotate_after_change')}
         onChange={() => setRotated((cur: boolean) => !cur)}
         checked={rotated}
       />
@@ -131,6 +150,7 @@ const IndexSetCustomFieldTypeRemoveContent = ({
 };
 
 const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { setSelectedEntities } = useSelectedEntities();
   const {
     data: { indexSets: indexSetsList },
@@ -203,8 +223,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
 
   return (
     <BootstrapModalForm
-      title="Remove Field Type Overrides"
-      submitButtonText="Remove field type overrides"
+      title={t('field_types.remove_modal_title')}
+      submitButtonText={t('field_types.remove_modal_submit')}
       onSubmitForm={onSubmit}
       onCancel={onCancel}
       show={show}

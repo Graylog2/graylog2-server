@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CountBadge } from 'components/common';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
@@ -27,6 +28,7 @@ type Props = {
 };
 
 const StreamCountCell = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { toggleSection, expandedSections } = useExpandedSections();
   const isOpen = expandedSections?.[indexSet.id]?.includes(STREAMS_SECTION) ?? false;
 
@@ -35,7 +37,11 @@ const StreamCountCell = ({ indexSet }: Props) => {
       count={indexSet.stream_count}
       iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={() => toggleSection(indexSet.id, STREAMS_SECTION)}
-      title={`${isOpen ? 'Hide' : 'Show'} associated streams for ${indexSet.title}`}
+      title={
+        isOpen
+          ? t('overview_table.hide_streams', { title: indexSet.title })
+          : t('overview_table.show_streams', { title: indexSet.title })
+      }
     />
   );
 };

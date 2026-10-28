@@ -15,17 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import type { TFunction } from 'i18next';
 
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
 
-const expandedSections = {
+const getExpandedSections = (t: TFunction) => ({
   overriddenProfile: {
-    title: 'Origin explanation',
+    title: t('hooks.origin_explanation'),
     content: ({ type, origin, fieldName }: IndexSetFieldType) => (
       <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />
     ),
   },
-};
+});
 
-export default expandedSections;
+export default getExpandedSections;

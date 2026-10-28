@@ -15,17 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 import moment from 'moment';
 
 const Meter = ({ meter }) => {
-  const value = <span>{numeral(meter.total).format('0,0')} ops</span>;
+  const { t } = useTranslation('indexsets');
+  const value = (
+    <span>{t('shards.ops', { count: meter.total, formattedCount: numeral(meter.total).format('0,0') })}</span>
+  );
 
   if (meter.total > 0) {
     return (
       <span>
         {value}{' '}
-        <span title={`${meter.time_seconds}s`}>(took {moment.duration(meter.time_seconds, 'seconds').humanize()})</span>
+        <span title={t('shards.seconds_short', { seconds: meter.time_seconds })}>
+          {t('shards.took', { duration: moment.duration(meter.time_seconds, 'seconds').humanize() })}
+        </span>
       </span>
     );
   }
@@ -38,46 +44,50 @@ type Props = {
   shardMeter: any;
 };
 
-const ShardMeter = ({ shardMeter, title }: Props) => (
-  <span>
-    <h3 style={{ display: 'inline' }}>{title}</h3>
-    <dl>
-      <dt>Index:</dt>
-      <dd>
-        <Meter meter={shardMeter.index} />
-      </dd>
+const ShardMeter = ({ shardMeter, title }: Props) => {
+  const { t } = useTranslation('indexsets');
 
-      <dt>Flush:</dt>
-      <dd>
-        <Meter meter={shardMeter.flush} />
-      </dd>
+  return (
+    <span>
+      <h3 style={{ display: 'inline' }}>{title}</h3>
+      <dl>
+        <dt>{t('shards.index')}</dt>
+        <dd>
+          <Meter meter={shardMeter.index} />
+        </dd>
 
-      <dt>Merge:</dt>
-      <dd>
-        <Meter meter={shardMeter.merge} />
-      </dd>
+        <dt>{t('shards.flush')}</dt>
+        <dd>
+          <Meter meter={shardMeter.flush} />
+        </dd>
 
-      <dt>Query:</dt>
-      <dd>
-        <Meter meter={shardMeter.search_query} />
-      </dd>
+        <dt>{t('shards.merge')}</dt>
+        <dd>
+          <Meter meter={shardMeter.merge} />
+        </dd>
 
-      <dt>Fetch:</dt>
-      <dd>
-        <Meter meter={shardMeter.search_fetch} />
-      </dd>
+        <dt>{t('shards.query')}</dt>
+        <dd>
+          <Meter meter={shardMeter.search_query} />
+        </dd>
 
-      <dt>Get:</dt>
-      <dd>
-        <Meter meter={shardMeter.get} />
-      </dd>
+        <dt>{t('shards.fetch')}</dt>
+        <dd>
+          <Meter meter={shardMeter.search_fetch} />
+        </dd>
 
-      <dt>Refresh:</dt>
-      <dd>
-        <Meter meter={shardMeter.refresh} />
-      </dd>
-    </dl>
-  </span>
-);
+        <dt>{t('shards.get')}</dt>
+        <dd>
+          <Meter meter={shardMeter.get} />
+        </dd>
+
+        <dt>{t('shards.refresh')}</dt>
+        <dd>
+          <Meter meter={shardMeter.refresh} />
+        </dd>
+      </dl>
+    </span>
+  );
+};
 
 export default ShardMeter;

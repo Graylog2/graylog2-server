@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import 'moment-duration-format';
 
@@ -23,6 +24,7 @@ type Props = {
 };
 
 const TimeBasedRotationStrategySummary = ({ config }: Props) => {
+  const { t } = useTranslation('indexsets');
   const humanizedPeriod = () => {
     const duration = moment.duration(config.rotation_period);
 
@@ -32,14 +34,14 @@ const TimeBasedRotationStrategySummary = ({ config }: Props) => {
   return (
     <div>
       <dl>
-        <dt>Index rotation strategy:</dt>
-        <dd>Index Time</dd>
-        <dt>Rotation period:</dt>
+        <dt>{t('strategies.rotation_summary_strategy')}</dt>
+        <dd>{t('strategies.rotation_index_time')}</dd>
+        <dt>{t('strategies.rotation_period_summary')}</dt>
         <dd>
           {config.rotation_period} ({humanizedPeriod()})
         </dd>
-        <dt>Rotate empty index set:</dt>
-        <dd>{config.rotate_empty_index_set ? 'Yes' : 'No'}</dd>
+        <dt>{t('strategies.rotation_rotate_empty_summary')}</dt>
+        <dd>{config.rotate_empty_index_set ? t('strategies.yes') : t('strategies.no')}</dd>
       </dl>
     </div>
   );

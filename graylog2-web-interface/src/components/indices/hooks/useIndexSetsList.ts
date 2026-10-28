@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -54,8 +55,8 @@ const useIndexSetsList = (
     queryFn: () =>
       defaultOnError(
         fetchIndexSetsList(stats, only_open),
-        'Loading index sets with list failed with status',
-        'Could not load index sets list',
+        i18n.t('hooks.index_sets_list_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.index_sets_list_load_failed_title', { ns: 'indexsets' }),
       ),
 
     placeholderData: keepPreviousData,

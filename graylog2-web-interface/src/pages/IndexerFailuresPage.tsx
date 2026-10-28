@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 import moment from 'moment';
 
@@ -27,6 +28,7 @@ import useIndexerFailuresCount from 'components/indexers/hooks/useIndexerFailure
 import useIndexerFailuresList from 'components/indexers/hooks/useIndexerFailuresList';
 
 const IndexerFailuresPage = () => {
+  const { t } = useTranslation('indexsets');
   const { page, pageSize, setPagination } = usePaginationQueryParameter();
   const since = useMemo(() => moment().subtract(10, 'years').format('YYYY-MM-DDTHH:mm:ss.SSS'), []);
   const { data: total, isLoading: isLoadingCount } = useIndexerFailuresCount(since);
@@ -45,20 +47,18 @@ const IndexerFailuresPage = () => {
   }
 
   return (
-    <DocumentTitle title="Indexer failures">
+    <DocumentTitle title={t('pages.failures_title')}>
       <span>
         <PageHeader
-          title="Indexer failures"
+          title={t('pages.failures_title')}
           documentationLink={{
-            title: 'Indexer failures documentation',
+            title: t('indexers.failures.docs'),
             path: DocsHelper.PAGES.INDEXER_FAILURES,
           }}>
           <span>
-            This is a list of message index attempts that failed. A failure means that a message was properly processed
-            but writing it to the indexer cluster failed. Note that the list is capped to a size of 50 MB so it will
-            contain a lot of failure logs but not necessarily all that ever occurred.
+            {t('pages.failures_description')}
             <br />
-            Collection containing a total of {numeral(total).format('0,0')} indexer failures.
+            {t('pages.failures_total', { count: total, formattedCount: numeral(total).format('0,0') })}
           </span>
         </PageHeader>
         <Row className="content">

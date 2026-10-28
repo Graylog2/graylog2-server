@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import { cycleActiveWriteIndex, recalculateIndexRanges } from 'components/indices/helpers/indexSetMaintenanceActions';
@@ -23,25 +24,12 @@ export type IndexSetMaintenanceAction = 'recalculateIndexRanges' | 'rotateActive
 
 const ACTIONS: {
   [action in IndexSetMaintenanceAction]: {
-    title: string;
-    confirmText: string;
-    message: string;
+    translationKey: string;
     run: (indexSetId: string) => unknown;
   };
 } = {
-  recalculateIndexRanges: {
-    title: 'Recalculate index ranges',
-    confirmText: 'Recalculate',
-    message:
-      'This will recalculate index ranges for this index set using a background system job. Do you want to proceed?',
-    run: recalculateIndexRanges,
-  },
-  rotateActiveWriteIndex: {
-    title: 'Rotate active write index',
-    confirmText: 'Rotate',
-    message: 'This will manually cycle the current active write index on this index set. Do you want to proceed?',
-    run: cycleActiveWriteIndex,
-  },
+  recalculateIndexRanges: { translationKey: 'recalculate', run: recalculateIndexRanges },
+  rotateActiveWriteIndex: { translationKey: 'rotate', run: cycleActiveWriteIndex },
 };
 
 type Props = {
@@ -51,7 +39,11 @@ type Props = {
 };
 
 const IndexSetMaintenanceDialog = ({ action, indexSetId, onClose }: Props) => {
-  const { title, confirmText, message, run } = ACTIONS[action];
+  const { t } = useTranslation('indexsets');
+  const { translationKey, run } = ACTIONS[action];
+  const title = t(`maintenance_dialog.${translationKey}_title`);
+  const confirmText = t(`maintenance_dialog.${translationKey}_confirm`);
+  const message = t(`maintenance_dialog.${translationKey}_message`);
 
   const onConfirm = () => {
     run(indexSetId);

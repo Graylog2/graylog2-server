@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from 'components/common';
 
@@ -31,7 +32,7 @@ const BulkIndexActionConfirmDialog = ({
   onCancel: () => void;
   onConfirm: () => void;
 }) => {
-  const indicesLabel = bulkAction.targetIndices.length === 1 ? 'index' : 'indices';
+  const { t } = useTranslation('indexsets');
 
   return (
     <ConfirmDialog
@@ -42,11 +43,9 @@ const BulkIndexActionConfirmDialog = ({
       isSubmitting={isSubmitting}
       onCancel={onCancel}
       onConfirm={onConfirm}
-      submitLoadingText="Working...">
-      <p>
-        This will {bulkAction.targetVerb} {bulkAction.targetIndices.length} incompatible {indicesLabel}.
-      </p>
-      <p>If an individual index fails, the remaining indices will still be processed.</p>
+      submitLoadingText={t('incompatible.working')}>
+      <p>{bulkAction.confirmBody(bulkAction.targetIndices.length)}</p>
+      <p>{t('incompatible.bulk_remaining')}</p>
     </ConfirmDialog>
   );
 };

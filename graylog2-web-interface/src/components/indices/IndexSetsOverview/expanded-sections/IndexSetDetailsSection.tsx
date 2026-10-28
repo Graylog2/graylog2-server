@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SectionGrid from 'components/common/Section/SectionGrid';
@@ -58,32 +59,36 @@ type Props = {
   indexSet: IndexSetEntity;
 };
 
-const IndexSetDetailsSection = ({ indexSet }: Props) => (
-  <Container $columns="minmax(0, 1fr) minmax(0, 2fr)">
-    <div>
-      <GroupTitle>Index set</GroupTitle>
-      <dl>
-        <dt>Index prefix:</dt>
-        <dd>{indexSet.index_prefix}</dd>
-        <HideOnCloud>
-          <dt>Shards:</dt>
-          <dd>{indexSet.shards}</dd>
-          <dt>Replicas:</dt>
-          <dd>{indexSet.replicas}</dd>
-        </HideOnCloud>
-        <dt>Field type refresh interval:</dt>
-        <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
-        <dt>Field type profile:</dt>
-        <dd>
-          <FieldTypeProfileCell profileId={indexSet.field_type_profile} />
-        </dd>
-      </dl>
-    </div>
-    <div>
-      <GroupTitle>Rotation & retention</GroupTitle>
-      <IndicesConfiguration indexSet={indexSet} />
-    </div>
-  </Container>
-);
+const IndexSetDetailsSection = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <Container $columns="minmax(0, 1fr) minmax(0, 2fr)">
+      <div>
+        <GroupTitle>{t('overview_table.group_index_set')}</GroupTitle>
+        <dl>
+          <dt>{t('set_details.index_prefix')}</dt>
+          <dd>{indexSet.index_prefix}</dd>
+          <HideOnCloud>
+            <dt>{t('set_details.shards')}</dt>
+            <dd>{indexSet.shards}</dd>
+            <dt>{t('set_details.replicas')}</dt>
+            <dd>{indexSet.replicas}</dd>
+          </HideOnCloud>
+          <dt>{t('set_details.field_type_refresh_interval')}</dt>
+          <dd>{t('set_details.seconds', { count: indexSet.field_type_refresh_interval / 1000.0 })}</dd>
+          <dt>{t('set_details.field_type_profile')}</dt>
+          <dd>
+            <FieldTypeProfileCell profileId={indexSet.field_type_profile} />
+          </dd>
+        </dl>
+      </div>
+      <div>
+        <GroupTitle>{t('overview_table.group_rotation_retention')}</GroupTitle>
+        <IndicesConfiguration indexSet={indexSet} />
+      </div>
+    </Container>
+  );
+};
 
 export default IndexSetDetailsSection;

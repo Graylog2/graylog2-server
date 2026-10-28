@@ -19,6 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemIndexSets } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 import { KEY_PREFIX } from '../fetchIndexSets';
 import type { IndexSetEntity } from '../types';
@@ -38,14 +39,17 @@ const useIndexSetMutations = (): {
   const setDefaultMutation = useMutation({
     mutationFn: (indexSet: IndexSetEntity) => SystemIndexSets.setDefault(indexSet.id),
     onSuccess: (_response, indexSet) => {
-      UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
+      UserNotification.success(
+        i18n.t('overview_table.default_set_success', { ns: 'indexsets', title: indexSet.title }),
+        i18n.t('overview_table.success', { ns: 'indexsets' }),
+      );
 
       return invalidateIndexSets();
     },
     onError: (error, indexSet) => {
       UserNotification.error(
-        `Setting index set '${indexSet.title}' as default failed with status: ${error}`,
-        'Could not set default index set.',
+        i18n.t('overview_table.default_set_failed', { ns: 'indexsets', title: indexSet.title, error }),
+        i18n.t('overview_table.default_set_failed_title', { ns: 'indexsets' }),
       );
     },
   });
@@ -54,14 +58,17 @@ const useIndexSetMutations = (): {
     mutationFn: ({ indexSet, deleteIndices }: DeleteIndexSetParams) =>
       SystemIndexSets.remove(indexSet.id, deleteIndices),
     onSuccess: (_response, { indexSet }) => {
-      UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
+      UserNotification.success(
+        i18n.t('overview_table.delete_success', { ns: 'indexsets', title: indexSet.title }),
+        i18n.t('overview_table.success', { ns: 'indexsets' }),
+      );
 
       return invalidateIndexSets();
     },
     onError: (error, { indexSet }) => {
       UserNotification.error(
-        `Deleting index set '${indexSet.title}' failed with status: ${error}`,
-        'Could not delete index set.',
+        i18n.t('overview_table.delete_failed', { ns: 'indexsets', title: indexSet.title, error }),
+        i18n.t('overview_table.delete_failed_title', { ns: 'indexsets' }),
       );
     },
   });

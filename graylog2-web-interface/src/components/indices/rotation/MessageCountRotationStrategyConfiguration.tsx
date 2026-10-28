@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
@@ -31,6 +32,7 @@ const MessageCountRotationStrategyConfiguration = ({
   updateConfig,
   disabled = false,
 }: MessageCountRotationStrategyConfigurationProps) => {
+  const { t } = useTranslation('indexsets');
   const { max_docs_per_index } = config;
   const [maxDocsPerIndex, setMaxDocsPerIndex] = useState(max_docs_per_index);
 
@@ -49,10 +51,10 @@ const MessageCountRotationStrategyConfiguration = ({
         disabled={disabled}
         type="number"
         id="max-docs-per-index"
-        label="Max documents per index"
+        label={t('strategies.rotation_max_docs_label')}
         onChange={_onInputUpdate('max_docs_per_index')}
         value={maxDocsPerIndex}
-        help="Maximum number of documents in an index before it gets rotated"
+        help={t('strategies.rotation_max_docs_help')}
         required
       />
     </div>

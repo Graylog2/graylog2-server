@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
@@ -30,13 +31,12 @@ type Props = {
 };
 
 const IndicesConfiguration = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
+
   if (!indexSet.writable) {
     return (
       <Row>
-        <Col md={12}>
-          Index set is not writable and will not be included in index rotation and retention. It is also not possible to
-          assign it to a stream.
-        </Col>
+        <Col md={12}>{t('indices_configuration.not_writable')}</Col>
       </Row>
     );
   }

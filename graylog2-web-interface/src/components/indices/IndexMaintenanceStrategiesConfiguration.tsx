@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -74,6 +75,7 @@ type Props = {
   pluginExports: Array<{
     type: string;
     displayName: string;
+    displayNameKey?: string;
     configComponent: React.ComponentType<ConfigComponentProps>;
   }>;
   strategies: Strategies;
@@ -224,6 +226,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   activeConfig: { strategy, config },
   getState,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const [newStrategy, setNewStrategy] = useState<string | undefined>(strategy);
   const {
     setValues,
@@ -254,10 +257,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
     !isTimeBasedSizeOptimizing || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention));
   const helpText =
     isTimeBasedSizeOptimizing && name === 'rotation'
-      ? 'The Time Based Size Optimizing Rotation Strategy tries to rotate the index daily.' +
-        ' It can however skip the rotation to achieve optimal sized indices by keeping the shard size within an acceptable range.' +
-        ' The optimization can delay the rotation within the range of the configured retention min/max lifetime.' +
-        ' If an index is older than the range between min/max, it will be rotated regardless of its current size.'
+      ? t('indices.maintenance_strategies.time_based_size_optimizing_help')
       : null;
 
   const _onSelect = (selectedStrategy) => {
@@ -307,6 +307,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
     [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values],
   );
 
+  const strategyLabel = ({ displayName, displayNameKey }: { displayName: string; displayNameKey?: string }) =>
+    displayNameKey ? t(displayNameKey, { defaultValue: displayName }) : displayName;
+
   const getAvailableSelectOptions = () => {
     const availableStrategies = pluginExports.filter((pluginOptions) =>
       strategies.find(({ type }) => type === pluginOptions.type),
@@ -321,20 +324,20 @@ const IndexMaintenanceStrategiesConfiguration = ({
       if (selectedItemStrategy) {
         return [...availableStrategies, selectedItemStrategy].map((pluginOptions) => ({
           value: pluginOptions.type,
-          label: pluginOptions.displayName,
+          label: strategyLabel(pluginOptions),
         }));
       }
 
       return availableStrategies.map((pluginOptions) => ({
         value: pluginOptions.type,
-        label: pluginOptions.displayName,
+        label: strategyLabel(pluginOptions),
       }));
     }
 
-    return availableStrategies.map((c) => ({ value: c.type, label: c.displayName }));
+    return availableStrategies.map((c) => ({ value: c.type, label: strategyLabel(c) }));
   };
 
-  const getDisplayName = () => pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
+  const getDisplayName = () => strategyLabel(pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy));
 
   const getActiveSelection = () => newStrategy;
 
@@ -348,14 +351,17 @@ const IndexMaintenanceStrategiesConfiguration = ({
       {helpText && <StyledAlert>{helpText}</StyledAlert>}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
-          The effective retention period value calculated from the
-          <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
-          <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+          <Trans
+            t={t}
+            i18nKey="indices.maintenance_strategies.max_retention_warning"
+            values={{ maxRetentionPeriod }}
+            components={{ b: <b /> }}
+          />
         </StyledAlert>
       )}
       {shouldShowInvalidRetentionWarning() && (
         <StyledAlert bsStyle="danger">
-          {getDisplayName()} strategy was deactivated. Please configure a valid retention strategy.
+          {t('indices.maintenance_strategies.deactivated', { name: getDisplayName() })}
         </StyledAlert>
       )}
       <Row>

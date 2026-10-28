@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -61,6 +62,7 @@ const SetProfileModal = ({
   currentProfile = null,
   onChangeApplied = undefined,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const [rotated, setRotated] = useState(true);
   const [profile, setProfile] = useState<string | null>(currentProfile);
   const [lastResult, setLastResult] = useState<{
@@ -133,8 +135,8 @@ const SetProfileModal = ({
   );
 
   const isSetAction = action === 'set';
-  const title = isSetAction ? 'Set Profile' : 'Remove Profile';
-  const submitText = isSetAction ? 'Set profile' : 'Remove profile';
+  const title = isSetAction ? t('field_types.set_profile') : t('field_types.remove_profile');
+  const submitText = isSetAction ? t('field_types.set_profile_submit') : t('field_types.remove_profile_submit');
 
   return (
     <Modal onHide={onCancel} show={show}>
@@ -149,13 +151,13 @@ const SetProfileModal = ({
             {problems.length > 0 && <ProfileChangeErrorAlert results={problems} titles={lastResult.titles} />}
             {isSetAction && (
               <>
-                <Input id="index_set_profile" label="Select profile">
+                <Input id="index_set_profile" label={t('field_types.select_profile')}>
                   <StyledSelect
                     inputId="index_set_profile"
                     options={options}
                     value={profile}
                     onChange={(newProfile: string) => setProfile(newProfile)}
-                    placeholder="Select index set profile"
+                    placeholder={t('field_types.select_profile_placeholder')}
                     disabled={profileOptionsIsLoading}
                     required
                   />
@@ -164,16 +166,13 @@ const SetProfileModal = ({
               </>
             )}
             <ProfileTargetsList affected={affected} skipped={skipped} rotated={rotated} />
-            <StyledLabel>Select Rotation Strategy</StyledLabel>
-            <p>
-              To see and use new profile setting (changing or removal) for index set, you have to rotate indices. You
-              can automatically rotate affected indices after submitting this form or do that manually later.
-            </p>
+            <StyledLabel>{t('field_types.select_rotation_strategy')}</StyledLabel>
+            <p>{t('field_types.rotate_hint_profile')}</p>
             <Input
               type="checkbox"
               id="rotate"
               name="rotate"
-              label="Rotate affected indices after change"
+              label={t('field_types.rotate_after_change')}
               onChange={() => setRotated((cur: boolean) => !cur)}
               checked={rotated}
             />
@@ -192,7 +191,7 @@ const SetProfileModal = ({
               isSetAction &&
               currentProfile && (
                 <Button onClick={() => removeProfile(removalTargets)} disabled={isSubmitting} bsStyle="danger">
-                  Remove profile
+                  {t('field_types.remove_profile_submit')}
                 </Button>
               )
             }

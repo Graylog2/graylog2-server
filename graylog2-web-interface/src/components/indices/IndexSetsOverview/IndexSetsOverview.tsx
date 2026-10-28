@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
@@ -41,16 +43,16 @@ import { IndexSetMetricsProvider } from './IndexSetMetricsContext';
 import { backendFieldsForVisibleColumns } from './metricColumns';
 import type { IndexSetEntity } from './types';
 
-const expandedSections = {
+const getExpandedSections = (t: TFunction) => ({
   [DETAILS_SECTION]: {
-    title: 'Details',
+    title: t('overview_table.section_details'),
     content: (indexSet: IndexSetEntity) => <IndexSetDetailsSection indexSet={indexSet} />,
   },
   [STREAMS_SECTION]: {
-    title: 'Associated streams',
+    title: t('overview_table.section_streams'),
     content: (indexSet: IndexSetEntity) => <AssociatedStreamsSection indexSet={indexSet} />,
   },
-};
+});
 
 const TopSection = () => (
   <>
@@ -65,6 +67,8 @@ const idsEqual = (first: Array<string>, second: Array<string>) =>
   first.length === second.length && first.every((id, index) => id === second[index]);
 
 const IndexSetsOverview = () => {
+  const { t } = useTranslation('indexsets');
+  const expandedSections = useMemo(() => getExpandedSections(t), [t]);
   const {
     columnRenderers: extensionColumnRenderers,
     attributes: extensionAttributes,
@@ -114,8 +118,8 @@ const IndexSetsOverview = () => {
   return (
     <IndexSetMetricsProvider indexSetIds={visibleIndexSetIds} fields={backendFieldsForVisibleColumns(visibleColumns)}>
       <PaginatedEntityTable<IndexSetEntity>
-        humanName="index sets"
-        searchPlaceholder="Find index sets"
+        humanName={t('overview_table.human_name')}
+        searchPlaceholder={t('overview_table.search_placeholder')}
         additionalAttributes={additionalAttributes}
         entityActions={renderActions}
         tableLayout={activeLayout}

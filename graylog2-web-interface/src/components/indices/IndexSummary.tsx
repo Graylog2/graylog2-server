@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Label, Button } from 'components/bootstrap';
 import { RelativeTime, Icon } from 'components/common';
@@ -28,128 +29,130 @@ type Props = {
   name: string;
 };
 
-class IndexSummary extends React.Component<Props, { showDetails: boolean }> {
-  static defaultProps = {
-    indexRange: undefined,
-  };
+const FormattedLabels = ({ index, name }: { index: any; name: string }) => {
+  const { t } = useTranslation('indexsets');
+  const labels = [];
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      showDetails: props.isDeflector,
-    };
+  if (index.is_deflector) {
+    labels.push(
+      <Label key={`${name}-deflector-label`} bsStyle="primary">
+        {t('index_summary.label_active_write_index')}
+      </Label>,
+    );
   }
 
-  _formatLabels = (index) => {
-    const labels = [];
+  if (index.is_closed) {
+    labels.push(
+      <Label key={`${name}-closed-label`} bsStyle="warning">
+        {t('index_summary.label_closed')}
+      </Label>,
+    );
+  }
 
-    if (index.is_deflector) {
-      labels.push(
-        <Label key={`${this.props.name}-deflector-label`} bsStyle="primary">
-          active write index
-        </Label>,
-      );
-    }
+  if (index.is_reopened) {
+    labels.push(
+      <Label key={`${name}-reopened-label`} bsStyle="success">
+        {t('index_summary.label_reopened')}
+      </Label>,
+    );
+  }
 
-    if (index.is_closed) {
-      labels.push(
-        <Label key={`${this.props.name}-closed-label`} bsStyle="warning">
-          closed
-        </Label>,
-      );
-    }
+  return <span className="index-label">{labels}</span>;
+};
 
-    if (index.is_reopened) {
-      labels.push(
-        <Label key={`${this.props.name}-reopened-label`} bsStyle="success">
-          reopened
-        </Label>,
-      );
-    }
+const FormattedIndexRange = ({
+  index,
+  indexRange,
+  isDeflector,
+}: {
+  index: any;
+  indexRange: any;
+  isDeflector: boolean;
+}) => {
+  const { t } = useTranslation('indexsets');
 
-    return <span className="index-label">{labels}</span>;
-  };
-
-  _formatIndexRange = () => {
-    if (this.props.isDeflector) {
-      return (
-        <span>
-          Contains messages up to <RelativeTime dateTime={new Date()} />
-        </span>
-      );
-    }
-
-    const sizes = this.props.index.size;
-
-    if (sizes) {
-      const count = sizes.events;
-      const { deleted } = sizes;
-
-      if (count === 0 || count - deleted === 0) {
-        return 'Index does not contain any messages.';
-      }
-    }
-
-    if (!this.props.indexRange) {
-      return 'Time range of index is unknown, because index range is not available. Please recalculate index ranges manually.';
-    }
-
-    if (this.props.indexRange.begin === 0) {
-      return (
-        <span>
-          Contains messages up to <RelativeTime dateTime={this.props.indexRange.end} />
-        </span>
-      );
-    }
-
+  if (isDeflector) {
     return (
       <span>
-        Contains messages from <RelativeTime dateTime={this.props.indexRange.begin} /> up to{' '}
-        <RelativeTime dateTime={this.props.indexRange.end} />
+        <Trans
+          t={t}
+          i18nKey="index_summary.contains_up_to"
+          components={{ relativeTime: <RelativeTime dateTime={new Date()} /> }}
+        />
       </span>
     );
-  };
+  }
 
-  _formatShowDetailsLink = () => {
-    if (this.state.showDetails) {
-      return (
-        <span className="index-more-actions">
-          <Icon name="arrow_drop_down" /> Hide Details / Actions
-        </span>
-      );
+  const sizes = index.size;
+
+  if (sizes) {
+    const count = sizes.events;
+    const { deleted } = sizes;
+
+    if (count === 0 || count - deleted === 0) {
+      return <>{t('index_summary.empty')}</>;
     }
+  }
 
+  if (!indexRange) {
+    return <>{t('index_summary.range_unknown')}</>;
+  }
+
+  if (indexRange.begin === 0) {
     return (
-      <span className="index-more-actions">
-        <Icon name="arrow_right" /> Show Details / Actions
+      <span>
+        <Trans
+          t={t}
+          i18nKey="index_summary.contains_up_to"
+          components={{ relativeTime: <RelativeTime dateTime={indexRange.end} /> }}
+        />
       </span>
     );
-  };
+  }
 
-  _toggleShowDetails = (event) => {
+  return (
+    <span>
+      <Trans
+        t={t}
+        i18nKey="index_summary.contains_from"
+        components={{
+          begin: <RelativeTime dateTime={indexRange.begin} />,
+          end: <RelativeTime dateTime={indexRange.end} />,
+        }}
+      />
+    </span>
+  );
+};
+
+const IndexSummary = ({ children, index, indexRange = undefined, isDeflector, name }: Props) => {
+  const { t } = useTranslation('indexsets');
+  const [showDetails, setShowDetails] = useState<boolean>(isDeflector);
+
+  const toggleShowDetails = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    this.setState((prevState) => ({ showDetails: !prevState.showDetails }));
+    setShowDetails((prev) => !prev);
   };
 
-  render() {
-    const { index } = this.props;
+  return (
+    <span>
+      <h2>
+        {name}{' '}
+        <small>
+          <FormattedLabels index={index} name={name} />{' '}
+          <FormattedIndexRange index={index} indexRange={indexRange} isDeflector={isDeflector} />{' '}
+          <IndexSizeSummary index={index} />
+          <Button onClick={toggleShowDetails} bsStyle="link">
+            <span className="index-more-actions">
+              <Icon name={showDetails ? 'arrow_drop_down' : 'arrow_right'} />{' '}
+              {showDetails ? t('index_summary.hide_details') : t('index_summary.show_details')}
+            </span>
+          </Button>
+        </small>
+      </h2>
 
-    return (
-      <span>
-        <h2>
-          {this.props.name}{' '}
-          <small>
-            {this._formatLabels(index)} {this._formatIndexRange()} <IndexSizeSummary index={index} />
-            <Button onClick={this._toggleShowDetails} bsStyle="link">
-              {this._formatShowDetailsLink()}
-            </Button>
-          </small>
-        </h2>
-
-        <div className="index-info-holder">{this.state.showDetails && this.props.children}</div>
-      </span>
-    );
-  }
-}
+      <div className="index-info-holder">{showDetails && children}</div>
+    </span>
+  );
+};
 
 export default IndexSummary;

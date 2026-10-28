@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 
 import { Alert, Col, Input, Row } from 'components/bootstrap';
@@ -41,24 +42,26 @@ const IndexSetProfileConfiguration = ({
   onChange: (value: string | null) => void;
   disabled?: boolean;
 }) => {
+  const { t } = useTranslation('indexsets');
   const { isLoading, options } = useProfileOptions();
   const _onChange = (val: string) => onChange(val || null);
 
   return (
     <div>
       <StyledAlert>
-        With index set field type{' '}
-        <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>
-          profiles
-        </Link>{' '}
-        you can bundle up custom field types into profiles. You can assign any profile to this index set. To see and use
-        profile setting for index set, you have to rotate indices.
+        <Trans
+          t={t}
+          i18nKey="field_types.profile_config_info"
+          components={{
+            profilesLink: <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW} />,
+          }}
+        />
       </StyledAlert>
       <Row>
         <Col md={12}>
-          <Input id={name} label="Index field type mapping profile (optional)">
+          <Input id={name} label={t('field_types.profile_config_label')}>
             <StyledSelect
-              placeholder="Select index field type profile"
+              placeholder={t('field_types.profile_config_placeholder')}
               inputId={name}
               options={options}
               value={value}

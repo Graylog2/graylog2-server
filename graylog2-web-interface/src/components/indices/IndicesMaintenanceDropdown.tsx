@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
+  const { t } = useTranslation('indexsets');
   const dataTieringPlugin = PluginStore.exports('dataTiering').find(
     (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
   );
@@ -39,13 +41,17 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
   return (
     <>
       <ButtonGroup>
-        <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+        <DropdownButton
+          bsStyle="info"
+          title={t('indices.maintenance.title')}
+          id="indices-maintenance-actions"
+          pullRight>
           <MenuItem eventKey="1" onClick={() => setPendingAction('recalculateIndexRanges')}>
-            Recalculate index ranges
+            {t('indices.details.recalculate')}
           </MenuItem>
           {indexSet?.writable && (
             <MenuItem eventKey="2" onClick={() => setPendingAction('rotateActiveWriteIndex')}>
-              Rotate active write index
+              {t('overview_table.rotate_active_write_index')}
             </MenuItem>
           )}
           {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (

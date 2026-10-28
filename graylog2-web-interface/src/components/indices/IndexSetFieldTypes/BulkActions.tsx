@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -40,6 +41,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const BulkActions = ({ indexSetId, selectedEntitiesData }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { pushWithState } = useHistory();
   const sendTelemetry = useSendTelemetry();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
@@ -78,10 +80,10 @@ const BulkActions = ({ indexSetId, selectedEntitiesData }: Props) => {
       <BulkActionsDropdown>
         <>
           <StyledMenuItem disabled={!removableFields.length} onSelect={toggleResetModal}>
-            Reset
-            {!removableFields.length && '(overridden only)'}
+            {t('field_types.reset')}
+            {!removableFields.length && t('field_types.overridden_only')}
           </StyledMenuItem>
-          <MenuItem onSelect={createNewProfile}>Create new profile</MenuItem>
+          <MenuItem onSelect={createNewProfile}>{t('field_types.create_new_profile')}</MenuItem>
         </>
       </BulkActionsDropdown>
       {showResetModal && (

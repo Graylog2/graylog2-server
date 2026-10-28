@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
@@ -41,8 +42,8 @@ const useBuiltInTemplates = (
     queryFn: () =>
       defaultOnError(
         fetchBuiltInIndexSetTemplates(warmTierEnabled),
-        'Loading built in index set templates failed with status',
-        'Could not load built in index set templates',
+        i18n.t('hooks.built_in_templates_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.built_in_templates_load_failed_title', { ns: 'indexsets' }),
       ),
 
     placeholderData: keepPreviousData,

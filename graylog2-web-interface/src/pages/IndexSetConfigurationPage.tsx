@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -39,6 +40,7 @@ const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) =>
   });
 
 const IndexSetConfigurationPage = () => {
+  const { t } = useTranslation('indexsets');
   const { indexSetId } = useParams();
   const { data: indexSet } = useSingleIndexSet(indexSetId);
   const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
@@ -70,19 +72,16 @@ const IndexSetConfigurationPage = () => {
 
   return (
     <SelectIndexSetTemplateProvider>
-      <DocumentTitle title="Configure Index Set">
+      <DocumentTitle title={t('pages.configure_index_set')}>
         <IndicesPageNavigation />
         <div>
           <PageHeader
-            title="Configure Index Set"
+            title={t('pages.configure_index_set')}
             documentationLink={{
-              title: 'Index model documentation',
+              title: t('overview.header.documentation_link'),
               path: DocsHelper.PAGES.INDEX_MODEL,
             }}>
-            <span>
-              Modify the current configuration for this index set, allowing you to customize the retention, sharding,
-              and replication of messages coming from one or more streams.
-            </span>
+            <span>{t('pages.configure_description')}</span>
           </PageHeader>
 
           <Row className="content">
@@ -92,8 +91,8 @@ const IndexSetConfigurationPage = () => {
                 retentionStrategiesContext={retentionStrategiesContext}
                 rotationStrategies={rotationStrategies}
                 retentionStrategies={retentionStrategies}
-                submitButtonText="Update index set"
-                submitLoadingText="Updating index set..."
+                submitButtonText={t('pages.update_index_set')}
+                submitLoadingText={t('pages.updating_index_set')}
                 cancelLink={formCancelLink()}
                 onUpdate={saveConfiguration}
               />

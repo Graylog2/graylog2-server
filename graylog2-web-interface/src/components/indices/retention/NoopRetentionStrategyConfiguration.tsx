@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -23,8 +24,10 @@ const StyledAlert = styled(Alert)`
   overflow: auto;
 `;
 
-const NoopRetentionStrategyConfiguration = () => (
-  <StyledAlert>This retention strategy is not configurable because it does not do anything.</StyledAlert>
-);
+const NoopRetentionStrategyConfiguration = () => {
+  const { t } = useTranslation('indexsets');
+
+  return <StyledAlert>{t('strategies.retention_noop_help')}</StyledAlert>;
+};
 
 export default NoopRetentionStrategyConfiguration;

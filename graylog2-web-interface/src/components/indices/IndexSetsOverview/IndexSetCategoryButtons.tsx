@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { OrderedMap } from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -22,7 +23,7 @@ import { AccessibleCard } from 'components/common';
 import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-import { CATEGORY_ATTRIBUTE, INDEX_SET_CATEGORY_TITLES } from './Constants';
+import { CATEGORY_ATTRIBUTE, getIndexSetCategoryTitle } from './Constants';
 import useIndexSetCategoryCounts from './hooks/useIndexSetCategoryCounts';
 import type { IndexSetCategory } from './types';
 
@@ -30,12 +31,7 @@ const ALL = 'all';
 
 type CategoryOption = typeof ALL | IndexSetCategory;
 
-const CATEGORY_OPTIONS: Array<{ value: CategoryOption; title: string }> = [
-  { value: ALL, title: 'All' },
-  { value: 'user', title: INDEX_SET_CATEGORY_TITLES.user },
-  { value: 'illuminate', title: INDEX_SET_CATEGORY_TITLES.illuminate },
-  { value: 'system', title: INDEX_SET_CATEGORY_TITLES.system },
-];
+const CATEGORY_VALUES: Array<CategoryOption> = [ALL, 'user', 'illuminate', 'system'];
 
 const Container = styled.div<{ $columns: number }>(
   ({ theme, $columns }) => css`
@@ -70,6 +66,7 @@ const activeCategory = (filters: UrlQueryFilters | undefined): CategoryOption | 
 };
 
 const IndexSetCategoryButtons = () => {
+  const { t } = useTranslation('indexsets');
   const { searchParams, onChangeFilters } = useTableFilterContext();
   const { data: counts } = useIndexSetCategoryCounts();
   const active = activeCategory(searchParams.filters);
@@ -82,7 +79,12 @@ const IndexSetCategoryButtons = () => {
     );
   };
 
-  const visibleOptions = CATEGORY_OPTIONS.filter(
+  const categoryOptions = CATEGORY_VALUES.map((value) => ({
+    value,
+    title: value === ALL ? t('overview_table.category.all') : getIndexSetCategoryTitle(value),
+  }));
+
+  const visibleOptions = categoryOptions.filter(
     ({ value }) => value !== 'illuminate' || active === 'illuminate' || (counts?.illuminate ?? 0) > 0,
   );
 

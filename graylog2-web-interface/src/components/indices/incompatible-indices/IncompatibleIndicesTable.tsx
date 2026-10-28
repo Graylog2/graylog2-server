@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Alert } from 'components/bootstrap';
 import { PaginatedEntityTable } from 'components/common';
 
@@ -42,7 +43,13 @@ type Props = {
   withoutURLParams?: boolean;
 };
 
+const MigrationLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <DataNodeMigrationLink text={children as string} />
+);
+
 const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
+  const { t } = useTranslation('indexsets');
+  const productName = useProductName();
   const { selectedIndices, trackedIndices, hasLoaded, onDataLoaded, onChangeSelection } =
     useTrackedIncompatibleIndices();
   const contextValue = useIncompatibleIndexActionState({ trackedIndices, isLoading: !hasLoaded });
@@ -53,13 +60,16 @@ const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
     <IncompatibleIndicesContext.Provider value={contextValue}>
       {!contextValue.reindexActionsAvailable && (
         <Alert bsStyle="info">
-          System indices can only be reindexed when <ProductName /> runs against a Data Node search backend.{' '}
-          <DataNodeMigrationLink text="Migrate to Data Nodes" /> to reindex them before upgrading to the next OpenSearch
-          major version.
+          <Trans
+            t={t}
+            i18nKey="incompatible.reindex_requires_data_node"
+            values={{ productName }}
+            components={{ migrationLink: <MigrationLink /> }}
+          />
         </Alert>
       )}
       <PaginatedEntityTable<IncompatibleIndexRow>
-        humanName="incompatible indices"
+        humanName={t('incompatible.human_name')}
         tableLayout={TABLE_LAYOUT}
         fetchEntities={fetchIncompatibleIndices}
         keyFn={incompatibleIndicesKeyFn}

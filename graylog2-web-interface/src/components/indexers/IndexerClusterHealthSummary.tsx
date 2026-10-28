@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -44,6 +45,7 @@ const IndexerClusterHealthSummary = ({
     distribution: string;
   };
 }) => {
+  const { t } = useTranslation('indexsets');
   const formattedHealthStatus = health.status.toLowerCase();
 
   const alertClassForHealth = () => {
@@ -60,7 +62,11 @@ const IndexerClusterHealthSummary = ({
   };
 
   const formattedTextForHealth = useMemo(() => {
-    const text = `${name?.distribution || 'Elasticsearch'} cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
+    const text = t('indexers.cluster_health.status', {
+      distribution: name?.distribution || 'Elasticsearch',
+      name: name?.name || '',
+      status: formattedHealthStatus,
+    });
 
     switch (formattedHealthStatus) {
       case 'green':
@@ -71,13 +77,21 @@ const IndexerClusterHealthSummary = ({
       default:
         return text;
     }
-  }, [formattedHealthStatus, name]);
+  }, [formattedHealthStatus, name, t]);
 
   return (
     <ESClusterStatus bsStyle={alertClassForHealth()}>
-      {formattedTextForHealth} Shards: {health.shards.active} active, {health.shards.initializing} initializing,{' '}
-      {health.shards.relocating} relocating, {health.shards.unassigned} unassigned,{' '}
-      <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
+      {formattedTextForHealth}{' '}
+      {t('indexers.cluster_health.shards', {
+        active: health.shards.active,
+        initializing: health.shards.initializing,
+        relocating: health.shards.relocating,
+        unassigned: health.shards.unassigned,
+      })}{' '}
+      <DocumentationLink
+        page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED}
+        text={t('indexers.cluster_health.what_does_this_mean')}
+      />
     </ESClusterStatus>
   );
 };

@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { qualifyUrl } from 'util/URLUtils';
@@ -39,8 +40,8 @@ const useSingleIndexSet = (
     queryFn: () =>
       defaultOnError(
         fetchIndexSet(indexSetId),
-        `Loading index set with id: ${indexSetId} failed with status`,
-        'Could not load index set',
+        i18n.t('hooks.index_set_load_failed', { ns: 'indexsets', indexSetId }),
+        i18n.t('hooks.index_set_load_failed_title', { ns: 'indexsets' }),
       ),
 
     placeholderData: keepPreviousData,

@@ -214,6 +214,8 @@ type EntityTypeRouteGenerator = { type: string; route: (id: string) => Qualified
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
+  /** Translation key of the displayed name, e.g. `indexsets:retention.delete`. `displayName` stays the fallback. */
+  displayNameKey?: string;
   configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
 };

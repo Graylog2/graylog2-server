@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ClusterJobs } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
@@ -41,8 +42,8 @@ const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
     queryFn: () =>
       defaultOnError(
         ClusterJobs.list({ requestShouldExtendSession: false }),
-        'Loading cluster jobs failed',
-        'Could not load cluster jobs',
+        i18n.t('incompatible.cluster_jobs_failed', { ns: 'indexsets' }),
+        i18n.t('incompatible.cluster_jobs_failed_title', { ns: 'indexsets' }),
       ),
     enabled,
     refetchInterval: poll ? ARCHIVE_POLL_INTERVAL_MS : false,

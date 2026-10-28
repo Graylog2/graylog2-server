@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import { ClusterDeflector, IndexerIndices, SystemIndexerIndices } from '@graylog/server-api';
 
@@ -22,6 +23,7 @@ import type { StyleProps } from 'components/bootstrap/Button';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import useIndexArchive from 'components/indices/archive/useIndexArchive';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
+import i18n from 'i18n';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
@@ -44,6 +46,7 @@ type ActionDefinition = {
   buttonStyle: StyleProps;
   confirmTitle: string;
   confirmText: string;
+  errorTitle: string;
   confirmationBody: (index: IncompatibleIndex) => React.ReactNode;
   run: (index: IncompatibleIndex) => Promise<unknown>;
   successMessage: (index: IncompatibleIndex) => string;
@@ -59,73 +62,67 @@ const reindexSystemIndex = (index: IncompatibleIndex) => SystemIndexerIndices.re
 
 const rotateWriteIndex = (index: IncompatibleIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
-export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delete'>, ActionDefinition> = {
+const tr = (key: string, options: Record<string, unknown> = {}) => i18n.t(key, { ns: 'indexsets', ...options });
+
+const boldIndexBody = (key: string, indexName: string) => (
+  <p>
+    <Trans i18nKey={key} ns="indexsets" values={{ indexName }} components={{ strong: <strong /> }} />
+  </p>
+);
+
+export const getCoreActionDefinitions = (): Record<Exclude<IndexAction, 'archive-delete'>, ActionDefinition> => ({
   delete: {
-    buttonLabel: 'Delete',
+    buttonLabel: tr('incompatible.delete.button'),
     buttonStyle: 'danger',
-    confirmTitle: 'Delete index',
-    confirmText: 'Delete',
-    confirmationBody: (index) => (
-      <p>
-        This will permanently delete <strong>{index.index_name}</strong>.
-      </p>
-    ),
+    confirmTitle: tr('incompatible.delete.title'),
+    confirmText: tr('incompatible.delete.confirm'),
+    errorTitle: tr('incompatible.delete.error'),
+    confirmationBody: (index) => boldIndexBody('incompatible.delete.body', index.index_name),
     run: deleteIncompatibleIndex,
-    successMessage: (index) => `Index "${index.index_name}" was deleted.`,
+    successMessage: (index) => tr('incompatible.delete.success', { indexName: index.index_name }),
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
   },
   'reindex-system-index': {
-    buttonLabel: 'Reindex',
+    buttonLabel: tr('incompatible.reindex.button'),
     buttonStyle: 'primary',
-    confirmTitle: 'Reindex system index',
-    confirmText: 'Reindex system index',
-    confirmationBody: (index) => (
-      <p>
-        This will reindex <strong>{index.index_name}</strong> so it can be used with OpenSearch 3.
-      </p>
-    ),
+    confirmTitle: tr('incompatible.reindex.title'),
+    confirmText: tr('incompatible.reindex.confirm'),
+    errorTitle: tr('incompatible.reindex.error'),
+    confirmationBody: (index) => boldIndexBody('incompatible.reindex.body', index.index_name),
     run: reindexSystemIndex,
-    successMessage: (index) => `Index "${index.index_name}" was reindexed.`,
+    successMessage: (index) => tr('incompatible.reindex.success', { indexName: index.index_name }),
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.SYSTEM_INDEX_REINDEX_CONFIRMED,
   },
   rotate: {
-    buttonLabel: 'Rotate',
+    buttonLabel: tr('incompatible.rotate.button'),
     buttonStyle: 'primary',
-    confirmTitle: 'Rotate active write index',
-    confirmText: 'Rotate',
+    confirmTitle: tr('incompatible.rotate.title'),
+    confirmText: tr('incompatible.rotate.confirm'),
+    errorTitle: tr('incompatible.rotate.error'),
     confirmationBody: (index) => (
       <div>
-        <p>
-          <strong>{index.index_name}</strong> is the active write index of its index set and still receives new
-          messages. Rotating starts a new write index on the current OpenSearch version.
-        </p>
-        <p>
-          Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.
-        </p>
+        {boldIndexBody('incompatible.rotate.body_active', index.index_name)}
+        {boldIndexBody('incompatible.rotate.body_afterwards', index.index_name)}
       </div>
     ),
     run: rotateWriteIndex,
-    successMessage: (index) =>
-      `The index set of "${index.index_name}" was rotated. The index no longer receives messages and can now be archived or deleted.`,
+    successMessage: (index) => tr('incompatible.rotate.success', { indexName: index.index_name }),
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.WRITE_INDEX_ROTATE_CONFIRMED,
   },
-};
+});
 
 const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): ActionDefinition => ({
-  buttonLabel: 'Archive and delete',
+  buttonLabel: tr('incompatible.archive_delete.button'),
   buttonStyle: 'warning',
-  confirmTitle: 'Archive and delete index',
-  confirmText: 'Archive and delete',
-  confirmationBody: (index) => (
-    <p>
-      This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
-    </p>
-  ),
+  confirmTitle: tr('incompatible.archive_delete.title'),
+  confirmText: tr('incompatible.archive_delete.confirm'),
+  errorTitle: tr('incompatible.archive_delete.error'),
+  confirmationBody: (index) => boldIndexBody('incompatible.archive_delete.body', index.index_name),
   run: (index) =>
     archive
       ? archive.archiveAndDeleteIndex(index.index_name)
-      : Promise.reject(new Error('Archiving is not available.')),
-  successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
+      : Promise.reject(new Error(tr('incompatible.archive_unavailable'))),
+  successMessage: (index) => tr('incompatible.archive_delete.success', { indexName: index.index_name }),
   telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   getPendingArchiveTracking: (index, response) => ({
     indexName: index.index_name,
@@ -138,7 +135,7 @@ export const useIncompatibleIndexActionDefinitions = (): Record<IndexAction, Act
   const archive = useIndexArchive();
 
   return {
-    ...CORE_ACTION_DEFINITIONS,
+    ...getCoreActionDefinitions(),
     'archive-delete': archiveDeleteDefinition(archive),
   };
 };

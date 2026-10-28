@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 
+import i18n from 'i18n';
 import { Label } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -31,22 +32,28 @@ export const DEFAULT_DISPLAYED_COLUMNS = ['index_name', 'category', 'version', '
 
 type Badge = { text: string; style: ColorVariant };
 
+const tr = (key: string) => i18n.t(key, { ns: 'indexsets' });
+
 const primaryTypeBadge = (index: IncompatibleIndex): Badge => {
   if (index.system_index) {
-    return { text: 'System', style: 'info' };
+    return { text: tr('incompatible.badge_system'), style: 'info' };
   }
 
-  return index.managed_index ? { text: 'Managed', style: 'success' } : { text: 'Foreign', style: 'warning' };
+  return index.managed_index
+    ? { text: tr('incompatible.badge_managed'), style: 'success' }
+    : { text: tr('incompatible.badge_foreign'), style: 'warning' };
 };
 
 const typeBadges = (index: IncompatibleIndex): Array<Badge> => [
   primaryTypeBadge(index),
-  ...(index.warm_index ? [{ text: 'Warm', style: 'default' as const }] : []),
+  ...(index.warm_index ? [{ text: tr('incompatible.badge_warm'), style: 'default' as const }] : []),
 ];
 
 const statusBadges = (index: IncompatibleIndex, isArchived: boolean): Array<Badge> => [
-  ...(index.active_write_index ? [{ text: 'active write index', style: 'default' as const }] : []),
-  ...(isArchived ? [{ text: 'archived already', style: 'success' as const }] : []),
+  ...(index.active_write_index
+    ? [{ text: tr('incompatible.badge_active_write_index'), style: 'default' as const }]
+    : []),
+  ...(isArchived ? [{ text: tr('incompatible.badge_archived'), style: 'success' as const }] : []),
 ];
 
 const renderBadges = (badges: Array<Badge>) =>
@@ -86,7 +93,7 @@ export const createColumnRenderers = (): ColumnRenderers<IncompatibleIndexRow> =
     },
     version: {
       staticWidth: 'matchHeader',
-      renderCell: (_value, index) => index.version || 'Unknown',
+      renderCell: (_value, index) => index.version || tr('incompatible.version_unknown'),
     },
     begin: {
       staticWidth: 'matchHeader',

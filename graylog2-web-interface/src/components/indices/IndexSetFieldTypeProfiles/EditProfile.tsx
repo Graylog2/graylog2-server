@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import omit from 'lodash/omit';
 
 import useHistory from 'routing/useHistory';
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const EditProfile = ({ profile }: Props) => {
+  const { t } = useTranslation('indexsets');
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
   const { editProfile } = useProfileMutations();
@@ -67,8 +69,8 @@ const EditProfile = ({ profile }: Props) => {
   return (
     <ProfileForm
       onCancel={onCancel}
-      submitButtonText="Update profile"
-      submitLoadingText="Updating profile..."
+      submitButtonText={t('profiles.update')}
+      submitLoadingText={t('profiles.updating')}
       onSubmit={onSubmit}
       initialValues={initialValues}
     />

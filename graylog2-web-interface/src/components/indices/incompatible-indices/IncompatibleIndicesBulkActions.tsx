@@ -26,6 +26,7 @@ import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
+import i18n from 'i18n';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
@@ -71,9 +72,9 @@ const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
         name: entity_id,
         explanation: failure_explanation,
       })),
-      successMessage: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.`,
-      partialSuccessTitle: 'Some indices could not be deleted',
-      failureTitle: 'Could not delete indices',
+      successMessage: i18n.t('incompatible.bulk.deleted', { ns: 'indexsets', count: succeeded }),
+      partialSuccessTitle: i18n.t('incompatible.bulk.delete_partial_title', { ns: 'indexsets' }),
+      failureTitle: i18n.t('incompatible.bulk.delete_failure_title', { ns: 'indexsets' }),
     }),
   );
 
@@ -105,7 +106,7 @@ const bulkRotateIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
   });
 
   if (!success) {
-    throw new Error(error_text || 'Bulk rotation request failed.');
+    throw new Error(error_text || i18n.t('incompatible.bulk_rotation_failed', { ns: 'indexsets' }));
   }
 
   const explanationByIndexSet = new Map((entity?.failures ?? []).map((f) => [f.entity_id, f.failure_explanation]));
@@ -125,9 +126,9 @@ const bulkRotateIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
     buildPartialBulkNotification({
       succeeded: succeededNames.length,
       failures,
-      successMessage: `${succeededNames.length} ${succeededNames.length === 1 ? 'index was' : 'indices were'} rotated.`,
-      partialSuccessTitle: 'Some indices could not be rotated',
-      failureTitle: 'Could not rotate indices',
+      successMessage: i18n.t('incompatible.bulk.rotate.success', { ns: 'indexsets', count: succeededNames.length }),
+      partialSuccessTitle: i18n.t('incompatible.bulk.rotate_partial_title', { ns: 'indexsets' }),
+      failureTitle: i18n.t('incompatible.bulk.rotate_failure_title', { ns: 'indexsets' }),
     }),
   );
 
@@ -140,7 +141,7 @@ const bulkArchiveDeleteIndices = async (
   addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void,
 ): Promise<Array<string>> => {
   if (!archive) {
-    throw new Error('Archiving is not available.');
+    throw new Error(i18n.t('incompatible.archive_unavailable', { ns: 'indexsets' }));
   }
 
   const indexNames = bulkAction.targetIndices.map((index) => index.index_name);
@@ -231,13 +232,13 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
 
       if (confirmedBulkAction.action === 'archive-delete' && archive?.isArchiveJobConflict(errorMessage)) {
         UserNotification.warning(
-          'Another archive job is already running. New archive jobs can be started after it finishes.',
-          'Archive job already running',
+          i18n.t('incompatible.archive_conflict', { ns: 'indexsets' }),
+          i18n.t('incompatible.archive_conflict_title', { ns: 'indexsets' }),
         );
         refetchClusterJobs?.();
         setConfirmedBulkAction(undefined);
       } else {
-        UserNotification.error(errorMessage, `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`);
+        UserNotification.error(errorMessage, confirmedBulkAction.errorTitle);
       }
     } finally {
       setIsSubmitting(false);

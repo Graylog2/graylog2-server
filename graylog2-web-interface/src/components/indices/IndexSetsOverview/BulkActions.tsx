@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const BulkActions = ({ indexSetsById, onProfileAction }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { isAnyPermitted } = usePermissions();
   const selectedIndexSets = selectedEntities.map((id) => indexSetsById[id]).filter(Boolean);
@@ -56,8 +58,10 @@ const BulkActions = ({ indexSetsById, onProfileAction }: Props) => {
     <BulkActionsDropdown>
       {canEditSelection && (
         <>
-          <MenuItem onSelect={() => openProfileAction('set')}>Set field type profile</MenuItem>
-          <MenuItem onSelect={() => openProfileAction('remove')}>Remove field type profile</MenuItem>
+          <MenuItem onSelect={() => openProfileAction('set')}>{t('overview_table.set_field_type_profile')}</MenuItem>
+          <MenuItem onSelect={() => openProfileAction('remove')}>
+            {t('overview_table.remove_field_type_profile')}
+          </MenuItem>
         </>
       )}
     </BulkActionsDropdown>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const TemplateActions = ({ id, title, built_in, isDefault, isEnabled }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { deselectEntity } = useSelectedEntities();
   const { deleteTemplate, setAsDefault } = useTemplateMutation();
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
@@ -66,20 +68,20 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled }: Props) =
       {showDeleteDialog && (
         <ConfirmDialog
           show={showDeleteDialog}
-          title={`Deleting "${title}"`}
+          title={t('templates.delete_title', { title })}
           onCancel={cancelDelete}
           onConfirm={handleDelete}>
-          <p>You are about to delete the template: &quot;{title}&quot;. Are you sure?</p>
+          <p>{t('templates.delete_confirm', { title })}</p>
         </ConfirmDialog>
       )}
 
       <ButtonToolbar>
         <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(id)}>
-          <Button bsSize="xs">Edit</Button>
+          <Button bsSize="xs">{t('common:actions.edit')}</Button>
         </LinkContainer>
         {!isDefault && (
           <MoreActions>
-            <MenuItem onSelect={onSetAsDefault}>Set as default</MenuItem>
+            <MenuItem onSelect={onSetAsDefault}>{t('templates.set_as_default')}</MenuItem>
             <DeleteMenuItem onSelect={onDelete} />
           </MoreActions>
         )}

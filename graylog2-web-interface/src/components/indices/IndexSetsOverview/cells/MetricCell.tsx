@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { IconButton, Spinner } from 'components/common';
 
 import metricCellState from './metricCellState';
 
 import { useIndexSetMetricsFor } from '../IndexSetMetricsContext';
-import { METRIC_COLUMN_TITLES } from '../metricColumns';
+import { getMetricColumnTitle } from '../metricColumns';
 import type { IndexSetMetricField, IndexSetMetrics } from '../hooks/useIndexSetMetrics';
 import type { IndexSetEntity } from '../types';
 
@@ -32,9 +33,10 @@ type Props<F extends IndexSetMetricField> = {
 };
 
 const MetricCell = <F extends IndexSetMetricField>({ indexSet, field, renderValue }: Props<F>) => {
+  const { t } = useTranslation('indexsets');
   const { metrics, isLoading, isError, refetch } = useIndexSetMetricsFor(indexSet.id);
   const value = metrics?.[field];
-  const title = METRIC_COLUMN_TITLES[field];
+  const title = getMetricColumnTitle(field);
 
   const state = metricCellState({
     hasValue: value !== undefined && value !== null,
@@ -51,8 +53,8 @@ const MetricCell = <F extends IndexSetMetricField>({ indexSet, field, renderValu
       return (
         <IconButton
           name="warning"
-          title="Could not load metrics. Click to retry"
-          ariaLabel={`Retry loading ${title.toLowerCase()} for index set ${indexSet.title}`}
+          title={t('overview_table.metrics_retry_title')}
+          ariaLabel={t('overview_table.metrics_retry_aria', { metric: title, title: indexSet.title })}
           size="xsmall"
           onClick={() => refetch()}
         />

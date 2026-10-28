@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,6 +29,7 @@ import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { IndicesPageNavigation } from 'components/indices';
 
 const IndexSetFieldTypeProfileEditPage = () => {
+  const { t } = useTranslation('indexsets');
   const { profileId } = useParams();
   const { data, isFetching } = useProfile(profileId);
   const { push } = useHistory();
@@ -40,19 +42,15 @@ const IndexSetFieldTypeProfileEditPage = () => {
   }, [hasMappingPermission, push]);
 
   return (
-    <DocumentTitle title="Edit Index Set Field Type Profile">
+    <DocumentTitle title={t('pages.profile_edit_document_title')}>
       <IndicesPageNavigation />
       <PageHeader
-        title={`Edit  "${data?.name}" Index Set Field Type Profile`}
+        title={t('pages.profile_edit_title', { name: data?.name })}
         documentationLink={{
-          title: 'Index model documentation',
+          title: t('overview.header.documentation_link'),
           path: DocsHelper.PAGES.INDEX_MODEL,
         }}>
-        <span>
-          With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
-          this profile to any index set. On this page you can modify the &quot;{data?.name}&quot; field type profile
-          configuration.
-        </span>
+        <span>{t('pages.profile_edit_description', { name: data?.name })}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>{!isFetching ? <EditProfile profile={data} /> : <Spinner />}</Col>

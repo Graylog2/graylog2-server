@@ -15,20 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MessageCountRotationStrategySummaryProps = {
   config: any;
 };
 
-const MessageCountRotationStrategySummary = ({ config }: MessageCountRotationStrategySummaryProps) => (
-  <div>
-    <dl>
-      <dt>Index rotation strategy:</dt>
-      <dd>Message Count</dd>
-      <dt>Max docs per index:</dt>
-      <dd>{config.max_docs_per_index}</dd>
-    </dl>
-  </div>
-);
+const MessageCountRotationStrategySummary = ({ config }: MessageCountRotationStrategySummaryProps) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <div>
+      <dl>
+        <dt>{t('strategies.rotation_summary_strategy')}</dt>
+        <dd>{t('strategies.rotation_message_count')}</dd>
+        <dt>{t('strategies.rotation_max_docs_summary')}</dt>
+        <dd>{config.max_docs_per_index}</dd>
+      </dl>
+    </div>
+  );
+};
 
 export default MessageCountRotationStrategySummary;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -27,6 +28,7 @@ import { IndicesPageNavigation } from 'components/indices';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndexSetFieldTypeProfilesPage = () => {
+  const { t } = useTranslation('indexsets');
   const { push } = useHistory();
   const hasMappingPermission = useHasTypeMappingPermission();
 
@@ -37,19 +39,16 @@ const IndexSetFieldTypeProfilesPage = () => {
   }, [hasMappingPermission, push]);
 
   return (
-    <DocumentTitle title="Index Set Field Type Profiles">
+    <DocumentTitle title={t('pages.profiles_title')}>
       <IndicesPageNavigation />
       <PageHeader
-        title="Index Set Field Type Profiles"
+        title={t('pages.profiles_title')}
         documentationLink={{
-          title: 'Index model documentation',
+          title: t('overview.header.documentation_link'),
           path: DocsHelper.PAGES.INDEX_MODEL,
         }}
         actions={<CreateProfileButton />}>
-        <span>
-          With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
-          this profile to any index set. You can view and edit existing profiles or create new ones.
-        </span>
+        <span>{t('pages.profiles_description')}</span>
       </PageHeader>
 
       <Row className="content">

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -32,6 +33,8 @@ type Props = {
 };
 
 const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStrategyClass = undefined }: Props) => {
+  const { t } = useTranslation('indexsets');
+
   if (!config) {
     return <Spinner />;
   }
@@ -40,7 +43,11 @@ const IndexMaintenanceStrategiesSummary = ({ config, pluginExports, rotationStra
   const strategy = pluginExports.filter((exportedStrategy) => exportedStrategy.type === activeStrategy)[0];
 
   if (!strategy?.summaryComponent) {
-    return <Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>;
+    return (
+      <Alert bsStyle="danger">
+        {t('indices.maintenance_strategies.summary_not_found', { strategy: activeStrategy })}
+      </Alert>
+    );
   }
 
   const { summaryComponent: SummaryComponent } = strategy;

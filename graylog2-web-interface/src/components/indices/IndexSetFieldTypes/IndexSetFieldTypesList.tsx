@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import pickBy from 'lodash/pickBy';
 import keyBy from 'lodash/keyBy';
@@ -24,7 +25,7 @@ import useParams from 'routing/useParams';
 import { PaginatedEntityTable, StatusIcon } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
-import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
+import getExpandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
@@ -58,6 +59,8 @@ const FilterValueRenderers = {
 };
 
 const IndexSetFieldTypesList = () => {
+  const { t } = useTranslation('indexsets');
+  const expandedSections = useMemo(() => getExpandedSections(t), [t]);
   const { indexSetId } = useParams();
   const { data: indexSet } = useSingleIndexSet(indexSetId);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
@@ -103,7 +106,7 @@ const IndexSetFieldTypesList = () => {
 
   return (
     <PaginatedEntityTable<IndexSetFieldType>
-      humanName="index set field types"
+      humanName={t('hooks.field_types_human_name')}
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}

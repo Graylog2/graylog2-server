@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
@@ -26,13 +27,14 @@ type Props = {
 };
 
 const ChangeFieldTypeButton = ({ indexSetId }: Props) => {
+  const { t } = useTranslation('indexsets');
   const [showModal, setShowModal] = useState(false);
   const toggleModal = () => setShowModal((cur) => !cur);
 
   return (
     <>
       <Button bsStyle="primary" onClick={toggleModal}>
-        Change field type
+        {t('field_types.change_field_type')}
       </Button>
       {showModal && (
         <ChangeFieldTypeModal

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { SegmentedControl } from 'components/bootstrap';
@@ -66,9 +67,10 @@ const IndexSetRotationRetentionConfigurationSection = ({
   selectedRetentionSegment,
   setSelectedRetentionSegment,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const retentionConfigSegments: Array<{ value: RetentionConfigSegment; label: string }> = [
-    { value: 'data_tiering', label: 'Data Tiering' },
-    { value: 'legacy', label: 'Legacy (Deprecated)' },
+    { value: 'data_tiering', label: t('index_set_form.segment_data_tiering') },
+    { value: 'legacy', label: t('index_set_form.segment_legacy') },
   ];
 
   const legacyRenderable = (): boolean => {
@@ -92,7 +94,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
 
   if (!dataTieringFieldsRenderable())
     return (
-      <Section title="Rotation & Retention">
+      <Section title={t('index_set_form.rotation_retention')}>
         <IndexSetRotationRetentionLegacyConfiguration
           indexSet={indexSet}
           values={values}
@@ -108,7 +110,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
 
   if (!legacyRenderable())
     return (
-      <Section title="Rotation & Retention">
+      <Section title={t('index_set_form.rotation_retention')}>
         <IndexSetRotationRetentionDataTieringConfiguration
           values={values}
           hiddenFields={hiddenFields}
@@ -119,7 +121,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
     );
 
   return (
-    <Section title="Rotation & Retention">
+    <Section title={t('index_set_form.rotation_retention')}>
       <SegmentedControlContainer>
         <SegmentedControl<RetentionConfigSegment>
           data={retentionConfigSegments}

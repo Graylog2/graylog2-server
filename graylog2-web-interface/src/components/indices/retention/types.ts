@@ -34,6 +34,8 @@ type IndexRetentionSummaryComponentProps = {
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
+  /** Optional translation key (`namespace:key`) of the displayed name. `displayName` stays the fallback. */
+  displayNameKey?: string;
   configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
 };

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Table } from 'components/bootstrap';
 import { StatusIcon } from 'components/common';
@@ -25,10 +26,12 @@ type Props = {
 };
 
 const IndexerFailuresList = ({ failures }: Props) => {
+  const { t } = useTranslation('indexsets');
+
   if (failures.length === 0) {
     return (
       <Alert bsStyle="success">
-        <StatusIcon active /> Hurray! There are not any indexer failures.
+        <StatusIcon active /> {t('indexers.failures.none_hurray')}
       </Alert>
     );
   }
@@ -38,10 +41,10 @@ const IndexerFailuresList = ({ failures }: Props) => {
       <Table className="indexer-failures" condensed>
         <thead>
           <tr>
-            <th style={{ width: 200 }}>Timestamp</th>
-            <th>Index</th>
-            <th>Letter ID</th>
-            <th>Error message</th>
+            <th style={{ width: 200 }}>{t('indexers.failures.timestamp')}</th>
+            <th>{t('indexers.failures.index')}</th>
+            <th>{t('indexers.failures.letter_id')}</th>
+            <th>{t('indexers.failures.error_message')}</th>
           </tr>
         </thead>
         <tbody>

@@ -55,12 +55,8 @@ const ElasticsearchUnavailableInformation = () => {
                 <Icon name="warning" /> {t('overview.elasticsearch_unavailable.title')}
               </span>
             }>
-            <p>
-              {t('overview.elasticsearch_unavailable.description', { productName })}
-            </p>
-            <p>
-              {t('overview.elasticsearch_unavailable.journal_info')}
-            </p>
+            <p>{t('overview.elasticsearch_unavailable.description', { productName })}</p>
+            <p>{t('overview.elasticsearch_unavailable.journal_info')}</p>
           </Panel>
         </div>
       </Col>
