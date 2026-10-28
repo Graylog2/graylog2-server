@@ -20,7 +20,7 @@ import type { Stream } from 'logic/streams/types';
 import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
-import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+import useSingleStreamMetrics from 'hooks/useSingleStreamMetrics';
 import Routes from 'routing/Routes';
 
 type Props = {
@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ExpandedRoutingPipelinesSection = ({ stream }: Props) => {
-  const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
+  const { metrics, isInitialLoading, isError } = useSingleStreamMetrics(stream.id, ['routing_pipelines']);
   const pipelineIds = metrics?.routing_pipelines;
 
   const titleEntities = (pipelineIds ?? []).map((id) => ({ id, type: 'pipeline_processor_pipelines' }));

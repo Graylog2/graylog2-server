@@ -18,14 +18,12 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import useSingleInputMetrics from 'hooks/useSingleInputMetrics';
 import useEntityTitles from 'hooks/useEntityTitles';
 
 import AssociatedStreamsSection from './AssociatedStreamsSection';
 
-jest.mock('components/inputs/InputsOveriew/InputMetricsContext', () => ({
-  useInputMetricsFor: jest.fn(),
-}));
+jest.mock('hooks/useSingleInputMetrics');
 jest.mock('hooks/useEntityTitles', () => jest.fn());
 
 const input = {
@@ -55,7 +53,7 @@ describe('AssociatedStreamsSection', () => {
   });
 
   it('renders linked stream titles for each associated stream', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
+    asMock(useSingleInputMetrics).mockReturnValue({
       metrics: { messages_per_stream: { 'stream-a': 100 } },
       isInitialLoading: false,
       isError: false,
@@ -67,7 +65,7 @@ describe('AssociatedStreamsSection', () => {
   });
 
   it('renders "<id> (deleted)" for streams whose title is not resolved', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
+    asMock(useSingleInputMetrics).mockReturnValue({
       metrics: { messages_per_stream: { 'stream-deleted': 5 } },
       isInitialLoading: false,
       isError: false,
@@ -79,7 +77,7 @@ describe('AssociatedStreamsSection', () => {
   });
 
   it('renders empty-state when there are no associated streams', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
+    asMock(useSingleInputMetrics).mockReturnValue({
       metrics: { messages_per_stream: {} },
       isInitialLoading: false,
       isError: false,
