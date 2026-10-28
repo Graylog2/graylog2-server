@@ -24,7 +24,7 @@ import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
 import useInputTypes from 'hooks/useInputTypes';
-import { prefixUrl } from 'routing/Routes';
+import Routes from 'routing/Routes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 import InputsNotifications from 'components/inputs/InputsNotifications';
 
@@ -60,7 +60,7 @@ const InputsPage = () => {
             </p>
             <p>
               If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
-              a <Link to={prefixUrl('/system/forwarders')}>Forwarder</Link>.
+              a <Link to={Routes.SYSTEM.FORWARDERS}>Forwarder</Link>.
             </p>
           </>
         ) : (
