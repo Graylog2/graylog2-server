@@ -21,5 +21,392 @@
   "rule_is_managed_warning": "This rule is managed by Application. You cannot edit it.",
   "switch_to_source_code_editor": "Switch to Source Code Editor",
   "switch_to_source_code_editor_confirm_text": "You are about to leave this page and go to the Source Code Editor.",
-  "switch_to_source_code_editor_confirm_warning": "Make sure you have no unsaved changes."
+  "switch_to_source_code_editor_confirm_warning": "Make sure you have no unsaved changes.",
+  "pipeline_new": {
+    "description": "Give a name and description to the new pipeline. You can add stages to it when you save the changes."
+  },
+  "processing_errors": {
+    "rate_suffix": "errors/s",
+    "total": "({{total}} total)"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "Do you really want to delete pipeline \"{{title}}\"? This action cannot be undone.",
+    "filter_label": "Filter Pipelines",
+    "no_pipelines": "No pipelines have been found",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "Connected to Streams",
+      "processing_errors": "Processing Errors",
+      "pipeline_load": "Pipeline Load (15m)",
+      "processing_timeline": "Processing Timeline",
+      "actions": "Actions"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "Debug metrics are enabled",
+    "banner_text": "Debug metrics add overhead to message processing and increase memory usage. Disable them when you are finished troubleshooting. Pipeline Load values are smoothed over a 15-minute window and may take a few minutes to stabilize after enabling.",
+    "disable": "Disable debug metrics",
+    "enable": "Enable debug metrics",
+    "help": "Pipeline Load (15m) shows the relative share of pipeline rule execution time across the cluster. Enable debug metrics to start collecting timer data. Values may take up to about 15 minutes to populate after enabling, and collection adds overhead to message processing."
+  },
+  "pipeline": {
+    "not_connected": "This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one stream to make it process incoming messages. Note that this is not required if you intend to use this pipeline only for search result transformation using decorators.",
+    "delete_stage_confirm": "You are about to delete stage {{stage}}, are you sure you want to proceed?",
+    "list_and": " and ",
+    "processing_streams_one": "This pipeline is processing messages from the stream {{streams}}.",
+    "processing_streams_other": "This pipeline is processing messages from the streams {{streams}}.",
+    "managed_1": "This pipeline is system managed and can only be edited in a limited way.",
+    "managed_2": "Pipeline Rules may only be added to this Pipeline via the Input Wizard.",
+    "managed_3": "Pipeline Rules in this Pipeline will be automatically renamed to reflect any changes to the corresponding Input name.",
+    "managed_4": "Pipeline Rules can be removed manually from this Pipeline, but not added manually.",
+    "connections_title": "Pipeline connections",
+    "no_connections": "Select streams that will be processed by this pipeline.",
+    "stages_title": "Pipeline Stages",
+    "stages_description": "Stages are groups of conditions and actions which need to run in order, and provide the necessary control flow to decide whether or not to run the rest of a pipeline.",
+    "no_rules_on_stage": "There are no rules on this stage."
+  },
+  "connections_form": {
+    "streams_help": "Select the streams you want to connect to this pipeline, or create one in the <streamsLink>Streams page</streamsLink>.",
+    "edit": "Edit connections",
+    "title": "Edit connections for <pipelineTitle>{{title}}</pipelineTitle>",
+    "submit": "Update connections",
+    "streams": "Streams"
+  },
+  "details": {
+    "title": "Details",
+    "title_label": "Title",
+    "description": "Description",
+    "created": "Created",
+    "last_modified": "Last modified",
+    "throughput": "Current throughput",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "Title",
+    "title_help": "Pipeline name.",
+    "description": "Description",
+    "description_help": "Pipeline description.",
+    "add_button": "Add new pipeline",
+    "edit_button": "Edit pipeline details",
+    "add_title": "Add new pipeline {{title}}",
+    "edit_title": "Edit pipeline {{title}}",
+    "add_submit": "Add pipeline",
+    "update_submit": "Update pipeline",
+    "create_submit": "Create pipeline"
+  },
+  "list_item": {
+    "idle": "Idle",
+    "stage": "Stage {{stage}}",
+    "loading": "Loading pipeline...",
+    "managed": "Managed by Application",
+    "throughput_prefix": "Throughput:",
+    "throughput_suffix": "msg/s",
+    "not_connected": "Not connected",
+    "edit_aria": "Edit Pipeline",
+    "edit": "Edit",
+    "delete_aria": "Delete Pipeline",
+    "delete": "Delete"
+  },
+  "stage_rules": {
+    "invalid_rule": "Rule {{name}} has been renamed or removed. This rule will be skipped.",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s",
+    "remove_title": "Remove {{title}}",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "no_rules": "This stage has no rules yet. Click on edit to add some.",
+    "headers": {
+      "title": "Title",
+      "description": "Description",
+      "throughput": "Throughput",
+      "errors": "Errors",
+      "rule_load": "Rule Load (15m)",
+      "actions": "Actions"
+    }
+  },
+  "stage": {
+    "contains_rules_one": "Contains {{count}} rule",
+    "contains_rules_other": "Contains {{count}} rules",
+    "last_stage": "There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.",
+    "continue_all": "Messages satisfying <matchText>all rules</matchText> in this stage, will continue to the next stage.",
+    "continue_either": "Messages satisfying <matchText>at least one rule</matchText> in this stage, will continue to the next stage.",
+    "continue_pass": "Messages satisfying <matchText>none or more rules</matchText> in this stage, will continue to the next stage.",
+    "continue_unknown": "Messages satisfying <matchText>UNKNOWN</matchText> in this stage, will continue to the next stage.",
+    "title": "Stage {{stage}}",
+    "remove_routing_rule_title": "Remove Routing Rule",
+    "remove_routing_rule_confirm": "Do you really want to remove routing rule <ruleTitle>{{title}}</ruleTitle>?"
+  },
+  "stage_form": {
+    "rules_help": "Select the rules evaluated on this stage, or create one in the <rulesLink>Pipeline Rules page</rulesLink>.",
+    "add_button": "Add new stage",
+    "add_title": "Add new stage {{stage}}",
+    "edit_title": "Edit stage {{stage}}",
+    "add_submit": "Add stage",
+    "update_submit": "Update stage",
+    "stage": "Stage",
+    "stage_in_use": "Stage is already in use, please use another number or edit the existing stage.",
+    "stage_help": "Stage priority. The lower the number, the earlier it will execute.",
+    "continue_when": "Continue processing on next stage when",
+    "match_all": "All rules on this stage match the message",
+    "match_any": "At least one of the rules on this stage matches the message",
+    "match_pass": "None or more rules on this stage match",
+    "stage_rules": "Stage rules"
+  },
+  "used_in_pipelines": {
+    "label": "Used in pipelines",
+    "help": "Pipelines that use this rule in one or more of their stages.",
+    "none": "This rule is not being used in any pipelines."
+  },
+  "deprecation": {
+    "label": "Deprecated Function",
+    "title_rule": "This rule contains at least one deprecated function:",
+    "title_pipeline": "This pipeline contains at least one deprecated function:"
+  },
+  "rule_form": {
+    "duplicate_title": "Rule title \"{{title}}\" already exists!",
+    "title": "Title",
+    "title_help": "You can set the rule title in the rule source. See the quick reference for more information.",
+    "leave_question": "Do you really want to abandon this page and lose your changes? This action cannot be undone.",
+    "description": "Description",
+    "description_help": "Rule description (optional).",
+    "source": "Rule source",
+    "source_help": "Rule source, see quick reference for more information.",
+    "create_submit": "Create rule",
+    "update_close_submit": "Update rule & close",
+    "update": "Update rule"
+  },
+  "rule_list_entry": {
+    "edit": "Edit",
+    "delete_title": "Delete rule",
+    "delete": "Delete",
+    "managed": "Managed by Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s"
+  },
+  "metrics_config": {
+    "loading": "Loading metrics config...",
+    "title": "Rule Metrics Configuration",
+    "submit": "Update configuration",
+    "warning": "Rule metrics should only be enabled to debug a performance issue because collecting the metrics will slow down message processing and increase memory usage.",
+    "enable": "Enable rule metrics",
+    "disable": "Disable rule metrics",
+    "pipeline_load_info": "Enabling these metrics will add a new column to the Pipeline and Pipeline Rule pages called <columnName>Pipeline Load</columnName>, which will contain % values showing relatively, which of your Pipelines is consuming the most thread time.",
+    "rule_load_info": "Enabling these metrics will also add a new column to the Pipeline Detail page called <columnName>Rule Load</columnName>, This will identify which Pipeline rules within the selected Pipeline are the most expensive."
+  },
+  "rule_simulation": {
+    "error_builder": "Could not run the rule simulation. Please fix the rule builder errors.",
+    "placeholder_simple": "simple message field",
+    "invalid_json": "Invalid JSON!",
+    "title": "Rule Simulation",
+    "optional": "(Optional)",
+    "json": "JSON",
+    "key_value": "Key Value",
+    "simple_message": "Simple Message",
+    "input_title": "Simple message field, Key-Value pairs or JSON",
+    "input_help": "Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message.",
+    "run": "Run rule simulation",
+    "reset": "Reset",
+    "conditions_output": "Conditions Output",
+    "actions_output": "Actions Output"
+  },
+  "convert_modal": {
+    "no_title": "<no title>",
+    "no_code": "<no code>",
+    "create_rule": "Create new Rule from Code",
+    "copied": "Rule source code copied to clipboard!",
+    "copy_close": "Copy & Close"
+  },
+  "block_display": {
+    "number": "Number",
+    "not": "Not",
+    "deprecated": "Deprecated",
+    "edit": "Edit",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "insert_above": "Insert above",
+    "insert_below": "Insert below"
+  },
+  "block": {
+    "insert_title_above": "Insert new action above action N°{{order}}",
+    "insert_title_below": "Insert new action below action N°{{order}}"
+  },
+  "builder_form": {
+    "title": "Title",
+    "title_help": "Rule title.",
+    "description": "Description",
+    "description_help": "Rule description (optional)."
+  },
+  "block_form": {
+    "add_condition": "Add condition",
+    "add_action": "Add action",
+    "syntax_help": "Function Syntax Help",
+    "update": "Update",
+    "add": "Add"
+  },
+  "block_field": {
+    "no_dollar": "Fields starting with '$' are not allowed.",
+    "use_previous_output": "Use output from previous steps",
+    "set_custom": "Set custom {{name}}",
+    "select_output": "Select output from list",
+    "output_from_step": "Output from step {{step}} ({{name}})",
+    "type_not_found": "No previous action returns type {{type}}",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "Rule Builder",
+    "when": "When",
+    "and": "and",
+    "or": "or",
+    "then": "Then",
+    "convert_title": "Convert Rule Builder to Source Code",
+    "convert": "Convert to Source Code",
+    "delete_condition": "Delete condition",
+    "delete_action": "Delete action",
+    "delete_condition_confirm": "Are you sure you want to delete <blockName>condition N° {{order}}</blockName>?",
+    "delete_action_confirm": "Are you sure you want to delete <blockName>action N° {{order}}</blockName>?"
+  },
+  "helper": {
+    "title": "Rules quick reference",
+    "docs_hint": "Read the <docsLink>full documentation</docsLink> to gain a better understanding of how pipeline rules work.",
+    "functions": "Functions",
+    "example": "Example",
+    "functions_description": "This is a list of all available functions in pipeline rules. Click on a row to see more information about the function parameters.",
+    "filter_rules": "Filter rules",
+    "example_description": "Do you want to see how a pipeline rule looks like? Take a look at this example:"
+  },
+  "helper_table": {
+    "parameter": "Parameter",
+    "type": "Type",
+    "required": "Required",
+    "description": "Description",
+    "function": "Function"
+  },
+  "simulator": {
+    "no_streams_title": "No streams found",
+    "no_streams": "Pipelines operate on streams, but your system currently has no streams. Please <streamsLink>create a stream</streamsLink> and come back here later to test pipelines processing messages in your new stream.",
+    "stream_help": "Select a stream to use during simulation, the <streamTitle>{{title}}</streamTitle> stream is used by default.",
+    "load_message": "Load a message",
+    "load_message_description": "Build an example message that will be used in the simulation. <notice>No real messages will be altered. All actions are purely simulated on the temporary input you provide below.</notice>",
+    "stream": "Stream"
+  },
+  "simulation_changes": {
+    "added_fields": "Added fields",
+    "removed_fields": "Removed fields",
+    "mutated_fields": "Mutated fields",
+    "dropped": "Original message would be dropped during processing.",
+    "not_modified": "Original message would be not be modified during processing.",
+    "original_changes": "Changes in original message <idSmall><idEm>{{id}}</idEm></idSmall>",
+    "other_changes": "Other changes",
+    "other_changes_description_one": "There would be {{count}} message created. Switch to the <previewOption>Results preview</previewOption> view option to see it.",
+    "other_changes_description_other": "There would be {{count}} messages created. Switch to the <previewOption>Results preview</previewOption> view option to see them."
+  },
+  "simulation_preview": {
+    "dropped_title": "Message would be dropped",
+    "dropped": "The pipeline processor would drop such a message. That means that the message <notStored>would not be stored</notStored>, and would not be available for searches, alerts, outputs, or dashboards."
+  },
+  "simulation_trace": {
+    "microseconds": "μs"
+  },
+  "simulation_results": {
+    "changes_summary": "Changes summary",
+    "results_preview": "Results preview",
+    "simulation_trace": "Simulation trace",
+    "error_title": "Error simulating message processing",
+    "error": "Could not simulate processing of message <emphasis>{{id}}</emphasis> in stream <emphasis>{{stream}}</emphasis>.<lineBreak />Please try loading the message again, or use another message for the simulation.",
+    "original_message": "Original message",
+    "more_results": "More results",
+    "title": "Simulation results",
+    "simulating": "Simulating message processing, please wait a moment.",
+    "results_description": "These are the results of processing the loaded message. Processing took {{took}} µs."
+  },
+  "simulator_page": {
+    "title": "Simulate processing",
+    "documentation_title": "Pipelines documentation",
+    "description": "Processing messages can be complex. Use this page to simulate the result of processing an incoming message using your current set of pipelines and rules."
+  },
+  "rule_notifications": {
+    "fetch_failed": "Fetching rules failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve processing rules",
+    "list_failed": "Loading rules list failed with status: {{error}}",
+    "list_failed_title": "Could not load rules.",
+    "fetch_rule_failed": "Fetching rule \"{{id}}\" failed with status: {{error}}",
+    "fetch_rule_failed_title": "Could not retrieve processing rule \"{{id}}\"",
+    "create_success": "Rule \"{{title}}\" created successfully",
+    "create_failed": "Saving rule \"{{title}}\" failed with status: {{error}}",
+    "create_failed_title": "Could not save processing rule \"{{title}}\"",
+    "update_success": "Rule \"{{title}}\" updated successfully",
+    "update_failed": "Updating rule \"{{title}}\" failed with status: {{error}}",
+    "update_failed_title": "Could not update processing rule \"{{title}}\"",
+    "delete_success": "Rule \"{{title}}\" was deleted successfully",
+    "delete_failed": "Deleting rule \"{{title}}\" failed with status: {{error}}",
+    "delete_failed_title": "Could not delete processing rule \"{{title}}\"",
+    "metrics_load_failed": "Couldn't load rule metrics config: {{error}}",
+    "metrics_load_failed_title": "Couldn't load rule metrics config",
+    "metrics_update_success": "Successfully updated rule metrics config",
+    "metrics_update_failed": "Couldn't update rule metrics config: {{error}}",
+    "metrics_update_failed_title": "Couldn't update rule metrics config",
+    "metadata_failed": "Loading pipeline rules metadata failed with status",
+    "metadata_failed_title": "Could not load pipeline rules metadata",
+    "deprecated_failed": "Loading deprecated functions for rule failed with status",
+    "deprecated_failed_title": "Could not load deprecated functions for rule metadata",
+    "builder_create_failed": "Creating the Rule Builder Rule failed with status: {{error}}",
+    "builder_create_failed_title": "Could not Create the Rule Builder Rule.",
+    "builder_update_failed": "Updating the Rule Builder Rule failed with status: {{error}}",
+    "builder_update_failed_title": "Could not Update the Rule Builder Rule.",
+    "builder_load_failed": "Loading Rule Builder Rule failed with status",
+    "builder_load_failed_title": "Could not load Rule Builder Rule.",
+    "builder_conditions_failed": "Loading Rule Builder Conditions list failed with status",
+    "builder_conditions_failed_title": "Could not load Rule Builder Conditions list.",
+    "builder_actions_failed": "Loading Rule Builder Actions list failed with status",
+    "builder_actions_failed_title": "Could not load Rule Builder Actions list."
+  },
+  "page_navigation": {
+    "manage_pipelines": "Manage pipelines",
+    "manage_rules": "Manage rules",
+    "simulator": "Simulator"
+  },
+  "pipeline_notifications": {
+    "load_failed": "Loading pipelines failed with status",
+    "load_failed_title": "Could not load pipelines",
+    "load_paginated_failed": "Loading paginated pipelines failed with status",
+    "load_paginated_failed_title": "Could not load  paginated pipelines",
+    "load_single_failed": "Loading pipeline failed with status",
+    "load_single_failed_title": "Could not load pipeline",
+    "connections_failed": "Fetching pipeline connections failed with status",
+    "connections_failed_title": "Could not retrieve pipeline connections",
+    "connections_updated": "Pipeline connections updated successfully",
+    "connections_update_failed": "Updating pipeline connections failed with status: {{error}}",
+    "connections_update_failed_title": "Could not update pipeline connections",
+    "create_failed": "Creating pipeline failed with status: {{error}}",
+    "create_failed_title": "Could not create pipeline",
+    "create_success": "Pipeline has been successfully created.",
+    "update_failed": "Updating pipeline failed with status: {{error}}",
+    "update_failed_title": "Could not update pipeline",
+    "update_success": "Pipeline has been successfully updated.",
+    "delete_failed": "Deleting pipeline failed with status: {{error}}",
+    "delete_failed_title": "Could not delete pipeline",
+    "delete_success": "Pipeline has been successfully deleted.",
+    "success_title": "Success!"
+  },
+  "connections_list": {
+    "not_connected": "Pipeline not connected to any streams"
+  },
+  "rule_list": {
+    "headers": {
+      "title": "Title",
+      "description": "Description",
+      "created": "Created",
+      "last_modified": "Last modified",
+      "throughput": "Throughput",
+      "errors": "Errors",
+      "pipeline_load": "Pipeline Load (15m)",
+      "pipelines": "Pipelines",
+      "actions": "Actions"
+    }
+  },
+  "load_cell": {
+    "error_tooltip": "Pipeline Load is unavailable: failed to load processing-load metrics."
+  }
 }

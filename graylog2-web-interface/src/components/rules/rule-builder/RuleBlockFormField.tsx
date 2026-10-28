@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FormikFormGroup, InputOptionalInfo } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
@@ -49,6 +50,7 @@ const RuleBlockFormField = ({
   blockType,
   resetField,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -71,7 +73,7 @@ const RuleBlockFormField = ({
 
   const validateTextField = (value: string): string | undefined => {
     if (paramValueExists(value) && paramValueIsVariable(value)) {
-      return "Fields starting with '$' are not allowed.";
+      return t('block_field.no_dollar');
     }
 
     return null;
@@ -96,7 +98,7 @@ const RuleBlockFormField = ({
   const primaryInputButtonAfter = () => {
     if (!shouldHandlePrimaryParam() || filteredOutputVariableList().length <= 0) return null;
 
-    return <Button onClick={() => onPrimaryInputToggle('select')}>Use output from previous steps</Button>;
+    return <Button onClick={() => onPrimaryInputToggle('select')}>{t('block_field.use_previous_output')}</Button>;
   };
 
   const showOutputVariableSelect = () => {
@@ -133,24 +135,26 @@ const RuleBlockFormField = ({
         name={param.name}
         label={labelText(param)}
         required={!param.optional}
-        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
+        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{t('block_field.set_custom', { name: param.name })}</Button>}
         help={param.description}
         {...field}>
         <>
           <option key="placeholder" value="">
-            Select output from list
+            {t('block_field.select_output')}
           </option>
           {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-            <option
-              key={`option-${variableName}`}
-              value={variableName}>{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+            <option key={`option-${variableName}`} value={variableName}>
+              {t('block_field.output_from_step', { step: stepOrder + 1, name: variableName })}
+            </option>
           ))}
         </>
       </FormikFormGroup>
     );
   }
 
-  const typeNotFoundErrorMessage = `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`;
+  const typeNotFoundErrorMessage = t('block_field.type_not_found', {
+    type: param.type.slice(param.type.lastIndexOf('.') + 1),
+  });
 
   switch (param.type) {
     case RuleBuilderTypes.String:
@@ -189,7 +193,7 @@ const RuleBlockFormField = ({
             type="checkbox"
             key={`${functionName}_${param.name}`}
             name={param.name}
-            label={field.value ? 'true' : 'false'}
+            label={field.value ? t('block_field.true') : t('block_field.false')}
             help={param.description}
             checked={field.value}
             buttonAfter={primaryInputButtonAfter()}
@@ -211,12 +215,12 @@ const RuleBlockFormField = ({
             {...field}>
             <>
               <option key="placeholder" value="">
-                Select output from list
+                {t('block_field.select_output')}
               </option>
               {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-                <option
-                  key={`option-${variableName}`}
-                  value={variableName}>{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+                <option key={`option-${variableName}`} value={variableName}>
+                  {t('block_field.output_from_step', { step: stepOrder + 1, name: variableName })}
+                </option>
               ))}
             </>
           </FormikFormGroup>

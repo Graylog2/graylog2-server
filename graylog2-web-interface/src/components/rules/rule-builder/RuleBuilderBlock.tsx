@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
@@ -54,6 +55,7 @@ const RuleBuilderBlock = ({
   updateBlock,
   deleteBlock,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [insertMode, setInsertMode] = useState<'above' | 'below' | undefined>(undefined);
@@ -241,7 +243,9 @@ const RuleBuilderBlock = ({
             <Modal show bsSize="lg" onHide={resetInsertBlock}>
               <Modal.Header>
                 <Modal.Title>
-                  Insert new action {insertMode} action N°{order + 1}
+                  {insertMode === 'above'
+                    ? t('block.insert_title_above', { order: order + 1 })
+                    : t('block.insert_title_below', { order: order + 1 })}
                 </Modal.Title>
               </Modal.Header>
               <Modal.Body>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const NewPipeline = ({ onChange }: Props) => {
+  const { t } = useTranslation('pipelines');
   const history = useHistory();
 
   const _goToPipeline = (pipeline) => {
@@ -45,7 +47,7 @@ const NewPipeline = ({ onChange }: Props) => {
   return (
     <Row>
       <Col md={6}>
-        <p>Give a name and description to the new pipeline. You can add stages to it when you save the changes.</p>
+        <p>{t('pipeline_new.description')}</p>
         <PipelineDetails create onChange={_onChange} onCancel={_goBack} />
       </Col>
     </Row>

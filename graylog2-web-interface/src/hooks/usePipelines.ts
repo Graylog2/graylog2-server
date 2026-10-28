@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { PipelinesPipelines } from '@graylog/server-api';
 
 import type { PipelineType } from 'components/pipelines/types';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const PIPELINES_QUERY_KEY = ['pipelines'];
@@ -38,7 +39,11 @@ const usePipelines = (
     queryKey: PIPELINES_QUERY_KEY,
 
     queryFn: () =>
-      defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
+      defaultOnError(
+        PipelinesPipelines.getAll(),
+        i18n.t('pipeline_notifications.load_failed', { ns: 'pipelines' }),
+        i18n.t('pipeline_notifications.load_failed_title', { ns: 'pipelines' }),
+      ),
 
     enabled,
   });

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { DataTable, Icon, Link } from 'components/common';
@@ -57,6 +58,15 @@ export const isInputSetupWizardRoutingRule = (rule: RuleType | undefined): rule 
   !!rule && rule.description === INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION;
 const isInvalidRule = (rule: RuleData): rule is InvalidRule => 'isInvalid' in rule && rule.isInvalid;
 
+const STAGE_RULES_HEADER_KEYS = {
+  Title: 'stage_rules.headers.title',
+  Description: 'stage_rules.headers.description',
+  Throughput: 'stage_rules.headers.throughput',
+  Errors: 'stage_rules.headers.errors',
+  'Rule Load (15m)': 'stage_rules.headers.rule_load',
+  Actions: 'stage_rules.headers.actions',
+};
+
 const StageRules = ({
   pipeline,
   stage,
@@ -68,6 +78,7 @@ const StageRules = ({
   processingLoad: processingLoadProp = undefined,
   processingLoadError: processingLoadErrorProp = undefined,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     metricsEnabled,
     processingLoad: processingLoadContext,
@@ -85,7 +96,11 @@ const StageRules = ({
     ...(canRemoveRoutingRules ? ['Actions'] : []),
   ];
 
-  const headerCellFormatter = useCallback((header: string) => <th>{header}</th>, []);
+  // The English header texts identify the columns, the displayed texts are translated.
+  const headerCellFormatter = useCallback(
+    (header: string) => <th>{t(STAGE_RULES_HEADER_KEYS[header] ?? header)}</th>,
+    [t],
+  );
 
   const getMetricName = useCallback(
     (ruleId: string, metricType: 'executed' | 'failed'): string =>
@@ -102,11 +117,11 @@ const StageRules = ({
       return {
         id: `invalid-${ruleIdx}`,
         title: invalidRuleName,
-        description: `Rule ${invalidRuleName} has been renamed or removed. This rule will be skipped.`,
+        description: t('stage_rules.invalid_rule', { name: invalidRuleName }),
         isInvalid: true,
       };
     },
-    [stage.rules],
+    [stage.rules, t],
   );
 
   const ruleRowFormatter = useCallback(
@@ -140,12 +155,12 @@ const StageRules = ({
           <td>{rule.description}</td>
           <td>
             <MetricContainer name={getMetricName(rule.id, 'executed')}>
-              <CounterRate suffix="msg/s" />
+              <CounterRate suffix={t('stage_rules.throughput_suffix')} />
             </MetricContainer>
           </td>
           <td>
             <MetricContainer name={getMetricName(rule.id, 'failed')}>
-              <CounterRate showTotal suffix="errors/s" />
+              <CounterRate showTotal suffix={t('stage_rules.errors_suffix')} />
             </MetricContainer>
           </td>
           {showLoadColumn && (
@@ -166,8 +181,8 @@ const StageRules = ({
                   bsSize="xsmall"
                   disabled={Boolean(removingRuleId)}
                   onClick={() => removableRule && onRemoveRule(removableRule)}
-                  title={`Remove ${removableRule.title}`}>
-                  {removingRuleId === removableRule.id ? 'Removing...' : 'Remove'}
+                  title={t('stage_rules.remove_title', { title: removableRule.title })}>
+                  {removingRuleId === removableRule.id ? t('stage_rules.removing') : t('stage_rules.remove')}
                 </Button>
               )}
             </td>
@@ -186,6 +201,7 @@ const StageRules = ({
       processingLoadError,
       pipeline.id,
       stage.stage,
+      t,
     ],
   );
 
@@ -196,7 +212,7 @@ const StageRules = ({
       headerCellFormatter={headerCellFormatter}
       rows={rules}
       dataRowFormatter={ruleRowFormatter}
-      noDataText="This stage has no rules yet. Click on edit to add some."
+      noDataText={t('stage_rules.no_rules')}
       filterLabel=""
       filterKeys={[]}
     />

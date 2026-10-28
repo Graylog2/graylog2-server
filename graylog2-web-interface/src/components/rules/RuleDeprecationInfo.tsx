@@ -16,6 +16,7 @@
  */
 import styled, { css } from 'styled-components';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
@@ -47,6 +48,7 @@ const StyledList = styled.ul(
 );
 
 const RuleDeprecationInfo = ({ pipelineId = undefined, ruleId = undefined, showFor = 'rule' }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { data: pipelineMetaData, isLoading: isLoadingPipelineMetaData } = usePipelineRulesMetadata(pipelineId, {
     enabled: !!pipelineId,
   });
@@ -84,8 +86,8 @@ const RuleDeprecationInfo = ({ pipelineId = undefined, ruleId = undefined, showF
 
   return (
     <DeprecatedLabel bsStyle="warning">
-      <span>Deprecated Function</span>
-      <HoverForHelp trigger="hover" type="info" title={`This ${showFor} contains at least one deprecated function:`}>
+      <span>{t('deprecation.label')}</span>
+      <HoverForHelp trigger="hover" type="info" title={showFor === 'pipeline' ? t('deprecation.title_pipeline') : t('deprecation.title_rule')}>
         <StyledList>
           {deprecatedFunctions?.map((func) => (
             <li key={func}>{func}</li>

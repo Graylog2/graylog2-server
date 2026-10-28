@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import { CounterRate } from 'components/metrics';
 import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
@@ -68,6 +69,7 @@ export const getPipelineRuleFailureMetricNames = (pipeline: PipelineType, ruleId
 };
 
 const PipelineProcessingErrors = ({ pipeline }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { data: pipelineRulesMetadata } = usePipelineRulesMetadata(pipeline.id, {
     enabled: !!pipeline.id,
   });
@@ -100,10 +102,12 @@ const PipelineProcessingErrors = ({ pipeline }: Props) => {
           full_name: `pipeline.${pipeline.id}.failed`,
           count: totalErrors,
         }}
-        suffix="errors/s"
+        suffix={t('processing_errors.rate_suffix')}
       />
       <br />
-      <span className="number-format">({numeral(totalErrors).format('0')} total)</span>
+      <span className="number-format">
+        {t('processing_errors.total', { total: numeral(totalErrors).format('0') })}
+      </span>
     </span>
   );
 };

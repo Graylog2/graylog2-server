@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState, useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { PipelinesSimulator } from '@graylog/server-api';
 
@@ -56,6 +57,7 @@ const simulateMessage = (streamId: string, messageFields: Record<string, unknown
   }));
 
 const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
+  const { t } = useTranslation('pipelines');
   const defaultStream = useMemo(() => streams.find((s) => s.id === DEFAULT_STREAM_ID) ?? streams[0], [streams]);
 
   const [stream, setStream] = useState<Stream>(defaultStream);
@@ -96,10 +98,12 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
       <div>
         <Row className="row-sm">
           <Col md={8} mdOffset={2}>
-            <Panel bsStyle="danger" header="No streams found">
-              Pipelines operate on streams, but your system currently has no streams. Please{' '}
-              <Link to={Routes.STREAMS}>create a stream</Link> and come back here later to test pipelines processing
-              messages in your new stream.
+            <Panel bsStyle="danger" header={t('simulator.no_streams_title')}>
+              <Trans
+                t={t}
+                i18nKey="simulator.no_streams"
+                components={{ streamsLink: <Link to={Routes.STREAMS} /> }}
+              />
             </Panel>
           </Col>
         </Row>
@@ -109,7 +113,12 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
 
   const streamHelp = (
     <span>
-      Select a stream to use during simulation, the <em>{defaultStream.title}</em> stream is used by default.
+      <Trans
+        t={t}
+        i18nKey="simulator.stream_help"
+        values={{ title: defaultStream.title }}
+        components={{ streamTitle: <em /> }}
+      />
     </span>
   );
 
@@ -117,18 +126,14 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
     <div>
       <Row>
         <Col md={12}>
-          <h1>Load a message</h1>
+          <h1>{t('simulator.load_message')}</h1>
           <p>
-            Build an example message that will be used in the simulation.{' '}
-            <strong>
-              No real messages will be altered. All actions are purely simulated on the temporary input you provide
-              below.
-            </strong>
+            <Trans t={t} i18nKey="simulator.load_message_description" components={{ notice: <strong /> }} />
           </p>
           <Row className="row-sm">
             <Col md={7}>
               <FormGroup id="streamSelectorSimulation">
-                <ControlLabel>Stream</ControlLabel>
+                <ControlLabel>{t('simulator.stream')}</ControlLabel>
                 <Select
                   options={getFormattedStreams(streams)}
                   onChange={onStreamSelect}

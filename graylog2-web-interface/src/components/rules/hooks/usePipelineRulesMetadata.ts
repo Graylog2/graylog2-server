@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { PipelinesPipelines } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PipelineRulesMetadata } from 'components/rules/types';
 
@@ -50,8 +51,8 @@ const usePipelineRulesMetadata = (
     queryFn: () =>
       defaultOnError(
         getMetaData({ pipelineId }),
-        'Loading pipeline rules metadata failed with status',
-        'Could not load pipeline rules metadata',
+        i18n.t('rule_notifications.metadata_failed', { ns: 'pipelines' }),
+        i18n.t('rule_notifications.metadata_failed_title', { ns: 'pipelines' }),
       ),
     enabled,
   });

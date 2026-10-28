@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/bootstrap';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 const DebugMetricsBanner = ({ config = undefined }: Props) => {
+  const { t } = useTranslation('pipelines');
   const hookConfig = useDebugMetricsConfig({ loadOnMount: config === undefined });
   const { metricsEnabled, isLoading, disable } = config ?? hookConfig;
 
@@ -45,16 +47,12 @@ const DebugMetricsBanner = ({ config = undefined }: Props) => {
   }
 
   return (
-    <Alert bsStyle="warning" title="Debug metrics are enabled">
-      <p>
-        Debug metrics add overhead to message processing and increase memory usage. Disable them when you are finished
-        troubleshooting. Pipeline Load values are smoothed over a 15-minute window and may take a few minutes to
-        stabilize after enabling.
-      </p>
+    <Alert bsStyle="warning" title={t('debug_metrics.banner_title')}>
+      <p>{t('debug_metrics.banner_text')}</p>
       <IfPermitted permissions={[EDIT_PERMISSION]}>
         <BannerActions>
           <Button bsStyle="warning" bsSize="small" onClick={disable}>
-            Disable debug metrics
+            {t('debug_metrics.disable')}
           </Button>
         </BannerActions>
       </IfPermitted>

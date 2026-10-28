@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
@@ -25,14 +26,14 @@ type SimulationPreviewProps = {
 };
 
 const SimulationPreview = ({ simulationResults, streams }: SimulationPreviewProps) => {
+  const { t } = useTranslation('pipelines');
   const { messages } = simulationResults;
 
   if (messages.length === 0) {
     return (
-      <Alert bsStyle="info" title="Message would be dropped">
+      <Alert bsStyle="info" title={t('simulation_preview.dropped_title')}>
         <p>
-          The pipeline processor would drop such a message. That means that the message
-          <strong>would not be stored</strong>, and would not be available for searches, alerts, outputs, or dashboards.
+          <Trans t={t} i18nKey="simulation_preview.dropped" components={{ notStored: <strong /> }} />
         </p>
       </Alert>
     );

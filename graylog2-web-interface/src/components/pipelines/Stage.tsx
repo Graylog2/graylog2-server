@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Button } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, Spinner } from 'components/common';
@@ -41,6 +42,7 @@ type Props = {
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit = false }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { isPermitted } = usePermissions();
   const queryClient = useQueryClient();
   const { data: allRules } = useRules();
@@ -84,12 +86,16 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
       .finally(() => setRemovingRuleId(undefined));
   }, [pipeline.id, queryClient, removingRuleId, rulePendingRemoval]);
 
-  const suffix = `Contains ${stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`}`;
+  const suffix = t('stage.contains_rules', { count: stage.rules.length });
 
   const throughput = (
     <MetricContainer
       name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
-      <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
+      <CounterRate
+        showTotal={false}
+        prefix={`${t('list_item.throughput_prefix')} `}
+        suffix={t('list_item.throughput_suffix')}
+      />
     </MetricContainer>
   );
 
@@ -99,7 +105,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
       key={`delete-stage-${stage}`}
       bsStyle="danger"
       onClick={onDelete}>
-      Delete
+      {t('list_item.delete')}
     </Button>,
     <StageForm
       key={`edit-stage-${stage}`}
@@ -113,29 +119,17 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
   let description;
 
   if (isLastStage) {
-    description =
-      'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
+    description = t('stage.last_stage');
   } else {
-    let matchText;
-
-    switch (stage.match) {
-      case 'ALL':
-        matchText = 'all rules';
-        break;
-      case 'EITHER':
-        matchText = 'at least one rule';
-        break;
-      case 'PASS':
-        matchText = 'none or more rules';
-        break;
-      default:
-        matchText = 'UNKNOWN';
-        break;
-    }
+    const matchKeys = {
+      ALL: 'stage.continue_all',
+      EITHER: 'stage.continue_either',
+      PASS: 'stage.continue_pass',
+    };
 
     description = (
       <span>
-        Messages satisfying <strong>{matchText}</strong> in this stage, will continue to the next stage.
+        <Trans t={t} i18nKey={matchKeys[stage.match] ?? 'stage.continue_unknown'} components={{ matchText: <strong /> }} />
       </span>
     );
   }
@@ -164,7 +158,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
   return (
     <>
       <EntityListItem
-        title={`Stage ${stage.stage}`}
+        title={t('stage.title', { stage: stage.stage })}
         titleSuffix={suffix}
         actions={actions}
         description={block}
@@ -172,13 +166,18 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
       />
       {rulePendingRemoval && (
         <ConfirmDialog
-          title="Remove Routing Rule"
+          title={t('stage.remove_routing_rule_title')}
           show
           onConfirm={confirmRemoveRoutingRule}
           onCancel={closeRemoveRoutingRuleDialog}
-          btnConfirmText="Remove">
+          btnConfirmText={t('stage_rules.remove')}>
           <span>
-            Do you really want to remove routing rule <b>{rulePendingRemoval.title}</b>?
+            <Trans
+              t={t}
+              i18nKey="stage.remove_routing_rule_confirm"
+              values={{ title: rulePendingRemoval.title }}
+              components={{ ruleTitle: <b /> }}
+            />
           </span>
         </ConfirmDialog>
       )}

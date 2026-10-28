@@ -16,9 +16,10 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Alert } from 'components/bootstrap';
-import { EntityList, Pluralize, Spinner } from 'components/common';
+import { EntityList, Spinner } from 'components/common';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { Stream } from 'logic/streams/types';
 import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
@@ -52,6 +53,7 @@ type Props = {
 };
 
 const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStagesChange, onPipelineChange }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
 
@@ -59,9 +61,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     if (connections.length === 0) {
       return (
         <ConnectionWarning bsStyle="danger">
-          This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one stream
-          to make it process incoming messages. Note that this is not required if you intend to use this pipeline only
-          for search result transformation using decorators.
+          {t('pipeline.not_connected')}
         </ConnectionWarning>
       );
     }
@@ -89,28 +89,23 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
   const _deleteStage = useCallback(
     (stage) => () => {
       // eslint-disable-next-line no-alert
-      if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
+      if (window.confirm(t('pipeline.delete_stage_confirm', { stage: stage.stage }))) {
         const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
 
         onStagesChange(newStages);
       }
     },
-    [pipeline, onStagesChange],
+    [pipeline, onStagesChange, t],
   );
 
   const _formatConnectedStreams = (connectedStreams: Stream[]) => {
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
     const streamList =
       formattedStreams.length > 1
-        ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ')
+        ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(t('pipeline.list_and'))
         : formattedStreams[0];
 
-    return (
-      <span>
-        This pipeline is processing messages from the{' '}
-        <Pluralize singular="stream" plural="streams" value={formattedStreams.length} /> {streamList}.
-      </span>
-    );
+    return <span>{t('pipeline.processing_streams', { count: formattedStreams.length, streams: streamList })}</span>;
   };
 
   const formattedStages = useMemo(() => {
@@ -141,13 +136,10 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     <div>
       {isManaged && (
         <Alert bsStyle="warning">
-          <p>This pipeline is system managed and can only be edited in a limited way.</p>
-          <p>Pipeline Rules may only be added to this Pipeline via the Input Wizard.</p>
-          <p>
-            Pipeline Rules in this Pipeline will be automatically renamed to reflect any changes to the corresponding
-            Input name.
-          </p>
-          <p>Pipeline Rules can be removed manually from this Pipeline, but not added manually.</p>
+          <p>{t('pipeline.managed_1')}</p>
+          <p>{t('pipeline.managed_2')}</p>
+          <p>{t('pipeline.managed_3')}</p>
+          <p>{t('pipeline.managed_4')}</p>
         </Alert>
       )}
       {_connectionsWarning()}
@@ -163,14 +155,14 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
               disableEdit={isManaged}
             />
           </div>
-          <h2>Pipeline connections</h2>
+          <h2>{t('pipeline.connections_title')}</h2>
           <StyledP>
             <PipelineConnectionsList
               pipeline={pipeline}
               connections={connections}
               streams={streams}
               streamsFormatter={_formatConnectedStreams}
-              noConnectionsMessage="Select streams that will be processed by this pipeline."
+              noConnectionsMessage={t('pipeline.no_connections')}
             />
           </StyledP>
           <hr />
@@ -181,14 +173,11 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
           <div className="pull-right">
             <StageForm key={stageKey} pipeline={pipeline} create save={_saveStage} disableEdit={isManaged} />
           </div>
-          <h2>Pipeline Stages</h2>
-          <StyledP>
-            Stages are groups of conditions and actions which need to run in order, and provide the necessary control
-            flow to decide whether or not to run the rest of a pipeline.
-          </StyledP>
+          <h2>{t('pipeline.stages_title')}</h2>
+          <StyledP>{t('pipeline.stages_description')}</StyledP>
         </Col>
       </StyledRow>
-      <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages} />
+      <EntityList bsNoItemsStyle="info" noItemsText={t('pipeline.no_rules_on_stage')} items={formattedStages} />
     </div>
   );
 };

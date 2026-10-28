@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label, Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }: Props) => {
+  const { t } = useTranslation('pipelines');
   const parameters = (descriptor: BlockDict) =>
     descriptor.params.map((p) => (
       <tr key={p.name}>
@@ -58,10 +60,10 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
               <Table condensed>
                 <thead>
                   <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Description</th>
+                    <th>{t('helper_table.parameter')}</th>
+                    <th>{t('helper_table.type')}</th>
+                    <th>{t('helper_table.required')}</th>
+                    <th>{t('helper_table.description')}</th>
                   </tr>
                 </thead>
                 <tbody>{parameters(d)}</tbody>
@@ -83,7 +85,7 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
               {d.deprecated && (
                 <span>
                   <Label bsStyle="warning" bsSize="xs">
-                    Deprecated
+                    {t('block_display.deprecated')}
                   </Label>
                   &nbsp;
                 </span>
@@ -101,8 +103,8 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
     <Table condensed>
       <thead>
         <tr>
-          <th>Function</th>
-          <th>Description</th>
+          <th>{t('helper_table.function')}</th>
+          <th>{t('helper_table.description')}</th>
         </tr>
       </thead>
       {renderFunctions(entries)}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input, Row, Col } from 'components/bootstrap';
 
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const RuleBuilderForm = ({ rule, onChange }: Props) => {
+  const { t } = useTranslation('pipelines');
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...rule, title: event.target.value });
   };
@@ -43,23 +45,23 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
           <Input
             type="text"
             id="title"
-            label="Title"
+            label={t('builder_form.title')}
             value={rule.title}
             onChange={handleTitleChange}
             autoFocus
             required
-            help="Rule title."
+            help={t('builder_form.title_help')}
           />
         </Col>
         <Col xs={6}>
           <Input
             type="textarea"
             id="description"
-            label="Description"
+            label={t('builder_form.description')}
             value={rule.description}
             onChange={handleDescriptionChange}
             rows={1}
-            help="Rule description (optional)."
+            help={t('builder_form.description_help')}
           />
         </Col>
       </Row>

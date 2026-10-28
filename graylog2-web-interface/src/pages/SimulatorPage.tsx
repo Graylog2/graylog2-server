@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -24,24 +25,22 @@ import useAllStreams from 'components/streams/hooks/useAllStreams';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 
 const SimulatorPage = () => {
+  const { t } = useTranslation('pipelines');
   const { data: allStreams } = useAllStreams();
   const streams = useMemo(() => (allStreams ? allStreams.filter((s) => s.is_editable) : undefined), [allStreams]);
 
   const content = !streams ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
   return (
-    <DocumentTitle title="Simulate processing">
+    <DocumentTitle title={t('simulator_page.title')}>
       <PipelinesPageNavigation />
       <PageHeader
-        title="Simulate processing"
+        title={t('simulator_page.title')}
         documentationLink={{
-          title: 'Pipelines documentation',
+          title: t('simulator_page.documentation_title'),
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
-        <span>
-          Processing messages can be complex. Use this page to simulate the result of processing an incoming message
-          using your current set of pipelines and rules.
-        </span>
+        <span>{t('simulator_page.description')}</span>
       </PageHeader>
 
       <Row className="content">

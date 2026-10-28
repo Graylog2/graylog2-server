@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
 import { Button, Col, Label, Row } from 'components/bootstrap';
@@ -112,6 +113,7 @@ const RuleBlockForm = ({
   selectedBlockDict = undefined,
   type,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const [initialValues, setInitialValues] = useState<{}>({});
 
   const sendTelemetry = useSendTelemetry('pipeline-rule-builder');
@@ -190,7 +192,7 @@ const RuleBlockForm = ({
         <span>
           {option.deprecated && (
             <Label bsStyle="warning" bsSize="xs">
-              Deprecated
+              {t('block_display.deprecated')}
             </Label>
           )}
         </span>
@@ -210,7 +212,7 @@ const RuleBlockForm = ({
                   <Select
                     id={`existingBlock-select-${type}`}
                     name={`existingBlock-select-${type}`}
-                    placeholder={`Add ${type}`}
+                    placeholder={type === 'condition' ? t('block_form.add_condition') : t('block_form.add_action')}
                     options={options}
                     optionRenderer={optionRenderer}
                     clearable={false}
@@ -231,7 +233,7 @@ const RuleBlockForm = ({
                           trigger="click"
                           rootClose
                           placement="right"
-                          title="Function Syntax Help"
+                          title={t('block_form.syntax_help')}
                           width={700}
                           overlay={
                             <RuleHelperTable
@@ -240,14 +242,14 @@ const RuleBlockForm = ({
                             />
                           }>
                           <Button bsStyle="link">
-                            <Icon name="help" title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
+                            <Icon name="help" title={t('block_form.syntax_help')} data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
                         {selectedBlockDict.deprecated && (
                           <DeprecatedLabel>
                             &nbsp;
                             <Label bsStyle="warning" bsSize="xs">
-                              Deprecated
+                              {t('block_display.deprecated')}
                             </Label>
                           </DeprecatedLabel>
                         )}
@@ -274,7 +276,7 @@ const RuleBlockForm = ({
                   <FormSubmit
                     bsSize="small"
                     disabledSubmit={!isValid}
-                    submitButtonText={existingBlock ? 'Update' : 'Add'}
+                    submitButtonText={existingBlock ? t('block_form.update') : t('block_form.add')}
                     submitButtonType="submit"
                     onCancel={() => {
                       resetForm();

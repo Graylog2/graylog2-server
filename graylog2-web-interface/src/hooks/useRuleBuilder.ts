@@ -18,6 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { PipelinesRulebuilder } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -40,13 +41,13 @@ const createRule = async (rule: RuleBuilderRule) => {
   try {
     const result = await fetch('POST', qualifyUrl(ApiRoutes.RuleBuilderController.create().url), rule);
 
-    UserNotification.success(`Rule "${rule.title}" created successfully`);
+    UserNotification.success(i18n.t('rule_notifications.create_success', { ns: 'pipelines', title: rule.title }));
 
     return result;
   } catch (errorThrown) {
     UserNotification.error(
-      `Creating the Rule Builder Rule failed with status: ${errorThrown}`,
-      'Could not Create the Rule Builder Rule.',
+      i18n.t('rule_notifications.builder_create_failed', { ns: 'pipelines', error: errorThrown }),
+      i18n.t('rule_notifications.builder_create_failed_title', { ns: 'pipelines' }),
     );
 
     return null;
@@ -60,11 +61,11 @@ const updateRule = async (rule: RuleBuilderRule) => {
   try {
     await PipelinesRulebuilder.updateFromBuilder(ruleToUpdate, rule.id);
 
-    UserNotification.success(`Rule "${rule.title}" updated successfully`);
+    UserNotification.success(i18n.t('rule_notifications.update_success', { ns: 'pipelines', title: rule.title }));
   } catch (errorThrown) {
     UserNotification.error(
-      `Updating the Rule Builder Rule failed with status: ${errorThrown}`,
-      'Could not Update the Rule Builder Rule.',
+      i18n.t('rule_notifications.builder_update_failed', { ns: 'pipelines', error: errorThrown }),
+      i18n.t('rule_notifications.builder_update_failed_title', { ns: 'pipelines' }),
     );
   }
 };
@@ -94,8 +95,8 @@ const useRuleBuilder = () => {
     queryFn: () =>
       defaultOnError(
         fetchRule(ruleId),
-        'Loading Rule Builder Rule failed with status',
-        'Could not load Rule Builder Rule.',
+        i18n.t('rule_notifications.builder_load_failed', { ns: 'pipelines' }),
+        i18n.t('rule_notifications.builder_load_failed_title', { ns: 'pipelines' }),
       ),
 
     enabled,
@@ -110,8 +111,8 @@ const useRuleBuilder = () => {
     queryFn: () =>
       defaultOnError(
         fetchConditionsDict(),
-        'Loading Rule Builder Conditions list failed with status',
-        'Could not load Rule Builder Conditions list.',
+        i18n.t('rule_notifications.builder_conditions_failed', { ns: 'pipelines' }),
+        i18n.t('rule_notifications.builder_conditions_failed_title', { ns: 'pipelines' }),
       ),
 
     placeholderData: keepPreviousData,
@@ -126,8 +127,8 @@ const useRuleBuilder = () => {
     queryFn: () =>
       defaultOnError(
         fetchActionsDict(),
-        'Loading Rule Builder Actions list failed with status',
-        'Could not load Rule Builder Actions list.',
+        i18n.t('rule_notifications.builder_actions_failed', { ns: 'pipelines' }),
+        i18n.t('rule_notifications.builder_actions_failed_title', { ns: 'pipelines' }),
       ),
 
     placeholderData: keepPreviousData,

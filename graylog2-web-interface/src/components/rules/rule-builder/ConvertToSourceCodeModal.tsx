@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -45,17 +46,18 @@ type Props = {
 };
 
 const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props) => {
+  const { t } = useTranslation('pipelines');
   const history = useHistory();
   const sendTelemetry = useSendTelemetry('convert-rule-builder-to-source-code-modal');
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large">
       <Modal.Header>
-        <Modal.Title>{rule.title || '<no title>'}</Modal.Title>
+        <Modal.Title>{rule.title || t('convert_modal.no_title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <pre>
-          <SourceCodeContainer>{rule.source || '<no code>'}</SourceCodeContainer>
+          <SourceCodeContainer>{rule.source || t('convert_modal.no_code')}</SourceCodeContainer>
         </pre>
       </Modal.Body>
       <Modal.Footer>
@@ -72,7 +74,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
               await onNavigateAway(rule);
               history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
             }}>
-            Create new Rule from Code
+            {t('convert_modal.create_rule')}
           </Button>
           <Button
             type="button"
@@ -83,10 +85,10 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
               });
 
               copyToClipboard(rule.source);
-              UserNotification.success('Rule source code copied to clipboard!');
+              UserNotification.success(t('convert_modal.copied'));
               onHide();
             }}>
-            Copy & Close
+            {t('convert_modal.copy_close')}
           </Button>
         </ModalButtonToolbar>
       </Modal.Footer>

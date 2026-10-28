@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { PipelinesPipelines } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = [];
@@ -42,8 +43,8 @@ const useRuleDeprecatedFunctions = (
     queryFn: () =>
       defaultOnError(
         getDeprecatedFunctions({ ruleId }),
-        'Loading deprecated functions for rule failed with status',
-        'Could not load deprecated functions for rule metadata',
+        i18n.t('rule_notifications.deprecated_failed', { ns: 'pipelines' }),
+        i18n.t('rule_notifications.deprecated_failed_title', { ns: 'pipelines' }),
       ),
     enabled,
   });

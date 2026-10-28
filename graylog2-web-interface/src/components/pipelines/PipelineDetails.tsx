@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
@@ -59,6 +60,8 @@ const PipelineDetails = ({
   onCancel = () => {},
   disableEdit = false,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
+
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }
@@ -70,24 +73,24 @@ const PipelineDetails = ({
           <div className="pull-right">
             <PipelineForm pipeline={pipeline} save={onChange} disableEdit={disableEdit} />
           </div>
-          <h2>Details</h2>
+          <h2>{t('details.title')}</h2>
           <PipelineDl className="dl-horizontal">
-            <dt>Title</dt>
+            <dt>{t('details.title_label')}</dt>
             <dd>{pipeline.title}</dd>
-            <dt>Description</dt>
+            <dt>{t('details.description')}</dt>
             <dd>{pipeline.description}</dd>
-            <dt>Created</dt>
+            <dt>{t('details.created')}</dt>
             <dd>
               <RelativeTime dateTime={pipeline.created_at} />
             </dd>
-            <dt>Last modified</dt>
+            <dt>{t('details.last_modified')}</dt>
             <dd>
               <RelativeTime dateTime={pipeline.modified_at} />
             </dd>
-            <dt>Current throughput</dt>
+            <dt>{t('details.throughput')}</dt>
             <dd>
               <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
-                <CounterRate suffix="msg/s" />
+                <CounterRate suffix={t('details.throughput_suffix')} />
               </MetricContainer>
             </dd>
           </PipelineDl>

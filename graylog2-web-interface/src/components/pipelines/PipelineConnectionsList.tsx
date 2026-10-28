@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import type { PipelineType } from 'components/pipelines/types';
@@ -34,8 +35,9 @@ const PipelineConnectionsList = ({
   connections,
   streams,
   streamsFormatter,
-  noConnectionsMessage = 'Pipeline not connected to any streams',
+  noConnectionsMessage = undefined,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const streamsUsingPipeline = connections
     .filter((c) => c.pipeline_ids && c.pipeline_ids.includes(pipeline.id)) // Get connections for this pipeline
     .filter((c) => streams.some((s) => s.id === c.stream_id)) // Filter out deleted streams
@@ -43,7 +45,7 @@ const PipelineConnectionsList = ({
     .sort((s1, s2) => naturalSort(s1.title, s2.title));
 
   return (
-    <span>{streamsUsingPipeline.length === 0 ? noConnectionsMessage : streamsFormatter(streamsUsingPipeline)}</span>
+    <span>{streamsUsingPipeline.length === 0 ? (noConnectionsMessage ?? t('connections_list.not_connected')) : streamsFormatter(streamsUsingPipeline)}</span>
   );
 };
 

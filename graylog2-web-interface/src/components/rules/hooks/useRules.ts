@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { PipelinesRules } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
@@ -82,8 +83,8 @@ export const fetchRules = (): Promise<Array<RuleType>> => {
     (response: Array<RuleType>) => response,
     (error: Error) => {
       UserNotification.error(
-        `Fetching rules failed with status: ${error.message}`,
-        'Could not retrieve processing rules',
+        i18n.t('rule_notifications.fetch_failed', { ns: 'pipelines', error: error.message }),
+        i18n.t('rule_notifications.fetch_failed_title', { ns: 'pipelines' }),
       );
 
       throw error;
@@ -106,7 +107,10 @@ export const fetchRulesPaginated = ({ page, perPage, query }: Pagination): Promi
     }),
     (error: FetchError) => {
       if (!error.additional || error.additional.status !== 404) {
-        UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+        UserNotification.error(
+          i18n.t('rule_notifications.list_failed', { ns: 'pipelines', error: error }),
+          i18n.t('rule_notifications.list_failed_title', { ns: 'pipelines' }),
+        );
       }
 
       throw error;
@@ -120,8 +124,8 @@ export const getRule = (ruleId: string): Promise<RuleType> => {
     (response: RuleType) => response,
     (error: Error) => {
       UserNotification.error(
-        `Fetching rule "${ruleId}" failed with status: ${error.message}`,
-        `Could not retrieve processing rule "${ruleId}"`,
+        i18n.t('rule_notifications.fetch_rule_failed', { ns: 'pipelines', id: ruleId, error: error.message }),
+        i18n.t('rule_notifications.fetch_rule_failed_title', { ns: 'pipelines', id: ruleId }),
       );
 
       throw error;
@@ -140,14 +144,14 @@ export const saveRule = (ruleSource: RuleType): Promise<RuleType> => {
 
   return fetch('POST', url, rule).then(
     (response: RuleType) => {
-      UserNotification.success(`Rule "${response.title}" created successfully`);
+      UserNotification.success(i18n.t('rule_notifications.create_success', { ns: 'pipelines', title: response.title }));
 
       return response;
     },
     (error: Error) => {
       UserNotification.error(
-        `Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
-        `Could not save processing rule "${ruleSource.title}"`,
+        i18n.t('rule_notifications.create_failed', { ns: 'pipelines', title: ruleSource.title, error: error.message }),
+        i18n.t('rule_notifications.create_failed_title', { ns: 'pipelines', title: ruleSource.title }),
       );
 
       throw error;
@@ -167,14 +171,14 @@ export const updateRule = (ruleSource: RuleType): Promise<RuleType> => {
 
   return fetch('PUT', url, rule).then(
     (response: RuleType) => {
-      UserNotification.success(`Rule "${response.title}" updated successfully`);
+      UserNotification.success(i18n.t('rule_notifications.update_success', { ns: 'pipelines', title: response.title }));
 
       return response;
     },
     (error: Error) => {
       UserNotification.error(
-        `Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
-        `Could not update processing rule "${ruleSource.title}"`,
+        i18n.t('rule_notifications.update_failed', { ns: 'pipelines', title: ruleSource.title, error: error.message }),
+        i18n.t('rule_notifications.update_failed_title', { ns: 'pipelines', title: ruleSource.title }),
       );
 
       throw error;
@@ -185,12 +189,12 @@ export const updateRule = (ruleSource: RuleType): Promise<RuleType> => {
 export const deleteRule = (rule: RuleType): Promise<void> =>
   PipelinesRules.remove(rule.id).then(
     () => {
-      UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
+      UserNotification.success(i18n.t('rule_notifications.delete_success', { ns: 'pipelines', title: rule.title }));
     },
     (error: Error) => {
       UserNotification.error(
-        `Deleting rule "${rule.title}" failed with status: ${error.message}`,
-        `Could not delete processing rule "${rule.title}"`,
+        i18n.t('rule_notifications.delete_failed', { ns: 'pipelines', title: rule.title, error: error.message }),
+        i18n.t('rule_notifications.delete_failed_title', { ns: 'pipelines', title: rule.title }),
       );
 
       throw error;
@@ -290,8 +294,8 @@ export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> =>
     (response: MetricsConfigType) => response,
     (error: Error) => {
       UserNotification.error(
-        `Couldn't load rule metrics config: ${error.message}`,
-        "Couldn't load rule metrics config",
+        i18n.t('rule_notifications.metrics_load_failed', { ns: 'pipelines', error: error.message }),
+        i18n.t('rule_notifications.metrics_load_failed_title', { ns: 'pipelines' }),
       );
 
       throw error;
@@ -301,14 +305,14 @@ export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> =>
 export const updateRuleMetricsConfig = (nextConfig: MetricsConfigType): Promise<MetricsConfigType> =>
   PipelinesRules.updateMetricsConfig(nextConfig).then(
     (response: MetricsConfigType) => {
-      UserNotification.success('Successfully updated rule metrics config');
+      UserNotification.success(i18n.t('rule_notifications.metrics_update_success', { ns: 'pipelines' }));
 
       return response;
     },
     (error: Error) => {
       UserNotification.error(
-        `Couldn't update rule metrics config: ${error.message}`,
-        "Couldn't update rule metrics config",
+        i18n.t('rule_notifications.metrics_update_failed', { ns: 'pipelines', error: error.message }),
+        i18n.t('rule_notifications.metrics_update_failed_title', { ns: 'pipelines' }),
       );
 
       throw error;
