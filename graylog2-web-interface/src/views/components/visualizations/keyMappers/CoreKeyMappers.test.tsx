@@ -35,10 +35,20 @@ jest.mock('hooks/useNodeSummaries', () => () => ({
 
 jest.mock('hooks/usePluginEntities');
 
-const fetchForwarderInput = jest.fn((id: string) => Promise.resolve({ id, title: `Forwarder input ${id}` }));
+const fetchForwarderInputs = jest.fn((ids: Array<string>) =>
+  Promise.resolve(ids.map((id) => ({ type: 'forwarder_input', id, title: `Forwarder input ${id}` }))),
+);
 const fetchForwarderNode = jest.fn((id: string) => Promise.resolve({ id, title: `Forwarder ${id}` }));
 
 describe('CoreKeyMappers', () => {
+  const pluginEntities = {
+    forwarder: [{ fetchForwarderNode }],
+    inputDetailsFetchers: [{ type: 'forwarder_input', fetchDetails: fetchForwarderInputs }],
+  };
+
+  const withForwarderPlugin = () =>
+    asMock(usePluginEntities).mockImplementation((key: string) => pluginEntities[key] ?? []);
+
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
   });
@@ -63,18 +73,18 @@ describe('CoreKeyMappers', () => {
   });
 
   it('resolves forwarder input ids through the forwarder plugin', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ fetchForwarderInput, fetchForwarderNode }] as any);
+    withForwarderPlugin();
     const { result } = renderHook(() => mapperFor('input')(['input-1', 'fw-input-1']));
 
     await waitFor(() => expect(result.current('fw-input-1')).toBe('Forwarder input fw-input-1'));
 
     expect(result.current('input-1')).toBe('Syslog UDP');
-    expect(fetchForwarderInput).toHaveBeenCalledTimes(1);
-    expect(fetchForwarderInput).toHaveBeenCalledWith('fw-input-1');
+    expect(fetchForwarderInputs).toHaveBeenCalledTimes(1);
+    expect(fetchForwarderInputs).toHaveBeenCalledWith(['fw-input-1']);
   });
 
   it('resolves forwarder node ids through the forwarder plugin', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ fetchForwarderInput, fetchForwarderNode }] as any);
+    withForwarderPlugin();
     const { result } = renderHook(() => mapperFor('node')(['node-1', 'fw-node-1']));
 
     await waitFor(() => expect(result.current('fw-node-1')).toBe('Forwarder fw-node-1'));

@@ -18,6 +18,7 @@ import { useCallback, useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 
 import { useInputs } from 'hooks/useInputs';
+import useInputDetails from 'hooks/useInputDetails';
 import useNodeSummaries from 'hooks/useNodeSummaries';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
@@ -25,15 +26,13 @@ import { MISSING_BUCKET_NAME } from 'views/Constants';
 type Titles = { [id: string]: string };
 type TitleResolver = (id: string) => string | undefined;
 
-// Query keys are shared across all consumers, so forwarder lookups are cached app-wide.
-const useForwarderTitles = (
-  kind: 'input' | 'node',
+const useForwarderNodeTitles = (
   ids: Array<string>,
   fetchFn: ((id: string) => Promise<{ title: string }>) | undefined,
 ): Titles =>
   useQueries({
     queries: ids.map((id) => ({
-      queryKey: ['forwarder', kind, id],
+      queryKey: ['forwarder', 'node', id],
       queryFn: () => fetchFn(id),
       enabled: !!fetchFn,
       retry: false,
@@ -50,10 +49,11 @@ const useUnresolvedIds = (ids: Array<string>, known: { [id: string]: unknown } |
 
 export const useInputTitleResolver = (ids: Array<string>): TitleResolver => {
   const inputs = useInputs();
-  const { fetchForwarderInput } = usePluginEntities('forwarder')[0] ?? {};
-  const forwarderTitles = useForwarderTitles('input', useUnresolvedIds(ids, inputs), fetchForwarderInput);
+  const unresolvedIds = useUnresolvedIds(ids, inputs);
+  const forwarderInputs = useMemo(() => unresolvedIds.map((id) => ({ id, type: 'forwarder_input' })), [unresolvedIds]);
+  const { resolvedById } = useInputDetails(forwarderInputs);
 
-  return useCallback((id: string) => inputs?.[id]?.title ?? forwarderTitles[id], [inputs, forwarderTitles]);
+  return useCallback((id: string) => inputs?.[id]?.title ?? resolvedById[id]?.title, [inputs, resolvedById]);
 };
 
 const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
@@ -61,7 +61,7 @@ const formatNode = (node: { short_node_id: string; hostname: string }) => `${nod
 export const useNodeTitleResolver = (ids: Array<string>): TitleResolver => {
   const nodes = useNodeSummaries();
   const { fetchForwarderNode } = usePluginEntities('forwarder')[0] ?? {};
-  const forwarderTitles = useForwarderTitles('node', useUnresolvedIds(ids, nodes), fetchForwarderNode);
+  const forwarderTitles = useForwarderNodeTitles(useUnresolvedIds(ids, nodes), fetchForwarderNode);
 
   return useCallback(
     (id: string) => (nodes?.[id] ? formatNode(nodes[id]) : forwarderTitles[id]),
