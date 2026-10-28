@@ -1,0 +1,4 @@
+type = "f"
+message = "Include path prefix in \"Configure presets\" link of time range preset dropdown."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10786"]
