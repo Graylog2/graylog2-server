@@ -19,17 +19,103 @@ import { ColorVariant, ThemeBase } from './types';
 export const COLOR_SCHEME_DARK = 'dark';
 export const COLOR_SCHEME_LIGHT = 'light';
 
-export const VARIANT_NAMES: Array<ColorVariant> = ['danger', 'default', 'info', 'primary', 'success', 'warning', 'gray'];
+export const VARIANT_NAMES: Array<ColorVariant> = [
+  'danger',
+  'default',
+  'info',
+  'primary',
+  'success',
+  'warning',
+  'gray',
+];
 
-const colorVariants: Record<string, [string, string, string, string, string, string, string, string, string, string]> = {
-  danger: ['#FFEDED', '#FFC7C7', '#FFACAB', '#FE8685', '#FE6E6D', '#FE4A49', '#E74342', '#B43534', '#8C2928', '#6B1F1F'],
-  default: ['#FAF9FF', '#EEEDF6', '#CAC8D7', '#8D8AA9', '#362F62', '#20194D', '#1A143E', '#130F2E', '#0D0A1F', '#06050F'],
-  info: ['#EBFAFF', '#C2F0FF', '#85E0FF', '#47D1FF', '#1FC7FF', '#03C2FF', '#00A8E0', '#008AB8', '#006B8F', '#003D52'],
-  primary: ['#D9EBFF', '#ADD0FF', '#7FB8FF', '#65A9FF', '#4396FF', '#1877EF', '#1064CD', '#0C50A5', '#083772', '#032551'],
-  success: ['#E1FFF4', '#ACFFE0', '#69F9C3', '#62F3BC', '#45E5A8', '#2ECA8F', '#22B07A', '#1A9869', '#128057', '#094F35'],
-  warning: ['#FFFBEB', '#FFF2C2', '#FFEDAD', '#FFE485', '#FFDC5C', '#FFCA0A', '#FFCA0A', '#CCA000', '#7A6000', '#292000'],
-  gray: ['#F6F7FC', '#E1E4ED', '#C1C7DC', '#6F768F', '#394261', '#252D47', '#232B43', '#1C2235', '#12182B', '#060C1F'],
-};
+const colorVariants: Record<string, [string, string, string, string, string, string, string, string, string, string]> =
+  {
+    danger: [
+      '#FFEDED',
+      '#FFC7C7',
+      '#FFACAB',
+      '#FE8685',
+      '#FE6E6D',
+      '#FE4A49',
+      '#E74342',
+      '#B43534',
+      '#8C2928',
+      '#6B1F1F',
+    ],
+    default: [
+      '#FAF9FF',
+      '#EEEDF6',
+      '#CAC8D7',
+      '#8D8AA9',
+      '#362F62',
+      '#20194D',
+      '#1A143E',
+      '#130F2E',
+      '#0D0A1F',
+      '#06050F',
+    ],
+    info: [
+      '#EBFAFF',
+      '#C2F0FF',
+      '#85E0FF',
+      '#47D1FF',
+      '#1FC7FF',
+      '#03C2FF',
+      '#00A8E0',
+      '#008AB8',
+      '#006B8F',
+      '#003D52',
+    ],
+    primary: [
+      '#D9EBFF',
+      '#ADD0FF',
+      '#7FB8FF',
+      '#65A9FF',
+      '#4396FF',
+      '#1877EF',
+      '#1064CD',
+      '#0C50A5',
+      '#083772',
+      '#032551',
+    ],
+    success: [
+      '#E1FFF4',
+      '#ACFFE0',
+      '#69F9C3',
+      '#62F3BC',
+      '#45E5A8',
+      '#2ECA8F',
+      '#22B07A',
+      '#1A9869',
+      '#128057',
+      '#094F35',
+    ],
+    warning: [
+      '#FFFBEB',
+      '#FFF2C2',
+      '#FFEDAD',
+      '#FFE485',
+      '#FFDC5C',
+      '#FFCA0A',
+      '#FFCA0A',
+      '#CCA000',
+      '#7A6000',
+      '#292000',
+    ],
+    gray: [
+      '#F6F7FC',
+      '#E1E4ED',
+      '#C1C7DC',
+      '#6F768F',
+      '#394261',
+      '#252D47',
+      '#232B43',
+      '#1C2235',
+      '#12182B',
+      '#060C1F',
+    ],
+  };
 
 export const COLOR_WHITE = '#FFFFFF';
 

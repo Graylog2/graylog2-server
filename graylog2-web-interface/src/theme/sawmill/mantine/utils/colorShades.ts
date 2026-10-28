@@ -27,7 +27,7 @@ const colorShades = (colorScheme: ColorScheme, customBaseVariantColors?: CustomC
   }
 
   const customVariantColors = Object.fromEntries(
-    Object.entries(customBaseVariantColors).map(([variantName, color]) => ([
+    Object.entries(customBaseVariantColors).map(([variantName, color]) => [
       variantName,
       [
         lighten(color, 0.85),
@@ -36,12 +36,12 @@ const colorShades = (colorScheme: ColorScheme, customBaseVariantColors?: CustomC
         lighten(color, 0.35),
         lighten(color, 0.14),
         color,
-        darken(color, 0.10),
+        darken(color, 0.1),
         darken(color, 0.28),
         darken(color, 0.45),
         darken(color, 0.66),
       ],
-    ])),
+    ]),
   ) as MantineColors;
 
   return { ...defaultVariantColors, ...customVariantColors };

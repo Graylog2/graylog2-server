@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { TColorVariants, TColorVariantShades } from '../types';
-import THEME_BASE, {
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-} from '../../THEME_BASE';
+import THEME_BASE, { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../../THEME_BASE';
 import { ColorScheme, ColorVariant } from '../../types';
 import { MantineColors } from '../../mantine/types';
 
@@ -50,8 +47,13 @@ const variantColors = (colorScheme: ColorScheme, colors: MantineColors, primaryS
     throw new Error(`Requires "${COLOR_SCHEME_DARK}" or "${COLOR_SCHEME_LIGHT}" color scheme option.`);
   }
 
-  const variantBaseColors = Object.fromEntries(ColorVariants.map((colorVariant) => [colorVariant, colors[colorVariant][primaryShade]]));
-  const variantColorShades = Object.fromEntries(shades.map((shade) => ([shade, {}]))) as Record<TColorVariantShades, TColorVariants>;
+  const variantBaseColors = Object.fromEntries(
+    ColorVariants.map((colorVariant) => [colorVariant, colors[colorVariant][primaryShade]]),
+  );
+  const variantColorShades = Object.fromEntries(shades.map((shade) => [shade, {}])) as Record<
+    TColorVariantShades,
+    TColorVariants
+  >;
   const schemeShadesMap = shadesMap[colorScheme];
 
   ColorVariants.forEach((colorVariant) => {

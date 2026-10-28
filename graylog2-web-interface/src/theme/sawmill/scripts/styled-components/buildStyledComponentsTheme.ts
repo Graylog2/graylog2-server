@@ -30,7 +30,7 @@ const buildStyledComponentsTheme = () => {
   const lightColors = colors(lightMantineTheme);
   const darkColors = colors(darkMantineTheme);
 
-  return ({
+  return {
     colors: {
       [COLOR_SCHEME_LIGHT]: lightColors,
       [COLOR_SCHEME_DARK]: darkColors,
@@ -69,7 +69,7 @@ const buildStyledComponentsTheme = () => {
         aceEditor: aceEditor(darkColors),
       },
     },
-  });
+  };
 };
 
 export default buildStyledComponentsTheme;

@@ -19,9 +19,7 @@ import Theme from './generated/theme.json';
 import aceEditor from './component-styles/aceEditor';
 import generateColors from './utils/colors';
 
-import {
-  colorLevel, contrastingColor, opacify, readableColor, mixColor, flattenColorStack,
-} from '../utils';
+import { colorLevel, contrastingColor, opacify, readableColor, mixColor, flattenColorStack } from '../utils';
 import { MantineTheme } from '../mantine/types';
 import { COLOR_SCHEME_LIGHT } from '../THEME_BASE';
 
@@ -44,17 +42,19 @@ const Sawmill = (mantineTheme: MantineTheme): StyledComponentsTheme => {
     flattenColorStack,
   };
 
-  return ({
+  return {
     breakpoints: Theme.breakpoints,
-    components: hasCustomColors ? {
-      aceEditor: aceEditor(colors),
-    } : Theme.components[mantineTheme.colorScheme],
+    components: hasCustomColors
+      ? {
+          aceEditor: aceEditor(colors),
+        }
+      : Theme.components[mantineTheme.colorScheme],
     colors,
     fonts: Theme.fonts,
     mode: mantineTheme.colorScheme,
     spacings: Theme.spacings,
     utils,
-  });
+  };
 };
 
 export { generateColors };

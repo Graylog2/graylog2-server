@@ -28,9 +28,9 @@ const Sawmill = ({
   colorScheme,
   customColors,
 }: {
-  colorScheme: MantineTheme['colorScheme'],
-  changeColorScheme?: (newColorScheme: MantineTheme['colorScheme']) => void,
-  customColors?: CustomColors | undefined,
+  colorScheme: MantineTheme['colorScheme'];
+  changeColorScheme?: (newColorScheme: MantineTheme['colorScheme']) => void;
+  customColors?: CustomColors | undefined;
 }): MantineTheme => ({
   defaultRadius: DEFAULT_RADIUS,
   breakpoints: Theme.breakpoints,

@@ -30,13 +30,6 @@ const utils = {
   flattenColorStack,
 };
 
-export {
-  colorLevel,
-  contrastingColor,
-  mixColor,
-  opacify,
-  readableColor,
-  flattenColorStack,
-};
+export { colorLevel, contrastingColor, mixColor, opacify, readableColor, flattenColorStack };
 
 export default utils;

@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {
-  ColorScheme,
-  ColorVariant,
-  CustomColors,
-} from '../types';
+import { ColorScheme, ColorVariant, CustomColors } from '../types';
 
-export type MantineColors = Record<ColorVariant, [string, string, string, string, string, string, string, string, string, string]>
+export type MantineColors = Record<
+  ColorVariant,
+  [string, string, string, string, string, string, string, string, string, string]
+>;
 export type FontSizes = Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', string>;
 export type Breakpoints = Record<'xs' | 'sm' | 'md' | 'lg' | 'xl', string>;
 export type Spacing = Record<'xs' | 'sm' | 'md' | 'lg' | 'xl', string>;
@@ -33,23 +32,23 @@ export type Headings = {
     h5: { fontSize: string };
     h6: { fontSize: string };
   };
-}
+};
 
 export type OtherAttributes = {
-  customColors: CustomColors | undefined
-}
+  customColors: CustomColors | undefined;
+};
 
 export interface MantineTheme {
   breakpoints: Breakpoints;
-  colorScheme: ColorScheme,
-  colors: MantineColors,
-  defaultRadius: number,
-  fontFamily: string,
-  fontFamilyMonospace: string,
+  colorScheme: ColorScheme;
+  colors: MantineColors;
+  defaultRadius: number;
+  fontFamily: string;
+  fontFamilyMonospace: string;
   fontSizes: FontSizes;
   headings: Headings;
-  other: OtherAttributes,
-  primaryColor: ColorVariant,
-  primaryShade: Record<ColorScheme, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>,
-  spacing: Spacing,
+  other: OtherAttributes;
+  primaryColor: ColorVariant;
+  primaryShade: Record<ColorScheme, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>;
+  spacing: Spacing;
 }

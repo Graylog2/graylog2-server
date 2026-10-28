@@ -34,7 +34,7 @@ const inputColors = (
 ) => {
   const background = colorScheme === COLOR_SCHEME_LIGHT ? completeGlobal.contentBackground : colors.gray[7];
 
-  return ({
+  return {
     background,
     backgroundDisabled: darken(background, 0.25),
     border: colorScheme === COLOR_SCHEME_LIGHT ? colors.gray[2] : opacify(colors.default[3], 0.74),
@@ -43,7 +43,7 @@ const inputColors = (
     color: primaryTextColor,
     colorDisabled: gray[60],
     placeholder: gray[60],
-  });
+  };
 };
 
 export default inputColors;

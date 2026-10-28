@@ -28,12 +28,7 @@ const flattenColorStack = (colors: Array<string | Color>) => {
     .reduce((acc, color) => {
       const alpha = color.alpha();
 
-      return chroma.mix(
-        acc,
-        color.alpha(1),
-        alpha,
-        'rgb',
-      );
+      return chroma.mix(acc, color.alpha(1), alpha, 'rgb');
     })
     .hex();
 };

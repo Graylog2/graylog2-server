@@ -29,14 +29,13 @@ const buttonColors = (colorScheme: ColorScheme, colors: MantineColors, primarySh
     },
   };
 
-  return Object.fromEntries(VARIANT_NAMES.map((variantName) => {
-    const background = customColors[variantName]?.[colorScheme] ?? colors[variantName][primaryShade];
+  return Object.fromEntries(
+    VARIANT_NAMES.map((variantName) => {
+      const background = customColors[variantName]?.[colorScheme] ?? colors[variantName][primaryShade];
 
-    return [
-      variantName,
-      { background, color: contrastingColor(background) },
-    ];
-  })) as ButtonColors;
+      return [variantName, { background, color: contrastingColor(background) }];
+    }),
+  ) as ButtonColors;
 };
 
 export default buttonColors;

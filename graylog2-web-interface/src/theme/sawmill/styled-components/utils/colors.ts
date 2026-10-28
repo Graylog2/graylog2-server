@@ -26,18 +26,22 @@ import generatePaginationColors from './paginationColors';
 import generateTextColors from './textColors';
 import alertColors from './alertColors';
 
-import {
-  ContrastColors, DisabledColors, StyledComponentsTheme,
-} from '../types';
+import { ContrastColors, DisabledColors, StyledComponentsTheme } from '../types';
 import { MantineColors, MantineTheme } from '../../mantine/types';
 import THEME_BASE, { COLOR_SCHEME_LIGHT, COLOR_WHITE } from '../../THEME_BASE';
 import { ColorVariant } from '../../types';
 import { contrastingColor, mixColor, opacify } from '../../utils';
 
-const mixDisabledColors = (variant: string, colors: MantineColors, primaryShade: number, defaultTextColor: string, alternativeTextColor: string) => {
+const mixDisabledColors = (
+  variant: string,
+  colors: MantineColors,
+  primaryShade: number,
+  defaultTextColor: string,
+  alternativeTextColor: string,
+) => {
   const variantColor = colors[variant as ColorVariant][primaryShade];
   const buttonAdjustColor = chroma(variantColor).luminance() > 0.5 ? defaultTextColor : alternativeTextColor;
-  const disabledBackground = mixColor(variantColor, buttonAdjustColor, 0.20);
+  const disabledBackground = mixColor(variantColor, buttonAdjustColor, 0.2);
   const disabledColor = contrastingColor(disabledBackground, 'AA');
 
   return {
@@ -65,11 +69,23 @@ const generateColors = (mantineTheme: MantineTheme): StyledComponentsTheme['colo
 
   const gray = generateGrayScale(baseColors.grayScale.start, baseColors.grayScale.end);
   const table = tableColors(mantineTheme.colorScheme, completeVariant, completeGlobal, colors);
-  const input = inputColors(completeGlobal, gray, completeVariant, mantineTheme.colorScheme, colors, textColors.primary);
-  const disabledColors = Object.fromEntries(Object.keys(colors)
-    .map((variant) => [variant, mixDisabledColors(variant, colors, primaryShade, textColors.primary, completeGlobal.textAlt)])) as DisabledColors;
-  const contrastColors = Object.fromEntries(Object.keys(colors)
-    .map((variant) => [variant, contrastingColor(colors[variant as ColorVariant][primaryShade])])) as ContrastColors;
+  const input = inputColors(
+    completeGlobal,
+    gray,
+    completeVariant,
+    mantineTheme.colorScheme,
+    colors,
+    textColors.primary,
+  );
+  const disabledColors = Object.fromEntries(
+    Object.keys(colors).map((variant) => [
+      variant,
+      mixDisabledColors(variant, colors, primaryShade, textColors.primary, completeGlobal.textAlt),
+    ]),
+  ) as DisabledColors;
+  const contrastColors = Object.fromEntries(
+    Object.keys(colors).map((variant) => [variant, contrastingColor(colors[variant as ColorVariant][primaryShade])]),
+  ) as ContrastColors;
   const buttonColors = generateButtonColors(mantineTheme.colorScheme, colors, primaryShade);
   const pagination = generatePaginationColors(colors);
 
