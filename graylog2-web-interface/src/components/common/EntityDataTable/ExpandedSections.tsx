@@ -101,7 +101,9 @@ const ExpandedSections = <Entity extends EntityBase>({
       <ContentCell colSpan={visibleCellCount}>
         <Content>
           {hasMultipleSections ? (
+            // Inactive sections stay unmounted, so they don't fetch their data in the background.
             <Tabs
+              keepMounted={false}
               value={activeSectionName}
               onChange={(sectionName) => {
                 // Mantine also reports clicks on the active tab, which would collapse the row.
@@ -119,8 +121,11 @@ const ExpandedSections = <Entity extends EntityBase>({
                 </Tabs.List>
                 {actionsToolbar}
               </Header>
-              {/* Only the active panel, since Mantine would otherwise mount every section and start its requests. */}
-              <SectionPanel value={activeSectionName}>{activeSection.content(entity)}</SectionPanel>
+              {sectionNames.map((sectionName) => (
+                <SectionPanel key={sectionName} value={sectionName}>
+                  {expandedSectionRenderers[sectionName].content(entity)}
+                </SectionPanel>
+              ))}
             </Tabs>
           ) : (
             <>
