@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import StreamsContext from 'contexts/StreamsContext';
+import usePluginEntities from 'hooks/usePluginEntities';
+import asMock from 'helpers/mocking/AsMock';
 
 import CoreKeyMappers from './CoreKeyMappers';
 
@@ -31,7 +33,26 @@ jest.mock('hooks/useNodeSummaries', () => () => ({
   'node-1': { short_node_id: 'abc123', hostname: 'graylog-01' },
 }));
 
+jest.mock('hooks/usePluginEntities');
+
+const fetchForwarderInputs = jest.fn((ids: Array<string>) =>
+  Promise.resolve(ids.map((id) => ({ type: 'forwarder_input', id, title: `Forwarder input ${id}` }))),
+);
+const fetchForwarderNode = jest.fn((id: string) => Promise.resolve({ id, title: `Forwarder ${id}` }));
+
 describe('CoreKeyMappers', () => {
+  const pluginEntities = {
+    forwarder: [{ fetchForwarderNode }],
+    inputDetailsFetchers: [{ type: 'forwarder_input', fetchDetails: fetchForwarderInputs }],
+  };
+
+  const withForwarderPlugin = () =>
+    asMock(usePluginEntities).mockImplementation((key: string) => pluginEntities[key] ?? []);
+
+  beforeEach(() => {
+    asMock(usePluginEntities).mockReturnValue([]);
+  });
+
   it('resolves stream ids to titles and falls back to the raw id', () => {
     const wrapper = ({ children }: React.PropsWithChildren) => (
       <StreamsContext.Provider value={[{ id: 'stream-1', title: 'All messages' } as any]}>
@@ -49,6 +70,26 @@ describe('CoreKeyMappers', () => {
 
     expect(result.current('input-1')).toBe('Syslog UDP');
     expect(result.current('missing')).toBe('missing');
+  });
+
+  it('resolves forwarder input ids through the forwarder plugin', async () => {
+    withForwarderPlugin();
+    const { result } = renderHook(() => mapperFor('input')(['input-1', 'fw-input-1']));
+
+    await waitFor(() => expect(result.current('fw-input-1')).toBe('Forwarder input fw-input-1'));
+
+    expect(result.current('input-1')).toBe('Syslog UDP');
+    expect(fetchForwarderInputs).toHaveBeenCalledTimes(1);
+    expect(fetchForwarderInputs).toHaveBeenCalledWith(['fw-input-1']);
+  });
+
+  it('resolves forwarder node ids through the forwarder plugin', async () => {
+    withForwarderPlugin();
+    const { result } = renderHook(() => mapperFor('node')(['node-1', 'fw-node-1']));
+
+    await waitFor(() => expect(result.current('fw-node-1')).toBe('Forwarder fw-node-1'));
+
+    expect(result.current('node-1')).toBe('abc123 / graylog-01');
   });
 
   it('formats node ids as "short_node_id / hostname"', () => {
