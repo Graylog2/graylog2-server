@@ -998,7 +998,7 @@ public class IndexSetsResourceTest {
         final PageListResponse<IndexSetOverviewResponse> response =
                 indexSetsResource.getPage(1, 50, "", List.of(), "title", SortOrder.ASCENDING);
 
-        assertThat(response.attributes()).extracting(EntityAttribute::id).doesNotContain("plugin_attribute");
+        assertThat(response.attributes()).containsExactlyElementsOf(IndexSetsResource.builtInAttributes());
     }
 
     @Test
