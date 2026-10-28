@@ -240,6 +240,7 @@ export class Builder {
   noSessionExtension() {
     this.options = {
       ...this.options,
+      // eslint-disable-next-line graylog/no-literal-product-name -- HTTP header name expected by the backend
       'X-Graylog-No-Session-Extension': 'true',
     };
 
