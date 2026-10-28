@@ -26,10 +26,10 @@ import generatePaginationColors from './paginationColors';
 import generateTextColors from './textColors';
 import alertColors from './alertColors';
 
-import { ContrastColors, DisabledColors, StyledComponentsTheme } from '../types';
-import { MantineColors, MantineTheme } from '../../mantine/types';
+import type { ContrastColors, DisabledColors, StyledComponentsTheme } from '../types';
+import type { MantineColors, MantineTheme } from '../../mantine/types';
 import THEME_BASE, { COLOR_SCHEME_LIGHT, COLOR_WHITE } from '../../THEME_BASE';
-import { ColorVariant } from '../../types';
+import type { ColorVariant } from '../../types';
 import { contrastingColor, mixColor, opacify } from '../../utils';
 
 const mixDisabledColors = (
@@ -64,11 +64,11 @@ const generateColors = (mantineTheme: MantineTheme): StyledComponentsTheme['colo
     : baseColors.global;
 
   const completeVariant = generateColorVariants(mantineTheme.colorScheme, colors, primaryShade);
-  const completeGlobal = generateGlobalColors(mantineTheme.colorScheme, colors, brandColors, baseGlobalColors);
+  const completeGlobal = generateGlobalColors(mantineTheme.colorScheme, brandColors, baseGlobalColors);
   const textColors = generateTextColors(isLightTheme, colors, brandColors.tertiary);
 
   const gray = generateGrayScale(baseColors.grayScale.start, baseColors.grayScale.end);
-  const table = tableColors(mantineTheme.colorScheme, completeVariant, completeGlobal, colors);
+  const table = tableColors(mantineTheme.colorScheme, completeVariant, colors);
   const input = inputColors(
     completeGlobal,
     gray,

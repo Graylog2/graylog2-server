@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import chroma, { Color } from 'chroma-js';
+import type { Color } from 'chroma-js';
+import chroma from 'chroma-js';
 
 // Flattens layered colors into a single opaque hex value by compositing them in order.
 const flattenColorStack = (colors: Array<string | Color>) => {

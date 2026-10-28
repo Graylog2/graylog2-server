@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { MantineColors } from '../../mantine/types';
+import type { MantineColors } from '../../mantine/types';
 import { COLOR_WHITE } from '../../THEME_BASE';
 
 const paginationColors = (colors: MantineColors) => ({

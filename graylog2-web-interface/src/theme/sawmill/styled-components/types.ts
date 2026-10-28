@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ColorVariant, ColorScheme, Utils } from '../types';
+import type { ColorVariant, ColorScheme, Utils } from '../types';
 
 export type TColorVariants = Partial<Record<ColorVariant, string>>;
 export type TColorVariantShades = 'dark' | 'darker' | 'darkest' | 'light' | 'lighter' | 'lightest';

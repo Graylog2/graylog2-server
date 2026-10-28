@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ColorVariant, ThemeBase } from './types';
+import type { ColorVariant, ThemeBase } from './types';
 
 export const COLOR_SCHEME_DARK = 'dark';
 export const COLOR_SCHEME_LIGHT = 'light';

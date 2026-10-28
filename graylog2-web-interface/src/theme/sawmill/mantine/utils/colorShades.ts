@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ColorScheme, CustomColors } from '../../types';
-import { MantineColors } from '../types';
+import type { ColorScheme, CustomColors } from '../../types';
+import type { MantineColors } from '../types';
 import { darken, lighten } from '../../utils/colors';
 import THEME_BASE from '../../THEME_BASE';
 

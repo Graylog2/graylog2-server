@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ThemeBase } from '../../types';
+import type { ThemeBase } from '../../types';
 
 const SPACE = 0.08; // ratio we use for our calculations
 const FIBONACCI = [3, 5, 8, 13, 21, 34, 55, 89, 144]; // skipped [1, 2]

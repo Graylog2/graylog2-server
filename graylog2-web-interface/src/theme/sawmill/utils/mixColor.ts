@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import chroma, { Color } from 'chroma-js';
+import type { Color } from 'chroma-js';
+import chroma from 'chroma-js';
 
 const mixColor = (originalColor: string | Color, adjustColor: string | Color, ratio = 0.15) =>
   chroma.mix(originalColor, adjustColor, ratio).hex();

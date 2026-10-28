@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ColorScheme, ColorVariant, CustomColors } from '../types';
+import type { ColorScheme, ColorVariant, CustomColors } from '../types';
 
 export type MantineColors = Record<
   ColorVariant,

@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Color } from 'chroma-js';
+import type { Color } from 'chroma-js';
 
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from './THEME_BASE';
+import type { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from './THEME_BASE';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type DeepPartial<T> =
   T extends Record<string, unknown>
     ? {

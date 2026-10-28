@@ -16,10 +16,10 @@
  */
 import chroma from 'chroma-js';
 
-import { StyledComponentsTheme } from '../types';
-import { ColorScheme } from '../../types';
+import type { StyledComponentsTheme } from '../types';
+import type { ColorScheme } from '../../types';
 import { COLOR_SCHEME_LIGHT } from '../../THEME_BASE';
-import { MantineColors } from '../../mantine/types';
+import type { MantineColors } from '../../mantine/types';
 import { opacify } from '../../utils';
 
 const darken = (color: string, ratio: number) => chroma.mix(color, '#000', ratio).hex();

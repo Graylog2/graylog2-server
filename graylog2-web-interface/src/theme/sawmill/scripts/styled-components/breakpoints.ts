@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { TBreakpoint } from '../../styled-components/types';
-import { ThemeBase } from '../../types';
+import type { TBreakpoint } from '../../styled-components/types';
+import type { ThemeBase } from '../../types';
 
 const breakpoints = (baseBreakpoints: ThemeBase['breakpoints']) => ({
   min: Object.fromEntries(Object.entries(baseBreakpoints).map(([key, value]) => [key, `${value}px`])) as TBreakpoint,

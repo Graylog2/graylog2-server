@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { MantineColors } from '../../mantine/types';
+import type { MantineColors } from '../../mantine/types';
 import { opacify } from '../../utils';
 
 const textColors = (isLightTheme: boolean, colors: MantineColors, primaryTextColor: string) => ({

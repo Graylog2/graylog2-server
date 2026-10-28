@@ -17,13 +17,10 @@
 import chroma from 'chroma-js';
 
 import { COLOR_SCHEME_LIGHT } from '../../THEME_BASE';
-import { ColorScheme, ThemeBaseColors } from '../../types';
-import { MantineColors } from '../../mantine/types';
-import { opacify } from '../../utils';
+import type { ColorScheme, ThemeBaseColors } from '../../types';
 
 const globalColors = (
   colorScheme: ColorScheme,
-  colors: MantineColors,
   baseBrandColors: ThemeBaseColors['brand'],
   baseGlobalColors: ThemeBaseColors['global'],
 ) => ({

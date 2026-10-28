@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, COLOR_WHITE } from '../../THEME_BASE';
-import { StyledComponentsTheme } from '../types';
-import { ColorScheme } from '../../types';
-import { MantineColors } from '../../mantine/types';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../../THEME_BASE';
+import type { StyledComponentsTheme } from '../types';
+import type { ColorScheme } from '../../types';
+import type { MantineColors } from '../../mantine/types';
 import { opacify } from '../../utils';
 
 const tableColors = (
   colorScheme: ColorScheme,
   completeVariant: StyledComponentsTheme['colors']['variant'],
-  global: StyledComponentsTheme['colors']['global'],
   colors: MantineColors,
 ) => {
   if (![COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT].includes(colorScheme)) {

@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StyledComponentsTheme } from './types';
+import type { StyledComponentsTheme } from './types';
 import Theme from './generated/theme.json';
 import aceEditor from './component-styles/aceEditor';
 import generateColors from './utils/colors';
 
 import { colorLevel, contrastingColor, opacify, readableColor, mixColor, flattenColorStack } from '../utils';
-import { MantineTheme } from '../mantine/types';
+import type { MantineTheme } from '../mantine/types';
 import { COLOR_SCHEME_LIGHT } from '../THEME_BASE';
 
 const Sawmill = (mantineTheme: MantineTheme): StyledComponentsTheme => {

@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { MantineColors } from '../../mantine/types';
+import type { MantineColors } from '../../mantine/types';
 import { VARIANT_NAMES } from '../../THEME_BASE';
 import { opacify } from '../../utils';
-import { AlertColors } from '../types';
+import type { AlertColors } from '../types';
 
 const alertColors = (colors: MantineColors, isLightTheme: boolean) =>
   Object.fromEntries(

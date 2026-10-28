@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, VARIANT_NAMES } from '../../THEME_BASE';
-import { ColorScheme, ColorVariant } from '../../types';
-import { MantineColors } from '../../mantine/types';
+import type { ColorScheme, ColorVariant } from '../../types';
+import type { MantineColors } from '../../mantine/types';
 import opacify from '../../utils/opacify';
 import { contrastingColor } from '../../utils';
-import { ButtonColors } from '../types';
+import type { ButtonColors } from '../types';
 
 const buttonColors = (colorScheme: ColorScheme, colors: MantineColors, primaryShade: number) => {
   const customColors: Partial<Record<ColorVariant, Partial<Record<ColorScheme, string>>>> = {

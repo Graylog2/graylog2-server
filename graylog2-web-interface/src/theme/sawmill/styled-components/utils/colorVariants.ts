@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { TColorVariants, TColorVariantShades } from '../types';
+import type { TColorVariants, TColorVariantShades } from '../types';
 import THEME_BASE, { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../../THEME_BASE';
-import { ColorScheme, ColorVariant } from '../../types';
-import { MantineColors } from '../../mantine/types';
+import type { ColorScheme, ColorVariant } from '../../types';
+import type { MantineColors } from '../../mantine/types';
 
 const ColorVariants = Object.keys(THEME_BASE.colors[COLOR_SCHEME_LIGHT].variant) as Array<ColorVariant>;
 

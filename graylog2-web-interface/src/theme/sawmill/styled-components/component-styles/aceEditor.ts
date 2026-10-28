@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StyledComponentsTheme } from '../types';
+import type { StyledComponentsTheme } from '../types';
 
 const aceEditorStyles = (colors: StyledComponentsTheme['colors']) => `
  .ace_editor {

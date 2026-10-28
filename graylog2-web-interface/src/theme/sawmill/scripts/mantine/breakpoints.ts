@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ThemeBase } from '../../types';
+import type { ThemeBase } from '../../types';
 
 const pxToRem = (sizePx: number, rootFontSize: number, targetUnit = 'rem') =>
   `${(1 / rootFontSize) * sizePx}${targetUnit}`;
