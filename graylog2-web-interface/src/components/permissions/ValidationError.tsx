@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import capitalize from 'lodash/capitalize';
 
 import { Alert } from 'components/bootstrap';
+import useGranteeTypeLabel from 'components/permissions/useGranteeTypeLabel';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import type ValidationResult from 'logic/permissions/ValidationResult';
 
@@ -43,6 +44,8 @@ type Props = {
 };
 
 const ValidationError = ({ validationResult, availableGrantees }: Props) => {
+  const { t } = useTranslation('users');
+  const granteeTypeLabel = useGranteeTypeLabel();
   const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.map((grn) =>
     availableGrantees.find((grantee) => grantee.id === grn),
   );
@@ -51,11 +54,11 @@ const ValidationError = ({ validationResult, availableGrantees }: Props) => {
     <Container bsStyle="danger">
       <List>
         <li>
-          Removing the following owners will leave the entity ownerless: <br />
+          {t('permissions.validation_error.ownerless')} <br />
           {pastOwners
             .map((owner, key) => (
               <span key={owner?.id}>
-                {capitalize(owner?.type)} <i>{owner?.title}</i>
+                {granteeTypeLabel(owner?.type)} <i>{owner?.title}</i>
                 {key !== pastOwners.size - 1 && ', '}
               </span>
             ))

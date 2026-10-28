@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Users } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 const deleteToken = async (userId: string, tokenId: string) => Users.revokeToken(userId, tokenId);
@@ -29,11 +30,17 @@ const useDeleteTokenMutation = (userId: string, tokenId: string) => {
     mutationFn: () => deleteToken(userId, tokenId),
 
     onError: (errorThrown) => {
-      UserNotification.error(`Token deletion failed: ${errorThrown}`, 'Could not delete token');
+      UserNotification.error(
+        i18n.t('token_admin.delete_failed', { ns: 'users', error: errorThrown }),
+        i18n.t('token_admin.delete_failed_title', { ns: 'users' }),
+      );
     },
 
     onSuccess: () => {
-      UserNotification.success('Token has been successfully deleted.', 'Success!');
+      UserNotification.success(
+        i18n.t('token_admin.deleted', { ns: 'users' }),
+        i18n.t('token_admin.deleted_title', { ns: 'users' }),
+      );
 
       queryClient.invalidateQueries({
         queryKey: ['token-management', 'overview'],

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { PaginatedItemOverview } from 'components/common';
@@ -27,6 +28,7 @@ type Props = {
 };
 
 const UsersSection = ({ role: { id, name } }: Props) => {
+  const { t } = useTranslation('users');
   const [loading, setLoading] = useState(false);
 
   const _onLoad = useCallback(
@@ -43,8 +45,8 @@ const UsersSection = ({ role: { id, name } }: Props) => {
   );
 
   return (
-    <SectionComponent title="Users" showLoading={loading}>
-      <PaginatedItemOverview noDataText="No selected users have been found." onLoad={_onLoad} />
+    <SectionComponent title={t('roles.users.title')} showLoading={loading}>
+      <PaginatedItemOverview noDataText={t('roles.users.none_selected')} onLoad={_onLoad} />
     </SectionComponent>
   );
 };

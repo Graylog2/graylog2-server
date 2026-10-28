@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FormikProps } from 'formik';
 import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
@@ -82,6 +83,7 @@ const GranteesSelector = ({
   onSubmit,
   formRef = null,
 }: Props) => {
+  const { t } = useTranslation('users');
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   const _handelSubmit = (data, resetForm) => {
@@ -106,9 +108,9 @@ const GranteesSelector = ({
               <SubmitButton
                 bsStyle="primary"
                 disabled={isSubmitting || !isValid}
-                title="Add Collaborator"
+                title={t('permissions.share.add_collaborator')}
                 type="submit">
-                Add Collaborator
+                {t('permissions.share.add_collaborator')}
               </SubmitButton>
             </FormElements>
             {errors && (

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { FormikProps } from 'formik';
 
@@ -85,6 +86,7 @@ const EntityShareSettings = ({
   showShareableEntityURL = true,
   entityTypeTitle = null,
 }: Props) => {
+  const { t } = useTranslation('users');
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
   const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
@@ -129,7 +131,7 @@ const EntityShareSettings = ({
   return (
     <>
       <Section>
-        <GranteesSelectorHeadline>Add Collaborator</GranteesSelectorHeadline>
+        <GranteesSelectorHeadline>{t('permissions.share.add_collaborator')}</GranteesSelectorHeadline>
         <p>{description}</p>
         <GranteesSelector
           availableGrantees={filteredGrantees}
@@ -146,11 +148,11 @@ const EntityShareSettings = ({
         onDelete={_handleDeletion}
         onCapabilityChange={_handleSelection}
         selectedGrantees={selectedGrantees}
-        title="Direct Collaborators"
+        title={t('permissions.share.direct_collaborators')}
       />
       {CollectionGranteeList && (
         <CollectionGranteeList
-          title="Shared via Collections"
+          title={t('permissions.share.shared_via_collections')}
           entityType={entityType}
           entityTypeTitle={entityTypeTitle}
           entityGRN={entityGRN}

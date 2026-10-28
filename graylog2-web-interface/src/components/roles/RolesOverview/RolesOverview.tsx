@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -72,6 +73,7 @@ const getUseTeamMembersHook = () => {
 };
 
 const RolesOverview = () => {
+  const { t } = useTranslation('users');
   const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const queryClient = useQueryClient();
@@ -120,10 +122,10 @@ const RolesOverview = () => {
       <Row className="content">
         <Col xs={12}>
           <Header>
-            <h2>Roles</h2>
+            <h2>{t('roles.overview.title')}</h2>
             {isFetching && <LoadingSpinner text="" delay={0} />}
           </Header>
-          <p className="description">Found {paginatedRoles.pagination.total} roles on the system.</p>
+          <p className="description">{t('roles.overview.found', { total: paginatedRoles.pagination.total })}</p>
           <StyledPaginatedList totalItems={paginatedRoles.pagination.total}>
             <DataTable
               id="roles-overview"
@@ -132,7 +134,7 @@ const RolesOverview = () => {
               headerCellFormatter={_headerCellFormatter}
               sortByKey="name"
               rows={roles.toJS()}
-              noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
+              noDataText={<NoSearchResult>{t('roles.overview.none_found')}</NoSearchResult>}
               customFilter={searchFilter}
               dataRowFormatter={_rolesOverviewItem}
               filterKeys={[]}

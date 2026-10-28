@@ -17,10 +17,12 @@
 import type { PropsWithChildren } from 'react';
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/bootstrap';
 import { Icon, ConfirmDialog } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 
 const StyledAlert = styled(Alert)`
   padding: ${({ theme }) => theme.spacings.lg};
@@ -74,30 +76,31 @@ const StyledIcon = styled(Icon)`
 `;
 
 const LEFT_COLUMN_ITEM_LIST = [
-  'Anomaly Detection AI',
-  'Cloud Option',
-  'Archiving',
-  'Audit Logs for Graylog Cloud',
-  'Dynamic Lookup Tables',
-  'Advanced Alerting With Scripting',
-  'Compliance Reporting',
-  'Correlation & Aggregation Events',
-  'Threat Intel Integrations',
+  'anomaly_detection_ai',
+  'cloud_option',
+  'archiving',
+  'audit_logs_cloud',
+  'dynamic_lookup_tables',
+  'advanced_alerting',
+  'compliance_reporting',
+  'correlation_aggregation',
+  'threat_intel',
 ];
 
 const RIGHT_COLUMN_ITEM_LIST = [
-  'Incident Investigation Workspaces',
-  'Pre-build Security Parser & Dashboards',
-  'Sigma Rules',
-  'Parameterized Dashboarding',
-  'Input & Output Integrations',
-  'Threat Management',
-  'Search Workflow, Templates & Filters',
-  'Integrated Search & Alerting',
-  'SOAR Integrations',
+  'incident_workspaces',
+  'prebuilt_parser_dashboards',
+  'sigma_rules',
+  'parameterized_dashboards',
+  'input_output_integrations',
+  'threat_management',
+  'search_workflow',
+  'soar_integrations',
 ];
 
 const TeaserPageLayout = ({ children }: PropsWithChildren) => {
+  const { t } = useTranslation('users');
+  const productName = useProductName();
   const [showModal, setShowModal] = useState(true);
 
   return (
@@ -105,11 +108,11 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
       <StyledAlert bsStyle="info" noIcon>
         <Banner>
           <LeftItems>
-            <BoldText>Security Demo</BoldText>
-            <span>For more information and booking a full demo of the product visit Graylog website.</span>
+            <BoldText>{t('security_teaser.demo.title')}</BoldText>
+            <span>{t('security_teaser.demo.banner_text', { productName })}</span>
           </LeftItems>
           <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
-            Graylog Security <Icon name="open_in_new" />
+            {t('security_teaser.demo.button', { productName })} <Icon name="open_in_new" />
           </Button>
         </Banner>
       </StyledAlert>
@@ -118,24 +121,19 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
       {showModal && (
         <ConfirmDialog
           show
-          title="Security Demo"
+          title={t('security_teaser.demo.title')}
           onConfirm={() => setShowModal(false)}
           onCancel={() => setShowModal(false)}
-          btnConfirmText="Close">
+          btnConfirmText={t('common:actions.close')}>
           <Col>
-            <h2 className="text-danger">OVERVIEW</h2>
-            <p>
-              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined
-              capabilities of SIEM, Security Analytics, Incident Investigation, and Anomaly Detection. By using our
-              platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by
-              malicious actors and credential-based attacks.
-            </p>
+            <h2 className="text-danger">{t('security_teaser.demo.overview')}</h2>
+            <p>{t('security_teaser.demo.description', { productName })}</p>
             <Row $justify="space-between" $fullWidth>
               <Col>
                 {LEFT_COLUMN_ITEM_LIST.map((item) => (
                   <Row key={item}>
                     <StyledIcon name="check" />
-                    <span>{item}</span>
+                    <span>{t(`security_teaser.demo.items.${item}`, { productName })}</span>
                   </Row>
                 ))}
               </Col>
@@ -143,7 +141,7 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
                 {RIGHT_COLUMN_ITEM_LIST.map((item) => (
                   <Row key={item}>
                     <StyledIcon name="check" />
-                    <span>{item}</span>
+                    <span>{t(`security_teaser.demo.items.${item}`, { productName })}</span>
                   </Row>
                 ))}
               </Col>

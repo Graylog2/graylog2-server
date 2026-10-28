@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import type { FormikProps } from 'formik';
 import upperCase from 'lodash/upperCase';
 
@@ -51,6 +52,7 @@ const EntityShareModal = ({
   onClose,
   showShareableEntityURL = true,
 }: Props) => {
+  const { t } = useTranslation('users');
   const entityGRN = createGRN(entityType, entityId);
   const { data: entityShareState } = useEntityShareState(entityGRN);
   const setEntityShareState = useSetEntityShareState();
@@ -77,7 +79,9 @@ const EntityShareModal = ({
       if (
         // eslint-disable-next-line no-alert
         !window.confirm(
-          `${selectedGrantee.title ? `"${selectedGrantee.title}"` : 'An entity (name not found)'} got selected but was never added as a collaborator. Do you want to continue anyway?`,
+          selectedGrantee.title
+            ? t('permissions.share.confirm_not_added_named', { title: selectedGrantee.title })
+            : t('permissions.share.confirm_not_added_unnamed'),
         )
       ) {
         setDisableSubmit(false);
@@ -100,14 +104,17 @@ const EntityShareModal = ({
   return (
     <BootstrapModalConfirm
       confirmButtonDisabled={disableSubmit}
-      confirmButtonText="Update sharing"
+      confirmButtonText={t('permissions.share.update_sharing')}
       onConfirm={_handleSave}
       onCancel={onClose}
       showModal
       title={
-        <>
-          Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i>
-        </>
+        <Trans
+          t={t}
+          i18nKey="permissions.share.modal_title"
+          values={{ entityType: entityTypeTitle ?? entityType, entityTitle }}
+          components={{ entityTitle: <i /> }}
+        />
       }>
       {entityShareState && entityShareState.entity === entityGRN ? (
         <EntityShareSettings

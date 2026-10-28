@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import type { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
 import { Alert } from 'components/bootstrap';
+import useGranteeTypeLabel from 'components/permissions/useGranteeTypeLabel';
 
 type Props = {
   missingDependencies: MissingDependencies;
@@ -43,40 +45,60 @@ const List = styled.ul`
 
 const _cap = StringUtils.capitalizeFirstLetter;
 
-const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) => (
-  <Container bsStyle="danger" title="There are missing dependencies for the current set of collaborators">
-    <List>
-      {missingDependencies
-        .entrySeq()
-        .map(([granteeGRN, dependencyList]) => {
-          const grantee = availableGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);
+const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) => {
+  const { t } = useTranslation('users');
+  const granteeTypeLabel = useGranteeTypeLabel();
 
-          return (
-            grantee && (
-              <li key={grantee.id}>
-                {_cap(grantee.type)} <i>{grantee.title}</i> needs access to
-                {dependencyList.map((dependency) => (
-                  <List key={dependency.id}>
-                    <li>
-                      {_cap(dependency.type)}: <i>{dependency.title}</i>
-                      <br />
-                      Owners:{' '}
-                      {dependency.owners.map((owner, key) => (
-                        <span key={owner.id}>
-                          {_cap(owner.type)} <i>{owner.title}</i>
-                          {key !== dependency.owners.size - 1 && ', '}
-                        </span>
-                      ))}
-                    </li>
-                  </List>
-                ))}
-              </li>
-            )
-          );
-        })
-        .toArray()}
-    </List>
-  </Container>
-);
+  return (
+    <Container bsStyle="danger" title={t('permissions.dependencies_warning.title')}>
+      <List>
+        {missingDependencies
+          .entrySeq()
+          .map(([granteeGRN, dependencyList]) => {
+            const grantee = availableGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);
+
+            return (
+              grantee && (
+                <li key={grantee.id}>
+                  <Trans
+                    t={t}
+                    i18nKey="permissions.dependencies_warning.needs_access"
+                    values={{ type: granteeTypeLabel(grantee.type), title: grantee.title }}
+                    components={{ granteeTitle: <i /> }}
+                  />
+                  {dependencyList.map((dependency) => (
+                    <List key={dependency.id}>
+                      <li>
+                        <Trans
+                          t={t}
+                          i18nKey="permissions.dependencies_warning.dependency"
+                          values={{ type: _cap(dependency.type), title: dependency.title }}
+                          components={{ dependencyTitle: <i /> }}
+                        />
+                        <br />
+                        {t('permissions.dependencies_warning.owners')}{' '}
+                        {dependency.owners.map((owner, key) => (
+                          <span key={owner.id}>
+                            <Trans
+                              t={t}
+                              i18nKey="permissions.dependencies_warning.owner"
+                              values={{ type: granteeTypeLabel(owner.type), title: owner.title }}
+                              components={{ ownerTitle: <i /> }}
+                            />
+                            {key !== dependency.owners.size - 1 && ', '}
+                          </span>
+                        ))}
+                      </li>
+                    </List>
+                  ))}
+                </li>
+              )
+            );
+          })
+          .toArray()}
+      </List>
+    </Container>
+  );
+};
 
 export default DependenciesWarning;

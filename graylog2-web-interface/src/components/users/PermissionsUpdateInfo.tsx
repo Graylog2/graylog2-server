@@ -15,25 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { Col, Row, Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
-const PermissionsUpdateInfo = () => (
-  <Row className="content">
-    <Col xs={12}>
-      <Alert bsStyle="info" title="Granting Permissions">
-        Granting permissions for an entity like streams and dashboards can be configured using the{' '}
-        <b>
-          <Icon name="person_add" /> Share
-        </b>{' '}
-        button of an entity. You can find the button e.g. on the entities overview page. Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text="documentation" />.
-      </Alert>
-    </Col>
-  </Row>
+const ShareLabel = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <b>
+    <Icon name="person_add" /> {children}
+  </b>
 );
+
+const DocsLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text={children} />
+);
+
+const PermissionsUpdateInfo = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <Row className="content">
+      <Col xs={12}>
+        <Alert bsStyle="info" title={t('permissions_info.title')}>
+          <Trans
+            t={t}
+            i18nKey="permissions_info.text"
+            components={{ shareLabel: <ShareLabel />, docsLink: <DocsLink /> }}
+          />
+        </Alert>
+      </Col>
+    </Row>
+  );
+};
 
 export default PermissionsUpdateInfo;

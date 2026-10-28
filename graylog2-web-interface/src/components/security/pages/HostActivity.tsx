@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
@@ -28,41 +29,43 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '120px',
-    description:
-      'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
+    descriptionKey: 'security_teaser.host_activity.hotspot_0',
   },
   {
     positionX: '40%',
     positionY: '480px',
-    description: 'Immediately identify which hosts are generating the high alerts, to shrink MTTR.',
+    descriptionKey: 'security_teaser.host_activity.hotspot_1',
   },
   {
     positionX: '65%',
     positionY: '950px',
-    description: 'See which tech is generating the most log-ons.',
+    descriptionKey: 'security_teaser.host_activity.hotspot_2',
   },
   {
     positionX: '40%',
     positionY: '1350px',
-    description: 'Initiate an investigation when identity and access control changes come from unexpected machines.',
+    descriptionKey: 'security_teaser.host_activity.hotspot_3',
   },
   {
     positionX: '80%',
     positionY: '1730px',
-    description:
-      'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
+    descriptionKey: 'security_teaser.host_activity.hotspot_4',
   },
 ];
 
-const HostActivity = () => (
-  <DocumentTitle title="Host activity">
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </DocumentTitle>
-);
+const HostActivity = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <DocumentTitle title={t('security_teaser.host_activity.title')}>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </DocumentTitle>
+  );
+};
 
 export default HostActivity;

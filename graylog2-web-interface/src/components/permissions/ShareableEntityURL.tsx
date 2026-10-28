@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
@@ -43,6 +44,7 @@ type Props = {
 };
 
 const ShareableEntityURL = ({ entityGRN }: Props) => {
+  const { t } = useTranslation('users');
   const entityRoute = useShowRouteFromGRN(entityGRN);
   const entityUrl = `${window.location.origin.toString()}${entityRoute}`;
 
@@ -54,13 +56,13 @@ const ShareableEntityURL = ({ entityGRN }: Props) => {
           <InputGroupAddon>
             <StyledClipboardButton
               text={entityUrl}
-              buttonTitle="Copy parameter to clipboard"
+              buttonTitle={t('permissions.shareable_url.copy_title')}
               title={<Icon name="content_copy" />}
             />
           </InputGroupAddon>
         </InputGroup>
       </FormGroup>
-      <div>You or anyone authorized to view can access this link.</div>
+      <div>{t('permissions.shareable_url.hint')}</div>
     </div>
   );
 };

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import withParams from 'routing/withParams';
 import { PageHeader, DocumentTitle } from 'components/common';
@@ -32,18 +33,20 @@ type Props = {
   };
 };
 
-const PageTitle = ({ fullName }: { fullName: string }) => (
-  <>
-    User Details{' '}
-    {fullName && (
-      <>
-        - <i>{fullName}</i>
-      </>
-    )}
-  </>
-);
+const PageTitle = ({ fullName }: { fullName: string }) => {
+  const { t } = useTranslation('users');
+
+  return fullName ? (
+    <>
+      {t('user_details_page.title')} - <i>{fullName}</i>
+    </>
+  ) : (
+    <>{t('user_details_page.title')}</>
+  );
+};
 
 const UserDetailsPage = ({ params }: Props) => {
+  const { t } = useTranslation('users');
   const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const userId = params?.userId;
 
@@ -52,7 +55,7 @@ const UserDetailsPage = ({ params }: Props) => {
   }, [userId]);
 
   return (
-    <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
+    <DocumentTitle title={t('user_details_page.title_with_name', { name: loadedUser?.fullName ?? '' })}>
       <UsersPageNavigation />
       <PageHeader
         title={<PageTitle fullName={loadedUser?.fullName} />}
@@ -64,10 +67,10 @@ const UserDetailsPage = ({ params }: Props) => {
           />
         }
         documentationLink={{
-          title: 'Permissions documentation',
+          title: t('user_details_page.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Overview of details like profile information, settings, teams and roles.</span>
+        <span>{t('user_details_page.description')}</span>
       </PageHeader>
 
       <UserDetails user={userId === loadedUser?.id ? loadedUser : undefined} />

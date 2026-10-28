@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type User from 'logic/users/User';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const RolesSection = ({ user: { username } }: Props) => {
+  const { t } = useTranslation('users');
   const [loading, setLoading] = useState(false);
 
   const _onLoad = useCallback(
@@ -47,9 +49,9 @@ const RolesSection = ({ user: { username } }: Props) => {
   );
 
   return (
-    <SectionComponent title="Roles" showLoading={loading}>
+    <SectionComponent title={t('user_fields.roles')} showLoading={loading}>
       <PaginatedItemOverview
-        noDataText="No selected roles have been found."
+        noDataText={t('user_details.roles_none_selected')}
         onLoad={_onLoad}
         queryHelper={<RolesQueryHelper />}
       />

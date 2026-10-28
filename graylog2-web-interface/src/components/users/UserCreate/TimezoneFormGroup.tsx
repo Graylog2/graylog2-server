@@ -15,29 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FastField } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
 
-const TimezoneFormGroup = () => (
-  <FastField name="timezone">
-    {({ field: { name, value, onChange } }) => (
-      <Input
-        id="timezone-select"
-        label="Time Zone"
-        help="Choose your local time zone or leave it as it is to use the browser's default."
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9">
-        <TimezoneSelect
-          className="timezone-select"
-          value={value || "Browser's time zone"}
-          name="timezone"
-          onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-        />
-      </Input>
-    )}
-  </FastField>
-);
+const TimezoneFormGroup = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <FastField name="timezone">
+      {({ field: { name, value, onChange } }) => (
+        <Input
+          id="timezone-select"
+          label={t('user_fields.time_zone')}
+          help={t('user_form.time_zone_help')}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9">
+          <TimezoneSelect
+            className="timezone-select"
+            value={value || "Browser's time zone"}
+            name="timezone"
+            onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+          />
+        </Input>
+      )}
+    </FastField>
+  );
+};
 
 export default TimezoneFormGroup;

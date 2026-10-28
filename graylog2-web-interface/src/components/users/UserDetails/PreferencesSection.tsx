@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { ReadOnlyFormGroup } from 'components/common';
@@ -37,6 +38,7 @@ const defaultPreferences = {
 };
 
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
+  const { t } = useTranslation('users');
   let preferences = databasePreferences || defaultPreferences;
 
   if (readOnly) {
@@ -52,13 +54,28 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
     preferences;
 
   return (
-    <SectionComponent title="Preferences">
-      <ReadOnlyFormGroup label="Search autocompletion" value={enableSmartSearch ?? false} />
-      <ReadOnlyFormGroup label="Update unfocused" value={updateUnfocussed ?? false} />
-      <ReadOnlyFormGroup label="Pin search sidebar" value={searchSidebarIsPinned ?? false} />
-      <ReadOnlyFormGroup label="Pin dashboard sidebar" value={dashboardSidebarIsPinned ?? false} />
-      <ReadOnlyFormGroup label="Theme mode" value={preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'} />
-      <ReadOnlyFormGroup label="Language" value={<LanguageLabel language={getLanguage(language)} />} />
+    <SectionComponent title={t('user_details.preferences.title')}>
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.search_autocompletion')}
+        value={enableSmartSearch ?? false}
+      />
+      <ReadOnlyFormGroup label={t('user_details.preferences.update_unfocused')} value={updateUnfocussed ?? false} />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.pin_search_sidebar')}
+        value={searchSidebarIsPinned ?? false}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.pin_dashboard_sidebar')}
+        value={dashboardSidebarIsPinned ?? false}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.theme_mode')}
+        value={preferences?.[PREFERENCES_THEME_MODE] ?? t('user_details.preferences.not_configured')}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.language')}
+        value={<LanguageLabel language={getLanguage(language)} />}
+      />
     </SectionComponent>
   );
 };

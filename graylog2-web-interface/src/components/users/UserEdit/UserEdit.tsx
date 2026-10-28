@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -36,7 +37,7 @@ import RolesSection from './RolesSection';
 import TeamsSection from './TeamsSection';
 
 import type { UserSegment } from '../UserDetails/UserDetails';
-import { editableUserSegments } from '../UserDetails/UserDetails';
+import { useEditableUserSegments } from '../UserDetails/UserDetails';
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
 type Props = {
@@ -44,6 +45,8 @@ type Props = {
 };
 
 const UserEdit = ({ user }: Props) => {
+  const { t } = useTranslation('users');
+  const editableUserSegments = useEditableUserSegments();
   const currentUser = useCurrentUser();
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
   const updateUser = useCallback(
@@ -78,11 +81,8 @@ const UserEdit = ({ user }: Props) => {
           {selectedSegment === 'profile' && (
             <>
               {user.external && (
-                <SectionComponent title="External User">
-                  <Alert bsStyle="warning">
-                    This user was synced from an external server, therefore neither the profile nor the password can be
-                    changed. Please contact your administrator for more information.
-                  </Alert>
+                <SectionComponent title={t('user_edit.external.title')}>
+                  <Alert bsStyle="warning">{t('user_edit.external.text')}</Alert>
                 </SectionComponent>
               )}
               {!user.external && <ProfileSection user={user} onSubmit={(data) => updateUser(data)} />}

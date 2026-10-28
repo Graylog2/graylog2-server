@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
-const queryExample = (
-  <p>
-    Find role with a name containing manager:
-    <br />
-    <kbd>name:manager</kbd>
-    <br />
-  </p>
-);
-const RolesQueryHelper = () => (
-  <QueryHelper entityName="role" example={queryExample} commonFields={['name', 'description']} />
-);
+const EXAMPLE_QUERY = 'name:manager';
+const RolesQueryHelper = () => {
+  const { t } = useTranslation('users');
+  const queryExample = (
+    <p>
+      {t('roles.query_example')}
+      <br />
+      <kbd>{EXAMPLE_QUERY}</kbd>
+      <br />
+    </p>
+  );
+
+  return <QueryHelper entityName="role" example={queryExample} commonFields={['name', 'description']} />;
+};
 
 export default RolesQueryHelper;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { ConfirmDialog, IfPermitted } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const TokenActions = ({ userId, username, tokenId, tokenName, onDeleteCallback = () => {} }: Props) => {
+  const { t } = useTranslation('users');
   const { deleteToken } = useDeleteTokenMutation(userId, tokenId);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -54,14 +56,18 @@ const TokenActions = ({ userId, username, tokenId, tokenName, onDeleteCallback =
   return (
     <IfPermitted permissions={[`users:tokenremove:${username}`]}>
       {showDeleteDialog && (
-        <ConfirmDialog show={showDeleteDialog} title="Deleting token" onCancel={cancelDelete} onConfirm={handleDelete}>
-          <p>You are about to delete the token: &quot;{tokenName}&quot;. Are you sure?</p>
+        <ConfirmDialog
+          show={showDeleteDialog}
+          title={t('token_admin.deleting_title')}
+          onCancel={cancelDelete}
+          onConfirm={handleDelete}>
+          <p>{t('token_admin.delete_confirm', { name: tokenName })}</p>
         </ConfirmDialog>
       )}
 
       <ButtonToolbar className="pull-right">
         <Button bsSize="xs" disabled={isDeleting} bsStyle="danger" onClick={onDelete}>
-          Delete
+          {t('token_admin.delete')}
         </Button>
       </ButtonToolbar>
     </IfPermitted>

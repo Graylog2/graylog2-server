@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import type Role from 'logic/roles/Role';
@@ -25,15 +26,19 @@ type Props = {
   roleId: Role['id'];
 };
 
-const RoleActionLinks = ({ roleId }: Props) => (
-  <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.show(roleId)}>
-      <Button>View Details</Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(roleId)}>
-      <Button bsStyle="primary">Edit Role</Button>
-    </LinkContainer>
-  </ButtonToolbar>
-);
+const RoleActionLinks = ({ roleId }: Props) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <ButtonToolbar>
+      <LinkContainer to={Routes.SYSTEM.AUTHZROLES.show(roleId)}>
+        <Button>{t('roles.navigation.view_details')}</Button>
+      </LinkContainer>
+      <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(roleId)}>
+        <Button bsStyle="primary">{t('roles.navigation.edit_role')}</Button>
+      </LinkContainer>
+    </ButtonToolbar>
+  );
+};
 
 export default RoleActionLinks;

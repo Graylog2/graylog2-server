@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type * as Immutable from 'immutable';
 
@@ -41,6 +42,7 @@ const Container = styled.div`
 `;
 
 const UsersSection = ({ role: { id, name }, role }: Props) => {
+  const { t } = useTranslation('users');
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedList<UserOverview>>();
   const [errors, setErrors] = useState<string | undefined>();
@@ -85,7 +87,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       (role.name === 'Reader' || role.name === 'Admin') &&
       (!user.roles.includes('Reader') || !user.roles.includes('Admin'))
     ) {
-      setErrors(`User '${user.name}' needs at least a Reader or Admin role.`);
+      setErrors(t('roles.users.needs_reader_or_admin', { name: user.name }));
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
 
       return;
@@ -100,16 +102,16 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   };
 
   return (
-    <SectionComponent title="Users" showLoading={loading}>
-      <h3>Assign Users</h3>
+    <SectionComponent title={t('roles.users.title')} showLoading={loading}>
+      <h3>{t('roles.users.assign_users')}</h3>
       <Container>
         <UsersSelector onSubmit={_onAssignUser} role={role} refreshVersion={refreshVersion} />
       </Container>
       <ErrorAlert onClose={setErrors}>{errors}</ErrorAlert>
-      <h3>Selected Users</h3>
+      <h3>{t('roles.users.selected_users')}</h3>
       <Container>
         <PaginatedItemOverview
-          noDataText="No selected users have been found."
+          noDataText={t('roles.users.none_selected')}
           onLoad={_onLoad}
           overrideList={paginatedUsers}
           onDeleteItem={_onUnassignUser}

@@ -15,18 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { FormikFormGroup } from 'components/common';
 
-const EmailFormGroup = () => (
-  <FormikFormGroup
-    label="E-Mail Address"
-    name="email"
-    maxLength={254}
-    type="email"
-    required
-    help="The user's email address."
-  />
-);
+const EmailFormGroup = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <FormikFormGroup
+      label={t('user_fields.email')}
+      name="email"
+      maxLength={254}
+      type="email"
+      required
+      help={t('user_form.email_help')}
+    />
+  );
+};
 
 export default EmailFormGroup;

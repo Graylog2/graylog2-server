@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
@@ -28,7 +29,8 @@ import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem
 import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup, Link } from 'components/common';
+import { FormSubmit, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import GlobalSessionTimeoutText from 'components/users/GlobalSessionTimeoutText';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -102,10 +104,11 @@ const EmailGroup = () => {
 };
 
 const UserCreate = () => {
+  const { t } = useTranslation('users');
   const productName = useProductName();
   const initialRole = {
     name: 'Reader',
-    description: `Grants basic permissions for every ${productName} user (built-in)`,
+    description: t('user_create.reader_role_description', { productName }),
     id: '',
   };
   const [user, setUser] = useState(
@@ -202,24 +205,20 @@ const UserCreate = () => {
           {({ isSubmitting, isValidating, isValid }) => (
             <Form className="form form-horizontal">
               <div>
-                <Headline>Profile</Headline>
+                <Headline>{t('user_fields.profile')}</Headline>
                 <FirstNameFormGroup />
                 <LastNameFormGroup />
                 <UserNameGroup />
                 <EmailGroup />
               </div>
               <div>
-                <Headline>Settings</Headline>
+                <Headline>{t('user_fields.settings')}</Headline>
                 {isGlobalTimeoutEnabled ? (
                   <GlobalTimeoutMessage
-                    label="Sessions Timeout"
+                    label={t('user_fields.sessions_timeout')}
                     value={
                       <NoSearchResult>
-                        User session timeout is not editable because the
-                        <IfPermitted permissions={['clusterconfigentry:read']}>
-                          <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link>
-                        </IfPermitted>{' '}
-                        is enabled.
+                        <GlobalSessionTimeoutText />
                       </NoSearchResult>
                     }
                   />
@@ -230,12 +229,12 @@ const UserCreate = () => {
                 <ServiceAccountFormGroup />
               </div>
               <div>
-                <Headline>Roles</Headline>
+                <Headline>{t('user_fields.roles')}</Headline>
                 <Input
                   id="roles-selector-input"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
-                  label="Assign Roles">
+                  label={t('user_fields.assign_roles')}>
                   <RolesSelector
                     onSubmit={_onAssignRole}
                     assignedRolesIds={user.roles}
@@ -248,7 +247,7 @@ const UserCreate = () => {
                   id="selected-roles-overview"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
-                  label="Selected Roles">
+                  label={t('user_fields.selected_roles')}>
                   <>
                     {selectedRoles
                       .map((role) => (
@@ -257,20 +256,20 @@ const UserCreate = () => {
                       .toArray()}
                     {!hasValidRole && (
                       <Alert bsStyle="danger">
-                        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
+                        <Trans t={t} i18nKey="user_create.role_required" components={{ em: <em /> }} />
                       </Alert>
                     )}
                   </>
                 </Input>
               </div>
               <div>
-                <Headline>Password</Headline>
+                <Headline>{t('user_fields.password')}</Headline>
                 <PasswordGroup passwordComplexityConfig={passwordComplexityConfig} />
               </div>
               {submitError && (
                 <Row>
                   <Col xs={9} xsOffset={3}>
-                    <Alert bsStyle="danger" title="Failed to create user">
+                    <Alert bsStyle="danger" title={t('user_create.failed_title')}>
                       {showSubmitError(submitError)}
                     </Alert>
                   </Col>
@@ -280,8 +279,8 @@ const UserCreate = () => {
                 <Col md={9} mdOffset={3}>
                   <FormSubmit
                     disabledSubmit={!isValid || !hasValidRole || isValidating}
-                    submitButtonText="Create user"
-                    submitLoadingText="Creating user..."
+                    submitButtonText={t('user_create.submit')}
+                    submitLoadingText={t('user_create.submitting')}
                     isSubmitting={isSubmitting}
                     isAsyncSubmit
                     onCancel={_handleCancel}

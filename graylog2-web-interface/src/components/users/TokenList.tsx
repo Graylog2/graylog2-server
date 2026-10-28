@@ -98,9 +98,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
-            <Panel.Title>
-              {t('token_list.token_created', { name: createdToken.name })}
-            </Panel.Title>
+            <Panel.Title>{t('token_list.token_created', { name: createdToken.name })}</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
             <p>{t('token_list.token_created_description')}</p>
@@ -117,9 +115,16 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       <hr />
 
       <Headline>{t('token_list.title_list')}</Headline>
-      <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label={t('token_list.filter_label')} useLoadingState={false} />
+      <StyledSearchForm
+        onSearch={updateQuery}
+        onReset={updateQuery}
+        label={t('token_list.filter_label')}
+        useLoadingState={false}
+      />
       {effectiveTokens.length === 0 ? (
-        <NoEntitiesExist>{query === '' ? t('token_list.no_tokens_to_display') : t('token_list.no_tokens_match_filter')}</NoEntitiesExist>
+        <NoEntitiesExist>
+          {query === '' ? t('token_list.no_tokens_to_display') : t('token_list.no_tokens_match_filter')}
+        </NoEntitiesExist>
       ) : (
         <Table bordered condensed>
           <thead>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
@@ -62,6 +63,7 @@ const _estimateUnit = (value: number): number => {
 };
 
 const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Props) => {
+  const { t } = useTranslation('users');
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
@@ -91,13 +93,15 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
   };
 
   return (
-    <Input id="timeout-controls" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Sessions Timeout">
+    <Input
+      id="timeout-controls"
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+      label={t('timeout.sessions_label')}>
       <Row className="no-bm">
         <Col xs={12}>
-          <Alert bsStyle="info" title="Changing the session timeout">
-            Changing the timeout setting for sessions will log the user out and will invalidate all their current
-            sessions. If you are changing the setting for your own user, you will be logged out at the moment of saving
-            the setting. In that case, make sure to save any pending changes before changing the timeout.
+          <Alert bsStyle="info" title={t('timeout.alert_title')}>
+            {t('timeout.alert_text')}
           </Alert>
         </Col>
       </Row>
@@ -106,8 +110,8 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
           type="checkbox"
           id="session-timeout-never"
           name="session_timeout_never"
-          label="Sessions do not time out"
-          help="When checked, sessions never time out due to inactivity."
+          label={t('timeout.never_label')}
+          help={t('timeout.never_help')}
           formGroupClassName="no-bm"
           onChange={_onClick}
           checked={sessionTimeoutNever}
@@ -118,7 +122,7 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
             <Input
               type="number"
               id="timeout"
-              placeholder="Timeout amount"
+              placeholder={t('timeout.amount_placeholder')}
               name="timeout"
               min={1}
               formGroupClassName="form-group no-bm"
@@ -132,7 +136,7 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
           </Col>
           <Row className="no-bm">
             <Col xs={12}>
-              <HelpBlock>Session automatically end after this amount of time, unless they are actively used.</HelpBlock>
+              <HelpBlock>{t('timeout.help')}</HelpBlock>
             </Col>
           </Row>
         </ClearfixContainer>

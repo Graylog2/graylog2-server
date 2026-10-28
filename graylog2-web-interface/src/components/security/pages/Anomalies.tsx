@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
@@ -28,34 +29,37 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '110px',
-    description:
-      'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+    descriptionKey: 'security_teaser.anomalies.hotspot_0',
   },
   {
     positionX: '60%',
     positionY: '550px',
-    description: 'Confidence intervals tell you how far off the normal the behavior is.',
+    descriptionKey: 'security_teaser.anomalies.hotspot_1',
   },
   {
     positionX: '40%',
     positionY: '910px',
-    description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
+    descriptionKey: 'security_teaser.anomalies.hotspot_2',
   },
   {
     positionX: '70%',
     positionY: '910px',
-    description: 'Identify user accounts that have unusual-for-them behaviors for logons or security events.',
+    descriptionKey: 'security_teaser.anomalies.hotspot_3',
   },
 ];
-const Anomalies = () => (
-  <DocumentTitle title="Anomalies">
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </DocumentTitle>
-);
+const Anomalies = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <DocumentTitle title={t('security_teaser.anomalies.title')}>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </DocumentTitle>
+  );
+};
 
 export default Anomalies;

@@ -15,26 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
-const queryExample = (
-  <p>
-    Find users with a email containing example.com:
-    <br />
-    <kbd>email:example.com</kbd>
-    <br />
-  </p>
-);
+const EXAMPLE_QUERY = 'email:example.com';
 
-const fieldMap = {
-  full_name: 'The full name of a user',
-  username: 'The users login username.',
-  email: 'The users email.',
+const UserQueryHelper = () => {
+  const { t } = useTranslation('users');
+  const queryExample = (
+    <p>
+      {t('users_list.query_example')}
+      <br />
+      <kbd>{EXAMPLE_QUERY}</kbd>
+      <br />
+    </p>
+  );
+  const fieldMap = {
+    full_name: t('users_list.fields.full_name'),
+    username: t('users_list.fields.username'),
+    email: t('users_list.fields.email'),
+  };
+
+  return <QueryHelper example={queryExample} commonFields={[]} fieldMap={fieldMap} entityName="user" />;
 };
-
-const UserQueryHelper = () => (
-  <QueryHelper example={queryExample} commonFields={[]} fieldMap={fieldMap} entityName="user" />
-);
 
 export default UserQueryHelper;

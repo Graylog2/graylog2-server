@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import upperFirst from 'lodash/upperFirst';
+import type { TFunction } from 'i18next';
 
 import Routes from 'routing/Routes';
 import { Link, IfPermitted, ReadOnlyFormGroup } from 'components/common';
@@ -30,11 +32,19 @@ type Props = {
   user: User;
 };
 
-const _sessionTimeout = (sessionTimeout: { value: number; unitString: string }, isGlobalTimeoutEnabled: boolean) => {
+const _sessionTimeout = (
+  sessionTimeout: { value: number; unitString: string },
+  isGlobalTimeoutEnabled: boolean,
+  t: TFunction,
+) => {
   if (sessionTimeout) {
     const globalTimeoutLink = (
       <IfPermitted permissions={['clusterconfigentry:read']}>
-        (<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)
+        <Trans
+          t={t}
+          i18nKey="user_details.settings.globally_set"
+          components={{ configLink: <Link to={Routes.SYSTEM.CONFIGURATIONS} /> }}
+        />
       </IfPermitted>
     );
 
@@ -45,10 +55,11 @@ const _sessionTimeout = (sessionTimeout: { value: number; unitString: string }, 
     );
   }
 
-  return 'Sessions do not timeout';
+  return t('user_details.settings.no_timeout');
 };
 
 const StartpageValue = ({ type, id }: { type: string | null | undefined; id: string | null | undefined }) => {
+  const { t, i18n } = useTranslation('users');
   const [viewTitle, setViewTitle] = useState<string | undefined>();
   const isStream = type === 'stream';
   const { data: stream } = useStream(id ?? '', { enabled: isStream && !!id });
@@ -62,7 +73,7 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined; id: str
   }, [id, type, isStream]);
 
   if (!type || !id) {
-    return <span>No start page set</span>;
+    return <span>{t('user_details.settings.no_startpage')}</span>;
   }
 
   const title = isStream ? stream?.title : viewTitle;
@@ -70,20 +81,28 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined; id: str
 
   return (
     <Link to={route}>
-      <b>{upperFirst(type)}</b>: {title}
+      <b>{i18n.exists(`startpage.types.${type}`, { ns: 'users' }) ? t(`startpage.types.${type}`) : upperFirst(type)}</b>
+      : {title}
     </Link>
   );
 };
 
 const SettingsSection = ({ user: { timezone, serviceAccount, sessionTimeout, startpage } }: Props) => {
+  const { t } = useTranslation('users');
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   return (
-    <SectionComponent title="Settings">
-      <ReadOnlyFormGroup label="Sessions Timeout" value={_sessionTimeout(sessionTimeout, isGlobalTimeoutEnabled)} />
-      <ReadOnlyFormGroup label="Service Account" value={serviceAccount} />
-      <ReadOnlyFormGroup label="Timezone" value={timezone} />
-      <ReadOnlyFormGroup label="Startpage" value={<StartpageValue type={startpage?.type} id={startpage?.id} />} />
+    <SectionComponent title={t('user_fields.settings')}>
+      <ReadOnlyFormGroup
+        label={t('user_fields.sessions_timeout')}
+        value={_sessionTimeout(sessionTimeout, isGlobalTimeoutEnabled, t)}
+      />
+      <ReadOnlyFormGroup label={t('user_form.service_account')} value={serviceAccount} />
+      <ReadOnlyFormGroup label={t('user_details.settings.timezone')} value={timezone} />
+      <ReadOnlyFormGroup
+        label={t('user_details.settings.startpage')}
+        value={<StartpageValue type={startpage?.type} id={startpage?.id} />}
+      />
     </SectionComponent>
   );
 };

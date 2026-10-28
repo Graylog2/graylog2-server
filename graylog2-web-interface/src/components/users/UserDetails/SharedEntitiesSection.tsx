@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -27,6 +28,7 @@ type Props = {
 };
 
 const SharedEntitiesSection = ({ userId }: Props) => {
+  const { t } = useTranslation('users');
   const [loading, setLoading] = useState(false);
   const _searchPaginated = useCallback(
     (pagination) => EntityShareDomain.loadUserSharesPaginated(userId, pagination),
@@ -34,7 +36,7 @@ const SharedEntitiesSection = ({ userId }: Props) => {
   );
 
   return (
-    <SectionComponent title="Shared Entities" showLoading={loading}>
+    <SectionComponent title={t('user_details.shared_entities')} showLoading={loading}>
       <SharedEntitiesOverview setLoading={setLoading} entityType="user" searchPaginated={_searchPaginated} />
     </SectionComponent>
   );

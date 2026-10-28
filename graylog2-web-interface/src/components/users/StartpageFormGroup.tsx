@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
@@ -68,13 +69,10 @@ const UNLIMITED_ENTITY_SHARE_REQ = { page: 1, perPage: 10000, query: '' };
 
 const grnId = (grn) => getValuesFromGRN(grn).id;
 const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: grnId(id), label: title });
-const typeOptions = [
-  { value: 'dashboard', label: 'Dashboard' },
-  { value: 'stream', label: 'Stream' },
-  { value: 'search', label: 'Search' },
-];
+const TYPE_OPTION_VALUES = ['dashboard', 'stream', 'search'];
 
 const useStartPageOptions = (userId, permissions) => {
+  const { t } = useTranslation('users');
   const {
     values: { startpage },
   } = useFormikContext<SettingsFormValues>();
@@ -136,7 +134,7 @@ const useStartPageOptions = (userId, permissions) => {
       case 'dashboard':
         return [...userDashboards, ...allDashboardsOptions];
       case 'search':
-        return [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions];
+        return [{ value: 'default', label: t('startpage.new_search') }, ...userSearches, ...allSearchesOptions];
       case 'stream':
         return [...userStreams, ...allStreamsOptions];
       default:
@@ -151,11 +149,13 @@ const useStartPageOptions = (userId, permissions) => {
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const { t } = useTranslation('users');
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
   const { options, isLoading } = useStartPageOptions(userId, permissions);
-  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Threat Coverage' };
+  const typeOptions = TYPE_OPTION_VALUES.map((value) => ({ value, label: t(`startpage.types.${value}`) }));
+  const securityOverviewOption = { value: 'graylog_security_welcome', label: t('startpage.threat_coverage') };
 
   if (isLoading) {
     return <Spinner />;
@@ -168,18 +168,18 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
 
         const error =
           value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
-            <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
+            <Alert bsStyle="warning">{t('startpage.missing_permission')}</Alert>
           ) : null;
 
         const resetBtn = value?.type ? (
-          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
+          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>{t('common:actions.reset')}</ResetBtn>
         ) : null;
 
         return (
           <Input
             id="startpage"
-            label="Start page"
-            help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
+            label={t('startpage.label')}
+            help={t('startpage.help')}
             labelClassName="col-sm-3"
             wrapperClassName="col-sm-9"
             error={meta?.error}>
@@ -187,7 +187,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
               <Container>
                 <TypeSelect
                   options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
-                  placeholder="Select type"
+                  placeholder={t('startpage.select_type')}
                   onChange={(newType) => {
                     if (!newType) {
                       onChange({ target: { name, value: null } });
@@ -200,7 +200,9 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                 {value?.type !== 'graylog_security_welcome' && (
                   <ValueSelect
                     options={options}
-                    placeholder={`Select ${value?.type ?? 'entity'}`}
+                    placeholder={t('startpage.select_value', {
+                      type: value?.type ? t(`startpage.types.${value.type}`) : t('startpage.entity'),
+                    })}
                     onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
                     value={value?.id}
                   />

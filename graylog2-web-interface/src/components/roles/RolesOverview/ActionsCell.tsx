@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { LinkContainer, IfPermitted, Spinner } from 'components/common';
@@ -23,6 +24,7 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 import { Button } from 'components/bootstrap';
+import i18n from 'i18n';
 
 type Props = {
   readOnly: Role['readOnly'];
@@ -42,13 +44,13 @@ const _deleteRole = (
   setDeleting: (deleting: boolean) => void,
   onDeleted?: () => void,
 ) => {
-  let confirmMessage = `Do you really want to delete role "${roleName}"?`;
+  let confirmMessage = i18n.t('roles.actions.confirm_delete', { ns: 'users', name: roleName });
   const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);
 
   AuthzRolesDomain.loadUsersForRole(roleId, roleName, getOneUser).then((paginatedUsers) => {
     if (paginatedUsers.pagination.total >= 1) {
-      confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
+      confirmMessage += `\n\n${i18n.t('roles.actions.still_assigned', { ns: 'users', count: paginatedUsers.pagination.total })}`;
     }
 
     // eslint-disable-next-line no-alert
@@ -65,6 +67,7 @@ const _deleteRole = (
 };
 
 const ActionsCell = ({ roleId, roleName, readOnly, onDeleted }: Props) => {
+  const { t } = useTranslation('users');
   const [deleting, setDeleting] = useState(false);
 
   return (
@@ -72,8 +75,12 @@ const ActionsCell = ({ roleId, roleName, readOnly, onDeleted }: Props) => {
       <ActionsWrapper>
         <IfPermitted permissions={[`roles:edit:${roleName}`]}>
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleId))}>
-            <Button id={`edit-role-${roleId}`} bsSize="xs" title={`Edit role ${roleName}`} type="button">
-              Edit
+            <Button
+              id={`edit-role-${roleId}`}
+              bsSize="xs"
+              title={t('roles.actions.edit_role_title', { name: roleName })}
+              type="button">
+              {t('roles.actions.edit')}
             </Button>
           </LinkContainer>
         </IfPermitted>
@@ -85,10 +92,10 @@ const ActionsCell = ({ roleId, roleName, readOnly, onDeleted }: Props) => {
                 id={`delete-role-${roleId}`}
                 bsStyle="danger"
                 bsSize="xs"
-                title={`Delete role ${roleName}`}
+                title={t('roles.actions.delete_role_title', { name: roleName })}
                 onClick={() => _deleteRole(roleId, roleName, setDeleting, onDeleted)}
                 type="button">
-                {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
+                {deleting ? <Spinner text={t('roles.actions.deleting')} delay={0} /> : t('roles.actions.delete')}
               </Button>
             </>
           </IfPermitted>

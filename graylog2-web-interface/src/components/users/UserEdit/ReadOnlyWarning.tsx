@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import type User from 'logic/users/User';
@@ -23,12 +24,16 @@ type Props = {
   fullName: User['fullName'];
 };
 
-const ReadOnlyWarning = ({ fullName }: Props) => (
-  <Row className="content">
-    <Col xs={12}>
-      <Alert bsStyle="danger">The selected user {fullName} can&apos;t be edited.</Alert>
-    </Col>
-  </Row>
-);
+const ReadOnlyWarning = ({ fullName }: Props) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <Row className="content">
+      <Col xs={12}>
+        <Alert bsStyle="danger">{t('user_edit.read_only', { fullName })}</Alert>
+      </Col>
+    </Row>
+  );
+};
 
 export default ReadOnlyWarning;

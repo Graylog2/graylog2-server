@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
 
 export const PASSWORD_SPECIAL_CHARACTERS = '!@#$%^&*()-_=+[]{}|;:,.<>?/';
@@ -30,11 +31,14 @@ const containsSpecialCharacter = (password: string) =>
   Array.from(PASSWORD_SPECIAL_CHARACTERS).some((character) => password.includes(character));
 
 const passwordComplexityRuleMessages = (config: PasswordComplexityConfigType) => ({
-  min_length: `Password must be at least ${config.min_length} characters long.`,
-  require_uppercase: 'Password must contain at least one uppercase letter.',
-  require_lowercase: 'Password must contain at least one lowercase letter.',
-  require_numbers: 'Password must contain at least one number.',
-  require_special_chars: `Password must contain at least one special character from: ${PASSWORD_SPECIAL_CHARACTERS}`,
+  min_length: i18n.t('password_rules.min_length', { ns: 'users', minLength: config.min_length }),
+  require_uppercase: i18n.t('password_rules.require_uppercase', { ns: 'users' }),
+  require_lowercase: i18n.t('password_rules.require_lowercase', { ns: 'users' }),
+  require_numbers: i18n.t('password_rules.require_numbers', { ns: 'users' }),
+  require_special_chars: i18n.t('password_rules.require_special_chars', {
+    ns: 'users',
+    characters: PASSWORD_SPECIAL_CHARACTERS,
+  }),
 });
 
 export const passwordComplexityHelpLines = (config: PasswordComplexityConfigType): string[] => {

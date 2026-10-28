@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
@@ -42,6 +43,7 @@ const Container = styled.div`
 `;
 
 const RolesSection = ({ user, onSubmit }: Props) => {
+  const { t } = useTranslation('users');
   const { username, id } = user;
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
@@ -87,23 +89,23 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       onRolesUpdate({ roles: newUserRoles });
       setErrors(undefined);
     } else {
-      setErrors('Roles must at least contain Admin or Reader role.');
+      setErrors(t('user_edit.roles_required'));
       _onLoad().then(setPaginatedRoles);
     }
   };
 
   return (
-    <SectionComponent title="Roles" showLoading={loading}>
-      <h3>Assign Roles</h3>
+    <SectionComponent title={t('user_fields.roles')} showLoading={loading}>
+      <h3>{t('user_fields.assign_roles')}</h3>
       <Container>
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
 
       <ErrorAlert onClose={setErrors}>{errors}</ErrorAlert>
-      <h3>Selected Roles</h3>
+      <h3>{t('user_fields.selected_roles')}</h3>
       <Container>
         <PaginatedItemOverview
-          noDataText="No selected roles have been found."
+          noDataText={t('user_details.roles_none_selected')}
           onLoad={_onLoad}
           overrideList={paginatedRoles}
           onDeleteItem={onDeleteRole}

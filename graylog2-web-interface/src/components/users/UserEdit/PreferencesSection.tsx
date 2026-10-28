@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, useFormikContext } from 'formik';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
@@ -30,6 +31,7 @@ import useProductName from 'brand-customization/useProductName';
 const renderLanguageOption = ({ value }: { value: string }) => <LanguageLabel language={getLanguage(value)} showBeta />;
 
 const LanguageSelect = () => {
+  const { t } = useTranslation('users');
   const { values, setFieldValue } = useFormikContext<PreferencesUpdateMap>();
   const productName = useProductName();
   const options = availableLanguages().map(({ code, name }) => ({ value: code, label: name }));
@@ -39,8 +41,8 @@ const LanguageSelect = () => {
       id="language"
       labelClassName="col-sm-3"
       wrapperClassName="col-sm-9"
-      label="Language"
-      help={`Language of the ${productName} interface. Translations marked Beta have not been reviewed yet.`}>
+      label={t('user_details.preferences.language')}
+      help={t('user_edit.preferences.language_help', { productName })}>
       <Select
         inputId="language"
         options={options}
@@ -59,10 +61,11 @@ type Props = {
 };
 
 const PreferencesSection = ({ user }: Props) => {
+  const { t } = useTranslation('users');
   const onSubmit = (data: PreferencesUpdateMap) => saveUserPreferences(user.username, data);
 
   return (
-    <SectionComponent title="Preferences">
+    <SectionComponent title={t('user_details.preferences.title')}>
       <Formik<PreferencesUpdateMap> onSubmit={onSubmit} initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
@@ -72,9 +75,9 @@ const PreferencesSection = ({ user }: Props) => {
               id="timeout-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Search autocompletion">
+              label={t('user_details.preferences.search_autocompletion')}>
               <FormikFormGroup
-                label="Enable autocompletion"
+                label={t('user_edit.preferences.enable_autocompletion')}
                 name="enableSmartSearch"
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
@@ -85,9 +88,9 @@ const PreferencesSection = ({ user }: Props) => {
               id="update-unfocused-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Update unfocused">
+              label={t('user_details.preferences.update_unfocused')}>
               <FormikFormGroup
-                label="Update unfocused"
+                label={t('user_details.preferences.update_unfocused')}
                 name="updateUnfocussed"
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
@@ -98,13 +101,13 @@ const PreferencesSection = ({ user }: Props) => {
               id="search-sidebar-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Search sidebar">
+              label={t('user_edit.preferences.search_sidebar')}>
               <FormikFormGroup
-                label="Is pinned"
+                label={t('user_edit.preferences.is_pinned')}
                 name="searchSidebarIsPinned"
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
-                help="Can also be changed by using the search sidebar pin icon"
+                help={t('user_edit.preferences.search_sidebar_help')}
               />
             </Input>
 
@@ -112,20 +115,20 @@ const PreferencesSection = ({ user }: Props) => {
               id="dashboard-sidebar-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Dashboard sidebar">
+              label={t('user_edit.preferences.dashboard_sidebar')}>
               <FormikFormGroup
-                label="Is pinned"
+                label={t('user_edit.preferences.is_pinned')}
                 name="dashboardSidebarIsPinned"
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
-                help="Can also be changed by using the dashboard sidebar pin icon"
+                help={t('user_edit.preferences.dashboard_sidebar_help')}
               />
             </Input>
 
             <ReadOnlyFormGroup
-              label="Theme mode"
-              value={user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'}
-              help="Can be changed by using the toggle in the user dropdown"
+              label={t('user_details.preferences.theme_mode')}
+              value={user.preferences?.[PREFERENCES_THEME_MODE] ?? t('user_details.preferences.not_configured')}
+              help={t('user_edit.preferences.theme_mode_help')}
             />
 
             <Row className="no-bm">
@@ -134,9 +137,9 @@ const PreferencesSection = ({ user }: Props) => {
                   <Button
                     bsStyle="primary"
                     disabled={isSubmitting || !isValid}
-                    title="Update Preferences"
+                    title={t('user_edit.preferences.update')}
                     type="submit">
-                    Update Preferences
+                    {t('user_edit.preferences.update')}
                   </Button>
                 </div>
               </Col>

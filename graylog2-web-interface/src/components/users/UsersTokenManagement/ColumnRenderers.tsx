@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import { Timestamp, StatusIcon } from 'components/common';
@@ -45,14 +46,15 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
     },
     last_access: {
       renderCell: (_last_access: string, token) =>
-        token?.last_access ? <Timestamp dateTime={token.last_access} /> : 'Never',
+        token?.last_access ? <Timestamp dateTime={token.last_access} /> : i18n.t('time.never', { ns: 'common' }),
     },
     external_user: {
       renderCell: (_external_user: boolean, token) => <StatusIcon active={token.external_user} />,
       staticWidth: 'matchHeader',
     },
     title: {
-      renderCell: (_title: string, token) => (token.title ? token.title : 'N/A'),
+      renderCell: (_title: string, token) =>
+        token.title ? token.title : i18n.t('token_admin.not_available', { ns: 'users' }),
       staticWidth: COLUMN_WIDTH.reference,
     },
   },
