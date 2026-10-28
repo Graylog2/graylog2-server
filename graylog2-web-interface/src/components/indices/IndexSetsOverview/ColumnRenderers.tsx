@@ -17,7 +17,6 @@
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { Timestamp } from 'components/common';
@@ -25,7 +24,7 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import NumberUtils from 'util/NumberUtils';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
-import { DETAILS_SECTION, INDEX_SET_CATEGORY_TITLES } from './Constants';
+import { INDEX_SET_CATEGORY_TITLES } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
@@ -34,107 +33,60 @@ import DeflectorHealthCell from './cells/DeflectorHealthCell';
 import StreamCountCell from './cells/StreamCountCell';
 import { METRIC_COLUMN_IDS } from './metricColumns';
 
-type ToggleProps = React.PropsWithChildren<{
-  indexSet: IndexSetEntity;
-  align?: 'right';
-}>;
-
-const DetailsToggle = ({ indexSet, align = undefined, children = undefined }: ToggleProps) => (
-  <ExpandedSectionToggleWrapper id={indexSet.id} section={DETAILS_SECTION} align={align}>
-    {children}
-  </ExpandedSectionToggleWrapper>
-);
-
 const customColumnRenderers = (
   extensionColumnRenderers: ColumnRenderersByAttribute<IndexSetEntity>,
 ): ColumnRenderers<IndexSetEntity> => ({
   attributes: {
     title: {
-      renderCell: (_title: string, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>
-          <TitleCell indexSet={indexSet} />
-        </DetailsToggle>
-      ),
+      renderCell: (_title: string, indexSet: IndexSetEntity) => <TitleCell indexSet={indexSet} />,
       staticWidth: COLUMN_WIDTH.title,
     },
     description: {
-      renderCell: (description: string, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>
-          <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
-        </DetailsToggle>
-      ),
+      renderCell: (description: string) => <TextOverflowEllipsis>{description}</TextOverflowEllipsis>,
     },
     index_prefix: {
-      renderCell: (indexPrefix: string, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>{indexPrefix}</DetailsToggle>
-      ),
+      renderCell: (indexPrefix: string) => indexPrefix,
       staticWidth: 200,
     },
     index_template_type: {
-      renderCell: (templateType: string, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>{templateType}</DetailsToggle>
-      ),
+      renderCell: (templateType: string) => templateType,
       staticWidth: 'matchHeader',
     },
     category: {
-      renderCell: (category: IndexSetCategory, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>{INDEX_SET_CATEGORY_TITLES[category] ?? category}</DetailsToggle>
-      ),
+      renderCell: (category: IndexSetCategory) => INDEX_SET_CATEGORY_TITLES[category] ?? category,
       staticWidth: 'matchHeader',
     },
     stream_count: {
       renderCell: (streamCount: number, indexSet: IndexSetEntity) =>
-        streamCount > 0 ? (
-          <StreamCountCell indexSet={indexSet} />
-        ) : (
-          <DetailsToggle indexSet={indexSet} align="right">
-            {streamCount}
-          </DetailsToggle>
-        ),
+        streamCount > 0 ? <StreamCountCell indexSet={indexSet} /> : streamCount,
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     shards: {
-      renderCell: (shards: number, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet} align="right">
-          {shards}
-        </DetailsToggle>
-      ),
+      renderCell: (shards: number) => shards,
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     replicas: {
-      renderCell: (replicas: number, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet} align="right">
-          {replicas}
-        </DetailsToggle>
-      ),
+      renderCell: (replicas: number) => replicas,
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     field_type_refresh_interval: {
       renderCell: (_interval: unknown, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet} align="right">
-          {indexSet.field_type_refresh_interval / 1000.0} seconds
-        </DetailsToggle>
+        <>{indexSet.field_type_refresh_interval / 1000.0} seconds</>
       ),
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },
     field_type_profile: {
       renderCell: (_profile: unknown, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>
-          <FieldTypeProfileCell profileId={indexSet.field_type_profile} />
-        </DetailsToggle>
+        <FieldTypeProfileCell profileId={indexSet.field_type_profile} />
       ),
       staticWidth: COLUMN_WIDTH.reference,
     },
     creation_date: {
-      renderCell: (creationDate: string, indexSet: IndexSetEntity) => (
-        <DetailsToggle indexSet={indexSet}>
-          <Timestamp dateTime={creationDate} />
-        </DetailsToggle>
-      ),
+      renderCell: (creationDate: string) => <Timestamp dateTime={creationDate} />,
       staticWidth: COLUMN_WIDTH.date,
     },
     [METRIC_COLUMN_IDS.indexCount]: {

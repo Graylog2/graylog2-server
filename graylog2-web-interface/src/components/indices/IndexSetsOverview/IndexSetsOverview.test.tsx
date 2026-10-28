@@ -268,7 +268,7 @@ describe('IndexSetsOverview', () => {
   it('expands the details of an index set', async () => {
     render(<IndexSetsOverview />);
 
-    await userEvent.click(within(await findRow(exampleIndexSet)).getByText(exampleIndexSet.description));
+    await userEvent.click(await within(await findRow(exampleIndexSet)).findByRole('button', { name: /expand row/i }));
 
     await screen.findByText('Rotation and retention of Example Index Set');
     await screen.findByText('Field type refresh interval:');

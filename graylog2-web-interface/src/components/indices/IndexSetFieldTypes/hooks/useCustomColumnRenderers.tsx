@@ -20,7 +20,6 @@ import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/type
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const useCustomColumnRenderers = () => {
@@ -38,11 +37,7 @@ const useCustomColumnRenderers = () => {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
         origin: {
-          renderCell: (origin: FieldTypeOrigin, { id }) => (
-            <ExpandedSectionToggleWrapper id={id} section="overriddenProfile">
-              <OriginCell origin={origin} />
-            </ExpandedSectionToggleWrapper>
-          ),
+          renderCell: (origin: FieldTypeOrigin) => <OriginCell origin={origin} />,
           staticWidth: 150,
         },
         is_reserved: {
