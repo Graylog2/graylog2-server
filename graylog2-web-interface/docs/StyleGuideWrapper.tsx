@@ -24,9 +24,9 @@ import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 import CurrentUserContext from '../src/contexts/CurrentUserContext';
 import User from '../src/logic/users/User';
 import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
+import '../src/theme/sawmill/fonts';
 /* eslint-enable import/no-relative-packages */
 
-import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
 

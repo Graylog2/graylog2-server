@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { MantineTheme as CustomMantineTheme } from '@graylog/sawmill/mantine';
+import type { MantineTheme as CustomMantineTheme } from 'theme/sawmill/mantine/Sawmill';
 
 type Other = CustomMantineTheme['other'];
 

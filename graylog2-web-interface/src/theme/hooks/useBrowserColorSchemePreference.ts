@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useEffect } from 'react';
-import type { ColorScheme } from '@graylog/sawmill';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+
+import type { ColorScheme } from 'theme/sawmill';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
 
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList

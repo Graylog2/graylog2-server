@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
-import type { ColorScheme } from '@graylog/sawmill';
 import { MantineProvider } from '@mantine/core';
 
+import type { ColorScheme } from 'theme/sawmill';
 import useThemes from 'theme/hooks/useThemes';
 
 import ColorSchemeContext from './ColorSchemeContext';

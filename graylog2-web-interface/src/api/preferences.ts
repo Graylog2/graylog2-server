@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorScheme } from '@graylog/sawmill';
-
 import { Users } from '@graylog/server-api';
 
+import type { ColorScheme } from 'theme/sawmill';
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import UserNotification from 'util/UserNotification';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
