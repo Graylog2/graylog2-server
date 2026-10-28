@@ -118,11 +118,8 @@ const ExpandedSections = <Entity extends EntityBase>({
                 </Tabs.List>
                 {actionsToolbar}
               </Header>
-              {sectionNames.map((sectionName) => (
-                <SectionPanel key={sectionName} value={sectionName}>
-                  {expandedSectionRenderers[sectionName].content(entity)}
-                </SectionPanel>
-              ))}
+              {/* Only the active panel, since Mantine would otherwise mount every section and start its requests. */}
+              <SectionPanel value={activeSectionName}>{activeSection.content(entity)}</SectionPanel>
             </Tabs>
           ) : (
             <>
