@@ -22,9 +22,10 @@ import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
-import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
 import { ROW_EXPAND_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import getAvailableSectionNames from 'components/common/EntityDataTable/getAvailableSectionNames';
 
 const Container = styled.div`
   display: flex;
@@ -44,35 +45,54 @@ const ToggleIcon = styled(Icon)`
   line-height: 1;
 `;
 
-const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => {
+const RowExpandToggle = ({ entityId }: { entityId: string }) => {
   const { expandedSections, toggleSection } = useExpandedSections();
-  const isExpanded = !!expandedSections?.[row.id];
+  const isExpanded = !!expandedSections?.[entityId];
   const title = isExpanded ? 'Collapse row' : 'Expand row';
 
   return (
     <Container>
-      <ToggleButton bsStyle="default" bsSize="xs" onClick={() => toggleSection(row.id)} title={title} aria-label={title}>
+      <ToggleButton
+        bsStyle="default"
+        bsSize="xs"
+        onClick={() => toggleSection(entityId)}
+        title={title}
+        aria-label={title}>
         <ToggleIcon name={isExpanded ? 'keyboard_arrow_down' : 'chevron_right'} />
       </ToggleButton>
     </Container>
   );
 };
 
-const useRowExpandColumnDefinition = <Entity extends EntityBase>(displayRowExpandCol: boolean, colWidth: number) => {
+const RowExpandCell = <Entity extends EntityBase>({
+  row,
+  expandedSectionRenderers,
+}: {
+  row: Row<Entity>;
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity>;
+}) =>
+  getAvailableSectionNames(expandedSectionRenderers, row.original).length > 0 ? (
+    <RowExpandToggle entityId={row.id} />
+  ) : null;
+
+const useRowExpandColumnDefinition = <Entity extends EntityBase>(
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined,
+  colWidth: number,
+) => {
   const columnHelper = createColumnHelper<Entity>();
 
   return useMemo(
     () =>
-      displayRowExpandCol
+      Object.keys(expandedSectionRenderers ?? {}).length > 0
         ? columnHelper.display({
             id: ROW_EXPAND_COL_ID,
             size: colWidth,
             enableHiding: false,
-            cell: RowExpandCell<Entity>,
+            cell: ({ row }) => <RowExpandCell row={row} expandedSectionRenderers={expandedSectionRenderers} />,
             enableResizing: false,
           })
         : null,
-    [displayRowExpandCol, columnHelper, colWidth],
+    [expandedSectionRenderers, columnHelper, colWidth],
   );
 };
 

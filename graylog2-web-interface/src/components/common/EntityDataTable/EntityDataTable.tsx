@@ -58,6 +58,7 @@ import type {
   RowOverride,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import getAvailableSectionNames from './getAvailableSectionNames';
 import BulkActionsRow from './BulkActionsRow';
 
 const cssVariable = (variable: string, value: string | number) => css`
@@ -232,8 +233,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
-  const expandedSectionNames = Object.keys(expandedSectionRenderers ?? {});
-  const displayRowExpandCol = expandedSectionNames.length > 0;
+  const displayRowExpandCol = Object.keys(expandedSectionRenderers ?? {}).length > 0;
+  const getDefaultExpandedSection = (entityId: string) => {
+    const entity = entities.find(({ id }) => id === entityId);
+
+    return entity ? getAvailableSectionNames(expandedSectionRenderers, entity)[0] : undefined;
+  };
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
@@ -283,9 +288,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
     displayBulkSelectCol,
-    displayRowExpandCol,
     enableSlicing,
     entityActions,
+    expandedSectionRenderers,
     entityAttributesAreCamelCase,
     hasRowActions,
     meta,
@@ -342,7 +347,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider defaultSection={expandedSectionNames[0]}>
+          <ExpandedSectionsProvider getDefaultSection={getDefaultExpandedSection}>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
               {noColumnReordering && noPageSizeSelect ? null : (

@@ -24,6 +24,7 @@ import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVa
 
 import type { EntityBase, ExpandedSectionRenderers } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
+import getAvailableSectionNames from './getAvailableSectionNames';
 
 const Container = styled.tr(
   ({ theme }) => css`
@@ -89,7 +90,7 @@ const ExpandedSections = <Entity extends EntityBase>({
     return null;
   }
 
-  const sectionNames = Object.keys(expandedSectionRenderers);
+  const sectionNames = getAvailableSectionNames(expandedSectionRenderers, entity);
   const hasMultipleSections = sectionNames.length > 1;
   const actions = activeSection.actions?.(entity);
 

@@ -25,11 +25,14 @@ const collapseRow = (cur: ExpandedSections | undefined, entityId: string) =>
   Object.fromEntries(Object.entries(cur ?? {}).filter(([id]) => id !== entityId));
 
 type Props = React.PropsWithChildren<{
-  // Opened when the whole row is toggled.
-  defaultSection?: string;
+  // Section opened when the whole row is toggled.
+  getDefaultSection?: (entityId: string) => string | undefined;
 }>;
 
-const ExpandedSectionsProvider = ({ children = undefined, defaultSection = undefined }: Props): React.ReactElement => {
+const ExpandedSectionsProvider = ({
+  children = undefined,
+  getDefaultSection = undefined,
+}: Props): React.ReactElement => {
   const [expandedSections, setExpandedSections] = useState<ExpandedSections | undefined>();
 
   // Opens the row on the given section, switches to it when the row shows another section,
@@ -39,11 +42,11 @@ const ExpandedSectionsProvider = ({ children = undefined, defaultSection = undef
     (entityId: string, sectionName?: string) =>
       setExpandedSections((cur) => {
         const isShown = sectionName ? cur?.[entityId]?.includes(sectionName) : !!cur?.[entityId];
-        const section = sectionName ?? defaultSection;
+        const section = sectionName ?? getDefaultSection?.(entityId);
 
         return isShown || !section ? collapseRow(cur, entityId) : { ...(cur ?? {}), [entityId]: [section] };
       }),
-    [defaultSection],
+    [getDefaultSection],
   );
 
   const contextValue = useMemo(

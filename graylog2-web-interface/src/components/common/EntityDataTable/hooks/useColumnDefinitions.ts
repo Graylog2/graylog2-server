@@ -19,7 +19,11 @@ import type * as React from 'react';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type {
+  EntityBase,
+  ColumnRenderersByAttribute,
+  ExpandedSectionRenderers,
+} from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
 import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ROW_EXPAND_COL_ID } from 'components/common/EntityDataTable/Constants';
@@ -33,10 +37,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidths,
   displayBulkSelectCol,
-  displayRowExpandCol,
   enableSlicing,
   entityActions,
   entityAttributesAreCamelCase,
+  expandedSectionRenderers,
   hasRowActions,
   meta,
   onActionsWidthChange,
@@ -49,10 +53,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
   displayBulkSelectCol: boolean;
-  displayRowExpandCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   enableSlicing: boolean;
   entityAttributesAreCamelCase: boolean;
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   hasRowActions: boolean;
   meta: Meta;
   onActionsWidthChange: (colId: string, width: number) => void;
@@ -61,7 +65,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
-  const rowExpandCol = useRowExpandColumnDefinition<Entity>(displayRowExpandCol, columnWidths[ROW_EXPAND_COL_ID]);
+  const rowExpandCol = useRowExpandColumnDefinition<Entity>(expandedSectionRenderers, columnWidths[ROW_EXPAND_COL_ID]);
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
   // Always include the actions column as the trailing "tail" column, even when there are no row actions.
   // This lets the table use it to fill remaining space in fully-static layouts.
