@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { forwardRef } from 'react';
 
-import CountBadge from 'components/common/CountBadge';
+import { Badge } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
 type Props = {
   entityId: string;
@@ -32,25 +33,20 @@ type Props = {
 /**
  * Count of the items in an expanded section. Clicking it opens the row on that section.
  */
-const ExpandedSectionCount = (
-  { entityId, section, count, label, abbreviate = false }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => {
+const ExpandedSectionCount = ({ entityId, section, count, label, abbreviate = false }: Props) => {
   const { expandedSections, toggleSection } = useExpandedSections();
   const isActive = expandedSections?.[entityId]?.includes(section) ?? false;
 
   return (
-    <CountBadge
-      ref={ref}
-      count={count}
-      abbreviate={abbreviate}
-      iconName="dock_to_bottom"
+    <Badge
       color={isActive ? 'primary' : undefined}
       variant={isActive ? 'filled' : undefined}
       onClick={() => toggleSection(entityId, section)}
-      title={`${isActive ? 'Hide' : 'Show'} ${label}`}
-    />
+      title={`${isActive ? 'Hide' : 'Show'} ${label}`}>
+      {abbreviate ? formatReadableNumber(count) : count}
+      <Icon name="dock_to_bottom" size="xs" type="regular" />
+    </Badge>
   );
 };
 
-export default forwardRef(ExpandedSectionCount);
+export default ExpandedSectionCount;
