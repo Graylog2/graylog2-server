@@ -45,7 +45,6 @@ describe('TimeRangePresetDropdown', () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchClusterConfig,
       refresh: jest.fn(),
-      isInitialLoading: false,
     });
 
     render(<TimeRangePresetDropdown onChange={jest.fn()} limitDuration={0} />);
