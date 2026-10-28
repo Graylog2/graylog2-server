@@ -41,6 +41,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -195,5 +196,40 @@ public class ShiroSecurityContextFilterTest {
         assertThat(securityContext.getUsername()).isEqualTo("user");
         assertThat(securityContext.getPassword()).isEqualTo("pass:word");
         assertThat(securityContext.getToken()).isExactlyInstanceOf(UsernamePasswordToken.class);
+    }
+
+    @Test
+    public void filterWithBearerTokenOnAudienceResourceShouldCreateAccessTokenAuthToken() throws Exception {
+        final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle(HttpHeaders.AUTHORIZATION, "Bearer secret-token");
+        when(requestContext.getHeaders()).thenReturn(headers);
+        final UriInfo uriInfo = mock(UriInfo.class);
+        when(uriInfo.getMatchedResources()).thenReturn(List.of(new AudienceResource()));
+        when(requestContext.getUriInfo()).thenReturn(uriInfo);
+
+        filter.filter(requestContext);
+
+        final ArgumentCaptor<ShiroSecurityContext> argument = ArgumentCaptor.forClass(ShiroSecurityContext.class);
+        verify(requestContext).setSecurityContext(argument.capture());
+        final ShiroSecurityContext securityContext = argument.getValue();
+        assertThat(securityContext.getToken()).isExactlyInstanceOf(AccessTokenAuthToken.class);
+        assertThat(((AccessTokenAuthToken) securityContext.getToken()).getToken()).isEqualTo("secret-token");
+    }
+
+    @Test
+    public void filterWithBearerTokenOnOtherResourceShouldIgnoreIt() throws Exception {
+        final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle(HttpHeaders.AUTHORIZATION, "Bearer secret-token");
+        when(requestContext.getHeaders()).thenReturn(headers);
+
+        filter.filter(requestContext);
+
+        final ArgumentCaptor<ShiroSecurityContext> argument = ArgumentCaptor.forClass(ShiroSecurityContext.class);
+        verify(requestContext).setSecurityContext(argument.capture());
+        assertThat(argument.getValue().getToken()).isNotInstanceOf(AccessTokenAuthToken.class);
+    }
+
+    @AccessTokenAudience("test")
+    private static class AudienceResource {
     }
 }

@@ -45,6 +45,8 @@ public class ShiroSecurityBinding implements DynamicFeature {
             } else {
                 LOG.debug("Resource method {}#{} requires an authenticated user.", resourceClass.getCanonicalName(), resourceMethod.getName());
                 context.register(new ShiroAuthenticationFilter());
+                final AccessTokenAudience audience = resourceClass.getAnnotation(AccessTokenAudience.class);
+                context.register(new AccessTokenAudienceFilter(audience == null ? null : audience.value()));
             }
         }
 

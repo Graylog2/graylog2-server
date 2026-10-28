@@ -70,6 +70,7 @@ export type TokenSummary = {
   created_at: string;
   expires_at: string;
   tokenTtl: string;
+  audience?: string;
 };
 
 export type ChangePasswordRequest = {

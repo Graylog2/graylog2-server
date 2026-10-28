@@ -50,11 +50,19 @@ public interface AccessTokenService extends PersistedService {
 
     AccessToken create(String username, String name, PeriodDuration ttl);
 
+    /**
+     * Creates a token that is restricted to resources annotated with a matching
+     * {@link org.graylog2.shared.security.AccessTokenAudience}.
+     */
+    AccessToken create(String username, String name, PeriodDuration ttl, String audience, @Nullable String oauthClientId);
+
     DateTime touch(AccessToken accessToken) throws ValidationException;
 
     String save(AccessToken accessToken) throws ValidationException;
 
     int deleteAllForUser(String username);
+
+    int deleteAllForOAuthClient(String username, String oauthClientId);
 
     void setLastAccessCache(long duration, TimeUnit unit);
 

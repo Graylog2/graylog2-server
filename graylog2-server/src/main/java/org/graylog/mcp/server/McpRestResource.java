@@ -44,6 +44,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.AccessTokenAudience;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +55,12 @@ import java.util.UUID;
 
 
 @RequiresAuthentication
+@AccessTokenAudience(McpRestResource.ACCESS_TOKEN_AUDIENCE)
 @Path("/mcp")
 @PublicCloudAPI
 @Tag(name = "MCP", description = "Endpoints allowing MCP clients to connect to")
 public class McpRestResource extends RestResource {
+    public static final String ACCESS_TOKEN_AUDIENCE = "mcp";
     private static final Logger LOG = LoggerFactory.getLogger(McpRestResource.class);
     private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
     private static final String HEADER_MCP_PROTOCOL_VERSION = "MCP-Protocol-Version";

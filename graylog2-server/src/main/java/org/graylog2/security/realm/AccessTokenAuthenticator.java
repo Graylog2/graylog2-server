@@ -22,15 +22,20 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.security.AccessTokenAuthToken;
+import org.graylog2.shared.security.AccessTokenPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenAuthenticator.class);
@@ -58,6 +63,11 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         if (accessToken == null) {
             return null;
         }
+        // The expired token cleaner only runs periodically
+        if (accessToken.getExpiresAt() != null && accessToken.getExpiresAt().isBefore(Tools.nowUTC())) {
+            LOG.debug("Access token <{}> has expired.", accessToken.getId());
+            return null;
+        }
         // TODO should be using IDs
         final User user = userService.load(accessToken.getUserName());
         if (user == null) {
@@ -76,6 +86,9 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
             LOG.warn("Unable to update access token's last access date.", e);
         }
         ShiroSecurityContext.requestSessionCreation(false);
-        return new SimpleAccount(user.getId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, "access token realm");
+        final var principals = ImmutablePrincipalCollection.ofSingleRealm(
+                List.of(user.getId(), new AccessTokenPrincipal(accessToken.getId(), accessToken.getAudience())),
+                "access token realm");
+        return new SimpleAccount(principals, ServiceValidatedCredentialsMatcher.AUTHENTICATED);
     }
 }

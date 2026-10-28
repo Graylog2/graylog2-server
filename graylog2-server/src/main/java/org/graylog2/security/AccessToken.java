@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import jakarta.annotation.Nullable;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
@@ -40,4 +41,14 @@ public interface AccessToken extends Persisted {
     String getName();
 
     void setName(String name);
+
+    /**
+     * @return the audience the token is restricted to, or {@code null} if it is valid for the whole API
+     * @see org.graylog2.shared.security.AccessTokenAudience
+     */
+    @Nullable
+    String getAudience();
+
+    @Nullable
+    String getOAuthClientId();
 }
