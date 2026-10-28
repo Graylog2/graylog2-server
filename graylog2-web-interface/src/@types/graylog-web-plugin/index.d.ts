@@ -297,6 +297,7 @@ declare module 'graylog-web-plugin/plugin' {
     loggersmessages: 'read';
     lookuptables: 'read';
     mappingprofiles: 'read';
+    mcp_server: 'access';
     metrics: 'read';
     mongodb: 'enableprofiling';
     messagecount: 'read';
