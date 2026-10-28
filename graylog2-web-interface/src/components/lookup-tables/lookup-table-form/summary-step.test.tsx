@@ -19,7 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 
 import type { LookupTable } from 'logic/lookup-tables/types';
-import { UNSUPPORTED_PREVIEW } from 'components/lookup-tables/fixtures';
+import { UNSUPPORTED_PREVIEW as MOCK_UNSUPPORTED_PREVIEW } from 'components/lookup-tables/fixtures';
 
 import SummaryStep from './summary-step';
 
@@ -37,7 +37,7 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchDataAdapter: () => ({ dataAdapter: undefined, loadingDataAdapter: false }),
   usePurgeAllLookupTableKey: () => ({ purgeAllLookupTableKey: jest.fn() }),
   usePurgeLookupTableKey: () => ({ purgeLookupTableKey: jest.fn() }),
-  useFetchLookupPreview: () => ({ lookupPreview: UNSUPPORTED_PREVIEW }),
+  useFetchLookupPreview: () => ({ lookupPreview: MOCK_UNSUPPORTED_PREVIEW }),
   useValidateLookupTable: () => ({ validateLookupTable: mockValidateLookupTable }),
   useTestLookupTableKey: () => ({ testLookupTableKey: jest.fn() }),
 }));
