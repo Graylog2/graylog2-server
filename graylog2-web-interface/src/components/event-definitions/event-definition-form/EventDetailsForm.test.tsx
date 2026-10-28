@@ -30,7 +30,6 @@ import EventDetailsForm from './EventDetailsForm';
 jest.mock('hooks/usePluggableLicenseCheck');
 jest.mock('hooks/usePluginEntities');
 jest.mock('logic/telemetry/useSendTelemetry');
-jest.mock('./EventSummaryTemplateHelp', () => () => null);
 jest.mock('components/common', () => ({
   Select: jest.requireActual('components/common/Select').default,
 }));
