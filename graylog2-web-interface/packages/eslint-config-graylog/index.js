@@ -301,6 +301,7 @@ export default [
         },
       ],
       'testing-library/render-result-naming-convention': 'off',
+      'graylog/no-literal-product-name': 'off',
     },
   },
 ];
