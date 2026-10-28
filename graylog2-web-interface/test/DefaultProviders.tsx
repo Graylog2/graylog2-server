@@ -24,6 +24,7 @@ import { MantineProvider } from '@mantine/core';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
+import DocumentTitleContextProvider from 'contexts/DocumentTitleContextProvider';
 
 const mantineTheme = SawmillMantine({ colorScheme: COLOR_SCHEME_LIGHT });
 const scTheme = SawmillSC(mantineTheme);
@@ -37,7 +38,9 @@ const DefaultProviders = ({ children, env = undefined }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
     <MantineProvider theme={mantineTheme} env={env}>
       <ThemeProvider theme={{ ...scTheme, changeMode: () => {} }}>
-        <UserDateTimeProvider tz={defaultTimezone}>{children}</UserDateTimeProvider>
+        <UserDateTimeProvider tz={defaultTimezone}>
+          <DocumentTitleContextProvider>{children}</DocumentTitleContextProvider>
+        </UserDateTimeProvider>
       </ThemeProvider>
     </MantineProvider>
   </CurrentUserContext.Provider>
