@@ -192,14 +192,15 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           {!validSecurityLicense && (
             <FormGroup>
               <ControlLabel>
-                Remediation Steps <small className="text-muted">(Optional)</small>
+                {t('details_form.remediation_steps')}{' '}
+                <small className="text-muted">{t('details_form.optional')}</small>
               </ControlLabel>
               {readOnly ? (
                 <MarkdownPreview
                   show
                   withFullView
                   height={150}
-                  value={eventDefinition.remediation_steps || 'No remediation steps given'}
+                  value={eventDefinition.remediation_steps || t('details_form.no_remediation_steps')}
                 />
               ) : (
                 <MarkdownEditor
@@ -209,7 +210,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
                   onChange={(newValue) => onChange('remediation_steps', newValue)}
                 />
               )}
-              <HelpBlock>Steps to remediate this Event. Markdown formatting is supported.</HelpBlock>
+              <HelpBlock>{t('details_form.remediation_steps_help')}</HelpBlock>
             </FormGroup>
           )}
           {validSecurityLicense && showAddEventProcedureForm && (

@@ -51,7 +51,7 @@ const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: in
   const [validation, setValidation] = useState<Record<string, string | undefined>>({});
 
   const parameterTypes = usePluginEntities('eventDefinitionQueryParameterTypes');
-  const currentTypeDef = parameterTypes.find((t) => t.type === parameter.type) ?? parameterTypes[0];
+  const currentTypeDef = parameterTypes.find((typeDef) => typeDef.type === parameter.type) ?? parameterTypes[0];
 
   const openModal = useCallback(() => {
     setParameter(initialParameter);
@@ -67,7 +67,7 @@ const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: in
   const handleTypeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newType = e.target.value;
-      const newTypeDef = parameterTypes.find((t) => t.type === newType);
+      const newTypeDef = parameterTypes.find((typeDef) => typeDef.type === newType);
       if (!newTypeDef) return;
 
       const newParam = newTypeDef.fromJSON({
