@@ -118,8 +118,8 @@ public class ClientCertResourceIT {
     void readallClientCertCannotModifySecurityConfiguration() throws Exception {
         final SSLContext sslContext = createClientCert("readall-user", "readall").sslContext();
 
-        // read access to the cluster works as expected
-        Assertions.assertThat(request(sslContext, "GET", "/", null).status()).isEqualTo(200);
+        // reading indices works as expected
+        Assertions.assertThat(request(sslContext, "GET", "/_search?size=0", null).status()).isEqualTo(200);
 
         // but the security REST API must not be accessible, otherwise the user can map itself to any role
         Assertions.assertThat(request(sslContext, "GET", "/_plugins/_security/api/rolesmapping", null).status()).isEqualTo(403);
