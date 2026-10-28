@@ -62,6 +62,7 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivityServic
 import org.graylog.security.UserContext;
 import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -116,6 +117,8 @@ import org.graylog2.streams.filters.StreamDestinationFilterService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -142,6 +145,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Tag(name = "Streams", description = "Manage streams")
 @Path("/streams")
 public class StreamResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
     private static final String DEFAULT_SORT_FIELD = StreamImpl.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -176,6 +180,8 @@ public class StreamResource extends RestResource {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
+    private final AuditEventSender auditEventSender;
+    private final SuccessContextCreator<Stream> successAuditLogContextCreator;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -204,7 +210,8 @@ public class StreamResource extends RestResource {
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
-        final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
+        this.auditEventSender = auditEventSender;
+        this.successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
                                 "title", entity.getTitle()
@@ -736,21 +743,23 @@ public class StreamResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
+    @NoAuditEvent("Audit events triggered manually")
     public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds) {
+                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds,
+                                     @Context UserContext userContext) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams;
+        final List<Stream> existingStreams;
         try (var stream = streamService.streamDTOByIds(streamIds)) {
-            existingStreams = stream.map(Stream::getId).collect(Collectors.toSet());
+            existingStreams = stream.toList();
         }
 
-        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
+        final Set<String> existingStreamIds = existingStreams.stream().map(Stream::getId).collect(Collectors.toSet());
+        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreamIds);
 
         if (!missingStreams.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).entity("Missing streams: " + missingStreams).build();
@@ -760,10 +769,31 @@ public class StreamResource extends RestResource {
                 .map(indexSet -> {
                     checkIndexSet(indexSet);
 
-                    streamService.addToIndexSet(indexSetId, streamIds);
+                    final AuditActor auditActor = AuditActor.user(userContext.getUser());
+                    try {
+                        streamService.addToIndexSet(indexSetId, streamIds);
+                    } catch (RuntimeException e) {
+                        existingStreams.forEach(stream -> auditStreamUpdate(auditActor, stream, false));
+                        throw e;
+                    }
+                    existingStreams.forEach(stream -> auditStreamUpdate(auditActor, stream, true));
                     return Response.ok().build();
                 })
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private void auditStreamUpdate(AuditActor auditActor, Stream stream, boolean success) {
+        final Map<String, Object> context = successAuditLogContextCreator.create(stream, Stream.class);
+        try {
+            if (success) {
+                auditEventSender.success(auditActor, AuditEventTypes.STREAM_UPDATE, context);
+            } else {
+                auditEventSender.failure(auditActor, AuditEventTypes.STREAM_UPDATE, context);
+            }
+        } catch (Exception e) {
+            // A failing audit sink must not fail an index set assignment that was already stored
+            LOG.error("Failed to store audit log entry for stream <{}>", stream.getId(), e);
+        }
     }
 
     private void checkIndexSet(IndexSet indexSet) {
