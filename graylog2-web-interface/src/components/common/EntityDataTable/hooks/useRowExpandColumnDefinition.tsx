@@ -52,7 +52,7 @@ const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> })
   return (
     <Container>
       <ToggleButton bsStyle="default" bsSize="xs" onClick={() => toggleSection(row.id)} title={title} aria-label={title}>
-        <ToggleIcon name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+        <ToggleIcon name={isExpanded ? 'keyboard_arrow_down' : 'chevron_right'} />
       </ToggleButton>
     </Container>
   );
