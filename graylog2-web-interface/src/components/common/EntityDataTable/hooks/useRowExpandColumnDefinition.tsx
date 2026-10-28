@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import * as React from 'react';
 import { useMemo } from 'react';
@@ -43,44 +44,35 @@ const ToggleIcon = styled(Icon)`
   line-height: 1;
 `;
 
-const RowExpandCell = ({ entityId, defaultSection }: { entityId: string; defaultSection: string }) => {
+const RowExpandCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => {
   const { expandedSections, toggleSection } = useExpandedSections();
-  const activeSection = expandedSections?.[entityId]?.[0];
-  const title = activeSection ? 'Collapse row' : 'Expand row';
+  const isExpanded = !!expandedSections?.[row.id];
+  const title = isExpanded ? 'Collapse row' : 'Expand row';
 
   return (
     <Container>
-      <ToggleButton
-        bsStyle="default"
-        bsSize="xs"
-        // Toggling the section the row already shows collapses the row.
-        onClick={() => toggleSection(entityId, activeSection ?? defaultSection)}
-        title={title}
-        aria-label={title}>
-        <ToggleIcon name={activeSection ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+      <ToggleButton bsStyle="default" bsSize="xs" onClick={() => toggleSection(row.id)} title={title} aria-label={title}>
+        <ToggleIcon name={isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
       </ToggleButton>
     </Container>
   );
 };
 
-const useRowExpandColumnDefinition = <Entity extends EntityBase>(
-  defaultSection: string | undefined,
-  colWidth: number,
-) => {
+const useRowExpandColumnDefinition = <Entity extends EntityBase>(displayRowExpandCol: boolean, colWidth: number) => {
   const columnHelper = createColumnHelper<Entity>();
 
   return useMemo(
     () =>
-      defaultSection
+      displayRowExpandCol
         ? columnHelper.display({
             id: ROW_EXPAND_COL_ID,
             size: colWidth,
             enableHiding: false,
-            cell: ({ row }) => <RowExpandCell entityId={row.id} defaultSection={defaultSection} />,
+            cell: RowExpandCell<Entity>,
             enableResizing: false,
           })
         : null,
-    [defaultSection, columnHelper, colWidth],
+    [displayRowExpandCol, columnHelper, colWidth],
   );
 };
 

@@ -24,19 +24,26 @@ type ExpandedSections = { [entityId: string]: Array<string> };
 const collapseRow = (cur: ExpandedSections | undefined, entityId: string) =>
   Object.fromEntries(Object.entries(cur ?? {}).filter(([id]) => id !== entityId));
 
-const ExpandedSectionsProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
+type Props = React.PropsWithChildren<{
+  // Opened when the whole row is toggled.
+  defaultSection?: string;
+}>;
+
+const ExpandedSectionsProvider = ({ children = undefined, defaultSection = undefined }: Props): React.ReactElement => {
   const [expandedSections, setExpandedSections] = useState<ExpandedSections | undefined>();
 
   // Opens the row on the given section, switches to it when the row shows another section,
   // or collapses the row when the section is already shown.
+  // Without a section, it collapses an expanded row or opens it on the default section.
   const toggleSection = useCallback(
-    (entityId: string, sectionName: string) =>
-      setExpandedSections((cur) =>
-        cur?.[entityId]?.includes(sectionName)
-          ? collapseRow(cur, entityId)
-          : { ...(cur ?? {}), [entityId]: [sectionName] },
-      ),
-    [],
+    (entityId: string, sectionName?: string) =>
+      setExpandedSections((cur) => {
+        const isShown = sectionName ? cur?.[entityId]?.includes(sectionName) : !!cur?.[entityId];
+        const section = sectionName ?? defaultSection;
+
+        return isShown || !section ? collapseRow(cur, entityId) : { ...(cur ?? {}), [entityId]: [section] };
+      }),
+    [defaultSection],
   );
 
   const contextValue = useMemo(
