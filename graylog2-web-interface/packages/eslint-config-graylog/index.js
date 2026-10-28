@@ -95,7 +95,18 @@ export default [
       'no-plusplus': 'error',
       'no-promise-executor-return': 'error',
       'no-restricted-globals': 'error',
-      'no-restricted-syntax': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXAttribute[name.name=/^(href|to)$/] > Literal[value=/^\\x2F/]',
+          message: 'Use `Routes` or `prefixUrl()` for internal links so the app path prefix is applied.',
+        },
+        {
+          selector:
+            'JSXAttribute[name.name=/^(href|to)$/] > JSXExpressionContainer > TemplateLiteral > TemplateElement:first-child[value.raw=/^\\x2F/]',
+          message: 'Use `Routes` or `prefixUrl()` for internal links so the app path prefix is applied.',
+        },
+      ],
       'no-script-url': 'error',
       'no-template-curly-in-string': 'error',
       'no-throw-literal': 'error',
@@ -302,6 +313,7 @@ export default [
       ],
       'testing-library/render-result-naming-convention': 'off',
       'graylog/no-literal-product-name': 'off',
+      'no-restricted-syntax': 'off',
     },
   },
 ];
