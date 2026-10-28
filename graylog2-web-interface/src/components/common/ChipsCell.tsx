@@ -110,7 +110,7 @@ const ChipsCell = ({
     <ExpandableCellList
       items={sorted}
       renderItem={renderChip}
-      getItemKey={(item) => item}
+      itemKey={(item) => item}
       collapsedCount={truncate ? collapsedCount : sorted.length}
       layout="inline"
     />

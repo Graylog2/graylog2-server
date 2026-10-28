@@ -55,8 +55,8 @@ const EventDefinitionNotificationsCell = ({ eventDefinition }: Props) => {
     <ExpandableCellList
       items={items}
       renderItem={renderNotification}
-      getItemKey={({ id }) => id}
-      getItemTitle={({ id, title }) => title ?? id}
+      itemKey={({ id }) => id}
+      itemTitle={({ id, title }) => title ?? id}
     />
   );
 };

@@ -102,9 +102,9 @@ const ToggleBadge = styled(Badge)`
 type Props<ItemType> = {
   items: ReadonlyArray<ItemType> | undefined | null;
   renderItem: (item: ItemType) => React.ReactNode;
-  getItemKey: (item: ItemType) => string;
+  itemKey: (item: ItemType) => string;
   // Shown on hover, since long items are cut off.
-  getItemTitle?: (item: ItemType) => string;
+  itemTitle?: (item: ItemType) => string;
   collapsedCount?: number;
   // `stacked` lists one item per line (e.g. entity links), `inline` wraps items next to each other (e.g. chips).
   layout?: Layout;
@@ -117,8 +117,8 @@ type Props<ItemType> = {
 const ExpandableCellList = <ItemType,>({
   items,
   renderItem,
-  getItemKey,
-  getItemTitle = undefined,
+  itemKey,
+  itemTitle = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   layout = 'stacked',
 }: Props<ItemType>) => {
@@ -132,7 +132,7 @@ const ExpandableCellList = <ItemType,>({
   const renderAllItems = (scrollable: boolean) => (
     <Items $layout={layout} $scrollable={scrollable}>
       {items.map((item) => (
-        <Item key={getItemKey(item)} $layout={layout} title={getItemTitle?.(item)}>
+        <Item key={itemKey(item)} $layout={layout} title={itemTitle?.(item)}>
           {renderItem(item)}
         </Item>
       ))}
@@ -154,7 +154,7 @@ const ExpandableCellList = <ItemType,>({
     return (
       <CollapsedRow>
         {items.slice(0, collapsedCount).map((item) => (
-          <CollapsedItem key={getItemKey(item)} title={getItemTitle?.(item)}>
+          <CollapsedItem key={itemKey(item)} title={itemTitle?.(item)}>
             {renderItem(item)}
           </CollapsedItem>
         ))}
