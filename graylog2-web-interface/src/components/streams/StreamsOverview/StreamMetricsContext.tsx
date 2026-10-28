@@ -25,12 +25,14 @@ type StreamMetricsContextValue = {
   metricsByStreamId: StreamMetricsByStreamId;
   isInitialLoading: boolean;
   isError: boolean;
+  isFieldRequested: (field: StreamMetricField | string) => boolean;
 };
 
 const EMPTY_CONTEXT: StreamMetricsContextValue = {
   metricsByStreamId: {},
   isInitialLoading: false,
   isError: false,
+  isFieldRequested: () => false,
 };
 
 const StreamMetricsContext = singleton('contexts.StreamMetricsContext', () =>
@@ -44,11 +46,13 @@ type Props = React.PropsWithChildren<{
 
 export const StreamMetricsProvider = ({ streamIds, fields, children = undefined }: Props) => {
   const { metricsByStreamId, isInitialLoading, isError } = useStreamMetrics(streamIds, fields);
+  const requestedFields = new Set(fields);
 
   const value: StreamMetricsContextValue = {
     metricsByStreamId,
     isInitialLoading,
     isError,
+    isFieldRequested: (field) => requestedFields.has(field),
   };
 
   return <StreamMetricsContext.Provider value={value}>{children}</StreamMetricsContext.Provider>;
@@ -56,14 +60,26 @@ export const StreamMetricsProvider = ({ streamIds, fields, children = undefined 
 
 export const useStreamMetricsContext = (): StreamMetricsContextValue => useContext(StreamMetricsContext);
 
+// Loads the `fields` for this stream only when the provider didn't request them, e.g. because their column is hidden.
 export const useStreamMetricsFor = (
   streamId: string,
+  fields: Array<StreamMetricField | string> = [],
 ): {
   metrics: StreamMetrics | undefined;
   isInitialLoading: boolean;
   isError: boolean;
 } => {
-  const { metricsByStreamId, isInitialLoading, isError } = useContext(StreamMetricsContext);
+  const { metricsByStreamId, isInitialLoading, isError, isFieldRequested } = useContext(StreamMetricsContext);
+  const isProvided = fields.every(isFieldRequested);
+  const ownMetrics = useStreamMetrics([streamId], isProvided ? [] : fields);
+
+  if (!isProvided) {
+    return {
+      metrics: ownMetrics.metricsByStreamId[streamId],
+      isInitialLoading: ownMetrics.isInitialLoading,
+      isError: ownMetrics.isError,
+    };
+  }
 
   return {
     metrics: metricsByStreamId[streamId],

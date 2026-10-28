@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import useInputDetails from 'hooks/useInputDetails';
-import useSingleStreamMetrics from 'hooks/useSingleStreamMetrics';
+import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inputTitleLinks';
 
 import ExpandedAssociatedInputsSection from './ExpandedAssociatedInputsSection';
@@ -32,7 +32,9 @@ declare module 'hooks/useInputDetails' {
   }
 }
 
-jest.mock('hooks/useSingleStreamMetrics');
+jest.mock('components/streams/StreamsOverview/StreamMetricsContext', () => ({
+  useStreamMetricsFor: jest.fn(),
+}));
 jest.mock('hooks/useInputDetails', () => jest.fn());
 jest.mock('components/streams/StreamsOverview/inputTitleLinks', () => ({
   useInputTitleLinkBuilder: jest.fn(),
@@ -69,7 +71,7 @@ describe('ExpandedAssociatedInputsSection', () => {
   });
 
   it('renders linked regular input title', () => {
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'input-a', type: 'input' }] },
       isInitialLoading: false,
       isError: false,
@@ -83,7 +85,7 @@ describe('ExpandedAssociatedInputsSection', () => {
   });
 
   it('links a forwarder input to its input profile page', () => {
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'forwarder-a', type: 'forwarder_input' }] },
       isInitialLoading: false,
       isError: false,
@@ -109,7 +111,7 @@ describe('ExpandedAssociatedInputsSection', () => {
       isFetching: false,
       isError: false,
     });
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'forwarder-unlinkable', type: 'forwarder_input' }] },
       isInitialLoading: false,
       isError: false,
@@ -130,7 +132,7 @@ describe('ExpandedAssociatedInputsSection', () => {
       isFetching: true,
       isError: false,
     });
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'input-x', type: 'input' }] },
       isInitialLoading: false,
       isError: false,
@@ -149,7 +151,7 @@ describe('ExpandedAssociatedInputsSection', () => {
       isFetching: false,
       isError: true,
     });
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'input-x', type: 'input' }] },
       isInitialLoading: false,
       isError: false,
@@ -170,7 +172,7 @@ describe('ExpandedAssociatedInputsSection', () => {
       isFetching: false,
       isError: false,
     });
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [{ id: 'input-deleted', type: 'input' }] },
       isInitialLoading: false,
       isError: false,
@@ -182,7 +184,7 @@ describe('ExpandedAssociatedInputsSection', () => {
   });
 
   it('renders empty-state when there are no associated inputs', () => {
-    asMock(useSingleStreamMetrics).mockReturnValue({
+    asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { associated_inputs: [] },
       isInitialLoading: false,
       isError: false,
