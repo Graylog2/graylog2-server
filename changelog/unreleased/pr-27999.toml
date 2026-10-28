@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed missing stream ID and name in the audit event recorded when assigning streams to an index set."
+
+pulls = ["27999"]
