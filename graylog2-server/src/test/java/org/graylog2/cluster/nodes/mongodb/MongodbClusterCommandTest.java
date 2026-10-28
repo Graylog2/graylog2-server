@@ -83,6 +83,20 @@ class MongodbClusterCommandTest {
     }
 
     @Test
+    void testHostWithFailingClientCreationIsExcluded() {
+        List<String> hosts = List.of("host1:27017", "broken:27017", "host3:27017");
+        setupReplicaSet(hosts);
+        when(connectionResolver.resolve("broken:27017")).thenThrow(new IllegalArgumentException("Illegal character in authority"));
+
+        MongodbClusterCommand command = new MongodbClusterCommand(mongoConnection, connectionResolver);
+        Map<String, String> results = command.runOnEachNode((host, client) -> "result-" + host);
+
+        assertThat(results).hasSize(2)
+                .containsEntry("host1:27017", "result-host1:27017")
+                .containsEntry("host3:27017", "result-host3:27017");
+    }
+
+    @Test
     void testStandaloneInstanceExecutesOnSingleHost() {
         setupStandalone("standalone:27017");
 
