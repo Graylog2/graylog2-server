@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import { ButtonToolbar, SegmentedControl } from 'components/bootstrap';
+import { ButtonToolbar, Tabs } from 'components/bootstrap';
 import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
 import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
@@ -54,6 +54,8 @@ const Content = styled.div(
 const Header = styled.div(
   ({ theme }) => css`
     display: flex;
+    /* Moves the actions below the tabs, instead of squeezing both, when they don't fit next to each other. */
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: ${theme.spacings.sm};
@@ -64,6 +66,10 @@ const Header = styled.div(
 const Actions = styled(ButtonToolbar)`
   display: flex;
   align-items: center;
+`;
+
+const SectionPanel = styled(Tabs.Panel)`
+  padding: 0;
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
@@ -87,28 +93,48 @@ const ExpandedSections = <Entity extends EntityBase>({
   const hasMultipleSections = sectionNames.length > 1;
   const actions = activeSection.actions?.(entity);
 
+  const actionsToolbar = actions && <Actions>{actions}</Actions>;
+
   return (
     <Container>
       <ContentCell colSpan={visibleCellCount}>
         <Content>
-          {(hasMultipleSections || activeSection.disableHeader !== true) && (
-            <Header>
-              {hasMultipleSections ? (
-                <SegmentedControl<string>
-                  data={sectionNames.map((sectionName) => ({
-                    value: sectionName,
-                    label: expandedSectionRenderers[sectionName].title,
-                  }))}
-                  value={activeSectionName}
-                  onChange={(sectionName) => toggleSection(entity.id, sectionName)}
-                />
-              ) : (
-                <h3>{activeSection.title}</h3>
+          {hasMultipleSections ? (
+            <Tabs
+              value={activeSectionName}
+              onChange={(sectionName) => {
+                // Mantine also reports clicks on the active tab, which would collapse the row.
+                if (sectionName && sectionName !== activeSectionName) {
+                  toggleSection(entity.id, sectionName);
+                }
+              }}>
+              <Header>
+                <Tabs.List>
+                  {sectionNames.map((sectionName) => (
+                    <Tabs.Tab key={sectionName} value={sectionName}>
+                      {expandedSectionRenderers[sectionName].title}
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>
+                {actionsToolbar}
+              </Header>
+              {sectionNames.map((sectionName) => (
+                <SectionPanel key={sectionName} value={sectionName}>
+                  {expandedSectionRenderers[sectionName].content(entity)}
+                </SectionPanel>
+              ))}
+            </Tabs>
+          ) : (
+            <>
+              {activeSection.disableHeader !== true && (
+                <Header>
+                  <h3>{activeSection.title}</h3>
+                  {actionsToolbar}
+                </Header>
               )}
-              {actions && <Actions>{actions}</Actions>}
-            </Header>
+              {activeSection.content(entity)}
+            </>
           )}
-          {activeSection.content(entity)}
         </Content>
       </ContentCell>
     </Container>
