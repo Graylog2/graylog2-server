@@ -119,6 +119,7 @@ const Routes = {
         `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
       show: (contentPackId: string) => `/system/contentpacks/${contentPackId}`,
     },
+    FORWARDERS: '/system/forwarders',
     GROKPATTERNS: '/system/grokpatterns',
     INDICES: {
       LIST: '/system/indices',

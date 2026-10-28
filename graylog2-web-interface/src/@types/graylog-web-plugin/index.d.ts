@@ -76,6 +76,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -148,10 +149,9 @@ type DataTiering = {
     immutableFields?: string[];
     ignoreFieldRestrictions?: boolean;
   }>;
-  useIndexSetSubmitConfirmation?: (options?: { enabled?: boolean }) => (
-    initialValues: unknown,
-    values: unknown,
-  ) => { title: string; message: string } | null;
+  useIndexSetSubmitConfirmation?: (options?: {
+    enabled?: boolean;
+  }) => (initialValues: unknown, values: unknown) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {

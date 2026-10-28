@@ -90,5 +90,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20260911120000_AddExcludeEmptyFieldsToTemplateProviders.class);
         addMigration(V20261015120000_RemoveLegacyDatanodeCertificatesCollection.class);
         addMigration(V20261014120000_RotateIndexSetsWithNumericDateFields.class);
+        addMigration(V20261027120000_FixMultiWordPhysicalFieldTypes.class);
     }
 }
