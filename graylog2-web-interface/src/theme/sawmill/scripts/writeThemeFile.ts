@@ -17,7 +17,8 @@
 import fs from 'fs';
 
 const writeThemeFile = (fileName: string, theme: unknown) => {
-  const fileContent = JSON.stringify(theme, null, 2);
+  // The trailing newline matches the output of `yarn format`.
+  const fileContent = `${JSON.stringify(theme, null, 2)}\n`;
 
   fs.writeFile(fileName, fileContent, (err) => {
     if (err) {

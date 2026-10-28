@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import path from 'path';
+
 import buildMantineTheme from './mantine/buildMantineTheme';
 import buildStyledComponentsTheme from './styled-components/buildStyledComponentsTheme';
 import writeThemeFile from './writeThemeFile';
 
 const mantineTheme = buildMantineTheme();
-writeThemeFile('./lib/mantine/generated/theme.json', mantineTheme);
+writeThemeFile(path.resolve(__dirname, '../mantine/generated/theme.json'), mantineTheme);
 const styledComponentsTheme = buildStyledComponentsTheme();
-writeThemeFile('./lib/styled-components/generated/theme.json', styledComponentsTheme);
+writeThemeFile(path.resolve(__dirname, '../styled-components/generated/theme.json'), styledComponentsTheme);

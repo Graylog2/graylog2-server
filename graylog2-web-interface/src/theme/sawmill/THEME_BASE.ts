@@ -119,6 +119,7 @@ const colorVariants: Record<string, [string, string, string, string, string, str
 
 export const COLOR_WHITE = '#FFFFFF';
 
+// The default themes are generated from this file. Run `yarn generate:themes` after changing it.
 const THEME_BASE: ThemeBase = {
   fonts: {
     families: {
