@@ -23,11 +23,15 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.util.ThreadContext;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import static org.graylog2.shared.rest.RequestIdFilter.X_REQUEST_ID;
 
 /**
  * This filter makes the request headers accessible within Shiro's {@link ThreadContext}.
@@ -54,6 +58,27 @@ public class ShiroRequestHeadersBinder implements ContainerRequestFilter, Contai
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Runs the supplier with the given X-Request-Id header added to a copy of the headers bound to the thread context
+     * and restores the previous headers afterwards. {@link org.graylog2.security.realm.MongoDbAuthorizationRealm}
+     * scopes its authorization cache by this header, so code running outside of REST requests needs to provide one.
+     */
+    public static <T> T withRequestId(String requestId, Supplier<T> supplier) {
+        @SuppressWarnings("unchecked")
+        final MultivaluedMap<String, String> previousHeaders = (MultivaluedMap<String, String>) ThreadContext.get(REQUEST_HEADERS);
+        final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        if (previousHeaders != null) {
+            headers.putAll(previousHeaders);
+        }
+        headers.putSingle(X_REQUEST_ID, requestId);
+        ThreadContext.put(REQUEST_HEADERS, headers);
+        try {
+            return supplier.get();
+        } finally {
+            ThreadContext.put(REQUEST_HEADERS, previousHeaders);
+        }
     }
 
     @Override
