@@ -74,7 +74,7 @@ const CountBadge = (
       {iconName ? (
         <BadgeInner>
           {displayCount}
-          <Icon name={iconName} size="sm" />
+          <Icon name={iconName} size="sm" type="regular" />
         </BadgeInner>
       ) : (
         displayCount
