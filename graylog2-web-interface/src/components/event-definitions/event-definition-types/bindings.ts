@@ -18,7 +18,6 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import i18n from 'i18n';
-
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import LookupTableQueryParameterEdit from 'components/lookup-table-parameters/LookupTableQueryParameterEdit';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';

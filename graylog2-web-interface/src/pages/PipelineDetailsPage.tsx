@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -37,7 +38,6 @@ import {
 } from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
-import { useTranslation } from 'react-i18next';
 
 const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 

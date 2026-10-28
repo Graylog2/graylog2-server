@@ -18,7 +18,6 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import i18n from 'i18n';
-
 import { ClearFloat, Icon } from 'components/common';
 import { Button, ButtonToolbar, Col, FormGroup } from 'components/bootstrap';
 import {

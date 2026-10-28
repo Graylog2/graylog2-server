@@ -21,7 +21,6 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { Trans, useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
-
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -30,7 +29,6 @@ import { Alert } from 'components/bootstrap';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
-
 import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
 
 import commonStyles from '../common/commonStyles.css';

@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
@@ -26,7 +27,6 @@ import { useRule } from 'components/rules/hooks/useRules';
 import usePipelines from 'hooks/usePipelines';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 
-import { useTranslation } from 'react-i18next';
 import useHistory from '../routing/useHistory';
 
 function filterPipelines(pipelines: Array<PipelineType> = [], title = '') {

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { withTranslation, WithTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
 import withTelemetry from 'logic/telemetry/withTelemetry';

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import i18n from 'i18n';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';

@@ -24,6 +24,7 @@ import PageContentLayout from 'components/layout/PageContentLayout';
 
 const UserHasNoStreamAccess = () => {
   const { t } = useTranslation('streams');
+
   return (
     <DocumentTitle title={t('user_no_stream_access.title')}>
       <PageContentLayout>

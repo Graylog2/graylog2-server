@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { LoggerOverview, ClusterSupportBundleOverview } from 'components/loggers';
-import { useTranslation } from 'react-i18next';
 
 const LoggersPage = () => {
   const { t } = useTranslation('loggers');

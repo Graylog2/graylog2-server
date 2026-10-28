@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -25,7 +26,6 @@ import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { DataAdapterFormView } from 'components/lookup-tables';
-import { useTranslation } from 'react-i18next';
 
 const FlexContainer = styled.div`
   display: flex;

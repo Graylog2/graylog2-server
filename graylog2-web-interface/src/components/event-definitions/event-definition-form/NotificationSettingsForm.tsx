@@ -21,7 +21,6 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import i18n from 'i18n';
-
 import { ControlLabel, FormControl, FormGroup, InputGroup } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';

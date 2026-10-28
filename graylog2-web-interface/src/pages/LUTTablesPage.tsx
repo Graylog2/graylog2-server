@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { useTranslation } from 'react-i18next';
 
 function LUTTablesPage() {
   const { push } = useHistory();

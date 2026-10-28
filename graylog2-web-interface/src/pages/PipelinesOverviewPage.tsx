@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -22,7 +23,6 @@ import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimeline
 import DocsHelper from 'util/DocsHelper';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import CreateButton from 'components/common/CreateButton';
-import { useTranslation } from 'react-i18next';
 import {
   EnableDebugMetricsButton,
   ProcessingLoadDebugMetricsBanner,

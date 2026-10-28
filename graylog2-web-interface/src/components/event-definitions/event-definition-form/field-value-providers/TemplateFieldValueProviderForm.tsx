@@ -20,7 +20,6 @@ import type { FieldValueProvider } from 'graylog-web-plugin';
 import { Trans } from 'react-i18next';
 
 import i18n from 'i18n';
-
 import { ExternalLink } from 'components/common';
 import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';

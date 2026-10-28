@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-
-import { EventsDefinitions } from '@graylog/server-api';
 import { useTranslation } from 'react-i18next';
 
-import i18n from 'i18n';
+import { EventsDefinitions } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { FormGroup } from 'components/bootstrap';
 import { InputDescription, Select, useChipInput } from 'components/common';
 import useDebouncedValue from 'hooks/useDebouncedValue';

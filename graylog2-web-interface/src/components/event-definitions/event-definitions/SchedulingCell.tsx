@@ -20,7 +20,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
-
 import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';

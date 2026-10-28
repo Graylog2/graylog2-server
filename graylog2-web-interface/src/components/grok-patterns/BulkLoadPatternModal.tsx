@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { withTranslation, WithTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';

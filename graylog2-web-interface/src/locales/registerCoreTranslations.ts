@@ -20,7 +20,6 @@ import { registerTranslations } from 'i18n';
 import enAggregation from 'locales/en/aggregation.json';
 import enAuthentication from 'locales/en/authentication.json';
 import enClusterCertificateManagement from 'locales/en/cluster_certificate_management.json';
-
 import enCommon from 'locales/en/common.json';
 import enContentPacks from 'locales/en/content_packs.json';
 import enDashboards from 'locales/en/dashboards.json';

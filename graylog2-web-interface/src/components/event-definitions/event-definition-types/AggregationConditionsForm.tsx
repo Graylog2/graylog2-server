@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import { withTranslation, WithTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';

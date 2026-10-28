@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { withTranslation, WithTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { ListGroup, ListGroupItem, Button, Input } from 'components/bootstrap';
 

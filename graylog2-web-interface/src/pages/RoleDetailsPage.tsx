@@ -20,6 +20,7 @@ type Props = {
 
 const PageTitle = ({ fullName }: { fullName: string | undefined | null }) => {
   const { t } = useTranslation('users');
+
   return (
     <>
       {t('role_details.title_prefix')}{' '}

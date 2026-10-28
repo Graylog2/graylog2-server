@@ -20,6 +20,7 @@ type Props = {
 
 const PageTitle = ({ name }: { name: string | undefined | null }) => {
   const { t } = useTranslation('users');
+
   return (
     <>
       {t('role_edit.title_prefix')}{' '}

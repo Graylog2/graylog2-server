@@ -17,9 +17,9 @@
 import React, { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
-import { useTranslation } from 'react-i18next';
 import {
   EnableDebugMetricsButton,
   ProcessingLoadDebugMetricsBanner,

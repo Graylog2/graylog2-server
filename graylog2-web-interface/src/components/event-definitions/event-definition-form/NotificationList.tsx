@@ -19,7 +19,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Trans } from 'react-i18next';
 
 import i18n from 'i18n';
-
 import { Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';

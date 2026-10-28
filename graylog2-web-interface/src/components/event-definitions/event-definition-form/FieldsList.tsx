@@ -18,7 +18,6 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import i18n from 'i18n';
-
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';

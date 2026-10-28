@@ -17,7 +17,6 @@
 import React from 'react';
 
 import i18n from 'i18n';
-
 import { Select } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';

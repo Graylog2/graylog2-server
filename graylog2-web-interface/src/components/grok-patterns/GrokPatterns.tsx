@@ -16,13 +16,14 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { DataTable, IfPermitted, PageHeader, PaginatedList, SearchForm } from 'components/common';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { withTranslation, WithTranslation } from 'react-i18next';
 import {
   searchGrokPatternsPaginated,
   testGrokPattern,

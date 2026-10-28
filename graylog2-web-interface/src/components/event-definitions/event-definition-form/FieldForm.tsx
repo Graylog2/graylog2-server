@@ -19,7 +19,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import isNumber from 'lodash/isNumber';
 
 import i18n from 'i18n';
-
 import { Select, HoverForHelp } from 'components/common';
 import {
   Button,

@@ -28,6 +28,7 @@ type Props = {
 
 const CaffeineCacheSummary = ({ cache }: Props) => {
   const { t } = useTranslation('lookup_tables');
+
   return (
     <SummaryContainer>
       <SummaryRow>
