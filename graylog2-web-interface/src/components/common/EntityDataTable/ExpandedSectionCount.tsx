@@ -44,7 +44,9 @@ const ExpandedSectionCount = (
       ref={ref}
       count={count}
       abbreviate={abbreviate}
-      iconName={isActive ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      iconName="dock_to_bottom"
+      color={isActive ? 'primary' : undefined}
+      variant={isActive ? 'filled' : undefined}
       onClick={() => toggleSection(entityId, section)}
       title={`${isActive ? 'Hide' : 'Show'} ${label}`}
     />

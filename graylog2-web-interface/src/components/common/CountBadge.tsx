@@ -19,6 +19,7 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
+import type { BadgeColor, BadgeVariant } from 'components/bootstrap/Badge';
 import Icon from 'components/common/Icon';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
@@ -41,16 +42,35 @@ type Props = {
   count: React.ReactNode;
   iconName?: React.ComponentProps<typeof Icon>['name'];
   abbreviate?: boolean;
+  // Without a color, the badge keeps the default gray style.
+  color?: BadgeColor;
+  variant?: BadgeVariant;
 };
 
 const CountBadge = (
-  { onClick = undefined, className = '', title = undefined, count, iconName = undefined, abbreviate = false }: Props,
+  {
+    onClick = undefined,
+    className = '',
+    title = undefined,
+    count,
+    iconName = undefined,
+    abbreviate = false,
+    color = undefined,
+    variant = undefined,
+  }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const displayCount = abbreviate && typeof count === 'number' ? formatReadableNumber(count) : count;
 
   return (
-    <StyledBadge bsStyle="default" className={className} onClick={onClick} ref={ref} title={title}>
+    <StyledBadge
+      bsStyle="default"
+      color={color}
+      variant={variant}
+      className={className}
+      onClick={onClick}
+      ref={ref}
+      title={title}>
       {iconName ? (
         <BadgeInner>
           {displayCount}
