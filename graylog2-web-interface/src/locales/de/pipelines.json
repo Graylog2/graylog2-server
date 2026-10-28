@@ -16,7 +16,7 @@
   "rule_details_loading": "Pipeline-Regel-Details werden geladen...",
   "loading_rule": "Regel wird geladen",
   "create_pipeline_rule": "Pipeline-Regel erstellen",
-  "pipeline_rule": "Pipeline-Regel {{title}}",
+  "pipeline_rule": "Pipeline-Regel <ruleTitle>{{title}}</ruleTitle>",
   "use_source_code_editor": "Source-Code-Editor verwenden",
   "rule_is_managed_warning": "Diese Regel wird von der Anwendung verwaltet. Sie können sie nicht bearbeiten.",
   "switch_to_source_code_editor": "Zum Source-Code-Editor wechseln",

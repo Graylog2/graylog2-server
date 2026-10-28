@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { PageHeader, Spinner } from 'components/common';
 import { Row, Col, Button, BootstrapModalConfirm, Alert } from 'components/bootstrap';
@@ -59,7 +59,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   } else {
     pageTitle = (
       <span>
-        {t('pipeline_rule', { title })}
+        <Trans t={t} i18nKey="pipeline_rule" values={{ title }} components={{ ruleTitle: <em /> }} />
       </span>
     );
   }

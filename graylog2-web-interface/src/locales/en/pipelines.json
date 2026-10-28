@@ -16,7 +16,7 @@
   "rule_details_loading": "Loading Rule Details...",
   "loading_rule": "Loading Rule",
   "create_pipeline_rule": "Create pipeline rule",
-  "pipeline_rule": "Pipeline rule {{title}}",
+  "pipeline_rule": "Pipeline rule <ruleTitle>{{title}}</ruleTitle>",
   "use_source_code_editor": "Use Source Code Editor",
   "rule_is_managed_warning": "This rule is managed by Application. You cannot edit it.",
   "switch_to_source_code_editor": "Switch to Source Code Editor",
