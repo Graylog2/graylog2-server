@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
@@ -55,6 +56,7 @@ const LabelSpan = styled.span(
 const configType = ConfigurationType.MARKDOWN_CONFIG;
 
 const MarkdownConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<MarkdownConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<MarkdownConfigType | undefined>(undefined);
@@ -92,25 +94,19 @@ const MarkdownConfig = () => {
     setFormConfig(viewConfig);
   };
 
-  const modalTitle = 'Update Markdown Configuration';
-
   return (
     <div>
-      <h2>Markdown Configuration</h2>
-      <p>
-        These settings can be used to configure Markdown rendering in different parts of the product, including the
-        Text/Markdown widget. When changing settings for allowed image sources, the page will be reloaded afterwards to
-        make sure they are applied.
-      </p>
+      <h2>{t('markdown.title')}</h2>
+      <p>{t('markdown.description')}</p>
 
       {!viewConfig ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            <dt>Allow images from all sources:</dt>
-            <dd>{viewConfig.allow_all_image_sources ? 'Enabled' : 'Disabled'}</dd>
-            <dt>Allowed imaged sources (comma-separated):</dt>
+            <dt>{t('markdown.allow_all_sources')}:</dt>
+            <dd>{viewConfig.allow_all_image_sources ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+            <dt>{t('markdown.allowed_sources_view')}:</dt>
             <dd>{viewConfig.allowed_image_sources || '-'}</dd>
           </StyledDefList>
 
@@ -123,7 +119,7 @@ const MarkdownConfig = () => {
                 onClick={() => {
                   setShowModal(true);
                 }}>
-                Edit configuration
+                {t('shared.edit_configuration')}
               </Button>
             </p>
           </IfPermitted>
@@ -133,7 +129,7 @@ const MarkdownConfig = () => {
               {({ isSubmitting, values }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title>{modalTitle}</Modal.Title>
+                    <Modal.Title>{t('markdown.update_title')}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -144,9 +140,9 @@ const MarkdownConfig = () => {
                             type="checkbox"
                             name="allow_all_image_sources"
                             id="allow_all_image_sources"
-                            label={<LabelSpan>Allow images from all sources</LabelSpan>}
+                            label={<LabelSpan>{t('markdown.allow_all_sources')}</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, images can be embedded from all sources." />
+                          <InputDescription help={t('markdown.allow_all_sources_help')} />
                         </Col>
                         <Col sm={12}>
                           <FormikInput
@@ -154,9 +150,9 @@ const MarkdownConfig = () => {
                             name="allowed_image_sources"
                             id="allowed_image_sources"
                             disabled={values.allow_all_image_sources === true}
-                            label={<LabelSpan>Allowed images sources (comma-separated)</LabelSpan>}
+                            label={<LabelSpan>{t('markdown.allowed_sources')}</LabelSpan>}
                           />
-                          <InputDescription help="Allowed image sources for image embedding markdown documents." />
+                          <InputDescription help={t('markdown.allowed_sources_help')} />
                         </Col>
                       </Row>
                     </div>
@@ -167,8 +163,8 @@ const MarkdownConfig = () => {
                       onCancel={resetConfig}
                       isSubmitting={isSubmitting}
                       isAsyncSubmit
-                      submitLoadingText="Update configuration"
-                      submitButtonText="Update configuration"
+                      submitLoadingText={t('shared.update_configuration')}
+                      submitButtonText={t('shared.update_configuration')}
                     />
                   </Modal.Footer>
                 </Form>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -26,7 +27,6 @@ import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import * as ISODurationUtils from 'util/ISODurationUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import StringUtils from 'util/StringUtils';
 
 type Config = {
   sidecar_expiration_threshold: string;
@@ -45,6 +45,7 @@ const DEFAULT_CONFIG = {
 };
 
 const SidecarConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [viewConfig, setViewConfig] = useState<Config>(DEFAULT_CONFIG);
   const [formConfig, setFormConfig] = useState<Config>(DEFAULT_CONFIG);
@@ -102,43 +103,43 @@ const SidecarConfig = () => {
 
   return (
     <div>
-      <h2>Sidecars Configuration</h2>
+      <h2>{t('sidecar.title')}</h2>
 
       <dl className="deflist">
-        <dt>Inactive threshold:</dt>
+        <dt>{t('sidecar.inactive_threshold')}:</dt>
         <dd>{viewConfig.sidecar_inactive_threshold}</dd>
-        <dt>Expiration threshold:</dt>
+        <dt>{t('sidecar.expiration_threshold')}:</dt>
         <dd>{viewConfig.sidecar_expiration_threshold}</dd>
-        <dt>Update interval:</dt>
+        <dt>{t('sidecar.update_interval')}:</dt>
         <dd>{viewConfig.sidecar_update_interval}</dd>
-        <dt>Send status:</dt>
-        <dd>{StringUtils.capitalizeFirstLetter(viewConfig.sidecar_send_status.toString())}</dd>
-        <dt>Override configuration:</dt>
-        <dd>{StringUtils.capitalizeFirstLetter(viewConfig.sidecar_configuration_override.toString())}</dd>
+        <dt>{t('sidecar.send_status')}:</dt>
+        <dd>{viewConfig.sidecar_send_status ? t('shared.true') : t('shared.false')}</dd>
+        <dt>{t('sidecar.override_configuration')}:</dt>
+        <dd>{viewConfig.sidecar_configuration_override ? t('shared.true') : t('shared.false')}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('shared.edit_configuration')}
         </Button>
       </IfPermitted>
 
       {showConfigModal && formConfig && (
         <BootstrapModalForm
           show
-          title="Update Sidecars System Configuration"
+          title={t('sidecar.update_title')}
           onSubmitForm={saveConfig}
           onCancel={closeModal}
-          submitButtonText="Update configuration">
+          submitButtonText={t('shared.update_configuration')}>
           <fieldset>
             <ISODurationInput
               id="inactive-threshold-field"
               duration={formConfig.sidecar_inactive_threshold}
               update={onUpdate('sidecar_inactive_threshold')}
-              label="Inactive threshold (as ISO8601 Duration)"
-              help="Amount of time of inactivity after which Sidecars are flagged as inactive."
+              label={t('sidecar.inactive_threshold_label')}
+              help={t('sidecar.inactive_threshold_help')}
               validator={inactiveThresholdValidator}
-              errorText="invalid (min: 1 second)"
+              errorText={t('sidecar.inactive_threshold_error')}
               required
             />
 
@@ -146,38 +147,38 @@ const SidecarConfig = () => {
               id="sidecar-expiration-field"
               duration={formConfig.sidecar_expiration_threshold}
               update={onUpdate('sidecar_expiration_threshold')}
-              label="Expiration threshold (as ISO8601 Duration)"
-              help="Amount of time after which inactive Sidecars are purged from the database."
+              label={t('sidecar.expiration_threshold_label')}
+              help={t('sidecar.expiration_threshold_help')}
               validator={expirationThresholdValidator}
-              errorText="invalid (min: 1 minute)"
+              errorText={t('sidecar.expiration_threshold_error')}
               required
             />
             <ISODurationInput
               id="sidecar-update-field"
               duration={formConfig.sidecar_update_interval}
               update={onUpdate('sidecar_update_interval')}
-              label="Update interval (as ISO8601 Duration)"
-              help="Time between Sidecar update requests."
+              label={t('sidecar.update_interval_label')}
+              help={t('sidecar.update_interval_help')}
               validator={updateIntervalValidator}
-              errorText="invalid (min: 1 second, but less than Inactive threshold)"
+              errorText={t('sidecar.update_interval_error')}
               required
             />
           </fieldset>
           <Input
             type="checkbox"
             id="send-status-updates-checkbox"
-            label="Send status updates"
+            label={t('sidecar.send_status_updates')}
             checked={formConfig.sidecar_send_status}
             onChange={onUpdate('sidecar_send_status')}
-            help="Send Sidecar status and host metrics from each client"
+            help={t('sidecar.send_status_updates_help')}
           />
           <Input
             type="checkbox"
             id="override-sidecar-config-checkbox"
-            label="Override Sidecar configuration"
+            label={t('sidecar.override_sidecar_configuration')}
             checked={formConfig.sidecar_configuration_override}
             onChange={onUpdate('sidecar_configuration_override')}
-            help="Override configuration file settings for all Sidecars"
+            help={t('sidecar.override_sidecar_configuration_help')}
           />
         </BootstrapModalForm>
       )}

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment';
 import Immutable from 'immutable';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -77,6 +78,7 @@ const mapQuickAccessBEData = (
   );
 
 const SearchesConfig = () => {
+  const { t } = useTranslation('configurations');
   const { userTimezone, formatTime } = useUserDateTime();
   const isLimitEnabled = (config: { query_time_range_limit: string }) =>
     moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
@@ -281,7 +283,7 @@ const SearchesConfig = () => {
 
   const duration = (config) => moment.duration(config.query_time_range_limit);
   const limit = (config) =>
-    isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : 'disabled';
+    isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : t('shared.disabled');
   const autoRefreshOptions = (config) =>
     autoRefreshTimeRangeOptionsUpdate ?? buildTimeRangeOptions(config.auto_refresh_timerange_options);
   const formDefaultAutoRefreshOptionUpdate = (config) =>
@@ -292,41 +294,37 @@ const SearchesConfig = () => {
       : autoRefreshOptions[0]?.period;
 
   const cancellationTimeout = (config) =>
-    config.cancel_after_seconds ? `${config.cancel_after_seconds} seconds` : 'disabled';
+    config.cancel_after_seconds
+      ? t('searches.cancel_after_seconds', { count: config.cancel_after_seconds })
+      : t('shared.disabled');
 
   return (
     <div>
-      <h2>Search Configuration</h2>
+      <h2>{t('searches.title')}</h2>
 
       <dl className="deflist">
-        <dt>Query time range limit</dt>
+        <dt>{t('searches.query_time_range_limit_view')}</dt>
         <dd>{limit(viewConfig)}</dd>
-        <dd>
-          The maximum time users can query data in the past. This prevents users from accidentally creating queries
-          which span a lot of data and would need a long time and many resources to complete (if at all).
-        </dd>
+        <dd>{t('searches.query_time_range_limit_description')}</dd>
       </dl>
 
       <dl className="deflist">
-        <dt>Cancellation timeout</dt>
+        <dt>{t('searches.cancellation_timeout')}</dt>
         <dd>{cancellationTimeout(viewConfig)}</dd>
-        <dd>
-          The time in seconds per widget after which search execution will be canceled automatically. This minimizes the
-          amount of executed searches and improves performance.
-        </dd>
+        <dd>{t('searches.cancellation_timeout_description')}</dd>
       </dl>
 
       <Row>
         <Col md={4}>
-          <strong>Search Time Range Presets</strong>
+          <strong>{t('searches.time_range_presets')}</strong>
           <TimeRangePresetOptionsSummary options={timeRangePresetsFromBE.toArray()} />
-          <strong>Surrounding time range options</strong>
+          <strong>{t('searches.surrounding_time_range_options')}</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
         <Col md={4}>
           <Row style={{ marginBottom: 20 }}>
             <Col>
-              <strong>Surrounding search filter fields</strong>
+              <strong>{t('searches.surrounding_filter_fields')}</strong>
               <ul>
                 {viewConfig.surrounding_filter_fields &&
                   viewConfig.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
@@ -335,7 +333,7 @@ const SearchesConfig = () => {
           </Row>
           <Row>
             <Col>
-              <strong>UI analysis disabled for fields</strong>
+              <strong>{t('searches.analysis_disabled_fields_view')}</strong>
               <ul>
                 {viewConfig.analysis_disabled_fields &&
                   viewConfig.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>)}
@@ -344,10 +342,10 @@ const SearchesConfig = () => {
           </Row>
         </Col>
         <Col md={4}>
-          <strong>Auto-refresh interval options</strong>
+          <strong>{t('searches.auto_refresh_options')}</strong>
           <TimeRangeOptionsSummary options={viewConfig.auto_refresh_timerange_options} />
 
-          <strong>Default auto-refresh interval</strong>
+          <strong>{t('searches.default_auto_refresh_interval')}</strong>
           <TimeRangeOptionsSummary
             options={{
               [viewConfig.default_auto_refresh_option]:
@@ -358,7 +356,7 @@ const SearchesConfig = () => {
       </Row>
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('shared.edit_configuration')}
         </Button>
       </IfPermitted>
 
@@ -366,16 +364,16 @@ const SearchesConfig = () => {
         <BootstrapModalForm
           show
           bsSize="large"
-          title="Update Search Configuration"
+          title={t('searches.update_title')}
           onSubmitForm={saveConfig}
           onCancel={handleModalCancel}
-          submitButtonText="Update configuration">
+          submitButtonText={t('shared.update_configuration')}>
           <fieldset>
-            <label htmlFor="query-limit-checkbox">Query Time Range Limit</label>
+            <label htmlFor="query-limit-checkbox">{t('searches.query_time_range_limit_form')}</label>
             <Input
               id="query-limit-checkbox"
               type="checkbox"
-              label="Enable query limit"
+              label={t('searches.enable_query_limit')}
               name="enabled"
               checked={isLimitEnabled(formConfig)}
               onChange={onChecked}
@@ -385,27 +383,27 @@ const SearchesConfig = () => {
                 id="query-timerange-limit-field"
                 duration={formConfig.query_time_range_limit}
                 update={onUpdate('query_time_range_limit')}
-                label="Query time range limit (ISO8601 Duration)"
-                help='The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'
+                label={t('searches.query_time_range_limit_label')}
+                help={t('searches.query_time_range_limit_help')}
                 validator={queryTimeRangeLimitValidator}
                 required
               />
             )}
-            <label htmlFor="cancel_after_seconds_checkbox">Query Cancellation Timeout</label>
+            <label htmlFor="cancel_after_seconds_checkbox">{t('searches.query_cancellation_timeout')}</label>
             <Input
               id="cancel_after_seconds_checkbox"
               type="checkbox"
-              label="Enable query cancellation timeout"
+              label={t('searches.enable_cancellation_timeout')}
               name="cancel_after_seconds_checkbox"
               checked={showCancelAfterSeconds}
               onChange={onCheckedCancelAfterSeconds}
-              help="The time in seconds per widget after which search execution will be canceled automatically. This minimizes the amount of executed searches and improves performance."
+              help={t('searches.cancellation_timeout_description')}
             />
             {showCancelAfterSeconds && (
               <Input
                 id="cancel_after_seconds"
                 type="number"
-                label="Cancellation timeout"
+                label={t('searches.cancellation_timeout')}
                 name="cancel_after_seconds"
                 min="1"
                 step="1"
@@ -422,11 +420,10 @@ const SearchesConfig = () => {
               }
               update={onSurroundingTimeRangeOptionsUpdate}
               validator={surroundingTimeRangeValidator}
-              title="Surrounding Timerange Options"
+              title={t('searches.surrounding_options_title')}
               help={
                 <span>
-                  Configure the available options for the <strong>surrounding</strong> time range selector as{' '}
-                  <strong>ISO8601 duration</strong>
+                  <Trans t={t} i18nKey="searches.surrounding_options_help" components={{ strong: <strong /> }} />
                 </span>
               }
             />
@@ -434,47 +431,46 @@ const SearchesConfig = () => {
             <Input
               id="filter-fields-input"
               type="text"
-              label="Surrounding search filter fields"
+              label={t('searches.surrounding_filter_fields')}
               onChange={onFilterFieldsUpdate}
               value={
                 surroundingFilterFieldsUpdate ||
                 (formConfig.surrounding_filter_fields && formConfig.surrounding_filter_fields.join(', '))
               }
-              help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
+              help={t('searches.surrounding_filter_fields_help')}
               required
             />
 
             <Input
               id="disabled-fields-input"
               type="text"
-              label="Disabled analysis fields"
+              label={t('searches.analysis_disabled_fields')}
               onChange={onAnalysisDisabledFieldsUpdate}
               value={
                 analysisDisabledFieldsUpdate ||
                 (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))
               }
-              help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
+              help={t('searches.analysis_disabled_fields_help')}
               required
             />
             <TimeRangeOptionsForm
               options={autoRefreshOptions(formConfig)}
               update={onAutoRefreshTimeRangeOptionsUpdate}
               validator={autoRefreshTimeRangeValidator(minimumRefreshIntervalMS)}
-              title="Auto-Refresh Interval Options"
+              title={t('searches.auto_refresh_options_title')}
               help={
                 <span>
-                  Configure the available options for the <strong>auto-refresh</strong> interval selector as{' '}
-                  <strong>ISO8601 duration</strong>
+                  <Trans t={t} i18nKey="searches.auto_refresh_options_help" components={{ strong: <strong /> }} />
                 </span>
               }
             />
             <Input
-              label="Default Auto-Refresh Option"
+              label={t('searches.default_auto_refresh_option')}
               id="default-auto-refresh-option"
               required
-              help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
+              help={t('searches.default_auto_refresh_option_help')}>
               <Select
-                placeholder="Select the default interval"
+                placeholder={t('searches.select_default_interval')}
                 clearable={false}
                 options={autoRefreshOptions(formConfig)}
                 displayKey="description"
@@ -485,9 +481,12 @@ const SearchesConfig = () => {
             </Input>
             {!isLoadingMinimumRefreshInterval && (
               <Alert bsStyle="warning">
-                Please note, a minimum refresh interval of <ReadableDuration duration={minimumRefreshInterval} /> (
-                {minimumRefreshInterval}) has been configured in the server configuration file. Only intervals which are
-                equal or above the minimum can be used.
+                <Trans
+                  t={t}
+                  i18nKey="searches.minimum_refresh_interval_notice"
+                  values={{ interval: minimumRefreshInterval }}
+                  components={{ duration: <ReadableDuration duration={minimumRefreshInterval} /> }}
+                />
               </Alert>
             )}
           </fieldset>

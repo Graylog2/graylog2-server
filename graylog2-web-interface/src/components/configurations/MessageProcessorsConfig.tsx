@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -29,6 +30,7 @@ import GlobalProcessingView from 'components/configurations/message-processors/G
 import ProcessingConfigModalForm from './message-processors/ProcessingConfigModalForm';
 
 const MessageProcessorsConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [viewConfig, setViewConfig] = useState<FormConfig | undefined>(undefined);
@@ -65,7 +67,9 @@ const MessageProcessorsConfig = () => {
 
   const summary = () =>
     viewConfig?.processor_order?.map((processor, idx) => {
-      const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
+      const status = isProcessorEnabled(processor, viewConfig)
+        ? t('message_processors.status_active')
+        : t('message_processors.status_disabled');
 
       return (
         <tr key={processor.name}>
@@ -83,15 +87,15 @@ const MessageProcessorsConfig = () => {
   return (
     <div>
       <GlobalProcessingView gracePeriod={viewConfig.grace_period} />
-      <h2>Message Processors Configuration</h2>
-      <p>The following message processors are executed in order. Disabled processors will be skipped.</p>
+      <h2>{t('message_processors.title')}</h2>
+      <p>{t('message_processors.description')}</p>
 
       <Table bordered condensed className="top-margin">
         <thead>
           <tr>
             <th>#</th>
-            <th>Processor</th>
-            <th>Status</th>
+            <th>{t('message_processors.processor')}</th>
+            <th>{t('message_processors.status')}</th>
           </tr>
         </thead>
         <tbody>{summary()}</tbody>
@@ -99,7 +103,7 @@ const MessageProcessorsConfig = () => {
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('shared.edit_configuration')}
         </Button>
       </IfPermitted>
       {showConfigModal && <ProcessingConfigModalForm closeModal={closeModal} formConfig={formConfig} />}

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
@@ -33,6 +34,9 @@ type Props = {
   formConfig: FormConfig;
 };
 
+// ISO8601 duration, not translatable
+const DEFAULT_GRACE_PERIOD = 'P2D';
+
 const LabelSpan = styled.span(
   ({ theme }) => css`
     margin-left: ${theme.spacings.sm};
@@ -40,8 +44,8 @@ const LabelSpan = styled.span(
   `,
 );
 const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
+  const { t } = useTranslation('configurations');
   const productName = useProductName();
-  const futureTimestampNormalizationHelpText = `Enable normalisation of timestamps that specify a time significantly ahead of the ${productName} system time. This typically happens when a log source runs on a server with an incorrect system clock. Future timestamps will be normalised to match the time it was first received by either a ${productName} Forwarder, or ${productName}. It is important to prevent future timestamps when making use of the Warm Tier, as this can otherwise degrade performance.`;
   const hasNoActiveProcessor = () => formConfig.disabled_processors.length >= formConfig.processor_order.length;
   const saveConfig = (values: FormConfig) => {
     if (!hasNoActiveProcessor()) {
@@ -72,7 +76,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
     setFieldValue: (key: string, value: string) => void,
   ) => {
     if (enabled) {
-      setFieldValue('grace_period', formConfig?.grace_period || 'P2D');
+      setFieldValue('grace_period', formConfig?.grace_period || DEFAULT_GRACE_PERIOD);
     } else {
       setFieldValue('grace_period', undefined);
     }
@@ -82,7 +86,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
     let errorMessage = '';
 
     if (enabled && !ISODurationUtils.isValidDuration(value, gracePeriodValidator)) {
-      errorMessage = 'Grace Period is invalid';
+      errorMessage = t('message_processors.grace_period_invalid');
     }
 
     return errorMessage;
@@ -94,52 +98,52 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
         {({ isSubmitting, values, setFieldValue, isValid }) => (
           <Form>
             <Modal.Header>
-              <Modal.Title>Update Message Processors Configuration</Modal.Title>
+              <Modal.Title>{t('message_processors.update_title')}</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
               <>
-                <h2>Global Processing Rules Configuration</h2>
+                <h2>{t('message_processors.global_title')}</h2>
                 <FormikInput
                   type="checkbox"
                   name="enableFutureTimestampNormalization"
                   id="enableFutureTimestampNormalization"
-                  help={futureTimestampNormalizationHelpText}
+                  help={t('message_processors.future_timestamp_help', { productName })}
                   onChange={(event) =>
                     handleEnableFutureTimestampNormalisation(Boolean(getValueFromInput(event.target)), setFieldValue)
                   }
-                  label={<LabelSpan>Future Timestamp Normalization</LabelSpan>}
+                  label={<LabelSpan>{t('message_processors.future_timestamp_normalization')}</LabelSpan>}
                 />
                 <FormikInput
                   type="text"
                   name="grace_period"
                   id="grace_period"
-                  placeholder="P2D"
-                  label="Grace Period"
+                  placeholder={DEFAULT_GRACE_PERIOD}
+                  label={t('message_processors.grace_period')}
                   disabled={!values?.enableFutureTimestampNormalization}
-                  help={`If Future Timestamp Normalisation is enabled, timestamps specifying a time further ahead of the ${productName} system time than the Grace Period interval will be normalised.`}
+                  help={t('message_processors.grace_period_help', { productName })}
                   addonAfter={
                     values.enableFutureTimestampNormalization &&
-                    ISODurationUtils.formatDuration(values.grace_period, gracePeriodValidator, 'invalid')
+                    ISODurationUtils.formatDuration(values.grace_period, gracePeriodValidator, t('shared.invalid'))
                   }
                   validate={validateGracePeriodField(values.enableFutureTimestampNormalization)}
                   required
                 />
-                <h2>Message Processors Configuration</h2>
-                <h3>Order</h3>
-                <p>Use drag and drop to change the execution order of the message processors.</p>
+                <h2>{t('message_processors.title')}</h2>
+                <h3>{t('message_processors.order')}</h3>
+                <p>{t('message_processors.order_help')}</p>
                 <SortableList
                   items={sortableItems(values)}
                   onMoveItem={(newSorting) => updateSorting(newSorting, setFieldValue)}
                   displayOverlayInPortal
                 />
-                <h3>Status</h3>
-                <p>Change the checkboxes to change the status of a message processor.</p>
+                <h3>{t('message_processors.status')}</h3>
+                <p>{t('message_processors.status_help')}</p>
                 <Table bordered condensed className="top-margin">
                   <thead>
                     <tr>
-                      <th>Processor</th>
-                      <th>Enabled</th>
+                      <th>{t('message_processors.processor')}</th>
+                      <th>{t('message_processors.enabled')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -147,8 +151,8 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
                   </tbody>
                 </Table>
                 {hasNoActiveProcessor() && (
-                  <Alert bsStyle="danger" title="Error">
-                    No active message processor!
+                  <Alert bsStyle="danger" title={t('shared.error')}>
+                    {t('message_processors.no_active_processor')}
                   </Alert>
                 )}
               </>
@@ -159,8 +163,8 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
                 isSubmitting={isSubmitting}
                 disabledSubmit={!isValid}
                 isAsyncSubmit
-                submitLoadingText="Update configuration"
-                submitButtonText="Update configuration"
+                submitLoadingText={t('shared.update_configuration')}
+                submitButtonText={t('shared.update_configuration')}
               />
             </Modal.Footer>
           </Form>

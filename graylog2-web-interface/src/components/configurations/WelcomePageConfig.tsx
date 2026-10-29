@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
@@ -55,6 +56,7 @@ const configType = ConfigurationType.WELCOME_PAGE_CONFIG;
 type FormValues = { metrics_enabled: boolean };
 
 const WelcomePageConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<WelcomePageConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<FormValues | undefined>(undefined);
@@ -88,20 +90,16 @@ const WelcomePageConfig = () => {
 
   return (
     <div>
-      <h2>Welcome Page</h2>
-      <p>
-        The welcome page can show widgets with message, alert, and event counts, plus a top sources chart. On large or
-        busy clusters, these queries add extra load every time a user opens the welcome page. Disable them below if you
-        want to avoid that load. The widgets will be hidden and their queries will not run.
-      </p>
+      <h2>{t('welcome_page.title')}</h2>
+      <p>{t('welcome_page.description')}</p>
 
       {!viewConfig ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            <dt>Welcome page metrics:</dt>
-            <dd>{viewConfig.disable_metrics ? 'Disabled' : 'Enabled'}</dd>
+            <dt>{t('welcome_page.metrics')}:</dt>
+            <dd>{viewConfig.disable_metrics ? t('markdown.disabled') : t('markdown.enabled')}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -113,7 +111,7 @@ const WelcomePageConfig = () => {
                 onClick={() => {
                   setShowModal(true);
                 }}>
-                Edit configuration
+                {t('shared.edit_configuration')}
               </Button>
             </p>
           </IfPermitted>
@@ -123,7 +121,7 @@ const WelcomePageConfig = () => {
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title>Update Welcome Page Configuration</Modal.Title>
+                    <Modal.Title>{t('welcome_page.update_title')}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -133,8 +131,8 @@ const WelcomePageConfig = () => {
                           type="checkbox"
                           name="metrics_enabled"
                           id="metrics_enabled"
-                          label={<LabelSpan>Enable welcome page metrics</LabelSpan>}
-                          help="If disabled, the message, alert, and event count widgets and the top sources chart will be hidden from the welcome page, and their underlying queries will not run. Turn this off on large or busy clusters to reduce query load."
+                          label={<LabelSpan>{t('welcome_page.enable_metrics')}</LabelSpan>}
+                          help={t('welcome_page.enable_metrics_help')}
                         />
                       </Col>
                     </Row>
@@ -145,8 +143,8 @@ const WelcomePageConfig = () => {
                       onCancel={resetConfig}
                       isSubmitting={isSubmitting}
                       isAsyncSubmit
-                      submitLoadingText="Update configuration"
-                      submitButtonText="Update configuration"
+                      submitLoadingText={t('shared.update_configuration')}
+                      submitButtonText={t('shared.update_configuration')}
                     />
                   </Modal.Footer>
                 </Form>

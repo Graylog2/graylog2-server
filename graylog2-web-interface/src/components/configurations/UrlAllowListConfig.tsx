@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import type { AllowListConfig } from 'stores/configurations/ConfigurationsStore';
@@ -32,6 +33,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useProductName from 'brand-customization/useProductName';
 
 const UrlAllowListConfig = () => {
+  const { t } = useTranslation('configurations');
   const productName = useProductName();
   const [showConfigModal, setShowConfigModal] = useState(false);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
@@ -59,7 +61,7 @@ const UrlAllowListConfig = () => {
         <td>{idx + 1}</td>
         <td>{urlConfig.title}</td>
         <td>{urlConfig.value}</td>
-        <td>{urlConfig.type === literal ? 'Exact match' : 'Regex'}</td>
+        <td>{urlConfig.type === literal ? t('url_allowlist.exact_match') : t('url_allowlist.regex')}</td>
       </tr>
     ));
   };
@@ -96,40 +98,37 @@ const UrlAllowListConfig = () => {
 
   return (
     <div>
-      <h2>URL Allowlist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
-      <p>
-        When enabled, outgoing HTTP requests from {productName} servers, such as event notifications or HTTP-based data
-        adapter requests, are validated against the allowlists configured here. Because the HTTP requests are made from
-        the {productName} servers, they might be able to reach more sensitive systems than an external user would have
-        access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
-        Allowlist administrative access is separate from data adapters and event notification configuration.
-      </p>
+      <h2>
+        {t('url_allowlist.title')}{' '}
+        {disabled ? <small>({t('url_allowlist.disabled')})</small> : <small>({t('url_allowlist.enabled')})</small>}
+      </h2>
+      <p>{t('url_allowlist.description', { productName })}</p>
       <Table bordered condensed className="top-margin">
         <thead>
           <tr>
             <th>#</th>
-            <th>Title</th>
-            <th>URL</th>
-            <th>Type</th>
+            <th>{t('url_allowlist.column_title')}</th>
+            <th>{t('url_allowlist.column_url')}</th>
+            <th>{t('url_allowlist.column_type')}</th>
           </tr>
         </thead>
         <tbody>{summary()}</tbody>
       </Table>
       <IfPermitted permissions="urlallowlist:write">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('shared.edit_configuration')}
         </Button>
       </IfPermitted>
       {showConfigModal && (
         <BootstrapModalForm
           show
           bsSize="lg"
-          title="Update Allowlist Configuration"
+          title={t('url_allowlist.update_title')}
           onSubmitForm={saveConfig}
           onCancel={closeModal}
           submitButtonDisabled={!isValid}
-          submitButtonText="Update configuration">
-          <h3>Allowlist URLs</h3>
+          submitButtonText={t('shared.update_configuration')}>
+          <h3>{t('url_allowlist.urls')}</h3>
           <UrlAllowListForm urls={entries} disabled={disabled} onUpdate={update} />
         </BootstrapModalForm>
       )}

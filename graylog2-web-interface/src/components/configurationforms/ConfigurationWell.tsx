@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Well } from 'components/bootstrap';
@@ -39,10 +40,11 @@ type Props = {
 };
 
 const RegularField = ({ id, value, name }: { id: string; value: ConfigurationFieldValue; name: string }) => {
+  const { t } = useTranslation('common');
   let finalValue;
 
   if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
-    finalValue = <i>{'<empty>'}</i>;
+    finalValue = <i>{t('configuration_well.empty')}</i>;
   } else {
     finalValue = Array.isArray(value) ? value.join(', ') : String(value);
   }
@@ -55,12 +57,13 @@ const RegularField = ({ id, value, name }: { id: string; value: ConfigurationFie
 };
 
 const InlineBinaryField = ({ id, value, name }: { id: string; value: ConfigurationFieldValue; name: string }) => {
+  const { t } = useTranslation('common');
   let finalValue;
 
   if (value === null || value === undefined || value === '') {
-    finalValue = <i>{'<empty>'}</i>;
+    finalValue = <i>{t('configuration_well.empty')}</i>;
   } else {
-    finalValue = <i>{'<uploaded file content>'}</i>;
+    finalValue = <i>{t('configuration_well.uploaded_file_content')}</i>;
   }
 
   return (
@@ -71,10 +74,11 @@ const InlineBinaryField = ({ id, value, name }: { id: string; value: Configurati
 };
 
 const EncryptedField = ({ id, value, name }: { id: string; value: EncryptedFieldValue<unknown>; name: string }) => {
+  const { t } = useTranslation('common');
   let finalValue;
 
   if (!value.is_set) {
-    finalValue = <i>{'<empty>'}</i>;
+    finalValue = <i>{t('configuration_well.empty')}</i>;
   } else {
     finalValue = PASSWORD_PLACEHOLDER;
   }
@@ -104,6 +108,8 @@ const Configuration = ({
   config: Props['configuration'];
   typeDefinition?: Props['typeDefinition'];
 }) => {
+  const { t } = useTranslation('common');
+
   if (!config) {
     return '';
   }
@@ -130,7 +136,7 @@ const Configuration = ({
     });
 
   if (formattedItems.length < 1) {
-    formattedItems.push(<li key="placeholder">-- no configuration --</li>);
+    formattedItems.push(<li key="placeholder">{t('configuration_well.no_configuration')}</li>);
   }
 
   return <ul>{formattedItems}</ul>;

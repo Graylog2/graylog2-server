@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import DecoratorSummary from 'views/components/messagelist/decorators/DecoratorSummary';
 import type { Decorator, DecoratorType } from 'views/components/messagelist/decorators/Types';
 
@@ -27,7 +28,10 @@ const formatDecorator = (
 ) => {
   const typeDefinition =
     decoratorTypes[decorator.type] ||
-    ({ requested_configuration: {}, name: `Unknown type: ${decorator.type}` } as DecoratorType);
+    ({
+      requested_configuration: {},
+      name: i18n.t('decorators.unknown_type', { ns: 'configurations', type: decorator.type }),
+    } as DecoratorType);
 
   const onUpdate = updateFn
     ? (id: string, updatedDecorator: Decorator) =>

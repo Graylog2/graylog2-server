@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -32,12 +34,12 @@ type Props = {
   addButtonTitle?: string;
   update: (options: Array<Option>) => void;
   validator?: (milliseconds: number, duration: string) => boolean;
-};
+} & WithTranslation;
 
 class TimeRangeOptionsForm extends React.Component<Props> {
   static defaultProps = {
     options: [],
-    addButtonTitle: 'Add option',
+    addButtonTitle: undefined,
     validator: () => true,
   };
 
@@ -107,7 +109,7 @@ class TimeRangeOptionsForm extends React.Component<Props> {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Add description..."
+                  placeholder={this.props.t('time_range_options.add_description')}
                   value={description}
                   onChange={this._onChange(idx, 'description')}
                 />
@@ -128,11 +130,11 @@ class TimeRangeOptionsForm extends React.Component<Props> {
         <span className="help-block">{this.props.help}</span>
         <div className="wrapper">{this._buildTimeRangeOptions()}</div>
         <Button bsSize="xs" onClick={this._onAdd}>
-          {this.props.addButtonTitle}
+          {this.props.addButtonTitle ?? this.props.t('time_range_options.add_option')}
         </Button>
       </div>
     );
   }
 }
 
-export default TimeRangeOptionsForm;
+export default withTranslation('configurations')(TimeRangeOptionsForm);

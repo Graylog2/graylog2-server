@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
@@ -45,6 +46,7 @@ const EncryptedInlineBinaryField = ({
   value = {},
   autoFocus = false,
 }: Props) => {
+  const { t } = useTranslation('common');
   const [fileName, setFileName] = useState(undefined);
   const [isResetted, setIsResetted] = useState<boolean>(false);
   const [resettedFieldValue, setResettedFieldValue] = useState<FieldValue | EncryptedFieldValue<string>>(undefined);
@@ -92,7 +94,7 @@ const EncryptedInlineBinaryField = ({
     if (isValuePresent) {
       return (
         <Button type="button" onClick={handleReset}>
-          Reset
+          {t('actions.reset')}
         </Button>
       );
     }
@@ -105,7 +107,7 @@ const EncryptedInlineBinaryField = ({
 
     return (
       <Button type="button" onClick={handleUndoReset}>
-        Undo Reset
+        {t('configuration_forms.undo_reset')}
       </Button>
     );
   };
@@ -119,7 +121,7 @@ const EncryptedInlineBinaryField = ({
             setFileName(undefined);
             onChange(title, '');
           }}>
-          Remove
+          {t('configuration_forms.remove')}
         </Button>
       );
     }

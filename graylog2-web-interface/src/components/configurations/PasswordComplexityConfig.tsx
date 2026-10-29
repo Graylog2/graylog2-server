@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
@@ -53,6 +54,7 @@ const LabelSpan = styled.span(
 const configType = ConfigurationType.PASSWORD_COMPLEXITY_CONFIG;
 
 const PasswordComplexityConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
@@ -92,7 +94,7 @@ const PasswordComplexityConfig = () => {
     const errors: Partial<Record<keyof PasswordComplexityConfigType, string>> = {};
 
     if (!values.min_length || Number(values.min_length) < 1) {
-      errors.min_length = 'Minimum length must be at least 1';
+      errors.min_length = t('password_complexity.min_length_error');
     }
 
     return errors;
@@ -105,23 +107,36 @@ const PasswordComplexityConfig = () => {
     </>
   );
 
-  const requirementLabel = (required: boolean) => (required ? 'Required' : 'Not required');
+  const requirementLabel = (required: boolean) =>
+    required ? t('password_complexity.required') : t('password_complexity.not_required');
 
   return (
     <div>
-      <h2>Password Complexity</h2>
-      <p>Configure the minimum password length and character requirements enforced for local users.</p>
+      <h2>{t('password_complexity.title')}</h2>
+      <p>{t('password_complexity.description')}</p>
 
       {!viewConfig ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            {renderRequirement('Minimum length:', viewConfig.min_length)}
-            {renderRequirement('Require uppercase letters:', requirementLabel(viewConfig.require_uppercase))}
-            {renderRequirement('Require lowercase letters:', requirementLabel(viewConfig.require_lowercase))}
-            {renderRequirement('Require numbers:', requirementLabel(viewConfig.require_numbers))}
-            {renderRequirement('Require special characters:', requirementLabel(viewConfig.require_special_chars))}
+            {renderRequirement(`${t('password_complexity.min_length')}:`, viewConfig.min_length)}
+            {renderRequirement(
+              `${t('password_complexity.require_uppercase')}:`,
+              requirementLabel(viewConfig.require_uppercase),
+            )}
+            {renderRequirement(
+              `${t('password_complexity.require_lowercase')}:`,
+              requirementLabel(viewConfig.require_lowercase),
+            )}
+            {renderRequirement(
+              `${t('password_complexity.require_numbers')}:`,
+              requirementLabel(viewConfig.require_numbers),
+            )}
+            {renderRequirement(
+              `${t('password_complexity.require_special_chars')}:`,
+              requirementLabel(viewConfig.require_special_chars),
+            )}
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -132,7 +147,7 @@ const PasswordComplexityConfig = () => {
               onClick={() => {
                 setShowModal(true);
               }}>
-              Edit configuration
+              {t('shared.edit_configuration')}
             </Button>
           </IfPermitted>
 
@@ -141,7 +156,7 @@ const PasswordComplexityConfig = () => {
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title>Update Password Complexity</Modal.Title>
+                    <Modal.Title>{t('password_complexity.update_title')}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -151,10 +166,10 @@ const PasswordComplexityConfig = () => {
                           type="number"
                           name="min_length"
                           id="min_length"
-                          label="Minimum length"
+                          label={t('password_complexity.min_length')}
                           min={1}
                           required
-                          help="Passwords shorter than this length will be rejected."
+                          help={t('password_complexity.min_length_help')}
                         />
                       </Col>
                       <Col sm={12}>
@@ -162,8 +177,8 @@ const PasswordComplexityConfig = () => {
                           type="checkbox"
                           name="require_uppercase"
                           id="require_uppercase"
-                          label={<LabelSpan>Require uppercase letters</LabelSpan>}
-                          help="Password must include at least one uppercase character (A-Z)."
+                          label={<LabelSpan>{t('password_complexity.require_uppercase')}</LabelSpan>}
+                          help={t('password_complexity.require_uppercase_help')}
                         />
                       </Col>
                       <Col sm={12}>
@@ -171,8 +186,8 @@ const PasswordComplexityConfig = () => {
                           type="checkbox"
                           name="require_lowercase"
                           id="require_lowercase"
-                          label={<LabelSpan>Require lowercase letters</LabelSpan>}
-                          help="Password must include at least one lowercase character (a-z)."
+                          label={<LabelSpan>{t('password_complexity.require_lowercase')}</LabelSpan>}
+                          help={t('password_complexity.require_lowercase_help')}
                         />
                       </Col>
                       <Col sm={12}>
@@ -180,8 +195,8 @@ const PasswordComplexityConfig = () => {
                           type="checkbox"
                           name="require_numbers"
                           id="require_numbers"
-                          label={<LabelSpan>Require numbers</LabelSpan>}
-                          help="Password must include at least one numeric character (0-9)."
+                          label={<LabelSpan>{t('password_complexity.require_numbers')}</LabelSpan>}
+                          help={t('password_complexity.require_numbers_help')}
                         />
                       </Col>
                       <Col sm={12}>
@@ -189,10 +204,10 @@ const PasswordComplexityConfig = () => {
                           type="checkbox"
                           name="require_special_chars"
                           id="require_special_chars"
-                          label={<LabelSpan>Require special characters</LabelSpan>}
+                          label={<LabelSpan>{t('password_complexity.require_special_chars')}</LabelSpan>}
                           help={
                             <>
-                              Password must include at least one of the following characters:
+                              {t('password_complexity.require_special_chars_help')}
                               <br />
                               {PASSWORD_SPECIAL_CHARACTERS}
                             </>
@@ -207,8 +222,8 @@ const PasswordComplexityConfig = () => {
                       onCancel={resetConfig}
                       isSubmitting={isSubmitting}
                       isAsyncSubmit
-                      submitLoadingText="Update configuration"
-                      submitButtonText="Update configuration"
+                      submitLoadingText={t('shared.update_configuration')}
+                      submitButtonText={t('shared.update_configuration')}
                     />
                   </Modal.Footer>
                 </Form>
