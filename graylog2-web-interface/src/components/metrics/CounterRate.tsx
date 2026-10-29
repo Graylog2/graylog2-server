@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import TimeHelper from 'util/TimeHelper';
 
@@ -26,7 +28,7 @@ type Props = {
   suffix?: string;
   hideOnZero?: boolean;
   hideOnMissing?: boolean;
-};
+} & WithTranslation;
 
 class CounterRate extends React.Component<
   Props,
@@ -69,7 +71,7 @@ class CounterRate extends React.Component<
       return null;
     }
 
-    return <span>{this._prefix()}Calculating...</span>;
+    return <span>{this._prefix()}{this.props.t('counter_rate.calculating')}</span>;
   };
 
   _prefix = () => {
@@ -127,7 +129,7 @@ class CounterRate extends React.Component<
         {this.props.showTotal && (
           <span key="absolute" className="number-format">
             {' '}
-            ({numeral(count).format('0')} total)
+            {this.props.t('counter_rate.total', { total: numeral(count).format('0') })}
           </span>
         )}
       </span>
@@ -135,4 +137,4 @@ class CounterRate extends React.Component<
   }
 }
 
-export default CounterRate;
+export default withTranslation('system')(CounterRate);

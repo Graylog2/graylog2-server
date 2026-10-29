@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Metric } from 'components/metrics';
 import type { Metric as MetricType } from 'types/metrics';
@@ -66,7 +68,7 @@ type Props = {
   namespace: string;
   nodeId: string;
   names: Array<MetricType>;
-};
+} & WithTranslation;
 
 class MetricsList extends React.Component<Props> {
   _formatMetric = (metric: MetricType) => {
@@ -80,7 +82,7 @@ class MetricsList extends React.Component<Props> {
   };
 
   render() {
-    const { names } = this.props;
+    const { names, t } = this.props;
     const metrics = names
       .sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
       .map((metric) => this._formatMetric(metric));
@@ -90,11 +92,11 @@ class MetricsList extends React.Component<Props> {
         {metrics.length > 0 ? (
           metrics
         ) : (
-          <li>No metrics match the given filter. Please ensure you use a valid regular expression</li>
+          <li>{t('metrics_list.no_metrics')}</li>
         )}
       </MetricListWrap>
     );
   }
 }
 
-export default MetricsList;
+export default withTranslation('system')(MetricsList);

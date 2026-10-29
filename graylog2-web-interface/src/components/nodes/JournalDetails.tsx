@@ -20,6 +20,7 @@ import moment from 'moment';
 import 'moment-duration-format';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ClusterJournal } from '@graylog/server-api';
 
@@ -59,6 +60,7 @@ const fetchJournalInfo = (nodeId: string) =>
   defaultOnError(ClusterJournal.get(nodeId), 'Could not get journal information');
 
 const JournalDetails = ({ nodeId }: Props) => {
+  const { t } = useTranslation('system');
   const { data: journalInformation } = useQuery({
     queryKey: ['journal', 'info', nodeId],
     queryFn: () => fetchJournalInfo(nodeId),
@@ -69,17 +71,17 @@ const JournalDetails = ({ nodeId }: Props) => {
   const _isLoading = metricsLoading || !journalInformation;
 
   if (_isLoading) {
-    return <Spinner text="Loading journal metrics..." />;
+    return <Spinner text={t('journal_details.loading')} />;
   }
 
   if (!journalInformation.enabled) {
-    return <Alert bsStyle="warning">The disk journal is disabled on this node.</Alert>;
+    return <Alert bsStyle="warning">{t('journal_details.disabled')}</Alert>;
   }
 
   const metrics = journalInformation.enabled ? MetricsExtractor.getValuesForNode(nodeMetrics, metricNames) : {};
 
   if (Object.keys(metrics).length === 0) {
-    return <Alert bsStyle="warning">Journal metrics unavailable.</Alert>;
+    return <Alert bsStyle="warning">{t('journal_details.unavailable')}</Alert>;
   }
 
   const oldestSegment = moment(metrics.oldestSegment);
@@ -88,8 +90,11 @@ const JournalDetails = ({ nodeId }: Props) => {
   if (metrics.utilizationRatio >= 1) {
     overcommittedWarning = (
       <span>
-        <strong>Warning!</strong> The journal utilization is exceeding the maximum size defined.{' '}
-        <Link to={Routes.SYSTEM.OVERVIEW}>Click here</Link> for more information.
+        <Trans
+          t={t}
+          i18nKey="journal_details.overcommitted"
+          components={{ strong: <strong />, overviewLink: <Link to={Routes.SYSTEM.OVERVIEW} /> }}
+        />
         <br />
       </span>
     );
@@ -98,27 +103,31 @@ const JournalDetails = ({ nodeId }: Props) => {
   return (
     <Row className="row-sm">
       <Col md={6}>
-        <h3>Configuration</h3>
+        <h3>{t('journal_details.configuration')}</h3>
         <dl className="system-journal">
-          <dt>Path:</dt>
+          <dt>{t('journal_details.path')}</dt>
           <dd>{journalInformation.journal_config.directory}</dd>
-          <dt>Earliest entry:</dt>
+          <dt>{t('journal_details.earliest_entry')}</dt>
           <dd>
             <RelativeTime dateTime={oldestSegment} />
           </dd>
-          <dt>Maximum size:</dt>
+          <dt>{t('journal_details.maximum_size')}</dt>
           <dd>{NumberUtils.formatBytes(journalInformation.journal_config.max_size)}</dd>
-          <dt>Maximum age:</dt>
+          <dt>{t('journal_details.maximum_age')}</dt>
           <dd>{moment.duration(journalInformation.journal_config.max_age).format('d [days] h [hours] m [minutes]')}</dd>
-          <dt>Flush policy:</dt>
+          <dt>{t('journal_details.flush_policy')}</dt>
           <dd>
-            Every {numeral(journalInformation.journal_config.flush_interval).format('0,0')} messages or{' '}
-            {moment.duration(journalInformation.journal_config.flush_age).format('h [hours] m [minutes] s [seconds]')}
+            {t('journal_details.flush_policy_value', {
+              messages: numeral(journalInformation.journal_config.flush_interval).format('0,0'),
+              duration: moment
+                .duration(journalInformation.journal_config.flush_age)
+                .format('h [hours] m [minutes] s [seconds]'),
+            })}
           </dd>
         </dl>
       </Col>
       <Col md={6}>
-        <h3>Utilization</h3>
+        <h3>{t('journal_details.utilization')}</h3>
         <JournalUsageProgressBar
           bars={[
             {
@@ -128,11 +137,19 @@ const JournalDetails = ({ nodeId }: Props) => {
           ]}
         />
         {overcommittedWarning}
-        <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> are currently in the
-        journal, in {metrics.segments} segments.
+        <Trans
+          t={t}
+          i18nKey="journal_details.unprocessed_messages"
+          values={{ messages: numeral(metrics.entriesUncommitted).format('0,0'), segments: metrics.segments }}
+          components={{ strong: <strong /> }}
+        />
         <br />
-        <strong>{numeral(metrics.append).format('0,0')} messages</strong> have been appended in the last second,{' '}
-        <strong>{numeral(metrics.read).format('0,0')} messages</strong> have been read in the last second.
+        <Trans
+          t={t}
+          i18nKey="journal_details.appended_and_read"
+          values={{ appended: numeral(metrics.append).format('0,0'), read: numeral(metrics.read).format('0,0') }}
+          components={{ strong: <strong /> }}
+        />
       </Col>
     </Row>
   );

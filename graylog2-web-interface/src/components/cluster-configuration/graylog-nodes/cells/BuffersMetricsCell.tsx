@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { buildRatioIndicator, computeRatio } from '../../shared-components/RatioIndicator';
 import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from '../../shared-components/NodeMetricsLayout';
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
@@ -40,7 +41,7 @@ const renderBufferRow = (
       <span>{label}</span>
       {ratioIndicator ?? (
         <SecondaryText>
-          <span>N/A</span>
+          <span>{i18n.t('shared.not_available', { ns: 'system' })}</span>
         </SecondaryText>
       )}
     </MetricsRow>

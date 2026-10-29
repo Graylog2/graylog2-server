@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
@@ -58,7 +59,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
     version: {
       renderCell: (_value, entity) => (
         <SecondaryText>
-          <span>{entity.version ?? 'N/A'}</span>
+          <span>{entity.version ?? i18n.t('shared.not_available', { ns: 'system' })}</span>
         </SecondaryText>
       ),
       staticWidth: 'matchHeader',

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -40,6 +41,7 @@ const OpensearchNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
+  const { t } = useTranslation('system');
   const [totalOpensearchNodes, setTotalOpensearchNodes] = useState<number | undefined>(undefined);
   const handleDataLoaded = (data: OpensearchNodesResponse) => {
     setTotalOpensearchNodes(data.pagination?.total ?? data.list.length);
@@ -59,7 +61,7 @@ const OpensearchNodesExpandable = ({
 
   return (
     <ClusterNodesSectionWrapper
-      title="OpenSearch Nodes"
+      title={t('opensearch_nodes_expandable.title')}
       titleCount={totalOpensearchNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
@@ -68,7 +70,7 @@ const OpensearchNodesExpandable = ({
         fetchEntities={fetchOpensearchNodes}
         keyFn={clusterOpensearchNodesKeyFn}
         columnRenderers={columnRenderers}
-        humanName="OpenSearch Nodes"
+        humanName={t('opensearch_nodes_expandable.title')}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={handleDataLoaded}

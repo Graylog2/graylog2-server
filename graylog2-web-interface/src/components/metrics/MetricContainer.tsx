@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { useMetric } from 'hooks/useMetrics';
@@ -26,10 +27,11 @@ type Props = {
 };
 
 const MetricContainer = ({ name, zeroOnMissing = true, children }: Props) => {
+  const { t } = useTranslation('system');
   const { data: metrics, isLoading } = useMetric(name);
 
   if (isLoading || Object.keys(metrics).length === 0) {
-    return <span>Loading...</span>;
+    return <span>{t('metric_container.loading')}</span>;
   }
 
   let throughput = Object.keys(metrics)

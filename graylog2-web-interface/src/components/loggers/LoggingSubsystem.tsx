@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import capitalize from 'lodash/capitalize';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonGroup, Col } from 'components/bootstrap';
 import { LogLevelDropdown } from 'components/loggers';
@@ -26,19 +27,23 @@ type Props = {
   subsystem: any;
 };
 
-const LoggingSubsystem = ({ name, nodeId, subsystem }: Props) => (
-  <div className="subsystem-row">
-    <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
-      <h3 className="u-light">
-        Subsystem: {capitalize(name)}
-        <ButtonGroup className="pull-right">
-          <LogLevelDropdown nodeId={nodeId} name={name} subsystem={subsystem} />
-        </ButtonGroup>
-      </h3>
-      {subsystem.description}
-      <br style={{ clear: 'both' }} />
-    </Col>
-  </div>
-);
+const LoggingSubsystem = ({ name, nodeId, subsystem }: Props) => {
+  const { t } = useTranslation('system');
+
+  return (
+    <div className="subsystem-row">
+      <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
+        <h3 className="u-light">
+          {t('logging_subsystem.subsystem', { name: capitalize(name) })}
+          <ButtonGroup className="pull-right">
+            <LogLevelDropdown nodeId={nodeId} name={name} subsystem={subsystem} />
+          </ButtonGroup>
+        </h3>
+        {subsystem.description}
+        <br style={{ clear: 'both' }} />
+      </Col>
+    </div>
+  );
+};
 
 export default LoggingSubsystem;

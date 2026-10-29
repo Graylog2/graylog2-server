@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { useNodeMetrics } from 'hooks/useMetrics';
@@ -33,6 +34,7 @@ const metric_name = 'org.apache.logging.log4j.core.Appender.all';
 const METRIC_NAMES = [metric_name];
 
 const NodeLoggers = ({ nodeId, subsystems }: Props) => {
+  const { t } = useTranslation('system');
   const sendTelemetry = useSendTelemetry('log-level');
 
   const { data: nodeMetrics } = useNodeMetrics(nodeId, METRIC_NAMES);
@@ -77,13 +79,21 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
                     event_details: { showing: !showDetails },
                   });
                 }}>
-                <Icon name="speed" /> {showDetails ? 'Hide' : 'Show'} log level metrics
+                <Icon name="speed" />{' '}
+                {showDetails
+                  ? t('node_loggers.hide_log_level_metrics')
+                  : t('node_loggers.show_log_level_metrics')}
               </Button>
             </div>
             <h2>
               <LinkToNode nodeId={nodeId} />{' '}
               <small>
-                Has written a total of <strong>{_formattedThroughput} internal log messages.</strong>
+                <Trans
+                  t={t}
+                  i18nKey="node_loggers.total_log_messages"
+                  values={{ throughput: _formattedThroughput }}
+                  components={{ strong: <strong /> }}
+                />
               </small>
             </h2>
           </div>

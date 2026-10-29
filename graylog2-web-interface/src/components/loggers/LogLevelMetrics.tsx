@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import capitalize from 'lodash/capitalize';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 
 import { Col } from 'components/bootstrap';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const LogLevelMetrics = ({ nodeId, loglevel }: Props) => {
+  const { t } = useTranslation('system');
   const metricName = `org.apache.logging.log4j.core.Appender.${loglevel}`;
   const { data: nodeMetrics } = useNodeMetric(nodeId, metricName);
 
@@ -41,17 +43,19 @@ const LogLevelMetrics = ({ nodeId, loglevel }: Props) => {
     metricsDetails =
       'rate' in metric ? (
         <dl className="loglevel-metrics-list">
-          <dt>Total written:</dt>
+          <dt>{t('log_level_metrics.total_written')}</dt>
           <dd>
             <span className="loglevel-metric-total">{metric.rate.total}</span>
           </dd>
-          <dt>Mean rate:</dt>
+          <dt>{t('log_level_metrics.mean_rate')}</dt>
           <dd>
-            <span className="loglevel-metric-mean">{numeral(metric.rate.mean).format('0.00')}</span> / second
+            <span className="loglevel-metric-mean">{numeral(metric.rate.mean).format('0.00')}</span>{' '}
+            {t('log_level_metrics.per_second')}
           </dd>
-          <dt>1 min rate:</dt>
+          <dt>{t('log_level_metrics.one_minute_rate')}</dt>
           <dd>
-            <span className="loglevel-metric-1min">{numeral(metric.rate.one_minute).format('0.00')}</span> / second
+            <span className="loglevel-metric-1min">{numeral(metric.rate.one_minute).format('0.00')}</span>{' '}
+            {t('log_level_metrics.per_second')}
           </dd>
         </dl>
       ) : null;
@@ -60,7 +64,7 @@ const LogLevelMetrics = ({ nodeId, loglevel }: Props) => {
   return (
     <div className="loglevel-metrics-row">
       <Col md={4}>
-        <h3 className="u-light">Level: {capitalize(loglevel)}</h3>
+        <h3 className="u-light">{t('log_level_metrics.level', { level: capitalize(loglevel) })}</h3>
         {metricsDetails}
       </Col>
     </div>

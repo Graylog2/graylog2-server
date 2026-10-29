@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import NumberUtils from 'util/NumberUtils';
 
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
@@ -39,7 +40,7 @@ const renderThroughputRow = (label: string, formattedValue: string | undefined |
   <MetricsRow key={label}>
     <span>{label}</span>
     <SecondaryText>
-      <span>{formattedValue || 'N/A'}</span>
+      <span>{formattedValue || i18n.t('shared.not_available', { ns: 'system' })}</span>
     </SecondaryText>
   </MetricsRow>
 );

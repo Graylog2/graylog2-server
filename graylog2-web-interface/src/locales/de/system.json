@@ -1,1 +1,180 @@
-{}
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "k. A."
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Knoten des Suchbackends werden geladen...",
+    "search_backend_unknown": "Das konfigurierte Suchbackend konnte nicht ermittelt werden.",
+    "search_placeholder": "Knoten durchsuchen…"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Dokumente",
+    "latency": "Latenz"
+  },
+  "node_actions": {
+    "thread_dump": "Thread-Dump abrufen",
+    "process_buffer_dump": "Process-Buffer-Dump abrufen",
+    "metrics": "Metriken"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Nachrichtenverarbeitung pausieren",
+    "resume_message_processing": "Nachrichtenverarbeitung fortsetzen",
+    "override_load_balancer_dead": "Load-Balancer-Status auf DEAD setzen",
+    "override_load_balancer_alive": "Load-Balancer-Status auf ALIVE setzen",
+    "local_message_inputs": "Lokale Message-Inputs",
+    "recent_system_logs": "Aktuelle System-Log-Nachrichten abrufen",
+    "message_processing_title": "Nachrichtenverarbeitung",
+    "pause_confirm": "Sie sind dabei, die Nachrichtenverarbeitung im Knoten <b>{{nodeName}}</b> zu <b>pausieren</b>. Sind Sie sicher?",
+    "resume_confirm": "Sie sind dabei, die Nachrichtenverarbeitung im Knoten <b>{{nodeName}}</b> zu <b>fortsetzen</b>. Sind Sie sicher?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "Sie sind dabei, den Load-Balancer-Status des Knotens <b>{{nodeName}}</b> auf <b>{{status}}</b> zu ändern. Sind Sie sicher?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}}-Knoten"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load Balancer {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "Nachrichtenverarbeitung {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB Nodes"
+  },
+  "mongodb_profiling_action": {
+    "description": "Das MongoDB-Profiling hilft dabei, langsame Abfragen zu erkennen und Performance-Probleme über alle Cluster-Knoten hinweg zu beheben.",
+    "enabling_profiling": "Profiling wird aktiviert...",
+    "enable_confirm": "Profiling für <b>Slow Ops</b> ({{threshold}}) auf allen MongoDB-Knoten aktivieren? Die Einstellung wird sofort ohne Neustart übernommen, wird nach einem Neustart aber zurückgesetzt, sofern sie nicht beim Start konfiguriert ist."
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch Nodes"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "{{title}} anzeigen"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Last (1m)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "Cluster-ID:",
+    "not_available": "Nicht verfügbar",
+    "number_of_nodes": "Anzahl der Knoten:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Erstellt eine ZIP-Datei mit nützlichen Debugging-Informationen aus Ihrem Graylog-Cluster.",
+    "enterprise_customers": "Kunden von Graylog Enterprise können Bundles an ihr Support-Ticket anhängen. Das hilft dem technischen Support von Graylog bei der Analyse und Diagnose von Problemen.",
+    "examine_content": "Bitte prüfen Sie den Inhalt des Bundles, bevor Sie es weitergeben. Er kann sensible Daten wie IP-Adressen, Hostnamen oder sogar Passwörter enthalten!",
+    "paid_license_only": "Nur Nutzer mit einer kostenpflichtigen Lizenz haben Anspruch auf den Graylog-Enterprise-Support. Sie können diese Datei jedoch für andere Zwecke der Fehlersuche verwenden."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Cluster Support Bundle",
+    "create": "Support Bundle erstellen",
+    "download": "Herunterladen",
+    "delete": "Löschen",
+    "filename": "Dateiname",
+    "size": "Größe",
+    "no_bundles": "Es wurden keine Support Bundles gefunden.",
+    "delete_title": "Support Bundle löschen",
+    "delete_confirm": "Möchten Sie <strong>{{name}}</strong> wirklich löschen?"
+  },
+  "log_level_metrics": {
+    "level": "Level: {{level}}",
+    "total_written": "Insgesamt geschrieben:",
+    "mean_rate": "Mittlere Rate:",
+    "one_minute_rate": "1-Minuten-Rate:",
+    "per_second": "/ Sekunde"
+  },
+  "logging_subsystem": {
+    "subsystem": "Subsystem: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Protokollpegel-Metriken einblenden",
+    "hide_log_level_metrics": "Protokollpegel-Metriken ausblenden",
+    "total_log_messages": "Insgesamt wurden <strong>{{throughput}} interne Log-Nachrichten</strong> geschrieben."
+  },
+  "metric_details": {
+    "value": "Wert:",
+    "count": "Anzahl:",
+    "mean": "Mittelwert:",
+    "minimum": "Minimum:",
+    "maximum": "Maximum:",
+    "standard_deviation": "Standardabweichung:",
+    "percentile_95": "95. Perzentil:",
+    "percentile_98": "98. Perzentil:",
+    "percentile_99": "99. Perzentil:",
+    "invalid_type": "Ungültiger Metriktyp: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Gesamt:",
+    "events": "Ereignisse",
+    "one_minute_avg": "Durchschnitt 1 Min.:",
+    "five_minute_avg": "Durchschnitt 5 Min.:",
+    "fifteen_minute_avg": "Durchschnitt 15 Min.:"
+  },
+  "counter_rate": {
+    "calculating": "Wird berechnet...",
+    "total": "({{total}} gesamt)"
+  },
+  "metric_container": {
+    "loading": "Wird geladen..."
+  },
+  "metrics_component": {
+    "fetch_error": "Metriken konnten nicht vom Knoten abgerufen werden: Der Server hat <em>{{responseMessage}}</em> mit dem Statuscode {{status}} geantwortet.",
+    "fetch_problem": "Beim Abrufen der Knoten-Metriken ist ein Problem aufgetreten.",
+    "retry_in_background": "Der Abruf wird im Hintergrund fortgesetzt.",
+    "fetch_error_last_metrics": "Metriken konnten nicht vom Knoten abgerufen werden: Der Server hat <em>{{responseMessage}}</em> mit dem Statuscode {{status}} geantwortet. Die zuletzt verfügbaren Metriken werden angezeigt.",
+    "filter_placeholder": "Metrikname zum Filtern eingeben…"
+  },
+  "metrics_list": {
+    "no_metrics": "Keine Metriken entsprechen dem Filter. Bitte stellen Sie sicher, dass Sie einen gültigen regulären Ausdruck verwenden."
+  },
+  "buffer_usage": {
+    "metrics": "Metriken",
+    "utilization": "<strong>{{usage}} Nachrichten</strong> in {{title}}, {{percentage}} ausgelastet."
+  },
+  "input_types_data_table": {
+    "loading": "Input-Typen werden geladen...",
+    "unavailable": "Input-Typen sind nicht verfügbar.",
+    "documentation": "Dokumentation"
+  },
+  "journal_details": {
+    "loading": "Journal-Metriken werden geladen...",
+    "disabled": "Das Disk-Journal ist auf diesem Knoten deaktiviert.",
+    "unavailable": "Journal-Metriken sind nicht verfügbar.",
+    "overcommitted": "<strong>Warnung!</strong> Die Journal-Auslastung überschreitet die definierte maximale Größe. <overviewLink>Klicken Sie hier</overviewLink> für weitere Informationen.",
+    "configuration": "Konfiguration",
+    "path": "Pfad:",
+    "earliest_entry": "Ältester Eintrag:",
+    "maximum_size": "Maximale Größe:",
+    "maximum_age": "Maximales Alter:",
+    "flush_policy": "Flush-Richtlinie:",
+    "flush_policy_value": "Alle {{messages}} Nachrichten oder {{duration}}",
+    "utilization": "Auslastung",
+    "unprocessed_messages": "Derzeit befinden sich <strong>{{messages}} unverarbeitete Nachrichten</strong> im Journal, verteilt auf {{segments}} Segmente.",
+    "appended_and_read": "In der letzten Sekunde wurden <strong>{{appended}} Nachrichten</strong> angehängt und <strong>{{read}} Nachrichten</strong> gelesen."
+  },
+  "journal_state": {
+    "loading": "Journal-Metriken werden geladen...",
+    "unavailable": "Journal-Metriken sind nicht verfügbar.",
+    "summary_one": "Das Journal enthält <strong>{{messages}} unverarbeitete Nachrichten</strong> in {{count}} Segment. <strong>{{appended}} Nachrichten</strong> angehängt, <strong>{{read}} Nachrichten</strong> in der letzten Sekunde gelesen.",
+    "summary_other": "Das Journal enthält <strong>{{messages}} unverarbeitete Nachrichten</strong> in {{count}} Segmenten. <strong>{{appended}} Nachrichten</strong> angehängt, <strong>{{read}} Nachrichten</strong> in der letzten Sekunde gelesen."
+  },
+  "jvm_heap_usage": {
+    "loading": "Informationen zur Heap-Nutzung werden geladen...",
+    "unavailable": "Heap-Informationen sind nicht verfügbar.",
+    "usage": "Die JVM verwendet <usedBlob /><strong> {{used}}</strong> von <committedBlob /><strong> {{committed}}</strong> Heap-Speicher und versucht nicht, mehr als <maxBlob /><strong> {{max}}</strong> zu verwenden."
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Systeminformationen sind derzeit nicht verfügbar."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Aktionen",
+    "configure_internal_logging": "Interne Protokollierung konfigurieren"
+  }
+}

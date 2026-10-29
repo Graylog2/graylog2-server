@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
@@ -76,14 +77,16 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     is_leader: {
       renderCell: (isLeader: boolean) => (
-        <SecondaryText>{isLeader ? <Label bsSize="xs">Leader</Label> : <span>-</span>}</SecondaryText>
+        <SecondaryText>
+          {isLeader ? <Label bsSize="xs">{i18n.t('shared.leader', { ns: 'system' })}</Label> : <span>-</span>}
+        </SecondaryText>
       ),
       staticWidth: 'matchHeader',
     },
     version: {
       renderCell: (_value, entity) => (
         <SecondaryText>
-          <span>{entity.version ?? 'N/A'}</span>
+          <span>{entity.version ?? i18n.t('shared.not_available', { ns: 'system' })}</span>
         </SecondaryText>
       ),
       staticWidth: 150,

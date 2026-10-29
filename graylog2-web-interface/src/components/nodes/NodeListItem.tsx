@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col } from 'components/bootstrap';
 import { EntityListItem, LinkToNode } from 'components/common';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const NodeListItem = ({ systemOverview = undefined, node }: Props) => {
+  const { t } = useTranslation('system');
   const title = <LinkToNode nodeId={node.node_id} />;
 
   if (!systemOverview) {
@@ -38,7 +40,7 @@ const NodeListItem = ({ systemOverview = undefined, node }: Props) => {
       <EntityListItem
         key={`entry-list-${node.node_id}`}
         title={title}
-        description="System information is currently unavailable."
+        description={t('node_list_item.system_info_unavailable')}
       />
     );
   }

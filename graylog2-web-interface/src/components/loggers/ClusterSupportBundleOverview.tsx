@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Spinner, ConfirmDialog, NoSearchResult } from 'components/common';
 import { Col, Row, Table, Button } from 'components/bootstrap';
@@ -53,6 +54,7 @@ const LoadingSpinner = styled(Spinner)(
 );
 
 const ClusterSupportBundleOverview = () => {
+  const { t } = useTranslation('system');
   const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
   const [bundleNameToDelete, setBundleNameToDelete] = useState<string | null>(null);
 
@@ -62,10 +64,10 @@ const ClusterSupportBundleOverview = () => {
       <AlignRightCell>{bundle.size}</AlignRightCell>
       <AlignRightCell>
         <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>
-          Download
+          {t('cluster_support_bundle_overview.download')}
         </DownloadButton>
         <Button bsSize="xsmall" bsStyle="danger" onClick={() => setBundleNameToDelete(bundle.file_name)}>
-          Delete
+          {t('cluster_support_bundle_overview.delete')}
         </Button>
       </AlignRightCell>
     </tr>
@@ -76,9 +78,9 @@ const ClusterSupportBundleOverview = () => {
       <Row className="content">
         <Col xs={12}>
           <Header>
-            <h2>Cluster Support Bundle</h2>
+            <h2>{t('cluster_support_bundle_overview.title')}</h2>
             <Button bsStyle="primary" onClick={onCreate} disabled={isCreating}>
-              Create Support Bundle
+              {t('cluster_support_bundle_overview.create')}
               {isCreating && <LoadingSpinner text="" delay={0} />}
             </Button>
           </Header>
@@ -90,28 +92,31 @@ const ClusterSupportBundleOverview = () => {
               </colgroup>
               <thead>
                 <tr>
-                  <th>Filename</th>
-                  <AlignRightHeadCell>Size</AlignRightHeadCell>
+                  <th>{t('cluster_support_bundle_overview.filename')}</th>
+                  <AlignRightHeadCell>{t('cluster_support_bundle_overview.size')}</AlignRightHeadCell>
                 </tr>
               </thead>
               <tbody>{list.map(renderRow)}</tbody>
             </Table>
           ) : (
-            <NoSearchResult>No Support Bundles have been found.</NoSearchResult>
+            <NoSearchResult>{t('cluster_support_bundle_overview.no_bundles')}</NoSearchResult>
           )}
         </Col>
       </Row>
       <ConfirmDialog
-        title="Delete Support Bundle"
+        title={t('cluster_support_bundle_overview.delete_title')}
         show={Boolean(bundleNameToDelete)}
         onConfirm={() => {
           onDelete(bundleNameToDelete);
           setBundleNameToDelete(null);
         }}
         onCancel={() => setBundleNameToDelete(null)}>
-        <>
-          Are you sure you want to delete <strong>{bundleNameToDelete}</strong>?
-        </>
+        <Trans
+          t={t}
+          i18nKey="cluster_support_bundle_overview.delete_confirm"
+          values={{ name: bundleNameToDelete ?? '' }}
+          components={{ strong: <strong /> }}
+        />
       </ConfirmDialog>
     </div>
   );

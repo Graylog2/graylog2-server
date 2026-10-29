@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { LinkContainer, ConfirmDialog, IfPermitted } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const GraylogNodeActions = ({ node }: Props) => {
+  const { t } = useTranslation('system');
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
   const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<LoadBalancerStatus | undefined>(
     undefined,
@@ -58,17 +60,19 @@ const GraylogNodeActions = ({ node }: Props) => {
       <MoreActions>
         <IfPermitted permissions="processing:changestate">
           <MenuItem onSelect={() => setShowMessageProcessingModal(true)}>
-            {node.is_processing ? 'Pause' : 'Resume'} message processing
+            {node.is_processing
+              ? t('graylog_node_actions.pause_message_processing')
+              : t('graylog_node_actions.resume_message_processing')}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
           {node.lb_status === LOAD_BALANCER_STATUS.ALIVE ? (
             <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.DEAD)}>
-              Override load balancer status to DEAD
+              {t('graylog_node_actions.override_load_balancer_dead')}
             </MenuItem>
           ) : (
             <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.ALIVE)}>
-              Override load balancer status to ALIVE
+              {t('graylog_node_actions.override_load_balancer_alive')}
             </MenuItem>
           )}
         </IfPermitted>
@@ -78,28 +82,28 @@ const GraylogNodeActions = ({ node }: Props) => {
           </IfPermitted>
         </IfPermitted>
         <LinkContainer to={Routes.SYSTEM.METRICS(node.node_id)}>
-          <MenuItem>Metrics</MenuItem>
+          <MenuItem>{t('node_actions.metrics')}</MenuItem>
         </LinkContainer>
         <HideOnCloud>
           <IfPermitted permissions="inputs:read">
             <LinkContainer to={Routes.node_inputs(node.node_id)}>
-              <MenuItem>Local message inputs</MenuItem>
+              <MenuItem>{t('graylog_node_actions.local_message_inputs')}</MenuItem>
             </LinkContainer>
           </IfPermitted>
         </HideOnCloud>
         <IfPermitted permissions="threads:dump">
           <LinkContainer to={Routes.SYSTEM.THREADDUMP(node.node_id)}>
-            <MenuItem>Get thread dump</MenuItem>
+            <MenuItem>{t('node_actions.thread_dump')}</MenuItem>
           </LinkContainer>
         </IfPermitted>
         <IfPermitted permissions="processbuffer:dump">
           <LinkContainer to={Routes.SYSTEM.PROCESSBUFFERDUMP(node.node_id)}>
-            <MenuItem>Get process-buffer dump</MenuItem>
+            <MenuItem>{t('node_actions.process_buffer_dump')}</MenuItem>
           </LinkContainer>
         </IfPermitted>
         <IfPermitted permissions="loggersmessages:read">
           <LinkContainer to={Routes.SYSTEM.SYSTEMLOGS(node.node_id)}>
-            <MenuItem>Get recent system log messages</MenuItem>
+            <MenuItem>{t('graylog_node_actions.recent_system_logs')}</MenuItem>
           </LinkContainer>
         </IfPermitted>
       </MoreActions>
@@ -108,11 +112,13 @@ const GraylogNodeActions = ({ node }: Props) => {
           show
           onConfirm={toggleMessageProcessing}
           onCancel={() => setShowMessageProcessingModal(false)}
-          title="Message Processing">
-          <>
-            You are about to <b>{node.is_processing ? 'pause' : 'resume'}</b> message processing in <b>{nodeName}</b>{' '}
-            node. Are you sure?
-          </>
+          title={t('graylog_node_actions.message_processing_title')}>
+          <Trans
+            t={t}
+            i18nKey={node.is_processing ? 'graylog_node_actions.pause_confirm' : 'graylog_node_actions.resume_confirm'}
+            values={{ nodeName }}
+            components={{ b: <b /> }}
+          />
         </ConfirmDialog>
       )}
       {loadBalancerStatusToConfirm && (
@@ -120,11 +126,13 @@ const GraylogNodeActions = ({ node }: Props) => {
           show
           onConfirm={() => updateLoadBalancerStatus(loadBalancerStatusToConfirm)}
           onCancel={() => setLoadBalancerStatusToConfirm(undefined)}
-          title="Load Balancer">
-          <>
-            You are about to change the load balancer status for <b>{nodeName}</b> node to{' '}
-            <b>{loadBalancerStatusToConfirm}</b>. Are you sure?
-          </>
+          title={t('graylog_node_actions.load_balancer_title')}>
+          <Trans
+            t={t}
+            i18nKey="graylog_node_actions.load_balancer_confirm"
+            values={{ nodeName, status: loadBalancerStatusToConfirm }}
+            components={{ b: <b /> }}
+          />
         </ConfirmDialog>
       )}
     </>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const LoadBalancerStatusCell = ({ node }: Props) => {
+  const { t } = useTranslation('system');
   const status = node.lb_status?.toUpperCase();
 
   if (!status) {
@@ -35,7 +37,7 @@ const LoadBalancerStatusCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <Label bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={`Load balancer ${status}`}>
+        <Label bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={t('load_balancer_status_cell.aria_label', { status })}>
           {status}
         </Label>
       </MetricsRow>

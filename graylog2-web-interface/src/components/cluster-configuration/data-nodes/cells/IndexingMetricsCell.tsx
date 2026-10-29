@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -39,6 +40,7 @@ const formatIndexLatency = (total: number | undefined | null, timeInMillis: numb
 };
 
 const IndexingMetricsCell = ({ totalIndexed, indexTimeInMillis }: Props) => {
+  const { t } = useTranslation('system');
   const totalIndexedLabel = formatNumberValue(totalIndexed);
   const indexingLatencyLabel = formatIndexLatency(totalIndexed, indexTimeInMillis);
   const hasContent = totalIndexedLabel || indexingLatencyLabel;
@@ -51,7 +53,7 @@ const IndexingMetricsCell = ({ totalIndexed, indexTimeInMillis }: Props) => {
     <MetricsColumn>
       {totalIndexedLabel && (
         <MetricsRow>
-          <span>Docs</span>
+          <span>{t('indexing_metrics_cell.docs')}</span>
           <SecondaryText>
             <span>{totalIndexedLabel}</span>
           </SecondaryText>
@@ -59,7 +61,7 @@ const IndexingMetricsCell = ({ totalIndexed, indexTimeInMillis }: Props) => {
       )}
       {indexingLatencyLabel && (
         <MetricsRow>
-          <span>Latency</span>
+          <span>{t('indexing_metrics_cell.latency')}</span>
           <SecondaryText>
             <span>{indexingLatencyLabel}</span>
           </SecondaryText>

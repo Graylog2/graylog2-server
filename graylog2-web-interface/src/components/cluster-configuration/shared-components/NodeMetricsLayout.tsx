@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 export const MetricsColumn = styled.div`
   display: flex;
@@ -57,10 +58,14 @@ export const NodePrimary = styled.div`
   gap: 2px;
 `;
 
-export const MetricPlaceholder = () => (
-  <MetricsColumn>
-    <SecondaryText>
-      <GrowContainer>N/A</GrowContainer>
-    </SecondaryText>
-  </MetricsColumn>
-);
+export const MetricPlaceholder = () => {
+  const { t } = useTranslation('system');
+
+  return (
+    <MetricsColumn>
+      <SecondaryText>
+        <GrowContainer>{t('shared.not_available')}</GrowContainer>
+      </SecondaryText>
+    </MetricsColumn>
+  );
+};

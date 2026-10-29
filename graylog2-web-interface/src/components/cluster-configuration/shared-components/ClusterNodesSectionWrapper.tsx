@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Section } from 'components/common';
 
@@ -99,6 +100,7 @@ const ClusterNodesSectionWrapper = ({
   maxContentHeight = 400,
   actions = undefined,
 }: Props) => {
+  const { t } = useTranslation('system');
   const renderHeader = () => {
     const hasCount = titleCount !== null && titleCount !== undefined;
 
@@ -123,7 +125,7 @@ const ClusterNodesSectionWrapper = ({
               : undefined
           }
           disabled={!isInteractive}
-          aria-label={`Show ${title}`}>
+          aria-label={t('cluster_nodes_section_wrapper.show_title', { title })}>
           ({titleCount})
         </TitleCountButton>
       </TitleWrapper>

@@ -1,1 +1,180 @@
-{}
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Loading search backend nodes...",
+    "search_backend_unknown": "Could not determine the configured search backend.",
+    "search_placeholder": "Search nodes…"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Docs",
+    "latency": "Latency"
+  },
+  "node_actions": {
+    "thread_dump": "Get thread dump",
+    "process_buffer_dump": "Get process-buffer dump",
+    "metrics": "Metrics"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Pause message processing",
+    "resume_message_processing": "Resume message processing",
+    "override_load_balancer_dead": "Override load balancer status to DEAD",
+    "override_load_balancer_alive": "Override load balancer status to ALIVE",
+    "local_message_inputs": "Local message inputs",
+    "recent_system_logs": "Get recent system log messages",
+    "message_processing_title": "Message Processing",
+    "pause_confirm": "You are about to <b>pause</b> message processing in <b>{{nodeName}}</b> node. Are you sure?",
+    "resume_confirm": "You are about to <b>resume</b> message processing in <b>{{nodeName}}</b> node. Are you sure?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "You are about to change the load balancer status for <b>{{nodeName}}</b> node to <b>{{status}}</b>. Are you sure?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} Nodes"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "Message processing {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB Nodes"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.",
+    "enabling_profiling": "Enabling profiling...",
+    "enable_confirm": "Enable <b>Slow Ops</b> profiling ({{threshold}}) on all MongoDB nodes? It applies immediately without restart, but resets after restart unless configured at startup."
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch Nodes"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Show {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Load (1m)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "Cluster ID:",
+    "not_available": "Not available",
+    "number_of_nodes": "Number of nodes:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Create a zip file which contains useful debugging information from your Graylog cluster.",
+    "enterprise_customers": "Graylog Enterprise customers can attach bundles to their support ticket, which will help the Graylog technical support team with analyzing and diagnosing issues.",
+    "examine_content": "Please examine the bundle content before sharing it. It might contain sensitive data like IP addresses, hostnames or even passwords!",
+    "paid_license_only": "Only paid license users are entitled to use Graylog enterprise support. You may however use this file for other means of debugging."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Cluster Support Bundle",
+    "create": "Create Support Bundle",
+    "download": "Download",
+    "delete": "Delete",
+    "filename": "Filename",
+    "size": "Size",
+    "no_bundles": "No Support Bundles have been found.",
+    "delete_title": "Delete Support Bundle",
+    "delete_confirm": "Are you sure you want to delete <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Level: {{level}}",
+    "total_written": "Total written:",
+    "mean_rate": "Mean rate:",
+    "one_minute_rate": "1 min rate:",
+    "per_second": "/ second"
+  },
+  "logging_subsystem": {
+    "subsystem": "Subsystem: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Show log level metrics",
+    "hide_log_level_metrics": "Hide log level metrics",
+    "total_log_messages": "Has written a total of <strong>{{throughput}} internal log messages.</strong>"
+  },
+  "metric_details": {
+    "value": "Value:",
+    "count": "Count:",
+    "mean": "Mean:",
+    "minimum": "Minimum:",
+    "maximum": "Maximum:",
+    "standard_deviation": "Standard deviation:",
+    "percentile_95": "95th percentile:",
+    "percentile_98": "98th percentile:",
+    "percentile_99": "99th percentile:",
+    "invalid_type": "Invalid metric type: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Total:",
+    "events": "events",
+    "one_minute_avg": "1 minute avg:",
+    "five_minute_avg": "5 minute avg:",
+    "fifteen_minute_avg": "15 minute avg:"
+  },
+  "counter_rate": {
+    "calculating": "Calculating...",
+    "total": "({{total}} total)"
+  },
+  "metric_container": {
+    "loading": "Loading..."
+  },
+  "metrics_component": {
+    "fetch_error": "Could not fetch metrics from node: server returned <em>{{responseMessage}}</em> with a {{status}} status code.",
+    "fetch_problem": "There was a problem fetching node metrics.",
+    "retry_in_background": "Attempts to retrieve them will continue in the background.",
+    "fetch_error_last_metrics": "Could not fetch metrics from node: server returned <em>{{responseMessage}}</em> with a {{status}} status code. Displaying last metrics available.",
+    "filter_placeholder": "Type a metric name to filter…"
+  },
+  "metrics_list": {
+    "no_metrics": "No metrics match the given filter. Please ensure you use a valid regular expression"
+  },
+  "buffer_usage": {
+    "metrics": "Metrics",
+    "utilization": "<strong>{{usage}} messages</strong> in {{title}}, {{percentage}} utilized."
+  },
+  "input_types_data_table": {
+    "loading": "Loading input types...",
+    "unavailable": "Input types are unavailable.",
+    "documentation": "Documentation"
+  },
+  "journal_details": {
+    "loading": "Loading journal metrics...",
+    "disabled": "The disk journal is disabled on this node.",
+    "unavailable": "Journal metrics unavailable.",
+    "overcommitted": "<strong>Warning!</strong> The journal utilization is exceeding the maximum size defined. <overviewLink>Click here</overviewLink> for more information.",
+    "configuration": "Configuration",
+    "path": "Path:",
+    "earliest_entry": "Earliest entry:",
+    "maximum_size": "Maximum size:",
+    "maximum_age": "Maximum age:",
+    "flush_policy": "Flush policy:",
+    "flush_policy_value": "Every {{messages}} messages or {{duration}}",
+    "utilization": "Utilization",
+    "unprocessed_messages": "<strong>{{messages}} unprocessed messages</strong> are currently in the journal, in {{segments}} segments.",
+    "appended_and_read": "<strong>{{appended}} messages</strong> have been appended in the last second, <strong>{{read}} messages</strong> have been read in the last second."
+  },
+  "journal_state": {
+    "loading": "Loading journal metrics...",
+    "unavailable": "Journal metrics unavailable.",
+    "summary_one": "The journal contains <strong>{{messages}} unprocessed messages</strong> in {{count}} segment. <strong>{{appended}} messages</strong> appended, <strong>{{read}} messages</strong> read in the last second.",
+    "summary_other": "The journal contains <strong>{{messages}} unprocessed messages</strong> in {{count}} segments. <strong>{{appended}} messages</strong> appended, <strong>{{read}} messages</strong> read in the last second."
+  },
+  "jvm_heap_usage": {
+    "loading": "Loading heap usage information...",
+    "unavailable": "Heap information unavailable.",
+    "usage": "The JVM is using <usedBlob /><strong> {{used}}</strong> of <committedBlob /><strong> {{committed}}</strong> heap space and will not attempt to use more than <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "System information is currently unavailable."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Actions",
+    "configure_internal_logging": "Configure internal logging"
+  }
+}

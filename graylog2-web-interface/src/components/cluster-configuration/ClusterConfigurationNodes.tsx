@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { SearchForm, Spinner } from 'components/common';
@@ -66,6 +67,7 @@ const getSearchNodesConfig = (runsWithDataNode: boolean | undefined): SearchNode
 
 const ClusterConfigurationNodes = () => {
   const productName = useProductName();
+  const { t } = useTranslation('system');
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const { data: runsWithDataNode, isLoading: isLoadingSearchBackend } = useRunsWithDataNode();
@@ -91,11 +93,11 @@ const ClusterConfigurationNodes = () => {
 
   const renderSearchNodes = () => {
     if (isLoadingSearchBackend) {
-      return <Spinner text="Loading search backend nodes..." />;
+      return <Spinner text={t('cluster_configuration_nodes.loading_search_backend')} />;
     }
 
     if (!SearchNodesExpandable || !searchNodeType) {
-      return <p>Could not determine the configured search backend.</p>;
+      return <p>{t('cluster_configuration_nodes.search_backend_unknown')}</p>;
     }
 
     return (
@@ -115,7 +117,7 @@ const ClusterConfigurationNodes = () => {
         <ControlsWrapper>
           <SearchForm
             query={searchQuery}
-            placeholder="Search nodes…"
+            placeholder={t('cluster_configuration_nodes.search_placeholder')}
             wrapperClass=""
             queryWidth={400}
             topMargin={0}
