@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 
 import ExpandedEntitiesSectionsContext from './ExpandedSectionsContext';
 
@@ -34,20 +34,26 @@ const ExpandedSectionsProvider = ({
   getDefaultSection = undefined,
 }: Props): React.ReactElement => {
   const [expandedSections, setExpandedSections] = useState<ExpandedSections | undefined>();
+  // Keeps `toggleSection` stable, because consumers call it in effects
+  // and `getDefaultSection` changes on every render of the table.
+  const getDefaultSectionRef = useRef(getDefaultSection);
+
+  useEffect(() => {
+    getDefaultSectionRef.current = getDefaultSection;
+  }, [getDefaultSection]);
 
   // Opens the row on the given section, switches to it when the row shows another section,
   // or collapses the row when the section is already shown.
   // Without a section, it collapses an expanded row or opens it on the default section.
-  const toggleSection = useCallback(
-    (entityId: string, sectionName?: string) =>
-      setExpandedSections((cur) => {
-        const isShown = sectionName ? cur?.[entityId]?.includes(sectionName) : !!cur?.[entityId];
-        const section = sectionName ?? getDefaultSection?.(entityId);
+  const toggleSection = useCallback((entityId: string, sectionName?: string) => {
+    const section = sectionName ?? getDefaultSectionRef.current?.(entityId);
 
-        return isShown || !section ? collapseRow(cur, entityId) : { ...(cur ?? {}), [entityId]: [section] };
-      }),
-    [getDefaultSection],
-  );
+    setExpandedSections((cur) => {
+      const isShown = sectionName ? cur?.[entityId]?.includes(sectionName) : !!cur?.[entityId];
+
+      return isShown || !section ? collapseRow(cur, entityId) : { ...(cur ?? {}), [entityId]: [section] };
+    });
+  }, []);
 
   const contextValue = useMemo(
     () => ({
