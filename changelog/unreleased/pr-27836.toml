@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash on pages checking entity scope permissions when the scope permissions could not be loaded."
+
+pulls = ["27836"]

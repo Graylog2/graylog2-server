@@ -92,7 +92,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@Parameter(name = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-                                        @Parameter(name = "streams", description = "Comma separated list of streams to search in") Set<String> streams,
+                                        @Parameter(name = "streams", description = "Comma separated list of streams to search in") @QueryParam("streams") Set<String> streams,
                                         @Parameter(name = "stream_categories", description = "Comma separated list of streams categories to search in") @QueryParam("stream_categories") Set<String> streamCategories,
                                         @Parameter(name = "timerange", description = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
                                         @Parameter(name = "fields", description = "Fields from the message to show as columns in result") @QueryParam("fields") List<String> fields,
