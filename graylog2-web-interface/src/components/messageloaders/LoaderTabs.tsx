@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
+import i18n from 'i18n';
 import { Col, Tabs } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
@@ -148,7 +149,7 @@ class LoaderTabs extends React.Component<
     if (this._isTabVisible('recent')) {
       defs.push({
         key: 'recent',
-        title: 'Recent Message',
+        title: i18n.t('tabs.recent', { ns: 'messageloaders' }),
         content: (
           <RecentMessageLoader
             inputs={inputs}
@@ -162,11 +163,11 @@ class LoaderTabs extends React.Component<
     if (this._isTabVisible('messageId')) {
       defs.push({
         key: 'messageId',
-        title: 'Message ID',
+        title: i18n.t('tabs.message_id', { ns: 'messageloaders' }),
         content: (
           <>
             <div style={{ marginTop: 5, marginBottom: 15 }}>
-              Please provide the id and index of the message that you want to load in this form:
+              {i18n.t('tabs.message_id_description', { ns: 'messageloaders' })}
             </div>
             <MessageLoader
               messageId={messageId}
@@ -183,11 +184,11 @@ class LoaderTabs extends React.Component<
     if (this._isTabVisible('raw')) {
       defs.push({
         key: 'raw',
-        title: 'Raw Message',
+        title: i18n.t('tabs.raw', { ns: 'messageloaders' }),
         content: (
           <>
             <div style={{ marginTop: 5, marginBottom: 15 }}>
-              Load a message from text, as if it was sent by a log source.
+              {i18n.t('tabs.raw_description', { ns: 'messageloaders' })}
             </div>
             <RawMessageLoader onMessageLoaded={this.onMessageLoaded} />
           </>

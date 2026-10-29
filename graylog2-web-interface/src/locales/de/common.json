@@ -299,5 +299,117 @@
     "collection": "Sammlung",
     "collection_entities": "Sammlungseinträge"
   },
-  "marketplace_link": "{{productName}} Marketplace"
+  "marketplace_link": "{{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "Weniger anzeigen",
+    "show_all": "Alle anzeigen"
+  },
+  "compact_pagination": {
+    "previous_page": "Vorherige Seite",
+    "select_page": "Seite auswählen",
+    "next_page": "Nächste Seite",
+    "of_pages": "von {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Eintrag auswählen"
+  },
+  "traffic_graph": {
+    "days": "Tage",
+    "incoming": "Eingehender Datenverkehr",
+    "outgoing": "Ausgehender Datenverkehr",
+    "last_days": "Letzte {{days}} Tage: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Unbekannter Node"
+  },
+  "markdown": {
+    "images_unsupported": "Bilder werden aus Sicherheitsgründen nicht unterstützt. Bitte aktivieren Sie die erlaubten Quellen <configurationLink>hier</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Weniger lesen",
+    "read_more": "Mehr lesen"
+  },
+  "refresh_controls": {
+    "controls_label": "Steuerung der Aktualisierung: {{humanName}}",
+    "below_minimum": "Das Intervall von <intervalDuration /> ({{interval}}) liegt unter dem konfigurierten Mindestintervall von <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Nach oben"
+  },
+  "section": {
+    "toggle_section": "Bereich „{{title}}“ ein- oder ausklappen"
+  },
+  "selectable_list": {
+    "remove": "Entfernen"
+  },
+  "share_menu_item": {
+    "share": "Teilen"
+  },
+  "status_icon": {
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Feld auswählen"
+  },
+  "query_helper": {
+    "title": "Hilfe zur Suchsyntax",
+    "show_help": "Hilfe zur Suchsyntax anzeigen",
+    "available_fields": "Verfügbare Suchfelder",
+    "field": "Feld",
+    "description": "Beschreibung",
+    "examples": "Beispiele",
+    "example_description": "Finden Sie alle Einträge vom Typ „{{entityName}}“ mit einer Beschreibung, die security enthält:",
+    "example_id": "Finden Sie einen Eintrag vom Typ „{{entityName}}“ mit der ID 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "ID des Eintrags vom Typ „{{entityName}}“. Sie ist eine eindeutige Referenz.",
+      "title": "Titel des Eintrags vom Typ „{{entityName}}“.",
+      "name": "Name des Eintrags vom Typ „{{entityName}}“.",
+      "description": "Kurzbeschreibung des Eintrags vom Typ „{{entityName}}“.",
+      "summary": "Ausführliche Zusammenfassung des Eintrags vom Typ „{{entityName}}“."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Zur URL-Allowlist hinzufügen",
+    "title": "Allowlist-Konfiguration aktualisieren",
+    "submit": "Konfiguration aktualisieren",
+    "urls": "Allowlist-URLs"
+  },
+  "configuration_well": {
+    "empty": "<leer>",
+    "uploaded_file_content": "<Inhalt der hochgeladenen Datei>",
+    "no_configuration": "-- keine Konfiguration --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Zurücksetzen rückgängig machen",
+    "remove": "Entfernen",
+    "title": "Titel"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "{{productName}} Enterprise wurde für die Anforderungen von IT-Betriebs- und Software-Engineering-Teams mit begrenzten Ressourcen entwickelt und bietet zahlreiche Produktivitätsverbesserungen, die Ihnen jedes Jahr Tausende Arbeitsstunden beim Sammeln und Analysieren von Logdaten ersparen, um die Ursache von Leistungs-, Ausfall- und Fehlerproblemen aufzudecken.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Erweitern Sie die Möglichkeiten von {{productName}} Open zum Erkennen, Untersuchen und Beantworten von Cybersicherheitsbedrohungen um sicherheitsspezifische Dashboards und Alarme, eine KI/ML-Engine zur Anomalieerkennung, Integrationen mit anderen Sicherheitstools, SOAR-Funktionen und zahlreiche Funktionen für Compliance-Berichte.",
+    "request_now": "Jetzt anfragen"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Enterprise-Plugin",
+    "installed": "{{pluginName}} ist installiert",
+    "not_installed": "{{pluginName}} ist nicht installiert",
+    "status": "Dies ist der Status der {{productName}}-Enterprise-Module in diesem Cluster:"
+  },
+  "reported_error": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Es ist ein unbekannter Fehler aufgetreten. Weitere Informationen finden Sie in der folgenden Meldung und im {{productName}}-Serverlog."
+  },
+  "hotkeys": {
+    "or": "oder",
+    "title": "Tastenkürzel",
+    "view_all": "Alle Tastenkürzel anzeigen"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} auf {{hostname}} ({{jvmInfo}})"
+  }
 }

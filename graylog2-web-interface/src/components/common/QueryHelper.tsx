@@ -15,20 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { OverlayTrigger, Icon } from 'components/common';
 import { Table, Button } from 'components/bootstrap';
 
-const COMMON_FIELD_MAP = {
-  id: (entityName: string) => `Id of the ${entityName}, which is a unique reference.`,
-  title: (entityName: string) => `Title of the ${entityName}.`,
-  name: (entityName: string) => `Name of the ${entityName}.`,
-  description: (entityName: string) => `Short description of the ${entityName}.`,
-  summary: (entityName: string) => `Long summary of the ${entityName}.`,
-};
-
-type CommonFields = keyof typeof COMMON_FIELD_MAP;
+type CommonFields = 'id' | 'title' | 'name' | 'description' | 'summary';
 
 type Props = {
   commonFields?: Array<CommonFields>;
@@ -41,76 +34,98 @@ const QueryHelpButton = styled(Button)`
   padding: 6px 8px;
 `;
 
-const row = (field: CommonFields, description: string) => (
+// Entity names are passed as English words. Known ones are translated, so they can be used in other languages' sentences.
+const useTranslatedEntityName = (entityName: string) => {
+  const { t, i18n } = useTranslation('common');
+  const key = `entity_types.${entityName.toLowerCase().replace(/\s+/g, '_')}`;
+
+  return i18n.exists(key, { ns: 'common' }) ? t(key) : entityName;
+};
+
+const row = (field: string, description: string) => (
   <tr key={`row-field-${field}`}>
     <td>{field}</td>
     <td>{description}</td>
   </tr>
 );
 
-const defaultExample = (entityName: string) => (
-  <>
-    <p>
-      Find all {entityName}s with a description containing security:
-      <br />
-      <code>description:security</code>
-      <br />
-    </p>
-    <p>
-      Find a {entityName} with the id 5f4dfb9c69be46153b9a9a7b:
-      <br />
-      <code>id:5f4dfb9c69be46153b9a9a7b</code>
-      <br />
-    </p>
-  </>
-);
+const DefaultExample = ({ entityName }: { entityName: string }) => {
+  const { t } = useTranslation('common');
 
-const queryHelpPopover = (
-  commonFields: Props['commonFields'],
-  fieldMap: Props['fieldMap'],
-  example: Props['example'],
-  entityName: Props['entityName'],
-) => (
-  <>
-    <p>
-      <strong>Available search fields</strong>
-    </p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        {commonFields.map((field) => row(field, COMMON_FIELD_MAP[field](entityName)))}
-        {Object.keys(fieldMap).map((field: CommonFields) => row(field, fieldMap[field]))}
-      </tbody>
-    </Table>
-    <p>
-      <strong>Examples</strong>
-    </p>
-    {example || defaultExample(entityName)}
-  </>
-);
+  return (
+    <>
+      <p>
+        {t('query_helper.example_description', { entityName })}
+        <br />
+        <code>{t('query_helper.example_query_description')}</code>
+        <br />
+      </p>
+      <p>
+        {t('query_helper.example_id', { entityName })}
+        <br />
+        <code>{t('query_helper.example_query_id')}</code>
+        <br />
+      </p>
+    </>
+  );
+};
+
+type PopoverProps = Pick<Props, 'commonFields' | 'fieldMap' | 'example' | 'entityName'>;
+
+const QueryHelpPopover = ({ commonFields, fieldMap, example, entityName }: PopoverProps) => {
+  const { t } = useTranslation('common');
+  const translatedEntityName = useTranslatedEntityName(entityName);
+
+  return (
+    <>
+      <p>
+        <strong>{t('query_helper.available_fields')}</strong>
+      </p>
+      <Table condensed>
+        <thead>
+          <tr>
+            <th>{t('query_helper.field')}</th>
+            <th>{t('query_helper.description')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {commonFields.map((field) =>
+            row(field, t(`query_helper.common_fields.${field}`, { entityName: translatedEntityName })),
+          )}
+          {Object.keys(fieldMap).map((field) => row(field, fieldMap[field]))}
+        </tbody>
+      </Table>
+      <p>
+        <strong>{t('query_helper.examples')}</strong>
+      </p>
+      {example || <DefaultExample entityName={translatedEntityName} />}
+    </>
+  );
+};
 
 const QueryHelper = ({
   commonFields = ['id', 'title', 'description'],
   fieldMap = {},
   example = undefined,
   entityName = 'entity',
-}: Props) => (
-  <OverlayTrigger
-    trigger="click"
-    rootClose
-    placement="right"
-    overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)}
-    title="Search Syntax Help"
-    width={500}>
-    <QueryHelpButton bsStyle="link" title="Show search syntax help">
-      <Icon name="help" />
-    </QueryHelpButton>
-  </OverlayTrigger>
-);
+}: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <OverlayTrigger
+      trigger="click"
+      rootClose
+      placement="right"
+      overlay={
+        <QueryHelpPopover commonFields={commonFields} fieldMap={fieldMap} example={example} entityName={entityName} />
+      }
+      title={t('query_helper.title')}
+      width={500}>
+      <QueryHelpButton bsStyle="link" title={t('query_helper.show_help')}>
+        <Icon name="help" />
+      </QueryHelpButton>
+    </OverlayTrigger>
+  );
+};
 
 export default QueryHelper;

@@ -30,7 +30,9 @@ import enExtractors from 'locales/en/extractors.json';
 import enInputs from 'locales/en/inputs.json';
 import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
+import enPages from 'locales/en/pages.json';
 import enSearch from 'locales/en/search.json';
+import enSidecars from 'locales/en/sidecars.json';
 import enStreams from 'locales/en/streams.json';
 import enWelcome from 'locales/en/welcome.json';
 import enWidgets from 'locales/en/widgets.json';
@@ -46,6 +48,8 @@ import enDataNode from 'locales/en/datanode.json';
 import enApiBrowser from 'locales/en/api_browser.json';
 import enCertificates from 'locales/en/certificates.json';
 import enMessageloaders from 'locales/en/messageloaders.json';
+import enSystem from 'locales/en/system.json';
+import enConfigurations from 'locales/en/configurations.json';
 
 registerTranslations('aggregation', enAggregation, {
 
@@ -100,8 +104,16 @@ registerTranslations('navigation', enNavigation, {
   de: () => import(/* webpackChunkName: "translations-de-navigation" */ 'locales/de/navigation.json'),
 });
 
+registerTranslations('pages', enPages, {
+  de: () => import(/* webpackChunkName: "translations-de-pages" */ 'locales/de/pages.json'),
+});
+
 registerTranslations('search', enSearch, {
   de: () => import(/* webpackChunkName: "translations-de-search" */ 'locales/de/search.json'),
+});
+
+registerTranslations('sidecars', enSidecars, {
+  de: () => import(/* webpackChunkName: "translations-de-sidecars" */ 'locales/de/sidecars.json'),
 });
 
 registerTranslations('streams', enStreams, {
@@ -164,3 +176,10 @@ registerTranslations('messageloaders', enMessageloaders, {
   de: () => import(/* webpackChunkName: "translations-de-messageloaders" */ 'locales/de/messageloaders.json'),
 });
 
+registerTranslations('system', enSystem, {
+  de: () => import(/* webpackChunkName: "translations-de-system" */ 'locales/de/system.json'),
+});
+
+registerTranslations('configurations', enConfigurations, {
+  de: () => import(/* webpackChunkName: "translations-de-configurations" */ 'locales/de/configurations.json'),
+});

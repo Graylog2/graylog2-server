@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { PublicNotificationsHooks, Notification } from 'theme/types';
@@ -77,6 +78,7 @@ type PublicNotificationProps = {
   onDismissPublicNotification: (id: string) => void;
 };
 const PublicNotification = ({ notificationId, notification, onDismissPublicNotification }: PublicNotificationProps) => {
+  const { t } = useTranslation('common');
   const [showReadMore, { toggle: toggleReadMore }] = useDisclosure(false);
 
   const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
@@ -97,7 +99,7 @@ const PublicNotification = ({ notificationId, notification, onDismissPublicNotif
           <ShortContent>{shortMessage}</ShortContent>
           {longMessage && (
             <Button bsStyle="link" onClick={toggleReadMore}>
-              Read {showReadMore ? 'Less' : 'More'}
+              {showReadMore ? t('public_notifications.read_less') : t('public_notifications.read_more')}
             </Button>
           )}
         </FlexWrap>

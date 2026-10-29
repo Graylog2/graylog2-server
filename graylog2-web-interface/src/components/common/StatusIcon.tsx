@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Icon from 'components/common/Icon';
 
@@ -23,14 +24,18 @@ type Props = {
   className?: string;
 };
 
-const StatusIcon = ({ active, className = undefined }: Props, ref: React.ForwardedRef<HTMLSpanElement>) => (
-  <Icon
-    ref={ref}
-    name={active ? 'check_circle' : 'cancel'}
-    bsStyle={active ? 'success' : undefined}
-    className={className}
-    title={active ? 'Yes' : 'No'}
-  />
-);
+const StatusIcon = ({ active, className = undefined }: Props, ref: React.ForwardedRef<HTMLSpanElement>) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Icon
+      ref={ref}
+      name={active ? 'check_circle' : 'cancel'}
+      bsStyle={active ? 'success' : undefined}
+      className={className}
+      title={active ? t('status_icon.yes') : t('status_icon.no')}
+    />
+  );
+};
 
 export default React.forwardRef(StatusIcon);

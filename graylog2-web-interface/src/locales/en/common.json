@@ -296,5 +296,117 @@
     "collection": "collection",
     "collection_entities": "collection entities"
   },
-  "marketplace_link": "the {{productName}} Marketplace"
+  "marketplace_link": "the {{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "Show fewer",
+    "show_all": "Show all"
+  },
+  "compact_pagination": {
+    "previous_page": "Previous page",
+    "select_page": "Select page",
+    "next_page": "Next page",
+    "of_pages": "of {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Select item"
+  },
+  "traffic_graph": {
+    "days": "Days",
+    "incoming": "Incoming traffic",
+    "outgoing": "Outgoing traffic",
+    "last_days": "Last {{days}} days: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Unknown Node"
+  },
+  "markdown": {
+    "images_unsupported": "Images are not supported for security reasons. Please enable allowed sources <configurationLink>here</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Read Less",
+    "read_more": "Read More"
+  },
+  "refresh_controls": {
+    "controls_label": "Refresh {{humanName}} Controls",
+    "below_minimum": "Interval of <intervalDuration /> ({{interval}}) is below configured minimum interval of <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Back to top"
+  },
+  "section": {
+    "toggle_section": "Toggle {{title, lowercase}} section"
+  },
+  "selectable_list": {
+    "remove": "Remove"
+  },
+  "share_menu_item": {
+    "share": "Share"
+  },
+  "status_icon": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Select Field"
+  },
+  "query_helper": {
+    "title": "Search Syntax Help",
+    "show_help": "Show search syntax help",
+    "available_fields": "Available search fields",
+    "field": "Field",
+    "description": "Description",
+    "examples": "Examples",
+    "example_description": "Find all {{entityName}}s with a description containing security:",
+    "example_id": "Find a {{entityName}} with the id 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Id of the {{entityName}}, which is a unique reference.",
+      "title": "Title of the {{entityName}}.",
+      "name": "Name of the {{entityName}}.",
+      "description": "Short description of the {{entityName}}.",
+      "summary": "Long summary of the {{entityName}}."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Add to URL allowlist",
+    "title": "Update Allowlist Configuration",
+    "submit": "Update configuration",
+    "urls": "Allowlist URLs"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- no configuration --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Undo Reset",
+    "remove": "Remove",
+    "title": "Title"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams, {{productName}} Enterprise provides numerous productivity enhancements that will save you thousands of hours per year in collecting and analyzing log data to uncover the root cause of performance, outage, and error issues.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Extend {{productName}} Open’s capabilities for detecting, investigating, and responding to cybersecurity threats with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with other security tools, SOAR capabilities, and numerous compliance reporting features.",
+    "request_now": "Request now"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Plugin Enterprise",
+    "installed": "{{pluginName}} is installed",
+    "not_installed": "{{pluginName}} is not installed",
+    "status": "This is the status of {{productName}} Enterprise modules in this cluster:"
+  },
+  "reported_error": {
+    "title": "Something went wrong",
+    "description": "An unknown error has occurred. Please have a look at the following message and the {{productName}} server log for more information."
+  },
+  "hotkeys": {
+    "or": "or",
+    "title": "Keyboard shortcuts",
+    "view_all": "View all keyboard shortcuts"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} on {{hostname}} ({{jvmInfo}})"
+  }
 }

@@ -18,6 +18,7 @@ import * as React from 'react';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -69,6 +70,7 @@ const TrafficGraphWithDaySelect = ({
   title = undefined,
   trafficType = 'output',
 }: Props) => {
+  const { t } = useTranslation('common');
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
 
@@ -102,7 +104,7 @@ const TrafficGraphWithDaySelect = ({
           id="graph-days"
           type="select"
           bsSize="small"
-          label="Days"
+          label={t('traffic_graph.days')}
           value={graphDays}
           onChange={onGraphDaysChange}
           formGroupClassName="graph-days-select">
@@ -115,12 +117,8 @@ const TrafficGraphWithDaySelect = ({
       </Wrapper>
 
       <StyledH3 ref={graphContainerRef}>
-        {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
-        {bytesOut && (
-          <small>
-            Last {graphDays} days: {formattedTotalTraffic}
-          </small>
-        )}
+        {title ?? (trafficType === 'input-indexed' ? t('traffic_graph.incoming') : t('traffic_graph.outgoing'))}{' '}
+        {bytesOut && <small>{t('traffic_graph.last_days', { days: graphDays, traffic: formattedTotalTraffic })}</small>}
       </StyledH3>
       {unixTraffic ? (
         <TrafficGraph trafficLimit={trafficLimit} traffic={unixTraffic} width={graphWidth} />

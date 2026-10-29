@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -29,6 +30,7 @@ const GraylogEnterpriseHeader = styled.h2`
 `;
 
 const AdvertisementSection = () => {
+  const { t } = useTranslation('common');
   const nodes = useStore(NodesStore);
   const productName = useProductName();
   const licensePlugin = PluginStore.exports('license');
@@ -38,28 +40,24 @@ const AdvertisementSection = () => {
   return (
     <Row className="content">
       <Col md={6}>
-        <GraylogEnterpriseHeader>{productName} Enterprise</GraylogEnterpriseHeader>
-        <p>
-          Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams, {productName}{' '}
-          Enterprise provides numerous productivity enhancements that will save you thousands of hours per year in
-          collecting and analyzing log data to uncover the root cause of performance, outage, and error issues.
-        </p>
+        <GraylogEnterpriseHeader>
+          {t('enterprise_advertisement.enterprise_title', { productName })}
+        </GraylogEnterpriseHeader>
+        <p>{t('enterprise_advertisement.enterprise_description', { productName })}</p>
         <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
-          Request now
+          {t('enterprise_advertisement.request_now')}
         </ProductLinkComponent>
       </Col>
       <Col md={6}>
-        <GraylogEnterpriseHeader>{productName} Security</GraylogEnterpriseHeader>
-        <p>
-          Extend {productName} Open’s capabilities for detecting, investigating, and responding to cybersecurity threats
-          with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with other security
-          tools, SOAR capabilities, and numerous compliance reporting features.
-        </p>
+        <GraylogEnterpriseHeader>
+          {t('enterprise_advertisement.security_title', { productName })}
+        </GraylogEnterpriseHeader>
+        <p>{t('enterprise_advertisement.security_description', { productName })}</p>
         <ProductLinkComponent
           href="https://go2.graylog.org/request-graylog-security"
           licenseSubject="/license/security"
           clusterId={clusterId}>
-          Request now
+          {t('enterprise_advertisement.request_now')}
         </ProductLinkComponent>
       </Col>
     </Row>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 
 import { getFullVersion } from 'util/Version';
@@ -23,6 +24,7 @@ import useSystemDetails from 'hooks/useSystemDetails';
 import { fetchSystemJvm } from 'hooks/useSystemStore';
 
 const StandardFooter = () => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
   const { data: jvm } = useQuery({ queryKey: ['system', 'jvm'], queryFn: fetchSystemJvm });
   const system = useSystemDetails();
@@ -33,7 +35,7 @@ const StandardFooter = () => {
     </>
   ) : (
     <>
-      {productName} {system.version} on {system.hostname} ({jvm.info})
+      {t('footer.system_info', { productName, version: system.version, hostname: system.hostname, jvmInfo: jvm.info })}
     </>
   );
 };

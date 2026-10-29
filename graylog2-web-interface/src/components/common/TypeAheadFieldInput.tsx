@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 
 import { SystemFields } from '@graylog/server-api';
@@ -59,6 +60,7 @@ const TypeAheadFieldInput = ({
   name = undefined,
   defaultValue = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const { data, isInitialLoading } = useQuery({
     queryKey: ['system', 'fields'],
     queryFn: () => SystemFields.fields(),
@@ -80,7 +82,7 @@ const TypeAheadFieldInput = ({
         onBlur={onBlur}
         value={defaultValue}
         options={options}
-        placeholder="Select Field"
+        placeholder={t('type_ahead_field_input.select_field')}
         autoFocus={autoFocus}
       />
       <HelpBlock />

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Menu from 'components/bootstrap/Menu';
 import Button from 'components/bootstrap/Button';
@@ -43,21 +44,25 @@ const SplitButton = (
     ...props
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
-) => (
-  <Menu opened={open} onChange={onMenuChange} width={width}>
-    <ButtonGroup data-testid={dataTestId}>
-      <Button {...props} disabled={disabled} onClick={onClick}>
-        {title}
-      </Button>
-      <Menu.Target>
-        <Button ref={ref} aria-label="More Actions" {...props}>
-          <Icon name="arrow_drop_down" />
+) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Menu opened={open} onChange={onMenuChange} width={width}>
+      <ButtonGroup data-testid={dataTestId}>
+        <Button {...props} disabled={disabled} onClick={onClick}>
+          {title}
         </Button>
-      </Menu.Target>
-      <Menu.Dropdown>{children}</Menu.Dropdown>
-    </ButtonGroup>
-  </Menu>
-);
+        <Menu.Target>
+          <Button ref={ref} aria-label={t('actions.more_actions')} {...props}>
+            <Icon name="arrow_drop_down" />
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>{children}</Menu.Dropdown>
+      </ButtonGroup>
+    </Menu>
+  );
+};
 
 /** @component */
 export default React.forwardRef(SplitButton);

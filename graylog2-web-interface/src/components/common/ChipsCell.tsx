@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -121,6 +122,7 @@ const ChipsCell = ({
   itemLabel,
   itemTitle = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items?.length) {
@@ -166,8 +168,8 @@ const ChipsCell = ({
       {isTruncated && (
         <ToggleButton
           type="button"
-          aria-label={isExpanded ? 'Show fewer' : 'Show all'}
-          title={isExpanded ? 'Show fewer' : 'Show all'}
+          aria-label={isExpanded ? t('chips_cell.show_fewer') : t('chips_cell.show_all')}
+          title={isExpanded ? t('chips_cell.show_fewer') : t('chips_cell.show_all')}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             setIsExpanded((v) => !v);

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import parse, { domToReact, Element } from 'html-react-parser';
@@ -100,12 +101,19 @@ const Augment: Renderer = ({ html, transformer }) => {
   return parse(html, { replace });
 };
 
-const UnsupportedImageWarning = () => (
-  <span>
-    Images are not supported for security reasons. Please enable allowed sources{' '}
-    <Link to={Routes.SYSTEM.configurationsSection('Markdown')}>here</Link>
-  </span>
-);
+const UnsupportedImageWarning = () => {
+  const { t } = useTranslation('common');
+
+  return (
+    <span>
+      <Trans
+        t={t}
+        i18nKey="markdown.images_unsupported"
+        components={{ configurationLink: <Link to={Routes.SYSTEM.configurationsSection('Markdown')} /> }}
+      />
+    </span>
+  );
+};
 
 const imageWarningTransformer: Transformer = (domNode) => {
   if ('name' in domNode && domNode.name === 'img') {

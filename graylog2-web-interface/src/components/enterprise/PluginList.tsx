@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StatusIcon } from 'components/common';
@@ -23,12 +24,13 @@ import useProductName from 'brand-customization/useProductName';
 import style from './PluginList.css';
 
 const PluginList = () => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
   const ENTERPRISE_PLUGINS = useMemo(
     () => ({
-      'graylog-plugin-enterprise': `${productName} Plugin Enterprise`,
+      'graylog-plugin-enterprise': t('plugin_list.plugin_enterprise', { productName }),
     }),
-    [productName],
+    [productName, t],
   );
 
   const _formatPlugin = (pluginName: string) => {
@@ -38,7 +40,9 @@ const PluginList = () => {
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <StatusIcon active={!!plugin} />
         &nbsp;
-        {ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
+        {plugin
+          ? t('plugin_list.installed', { pluginName: ENTERPRISE_PLUGINS[pluginName] })
+          : t('plugin_list.not_installed', { pluginName: ENTERPRISE_PLUGINS[pluginName] })}
       </li>
     );
   };
@@ -47,7 +51,7 @@ const PluginList = () => {
 
   return (
     <>
-      <p>This is the status of {productName} Enterprise modules in this cluster:</p>
+      <p>{t('plugin_list.status', { productName })}</p>
       <ul className={style.enterprisePlugins}>{enterprisePluginList}</ul>
     </>
   );

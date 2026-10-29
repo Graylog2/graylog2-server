@@ -31,5 +31,22 @@
   "message_codec_help": "Select the codec that should be used to decode the message.",
   "select_codec_placeholder": "Select codec",
   "load_message_button": "Load message",
-  "loading_message_button": "Loading message..."
+  "loading_message_button": "Loading message...",
+  "tabs": {
+    "recent": "Recent Message",
+    "message_id": "Message ID",
+    "raw": "Raw Message",
+    "message_id_description": "Please provide the id and index of the message that you want to load in this form:",
+    "raw_description": "Load a message from text, as if it was sent by a log source."
+  },
+  "recent": {
+    "load_message": "Load Message",
+    "server_description_selected": "Click on \"Load Message\" to load the most recent message received by this input within the last hour.",
+    "server_description": "Select an Input from the list below and click \"Load Message\" to load the most recent message received by this input within the last hour.",
+    "forwarder_description": "Select an Input profile from the list below, then select an Input and click on \"Load message\" to load the most recent message received by this input within the last hour.",
+    "invalid_input_selected": "Invalid input selected: {{inputId}}",
+    "invalid_input_title": "Could not load message from invalid Input {{inputId}}",
+    "no_recent_message": "Input did not return a recent message.",
+    "input_type_select_label": "input type select"
+  }
 }

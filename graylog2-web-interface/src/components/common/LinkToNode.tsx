@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -41,6 +42,7 @@ type LinkToNodeProps = {
  */
 
 const LinkToNode = ({ nodeId }: LinkToNodeProps) => {
+  const { t } = useTranslation('common');
   const nodes = useStore(NodesStore, (state) => state?.nodes);
 
   if (!nodes) {
@@ -68,7 +70,7 @@ const LinkToNode = ({ nodeId }: LinkToNodeProps) => {
     return <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{content}</Link>;
   }
 
-  return <i>Unknown Node</i>;
+  return <i>{t('link_to_node.unknown_node')}</i>;
 };
 
 export default LinkToNode;

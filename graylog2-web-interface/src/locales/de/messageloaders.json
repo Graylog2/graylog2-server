@@ -31,5 +31,22 @@
   "message_codec_help": "Wählen Sie den Codec aus, der zum Dekodieren der Nachricht verwendet werden soll.",
   "select_codec_placeholder": "Codec auswählen",
   "load_message_button": "Nachricht laden",
-  "loading_message_button": "Nachricht wird geladen..."
+  "loading_message_button": "Nachricht wird geladen...",
+  "tabs": {
+    "recent": "Letzte Nachricht",
+    "message_id": "Nachrichten-ID",
+    "raw": "Rohnachricht",
+    "message_id_description": "Geben Sie in diesem Formular die ID und den Index der Nachricht an, die Sie laden möchten:",
+    "raw_description": "Laden Sie eine Nachricht aus Text, als wäre sie von einer Logquelle gesendet worden."
+  },
+  "recent": {
+    "load_message": "Nachricht laden",
+    "server_description_selected": "Klicken Sie auf „Nachricht laden“, um die zuletzt von diesem Input empfangene Nachricht der letzten Stunde zu laden.",
+    "server_description": "Wählen Sie unten einen Input aus der Liste aus und klicken Sie auf „Nachricht laden“, um die zuletzt von diesem Input empfangene Nachricht der letzten Stunde zu laden.",
+    "forwarder_description": "Wählen Sie unten ein Input-Profil aus der Liste aus, wählen Sie dann einen Input und klicken Sie auf „Nachricht laden“, um die zuletzt von diesem Input empfangene Nachricht der letzten Stunde zu laden.",
+    "invalid_input_selected": "Ungültiger Input ausgewählt: {{inputId}}",
+    "invalid_input_title": "Nachricht konnte nicht von ungültigem Input {{inputId}} geladen werden",
+    "no_recent_message": "Der Input hat keine aktuelle Nachricht zurückgegeben.",
+    "input_type_select_label": "Input-Typ auswählen"
+  }
 }
