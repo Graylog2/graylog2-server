@@ -540,6 +540,52 @@ describe('IndexSetsOverview', () => {
     }
   });
 
+  it('places backend-declared plugin columns in the configuration view and keeps them sortable', async () => {
+    asMock(useFetchEntities).mockReturnValue({
+      data: {
+        pagination: { total: 3 },
+        list: [defaultIndexSet, exampleIndexSet, readOnlyIndexSet],
+        attributes: [...attributes, { id: 'backend_plugin_column', title: 'Backend Plugin Column', sortable: true }],
+      },
+      refetch: () => {},
+      isInitialLoading: false,
+    });
+    const plugin = new PluginManifest(
+      {},
+      {
+        'components.indexSets.overview.tableElements': [
+          {
+            attributeName: 'backend_plugin_column',
+            group: 'configuration',
+            backendAttributeIds: ['backend_plugin_column'],
+            columnRenderers: {
+              backend_plugin_column: { renderCell: () => 'backend plugin cell', staticWidth: 'matchHeader' },
+            },
+          },
+        ],
+      },
+    );
+    PluginStore.register(plugin);
+
+    try {
+      render(<IndexSetsOverview />);
+
+      await screen.findByText('Title');
+
+      expect(screen.queryByText('Backend Plugin Column')).not.toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('radio', { name: 'Configuration' }));
+
+      await screen.findByText('Backend Plugin Column');
+      within(await findRow(exampleIndexSet)).getByText('backend plugin cell');
+
+      await userEvent.click(await screen.findByTitle('Toggle Backend Plugin Column actions'));
+      await screen.findByRole('menuitem', { name: /sort ascending/i });
+    } finally {
+      PluginStore.unregister(plugin);
+    }
+  });
+
   describe('associated streams section', () => {
     const openRoutingView = async () => userEvent.click(await screen.findByRole('radio', { name: 'Routing' }));
 
