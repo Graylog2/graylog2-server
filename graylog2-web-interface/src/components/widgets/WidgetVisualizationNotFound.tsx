@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
@@ -24,14 +25,19 @@ type Props = {
 };
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
+  const { t } = useTranslation('common');
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   useEffect(() => onRenderComplete(), [onRenderComplete]);
 
   return (
     <Alert bsStyle="danger">
-      Widget Visualization (<i>{widgetClassName}</i>) not found. It looks like the plugin supplying this widget is not
-      loaded.
+      <Trans
+        t={t}
+        i18nKey="widget_visualization_not_found.description"
+        values={{ widgetClassName }}
+        components={{ italic: <i /> }}
+      />
     </Alert>
   );
 };

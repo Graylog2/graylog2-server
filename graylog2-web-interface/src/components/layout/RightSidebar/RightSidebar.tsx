@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -138,6 +139,7 @@ const RightSidebar = () => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
+  const { t } = useTranslation('common');
 
   if (!content) {
     return null;
@@ -145,9 +147,16 @@ const RightSidebar = () => {
 
   if (isCollapsed) {
     return (
-      <CollapsedContainer role="complementary" aria-label={`${content.title} sidebar (collapsed)`}>
-        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
-        <CollapsedTitleArea onClick={expandSidebar} title="Expand sidebar">
+      <CollapsedContainer
+        role="complementary"
+        aria-label={t('right_sidebar.sidebar_label_collapsed', { title: content.title })}>
+        <IconButton
+          name="close"
+          title={t('right_sidebar.close')}
+          onClick={closeSidebar}
+          aria-label={t('right_sidebar.close')}
+        />
+        <CollapsedTitleArea onClick={expandSidebar} title={t('right_sidebar.expand')}>
           <CollapsedTitle>{content.title}</CollapsedTitle>
         </CollapsedTitleArea>
       </CollapsedContainer>
@@ -162,35 +171,40 @@ const RightSidebar = () => {
   }
 
   return (
-    <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
+    <Container $width={width} role="complementary" aria-label={t('right_sidebar.sidebar_label', { title: content.title })}>
       <SidebarRow className="content">
         <SidebarHeader>
           <NavigationButtons>
             <IconButton
               name="arrow_back"
-              title="Go back"
+              title={t('right_sidebar.go_back')}
               onClick={goBack}
               disabled={!canGoBack}
-              aria-label="Go back to previous content"
+              aria-label={t('right_sidebar.go_back_label')}
             />
             <IconButton
               name="arrow_forward"
-              title="Go forward"
+              title={t('right_sidebar.go_forward')}
               onClick={goForward}
               disabled={!canGoForward}
-              aria-label="Go forward to next content"
+              aria-label={t('right_sidebar.go_forward_label')}
             />
           </NavigationButtons>
           <SidebarTitle id="sidebar-title">{content.title}</SidebarTitle>
           <HeaderActions>
             <CollapseButton
               type="button"
-              title="Collapse sidebar"
+              title={t('right_sidebar.collapse')}
               onClick={collapseSidebar}
-              aria-label="Collapse sidebar">
+              aria-label={t('right_sidebar.collapse')}>
               <Icon name="collapse_content" />
             </CollapseButton>
-            <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
+            <IconButton
+              name="close"
+              title={t('right_sidebar.close')}
+              onClick={closeSidebar}
+              aria-label={t('right_sidebar.close')}
+            />
           </HeaderActions>
         </SidebarHeader>
         <SidebarContentArea aria-labelledby="sidebar-title">

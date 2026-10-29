@@ -276,7 +276,9 @@
     "add_favorite_failed": "Adding field to favorites failed with error: {{error}}",
     "add_favorite_failed_title": "Could not add field to favorites",
     "remove_favorite_failed": "Removing field from favorites failed with error: {{error}}",
-    "remove_favorite_failed_title": "Could not remove field from favorites"
+    "remove_favorite_failed_title": "Could not remove field from favorites",
+    "field_terms": "Field terms:",
+    "received_by_radio_value": "via <inputName/> on radio <node/>"
   },
   "entity_types": {
     "user": "user",
@@ -299,7 +301,8 @@
   "marketplace_link": "the {{productName}} Marketplace",
   "chips_cell": {
     "show_fewer": "Show fewer",
-    "show_all": "Show all"
+    "show_all": "Show all",
+    "filter_by": "Filter by {{itemLabel}} \"{{value}}\""
   },
   "compact_pagination": {
     "previous_page": "Previous page",
@@ -405,6 +408,161 @@
     "or": "or",
     "title": "Keyboard shortcuts",
     "view_all": "View all keyboard shortcuts"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}} sidebar",
+    "sidebar_label_collapsed": "{{title}} sidebar (collapsed)",
+    "close": "Close sidebar",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "go_back": "Go back",
+    "go_back_label": "Go back to previous content",
+    "go_forward": "Go forward",
+    "go_forward_label": "Go forward to next content"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.",
+      "limitations_title": "Limitations",
+      "limitations_supported": "Currently the ASN, city and country databases are supported.",
+      "limitations_more": "For support of additional database types, please visit our support channels.",
+      "asn_fields": "ASN database fields",
+      "country_fields": "Country database fields",
+      "city_fields": "City database fields",
+      "city_additional_fields": "In addition to the fields provided by the country database, the city database also includes the following fields:",
+      "complete_documentation": "For a complete documentation of the fields, please see MaxMind's <docsLink>developer documentation</docsLink>"
+    },
+    "database_types": {
+      "asn": "ASN database",
+      "city": "City database",
+      "country": "Country database",
+      "ipinfo_location": "IPinfo location database",
+      "ipinfo_asn": "IPinfo ASN database"
+    },
+    "field_set": {
+      "file_path": "File path",
+      "file_path_help": "The path to the database file.",
+      "database_type": "Database type",
+      "database_type_help": "Select the type of the database file",
+      "database_type_placeholder": "Select the type of database file",
+      "refresh_file": "Refresh file",
+      "refresh_file_help": "If enabled, the database file is checked for modifications and refreshed when it changed on disk."
+    },
+    "summary": {
+      "database_file_path": "Database file path",
+      "database_type": "Database type",
+      "check_interval": "Check interval"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Azure Blob Container Name",
+    "container_name_help": "Your Azure Blob Container name.",
+    "endpoint_url": "Azure Blob Endpoint URL",
+    "endpoint_url_help": "Your Azure Blob Endpoint URL, only required if you want to override the default endpoint.",
+    "account_name": "Azure account name",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "The name of your Azure storage account.",
+    "account_key_reset": "Azure Account Key",
+    "reset_password": "Reset password",
+    "account_key": "Azure account key",
+    "account_key_help": "The account key for your Azure storage account."
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage Project ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor Configuration",
+    "description": "The Geo-Location Processor plugin scans all messages for fields containing <bold>exclusively</bold> an IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into different fields. Read more in the <docsLink>documentation</docsLink>.",
+    "enabled_summary": "Enabled:",
+    "enforce_schema_summary": "Enforce default schema:",
+    "vendor_type_summary": "Database vendor type:",
+    "city_db_path_summary": "City database path:",
+    "asn_db_path_summary": "ASN database path:",
+    "refresh_interval_summary": "Database refresh interval:",
+    "pull_from_cloud_summary": "Pull files from cloud storage bucket:",
+    "edit": "Edit configuration",
+    "modal_title": "Update Geo-Location Processor Configuration",
+    "enable_processor": "Enable Geo-Location processor",
+    "enforce_schema": "Enforce default schema",
+    "vendor_select": "Select the GeoIP database vendor",
+    "city_db_path": "Path to the city database",
+    "asn_db_path": "Path to the ASN database",
+    "refresh_interval": "Database refresh interval",
+    "refresh_interval_help": "Interval at which the database files are checked for modifications and refreshed changes are detected on disk.",
+    "pull_from_cloud": "Pull files from cloud storage bucket",
+    "select_cloud_storage": "Select cloud storage",
+    "update_configuration": "Update configuration",
+    "updating_configuration": "Updating configuration..."
+  },
+  "links": {
+    "documentation": "documentation"
+  },
+  "quick_jump": {
+    "title": "Quick Jump",
+    "open": "Open Quick Jump",
+    "search_placeholder": "Search for pages/dashboards/streams ...",
+    "intro": "Please enter a search query to search for a page, stream, dashboard, input or other entities.",
+    "intro_hint": "To give you a head start, you will find a list of your <bold>last opened</bold> and <bold>favorite</bold> items below:",
+    "no_results": "No search results found. Please try different search terms.",
+    "recent": "Recent"
+  },
+  "scratchpad": {
+    "title": "Scratchpad",
+    "status_cleared": "Cleared.",
+    "status_auto_saved": "Auto saved.",
+    "got_it": "Got It!",
+    "sensitive_warning": "We recommend you do <bold>not</bold> store any sensitive information, such as passwords, in this area.",
+    "help_overlay": "You can use this space to store personal notes and other information, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.",
+    "copy": "Copy",
+    "clear": "Clear",
+    "clear_confirm": "This will clear out your Scratchpad content, do you wish to proceed?"
+  },
+  "extractor_actions": {
+    "select_type": "Select extractor type",
+    "only_string_fields": "Extractors can only be used with string fields."
+  },
+  "surrounding_search": {
+    "button": "Show surrounding messages"
+  },
+  "support_sources": {
+    "title": "Need help?",
+    "help_text": "Do not hesitate to consult the {{productName}} community if your questions are not answered in the <docsLink>documentation</docsLink>.",
+    "community_support": "Community support",
+    "issue_tracker": "Issue tracker",
+    "professional_support": "Professional support"
+  },
+  "times_list": {
+    "title": "Time configuration",
+    "description": "Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system. You can check timezone settings of specific {{productName}} server nodes on their respective detail page.",
+    "user": "User <bold>{{username}}</bold>:",
+    "web_browser": "Your web browser:",
+    "server": "{{productName}} server:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Widget Visualization (<italic>{{widgetClassName}}</italic>) not found. It looks like the plugin supplying this widget is not loaded."
+  },
+  "telemetry": {
+    "title": "Telemetry",
+    "enable_label": "Enable telemetry",
+    "enabled_checkbox": "enabled",
+    "update_preferences": "Update Preferences",
+    "update_button": "Update telemetry",
+    "info_modal_title": "Help us improve {{productName}}",
+    "ok": "Ok",
+    "info": "We would like to collect anonymous usage data to help us prioritize improvements and make {{productName}} better in the future.",
+    "no_personal_data": "We do not collect personal data, sensitive information, or content such as logs in your instances.",
+    "learn_more": "Learn more on our <privacyLink>Privacy Policy</privacyLink>.",
+    "turn_off_profile": "You can turn data collection off or on any time <bold>in the user profile</bold>.",
+    "turn_off_here": "You can turn data collection off or on any time here."
+  },
+  "app_facade": {
+    "preparing": "We are preparing the web interface for you..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}} Version Changed",
+    "version_changed": "Your {{productName}} version has changed from <bold>{{version}}</bold> to <bold>{{newVersion}}</bold>.",
+    "save_work": "Please save your work and reload the page to avoid running into errors.",
+    "reload_now": "Reload now"
   },
   "footer": {
     "system_info": "{{productName}} {{version}} on {{hostname}} ({{jvmInfo}})"

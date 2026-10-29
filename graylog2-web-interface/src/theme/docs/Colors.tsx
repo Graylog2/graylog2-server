@@ -16,6 +16,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Tooltip from 'components/common/Tooltip';
 import copyToClipboard from 'util/copyToClipboard';
@@ -66,6 +67,7 @@ type ColorSwatchProps = {
 };
 
 const ColorSwatch = ({ className = undefined, color, name = '', copyText = undefined }: ColorSwatchProps) => {
+  const { t } = useTranslation('common');
   const [opened, setOpened] = useState(false);
 
   const copyCallback = useCallback(() => {
@@ -80,7 +82,7 @@ const ColorSwatch = ({ className = undefined, color, name = '', copyText = undef
 
   return (
     <Wrapped className={className}>
-      <Tooltip label="Copied!" position="top" opened={opened}>
+      <Tooltip label={t('clipboard.copied')} position="top" opened={opened}>
         <Swatch color={color} onClick={copyCallback}>
           <Name>{name}</Name>
           <Value>{color}</Value>

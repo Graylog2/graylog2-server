@@ -15,32 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TimeUnit } from 'components/common';
 
 const DATABASE_TYPES = {
-  MAXMIND_ASN: 'ASN database',
-  MAXMIND_CITY: 'City database',
-  MAXMIND_COUNTRY: 'Country database',
-  IPINFO_STANDARD_LOCATION: 'IPinfo location database',
-  IPINFO_ASN: 'IPinfo ASN database',
+  MAXMIND_ASN: 'maxmind_adapter.database_types.asn',
+  MAXMIND_CITY: 'maxmind_adapter.database_types.city',
+  MAXMIND_COUNTRY: 'maxmind_adapter.database_types.country',
+  IPINFO_STANDARD_LOCATION: 'maxmind_adapter.database_types.ipinfo_location',
+  IPINFO_ASN: 'maxmind_adapter.database_types.ipinfo_asn',
 };
 
 type Props = {
   dataAdapter: any;
 };
 
-const MaxmindAdapterSummary = ({ dataAdapter: { config } }: Props) => (
-  <dl>
-    <dt>Database file path</dt>
-    <dd>{config.path}</dd>
-    <dt>Database type</dt>
-    <dd>{DATABASE_TYPES[config.database_type]}</dd>
-    <dt>Check interval</dt>
-    <dd>
-      <TimeUnit value={config.check_interval} unit={config.check_interval_unit} />
-    </dd>
-  </dl>
-);
+const MaxmindAdapterSummary = ({ dataAdapter: { config } }: Props) => {
+  const { t } = useTranslation('common');
+  const databaseTypeKey = DATABASE_TYPES[config.database_type];
+
+  return (
+    <dl>
+      <dt>{t('maxmind_adapter.summary.database_file_path')}</dt>
+      <dd>{config.path}</dd>
+      <dt>{t('maxmind_adapter.summary.database_type')}</dt>
+      <dd>{databaseTypeKey ? t(databaseTypeKey) : null}</dd>
+      <dt>{t('maxmind_adapter.summary.check_interval')}</dt>
+      <dd>
+        <TimeUnit value={config.check_interval} unit={config.check_interval_unit} />
+      </dd>
+    </dl>
+  );
+};
 
 export default MaxmindAdapterSummary;

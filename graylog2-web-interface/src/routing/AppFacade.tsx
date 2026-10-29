@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
@@ -45,6 +46,7 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 );
 
 const AppFacade = () => {
+  const { t } = useTranslation('common');
   const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
   const { server, ping } = useContext(ServerAvailabilityContext);
   const username = useStore(SessionStore, (state) => state?.username ?? '');
@@ -69,11 +71,11 @@ const AppFacade = () => {
     }
 
     if (!currentUser) {
-      return <LoadingPage text="We are preparing the web interface for you..." />;
+      return <LoadingPage text={t('app_facade.preparing')} />;
     }
 
     return <LoggedInPage />;
-  }, [currentUser, server, username]);
+  }, [currentUser, server, username, t]);
 
   return <ThemeProvider>{content}</ThemeProvider>;
 };

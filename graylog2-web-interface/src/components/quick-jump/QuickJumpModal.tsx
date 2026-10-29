@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Modal, Input, ListGroup } from 'components/bootstrap';
 import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
@@ -76,24 +77,29 @@ const Description = styled.div(
   `,
 );
 
-const QuickJumpIntro = () => (
-  <Explanation>
-    <Description>
-      Please enter a search query to search for a page, stream, dashboard, input or other entities.{' '}
-    </Description>
-    <Description>
-      To give you a head start, you will find a list of your <strong>last opened</strong> and <strong>favorite</strong>{' '}
-      items below:
-    </Description>
-    <br />
-  </Explanation>
-);
+const QuickJumpIntro = () => {
+  const { t } = useTranslation('common');
 
-const NoResultsFound = () => (
-  <Explanation>
-    <Description>No search results found. Please try different search terms.</Description>
-  </Explanation>
-);
+  return (
+    <Explanation>
+      <Description>{t('quick_jump.intro')}</Description>
+      <Description>
+        <Trans t={t} i18nKey="quick_jump.intro_hint" components={{ bold: <strong /> }} />
+      </Description>
+      <br />
+    </Explanation>
+  );
+};
+
+const NoResultsFound = () => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Explanation>
+      <Description>{t('quick_jump.no_results')}</Description>
+    </Explanation>
+  );
+};
 
 const SearchInputContainer = styled.div`
   display: inline-block;
@@ -109,6 +115,7 @@ const InputFeedback = styled.div`
 `;
 
 const QuickJumpModal = ({ onToggle }: Props) => {
+  const { t } = useTranslation('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 500);
   const { searchResults, isLoading } = useQuickJumpSearch(debouncedSearchQuery);
@@ -130,7 +137,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   return (
     <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={modalProps}>
       <Modal.Header>
-        <Modal.Title>Quick Jump</Modal.Title>
+        <Modal.Title>{t('quick_jump.title')}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -141,7 +148,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
             id="quick-jump-search"
             type="text"
             onChange={handleSearch}
-            placeholder="Search for pages/dashboards/streams ..."
+            placeholder={t('quick_jump.search_placeholder')}
             {...searchInputProps}
           />
           <InputFeedback>{isLoading && <Spinner delay={0} text="" />}</InputFeedback>

@@ -16,6 +16,7 @@
  */
 
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHotkey from 'hooks/useHotkey';
 import NavIcon from 'components/navigation/NavIcon';
@@ -24,6 +25,7 @@ import NavigationButton from 'components/navigation/NavigationButton';
 import QuickJumpModal from './QuickJumpModal';
 
 const QuickJumpModalContainer = () => {
+  const { t } = useTranslation('common');
   const [showQuickJumpModal, setShowQuickJumpModal] = useState(false);
   const toggleModal = useCallback(() => setShowQuickJumpModal((cur) => !cur), [setShowQuickJumpModal]);
 
@@ -35,8 +37,8 @@ const QuickJumpModalContainer = () => {
 
   return (
     <>
-      <NavigationButton aria-label="Open Quick Jump" id="quickjump-search-nav" onClick={toggleModal}>
-        <NavIcon type="search" title="Open Quick Jump" />
+      <NavigationButton aria-label={t('quick_jump.open')} id="quickjump-search-nav" onClick={toggleModal}>
+        <NavIcon type="search" title={t('quick_jump.open')} />
       </NavigationButton>
       {showQuickJumpModal && <QuickJumpModal onToggle={() => toggleModal()} />}
     </>

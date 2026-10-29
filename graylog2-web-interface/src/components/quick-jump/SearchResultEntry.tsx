@@ -17,6 +17,7 @@
 
 import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Badge from 'components/bootstrap/Badge';
 import { Icon } from 'components/common';
@@ -123,6 +124,7 @@ type Props = {
 };
 
 const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: Props) => {
+  const { t } = useTranslation('common');
   const typeColor = useTypeColor(item.type);
 
   return (
@@ -131,7 +133,7 @@ const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: 
       <FullWidthCol>
         <HeaderRow>
           <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-          {lastOpened ? <RecentBadge>Recent</RecentBadge> : null}
+          {lastOpened ? <RecentBadge>{t('quick_jump.recent')}</RecentBadge> : null}
         </HeaderRow>
 
         <div>

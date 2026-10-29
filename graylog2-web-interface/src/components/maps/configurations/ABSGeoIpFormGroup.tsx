@@ -17,12 +17,14 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FormikFormGroup } from 'components/common';
 import type { GeoIpConfigType } from 'components/maps/configurations/types';
 import { Button, Input } from 'components/bootstrap';
 
 const ABSGeoIpFormGroup = () => {
+  const { t } = useTranslation('common');
   const { values, setFieldValue } = useFormikContext<GeoIpConfigType>();
   const isKeySet = values.azure_account_key && 'is_set' in values.azure_account_key;
   const [isCreate] = useState(() => !isKeySet);
@@ -58,8 +60,8 @@ const ABSGeoIpFormGroup = () => {
       <FormikFormGroup
         name="azure_container"
         type="text"
-        label="Azure Blob Container Name"
-        help="Your Azure Blob Container name."
+        label={t('abs_geoip.container_name')}
+        help={t('abs_geoip.container_name_help')}
         labelClassName=""
         required
         disabled={!values.enabled}
@@ -68,8 +70,8 @@ const ABSGeoIpFormGroup = () => {
       <FormikFormGroup
         name="azure_endpoint"
         type="text"
-        label="Azure Blob Endpoint URL"
-        help="Your Azure Blob Endpoint URL, only required if you want to override the default endpoint."
+        label={t('abs_geoip.endpoint_url')}
+        help={t('abs_geoip.endpoint_url_help')}
         labelClassName=""
         disabled={!values.enabled}
         wrapperClassName=""
@@ -77,18 +79,22 @@ const ABSGeoIpFormGroup = () => {
       <FormikFormGroup
         name="azure_account"
         type="text"
-        label="Azure account name"
-        placeholder="your-account-name"
-        help="The name of your Azure storage account."
+        label={t('abs_geoip.account_name')}
+        placeholder={t('abs_geoip.account_name_placeholder')}
+        help={t('abs_geoip.account_name_help')}
         required
         disabled={!values.enabled}
         labelClassName=""
         wrapperClassName=""
       />
       {showResetPasswordButton ? (
-        <Input id="azure_account_reset" label="Azure Account Key" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+        <Input
+          id="azure_account_reset"
+          label={t('abs_geoip.account_key_reset')}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9">
           <Button onClick={toggleAccountKeyReset} disabled={!values.enabled}>
-            Reset password
+            {t('abs_geoip.reset_password')}
           </Button>
         </Input>
       ) : (
@@ -97,18 +103,18 @@ const ABSGeoIpFormGroup = () => {
           id="azure_account_key"
           data-testid="azure-account-key-input"
           type="password"
-          label="Azure account key"
+          label={t('abs_geoip.account_key')}
           disabled={!values.enabled}
           onChange={({ target: { value } }) => setAccessKey({ set_value: value })}
           buttonAfter={
             !isCreate ? (
               <Button type="button" onClick={toggleAccountKeyReset} disabled={!values.enabled}>
-                Undo Reset
+                {t('configuration_forms.undo_reset')}
               </Button>
             ) : undefined
           }
           placeholder="****************"
-          help="The account key for your Azure storage account."
+          help={t('abs_geoip.account_key_help')}
           required
         />
       )}

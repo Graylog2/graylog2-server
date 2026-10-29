@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
@@ -91,6 +92,7 @@ type Props = {
 };
 
 const SurroundingSearchButton = ({ timestamp, id, messageFields }: Props) => {
+  const { t } = useTranslation('common');
   const { streams, streamCategories } = useContext(DrilldownContext);
   const { config: searchConfig, isInitialLoading: isLoadingSearchConfig } = useSearchConfiguration();
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
@@ -120,7 +122,7 @@ const SurroundingSearchButton = ({ timestamp, id, messageFields }: Props) => {
 
   return (
     <DropdownButton
-      title="Show surrounding messages"
+      title={t('surrounding_search.button')}
       bsSize="small"
       id="surrounding-search-dropdown"
       disabled={isLoadingSearchConfig}>

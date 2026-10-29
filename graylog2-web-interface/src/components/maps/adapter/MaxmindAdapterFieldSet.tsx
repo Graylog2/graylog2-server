@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppConfig from 'util/AppConfig';
 import ObjectUtils from 'util/ObjectUtils';
@@ -43,6 +44,7 @@ const MaxmindAdapterFieldSet = ({
   validationState,
   validationMessage,
 }: MaxmindAdapterFieldSetProps) => {
+  const { t } = useTranslation('common');
   const isCloud = AppConfig.isCloud();
 
   const pathsForCloud = {
@@ -51,14 +53,14 @@ const MaxmindAdapterFieldSet = ({
   };
 
   const ipInfoDatabaseTypes = [
-    { label: 'IPinfo location database', value: 'IPINFO_STANDARD_LOCATION' },
-    { label: 'IPinfo ASN database', value: 'IPINFO_ASN' },
+    { label: t('maxmind_adapter.database_types.ipinfo_location'), value: 'IPINFO_STANDARD_LOCATION' },
+    { label: t('maxmind_adapter.database_types.ipinfo_asn'), value: 'IPINFO_ASN' },
   ];
 
   let databaseTypes = [
-    { label: 'ASN database', value: 'MAXMIND_ASN' },
-    { label: 'City database', value: 'MAXMIND_CITY' },
-    { label: 'Country database', value: 'MAXMIND_COUNTRY' },
+    { label: t('maxmind_adapter.database_types.asn'), value: 'MAXMIND_ASN' },
+    { label: t('maxmind_adapter.database_types.city'), value: 'MAXMIND_CITY' },
+    { label: t('maxmind_adapter.database_types.country'), value: 'MAXMIND_COUNTRY' },
   ];
 
   if (isCloud) {
@@ -97,11 +99,11 @@ const MaxmindAdapterFieldSet = ({
           type="text"
           id="path"
           name="path"
-          label="File path"
+          label={t('maxmind_adapter.field_set.file_path')}
           autoFocus
           required
           onChange={handleFormEvent}
-          help={validationMessage('path', 'The path to the database file.')}
+          help={validationMessage('path', t('maxmind_adapter.field_set.file_path_help'))}
           bsStyle={validationState('path')}
           value={config.path}
           labelClassName="col-sm-3"
@@ -110,14 +112,14 @@ const MaxmindAdapterFieldSet = ({
       )}
       <Input
         id="database-type-select"
-        label="Database type"
+        label={t('maxmind_adapter.field_set.database_type')}
         required
         autoFocus
-        help="Select the type of the database file"
+        help={t('maxmind_adapter.field_set.database_type_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9">
         <Select
-          placeholder="Select the type of database file"
+          placeholder={t('maxmind_adapter.field_set.database_type_placeholder')}
           clearable={false}
           options={databaseTypes}
           onChange={onDbTypeSelect}
@@ -125,8 +127,8 @@ const MaxmindAdapterFieldSet = ({
         />
       </Input>
       <TimeUnitInput
-        label="Refresh file"
-        help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
+        label={t('maxmind_adapter.field_set.refresh_file')}
+        help={t('maxmind_adapter.field_set.refresh_file_help')}
         update={updateCheckInterval}
         value={config.check_interval}
         unit={config.check_interval_unit || 'MINUTES'}

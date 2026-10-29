@@ -17,7 +17,7 @@
 import React from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
 import { ButtonGroup, Col, Label, Row } from 'components/bootstrap';
@@ -35,13 +35,17 @@ const Span = styled.span`
   word-break: break-word;
 `;
 
-const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined; messageId: string }) => (
-  <ButtonGroup className="pull-right">
-    <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
+const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined; messageId: string }) => {
+  const { t } = useTranslation('search');
 
-    <ClipboardButton title="Copy ID" bsSize="small" text={messageId} />
-  </ButtonGroup>
-);
+  return (
+    <ButtonGroup className="pull-right">
+      <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
+
+      <ClipboardButton title={t('common:message.copy_id')} bsSize="small" text={messageId} />
+    </ButtonGroup>
+  );
+};
 
 const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> | undefined; inputId: string }) => {
   const { t } = useTranslation('search');
@@ -141,20 +145,35 @@ const MessageDetail = ({
               <div>
                 <dt>{t('message_details.received_by')}</dt>
                 <dd>
-                  <em>
-                    <InputName inputs={inputs} inputId={message.source_input_id} />
-                  </em>{' '}
-                  on <NodeName nodeId={message.source_node_id} />
+                  <Trans
+                    t={t}
+                    i18nKey="common:message.received_by_value"
+                    components={{
+                      inputName: (
+                        <em>
+                          <InputName inputs={inputs} inputId={message.source_input_id} />
+                        </em>
+                      ),
+                      node: <NodeName nodeId={message.source_node_id} />,
+                    }}
+                  />
                   {/* Legacy */}
                   {message.source_radio_id && (
                     <>
                       <br />
                       <span>
-                        via{' '}
-                        <em>
-                          <InputName inputs={inputs} inputId={message.source_radio_input_id} />
-                        </em>{' '}
-                        on radio <NodeName nodeId={message.source_radio_id} />
+                        <Trans
+                          t={t}
+                          i18nKey="common:message.received_by_radio_value"
+                          components={{
+                            inputName: (
+                              <em>
+                                <InputName inputs={inputs} inputId={message.source_radio_input_id} />
+                              </em>
+                            ),
+                            node: <NodeName nodeId={message.source_radio_id} />,
+                          }}
+                        />
                       </span>
                     </>
                   )}

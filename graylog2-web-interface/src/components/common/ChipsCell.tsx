@@ -145,7 +145,7 @@ const ChipsCell = ({
       );
     }
 
-    const filterLabel = `Filter by ${itemLabel} "${itemTitle ? itemTitle(item) : item}"`;
+    const filterLabel = t('chips_cell.filter_by', { itemLabel, value: itemTitle ? itemTitle(item) : item });
 
     return (
       <HoverableLabel

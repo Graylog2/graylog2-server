@@ -279,7 +279,9 @@
     "add_favorite_failed": "Hinzufügen des Favoritenfelds fehlgeschlagen: {{error}}",
     "add_favorite_failed_title": "Feld konnte nicht zu den Favoriten hinzugefügt werden",
     "remove_favorite_failed": "Entfernen des Favoritenfelds fehlgeschlagen: {{error}}",
-    "remove_favorite_failed_title": "Feld konnte nicht aus den Favoriten entfernt werden"
+    "remove_favorite_failed_title": "Feld konnte nicht aus den Favoriten entfernt werden",
+    "field_terms": "Feldbegriffe:",
+    "received_by_radio_value": "über <inputName/> auf Radio <node/>"
   },
   "entity_types": {
     "user": "Benutzer",
@@ -302,7 +304,8 @@
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
     "show_fewer": "Weniger anzeigen",
-    "show_all": "Alle anzeigen"
+    "show_all": "Alle anzeigen",
+    "filter_by": "Nach {{itemLabel}} „{{value}}“ filtern"
   },
   "compact_pagination": {
     "previous_page": "Vorherige Seite",
@@ -408,6 +411,161 @@
     "or": "oder",
     "title": "Tastenkürzel",
     "view_all": "Alle Tastenkürzel anzeigen"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Seitenleiste {{title}}",
+    "sidebar_label_collapsed": "Seitenleiste {{title}} (eingeklappt)",
+    "close": "Seitenleiste schließen",
+    "expand": "Seitenleiste ausklappen",
+    "collapse": "Seitenleiste einklappen",
+    "go_back": "Zurück",
+    "go_back_label": "Zum vorherigen Inhalt wechseln",
+    "go_forward": "Vorwärts",
+    "go_forward_label": "Zum nächsten Inhalt wechseln"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "Der GeoIP-Datenadapter unterstützt das Lesen der GeoIP2-Datenbanken von MaxMind.",
+      "limitations_title": "Einschränkungen",
+      "limitations_supported": "Derzeit werden die ASN-, Stadt- und Länderdatenbanken unterstützt.",
+      "limitations_more": "Für die Unterstützung weiterer Datenbanktypen besuchen Sie bitte unsere Support-Kanäle.",
+      "asn_fields": "Felder der ASN-Datenbank",
+      "country_fields": "Felder der Länderdatenbank",
+      "city_fields": "Felder der Stadt-Datenbank",
+      "city_additional_fields": "Zusätzlich zu den Feldern der Länderdatenbank enthält die Stadt-Datenbank auch die folgenden Felder:",
+      "complete_documentation": "Eine vollständige Beschreibung der Felder finden Sie in der <docsLink>Entwicklerdokumentation</docsLink> von MaxMind"
+    },
+    "database_types": {
+      "asn": "ASN-Datenbank",
+      "city": "Stadt-Datenbank",
+      "country": "Länder-Datenbank",
+      "ipinfo_location": "IPinfo-Standortdatenbank",
+      "ipinfo_asn": "IPinfo-ASN-Datenbank"
+    },
+    "field_set": {
+      "file_path": "Dateipfad",
+      "file_path_help": "Der Pfad zur Datenbankdatei.",
+      "database_type": "Datenbanktyp",
+      "database_type_help": "Wählen Sie den Typ der Datenbankdatei aus",
+      "database_type_placeholder": "Typ der Datenbankdatei auswählen",
+      "refresh_file": "Dateiaktualisierung",
+      "refresh_file_help": "Wenn aktiviert, wird die Datenbankdatei auf Änderungen geprüft und aktualisiert, sobald sie sich auf dem Datenträger ändert."
+    },
+    "summary": {
+      "database_file_path": "Pfad zur Datenbankdatei",
+      "database_type": "Datenbanktyp",
+      "check_interval": "Prüfintervall"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Name des Azure-Blob-Containers",
+    "container_name_help": "Der Name Ihres Azure-Blob-Containers.",
+    "endpoint_url": "URL des Azure-Blob-Endpunkts",
+    "endpoint_url_help": "Die URL Ihres Azure-Blob-Endpunkts. Sie ist nur erforderlich, wenn Sie den Standardendpunkt überschreiben möchten.",
+    "account_name": "Name des Azure-Kontos",
+    "account_name_placeholder": "ihr-kontoname",
+    "account_name_help": "Der Name Ihres Azure-Speicherkontos.",
+    "account_key_reset": "Azure-Kontoschlüssel",
+    "reset_password": "Passwort zurücksetzen",
+    "account_key": "Azure-Kontoschlüssel",
+    "account_key_help": "Der Kontoschlüssel für Ihr Azure-Speicherkonto."
+  },
+  "gcs_geoip": {
+    "project_id": "Projekt-ID von Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location-Processor-Konfiguration",
+    "description": "Das Geo-Location-Processor-Plugin durchsucht alle Nachrichten nach Feldern, die <bold>ausschließlich</bold> eine IP-Adresse enthalten, und speichert deren Geolokationsdaten (Koordinaten, ISO-Ländercode und Stadtname) in separaten Feldern. Weitere Informationen finden Sie in der <docsLink>Dokumentation</docsLink>.",
+    "enabled_summary": "Aktiviert:",
+    "enforce_schema_summary": "Standardschema erzwingen:",
+    "vendor_type_summary": "Datenbankanbieter-Typ:",
+    "city_db_path_summary": "Pfad zur Stadt-Datenbank:",
+    "asn_db_path_summary": "Pfad zur ASN-Datenbank:",
+    "refresh_interval_summary": "Aktualisierungsintervall der Datenbank:",
+    "pull_from_cloud_summary": "Dateien aus Cloud-Storage-Bucket abrufen:",
+    "edit": "Konfiguration bearbeiten",
+    "modal_title": "Geo-Location-Processor-Konfiguration aktualisieren",
+    "enable_processor": "Geo-Location-Processor aktivieren",
+    "enforce_schema": "Standardschema erzwingen",
+    "vendor_select": "GeoIP-Datenbankanbieter auswählen",
+    "city_db_path": "Pfad zur Stadt-Datenbank",
+    "asn_db_path": "Pfad zur ASN-Datenbank",
+    "refresh_interval": "Aktualisierungsintervall der Datenbank",
+    "refresh_interval_help": "Intervall, in dem die Datenbankdateien auf Änderungen geprüft werden. Geänderte Dateien auf dem Datenträger werden erkannt.",
+    "pull_from_cloud": "Dateien aus Cloud-Storage-Bucket abrufen",
+    "select_cloud_storage": "Cloud-Speicher auswählen",
+    "update_configuration": "Konfiguration aktualisieren",
+    "updating_configuration": "Konfiguration wird aktualisiert..."
+  },
+  "links": {
+    "documentation": "Dokumentation"
+  },
+  "quick_jump": {
+    "title": "Quick Jump",
+    "open": "Quick Jump öffnen",
+    "search_placeholder": "Nach Seiten/Dashboards/Streams suchen ...",
+    "intro": "Geben Sie eine Suchanfrage ein, um nach einer Seite, einem Stream, einem Dashboard, einem Input oder anderen Einträgen zu suchen.",
+    "intro_hint": "Damit Sie schnell loslegen können, finden Sie unten eine Liste Ihrer <bold>zuletzt geöffneten</bold> und <bold>favorisierten</bold> Einträge:",
+    "no_results": "Keine Suchergebnisse gefunden. Bitte versuchen Sie andere Suchbegriffe.",
+    "recent": "Zuletzt"
+  },
+  "scratchpad": {
+    "title": "Scratchpad",
+    "status_cleared": "Geleert.",
+    "status_auto_saved": "Automatisch gespeichert.",
+    "got_it": "Verstanden!",
+    "sensitive_warning": "Wir empfehlen, in diesem Bereich <bold>keine</bold> sensiblen Informationen wie Passwörter zu speichern.",
+    "help_overlay": "Sie können diesen Bereich nutzen, um persönliche Notizen und andere Informationen zu speichern, ohne das Browserfenster zu verlassen. Speichern Sie zum Beispiel Zeitstempel, Benutzer-IDs oder IP-Adressen, die Sie bei verschiedenen Untersuchungen benötigen.",
+    "copy": "Kopieren",
+    "clear": "Leeren",
+    "clear_confirm": "Dadurch wird der Inhalt Ihres Scratchpads gelöscht. Möchten Sie fortfahren?"
+  },
+  "extractor_actions": {
+    "select_type": "Extractor-Typ auswählen",
+    "only_string_fields": "Extractors können nur mit Textfeldern verwendet werden."
+  },
+  "surrounding_search": {
+    "button": "Umgebende Nachrichten anzeigen"
+  },
+  "support_sources": {
+    "title": "Brauchen Sie Hilfe?",
+    "help_text": "Wenden Sie sich gerne an die {{productName}}-Community, wenn Ihre Fragen in der <docsLink>Dokumentation</docsLink> nicht beantwortet werden.",
+    "community_support": "Community-Support",
+    "issue_tracker": "Issue-Tracker",
+    "professional_support": "Professioneller Support"
+  },
+  "times_list": {
+    "title": "Zeitkonfiguration",
+    "description": "Der Umgang mit Zeitzonen kann verwirrend sein. Hier sehen Sie die Zeitzone, die auf verschiedene Komponenten Ihres Systems angewendet wird. Die Zeitzoneneinstellungen einzelner {{productName}}-Server-Nodes können Sie auf der jeweiligen Detailseite prüfen.",
+    "user": "Benutzer <bold>{{username}}</bold>:",
+    "web_browser": "Ihr Webbrowser:",
+    "server": "{{productName}}-Server:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Widget-Visualisierung (<italic>{{widgetClassName}}</italic>) nicht gefunden. Das Plugin, das dieses Widget bereitstellt, scheint nicht geladen zu sein."
+  },
+  "telemetry": {
+    "title": "Telemetrie",
+    "enable_label": "Telemetrie aktivieren",
+    "enabled_checkbox": "aktiviert",
+    "update_preferences": "Voreinstellungen aktualisieren",
+    "update_button": "Telemetrie aktualisieren",
+    "info_modal_title": "Helfen Sie uns, {{productName}} zu verbessern",
+    "ok": "OK",
+    "info": "Wir möchten anonyme Nutzungsdaten erfassen, um Verbesserungen gezielter zu priorisieren und {{productName}} in Zukunft besser zu machen.",
+    "no_personal_data": "Wir erfassen keine personenbezogenen Daten, sensiblen Informationen oder Inhalte wie Logs in Ihren Instanzen.",
+    "learn_more": "Weitere Informationen finden Sie in unserer <privacyLink>Datenschutzerklärung</privacyLink>.",
+    "turn_off_profile": "Sie können die Datenerfassung jederzeit <bold>im Benutzerprofil</bold> ein- oder ausschalten.",
+    "turn_off_here": "Sie können die Datenerfassung jederzeit hier ein- oder ausschalten."
+  },
+  "app_facade": {
+    "preparing": "Die Weboberfläche wird für Sie vorbereitet..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}}-Version wurde geändert",
+    "version_changed": "Ihre {{productName}}-Version wurde von <bold>{{version}}</bold> auf <bold>{{newVersion}}</bold> geändert.",
+    "save_work": "Bitte speichern Sie Ihre Arbeit und laden Sie die Seite neu, um Fehler zu vermeiden.",
+    "reload_now": "Jetzt neu laden"
   },
   "footer": {
     "system_info": "{{productName}} {{version}} auf {{hostname}} ({{jvmInfo}})"
