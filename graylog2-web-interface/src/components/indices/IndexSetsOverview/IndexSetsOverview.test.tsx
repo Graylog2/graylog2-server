@@ -446,7 +446,10 @@ describe('IndexSetsOverview', () => {
     mockMetrics({ metricsByIndexSetId: {}, isLoading: true });
     render(<IndexSetsOverview />);
 
-    expect(await within(await findRow(exampleIndexSet)).findAllByText(/loading/i)).toHaveLength(2);
+    const exampleRow = await findRow(exampleIndexSet);
+
+    // Each spinner appears after its own delay, so they can show up in different renders.
+    await waitFor(() => expect(within(exampleRow).getAllByText(/loading/i)).toHaveLength(2));
   });
 
   it('keeps loaded metrics while the missing ones are loading', async () => {
