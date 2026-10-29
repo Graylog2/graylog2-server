@@ -125,10 +125,13 @@ export const useAllIndices = () =>
     }),
   });
 
-export const useMultipleIndices = (indexNames: string[]) =>
-  useQuery({
-    queryKey: [...INDICES_QUERY_KEY, 'multiple', [...indexNames].sort()],
-    queryFn: () => fetchMultipleIndices(indexNames),
-    enabled: indexNames.length > 0,
+export const useMultipleIndices = (indexNames: string[]) => {
+  const sortedIndexNames = [...indexNames].sort();
+
+  return useQuery({
+    queryKey: [...INDICES_QUERY_KEY, 'multiple', sortedIndexNames],
+    queryFn: () => fetchMultipleIndices(sortedIndexNames),
+    enabled: sortedIndexNames.length > 0,
     refetchInterval: 5000,
   });
+};

@@ -24,6 +24,7 @@ import { defaultOnError } from 'util/conditional/onError';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { Metric, NodeMetric } from 'types/metrics';
 import type { StubResponse } from 'util/UtilityTypes';
+import { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 export const GRAYLOG_NODE_METRIC_NAMES = {
   journalSize: 'org.graylog2.journal.size',
@@ -130,7 +131,7 @@ const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined
   return Object.fromEntries(response.metrics.map((metric) => [metric.full_name, metric])) as NodeMetric;
 };
 
-const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
+const fetchGraylogNodeMetrics = async (nodeIds: Array<string>, productName: string) => {
   if (!nodeIds.length) {
     return {};
   }
@@ -142,8 +143,8 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
       try {
         const response = await defaultOnError(
           fetch('POST', url, { metrics: METRIC_NAMES_LIST }),
-          'Loading Graylog node metrics failed with status',
-          'Could not load Graylog node metrics.',
+          `Loading ${productName} node metrics failed with status`,
+          `Could not load ${productName} node metrics.`,
         );
 
         return { nodeId, response };
@@ -172,10 +173,11 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
 
 export const fetchClusterGraylogNodesWithMetrics = async (
   searchParams: SearchParams = DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS,
+  productName: string = DEFAULT_PRODUCT_NAME,
 ): Promise<GraylogNodesResponse & { list: Array<ClusterGraylogNode> }> => {
   const base = await fetchGraylogNodes(searchParams);
   const nodeIds = Array.from(new Set(base.list.map(({ node_id }) => node_id).filter(Boolean)));
-  const metricsByNodeId = nodeIds.length ? await fetchGraylogNodeMetrics(nodeIds) : {};
+  const metricsByNodeId = nodeIds.length ? await fetchGraylogNodeMetrics(nodeIds, productName) : {};
 
   return {
     ...base,
