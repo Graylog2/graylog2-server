@@ -1,5 +1,30 @@
 {
   "administration": {
+    "collectors_administration": {
+      "edit_configuration": "Edit configuration",
+      "inactive": "inactive",
+      "no_collectors": "There are no collectors to display",
+      "no_compatible_collectors": "No collectors compatible with {{operatingSystem}}",
+      "no_filter_matches": "Filters do not match any collectors",
+      "select_all": "Select all",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "Assign Configurations",
+      "cannot_change_configurations": "Cannot change configurations of {{collectors}} collectors simultaneously.",
+      "incompatible_collectors": "Incompatible collectors, please check your sidecar configuration."
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Collector Status",
+      "configuration": "Configuration",
+      "filter_by_collector": "Filter by collector",
+      "filter_by_configuration": "Filter by configuration",
+      "filter_by_os": "Filter by OS",
+      "filter_by_status": "Filter by collector status",
+      "os": "OS"
+    },
     "configuration_modal": {
       "add_configuration": "Add a new configuration",
       "assigned_from_tags": "Assigned from tags: {{tags}}",
@@ -18,6 +43,12 @@
       "sidecars_summary_other": "{{count}} sidecars",
       "title": "Configuration summary"
     },
+    "filters_summary": {
+      "clear_all": "Clear all",
+      "collector_on_os": "{{name}} on {{os}}",
+      "filters": "Filters"
+    },
+    "loading_collectors": "Loading collector list...",
     "process": {
       "actions": {
         "restart": "Restart",
@@ -47,7 +78,231 @@
     }
   },
   "common": {
-    "save": "Save"
+    "clone_menu": {
+      "done": "Done",
+      "name": "Name",
+      "name_help": "Type a name for the new collector",
+      "title": "Clone"
+    },
+    "collector_indicator": {
+      "on_os": "on {{operatingSystem}}"
+    },
+    "save": "Save",
+    "sidecar_search_form": {
+      "field_last_seen": "Date and time when the sidecar last communicated with {{productName}}",
+      "field_node_id": "Identifier of the sidecar",
+      "field_operating_system": "Operating system the sidecar is running on",
+      "field_sidecar_version": "Sidecar version",
+      "field_status": "Status of the sidecar as it appears in the list, i.e. running, failing, or unknown",
+      "last_seen_example": "Find sidecars that have not communicated since a specific date:",
+      "placeholder": "Find sidecars",
+      "status_example": "Find sidecars with <code>failing</code> or <code>unknown</code> status:"
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "Create collector",
+      "default_template": "Default Template",
+      "default_template_help": "The default Collector configuration.",
+      "execute_parameters": "Execute Parameters",
+      "execute_parameters_help": "Parameters the collector is started with.<strong> %s will be replaced by the path to the configuration file.</strong>",
+      "executable_path": "Executable Path",
+      "executable_path_help": "Path to the collector executable",
+      "name": "Name",
+      "name_help": "Name for this collector",
+      "operating_system": "Operating System",
+      "operating_system_help": "Choose the operating system this collector is meant for.",
+      "optional": "(Optional)",
+      "process_management": "Process management",
+      "service_type": "Service Type",
+      "service_type_exec": "Foreground execution",
+      "service_type_help": "Choose the service type this collector is meant for.",
+      "service_type_svc": "Windows service",
+      "update_collector": "Update collector",
+      "validation_parameters": "Parameters for Configuration Validation",
+      "validation_parameters_help": "Parameters that validate the configuration file. <strong> %s will be replaced by the path to the configuration file.</strong>"
+    },
+    "configuration_form": {
+      "change_color": "Change color",
+      "collector": "Collector",
+      "collector_help": "Choose the log collector this configuration is meant for.",
+      "collector_in_use": "Log Collector cannot change while the Configuration is in use. Clone the Configuration to test it using another Collector.",
+      "collector_on_os": "{{name}} on {{os}}",
+      "collector_placeholder": "Collector",
+      "color": "Configuration color",
+      "color_help": "Choose a color to use for this configuration.",
+      "create_configuration": "Create configuration",
+      "name": "Name",
+      "name_help": "Required. Name for this configuration",
+      "preview": "Preview",
+      "tags": "Configuration Assignment Tags",
+      "tags_help": "Sidecars which are configured with a matching tag will automatically receive this configuration.",
+      "template": "Configuration",
+      "template_help": "Required. Collector configuration, see quick reference for more information.",
+      "template_required": "Please fill out the configuration field.",
+      "unknown_collector": "Unknown collector",
+      "update_configuration": "Update configuration",
+      "use_default_template_confirm": "Do you want to use the default template for the selected Configuration?"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Filebeat Reference",
+      "nxlog_reference": "NXLog Reference Manual",
+      "reference_help": "We provide collector configuration templates to get you started.<lineBreak/>For further information please refer to the official documentation of your collector.",
+      "runtime_variables_help": "These variables will be filled with the runtime information from each Sidecar",
+      "tab_reference": "Reference",
+      "tab_runtime_variables": "Runtime Variables",
+      "tab_variables": "Variables",
+      "title": "Collector Configuration Reference",
+      "variables_help": "Use variables to share text snippets across multiple configurations.<lineBreak/>If your configuration format needs to use literals like <code>${foo}</code>, which shall not act as a variable, you will have to write it as <code>${'$'}{foo}</code>.",
+      "winlogbeat_reference": "Winlogbeat Reference"
+    },
+    "configuration_tags_select": {
+      "placeholder": "Choose tags..."
+    },
+    "source_view_modal": {
+      "close": "Close",
+      "empty_template": "<empty template>",
+      "error_fetching_configuration": "Error fetching configuration: {{error}}",
+      "error_rendering_preview": "Error rendering preview: {{error}}",
+      "title": "Configuration"
+    },
+    "configuration_variables_helper": {
+      "actions": "Actions",
+      "close": "Close",
+      "delete": "Delete",
+      "delete_confirm_text": "Are you sure you want to remove the configuration variable <strong>{{name}}</strong>?",
+      "delete_confirm_title": "Delete Configuration Variable?",
+      "description": "Description",
+      "error_delete_title": "Error deleting configuration variable <strong>${user.{{name}}}</strong>",
+      "error_in_use": "Cannot delete this configuration variable as it is still in use. Please remove the variable from the following configurations and try again.",
+      "name": "Name"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "Create",
+      "create_variable": "Create Variable",
+      "content": "Content",
+      "content_help": "Write your variable content",
+      "description": "Description",
+      "description_help": "Type a description for this variable",
+      "edit": "Edit",
+      "edit_action": "Edit",
+      "name": "Name",
+      "name_help": "Type a name for this variable",
+      "optional": "(Optional)",
+      "title": "{{action}} Variable ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "Description",
+      "name": "Name",
+      "node_id": "UUID of the sidecar.",
+      "node_name": "The name of the sidecar, defaults to hostname if not set.",
+      "operating_system": "Name of the operating system the sidecar is running on, e.g. <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "Version string of the running sidecar.",
+      "spool_dir": "A directory that is unique per configuration and can be used to store collector data.",
+      "tags": "A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets. e.g.:"
+    }
+  },
+  "configurations": {
+    "collector_list": {
+      "actions": "Actions",
+      "create_collector": "Create Log Collector",
+      "description": "Manage Log Collectors that you can configure and supervise through sidecars and the web interface.",
+      "name": "Name",
+      "no_data": "There are no log collectors to display, why don't you create one?",
+      "operating_system": "Operating System",
+      "placeholder": "Find collectors",
+      "title": "Log Collectors",
+      "total": "{{total}} total"
+    },
+    "collector_row": {
+      "delete_confirm": "You are about to delete collector \"{{name}}\". Are you sure?",
+      "edit": "Edit"
+    },
+    "configuration_list": {
+      "actions": "Actions",
+      "collector": "Collector",
+      "color": "Color",
+      "configuration": "Configuration",
+      "create_configuration": "Create Configuration",
+      "description": "These are the Configurations to use in your Collectors. Remember to apply new configurations to Collectors in the Administration page.",
+      "no_data": "There are no configurations to display, try creating one or changing your query.",
+      "placeholder": "Find configurations",
+      "title": "Configurations",
+      "total": "{{total}} total"
+    },
+    "configuration_row": {
+      "clone": "Clone",
+      "delete_confirm": "You are about to delete configuration \"{{name}}\". Are you sure?",
+      "edit": "Edit",
+      "unknown_collector": "Unknown collector"
+    }
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {
+        "collector": "Collector",
+        "error_message": "Error Message",
+        "last_seen": "Last Seen",
+        "sidecar": "Sidecar",
+        "status": "Status",
+        "verbose_message": "Verbose Message"
+      },
+      "hide_inactive_sidecars": "Hide inactive sidecars",
+      "include_inactive_hint": " and/or click on \"Include inactive sidecars\"",
+      "include_inactive_sidecars": "Include inactive sidecars",
+      "no_failures": "There are no sidecars with failures.",
+      "no_matching_sidecars": "There are no sidecars with failures matching the search criteria. Try adjusting your search filter: {{query}} {{inactiveHint}}"
+    },
+    "rows": {
+      "inactive_annotation": " (inactive)",
+      "show_more": "Show more",
+      "sidecar_version": "v{{version}}"
+    }
+  },
+  "sidecars": {
+    "sidecar_list": {
+      "hide_inactive_sidecars": "Hide inactive sidecars",
+      "include_inactive_hint": " and/or click on \"Include inactive sidecars\"",
+      "include_inactive_sidecars": "Include inactive sidecars",
+      "last_seen": "Last Seen",
+      "name": "Name",
+      "no_matching_sidecars": "There are no sidecars matching the search criteria. Try adjusting your search filter{{inactiveHint}}.",
+      "no_sidecars": "There are no sidecars configured.",
+      "node_id": "Node Id",
+      "operating_system": "Operating System",
+      "sidecar_version": "Sidecar Version",
+      "status": "Status"
+    },
+    "sidecar_row": {
+      "inactive_annotation": " (inactive)",
+      "manage_sidecar": "Manage sidecar",
+      "show_messages": "Show messages"
+    },
+    "sidecar_status": {
+      "collector_running": "Collector is running.",
+      "collector_unknown": "Collector status is currently unknown.",
+      "collectors_status_title": "Collectors status",
+      "collectors_status_unavailable": "Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.",
+      "cpu_idle": "CPU Idle",
+      "ip_address": "IP Address",
+      "load": "Load",
+      "log_files_title": "Log Files",
+      "node_details_title": "Node details",
+      "node_details_unavailable": "Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.",
+      "no_collectors": "There are no collectors configured in this sidecar.",
+      "no_status_received": "Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.",
+      "none": "None",
+      "not_available": "Not available",
+      "operating_system": "Operating System",
+      "recently_modified": "Recently modified files will be highlighted in blue.",
+      "show_details": "Show Details",
+      "volumes_75": "Volumes > 75% full"
+    },
+    "verbose_message_modal": {
+      "close": "Close",
+      "no_messages": "<no messages>",
+      "title": "Error Details for <em>{{collectorName}}</em>"
+    }
   },
   "pages": {
     "administration": {

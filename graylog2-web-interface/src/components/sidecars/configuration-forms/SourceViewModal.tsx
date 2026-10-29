@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import isEqual from 'lodash/isEqual';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import { renderConfigurationPreview, fetchConfiguration } from 'hooks/useCollectorConfigurations';
@@ -25,7 +27,7 @@ type SourceViewModalProps = {
   templateString?: string;
   showModal: boolean;
   onHide: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class SourceViewModal extends React.Component<
   SourceViewModalProps,
@@ -75,7 +77,9 @@ class SourceViewModal extends React.Component<
         },
         (error) => {
           this.setState({
-            source: `Error rendering preview: ${error.responseMessage ? error.responseMessage : error}`,
+            source: this.props.t('configuration_forms.source_view_modal.error_rendering_preview', {
+              error: error.responseMessage ? error.responseMessage : error,
+            }),
           });
         },
       );
@@ -85,7 +89,11 @@ class SourceViewModal extends React.Component<
           this.setState({ source: configuration.template, name: configuration.name });
         },
         (error) => {
-          this.setState({ source: `Error fetching configuration: ${error.responseMessage || error}` });
+          this.setState({
+            source: this.props.t('configuration_forms.source_view_modal.error_fetching_configuration', {
+              error: error.responseMessage || error,
+            }),
+          });
         },
       );
     }
@@ -97,18 +105,18 @@ class SourceViewModal extends React.Component<
         <Modal.Header>
           <Modal.Title>
             <span>
-              Configuration <em>{this.state.name}</em>
+              {this.props.t('configuration_forms.source_view_modal.title')} <em>{this.state.name}</em>
             </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="configuration">
-            <pre>{this.state.source || '<empty template>'}</pre>
+            <pre>{this.state.source || this.props.t('configuration_forms.source_view_modal.empty_template')}</pre>
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" onClick={this.props.onHide}>
-            Close
+            {this.props.t('configuration_forms.source_view_modal.close')}
           </Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
@@ -116,4 +124,4 @@ class SourceViewModal extends React.Component<
   }
 }
 
-export default SourceViewModal;
+export default withTranslation('sidecars')(SourceViewModal);

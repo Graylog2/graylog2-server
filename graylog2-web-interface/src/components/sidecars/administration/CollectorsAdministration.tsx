@@ -20,6 +20,7 @@ import union from 'lodash/union';
 import uniq from 'lodash/uniq';
 import without from 'lodash/without';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Link, ControlledTableList, PaginatedList, IconButton } from 'components/common';
@@ -144,6 +145,7 @@ const CollectorsAdministration = ({
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const selectAllInput = useRef(null);
+  const { t } = useTranslation('sidecars');
 
   // Filter out sidecars with no compatible collectors
   const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !isEmpty(collector));
@@ -230,7 +232,11 @@ const CollectorsAdministration = ({
           ref={selectAllInput}
           id="select-all-checkbox"
           type="checkbox"
-          label={selectedItems === 0 ? 'Select all' : `${selectedItems} selected`}
+          label={
+            selectedItems === 0
+              ? t('administration.collectors_administration.select_all')
+              : t('administration.collectors_administration.selected', { count: selectedItems })
+          }
           disabled={enabledCollectors.length === 0}
           checked={isAllSelected(enabledCollectors, selected)}
           onChange={toggleSelectAll}
@@ -259,7 +265,11 @@ const CollectorsAdministration = ({
         </Row>
         <Row>
           <Col md={12}>
-            <span>No collectors compatible with {sidecar.node_details.operating_system}</span>
+            <span>
+              {t('administration.collectors_administration.no_compatible_collectors', {
+                operatingSystem: sidecar.node_details.operating_system,
+              })}
+            </span>
           </Col>
         </Row>
       </DisabledCollector>
@@ -318,7 +328,7 @@ const CollectorsAdministration = ({
             {configAssignments.length > 0 && (
               <IconButton
                 name="edit_square"
-                title="Edit configuration"
+                title={t('administration.collectors_administration.edit_configuration')}
                 onClick={() => {
                   setSelected([collectorId]);
                   setShowConfigurationModal(true);
@@ -352,7 +362,7 @@ const CollectorsAdministration = ({
                 {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
                 &emsp;
                 <small>
-                  {sidecar.node_id} {!sidecar.active && <b>&mdash; inactive</b>}
+                  {sidecar.node_id} {!sidecar.active && <b>&mdash; {t('administration.collectors_administration.inactive')}</b>}
                 </small>
               </AlignedInformation>
             </Col>
@@ -394,8 +404,8 @@ const CollectorsAdministration = ({
     formattedCollectors = (
       <ControlledTableList.Item>
         {sidecarCollectorPairs.length === 0
-          ? 'There are no collectors to display'
-          : 'Filters do not match any collectors'}
+          ? t('administration.collectors_administration.no_collectors')
+          : t('administration.collectors_administration.no_filter_matches')}
       </ControlledTableList.Item>
     );
   } else {

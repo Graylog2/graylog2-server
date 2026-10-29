@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -34,26 +35,35 @@ type VerboseMessageModalProps = {
   collectorVerbose: string;
 };
 
-const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }: VerboseMessageModalProps) => (
-  <BootstrapModalWrapper showModal={showModal} onHide={onHide} bsSize="large">
-    <Modal.Header>
-      <Modal.Title>
-        <span>
-          Error Details for <em>{collectorName}</em>
-        </span>
-      </Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <pre>
-        <VerboseMessage>{collectorVerbose || '<no messages>'}</VerboseMessage>
-      </pre>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button type="button" onClick={onHide}>
-        Close
-      </Button>
-    </Modal.Footer>
-  </BootstrapModalWrapper>
-);
+const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }: VerboseMessageModalProps) => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <BootstrapModalWrapper showModal={showModal} onHide={onHide} bsSize="large">
+      <Modal.Header>
+        <Modal.Title>
+          <span>
+            <Trans
+              t={t}
+              i18nKey="sidecars.verbose_message_modal.title"
+              components={{ em: <em /> }}
+              values={{ collectorName }}
+            />
+          </span>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <pre>
+          <VerboseMessage>{collectorVerbose || t('sidecars.verbose_message_modal.no_messages')}</VerboseMessage>
+        </pre>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" onClick={onHide}>
+          {t('sidecars.verbose_message_modal.close')}
+        </Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
+  );
+};
 
 export default VerboseMessageModal;

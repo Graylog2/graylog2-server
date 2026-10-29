@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { ClearFloat, Spinner } from 'components/common';
@@ -41,7 +43,7 @@ const _renderConfigList = (configurations) => (
 
 type ConfigurationVariablesHelperProps = {
   onVariableRename: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 type ConfigurationVariable = {
   id: string;
@@ -132,7 +134,7 @@ class ConfigurationVariablesHelper extends React.Component<
           <td>{configVar.description}</td>
           <td>
             <Button bsStyle="danger" bsSize="xsmall" onClick={this._handleDeleteCheck(configVar)}>
-              Delete
+              {this.props.t('configuration_forms.configuration_variables_helper.delete')}
             </Button>
             &nbsp;
             <EditConfigurationVariableModal
@@ -182,6 +184,7 @@ class ConfigurationVariablesHelper extends React.Component<
     }
 
     const { variableToDelete, errorModalContent, showModal, showConfirmModal } = this.state;
+    const { t } = this.props;
 
     return (
       <div>
@@ -191,9 +194,11 @@ class ConfigurationVariablesHelper extends React.Component<
           <Table responsive>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th className={ConfigurationHelperStyle.actionsColumn}>Actions</th>
+                <th>{t('configuration_forms.configuration_variables_helper.name')}</th>
+                <th>{t('configuration_forms.configuration_variables_helper.description')}</th>
+                <th className={ConfigurationHelperStyle.actionsColumn}>
+                  {t('configuration_forms.configuration_variables_helper.actions')}
+                </th>
               </tr>
             </thead>
             <tbody>{this._configurationVariableListBuilder()}</tbody>
@@ -203,30 +208,41 @@ class ConfigurationVariablesHelper extends React.Component<
         <BootstrapModalWrapper showModal={showModal} onHide={this._closeErrorModal}>
           <Modal.Header>
             <Modal.Title>
-              Error deleting configuration variable <strong>$&#123;user.{variableToDelete?.name}&#125;</strong>
+              <Trans
+                t={t}
+                i18nKey="configuration_forms.configuration_variables_helper.error_delete_title"
+                components={{ strong: <strong /> }}
+                values={{ name: variableToDelete?.name }}
+              />
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Alert bsStyle="warning">
               <p>
-                Cannot delete this configuration variable as it is still in use. Please remove the variable from the
-                following configurations and try again.
+                {t('configuration_forms.configuration_variables_helper.error_in_use')}
                 {errorModalContent}
               </p>
             </Alert>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this._closeErrorModal}>Close</Button>
+            <Button onClick={this._closeErrorModal}>
+              {t('configuration_forms.configuration_variables_helper.close')}
+            </Button>
           </Modal.Footer>
         </BootstrapModalWrapper>
 
         <BootstrapModalConfirm
           showModal={showConfirmModal}
-          title="Delete Configuration Variable?"
+          title={t('configuration_forms.configuration_variables_helper.delete_confirm_title')}
           onConfirm={this._handleDeleteConfirm}
           onCancel={this._closeErrorModal}>
           <p>
-            Are you sure you want to remove the configuration variable <strong>{variableToDelete?.name}</strong>?
+            <Trans
+              t={t}
+              i18nKey="configuration_forms.configuration_variables_helper.delete_confirm_text"
+              components={{ strong: <strong /> }}
+              values={{ name: variableToDelete?.name }}
+            />
           </p>
         </BootstrapModalConfirm>
       </div>
@@ -234,4 +250,4 @@ class ConfigurationVariablesHelper extends React.Component<
   }
 }
 
-export default ConfigurationVariablesHelper;
+export default withTranslation('sidecars')(ConfigurationVariablesHelper);

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
@@ -39,28 +40,32 @@ const CloneMenuModal = ({
   onSave,
   // TODO: Find out why this is not in use (anymore)
   onSelect: _onSelect = undefined,
-}: CloneMenuModalProps) => (
-  <BootstrapModalForm
-    show={showModal}
-    title="Clone"
-    onSubmitForm={onSave}
-    onCancel={onClose}
-    submitButtonDisabled={Boolean(error)}
-    submitButtonText="Done">
-    <fieldset>
-      <Input
-        type="text"
-        id={id}
-        label="Name"
-        defaultValue={name}
-        onChange={onChange}
-        bsStyle={error ? 'error' : null}
-        help={error || 'Type a name for the new collector'}
-        autoFocus
-        required
-      />
-    </fieldset>
-  </BootstrapModalForm>
-);
+}: CloneMenuModalProps) => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <BootstrapModalForm
+      show={showModal}
+      title={t('common.clone_menu.title')}
+      onSubmitForm={onSave}
+      onCancel={onClose}
+      submitButtonDisabled={Boolean(error)}
+      submitButtonText={t('common.clone_menu.done')}>
+      <fieldset>
+        <Input
+          type="text"
+          id={id}
+          label={t('common.clone_menu.name')}
+          defaultValue={name}
+          onChange={onChange}
+          bsStyle={error ? 'error' : null}
+          help={error || t('common.clone_menu.name_help')}
+          autoFocus
+          required
+        />
+      </fieldset>
+    </BootstrapModalForm>
+  );
+};
 
 export default CloneMenuModal;

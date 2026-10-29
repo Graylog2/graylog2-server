@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Link, LinkContainer, RelativeTime, Timestamp } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -40,7 +42,7 @@ const SidecarTR = styled.tr<{ inactive: boolean }>(
 
 type SidecarRowProps = {
   sidecar: any;
-};
+} & WithTranslation;
 
 class SidecarRow extends React.Component<
   SidecarRowProps,
@@ -58,8 +60,8 @@ class SidecarRow extends React.Component<
 
   render() {
     const { showRelativeTime } = this.state;
-    const { sidecar } = this.props;
-    const annotation = sidecar.active ? '' : ' (inactive)';
+    const { sidecar, t } = this.props;
+    const annotation = sidecar.active ? '' : t('sidecars.sidecar_row.inactive_annotation');
     let sidecarStatus = { status: null, message: null, id: null };
 
     if (sidecar.node_details.status && SidecarStatusEnum.isValidStatusCode(sidecar.node_details.status.status)) {
@@ -104,7 +106,7 @@ class SidecarRow extends React.Component<
           <ButtonToolbar>
             <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
               <Button bsSize="xsmall" bsStyle="info">
-                Manage sidecar
+                {t('sidecars.sidecar_row.manage_sidecar')}
               </Button>
             </LinkContainer>
             <LinkContainer
@@ -114,7 +116,7 @@ class SidecarRow extends React.Component<
                 recentMessagesTimeRange(),
               )}>
               <Button bsSize="xsmall" bsStyle="info">
-                Show messages
+                {t('sidecars.sidecar_row.show_messages')}
               </Button>
             </LinkContainer>
           </ButtonToolbar>
@@ -124,4 +126,4 @@ class SidecarRow extends React.Component<
   }
 }
 
-export default SidecarRow;
+export default withTranslation('sidecars')(SidecarRow);

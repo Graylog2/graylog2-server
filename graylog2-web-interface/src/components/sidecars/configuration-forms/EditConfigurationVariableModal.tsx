@@ -17,6 +17,8 @@
 import debounce from 'lodash/debounce';
 import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { validateConfigurationVariable } from 'api/configuration-variables';
@@ -30,7 +32,7 @@ type EditConfigurationVariableModalProps = {
   description?: string;
   content?: string;
   saveConfigurationVariable: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class EditConfigurationVariableModal extends React.Component<
   EditConfigurationVariableModalProps,
@@ -153,15 +155,15 @@ class EditConfigurationVariableModal extends React.Component<
   };
 
   render() {
-    const { create } = this.props;
+    const { create, t } = this.props;
     const { formData, showModal } = this.state;
 
     let triggerButtonContent;
 
     if (create) {
-      triggerButtonContent = 'Create Variable';
+      triggerButtonContent = t('configuration_forms.edit_configuration_variable_modal.create_variable');
     } else {
-      triggerButtonContent = <span>Edit</span>;
+      triggerButtonContent = <span>{t('configuration_forms.edit_configuration_variable_modal.edit')}</span>;
     }
 
     return (
@@ -175,26 +177,30 @@ class EditConfigurationVariableModal extends React.Component<
         </Button>
         <BootstrapModalForm
           show={showModal}
-          title={
-            <>
-              {create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;
-            </>
-          }
+          title={t('configuration_forms.edit_configuration_variable_modal.title', {
+            action: create
+              ? t('configuration_forms.edit_configuration_variable_modal.create_action')
+              : t('configuration_forms.edit_configuration_variable_modal.edit_action'),
+            name: formData.name,
+          })}
           data-telemetry-title={`${create ? 'Create' : 'Edit'} Variable user`}
           onSubmitForm={this._save}
           onCancel={this.closeModal}
           submitButtonDisabled={this._hasErrors()}
-          submitButtonText="Save">
+          submitButtonText={t('common.save')}>
           <fieldset>
             <Input
               type="text"
               id={this._getId('variable-name')}
-              label="Name"
+              label={t('configuration_forms.edit_configuration_variable_modal.name')}
               name="name"
               defaultValue={formData.name}
               onChange={this._handleInputChange}
               bsStyle={this._validationState('name')}
-              help={this._formatValidationMessage('name', 'Type a name for this variable')}
+              help={this._formatValidationMessage(
+                'name',
+                t('configuration_forms.edit_configuration_variable_modal.name_help'),
+              )}
               autoFocus
               spellCheck={false}
               required
@@ -204,26 +210,32 @@ class EditConfigurationVariableModal extends React.Component<
               id={this._getId('variable-description')}
               label={
                 <span>
-                  Description <small className="text-muted">(Optional)</small>
+                  {t('configuration_forms.edit_configuration_variable_modal.description')}{' '}
+                  <small className="text-muted">
+                    {t('configuration_forms.edit_configuration_variable_modal.optional')}
+                  </small>
                 </span>
               }
               name="description"
               defaultValue={formData.description}
               onChange={this._handleInputChange}
-              help="Type a description for this variable"
+              help={t('configuration_forms.edit_configuration_variable_modal.description_help')}
               spellCheck={false}
             />
             <Input
               type="textarea"
               id={this._getId('variable-content')}
-              label="Content"
+              label={t('configuration_forms.edit_configuration_variable_modal.content')}
               name="content"
               rows={10}
               className={ConfigurationHelperStyle.monoSpaceFont}
               defaultValue={formData.content}
               onChange={this._handleInputChange}
               bsStyle={this._validationState('content')}
-              help={this._formatValidationMessage('content', 'Write your variable content')}
+              help={this._formatValidationMessage(
+                'content',
+                t('configuration_forms.edit_configuration_variable_modal.content_help'),
+              )}
               spellCheck={false}
               required
             />
@@ -234,4 +246,4 @@ class EditConfigurationVariableModal extends React.Component<
   }
 }
 
-export default EditConfigurationVariableModal;
+export default withTranslation('sidecars')(EditConfigurationVariableModal);

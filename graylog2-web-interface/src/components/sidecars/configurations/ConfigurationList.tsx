@@ -15,6 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import i18n from 'i18n';
 
 import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
@@ -24,7 +27,8 @@ import ConfigurationRow from './ConfigurationRow';
 import style from './ConfigurationList.css';
 
 const _headerCellFormatter = (header) => {
-  const className = header === 'Actions' ? style.actionsColumn : '';
+  const actionsHeader = i18n.t('configurations.configuration_list.actions', { ns: 'sidecars' });
+  const className = header === actionsHeader ? style.actionsColumn : '';
 
   return <th className={className}>{header}</th>;
 };
@@ -40,7 +44,7 @@ type Props = {
   onClone: (...args: any[]) => void;
   onDelete: (...args: any[]) => void;
   validateConfiguration: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class ConfigurationList extends React.Component<Props> {
   private openModal: () => void;
@@ -62,8 +66,13 @@ class ConfigurationList extends React.Component<Props> {
   };
 
   render() {
-    const { configurations, pagination, query, total, onPageChange, onQueryChange } = this.props;
-    const headers = ['Configuration', 'Color', 'Collector', 'Actions'];
+    const { configurations, pagination, query, total, onPageChange, onQueryChange, t } = this.props;
+    const headers = [
+      t('configurations.configuration_list.configuration'),
+      t('configurations.configuration_list.color'),
+      t('configurations.configuration_list.collector'),
+      t('configurations.configuration_list.actions'),
+    ];
 
     return (
       <div>
@@ -72,19 +81,17 @@ class ConfigurationList extends React.Component<Props> {
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
                 <Button onClick={this.openModal} bsStyle="primary" bsSize="small">
-                  Create Configuration
+                  {t('configurations.configuration_list.create_configuration')}
                 </Button>
               </LinkContainer>
             </div>
             <h2>
-              Configurations <small>{total} total</small>
+              {t('configurations.configuration_list.title')}{' '}
+              <small>{t('configurations.configuration_list.total', { total })}</small>
             </h2>
           </Col>
           <Col md={12}>
-            <p>
-              These are the Configurations to use in your Collectors. Remember to apply new configurations to Collectors
-              in the Administration page.
-            </p>
+            <p>{t('configurations.configuration_list.description')}</p>
           </Col>
         </Row>
 
@@ -94,7 +101,7 @@ class ConfigurationList extends React.Component<Props> {
               query={query}
               onSearch={onQueryChange}
               onReset={onQueryChange}
-              placeholder="Find configurations"
+              placeholder={t('configurations.configuration_list.placeholder')}
               wrapperClass={style.inline}
               topMargin={0}
               useLoadingState
@@ -115,7 +122,7 @@ class ConfigurationList extends React.Component<Props> {
                   rows={configurations}
                   rowClassName="row-sm"
                   dataRowFormatter={this._collectorConfigurationFormatter}
-                  noDataText="There are no configurations to display, try creating one or changing your query."
+                  noDataText={t('configurations.configuration_list.no_data')}
                   filterLabel=""
                   filterKeys={[]}
                   useResponsiveTable={false}
@@ -129,4 +136,4 @@ class ConfigurationList extends React.Component<Props> {
   }
 }
 
-export default ConfigurationList;
+export default withTranslation('sidecars')(ConfigurationList);

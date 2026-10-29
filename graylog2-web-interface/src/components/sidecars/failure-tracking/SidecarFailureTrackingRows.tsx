@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from 'components/common';
 import RelativeTime from 'components/common/RelativeTime';
@@ -50,9 +51,10 @@ type Props = {
 };
 
 const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Props) => {
+  const { t } = useTranslation('sidecars');
   const { sidecar_version, active, node_id, node_name, last_seen, node_details } = sidecar;
 
-  const annotation = active ? '' : ' (inactive)';
+  const annotation = active ? '' : t('failure_tracking.rows.inactive_annotation');
   const collectorStatusList = node_details?.status?.collectors || [];
   const status = node_details?.status?.status;
   const message = node_details?.status?.message || '';
@@ -72,7 +74,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
                 <Link to={Routes.SYSTEM.SIDECARS.STATUS(node_id)}>{node_name}</Link>
                 <SecondaryText>{annotation}</SecondaryText>
                 <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
-                <SecondaryText>v{sidecar_version}</SecondaryText>
+                <SecondaryText>{t('failure_tracking.rows.sidecar_version', { version: sidecar_version })}</SecondaryText>
                 <SecondaryText>{node_id}</SecondaryText>
               </td>
               <td>{collectorData?.name}</td>
@@ -91,7 +93,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
                   onClick={() =>
                     onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })
                   }>
-                  Show more
+                  {t('failure_tracking.rows.show_more')}
                 </ShowDetailsLink>
               </td>
             </tr>

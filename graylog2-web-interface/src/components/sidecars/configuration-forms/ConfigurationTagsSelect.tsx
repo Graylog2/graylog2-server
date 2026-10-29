@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MultiSelect from 'components/common/MultiSelect';
 
@@ -27,9 +28,16 @@ type Props = {
 const ConfigurationTagsSelect = ({ tags, availableTags, onChange }: Props) => {
   const tagsValue = tags.join(',');
   const tagsOptions = availableTags.map((tag) => ({ value: tag.name, label: tag.name }));
+  const { t } = useTranslation('sidecars');
 
   return (
-    <MultiSelect options={tagsOptions} value={tagsValue} onChange={onChange} placeholder="Choose tags..." allowCreate />
+    <MultiSelect
+      options={tagsOptions}
+      value={tagsValue}
+      onChange={onChange}
+      placeholder={t('configuration_forms.configuration_tags_select.placeholder')}
+      allowCreate
+    />
   );
 };
 

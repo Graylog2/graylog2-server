@@ -18,6 +18,9 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import upperCase from 'lodash/upperCase';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import i18n from 'i18n';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -46,8 +49,14 @@ const ValidationMessage = ({ validationErrors, fieldName, defaultText }: Validat
 const formatServiceTypes = () => {
   const options = [];
 
-  options.push({ value: 'exec', label: 'Foreground execution' });
-  options.push({ value: 'svc', label: 'Windows service' });
+  options.push({
+    value: 'exec',
+    label: i18n.t('configuration_forms.collector_form.service_type_exec', { ns: 'sidecars' }),
+  });
+  options.push({
+    value: 'svc',
+    label: i18n.t('configuration_forms.collector_form.service_type_svc', { ns: 'sidecars' }),
+  });
 
   return options;
 };
@@ -63,7 +72,7 @@ const formatOperatingSystems = () => {
   return options;
 };
 
-type CollectorFormProps = HistoryContext & {
+type CollectorFormProps = HistoryContext & WithTranslation & {
   action?: 'create' | 'edit';
   collector?: any;
   sendTelemetry?: (...args: any[]) => void;
@@ -207,7 +216,7 @@ class CollectorForm extends React.Component<
   };
 
   render() {
-    const { action } = this.props;
+    const { action, t } = this.props;
     const { formData, validation_errors: validationErrors } = this.state;
 
     let validationParameters = '';
@@ -228,13 +237,13 @@ class CollectorForm extends React.Component<
             <Input
               type="text"
               id="name"
-              label="Name"
+              label={t('configuration_forms.collector_form.name')}
               onChange={this._onNameChange}
               bsStyle={this._validationState('name')}
               help={
                 <ValidationMessage
                   fieldName="name"
-                  defaultText="Name for this collector"
+                  defaultText={t('configuration_forms.collector_form.name_help')}
                   validationErrors={validationErrors}
                 />
               }
@@ -244,19 +253,19 @@ class CollectorForm extends React.Component<
             />
 
             <FormGroup controlId="service_type" validationState={this._validationState('service_type')}>
-              <ControlLabel>Process management</ControlLabel>
+              <ControlLabel>{t('configuration_forms.collector_form.process_management')}</ControlLabel>
               <Select
                 inputId="service_type"
                 options={formatServiceTypes()}
                 value={formData.service_type}
                 onChange={this._formDataUpdate('service_type')}
-                placeholder="Service Type"
+                placeholder={t('configuration_forms.collector_form.service_type')}
                 required
               />
               <HelpBlock>
                 <ValidationMessage
                   fieldName="service_type"
-                  defaultText="Choose the service type this collector is meant for."
+                  defaultText={t('configuration_forms.collector_form.service_type_help')}
                   validationErrors={validationErrors}
                 />
               </HelpBlock>
@@ -265,19 +274,19 @@ class CollectorForm extends React.Component<
             <FormGroup
               controlId="node_operating_system"
               validationState={this._validationState('node_operating_system')}>
-              <ControlLabel>Operating System</ControlLabel>
+              <ControlLabel>{t('configuration_forms.collector_form.operating_system')}</ControlLabel>
               <Select
                 inputId="node_operating_system"
                 options={formatOperatingSystems()}
                 value={formData.node_operating_system}
                 onChange={this._formDataUpdate('node_operating_system')}
-                placeholder="Name"
+                placeholder={t('configuration_forms.collector_form.name')}
                 required
               />
               <HelpBlock>
                 <ValidationMessage
                   fieldName="node_operating_system"
-                  defaultText="Choose the operating system this collector is meant for."
+                  defaultText={t('configuration_forms.collector_form.operating_system_help')}
                   validationErrors={validationErrors}
                 />
               </HelpBlock>
@@ -286,13 +295,13 @@ class CollectorForm extends React.Component<
             <Input
               type="text"
               id="executablePath"
-              label="Executable Path"
+              label={t('configuration_forms.collector_form.executable_path')}
               onChange={this._onInputChange('executable_path')}
               bsStyle={this._validationState('executable_path')}
               help={
                 <ValidationMessage
                   fieldName="executable_path"
-                  defaultText="Path to the collector executable"
+                  defaultText={t('configuration_forms.collector_form.executable_path_help')}
                   validationErrors={validationErrors}
                 />
               }
@@ -305,14 +314,18 @@ class CollectorForm extends React.Component<
               id="executeParameters"
               label={
                 <span>
-                  Execute Parameters <small className="text-muted">(Optional)</small>
+                  {t('configuration_forms.collector_form.execute_parameters')}{' '}
+                  <small className="text-muted">{t('configuration_forms.collector_form.optional')}</small>
                 </span>
               }
               onChange={this._onInputChange('execute_parameters')}
               help={
                 <span>
-                  Parameters the collector is started with.
-                  <strong> %s will be replaced by the path to the configuration file.</strong>
+                  <Trans
+                    t={t}
+                    i18nKey="configuration_forms.collector_form.execute_parameters_help"
+                    components={{ strong: <strong /> }}
+                  />
                 </span>
               }
               value={executeParameters || ''}
@@ -323,14 +336,18 @@ class CollectorForm extends React.Component<
               id="validationParameters"
               label={
                 <span>
-                  Parameters for Configuration Validation <small className="text-muted">(Optional)</small>
+                  {t('configuration_forms.collector_form.validation_parameters')}{' '}
+                  <small className="text-muted">{t('configuration_forms.collector_form.optional')}</small>
                 </span>
               }
               onChange={this._onInputChange('validation_parameters')}
               help={
                 <span>
-                  Parameters that validate the configuration file.{' '}
-                  <strong> %s will be replaced by the path to the configuration file.</strong>
+                  <Trans
+                    t={t}
+                    i18nKey="configuration_forms.collector_form.validation_parameters_help"
+                    components={{ strong: <strong /> }}
+                  />
                 </span>
               }
               value={validationParameters || ''}
@@ -339,7 +356,8 @@ class CollectorForm extends React.Component<
             <FormGroup controlId="defaultTemplate">
               <ControlLabel>
                 <span>
-                  Default Template <small className="text-muted">(Optional)</small>
+                  {t('configuration_forms.collector_form.default_template')}{' '}
+                  <small className="text-muted">{t('configuration_forms.collector_form.optional')}</small>
                 </span>
               </ControlLabel>
               <SourceCodeEditor
@@ -347,14 +365,18 @@ class CollectorForm extends React.Component<
                 value={formData.default_template || ''}
                 onChange={this._formDataUpdate('default_template')}
               />
-              <HelpBlock>The default Collector configuration.</HelpBlock>
+              <HelpBlock>{t('configuration_forms.collector_form.default_template_help')}</HelpBlock>
             </FormGroup>
           </fieldset>
 
           <Row>
             <Col md={12}>
               <FormSubmit
-                submitButtonText={`${action === 'create' ? 'Create' : 'Update'} collector`}
+                submitButtonText={
+                  action === 'create'
+                    ? t('configuration_forms.collector_form.create_collector')
+                    : t('configuration_forms.collector_form.update_collector')
+                }
                 disabledSubmit={this.hasErrors()}
                 onCancel={this._onCancel}
               />
@@ -366,4 +388,4 @@ class CollectorForm extends React.Component<
   }
 }
 
-export default withTelemetry(withHistory(CollectorForm), 'configuration');
+export default withTranslation('sidecars')(withTelemetry(withHistory(CollectorForm), 'configuration'));

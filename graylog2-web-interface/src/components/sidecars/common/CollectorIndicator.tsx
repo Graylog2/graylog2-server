@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import upperFirst from 'lodash/upperFirst';
+import { useTranslation } from 'react-i18next';
 
 import OperatingSystemIcon from './OperatingSystemIcon';
 
@@ -24,11 +25,17 @@ type Props = {
   operatingSystem?: string;
 };
 
-const CollectorIndicator = ({ collector, operatingSystem = undefined }: Props) => (
-  <span>
-    <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
-    {operatingSystem && <span> on {upperFirst(operatingSystem)}</span>}
-  </span>
-);
+const CollectorIndicator = ({ collector, operatingSystem = undefined }: Props) => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <span>
+      <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
+      {operatingSystem && (
+        <span> {t('common.collector_indicator.on_os', { operatingSystem: upperFirst(operatingSystem) })}</span>
+      )}
+    </span>
+  );
+};
 
 export default CollectorIndicator;

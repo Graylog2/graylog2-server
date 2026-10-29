@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -28,7 +30,7 @@ type FiltersSummaryProps = {
   configurations: any[];
   filters: any;
   onResetFilters: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class FiltersSummary extends React.Component<
   FiltersSummaryProps,
@@ -43,7 +45,10 @@ class FiltersSummary extends React.Component<
       // Get collector name
       const collector = collectors.find((c) => c.id === value);
 
-      return `${collector.name} on ${collector.node_operating_system}`;
+      return this.props.t('administration.filters_summary.collector_on_os', {
+        name: collector.name,
+        os: collector.node_operating_system,
+      });
     }
 
     if (type === 'configuration') {
@@ -78,12 +83,12 @@ class FiltersSummary extends React.Component<
         <Col md={10}>
           <ul className="list-inline">
             <li>
-              <b>Filters</b>
+              <b>{this.props.t('administration.filters_summary.filters')}</b>
             </li>
             {this.formatFilters(filters)}
             <li>
               <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>
-                <Icon name="close" /> Clear all
+                <Icon name="close" /> {this.props.t('administration.filters_summary.clear_all')}
               </Button>
             </li>
           </ul>
@@ -93,4 +98,4 @@ class FiltersSummary extends React.Component<
   }
 }
 
-export default FiltersSummary;
+export default withTranslation('sidecars')(FiltersSummary);
