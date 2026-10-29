@@ -20,7 +20,7 @@ import { Users } from '@graylog/server-api';
 
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import UserNotification from 'util/UserNotification';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 
 type BooleanString = 'true' | 'false';
 
@@ -71,7 +71,7 @@ export const saveUserPreferences = (
       }
 
       callback(preferences);
-      CurrentUserStore.reload();
+      CurrentUser.reload();
     },
     (errorThrown) => {
       UserNotification.error(
