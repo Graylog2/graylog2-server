@@ -40,6 +40,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -147,6 +148,9 @@ public class MessageResource extends RestResource {
     })
     @NoAuditEvent("only used to parse a test message")
     public ResultMessage parse(@RequestBody(required = true) MessageParseRequest request) {
+        if (!isAnyPermitted(RestPermissions.INPUTS_CREATE, PipelineRestPermissions.PIPELINE_RULE_CREATE)) {
+            throw new ForbiddenException("Not authorized");
+        }
         if (!codecFactory.getFactory().containsKey(request.codec())) {
             throw new NotFoundException("Codec type " + request.codec() + " does not exist.");
         }

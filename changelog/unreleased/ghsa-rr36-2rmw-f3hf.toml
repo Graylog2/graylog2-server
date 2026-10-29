@@ -1,2 +1,2 @@
 type = "s"
-message = "Prevent server file probing through the raw message parse endpoint. [GHSA-rr36-2rmw-f3hf](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-rr36-2rmw-f3hf)"
+message = "Prevent server file probing through the raw message parse endpoint. The endpoint now requires the permission to create inputs or pipeline rules. [GHSA-rr36-2rmw-f3hf](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-rr36-2rmw-f3hf)"
