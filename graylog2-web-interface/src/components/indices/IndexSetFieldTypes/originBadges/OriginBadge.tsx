@@ -25,7 +25,7 @@ type Props = {
 };
 
 type BadgeBsStyle = 'default' | 'danger' | 'info' | 'primary' | 'success' | 'warning' | 'gray';
-const originBsStyles: Record<FieldTypeOrigin, BadgeBsStyle> = {
+export const originBsStyles: Record<FieldTypeOrigin, BadgeBsStyle> = {
   INDEX: 'gray',
   OVERRIDDEN_INDEX: 'primary',
   OVERRIDDEN_PROFILE: 'warning',

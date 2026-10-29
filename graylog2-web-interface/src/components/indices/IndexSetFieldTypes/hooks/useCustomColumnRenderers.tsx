@@ -16,7 +16,7 @@
  */
 import React, { useMemo } from 'react';
 
-import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
+import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
@@ -37,8 +37,10 @@ const useCustomColumnRenderers = () => {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
         origin: {
-          renderCell: (origin: FieldTypeOrigin) => <OriginCell origin={origin} />,
-          staticWidth: 150,
+          renderCell: (origin: FieldTypeOrigin, fieldType: IndexSetFieldType) => (
+            <OriginCell entityId={fieldType.id} origin={origin} />
+          ),
+          staticWidth: 180,
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>

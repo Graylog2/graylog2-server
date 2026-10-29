@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 
-import { Badge } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import ExpandedSectionBadge from 'components/common/EntityDataTable/ExpandedSectionBadge';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
 type Props = {
@@ -38,21 +36,10 @@ type Props = {
 const ExpandedSectionCount = (
   { entityId, section, count, label, abbreviate = false }: Props,
   ref: React.ForwardedRef<HTMLElement>,
-) => {
-  const { expandedSections, toggleSection } = useExpandedSections();
-  const isActive = expandedSections?.[entityId]?.includes(section) ?? false;
-
-  return (
-    <Badge
-      ref={ref}
-      color={isActive ? 'primary' : undefined}
-      variant={isActive ? 'filled' : undefined}
-      onClick={() => toggleSection(entityId, section)}
-      title={`${isActive ? 'Hide' : 'Show'} ${label}`}>
-      {abbreviate ? formatReadableNumber(count) : count}
-      <Icon name="dock_to_bottom" size="xs" type="regular" />
-    </Badge>
-  );
-};
+) => (
+  <ExpandedSectionBadge ref={ref} entityId={entityId} section={section} label={label} highlightActive>
+    {abbreviate ? formatReadableNumber(count) : count}
+  </ExpandedSectionBadge>
+);
 
 export default forwardRef(ExpandedSectionCount);

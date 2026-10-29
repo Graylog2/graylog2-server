@@ -19,14 +19,16 @@ import keyBy from 'lodash/keyBy';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import ExpandedSectionBadge from 'components/common/EntityDataTable/ExpandedSectionBadge';
 
-import OriginBadge from './OriginBadge';
+import { originBsStyles } from './OriginBadge';
 
 type Props = {
+  entityId: string;
   origin: FieldTypeOrigin;
 };
 
-const OriginCell = ({ origin }: Props) => {
+const OriginCell = ({ entityId, origin }: Props) => {
   const { attributes } = useTableFetchContext();
 
   const normalizedOrigin = useMemo(() => {
@@ -35,7 +37,15 @@ const OriginCell = ({ origin }: Props) => {
     return keyBy(originOptions, 'value');
   }, [attributes]);
 
-  return <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} />;
+  return (
+    <ExpandedSectionBadge
+      entityId={entityId}
+      section="overriddenProfile"
+      label="origin explanation"
+      bsStyle={originBsStyles[origin]}>
+      {normalizedOrigin?.[origin]?.title}
+    </ExpandedSectionBadge>
+  );
 };
 
 export default OriginCell;
