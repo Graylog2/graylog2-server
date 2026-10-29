@@ -28,6 +28,7 @@ import enEventNotifications from 'locales/en/event_notifications.json';
 import enEvents from 'locales/en/events.json';
 import enExtractors from 'locales/en/extractors.json';
 import enInputs from 'locales/en/inputs.json';
+import enIntegrations from 'locales/en/integrations.json';
 import enLogin from 'locales/en/login.json';
 import enNavigation from 'locales/en/navigation.json';
 import enPages from 'locales/en/pages.json';
@@ -50,6 +51,7 @@ import enCertificates from 'locales/en/certificates.json';
 import enMessageloaders from 'locales/en/messageloaders.json';
 import enSystem from 'locales/en/system.json';
 import enConfigurations from 'locales/en/configurations.json';
+import 'locales/registerPreflightTranslations';
 
 registerTranslations('aggregation', enAggregation, {
 
@@ -94,6 +96,10 @@ registerTranslations('extractors', enExtractors, {
 
 registerTranslations('inputs', enInputs, {
   de: () => import(/* webpackChunkName: "translations-de-inputs" */ 'locales/de/inputs.json'),
+});
+
+registerTranslations('integrations', enIntegrations, {
+  de: () => import(/* webpackChunkName: "translations-de-integrations" */ 'locales/de/integrations.json'),
 });
 
 registerTranslations('login', enLogin, {

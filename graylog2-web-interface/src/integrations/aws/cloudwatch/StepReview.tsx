@@ -16,6 +16,7 @@
  */
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, Icon, StatusIcon } from 'components/common';
 import Routes from 'routing/Routes';
@@ -86,11 +87,15 @@ type DefaultProps = {
   value: string;
 };
 
-const Default = ({ value }: DefaultProps) => (
-  <>
-    {value} <small>(default)</small>
-  </>
-);
+const Default = ({ value }: DefaultProps) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      {value} <small>{t('aws_cloudwatch_step_review.default_label')}</small>
+    </>
+  );
+};
 
 type StepReviewProps = {
   onSubmit: (...args: any[]) => void;
@@ -99,6 +104,7 @@ type StepReviewProps = {
 };
 
 const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: StepReviewProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
   const {
@@ -154,7 +160,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   const formError = fetchSubmitStatus.error
     ? {
         full_message: fetchSubmitStatus.error,
-        nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
+        nice_message: <span>{t('aws_cloudwatch_step_review.save_error')}</span>,
       }
     : null;
 
@@ -171,103 +177,100 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   return (
     <FormWrap
       onSubmit={handleSubmit}
-      buttonContent="Complete CloudWatch Setup"
+      buttonContent={t('aws_cloudwatch_step_review.complete_button')}
       loading={fetchSubmitStatus.loading}
       error={formError}
-      title="Final Review"
-      description="Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!">
+      title={t('aws_cloudwatch_step_review.title')}
+      description={t('aws_cloudwatch_step_review.description')}>
       <Container>
         <Subheader>
-          Setting up CloudWatch{' '}
+          {t('aws_cloudwatch_step_review.setting_up_cloudwatch')}{' '}
           <small>
-            <EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor>
+            <EditAnchor onClick={onEditClick('authorize')}>{t('aws_cloudwatch_step_review.edit')}</EditAnchor>
           </small>
         </Subheader>
         <ReviewItems>
           <li>
-            <strong>Name</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_name')}</strong>
             <span>{awsCloudWatchName.value}</span>
           </li>
 
           <li>
-            <strong>Authorization Type</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_authorization_type')}</strong>
             <span>{awsAuthenticationType.value}</span>
           </li>
 
           {awsAccessKey.value && (
             <li>
-              <strong>AWS Key</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_aws_key')}</strong>
               <span>{awsAccessKey.value}</span>
             </li>
           )}
 
           {awsAssumeRoleARN.value && (
             <li>
-              <strong>AWS Assumed ARN Role</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_assumed_role_arn')}</strong>
               <span>{awsAssumeRoleARN.value}</span>
             </li>
           )}
 
           {awsExternalId.value && (
             <li>
-              <strong>AWS External ID</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_external_id')}</strong>
               <span>{awsExternalId.value}</span>
             </li>
           )}
 
           {awsEndpointCloudWatch.value && (
             <li>
-              <strong>CloudWatch VPC Endpoint</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_cloudwatch_endpoint')}</strong>
               <span>{awsEndpointCloudWatch.value}</span>
             </li>
           )}
 
           {awsEndpointDynamoDB.value && (
             <li>
-              <strong>DynamoDB VPC Endpoint</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_dynamodb_endpoint')}</strong>
               <span>{awsEndpointDynamoDB.value}</span>
             </li>
           )}
 
           {awsEndpointIAM.value && (
             <li>
-              <strong>IAM VPC Endpoint</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_iam_endpoint')}</strong>
               <span>{awsEndpointIAM.value}</span>
             </li>
           )}
 
           {awsEndpointKinesis.value && (
             <li>
-              <strong>Kinesis VPC Endpoint</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_kinesis_endpoint')}</strong>
               <span>{awsEndpointKinesis.value}</span>
             </li>
           )}
 
           <li>
-            <strong>AWS Region</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_aws_region')}</strong>
             <span>{awsCloudWatchAwsRegion.value}</span>
           </li>
         </ReviewItems>
 
         <Subheader>
-          Setting up Kinesis{' '}
+          {t('aws_cloudwatch_step_review.setting_up_kinesis')}{' '}
           <small>
-            <EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor>
+            <EditAnchor onClick={onEditClick('kinesis-setup')}>{t('aws_cloudwatch_step_review.edit')}</EditAnchor>
           </small>
         </Subheader>
         <ReviewItems>
           <li>
-            <strong>Kinesis Stream</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_kinesis_stream')}</strong>
             <span>{awsCloudWatchKinesisStream.value}</span>
           </li>
           <li>
-            <strong>Kinesis Stream ARN</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_kinesis_stream_arn')}</strong>
             <span>
               {!awsCloudwatchKinesisStreamArn ? (
-                <ArnErrorMessage>
-                  Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream
-                  permission.
-                </ArnErrorMessage>
+                <ArnErrorMessage>{t('aws_cloudwatch_step_review.stream_arn_error')}</ArnErrorMessage>
               ) : (
                 awsCloudwatchKinesisStreamArn
               )}
@@ -275,13 +278,13 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
           </li>
 
           <li>
-            <strong>Global Input</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_global_input')}</strong>
             <span>
               <Icon name="check" />
             </span>
           </li>
           <li>
-            <strong>Record Batch Size</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_record_batch_size')}</strong>
             <span>
               {awsCloudWatchBatchSize.value ? (
                 awsCloudWatchBatchSize.value
@@ -291,48 +294,51 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             </span>
           </li>
           <li>
-            <strong>Enable Throttling</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_enable_throttling')}</strong>
             <span>
               <StatusIcon active={throttleEnabled} />
             </span>
           </li>
           <li>
-            <strong>Add Flow Log prefix to field names</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_flow_log_prefix')}</strong>
             <span>
               <StatusIcon active={addPrefix} />
             </span>
           </li>
           <li>
-            <strong>Store full message</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_store_full_message')}</strong>
             <span>
               <StatusIcon active={storeFullMessage} />
             </span>
           </li>
           {overrideSource.value && (
             <li>
-              <strong>Override Source</strong>
+              <strong>{t('aws_cloudwatch_step_review.label_override_source')}</strong>
               <span>{overrideSource.value}</span>
             </li>
           )}
         </ReviewItems>
 
-        <Subheader>Formatting</Subheader>
+        <Subheader>{t('aws_cloudwatch_step_review.formatting')}</Subheader>
         <ReviewItems>
           <li>
-            <strong>Log Type</strong>
+            <strong>{t('aws_cloudwatch_step_review.label_log_type')}</strong>
             <span>{KINESIS_LOG_TYPES.find((type) => type.value === awsCloudWatchKinesisInputType.value).label}</span>
           </li>
         </ReviewItems>
         <p>
-          If you need your logs parsed differently check out our{' '}
-          <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link> for additional details and instructions.
+          <Trans
+            t={t}
+            i18nKey="aws_cloudwatch_step_review.pipeline_hint"
+            components={{ pipelineLink: <Link to={Routes.SYSTEM.PIPELINES.RULES} /> }}
+          />
         </p>
 
         <Input
           id="awsCloudWatchLog"
           type="textarea"
           label=""
-          value={(logData && logData.message) || "We haven't received a response back from Amazon yet."}
+          value={(logData && logData.message) || t('aws_cloudwatch_step_review.no_response')}
           rows={10}
           disabled
         />

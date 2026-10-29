@@ -15,19 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 export default function SidebarPermissions() {
+  const { t } = useTranslation('integrations');
+
   return (
-    <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
+    <Panel bsStyle="info" header={<span>{t('aws_sidebar_permissions.title')}</span>}>
       <p>
-        Please refer to the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.AWS_KINESIS_CLOUDWATCH_INPUT} text="official documentation" /> for
-        information on required AWS permissions.
-        <br />
+        <Trans
+          t={t}
+          i18nKey="aws_sidebar_permissions.description"
+          components={{
+            docsLink: (
+              <DocumentationLink
+                page={DocsHelper.PAGES.AWS_KINESIS_CLOUDWATCH_INPUT}
+                text={t('aws_sidebar_permissions.docs_link_text')}
+              />
+            ),
+          }}
+        />
       </p>
     </Panel>
   );

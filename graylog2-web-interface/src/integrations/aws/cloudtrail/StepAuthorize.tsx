@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AWSCloudTrail } from '@graylog/server-api';
 
@@ -35,6 +36,7 @@ type StepAuthorizeProps = {
 };
 
 const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
+  const { t } = useTranslation('integrations');
   const [regions, setRegions] = useState([]);
 
   useEffect(() => {
@@ -84,7 +86,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         } else {
           setFormError({
             full_message: result.result,
-            nice_message: 'Unable to connect to AWS CloudTrail using provided configuration.',
+            nice_message: t('aws_cloudtrail_step_authorize.connection_error'),
           });
         }
 
@@ -95,7 +97,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
 
         setFormError({
           full_message: err.message,
-          nice_message: 'Unable to connect to AWS CloudTrail using provided configuration.',
+          nice_message: t('aws_cloudtrail_step_authorize.connection_error'),
         });
       });
   };
@@ -108,7 +110,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   return (
     <FormWrap
       onSubmit={handleSubmit}
-      buttonContent="Verify Connection &amp; Proceed"
+      buttonContent={t('aws_cloudtrail_step_authorize.verify_button')}
       disabled={isFormValid}
       loading={loading}
       title=""
@@ -120,10 +122,10 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         type="text"
         fieldData={formData.awsCloudTrailName}
         onChange={onChange}
-        placeholder="Input Name"
-        label="Input Name"
+        placeholder={t('aws_cloudtrail_step_authorize.input_name')}
+        label={t('aws_cloudtrail_step_authorize.input_name')}
         autoComplete="off"
-        help="Select a name of your new input that describes it."
+        help={t('aws_cloudtrail_step_authorize.input_name_help')}
         defaultValue={awsSecretKey?.value}
         required
       />
@@ -135,10 +137,10 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         id="awsCloudTrailSqsRegion"
         onChange={onChange}
         fieldData={formData.awsCloudTrailSqsRegion}
-        help="AWS region where the SQS queue is located."
+        help={t('aws_cloudtrail_step_authorize.sqs_region_help')}
         required
-        label="AWS SQS Region">
-        {renderOptions(regions, 'Choose SQS region', false)}
+        label={t('aws_cloudtrail_step_authorize.sqs_region_label')}>
+        {renderOptions(regions, t('aws_cloudtrail_step_authorize.choose_sqs_region'), false)}
       </ValidatedInput>
 
       <ValidatedInput
@@ -146,10 +148,10 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         id="awsCloudTrailS3Region"
         onChange={onChange}
         fieldData={formData.awsCloudTrailS3Region}
-        help="AWS region where the S3 bucket is located."
+        help={t('aws_cloudtrail_step_authorize.s3_region_help')}
         required
-        label="AWS S3 Region">
-        {renderOptions(regions, 'Choose S3 region', false)}
+        label={t('aws_cloudtrail_step_authorize.s3_region_label')}>
+        {renderOptions(regions, t('aws_cloudtrail_step_authorize.choose_s3_region'), false)}
       </ValidatedInput>
 
       <ValidatedInput
@@ -158,8 +160,8 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         type="text"
         onChange={onChange}
         fieldData={formData.awsCloudTrailSqsQueueName}
-        help="SQS queue name created by the CloudTrail Subscriber"
-        label="SQS Queue Name"
+        help={t('aws_cloudtrail_step_authorize.sqs_queue_name_help')}
+        label={t('aws_cloudtrail_step_authorize.sqs_queue_name_label')}
         required
       />
     </FormWrap>

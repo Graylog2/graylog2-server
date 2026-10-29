@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, Panel, Input } from 'components/bootstrap';
 import FormWrap from 'integrations/aws/common/FormWrap';
@@ -53,6 +54,7 @@ type StepHealthCheckProps = {
 };
 
 const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
+  const { t } = useTranslation('integrations');
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
@@ -117,29 +119,31 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
         header={
           <Notice>
             <Icon name="warning" size="2x" />
-            <span>We haven&apos;t received a response back from Amazon yet.</span>
+            <span>{t('aws_step_health_check.no_response_title')}</span>
           </Notice>
         }>
-        <p>
-          Hang out for a few moments while we keep checking your AWS stream for logs. Amazon&apos;s servers parse logs
-          every 10 minutes, so grab a cup of coffee because this may take some time!
-        </p>
+        <p>{t('aws_step_health_check.waiting_description')}</p>
 
         <CheckAgain>
           <strong>
-            Checking again in: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} />
+            <Trans
+              t={t}
+              i18nKey="aws_step_health_check.checking_again_in"
+              components={{
+                countdown: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} />,
+              }}
+            />
           </strong>
 
           <Button type="button" bsStyle="primary" bsSize="sm" onClick={checkForLogs} disabled={logDataProgress.loading}>
-            {logDataProgress.loading ? 'Checking...' : 'Check Now'}
+            {logDataProgress.loading
+              ? t('aws_step_health_check.checking_button')
+              : t('aws_step_health_check.check_now_button')}
           </Button>
         </CheckAgain>
 
         <p>
-          <em>
-            Do not refresh your browser, we are continually checking for your logs and this page will automatically
-            refresh when your logs are available.
-          </em>
+          <em>{t('aws_step_health_check.do_not_refresh')}</em>
         </p>
 
         <div>
@@ -157,15 +161,15 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   return (
     <FormWrap
       onSubmit={handleSubmit}
-      buttonContent="Review &amp; Finalize"
+      buttonContent={t('aws_step_health_check.review_button')}
       disabled={false}
-      title="Create Kinesis Stream"
-      description={<p>If available, a parsed sample {logTypeLabel} message from the stream will be shown below.</p>}>
+      title={t('aws_step_health_check.title')}
+      description={<p>{t('aws_step_health_check.sample_description', { logType: logTypeLabel })}</p>}>
       <Input
         id="awsCloudWatchLog"
         type="textarea"
-        label="Formatted Log Message"
-        value={logData.message || 'No messages found in stream.'}
+        label={t('aws_step_health_check.formatted_log_label')}
+        value={logData.message || t('aws_step_health_check.no_messages')}
         rows={10}
         disabled
       />

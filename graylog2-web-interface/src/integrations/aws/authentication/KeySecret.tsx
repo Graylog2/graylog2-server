@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import MaskedInput from 'integrations/aws/common/MaskedInput';
@@ -31,41 +32,45 @@ type KeySecretProps = {
   required?: boolean;
 };
 
-const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, required = true }: KeySecretProps) => (
-  <>
-    <ValidatedInput
-      id="awsAccessKey"
-      type="text"
-      label="AWS Access Key"
-      placeholder="AK****************"
-      onChange={onChange}
-      fieldData={awsKey}
-      autoComplete="off"
-      maxLength={512}
-      help={
-        required
-          ? 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".'
-          : 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK". (Optional - will use legacy AWS plugin configuration if not provided)'
-      }
-      required={required}
-    />
+const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, required = true }: KeySecretProps) => {
+  const { t } = useTranslation('integrations');
 
-    <StyledMaskedInput
-      id="awsSecretKey"
-      label="AWS Secret Key"
-      placeholder="***********"
-      onChange={onChange}
-      fieldData={awsSecret}
-      autoComplete="off"
-      maxLength={512}
-      help={
-        required
-          ? 'Your AWS Secret is usually a 40-character long, base-64 encoded string.'
-          : 'Your AWS Secret is usually a 40-character long, base-64 encoded string. (Optional - will use legacy AWS plugin configuration if not provided)'
-      }
-      required={required}
-    />
-  </>
-);
+  return (
+    <>
+      <ValidatedInput
+        id="awsAccessKey"
+        type="text"
+        label={t('aws_key_secret.access_key_label')}
+        placeholder={t('aws_key_secret.access_key_placeholder')}
+        onChange={onChange}
+        fieldData={awsKey}
+        autoComplete="off"
+        maxLength={512}
+        help={
+          required
+            ? t('aws_key_secret.access_key_help')
+            : t('aws_key_secret.access_key_help_optional')
+        }
+        required={required}
+      />
+
+      <StyledMaskedInput
+        id="awsSecretKey"
+        label={t('aws_key_secret.secret_key_label')}
+        placeholder={t('aws_key_secret.secret_key_placeholder')}
+        onChange={onChange}
+        fieldData={awsSecret}
+        autoComplete="off"
+        maxLength={512}
+        help={
+          required
+            ? t('aws_key_secret.secret_key_help')
+            : t('aws_key_secret.secret_key_help_optional')
+        }
+        required={required}
+      />
+    </>
+  );
+};
 
 export default KeySecret;

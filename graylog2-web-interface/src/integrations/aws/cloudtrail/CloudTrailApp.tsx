@@ -15,22 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import PageHeader from 'components/common/PageHeader';
 import { ExternalLink } from 'components/common';
 
 import EmbeddedCloudTrailApp from './EmbeddedCloudTrailApp';
 
-const CloudTrailApp = () => (
-  <>
-    <PageHeader title="AWS CloudTrail Integrations">
-      <span>This feature retrieves log records from AWS CloudTrail Platform.</span>
-      <p>
-        You need to have <ExternalLink href="https://aws.amazon.com/console/">AWS CloudTrail</ExternalLink>.{' '}
-      </p>
-    </PageHeader>
-    <EmbeddedCloudTrailApp />
-  </>
-);
+const CloudTrailApp = () => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <PageHeader title={t('aws_cloudtrail_app.title')}>
+        <span>{t('aws_cloudtrail_app.description')}</span>
+        <p>
+          <Trans
+            t={t}
+            i18nKey="aws_cloudtrail_app.requirement"
+            components={{
+              cloudTrailLink: <ExternalLink href="https://aws.amazon.com/console/" />,
+            }}
+          />
+        </p>
+      </PageHeader>
+      <EmbeddedCloudTrailApp />
+    </>
+  );
+};
 
 export default CloudTrailApp;

@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
@@ -34,6 +35,12 @@ const BackButton = styled(Button)`
   margin-right: 9px;
 `;
 
+const DocsAnchor = ({ href, children }: { href: string; children?: React.ReactNode }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
 type KinesisSetupProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
@@ -41,6 +48,7 @@ type KinesisSetupProps = {
 };
 
 const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupProps) => {
+  const { t } = useTranslation('integrations');
   const { availableGroups, setGroups, clearLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
@@ -65,11 +73,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
       if (groupNamesStatus.error.match(noGroups)) {
         setFormError({
           full_message: groupNamesStatus.error,
-          nice_message: (
-            <span>
-              We&apos;re unable to find any groups in your chosen region. Please try selecting a different region.
-            </span>
-          ),
+          nice_message: <span>{t('aws_kinesis_setup_new_stream.no_groups_error')}</span>,
         });
 
         setDisabledGroups(true);
@@ -83,7 +87,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
     return () => {
       setGroups({ log_groups: [] });
     };
-  }, [groupNamesStatus.error, setGroupNamesUrl, setGroups]);
+  }, [groupNamesStatus.error, setGroupNamesUrl, setGroups, t]);
 
   const handleAgreeSubmit = () => {
     clearLogData();
@@ -103,43 +107,43 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
   return (
     <FormWrap
       onSubmit={handleFormSubmit}
-      buttonContent="Begin Automated Setup"
+      buttonContent={t('aws_kinesis_setup_new_stream.begin_button')}
       disabled={
         formValidation.isFormValid(['awsCloudWatchKinesisStream', 'awsCloudWatchAwsGroupName'], formData) ||
         disabledForm
       }
       loading={groupNamesStatus.loading}
       error={formError}
-      title="Set Up Kinesis Automatically"
+      title={t('aws_kinesis_setup_new_stream.title')}
       description="">
       <p>
-        Complete the fields below to start the automated Kinesis setup. This will perform the following operations
-        within your AWS account. See{' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">
-          Using CloudWatch Logs Subscription Filters
-        </a>{' '}
-        in the AWS documentation for more information.
+        <Trans
+          t={t}
+          i18nKey="aws_kinesis_setup_new_stream.intro"
+          components={{
+            docsLink: (
+              <DocsAnchor href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html" />
+            ),
+          }}
+        />
       </p>
 
       <ol>
-        <li>Create a new Kinesis stream with the specified name.</li>
-        <li>Create the IAM role/policy needed to subscribe the Kinesis stream to the CloudWatch Log Group.</li>
-        <li>Subscribe the new Kinesis stream to the Log Group.</li>
+        <li>{t('aws_kinesis_setup_new_stream.step_create_stream')}</li>
+        <li>{t('aws_kinesis_setup_new_stream.step_create_role')}</li>
+        <li>{t('aws_kinesis_setup_new_stream.step_subscribe')}</li>
       </ol>
 
       <ValidatedInput
         id="awsCloudWatchKinesisStream"
         type="text"
-        label="Kinesis Stream Name"
-        placeholder="Stream Name"
+        label={t('aws_kinesis_setup_new_stream.stream_name_label')}
+        placeholder={t('aws_kinesis_setup_new_stream.stream_name_placeholder')}
         onChange={onChange}
         fieldData={formData.awsCloudWatchKinesisStream}
         disabled={disabledForm}
         pattern="[a-zA-Z0-9_.-]{1,128}$"
-        help="1-128 alphanumeric characters and special characters underscore (_), period (.), and hyphen (-)."
+        help={t('aws_kinesis_setup_new_stream.stream_name_help')}
         required
       />
 
@@ -148,15 +152,19 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
         type="select"
         fieldData={formData.awsCloudWatchAwsGroupName}
         onChange={onChange}
-        label="CloudWatch Group Name"
+        label={t('aws_kinesis_setup_new_stream.group_name_label')}
         required
         disabled={groupNamesStatus.loading || disabledGroups || disabledForm}>
-        {renderOptions(availableGroups, 'Choose CloudWatch Group', groupNamesStatus.loading)}
+        {renderOptions(
+          availableGroups,
+          t('aws_kinesis_setup_new_stream.choose_group'),
+          groupNamesStatus.loading,
+        )}
       </ValidatedInput>
 
       {toggleSetup && (
         <BackButton onClick={toggleSetup} type="button" disabled={disabledForm}>
-          Back to stream Selection
+          {t('aws_kinesis_setup_new_stream.back_button')}
         </BackButton>
       )}
 

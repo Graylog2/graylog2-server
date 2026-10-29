@@ -1,0 +1,330 @@
+{
+  "aws_plugin_configuration": {
+    "title": "AWS Plugin Configuration",
+    "description": "Base configuration for all plugins the AWS module is providing. Note that some parameters will be stored in MongoDB without encryption. Users with required permissions will be able to read them in the configuration dialog on this page.",
+    "status_instance_detail_lookups": "Instance detail lookups:",
+    "status_connect_through_proxy": "Connect through proxy:",
+    "status_lookup_regions": "Lookup regions:",
+    "status_access_key": "Access Key:",
+    "status_secret_key": "Secret Key:",
+    "status_enabled": "Enabled",
+    "status_disabled": "Disabled",
+    "status_not_set": "[not set]",
+    "edit_configuration": "Edit configuration",
+    "modal_title": "Update AWS Plugin Configuration",
+    "submit_configuration": "Update configuration",
+    "lookups_enabled_label": "Run AWS instance detail lookups for IP addresses?",
+    "lookups_enabled_help": "When enabled, a message processor will try to identify IP addresses of your AWS entities (like EC2, ELB, RDS, ...) and add additional information abut the service or instance behind it. It can take up to a minute for a change of this to take effect.",
+    "access_key_label": "AWS Access Key",
+    "access_key_help": "Note that this will only be used in encrypted connections but stored in plaintext. Please consult the documentation for suggested rights to assign to the underlying IAM user.",
+    "secret_key_label": "AWS Secret Key",
+    "secret_key_help": "Note that this will only be used in encrypted connections and will be stored encrypted (using the system secret). Please consult the documentation for suggested rights to assign to the underlying IAM user.",
+    "lookup_regions_label": "Lookup regions",
+    "lookup_regions_help": "The AWS instance lookup message processor keeps a table of instances for fast address translation. Define the AWS regions you want to include in the tables. This should be all regions you run AWS services in. Remember that your IAM user needs permission for these regions or you will see warnings in your {{productName}} server logs.",
+    "proxy_enabled_label": "Use HTTP proxy?",
+    "proxy_enabled_help": "When enabled, we'll access the AWS APIs through the HTTP proxy configured (<code>http_proxy_uri</code>) in your {{productName}} configuration file.<lineBreak/><em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.",
+    "save_error_message": "AWS plugin configuration failed with status: {{error}}",
+    "save_error_title": "Could not save AWS plugin configuration."
+  },
+  "gcs_setup_info": {
+    "intro": "To setup a Google Cloud Storage backend, the steps are as follows:",
+    "step_bucket": "Create a Google Cloud Storage Bucket with a unique name - see Google‘s documentation on <bucketsLink>Buckets</bucketsLink>. The default Standard Storage Class is recommended.",
+    "step_service_account": "Create a Google Cloud Service Account, with permissions to read/write/delete from that Bucket - see Google‘s documentation on <serviceAccountsLink>Service Accounts</serviceAccountsLink>.",
+    "step_credentials": "Set up Application Default credentials on all Graylog nodes. The method differs depending on how your cluster is hosted - see Google‘s documentation on <adcLink>Setting up Application Default credentials</adcLink>.",
+    "step_setup_backend": "On this page, you are now ready to set up a Google Cloud Storage Backend. You will need to provide the unique name of the Google Cloud storage created during the first step."
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "Invalid AWS Key, check out your AWS account for the 20-character long, alphanumeric string that usually starts with the letters \"AK\"",
+    "invalid_secret_message": "Invalid AWS Secret, it is usually a 40-character long, base-64 encoded string, but you only get to view it once when you create the Key",
+    "authorize_button": "Authorize & Choose Stream",
+    "title": "Create Input & Authorize AWS",
+    "description": "This integration allows reading messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then processed.",
+    "input_name": "Input Name",
+    "aws_region": "AWS Region",
+    "aws_region_help": "The AWS Region your service is running in.",
+    "choose_region": "Choose AWS Region"
+  },
+  "aws_arn": {
+    "assume_role_label": "AWS Assume Role (ARN)",
+    "assume_role_help": "Amazon Resource Name with required cross account permission",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "AWS External ID (optional)",
+    "external_id_help": "An external ID added to the AssumeRole request to prevent the confused deputy problem. Required only if your role trust policy enforces it."
+  },
+  "aws_authentication_types": {
+    "label": "AWS Authentication Type"
+  },
+  "aws_custom_endpoints": {
+    "title": "Optional AWS VPC Endpoints",
+    "section_title": "Overrides the default AWS API endpoint URL that {{productName}} communicates with.",
+    "note": "Only specify these if you are using <vpcEndpointsLink>VPC Endpoints</vpcEndpointsLink> for AWS services.",
+    "input_message": "Domain should begin with 'https://'",
+    "cloudwatch_label": "CloudWatch API Endpoint Override",
+    "iam_label": "IAM API Endpoint Override",
+    "dynamodb_label": "DynamoDB API Endpoint Override",
+    "kinesis_label": "Kinesis API Endpoint Override"
+  },
+  "aws_automatic": {
+    "section_title": "Automatic authentication will attempt each of the following in the listed order.",
+    "env_variables_label": "Environment variables",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Java system properties",
+    "java_properties_value": "<code>aws.accessKeyId</code> and <code>aws.secretKey</code>",
+    "profiles_label": "Default credential profiles file",
+    "profiles_value": "Typically located at <code>~/.aws/credentials</code>",
+    "ecs_label": "Amazon ECS container credentials",
+    "ecs_value": "Loaded from the Amazon ECS if the environment variable <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code> is set",
+    "instance_label": "Instance profile credentials",
+    "instance_value": "Used on EC2 instances, and delivered through the Amazon EC2 metadata service",
+    "more_info": "For more information, check out the <docsLink>AWS Credential Configuration Documentation <openIcon/></docsLink>."
+  },
+  "aws_key_secret": {
+    "access_key_label": "AWS Access Key",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters \"AK\".",
+    "access_key_help_optional": "Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters \"AK\". (Optional - will use legacy AWS plugin configuration if not provided)",
+    "secret_key_label": "AWS Secret Key",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "Your AWS Secret is usually a 40-character long, base-64 encoded string.",
+    "secret_key_help_optional": "Your AWS Secret is usually a 40-character long, base-64 encoded string. (Optional - will use legacy AWS plugin configuration if not provided)"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "AWS CloudTrail Connection Configuration",
+    "step_subscribe_title": "AWS CloudTrail Input Configuration",
+    "step_review_title": "AWS CloudTrail Final Review"
+  },
+  "aws_cloudtrail_app": {
+    "title": "AWS CloudTrail Integrations",
+    "description": "This feature retrieves log records from AWS CloudTrail Platform.",
+    "requirement": "You need to have <cloudTrailLink>AWS CloudTrail</cloudTrailLink>."
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "Advanced Options",
+    "sqs_batch_size_error": "Please select SQS Message Batch Size between 1 - 10.",
+    "override_source_label": "Override Source (optional)",
+    "override_source_help": "The source is set to aws-cloudtrail by default. If desired, you may override it with a custom value.",
+    "sqs_batch_size_label": "SQS Message Batch Size",
+    "sqs_batch_size_help": "The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10.",
+    "include_full_message_json_label": "Include full_message_json?",
+    "include_full_message_json_help": "Store the complete CloudTrail event as JSON in the full_message_json field?"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "Unable to connect to AWS CloudTrail using provided configuration.",
+    "verify_button": "Verify Connection & Proceed",
+    "input_name": "Input Name",
+    "input_name_help": "Select a name of your new input that describes it.",
+    "sqs_region_help": "AWS region where the SQS queue is located.",
+    "sqs_region_label": "AWS SQS Region",
+    "choose_sqs_region": "Choose SQS region",
+    "s3_region_help": "AWS region where the S3 bucket is located.",
+    "s3_region_label": "AWS S3 Region",
+    "choose_s3_region": "Choose S3 region",
+    "sqs_queue_name_help": "SQS queue name created by the CloudTrail Subscriber",
+    "sqs_queue_name_label": "SQS Queue Name"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "We were unable to save your Input, please try again in a few moments.",
+    "save_button": "Save and Start Input",
+    "description": "Check out everything below to make sure it's correct, then click the button below to complete your AWS CloudTrail setup!",
+    "input_configuration": "Input Configuration",
+    "label_name": "Name",
+    "label_access_key": "AWS Access Key",
+    "label_sqs_region": "SQS Region",
+    "label_s3_region": "S3 Region",
+    "label_assume_role_arn": "AWS Assume Role (ARN)",
+    "label_external_id": "AWS External ID",
+    "label_sqs_queue_name": "AWS SQS Queue name",
+    "label_sqs_batch_size": "SQS Message Batch Size",
+    "label_polling_interval": "Polling Interval",
+    "label_enable_throttling": "Enable Throttling"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "Please provide valid polling interval",
+    "polling_interval_error": "Minimum allowable polling interval is 1 minute.",
+    "batch_size_error_full": "Please provide valid SQS Message Batch Size.",
+    "batch_size_error": "Please select SQS Message Batch Size between 1 - 10.",
+    "proceed_button": "Proceed",
+    "polling_interval_help": "Determines how often (in minutes) new data will be checked for in AWS CloudTrail. The smallest allowable interval is 1 minute.",
+    "polling_interval_label": "Polling Interval"
+  },
+  "aws_cloudwatch_app": {
+    "title": "AWS Integrations",
+    "description": "This feature retrieves log messages from various AWS sources."
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "Advanced Options",
+    "flow_log_prefix_label": "Add Flow Log field name prefix",
+    "flow_log_prefix_help": "Add field with the Flow Log prefix e. g. \"src_addr\" -> \"flow_log_src_addr\".",
+    "store_full_message_label": "Store full message?",
+    "store_full_message_help": "Store the original Kinesis/CloudWatch log event payload in the full_message field.",
+    "override_source_label": "Override Source (optional)",
+    "override_source_help": "The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value.",
+    "batch_size_label": "Kinesis Record batch size",
+    "batch_size_help": "The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
+  },
+  "aws_sidebar_permissions": {
+    "title": "AWS Policy Permissions",
+    "description": "Please refer to the <docsLink/> for information on required AWS permissions.",
+    "docs_link_text": "official documentation"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "We haven't received a response back from Amazon yet.",
+    "waiting_description": "Hang out for a few moments while we keep checking your AWS stream for logs. Amazon's servers parse logs every 10 minutes, so grab a cup of coffee because this may take some time!",
+    "checking_again_in": "Checking again in: <countdown/>",
+    "checking_button": "Checking...",
+    "check_now_button": "Check Now",
+    "do_not_refresh": "Do not refresh your browser, we are continually checking for your logs and this page will automatically refresh when your logs are available.",
+    "review_button": "Review & Finalize",
+    "title": "Create Kinesis Stream",
+    "sample_description": "If available, a parsed sample {{logType}} message from the stream will be shown below.",
+    "formatted_log_label": "Formatted Log Message",
+    "no_messages": "No messages found in stream."
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "(default)",
+    "save_error": "We were unable to save your Input, please try again in a few moments.",
+    "complete_button": "Complete CloudWatch Setup",
+    "title": "Final Review",
+    "description": "Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!",
+    "setting_up_cloudwatch": "Setting up CloudWatch",
+    "edit": "Edit",
+    "label_name": "Name",
+    "label_authorization_type": "Authorization Type",
+    "label_aws_key": "AWS Key",
+    "label_assumed_role_arn": "AWS Assumed ARN Role",
+    "label_external_id": "AWS External ID",
+    "label_cloudwatch_endpoint": "CloudWatch VPC Endpoint",
+    "label_dynamodb_endpoint": "DynamoDB VPC Endpoint",
+    "label_iam_endpoint": "IAM VPC Endpoint",
+    "label_kinesis_endpoint": "Kinesis VPC Endpoint",
+    "label_aws_region": "AWS Region",
+    "setting_up_kinesis": "Setting up Kinesis",
+    "label_kinesis_stream": "Kinesis Stream",
+    "label_kinesis_stream_arn": "Kinesis Stream ARN",
+    "stream_arn_error": "Error: Failed to get stream ARN. Please ensure the IAM role includes the kinesis:DescribeStream permission.",
+    "label_global_input": "Global Input",
+    "label_record_batch_size": "Record Batch Size",
+    "label_enable_throttling": "Enable Throttling",
+    "label_flow_log_prefix": "Add Flow Log prefix to field names",
+    "label_store_full_message": "Store full message",
+    "label_override_source": "Override Source",
+    "formatting": "Formatting",
+    "label_log_type": "Log Type",
+    "pipeline_hint": "If you need your logs parsed differently check out our <pipelineLink>Pipeline Rule</pipelineLink> for additional details and instructions.",
+    "no_response": "We haven't received a response back from Amazon yet."
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "Don't see the stream you need?",
+    "sidebar_requirement": "At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log stream must contain at least a few log messages.",
+    "sidebar_auto_setup": "{{productName}} also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log group of your choice. Please be aware that this option will create additional resources in your AWS environment that will incur billing charges.",
+    "setup_automatically_button": "Setup Kinesis Automatically",
+    "no_logs_error": "We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.",
+    "loading_message": "This request may take a few moments.",
+    "verify_button": "Verify Stream & Format",
+    "title": "Select Kinesis Stream",
+    "description_list": "Below is a list of all Kinesis streams found within the specified AWS account.",
+    "description_docs": "Please select the stream you would like to read messages from, or follow the <docsLink/> documentation for more details on this set up.",
+    "docs_link_text": "AWS Kinesis/CloudWatch Input",
+    "select_stream_label": "Select Stream",
+    "select_stream_placeholder": "Select Kinesis Stream"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "We're unable to find any groups in your chosen region. Please try selecting a different region.",
+    "begin_button": "Begin Automated Setup",
+    "title": "Set Up Kinesis Automatically",
+    "intro": "Complete the fields below to start the automated Kinesis setup. This will perform the following operations within your AWS account. See <docsLink>Using CloudWatch Logs Subscription Filters</docsLink> in the AWS documentation for more information.",
+    "step_create_stream": "Create a new Kinesis stream with the specified name.",
+    "step_create_role": "Create the IAM role/policy needed to subscribe the Kinesis stream to the CloudWatch Log Group.",
+    "step_subscribe": "Subscribe the new Kinesis stream to the Log Group.",
+    "stream_name_label": "Kinesis Stream Name",
+    "stream_name_placeholder": "Stream Name",
+    "stream_name_help": "1-128 alphanumeric characters and special characters underscore (_), period (.), and hyphen (-).",
+    "group_name_label": "CloudWatch Group Name",
+    "choose_group": "Choose CloudWatch Group",
+    "back_button": "Back to stream Selection"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "This auto setup will create the following AWS resources. Click below to acknowledge that you understand that these resources will be created and that you are solely responsible for any associated AWS fees incurred from them. Note that all resources must be manually deleted by you if they are not needed.",
+    "step_stream": "Create a Kinesis stream with <strong>1</strong> shard.",
+    "step_role": "Create an IAM Role and Policy to allow the specified CloudWatch group <strong>{{groupName}}</strong> to publish log messages to the Kinesis stream <strong>{{streamName}}</strong>",
+    "step_subscription": "Create a CloudWatch Subscription, which publishes log messages to the Kinesis stream."
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "Waiting...",
+    "creating": "Creating {{label}}",
+    "create": "Create {{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis Stream",
+    "policy_label": "Subscription Policy",
+    "subscription_label": "Subscription"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "Creating...",
+    "close_button": "Close",
+    "continue_button": "Continue Setup",
+    "executing_title": "Executing Auto-Setup",
+    "agreement_title": "Kinesis Auto Setup Agreement",
+    "delayed_logs": "It may take up to ten minutes for the first messages to arrive in the Kinesis stream. The Kinesis Health Check in the following step will not complete successfully until messages are present in the stream. Please see the official <cloudWatchLink>CloudWatch Subscriptions</cloudWatchLink> documentation for more information.",
+    "agree_button": "I Agree! Create these AWS resources now."
+  },
+  "form_wrap": {
+    "more_info": "More Info",
+    "additional_information": "Additional Information:",
+    "loading_button": "Loading...",
+    "submit_button": "Submit"
+  },
+  "aws_skip_health_check": {
+    "title": "Skip Health Check",
+    "confirm_button": "Confirm",
+    "form_title": "Choose Log Type & Skip Health Check",
+    "description": "If you're sure of the data contained within your new <strong>{{streamName}}</strong> stream, then choose your option below to skip our automated check.",
+    "input_type_label": "Choose AWS Input Type",
+    "choose_log_type": "Choose Log Type"
+  },
+  "throttling_checkbox": {
+    "label": "Enable Throttling",
+    "help": "If enabled, no new messages will be read from this input until the {{productName}} server catches up with its message load. This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "The GreyNoise Quick IP Lookup data adapter uses the <greynoiseLink>Greynoise API</greynoiseLink> to lookup indicators for the given key and returns the values for the IP Quick Context endpoint. See <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "User Password",
+    "reset_token_button": "Reset token",
+    "api_token_label": "API Token",
+    "undo_reset_button": "Undo Reset",
+    "api_token_help": "The API Token."
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API Token"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "Channel",
+    "custom_message_label": "Custom Message Template",
+    "empty_body": "Empty body",
+    "include_event_procedure_label": "Include Event Procedure in Email Body",
+    "backlog_limit_label": "Message Backlog Limit",
+    "user_name_label": "User Name",
+    "include_title_label": "Include Title",
+    "notify_channel_label": "Notify Channel",
+    "link_names_label": "Link Names",
+    "icon_url_label": "Icon URL",
+    "icon_emoji_label": "Icon Emoji",
+    "time_zone_label": "Time Zone"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "Custom Message Template",
+    "empty_body": "Empty body",
+    "backlog_limit_label": "Message Backlog Limit",
+    "icon_url_label": "Icon URL",
+    "time_zone_label": "Time Zone"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "Adaptive Card Template",
+    "backlog_limit_label": "Message Backlog Limit"
+  }
+}

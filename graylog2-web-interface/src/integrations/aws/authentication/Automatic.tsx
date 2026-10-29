@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -25,64 +26,92 @@ const StyledTable = styled(Table)`
   margin: 0;
 `;
 
-const Automatic = () => (
-  <StyledTable condensed>
-    <thead>
-      <tr>
-        <td colSpan={2}>
-          <SectionTitle>Automatic authentication will attempt each of the following in the listed order.</SectionTitle>
-        </td>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr>
-        <th>Environment variables</th>
-        <td>
-          <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>
-        </td>
-      </tr>
-      <tr>
-        <th>Java system properties</th>
-        <td>
-          <code>aws.accessKeyId</code> and <code>aws.secretKey</code>
-        </td>
-      </tr>
-      <tr>
-        <th>Default credential profiles file</th>
-        <td>
-          Typically located at <code>~/.aws/credentials</code>
-        </td>
-      </tr>
-      <tr>
-        <th>Amazon ECS container credentials</th>
-        <td>
-          Loaded from the Amazon ECS if the environment variable <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code> is
-          set
-        </td>
-      </tr>
-      <tr>
-        <th>Instance profile credentials</th>
-        <td>Used on EC2 instances, and delivered through the Amazon EC2 metadata service</td>
-      </tr>
-    </tbody>
-
-    <tfoot>
-      <tr>
-        <td colSpan={2}>
-          <SectionNote>
-            For more information, check out the{' '}
-            <a
-              href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html"
-              target="_blank"
-              rel="noopener noreferrer">
-              AWS Credential Configuration Documentation <Icon name="open_in_new" />
-            </a>
-          </SectionNote>
-        </td>
-      </tr>
-    </tfoot>
-  </StyledTable>
+const DocsAnchor = ({ href, children }: { href: string; children?: React.ReactNode }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
 );
+
+const Automatic = () => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <StyledTable condensed>
+      <thead>
+        <tr>
+          <td colSpan={2}>
+            <SectionTitle>{t('aws_automatic.section_title')}</SectionTitle>
+          </td>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <th>{t('aws_automatic.env_variables_label')}</th>
+          <td>
+            <Trans
+              t={t}
+              i18nKey="aws_automatic.env_variables_value"
+              components={{ code: <code /> }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>{t('aws_automatic.java_properties_label')}</th>
+          <td>
+            <Trans
+              t={t}
+              i18nKey="aws_automatic.java_properties_value"
+              components={{ code: <code /> }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>{t('aws_automatic.profiles_label')}</th>
+          <td>
+            <Trans
+              t={t}
+              i18nKey="aws_automatic.profiles_value"
+              components={{ code: <code /> }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>{t('aws_automatic.ecs_label')}</th>
+          <td>
+            <Trans
+              t={t}
+              i18nKey="aws_automatic.ecs_value"
+              components={{ code: <code /> }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>{t('aws_automatic.instance_label')}</th>
+          <td>{t('aws_automatic.instance_value')}</td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td colSpan={2}>
+            <SectionNote>
+              <Trans
+                t={t}
+                i18nKey="aws_automatic.more_info"
+                components={{
+                  docsLink: (
+                    <DocsAnchor href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html" />
+                  ),
+                  openIcon: <Icon name="open_in_new" />,
+                }}
+              />
+            </SectionNote>
+          </td>
+        </tr>
+      </tfoot>
+    </StyledTable>
+  );
+};
 
 export default Automatic;

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
@@ -51,10 +52,11 @@ type KinesisSetupStepProps = {
 };
 
 const KinesisSetupStep = ({ label, progress }: KinesisSetupStepProps) => {
+  const { t } = useTranslation('integrations');
   const { data, error, loading } = progress;
 
-  const waitingText = !data && !loading && !error && 'Waiting...';
-  const loadingText = loading ? `Creating ${label}` : waitingText;
+  const waitingText = !data && !loading && !error && t('aws_kinesis_setup_step.waiting');
+  const loadingText = loading ? t('aws_kinesis_setup_step.creating', { label }) : waitingText;
   const successText = data ? data.result : loadingText;
   const defaultText = error || successText;
 
@@ -68,7 +70,7 @@ const KinesisSetupStep = ({ label, progress }: KinesisSetupStepProps) => {
       </IconWrap>
 
       <Content>
-        <StepHeader>Create {label}</StepHeader>
+        <StepHeader>{t('aws_kinesis_setup_step.create', { label })}</StepHeader>
 
         <StepDetails>{defaultText}</StepDetails>
       </Content>

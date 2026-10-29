@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import FormDataContext from 'integrations/contexts/FormDataContext';
@@ -40,6 +41,7 @@ type AWSAuthenticationTypesProps = {
 };
 
 const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuthenticationTypesProps) => {
+  const { t } = useTranslation('integrations');
   const { clearField, formData } = useContext(FormDataContext);
 
   const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN, awsExternalId } = formData;
@@ -84,7 +86,7 @@ const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuth
             name="awsAuthType"
             id="awsAuthType"
             onChange={handleTypeChange}
-            label="AWS Authentication Type"
+            label={t('aws_authentication_types.label')}
             defaultValue={currentType}>
             {Object.keys(AWS_AUTH_TYPES).map((type) => (
               <option value={AWS_AUTH_TYPES[type]} key={`option-${type}`}>

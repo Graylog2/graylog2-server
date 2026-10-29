@@ -16,6 +16,7 @@
  */
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ExternalLink } from 'components/common';
 import FormDataContext from 'integrations/contexts/FormDataContext';
@@ -26,7 +27,6 @@ import { SectionTitle, SectionNote } from 'integrations/aws/common/sharedStyles'
 import useProductName from 'brand-customization/useProductName';
 
 const INPUT_PATTERN = 'https://(.*)';
-const INPUT_MESSAGE = "Domain should begin with 'https://'";
 const INPUT_PLACEHOLDER = 'https://vpce-1234.service.region.vpce.amazonaws.com';
 
 const StyledSectionTitle = styled(SectionTitle)`
@@ -42,6 +42,7 @@ type AWSCustomEndpointsProps = {
 };
 
 const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const productName = useProductName();
   const { isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility } = useContext(AdvancedOptionsContext);
@@ -52,16 +53,21 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
   };
 
   return (
-    <AdditionalFields title="Optional AWS VPC Endpoints" visible={isAWSCustomEndpointsVisible} onToggle={handleToggle}>
-      <StyledSectionTitle>
-        Overrides the default AWS API endpoint URL that {productName} communicates with.
-      </StyledSectionTitle>
+    <AdditionalFields
+      title={t('aws_custom_endpoints.title')}
+      visible={isAWSCustomEndpointsVisible}
+      onToggle={handleToggle}>
+      <StyledSectionTitle>{t('aws_custom_endpoints.section_title', { productName })}</StyledSectionTitle>
       <StyledSectionNote>
-        Only specify these if you are using{' '}
-        <ExternalLink href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-endpoints.html">
-          VPC Endpoints
-        </ExternalLink>{' '}
-        for AWS services.
+        <Trans
+          t={t}
+          i18nKey="aws_custom_endpoints.note"
+          components={{
+            vpcEndpointsLink: (
+              <ExternalLink href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-endpoints.html" />
+            ),
+          }}
+        />
       </StyledSectionNote>
 
       <ValidatedInput
@@ -69,10 +75,10 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
         type="text"
         fieldData={awsEndpointCloudWatch}
         onChange={onChange}
-        label="CloudWatch API Endpoint Override"
+        label={t('aws_custom_endpoints.cloudwatch_label')}
         placeholder={INPUT_PLACEHOLDER}
         pattern={INPUT_PATTERN}
-        title={INPUT_MESSAGE}
+        title={t('aws_custom_endpoints.input_message')}
       />
 
       <ValidatedInput
@@ -80,10 +86,10 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
         type="text"
         fieldData={awsEndpointIAM}
         onChange={onChange}
-        label="IAM API Endpoint Override"
+        label={t('aws_custom_endpoints.iam_label')}
         placeholder={INPUT_PLACEHOLDER}
         pattern={INPUT_PATTERN}
-        title={INPUT_MESSAGE}
+        title={t('aws_custom_endpoints.input_message')}
       />
 
       <ValidatedInput
@@ -91,10 +97,10 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
         type="text"
         fieldData={awsEndpointDynamoDB}
         onChange={onChange}
-        label="DynamoDB API Endpoint Override"
+        label={t('aws_custom_endpoints.dynamodb_label')}
         placeholder={INPUT_PLACEHOLDER}
         pattern={INPUT_PATTERN}
-        title={INPUT_MESSAGE}
+        title={t('aws_custom_endpoints.input_message')}
       />
 
       <ValidatedInput
@@ -102,10 +108,10 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
         type="text"
         fieldData={awsEndpointKinesis}
         onChange={onChange}
-        label="Kinesis API Endpoint Override"
+        label={t('aws_custom_endpoints.kinesis_label')}
         placeholder={INPUT_PLACEHOLDER}
         pattern={INPUT_PATTERN}
-        title={INPUT_MESSAGE}
+        title={t('aws_custom_endpoints.input_message')}
       />
     </AdditionalFields>
   );

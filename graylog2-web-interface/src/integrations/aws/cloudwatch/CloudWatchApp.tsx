@@ -15,18 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PageHeader from 'components/common/PageHeader';
 
 import EmbeddedCloudWatchApp from './EmbeddedCloudWatchApp';
 
-const CloudWatchApp = () => (
-  <>
-    <PageHeader title="AWS Integrations">
-      <span>This feature retrieves log messages from various AWS sources.</span>
-    </PageHeader>
-    <EmbeddedCloudWatchApp />
-  </>
-);
+const CloudWatchApp = () => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <PageHeader title={t('aws_cloudwatch_app.title')}>
+        <span>{t('aws_cloudwatch_app.description')}</span>
+      </PageHeader>
+      <EmbeddedCloudWatchApp />
+    </>
+  );
+};
 
 export default CloudWatchApp;

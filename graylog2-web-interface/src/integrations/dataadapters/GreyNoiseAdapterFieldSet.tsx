@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
@@ -35,6 +36,7 @@ const GreyNoiseAdapterFieldSet = ({
   validationMessage,
   validationState,
 }: GreyNoiseAdapterFieldSetProps) => {
+  const { t } = useTranslation('integrations');
   const [isCreate] = useState(() => !config.api_token?.keep_value);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(!!config.api_token?.keep_value);
 
@@ -68,24 +70,28 @@ const GreyNoiseAdapterFieldSet = ({
   return (
     <fieldset>
       {showResetPasswordButton ? (
-        <Input id="api_token" label="User Password" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-          <Button onClick={toggleUserPasswordReset}>Reset token</Button>
+        <Input
+          id="api_token"
+          label={t('grey_noise_adapter_field_set.user_password_label')}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9">
+          <Button onClick={toggleUserPasswordReset}>{t('grey_noise_adapter_field_set.reset_token_button')}</Button>
         </Input>
       ) : (
         <Input
           type="password"
           id="api_token"
           name="api_token"
-          label="API Token"
+          label={t('grey_noise_adapter_field_set.api_token_label')}
           buttonAfter={
             !isCreate ? (
               <Button type="button" onClick={toggleUserPasswordReset}>
-                Undo Reset
+                {t('grey_noise_adapter_field_set.undo_reset_button')}
               </Button>
             ) : undefined
           }
           onChange={handleUserPasswordChange}
-          help={validationMessage('api_token', 'The API Token.')}
+          help={validationMessage('api_token', t('grey_noise_adapter_field_set.api_token_help'))}
           bsStyle={validationState('api_token')}
           value={config.api_token?.set_value || ''}
           labelClassName="col-sm-3"

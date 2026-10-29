@@ -15,12 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const GreyNoiseAdapterSummary = () => (
-  <dl>
-    <dt>API Token</dt>
-    <dd>******</dd>
-  </dl>
-);
+const GreyNoiseAdapterSummary = () => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <dl>
+      <dt>{t('grey_noise_adapter_summary.api_token_label')}</dt>
+      <dd>******</dd>
+    </dl>
+  );
+};
 
 export default GreyNoiseAdapterSummary;

@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { AWSConfig } from '@graylog/server-api';
 
@@ -52,6 +53,7 @@ const AWSPluginConfiguration = ({
   },
 }: Props) => {
   const productName = useProductName();
+  const { t } = useTranslation('integrations');
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
 
@@ -92,8 +94,8 @@ const AWSPluginConfiguration = ({
       },
       (error) => {
         UserNotification.error(
-          `AWS plugin configuration failed with status: ${error}`,
-          'Could not save AWS plugin configuration.',
+          t('aws_plugin_configuration.save_error_message', { error }),
+          t('aws_plugin_configuration.save_error_title'),
         );
       },
     );
@@ -101,55 +103,55 @@ const AWSPluginConfiguration = ({
 
   return (
     <div>
-      <h3>AWS Plugin Configuration</h3>
+      <h3>{t('aws_plugin_configuration.title')}</h3>
 
-      <p>
-        Base configuration for all plugins the AWS module is providing. Note that some parameters will be stored in
-        MongoDB without encryption. Users with required permissions will be able to read them in the configuration
-        dialog on this page.
-      </p>
+      <p>{t('aws_plugin_configuration.description')}</p>
 
       <dl className="deflist">
-        <dt>Instance detail lookups:</dt>
-        <dd>{config.lookups_enabled === true ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('aws_plugin_configuration.status_instance_detail_lookups')}</dt>
+        <dd>
+          {config.lookups_enabled === true
+            ? t('aws_plugin_configuration.status_enabled')
+            : t('aws_plugin_configuration.status_disabled')}
+        </dd>
 
-        <dt>Connect through proxy:</dt>
-        <dd>{config.proxy_enabled === true ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('aws_plugin_configuration.status_connect_through_proxy')}</dt>
+        <dd>
+          {config.proxy_enabled === true
+            ? t('aws_plugin_configuration.status_enabled')
+            : t('aws_plugin_configuration.status_disabled')}
+        </dd>
 
-        <dt>Lookup regions:</dt>
-        <dd>{config.lookup_regions ? config.lookup_regions : '[not set]'}</dd>
+        <dt>{t('aws_plugin_configuration.status_lookup_regions')}</dt>
+        <dd>
+          {config.lookup_regions ? config.lookup_regions : t('aws_plugin_configuration.status_not_set')}
+        </dd>
 
-        <dt>Access Key:</dt>
-        <dd>{config.access_key ? config.access_key : '[not set]'}</dd>
+        <dt>{t('aws_plugin_configuration.status_access_key')}</dt>
+        <dd>{config.access_key ? config.access_key : t('aws_plugin_configuration.status_not_set')}</dd>
 
-        <dt>Secret Key:</dt>
-        <dd>{config.secret_key ? '***********' : '[not set]'}</dd>
+        <dt>{t('aws_plugin_configuration.status_secret_key')}</dt>
+        <dd>{config.secret_key ? '***********' : t('aws_plugin_configuration.status_not_set')}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('aws_plugin_configuration.edit_configuration')}
         </Button>
       </IfPermitted>
 
       <BootstrapModalForm
         show={showAwsConfigModal}
-        title="Update AWS Plugin Configuration"
+        title={t('aws_plugin_configuration.modal_title')}
         onSubmitForm={saveConfig}
         onCancel={resetConfig}
-        submitButtonText="Update configuration">
+        submitButtonText={t('aws_plugin_configuration.submit_configuration')}>
         <fieldset>
           <Input
             id="aws-lookups-enabled"
             type="checkbox"
-            label="Run AWS instance detail lookups for IP addresses?"
-            help={
-              <span>
-                When enabled, a message processor will try to identify IP addresses of your AWS entities (like EC2, ELB,
-                RDS, ...) and add additional information abut the service or instance behind it. It can take up to a
-                minute for a change of this to take effect.
-              </span>
-            }
+            label={t('aws_plugin_configuration.lookups_enabled_label')}
+            help={<span>{t('aws_plugin_configuration.lookups_enabled_help')}</span>}
             name="lookups_enabled"
             checked={updateConfig.lookups_enabled}
             onChange={onUpdate('lookups_enabled')}
@@ -158,13 +160,8 @@ const AWSPluginConfiguration = ({
           <Input
             id="aws-access-key"
             type="text"
-            label="AWS Access Key"
-            help={
-              <span>
-                Note that this will only be used in encrypted connections but stored in plaintext. Please consult the
-                documentation for suggested rights to assign to the underlying IAM user.
-              </span>
-            }
+            label={t('aws_plugin_configuration.access_key_label')}
+            help={<span>{t('aws_plugin_configuration.access_key_help')}</span>}
             name="access_key"
             value={updateConfig.access_key}
             onChange={onUpdate('access_key')}
@@ -173,13 +170,8 @@ const AWSPluginConfiguration = ({
           <Input
             id="aws-secret-key"
             type="password"
-            label="AWS Secret Key"
-            help={
-              <span>
-                Note that this will only be used in encrypted connections and will be stored encrypted (using the system
-                secret). Please consult the documentation for suggested rights to assign to the underlying IAM user.
-              </span>
-            }
+            label={t('aws_plugin_configuration.secret_key_label')}
+            help={<span>{t('aws_plugin_configuration.secret_key_help')}</span>}
             name="secret_key"
             value={updateConfig.secret_key !== undefined ? updateConfig.secret_key : config.secret_key}
             onFocus={onFocusSecretKey}
@@ -189,15 +181,8 @@ const AWSPluginConfiguration = ({
           <Input
             id="aws-lookup-regions"
             type="text"
-            label="Lookup regions"
-            help={
-              <span>
-                The AWS instance lookup message processor keeps a table of instances for fast address translation.
-                Define the AWS regions you want to include in the tables. This should be all regions you run AWS
-                services in. Remember that your IAM user needs permission for these regions or you will see warnings in
-                your {productName} server logs.
-              </span>
-            }
+            label={t('aws_plugin_configuration.lookup_regions_label')}
+            help={<span>{t('aws_plugin_configuration.lookup_regions_help', { productName })}</span>}
             name="lookup_regions"
             value={updateConfig.lookup_regions}
             onChange={onUpdate('lookup_regions')}
@@ -206,13 +191,15 @@ const AWSPluginConfiguration = ({
           <Input
             id="aws-proxy-enabled"
             type="checkbox"
-            label="Use HTTP proxy?"
+            label={t('aws_plugin_configuration.proxy_enabled_label')}
             help={
               <span>
-                When enabled, we&apos;ll access the AWS APIs through the HTTP proxy configured (
-                <code>http_proxy_uri</code>) in your {productName} configuration file.
-                <br />
-                <em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.
+                <Trans
+                  t={t}
+                  i18nKey="aws_plugin_configuration.proxy_enabled_help"
+                  values={{ productName }}
+                  components={{ code: <code />, lineBreak: <br />, em: <em /> }}
+                />
               </span>
             }
             name="proxy_enabled"

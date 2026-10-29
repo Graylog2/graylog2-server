@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ThrottlingCheckbox from 'integrations/components/ThrottlingCheckbox';
 import { Input } from 'components/bootstrap';
@@ -27,6 +28,7 @@ type FormAdvancedOptionsProps = {
 };
 
 const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
@@ -43,7 +45,10 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   };
 
   return (
-    <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
+    <AdditionalFields
+      title={t('aws_cloudwatch_advanced_options.title')}
+      visible={isAdvancedOptionsVisible}
+      onToggle={handleToggle}>
       <ThrottlingCheckbox
         id="awsCloudWatchThrottleEnabled"
         defaultChecked={awsCloudWatchThrottleEnabled?.value}
@@ -56,8 +61,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         value="enable-logprefix"
         defaultChecked={awsCloudWatchAddFlowLogPrefix && awsCloudWatchAddFlowLogPrefix.value}
         onChange={onChange}
-        label="Add Flow Log field name prefix"
-        help='Add field with the Flow Log prefix e. g. "src_addr" -> "flow_log_src_addr".'
+        label={t('aws_cloudwatch_advanced_options.flow_log_prefix_label')}
+        help={t('aws_cloudwatch_advanced_options.flow_log_prefix_help')}
       />
 
       <Input
@@ -66,8 +71,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         value="enable-store-full-message"
         defaultChecked={awsCloudWatchStoreFullMessage?.value}
         onChange={onChange}
-        label="Store full message?"
-        help="Store the original Kinesis/CloudWatch log event payload in the full_message field."
+        label={t('aws_cloudwatch_advanced_options.store_full_message_label')}
+        help={t('aws_cloudwatch_advanced_options.store_full_message_help')}
       />
 
       <Input
@@ -75,8 +80,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         type="text"
         value={overrideSource?.value}
         onChange={onChange}
-        label="Override Source (optional)"
-        help="The message source is set to aws-kinesis-raw-logs by default. If desired, you may override it with a custom value."
+        label={t('aws_cloudwatch_advanced_options.override_source_label')}
+        help={t('aws_cloudwatch_advanced_options.override_source_help')}
       />
 
       <Input
@@ -84,8 +89,8 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         type="number"
         value={awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue}
         onChange={onChange}
-        label="Kinesis Record batch size"
-        help="The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
+        label={t('aws_cloudwatch_advanced_options.batch_size_label')}
+        help={t('aws_cloudwatch_advanced_options.batch_size_help')}
       />
     </AdditionalFields>
   );
