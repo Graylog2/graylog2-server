@@ -1,0 +1,129 @@
+{
+  "navigation": {
+    "initial_setup": "{{productName}} Ersteinrichtung",
+    "get_help": "Hilfe",
+    "documentation": "Dokumentation",
+    "changelogs": "Changelogs",
+    "operations_changelogs": "Operations-Changelogs",
+    "support": "Support"
+  },
+  "setup": {
+    "welcome": "Willkommen!",
+    "first_start": "Es sieht so aus, als würden Sie {{productName}} zum ersten Mal starten und hätten noch keinen Data Node konfiguriert.",
+    "data_nodes_allow": "Mit Data Nodes können Sie alle Nachrichten in Ihrer {{productName}}-Nachrichtendatenbank indexieren und durchsuchen.",
+    "data_node_setup": "Sie können entweder einen <dataNodeLink>{{productName}} Data Node</dataNodeLink> (empfohlen) einrichten oder einen <openSearchLink>OpenSearch</openSearchLink>-Node manuell konfigurieren. Für die manuelle OpenSearch-Konfiguration müssen Sie die Konfiguration von {{productName}} anpassen und den {{productName}}-Server neu starten. Nach dem Neustart wird diese Seite nicht mehr angezeigt.",
+    "data_nodes_title": "{{productName}} Data Nodes"
+  },
+  "data_nodes": {
+    "description": "{{productName}} Data Nodes bieten eine bessere Integration mit {{productName}} und vereinfachen zukünftige Updates. Sobald ein {{productName}} Data Node läuft und Sie die Certificate Authority konfiguriert haben, können Sie den Start fortsetzen.",
+    "registered": "Dies sind die Data Nodes, die aktuell registriert sind. Die Liste wird fortlaufend aktualisiert.",
+    "transport_address": "Transportadresse",
+    "hostname": "Hostname",
+    "separator": " – ",
+    "none_found": "Es wurden keine Data Nodes gefunden."
+  },
+  "waiting_for_startup": {
+    "title": "Konfiguration erfolgreich",
+    "description": "Der {{productName}}-Server wird gerade gestartet. Je nach Ihrer Umgebung kann dies einige Minuten dauern. Diese Seite wird automatisch aktualisiert, sobald der {{productName}}-Server erreichbar ist. Sie können jederzeit manuell aktualisieren. Beachten Sie jedoch, dass diese Seite danach nicht mehr angezeigt wird.",
+    "spinner": "Warten auf den {{productName}}-Server ..."
+  },
+  "error_boundary": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Ein unbekannter Fehler ist aufgetreten. Bitte sehen Sie sich die folgende Meldung und das Log des {{productName}}-Servers an, um weitere Informationen zu erhalten."
+  },
+  "resume_startup": {
+    "button": "Start fortsetzen",
+    "confirm": "Sind Sie sicher, dass Sie den Start ohne einen laufenden {{productName}} Data Node fortsetzen möchten? Die Konfiguration greift dann auf eine OpenSearch-Instanz auf localhost:9200 zurück.",
+    "error": "Fortsetzen des Starts fehlgeschlagen mit Fehler: {{error}}",
+    "error_title": "Start konnte nicht fortgesetzt werden"
+  },
+  "restart_configuration": {
+    "confirm": "Sind Sie sicher, dass Sie die Konfiguration neu starten möchten? Alle bisherigen Änderungen werden gelöscht.",
+    "restart": "neu starten",
+    "restarting": "wird neu gestartet..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "Sie können die Konfiguration jederzeit <restartButton>neu starten</restartButton>",
+    "fetch_error": "Fehler beim Abrufen von {{entityName}}: {{message}}"
+  },
+  "entities": {
+    "data_nodes": "Data Nodes",
+    "certificate_authority": "Certificate Authority",
+    "renewal_policy": "Renewal Policy"
+  },
+  "steps": {
+    "ca_configuration": "Certificate Authority konfigurieren",
+    "renewal_policy_configuration": "Renewal Policy konfigurieren",
+    "certificate_provisioning": "Zertifikate für Ihre Data Nodes bereitstellen",
+    "configuration_finished": "Konfiguration abgeschlossen"
+  },
+  "ca_configuration": {
+    "title": "Certificate Authority konfigurieren",
+    "explanation_upload_or_create": "In diesem ersten Schritt können Sie eine neue Certificate Authority entweder hochladen oder erstellen.",
+    "explanation_provisioning": "Mit ihr können wir Ihre Data Nodes ganz einfach mit Zertifikaten versorgen.",
+    "create_tab": "Neue CA erstellen",
+    "upload_tab": "CA hochladen"
+  },
+  "ca_create": {
+    "description": "Hier können Sie schnell eine neue Certificate Authority erstellen. Sie müssen lediglich auf die Schaltfläche „CA erstellen“ klicken. Die CA sollte ausschließlich zur Absicherung Ihrer {{productName}} Data Nodes verwendet werden.",
+    "organization_name": "Name der Organisation",
+    "creating": "CA wird erstellt...",
+    "create": "CA erstellen",
+    "success": "CA erfolgreich erstellt",
+    "error": "Erstellen der CA fehlgeschlagen mit Fehler: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Hier können Sie Ihre bestehende CA hochladen. Sie müssen eine einzelne Datei hochladen, die sowohl den privaten Schlüssel (verschlüsselt oder unverschlüsselt) als auch das CA-Zertifikat sowie alle Zwischenzertifikate enthält. Die Datei kann im PEM- oder PKCS#12-Format vorliegen. Wenn Ihr privater Schlüssel verschlüsselt ist, müssen Sie außerdem dessen Passwort angeben.",
+    "certificate_authority": "Certificate Authority",
+    "drop_hint": "CA hierher ziehen oder klicken, um eine Datei auszuwählen",
+    "rejected": "CA-Upload fehlgeschlagen",
+    "password": "Passwort",
+    "uploading": "CA wird hochgeladen...",
+    "upload": "CA hochladen",
+    "success": "CA erfolgreich hochgeladen",
+    "error": "Hochladen der CA fehlgeschlagen mit Fehler: {{error}}",
+    "validation_missing_file": "Bitte laden Sie eine Datei hoch.",
+    "validation_multiple_files": "Bitte laden Sie nur eine einzelne Datei hoch."
+  },
+  "certificate_provisioning": {
+    "title": "Zertifikate bereitstellen",
+    "configured": "Die Certificate Authority wurde erfolgreich konfiguriert.",
+    "ready": "Sie können jetzt Zertifikate für Ihre Data Nodes bereitstellen.",
+    "data_node_required": "Mindestens ein {{productName}} Data Node muss laufen, bevor das Zertifikat bereitgestellt werden kann.",
+    "started": "Bereitstellung des Zertifikats erfolgreich gestartet",
+    "error": "Starten der Zertifikatsbereitstellung fehlgeschlagen mit Fehler: {{error}}",
+    "provisioning": "Zertifikat wird bereitgestellt...",
+    "provision": "Zertifikat bereitstellen und fortfahren",
+    "skip": "Bereitstellung überspringen"
+  },
+  "renewal_policy": {
+    "title": "Renewal Policy konfigurieren",
+    "explanation_automatic": "In diesem Schritt können Sie festlegen, ob Zertifikate, die bald ablaufen, automatisch erneuert werden sollen.",
+    "explanation_manual": "Wenn Sie die manuelle Erneuerung wählen, wird eine Systembenachrichtigung angezeigt, sobald das Ablaufdatum naht, und Sie müssen die Erneuerung bestätigen.",
+    "policy": "Renewal Policy",
+    "select_policy": "Renewal Policy auswählen",
+    "automatic": "Automatisch",
+    "manual": "Manuell",
+    "certificate_lifetime": "Gültigkeitsdauer des Zertifikats",
+    "enter_lifetime": "Gültigkeitsdauer eingeben",
+    "select_unit": "Einheit auswählen",
+    "unit_hours": "Stunde(n)",
+    "unit_days": "Tag(e)",
+    "unit_months": "Monat(e)",
+    "unit_years": "Jahr(e)",
+    "min_lifetime": "Muss mindestens {{duration}} betragen",
+    "creating": "Richtlinie wird erstellt...",
+    "create": "Richtlinie erstellen",
+    "success": "Renewal Policy erfolgreich erstellt",
+    "error": "Erstellen der Renewal Policy fehlgeschlagen mit Fehler: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "Ihre Verbindung ist nicht sicher. Bitte beachten Sie, dass die Informationen unverschlüsselt an den Server gesendet werden.",
+    "maybe_not_secure": "Ihre Verbindung ist möglicherweise nicht sicher. Bitte beachten Sie, dass die Informationen möglicherweise unverschlüsselt an den Server gesendet werden."
+  },
+  "configuration_finished": {
+    "title": "Konfiguration abgeschlossen",
+    "skipped_provisioning": "Sie haben die Konfiguration erfolgreich abgeschlossen. Sie können aber noch <goBackButton>zurückgehen</goBackButton>, um die Zertifikate bereitzustellen.",
+    "provisioned": "Die Bereitstellung war erfolgreich, und alle Data Nodes sind gesichert und erreichbar."
+  }
+}

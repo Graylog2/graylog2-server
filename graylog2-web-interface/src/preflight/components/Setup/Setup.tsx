@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import DocsHelper from 'util/DocsHelper';
@@ -28,31 +29,40 @@ const P = styled.p`
   max-width: 700px;
 `;
 
+// Trans renders the translated text of a tag as children, DocumentationLink renders its `text` prop instead.
+const DocsLink = ({ page, children = null }: { page: string; children?: React.ReactNode }) => (
+  <DocumentationLink page={page} text={children} />
+);
+
 type Props = {
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Setup = ({ setIsWaitingForStartup }: Props) => {
+  const { t } = useTranslation('preflight');
   const productName = useProductName();
 
   return (
     <>
-      <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
+      <Section title={t('setup.welcome')} titleOrder={1} dataTestid="welcome-section">
         <P>
-          It looks like you are starting {productName} for the first time and have not configured a data node.
+          {t('setup.first_start', { productName })}
           <br />
-          Data nodes allow you to index and search through all the messages in your {productName} message database.
+          {t('setup.data_nodes_allow', { productName })}
         </P>
         <P>
-          You can either implement a{' '}
-          <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text={`${productName} data node`} />{' '}
-          (recommended) or you can configure an{' '}
-          <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually. For the
-          manual OpenSearch configuration you need to adjust the {productName} configuration and restart the{' '}
-          {productName} server. After the restart this page will not show up again.
+          <Trans
+            t={t}
+            i18nKey="setup.data_node_setup"
+            values={{ productName }}
+            components={{
+              dataNodeLink: <DocsLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />,
+              openSearchLink: <DocsLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} />,
+            }}
+          />
         </P>
       </Section>
-      <Section title={`${productName} Data Nodes`} titleOrder={2}>
+      <Section title={t('setup.data_nodes_title', { productName })} titleOrder={2}>
         <DataNodesOverview />
         <ConfigurationWizard setIsWaitingForStartup={setIsWaitingForStartup} />
       </Section>

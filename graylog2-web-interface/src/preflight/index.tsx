@@ -18,6 +18,8 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Notifications } from '@mantine/notifications';
 
+import { changeLanguage } from 'i18n';
+import 'locales/registerPreflightTranslations';
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
@@ -27,19 +29,24 @@ import App from './App';
 
 import 'theme/theme-styles';
 
+// There is no logged-in user yet, so the language follows the browser.
+const language = navigator.language.startsWith('de') ? 'de' : 'en';
+
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
-root.render(
-  <PreflightThemeProvider>
-    <GlobalThemeStyles />
-    <DefaultQueryClientProvider>
-      <ThemeWrapper>
-        <>
-          <Notifications />
-          <App />
-        </>
-      </ThemeWrapper>
-    </DefaultQueryClientProvider>
-  </PreflightThemeProvider>,
+changeLanguage(language).then(() =>
+  root.render(
+    <PreflightThemeProvider>
+      <GlobalThemeStyles />
+      <DefaultQueryClientProvider>
+        <ThemeWrapper>
+          <>
+            <Notifications />
+            <App />
+          </>
+        </ThemeWrapper>
+      </DefaultQueryClientProvider>
+    </PreflightThemeProvider>,
+  ),
 );

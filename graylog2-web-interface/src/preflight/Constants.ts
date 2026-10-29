@@ -18,19 +18,19 @@
 export const CONFIGURATION_STEPS = {
   CA_CONFIGURATION: {
     key: 'CA_CONFIGURATION',
-    description: 'Configure a certificate authority',
+    description: 'steps.ca_configuration',
   },
   RENEWAL_POLICY_CONFIGURATION: {
     key: 'RENEWAL_POLICY_CONFIGURATION',
-    description: 'Configure a renewal policy',
+    description: 'steps.renewal_policy_configuration',
   },
   CERTIFICATE_PROVISIONING: {
     key: 'CERTIFICATE_PROVISIONING',
-    description: 'Provision certificates for your data nodes',
+    description: 'steps.certificate_provisioning',
   },
   CONFIGURATION_FINISHED: {
     key: 'CONFIGURATION_FINISHED',
-    description: 'Configuration finished',
+    description: 'steps.configuration_finished',
   },
 } as const;
 

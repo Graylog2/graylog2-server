@@ -72,9 +72,9 @@ const useConfigurationStep = ({ isSkippingProvisioning }: Props): Result => {
   return useMemo(() => {
     if (dataNodesError || caError || renewalPolicyError) {
       const errors = [
-        { entityName: 'data nodes', error: dataNodesError },
-        { entityName: 'certificate authority', error: caError },
-        { entityName: 'renewal policy', error: renewalPolicyError },
+        { entityName: 'entities.data_nodes', error: dataNodesError },
+        { entityName: 'entities.certificate_authority', error: caError },
+        { entityName: 'entities.renewal_policy', error: renewalPolicyError },
       ].filter(({ error }) => !!error);
 
       return { isLoading: false, step: null, errors };

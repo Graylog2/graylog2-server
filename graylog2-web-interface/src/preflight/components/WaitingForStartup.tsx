@@ -19,6 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useEffect } from 'react';
 import { Space } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import Spinner from 'components/common/Spinner';
@@ -31,6 +32,7 @@ const P = styled.p`
 `;
 
 const WaitingForStartup = () => {
+  const { t } = useTranslation('preflight');
   const productName = useProductName();
   const { data: serverIsAvailable } = useServerAvailability();
 
@@ -41,16 +43,12 @@ const WaitingForStartup = () => {
   }, [serverIsAvailable]);
 
   return (
-    <Section title="Configuration successful">
-      <P>
-        The {productName} server is currently starting. Depending on your setup it may take a few minutes. This page
-        will automatically refresh once the {productName} server is reachable. You can always refresh manually, please
-        be aware that this page will not be visible afterwards.
-      </P>
+    <Section title={t('waiting_for_startup.title')}>
+      <P>{t('waiting_for_startup.description', { productName })}</P>
 
       <Space h="md" />
       <b>
-        <Spinner delay={0} text={`Waiting for ${productName} server ...`} />
+        <Spinner delay={0} text={t('waiting_for_startup.spinner', { productName })} />
       </b>
     </Section>
   );

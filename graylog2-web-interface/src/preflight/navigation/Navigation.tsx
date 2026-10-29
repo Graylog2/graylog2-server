@@ -17,8 +17,9 @@
 import React from 'react';
 import type { TextProps } from '@mantine/core';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import HelpMenu from 'preflight/navigation/HelpMenu';
 import { Group, AppShell, Text } from 'preflight/components/common';
 import NavigationBrand from 'components/navigation/NavigationBrand';
@@ -45,21 +46,26 @@ const StyledText = styled(Text)<StyledMantineTextProps>(
     color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
   `,
 );
-const Navigation = () => (
-  <GraylogHeader>
-    <NavigationContainer>
-      <Group gap="xs">
-        <NavigationBrand />
-        <StyledText fw={500} size="xs" mr={1}>
-          <ProductName /> Initial Setup
-        </StyledText>
-      </Group>
-      <Group justify="flex-end">
-        <HelpMenu />
-        <ThemeModeToggle />
-      </Group>
-    </NavigationContainer>
-  </GraylogHeader>
-);
+const Navigation = () => {
+  const { t } = useTranslation('preflight');
+  const productName = useProductName();
+
+  return (
+    <GraylogHeader>
+      <NavigationContainer>
+        <Group gap="xs">
+          <NavigationBrand />
+          <StyledText fw={500} size="xs" mr={1}>
+            {t('navigation.initial_setup', { productName })}
+          </StyledText>
+        </Group>
+        <Group justify="flex-end">
+          <HelpMenu />
+          <ThemeModeToggle />
+        </Group>
+      </NavigationContainer>
+    </GraylogHeader>
+  );
+};
 
 export default Navigation;

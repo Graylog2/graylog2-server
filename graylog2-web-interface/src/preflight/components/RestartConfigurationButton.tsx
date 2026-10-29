@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Button from 'components/bootstrap/Button';
 import fetch from 'logic/rest/FetchProvider';
@@ -24,26 +25,30 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 const ResumeConfigurationButton = () => {
+  const { t } = useTranslation('preflight');
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to restart the configuration? All previous changes will be deleted.')) {
+    if (window.confirm(t('restart_configuration.confirm'))) {
       fetch('DELETE', qualifyUrl('/api/startOver'), undefined, false)
         .then(() => {
           setIsRestartingConfiguration(true);
         })
         .catch((error) => {
-          UserNotification.error(`Resuming startup failed with error: ${error}`, 'Could not resume startup');
+          UserNotification.error(
+            t('resume_startup.error', { error: String(error) }),
+            t('resume_startup.error_title'),
+          );
         })
         .finally(() => {
           setIsRestartingConfiguration(false);
         });
     }
-  }, [setIsRestartingConfiguration]);
+  }, [setIsRestartingConfiguration, t]);
 
   return (
     <Button bsSize="xs" bsStyle="danger" onClick={onResumeStartup}>
-      {isRestartingConfiguration ? 'restarting...' : 'restart'}
+      {isRestartingConfiguration ? t('restart_configuration.restarting') : t('restart_configuration.restart')}
     </Button>
   );
 };

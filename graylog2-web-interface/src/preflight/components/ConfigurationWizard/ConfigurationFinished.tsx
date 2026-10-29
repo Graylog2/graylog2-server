@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Title, Space } from 'preflight/components/common';
 import Button from 'components/bootstrap/Button';
@@ -31,21 +32,22 @@ const ConfigurationFinished = ({
   isSkippingProvisioning,
   setIsSkippingProvisioning,
 }: Props) => {
+  const { t } = useTranslation('preflight');
   const description = isSkippingProvisioning ? (
-    <>
-      You&apos;ve finished the configuration successfully. You can still{' '}
-      <Button onClick={() => setIsSkippingProvisioning(false)} bsSize="xs">
-        go back
-      </Button>{' '}
-      to provision the certificates.
-    </>
+    <Trans
+      t={t}
+      i18nKey="configuration_finished.skipped_provisioning"
+      components={{
+        goBackButton: <Button onClick={() => setIsSkippingProvisioning(false)} bsSize="xs" />,
+      }}
+    />
   ) : (
-    'The provisioning has been successful and all data nodes are secured and reachable.'
+    t('configuration_finished.provisioned')
   );
 
   return (
     <div>
-      <Title order={3}>Configuration finished</Title>
+      <Title order={3}>{t('configuration_finished.title')}</Title>
       <p>{description}</p>
       <Space h="md" />
       <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} />
