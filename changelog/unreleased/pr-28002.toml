@@ -1,0 +1,5 @@
+type = "a"
+message = "Add per-value actions and an \"Add all values to query\" action for array fields in message details."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9889"]
+pulls = ["28002"]
