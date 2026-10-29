@@ -136,21 +136,27 @@ import App from 'routing/App';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
+import RoutePermissionGuard from 'routing/RoutePermissionGuard';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
 import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
+const renderPluginRoute = (
+  { path, component: Component, parentComponent, permissions, requiredFeatureFlag }: PluginRoute,
+  { insidePageLayout = false }: { insidePageLayout?: boolean } = {},
+) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
     return null;
   }
 
   const ParentComponent = parentComponent ?? React.Fragment;
   const WrappedComponent = () => (
-    <ParentComponent>
-      <Component />
-    </ParentComponent>
+    <RoutePermissionGuard permissions={permissions} displayPageLayout={!insidePageLayout}>
+      <ParentComponent>
+        <Component />
+      </ParentComponent>
+    </RoutePermissionGuard>
   );
 
   return {
@@ -171,10 +177,10 @@ const AppRouter = () => {
     .map((route) => renderPluginRoute({ ...route, parentComponent: null }));
   const pluginRoutesWithParent = pluginRoutes
     .filter((route) => route.parentComponent && !routeHasAppParent(route))
-    .map(renderPluginRoute);
+    .map((route) => renderPluginRoute(route));
   const standardPluginRoutes = pluginRoutes
     .filter((route) => route.parentComponent === undefined)
-    .map(renderPluginRoute);
+    .map((route) => renderPluginRoute(route, { insidePageLayout: true }));
 
   const isCloud = AppConfig.isCloud();
 
