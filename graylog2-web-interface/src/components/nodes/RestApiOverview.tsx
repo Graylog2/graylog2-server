@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import RelativeTime from 'components/common/RelativeTime';
 
@@ -37,13 +38,14 @@ type RestApiOverviewProps = {
 };
 
 const RestApiOverview = ({ node }: RestApiOverviewProps) => {
+  const { t } = useTranslation('system');
   const { transport_address, last_seen } = node;
 
   return (
     <StyledDl>
-      <dt>Transport address:</dt>
+      <dt>{t('rest_api_overview.transport_address')}</dt>
       <dd>{transport_address}</dd>
-      <dt>Last seen:</dt>
+      <dt>{t('rest_api_overview.last_seen')}</dt>
       <dd>
         <RelativeTime dateTime={last_seen} />
       </dd>

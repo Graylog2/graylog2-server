@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
+import { useTranslation } from 'react-i18next';
 
 import type { CoreSystemConfiguration } from 'views/types';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
@@ -65,6 +66,7 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
 };
 
 const ConfigurationsPage = () => {
+  const { t } = useTranslation('system');
   const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
   const { isPermitted } = usePermissions();
 
@@ -79,9 +81,9 @@ const ConfigurationsPage = () => {
   ].filter(({ permissions }) => (permissions ? isPermitted(permissions) : true));
 
   return (
-    <DocumentTitle title="Configurations">
-      <PageHeader title="Configurations">
-        <span>You can configure system settings for different sub systems on this page.</span>
+    <DocumentTitle title={t('configurations_page.title')}>
+      <PageHeader title={t('configurations_page.title')}>
+        <span>{t('configurations_page.description')}</span>
       </PageHeader>
 
       <ConfigletRow className="content">

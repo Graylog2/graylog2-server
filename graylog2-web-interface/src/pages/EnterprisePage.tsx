@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
@@ -26,22 +27,29 @@ import AdvertisementSection from 'components/enterprise/AdvertisementSection';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
 const EnterprisePage = () => {
+  const { t } = useTranslation('system');
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
   return (
-    <DocumentTitle title={`${productName} Enterprise`}>
+    <DocumentTitle title={t('enterprise_page.document_title', { productName })}>
       <div>
         <PageHeader
           title={
-            <>
-              <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
-            </>
+            <Trans
+              t={t}
+              i18nKey="enterprise_page.page_title"
+              values={{ productName }}
+              components={{ upsell: <UpsellWrapper /> }}
+            />
           }>
           <span>
-            <UpsellWrapper>
-              <EnterpriseProductLink>Learn More</EnterpriseProductLink> about {productName} Enterprise features.
-            </UpsellWrapper>
+            <Trans
+              t={t}
+              i18nKey="enterprise_page.learn_more"
+              values={{ productName }}
+              components={{ upsell: <UpsellWrapper />, productLink: <EnterpriseProductLink /> }}
+            />
           </span>
         </PageHeader>
 

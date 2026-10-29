@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { SystemJob } from 'components/systemjobs';
 import { Alert } from 'components/bootstrap';
@@ -50,6 +51,7 @@ type SystemJobsListProps = {
 };
 
 const SystemJobsList = ({ jobs }: SystemJobsListProps): React.ReactElement => {
+  const { t } = useTranslation('system');
   const formatSystemJob = (job) => (
     <SystemJobWrap key={`job-${job.id}`}>
       <SystemJob job={job} />
@@ -59,7 +61,7 @@ const SystemJobsList = ({ jobs }: SystemJobsListProps): React.ReactElement => {
   const formattedJobs = jobs.map(formatSystemJob);
 
   return formattedJobs.length === 0 ? (
-    <StyledAlert bsStyle="info">No active system jobs.</StyledAlert>
+    <StyledAlert bsStyle="info">{t('system_jobs_list.no_active_jobs')}</StyledAlert>
   ) : (
     <span>{formattedJobs}</span>
   );

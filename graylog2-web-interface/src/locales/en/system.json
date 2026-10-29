@@ -197,5 +197,206 @@
   "node_maintenance_dropdown": {
     "actions": "Actions",
     "configure_internal_logging": "Configure internal logging"
+  },
+  "node_overview": {
+    "plugins_installed_one": "{{count}} plugin installed",
+    "plugins_installed_other": "{{count}} plugins installed",
+    "inputs_running_one": "{{count}} input running on this node",
+    "inputs_running_other": "{{count}} inputs running on this node",
+    "memory_heap_usage": "Memory/Heap usage",
+    "buffers": "Buffers",
+    "buffers_description": "Buffers are built to cache small amounts of messages for a very short time (usually milliseconds) on their way through the different processors.",
+    "input_buffer": "Input buffer",
+    "process_buffer": "Process buffer",
+    "output_buffer": "Output buffer",
+    "disk_journal": "Disk Journal",
+    "disk_journal_description": "Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps maintain functionality if any of the outputs is too slow to keep up with the message rate or whenever there is a peak in incoming messages. It makes sure that memory is not overloaded and avoids overly long garbage collection pauses that way.",
+    "system": "System",
+    "rest_api": "REST API",
+    "installed_plugins": "Installed plugins",
+    "manage_inputs": "Manage inputs",
+    "available_input_types": "Available input types"
+  },
+  "nodes_actions": {
+    "details": "Details",
+    "metrics": "Metrics",
+    "more_actions": "More actions",
+    "pause_message_processing": "Pause message processing",
+    "resume_message_processing": "Resume message processing",
+    "pause_confirm": "You are about to pause message processing in this node. Are you sure?",
+    "resume_confirm": "You are about to resume message processing in this node. Are you sure?",
+    "override_lb_status": "Override LB status",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "You are about to change the load balancer status for this node to {{status}}. Are you sure?",
+    "local_message_inputs": "Local message inputs",
+    "thread_dump": "Get thread dump",
+    "process_buffer_dump": "Get process-buffer dump",
+    "recent_system_logs": "Get recent system log messages"
+  },
+  "nodes_list": {
+    "active_nodes_one": "There is {{count}} active node",
+    "active_nodes_other": "There are {{count}} active nodes",
+    "no_active_nodes": "There are no active nodes."
+  },
+  "plugins_data_table": {
+    "loading": "Loading plugins on this node...",
+    "no_plugins": "This node has not any installed plugins.",
+    "name": "Name",
+    "version": "Version",
+    "author": "Author",
+    "description": "Description",
+    "website": "Website",
+    "filter": "Filter"
+  },
+  "rest_api_overview": {
+    "transport_address": "Transport address:",
+    "last_seen": "Last seen:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "JMV information for this node is unavailable.",
+    "hostname": "Hostname:",
+    "node_id": "Node ID:",
+    "version": "Version:",
+    "version_codename": "{{version}}, codename <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Time:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "You are about to pause message processing in this node. Are you sure?",
+    "resume_confirm": "You are about to resume message processing in this node. Are you sure?",
+    "what_does_this_mean": "What does this mean?",
+    "lifecycle_state": "Lifecycle state: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Marked as <strong>{{status}}</strong> for load balancers",
+    "pause_processing": "Pause processing",
+    "resume_processing": "Resume processing",
+    "not_processing": "Node is <strong>not</strong> processing messages"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Current lifecycle state:",
+    "message_processing": "Message processing:",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "lb_indication": "Load balancer indication:"
+  },
+  "bulk_actions": {
+    "dismiss": "Dismiss"
+  },
+  "system_notifications_table": {
+    "title": "Notifications",
+    "human_name": "notifications"
+  },
+  "actions_cell": {
+    "dismiss": "Dismiss"
+  },
+  "title_cell": {
+    "show_full_message": "Show full message for: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Unable to acknowledge the job",
+    "cancel_failed": "Unable to cancel the job",
+    "cancel_confirm": "Are you sure you want to cancel system job \"{{info}}\"?",
+    "on_node": "- on",
+    "runtime": "runtime: {{duration}}",
+    "cancel": "Cancel",
+    "acknowledge": "Acknowledge"
+  },
+  "system_jobs_component": {
+    "title": "System jobs",
+    "description": "A system job is a long-running task a {{productName}} server node executes for maintenance reasons. Some jobs provide progress information or can be stopped."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "No active system jobs."
+  },
+  "system_messages_component": {
+    "title": "System messages",
+    "description": "System messages are generated by {{productName}} server nodes on certain events that may be interesting for the {{productName}} administrators. You don't need to actively act upon any events in here because notifications will be raised for any events that required action."
+  },
+  "system_messages_list": {
+    "timestamp": "Timestamp",
+    "node": "Node",
+    "message": "Message"
+  },
+  "global_throughput": {
+    "aria_label": "Throughput: In {{input}} / Out {{output}} msg/s",
+    "in": "in",
+    "out": "out"
+  },
+  "node_throughput": {
+    "loading": "Loading throughput...",
+    "unable_to_load": "Unable to load throughput.",
+    "processing_long": "Processing <strong>{{totalIn}}</strong> incoming and <strong>{{totalOut}}</strong> outgoing msg/s.",
+    "short": "In {{totalIn}} / Out {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "PII suspect: {{suspect}}",
+    "copy_as_json": "Copy event as JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Telemetry debug",
+    "badge": "Telemetry debug: {{count}}",
+    "drawer_label": "Telemetry debug panel",
+    "resize_label": "Resize telemetry debug panel",
+    "title": "Telemetry Debug ({{count}})",
+    "filter_label": "Filter events",
+    "filter_placeholder": "Filter by event name or payload...",
+    "resume": "Resume",
+    "pause": "Pause",
+    "clear": "Clear",
+    "export_session": "Export session",
+    "collapse": "Collapse",
+    "no_events": "No telemetry events recorded yet — interact with the app to see them here.",
+    "time": "Time",
+    "event": "Event",
+    "action": "Action",
+    "status": "Status"
+  },
+  "cluster_configuration_page": {
+    "title": "Cluster Configuration",
+    "description": "This page provides a real-time overview of the nodes in your cluster. You can pause message processing at any time. The process buffers will not accept any new messages until you resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be persisted to disk, even when processing is disabled."
+  },
+  "configurations_page": {
+    "title": "Configurations",
+    "description": "You can configure system settings for different sub systems on this page."
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Try</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Learn More</productLink> about {{productName}} Enterprise features.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Process-buffer dump of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metrics of node {{shortNodeId}} / {{hostname}}",
+    "description": "All {{productName}} nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access all metrics via JMX, too.",
+    "total_metrics_one": "This node is reporting a total of {{count}} metric.",
+    "total_metrics_other": "This node is reporting a total of {{count}} metrics."
+  },
+  "node_page": {
+    "title": "Node {{shortNodeId}} / {{hostname}}",
+    "description": "This page shows details of a {{productName}} server node that is active and reachable in your cluster.",
+    "leader_node": "This is the leader node.",
+    "not_leader_node": "This is <em>not</em> the leader node."
+  },
+  "system_logs_page": {
+    "title": "The most recent system logs (limited to {{limit}}) of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>",
+    "reload": "Reload",
+    "back": "Back",
+    "document_title": "System Logs of node {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "System notifications"
+  },
+  "system_overview_page": {
+    "title": "System overview"
+  },
+  "thread_dump_page": {
+    "title": "Thread dump of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>"
   }
 }

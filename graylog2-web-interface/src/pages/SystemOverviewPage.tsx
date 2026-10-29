@@ -27,36 +27,41 @@ import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import { Row } from 'components/bootstrap';
 import { PAGE_NAV_TITLE } from 'components/system-overview/bindings';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import { useTranslation } from 'react-i18next';
 
-const SystemOverviewPage = () => (
-  <DocumentTitle title="System overview">
-    <span>
-      <Row>
-        <PageNavigation page={PAGE_NAV_TITLE} />
-      </Row>
+const SystemOverviewPage = () => {
+  const { t } = useTranslation('system');
 
-      <HideOnCloud>
-        <IfPermitted permissions="systemjobs:read">
-          <SystemJobsComponent />
+  return (
+    <DocumentTitle title={t('system_overview_page.title')}>
+      <span>
+        <Row>
+          <PageNavigation page={PAGE_NAV_TITLE} />
+        </Row>
+
+        <HideOnCloud>
+          <IfPermitted permissions="systemjobs:read">
+            <SystemJobsComponent />
+          </IfPermitted>
+        </HideOnCloud>
+
+        <GraylogClusterOverview showLicenseGraph />
+
+        <HideOnCloud>
+          <IndexerClusterHealth />
+        </HideOnCloud>
+
+        <IfPermitted permissions="indices:failures">
+          <IndexerSystemOverviewComponent />
         </IfPermitted>
-      </HideOnCloud>
+        <TimesList />
 
-      <GraylogClusterOverview showLicenseGraph />
-
-      <HideOnCloud>
-        <IndexerClusterHealth />
-      </HideOnCloud>
-
-      <IfPermitted permissions="indices:failures">
-        <IndexerSystemOverviewComponent />
-      </IfPermitted>
-      <TimesList />
-
-      <IfPermitted permissions="systemmessages:read">
-        <SystemMessagesComponent />
-      </IfPermitted>
-    </span>
-  </DocumentTitle>
-);
+        <IfPermitted permissions="systemmessages:read">
+          <SystemMessagesComponent />
+        </IfPermitted>
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default SystemOverviewPage;

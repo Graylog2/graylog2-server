@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, Icon, PageHeader, Spinner, Timestamp } from 'components/common';
@@ -38,6 +39,7 @@ const StyledButton = styled(Button)`
 const DEFAULT_LIMIT = 5000;
 
 const SystemLogsPage = () => {
+  const { t } = useTranslation('system');
   const [isReloadingResults, setIsReloadingResults] = useState(false);
   const [sysLogs, setSysLogs] = useState(undefined);
   const [taken, setTaken] = useState<Date>(undefined);
@@ -73,10 +75,10 @@ const SystemLogsPage = () => {
   const { short_node_id: shortNodeId, hostname } = node;
   const title = (
     <span>
-      The most recent system logs (limited to {DEFAULT_LIMIT}) of node {shortNodeId} / {hostname}
+      {t('system_logs_page.title', { limit: DEFAULT_LIMIT, shortNodeId, hostname })}
       &nbsp;
       <small>
-        Taken at <Timestamp dateTime={taken} />
+        <Trans t={t} i18nKey="system_logs_page.taken_at" components={[<Timestamp dateTime={taken} />]} />
       </small>
     </span>
   );
@@ -85,10 +87,10 @@ const SystemLogsPage = () => {
     <Col md={12}>
       <div className="pull-left">
         <Button onClick={fetchLogs} disabled={isReloadingResults}>
-          <small>Reload&nbsp;</small>
+          <small>{t('system_logs_page.reload')}&nbsp;</small>
           <Icon name="sync" spin={isReloadingResults} />
         </Button>
-        <StyledButton onClick={onCancel}>Back</StyledButton>
+        <StyledButton onClick={onCancel}>{t('system_logs_page.back')}</StyledButton>
       </div>
     </Col>
   );
@@ -96,7 +98,7 @@ const SystemLogsPage = () => {
   const logs = sysLogs ? <pre className="threaddump">{sysLogs}</pre> : <Spinner />;
 
   return (
-    <DocumentTitle title={`System Logs of node ${shortNodeId} / ${hostname}`}>
+    <DocumentTitle title={t('system_logs_page.document_title', { shortNodeId, hostname })}>
       <div>
         <PageHeader title={title} />
         <Row className="content">{control}</Row>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
@@ -50,25 +51,29 @@ const bulkSelection = { actions: <BulkActions /> };
 
 const renderActions = (row: NotificationType) => <ActionsCell row={row} />;
 
-const SystemNotificationsTable = () => (
-  <Row className="content">
-    <Col md={12}>
-      <StyledHeading>Notifications</StyledHeading>
-      <PaginatedEntityTable<NotificationType>
-        humanName="notifications"
-        tableLayout={TABLE_LAYOUT}
-        fetchEntities={fetchNotifications}
-        keyFn={keyFn}
-        entityAttributesAreCamelCase={false}
-        columnRenderers={customColumnRenderers}
-        entityActions={renderActions}
-        expandedSectionRenderers={expandedSections}
-        externalSearch={EXTERNAL_SEARCH}
-        bulkSelection={bulkSelection}
-        fetchOptions={{ refetchInterval: REFETCH_INTERVAL }}
-      />
-    </Col>
-  </Row>
-);
+const SystemNotificationsTable = () => {
+  const { t } = useTranslation('system');
+
+  return (
+    <Row className="content">
+      <Col md={12}>
+        <StyledHeading>{t('system_notifications_table.title')}</StyledHeading>
+        <PaginatedEntityTable<NotificationType>
+          humanName={t('system_notifications_table.human_name')}
+          tableLayout={TABLE_LAYOUT}
+          fetchEntities={fetchNotifications}
+          keyFn={keyFn}
+          entityAttributesAreCamelCase={false}
+          columnRenderers={customColumnRenderers}
+          entityActions={renderActions}
+          expandedSectionRenderers={expandedSections}
+          externalSearch={EXTERNAL_SEARCH}
+          bulkSelection={bulkSelection}
+          fetchOptions={{ refetchInterval: REFETCH_INTERVAL }}
+        />
+      </Col>
+    </Row>
+  );
+};
 
 export default SystemNotificationsTable;

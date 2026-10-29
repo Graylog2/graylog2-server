@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
@@ -48,6 +49,7 @@ const useNodeId = (nodes: NodesStoreState['nodes']) => {
 };
 
 const ShowMetricsPage = () => {
+  const { t } = useTranslation('system');
   const productName = useProductName();
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
@@ -60,21 +62,16 @@ const ShowMetricsPage = () => {
   }
 
   const node = nodes[nodeId];
-  const title = (
-    <span>
-      Metrics of node {node.short_node_id} / {node.hostname}
-    </span>
-  );
+  const title = <span>{t('show_metrics_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>;
 
   return (
-    <DocumentTitle title={`Metrics of node ${node.short_node_id} / ${node.hostname}`}>
+    <DocumentTitle title={t('show_metrics_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>
       <span>
         <PageHeader title={title}>
           <span>
-            All {productName} nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that
-            you can access all metrics via JMX, too.
+            {t('show_metrics_page.description', { productName })}
             <br />
-            This node is reporting a total of {(names || []).length} metrics.
+            {t('show_metrics_page.total_metrics', { count: (names || []).length })}
           </span>
         </PageHeader>
 

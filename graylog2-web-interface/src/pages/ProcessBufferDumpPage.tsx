@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
@@ -25,6 +26,7 @@ import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 
 const ProcessBufferDumpPage = () => {
+  const { t } = useTranslation('system');
   const { nodeId } = useParams<{ nodeId: string }>();
   const { nodes } = useStore(NodesStore);
   const { data: processbufferDump } = useQuery({
@@ -41,10 +43,14 @@ const ProcessBufferDumpPage = () => {
 
   const title = (
     <span>
-      Process-buffer dump of node {node.short_node_id} / {node.hostname}
+      {t('process_buffer_dump_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}
       &nbsp;
       <small>
-        Taken at <Timestamp dateTime={new Date()} />{' '}
+        <Trans
+          t={t}
+          i18nKey="process_buffer_dump_page.taken_at"
+          components={[<Timestamp dateTime={new Date()} />]}
+        />{' '}
       </small>
     </span>
   );
@@ -56,7 +62,8 @@ const ProcessBufferDumpPage = () => {
   );
 
   return (
-    <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
+    <DocumentTitle
+      title={t('process_buffer_dump_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>
       <div>
         <PageHeader title={title} />
         <Row className="content">

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Row, Col, Alert, Button } from 'components/bootstrap';
 import { IfPermitted, Icon } from 'components/common';
@@ -27,7 +29,7 @@ import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 type SystemOverviewDetailsProps = {
   node: any;
   information: any;
-};
+} & WithTranslation;
 
 class SystemOverviewDetails extends React.Component<
   SystemOverviewDetailsProps,
@@ -36,9 +38,13 @@ class SystemOverviewDetails extends React.Component<
   }
 > {
   _toggleMessageProcessing = () => {
+    const { t } = this.props;
+
     if (
       confirm(
-        `You are about to ${this.props.information.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`,
+        this.props.information.is_processing
+          ? t('system_overview_details.pause_confirm')
+          : t('system_overview_details.resume_confirm'),
       )
     ) {
       if (this.props.information.is_processing) {
@@ -50,7 +56,7 @@ class SystemOverviewDetails extends React.Component<
   };
 
   render() {
-    const { information } = this.props;
+    const { information, t } = this.props;
     const lbStatus = information.lb_status.toUpperCase();
     let processingStatus;
 
@@ -65,7 +71,12 @@ class SystemOverviewDetails extends React.Component<
       processingStatus = (
         <span>
           <Icon name="warning" />
-          &nbsp; Node is <strong>not</strong> processing messages
+          &nbsp;{' '}
+          <Trans
+            t={t}
+            i18nKey="system_overview_details.not_processing"
+            components={{ strong: <strong /> }}
+          />
         </span>
       );
     }
@@ -76,18 +87,28 @@ class SystemOverviewDetails extends React.Component<
           <Alert bsStyle="info">
             <span className="pull-right">
               {' '}
-              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" />
+              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text={t('system_overview_details.what_does_this_mean')} />
             </span>
-            Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
+            <Trans
+              t={t}
+              i18nKey="system_overview_details.lifecycle_state"
+              values={{ lifecycle: StringUtils.capitalizeFirstLetter(this.props.information.lifecycle) }}
+              components={{ strong: <strong /> }}
+            />
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
             <span className="pull-right">
               {' '}
-              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" />
+              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text={t('system_overview_details.what_does_this_mean')} />
             </span>
-            Marked as <strong>{lbStatus}</strong> for load balancers
+            <Trans
+              t={t}
+              i18nKey="system_overview_details.marked_as_lb_status"
+              values={{ status: lbStatus }}
+              components={{ strong: <strong /> }}
+            />
           </Alert>
         </Col>
         <Col md={4}>
@@ -98,7 +119,9 @@ class SystemOverviewDetails extends React.Component<
                   onClick={this._toggleMessageProcessing}
                   bsSize="xsmall"
                   bsStyle={information.is_processing ? 'danger' : 'success'}>
-                  {information.is_processing ? 'Pause' : 'Resume'} processing
+                  {information.is_processing
+                    ? t('system_overview_details.pause_processing')
+                    : t('system_overview_details.resume_processing')}
                 </Button>
               </span>
             </IfPermitted>
@@ -110,4 +133,4 @@ class SystemOverviewDetails extends React.Component<
   }
 }
 
-export default SystemOverviewDetails;
+export default withTranslation('system')(SystemOverviewDetails);

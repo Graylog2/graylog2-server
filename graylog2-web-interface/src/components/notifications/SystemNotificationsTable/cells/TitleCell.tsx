@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import type { NotificationType } from 'components/notifications/types';
@@ -36,13 +37,14 @@ const TitleButton = styled.button`
 `;
 
 const TitleCell = ({ row }: Props) => {
+  const { t } = useTranslation('system');
   const { toggleSection } = useExpandedSections();
 
   return (
     <TitleButton
       type="button"
       onClick={() => toggleSection(row.id, 'body')}
-      aria-label={`Show full message for: ${row.title}`}>
+      aria-label={t('title_cell.show_full_message', { title: row.title })}>
       {row.title}
     </TitleButton>
   );

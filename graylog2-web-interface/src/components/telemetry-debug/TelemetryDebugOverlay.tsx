@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useRef, useState, useSyncExternalStore } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Table } from 'components/bootstrap';
 import copyToClipboard from 'util/copyToClipboard';
@@ -149,7 +150,8 @@ const matchesFilter = (entry: TelemetryDebugEntry, filter: string) => {
  * TelemetryDebugStore); toggled via the dev-mode quick-jump action or localStorage.
  */
 const TelemetryDebugOverlay = () => {
-  const enabled = useSyncExternalStore(telemetryDebugStore.subscribe, isTelemetryDebugEnabled);
+  const { t } = useTranslation('system');
+  const enabled =useSyncExternalStore(telemetryDebugStore.subscribe, isTelemetryDebugEnabled);
   const liveEntries = useSyncExternalStore(telemetryDebugStore.subscribe, telemetryDebugStore.getEntries);
   const [open, setOpen] = useState(false);
   const [frozenEntries, setFrozenEntries] = useState<TelemetryDebugEntry[] | null>(null);
@@ -190,8 +192,8 @@ const TelemetryDebugOverlay = () => {
 
   if (!open) {
     return (
-      <Badge type="button" aria-label="Telemetry debug" onClick={() => setOpen(true)}>
-        Telemetry debug: {liveEntries.length}
+      <Badge type="button" aria-label={t('telemetry_debug_overlay.badge_label')} onClick={() => setOpen(true)}>
+        {t('telemetry_debug_overlay.badge', { count: liveEntries.length })}
       </Badge>
     );
   }
@@ -206,55 +208,55 @@ const TelemetryDebugOverlay = () => {
   };
 
   return (
-    <Drawer role="region" aria-label="Telemetry debug panel" style={{ height: `${height}px` }}>
+    <Drawer role="region" aria-label={t('telemetry_debug_overlay.drawer_label')} style={{ height: `${height}px` }}>
       <ResizeHandle
         role="separator"
         aria-orientation="horizontal"
-        aria-label="Resize telemetry debug panel"
+        aria-label={t('telemetry_debug_overlay.resize_label')}
         onPointerDown={handleDragStart}
         onPointerMove={handleDragMove}
         onPointerUp={handleDragEnd}
       />
       <Toolbar>
-        <Title>Telemetry Debug ({entries.length})</Title>
+        <Title>{t('telemetry_debug_overlay.title', { count: entries.length })}</Title>
         <FilterInput
           type="text"
-          aria-label="Filter events"
-          placeholder="Filter by event name or payload..."
+          aria-label={t('telemetry_debug_overlay.filter_label')}
+          placeholder={t('telemetry_debug_overlay.filter_placeholder')}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
         {frozenEntries ? (
           <Button bsSize="xsmall" onClick={() => setFrozenEntries(null)}>
-            Resume
+            {t('telemetry_debug_overlay.resume')}
           </Button>
         ) : (
           <Button bsSize="xsmall" onClick={() => setFrozenEntries(liveEntries)}>
-            Pause
+            {t('telemetry_debug_overlay.pause')}
           </Button>
         )}
         <Button bsSize="xsmall" onClick={() => telemetryDebugStore.clear()}>
-          Clear
+          {t('telemetry_debug_overlay.clear')}
         </Button>
         <Button bsSize="xsmall" onClick={() => copyToClipboard(JSON.stringify(entries, null, 2))}>
-          Export session
+          {t('telemetry_debug_overlay.export_session')}
         </Button>
         <Spacer />
         <Button bsSize="xsmall" onClick={() => setOpen(false)}>
-          Collapse
+          {t('telemetry_debug_overlay.collapse')}
         </Button>
       </Toolbar>
       <Body>
         {visible.length === 0 ? (
-          <EmptyHint>No telemetry events recorded yet — interact with the app to see them here.</EmptyHint>
+          <EmptyHint>{t('telemetry_debug_overlay.no_events')}</EmptyHint>
         ) : (
           <Table condensed>
             <thead>
               <tr>
-                <th>Time</th>
-                <th>Event</th>
-                <th>Action</th>
-                <th>Status</th>
+                <th>{t('telemetry_debug_overlay.time')}</th>
+                <th>{t('telemetry_debug_overlay.event')}</th>
+                <th>{t('telemetry_debug_overlay.action')}</th>
+                <th>{t('telemetry_debug_overlay.status')}</th>
               </tr>
             </thead>
             <tbody>

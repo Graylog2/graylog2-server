@@ -197,5 +197,206 @@
   "node_maintenance_dropdown": {
     "actions": "Aktionen",
     "configure_internal_logging": "Interne Protokollierung konfigurieren"
+  },
+  "node_overview": {
+    "plugins_installed_one": "{{count}} Plugin installiert",
+    "plugins_installed_other": "{{count}} Plugins installiert",
+    "inputs_running_one": "{{count}} Input läuft auf diesem Knoten",
+    "inputs_running_other": "{{count}} Inputs laufen auf diesem Knoten",
+    "memory_heap_usage": "Arbeitsspeicher/Heap-Nutzung",
+    "buffers": "Buffer",
+    "buffers_description": "Buffer sind dafür ausgelegt, kleine Mengen an Nachrichten für eine sehr kurze Zeit (in der Regel Millisekunden) auf ihrem Weg durch die verschiedenen Prozessoren zwischenzuspeichern.",
+    "input_buffer": "Input-Buffer",
+    "process_buffer": "Process-Buffer",
+    "output_buffer": "Output-Buffer",
+    "disk_journal": "Disk-Journal",
+    "disk_journal_description": "Eingehende Nachrichten werden in das Disk-Journal geschrieben, damit sie bei einem Serverausfall sicher erhalten bleiben. Das Journal hilft außerdem, die Funktionsfähigkeit aufrechtzuerhalten, wenn einer der Outputs zu langsam ist, um mit der Nachrichtenrate Schritt zu halten, oder wenn es einen Spitzenwert bei eingehenden Nachrichten gibt. So wird sichergestellt, dass der Arbeitsspeicher nicht überlastet wird, und zu lange Garbage-Collection-Pausen werden vermieden.",
+    "system": "System",
+    "rest_api": "REST API",
+    "installed_plugins": "Installierte Plugins",
+    "manage_inputs": "Inputs verwalten",
+    "available_input_types": "Verfügbare Input-Typen"
+  },
+  "nodes_actions": {
+    "details": "Details",
+    "metrics": "Metriken",
+    "more_actions": "Weitere Aktionen",
+    "pause_message_processing": "Nachrichtenverarbeitung pausieren",
+    "resume_message_processing": "Nachrichtenverarbeitung fortsetzen",
+    "pause_confirm": "Sie sind dabei, die Nachrichtenverarbeitung in diesem Knoten zu pausieren. Sind Sie sicher?",
+    "resume_confirm": "Sie sind dabei, die Nachrichtenverarbeitung in diesem Knoten fortzusetzen. Sind Sie sicher?",
+    "override_lb_status": "LB-Status überschreiben",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Sie sind dabei, den Load-Balancer-Status dieses Knotens auf {{status}} zu ändern. Sind Sie sicher?",
+    "local_message_inputs": "Lokale Message-Inputs",
+    "thread_dump": "Thread-Dump abrufen",
+    "process_buffer_dump": "Process-Buffer-Dump abrufen",
+    "recent_system_logs": "Aktuelle System-Log-Nachrichten abrufen"
+  },
+  "nodes_list": {
+    "active_nodes_one": "Es ist {{count}} aktiver Knoten",
+    "active_nodes_other": "Es sind {{count}} aktive Knoten",
+    "no_active_nodes": "Es sind keine aktiven Knoten vorhanden."
+  },
+  "plugins_data_table": {
+    "loading": "Plugins auf diesem Knoten werden geladen...",
+    "no_plugins": "Auf diesem Knoten sind keine Plugins installiert.",
+    "name": "Name",
+    "version": "Version",
+    "author": "Autor",
+    "description": "Beschreibung",
+    "website": "Website",
+    "filter": "Filter"
+  },
+  "rest_api_overview": {
+    "transport_address": "Transportadresse:",
+    "last_seen": "Zuletzt gesehen:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "JVM-Informationen für diesen Knoten sind nicht verfügbar.",
+    "hostname": "Hostname:",
+    "node_id": "Knoten-ID:",
+    "version": "Version:",
+    "version_codename": "{{version}}, Codename <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Zeit:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Sie sind dabei, die Nachrichtenverarbeitung in diesem Knoten zu pausieren. Sind Sie sicher?",
+    "resume_confirm": "Sie sind dabei, die Nachrichtenverarbeitung in diesem Knoten fortzusetzen. Sind Sie sicher?",
+    "what_does_this_mean": "Was bedeutet das?",
+    "lifecycle_state": "Lifecycle-Status: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Für Load Balancer als <strong>{{status}}</strong> markiert",
+    "pause_processing": "Verarbeitung pausieren",
+    "resume_processing": "Verarbeitung fortsetzen",
+    "not_processing": "Der Knoten verarbeitet <strong>keine</strong> Nachrichten"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Aktueller Lifecycle-Status:",
+    "message_processing": "Nachrichtenverarbeitung:",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "lb_indication": "Load-Balancer-Status:"
+  },
+  "bulk_actions": {
+    "dismiss": "Verwerfen"
+  },
+  "system_notifications_table": {
+    "title": "Benachrichtigungen",
+    "human_name": "Benachrichtigungen"
+  },
+  "actions_cell": {
+    "dismiss": "Verwerfen"
+  },
+  "title_cell": {
+    "show_full_message": "Vollständige Nachricht anzeigen für: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Der Job konnte nicht bestätigt werden.",
+    "cancel_failed": "Der Job konnte nicht abgebrochen werden.",
+    "cancel_confirm": "Möchten Sie den Systemjob \"{{info}}\" wirklich abbrechen?",
+    "on_node": "- auf",
+    "runtime": "Laufzeit: {{duration}}",
+    "cancel": "Abbrechen",
+    "acknowledge": "Bestätigen"
+  },
+  "system_jobs_component": {
+    "title": "System-Jobs",
+    "description": "Ein System-Job ist eine lang laufende Aufgabe, die ein {{productName}}-Serverknoten aus Wartungsgründen ausführt. Einige Jobs liefern Fortschrittsinformationen oder können abgebrochen werden."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Keine aktiven System-Jobs."
+  },
+  "system_messages_component": {
+    "title": "Systemnachrichten",
+    "description": "Systemnachrichten werden von {{productName}}-Serverknoten bei bestimmten Ereignissen erzeugt, die für die {{productName}}-Administratoren interessant sein könnten. Sie müssen auf keines dieser Ereignisse aktiv reagieren, da für alle Ereignisse, die eine Aktion erfordern, Benachrichtigungen ausgegeben werden."
+  },
+  "system_messages_list": {
+    "timestamp": "Zeitstempel",
+    "node": "Knoten",
+    "message": "Nachricht"
+  },
+  "global_throughput": {
+    "aria_label": "Durchsatz: Ein {{input}} / Aus {{output}} msg/s",
+    "in": "ein",
+    "out": "aus"
+  },
+  "node_throughput": {
+    "loading": "Durchsatz wird geladen...",
+    "unable_to_load": "Durchsatz konnte nicht geladen werden.",
+    "processing_long": "Verarbeitung von <strong>{{totalIn}}</strong> eingehenden und <strong>{{totalOut}}</strong> ausgehenden msg/s.",
+    "short": "Ein {{totalIn}} / Aus {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "PII-Verdacht: {{suspect}}",
+    "copy_as_json": "Ereignis als JSON kopieren"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Telemetry-Debug",
+    "badge": "Telemetry-Debug: {{count}}",
+    "drawer_label": "Telemetry-Debug-Panel",
+    "resize_label": "Telemetry-Debug-Panel in der Größe ändern",
+    "title": "Telemetry-Debug ({{count}})",
+    "filter_label": "Ereignisse filtern",
+    "filter_placeholder": "Nach Ereignisname oder Payload filtern...",
+    "resume": "Fortsetzen",
+    "pause": "Pausieren",
+    "clear": "Leeren",
+    "export_session": "Sitzung exportieren",
+    "collapse": "Einklappen",
+    "no_events": "Noch keine Telemetrie-Ereignisse erfasst. Interagieren Sie mit der Anwendung, um sie hier zu sehen.",
+    "time": "Zeit",
+    "event": "Ereignis",
+    "action": "Aktion",
+    "status": "Status"
+  },
+  "cluster_configuration_page": {
+    "title": "Cluster-Konfiguration",
+    "description": "Diese Seite bietet einen Echtzeitüberblick über die Knoten in Ihrem Cluster. Sie können die Nachrichtenverarbeitung jederzeit pausieren. Die Process-Buffer nehmen keine neuen Nachrichten an, bis Sie die Verarbeitung fortsetzen. Ist das Nachrichten-Journal für einen Knoten aktiviert, was standardmäßig der Fall ist, werden eingehende Nachrichten auch dann auf der Festplatte gespeichert, wenn die Verarbeitung deaktiviert ist."
+  },
+  "configurations_page": {
+    "title": "Konfigurationen",
+    "description": "Auf dieser Seite können Sie die Systemeinstellungen für verschiedene Subsysteme konfigurieren."
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Testen Sie</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Mehr erfahren</productLink> über {{productName}} Enterprise-Funktionen.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Process-Buffer-Dump von Knoten {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Abgerufen am <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metriken von Knoten {{shortNodeId}} / {{hostname}}",
+    "description": "Alle {{productName}}-Knoten stellen eine Reihe interner Metriken zur Diagnose, zur Fehlersuche und zur Überwachung bereit. Beachten Sie, dass Sie alle Metriken auch über JMX abrufen können.",
+    "total_metrics_one": "Dieser Knoten meldet insgesamt {{count}} Metrik.",
+    "total_metrics_other": "Dieser Knoten meldet insgesamt {{count}} Metriken."
+  },
+  "node_page": {
+    "title": "Knoten {{shortNodeId}} / {{hostname}}",
+    "description": "Diese Seite zeigt Details zu einem {{productName}}-Serverknoten, der in Ihrem Cluster aktiv und erreichbar ist.",
+    "leader_node": "Dies ist der Leader-Knoten.",
+    "not_leader_node": "Dies ist <em>nicht</em> der Leader-Knoten."
+  },
+  "system_logs_page": {
+    "title": "Die neuesten System-Logs (begrenzt auf {{limit}}) von Knoten {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Abgerufen am <0/>",
+    "reload": "Neu laden",
+    "back": "Zurück",
+    "document_title": "System-Logs von Knoten {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Systembenachrichtigungen"
+  },
+  "system_overview_page": {
+    "title": "Systemübersicht"
+  },
+  "thread_dump_page": {
+    "title": "Thread-Dump von Knoten {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Abgerufen am <0/>"
   }
 }

@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
-import { Spinner, EntityList, Pluralize } from 'components/common';
+import { Spinner, EntityList } from 'components/common';
 import useClusterOverview from 'hooks/useClusterOverview';
 
 import NodeListItem from './NodeListItem';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const NodesList = ({ nodes = undefined }: Props) => {
+  const { t } = useTranslation('system');
   const { data: clusterOverview } = useClusterOverview();
 
   const _isLoading = !nodes || !clusterOverview;
@@ -51,11 +53,8 @@ const NodesList = ({ nodes = undefined }: Props) => {
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>
-          There <Pluralize value={nodesNo} singular="is" plural="are" /> {nodesNo} active{' '}
-          <Pluralize value={nodesNo} singular="node" plural="nodes" />
-        </h2>
-        <EntityList bsNoItemsStyle="info" noItemsText="There are no active nodes." items={_formattedNodes} />
+        <h2>{t('nodes_list.active_nodes', { count: nodesNo })}</h2>
+        <EntityList bsNoItemsStyle="info" noItemsText={t('nodes_list.no_active_nodes')} items={_formattedNodes} />
       </Col>
     </Row>
   );

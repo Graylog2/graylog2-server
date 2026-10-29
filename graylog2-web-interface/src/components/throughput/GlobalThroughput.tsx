@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
@@ -73,6 +74,7 @@ const ThroughputData = styled.span<{ $dataIn?: boolean }>(
 );
 
 const GlobalThroughput = (props) => {
+  const { t } = useTranslation('system');
   const { input, output: outputVal, isLoading } = useGlobalThroughput();
   let output = <Spinner text="" />;
 
@@ -81,12 +83,13 @@ const GlobalThroughput = (props) => {
     const outputNumeral = NumberUtils.formatNumber(outputVal);
 
     output = (
-      <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
+      <ContentWrap
+        aria-label={t('global_throughput.aria_label', { input: inputNumeral, output: outputNumeral })}>
         <ThroughputData $dataIn>
-          <span>{inputNumeral}</span> <i>in</i>
+          <span>{inputNumeral}</span> <i>{t('global_throughput.in')}</i>
         </ThroughputData>
         <ThroughputData>
-          <span>{outputNumeral}</span> <i>out</i>
+          <span>{outputNumeral}</span> <i>{t('global_throughput.out')}</i>
         </ThroughputData>
       </ContentWrap>
     );

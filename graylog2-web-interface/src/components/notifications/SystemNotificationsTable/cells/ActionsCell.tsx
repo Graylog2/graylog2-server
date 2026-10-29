@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
@@ -24,6 +25,7 @@ import useNotificationDismiss from 'components/notifications/hooks/useNotificati
 type Props = { row: NotificationType };
 
 const ActionsCell = ({ row }: Props) => {
+  const { t } = useTranslation('system');
   const { mutate: dismiss, isPending } = useNotificationDismiss();
 
   return (
@@ -33,8 +35,8 @@ const ActionsCell = ({ row }: Props) => {
         bsStyle="default"
         onClick={() => dismiss({ id: row.id })}
         disabled={isPending}
-        aria-label="Dismiss">
-        Dismiss
+        aria-label={t('actions_cell.dismiss')}>
+        {t('actions_cell.dismiss')}
       </Button>
     </IfPermitted>
   );
