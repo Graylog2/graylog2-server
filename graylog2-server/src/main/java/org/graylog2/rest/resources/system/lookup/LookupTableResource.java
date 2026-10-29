@@ -343,8 +343,9 @@ public class LookupTableResource extends RestResource {
     @Operation(summary = "Create a new lookup table")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public LookupTableApi createTable(@RequestBody(required = true) LookupTableApi lookupTable) {
+        final LookupTableApi toCreate = checkDefaultValues(trimDefaultValues(lookupTable));
         try {
-            LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
+            LookupTableDto saved = dbTableService.saveAndPostEvent(toCreate.toDto());
 
             return LookupTableApi.fromDto(saved);
         } catch (MongoException e) {
@@ -363,7 +364,7 @@ public class LookupTableResource extends RestResource {
                                       @Valid @RequestBody(required = true) LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
+        LookupTableDto saved = dbTableService.saveAndPostEvent(checkDefaultValues(trimDefaultValues(toUpdate)).toDto());
 
         return LookupTableApi.fromDto(saved);
     }
@@ -406,18 +407,69 @@ public class LookupTableResource extends RestResource {
             }
         }
 
-        try {
-            LookupDefaultSingleValue.create(toValidate.defaultSingleValue(), toValidate.defaultSingleValueType());
-        } catch (Exception e) {
-            validation.addError(LookupTableApi.FIELD_DEFAULT_SINGLE_VALUE, e.getMessage());
-        }
-        try {
-            LookupDefaultMultiValue.create(toValidate.defaultMultiValue(), toValidate.defaultMultiValueType());
-        } catch (Exception e) {
-            validation.addError(LookupTableApi.FIELD_DEFAULT_MULTI_VALUE, e.getMessage());
-        }
+        validation.addAll(validateDefaultValues(trimDefaultValues(toValidate)));
 
         return validation;
+    }
+
+    // Trimmed on save rather than on parse, so lookups on already stored tables keep returning what they did.
+    static LookupTableApi trimDefaultValues(LookupTableApi lookupTable) {
+        return lookupTable.toBuilder()
+                .defaultSingleValue(lookupTable.defaultSingleValue().trim())
+                .defaultMultiValue(lookupTable.defaultMultiValue().trim())
+                .build();
+    }
+
+    static ValidationResult validateDefaultValues(LookupTableApi lookupTable) {
+        final ValidationResult validation = new ValidationResult();
+        singleValueError(lookupTable.defaultSingleValue(), lookupTable.defaultSingleValueType())
+                .ifPresent(error -> validation.addError(LookupTableApi.FIELD_DEFAULT_SINGLE_VALUE, error));
+        multiValueError(lookupTable.defaultMultiValue(), lookupTable.defaultMultiValueType())
+                .ifPresent(error -> validation.addError(LookupTableApi.FIELD_DEFAULT_MULTI_VALUE, error));
+        return validation;
+    }
+
+    // Stricter than parsing, which turns an empty number into null and anything but "true" into false. Only
+    // checked on save, so existing tables with such defaults keep loading.
+    private static Optional<String> singleValueError(String value, LookupDefaultSingleValue.Type type) {
+        if (type == LookupDefaultSingleValue.Type.NULL) {
+            return Optional.empty();
+        }
+        // An empty string is a deliberate default, e.g. in shipped content, so only empty numbers and booleans fail.
+        if (value.isEmpty() && type != LookupDefaultSingleValue.Type.STRING) {
+            return Optional.of("Must not be empty.");
+        }
+        if (type == LookupDefaultSingleValue.Type.BOOLEAN && !value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) {
+            return Optional.of("Must be true or false.");
+        }
+        try {
+            LookupDefaultSingleValue.create(value, type);
+            return Optional.empty();
+        } catch (IllegalArgumentException e) {
+            return Optional.of(type == LookupDefaultSingleValue.Type.NUMBER
+                    ? "Must be a number."
+                    : "Must be a string, number or boolean.");
+        }
+    }
+
+    private static Optional<String> multiValueError(String value, LookupDefaultMultiValue.Type type) {
+        try {
+            LookupDefaultMultiValue.create(value, type);
+            return Optional.empty();
+        } catch (IllegalArgumentException e) {
+            return Optional.of("Must be a JSON object, e.g. {\"key\": \"value\"}.");
+        }
+    }
+
+    // An unparseable default stops the table from loading at all, so reject it instead of saving it.
+    static LookupTableApi checkDefaultValues(LookupTableApi lookupTable) {
+        final ValidationResult validation = validateDefaultValues(lookupTable);
+        if (validation.failed()) {
+            throw new BadRequestException(validation.getErrors().entrySet().stream()
+                    .flatMap(entry -> entry.getValue().stream().map(error -> entry.getKey() + ": " + error))
+                    .collect(Collectors.joining(" ")));
+        }
+        return lookupTable;
     }
 
     @GET
