@@ -14,20 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useSyncExternalStore } from 'react';
 
-import { Button } from 'components/bootstrap';
-import { IfPermitted, LinkContainer } from 'components/common';
-import Routes from 'routing/Routes';
+import type { Subscribable } from 'logic/createExternalStore';
 
-const ExpandedPipelinesActions = () => (
-  <IfPermitted permissions={['pipeline:read']}>
-    <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-      <Button bsStyle="link" bsSize="xsmall">
-        Manage Pipelines
-      </Button>
-    </LinkContainer>
-  </IfPermitted>
-);
+const useExternalStore = <S, T>(store: Subscribable<S>, selector: (state: S) => T): T =>
+  selector(useSyncExternalStore(store.subscribe, store.getState));
 
-export default ExpandedPipelinesActions;
+export default useExternalStore;

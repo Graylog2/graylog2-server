@@ -18,10 +18,9 @@ import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import type FetchError from 'logic/errors/FetchError';
-import { SessionActions } from 'stores/sessions/SessionStore';
+import { login as sessionLogin } from 'logic/session/SessionApi';
 
-const performLogin = ([username, password, host]: [string, string, string]) =>
-  SessionActions.login(username, password, host);
+const performLogin = ([username, password, host]: [string, string, string]) => sessionLogin(username, password, host);
 
 const useLogin = (onErrorChange: (message?: string) => void) => {
   const { mutateAsync, isPending: isLoading } = useMutation({

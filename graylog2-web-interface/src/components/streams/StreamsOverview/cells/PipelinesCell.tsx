@@ -19,15 +19,13 @@ import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
-import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
-import { METRIC_COLUMN_IDS } from 'components/streams/StreamsOverview/metricColumns';
+
+import PipelinesList from './PipelinesList';
 
 type Props = {
   stream: Stream;
 };
-
-const SECTION_NAME = METRIC_COLUMN_IDS.pipelines;
 
 const PipelinesCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
@@ -44,14 +42,7 @@ const PipelinesCell = ({ stream }: Props) => {
     return null;
   }
 
-  return (
-    <ExpandedSectionCount
-      entityId={stream.id}
-      section={SECTION_NAME}
-      count={metrics.pipelines.length}
-      label={`connected pipelines for ${stream.title}`}
-    />
-  );
+  return <PipelinesList pipelineIds={metrics.pipelines} />;
 };
 
 export default PipelinesCell;
