@@ -23,7 +23,7 @@ import { Col, Row, SegmentedControl, Alert } from 'components/bootstrap';
 import { Spinner, IfPermitted } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
 import type { UserUpdate } from 'hooks/useUsers';
 
@@ -50,7 +50,7 @@ const UserEdit = ({ user }: Props) => {
     (data: UserUpdate) =>
       UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {
         if (user.id === currentUser?.id) {
-          CurrentUserStore.reload();
+          CurrentUser.reload();
         }
       }),
     [user, currentUser?.id],
