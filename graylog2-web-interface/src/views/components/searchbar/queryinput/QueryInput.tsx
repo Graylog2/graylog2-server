@@ -21,7 +21,7 @@ import type { FormikErrors } from 'formik';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import QueryValidationActions from 'views/actions/QueryValidationActions';
+import QueryValidationErrors from 'views/components/searchbar/queryvalidation/QueryValidationErrors';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { displayHistoryCompletions } from 'views/components/searchbar/QueryHistoryButton';
@@ -48,10 +48,6 @@ const Container = styled.div<{ $hasValue: boolean }>(
     }
   `,
 );
-
-const displayValidationErrors = () => {
-  QueryValidationActions.displayValidationErrors();
-};
 
 const handleExecution = ({
   editor,
@@ -83,7 +79,7 @@ const handleExecution = ({
       if (isEmpty(errors)) {
         execute();
       } else {
-        displayValidationErrors();
+        QueryValidationErrors.display();
       }
     });
 
@@ -91,7 +87,7 @@ const handleExecution = ({
   }
 
   if (error) {
-    displayValidationErrors();
+    QueryValidationErrors.display();
   }
 
   if (disableExecution || error) {

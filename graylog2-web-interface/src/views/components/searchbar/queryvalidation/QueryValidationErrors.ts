@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import { singleton } from 'logic/singleton';
 
-import type { RefluxActions } from 'stores/StoreTypes';
-import { singletonActions } from 'logic/singleton';
+const createQueryValidationErrors = () => {
+  const listeners = new Set<() => void>();
 
-type QueryValidationActionsType = RefluxActions<{
-  displayValidationErrors: () => Promise<void>;
-}>;
+  return {
+    display: () => [...listeners].forEach((listener) => listener()),
+    onDisplay: (listener: () => void) => {
+      listeners.add(listener);
 
-const QueryValidationActions: QueryValidationActionsType = singletonActions('views.QueryValidation', () =>
-  Reflux.createActions({
-    displayValidationErrors: {
-      asyncResult: false,
+      return () => {
+        listeners.delete(listener);
+      };
     },
-  }),
-);
+  };
+};
 
-export default QueryValidationActions;
+const QueryValidationErrors = singleton('views.QueryValidationErrors', createQueryValidationErrors);
+
+export default QueryValidationErrors;
