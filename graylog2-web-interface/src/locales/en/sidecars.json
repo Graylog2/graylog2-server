@@ -1,0 +1,97 @@
+{
+  "administration": {
+    "configuration_modal": {
+      "add_configuration": "Add a new configuration",
+      "assigned_from_tags": "Assigned from tags: {{tags}}",
+      "lock_info": "Collector configurations that have a lock icon  <lockIcon/>  have been assigned using tags and cannot be changed here.",
+      "no_configurations": "No configurations available for the selected log collector.",
+      "remove": "Remove {{name}}",
+      "selected": "{{name}} is selected",
+      "sidecar_count_one": "{{count}} sidecar: ",
+      "sidecar_count_other": "{{count}} sidecars: ",
+      "title": "Edit <collectorName>{{name}}</collectorName> Configurations",
+      "unknown_collector": "Unknown collector"
+    },
+    "configuration_summary": {
+      "confirm": "Are you sure you want to proceed with this action for <summaryText>{{summary}}</summaryText>?",
+      "sidecars_summary_one": "{{count}} sidecar",
+      "sidecars_summary_other": "{{count}} sidecars",
+      "title": "Configuration summary"
+    },
+    "process": {
+      "actions": {
+        "restart": "Restart",
+        "start": "Start",
+        "stop": "Stop"
+      },
+      "button": "Process",
+      "confirm": "Are you sure you want to proceed with this action?",
+      "no_effect": {
+        "restart": "Restarting a Collector without Configuration will have no effect.",
+        "start": "Starting a Collector without Configuration will have no effect.",
+        "stop": "Stopping a Collector without Configuration will have no effect."
+      },
+      "summary": {
+        "restart_one": "You are going to <action>restart</action> log collectors in this sidecar:",
+        "restart_other": "You are going to <action>restart</action> log collectors in these sidecars:",
+        "start_one": "You are going to <action>start</action> log collectors in this sidecar:",
+        "start_other": "You are going to <action>start</action> log collectors in these sidecars:",
+        "stop_one": "You are going to <action>stop</action> log collectors in this sidecar:",
+        "stop_other": "You are going to <action>stop</action> log collectors in these sidecars:"
+      },
+      "summary_title": "Process action summary",
+      "title": "Manage collector processes",
+      "understood": "Understood, continue anyway",
+      "warning_text": "At least one selected Collector is not configured yet. To start a new Collector, assign a Configuration to it and the Sidecar will start the process for you.",
+      "warning_title": "Collectors without Configuration"
+    }
+  },
+  "common": {
+    "save": "Save"
+  },
+  "pages": {
+    "administration": {
+      "description": "Collectors can reliably forward contents of log files or Windows EventLog from your servers.",
+      "title": "Collectors Administration"
+    },
+    "configuration": {
+      "description": "The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can manage the Sidecar configurations.",
+      "title": "Collectors Configuration"
+    },
+    "documentation_title": "Sidecar documentation",
+    "edit_collector": {
+      "description": "Some words about log collectors.",
+      "title": "Log Collector"
+    },
+    "edit_configuration": {
+      "description": "Some words about collector configurations.",
+      "title": "Collector Configuration"
+    },
+    "failure_tracking": {
+      "description": "The Sidecar Failure Tracking provides additional useful information about failure reasons, that can help you decrease troubleshooting time and get your collectors back online faster.",
+      "document_title": "Sidecars",
+      "title": "Failure Tracking"
+    },
+    "new_collector": {
+      "description": "Some words about log collectors.",
+      "title": "New Log Collector"
+    },
+    "new_configuration": {
+      "description": "Some words about collector configurations.",
+      "title": "New Collector Configuration"
+    },
+    "overview": {
+      "description": "Sidecars can reliably forward contents of log files or Windows EventLog from your servers.",
+      "document_title": "Sidecars",
+      "title": "Sidecars Overview",
+      "token_hint": "Do you need an API token for a sidecar? <tokenLink>Create or reuse a token for the <em>{{username}}</em> user</tokenLink>"
+    },
+    "status": {
+      "description": "A status overview of the Sidecar.",
+      "document_title": "Sidecar status",
+      "document_title_named": "Sidecar {{name}} status",
+      "documentation_title": "Sidecars documentation",
+      "title": "Sidecar <em>{{name}} status</em>"
+    }
+  }
+}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import { Link } from 'components/common';
@@ -25,16 +26,17 @@ type Props = {
 };
 
 const NotFoundPage = ({ displayPageLayout = true }: Props) => {
+  const { t } = useTranslation('pages');
   const description = (
     <>
-      <p>The page you are looking for does not exist (anymore).</p>
+      <p>{t('not_found.description')}</p>
       <p>
-        You can head back to the <Link to={Routes.WELCOME}>Main Page</Link> and navigate from there.
+        <Trans t={t} i18nKey="not_found.back_hint" components={{ mainPageLink: <Link to={Routes.WELCOME} /> }} />
       </p>
     </>
   );
 
-  return <ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />;
+  return <ErrorPage title={t('not_found.title')} description={description} displayPageLayout={displayPageLayout} />;
 };
 
 export default NotFoundPage;

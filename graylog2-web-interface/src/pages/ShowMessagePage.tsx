@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
@@ -90,6 +91,7 @@ type ShowMessagePageProps = {
 };
 const emptyStreams: Stream[] = [];
 const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
+  const { t } = useTranslation('pages');
   const streams = useContext(StreamsContext) ?? emptyStreams;
   const streamsMap = useMemo(
     () => Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream]))),
@@ -112,7 +114,7 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
 
     return (
       <ViewsStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
-        <DocumentTitle title={`Message ${messageId} on ${index}`}>
+        <DocumentTitle title={t('show_message.document_title', { messageId, index })}>
           <Row className="content" id="sticky-augmentations-container">
             <Col md={12}>
               <WindowDimensionsContextProvider>
@@ -146,16 +148,14 @@ const ErrorPre = styled.pre`
   margin: 0 3rem;
 `;
 const ShowMessagePageLoader = ({ params: { index, messageId } }: Props) => {
+  const { t } = useTranslation('pages');
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
   }
   const { data: message, isError, error } = useMessage(index, messageId);
 
   return isError ? (
-    <ErrorPage
-      title="Index/Message not found"
-      description="The index or message specified was not found. The most probable reason for this is that the index containing the
-      message referenced has been deleted. The full error message is:">
+    <ErrorPage title={t('show_message.not_found_title')} description={t('show_message.not_found_description')}>
       <ErrorPre>{error.details}</ErrorPre>
     </ErrorPage>
   ) : (

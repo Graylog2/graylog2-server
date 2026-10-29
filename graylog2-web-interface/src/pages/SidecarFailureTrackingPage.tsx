@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -22,27 +23,28 @@ import DocsHelper from 'util/DocsHelper';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import SidecarFailureTrackingListContainer from 'components/sidecars/failure-tracking/SidecarFailureTrackingListContainer';
 
-const SidecarFailureTrackingPage = () => (
-  <DocumentTitle title="Sidecars">
-    <SidecarsPageNavigation />
-    <PageHeader
-      title="Failure Tracking"
-      documentationLink={{
-        title: 'Sidecar documentation',
-        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}>
-      <span>
-        The Sidecar Failure Tracking provides additional useful information about failure reasons, that can help you
-        decrease troubleshooting time and get your collectors back online faster.
-      </span>
-    </PageHeader>
+const SidecarFailureTrackingPage = () => {
+  const { t } = useTranslation('sidecars');
 
-    <Row className="content">
-      <Col md={12}>
-        <SidecarFailureTrackingListContainer />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('pages.failure_tracking.document_title')}>
+      <SidecarsPageNavigation />
+      <PageHeader
+        title={t('pages.failure_tracking.title')}
+        documentationLink={{
+          title: t('pages.documentation_title'),
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>{t('pages.failure_tracking.description')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <SidecarFailureTrackingListContainer />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default SidecarFailureTrackingPage;

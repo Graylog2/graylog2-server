@@ -1,0 +1,63 @@
+{
+  "api_browser": {
+    "download_label": "Download OpenAPI specification:",
+    "fetch_failed": "Fetching API spec failed!",
+    "loading": "Loading API spec ...",
+    "loading_title": "API Browser - Loading API Spec",
+    "select_format": "Select format",
+    "title": "API Browser"
+  },
+  "configlet": {
+    "error": "Something went wrong:"
+  },
+  "errors": {
+    "copy_error_details": "Copy error details to clipboard"
+  },
+  "keyboard_shortcuts": {
+    "description": "A list of all available shortcuts",
+    "title": "Keyboard Shortcuts"
+  },
+  "loading": {
+    "text": "Loading, please wait...",
+    "title": "Loading..."
+  },
+  "not_found": {
+    "back_hint": "You can head back to the <mainPageLink>Main Page</mainPageLink> and navigate from there.",
+    "description": "The page you are looking for does not exist (anymore).",
+    "title": "Page not found"
+  },
+  "runtime_error": {
+    "description_hint": "You can use the navigation to reach other parts of the product, refresh the page or submit an error report.",
+    "description_intro": "It seems like the page you navigated to contained an error.",
+    "error_label": "Error:",
+    "show_less": "Show less",
+    "show_more": "Show more",
+    "title": "Something went wrong."
+  },
+  "server_unavailable": {
+    "document_title": "Server unavailable",
+    "error_message": "Error message",
+    "full_error_message": "Full error message",
+    "intro": "We are experiencing problems connecting to the {{productName}} server running on <serverAddress>{{address}}</serverAddress>. Please verify that the server is healthy and working correctly.",
+    "last_response": "This is the last response we received from the server:",
+    "less_details": "Less details",
+    "modal_title": "Server currently unavailable",
+    "more_details": "More details",
+    "need_help": "Do you need a hand? <helpLink>We can help you</helpLink>.",
+    "no_information": "There is no information available.",
+    "original_request": "Original Request",
+    "redirect_hint": "You will be automatically redirected to the previous page once we can connect to the server.",
+    "status_code": "Status code"
+  },
+  "show_message": {
+    "document_title": "Message {{messageId}} on {{index}}",
+    "not_found_description": "The index or message specified was not found. The most probable reason for this is that the index containing the message referenced has been deleted. The full error message is:",
+    "not_found_title": "Index/Message not found"
+  },
+  "unauthorized": {
+    "description_hint": "Please contact your administrator and provide the error details.",
+    "description_intro": "You do not have the required permissions to view this resource.",
+    "page_details": "The permissions check for the following request failed,\nwhile trying to access {{pathname}}.",
+    "title": "Missing Permissions"
+  }
+}

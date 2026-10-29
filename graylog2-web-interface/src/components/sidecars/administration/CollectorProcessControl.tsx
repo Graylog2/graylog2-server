@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import capitalize from 'lodash/capitalize';
+import { Trans, useTranslation } from 'react-i18next';
 import uniq from 'lodash/uniq';
 
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
-import { Pluralize, SelectPopover } from 'components/common';
+import { SelectPopover } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -33,6 +33,7 @@ type Props = {
 };
 
 const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
+  const { t } = useTranslation('sidecars');
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -71,23 +72,24 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const renderSummaryContent = (selectedSidecars: string[]) => (
     <>
       <p>
-        You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
-        <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
+        <Trans
+          t={t}
+          i18nKey={`administration.process.summary.${selectedAction}`}
+          count={selectedSidecars.length}
+          components={{ action: <strong /> }}
+        />
       </p>
       <p>{selectedSidecars.join(', ')}</p>
-      <p>Are you sure you want to proceed with this action?</p>
+      <p>{t('administration.process.confirm')}</p>
     </>
   );
 
   const renderConfigurationWarning = () => (
-    <Panel bsStyle="info" header="Collectors without Configuration">
-      <p>
-        At least one selected Collector is not configured yet. To start a new Collector, assign a Configuration to it
-        and the Sidecar will start the process for you.
-      </p>
-      <p>{capitalize(selectedAction)}ing a Collector without Configuration will have no effect.</p>
+    <Panel bsStyle="info" header={t('administration.process.warning_title')}>
+      <p>{t('administration.process.warning_text')}</p>
+      <p>{t(`administration.process.no_effect.${selectedAction}`)}</p>
       <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>
-        Understood, continue anyway
+        {t('administration.process.understood')}
       </Button>
     </Panel>
   );
@@ -105,7 +107,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     return (
       <BootstrapModalConfirm
         showModal={showModal}
-        title="Process action summary"
+        title={t('administration.process.summary_title')}
         confirmButtonDisabled={shouldShowConfigurationWarning}
         onConfirm={confirmProcessAction}
         onCancel={cancelProcessAction}>
@@ -116,15 +118,15 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     );
   };
 
-  const actionFormatter = (action: string) => capitalize(action);
+  const actionFormatter = (action: string) => t(`administration.process.actions.${action}`);
 
   return (
     <span>
       <SelectPopover
-        title="Manage collector processes"
+        title={t('administration.process.title')}
         triggerNode={
           <Button bsStyle="primary" bsSize="small">
-            Process
+            {t('administration.process.button')}
           </Button>
         }
         items={PROCESS_ACTIONS}

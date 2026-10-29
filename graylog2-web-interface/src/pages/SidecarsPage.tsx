@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
@@ -26,28 +27,31 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import useBasicSidecarUser from 'components/sidecars/hooks/useBasicSidecarUser';
 
 const SidecarsPage = () => {
+  const { t } = useTranslation('sidecars');
   const { isPermitted } = usePermissions();
   const { data: sidecarUser } = useBasicSidecarUser();
   const canCreateSidecarUserTokens = sidecarUser && isPermitted([`users:tokencreate:${sidecarUser.username}`]);
 
   return (
-    <DocumentTitle title="Sidecars">
+    <DocumentTitle title={t('pages.overview.document_title')}>
       <SidecarsPageNavigation />
       <PageHeader
-        title="Sidecars Overview"
+        title={t('pages.overview.title')}
         documentationLink={{
-          title: 'Sidecar documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
         <span>
-          Sidecars can reliably forward contents of log files or Windows EventLog from your servers.
+          {t('pages.overview.description')}
           {canCreateSidecarUserTokens && (
             <span>
               <br />
-              Do you need an API token for a sidecar?&ensp;
-              <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                Create or reuse a token for the <em>{sidecarUser.username}</em> user
-              </Link>
+              <Trans
+                t={t}
+                i18nKey="pages.overview.token_hint"
+                values={{ username: sidecarUser.username }}
+                components={{ tokenLink: <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)} />, em: <em /> }}
+              />
             </span>
           )}
         </span>

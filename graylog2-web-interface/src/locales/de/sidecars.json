@@ -1,0 +1,97 @@
+{
+  "administration": {
+    "configuration_modal": {
+      "add_configuration": "Neue Konfiguration hinzufügen",
+      "assigned_from_tags": "Über Tags zugewiesen: {{tags}}",
+      "lock_info": "Collector-Konfigurationen mit einem Schlosssymbol  <lockIcon/>  wurden über Tags zugewiesen und können hier nicht geändert werden.",
+      "no_configurations": "Für den ausgewählten Log-Collector sind keine Konfigurationen verfügbar.",
+      "remove": "{{name}} entfernen",
+      "selected": "{{name}} ist ausgewählt",
+      "sidecar_count_one": "{{count}} Sidecar: ",
+      "sidecar_count_other": "{{count}} Sidecars: ",
+      "title": "Konfigurationen von <collectorName>{{name}}</collectorName> bearbeiten",
+      "unknown_collector": "Unbekannter Collector"
+    },
+    "configuration_summary": {
+      "confirm": "Möchten Sie diese Aktion für <summaryText>{{summary}}</summaryText> wirklich ausführen?",
+      "sidecars_summary_one": "{{count}} Sidecar",
+      "sidecars_summary_other": "{{count}} Sidecars",
+      "title": "Zusammenfassung der Konfiguration"
+    },
+    "process": {
+      "actions": {
+        "restart": "Neu starten",
+        "start": "Starten",
+        "stop": "Stoppen"
+      },
+      "button": "Prozess",
+      "confirm": "Möchten Sie diese Aktion wirklich ausführen?",
+      "no_effect": {
+        "restart": "Das Neustarten eines Collectors ohne Konfiguration hat keine Wirkung.",
+        "start": "Das Starten eines Collectors ohne Konfiguration hat keine Wirkung.",
+        "stop": "Das Stoppen eines Collectors ohne Konfiguration hat keine Wirkung."
+      },
+      "summary": {
+        "restart_one": "Sie sind dabei, die Log-Collectors in diesem Sidecar <action>neu zu starten</action>:",
+        "restart_other": "Sie sind dabei, die Log-Collectors in diesen Sidecars <action>neu zu starten</action>:",
+        "start_one": "Sie sind dabei, die Log-Collectors in diesem Sidecar zu <action>starten</action>:",
+        "start_other": "Sie sind dabei, die Log-Collectors in diesen Sidecars zu <action>starten</action>:",
+        "stop_one": "Sie sind dabei, die Log-Collectors in diesem Sidecar zu <action>stoppen</action>:",
+        "stop_other": "Sie sind dabei, die Log-Collectors in diesen Sidecars zu <action>stoppen</action>:"
+      },
+      "summary_title": "Zusammenfassung der Prozessaktion",
+      "title": "Collector-Prozesse verwalten",
+      "understood": "Verstanden, trotzdem fortfahren",
+      "warning_text": "Mindestens ein ausgewählter Collector ist noch nicht konfiguriert. Um einen neuen Collector zu starten, weisen Sie ihm eine Konfiguration zu; der Sidecar startet den Prozess dann für Sie.",
+      "warning_title": "Collectors ohne Konfiguration"
+    }
+  },
+  "common": {
+    "save": "Speichern"
+  },
+  "pages": {
+    "administration": {
+      "description": "Collectors können Inhalte von Logdateien oder des Windows-Ereignisprotokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
+      "title": "Collector-Verwaltung"
+    },
+    "configuration": {
+      "description": "Der Collector Sidecar läuft neben Ihrem bevorzugten Log-Collector und konfiguriert ihn für Sie. Hier können Sie die Sidecar-Konfigurationen verwalten.",
+      "title": "Collector-Konfiguration"
+    },
+    "documentation_title": "Sidecar-Dokumentation",
+    "edit_collector": {
+      "description": "Einige Worte zu Log-Collectors.",
+      "title": "Log-Collector"
+    },
+    "edit_configuration": {
+      "description": "Einige Worte zu Collector-Konfigurationen.",
+      "title": "Collector-Konfiguration"
+    },
+    "failure_tracking": {
+      "description": "Die Sidecar-Fehlerverfolgung liefert zusätzliche nützliche Informationen zu Fehlerursachen. Damit verkürzen Sie die Fehlersuche und bringen Ihre Collectors schneller wieder online.",
+      "document_title": "Sidecars",
+      "title": "Fehlerverfolgung"
+    },
+    "new_collector": {
+      "description": "Einige Worte zu Log-Collectors.",
+      "title": "Neuer Log-Collector"
+    },
+    "new_configuration": {
+      "description": "Einige Worte zu Collector-Konfigurationen.",
+      "title": "Neue Collector-Konfiguration"
+    },
+    "overview": {
+      "description": "Sidecars können Inhalte von Logdateien oder des Windows-Ereignisprotokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
+      "document_title": "Sidecars",
+      "title": "Sidecars-Übersicht",
+      "token_hint": "Benötigen Sie ein API-Token für einen Sidecar? <tokenLink>Token für den Benutzer <em>{{username}}</em> erstellen oder wiederverwenden</tokenLink>"
+    },
+    "status": {
+      "description": "Eine Statusübersicht des Sidecars.",
+      "document_title": "Sidecar-Status",
+      "document_title_named": "Status von Sidecar {{name}}",
+      "documentation_title": "Sidecars-Dokumentation",
+      "title": "Status von Sidecar <em>{{name}}</em>"
+    }
+  }
+}

@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import isEqual from 'lodash/isEqual';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -154,6 +155,7 @@ const CollectorConfigurationModal = ({
   unassignedConfigs,
   getRowData,
 }: Props) => {
+  const { t } = useTranslation('sidecars');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedConfigurations, setSelectedConfigurations] = useState<string[]>(initialAssignedConfigs);
   const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = useState<string[]>(
@@ -203,8 +205,16 @@ const CollectorConfigurationModal = ({
           }
         }}>
         <IconTableCell>
-          {selected && <Icon name="check" title={`${configName} is selected`} />}
-          {partiallySelected && <Icon type="regular" name="radio_button_partial" title={`${configName} is selected`} />}
+          {selected && (
+            <Icon name="check" title={t('administration.configuration_modal.selected', { name: configName })} />
+          )}
+          {partiallySelected && (
+            <Icon
+              type="regular"
+              name="radio_button_partial"
+              title={t('administration.configuration_modal.selected', { name: configName })}
+            />
+          )}
         </IconTableCell>
         <IconTableCell>
           <ColorLabel color={configuration.color} size="xsmall" />
@@ -216,20 +226,25 @@ const CollectorConfigurationModal = ({
           </SecondaryText>
         </ConfigurationTableCell>
         <IconTableCell>
-          {isAssignedFromTags && <Icon name="lock" title={`Assigned from tags: ${autoAssignedTags.join(', ')}`} />}
+          {isAssignedFromTags && (
+            <Icon
+              name="lock"
+              title={t('administration.configuration_modal.assigned_from_tags', { tags: autoAssignedTags.join(', ') })}
+            />
+          )}
         </IconTableCell>
         <CollectorTableCell>
           <small>
             {collector ? (
               <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />
             ) : (
-              <em>Unknown collector</em>
+              <em>{t('administration.configuration_modal.unknown_collector')}</em>
             )}
           </small>
         </CollectorTableCell>
         <UnselectTableCell>
           {(selected || partiallySelected) && !isAssignedFromTags && (
-            <Icon name="close" title={`Remove ${configName}`} />
+            <Icon name="close" title={t('administration.configuration_modal.remove', { name: configName })} />
           )}
         </UnselectTableCell>
       </TableRow>
@@ -240,10 +255,15 @@ const CollectorConfigurationModal = ({
     <BootstrapModalWrapper showModal={show} onHide={onCancel}>
       <Modal.Header>
         <ModalTitle>
-          Edit <b>{selectedCollectorName}</b> Configurations
+          <Trans
+            t={t}
+            i18nKey="administration.configuration_modal.title"
+            values={{ name: selectedCollectorName }}
+            components={{ collectorName: <b /> }}
+          />
           <ModalSubTitle>
             <small>
-              {`${selectedSidecarNames.length} sidecar${selectedSidecarNames.length > 1 ? 's' : ''}: `}
+              {t('administration.configuration_modal.sidecar_count', { count: selectedSidecarNames.length })}
               {selectedSidecarNames.join(', ')}
             </small>
           </ModalSubTitle>
@@ -253,9 +273,11 @@ const CollectorConfigurationModal = ({
         <StyledSearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} />
         {rows.length > 0 && (
           <InfoContainer bsStyle="info">
-            Collector configurations that have a lock icon &nbsp;
-            <Icon name="lock" size="xs" />
-            &nbsp; have been assigned using tags and cannot be changed here.
+            <Trans
+              t={t}
+              i18nKey="administration.configuration_modal.lock_info"
+              components={{ lockIcon: <Icon name="lock" size="xs" /> }}
+            />
           </InfoContainer>
         )}
         <ConfigurationContainer>
@@ -265,7 +287,7 @@ const CollectorConfigurationModal = ({
                 <TableRow>
                   <td colSpan={6}>
                     <NoConfigurationMessage>
-                      No configurations available for the selected log collector.
+                      {t('administration.configuration_modal.no_configurations')}
                     </NoConfigurationMessage>
                   </td>
                 </TableRow>
@@ -277,7 +299,7 @@ const CollectorConfigurationModal = ({
                   <AddNewConfiguration>
                     <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
                       <Icon name="add" />
-                      &nbsp;Add a new configuration
+                      &nbsp;{t('administration.configuration_modal.add_configuration')}
                     </Link>
                   </AddNewConfiguration>
                 </td>
@@ -288,13 +310,13 @@ const CollectorConfigurationModal = ({
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit
-          submitButtonText="Save"
+          submitButtonText={t('common.save')}
           disabledSubmit={isNotDirty}
           onSubmit={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}
           onCancel={onCancel}
           leftCol={
             <Button type="button" onClick={onReset}>
-              Reset
+              {t('common:actions.reset')}
             </Button>
           }
         />

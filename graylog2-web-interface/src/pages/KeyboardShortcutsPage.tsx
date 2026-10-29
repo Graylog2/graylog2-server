@@ -15,22 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
 
-const KeyboardShortcutsPage = () => (
-  <DocumentTitle title="Keyboard Shortcuts">
-    <PageHeader title="Keyboard Shortcuts">
-      <span>A list of all available shortcuts</span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <KeyboardShortcutsList />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const KeyboardShortcutsPage = () => {
+  const { t } = useTranslation('pages');
+
+  return (
+    <DocumentTitle title={t('keyboard_shortcuts.title')}>
+      <PageHeader title={t('keyboard_shortcuts.title')}>
+        <span>{t('keyboard_shortcuts.description')}</span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <KeyboardShortcutsList />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default KeyboardShortcutsPage;

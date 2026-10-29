@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -22,24 +23,28 @@ import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 
-const SidecarNewCollectorPage = () => (
-  <DocumentTitle title="New Log Collector">
-    <SidecarsPageNavigation />
-    <PageHeader
-      title="New Log Collector"
-      documentationLink={{
-        title: 'Sidecar documentation',
-        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}>
-      <span>Some words about log collectors.</span>
-    </PageHeader>
+const SidecarNewCollectorPage = () => {
+  const { t } = useTranslation('sidecars');
 
-    <Row className="content">
-      <Col md={6}>
-        <CollectorForm action="create" />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('pages.new_collector.title')}>
+      <SidecarsPageNavigation />
+      <PageHeader
+        title={t('pages.new_collector.title')}
+        documentationLink={{
+          title: t('pages.documentation_title'),
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>{t('pages.new_collector.description')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={6}>
+          <CollectorForm action="create" />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default SidecarNewCollectorPage;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
@@ -39,7 +40,14 @@ type Props = {
   };
 };
 
+const HelpLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <a href={DocsHelper.PAGES.SERVER_UNAVAILABLE} rel="noopener noreferrer" target="_blank">
+    {children}
+  </a>
+);
+
 const ServerUnavailablePage = ({ server = undefined }: Props) => {
+  const { t } = useTranslation('pages');
   const productName = useProductName();
   const [showDetails, setShowDetails] = useState(false);
 
@@ -53,7 +61,7 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
     const noInformationMessage = (
       <div>
         <hr />
-        <p>There is no information available.</p>
+        <p>{t('server_unavailable.no_information')}</p>
       </div>
     );
 
@@ -66,27 +74,30 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
     const errorDetails = [];
 
     if (error.message) {
-      errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
+      errorDetails.push(
+        <dt key="error-title">{t('server_unavailable.error_message')}</dt>,
+        <dd key="error-desc">{error.message}</dd>,
+      );
     }
 
     if (error.originalError) {
       const { originalError } = error;
 
       errorDetails.push(
-        <dt key="status-original-request-title">Original Request</dt>,
+        <dt key="status-original-request-title">{t('server_unavailable.original_request')}</dt>,
         <dd key="status-original-request-content">
           {String(originalError.method)} {String(originalError.url)}
         </dd>,
       );
 
       errorDetails.push(
-        <dt key="status-code-title">Status code</dt>,
+        <dt key="status-code-title">{t('server_unavailable.status_code')}</dt>,
         <dd key="status-code-desc">{String(originalError.status)}</dd>,
       );
 
       if (typeof originalError.toString === 'function') {
         errorDetails.push(
-          <dt key="full-error-title">Full error message</dt>,
+          <dt key="full-error-title">{t('server_unavailable.full_error_message')}</dt>,
           <dd key="full-error-desc">{originalError.toString()}</dd>,
         );
       }
@@ -99,7 +110,7 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
     return (
       <div>
         <hr style={{ marginTop: 10, marginBottom: 10 }} />
-        <p>This is the last response we received from the server:</p>
+        <p>{t('server_unavailable.last_response')}</p>
         <Well bsSize="small" style={{ whiteSpace: 'pre-line' }}>
           <dl style={{ marginBottom: 0 }}>{errorDetails}</dl>
         </Well>
@@ -107,10 +118,10 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
     );
   };
 
-  const modalTitle = 'Server currently unavailable';
+  const modalTitle = t('server_unavailable.modal_title');
 
   return (
-    <DocumentTitle title="Server unavailable">
+    <DocumentTitle title={t('server_unavailable.document_title')}>
       <LoginChrome>
         <Modal show onHide={() => {}}>
           <Modal.Header>
@@ -121,20 +132,20 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
           <Modal.Body>
             <div>
               <p>
-                We are experiencing problems connecting to the {productName} server running on <i>{qualifyUrl('')}</i>.
-                Please verify that the server is healthy and working correctly.
+                <Trans
+                  t={t}
+                  i18nKey="server_unavailable.intro"
+                  values={{ productName, address: qualifyUrl('') }}
+                  components={{ serverAddress: <i /> }}
+                />
               </p>
-              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
+              <p>{t('server_unavailable.redirect_hint')}</p>
               <p>
-                Do you need a hand?{' '}
-                <a href={DocsHelper.PAGES.SERVER_UNAVAILABLE} rel="noopener noreferrer" target="_blank">
-                  We can help you
-                </a>
-                .
+                <Trans t={t} i18nKey="server_unavailable.need_help" components={{ helpLink: <HelpLink /> }} />
               </p>
               <div>
                 <Button bsStyle="primary" tabIndex={0} onClick={_toggleDetails} bsSize="sm">
-                  {showDetails ? 'Less details' : 'More details'}
+                  {showDetails ? t('server_unavailable.less_details') : t('server_unavailable.more_details')}
                   <StyledIcon name={showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
                 </Button>
                 {_formatErrorMessage()}

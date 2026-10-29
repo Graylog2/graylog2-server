@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -28,6 +29,7 @@ import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 
 const SidecarStatusPage = () => {
+  const { t } = useTranslation('sidecars');
   const { sidecarId } = useParams<{ sidecarId: string }>();
   const history = useHistory();
   const { data: collectors } = useCollectorsAll();
@@ -45,26 +47,31 @@ const SidecarStatusPage = () => {
 
   if (!sidecar || !collectors) {
     return (
-      <DocumentTitle title="Sidecar status">
+      <DocumentTitle title={t('pages.status.document_title')}>
         <Spinner />
       </DocumentTitle>
     );
   }
 
   return (
-    <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
+    <DocumentTitle title={t('pages.status.document_title_named', { name: sidecar.node_name })}>
       <SidecarsPageNavigation />
       <PageHeader
         title={
           <span>
-            Sidecar <em>{sidecar.node_name} status</em>
+            <Trans
+              t={t}
+              i18nKey="pages.status.title"
+              values={{ name: sidecar.node_name }}
+              components={{ em: <em /> }}
+            />
           </span>
         }
         documentationLink={{
-          title: 'Sidecars documentation',
+          title: t('pages.status.documentation_title'),
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
-        <span>A status overview of the Sidecar.</span>
+        <span>{t('pages.status.description')}</span>
       </PageHeader>
 
       <SidecarStatus sidecar={sidecar} collectors={collectors} />

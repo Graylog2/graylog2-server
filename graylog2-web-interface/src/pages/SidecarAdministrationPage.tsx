@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
@@ -24,18 +25,19 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import useQuery from 'routing/useQuery';
 
 const SidecarAdministrationPage = () => {
+  const { t } = useTranslation('sidecars');
   const { node_id: nodeId } = useQuery();
 
   return (
-    <DocumentTitle title="Collectors Administration">
+    <DocumentTitle title={t('pages.administration.title')}>
       <SidecarsPageNavigation />
       <PageHeader
-        title="Collectors Administration"
+        title={t('pages.administration.title')}
         documentationLink={{
-          title: 'Sidecar documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
-        <span>Collectors can reliably forward contents of log files or Windows EventLog from your servers.</span>
+        <span>{t('pages.administration.description')}</span>
       </PageHeader>
 
       <Row className="content">
