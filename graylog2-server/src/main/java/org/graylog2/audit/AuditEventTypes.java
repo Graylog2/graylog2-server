@@ -156,6 +156,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String STREAM_DESTINATION_FILTER_CREATE = PREFIX + "stream_destination_filter:create";
     public static final String STREAM_DESTINATION_FILTER_DELETE = PREFIX + "stream_destination_filter:delete";
     public static final String STREAM_DESTINATION_FILTER_UPDATE = PREFIX + "stream_destination_filter:update";
+    public static final String STREAM_ASSIGN_INDEX_SET = PREFIX + "stream:assign_index_set";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -342,6 +343,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SESSION_DELETE)
             .add(STATIC_FIELD_CREATE)
             .add(STATIC_FIELD_DELETE)
+            .add(STREAM_ASSIGN_INDEX_SET)
             .add(STREAM_CREATE)
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)

@@ -74,6 +74,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
@@ -181,7 +182,6 @@ public class StreamResource extends RestResource {
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
     private final AuditEventSender auditEventSender;
-    private final SuccessContextCreator<Stream> successAuditLogContextCreator;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -211,7 +211,7 @@ public class StreamResource extends RestResource {
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         this.auditEventSender = auditEventSender;
-        this.successAuditLogContextCreator = (entity, entityClass) ->
+        final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
                                 "title", entity.getTitle()
@@ -773,22 +773,26 @@ public class StreamResource extends RestResource {
                     try {
                         streamService.addToIndexSet(indexSetId, streamIds);
                     } catch (RuntimeException e) {
-                        existingStreams.forEach(stream -> auditStreamUpdate(auditActor, stream, false));
+                        existingStreams.forEach(stream -> auditIndexSetAssignment(auditActor, stream, indexSet.getConfig(), false));
                         throw e;
                     }
-                    existingStreams.forEach(stream -> auditStreamUpdate(auditActor, stream, true));
+                    existingStreams.forEach(stream -> auditIndexSetAssignment(auditActor, stream, indexSet.getConfig(), true));
                     return Response.ok().build();
                 })
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
-    private void auditStreamUpdate(AuditActor auditActor, Stream stream, boolean success) {
-        final Map<String, Object> context = successAuditLogContextCreator.create(stream, Stream.class);
+    private void auditIndexSetAssignment(AuditActor auditActor, Stream stream, IndexSetConfig indexSetConfig, boolean success) {
+        final Map<String, Object> context = Map.of("response_entity", Map.of(
+                "stream_id", stream.getId(),
+                "title", stream.getTitle(),
+                "index_set_id", indexSetConfig.id(),
+                "index_set_title", indexSetConfig.title()));
         try {
             if (success) {
-                auditEventSender.success(auditActor, AuditEventTypes.STREAM_UPDATE, context);
+                auditEventSender.success(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
             } else {
-                auditEventSender.failure(auditActor, AuditEventTypes.STREAM_UPDATE, context);
+                auditEventSender.failure(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
             }
         } catch (Exception e) {
             // A failing audit sink must not fail an index set assignment that was already stored
