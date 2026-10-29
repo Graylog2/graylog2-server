@@ -46,95 +46,64 @@ type JSONValueInputProps = {
   validationState?: 'error' | 'success' | 'warning';
   value?: string;
   valueType?: string;
-  allowedTypes?: any;
+  allowedTypes?: Array<string>;
   labelClassName?: string;
   wrapperClassName?: string;
+  disabled?: boolean;
 };
 
 const StyledFormGroup = styled(FormGroup)`
   padding: 0 15px;
 `;
 
-class JSONValueInput extends React.Component<
-  JSONValueInputProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    value: '',
-    valueType: 'STRING',
-    allowedTypes: OPTIONS.map((option) => option.value),
-    label: '',
-    help: '',
-    required: false,
-    validationState: null,
-    labelClassName: undefined,
-    wrapperClassName: undefined,
-    onBlur: undefined,
-  };
+// Fully controlled: keeping a local copy of the value lets parent re-renders overwrite in-flight keystrokes.
+const JSONValueInput = ({
+  update,
+  onBlur = undefined,
+  label = '',
+  help = '',
+  required = false,
+  validationState = undefined,
+  value = '',
+  valueType = 'STRING',
+  allowedTypes = OPTIONS.map((option) => option.value),
+  labelClassName = undefined,
+  wrapperClassName = undefined,
+  disabled = false,
+}: JSONValueInputProps) => {
+  const options = OPTIONS.filter((o) => allowedTypes.indexOf(o.value) > -1).map((o) => (
+    <MenuItem key={o.value} onSelect={() => update(value, o.value)}>
+      {o.label}
+    </MenuItem>
+  ));
 
-  constructor(props) {
-    super(props);
-    this.state = this._computeInitialState();
-  }
-
-  UNSAFE_componentWillReceiveProps() {
-    this.setState(this._computeInitialState());
-  }
-
-  _computeInitialState = () => ({
-    value: this.props.value,
-    valueType: this.props.valueType,
-  });
-
-  _propagateState = () => {
-    this.props.update(this.state.value, this.state.valueType);
-  };
-
-  _onUpdate = (e) => {
-    const { value } = e.target;
-
-    this.setState({ value: value }, this._propagateState);
-  };
-
-  _onValueTypeSelect = (valueType) => {
-    this.setState({ valueType: valueType }, this._propagateState);
-  };
-
-  render() {
-    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => (
-      <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>
-        {o.label}
-      </MenuItem>
-    ));
-
-    return (
-      <StyledFormGroup validationState={this.props.validationState}>
-        {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
-        <InputWrapper className={this.props.wrapperClassName}>
-          <InputGroup>
-            <FormControl
-              type="text"
-              onChange={this._onUpdate}
-              onBlur={this.props.onBlur}
-              value={this.state.value}
-              required={this.props.required}
-            />
-            <InputGroup.Button>
-              <DropdownButton
-                id="input-dropdown-addon"
-                bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
-                {options}
-              </DropdownButton>
-            </InputGroup.Button>
-          </InputGroup>
-          {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
-        </InputWrapper>
-      </StyledFormGroup>
-    );
-  }
-}
+  return (
+    <StyledFormGroup validationState={validationState}>
+      {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
+      <InputWrapper className={wrapperClassName}>
+        <InputGroup>
+          <FormControl
+            type="text"
+            onChange={(e) => update((e.target as HTMLInputElement).value, valueType)}
+            onBlur={onBlur}
+            value={value}
+            required={required}
+            disabled={disabled}
+          />
+          <InputGroup.Button>
+            <DropdownButton
+              id="input-dropdown-addon"
+              bsStyle={validationState === 'error' ? 'danger' : 'default'}
+              disabled={disabled}
+              title={OPTIONS.filter((o) => o.value === valueType)[0].label}>
+              {options}
+            </DropdownButton>
+          </InputGroup.Button>
+        </InputGroup>
+        {help && <HelpBlock>{help}</HelpBlock>}
+      </InputWrapper>
+    </StyledFormGroup>
+  );
+};
 
 export default JSONValueInput;
