@@ -17,18 +17,15 @@
 import React from 'react';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
-import Routes from 'routing/Routes';
-import { Link } from 'components/common';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
 const IndexExpandedSection = ({ type }: ExpandedSectionProps) => {
-  const { id, name: profileName } = useIndexProfileWithMappingsByField();
+  const { name: profileName } = useIndexProfileWithMappingsByField();
 
   return (
     <p>
-      Field type <i>{type}</i> comes from profile{' '}
-      <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>{profileName}</Link>. It overrides possible mappings
-      from the search engine index mapping, either immediately (if index was rotated) or during the next rotation.
+      Field type <i>{type}</i> comes from profile {profileName}. It overrides possible mappings from the search engine
+      index mapping, either immediately (if index was rotated) or during the next rotation.
     </p>
   );
 };

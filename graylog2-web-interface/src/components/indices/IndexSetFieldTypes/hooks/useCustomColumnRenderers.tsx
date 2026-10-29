@@ -37,9 +37,7 @@ const useCustomColumnRenderers = () => {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
         origin: {
-          renderCell: (origin: FieldTypeOrigin, fieldType: IndexSetFieldType) => (
-            <OriginCell entityId={fieldType.id} origin={origin} />
-          ),
+          renderCell: (_origin: FieldTypeOrigin, fieldType: IndexSetFieldType) => <OriginCell fieldType={fieldType} />,
           staticWidth: 180,
         },
         is_reserved: {

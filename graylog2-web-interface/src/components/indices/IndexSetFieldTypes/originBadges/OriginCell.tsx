@@ -17,18 +17,18 @@
 import React, { useMemo } from 'react';
 import keyBy from 'lodash/keyBy';
 
-import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import ExpandedSectionBadge from 'components/common/EntityDataTable/ExpandedSectionBadge';
+import { OverlayTrigger } from 'components/common';
+import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
 
-import { originBsStyles } from './OriginBadge';
+import OriginBadge from './OriginBadge';
 
 type Props = {
-  entityId: string;
-  origin: FieldTypeOrigin;
+  fieldType: IndexSetFieldType;
 };
 
-const OriginCell = ({ entityId, origin }: Props) => {
+const OriginCell = ({ fieldType: { origin, type, fieldName } }: Props) => {
   const { attributes } = useTableFetchContext();
 
   const normalizedOrigin = useMemo(() => {
@@ -38,13 +38,12 @@ const OriginCell = ({ entityId, origin }: Props) => {
   }, [attributes]);
 
   return (
-    <ExpandedSectionBadge
-      entityId={entityId}
-      section="overriddenProfile"
-      label="origin explanation"
-      bsStyle={originBsStyles[origin]}>
-      {normalizedOrigin?.[origin]?.title}
-    </ExpandedSectionBadge>
+    <OverlayTrigger
+      trigger="hover"
+      placement="bottom"
+      overlay={<OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />}>
+      <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} withInfoIcon />
+    </OverlayTrigger>
   );
 };
 
