@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.configuration.tunables.RuntimeTunable;
+import org.graylog2.configuration.tunables.TunableField;
+import org.graylog2.configuration.tunables.When;
 import org.graylog2.security.encryption.ConfigUpdatePreparation;
 import org.graylog2.security.encryption.EncryptedValue;
 
@@ -33,6 +36,9 @@ import java.util.concurrent.TimeUnit;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AutoValue
+@RuntimeTunable(id = "geo_location.configuration", feature = "geo_location", title = "Geo-Location Processor Configuration",
+        description = "The Geo-Location Processor plugin scans all messages for fields containing exclusively an IP address, "
+                + "and puts their geo-location information (coordinates, ISO country code, and city name) into different fields.")
 public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
 
     private static final Long DEFAULT_INTERVAL = 10L;
@@ -41,18 +47,23 @@ public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
     public static final TimeUnit DEFAULT_INTERVAL_UNIT = TimeUnit.MINUTES;
 
     @JsonProperty("enabled")
+    @TunableField(label = "Enable Geo-Location processor", order = 1)
     public abstract boolean enabled();
 
     @JsonProperty("enforce_graylog_schema")
+    @TunableField(label = "Enforce default schema", order = 2, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract boolean enforceGraylogSchema();
 
     @JsonProperty("db_vendor_type")
+    @TunableField(label = "Database vendor type", order = 3, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract DatabaseVendorType databaseVendorType();
 
     @JsonProperty("city_db_path")
+    @TunableField(label = "Path to the city database", order = 4, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract String cityDbPath();
 
     @JsonProperty("asn_db_path")
+    @TunableField(label = "Path to the ASN database", order = 5, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract String asnDbPath();
 
     /**
@@ -60,41 +71,54 @@ public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
      */
     @Deprecated(since = "6.3.0")
     @JsonProperty("use_s3")
+    @TunableField(label = "Use S3", hidden = true)
     public abstract boolean useS3();
 
     @JsonProperty("pull_from_cloud")
+    @TunableField(label = "Pull files from cloud storage bucket", order = 8, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract Optional<CloudStorageType> pullFromCloud();
 
     @JsonProperty("gcs_project_id")
+    @TunableField(label = "Google Cloud Storage project ID", order = 9, enabledWhen = @When(property = "enabled", in = "true"),
+            visibleWhen = @When(property = "pull_from_cloud", in = "gcs"))
     @Nullable
     public abstract String gcsProjectId();
 
     @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT)
-    @Nullable
+    @TunableField(label = "Database refresh interval unit", order = 7,
+            allowedValues = {"SECONDS", "MINUTES", "HOURS", "DAYS"}, enabledWhen = @When(property = "enabled", in = "true"))
     public abstract TimeUnit refreshIntervalUnit();
 
     @JsonProperty(FIELD_REFRESH_INTERVAL)
+    @TunableField(label = "Database refresh interval", order = 6, enabledWhen = @When(property = "enabled", in = "true"),
+            help = "Interval at which the database files are checked for modifications and refreshed changes are detected on disk.")
     public abstract Long refreshInterval();
 
     @JsonProperty("azure_account")
+    @TunableField(label = "Azure account name", help = "The name of your Azure storage account.", order = 10, enabledWhen = @When(property = "enabled", in = "true"),
+            visibleWhen = @When(property = "pull_from_cloud", in = "abs"))
     @Nullable
     public abstract String azureAccountName();
 
     @JsonProperty("azure_account_key")
+    @TunableField(label = "Azure account key", help = "The account key for your Azure storage account.", order = 11, enabledWhen = @When(property = "enabled", in = "true"),
+            visibleWhen = @When(property = "pull_from_cloud", in = "abs"))
     @Nullable
     public abstract EncryptedValue azureAccountKey();
 
     @JsonProperty("azure_container")
+    @TunableField(label = "Azure Blob container name", help = "Your Azure Blob container name.", order = 12, enabledWhen = @When(property = "enabled", in = "true"),
+            visibleWhen = @When(property = "pull_from_cloud", in = "abs"))
     @Nullable
     public abstract String azureContainerName();
 
     @JsonProperty("azure_endpoint")
+    @TunableField(label = "Azure Blob endpoint URL",
+            help = "Your Azure Blob endpoint URL, only required if you want to override the default endpoint.", order = 13, enabledWhen = @When(property = "enabled", in = "true"),
+            visibleWhen = @When(property = "pull_from_cloud", in = "abs"))
     public abstract Optional<String> azureEndpoint();
 
     public Duration refreshIntervalAsDuration() {
-        if (refreshIntervalUnit() == null) {
-            return Duration.ofMinutes(DEFAULT_INTERVAL);
-        }
         return Duration.ofMillis(refreshIntervalUnit().toMillis(refreshInterval()));
     }
 
@@ -108,6 +132,7 @@ public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
         return pullFromCloud().map(CloudStorageType.S3::equals).orElse(false);
     }
 
+    @JsonIgnore
     public boolean isAzureCloud() {
         return pullFromCloud().map(CloudStorageType.ABS::equals).orElse(false);
     }
@@ -143,6 +168,10 @@ public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
                 .azureContainerName(azureContainerName)
                 .azureEndpoint(azureEndpoint)
                 .build();
+    }
+
+    public static GeoIpResolverConfig defaults() {
+        return defaultConfig();
     }
 
     public static GeoIpResolverConfig defaultConfig() {

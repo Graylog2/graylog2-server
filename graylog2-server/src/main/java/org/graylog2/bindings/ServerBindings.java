@@ -46,6 +46,8 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.configuration.WelcomePageConfiguration;
+import org.graylog2.configuration.tunables.RuntimeTunablesModule;
 import org.graylog2.database.filtering.ComputedFieldProvider;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.grok.GrokModule;
@@ -111,9 +113,12 @@ import org.graylog2.system.traffic.TrafficCounterCalculator;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.system.traffic.TrafficUpdater;
 import org.graylog2.users.GrantsCleanupListener;
+import org.graylog2.users.PasswordComplexityConfig;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
+import org.graylog2.users.UserAndTeamsConfig;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 
 import java.time.Clock;
@@ -153,6 +158,11 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule(configuration));
         install(new FieldTypesModule());
+        install(new RuntimeTunablesModule());
+        addRuntimeTunable(PasswordComplexityConfig.class);
+        addRuntimeTunable(UserAndTeamsConfig.class);
+        addRuntimeTunable(UserConfiguration.class);
+        addRuntimeTunable(WelcomePageConfiguration.class);
         if (isMigrationCommand) {
             install(new FakeLeaderElectionModule());
         } else {
