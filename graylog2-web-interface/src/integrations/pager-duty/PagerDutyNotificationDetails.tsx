@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup } from 'components/common';
 
@@ -26,20 +27,45 @@ type PagerDutyNotificationDetailsProps = {
   };
 };
 
-const PagerDutyNotificationDetails = ({ notification }: PagerDutyNotificationDetailsProps) => (
-  <>
-    <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />
-    <ReadOnlyFormGroup label="Incident Title" value={notification.config?.pager_duty_title} />
-    <ReadOnlyFormGroup label="Custom Incident" value={notification.config?.custom_incident} />
-    {notification?.config?.custom_incident && notification.config?.key_prefix && (
-      <ReadOnlyFormGroup label="Key Prefix" value={notification.config?.key_prefix} />
-    )}
-    {notification?.config?.custom_incident && notification.config?.incident_key && (
-      <ReadOnlyFormGroup label="Incident Key" value={notification.config?.incident_key} />
-    )}
-    <ReadOnlyFormGroup label="Client Name" value={notification.config?.client_name} />
-    <ReadOnlyFormGroup label="Client URL" value={notification.config?.client_url} />
-  </>
-);
+const PagerDutyNotificationDetails = ({ notification }: PagerDutyNotificationDetailsProps) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <ReadOnlyFormGroup
+        label={t('pager_duty_notification_details.routing_key_label')}
+        value={notification.config?.routing_key}
+      />
+      <ReadOnlyFormGroup
+        label={t('pager_duty_notification_details.incident_title_label')}
+        value={notification.config?.pager_duty_title}
+      />
+      <ReadOnlyFormGroup
+        label={t('pager_duty_notification_details.custom_incident_label')}
+        value={notification.config?.custom_incident}
+      />
+      {notification?.config?.custom_incident && notification.config?.key_prefix && (
+        <ReadOnlyFormGroup
+          label={t('pager_duty_notification_details.key_prefix_label')}
+          value={notification.config?.key_prefix}
+        />
+      )}
+      {notification?.config?.custom_incident && notification.config?.incident_key && (
+        <ReadOnlyFormGroup
+          label={t('pager_duty_notification_details.incident_key_label')}
+          value={notification.config?.incident_key}
+        />
+      )}
+      <ReadOnlyFormGroup
+        label={t('pager_duty_notification_details.client_name_label')}
+        value={notification.config?.client_name}
+      />
+      <ReadOnlyFormGroup
+        label={t('pager_duty_notification_details.client_url_label')}
+        value={notification.config?.client_url}
+      />
+    </>
+  );
+};
 
 export default PagerDutyNotificationDetails;

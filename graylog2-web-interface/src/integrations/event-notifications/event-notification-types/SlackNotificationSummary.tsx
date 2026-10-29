@@ -15,66 +15,69 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 function SlackNotificationSummary({ notification, ...restProps }: SlackNotificationSummaryType) {
+  const { t } = useTranslation('integrations');
+
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
-        <td>Color</td>
+        <td>{t('slack_notification_summary.color_label')}</td>
         <td>{notification?.config?.color}</td>
       </tr>
       <tr>
-        <td>Webhook URL</td>
+        <td>{t('slack_notification_details.webhook_url_label')}</td>
         <td>{notification.config.webhook_url}</td>
       </tr>
       <tr>
-        <td>Channel</td>
+        <td>{t('slack_notification_details.channel_label')}</td>
         <td>{notification.config.channel}</td>
       </tr>
       <tr>
-        <td>Include Title</td>
+        <td>{t('slack_notification_details.include_title_label')}</td>
         <td>{notification.config.include_title}</td>
       </tr>
       <tr>
-        <td>Custom Message</td>
+        <td>{t('slack_notification_summary.custom_message_label')}</td>
         <td>{notification.config.custom_message}</td>
       </tr>
       {usePluggableLicenseCheck('/license/security')?.data?.valid && (
         <tr>
-          <td>Include Event Procedure in Email Body</td>
+          <td>{t('slack_notification_details.include_event_procedure_label')}</td>
           <td>{notification.config.include_event_procedure}</td>
         </tr>
       )}
       <tr>
-        <td>Time Zone</td>
+        <td>{t('slack_notification_details.time_zone_label')}</td>
         <td>{notification.config.time_zone}</td>
       </tr>
       <tr>
-        <td>Message Backlog Limit</td>
+        <td>{t('slack_notification_details.backlog_limit_label')}</td>
         <td>{notification.config.backlog_size}</td>
       </tr>
       <tr>
-        <td>User Name</td>
+        <td>{t('slack_notification_details.user_name_label')}</td>
         <td>{notification.config.user_name}</td>
       </tr>
       <tr>
-        <td>Notify Channel</td>
-        <td>{notification.config.notify_channel ? 'Yes' : 'No'}</td>
+        <td>{t('slack_notification_details.notify_channel_label')}</td>
+        <td>{notification.config.notify_channel ? t('slack_notification_summary.yes') : t('slack_notification_summary.no')}</td>
       </tr>
       <tr>
-        <td>Link Names</td>
-        <td>{notification.config.link_names ? 'Yes' : 'No'}</td>
+        <td>{t('slack_notification_details.link_names_label')}</td>
+        <td>{notification.config.link_names ? t('slack_notification_summary.yes') : t('slack_notification_summary.no')}</td>
       </tr>
       <tr>
-        <td>Icon URL</td>
+        <td>{t('slack_notification_details.icon_url_label')}</td>
         <td>{notification.config.icon_url}</td>
       </tr>
       <tr>
-        <td>Icon Emoji</td>
+        <td>{t('slack_notification_details.icon_emoji_label')}</td>
         <td>{notification.config.icon_emoji}</td>
       </tr>
     </CommonNotificationSummary>

@@ -15,29 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const WhoisAdapterDocumentation = (): React.ReactElement => {
+  const { t } = useTranslation('integrations');
   const style: React.CSSProperties = { marginBottom: 10 };
 
   return (
     <div>
-      <p style={style}>The whois IP lookup data adapter can request network ownership information for an IP address.</p>
+      <p style={style}>{t('whois_adapter_documentation.intro')}</p>
 
-      <h3 style={style}>Configuration</h3>
+      <h3 style={style}>{t('whois_adapter_documentation.configuration_title')}</h3>
 
-      <h5 style={style}>Connect timeout</h5>
+      <h5 style={style}>{t('whois_adapter_field_set.connect_timeout_label')}</h5>
 
-      <p style={style}>
-        The connection timeout for the socket to the whois server in milliseconds. If you set this to a high value, it
-        can affect your processing performance.
-      </p>
+      <p style={style}>{t('whois_adapter_documentation.connect_timeout_description')}</p>
 
-      <h5 style={style}>Read timeout</h5>
+      <h5 style={style}>{t('whois_adapter_field_set.read_timeout_label')}</h5>
 
-      <p style={style}>
-        The connection read timeout for the socket to the whois server in milliseconds. If you set this to a high value,
-        it can affect your processing performance.
-      </p>
+      <p style={style}>{t('whois_adapter_documentation.read_timeout_description')}</p>
     </div>
   );
 };

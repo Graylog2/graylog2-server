@@ -326,5 +326,196 @@
     "webhook_url_label": "Webhook URL",
     "adaptive_card_label": "Adaptive Card Template",
     "backlog_limit_label": "Message Backlog Limit"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "Configuration color",
+    "change_color_button": "Change color",
+    "color_help": "Choose a color to use for this configuration.",
+    "custom_message_help": "Custom message to be appended below the alert title. See <docsLink/> for more details.",
+    "docs_link_text": "docs",
+    "webhook_url_help": "Slack \"Incoming Webhook\" URL",
+    "channel_help": "Name of Slack #channel or @user for a direct message",
+    "custom_message_label": "Custom Message (optional)",
+    "time_zone_help": "Time zone used for timestamps in the notification body.",
+    "time_zone_label": "Time zone for date/time values",
+    "backlog_limit_label": "Message Backlog Limit (optional)",
+    "backlog_limit_help": "Limit the number of backlog messages sent as part of the Slack notification. If set to 0, no limit will be enforced.",
+    "user_name_label": "User Name (optional)",
+    "user_name_help": "User name of the sender in Slack",
+    "include_title_help": "Include the event definition title and description in the notification",
+    "notify_channel_help": "Notify all users in channel by adding @channel to the message",
+    "notify_here_label": "Notify Here",
+    "notify_here_help": "Notify active users in channel by adding @here to the message",
+    "link_names_help": "Find and link channel names and user names",
+    "icon_url_label": "Icon URL (optional)",
+    "icon_url_help": "Image to use as the icon for this message",
+    "icon_emoji_label": "Icon Emoji (optional)",
+    "icon_emoji_help": "Emoji to use as the icon for this message (overrides Icon URL)"
+  },
+  "event_procedure_checkbox": {
+    "label": "Include Event Procedure",
+    "help": "Append a formatted version of the event definition's event procedure to the end of the notification body."
+  },
+  "slack_notification_summary": {
+    "color_label": "Color",
+    "custom_message_label": "Custom Message",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "teams_notification_summary": {
+    "color_label": "Color",
+    "custom_message_label": "Custom Message"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams \"Incoming Webhook\" URL",
+    "backlog_limit_help": "Limit the number of backlog messages sent as part of the Microsoft Teams notification. If set to 0, no limit will be enforced."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Adaptive Card to post to Teams. See <docsLink/> for more details.",
+    "backlog_toggle_aria_label": "Enable message backlog limit"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "Routing Key",
+    "incident_title_label": "Incident Title",
+    "custom_incident_label": "Custom Incident",
+    "key_prefix_label": "Key Prefix",
+    "incident_key_label": "Incident Key",
+    "client_name_label": "Client Name",
+    "client_url_label": "Client URL"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "Routing Key",
+    "routing_key_help": "The Pager Duty integration Routing Key.",
+    "incident_title_label": "Incident Title",
+    "incident_title_help": "Custom title for the incident in Pager Duty. Will be the event title as shown in {{productName}} if not set.",
+    "custom_incident_label": "Use Custom Incident Key",
+    "custom_incident_help": "Generate a custom incident key.",
+    "key_prefix_label": "Incident Key Prefix",
+    "key_prefix_help": "Incident key prefix that will be followed by Stream(s) and the Event Definition title. Use Incident Key to customize entire key.",
+    "incident_key_label": "Incident Key",
+    "incident_key_help": "Full key to identify the incident. Will be used instead of prefix, if provided.",
+    "client_name_label": "Client Name",
+    "client_name_help": "The name of the {{productName}} system that is triggering the PagerDuty event.",
+    "client_url_label": "Client URL",
+    "client_url_help": "The URL of the {{productName}} system that is triggering the PagerDuty event."
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "Routing Key",
+    "incident_title_label": "Incident Title",
+    "default_value": "Default",
+    "use_custom_incident_key_label": "Use Custom Incident Key",
+    "yes": "Yes",
+    "no": "No",
+    "key_prefix_label": "Incident Key Prefix",
+    "incident_key_label": "Incident Key",
+    "client_name_label": "Client Name",
+    "client_url_label": "Client URL"
+  },
+  "threat_intel_plugin_config": {
+    "title": "Threat Intelligence Lookup Configuration",
+    "description": "Configuration for threat intelligence lookup plugin.",
+    "tor_exit_nodes_label": "Tor exit nodes:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "modal_title": "Update Threat Intelligence plugin Configuration",
+    "tor_checkbox_label": "Allow Tor exit node lookups?",
+    "tor_checkbox_help": "Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data.",
+    "spamhaus_checkbox_label": "Allow Spamhaus DROP/EDROP lookups?",
+    "spamhaus_checkbox_help": "Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "Deprecation Warning",
+    "deprecation_text": "The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used."
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "Domain blocklist",
+    "urls_blocklist": "URL blocklist",
+    "ips_blocklist": "IP blocklist",
+    "blocklist_type_label": "Blocklist type",
+    "blocklist_type_help": "Select the type of the abuse.ch ransomware blocklist",
+    "blocklist_type_placeholder": "Select the type of blocklist",
+    "refresh_blocklist_label": "Refresh blocklist",
+    "refresh_blocklist_help": "If enabled, the abuse.ch ransomware blocklist is refreshed when it changed."
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "Domain blocklist",
+    "urls_blocklist": "URL blocklist",
+    "ips_blocklist": "IP blocklist",
+    "blocklist_type_label": "Blocklist type",
+    "update_interval_label": "Update interval",
+    "deprecation_title": "Deprecation Warning",
+    "deprecation_text": "The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used."
+  },
+  "otx_adapter_documentation": {
+    "intro": "The AlienVault OTX data adapter uses the <otxLink>OTX API</otxLink> to lookup indicators for the given key.",
+    "configuration_title": "Configuration",
+    "indicator_title": "Indicator",
+    "indicator_description": "The OTX API offers several different indicators of compromise (IOCs). You have to select which indicator should be used for this data adapter.",
+    "ip_auto_detect": "The <code>IP Auto-Detect</code> indicator is not an official one. We added that to make it possible to auto-detect the IP address type to allow using the same data adapter for IP v4 and v6 addresses.",
+    "api_key_title": "OTX API Key",
+    "api_key_description": "The OTX API key is used to authenticate API requests. Requests also work if you don't enter an API key, but you will most probably get a smaller request limit. <strong>If you use this data adapter for production traffic, please register for an OTX account and get an API key.</strong>",
+    "api_url_title": "OTX API URL",
+    "api_url_description": "HTTP URL of the OTX API server. The default setting of <code>https://otx.alienvault.com</code> should not be changed except if you want to run some tests with a custom server.",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "This will set the <code>User-Agent</code> HTTP header for OTX API requests. You can modify this to include your contact details so the OTX API operators can contact you if there are problems with your API requests.",
+    "connection_timeout_title": "HTTP Connection Timeout",
+    "connection_timeout_description": "The HTTP connection timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API connection is slow, processing performance can be affected.",
+    "write_timeout_title": "HTTP Write Timeout",
+    "write_timeout_description": "The HTTP write timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API connection is slow, processing performance can be affected.",
+    "read_timeout_title": "HTTP Read Timeout",
+    "read_timeout_description": "The HTTP read timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API connection is slow, processing performance can be affected."
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP Auto-Detect",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "Domain",
+    "option_hostname": "Hostname",
+    "option_file": "File",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "Correlation-Rule",
+    "indicator_label": "Indicator",
+    "indicator_help": "The OTX indicator type that should be used for lookups.",
+    "indicator_placeholder": "Select indicator",
+    "api_key_label": "OTX API Key",
+    "api_key_help": "Your OTX API key.",
+    "api_url_label": "OTX API URL",
+    "api_url_help": "URL of the OTX API server.",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "The User-Agent header that should be used for the HTTP request.",
+    "connect_timeout_label": "HTTP Connect Timeout",
+    "connect_timeout_help": "HTTP connection timeout in milliseconds.",
+    "write_timeout_label": "HTTP Write Timeout",
+    "write_timeout_help": "HTTP write timeout in milliseconds.",
+    "read_timeout_label": "HTTP Read Timeout",
+    "read_timeout_help": "HTTP read timeout in milliseconds."
+  },
+  "otx_adapter_summary": {
+    "not_available": "n/a",
+    "unit_ms": "ms"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "No configuration required."
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "No configuration necessary"
+  },
+  "whois_adapter_documentation": {
+    "intro": "The whois IP lookup data adapter can request network ownership information for an IP address.",
+    "configuration_title": "Configuration",
+    "connect_timeout_description": "The connection timeout for the socket to the whois server in milliseconds. If you set this to a high value, it can affect your processing performance.",
+    "read_timeout_description": "The connection read timeout for the socket to the whois server in milliseconds. If you set this to a high value, it can affect your processing performance."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Connect timeout",
+    "connect_timeout_help": "WHOIS connection timeout in milliseconds.",
+    "read_timeout_label": "Read timeout",
+    "read_timeout_help": "WHOIS connection read timeout in milliseconds."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
   }
 }

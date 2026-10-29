@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
@@ -30,15 +31,17 @@ type Props = {
 };
 
 const WhoisAdapterFieldSet = ({ config, handleFormEvent, validationMessage, validationState }: Props) => {
+  const { t } = useTranslation('integrations');
+
   <fieldset>
     <Input
       type="number"
       id="connect_timeout"
       name="connect_timeout"
-      label="Connect timeout"
+      label={t('whois_adapter_field_set.connect_timeout_label')}
       required
       onChange={handleFormEvent}
-      help={validationMessage('connect_timeout', 'WHOIS connection timeout in milliseconds.')}
+      help={validationMessage('connect_timeout', t('whois_adapter_field_set.connect_timeout_help'))}
       bsStyle={validationState('connect_timeout')}
       value={config.connect_timeout}
       labelClassName="col-sm-3"
@@ -48,10 +51,10 @@ const WhoisAdapterFieldSet = ({ config, handleFormEvent, validationMessage, vali
       type="number"
       id="read_timeout"
       name="read_timeout"
-      label="Read timeout"
+      label={t('whois_adapter_field_set.read_timeout_label')}
       required
       onChange={handleFormEvent}
-      help={validationMessage('read_timeout', 'WHOIS connection read timeout in milliseconds.')}
+      help={validationMessage('read_timeout', t('whois_adapter_field_set.read_timeout_help'))}
       bsStyle={validationState('read_timeout')}
       value={config.read_timeout}
       labelClassName="col-sm-3"

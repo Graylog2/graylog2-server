@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
@@ -36,6 +37,7 @@ const defaultConfig = {
 };
 
 const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, updateConfig }: Props) => {
+  const { t } = useTranslation('integrations');
   const [showModal, setShowModal] = useState(false);
   const [config, setConfig] = useState<Config>(ObjectUtils.clone(initialConfig));
   const sendTelemetry = useSendTelemetry('threat-intel');
@@ -78,36 +80,44 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
 
   return (
     <div>
-      <h3>Threat Intelligence Lookup Configuration</h3>
+      <h3>{t('threat_intel_plugin_config.title')}</h3>
 
-      <p>Configuration for threat intelligence lookup plugin.</p>
+      <p>{t('threat_intel_plugin_config.description')}</p>
 
       <dl className="deflist">
-        <dt>Tor exit nodes:</dt>
-        <dd>{config.tor_enabled === true ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('threat_intel_plugin_config.tor_exit_nodes_label')}</dt>
+        <dd>
+          {config.tor_enabled === true
+            ? t('threat_intel_plugin_config.enabled')
+            : t('threat_intel_plugin_config.disabled')}
+        </dd>
 
-        <dt>Spamhaus:</dt>
-        <dd>{config.spamhaus_enabled === true ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('threat_intel_plugin_config.spamhaus_label')}</dt>
+        <dd>
+          {config.spamhaus_enabled === true
+            ? t('threat_intel_plugin_config.enabled')
+            : t('threat_intel_plugin_config.disabled')}
+        </dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={_openModal}>
-          Edit configuration
+          {t('aws_plugin_configuration.edit_configuration')}
         </Button>
       </IfPermitted>
 
       <BootstrapModalForm
         show={showModal}
-        title="Update Threat Intelligence plugin Configuration"
+        title={t('threat_intel_plugin_config.modal_title')}
         onSubmitForm={_saveConfig}
         onCancel={_resetConfig}
-        submitButtonText="Update configuration">
+        submitButtonText={t('aws_plugin_configuration.submit_configuration')}>
         <fieldset>
           <Input
             type="checkbox"
             id="tor-checkbox"
-            label="Allow Tor exit node lookups?"
-            help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
+            label={t('threat_intel_plugin_config.tor_checkbox_label')}
+            help={t('threat_intel_plugin_config.tor_checkbox_help')}
             name="tor_enabled"
             checked={config.tor_enabled}
             onChange={_onCheckboxClick}
@@ -116,8 +126,8 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
           <Input
             type="checkbox"
             id="spamhaus-checkbox"
-            label="Allow Spamhaus DROP/EDROP lookups?"
-            help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
+            label={t('threat_intel_plugin_config.spamhaus_checkbox_label')}
+            help={t('threat_intel_plugin_config.spamhaus_checkbox_help')}
             name="spamhaus_enabled"
             checked={config.spamhaus_enabled}
             onChange={_onCheckboxClick}

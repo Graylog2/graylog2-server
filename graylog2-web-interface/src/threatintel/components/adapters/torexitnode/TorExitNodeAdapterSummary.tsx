@@ -15,7 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const TorExitNodeAdapterSummary = (): React.ReactElement => <i>No configuration necessary</i>;
+const TorExitNodeAdapterSummary = (): React.ReactElement => {
+  const { t } = useTranslation('integrations');
+
+  return <i>{t('tor_exit_node_adapter_summary.no_configuration')}</i>;
+};
 
 export default TorExitNodeAdapterSummary;

@@ -15,15 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
-const AbuseChRansomAdapterDocumentation = (): React.ReactElement => (
-  <div>
-    <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-      <p>The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used.</p>
-    </Alert>
-  </div>
-);
+const AbuseChRansomAdapterDocumentation = (): React.ReactElement => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <div>
+      <Alert style={{ marginBottom: 10 }} bsStyle="warning" title={t('abusech_ransom_adapter_documentation.deprecation_title')}>
+        <p>{t('abusech_ransom_adapter_documentation.deprecation_text')}</p>
+      </Alert>
+    </div>
+  );
+};
 
 export default AbuseChRansomAdapterDocumentation;

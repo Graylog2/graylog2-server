@@ -15,11 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const SpamhausEDROPAdapterSummary = (): React.ReactElement => (
-  <dl>
-    <i>No configuration required.</i>
-  </dl>
-);
+const SpamhausEDROPAdapterSummary = (): React.ReactElement => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <dl>
+      <i>{t('spamhaus_edrop_adapter_summary.no_configuration')}</i>
+    </dl>
+  );
+};
 
 export default SpamhausEDROPAdapterSummary;

@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import type { SlackConfigType, SlackValidationType } from 'integrations/event-notifications/types';
@@ -42,6 +43,7 @@ type EventProcedureCheckboxProps = {
 };
 
 function EventProcedureCheckbox({ checked, onChange, validation }: EventProcedureCheckboxProps) {
+  const { t } = useTranslation('integrations');
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -52,11 +54,8 @@ function EventProcedureCheckbox({ checked, onChange, validation }: EventProcedur
     <Input
       id="include_event_procedure"
       name="include_event_procedure"
-      label="Include Event Procedure"
-      help={
-        validation?.errors?.include_event_procedure?.[0] ||
-        "Append a formatted version of the event definition's event procedure to the end of the notification body."
-      }
+      label={t('event_procedure_checkbox.label')}
+      help={validation?.errors?.include_event_procedure?.[0] || t('event_procedure_checkbox.help')}
       type="checkbox"
       checked={checked}
       onChange={onChange}
@@ -117,6 +116,7 @@ type Props = {
 };
 
 const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
+  const { t } = useTranslation('integrations');
   const defaultBacklogSize = config.backlog_size;
   const [isBacklogSizeEnabled, setIsBacklogSizeEnabled] = useState(defaultBacklogSize > 0);
   const [backlogSize, setBacklogSize] = useState(defaultBacklogSize);
@@ -160,15 +160,20 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
 
   const element = (
     <p>
-      Custom message to be appended below the alert title. See{' '}
-      <DocumentationLink text="docs" page="alerts#notifications" /> for more details.
+      <Trans
+        t={t}
+        i18nKey="slack_notification_form.custom_message_help"
+        components={{
+          docsLink: <DocumentationLink text={t('slack_notification_form.docs_link_text')} page="alerts#notifications" />,
+        }}
+      />
     </p>
   );
 
   return (
     <>
       <FormGroup controlId="color">
-        <ControlLabel>Configuration color</ControlLabel>
+        <ControlLabel>{t('slack_notification_form.configuration_color_label')}</ControlLabel>
         <div>
           <ColorLabel color={config.color} />
           <div style={{ display: 'inline-block', marginLeft: 15 }}>
@@ -176,20 +181,20 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
               id="color"
               color={config.color || '#f06292'}
               placement="right"
-              triggerNode={<Button bsSize="xsmall">Change color</Button>}
+              triggerNode={<Button bsSize="xsmall">{t('slack_notification_form.change_color_button')}</Button>}
               onChange={handleColorChange}
             />
           </div>
         </div>
-        <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
+        <HelpBlock>{t('slack_notification_form.color_help')}</HelpBlock>
       </FormGroup>
       <Input
         id="notification-webhookUrl"
         name="webhook_url"
-        label="Webhook URL"
+        label={t('slack_notification_details.webhook_url_label')}
         type="text"
         bsStyle={validation.errors.webhook_url ? 'error' : null}
-        help={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
+        help={validation?.errors?.webhook_url?.[0] || t('slack_notification_form.webhook_url_help')}
         value={config.webhook_url || ''}
         onChange={handleChange}
         required
@@ -197,10 +202,10 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
       <Input
         id="notification-channel"
         name="channel"
-        label="Channel"
+        label={t('slack_notification_details.channel_label')}
         type="text"
         bsStyle={validation.errors.channel ? 'error' : null}
-        help={validation?.errors?.channel?.[0] || 'Name of Slack #channel or @user for a direct message'}
+        help={validation?.errors?.channel?.[0] || t('slack_notification_form.channel_help')}
         value={config.channel || ''}
         onChange={handleChange}
         required
@@ -208,7 +213,7 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
       <Input
         id="notification-customMessage"
         name="custom_message"
-        label="Custom Message (optional)"
+        label={t('slack_notification_form.custom_message_label')}
         type="textarea"
         bsStyle={validation.errors.custom_message ? 'error' : null}
         help={validation?.errors?.custom_message?.[0] || element}
@@ -222,8 +227,8 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
       />
       <Input
         id="notification-time-zone"
-        help="Time zone used for timestamps in the notification body."
-        label="Time zone for date/time values">
+        help={t('slack_notification_form.time_zone_help')}
+        label={t('slack_notification_form.time_zone_label')}>
         <TimezoneSelect
           className="timezone-select"
           name="time_zone"
@@ -233,7 +238,7 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
         />
       </Input>
       <FormGroup>
-        <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
+        <ControlLabel>{t('slack_notification_form.backlog_limit_label')}</ControlLabel>
         <InputGroup>
           <InputGroup.Addon>
             <input
@@ -254,18 +259,17 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
           />
         </InputGroup>
         <HelpBlock>
-          Limit the number of backlog messages sent as part of the Slack notification. If set to 0, no limit will be
-          enforced.
+          {t('slack_notification_form.backlog_limit_help')}
         </HelpBlock>
       </FormGroup>
 
       <Input
         id="notification-userName"
         name="user_name"
-        label="User Name (optional)"
+        label={t('slack_notification_form.user_name_label')}
         type="text"
         bsStyle={validation.errors.user_name ? 'error' : null}
-        help={validation?.errors?.user_name?.[0] || 'User name of the sender in Slack'}
+        help={validation?.errors?.user_name?.[0] || t('slack_notification_form.user_name_help')}
         value={config.user_name || ''}
         onChange={handleChange}
       />
@@ -274,12 +278,9 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
           <Input
             id="include_title"
             name="include_title"
-            label="Include Title"
+            label={t('slack_notification_details.include_title_label')}
             bsStyle={validation.errors.include_title ? 'error' : null}
-            help={
-              validation?.errors?.include_title?.[0] ||
-              'Include the event definition title and description in the notification'
-            }
+            help={validation?.errors?.include_title?.[0] || t('slack_notification_form.include_title_help')}
             type="checkbox"
             checked={config.include_title}
             onChange={handleChange}
@@ -289,12 +290,10 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
           <Input
             id="notification-notifyChannel"
             name="notify_channel"
-            label="Notify Channel"
+            label={t('slack_notification_details.notify_channel_label')}
             type="checkbox"
             bsStyle={validation.errors.notify_channel ? 'error' : null}
-            help={
-              validation?.errors?.notify_channel?.[0] || 'Notify all users in channel by adding @channel to the message'
-            }
+            help={validation?.errors?.notify_channel?.[0] || t('slack_notification_form.notify_channel_help')}
             checked={config.notify_channel ?? false}
             onChange={handleChange}
           />
@@ -303,12 +302,10 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
           <Input
             id="notification-notifyHere"
             name="notify_here"
-            label="Notify Here"
+            label={t('slack_notification_form.notify_here_label')}
             type="checkbox"
             bsStyle={validation.errors.notify_here ? 'error' : null}
-            help={
-              validation?.errors?.notify_here?.[0] || 'Notify active users in channel by adding @here to the message'
-            }
+            help={validation?.errors?.notify_here?.[0] || t('slack_notification_form.notify_here_help')}
             checked={config.notify_here ?? false}
             onChange={handleChange}
           />
@@ -317,30 +314,30 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
       <Input
         id="notification-linkNames"
         name="link_names"
-        label="Link Names"
+        label={t('slack_notification_details.link_names_label')}
         type="checkbox"
         bsStyle={validation.errors.link_names ? 'error' : null}
-        help={validation?.errors?.link_names?.[0] || 'Find and link channel names and user names'}
+        help={validation?.errors?.link_names?.[0] || t('slack_notification_form.link_names_help')}
         checked={!!config.link_names}
         onChange={handleChange}
       />
       <Input
         id="notification-iconUrl"
         name="icon_url"
-        label="Icon URL (optional)"
+        label={t('slack_notification_form.icon_url_label')}
         type="text"
         bsStyle={validation.errors.icon_url ? 'error' : null}
-        help={validation?.errors?.icon_url?.[0] || 'Image to use as the icon for this message'}
+        help={validation?.errors?.icon_url?.[0] || t('slack_notification_form.icon_url_help')}
         value={config.icon_url || ''}
         onChange={handleChange}
       />
       <Input
         id="notification-iconEmoji"
         name="icon_emoji"
-        label="Icon Emoji (optional)"
+        label={t('slack_notification_form.icon_emoji_label')}
         type="text"
         bsStyle={validation.errors.icon_emoji ? 'error' : null}
-        help={validation?.errors?.icon_emoji?.[0] || 'Emoji to use as the icon for this message (overrides Icon URL)'}
+        help={validation?.errors?.icon_emoji?.[0] || t('slack_notification_form.icon_emoji_help')}
         value={config.icon_emoji || ''}
         onChange={handleChange}
       />

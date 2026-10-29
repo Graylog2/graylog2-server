@@ -16,76 +16,73 @@
  */
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ExternalLink } from 'components/common';
 
 const style: React.CSSProperties = { marginBottom: 10 };
 
-const OTXAdapterDocumentation = (): React.ReactElement => (
-  <div>
-    <p style={style}>
-      The AlienVault OTX data adapter uses the{' '}
-      <ExternalLink href="https://otx.alienvault.com/api">OTX API</ExternalLink> to lookup indicators for the given key.
-    </p>
+const OTXAdapterDocumentation = (): React.ReactElement => {
+  const { t } = useTranslation('integrations');
 
-    <h3 style={style}>Configuration</h3>
+  return (
+    <div>
+      <p style={style}>
+        <Trans
+          t={t}
+          i18nKey="otx_adapter_documentation.intro"
+          components={{ otxLink: <ExternalLink href="https://otx.alienvault.com/api" /> }}
+        />
+      </p>
 
-    <h5 style={style}>Indicator</h5>
+      <h3 style={style}>{t('otx_adapter_documentation.configuration_title')}</h3>
 
-    <p style={style}>
-      The OTX API offers several different indicators of compromise (IOCs). You have to select which indicator should be
-      used for this data adapter.
-    </p>
-    <p style={style}>
-      The <code>IP Auto-Detect</code> indicator is not an official one. We added that to make it possible to auto-detect
-      the IP address type to allow using the same data adapter for IP v4 and v6 addresses.
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.indicator_title')}</h5>
 
-    <h5 style={style}>OTX API Key</h5>
+      <p style={style}>{t('otx_adapter_documentation.indicator_description')}</p>
+      <p style={style}>
+        <Trans
+          t={t}
+          i18nKey="otx_adapter_documentation.ip_auto_detect"
+          components={{ code: <code /> }}
+        />
+      </p>
 
-    <p style={style}>
-      The OTX API key is used to authenticate API requests. Requests also work if you don't enter an API key, but you
-      will most probably get a smaller request limit.{' '}
-      <strong>
-        If you use this data adapter for production traffic, please register for an OTX account and get an API key.
-      </strong>
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.api_key_title')}</h5>
 
-    <h5 style={style}>OTX API URL</h5>
+      <p style={style}>
+        <Trans
+          t={t}
+          i18nKey="otx_adapter_documentation.api_key_description"
+          components={{ strong: <strong /> }}
+        />
+      </p>
 
-    <p style={style}>
-      HTTP URL of the OTX API server. The default setting of <code>https://otx.alienvault.com</code> should not be
-      changed except if you want to run some tests with a custom server.
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.api_url_title')}</h5>
 
-    <h5 style={style}>HTTP User-Agent</h5>
+      <p style={style}>
+        <Trans t={t} i18nKey="otx_adapter_documentation.api_url_description" components={{ code: <code /> }} />
+      </p>
 
-    <p style={style}>
-      This will set the <code>User-Agent</code> HTTP header for OTX API requests. You can modify this to include your
-      contact details so the OTX API operators can contact you if there are problems with your API requests.
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.user_agent_title')}</h5>
 
-    <h5 style={style}>HTTP Connection Timeout</h5>
+      <p style={style}>
+        <Trans t={t} i18nKey="otx_adapter_documentation.user_agent_description" components={{ code: <code /> }} />
+      </p>
 
-    <p style={style}>
-      The HTTP connection timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX
-      API connection is slow, processing performance can be affected.
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.connection_timeout_title')}</h5>
 
-    <h5 style={style}>HTTP Write Timeout</h5>
+      <p style={style}>{t('otx_adapter_documentation.connection_timeout_description')}</p>
 
-    <p style={style}>
-      The HTTP write timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API
-      connection is slow, processing performance can be affected.
-    </p>
+      <h5 style={style}>{t('otx_adapter_documentation.write_timeout_title')}</h5>
 
-    <h5 style={style}>HTTP Read Timeout</h5>
+      <p style={style}>{t('otx_adapter_documentation.write_timeout_description')}</p>
 
-    <p style={style}>
-      The HTTP read timeout in milliseconds for the OTX API request. If you set this to a high value and the OTX API
-      connection is slow, processing performance can be affected.
-    </p>
-  </div>
-);
+      <h5 style={style}>{t('otx_adapter_documentation.read_timeout_title')}</h5>
+
+      <p style={style}>{t('otx_adapter_documentation.read_timeout_description')}</p>
+    </div>
+  );
+};
 
 export default OTXAdapterDocumentation;

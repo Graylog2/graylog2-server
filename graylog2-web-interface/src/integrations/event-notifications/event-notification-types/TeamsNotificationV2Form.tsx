@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
@@ -145,6 +146,7 @@ export const defaultConfig: ConfigV2Type = {
 };
 
 const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotificationFormV2Type) => {
+  const { t } = useTranslation('integrations');
   const defaultBacklogSize = config.backlog_size;
   const [isBacklogSizeEnabled, setIsBacklogSizeEnabled] = useState(defaultBacklogSize > 0);
   const [backlogSize, setBacklogSize] = useState(defaultBacklogSize);
@@ -182,23 +184,30 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
 
   const element = (
     <p>
-      Adaptive Card to post to Teams. See <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more
-      details.
+      <Trans
+        t={t}
+        i18nKey="teams_notification_v2_form.adaptive_card_help"
+        components={{
+          docsLink: (
+            <DocumentationLink page={DocsHelper.PAGES.ALERTS} text={t('slack_notification_form.docs_link_text')} />
+          ),
+        }}
+      />
     </p>
   );
 
   return (
     <>
       <URLAllowListInput
-        label="Webhook URL"
+        label={t('teams_notification_v2_details.webhook_url_label')}
         onChange={handleWebhookUrlChange}
         validationState={validation.errors.webhook_url ? 'error' : null}
-        validationMessage={validation?.errors?.webhook_url?.[0] ?? 'Teams "Incoming Webhook" URL'}
+        validationMessage={validation?.errors?.webhook_url?.[0] ?? t('teams_notification_form.webhook_url_help')}
         url={config.webhook_url || ''}
         autofocus={false}
       />
       <FormGroup>
-        <ControlLabel>Adaptive Card Template</ControlLabel>
+        <ControlLabel>{t('teams_notification_v2_details.adaptive_card_label')}</ControlLabel>
         <SourceCodeEditor
           id="notification-adaptiveCard"
           mode="text"
@@ -210,12 +219,12 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
         <HelpBlock>{validation?.errors?.adaptive_card?.[0] ?? element}</HelpBlock>
       </FormGroup>
       <FormGroup>
-        <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
+        <ControlLabel>{t('slack_notification_form.backlog_limit_label')}</ControlLabel>
         <InputGroup>
           <InputGroup.Addon>
             <input
               id="toggle_backlog_size"
-              aria-label="Enable message backlog limit"
+              aria-label={t('teams_notification_v2_form.backlog_toggle_aria_label')}
               type="checkbox"
               checked={isBacklogSizeEnabled}
               onChange={toggleBacklogSize}
@@ -232,8 +241,7 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
           />
         </InputGroup>
         <HelpBlock>
-          Limit the number of backlog messages sent as part of the Microsoft Teams notification. If set to 0, no limit
-          will be enforced.
+          {t('teams_notification_form.backlog_limit_help')}
         </HelpBlock>
       </FormGroup>
     </>

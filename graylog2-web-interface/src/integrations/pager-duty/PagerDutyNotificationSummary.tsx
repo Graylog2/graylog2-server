@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 
@@ -29,29 +30,35 @@ type PagerDutyNotificationSummaryProps = {
 };
 
 function PagerDutyNotificationSummary({ notification, ...restProps }: PagerDutyNotificationSummaryProps) {
+  const { t } = useTranslation('integrations');
+
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
-        <td>Routing Key</td>
+        <td>{t('pager_duty_notification_summary.routing_key_label')}</td>
         <td>
           <code>{notification?.config?.routing_key}</code>
         </td>
       </tr>
       <tr>
-        <td>Incident Title</td>
+        <td>{t('pager_duty_notification_summary.incident_title_label')}</td>
         <td>
-          <code>{notification?.config?.pager_duty_title ?? 'Default'}</code>
+          <code>{notification?.config?.pager_duty_title ?? t('pager_duty_notification_summary.default_value')}</code>
         </td>
       </tr>
       <tr>
-        <td>Use Custom Incident Key</td>
+        <td>{t('pager_duty_notification_summary.use_custom_incident_key_label')}</td>
         <td>
-          <code>{notification?.config?.custom_incident ? 'Yes' : 'No'}</code>
+          <code>
+            {notification?.config?.custom_incident
+              ? t('pager_duty_notification_summary.yes')
+              : t('pager_duty_notification_summary.no')}
+          </code>
         </td>
       </tr>
       {notification?.config?.custom_incident && notification?.config?.key_prefix && (
         <tr>
-          <td>Incident Key Prefix</td>
+          <td>{t('pager_duty_notification_summary.key_prefix_label')}</td>
           <td>
             <code>{notification?.config?.key_prefix}</code>
           </td>
@@ -59,20 +66,20 @@ function PagerDutyNotificationSummary({ notification, ...restProps }: PagerDutyN
       )}
       {notification?.config?.custom_incident && notification?.config?.incident_key && (
         <tr>
-          <td>Incident Key</td>
+          <td>{t('pager_duty_notification_summary.incident_key_label')}</td>
           <td>
             <code>{notification?.config?.incident_key}</code>
           </td>
         </tr>
       )}
       <tr>
-        <td>Client Name</td>
+        <td>{t('pager_duty_notification_summary.client_name_label')}</td>
         <td>
           <code>{notification?.config?.client_name}</code>
         </td>
       </tr>
       <tr>
-        <td>Client URL</td>
+        <td>{t('pager_duty_notification_summary.client_url_label')}</td>
         <td>
           <code>{notification?.config?.client_url}</code>
         </td>

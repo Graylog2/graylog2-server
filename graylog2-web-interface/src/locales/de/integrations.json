@@ -326,5 +326,196 @@
     "webhook_url_label": "Webhook-URL",
     "adaptive_card_label": "Adaptive-Card-Vorlage",
     "backlog_limit_label": "Nachrichten-Backlog-Limit"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "Konfigurationsfarbe",
+    "change_color_button": "Farbe ändern",
+    "color_help": "Wählen Sie eine Farbe für diese Konfiguration aus.",
+    "custom_message_help": "Benutzerdefinierte Nachricht, die unter dem Alarm-Titel angehängt wird. Weitere Informationen finden Sie in der <docsLink/>.",
+    "docs_link_text": "Dokumentation",
+    "webhook_url_help": "Slack-„Incoming Webhook“-URL",
+    "channel_help": "Name des Slack-#channels oder @Benutzers für eine Direktnachricht",
+    "custom_message_label": "Benutzerdefinierte Nachricht (optional)",
+    "time_zone_help": "Zeitzone für Zeitstempel im Nachrichtentext.",
+    "time_zone_label": "Zeitzone für Datums- und Zeitwerte",
+    "backlog_limit_label": "Nachrichten-Backlog-Limit (optional)",
+    "backlog_limit_help": "Begrenzt die Anzahl der Backlog-Nachrichten, die Teil der Slack-Benachrichtigung sind. Bei 0 gibt es keine Begrenzung.",
+    "user_name_label": "Benutzername (optional)",
+    "user_name_help": "Benutzername des Absenders in Slack",
+    "include_title_help": "Titel und Beschreibung der Ereignisdefinition in die Benachrichtigung aufnehmen",
+    "notify_channel_help": "Alle Benutzer im Kanal benachrichtigen, indem @channel zur Nachricht hinzugefügt wird",
+    "notify_here_label": "Hier benachrichtigen",
+    "notify_here_help": "Aktive Benutzer im Kanal benachrichtigen, indem @here zur Nachricht hinzugefügt wird",
+    "link_names_help": "Kanal- und Benutzernamen finden und verlinken",
+    "icon_url_label": "Symbol-URL (optional)",
+    "icon_url_help": "Bild, das als Symbol für diese Nachricht verwendet wird",
+    "icon_emoji_label": "Symbol-Emoji (optional)",
+    "icon_emoji_help": "Emoji, das als Symbol für diese Nachricht verwendet wird (überschreibt die Symbol-URL)"
+  },
+  "event_procedure_checkbox": {
+    "label": "Ereignisprozedur einschließen",
+    "help": "Eine formatierte Version der Ereignisprozedur der Ereignisdefinition am Ende des Nachrichtentextes anhängen."
+  },
+  "slack_notification_summary": {
+    "color_label": "Farbe",
+    "custom_message_label": "Benutzerdefinierte Nachricht",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "teams_notification_summary": {
+    "color_label": "Farbe",
+    "custom_message_label": "Benutzerdefinierte Nachricht"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams-„Incoming Webhook“-URL",
+    "backlog_limit_help": "Begrenzt die Anzahl der Backlog-Nachrichten, die Teil der Microsoft-Teams-Benachrichtigung sind. Bei 0 gibt es keine Begrenzung."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Adaptive Card, die in Teams gepostet wird. Weitere Informationen finden Sie in der <docsLink/>.",
+    "backlog_toggle_aria_label": "Nachrichten-Backlog-Limit aktivieren"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "Routing Key",
+    "incident_title_label": "Incident-Titel",
+    "custom_incident_label": "Benutzerdefinierter Incident",
+    "key_prefix_label": "Key-Präfix",
+    "incident_key_label": "Incident-Key",
+    "client_name_label": "Client-Name",
+    "client_url_label": "Client-URL"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "Routing Key",
+    "routing_key_help": "Der Routing Key der Pager-Duty-Integration.",
+    "incident_title_label": "Incident-Titel",
+    "incident_title_help": "Benutzerdefinierter Titel für den Incident in Pager Duty. Ist keiner angegeben, wird der Ereignistitel verwendet, wie er in {{productName}} angezeigt wird.",
+    "custom_incident_label": "Benutzerdefinierten Incident-Key verwenden",
+    "custom_incident_help": "Einen benutzerdefinierten Incident-Key generieren.",
+    "key_prefix_label": "Incident-Key-Präfix",
+    "key_prefix_help": "Incident-Key-Präfix, dem die Stream(s) und der Titel der Ereignisdefinition folgen. Verwenden Sie den Incident-Key, um den gesamten Schlüssel anzupassen.",
+    "incident_key_label": "Incident-Key",
+    "incident_key_help": "Vollständiger Schlüssel zur Identifikation des Incidents. Wird anstelle des Präfixes verwendet, sofern angegeben.",
+    "client_name_label": "Client-Name",
+    "client_name_help": "Der Name des {{productName}}-Systems, das das PagerDuty-Ereignis auslöst.",
+    "client_url_label": "Client-URL",
+    "client_url_help": "Die URL des {{productName}}-Systems, das das PagerDuty-Ereignis auslöst."
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "Routing Key",
+    "incident_title_label": "Incident-Titel",
+    "default_value": "Standard",
+    "use_custom_incident_key_label": "Benutzerdefinierten Incident-Key verwenden",
+    "yes": "Ja",
+    "no": "Nein",
+    "key_prefix_label": "Incident-Key-Präfix",
+    "incident_key_label": "Incident-Key",
+    "client_name_label": "Client-Name",
+    "client_url_label": "Client-URL"
+  },
+  "threat_intel_plugin_config": {
+    "title": "Threat-Intelligence-Lookup-Konfiguration",
+    "description": "Konfiguration für das Plugin für Threat-Intelligence-Abfragen.",
+    "tor_exit_nodes_label": "Tor-Exit-Nodes:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "modal_title": "Konfiguration des Threat-Intelligence-Plugins aktualisieren",
+    "tor_checkbox_label": "Tor-Exit-Node-Abfragen zulassen?",
+    "tor_checkbox_help": "Aktivieren, um Tor-Exit-Node-Abfragen in die globale Pipeline-Funktion aufzunehmen. Deaktivieren beendet außerdem die Aktualisierung der Daten.",
+    "spamhaus_checkbox_label": "Spamhaus-DROP/EDROP-Abfragen zulassen?",
+    "spamhaus_checkbox_help": "Aktivieren, um Spamhaus-Abfragen in die globale Pipeline-Funktion aufzunehmen. Deaktivieren beendet außerdem die Aktualisierung der Daten."
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "Warnung: Veraltet",
+    "deprecation_text": "Der abuse.ch Ransomware Tracker wurde am 08.12.2019 eingestellt. Dieser Data Adapter sollte nicht mehr verwendet werden."
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "Domain-Blocklist",
+    "urls_blocklist": "URL-Blocklist",
+    "ips_blocklist": "IP-Blocklist",
+    "blocklist_type_label": "Blocklist-Typ",
+    "blocklist_type_help": "Wählen Sie den Typ der abuse.ch-Ransomware-Blocklist aus",
+    "blocklist_type_placeholder": "Typ der Blocklist auswählen",
+    "refresh_blocklist_label": "Blocklist aktualisieren",
+    "refresh_blocklist_help": "Wenn aktiviert, wird die abuse.ch-Ransomware-Blocklist aktualisiert, sobald sie sich geändert hat."
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "Domain-Blocklist",
+    "urls_blocklist": "URL-Blocklist",
+    "ips_blocklist": "IP-Blocklist",
+    "blocklist_type_label": "Blocklist-Typ",
+    "update_interval_label": "Aktualisierungsintervall",
+    "deprecation_title": "Warnung: Veraltet",
+    "deprecation_text": "Der abuse.ch Ransomware Tracker wurde am 08.12.2019 eingestellt. Dieser Data Adapter sollte nicht mehr verwendet werden."
+  },
+  "otx_adapter_documentation": {
+    "intro": "Der AlienVault-OTX-Data-Adapter verwendet die <otxLink>OTX API</otxLink>, um Indikatoren für den angegebenen Schlüssel abzufragen.",
+    "configuration_title": "Konfiguration",
+    "indicator_title": "Indikator",
+    "indicator_description": "Die OTX API bietet mehrere verschiedene Indicators of Compromise (IOCs). Sie müssen auswählen, welcher Indikator für diesen Data Adapter verwendet werden soll.",
+    "ip_auto_detect": "Der Indikator <code>IP Auto-Detect</code> ist kein offizieller Indikator. Wir haben ihn hinzugefügt, damit der IP-Adresstyp automatisch erkannt werden kann und derselbe Data Adapter für IPv4- und IPv6-Adressen verwendet werden kann.",
+    "api_key_title": "OTX-API-Schlüssel",
+    "api_key_description": "Der OTX-API-Schlüssel wird zur Authentifizierung von API-Anfragen verwendet. Anfragen funktionieren auch ohne API-Schlüssel, allerdings gilt dann meist ein kleineres Anfragelimit. <strong>Wenn Sie diesen Data Adapter für Produktivverkehr verwenden, registrieren Sie sich bitte für ein OTX-Konto und erstellen Sie einen API-Schlüssel.</strong>",
+    "api_url_title": "OTX-API-URL",
+    "api_url_description": "HTTP-URL des OTX-API-Servers. Die Standardeinstellung <code>https://otx.alienvault.com</code> sollte nicht geändert werden, außer Sie möchten Tests mit einem eigenen Server durchführen.",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "Legt den HTTP-Header <code>User-Agent</code> für OTX-API-Anfragen fest. Sie können ihn um Ihre Kontaktdaten erweitern, damit die Betreiber der OTX API Sie bei Problemen mit Ihren API-Anfragen kontaktieren können.",
+    "connection_timeout_title": "HTTP-Verbindungs-Timeout",
+    "connection_timeout_description": "Das HTTP-Verbindungs-Timeout in Millisekunden für die OTX-API-Anfrage. Wenn Sie diesen Wert hoch einstellen und die Verbindung zur OTX API langsam ist, kann die Verarbeitungsleistung beeinträchtigt werden.",
+    "write_timeout_title": "HTTP-Schreib-Timeout",
+    "write_timeout_description": "Das HTTP-Schreib-Timeout in Millisekunden für die OTX-API-Anfrage. Wenn Sie diesen Wert hoch einstellen und die Verbindung zur OTX API langsam ist, kann die Verarbeitungsleistung beeinträchtigt werden.",
+    "read_timeout_title": "HTTP-Lese-Timeout",
+    "read_timeout_description": "Das HTTP-Lese-Timeout in Millisekunden für die OTX-API-Anfrage. Wenn Sie diesen Wert hoch einstellen und die Verbindung zur OTX API langsam ist, kann die Verarbeitungsleistung beeinträchtigt werden."
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP-Auto-Erkennung",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "Domain",
+    "option_hostname": "Hostname",
+    "option_file": "Datei",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "Correlation-Rule",
+    "indicator_label": "Indikator",
+    "indicator_help": "Der OTX-Indikatortyp, der für Abfragen verwendet werden soll.",
+    "indicator_placeholder": "Indikator auswählen",
+    "api_key_label": "OTX-API-Schlüssel",
+    "api_key_help": "Ihr OTX-API-Schlüssel.",
+    "api_url_label": "OTX-API-URL",
+    "api_url_help": "URL des OTX-API-Servers.",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "Der User-Agent-Header, der für die HTTP-Anfrage verwendet werden soll.",
+    "connect_timeout_label": "HTTP-Verbindungs-Timeout",
+    "connect_timeout_help": "HTTP-Verbindungs-Timeout in Millisekunden.",
+    "write_timeout_label": "HTTP-Schreib-Timeout",
+    "write_timeout_help": "HTTP-Schreib-Timeout in Millisekunden.",
+    "read_timeout_label": "HTTP-Lese-Timeout",
+    "read_timeout_help": "HTTP-Lese-Timeout in Millisekunden."
+  },
+  "otx_adapter_summary": {
+    "not_available": "k. A.",
+    "unit_ms": "ms"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "Keine Konfiguration erforderlich."
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "Keine Konfiguration erforderlich"
+  },
+  "whois_adapter_documentation": {
+    "intro": "Der Whois-IP-Lookup-Data-Adapter kann Informationen zum Netzwerkbesitz für eine IP-Adresse abfragen.",
+    "configuration_title": "Konfiguration",
+    "connect_timeout_description": "Das Verbindungs-Timeout für den Socket zum Whois-Server in Millisekunden. Wenn Sie diesen Wert hoch einstellen, kann dies die Verarbeitungsleistung beeinträchtigen.",
+    "read_timeout_description": "Das Lese-Timeout der Verbindung zum Socket des Whois-Servers in Millisekunden. Wenn Sie diesen Wert hoch einstellen, kann dies die Verarbeitungsleistung beeinträchtigen."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Verbindungs-Timeout",
+    "connect_timeout_help": "WHOIS-Verbindungs-Timeout in Millisekunden.",
+    "read_timeout_label": "Lese-Timeout",
+    "read_timeout_help": "WHOIS-Verbindungs-Lese-Timeout in Millisekunden."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
   }
 }
