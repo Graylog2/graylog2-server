@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
+import { useCallback, useMemo, useContext, useRef, useImperativeHandle, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -247,11 +247,14 @@ const QueryInput = (
   outerRef: React.ForwardedRef<Editor>,
 ) => {
   const innerRef = useRef<Editor>(null);
-  const inputElement = innerRef.current?.container;
+  const [inputElement, setInputElement] = useState<HTMLElement>();
   const { width: inputWidth } = useElementDimensions(inputElement);
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
+  const onLoadEditor = useCallback((editor: Editor) => {
+    setInputElement(editor.container);
+    _onLoadEditor(editor, isInitialTokenizerUpdate);
+  }, []);
   const onExecute = useCallback(
     (editor: Editor) =>
       handleExecution({
