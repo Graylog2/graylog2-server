@@ -87,7 +87,7 @@ describe('EventDefinitionsContainer', () => {
     });
   });
 
-  it('shows the count of notifications attached to an event definition in its row', async () => {
+  it('shows the first notification and the number of the others in its row', async () => {
     const definitionWithNotifications: EventDefinition = {
       ...simpleEventDefinition,
       notifications: [
@@ -104,7 +104,9 @@ describe('EventDefinitionsContainer', () => {
 
     const row = await screen.findByTestId(`table-row-${definitionWithNotifications.id}`);
 
-    expect(await within(row).findByText('5')).toBeInTheDocument();
+    await within(row).findByRole('link', { name: 'n1' });
+
+    expect(await within(row).findByRole('button', { name: /show 4 more/i })).toHaveTextContent('+4');
   });
 
   it('renders nothing in the notifications cell for an event definition with no notifications', async () => {
@@ -117,7 +119,7 @@ describe('EventDefinitionsContainer', () => {
     expect(within(row).queryByText('0')).not.toBeInTheDocument();
   });
 
-  it('lists each attached notification as a link to its detail page when the count badge is expanded', async () => {
+  it('lists each attached notification as a link to its detail page when the list is expanded', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: [
         { id: 'n1', title: 'PagerDuty Alert' },
@@ -136,7 +138,7 @@ describe('EventDefinitionsContainer', () => {
     render(<EventDefinitionsContainer />);
 
     const row = await screen.findByTestId(`table-row-${definition.id}`);
-    await userEvent.click(within(row).getByTitle(/show notifications/i));
+    await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
 
     const pagerDutyLink = await screen.findByRole('link', { name: 'PagerDuty Alert' });
     expect(pagerDutyLink).toHaveAttribute('href', '/alerts/notifications/n1');
@@ -145,7 +147,7 @@ describe('EventDefinitionsContainer', () => {
     expect(slackLink).toHaveAttribute('href', '/alerts/notifications/n2');
   });
 
-  it('shows a loading indicator instead of notification ids while resolving notifications', async () => {
+  it('does not show notification ids while resolving notifications', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: undefined,
       notPermittedIds: [],
@@ -161,10 +163,8 @@ describe('EventDefinitionsContainer', () => {
     render(<EventDefinitionsContainer />);
 
     const row = await screen.findByTestId(`table-row-${definition.id}`);
-    await userEvent.click(within(row).getByTitle(/show notifications/i));
 
-    expect(await screen.findByText('Loading notifications...')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'n1' })).not.toBeInTheDocument();
+    expect(within(row).queryByText('n1')).not.toBeInTheDocument();
   });
 
   it('renders an entry with the notification id when a referenced notification no longer exists', async () => {
@@ -183,13 +183,13 @@ describe('EventDefinitionsContainer', () => {
     render(<EventDefinitionsContainer />);
 
     const row = await screen.findByTestId(`table-row-${definition.id}`);
-    await userEvent.click(within(row).getByTitle(/show notifications/i));
+    await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
 
     const fallbackLink = await screen.findByRole('link', { name: 'missing-id' });
     expect(fallbackLink).toHaveAttribute('href', '/alerts/notifications/missing-id');
   });
 
-  it('warns about notifications the user is not permitted to view', async () => {
+  it('lists notifications the user is not permitted to view without a link', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: [{ id: 'n1', title: 'PagerDuty Alert' }],
       notPermittedIds: ['secret-id'],
@@ -205,11 +205,9 @@ describe('EventDefinitionsContainer', () => {
     render(<EventDefinitionsContainer />);
 
     const row = await screen.findByTestId(`table-row-${definition.id}`);
-    await userEvent.click(within(row).getByTitle(/show notifications/i));
+    await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
 
-    const warning = await screen.findByRole('alert');
-    expect(warning).toHaveTextContent(/Missing Notifications Permissions for/i);
-    expect(warning).toHaveTextContent('secret-id');
+    expect(await within(row).findByTitle('Missing permissions')).toHaveTextContent('secret-id');
     expect(screen.queryByRole('link', { name: 'secret-id' })).not.toBeInTheDocument();
   });
 
