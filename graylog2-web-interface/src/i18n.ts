@@ -90,11 +90,24 @@ export const registerTranslations = (
   return currentLanguageLoader ? loadTranslations(i18n.language, namespace, currentLanguageLoader) : Promise.resolve();
 };
 
-/** Loads the translations of all registered namespaces before switching, so no texts change twice. */
+/**
+ * Loads the translations of all registered namespaces before switching, so no texts change twice.
+ * A namespace which can't be loaded, e.g. because the file of a plugin is missing, stays in English instead of
+ * keeping the whole interface from switching.
+ */
 export const changeLanguage = async (language: string) => {
   const loaders = [...(loadersByLanguage.get(language) ?? new Map<string, TranslationsLoader>())];
 
-  await Promise.all(loaders.map(([namespace, loader]) => loadTranslations(language, namespace, loader)));
+  const results = await Promise.allSettled(
+    loaders.map(([namespace, loader]) => loadTranslations(language, namespace, loader)),
+  );
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      // eslint-disable-next-line no-console
+      console.error(`Could not load the "${language}" translations of "${loaders[index][0]}":`, result.reason);
+    }
+  });
 
   return i18n.changeLanguage(language);
 };

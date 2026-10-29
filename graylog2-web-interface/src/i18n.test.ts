@@ -41,6 +41,30 @@ describe('i18n', () => {
     expect(i18n.t('farewell', { ns: 'test-switch' })).toBe('Bye');
   });
 
+  it('still switches when the translations of one namespace can not be loaded', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const loadBroken = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('chunk failed'))
+      .mockResolvedValue({ default: { greeting: 'Hallo' } });
+
+    registerTranslations('test-broken', { greeting: 'Hello' }, { de: loadBroken });
+    registerTranslations(
+      'test-working',
+      { greeting: 'Hello' },
+      { de: () => Promise.resolve({ default: { greeting: 'Hallo' } }) },
+    );
+
+    await changeLanguage('de');
+
+    expect(i18n.language).toBe('de');
+    expect(i18n.t('greeting', { ns: 'test-working' })).toBe('Hallo');
+    expect(i18n.t('greeting', { ns: 'test-broken' })).toBe('Hello');
+    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('"test-broken"'), expect.any(Error));
+
+    consoleError.mockRestore();
+  });
+
   it('formats values in lower case on request', () => {
     registerTranslations('test-format', { create: 'Create {{entityName, lowercase}}' }, {});
 
