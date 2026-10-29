@@ -22,11 +22,13 @@ import { defaultUser } from 'defaultMockValues';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import UserPreferencesContext, { defaultUserPreferences } from 'contexts/UserPreferencesContext';
+import applyLanguage from 'util/applyLanguage';
 
 import UserMenu from './UserMenu';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useLogout', () => () => jest.fn());
+jest.mock('util/applyLanguage');
 
 const renderUserMenu = (language?: string) =>
   render(
@@ -54,5 +56,32 @@ describe('<UserMenu />', () => {
     await userEvent.click(screen.getByTitle(`User Menu for ${defaultUser.fullName}`));
 
     await screen.findByRole('menuitem', { name: /language.*english/i });
+  });
+
+  describe('for read-only users', () => {
+    beforeEach(() => {
+      asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().readOnly(true).build());
+      asMock(applyLanguage).mockResolvedValue(undefined);
+    });
+
+    it('lists the languages instead of linking to the profile', async () => {
+      renderUserMenu(undefined);
+
+      await userEvent.click(screen.getByTitle(`User Menu for ${defaultUser.fullName}`));
+
+      await screen.findByRole('menuitem', { name: /english/i });
+      await screen.findByRole('menuitem', { name: /deutsch/i });
+
+      expect(screen.queryByRole('menuitem', { name: /language.*english/i })).not.toBeInTheDocument();
+    });
+
+    it('applies the selected language', async () => {
+      renderUserMenu(undefined);
+
+      await userEvent.click(screen.getByTitle(`User Menu for ${defaultUser.fullName}`));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /deutsch/i }));
+
+      expect(applyLanguage).toHaveBeenCalledWith('de');
+    });
   });
 });

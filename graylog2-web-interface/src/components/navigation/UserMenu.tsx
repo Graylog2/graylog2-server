@@ -26,8 +26,9 @@ import Menu from 'components/bootstrap/Menu';
 import useLogout from 'hooks/useLogout';
 import NavIcon from 'components/navigation/NavIcon';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import { getLanguage } from 'components/users/languages/Languages';
+import { availableLanguages, getLanguage } from 'components/users/languages/Languages';
 import LanguageLabel from 'components/users/languages/LanguageLabel';
+import applyLanguage from 'util/applyLanguage';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -59,10 +60,16 @@ const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
   const { language } = useContext(UserPreferencesContext);
   const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
-  const { t } = useTranslation('navigation');
+  const { t, i18n } = useTranslation('navigation');
   const label = readOnly ? t('user_menu.show_profile') : t('user_menu.edit_profile');
 
   const onLogoutClicked = useLogout();
+  // Read-only users, like the built-in admin, can't save preferences. They pick their language right here and it
+  // is kept in the browser, so the current language is the one that is active.
+  const currentLanguage = readOnly ? i18n.language : language;
+  const onSelectLanguage = (code: string) => {
+    applyLanguage(code).catch(() => {});
+  };
 
   return (
     <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={t('user_menu.title', { name: fullName })} noCaret>
@@ -74,17 +81,28 @@ const UserMenu = () => {
         <ThemeModeToggle />
       </Menu.Label>
       <MenuItem divider />
-      <LinkContainer to={route}>
-        <MenuItem icon="translate">
-          <LanguageRow>
-            {t('user_menu.language')}
-            <CurrentLanguage>
-              <LanguageLabel language={getLanguage(language)} />
-              <Icon name="chevron_right" />
-            </CurrentLanguage>
-          </LanguageRow>
-        </MenuItem>
-      </LinkContainer>
+      {readOnly ? (
+        <>
+          <Menu.Label>{t('user_menu.language')}</Menu.Label>
+          {availableLanguages().map(({ code }) => (
+            <MenuItem key={code} active={code === currentLanguage} onClick={() => onSelectLanguage(code)}>
+              <LanguageLabel language={getLanguage(code)} showBeta />
+            </MenuItem>
+          ))}
+        </>
+      ) : (
+        <LinkContainer to={route}>
+          <MenuItem icon="translate">
+            <LanguageRow>
+              {t('user_menu.language')}
+              <CurrentLanguage>
+                <LanguageLabel language={getLanguage(currentLanguage)} />
+                <Icon name="chevron_right" />
+              </CurrentLanguage>
+            </LanguageRow>
+          </MenuItem>
+        </LinkContainer>
+      )}
       <MenuItem divider />
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>

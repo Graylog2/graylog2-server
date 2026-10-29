@@ -18,15 +18,23 @@ import * as React from 'react';
 import { useContext } from 'react';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { lastLanguage } from 'util/applyLanguage';
 import { DEFAULT_LANGUAGE } from 'components/users/languages/Languages';
 
 import LanguageProvider from './LanguageProvider';
 
-/** Applies the language of the current user. Users without one get the default, not the previous user's language. */
+/**
+ * Applies the language of the current user. Users without one get the default, not the previous user's language.
+ * Read-only users, like the built-in admin, can't save preferences. They choose their language in the user menu,
+ * which keeps it in the browser, so that choice must not be replaced by the default.
+ */
 const UserLanguageProvider = ({ children }: React.PropsWithChildren) => {
+  const currentUser = useCurrentUser();
   const { language } = useContext(UserPreferencesContext);
+  const userLanguage = currentUser?.readOnly ? lastLanguage() : (language ?? DEFAULT_LANGUAGE);
 
-  return <LanguageProvider language={language ?? DEFAULT_LANGUAGE}>{children}</LanguageProvider>;
+  return <LanguageProvider language={userLanguage}>{children}</LanguageProvider>;
 };
 
 export default UserLanguageProvider;

@@ -46,6 +46,7 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
       searchSidebarIsPinned: Store.get<boolean>('searchSidebarIsPinned'),
       dashboardSidebarIsPinned: Store.get<boolean>('dashboardSidebarIsPinned'),
       [PREFERENCES_THEME_MODE]: Store.get<string>(PREFERENCES_THEME_MODE),
+      language: Store.get<string>('language'),
     };
     preferences = { ...preferences, ...localStoragePreferences } as typeof preferences;
   }
