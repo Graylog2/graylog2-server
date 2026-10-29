@@ -17,19 +17,15 @@
 package org.graylog.security;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.graylog.grn.GRN;
 import org.graylog.util.uuid.ConcurrentUUID;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.Permission;
-import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
 
@@ -104,19 +100,13 @@ public class UserContext implements HasUser, HasPermissions {
     }
 
     private static <T> Callable<T> wrapWithRequestHeader(Callable<T> callable) {
-        // temporarily add "X-Request-Id" header to suppress warning in org.graylog2.security.realm.MongoDbAuthorizationRealm
-        return () -> {
-            final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-            headers.putSingle(RequestIdFilter.X_REQUEST_ID, ConcurrentUUID.generateRandomUuid().toString());
-            ThreadContext.put(ShiroRequestHeadersBinder.REQUEST_HEADERS, headers);
+        return () -> ShiroRequestHeadersBinder.withRequestId(ConcurrentUUID.generateRandomUuid().toString(), () -> {
             try {
                 return callable.call();
             } catch (Exception e) {
                 throw new RuntimeException(e);
-            } finally {
-                ThreadContext.remove(ShiroRequestHeadersBinder.REQUEST_HEADERS);
             }
-        };
+        });
     }
 
     public UserContext(String userId, Subject subject, UserService userService) {
