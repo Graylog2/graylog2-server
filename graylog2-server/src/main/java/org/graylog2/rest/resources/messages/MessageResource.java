@@ -40,6 +40,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -59,6 +60,8 @@ import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -75,6 +78,7 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
     private final Messages messages;
     private final CodecFactory codecFactory;
@@ -144,12 +148,22 @@ public class MessageResource extends RestResource {
     })
     @NoAuditEvent("only used to parse a test message")
     public ResultMessage parse(@RequestBody(required = true) MessageParseRequest request) {
-        Codec codec;
+        if (!isAnyPermitted(RestPermissions.INPUTS_CREATE, PipelineRestPermissions.PIPELINE_RULE_CREATE)) {
+            throw new ForbiddenException("Not authorized");
+        }
+        if (!codecFactory.getFactory().containsKey(request.codec())) {
+            throw new NotFoundException("Codec type " + request.codec() + " does not exist.");
+        }
+        if (codecFactory.isMultiMessageCodec(request.codec())) {
+            throw new BadRequestException("Codec type " + request.codec() + " does not support parsing a single message.");
+        }
+
+        final Codec codec;
         try {
-            final Configuration configuration = new Configuration(request.configuration());
-            codec = codecFactory.create(request.codec(), configuration);
-        } catch (IllegalArgumentException e) {
-            throw new NotFoundException(e);
+            codec = codecFactory.create(request.codec(), new Configuration(request.configuration()));
+        } catch (Exception e) {
+            LOG.debug("Could not create codec <{}>", request.codec(), e);
+            throw new BadRequestException("Could not decode message");
         }
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
