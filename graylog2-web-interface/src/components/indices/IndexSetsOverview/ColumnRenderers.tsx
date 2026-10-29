@@ -17,7 +17,6 @@
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { Timestamp } from 'components/common';
@@ -25,25 +24,15 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import NumberUtils from 'util/NumberUtils';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
-import { DETAILS_SECTION, INDEX_SET_CATEGORY_TITLES } from './Constants';
+import { INDEX_SET_CATEGORY_TITLES } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
+import DetailsToggle from './cells/DetailsToggle';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
 import MetricCell from './cells/MetricCell';
 import DeflectorHealthCell from './cells/DeflectorHealthCell';
 import StreamCountCell from './cells/StreamCountCell';
 import { METRIC_COLUMN_IDS } from './metricColumns';
-
-type ToggleProps = React.PropsWithChildren<{
-  indexSet: IndexSetEntity;
-  align?: 'right';
-}>;
-
-const DetailsToggle = ({ indexSet, align = undefined, children = undefined }: ToggleProps) => (
-  <ExpandedSectionToggleWrapper id={indexSet.id} section={DETAILS_SECTION} align={align}>
-    {children}
-  </ExpandedSectionToggleWrapper>
-);
 
 const customColumnRenderers = (
   extensionColumnRenderers: ColumnRenderersByAttribute<IndexSetEntity>,
