@@ -1,5 +1,6 @@
 {
   "destination_permission_alert": {
+    "data_lake": "You currently do not have the permissions to view or manage Data Lake destination.",
     "index_set": "You currently do not have the permissions to view or manage Index Set destination.",
     "outputs": "You currently do not have the permissions to view or manage Outputs destination."
   },

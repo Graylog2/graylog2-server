@@ -1,5 +1,6 @@
 {
   "destination_permission_alert": {
+    "data_lake": "Sie haben derzeit nicht die Berechtigung, das Data-Lake-Ziel anzuzeigen oder zu verwalten.",
     "index_set": "Sie haben derzeit nicht die Berechtigung, das Index-Set-Ziel anzuzeigen oder zu verwalten.",
     "outputs": "Sie haben derzeit nicht die Berechtigung, das Output-Ziel anzuzeigen oder zu verwalten."
   },

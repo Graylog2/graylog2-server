@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  section: 'index_set' | 'outputs';
+  section: 'index_set' | 'outputs' | 'data_lake';
 };
 
 const DestinationPermissionAlert = ({ section }: Props) => {
