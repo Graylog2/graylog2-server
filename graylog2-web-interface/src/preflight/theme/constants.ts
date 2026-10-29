@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorScheme } from '@graylog/sawmill';
-import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from '@graylog/sawmill';
+import type { ColorScheme } from 'theme/sawmill';
+import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from 'theme/sawmill';
 
 const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 

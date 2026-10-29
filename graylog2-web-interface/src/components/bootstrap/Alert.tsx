@@ -17,9 +17,9 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { CSSProperties } from 'react';
-import type { ColorVariant } from '@graylog/sawmill';
 import { Alert as MantineAlert } from '@mantine/core';
 
+import type { ColorVariant } from 'theme/sawmill';
 import Icon from 'components/common/Icon';
 
 type Props = {

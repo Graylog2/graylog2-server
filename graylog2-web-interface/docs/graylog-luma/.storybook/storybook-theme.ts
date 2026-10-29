@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import SawmillMantine from '@graylog/sawmill/mantine';
-import SawmillSC from '@graylog/sawmill/styled-components';
 import { create } from 'storybook/theming';
+
+import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
+import SawmillSC from 'theme/sawmill/styled-components/Sawmill';
 
 import graylogLogo from '../graylog-logo.png';
 

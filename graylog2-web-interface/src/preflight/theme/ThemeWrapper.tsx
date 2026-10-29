@@ -17,7 +17,8 @@
 import React, { useMemo } from 'react';
 import { createGlobalStyle, useTheme } from 'styled-components';
 import { MantineProvider } from '@mantine/core';
-import SawmillMantine from '@graylog/sawmill/mantine';
+
+import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 
 type Props = {
   children: React.ReactElement;

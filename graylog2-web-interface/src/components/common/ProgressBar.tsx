@@ -17,7 +17,8 @@
 import * as React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
-import type { ColorVariant } from '@graylog/sawmill';
+
+import type { ColorVariant } from 'theme/sawmill';
 
 type StyledBarProps = {
   $animated?: boolean;

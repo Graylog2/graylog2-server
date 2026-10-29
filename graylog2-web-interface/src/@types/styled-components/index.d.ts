@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import 'styled-components';
-import type { ColorScheme } from '@graylog/sawmill';
-import type { StyledComponentsTheme } from '@graylog/sawmill/styled-components';
+import type { ColorScheme } from 'theme/sawmill';
+import type { StyledComponentsTheme } from 'theme/sawmill/styled-components/Sawmill';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends StyledComponentsTheme {

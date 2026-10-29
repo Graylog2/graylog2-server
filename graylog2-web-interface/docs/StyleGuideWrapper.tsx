@@ -19,14 +19,12 @@ import { createGlobalStyle, css } from 'styled-components';
 import * as Immutable from 'immutable';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-/* eslint-disable import/no-relative-packages */
 import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 import CurrentUserContext from '../src/contexts/CurrentUserContext';
 import User from '../src/logic/users/User';
 import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
-/* eslint-enable import/no-relative-packages */
+import '../src/theme/sawmill/fonts';
 
-import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
 
