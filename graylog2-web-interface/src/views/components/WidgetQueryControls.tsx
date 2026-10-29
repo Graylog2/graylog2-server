@@ -47,7 +47,7 @@ import {
 import type { CombinedSearchBarFormValues, SearchBarControl, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
-import { SEARCH_BAR_GAP, TimeRangeRow, SearchQueryRow } from 'views/components/searchbar/SearchBarLayout';
+import { TimeRangeRow, SearchQueryRow, searchBarContainerStyles } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
@@ -74,10 +74,8 @@ import SearchBarForm from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${SEARCH_BAR_GAP};
+const SearchBarContainer = styled.div`
+  ${searchBarContainerStyles}
 `;
 
 const SearchInputAndValidation = styled.div`
@@ -263,7 +261,7 @@ const WidgetQueryControls = () => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
 
           return (
-            <Container>
+            <SearchBarContainer>
               <PropagateDisableSubmissionState
                 formKey="widget-query-controls"
                 disableSubmission={disableSearchSubmit}
@@ -346,7 +344,7 @@ const WidgetQueryControls = () => {
                 )}
               </SearchQueryRow>
               <PluggableSearchBarControls />
-            </Container>
+            </SearchBarContainer>
           );
         }}
       </SearchBarForm>
