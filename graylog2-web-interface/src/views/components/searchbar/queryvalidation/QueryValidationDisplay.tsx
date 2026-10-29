@@ -24,7 +24,7 @@ import Icon from 'components/common/Icon';
 import StringUtils from 'util/StringUtils';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import QueryValidationActions from 'views/actions/QueryValidationActions';
+import QueryValidationErrors from 'views/components/searchbar/queryvalidation/QueryValidationErrors';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState, ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 
@@ -139,7 +139,7 @@ const useTriggerIfErrorsPersist = (trigger: () => void) => {
   const toggleShow = useCallback(() => setShowExplanation((prevShow) => !prevShow), []);
 
   useEffect(() => {
-    const unsubscribe = QueryValidationActions.displayValidationErrors.listen(() => {
+    const unsubscribe = QueryValidationErrors.onDisplay(() => {
       if (!showExplanation) {
         toggleShow();
       } else {

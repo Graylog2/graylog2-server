@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
-import QueryValidationActions from 'views/actions/QueryValidationActions';
+import QueryValidationErrors from 'views/components/searchbar/queryvalidation/QueryValidationErrors';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -66,7 +66,7 @@ const onButtonClick = (
 
   if (disabled) {
     e.preventDefault();
-    QueryValidationActions.displayValidationErrors();
+    QueryValidationErrors.display();
   }
 
   triggerTelemetry();
