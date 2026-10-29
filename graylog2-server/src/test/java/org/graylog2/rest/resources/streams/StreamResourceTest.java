@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.streams;
 
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.subject.Subject;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditActor;
@@ -32,20 +34,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class StreamResourceTest {
     private static final String INDEX_SET_ID = "index-set-id";
 
@@ -61,11 +70,11 @@ class StreamResourceTest {
     private final AuditActor actor = AuditActor.user("admin");
     private final Stream stream1 = mockStream("stream-1", "Stream 1");
     private final Stream stream2 = mockStream("stream-2", "Stream 2");
+    private final Subject subject = mock(Subject.class);
     private StreamResource resource;
 
     @BeforeEach
     void setUp() {
-        final Subject subject = mock(Subject.class);
         when(subject.isPermitted(anyString())).thenReturn(true);
         resource = new StreamResource(streamService, null, null, null, null, indexSetRegistry, null,
                 auditEventSender, null, null, null, null) {
@@ -110,6 +119,31 @@ class StreamResourceTest {
 
         verify(auditEventSender).failure(actor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context("stream-1", "Stream 1"));
         verify(auditEventSender).failure(actor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context("stream-2", "Stream 2"));
+    }
+
+    @Test
+    void auditsFailureForEachRequestedStreamWhenRejected() {
+        when(subject.isPermitted("streams:edit:stream-2")).thenReturn(false);
+
+        assertThatThrownBy(() -> resource.assignToIndexSet(INDEX_SET_ID, List.of("stream-1", "stream-2"), userContext))
+                .isInstanceOf(ForbiddenException.class);
+
+        verify(auditEventSender).failure(actor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, rejectedContext("stream-1"));
+        verify(auditEventSender).failure(actor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, rejectedContext("stream-2"));
+        verify(auditEventSender, never()).success(any(AuditActor.class), anyString(), anyMap());
+    }
+
+    @Test
+    void auditsFailureForEachRequestedStreamWhenAStreamIsMissing() {
+        final Response response = resource.assignToIndexSet(INDEX_SET_ID, List.of("stream-1", "stream-2", "stream-3"), userContext);
+
+        assertThat(response.getStatus()).isEqualTo(404);
+        verify(auditEventSender).failure(actor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, rejectedContext("stream-3"));
+        verify(auditEventSender, never()).success(any(AuditActor.class), anyString(), anyMap());
+    }
+
+    private static Map<String, Object> rejectedContext(String streamId) {
+        return Map.of("response_entity", Map.of("stream_id", streamId, "index_set_id", INDEX_SET_ID));
     }
 
     private static Stream mockStream(String id, String title) {

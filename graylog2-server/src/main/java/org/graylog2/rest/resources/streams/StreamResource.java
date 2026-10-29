@@ -46,6 +46,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -747,6 +748,21 @@ public class StreamResource extends RestResource {
     public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
                                      @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds,
                                      @Context UserContext userContext) {
+        final AuditActor auditActor = AuditActor.user(userContext.getUser());
+        final Response response;
+        try {
+            response = assignStreamsToIndexSet(indexSetId, streamIds, auditActor);
+        } catch (WebApplicationException e) {
+            auditRejectedAssignment(auditActor, indexSetId, streamIds);
+            throw e;
+        }
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            auditRejectedAssignment(auditActor, indexSetId, streamIds);
+        }
+        return response;
+    }
+
+    private Response assignStreamsToIndexSet(String indexSetId, List<String> streamIds, AuditActor auditActor) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
@@ -769,7 +785,6 @@ public class StreamResource extends RestResource {
                 .map(indexSet -> {
                     checkIndexSet(indexSet);
 
-                    final AuditActor auditActor = AuditActor.user(userContext.getUser());
                     try {
                         streamService.addToIndexSet(indexSetId, streamIds);
                     } catch (RuntimeException e) {
@@ -783,11 +798,21 @@ public class StreamResource extends RestResource {
     }
 
     private void auditIndexSetAssignment(AuditActor auditActor, Stream stream, IndexSetConfig indexSetConfig, boolean success) {
-        final Map<String, Object> context = Map.of("response_entity", Map.of(
+        sendIndexSetAssignmentEvent(auditActor, Map.of(
                 "stream_id", stream.getId(),
                 "title", stream.getTitle(),
                 "index_set_id", indexSetConfig.id(),
-                "index_set_title", indexSetConfig.title()));
+                "index_set_title", indexSetConfig.title()), success);
+    }
+
+    // Rejected before anything was loaded, so the entries only carry the requested IDs
+    private void auditRejectedAssignment(AuditActor auditActor, String indexSetId, List<String> streamIds) {
+        streamIds.stream().distinct().forEach(streamId ->
+                sendIndexSetAssignmentEvent(auditActor, Map.of("stream_id", streamId, "index_set_id", indexSetId), false));
+    }
+
+    private void sendIndexSetAssignmentEvent(AuditActor auditActor, Map<String, Object> responseEntity, boolean success) {
+        final Map<String, Object> context = Map.of("response_entity", responseEntity);
         try {
             if (success) {
                 auditEventSender.success(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
@@ -795,8 +820,8 @@ public class StreamResource extends RestResource {
                 auditEventSender.failure(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
             }
         } catch (Exception e) {
-            // A failing audit sink must not fail an index set assignment that was already stored
-            LOG.error("Failed to store audit log entry for stream <{}>", stream.getId(), e);
+            // A failing audit sink must not fail the request
+            LOG.error("Failed to store audit log entry for stream <{}>", responseEntity.get("stream_id"), e);
         }
     }
 
