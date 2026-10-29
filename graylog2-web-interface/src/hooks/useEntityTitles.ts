@@ -29,8 +29,14 @@ const fetchEntityTitles = (entities: Array<EntityRef>) => SystemCatalog.getTitle
 type TitlesResponse = Awaited<ReturnType<typeof fetchEntityTitles>>;
 
 // Batches the requests of components rendered together, e.g. the cells of a table page.
+// Handles errors per batch, so a failed request shows one notification instead of one per component.
 const entityTitles = create({
-  fetcher: (entities: Array<EntityRef>) => fetchEntityTitles(uniqBy(entities, ({ id, type }) => `${type}:${id}`)),
+  fetcher: (entities: Array<EntityRef>) =>
+    defaultOnError(
+      fetchEntityTitles(uniqBy(entities, ({ id, type }) => `${type}:${id}`)),
+      'Loading entity titles failed with status',
+      'Could not load entity titles',
+    ),
   resolver: (response: TitlesResponse, { id }: EntityRef) => ({
     id,
     title: response.entities?.find((entity) => entity.id === id)?.title,
@@ -53,12 +59,7 @@ const useEntityTitles = (
 
   const { data, isInitialLoading, isFetching, isError } = useQuery({
     queryKey: ['entity_titles', stableEntities],
-    queryFn: () =>
-      defaultOnError(
-        Promise.all(stableEntities.map((entity) => entityTitles.fetch(entity))),
-        'Loading entity titles failed with status',
-        'Could not load entity titles',
-      ),
+    queryFn: () => Promise.all(stableEntities.map((entity) => entityTitles.fetch(entity))),
     enabled,
     placeholderData: keepPreviousData,
   });

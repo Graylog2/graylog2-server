@@ -20,6 +20,7 @@ import { waitFor } from 'wrappedTestingLibrary';
 import { SystemCatalog } from '@graylog/server-api';
 
 import { asMock } from 'helpers/mocking';
+import UserNotification from 'util/UserNotification';
 
 import useEntityTitles from './useEntityTitles';
 
@@ -27,6 +28,10 @@ jest.mock('@graylog/server-api', () => ({
   SystemCatalog: {
     getTitles: jest.fn(),
   },
+}));
+
+jest.mock('util/UserNotification', () => ({
+  error: jest.fn(),
 }));
 
 describe('useEntityTitles', () => {
@@ -100,6 +105,19 @@ describe('useEntityTitles', () => {
     });
     expect(result.current[0].titlesById).toEqual({ 'pipeline-a': 'Pipeline A' });
     expect(result.current[1].titlesById).toEqual({ 'pipeline-a': 'Pipeline A', 'pipeline-b': 'Pipeline B' });
+  });
+
+  it('shows one error notification when the request of hooks rendered together fails', async () => {
+    asMock(SystemCatalog.getTitles).mockRejectedValue(Object.assign(new Error('Not found'), { status: 404 }));
+
+    const { result } = renderHook(() => [
+      useEntityTitles([{ id: 'pipeline-a', type: 'pipeline_processor_pipelines' }]),
+      useEntityTitles([{ id: 'pipeline-b', type: 'pipeline_processor_pipelines' }]),
+    ]);
+
+    await waitFor(() => expect(result.current.every(({ isError }) => isError)).toBe(true));
+
+    expect(UserNotification.error).toHaveBeenCalledTimes(1);
   });
 
   it('does not call the API when the entities list is empty', () => {
