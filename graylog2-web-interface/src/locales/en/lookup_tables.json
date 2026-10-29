@@ -32,5 +32,179 @@
   "max_entries": "Maximum entries:",
   "expire_after_access": "Expire after access:",
   "expire_after_write": "Expire after write:",
-  "ttl_empty_results": "TTL for empty results:"
+  "ttl_empty_results": "TTL for empty results:",
+  "parameter_edit": {
+    "default_value_help": "Select a default value in case the lookup result is empty",
+    "default_value_label": "Default Value",
+    "empty_result": "The event definition query is only executed if a value for the parameter is present. If the lookup result is empty, the execution will be skipped and treated as if the <emphasis>Search Query</emphasis> found no messages. If an execution is desired a <emphasis>Default Value</emphasis> that yields the desired search result needs to be provided. For example, (depending on the use case) a wildcard like <inlineCode>{{wildcard}}</inlineCode> can be a meaningful Default Value.",
+    "empty_result_title": "Behaviour on empty lookup result list",
+    "general_usage": "After declaring it, the parameter <inlineCode>{{parameter}}</inlineCode> in your query, will be replaced with the list of results from the lookup table. The list of results will be presented in the form of a Lucene BooleanQuery. E.g.: <inlineCode>{{example}}</inlineCode>",
+    "general_usage_title": "General Usage",
+    "help_title": "How to use lookup table parameters",
+    "key_help": "Select the lookup table key",
+    "key_label": "Lookup Table Key",
+    "limitations": "Please note, the maximum number of supported results is depending on the <inlineCode>{{setting}}</inlineCode> setting. If the lookup table returns more results, the query will fail in your indexer.",
+    "limitations_title": "Limitations",
+    "loading": "Loading lookup tables",
+    "table_help": "Select the lookup table to use for retrieving the values.",
+    "table_label": "Lookup Table",
+    "table_placeholder": "Select lookup table"
+  },
+  "shared": {
+    "configuration": "Configuration",
+    "description": "Description",
+    "description_colon": "Description:",
+    "no": "no",
+    "no_description": "No description.",
+    "query_example_intro": "searching without a field name matches against the <fieldCode>title</fieldCode> field:",
+    "query_example_same": "is the same as",
+    "yes": "yes"
+  },
+  "cache_summary": {
+    "unknown_type": "Unknown cache type {{type}}. Is the plugin missing?"
+  },
+  "adapter_summary": {
+    "key_help": "Key to look up a value for.",
+    "key_label": "Key",
+    "look_up": "Look up",
+    "lookup_result": "Lookup result",
+    "test_lookup": "Test lookup",
+    "test_lookup_description": "You can manually trigger the data adapter using this form. The data will be not cached.",
+    "unknown_type": "Unknown data adapter type {{type}}. Is the plugin missing?"
+  },
+  "table_fields": {
+    "key_help": "Message Field name whose value will be used as Lookup Table Key.",
+    "key_label": "Lookup Table Key Field",
+    "key_placeholder": "Select Field",
+    "loading": "Loading Field Provider information...",
+    "none_found": "No Lookup Tables found.",
+    "table_help": "Select the Lookup Table which should be used to get the value.",
+    "table_label": "Select Lookup Table"
+  },
+  "adapter_form": {
+    "configure": "Configure Adapter",
+    "create": "Create adapter",
+    "creating": "Creating adapter...",
+    "description_help": "Data adapter description.",
+    "error_ttl_help": "Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used",
+    "error_ttl_label": "Custom Error TTL",
+    "name_help": "The name that is being used to refer to this data adapter. Must be unique.",
+    "name_label": "* Name",
+    "picker_create": "Create Data Adapter",
+    "picker_help": "Select an existing data adapter",
+    "picker_label": "Data Adapter",
+    "picker_placeholder": "Select a data adapter",
+    "title_help": "A short title for this data adapter.",
+    "title_label": "* Title",
+    "type_help": "The type of data adapter to configure.",
+    "type_label": "Data Adapter Type",
+    "type_missing_plugin": "{{type}} - missing or invalid plugin",
+    "type_placeholder": "Select Data Adapter Type",
+    "update": "Update adapter",
+    "updating": "Updating adapter...",
+    "use_existing": "Use Existing Data Adapter"
+  },
+  "adapter_list": {
+    "delete_confirm": "Are you sure you want to delete the data adapter \"{{title}}\"?",
+    "delete_title": "Delete Data Adapter",
+    "human_name": "data adapter",
+    "lookups_per_second": "lookups/s",
+    "more_actions": "More Actions for {{name}}",
+    "problem": "Data Adapter problem"
+  },
+  "adapter_view": {
+    "loading": "Loading data adapter details"
+  },
+  "adapter_fields": {
+    "case_insensitive_help": "Enable if the key lookup should be case-insensitive.",
+    "case_insensitive_label": "Allow case-insensitive lookups",
+    "case_insensitive_summary": "Case-insensitive lookup",
+    "check_interval": "Check interval",
+    "cidr_lookup": "CIDR lookup",
+    "key_column": "Key column",
+    "line_separator": "Line Separator",
+    "multi_value_lookup": "Multi-value lookup",
+    "quote_character": "Quote character",
+    "quote_help": "The character to use for quoted elements.",
+    "seconds_one": "{{count}} second",
+    "seconds_other": "{{count}} seconds",
+    "separator": "Separator",
+    "value_column": "Value column",
+    "value_columns": "Value columns"
+  },
+  "csv_adapter": {
+    "all_columns_except_key": "All columns except the key",
+    "check_interval_help": "The interval to check if the CSV file needs a reload. (in seconds)",
+    "cidr_help": "Enable if the keys in the lookup table are in CIDR notation and lookups will be done with IPs",
+    "file_path": "File path",
+    "file_path_help": "The path to the CSV file.",
+    "key_column_help": "The column name that should be used for the key lookup.",
+    "multi_value_help": "Enable for multiple value columns.",
+    "separator_help": "The delimiter to use for separating entries.",
+    "value_column_help": "The column name that should be used as the value for a key.",
+    "value_columns_help": "The column names that should be used as the values for a key, or leave empty for all columns except the key."
+  },
+  "dsv_adapter": {
+    "file_url": "File URL",
+    "file_url_help": "The URL of the DSV file.",
+    "ignore_characters": "Ignore characters",
+    "ignore_characters_help": "Ignore lines starting with these characters.",
+    "ignore_lines_starting_with": "Ignore lines starting with",
+    "key_column_help": "The column number that should be used for the key lookup.",
+    "line_separator_help": "The delimiter to use for separating lines.",
+    "presence_only": "Check Presence Only",
+    "presence_only_help": "Only check if key is present in table, returns boolean instead of value.",
+    "refresh_interval": "Refresh interval",
+    "refresh_interval_help": "The interval to check if the DSV file needs a reload. (in seconds)",
+    "separator_help": "The delimiter to use for separating columns of entries.",
+    "value_column_help": "The column number that should be used as the value for a key."
+  },
+  "doc": {
+    "example": "Example {{number}}",
+    "requirements_title": "CSV file requirements",
+    "utf8": "The file uses <bold>utf-8</bold> encoding"
+  },
+  "csv_doc": {
+    "cidr_intro_1": "If this data adapter will be used to lookup IP address keys against CIDR addresses",
+    "cidr_intro_2": "then it should be marked as a CIDR lookup. For example:",
+    "cidr_lookups": "CIDR Lookups",
+    "cidr_result": "Given this CSV file and configuration looking up the key {{key}} would return '{{result}}'.",
+    "csv_file": "CSV File",
+    "first_line": "The first line in the CSV file needs to be a list of field/column names",
+    "formatting_hint": "Please make sure your CSV file is formatted according to your configuration settings.",
+    "intro": "The CSV data adapter can read key value pairs from a CSV file.",
+    "multi_value_example": "Multi Value Example",
+    "multi_value_heading": "Multi-Value Example",
+    "readable": "The file is readable by <bold>every</bold> {{productName}} server node"
+  },
+  "dsv_doc": {
+    "accessible": "The file is accessible using the same URL by <bold>every</bold> {{productName}} server node",
+    "dsv_file": "DSV File",
+    "formatting_hint": "Please make sure your DSV file is formatted according to your configuration settings.",
+    "intro": "The DSV data adapter can read key value pairs (or check for the presence of a key) from a DSV file."
+  },
+  "dns_adapter": {
+    "cache_ttl_override": "Cache TTL Override",
+    "lookup_type_a": "Resolve hostname to IPv4 address (A)",
+    "lookup_type_a_aaaa_singular": "Resolve hostname to IPv4 and IPv6 address (A and AAAA)",
+    "lookup_type_aaaa": "Resolve hostname to IPv6 address (AAAA)",
+    "lookup_type_label": "DNS Lookup Type",
+    "lookup_type_ptr": "Reverse lookup (PTR)",
+    "lookup_type_txt": "Text lookup (TXT)",
+    "not_available": "n/a",
+    "request_timeout_label": "DNS Request Timeout",
+    "server_ips_label": "DNS Server IP Address",
+    "timeout_ms": "{{value}} ms"
+  },
+  "dns_doc": {
+    "a": "Returns both a <code>single_value</code> containing one of the IPv4 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv4 addresses that the hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).",
+    "a_aaaa": "Returns both a <code>single_value</code> containing one of the IPv4 or IPv6 addresses that the hostname resolves to (will return IPv4 if available), and a <code>multi_value</code> containing all IPv4 and IPv6 addresses that the hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).",
+    "aaaa": "Returns both a <code>single_value</code> containing one of the IPv6 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv6 addresses that the hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).",
+    "cache_ttl_override": "If enabled, the TTL for this adapter's cache will be overridden with the specified value.",
+    "ptr": "Returns a <code>single_value</code> containing the PTR value if defined for the IP address. The <code>domain</code> field displays the domain name (with no subdomains). The <code>full_domain</code> field displays the full un-trimmed host name/PTR value. The input for this type must be a pure IPv4 or IPv6 address (eg. <code>10.0.0.1</code> or <code>2622:f3b0:4000:812::200c</code>).",
+    "request_timeout": "The DNS request timeout in milliseconds.",
+    "server_ips": "A comma-separated list of DNS server IP addresses and optional ports to use (eg. <code>192.168.1.1:5353, 192.168.1.244</code>). Leave this blank to use the DNS server defined for your local system. All requests use port 53 unless otherwise specified.",
+    "server_ips_title": "DNS Server IP Addresses",
+    "txt": "Returns a <code>multi_value</code> with all TXT records defined for the hostname. Input for this type must be a pure domain name (eg. <code>api.example.com</code>)."
+  }
 }

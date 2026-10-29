@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import memoize from 'lodash/memoize';
 import type { Permission } from 'graylog-web-plugin/plugin';
 import { useQuery } from '@tanstack/react-query';
@@ -52,6 +53,7 @@ const LookupTableFields = ({
   lookupTableKeyLabel = '',
   customKeyField = null,
 }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
   const { isPermitted } = usePermissions();
   const hasPermission = isPermitted(LOOKUP_PERMISSIONS);
@@ -66,7 +68,7 @@ const LookupTableFields = ({
     return (
       <Row>
         <Col md={6} lg={5}>
-          <p>No Lookup Tables found.</p>
+          <p>{t('table_fields.none_found')}</p>
         </Col>
       </Row>
     );
@@ -91,23 +93,23 @@ const LookupTableFields = ({
   const isLoading = !allFieldTypes || !tables;
 
   if (isLoading) {
-    return <Spinner text="Loading Field Provider information..." />;
+    return <Spinner text={t('table_fields.loading')} />;
   }
 
   return (
     <Row className="row-sm">
       <Col md={6}>
         <FormGroup controlId="lookup-provider-table" validationState={nameValidation ? 'error' : null}>
-          <ControlLabel>{lookupTableNameLabel || 'Select Lookup Table'}</ControlLabel>
+          <ControlLabel>{lookupTableNameLabel || t('table_fields.table_label')}</ControlLabel>
           <Select
             name="event-field-table-name"
-            placeholder="Select Lookup Table"
+            placeholder={t('table_fields.table_label')}
             onChange={onTableNameChange}
             options={formatLookupTables(tables)}
             value={selectedTableName}
             required
           />
-          <HelpBlock>{nameValidation || 'Select the Lookup Table which should be used to get the value.'}</HelpBlock>
+          <HelpBlock>{nameValidation || t('table_fields.table_help')}</HelpBlock>
         </FormGroup>
       </Col>
       {customKeyField ? (
@@ -115,17 +117,17 @@ const LookupTableFields = ({
       ) : (
         <Col md={6}>
           <FormGroup controlId="lookup-provider-table" validationState={keyValidation ? 'error' : null}>
-            <ControlLabel>{lookupTableKeyLabel || 'Lookup Table Key Field'}</ControlLabel>
+            <ControlLabel>{lookupTableKeyLabel || t('table_fields.key_label')}</ControlLabel>
             <Select
               name="lookup-provider-key"
-              placeholder="Select Field"
+              placeholder={t('table_fields.key_placeholder')}
               onChange={onKeyChange}
               options={formatMessageFields(allFieldTypes)}
               value={selectedKeyName}
               allowCreate
               required
             />
-            <HelpBlock>{keyValidation || 'Message Field name whose value will be used as Lookup Table Key.'}</HelpBlock>
+            <HelpBlock>{keyValidation || t('table_fields.key_help')}</HelpBlock>
           </FormGroup>
         </Col>
       )}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const Cache = ({ cache, noEdit = false }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const plugin = usePluginEntities('lookupTableCaches').find((p: CachePluginType) => p.type === cache.config?.type);
   const { push } = useHistory();
@@ -39,7 +41,7 @@ const Cache = ({ cache, noEdit = false }: Props) => {
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   if (!plugin) {
-    return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
+    return <p>{t('cache_summary.unknown_type', { type: cache.config.type })}</p>;
   }
 
   const handleEdit = () => {
@@ -53,17 +55,17 @@ const Cache = ({ cache, noEdit = false }: Props) => {
           <Label>{plugin.displayName}</Label>
           {canEdit && (
             <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
-              Edit
+              {t('common:actions.edit')}
             </Button>
           )}
         </div>
 
         <SummaryRow>
-          <Title>Description:</Title>
-          <Value>{cache.description || <em>No description.</em>}</Value>
+          <Title>{t('shared.description_colon')}</Title>
+          <Value>{cache.description || <em>{t('shared.no_description')}</em>}</Value>
         </SummaryRow>
 
-        <h4>Configuration</h4>
+        <h4>{t('shared.configuration')}</h4>
         <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
       </Col>
     </Row>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useField } from 'formik';
 
@@ -40,6 +41,7 @@ type Props = {
 };
 
 function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
   const sortedAdapters = dataAdapters
     .map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` }))
@@ -51,7 +53,7 @@ function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
     <fieldset>
       <Input
         id="data-adapter-select"
-        label="Data Adapter"
+        label={t('adapter_form.picker_label')}
         required
         bsStyle={errorMessage ? 'error' : undefined}
         labelClassName="d-block mb-1"
@@ -59,19 +61,19 @@ function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
         formGroupClassName="mb-3">
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <StyledSelect
-            placeholder="Select a data adapter"
+            placeholder={t('adapter_form.picker_placeholder')}
             clearable={false}
             options={sortedAdapters}
             onBlur={() => setTouched(true)}
             onChange={(v) => setValue(v)}
             value={value}
           />
-          <StyledButton type="button" aria-label="Create Data Adapter" onClick={onCreateClick}>
-            Create Data Adapter
+          <StyledButton type="button" aria-label={t('adapter_form.picker_create')} onClick={onCreateClick}>
+            {t('adapter_form.picker_create')}
           </StyledButton>
         </div>
         <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
-          {errorMessage || 'Select an existing data adapter'}
+          {errorMessage || t('adapter_form.picker_help')}
         </div>
       </Input>
     </fieldset>

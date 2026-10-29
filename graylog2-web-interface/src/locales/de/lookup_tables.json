@@ -32,5 +32,179 @@
   "max_entries": "Maximale Einträge:",
   "expire_after_access": "Ablauf nach Zugriff:",
   "expire_after_write": "Ablauf nach Schreiben:",
-  "ttl_empty_results": "TTL für leere Ergebnisse:"
+  "ttl_empty_results": "TTL für leere Ergebnisse:",
+  "parameter_edit": {
+    "default_value_help": "Wählen Sie einen Standardwert für den Fall, dass das Lookup-Ergebnis leer ist",
+    "default_value_label": "Standardwert",
+    "empty_result": "Die Abfrage der Ereignisdefinition wird nur ausgeführt, wenn ein Wert für den Parameter vorhanden ist. Ist das Lookup-Ergebnis leer, wird die Ausführung übersprungen und so behandelt, als hätte die <emphasis>Suchanfrage</emphasis> keine Nachrichten gefunden. Soll die Abfrage dennoch ausgeführt werden, muss ein <emphasis>Standardwert</emphasis> angegeben werden, der das gewünschte Suchergebnis liefert. Je nach Anwendungsfall kann zum Beispiel ein Platzhalter wie <inlineCode>{{wildcard}}</inlineCode> ein sinnvoller Standardwert sein.",
+    "empty_result_title": "Verhalten bei leerer Lookup-Ergebnisliste",
+    "general_usage": "Nach der Deklaration wird der Parameter <inlineCode>{{parameter}}</inlineCode> in Ihrer Abfrage durch die Liste der Ergebnisse aus der Lookup-Tabelle ersetzt. Die Ergebnisliste wird in Form einer Lucene-BooleanQuery dargestellt, z. B.: <inlineCode>{{example}}</inlineCode>",
+    "general_usage_title": "Allgemeine Verwendung",
+    "help_title": "So verwenden Sie Lookup-Tabellen-Parameter",
+    "key_help": "Wählen Sie den Schlüssel der Lookup-Tabelle aus",
+    "key_label": "Schlüssel der Lookup-Tabelle",
+    "limitations": "Bitte beachten Sie, dass die maximale Anzahl unterstützter Ergebnisse von der Einstellung <inlineCode>{{setting}}</inlineCode> abhängt. Liefert die Lookup-Tabelle mehr Ergebnisse, schlägt die Abfrage in Ihrem Indexer fehl.",
+    "limitations_title": "Einschränkungen",
+    "loading": "Lookup-Tabellen werden geladen",
+    "table_help": "Wählen Sie die Lookup-Tabelle aus, aus der die Werte abgerufen werden sollen.",
+    "table_label": "Lookup-Tabelle",
+    "table_placeholder": "Lookup-Tabelle auswählen"
+  },
+  "shared": {
+    "configuration": "Konfiguration",
+    "description": "Beschreibung",
+    "description_colon": "Beschreibung:",
+    "no": "nein",
+    "no_description": "Keine Beschreibung.",
+    "query_example_intro": "Eine Suche ohne Feldnamen wird gegen das Feld <fieldCode>title</fieldCode> ausgeführt:",
+    "query_example_same": "entspricht",
+    "yes": "ja"
+  },
+  "cache_summary": {
+    "unknown_type": "Unbekannter Cache-Typ {{type}}. Fehlt das Plugin?"
+  },
+  "adapter_summary": {
+    "key_help": "Schlüssel, für den ein Wert nachgeschlagen werden soll.",
+    "key_label": "Schlüssel",
+    "look_up": "Nachschlagen",
+    "lookup_result": "Lookup-Ergebnis",
+    "test_lookup": "Lookup testen",
+    "test_lookup_description": "Mit diesem Formular können Sie den Data-Adapter manuell auslösen. Die Daten werden nicht zwischengespeichert.",
+    "unknown_type": "Unbekannter Data-Adapter-Typ {{type}}. Fehlt das Plugin?"
+  },
+  "table_fields": {
+    "key_help": "Name des Nachrichtenfelds, dessen Wert als Schlüssel der Lookup-Tabelle verwendet wird.",
+    "key_label": "Schlüsselfeld der Lookup-Tabelle",
+    "key_placeholder": "Feld auswählen",
+    "loading": "Informationen zum Feldprovider werden geladen...",
+    "none_found": "Keine Lookup-Tabellen gefunden.",
+    "table_help": "Wählen Sie die Lookup-Tabelle aus, die zum Abrufen des Werts verwendet werden soll.",
+    "table_label": "Lookup-Tabelle auswählen"
+  },
+  "adapter_form": {
+    "configure": "Adapter konfigurieren",
+    "create": "Adapter erstellen",
+    "creating": "Adapter wird erstellt...",
+    "description_help": "Beschreibung des Data-Adapters.",
+    "error_ttl_help": "Legen Sie eine benutzerdefinierte TTL für das Zwischenspeichern fehlerhafter Ergebnisse fest. Andernfalls gelten die standardmäßigen 5 Sekunden",
+    "error_ttl_label": "Benutzerdefinierte Fehler-TTL",
+    "name_help": "Der Name, mit dem auf diesen Data-Adapter verwiesen wird. Er muss eindeutig sein.",
+    "name_label": "* Name",
+    "picker_create": "Data-Adapter erstellen",
+    "picker_help": "Wählen Sie einen vorhandenen Data-Adapter aus",
+    "picker_label": "Data-Adapter",
+    "picker_placeholder": "Data-Adapter auswählen",
+    "title_help": "Ein kurzer Titel für diesen Data-Adapter.",
+    "title_label": "* Titel",
+    "type_help": "Der Typ des Data-Adapters, der konfiguriert werden soll.",
+    "type_label": "Data-Adapter-Typ",
+    "type_missing_plugin": "{{type}} - Plugin fehlt oder ist ungültig",
+    "type_placeholder": "Data-Adapter-Typ auswählen",
+    "update": "Adapter aktualisieren",
+    "updating": "Adapter wird aktualisiert...",
+    "use_existing": "Vorhandenen Data-Adapter verwenden"
+  },
+  "adapter_list": {
+    "delete_confirm": "Möchten Sie den Data-Adapter „{{title}}“ wirklich löschen?",
+    "delete_title": "Data-Adapter löschen",
+    "human_name": "Data-Adapter",
+    "lookups_per_second": "Lookups/s",
+    "more_actions": "Weitere Aktionen für {{name}}",
+    "problem": "Problem mit dem Data-Adapter"
+  },
+  "adapter_view": {
+    "loading": "Details des Data-Adapters werden geladen"
+  },
+  "adapter_fields": {
+    "case_insensitive_help": "Aktivieren Sie diese Option, wenn beim Schlüssel-Lookup die Groß-/Kleinschreibung ignoriert werden soll.",
+    "case_insensitive_label": "Groß-/Kleinschreibung beim Lookup ignorieren",
+    "case_insensitive_summary": "Lookup ohne Beachtung der Groß-/Kleinschreibung",
+    "check_interval": "Prüfintervall",
+    "cidr_lookup": "CIDR-Lookup",
+    "key_column": "Schlüsselspalte",
+    "line_separator": "Zeilentrenner",
+    "multi_value_lookup": "Lookup mit mehreren Werten",
+    "quote_character": "Anführungszeichen",
+    "quote_help": "Das Zeichen für Elemente in Anführungszeichen.",
+    "seconds_one": "{{count}} Sekunde",
+    "seconds_other": "{{count}} Sekunden",
+    "separator": "Trennzeichen",
+    "value_column": "Wertspalte",
+    "value_columns": "Wertspalten"
+  },
+  "csv_adapter": {
+    "all_columns_except_key": "Alle Spalten außer dem Schlüssel",
+    "check_interval_help": "Das Intervall, in dem geprüft wird, ob die CSV-Datei neu geladen werden muss. (in Sekunden)",
+    "cidr_help": "Aktivieren Sie diese Option, wenn die Schlüssel in der Lookup-Tabelle in CIDR-Notation vorliegen und Lookups mit IP-Adressen erfolgen.",
+    "file_path": "Dateipfad",
+    "file_path_help": "Der Pfad zur CSV-Datei.",
+    "key_column_help": "Der Spaltenname, der für den Schlüssel-Lookup verwendet werden soll.",
+    "multi_value_help": "Aktivieren Sie diese Option für mehrere Wertspalten.",
+    "separator_help": "Das Trennzeichen zwischen den Einträgen.",
+    "value_column_help": "Der Spaltenname, der als Wert für einen Schlüssel verwendet werden soll.",
+    "value_columns_help": "Die Spaltennamen, die als Werte für einen Schlüssel verwendet werden sollen. Leer lassen, um alle Spalten außer dem Schlüssel zu verwenden."
+  },
+  "dsv_adapter": {
+    "file_url": "Datei-URL",
+    "file_url_help": "Die URL der DSV-Datei.",
+    "ignore_characters": "Zeichen ignorieren",
+    "ignore_characters_help": "Zeilen ignorieren, die mit diesen Zeichen beginnen.",
+    "ignore_lines_starting_with": "Zeilen ignorieren, die beginnen mit",
+    "key_column_help": "Die Spaltennummer, die für den Schlüssel-Lookup verwendet werden soll.",
+    "line_separator_help": "Das Trennzeichen zwischen den Zeilen.",
+    "presence_only": "Nur Vorhandensein prüfen",
+    "presence_only_help": "Prüft nur, ob der Schlüssel in der Tabelle vorhanden ist, und gibt einen booleschen Wert statt des Werts zurück.",
+    "refresh_interval": "Aktualisierungsintervall",
+    "refresh_interval_help": "Das Intervall, in dem geprüft wird, ob die DSV-Datei neu geladen werden muss. (in Sekunden)",
+    "separator_help": "Das Trennzeichen zwischen den Spalten der Einträge.",
+    "value_column_help": "Die Spaltennummer, die als Wert für einen Schlüssel verwendet werden soll."
+  },
+  "doc": {
+    "example": "Beispiel {{number}}",
+    "requirements_title": "Anforderungen an die CSV-Datei",
+    "utf8": "Die Datei verwendet die Kodierung <bold>utf-8</bold>"
+  },
+  "csv_doc": {
+    "cidr_intro_1": "Wenn dieser Data-Adapter verwendet wird, um IP-Adressschlüssel mit CIDR-Adressen abzugleichen,",
+    "cidr_intro_2": "sollte er als CIDR-Lookup markiert werden. Zum Beispiel:",
+    "cidr_lookups": "CIDR-Lookups",
+    "cidr_result": "Bei dieser CSV-Datei und dieser Konfiguration liefert der Lookup des Schlüssels {{key}} den Wert „{{result}}“.",
+    "csv_file": "CSV-Datei",
+    "first_line": "Die erste Zeile der CSV-Datei muss eine Liste der Feld- bzw. Spaltennamen sein",
+    "formatting_hint": "Stellen Sie sicher, dass Ihre CSV-Datei gemäß Ihren Konfigurationseinstellungen formatiert ist.",
+    "intro": "Der CSV-Data-Adapter kann Schlüssel-Wert-Paare aus einer CSV-Datei lesen.",
+    "multi_value_example": "Beispiel mit mehreren Werten",
+    "multi_value_heading": "Beispiel mit mehreren Werten",
+    "readable": "Die Datei muss von <bold>jedem</bold> {{productName}}-Server-Node lesbar sein"
+  },
+  "dsv_doc": {
+    "accessible": "Die Datei muss unter derselben URL von <bold>jedem</bold> {{productName}}-Server-Node erreichbar sein",
+    "dsv_file": "DSV-Datei",
+    "formatting_hint": "Stellen Sie sicher, dass Ihre DSV-Datei gemäß Ihren Konfigurationseinstellungen formatiert ist.",
+    "intro": "Der DSV-Data-Adapter kann Schlüssel-Wert-Paare aus einer DSV-Datei lesen (oder prüfen, ob ein Schlüssel vorhanden ist)."
+  },
+  "dns_adapter": {
+    "cache_ttl_override": "Überschreibung der Cache-TTL",
+    "lookup_type_a": "Hostnamen zu IPv4-Adresse auflösen (A)",
+    "lookup_type_a_aaaa_singular": "Hostnamen zu IPv4- und IPv6-Adresse auflösen (A und AAAA)",
+    "lookup_type_aaaa": "Hostnamen zu IPv6-Adresse auflösen (AAAA)",
+    "lookup_type_label": "DNS-Lookup-Typ",
+    "lookup_type_ptr": "Umgekehrte Suche (PTR)",
+    "lookup_type_txt": "Textsuche (TXT)",
+    "not_available": "k. A.",
+    "request_timeout_label": "DNS-Anfrage-Timeout",
+    "server_ips_label": "IP-Adresse des DNS-Servers",
+    "timeout_ms": "{{value}} ms"
+  },
+  "dns_doc": {
+    "a": "Gibt sowohl einen <code>single_value</code> mit einer der IPv4-Adressen zurück, auf die der Hostname aufgelöst wird, als auch einen <code>multi_value</code> mit allen IPv4-Adressen, auf die der Hostname aufgelöst wird. Die Eingabe für diesen Typ muss ein reiner Domainname sein (z. B. <code>api.example.com</code>).",
+    "a_aaaa": "Gibt sowohl einen <code>single_value</code> mit einer der IPv4- oder IPv6-Adressen zurück, auf die der Hostname aufgelöst wird (wenn verfügbar, wird IPv4 zurückgegeben), als auch einen <code>multi_value</code> mit allen IPv4- und IPv6-Adressen, auf die der Hostname aufgelöst wird. Die Eingabe für diesen Typ muss ein reiner Domainname sein (z. B. <code>api.example.com</code>).",
+    "aaaa": "Gibt sowohl einen <code>single_value</code> mit einer der IPv6-Adressen zurück, auf die der Hostname aufgelöst wird, als auch einen <code>multi_value</code> mit allen IPv6-Adressen, auf die der Hostname aufgelöst wird. Die Eingabe für diesen Typ muss ein reiner Domainname sein (z. B. <code>api.example.com</code>).",
+    "cache_ttl_override": "Wenn diese Option aktiviert ist, wird die TTL des Caches für diesen Adapter durch den angegebenen Wert überschrieben.",
+    "ptr": "Gibt einen <code>single_value</code> mit dem PTR-Wert zurück, sofern er für die IP-Adresse definiert ist. Das Feld <code>domain</code> zeigt den Domainnamen ohne Subdomains an. Das Feld <code>full_domain</code> zeigt den vollständigen, ungekürzten Hostnamen bzw. PTR-Wert an. Die Eingabe für diesen Typ muss eine reine IPv4- oder IPv6-Adresse sein (z. B. <code>10.0.0.1</code> oder <code>2622:f3b0:4000:812::200c</code>).",
+    "request_timeout": "Der DNS-Anfrage-Timeout in Millisekunden.",
+    "server_ips": "Eine durch Kommas getrennte Liste von IP-Adressen der DNS-Server und optionalen Ports, die verwendet werden sollen (z. B. <code>192.168.1.1:5353, 192.168.1.244</code>). Lassen Sie dieses Feld leer, um den auf Ihrem lokalen System definierten DNS-Server zu verwenden. Alle Anfragen verwenden Port 53, sofern nicht anders angegeben.",
+    "server_ips_title": "IP-Adressen der DNS-Server",
+    "txt": "Gibt einen <code>multi_value</code> mit allen TXT-Records zurück, die für den Hostnamen definiert sind. Die Eingabe für diesen Typ muss ein reiner Domainname sein (z. B. <code>api.example.com</code>)."
+  }
 }

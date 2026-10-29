@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import { Spinner } from 'components/common';
@@ -23,10 +24,11 @@ import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTab
 import AdapterShow from './adapter-show';
 
 function AdapterView() {
+  const { t } = useTranslation('lookup_tables');
   const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
 
-  if (loadingDataAdapter) return <Spinner text="Loading data adapter details" />;
+  if (loadingDataAdapter) return <Spinner text={t('adapter_view.loading')} />;
 
   return <AdapterShow dataAdapter={dataAdapter} />;
 }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TimeUnit } from 'components/common';
 import type { TimeUnit as TimeUnitString } from 'components/common/types';
@@ -33,32 +34,33 @@ type DnsAdapterSummaryProps = {
 };
 
 const DnsAdapterSummary = ({ dataAdapter }: DnsAdapterSummaryProps) => {
+  const { t } = useTranslation('lookup_tables');
   const { config } = dataAdapter;
 
   // Allows enum > display label translation.
   const lookupType = {
-    A: 'Resolve hostname to IPv4 address (A)',
-    AAAA: 'Resolve hostname to IPv6 address (AAAA)',
-    A_AAAA: 'Resolve hostname to IPv4 and IPv6 address (A and AAAA)',
-    PTR: 'Reverse lookup (PTR)',
-    TXT: 'Text lookup (TXT)',
+    A: t('dns_adapter.lookup_type_a'),
+    AAAA: t('dns_adapter.lookup_type_aaaa'),
+    A_AAAA: t('dns_adapter.lookup_type_a_aaaa_singular'),
+    PTR: t('dns_adapter.lookup_type_ptr'),
+    TXT: t('dns_adapter.lookup_type_txt'),
   };
 
   return (
     <dl>
-      <dt>DNS Lookup Type</dt>
+      <dt>{t('dns_adapter.lookup_type_label')}</dt>
       <dd>{lookupType[config.lookup_type]}</dd>
 
-      <dt>DNS Server IP Address</dt>
-      <dd>{config.server_ips || 'n/a'}</dd>
+      <dt>{t('dns_adapter.server_ips_label')}</dt>
+      <dd>{config.server_ips || t('dns_adapter.not_available')}</dd>
 
-      <dt>DNS Request Timeout</dt>
-      <dd>{config.request_timeout} ms</dd>
+      <dt>{t('dns_adapter.request_timeout_label')}</dt>
+      <dd>{t('dns_adapter.timeout_ms', { value: config.request_timeout })}</dd>
 
-      <dt>Cache TTL Override</dt>
+      <dt>{t('dns_adapter.cache_ttl_override')}</dt>
       <dd>
         {!config.cache_ttl_override_enabled ? (
-          'n/a'
+          t('dns_adapter.not_available')
         ) : (
           <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} />
         )}

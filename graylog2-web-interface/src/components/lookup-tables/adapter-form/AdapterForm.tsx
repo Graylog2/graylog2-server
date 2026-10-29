@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
@@ -73,6 +74,7 @@ type Props = {
 };
 
 const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAdapter = INIT_ADAPTER }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const sendTelemetry = useSendTelemetry('lut_data_adapter');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
   const { createAdapter, creatingAdapter } = useCreateAdapter();
@@ -129,8 +131,8 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
               {canModify && (
                 <Row $align="center" $justify="flex-end">
                   <FormSubmit
-                    submitButtonText={create ? 'Create adapter' : 'Update adapter'}
-                    submitLoadingText={create ? 'Creating adapter...' : 'Updating adapter...'}
+                    submitButtonText={create ? t('adapter_form.create') : t('adapter_form.update')}
+                    submitLoadingText={create ? t('adapter_form.creating') : t('adapter_form.updating')}
                     isSubmitting={isSubmitting || creatingAdapter || updatingAdapter}
                     disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter || !isValid}
                     isAsyncSubmit
