@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { KeyValueTable } from 'components/common';
 
@@ -23,23 +24,24 @@ type HTTPJSONPathAdapterSummaryProps = {
 };
 
 const HTTPJSONPathAdapterSummary = ({ dataAdapter }: HTTPJSONPathAdapterSummaryProps) => {
+  const { t } = useTranslation('lookup_tables');
   const { config } = dataAdapter;
 
   return (
     <dl>
-      <dt>Lookup URL</dt>
+      <dt>{t('http_doc.lookup_url_label')}</dt>
       <dd>{config.url}</dd>
-      <dt>Single value JSONPath</dt>
+      <dt>{t('http_doc.single_value_label')}</dt>
       <dd>
         <code>{config.single_value_jsonpath}</code>
       </dd>
-      <dt>Multi value JSONPath</dt>
+      <dt>{t('http_doc.multi_value_label')}</dt>
       <dd>
         <code>{config.multi_value_jsonpath}</code>
       </dd>
-      <dt>HTTP User-Agent</dt>
+      <dt>{t('http_doc.http_useragent_label')}</dt>
       <dd>{config.user_agent}</dd>
-      <dt>HTTP Headers</dt>
+      <dt>{t('http_fields.headers_label')}</dt>
       <dd>
         <KeyValueTable pairs={config.headers || {}} />
       </dd>

@@ -19,7 +19,9 @@ import { useMemo } from 'react';
 import { Formik } from 'formik';
 import type { FormikErrors } from 'formik';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Wizard, Spinner } from 'components/common';
@@ -52,15 +54,17 @@ export const INIT_TABLE_VALUES: LookupTable = {
 const validations = (values: LookupTable) => {
   const errors: FormikErrors<LookupTable> = {};
 
-  if (!values.title) errors.title = 'Title is required';
-  if (!values.name) errors.name = 'Name is required';
-  if (!values.cache_id) errors.cache_id = 'Cache is required';
-  if (!values.data_adapter_id) errors.data_adapter_id = 'Data Adapter is required';
+  if (!values.title) errors.title = i18n.t('lookup_table_form.title_required', { ns: 'lookup_tables' });
+  if (!values.name) errors.name = i18n.t('lookup_table_form.name_required', { ns: 'lookup_tables' });
+  if (!values.cache_id) errors.cache_id = i18n.t('lookup_table_form.cache_required', { ns: 'lookup_tables' });
+  if (!values.data_adapter_id)
+    errors.data_adapter_id = i18n.t('lookup_table_form.data_adapter_required', { ns: 'lookup_tables' });
 
   return errors;
 };
 
 function LookupTableWizard() {
+  const { t } = useTranslation('lookup_tables');
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const initialValues = useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
@@ -97,7 +101,7 @@ function LookupTableWizard() {
     });
   };
 
-  if (loadingLookupTable) return <Spinner text="Loading Lookup Table ..." />;
+  if (loadingLookupTable) return <Spinner text={t('lookup_table_form.loading')} />;
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validations} validateOnMount>

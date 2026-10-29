@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -33,6 +34,7 @@ type ActionsProps = {
 };
 
 function Actions({ lut }: ActionsProps) {
+  const { t } = useTranslation('lookup_tables');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry('lut');
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
@@ -57,21 +59,21 @@ function Actions({ lut }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={lut.id} size="lg" pullRight title={`More Actions for ${lut.name}`}>
-        <MenuItem onSelect={handleEdit}>Edit</MenuItem>
+      <MoreActionsMenu id={lut.id} size="lg" pullRight title={t('lut_list.more_actions', { name: lut.name })}>
+        <MenuItem onSelect={handleEdit}>{t('lut_list.edit')}</MenuItem>
         <MenuItem divider />
-        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
+        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>{t('lut_list.delete')}</DeleteMenuItem>
       </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
-          title="Delete Lookup Table"
+          title={t('lut_list.delete_title')}
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={handleDelete}
           cancelButtonDisabled={deletingLookupTable}
           confirmButtonDisabled={deletingLookupTable}
-          confirmButtonText="Delete">
-          <p>Are you sure you want to delete lookup table &quot;{lut.title}&quot;?</p>
+          confirmButtonText={t('lut_list.delete')}>
+          <p>{t('lut_list.delete_confirm', { title: lut.title })}</p>
         </BootstrapModalConfirm>
       )}
     </>

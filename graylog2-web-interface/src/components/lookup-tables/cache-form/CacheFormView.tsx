@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { RowContainer } from 'components/lookup-tables/layout-componets';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 function CacheFormView({ saved = undefined, onCancel, cache = undefined, isStep = false }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const [lutCache, setLutCache] = useState<LookupTableCache>(cache);
   const isCreate = useMemo(() => !lutCache?.id, [lutCache]);
 
@@ -45,7 +47,7 @@ function CacheFormView({ saved = undefined, onCancel, cache = undefined, isStep 
       {isCreate && (
         <RowContainer>
           <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
-          {isStep && <UseExistingButton onClick={onCancel}>Use Existing Cache</UseExistingButton>}
+          {isStep && <UseExistingButton onClick={onCancel}>{t('cache_form.use_existing')}</UseExistingButton>}
         </RowContainer>
       )}
       {lutCache && (
@@ -53,7 +55,7 @@ function CacheFormView({ saved = undefined, onCancel, cache = undefined, isStep 
           cache={lutCache}
           type={lutCache?.config?.type}
           create={isCreate}
-          title="Configure Cache"
+          title={t('cache_form.configure')}
           saved={saved}
           onCancel={onCancel}
         />

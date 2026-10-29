@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
@@ -23,10 +24,11 @@ import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI
 import CacheShow from './cache-show';
 
 function CacheView() {
+  const { t } = useTranslation('lookup_tables');
   const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
   const { cache, loadingCache } = useFetchCache(cacheIdOrName);
 
-  if (loadingCache) return <Spinner text="Loading cache details" />;
+  if (loadingCache) return <Spinner text={t('cache_view.loading')} />;
 
   return <CacheShow cache={cache} />;
 }

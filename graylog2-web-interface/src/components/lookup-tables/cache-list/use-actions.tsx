@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -33,6 +34,7 @@ type ActionsProps = {
 };
 
 function Actions({ cache }: ActionsProps) {
+  const { t } = useTranslation('lookup_tables');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry('lut_cache');
   const { deleteCache, deletingCache } = useDeleteCache();
@@ -57,21 +59,21 @@ function Actions({ cache }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={cache.id} size="lg" pullRight title={`More Actions for ${cache.name}`}>
-        <MenuItem onSelect={handleEdit}>Edit</MenuItem>
+      <MoreActionsMenu id={cache.id} size="lg" pullRight title={t('cache_list.more_actions', { name: cache.name })}>
+        <MenuItem onSelect={handleEdit}>{t('cache_list.edit')}</MenuItem>
         <MenuItem divider />
-        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
+        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>{t('cache_list.delete')}</DeleteMenuItem>
       </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
-          title="Delete Cache"
+          title={t('cache_list.delete_title')}
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={handleDelete}
           cancelButtonDisabled={deletingCache}
           confirmButtonDisabled={deletingCache}
-          confirmButtonText="Delete">
-          <p>Are you sure you want to delete the cache &quot;{cache.title}&quot;?</p>
+          confirmButtonText={t('cache_list.delete')}>
+          <p>{t('cache_list.delete_confirm', { title: cache.title })}</p>
         </BootstrapModalConfirm>
       )}
     </>

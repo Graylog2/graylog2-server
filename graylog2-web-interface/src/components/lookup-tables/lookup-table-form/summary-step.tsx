@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { Alert } from 'components/bootstrap';
@@ -65,37 +66,40 @@ const MuttedText = styled.span`
 `;
 
 function DefaultValueErrors({ errors }: { errors: DefaultValueErrorsType }) {
+  const { t } = useTranslation('lookup_tables');
   const invalidDefaults = [
-    ['Default single value', errors.default_single_value],
-    ['Default multi value', errors.default_multi_value],
+    [t('lut_summary.default_single_label'), errors.default_single_value],
+    [t('lut_summary.default_multi_label'), errors.default_multi_value],
   ].filter(([, error]) => !!error);
 
   if (invalidDefaults.length === 0) return null;
 
   return (
-    <Alert style={{ width: '100%' }} bsStyle="danger" title="Invalid default values">
+    <Alert style={{ width: '100%' }} bsStyle="danger" title={t('lut_summary.invalid_defaults_title')}>
       {invalidDefaults.map(([label, error]) => (
         <div key={label}>
           {label}: {error}
         </div>
       ))}
-      <div>Fix them on the Lookup Table step.</div>
+      <div>{t('lut_summary.fix_defaults')}</div>
     </Alert>
   );
 }
 
 function TableSummary({ table, errors }: { table: LookupTable; errors: DefaultValueErrorsType }) {
+  const { t } = useTranslation('lookup_tables');
+
   return (
     <Col $gap="lg">
       <Col $gap="sm">
-        <h2>Lookup Table Details</h2>
+        <h2>{t('lut_summary.table_details')}</h2>
         <Row>
-          <MuttedText>Title:</MuttedText>
-          <span>{table.title || <DangerText>No title set (required)</DangerText>}</span>
+          <MuttedText>{t('lut_summary.title_colon')}</MuttedText>
+          <span>{table.title || <DangerText>{t('lut_summary.no_title')}</DangerText>}</span>
         </Row>
         <Row>
-          <MuttedText>Name:</MuttedText>
-          <span>{table.name || <DangerText>No name set (required)</DangerText>}</span>
+          <MuttedText>{t('lut_summary.name_colon')}</MuttedText>
+          <span>{table.name || <DangerText>{t('lut_summary.no_name')}</DangerText>}</span>
         </Row>
       </Col>
       <LookupTableDetails table={table} />
@@ -111,10 +115,12 @@ function TableSummary({ table, errors }: { table: LookupTable; errors: DefaultVa
 }
 
 function CacheSummary({ cache }: { cache: LookupTableCache }) {
+  const { t } = useTranslation('lookup_tables');
+
   if (!cache)
     return (
       <Alert style={{ width: '100%' }} bsStyle="danger">
-        No cache selected.
+        {t('lut_summary.no_cache_selected')}
       </Alert>
     );
 
@@ -122,10 +128,12 @@ function CacheSummary({ cache }: { cache: LookupTableCache }) {
 }
 
 function AdapterSummary({ adapter }: { adapter: LookupTableAdapter }) {
+  const { t } = useTranslation('lookup_tables');
+
   if (!adapter)
     return (
       <Alert style={{ width: '100%' }} bsStyle="danger">
-        No data adapter selected.
+        {t('lut_summary.no_adapter_selected')}
       </Alert>
     );
 
@@ -133,6 +141,7 @@ function AdapterSummary({ adapter }: { adapter: LookupTableAdapter }) {
 }
 
 function SummaryStep() {
+  const { t } = useTranslation('lookup_tables');
   const { values, initialValues } = useFormikContext<LookupTable>();
   const { defaultValueErrors, validateDefaultValues } = useDefaultValueValidation();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
@@ -155,18 +164,18 @@ function SummaryStep() {
         <TableSummary table={values} errors={defaultValueErrors} />
         <Col $gap="lg">
           {loadingCache ? (
-            <Spinner text="Loading cache..." />
+            <Spinner text={t('lut_summary.loading_cache')} />
           ) : (
             <Col $gap="sm">
-              <h2>Cache Details</h2>
+              <h2>{t('lut_summary.cache_details')}</h2>
               <CacheSummary cache={cache} />
             </Col>
           )}
           {loadingDataAdapter ? (
-            <Spinner text="Loading data adapter..." />
+            <Spinner text={t('lut_summary.loading_adapter')} />
           ) : (
             <Col $gap="sm">
-              <h2>Data Adapter Details</h2>
+              <h2>{t('lut_summary.adapter_details')}</h2>
               <AdapterSummary adapter={dataAdapter} />
             </Col>
           )}

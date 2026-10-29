@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -42,6 +43,7 @@ type Props = {
 };
 
 function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoading }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { values, submitForm, resetForm, isValid } = useFormikContext<LookupTable>();
   const { hasDefaultValueErrors } = useDefaultValueValidation();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
@@ -78,17 +80,17 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
   if (activeStepId === 'summary') {
     return (
       <ButtonsRow $align="center" $justify="flex-end" $width="100%">
-        <Button onClick={onCancel}>Cancel</Button>
+        <Button onClick={onCancel}>{t('lut_wizard.cancel')}</Button>
         <Button
           bsStyle="primary"
           onClick={onSubmit}
           disabled={!isValid || hasDefaultValueErrors || isLoading || !canModify}>
           {isLoading ? (
             <Row $gap="xs" $align="center">
-              <Spinner text="" /> <span>{isCreate ? 'Creating' : 'Updating'} Lookup Table...</span>
+              <Spinner text="" /> <span>{isCreate ? t('lut_wizard.creating') : t('lut_wizard.updating')}</span>
             </Row>
           ) : (
-            `${isCreate ? 'Create' : 'Update'} Lookup Table`
+            t(isCreate ? 'lut_wizard.create' : 'lut_wizard.update')
           )}
         </Button>
       </ButtonsRow>
@@ -98,9 +100,9 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
   return (
     <ButtonsRow $align="center" $justify="space-between" $width="100%">
       <Button onClick={onPrev} disabled={onFirstStep}>
-        Previous
+        {t('lut_wizard.previous')}
       </Button>
-      <Button onClick={onNext}>Next</Button>
+      <Button onClick={onNext}>{t('lut_wizard.next')}</Button>
     </ButtonsRow>
   );
 }

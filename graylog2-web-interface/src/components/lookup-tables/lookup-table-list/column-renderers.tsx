@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -46,6 +47,7 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string }) => {
+  const { t } = useTranslation('lookup_tables');
   const { errors } = useErrorsContext();
   const tableErrorText = errors?.lutErrors[lut.name];
   const { push } = useHistory();
@@ -56,13 +58,14 @@ const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string 
 
   return (
     <TitleRow>
-      {tableErrorText && <ErrorPopover placement="right" errorText={tableErrorText} title="Lookup Table problem" />}
+      {tableErrorText && <ErrorPopover placement="right" errorText={tableErrorText} title={t('lut_list.problem_title')} />}
       <Title onClick={onClick}>{children}</Title>
     </TitleRow>
   );
 };
 
 const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) => {
+  const { t } = useTranslation('lookup_tables');
   const { errors } = useErrorsContext();
   const { push } = useHistory();
 
@@ -70,19 +73,20 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
     push(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(caches?.[cacheId]?.name));
   }, [cacheId, caches, push]);
 
-  if (!caches || !cacheId || !caches[cacheId]) return <i>No cache</i>;
+  if (!caches || !cacheId || !caches[cacheId]) return <i>{t('lut_list.no_cache')}</i>;
 
   const cacheErrorText = errors?.cacheErrors[caches[cacheId].name];
 
   return (
     <TitleRow>
-      {cacheErrorText && <ErrorPopover placement="bottom" errorText={cacheErrorText} title="Cache problem" />}
+      {cacheErrorText && <ErrorPopover placement="bottom" errorText={cacheErrorText} title={t('lut_list.cache_problem')} />}
       <Title onClick={onClick}>{caches[cacheId].title}</Title>
     </TitleRow>
   );
 };
 
 const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string; dataAdapters: AdaptersMap }) => {
+  const { t } = useTranslation('lookup_tables');
   const { errors } = useErrorsContext();
   const { push } = useHistory();
 
@@ -90,14 +94,14 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
     push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapters?.[dataAdapterId]?.name));
   }, [dataAdapterId, dataAdapters, push]);
 
-  if (!dataAdapters || !dataAdapterId || !dataAdapters[dataAdapterId]) return <i>No data adapters</i>;
+  if (!dataAdapters || !dataAdapterId || !dataAdapters[dataAdapterId]) return <i>{t('lut_list.no_adapters')}</i>;
 
   const adapterErrorText = errors?.adapterErrors[dataAdapters[dataAdapterId].name];
 
   return (
     <TitleRow>
       {adapterErrorText && (
-        <ErrorPopover placement="bottom" errorText={adapterErrorText} title="Data Adapter problem" />
+        <ErrorPopover placement="bottom" errorText={adapterErrorText} title={t('adapter_list.problem')} />
       )}
       <Title onClick={onClick}>{dataAdapters[dataAdapterId].title}</Title>
     </TitleRow>

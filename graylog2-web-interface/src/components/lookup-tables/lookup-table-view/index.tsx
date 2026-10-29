@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import {
@@ -28,12 +29,13 @@ import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext'
 import LookupTableShow from './lookup-table-show';
 
 function LookupTableView() {
+  const { t } = useTranslation('lookup_tables');
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const { cache, loadingCache } = useFetchCache(lookupTable?.cache_id);
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(lookupTable?.data_adapter_id);
 
-  if (loadingLookupTable || loadingCache || loadingDataAdapter) return <Spinner text="Loading lookup table details" />;
+  if (loadingLookupTable || loadingCache || loadingDataAdapter) return <Spinner text={t('lut_view.loading')} />;
 
   return (
     <ErrorsProvider>

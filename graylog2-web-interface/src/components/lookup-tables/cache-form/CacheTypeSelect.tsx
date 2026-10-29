@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { types, fetchingCacheTypes } = useFetchCacheTypes();
   const plugins = usePluginEntities('lookupTableCaches');
   const cachePlugins = Object.fromEntries(plugins.map((p) => [p.type, p]));
@@ -47,7 +49,7 @@ function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
             return {
               value: typeItem.type,
               disabled: true,
-              label: `${typeItem.type} - missing or invalid plugin`,
+              label: t('cache_form.type_missing_plugin', { type: typeItem.type }),
             };
           }
 
@@ -60,7 +62,7 @@ function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
     }
 
     return [];
-  }, [fetchingCacheTypes, types, cachePlugins]);
+  }, [fetchingCacheTypes, types, cachePlugins, t]);
 
   const handleTypeSelect = useCallback(
     (cacheType: string) => {
@@ -78,9 +80,9 @@ function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
   );
 
   return (
-    <Input id="cache-type-select" label="Cache Type" required help="The type of cache to configure.">
+    <Input id="cache-type-select" label={t('cache_form.type_label')} required help={t('cache_form.type_help')}>
       <Select
-        placeholder="Select Cache Type"
+        placeholder={t('cache_form.type_placeholder')}
         clearable={false}
         options={sortedCaches}
         onChange={handleTypeSelect}

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import { Col, Row } from 'components/lookup-tables/layout-componets';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 function PurgeCache({ table }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const [purgeKey, setPurgeKey] = useState<{ value: string; valid: boolean }>(INIT_INPUT);
   const { purgeLookupTableKey } = usePurgeLookupTableKey();
   const { purgeAllLookupTableKey } = usePurgeAllLookupTableKey();
@@ -60,10 +62,8 @@ function PurgeCache({ table }: Props) {
   return (
     <Col $gap="sm">
       <Col $gap="xs">
-        <h2>Purge Cache</h2>
-        <Description>
-          You can purge the complete cache for this lookup table or only the cache entry for a single key.
-        </Description>
+        <h2>{t('lut_view.purge_title')}</h2>
+        <Description>{t('lut_view.purge_description')}</Description>
       </Col>
       <form onSubmit={handlePurgeKey} style={{ width: '100%' }}>
         <fieldset>
@@ -71,20 +71,20 @@ function PurgeCache({ table }: Props) {
             type="text"
             id="purge-key"
             name="purgekey"
-            placeholder="Insert key which should be purged"
-            label="Key"
+            placeholder={t('lut_view.purge_placeholder')}
+            label={t('lut_view.key_label')}
             data-testid="purgekey"
             onChange={onChange}
-            help="Key to purge from cache"
+            help={t('lut_view.purge_help')}
             required
             value={purgeKey.value}
           />
           <Row $justify="flex-end">
             <Button type="submit" disabled={!purgeKey.valid}>
-              Purge key
+              {t('lut_view.purge_key')}
             </Button>
             <Button type="button" bsStyle="primary" onClick={hadlePurgeAll}>
-              Purge all
+              {t('lut_view.purge_all')}
             </Button>
           </Row>
         </fieldset>

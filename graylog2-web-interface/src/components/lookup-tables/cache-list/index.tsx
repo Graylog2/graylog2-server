@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -29,26 +30,30 @@ import { cacheListElements } from './constants';
 import columnRenderers from './column-renderers';
 import useActions from './use-actions';
 
-const queryHelpComponent = (
-  <QueryHelper
-    entityName="cache"
-    commonFields={['id', 'title', 'name', 'description']}
-    example={
-      <p>
-        searching without a field name matches against the <code>title</code> field:
-        <br />
-        <kbd>geoip</kbd> <br />
-        is the same as
-        <br />
-        <kbd>title:geoip</kbd>
-      </p>
-    }
-  />
-);
+const exampleQuery = 'geoip';
+const exampleFieldQuery = 'title:geoip';
 
 function CacheList() {
+  const { t } = useTranslation('lookup_tables');
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
   const { renderActions } = useActions();
+
+  const queryHelpComponent = (
+    <QueryHelper
+      entityName="cache"
+      commonFields={['id', 'title', 'name', 'description']}
+      example={
+        <p>
+          <Trans t={t} i18nKey="shared.query_example_intro" components={{ fieldCode: <code /> }} />
+          <br />
+          <kbd>{exampleQuery}</kbd> <br />
+          {t('shared.query_example_same')}
+          <br />
+          <kbd>{exampleFieldQuery}</kbd>
+        </p>
+      }
+    />
+  );
 
   const handleFetchCaches = useCallback(
     async (searchParams: SearchParams) => {
@@ -94,7 +99,7 @@ function CacheList() {
       <Row className="content">
         <Col md={12}>
           <PaginatedEntityTable<CacheEntity>
-            humanName="caches"
+            humanName={t('cache_list.human_name')}
             entityActions={renderActions}
             queryHelpComponent={queryHelpComponent}
             tableLayout={cacheListElements.defaultLayout}

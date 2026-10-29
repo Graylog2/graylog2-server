@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Input, Button } from 'components/bootstrap';
@@ -40,6 +41,7 @@ type Props = {
 };
 
 function CachePicker({ onCreateClick, caches = [] }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches
     .map((inCache: LookupTableCache) => ({ value: inCache.id, label: `${inCache.title} (${inCache.name})` }))
@@ -51,7 +53,7 @@ function CachePicker({ onCreateClick, caches = [] }: Props) {
     <fieldset>
       <Input
         id="cache-select"
-        label="Cache"
+        label={t('cache_form.picker_label')}
         required
         bsStyle={errorMessage ? 'error' : undefined}
         labelClassName="d-block mb-1"
@@ -59,19 +61,19 @@ function CachePicker({ onCreateClick, caches = [] }: Props) {
         formGroupClassName="mb-3">
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <StyledSelect
-            placeholder="Select a cache"
+            placeholder={t('cache_form.picker_placeholder')}
             clearable={false}
             options={sortedCaches}
             onBlur={() => setTouched(true)}
             onChange={(v) => setValue(v)}
             value={value}
           />
-          <StyledButton type="button" aria-label="Create Cache" onClick={onCreateClick}>
-            Create Cache
+          <StyledButton type="button" aria-label={t('cache_form.picker_create')} onClick={onCreateClick}>
+            {t('cache_form.picker_create')}
           </StyledButton>
         </div>
         <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
-          {errorMessage || 'Select an existing cache'}
+          {errorMessage || t('cache_form.picker_help')}
         </div>
       </Input>
     </fieldset>
