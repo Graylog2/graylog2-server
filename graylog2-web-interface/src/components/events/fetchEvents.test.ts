@@ -16,14 +16,17 @@
  */
 import { OrderedMap } from 'immutable';
 
-import fetch from 'logic/rest/FetchProvider';
+import { Events } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './fetchEvents';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({
+  Events: { search: jest.fn() },
+}));
 
 describe('fetchEvents', () => {
   const SEVEN_DAYS_IN_SECONDS = 7 * 86400;
@@ -169,20 +172,35 @@ describe('fetchEvents', () => {
     beforeEach(() => {
       jest.clearAllMocks();
 
-      asMock(fetch).mockResolvedValue({
+      asMock(Events.search).mockResolvedValue({
         events: [],
         total_events: 0,
-        parameters: { page: 1, per_page: 10 },
-        context: {},
+        duration: 0,
+        used_indices: [],
+        parameters: {
+          page: 1,
+          per_page: 10,
+          query: '',
+          sort_by: 'timestamp',
+          sort_direction: 'desc',
+          timerange: defaultTimeRange,
+          filter: {
+            alerts: 'include',
+            extra_filters: {},
+            id: [],
+            event_definitions: [],
+            priority: [],
+            key: [],
+          },
+        },
+        context: { streams: {}, event_definitions: {} },
       });
     });
 
     it('sends 7 days timerange when no timestamp filter is provided', async () => {
       await fetchEvents(baseSearchParams, undefined);
 
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.any(String),
+      expect(Events.search).toHaveBeenCalledWith(
         expect.objectContaining({
           timerange: { type: 'relative', range: SEVEN_DAYS_IN_SECONDS },
         }),
@@ -197,9 +215,7 @@ describe('fetchEvents', () => {
 
       await fetchEvents(searchParams, undefined);
 
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.any(String),
+      expect(Events.search).toHaveBeenCalledWith(
         expect.objectContaining({
           timerange: {
             type: 'absolute',
@@ -213,9 +229,7 @@ describe('fetchEvents', () => {
     it('concatenates streamId with query', async () => {
       await fetchEvents({ ...baseSearchParams, query: 'test' }, 'stream-1');
 
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.any(String),
+      expect(Events.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: '(test) AND source_streams:stream-1',
         }),
@@ -225,9 +239,7 @@ describe('fetchEvents', () => {
     it('uses only streamId as query when query is empty', async () => {
       await fetchEvents(baseSearchParams, 'stream-1');
 
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.any(String),
+      expect(Events.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: 'source_streams:stream-1',
         }),

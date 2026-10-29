@@ -16,15 +16,11 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
-import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-import type {
-  IndexSetFieldTypeProfileJson,
-  IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
@@ -33,18 +29,26 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
+const usedInAttribute: Attribute = {
+  id: 'index_set_ids',
+  searchable: false,
+  sortable: false,
+  title: 'Used in',
+  type: 'STRING',
+};
+
 export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypeProfiles', searchParams];
 
-export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
-  const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
-  const url = PaginationURL(indexSetFieldTypeUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
-    filters: FiltersForQueryParams(searchParams.filters),
-    sort: searchParams.sort.attributeId,
-    order: searchParams.sort.direction,
-  });
-
-  return fetch('GET', url).then(({ elements, total, attributes }) => ({
-    list: elements.map((profile: IndexSetFieldTypeProfileJson) => ({
+export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) =>
+  SystemIndexSetsFieldTypeProfiles.getPage(
+    searchParams.sort.attributeId as Parameters<typeof SystemIndexSetsFieldTypeProfiles.getPage>[0],
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query || undefined,
+    FiltersForQueryParams(searchParams.filters),
+    searchParams.sort.direction,
+  ).then(({ elements, total, attributes }) => ({
+    list: elements.map((profile) => ({
       id: profile.id,
       name: profile.name,
       description: profile.description,
@@ -52,18 +56,8 @@ export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams)
       indexSetIds: profile.index_set_ids,
     })),
     pagination: { total },
-    attributes: [
-      ...attributes,
-      {
-        id: 'index_set_ids',
-        searchable: false,
-        sortable: false,
-        title: 'Used in',
-        type: 'STRING',
-      },
-    ],
+    attributes: [...attributes, usedInAttribute],
   }));
-};
 
 const useProfiles = (
   searchParams: SearchParams,

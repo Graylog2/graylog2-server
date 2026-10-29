@@ -19,10 +19,11 @@ import { useQuery } from '@tanstack/react-query';
 import { ClusterJobs } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
 
-export type SystemJobSummary = Awaited<ReturnType<typeof ClusterJobs.getJob>>;
+export type SystemJobSummary = StubResponse<typeof ClusterJobs.getJob>;
 
 export type ClusterJobsResult = {
   jobsById: Map<string, SystemJobSummary>;

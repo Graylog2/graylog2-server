@@ -14,62 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SearchParams, Attributes } from 'stores/PaginationTypes';
-import PaginationURL from 'util/PaginationURL';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import { TokenUsage } from '@graylog/server-api';
 
-export type Token = {
-  id: string;
-  _id: string;
-  username: string;
-  user_id: string;
-  NAME: string;
-  created_at: string;
-  last_access: string;
-  external_user: boolean;
-  title: string;
-  user_deleted: boolean;
-};
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
-type PaginatedResponse = {
-  per_page: number;
-  count: number;
-  total: number;
-  page: number;
-  query: string;
-  attributes: Attributes;
-  elements: Array<Token>;
-};
+type TokenUsageDTO = StubResponse<typeof TokenUsage.getPage>['elements'][number];
 
-export const fetchTokens = (searchParams: SearchParams) => {
-  const url = PaginationURL(
-    ApiRoutes.TokenManagementController.paginated().url,
+export type Token = TokenUsageDTO & { id: string };
+
+export const fetchTokens = (searchParams: SearchParams) =>
+  TokenUsage.getPage(
+    searchParams.sort.attributeId as Parameters<typeof TokenUsage.getPage>[0],
     searchParams.page,
     searchParams.pageSize,
-    searchParams.query,
-    {
-      sort: searchParams.sort.attributeId,
-      order: searchParams.sort.direction,
+    searchParams.query || undefined,
+    searchParams.sort.direction,
+  ).then(({ elements, query, attributes, total, pagination: { count, page, per_page: perPage } }) => ({
+    list: elements.map((el) => ({ ...el, id: el._id })),
+    attributes,
+    pagination: {
+      count,
+      total,
+      page,
+      perPage,
+      query,
     },
-  );
-
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
-    const { elements, query, attributes, count, total, page, per_page: perPage } = response;
-
-    return {
-      list: elements.map((el) => ({ ...el, id: el._id })),
-      attributes,
-      pagination: {
-        count,
-        total,
-        page,
-        perPage,
-        query,
-      },
-    };
-  });
-};
+  }));
 
 export const keyFn = (searchParams: SearchParams) => ['token-management', 'overview', searchParams];

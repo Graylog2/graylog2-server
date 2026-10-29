@@ -17,6 +17,7 @@
 import { SystemMongodb } from '@graylog/server-api';
 
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
 export const MongodbRole = {
   PRIMARY: 'PRIMARY',
@@ -67,7 +68,7 @@ export const fetchMongodbNodes = async (
 ): Promise<MongodbNodesResponse> => {
   type MongodbNodesSort = Parameters<typeof SystemMongodb.listNodes>[0];
   type MongodbNodesOrder = Parameters<typeof SystemMongodb.listNodes>[4];
-  type MongodbNodesApiResponse = Awaited<ReturnType<typeof SystemMongodb.listNodes>>;
+  type MongodbNodesApiResponse = StubResponse<typeof SystemMongodb.listNodes>;
 
   const sort = (params.sort?.attributeId ?? 'name') as MongodbNodesSort;
   const order = (params.sort?.direction ?? 'asc') as MongodbNodesOrder;

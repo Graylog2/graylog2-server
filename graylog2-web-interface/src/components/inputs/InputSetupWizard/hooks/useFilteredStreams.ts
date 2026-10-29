@@ -16,28 +16,21 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { Streams } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
-import { qualifyUrl } from 'util/URLUtils';
 import { onError } from 'util/conditional/onError';
-import type { Stream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
+import type { StubResponse } from 'util/UtilityTypes';
 
 const INITIAL_DATA = {
   total: 0,
   streams: [],
 };
 
-type StreamsResponse = {
-  total: number;
-  streams: Array<Stream>;
-};
+type StreamsResponse = StubResponse<typeof Streams.getNoSecurity>;
 
 export const STREAMS_NO_SECURITY_ID = ['streams_without_security', 'overview'];
-
-const getStreams = (): Promise<StreamsResponse> =>
-  fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.withoutSecurityDefaults().url));
 
 const useStreams = (): {
   data: StreamsResponse;
@@ -47,7 +40,7 @@ const useStreams = (): {
     queryKey: [STREAMS_NO_SECURITY_ID],
 
     queryFn: () =>
-      onError(getStreams(), (errorThrown: FetchError) => {
+      onError(Streams.getNoSecurity(), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
           UserNotification.error(`Loading streams failed with: ${errorThrown}`);
         }

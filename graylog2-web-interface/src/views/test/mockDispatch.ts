@@ -30,7 +30,7 @@ const mockSearchExecutors: SearchExecutors = {
   parse: async () => SearchMetadata.empty(),
   executeJobResult: async () => ({}) as SearchExecutionResult,
   startJob: async () => ({ nodeId: 'dummyNodeIdForTesting', asyncSearchId: 'dummySearchIdForTesting' }),
-  cancelJob: async () => null,
+  cancelJob: async () => {},
 };
 
 type ActionFn = (d: ViewsDispatch, getState: () => RootState, extraArgs?: ExtraArguments) => UnknownAction;

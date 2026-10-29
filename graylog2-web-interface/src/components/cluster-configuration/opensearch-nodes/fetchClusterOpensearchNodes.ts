@@ -18,6 +18,7 @@ import { SystemOpensearch } from '@graylog/server-api';
 
 import type { RequestOptions } from 'routing/request';
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
 const NO_SESSION_EXTENSION: RequestOptions = { requestShouldExtendSession: false };
 
@@ -52,7 +53,7 @@ export const fetchOpensearchNodes = async (
 ): Promise<OpensearchNodesResponse> => {
   type OpensearchNodesSort = Parameters<typeof SystemOpensearch.listNodes>[0];
   type OpensearchNodesOrder = Parameters<typeof SystemOpensearch.listNodes>[4];
-  type OpensearchNodesApiResponse = Awaited<ReturnType<typeof SystemOpensearch.listNodes>>;
+  type OpensearchNodesApiResponse = StubResponse<typeof SystemOpensearch.listNodes>;
 
   const sort = (params.sort?.attributeId ?? 'name') as OpensearchNodesSort;
   const order = (params.sort?.direction ?? 'asc') as OpensearchNodesOrder;

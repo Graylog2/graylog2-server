@@ -17,6 +17,8 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type { Cluster } from '@graylog/server-api';
+
 import { LinkContainer } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -33,6 +35,7 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'hooks/useInputType';
 import type { SystemOverview } from 'stores/cluster/types';
+import type { StubResponse } from 'util/UtilityTypes';
 
 type Plugin = {
   unique_id: string;
@@ -52,21 +55,7 @@ type InputState = {
   started_at: string;
   state: string;
 };
-type Memory = {
-  bytes: number;
-  kilobytes: number;
-  megabytes: number;
-};
-
-type JvmInformation = {
-  free_memory: Memory;
-  max_memory: Memory;
-  total_memory: Memory;
-  used_memory: Memory;
-  node_id: string;
-  pid: string;
-  info: string;
-};
+type JvmInformation = StubResponse<typeof Cluster.jvm>;
 
 type Props = {
   node: NodeInfo;

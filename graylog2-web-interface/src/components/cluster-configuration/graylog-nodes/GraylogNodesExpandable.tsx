@@ -75,7 +75,7 @@ const GraylogNodesExpandable = ({
       collapsible={collapsible}>
       <PaginatedEntityTable<ClusterGraylogNode>
         tableLayout={tableLayout}
-        fetchEntities={fetchClusterGraylogNodesWithMetrics}
+        fetchEntities={(searchParams) => fetchClusterGraylogNodesWithMetrics(searchParams, productName)}
         keyFn={clusterGraylogNodesKeyFn}
         additionalAttributes={columnSchemas}
         columnRenderers={columnRenderers}

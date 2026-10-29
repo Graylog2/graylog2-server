@@ -17,16 +17,13 @@
 
 import { Events } from '@graylog/server-api';
 
-import * as URLUtils from 'util/URLUtils';
 import type { SearchParams } from 'stores/PaginationTypes';
-import fetch from 'logic/rest/FetchProvider';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
-const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
   filter: {
@@ -143,12 +140,13 @@ const fetchEvents = (
 ): Promise<PaginatedResponse<Event, EventsAdditionalData>> => {
   const { filter, timerange } = parseFilters(searchParams.filters, defaultTimeRange);
 
-  return fetch('POST', url, {
+  return Events.search({
     query: getConcatenatedQuery(searchParams.query, streamId),
     page: searchParams.page,
     per_page: searchParams.pageSize,
     sort_by: searchParams.sort.attributeId,
     sort_direction: searchParams.sort.direction,
+    sort_unmapped_type: undefined,
     timerange,
     filter,
   }).then(({ events, total_events, parameters, context }) => ({

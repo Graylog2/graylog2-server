@@ -102,17 +102,11 @@ export const loadRole = (roleId: string): Promise<Role> => {
 
 export const deleteRole = (roleId: string): Promise<void> => AuthorizationRoles.remove(encodeURIComponent(roleId));
 
-export const addMembersToRole = (roleId: string, usernames: Immutable.Set<string>): Promise<Role> => {
-  const url = encodeApiUrl(ApiRoutes.AuthzRolesController.addMembers, [roleId]);
+export const addMembersToRole = (roleId: string, usernames: Immutable.Set<string>): Promise<void> =>
+  AuthorizationRoles.addUser(encodeURIComponent(roleId), usernames.toArray());
 
-  return fetch('PUT', qualifyUrl(url), usernames.toArray());
-};
-
-export const removeMemberFromRole = (roleId: string, username: string): Promise<Role> => {
-  const url = encodeApiUrl(ApiRoutes.AuthzRolesController.removeMember, [roleId, username]);
-
-  return fetch('DELETE', qualifyUrl(url));
-};
+export const removeMemberFromRole = (roleId: string, username: string): Promise<void> =>
+  AuthorizationRoles.removeUser(encodeURIComponent(roleId), encodeURIComponent(username));
 
 export const loadUsersForRole = (roleId: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> =>
   AuthorizationRoles.getUsersForRole(undefined, encodeURIComponent(roleId), page, perPage, query).then(

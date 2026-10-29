@@ -18,24 +18,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Telemetry } from '@graylog/server-api';
 
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import type { StubResponse } from 'util/UtilityTypes';
 
-export type UserTelemetrySettings = {
-  telemetry_permission_asked: boolean;
-  telemetry_enabled: boolean;
-};
+export type UserTelemetrySettings = StubResponse<typeof Telemetry.getTelemetryUserSettings>;
 
 const TELEMETRY_SETTINGS_QUERY_KEY = ['telemetry', 'settings'] as const;
 
-const settingsUrl = () => qualifyUrl(ApiRoutes.TelemetryApiController.setting().url);
-
 export const fetchTelemetrySettings = (): Promise<UserTelemetrySettings> => Telemetry.getTelemetryUserSettings();
 
-export const updateTelemetrySettings = (settings: Partial<UserTelemetrySettings>): Promise<UserTelemetrySettings> =>
-  fetch('PUT', settingsUrl(), settings);
+export const updateTelemetrySettings = (settings: UserTelemetrySettings): Promise<void> =>
+  Telemetry.saveTelemetryUserSettings(settings);
 
 const useTelemetrySettings = (options?: { enabled?: boolean }) =>
   useQuery({

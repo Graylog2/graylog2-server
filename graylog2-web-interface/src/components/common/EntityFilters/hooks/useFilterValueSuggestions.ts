@@ -16,9 +16,8 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import PaginationURL from 'util/PaginationURL';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { EntitySuggestions } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 const DEFAULT_DATA = {
@@ -47,19 +46,18 @@ const fetchFilterValueSuggestions = async (
   displayTemplate?: string,
   identifierType?: string,
   collectionProperty: string = 'title',
-): Promise<PaginatedSuggestions | undefined> => {
-  const additional = {
+): Promise<PaginatedSuggestions | undefined> =>
+  EntitySuggestions.getPage(
     collection,
-    identifier: relatedIdentifier,
-    column: collectionProperty,
-    ...(displayFields && displayFields.length > 0 && { display_fields: displayFields.join(',') }),
-    ...(displayTemplate && { display_template: displayTemplate }),
-    ...(identifierType && { identifier_type: identifierType }),
-  };
-  const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
-
-  return fetch('GET', qualifyUrl(url));
-};
+    relatedIdentifier,
+    collectionProperty,
+    displayFields?.length > 0 ? displayFields.join(',') : undefined,
+    displayTemplate || undefined,
+    (identifierType || undefined) as Parameters<typeof EntitySuggestions.getPage>[5],
+    page,
+    pageSize,
+    query || undefined,
+  );
 
 const useFilterValueSuggestions = (
   attributeId: string,
