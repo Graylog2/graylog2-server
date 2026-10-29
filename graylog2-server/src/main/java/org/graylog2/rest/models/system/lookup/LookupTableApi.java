@@ -83,6 +83,8 @@ public abstract class LookupTableApi implements ScopedResponse {
         return new AutoValue_LookupTableApi.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     public LookupTableDto toDto() {
         return LookupTableDto.builder()
                 .id(id())

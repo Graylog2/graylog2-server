@@ -25,7 +25,7 @@ import getDashboardTableElements from 'views/components/dashboard/DashboardsOver
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 import BulkActions from './BulkActions';
@@ -54,7 +54,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
   );
 
   const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
-    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+    CurrentUser.reload();
 
     return fetchDashboards(searchParams);
   };
