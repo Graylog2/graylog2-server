@@ -16,25 +16,17 @@
  */
 import * as React from 'react';
 
-import { ButtonToolbar, Button } from 'components/bootstrap';
+import { ButtonToolbar } from 'components/bootstrap';
 import { MoreActions } from 'components/common/EntityDataTable';
 import type { Event } from 'components/events/events/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 
 const EventActions = ({ event }: { event: Event }) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);
-  const { toggleSection } = useExpandedSections();
-  const toggleExtraSection = () => toggleSection(event.id, 'restFieldsExpandedSection');
 
   return (
     <>
-      <ButtonToolbar>
-        <Button bsSize="xs" onClick={toggleExtraSection}>
-          Details
-        </Button>
-        {moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}
-      </ButtonToolbar>
+      <ButtonToolbar>{moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}</ButtonToolbar>
       {pluggableActionModals}
     </>
   );
