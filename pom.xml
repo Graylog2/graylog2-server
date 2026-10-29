@@ -107,7 +107,7 @@
         <apache-httpclient5.version>5.6.5</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <apache-httpcore5.version>5.4.4</apache-httpcore5.version>
-        <asm.version>9.11</asm.version>
+        <asm.version>9.11.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
@@ -151,7 +151,7 @@
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.84.3</grpc.version>
+        <grpc.version>1.85.1</grpc.version>
         <gson.version>2.14.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.7.2-jre</guava.version>
@@ -209,7 +209,7 @@
         <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.12</snappy-java.version>
-        <oshi.version>7.7.1</oshi.version>
+        <oshi.version>7.7.2</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>

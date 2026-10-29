@@ -21,7 +21,7 @@ import type { ViewJson } from 'views/logic/views/View';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import UserNotification from 'util/UserNotification';
 
 const viewsUrl = qualifyUrl('/views');
@@ -37,7 +37,7 @@ export const createView = (view: View, entityShare?: EntitySharePayload, clonedF
   const promise = fetch('POST', url, JSON.stringify({ entity: view.toJSON(), share_request: entityShare }));
 
   return promise.then((response) => {
-    CurrentUserStore.reload();
+    CurrentUser.reload();
 
     return response;
   });
