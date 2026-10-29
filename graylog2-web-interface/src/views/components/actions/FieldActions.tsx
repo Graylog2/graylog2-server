@@ -30,6 +30,7 @@ type Props = {
   menuContainer: HTMLElement | undefined | null;
   name: string;
   type: FieldType;
+  value?: unknown;
 };
 
 type FieldElementProps = {
@@ -46,7 +47,7 @@ const FieldElement = styled.span.attrs({
   `,
 );
 
-const FieldActions = ({ children, disabled, element, menuContainer, name, type }: Props) => {
+const FieldActions = ({ children, disabled, element, menuContainer, name, type, value = undefined }: Props) => {
   const actionContext = useContext(ActionContext);
   const { additionalHandlerArgs } = useFieldActions();
   const wrappedElement = ({ active }: { active: boolean }) => (
@@ -57,6 +58,7 @@ const FieldActions = ({ children, disabled, element, menuContainer, name, type }
   const handlerArgs = {
     field: name,
     type,
+    value,
     contexts: actionContext,
     ...additionalHandlerArgs,
   };

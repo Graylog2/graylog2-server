@@ -53,6 +53,7 @@ type MessageFieldNamePros = {
   fieldName: string;
   fieldType: FieldType;
   message: Message;
+  value?: unknown;
 };
 
 type MessageFieldValueProps = {
@@ -62,12 +63,12 @@ type MessageFieldValueProps = {
   value: any;
 };
 
-export const MessageFieldName = ({ fieldName, fieldType, message }: MessageFieldNamePros) => {
+export const MessageFieldName = ({ fieldName, fieldType, message, value = undefined }: MessageFieldNamePros) => {
   const isDecoratedField =
     message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
 
   return (
-    <Field name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+    <Field name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType} value={value}>
       {fieldName}
     </Field>
   );
@@ -93,14 +94,21 @@ export const MessageFieldValue = ({ message, fieldName, fieldType, value }: Mess
 
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
+  const type = isDecoratedField ? FieldType.Decorated : fieldType;
+
   return (
     <ValueContext isDecoratedField={isDecoratedField}>
-      <Value
-        field={fieldName}
-        value={innerValue}
-        type={isDecoratedField ? FieldType.Decorated : fieldType}
-        render={DecoratedValue}
-      />
+      {Array.isArray(innerValue) ? (
+        innerValue.map((singleValue, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={`${idx}-${singleValue}`}>
+            {idx > 0 && ', '}
+            <Value field={fieldName} value={singleValue} type={type} render={DecoratedValue} />
+          </React.Fragment>
+        ))
+      ) : (
+        <Value field={fieldName} value={innerValue} type={type} render={DecoratedValue} />
+      )}
     </ValueContext>
   );
 };
@@ -108,7 +116,7 @@ export const MessageFieldValue = ({ message, fieldName, fieldType, value }: Mess
 const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
   <>
     <dt data-testid={`message-field-name-${fieldName}`}>
-      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} value={value} />
     </dt>
     <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
       <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
