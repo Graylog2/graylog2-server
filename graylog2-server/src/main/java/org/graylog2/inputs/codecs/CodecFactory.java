@@ -16,8 +16,10 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.google.common.reflect.TypeToken;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 
 import jakarta.inject.Inject;
 
@@ -43,5 +45,16 @@ public class CodecFactory {
         }
 
         return factory.create(configuration);
+    }
+
+    public boolean isMultiMessageCodec(String type) {
+        final Codec.Factory<? extends Codec> factory = this.codecFactory.get(type);
+        if (factory == null) {
+            return false;
+        }
+        final Class<?> codecClass = TypeToken.of(factory.getClass())
+                .resolveType(Codec.Factory.class.getTypeParameters()[0])
+                .getRawType();
+        return MultiMessageCodec.class.isAssignableFrom(codecClass);
     }
 }
