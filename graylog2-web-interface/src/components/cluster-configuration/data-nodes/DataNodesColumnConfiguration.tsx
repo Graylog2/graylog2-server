@@ -57,11 +57,11 @@ const VersionWarningIcon = styled(Icon)`
 `;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
-  { id: 'memory', title: 'Memory', sortable: false, isDerived: true },
-  { id: 'jvm', title: 'JVM', sortable: false, isDerived: true },
-  { id: 'indexing', title: 'Indexing', sortable: false, isDerived: true },
-  { id: 'storage', title: 'Storage', sortable: false, isDerived: true },
+  { id: 'cpu', title: 'cluster_column_titles.cpu', sortable: false, isDerived: true },
+  { id: 'memory', title: 'cluster_column_titles.memory', sortable: false, isDerived: true },
+  { id: 'jvm', title: 'cluster_column_titles.jvm', sortable: false, isDerived: true },
+  { id: 'indexing', title: 'cluster_column_titles.indexing', sortable: false, isDerived: true },
+  { id: 'storage', title: 'cluster_column_titles.storage', sortable: false, isDerived: true },
 ];
 
 const getRoleLabels = (roles: Array<string>) =>

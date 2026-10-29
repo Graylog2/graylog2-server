@@ -41,7 +41,6 @@ class CounterRate extends React.Component<
   static defaultProps = {
     showTotal: false,
     prefix: null,
-    suffix: 'per second',
     hideOnZero: false,
     hideOnMissing: false,
     metric: undefined,
@@ -83,8 +82,10 @@ class CounterRate extends React.Component<
   };
 
   _suffix = () => {
-    if (this.props.suffix) {
-      return ` ${this.props.suffix}`;
+    const suffix = this.props.suffix === undefined ? this.props.t('counter_rate.per_second') : this.props.suffix;
+
+    if (suffix) {
+      return ` ${suffix}`;
     }
 
     return null;

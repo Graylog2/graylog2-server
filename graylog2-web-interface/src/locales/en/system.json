@@ -6,7 +6,22 @@
   "cluster_configuration_nodes": {
     "loading_search_backend": "Loading search backend nodes...",
     "search_backend_unknown": "Could not determine the configured search backend.",
-    "search_placeholder": "Search nodes…"
+    "search_placeholder": "Search nodes…",
+    "all_nodes": "All Nodes",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "OpenSearch Nodes",
+    "mongodb_nodes": "MongoDB Nodes"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Memory",
+    "jvm": "JVM",
+    "indexing": "Indexing",
+    "storage": "Storage",
+    "buffers": "Buffers",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "Throughput"
   },
   "data_nodes_expandable": {
     "title": "Data Nodes"
@@ -119,7 +134,8 @@
   },
   "counter_rate": {
     "calculating": "Calculating...",
-    "total": "({{total}} total)"
+    "total": "({{total}} total)",
+    "per_second": "per second"
   },
   "metric_container": {
     "loading": "Loading..."
@@ -141,7 +157,10 @@
   "input_types_data_table": {
     "loading": "Loading input types...",
     "unavailable": "Input types are unavailable.",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "name": "Name",
+    "type": "Type",
+    "filter": "Filter"
   },
   "journal_details": {
     "loading": "Loading journal metrics...",
@@ -155,6 +174,8 @@
     "maximum_age": "Maximum age:",
     "flush_policy": "Flush policy:",
     "flush_policy_value": "Every {{messages}} messages or {{duration}}",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
     "utilization": "Utilization",
     "unprocessed_messages": "<strong>{{messages}} unprocessed messages</strong> are currently in the journal, in {{segments}} segments.",
     "appended_and_read": "<strong>{{appended}} messages</strong> have been appended in the last second, <strong>{{read}} messages</strong> have been read in the last second."

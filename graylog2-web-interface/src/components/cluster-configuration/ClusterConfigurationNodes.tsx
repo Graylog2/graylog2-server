@@ -47,8 +47,12 @@ const ControlsWrapper = styled.div`
 
 type NodeType = 'all' | 'graylog' | 'data' | 'mongodb' | 'opensearch';
 type SearchNodesConfig =
-  | { nodeType: 'data'; label: 'Data Nodes'; component: typeof DataNodesExpandable }
-  | { nodeType: 'opensearch'; label: 'OpenSearch Nodes'; component: typeof OpensearchNodesExpandable };
+  | { nodeType: 'data'; label: 'cluster_configuration_nodes.data_nodes'; component: typeof DataNodesExpandable }
+  | {
+      nodeType: 'opensearch';
+      label: 'cluster_configuration_nodes.opensearch_nodes';
+      component: typeof OpensearchNodesExpandable;
+    };
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
@@ -61,8 +65,12 @@ const getSearchNodesConfig = (runsWithDataNode: boolean | undefined): SearchNode
   }
 
   return runsWithDataNode
-    ? { nodeType: 'data', label: 'Data Nodes', component: DataNodesExpandable }
-    : { nodeType: 'opensearch', label: 'OpenSearch Nodes', component: OpensearchNodesExpandable };
+    ? { nodeType: 'data', label: 'cluster_configuration_nodes.data_nodes', component: DataNodesExpandable }
+    : {
+        nodeType: 'opensearch',
+        label: 'cluster_configuration_nodes.opensearch_nodes',
+        component: OpensearchNodesExpandable,
+      };
 };
 
 const ClusterConfigurationNodes = () => {
@@ -75,10 +83,12 @@ const ClusterConfigurationNodes = () => {
   const searchNodeType = searchNodesConfig?.nodeType;
   const SearchNodesExpandable = searchNodesConfig?.component;
   const nodeTypeOptions: Array<{ label: string; value: NodeType }> = [
-    { label: 'All Nodes', value: 'all' },
+    { label: t('cluster_configuration_nodes.all_nodes'), value: 'all' },
     { label: `${productName} Nodes`, value: 'graylog' },
-    ...(searchNodesConfig ? [{ label: searchNodesConfig.label, value: searchNodesConfig.nodeType }] : []),
-    { label: 'MongoDB Nodes', value: 'mongodb' },
+    ...(searchNodesConfig
+      ? [{ label: t(searchNodesConfig.label), value: searchNodesConfig.nodeType }]
+      : []),
+    { label: t('cluster_configuration_nodes.mongodb_nodes'), value: 'mongodb' },
   ];
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);

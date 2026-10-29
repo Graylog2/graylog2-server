@@ -54,7 +54,7 @@ const computeJvmHeapUsedBytes = (max: number | null | undefined, usedPercent: nu
 export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
   attributes: {
     name: {
-      renderCell: (_value, entity) => entity.name ?? 'N/A',
+      renderCell: (_value, entity) => entity.name ?? i18n.t('shared.not_available', { ns: 'system' }),
     },
     version: {
       renderCell: (_value, entity) => (

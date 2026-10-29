@@ -52,7 +52,10 @@ const DataNodesExpandable = ({
   const productName = useProductName();
   const { t } = useTranslation('system');
 
-  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(
+    () => createColumnDefinitions().map((column) => ({ ...column, title: t(column.title) })),
+    [t],
+  );
   const columnRenderers = useMemo(() => createColumnRenderers(productName), [productName]);
 
   const renderActions = useCallback((entity: ClusterDataNode) => <DataNodeActions dataNode={entity} />, []);

@@ -52,7 +52,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     name: {
-      renderCell: (_value, entity) => entity.name ?? 'N/A',
+      renderCell: (_value, entity) => entity.name ?? i18n.t('shared.not_available', { ns: 'system' }),
     },
     role: {
       renderCell: (_value, entity) => {

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DataTable, Timestamp, Icon } from 'components/common';
 
@@ -64,6 +65,7 @@ type Props = {
 };
 
 const SidecarStatusFileList = ({ files }: Props) => {
+  const { t } = useTranslation('sidecars');
   const filterKeys = [];
   const headers = ['Modified', 'Size', 'Path'];
 
@@ -75,7 +77,7 @@ const SidecarStatusFileList = ({ files }: Props) => {
         headerCellFormatter={_headerCellFormatter}
         rows={files}
         dataRowFormatter={_fileListFormatter}
-        filterLabel="Filter Files"
+        filterLabel={t('sidecar_status_file_list.filter_files')}
         filterKeys={filterKeys}
       />
     </div>

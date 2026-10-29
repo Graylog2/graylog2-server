@@ -6,7 +6,22 @@
   "cluster_configuration_nodes": {
     "loading_search_backend": "Knoten des Suchbackends werden geladen...",
     "search_backend_unknown": "Das konfigurierte Suchbackend konnte nicht ermittelt werden.",
-    "search_placeholder": "Knoten durchsuchen…"
+    "search_placeholder": "Knoten durchsuchen…",
+    "all_nodes": "Alle Knoten",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "OpenSearch Nodes",
+    "mongodb_nodes": "MongoDB Nodes"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Arbeitsspeicher",
+    "jvm": "JVM",
+    "indexing": "Indexierung",
+    "storage": "Speicherplatz",
+    "buffers": "Buffer",
+    "journal": "Journal",
+    "data_lake_journal": "Data-Lake-Journal",
+    "throughput": "Durchsatz"
   },
   "data_nodes_expandable": {
     "title": "Data Nodes"
@@ -119,7 +134,8 @@
   },
   "counter_rate": {
     "calculating": "Wird berechnet...",
-    "total": "({{total}} gesamt)"
+    "total": "({{total}} gesamt)",
+    "per_second": "pro Sekunde"
   },
   "metric_container": {
     "loading": "Wird geladen..."
@@ -141,7 +157,10 @@
   "input_types_data_table": {
     "loading": "Input-Typen werden geladen...",
     "unavailable": "Input-Typen sind nicht verfügbar.",
-    "documentation": "Dokumentation"
+    "documentation": "Dokumentation",
+    "name": "Name",
+    "type": "Typ",
+    "filter": "Filter"
   },
   "journal_details": {
     "loading": "Journal-Metriken werden geladen...",
@@ -155,6 +174,8 @@
     "maximum_age": "Maximales Alter:",
     "flush_policy": "Flush-Richtlinie:",
     "flush_policy_value": "Alle {{messages}} Nachrichten oder {{duration}}",
+    "maximum_age_format": "d [Tage] h [Stunden] m [Minuten]",
+    "flush_duration_format": "h [Stunden] m [Minuten] s [Sekunden]",
     "utilization": "Auslastung",
     "unprocessed_messages": "Derzeit befinden sich <strong>{{messages}} unverarbeitete Nachrichten</strong> im Journal, verteilt auf {{segments}} Segmente.",
     "appended_and_read": "In der letzten Sekunde wurden <strong>{{appended}} Nachrichten</strong> angehängt und <strong>{{read}} Nachrichten</strong> gelesen."

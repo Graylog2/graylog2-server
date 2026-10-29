@@ -51,7 +51,11 @@ const InputTypesDataTable = ({ inputDescriptions = undefined }: Props) => {
     return <Alert bsStyle="warning">{t('input_types_data_table.unavailable')}</Alert>;
   }
 
-  const headers = ['Name', 'Type', 'Documentation'];
+  const headers = [
+    t('input_types_data_table.name'),
+    t('input_types_data_table.type'),
+    t('input_types_data_table.documentation'),
+  ];
 
   const rows = Object.keys(inputDescriptions).map((key) => inputDescriptions[key]);
 
@@ -65,7 +69,7 @@ const InputTypesDataTable = ({ inputDescriptions = undefined }: Props) => {
       sortByKey="name"
       rows={rows}
       dataRowFormatter={inputTypeFormatter}
-      filterLabel="Filter"
+      filterLabel={t('input_types_data_table.filter')}
       filterKeys={[]}
     />
   );

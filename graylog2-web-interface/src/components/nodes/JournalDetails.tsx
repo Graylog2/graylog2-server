@@ -114,14 +114,16 @@ const JournalDetails = ({ nodeId }: Props) => {
           <dt>{t('journal_details.maximum_size')}</dt>
           <dd>{NumberUtils.formatBytes(journalInformation.journal_config.max_size)}</dd>
           <dt>{t('journal_details.maximum_age')}</dt>
-          <dd>{moment.duration(journalInformation.journal_config.max_age).format('d [days] h [hours] m [minutes]')}</dd>
+          <dd>
+            {moment.duration(journalInformation.journal_config.max_age).format(t('journal_details.maximum_age_format'))}
+          </dd>
           <dt>{t('journal_details.flush_policy')}</dt>
           <dd>
             {t('journal_details.flush_policy_value', {
               messages: numeral(journalInformation.journal_config.flush_interval).format('0,0'),
               duration: moment
                 .duration(journalInformation.journal_config.flush_age)
-                .format('h [hours] m [minutes] s [seconds]'),
+                .format(t('journal_details.flush_duration_format')),
             })}
           </dd>
         </dl>

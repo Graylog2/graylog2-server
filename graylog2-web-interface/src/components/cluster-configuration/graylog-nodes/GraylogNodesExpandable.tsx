@@ -52,7 +52,10 @@ const GraylogNodesExpandable = ({
   const { t } = useTranslation('system');
   const [totalGraylogNodes, setTotalGraylogNodes] = useState<number | undefined>(undefined);
 
-  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(
+    () => createColumnDefinitions().map((column) => ({ ...column, title: t(column.title) })),
+    [t],
+  );
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
   const renderActions = useCallback((entity: ClusterGraylogNode) => <GraylogNodeActions node={entity} />, []);

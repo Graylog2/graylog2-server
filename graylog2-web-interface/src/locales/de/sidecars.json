@@ -259,6 +259,13 @@
       "sidecar_version": "v{{version}}"
     }
   },
+  "basic_sidecar_user": {
+    "load_failed": "Laden des Sidecar-Benutzers ist mit Status {{error}} fehlgeschlagen",
+    "load_failed_title": "Sidecar-Benutzer konnte nicht geladen werden"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "Dateien filtern"
+  },
   "sidecars": {
     "sidecar_list": {
       "hide_inactive_sidecars": "Inaktive Sidecars ausblenden",
