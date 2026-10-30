@@ -202,7 +202,10 @@ describe('AggregationWizard', () => {
       await sortByTookMsDesc('sort-element-0', 'percentile(took_ms,95)');
       await submitWidgetConfigForm();
 
-      const updatedConfig = config.toBuilder().sort([SortConfig.fromSeries(percentileSeries)]).build();
+      const updatedConfig = config
+        .toBuilder()
+        .sort([SortConfig.fromSeries(percentileSeries)])
+        .build();
 
       await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
