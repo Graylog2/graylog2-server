@@ -273,7 +273,8 @@ public class McpOAuthService {
         if (!authorizationCode.clientId().equals(client.clientId())) {
             throw OAuthException.of(INVALID_GRANT, "Authorization code was issued to another client");
         }
-        if (!isBlank(redirectUri) && !redirectUri.equals(authorizationCode.redirectUri())) {
+        if (!isBlank(redirectUri) && !RedirectUriPolicy.resolve(authorizationCode.redirectUri(), redirectUri)
+                .filter(authorizationCode.redirectUri()::equals).isPresent()) {
             throw OAuthException.of(INVALID_GRANT, "redirect_uri does not match the authorization request");
         }
         if (!OAuthTokens.verifyPkce(codeVerifier, authorizationCode.codeChallenge())) {
@@ -445,10 +446,10 @@ public class McpOAuthService {
             }
             throw OAuthException.of(INVALID_REQUEST, "Missing redirect_uri");
         }
-        if (client.redirectUris().stream().noneMatch(registered -> RedirectUriPolicy.matches(registered, redirectUri))) {
-            throw OAuthException.of(INVALID_REQUEST, "redirect_uri is not registered for this client");
-        }
-        return redirectUri;
+        return client.redirectUris().stream()
+                .flatMap(registered -> RedirectUriPolicy.resolve(registered, redirectUri).stream())
+                .findFirst()
+                .orElseThrow(() -> OAuthException.of(INVALID_REQUEST, "redirect_uri is not registered for this client"));
     }
 
     private static String errorRedirectUri(String redirectUri, String error, @Nullable String description, @Nullable String state, String issuer) {
@@ -465,7 +466,7 @@ public class McpOAuthService {
     }
 
     // UriBuilder would interpret braces in client-provided values as URI templates
-    static String appendQueryParameters(String uri, Map<String, String> params) {
+    public static String appendQueryParameters(String uri, Map<String, String> params) {
         final String query = params.entrySet().stream()
                 .map(e -> f("%s=%s", e.getKey(), URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8)))
                 .collect(Collectors.joining("&"));

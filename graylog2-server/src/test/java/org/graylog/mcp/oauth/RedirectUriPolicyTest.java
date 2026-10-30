@@ -58,14 +58,25 @@ class RedirectUriPolicyTest {
 
     @ParameterizedTest
     @CsvSource({
-            "http://127.0.0.1:1234/callback, http://127.0.0.1:5678/callback, true",
-            "http://127.0.0.1/callback, http://127.0.0.1:5678/callback, true",
-            "http://127.0.0.1:1234/callback, http://127.0.0.1:1234/other, false",
-            "http://127.0.0.1:1234/callback, http://localhost:1234/callback, false",
-            "https://claude.ai/api/mcp/auth_callback, https://claude.ai/api/mcp/auth_callback, true",
-            "https://claude.ai:443/cb, https://claude.ai:8443/cb, false"
+            "http://127.0.0.1:1234/callback, http://127.0.0.1:5678/callback, http://127.0.0.1:5678/callback",
+            "http://127.0.0.1/callback, http://127.0.0.1:5678/callback, http://127.0.0.1:5678/callback",
+            "http://127.0.0.1:1234/callback, http://127.0.0.1/callback, http://127.0.0.1/callback",
+            "http://[::1]:1234/cb?a=%20b, http://[::1]:5678/cb?a=%20b, http://[::1]:5678/cb?a=%20b",
+            "http://localhost:1234/callback, http://LOCALHOST:5678/callback, http://localhost:5678/callback",
+            "https://claude.ai/api/mcp/auth_callback, https://claude.ai/api/mcp/auth_callback, https://claude.ai/api/mcp/auth_callback"
     })
-    void matchesRegisteredUris(String registered, String requested, boolean expected) {
-        assertThat(RedirectUriPolicy.matches(registered, requested)).isEqualTo(expected);
+    void resolvesRegisteredUris(String registered, String requested, String expected) {
+        assertThat(RedirectUriPolicy.resolve(registered, requested)).contains(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "http://127.0.0.1:1234/callback, http://127.0.0.1:1234/other",
+            "http://127.0.0.1:1234/callback, http://localhost:1234/callback",
+            "http://127.0.0.1:1234/callback, http://127.0.0.1:1234/callback?x=1",
+            "https://claude.ai:443/cb, https://claude.ai:8443/cb"
+    })
+    void rejectsUnregisteredUris(String registered, String requested) {
+        assertThat(RedirectUriPolicy.resolve(registered, requested)).isEmpty();
     }
 }

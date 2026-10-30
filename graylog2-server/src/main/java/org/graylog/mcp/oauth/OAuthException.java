@@ -16,11 +16,10 @@
  */
 package org.graylog.mcp.oauth;
 
-import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
 
 /**
- * An OAuth error as defined in RFC 6749 section 5.2.
+ * An OAuth error as defined in RFC 6749 section 5.2. The description is meant to be returned to clients.
  */
 public class OAuthException extends RuntimeException {
     public static final String INVALID_REQUEST = "invalid_request";
@@ -35,12 +34,14 @@ public class OAuthException extends RuntimeException {
     public static final String TEMPORARILY_UNAVAILABLE = "temporarily_unavailable";
 
     private final String error;
+    private final String description;
     private final Response.Status status;
     private final boolean redirectable;
 
     private OAuthException(String error, String description, Response.Status status, boolean redirectable) {
         super(description);
         this.error = error;
+        this.description = description;
         this.status = status;
         this.redirectable = redirectable;
     }
@@ -68,9 +69,8 @@ public class OAuthException extends RuntimeException {
         return error;
     }
 
-    @Nullable
     public String description() {
-        return getMessage();
+        return description;
     }
 
     public Response.Status status() {

@@ -171,7 +171,7 @@ public class McpOAuthResource extends RestResource {
             return oauthService.validateAuthorizationRequest(clientId, redirectUri, responseType, codeChallenge,
                     codeChallengeMethod, state, resource);
         } catch (OAuthException e) {
-            throw new BadRequestException(e.getMessage());
+            throw new BadRequestException(e.description());
         }
     }
 

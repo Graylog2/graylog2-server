@@ -137,6 +137,13 @@ class McpOAuthServiceTest {
     }
 
     @Test
+    void doesNotRedirectErrorsToUnregisteredUris() {
+        final OAuthException error = OAuthException.redirectable(OAuthException.INVALID_REQUEST, "PKCE required");
+
+        assertThat(service.errorRedirect(error, CLIENT.clientId(), "https://evil.example.com/callback", "state", ISSUER)).isEmpty();
+    }
+
+    @Test
     void redirectsRedirectableErrorsWithState() {
         final OAuthException error = OAuthException.redirectable(OAuthException.INVALID_REQUEST, "PKCE {required}");
 
@@ -175,6 +182,15 @@ class McpOAuthServiceTest {
                 VERIFIER.replace('d', 'e'), null, CONFIG))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
         verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString(), any());
+    }
+
+    @Test
+    void rejectsCodeForOtherRedirectUri() {
+        final String code = approveAndCaptureCode();
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, "http://127.0.0.1:1/callback",
+                VERIFIER, null, CONFIG))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
     }
 
     @Test

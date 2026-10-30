@@ -34,7 +34,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
@@ -48,7 +47,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -107,24 +108,39 @@ public class OAuthResource {
                               @QueryParam("code_challenge_method") String codeChallengeMethod,
                               @QueryParam("state") String state,
                               @QueryParam("resource") String resource,
-                              @Context HttpHeaders headers,
-                              @Context UriInfo uriInfo) {
+                              @Context HttpHeaders headers) {
         if (!oauthAvailable()) {
             return plainError(Response.Status.NOT_FOUND, "MCP OAuth is not enabled.");
         }
         final McpOAuthUrls.Urls requestUrls = urls.forRequest(headers.getRequestHeaders());
+        final McpOAuthService.AuthorizationRequest request;
         try {
-            oauthService.validateAuthorizationRequest(clientId, redirectUri, responseType, codeChallenge, codeChallengeMethod, state, resource);
+            request = oauthService.validateAuthorizationRequest(clientId, redirectUri, responseType, codeChallenge, codeChallengeMethod, state, resource);
         } catch (OAuthException e) {
             final Optional<String> errorRedirect = oauthService.errorRedirect(e, clientId, redirectUri, state, requestUrls.issuer());
             if (errorRedirect.isPresent()) {
                 return Response.seeOther(URI.create(errorRedirect.get())).build();
             }
             LOG.debug("Rejecting OAuth authorization request of client <{}>: {}", clientId, e.getMessage());
-            return plainError(Response.Status.BAD_REQUEST, f("Invalid authorization request: %s", e.getMessage()));
+            return plainError(Response.Status.BAD_REQUEST, f("Invalid authorization request: %s", e.description()));
         }
-        // The consent page validates the request again, so passing the raw query is fine
-        return Response.seeOther(URI.create(f("%s?%s", requestUrls.consentPage(), uriInfo.getRequestUri().getRawQuery()))).build();
+        return Response.seeOther(URI.create(McpOAuthService.appendQueryParameters(requestUrls.consentPage(), consentParameters(request)))).build();
+    }
+
+    private static Map<String, String> consentParameters(McpOAuthService.AuthorizationRequest request) {
+        final Map<String, String> params = new LinkedHashMap<>();
+        params.put("client_id", request.client().clientId());
+        params.put("redirect_uri", request.redirectUri());
+        params.put("response_type", McpOAuthService.RESPONSE_TYPE_CODE);
+        params.put("code_challenge", request.codeChallenge());
+        params.put("code_challenge_method", McpOAuthService.CODE_CHALLENGE_METHOD_S256);
+        if (request.state() != null) {
+            params.put("state", request.state());
+        }
+        if (request.resource() != null) {
+            params.put("resource", request.resource());
+        }
+        return params;
     }
 
     @POST

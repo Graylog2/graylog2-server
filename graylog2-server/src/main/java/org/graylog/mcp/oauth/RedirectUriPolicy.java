@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * Decides which redirect URIs clients may register and use.
  * <ul>
@@ -57,22 +59,32 @@ public final class RedirectUriPolicy {
     }
 
     /**
-     * Checks a redirect URI of an authorization request against a registered one. Loopback URIs may differ in port.
+     * Resolves the redirect URI of an authorization request against a registered one. Loopback URIs may differ in port.
+     * The result is built from the registered URI, so only the port is taken from the request.
      */
-    public static boolean matches(String registeredUri, String requestedUri) {
+    public static Optional<String> resolve(String registeredUri, String requestedUri) {
         if (registeredUri.equals(requestedUri)) {
-            return true;
+            return Optional.of(registeredUri);
         }
         final Optional<URI> registered = parse(registeredUri);
         final Optional<URI> requested = parse(requestedUri);
         if (registered.isEmpty() || requested.isEmpty() || !isLoopback(registered.get()) || !isLoopback(requested.get())) {
-            return false;
+            return Optional.empty();
         }
         final URI a = registered.get();
         final URI b = requested.get();
-        return a.getHost().equalsIgnoreCase(b.getHost())
-                && Objects.equals(a.getRawPath(), b.getRawPath())
-                && Objects.equals(a.getRawQuery(), b.getRawQuery());
+        if (!a.getHost().equalsIgnoreCase(b.getHost())
+                || !Objects.equals(a.getRawPath(), b.getRawPath())
+                || !Objects.equals(a.getRawQuery(), b.getRawQuery())) {
+            return Optional.empty();
+        }
+        return Optional.of(withPort(a, b.getPort()));
+    }
+
+    private static String withPort(URI uri, int port) {
+        final String portSuffix = port == -1 ? "" : f(":%d", port);
+        final String query = uri.getRawQuery() == null ? "" : f("?%s", uri.getRawQuery());
+        return f("%s://%s%s%s%s", uri.getScheme(), uri.getHost(), portSuffix, Objects.requireNonNullElse(uri.getRawPath(), ""), query);
     }
 
     private static boolean isLoopback(URI uri) {
