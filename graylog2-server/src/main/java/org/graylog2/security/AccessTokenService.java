@@ -26,6 +26,7 @@ import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,6 +63,13 @@ public interface AccessTokenService extends PersistedService {
     int deleteAllForUser(String username);
 
     int deleteAllForOAuthClient(String username, String oauthClientId);
+
+    /**
+     * Deletes the given token if it was issued to the OAuth client.
+     *
+     * @return the deleted token
+     */
+    Optional<AccessToken> deleteForOAuthClient(String token, String oauthClientId);
 
     void setLastAccessCache(long duration, TimeUnit unit);
 

@@ -242,6 +242,14 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         return destroy(query, AccessTokenImpl.COLLECTION_NAME);
     }
 
+    @Override
+    public Optional<AccessToken> deleteForOAuthClient(String token, String oauthClientId) {
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.TOKEN, cipher.encrypt(token))
+                .add(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId)
+                .get();
+        return Optional.ofNullable(collection(AccessTokenImpl.class).findAndRemove(query)).map(this::fromDBObject);
+    }
+
     @SuppressWarnings("unchecked")
     private AccessTokenImpl fromDBObject(DBObject dbObject) {
         final Map<String, Object> fields = new HashMap<String, Object>(dbObject.toMap());

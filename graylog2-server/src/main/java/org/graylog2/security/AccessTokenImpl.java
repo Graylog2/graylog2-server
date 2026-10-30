@@ -17,7 +17,6 @@
 package org.graylog2.security;
 
 import com.google.common.collect.Maps;
-import jakarta.annotation.Nullable;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
@@ -129,12 +128,6 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     @Override
     public void setName(String name) {
         fields.put(NAME, name);
-    }
-
-    @Nullable
-    @Override
-    public String getOAuthClientId() {
-        return (String) fields.get(OAUTH_CLIENT_ID);
     }
 
     private DateTime getDateTimeField(String fileName) {

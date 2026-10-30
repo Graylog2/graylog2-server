@@ -16,7 +16,6 @@
  */
 package org.graylog2.security;
 
-import jakarta.annotation.Nullable;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
@@ -41,7 +40,4 @@ public interface AccessToken extends Persisted {
     String getName();
 
     void setName(String name);
-
-    @Nullable
-    String getOAuthClientId();
 }

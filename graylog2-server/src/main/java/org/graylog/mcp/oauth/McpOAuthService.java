@@ -339,11 +339,8 @@ public class McpOAuthService {
             }
             return;
         }
-        final AccessToken accessToken = accessTokenService.load(token);
-        if (accessToken != null && clientId.equals(accessToken.getOAuthClientId())) {
-            accessTokenService.destroy(accessToken);
-            auditEventSender.success(AuditActor.user(accessToken.getUserName()), MCP_OAUTH_TOKEN_REVOKE, Map.of("client_id", clientId));
-        }
+        accessTokenService.deleteForOAuthClient(token, clientId).ifPresent(deleted ->
+                auditEventSender.success(AuditActor.user(deleted.getUserName()), MCP_OAUTH_TOKEN_REVOKE, Map.of("client_id", clientId)));
     }
 
     public List<Grant> grantsForUser(String username) {

@@ -228,6 +228,13 @@ class McpOAuthServiceTest {
     }
 
     @Test
+    void revokesAccessTokenOfRequestingClient() {
+        service.revoke(CLIENT.clientId(), "access-token");
+
+        verify(accessTokenService).deleteForOAuthClient("access-token", CLIENT.clientId());
+    }
+
+    @Test
     void refusesRefreshAfterAccessTokenWasRevoked() {
         when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.plusSeconds(60))));
         when(accessTokenService.loadById("old-access-token")).thenReturn(null);
