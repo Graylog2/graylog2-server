@@ -18,9 +18,9 @@ import * as React from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
-import { useStore } from 'stores/connect';
+import useExternalStore from 'hooks/useExternalStore';
 import AppConfig from 'util/AppConfig';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
 
 type PostHogSettings = {
@@ -53,7 +53,7 @@ const init = (key: string, host: string) => {
 
 const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
   const { host, key } = getPostHogSettings();
-  const { currentUser } = useStore(CurrentUserStore);
+  const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
   const { data: settings } = useTelemetrySettings({ enabled: !!currentUser });
 
   if (!settings?.telemetry_enabled || !host || !key) {

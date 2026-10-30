@@ -102,6 +102,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -158,13 +159,13 @@ public class IndexSetsResource extends RestResource {
     private final LegacySystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
+    private final Set<IndexSetOverviewAttributeProvider> attributeProviders;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
     private final EventBus eventBus;
     private final RefreshingLockService.Factory lockServiceFactory;
     private final PaginatedIndexSetService paginatedIndexSetService;
     private final StreamService streamService;
     private final EntityPermissionsUtils entityPermissionsUtils;
-    private final DbQueryCreator dbQueryCreator = new DbQueryCreator(DEFAULT_SORT_FIELD, ATTRIBUTES);
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -176,7 +177,9 @@ public class IndexSetsResource extends RestResource {
                              final ClusterConfigService clusterConfigService,
                              final LegacySystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
-                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories,
+                             final Set<IndexSetOverviewAttributeProvider> attributeProviders,
+                             final IndexSetRestrictionsService indexSetRestrictionsService,
                              final EventBus eventBus,
                              final RefreshingLockService.Factory lockServiceFactory,
                              final PaginatedIndexSetService paginatedIndexSetService,
@@ -192,6 +195,7 @@ public class IndexSetsResource extends RestResource {
         this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
+        this.attributeProviders = requireNonNull(attributeProviders);
         this.indexSetRestrictionsService = indexSetRestrictionsService;
         this.eventBus = eventBus;
         this.lockServiceFactory = lockServiceFactory;
@@ -212,26 +216,52 @@ public class IndexSetsResource extends RestResource {
                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
-                                                      @Parameter(name = "sort", description = "The field to sort the result on",
-                                                                 schema = @Schema(allowableValues = {"title", "index_prefix", "shards", "replicas", "creation_date", "index_template_type", "field_type_profile", "stream_count"}))
+                                                      @Parameter(name = "sort", description = "The field to sort the result on: the id of any sortable attribute in the response, built-in or added by a plugin",
+                                                                 example = "title")
                                                       @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                       @Parameter(name = "order", description = "The sort direction",
                                                                  schema = @Schema(allowableValues = {"asc", "desc"}))
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
-        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
-        final DbSortResolver.ResolvedSort resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
+        final List<IndexSetOverviewAttributeProvider.PageAttributes> pluginAttributes = attributeProviders.stream()
+                .map(IndexSetOverviewAttributeProvider::forPage)
+                .toList();
+        final List<EntityAttribute> attributes = attributes(pluginAttributes);
+        final Bson dbQuery = new DbQueryCreator(DEFAULT_SORT_FIELD, attributes).createDbQuery(filters, query);
+        final DbSortResolver.ResolvedSort resolvedSort = DbSortResolver.resolve(attributes, sort, order);
         // A user who may read every index set pages in MongoDB. Anyone else needs the per-entity predicate;
         // the helper applies it after fetching, so totals stay consistent.
         final PaginatedList<IndexSetConfig> result = canReadAllIndexSets()
                 ? paginatedIndexSetService.findPaginated(dbQuery, resolvedSort, page, perPage)
                 : paginatedIndexSetService.findPaginated(dbQuery, this::mayRead, resolvedSort, page, perPage);
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        final Map<String, Long> streamCounts = streamService.countByIndexSet(result.stream().map(IndexSetConfig::id).toList());
-        final List<IndexSetOverviewResponse> elements = result.stream()
-                .map(config -> IndexSetOverviewResponse.create(config, config.equals(defaultIndexSet), streamCounts.getOrDefault(config.id(), 0L)))
+        final List<IndexSetConfig> indexSets = result.stream().toList();
+        final Map<String, Long> streamCounts = streamService.countByIndexSet(indexSets.stream().map(IndexSetConfig::id).toList());
+        final Map<String, Map<String, Object>> pluginValues = pluginValues(pluginAttributes, indexSets);
+        final List<IndexSetOverviewResponse> elements = indexSets.stream()
+                .map(config -> IndexSetOverviewResponse.create(config, config.equals(defaultIndexSet),
+                        streamCounts.getOrDefault(config.id(), 0L), pluginValues.getOrDefault(config.id(), Map.of())))
                 .toList();
 
-        return PageListResponse.create(query, result.pagination(), result.pagination().total(), sort, order, elements, ATTRIBUTES, DEFAULTS);
+        return PageListResponse.create(query, result.pagination(), result.pagination().total(), sort, order, elements, attributes, DEFAULTS);
+    }
+
+    public static List<EntityAttribute> builtInAttributes() {
+        return ATTRIBUTES;
+    }
+
+    private static List<EntityAttribute> attributes(List<IndexSetOverviewAttributeProvider.PageAttributes> pluginAttributes) {
+        return Stream.concat(ATTRIBUTES.stream(), pluginAttributes.stream().flatMap(plugin -> plugin.attributes().stream()))
+                .toList();
+    }
+
+    private static Map<String, Map<String, Object>> pluginValues(List<IndexSetOverviewAttributeProvider.PageAttributes> pluginAttributes,
+                                                                 List<IndexSetConfig> indexSets) {
+        final Map<String, Map<String, Object>> values = new HashMap<>();
+        for (final IndexSetOverviewAttributeProvider.PageAttributes plugin : pluginAttributes) {
+            plugin.values(indexSets).forEach((indexSetId, pluginValues) ->
+                    values.computeIfAbsent(indexSetId, id -> new HashMap<>()).putAll(pluginValues));
+        }
+        return values;
     }
 
     @GET

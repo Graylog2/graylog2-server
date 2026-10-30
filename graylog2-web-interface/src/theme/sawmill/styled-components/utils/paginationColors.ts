@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { MantineColors } from '../../mantine/types';
+import { COLOR_WHITE } from '../../THEME_BASE';
 
-import { Button } from 'components/bootstrap';
-import { IfPermitted, LinkContainer } from 'components/common';
-import Routes from 'routing/Routes';
+const paginationColors = (colors: MantineColors) => ({
+  active: {
+    background: colors.info[5],
+    border: colors.info[5],
+    color: COLOR_WHITE,
+  },
+});
 
-const ExpandedPipelinesActions = () => (
-  <IfPermitted permissions={['pipeline:read']}>
-    <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-      <Button bsStyle="link" bsSize="xsmall">
-        Manage Pipelines
-      </Button>
-    </LinkContainer>
-  </IfPermitted>
-);
-
-export default ExpandedPipelinesActions;
+export default paginationColors;

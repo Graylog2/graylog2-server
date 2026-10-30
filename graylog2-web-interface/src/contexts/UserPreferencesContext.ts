@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ColorScheme } from '@graylog/sawmill';
 
+import type { ColorScheme } from 'theme/sawmill';
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';

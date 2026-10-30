@@ -20,7 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { SessionStore } from 'stores/sessions/SessionStore';
+import Session from 'logic/session/Session';
 
 type ListResponse = {
   nodes: Array<NodeInfo>;
@@ -71,7 +71,7 @@ export const NodesStore = singletonStore('core.Nodes', () =>
     },
 
     _triggerList() {
-      if (SessionStore.isLoggedIn()) {
+      if (Session.isLoggedIn()) {
         NodesActions.list();
       }
     },

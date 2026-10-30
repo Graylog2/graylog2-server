@@ -16,15 +16,17 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
+import * as Immutable from 'immutable';
 import { renderUnwrapped as render, screen } from 'wrappedTestingLibrary';
 import DefaultProviders from 'DefaultProviders';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
-import type { PluginExports } from 'graylog-web-plugin/plugin';
+import type { PluginExports, Permission } from 'graylog-web-plugin/plugin';
 import { dataRouterFuture } from 'reactRouterFutureFlags';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import type User from 'logic/users/User';
 import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -52,17 +54,20 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('components/navigation/NotificationBadge', () => () => null);
 
-const AppRouterWithContext = () => (
+const AppRouterWithContext = ({ currentUser = defaultUser }: { currentUser?: User }) => (
   <HotkeysProvider>
     <DefaultQueryClientProvider>
       <DefaultProviders>
-        <CurrentUserContext.Provider value={defaultUser}>
+        <CurrentUserContext.Provider value={currentUser}>
           <AppRouter />
         </CurrentUserContext.Provider>
       </DefaultProviders>
     </DefaultQueryClientProvider>
   </HotkeysProvider>
 );
+
+const userWithPermissions = (permissions: Array<Permission>) =>
+  defaultUser.toBuilder().permissions(Immutable.List(permissions)).build();
 
 const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
@@ -143,6 +148,58 @@ describe('AppRouter', () => {
       const { findByText } = render(<AppRouterWithContext />);
 
       await findByText('Hey there!');
+    });
+
+    it('renders plugin route when user has the required permissions', async () => {
+      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', permissions: 'streams:read' }]);
+      setInitialPath('/a-plugin-route');
+      render(<AppRouterWithContext currentUser={userWithPermissions(['streams:read'])} />);
+
+      await screen.findByText('Hey there!');
+    });
+
+    it('renders missing permissions page when user lacks the required permissions', async () => {
+      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', permissions: 'streams:read' }]);
+      setInitialPath('/a-plugin-route');
+      render(<AppRouterWithContext currentUser={userWithPermissions(['streams:edit'])} />);
+
+      await screen.findByText('Missing Permissions');
+
+      expect(screen.queryByText('Hey there!')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
+    });
+
+    it('requires all permissions declared for a plugin route', async () => {
+      mockRoutes([
+        {
+          component: () => <span>Hey there!</span>,
+          path: '/a-plugin-route',
+          permissions: ['streams:read', 'streams:edit'],
+        },
+      ]);
+      setInitialPath('/a-plugin-route');
+      render(<AppRouterWithContext currentUser={userWithPermissions(['streams:read'])} />);
+
+      await screen.findByText('Missing Permissions');
+
+      expect(screen.queryByText('Hey there!')).not.toBeInTheDocument();
+    });
+
+    it('renders missing permissions page for null-parent component plugin routes', async () => {
+      mockRoutes([
+        {
+          parentComponent: null,
+          component: () => <span>Hey there!</span>,
+          path: '/without-chrome',
+          permissions: 'streams:read',
+        },
+      ]);
+      setInitialPath('/without-chrome');
+      render(<AppRouterWithContext currentUser={userWithPermissions([])} />);
+
+      await screen.findByText('Missing Permissions');
+
+      expect(screen.queryByText('Hey there!')).not.toBeInTheDocument();
     });
 
     it('renders null-parent component plugin wrapped in global providers', async () => {

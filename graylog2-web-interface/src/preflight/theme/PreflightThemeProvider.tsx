@@ -16,11 +16,12 @@
  */
 import React, { useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import type { ColorScheme } from '@graylog/sawmill';
-import SawmillSC from '@graylog/sawmill/styled-components';
 import { MantineProvider } from '@mantine/core';
-import type { MantineTheme } from '@graylog/sawmill/mantine';
-import SawmillMantine from '@graylog/sawmill/mantine';
+
+import type { ColorScheme } from 'theme/sawmill';
+import SawmillSC from 'theme/sawmill/styled-components/Sawmill';
+import type { MantineTheme } from 'theme/sawmill/mantine/Sawmill';
+import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 
 import { DEFAULT_THEME_MODE } from './constants';
 

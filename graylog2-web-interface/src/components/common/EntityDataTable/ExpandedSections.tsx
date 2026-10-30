@@ -18,13 +18,13 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import IconButton from 'components/common/IconButton';
-import { ButtonToolbar } from 'components/bootstrap';
+import { ButtonToolbar, Tabs } from 'components/bootstrap';
 import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
 import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 import type { EntityBase, ExpandedSectionRenderers } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
+import getAvailableSectionNames from './getAvailableSectionNames';
 
 const Container = styled.tr(
   ({ theme }) => css`
@@ -55,8 +55,11 @@ const Content = styled.div(
 const Header = styled.div(
   ({ theme }) => css`
     display: flex;
+    /* Moves the actions below the tabs, instead of squeezing both, when they don't fit next to each other. */
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: ${theme.spacings.sm};
     margin-bottom: ${theme.spacings.sm};
   `,
 );
@@ -66,8 +69,8 @@ const Actions = styled(ButtonToolbar)`
   align-items: center;
 `;
 
-const HideSectionButton = styled(IconButton)`
-  margin-left: 5px;
+const SectionPanel = styled(Tabs.Panel)`
+  padding: 0;
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
@@ -80,37 +83,61 @@ const ExpandedSections = <Entity extends EntityBase>({
   visibleCellCount: number;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
-  const expandedEntitySections = expandedSections?.[entity.id];
+  const activeSectionName = expandedSections?.[entity.id]?.[0];
+  const activeSection = activeSectionName ? expandedSectionRenderers?.[activeSectionName] : undefined;
 
-  if (!expandedEntitySections?.length) {
+  if (!activeSection) {
     return null;
   }
+
+  const sectionNames = getAvailableSectionNames(expandedSectionRenderers, entity);
+  const hasMultipleSections = sectionNames.length > 1;
+  const actions = activeSection.actions?.(entity);
+
+  const actionsToolbar = actions && <Actions>{actions}</Actions>;
 
   return (
     <Container>
       <ContentCell colSpan={visibleCellCount}>
         <Content>
-          {Object.entries(expandedSectionRenderers ?? {})
-            .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
-            .map(([sectionName, section]) => {
-              const hideSection = () => toggleSection(entity.id, sectionName);
-              const actions = section.actions?.(entity);
-
-              return (
-                <div key={`${sectionName}-${entity.id}`}>
-                  {section.disableHeader !== true ? (
-                    <Header>
-                      <h3>{section.title}</h3>
-                      <Actions>
-                        {actions}
-                        <HideSectionButton name="keyboard_arrow_up" onClick={hideSection} title="Collapse section" />
-                      </Actions>
-                    </Header>
-                  ) : null}
-                  {section.content(entity)}
-                </div>
-              );
-            })}
+          {hasMultipleSections ? (
+            // Inactive sections stay unmounted, so they don't fetch their data in the background.
+            <Tabs
+              keepMounted={false}
+              value={activeSectionName}
+              onChange={(sectionName) => {
+                // Mantine also reports clicks on the active tab, which would collapse the row.
+                if (sectionName && sectionName !== activeSectionName) {
+                  toggleSection(entity.id, sectionName);
+                }
+              }}>
+              <Header>
+                <Tabs.List>
+                  {sectionNames.map((sectionName) => (
+                    <Tabs.Tab key={sectionName} value={sectionName}>
+                      {expandedSectionRenderers[sectionName].title}
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>
+                {actionsToolbar}
+              </Header>
+              {sectionNames.map((sectionName) => (
+                <SectionPanel key={sectionName} value={sectionName}>
+                  {expandedSectionRenderers[sectionName].content(entity)}
+                </SectionPanel>
+              ))}
+            </Tabs>
+          ) : (
+            <>
+              {activeSection.disableHeader !== true && (
+                <Header>
+                  <h3>{activeSection.title}</h3>
+                  {actionsToolbar}
+                </Header>
+              )}
+              {activeSection.content(entity)}
+            </>
+          )}
         </Content>
       </ContentCell>
     </Container>

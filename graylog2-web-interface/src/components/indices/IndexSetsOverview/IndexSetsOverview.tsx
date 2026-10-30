@@ -68,10 +68,11 @@ const IndexSetsOverview = () => {
   const {
     columnRenderers: extensionColumnRenderers,
     attributes: extensionAttributes,
+    columnIds: extensionColumnIds,
     columnGroups: extensionColumnGroups,
   } = useIndexSetsOverviewExtensions();
   const { defaultVariantLayout, configurationVariantLayout, routingVariantLayout, additionalAttributes } =
-    getIndexSetTableElements(extensionAttributes, extensionColumnGroups);
+    getIndexSetTableElements(extensionAttributes, extensionColumnIds, extensionColumnGroups);
   const { activeLayoutVariant } = useLayoutVariant();
   const variantLayouts: Record<string, typeof defaultVariantLayout> = {
     [INDEX_SET_VIEW_VARIANTS.configuration]: configurationVariantLayout,

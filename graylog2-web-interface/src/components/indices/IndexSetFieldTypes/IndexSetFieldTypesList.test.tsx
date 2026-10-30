@@ -314,7 +314,7 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  describe('Shows expanded row on origin bage click', () => {
+  describe('Shows origin explanation when hovering the origin badge', () => {
     it('for origin index', async () => {
       asMock(useFetchEntities).mockReturnValue({
         isInitialLoading: false,
@@ -324,10 +324,9 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field');
-      const originBadge = await within(tableRow).findByText(/index/i);
-      await userEvent.click(originBadge);
+      await userEvent.hover(await within(tableRow).findByText('Index'));
 
-      expect(tableRow).toHaveTextContent(
+      expect(await screen.findByRole('dialog')).toHaveTextContent(
         'Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by the system or come from historical profiles and/or custom mappings.',
       );
     });
@@ -348,10 +347,9 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-3');
-      const originBadge = await within(tableRow).findByText(/profile/i);
-      await userEvent.click(originBadge);
+      await userEvent.hover(await within(tableRow).findByText('Profile'));
 
-      expect(tableRow).toHaveTextContent(
+      expect(await screen.findByRole('dialog')).toHaveTextContent(
         'Field type String type comes from profile Profile-1. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation',
       );
     });
@@ -365,10 +363,9 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-1');
-      const originBadge = await within(tableRow).findByText(/overridden index/i);
-      await userEvent.click(originBadge);
+      await userEvent.hover(await within(tableRow).findByText('Overridden index'));
 
-      expect(tableRow).toHaveTextContent(
+      expect(await screen.findByRole('dialog')).toHaveTextContent(
         'Field type Boolean comes from the individual, custom field type mapping. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation.',
       );
     });
@@ -389,10 +386,9 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-2');
-      const originBadge = await within(tableRow).findByText(/overridden profile/i);
-      await userEvent.click(originBadge);
+      await userEvent.hover(await within(tableRow).findByText('Overridden profile'));
 
-      expect(tableRow).toHaveTextContent(
+      expect(await screen.findByRole('dialog')).toHaveTextContent(
         'Field type Boolean comes from the individual, custom field type mapping. It overrides not only possible mappings from the search engine index mapping, but also mapping field-2: Boolean present in profile Profile-1',
       );
     });

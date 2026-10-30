@@ -42,8 +42,7 @@ import { METRIC_COLUMN_IDS } from './metricColumns';
 const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
-    staticWidth: 'matchHeader' as const,
-    textAlign: 'right',
+    staticWidth: COLUMN_WIDTH.reference,
   },
 };
 const customColumnRenderers = (
@@ -105,8 +104,7 @@ const customColumnRenderers = (
     },
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
-      staticWidth: 'matchHeader' as const,
-      textAlign: 'right',
+      staticWidth: COLUMN_WIDTH.reference,
     },
     ...(extensionColumnRenderers || {}),
   },

@@ -6,4 +6,9 @@ export default defineConfig([
   {
     extends: [graylog, ...configs['flat/recommended']],
   },
+  {
+    rules: {
+      'graylog/no-literal-product-name': 'off',
+    },
+  },
 ]);

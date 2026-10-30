@@ -268,7 +268,7 @@ describe('IndexSetsOverview', () => {
   it('expands the details of an index set', async () => {
     render(<IndexSetsOverview />);
 
-    await userEvent.click(within(await findRow(exampleIndexSet)).getByText(exampleIndexSet.description));
+    await userEvent.click(await within(await findRow(exampleIndexSet)).findByRole('button', { name: /expand row/i }));
 
     await screen.findByText('Rotation and retention of Example Index Set');
     await screen.findByText('Field type refresh interval:');
@@ -446,7 +446,10 @@ describe('IndexSetsOverview', () => {
     mockMetrics({ metricsByIndexSetId: {}, isLoading: true });
     render(<IndexSetsOverview />);
 
-    expect(await within(await findRow(exampleIndexSet)).findAllByText(/loading/i)).toHaveLength(2);
+    const exampleRow = await findRow(exampleIndexSet);
+
+    // Each spinner appears after its own delay, so they can show up in different renders.
+    await waitFor(() => expect(within(exampleRow).getAllByText(/loading/i)).toHaveLength(2));
   });
 
   it('keeps loaded metrics while the missing ones are loading', async () => {
@@ -535,6 +538,52 @@ describe('IndexSetsOverview', () => {
 
       await screen.findByText('Plugin Column');
       within(await findRow(exampleIndexSet)).getByText('plugin cell');
+    } finally {
+      PluginStore.unregister(plugin);
+    }
+  });
+
+  it('places backend-declared plugin columns in the configuration view and keeps them sortable', async () => {
+    asMock(useFetchEntities).mockReturnValue({
+      data: {
+        pagination: { total: 3 },
+        list: [defaultIndexSet, exampleIndexSet, readOnlyIndexSet],
+        attributes: [...attributes, { id: 'backend_plugin_column', title: 'Backend Plugin Column', sortable: true }],
+      },
+      refetch: () => {},
+      isInitialLoading: false,
+    });
+    const plugin = new PluginManifest(
+      {},
+      {
+        'components.indexSets.overview.tableElements': [
+          {
+            attributeName: 'backend_plugin_column',
+            group: 'configuration',
+            backendAttributeIds: ['backend_plugin_column'],
+            columnRenderers: {
+              backend_plugin_column: { renderCell: () => 'backend plugin cell', staticWidth: 'matchHeader' },
+            },
+          },
+        ],
+      },
+    );
+    PluginStore.register(plugin);
+
+    try {
+      render(<IndexSetsOverview />);
+
+      await screen.findByText('Title');
+
+      expect(screen.queryByText('Backend Plugin Column')).not.toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('radio', { name: 'Configuration' }));
+
+      await screen.findByText('Backend Plugin Column');
+      within(await findRow(exampleIndexSet)).getByText('backend plugin cell');
+
+      await userEvent.click(await screen.findByTitle('Toggle Backend Plugin Column actions'));
+      await screen.findByRole('menuitem', { name: /sort ascending/i });
     } finally {
       PluginStore.unregister(plugin);
     }

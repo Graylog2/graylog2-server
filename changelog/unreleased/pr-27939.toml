@@ -1,0 +1,5 @@
+type = "a"
+message = "Let plugins add sortable and filterable columns to the index sets table"
+
+issues = ["Graylog2/graylog-plugin-enterprise#16092"]
+pulls = ["27939", "Graylog2/graylog-plugin-enterprise#16173"]

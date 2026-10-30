@@ -42,10 +42,7 @@ const useForwarderNodeTitles = (
   });
 
 const useUnresolvedIds = (ids: Array<string>, known: { [id: string]: unknown } | undefined) =>
-  useMemo(
-    () => (known ? ids.filter((id) => id && id !== MISSING_BUCKET_NAME && !known[id]) : []),
-    [ids, known],
-  );
+  useMemo(() => (known ? ids.filter((id) => id && id !== MISSING_BUCKET_NAME && !known[id]) : []), [ids, known]);
 
 export const useInputTitleResolver = (ids: Array<string>): TitleResolver => {
   const inputs = useInputs();

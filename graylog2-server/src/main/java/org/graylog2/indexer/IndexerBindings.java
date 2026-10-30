@@ -32,6 +32,7 @@ import org.graylog2.indexer.indexset.template.requirement.EnterprisePluginRequir
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
 import org.graylog2.indexer.indexset.validation.IndexSetConfigValidator;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.rest.resources.system.indexer.IndexSetOverviewAttributeProvider;
 import org.graylog2.rest.resources.system.indexer.OpenIndexSetFilterFactory;
 
 public class IndexerBindings extends Graylog2Module {
@@ -44,6 +45,7 @@ public class IndexerBindings extends Graylog2Module {
 
         Multibinder.newSetBinder(binder(), IndexSetTemplateRequirement.class).addBinding().to(EnterprisePluginRequirement.class);
         Multibinder.newSetBinder(binder(), OpenIndexSetFilterFactory.class);
+        Multibinder.newSetBinder(binder(), IndexSetOverviewAttributeProvider.class);
         Multibinder.newSetBinder(binder(), ExtendedBasicIndexSets.class);
         Multibinder.newSetBinder(binder(), IndexSetConfigValidator.class);
 
