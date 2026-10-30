@@ -22,6 +22,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
@@ -56,6 +57,11 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         final AccessToken accessToken = accessTokenService.load(String.valueOf(authToken.getToken()));
 
         if (accessToken == null) {
+            return null;
+        }
+        // The expired token cleaner only runs periodically
+        if (accessToken.getExpiresAt() != null && accessToken.getExpiresAt().isBefore(Tools.nowUTC())) {
+            LOG.debug("Access token <{}> has expired.", accessToken.getId());
             return null;
         }
         // TODO should be using IDs

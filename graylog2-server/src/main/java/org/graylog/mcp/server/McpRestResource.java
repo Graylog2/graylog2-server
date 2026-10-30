@@ -44,6 +44,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.AcceptsBearerAccessToken;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import java.util.UUID;
 
 
 @RequiresAuthentication
+@AcceptsBearerAccessToken
 @Path("/mcp")
 @PublicCloudAPI
 @Tag(name = "MCP", description = "Endpoints allowing MCP clients to connect to")

@@ -140,6 +140,7 @@ import RoutePermissionGuard from 'routing/RoutePermissionGuard';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
+import McpOAuthConsentPage from 'pages/McpOAuthConsentPage';
 import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 const renderPluginRoute = (
@@ -195,6 +196,15 @@ const AppRouter = () => {
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
+
+    {
+      path: RoutePaths.MCP_OAUTH_CONSENT,
+      element: (
+        <GlobalContextProviders>
+          <McpOAuthConsentPage />
+        </GlobalContextProviders>
+      ),
+    },
 
     {
       path: RoutePaths.STARTPAGE,

@@ -52,6 +52,8 @@ import static java.util.Objects.requireNonNull;
 @Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     public static final String SESSION_COOKIE_NAME = "authentication";
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String BEARER_AUTH = "BEARER";
 
     private final DefaultSecurityManager securityManager;
     private final Provider<Request> grizzlyRequestProvider;
@@ -99,6 +101,16 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                     cookies,
                     matchedResources);
 
+        } else if (authHeader != null && authHeader.startsWith(BEARER_PREFIX) && acceptsBearerAccessToken(matchedResources)) {
+            securityContext = createSecurityContext(authHeader.substring(BEARER_PREFIX.length()).trim(),
+                    "token",
+                    secure,
+                    BEARER_AUTH,
+                    host,
+                    grizzlyRequest.getRemoteAddr(),
+                    headers,
+                    cookies,
+                    matchedResources);
         } else {
             securityContext = createSecurityContext(null, null, secure, null, host,
                     grizzlyRequest.getRemoteAddr(),
@@ -108,6 +120,10 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         }
 
         requestContext.setSecurityContext(securityContext);
+    }
+
+    private boolean acceptsBearerAccessToken(Set<Class<?>> matchedResources) {
+        return matchedResources.stream().anyMatch(resource -> resource.isAnnotationPresent(AcceptsBearerAccessToken.class));
     }
 
     private String decodeBase64(String s) {

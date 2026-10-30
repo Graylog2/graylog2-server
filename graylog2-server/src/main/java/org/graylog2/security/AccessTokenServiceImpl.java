@@ -161,6 +161,15 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name, PeriodDuration ttl) {
+        return create(username, name, ttl, Map.of());
+    }
+
+    @Override
+    public AccessToken create(String username, String name, PeriodDuration ttl, String oauthClientId) {
+        return create(username, name, ttl, Map.of(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId));
+    }
+
+    private AccessToken create(String username, String name, PeriodDuration ttl, Map<String, Object> additionalFields) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -179,6 +188,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             // Until then, we need to add all fields of the period and the duration separately:
             fields.put(AccessTokenImpl.EXPIRES_AT, addTtlPeriodDuration(nowUTC, ttl));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
+            fields.putAll(additionalFields);
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(encrypt(accessToken));
@@ -222,6 +232,22 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
         LOG.debug("Deleted {} access tokens of user \"{}\"", result, username);
         return result;
+    }
+
+    @Override
+    public int deleteAllForOAuthClient(String username, String oauthClientId) {
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.USERNAME, username)
+                .add(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId)
+                .get();
+        return destroy(query, AccessTokenImpl.COLLECTION_NAME);
+    }
+
+    @Override
+    public Optional<AccessToken> deleteForOAuthClient(String token, String oauthClientId) {
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.TOKEN, cipher.encrypt(token))
+                .add(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId)
+                .get();
+        return Optional.ofNullable(collection(AccessTokenImpl.class).findAndRemove(query)).map(this::fromDBObject);
     }
 
     @SuppressWarnings("unchecked")
