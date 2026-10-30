@@ -25,11 +25,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.server.ExtendedUriInfo;
+import org.glassfish.jersey.server.model.Resource;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog.mcp.server.McpRestResource;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -54,12 +57,8 @@ public class McpOAuthResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        final Class<?> resourceClass = resourceInfo.getResourceClass();
-        if (resourceClass == null) {
-            return;
-        }
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
-        if (CORS_RESOURCES.contains(resourceClass)) {
+        if (isCorsResource(requestContext)) {
             // These endpoints don't use cookies, so allowing any origin is safe
             headers.putSingle("Access-Control-Allow-Origin", "*");
             headers.putSingle("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -67,7 +66,8 @@ public class McpOAuthResponseFilter implements ContainerResponseFilter {
             headers.putSingle("Access-Control-Max-Age", "86400");
             return;
         }
-        if (McpRestResource.class.isAssignableFrom(resourceClass)
+        final Class<?> resourceClass = resourceInfo.getResourceClass();
+        if (resourceClass != null && McpRestResource.class.isAssignableFrom(resourceClass)
                 && responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
                 && clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES).oauthAvailable()) {
             final String resourceMetadata = urls.forRequest(requestContext.getHeaders()).protectedResourceMetadata();
@@ -75,5 +75,11 @@ public class McpOAuthResponseFilter implements ContainerResponseFilter {
             final String error = authorization != null && authorization.startsWith("Bearer ") ? "error=\"invalid_token\", " : "";
             headers.putSingle(HttpHeaders.WWW_AUTHENTICATE, f("Bearer %sresource_metadata=\"%s\"", error, resourceMetadata));
         }
+    }
+
+    // Jersey answers OPTIONS with generated handlers, so match the resource model instead of the invoked class
+    private static boolean isCorsResource(ContainerRequestContext requestContext) {
+        final Resource resource = ((ExtendedUriInfo) requestContext.getUriInfo()).getMatchedModelResource();
+        return resource != null && !Collections.disjoint(resource.getHandlerClasses(), CORS_RESOURCES);
     }
 }
