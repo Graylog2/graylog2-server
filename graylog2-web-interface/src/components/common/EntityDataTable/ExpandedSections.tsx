@@ -55,6 +55,7 @@ const Content = styled.div(
 const Header = styled.div(
   ({ theme }) => css`
     display: flex;
+
     /* Moves the actions below the tabs, instead of squeezing both, when they don't fit next to each other. */
     flex-wrap: wrap;
     justify-content: space-between;
