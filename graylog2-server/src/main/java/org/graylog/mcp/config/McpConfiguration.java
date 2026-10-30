@@ -32,10 +32,14 @@ public abstract class McpConfiguration {
     public static final boolean DEFAULT_ENABLE_OAUTH = true;
     public static final Duration DEFAULT_OAUTH_ACCESS_TOKEN_TTL = Duration.ofHours(1);
     public static final Duration DEFAULT_OAUTH_REFRESH_TOKEN_TTL = Duration.ofDays(30);
+    // Only web-based clients need to be listed, loopback and custom-scheme redirect URIs are always allowed
     public static final List<String> DEFAULT_OAUTH_ALLOWED_REDIRECT_URIS = List.of(
             "https://claude.ai/api/mcp/auth_callback",
             "https://claude.com/api/mcp/auth_callback",
-            "https://vscode.dev/redirect"
+            "https://vscode.dev/redirect",
+            "https://insiders.vscode.dev/redirect",
+            "https://www.cursor.com/agents/mcp/oauth/callback",
+            "https://chatgpt.com/connector_platform_oauth_redirect"
     );
 
     public static final McpConfiguration DEFAULT_VALUES = create(false, false, false);
