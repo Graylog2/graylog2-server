@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix PDF report rendering failing for widgets showing the `streams` field before streams are loaded."
+
+pulls = ["27992"]

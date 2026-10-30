@@ -101,6 +101,7 @@ public class SupportBundleResource extends RestResource {
 
     @POST
     @Path("/bundle/build")
+    @Operation(summary = "Start building a support bundle")
     @Timed
     @RestrictToLeader
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)

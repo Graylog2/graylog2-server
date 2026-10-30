@@ -18,12 +18,9 @@ import { useCallback, useContext, useMemo } from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import StreamsContext from 'contexts/StreamsContext';
-import { useInputs } from 'hooks/useInputs';
-import useNodeSummaries from 'hooks/useNodeSummaries';
+import { useInputTitleResolver, useNodeTitleResolver } from 'views/hooks/useInputAndNodeTitles';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
-
-const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
 const useStreamsKeyMapper = () => {
   const streams = useContext(StreamsContext);
@@ -32,16 +29,16 @@ const useStreamsKeyMapper = () => {
   return useCallback((key: Key) => streamsMap[key]?.title ?? key, [streamsMap]);
 };
 
-const useInputKeyMapper = () => {
-  const inputs = useInputs();
+const useInputKeyMapper = (keys: Array<string>) => {
+  const resolveTitle = useInputTitleResolver(keys);
 
-  return useCallback((key: Key) => inputs?.[key]?.title ?? key, [inputs]);
+  return useCallback((key: Key) => resolveTitle(String(key)) ?? key, [resolveTitle]);
 };
 
-const useNodeKeyMapper = () => {
-  const nodes = useNodeSummaries();
+const useNodeKeyMapper = (keys: Array<string>) => {
+  const resolveTitle = useNodeTitleResolver(keys);
 
-  return useCallback((key: Key) => (nodes?.[key] ? formatNode(nodes[key]) : key), [nodes]);
+  return useCallback((key: Key) => resolveTitle(String(key)) ?? key, [resolveTitle]);
 };
 
 const CoreKeyMappers: PluginExports['visualizationKeyMappers'] = [

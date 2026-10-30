@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import useEntityTitles from 'hooks/useEntityTitles';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 
 import PipelinesCell from './PipelinesCell';
@@ -27,77 +27,93 @@ import PipelinesCell from './PipelinesCell';
 jest.mock('components/streams/StreamsOverview/StreamMetricsContext', () => ({
   useStreamMetricsFor: jest.fn(),
 }));
-jest.mock('components/common/EntityDataTable/hooks/useExpandedSections', () => jest.fn());
+jest.mock('hooks/useEntityTitles');
 
 const stream = { id: 'stream-1', title: 'Test Stream', is_default: false, is_editable: true } as any;
 
-describe('PipelinesCell (Streams)', () => {
-  const toggleSection = jest.fn();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
+const mockPipelines = (pipelineIds: Array<string>) =>
+  asMock(useStreamMetricsFor).mockReturnValue({
+    metrics: { pipelines: pipelineIds },
+    isInitialLoading: false,
+    isError: false,
   });
 
-  it('renders the count for the default stream (#14572)', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['p-1'] },
-      isInitialLoading: false,
-      isError: false,
-    });
+const mockTitles = (titlesById: Record<string, string>, notPermittedIds: Array<string> = []) =>
+  asMock(useEntityTitles).mockReturnValue({
+    titlesById,
+    notPermittedIds: new Set(notPermittedIds),
+    isInitialLoading: false,
+    isFetching: false,
+    isError: false,
+  });
+
+describe('PipelinesCell (Streams)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockTitles({ 'p-1': 'Alpha Pipeline', 'p-2': 'Beta Pipeline' });
+  });
+
+  it('renders the pipelines of the default stream (#14572)', async () => {
+    mockPipelines(['p-1']);
 
     render(<PipelinesCell stream={{ ...stream, is_default: true } as any} />);
 
-    expect(screen.getByText('1')).toBeInTheDocument();
+    await screen.findByRole('link', { name: 'Alpha Pipeline' });
   });
 
   it('renders nothing when the stream is not editable', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['p-1'] },
-      isInitialLoading: false,
-      isError: false,
-    });
+    mockPipelines(['p-1']);
 
     render(<PipelinesCell stream={{ ...stream, is_editable: false } as any} />);
 
-    expect(screen.queryByText('1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Alpha Pipeline')).not.toBeInTheDocument();
   });
 
   it('renders an empty cell when there are zero connected pipelines', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: [] },
-      isInitialLoading: false,
-      isError: false,
-    });
+    mockPipelines([]);
 
     render(<PipelinesCell stream={stream} />);
 
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(screen.queryByTitle(/connected pipelines/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('renders the count of connected pipelines', () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['p-1', 'p-2'] },
-      isInitialLoading: false,
-      isError: false,
-    });
+  it('renders the first pipeline and the number of the others', async () => {
+    mockPipelines(['p-2', 'p-1']);
 
     render(<PipelinesCell stream={stream} />);
 
-    expect(screen.getByText('2')).toBeInTheDocument();
+    await screen.findByRole('link', { name: 'Alpha Pipeline' });
+
+    expect(await screen.findByRole('button', { name: /show 1 more/i })).toHaveTextContent('+1');
+    expect(screen.queryByText('Beta Pipeline')).not.toBeInTheDocument();
   });
 
-  it('toggles the pipelines section on click', async () => {
-    asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { pipelines: ['p-1'] },
-      isInitialLoading: false,
-      isError: false,
-    });
+  it('links each pipeline to its detail page when the list is expanded', async () => {
+    mockPipelines(['p-1', 'p-2']);
 
     render(<PipelinesCell stream={stream} />);
-    await userEvent.click(screen.getByText('1'));
 
-    expect(toggleSection).toHaveBeenCalledWith('stream-1', 'pipelines');
+    await userEvent.click(await screen.findByRole('button', { name: /show 1 more/i }));
+
+    expect(await screen.findByRole('link', { name: 'Alpha Pipeline' })).toHaveAttribute(
+      'href',
+      '/system/pipelines/p-1',
+    );
+    expect(await screen.findByRole('link', { name: 'Beta Pipeline' })).toHaveAttribute('href', '/system/pipelines/p-2');
+  });
+
+  it('lists deleted pipelines and pipelines the user may not read without a link', async () => {
+    mockTitles({}, ['p-secret']);
+    mockPipelines(['p-deleted', 'p-secret']);
+
+    render(<PipelinesCell stream={stream} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /show 1 more/i }));
+
+    await screen.findByText('p-deleted (deleted)');
+
+    expect(await screen.findByTitle('Missing permissions')).toHaveTextContent('p-secret');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

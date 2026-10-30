@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import path from 'path';
 
-import { Button } from 'components/bootstrap';
-import { IfPermitted, LinkContainer } from 'components/common';
-import Routes from 'routing/Routes';
+import buildMantineTheme from './mantine/buildMantineTheme';
+import buildStyledComponentsTheme from './styled-components/buildStyledComponentsTheme';
+import writeThemeFile from './writeThemeFile';
 
-const ExpandedPipelinesActions = () => (
-  <IfPermitted permissions={['pipeline:read']}>
-    <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-      <Button bsStyle="link" bsSize="xsmall">
-        Manage Pipelines
-      </Button>
-    </LinkContainer>
-  </IfPermitted>
-);
-
-export default ExpandedPipelinesActions;
+const mantineTheme = buildMantineTheme();
+writeThemeFile(path.resolve(__dirname, '../mantine/generated/theme.json'), mantineTheme);
+const styledComponentsTheme = buildStyledComponentsTheme();
+writeThemeFile(path.resolve(__dirname, '../styled-components/generated/theme.json'), styledComponentsTheme);

@@ -103,6 +103,16 @@ The [graylog-luma design system](https://graylog2.github.io/design-system) (sour
 
 - No `link` style buttons — use anchors for navigation.
 
+## Theme
+
+The theme lives in `src/theme/sawmill`. `THEME_BASE.ts` defines the color shade matrix, which the Mantine theme is built on. `styled-components/utils/colors.ts` maps these shades to the tokens of the styled-components theme (`theme.colors.*`), which match the tokens in Figma.
+
+- Only our designer changes the color shade matrix in `THEME_BASE.ts`. To change the color of an element or token, point the token to a different shade instead.
+- Reuse existing tokens where they fit. Tokens named after their purpose, like `theme.colors.input.borderFocus`, are only used for that purpose.
+- Prefer descriptive tokens like `theme.colors.section.filled.background` over generic helpers like `theme.colors.variant.lighter.danger` or `theme.colors.gray[60]`. Descriptive tokens can use different shades in light and dark mode.
+- New tokens need a name that describes their usage. Inform the designer when you add one. Add them to `styled-components/utils/colors.ts` and their type to `styled-components/types.ts`. Applying an opacity with `opacify` is fine.
+- The default themes are read from the generated `mantine/generated/theme.json` and `styled-components/generated/theme.json`. After changing `THEME_BASE.ts` or the color utils, run `yarn generate:themes` and commit the generated files. Custom themes from the customization page are generated at runtime.
+
 ## Refactoring
 
 - Put refactoring in separate commits, and in a separate PR if it grows large.

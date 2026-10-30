@@ -61,21 +61,25 @@ public class CaffeineLookupCache extends LookupCache {
     public static final String IGNORE_NULL = "ignore_null";
     public static final String TTL_EMPTY = "ttl_empty";
     public static final String TTL_EMPTY_UNIT = "ttl_empty_unit";
-    private final Cache<LookupCacheKey, LookupResult> cache;
+    private final Cache<LookupCacheKey, CachedResult> cache;
     private final Config config;
+    private final Ticker ticker;
+
+    /**
+     * A cached result plus when it was loaded and how long its TTL (or expire-after-write) lasts, so reads
+     * extending the expiry for expire-after-access can't push it past that point. An expiry of Long.MAX_VALUE
+     * means unlimited. Ticker values have an arbitrary origin and can wrap, so only differences between them
+     * are meaningful; no absolute deadline is stored.
+     */
+    private record CachedResult(LookupResult result, long loadedAtNanos, long expiryNanos) {
+    }
 
     @Inject
     public CaffeineLookupCache(@Assisted("id") String id,
                                @Assisted("name") String name,
                                @Assisted LookupCacheConfiguration c,
                                MetricRegistry metricRegistry) {
-        super(id, name, c, metricRegistry);
-        config = (Config) c;
-        cache = Caffeine.newBuilder()
-                .recordStats(() -> new MetricStatsCounter(this))
-                .maximumSize(config.maxSize())
-                .expireAfter(buildExpiry(config))
-                .build();
+        this(id, name, c, metricRegistry, Ticker.systemTicker());
     }
 
     // Constructor with external ticker for testing
@@ -86,6 +90,7 @@ public class CaffeineLookupCache extends LookupCache {
                                Ticker ticker) {
         super(id, name, c, metricRegistry);
         config = (Config) c;
+        this.ticker = ticker;
         cache = Caffeine.newBuilder()
                 .recordStats(() -> new MetricStatsCounter(this))
                 .maximumSize(config.maxSize())
@@ -94,38 +99,54 @@ public class CaffeineLookupCache extends LookupCache {
                 .build();
     }
 
-    private Expiry<LookupCacheKey, LookupResult> buildExpiry(Config config) {
+    private long writeDurationNanos(LookupResult lookupResult) {
+        final long expireAfterWriteNanos = config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null
+                ? config.expireAfterWriteUnit().toNanos(config.expireAfterWrite())
+                : Long.MAX_VALUE;
+        if (lookupResult.hasTTL()) {
+            // A result TTL marks when the value stops being valid, not that it won't change before then, so it
+            // can only shorten expire-after-write: other nodes rely on it to pick up writes they don't see.
+            return Math.min(TimeUnit.MILLISECONDS.toNanos(lookupResult.cacheTTL()), expireAfterWriteNanos);
+        }
+        return expireAfterWriteNanos;
+    }
+
+    private CachedResult toCachedResult(LookupResult lookupResult) {
+        return new CachedResult(lookupResult, ticker.read(), writeDurationNanos(lookupResult));
+    }
+
+    private Expiry<LookupCacheKey, CachedResult> buildExpiry(Config config) {
         return new Expiry<>() {
             @Override
-            public long expireAfterCreate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime) {
-                if (lookupResult.hasTTL()) {
-                    return TimeUnit.MILLISECONDS.toNanos(lookupResult.cacheTTL());
-                } else {
-                    if (config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null) {
-                        //noinspection ConstantConditions
-                        return config.expireAfterWriteUnit().toNanos(config.expireAfterWrite());
-                    }
-                    return Long.MAX_VALUE;
-                }
+            public long expireAfterCreate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull CachedResult cachedResult, long currentTime) {
+                return cachedResult.expiryNanos();
             }
 
             @Override
-            public long expireAfterUpdate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime, long currentDuration) {
+            public long expireAfterUpdate(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull CachedResult cachedResult, long currentTime, long currentDuration) {
                 return currentDuration;
             }
 
             @Override
-            public long expireAfterRead(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull LookupResult lookupResult, long currentTime, long currentDuration) {
+            public long expireAfterRead(@Nonnull LookupCacheKey lookupCacheKey, @Nonnull CachedResult cachedResult, long currentTime, long currentDuration) {
                 if (config.ttlEmpty() != null
                         && !Boolean.TRUE.equals(config.ignoreNull())
-                        && lookupResult.isEmpty()) {
+                        && cachedResult.result().isEmpty()) {
                     LOG.trace("afterRead: empty: {}", currentDuration);
                     return currentDuration;
                 }
                 if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
                     //noinspection ConstantConditions
-                    LOG.trace("afterRead: config: {}", config.expireAfterAccessUnit().toNanos(config.expireAfterAccess()));
-                    return config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
+                    final long accessDuration = config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
+                    if (cachedResult.expiryNanos() == Long.MAX_VALUE) {
+                        LOG.trace("afterRead: config: {}", accessDuration);
+                        return accessDuration;
+                    }
+                    // Plain subtraction is correct across ticker wraparound, like System.nanoTime() differences.
+                    final long elapsed = currentTime - cachedResult.loadedAtNanos();
+                    final long remaining = Math.max(0, cachedResult.expiryNanos() - elapsed);
+                    LOG.trace("afterRead: config: {}, remaining: {}", accessDuration, remaining);
+                    return Math.min(accessDuration, remaining);
                 }
                 LOG.trace("afterRead: {}", currentDuration);
                 return currentDuration;
@@ -183,7 +204,7 @@ public class CaffeineLookupCache extends LookupCache {
         };
 
         try (final Timer.Context ignored = lookupTimer()) {
-            return cache.get(key, mapFunction);
+            return cache.get(key, mapFunction.andThen(this::toCachedResult)).result();
         }
     }
 
@@ -201,11 +222,11 @@ public class CaffeineLookupCache extends LookupCache {
 
     @Override
     public LookupResult getIfPresent(LookupCacheKey key) {
-        final LookupResult cacheEntry = cache.getIfPresent(key);
+        final CachedResult cacheEntry = cache.getIfPresent(key);
         if (cacheEntry == null) {
             return LookupResult.empty();
         }
-        return cacheEntry;
+        return cacheEntry.result();
     }
 
     @Override

@@ -76,6 +76,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -232,7 +233,8 @@ type StreamsOverviewTableElement = {
 type IndexSetsOverviewTableElement = {
   attributeName: string;
   group?: 'configuration';
-  attributes: Array<Attribute>;
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 

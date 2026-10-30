@@ -33,4 +33,14 @@ describe('UnauthorizedErrorPage', () => {
     await screen.findByText('Missing Permissions');
     await screen.findByText(/The request error message/);
   });
+
+  it('displays required permissions when there is no fetch error', async () => {
+    render(<UnauthorizedErrorPage errorDetails="Required permissions: team:read" />);
+
+    await screen.findByText('Missing Permissions');
+    await screen.findByText('Required permissions: team:read');
+    await screen.findByText(/The permissions check failed while trying to access/);
+
+    expect(screen.queryByText(/for the following request failed/)).not.toBeInTheDocument();
+  });
 });

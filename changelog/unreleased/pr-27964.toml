@@ -1,0 +1,4 @@
+type = "f"
+message = "Remove readall role from default configured security enabled roles in data node."
+
+pulls = ["27964"]

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 
 import type { LookupTable } from 'logic/lookup-tables/types';
@@ -24,6 +24,7 @@ import { UNSUPPORTED_PREVIEW } from 'components/lookup-tables/fixtures';
 import SummaryStep from './summary-step';
 
 const mockErrorsConsumer = jest.fn((_props: unknown) => null);
+const mockValidateLookupTable = jest.fn();
 
 jest.mock('components/lookup-tables/lookup-table-list/errors-consumer', () => (props: unknown) => {
   mockErrorsConsumer(props);
@@ -37,6 +38,7 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   usePurgeAllLookupTableKey: () => ({ purgeAllLookupTableKey: jest.fn() }),
   usePurgeLookupTableKey: () => ({ purgeLookupTableKey: jest.fn() }),
   useFetchLookupPreview: () => ({ lookupPreview: UNSUPPORTED_PREVIEW }),
+  useValidateLookupTable: () => ({ validateLookupTable: mockValidateLookupTable }),
   useTestLookupTableKey: () => ({ testLookupTableKey: jest.fn() }),
 }));
 
@@ -54,6 +56,12 @@ const NEW_TABLE_VALUES = {
   content_pack: null,
 } as unknown as LookupTable;
 
+const validationResult = (errors: { [field: string]: Array<string> } = {}) => ({
+  failed: Object.keys(errors).length > 0,
+  errors,
+  error_context: {},
+});
+
 function renderWithValues(values: LookupTable) {
   return render(
     <Formik initialValues={values} onSubmit={() => {}}>
@@ -63,8 +71,13 @@ function renderWithValues(values: LookupTable) {
 }
 
 describe('SummaryStep', () => {
+  beforeEach(() => {
+    mockValidateLookupTable.mockResolvedValue(validationResult());
+  });
+
   afterEach(() => {
     mockErrorsConsumer.mockClear();
+    mockValidateLookupTable.mockReset();
   });
 
   it('does not poll for lookup table errors while creating a new table that has not been saved yet', () => {
@@ -77,5 +90,25 @@ describe('SummaryStep', () => {
     renderWithValues({ ...NEW_TABLE_VALUES, id: 'existing-table-id' });
 
     expect(mockErrorsConsumer).toHaveBeenCalledWith(expect.objectContaining({ lutNames: ['new-table-name'] }));
+  });
+
+  it('shows the invalid default values the server reports', async () => {
+    mockValidateLookupTable.mockResolvedValue(
+      validationResult({ default_multi_value: ['Could not parse JSON object value <hello>'], name: ['Name in use'] }),
+    );
+    renderWithValues({ ...NEW_TABLE_VALUES, default_multi_value: 'hello', default_multi_value_type: 'OBJECT' });
+
+    await screen.findByText(/invalid default values/i);
+    expect(screen.getByText(/default multi value: could not parse json object value <hello>/i)).toBeInTheDocument();
+    expect(screen.queryByText(/default single value:/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/name in use/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show a default value alert when the server accepts the defaults', async () => {
+    renderWithValues(NEW_TABLE_VALUES);
+
+    await waitFor(() => expect(mockValidateLookupTable).toHaveBeenCalled());
+    await screen.findByText(/lookup table details/i);
+    expect(screen.queryByText(/invalid default values/i)).not.toBeInTheDocument();
   });
 });

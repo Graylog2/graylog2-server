@@ -54,10 +54,12 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -92,23 +94,8 @@ public class ClientCertResourceIT {
 
     @FullBackendTest
     void generateClientCert() throws Exception {
-
-        final String privateKeyPassword = RandomStringUtils.secure().nextAlphabetic(10);
-
-        // these roles are supported: all_access,security_rest_api_access,readall
-        final ValidatableResponse clientCertResponse = api.post("/ca/clientcert", """
-                {
-                    "principal": "admin",
-                    "roles": ["all_access"],
-                    "password": "%s",
-                    "certificate_lifetime": "P6M"
-                }
-                """.formatted(privateKeyPassword), Response.Status.OK.getStatusCode());
-
-        final GraylogApiResponse parsedResponse = new GraylogApiResponse(clientCertResponse);
-        final X509Certificate caCertificate = decodeCert(parsedResponse.properJSONPath().read("ca_certificate"));
-        final PrivateKey privateKey = decodePrivateKey(parsedResponse.properJSONPath().read("private_key"), privateKeyPassword);
-        final X509Certificate certificate = decodeCert(parsedResponse.properJSONPath().read("certificate"));
+        final ClientCert clientCert = createClientCert("admin", "all_access");
+        final X509Certificate certificate = clientCert.certificate();
 
         Assertions.assertThat(certificate.getIssuerX500Principal().getName()).isEqualTo("CN=Graylog CA");
         Assertions.assertThat(certificate.getSubjectX500Principal().getName()).isEqualTo("CN=admin");
@@ -119,21 +106,66 @@ public class ClientCertResourceIT {
         LocalDate shouldExpire = Instant.now().plus(Duration.ofDays(180)).atZone(ZoneId.systemDefault()).toLocalDate();
         Assertions.assertThat(expires).isBetween(shouldExpire.minusDays(2), shouldExpire.plusDays(2));
 
-        final SSLContext sslContext = createSslContext(
-                createKeystore(privateKey, certificate),
-                createTruststore(caCertificate));
+        final HttpResult response = request(clientCert.sslContext(), "GET", "/", null);
+        Assertions.assertThat(response.status()).isEqualTo(200);
 
-        final URL url = new URI("https://" + api.backend().searchServerInstance().getHttpHostAddress()).toURL();
+        final DocumentContext parsedOpensearchResponse = JsonPath.parse(response.body());
+        final String clusterName = parsedOpensearchResponse.read("cluster_name");
+        Assertions.assertThat(clusterName).isEqualTo("datanode-cluster");
+    }
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        if (connection instanceof HttpsURLConnection) {
-            ((HttpsURLConnection) connection).setSSLSocketFactory(sslContext.getSocketFactory());
+    @FullBackendTest
+    void readallClientCertCannotModifySecurityConfiguration() throws Exception {
+        final SSLContext sslContext = createClientCert("readall-user", "readall").sslContext();
 
-            Assertions.assertThat(connection.getResponseCode()).isEqualTo(200);
+        // reading indices works as expected
+        Assertions.assertThat(request(sslContext, "GET", "/_search?size=0", null).status()).isEqualTo(200);
 
-            final DocumentContext parsedOpensearchResponse = JsonPath.parse(connection.getInputStream());
-            final String clusterName = parsedOpensearchResponse.read("cluster_name");
-            Assertions.assertThat(clusterName).isEqualTo("datanode-cluster");
+        // but the security REST API must not be accessible, otherwise the user can map itself to any role
+        Assertions.assertThat(request(sslContext, "GET", "/_plugins/_security/api/rolesmapping", null).status()).isEqualTo(403);
+        Assertions.assertThat(request(sslContext, "PUT", "/_plugins/_security/api/rolesmapping/all_access", """
+                {"backend_roles": ["admin"], "hosts": [], "users": ["readall-user"]}
+                """).status()).isEqualTo(403);
+    }
+
+    private record ClientCert(X509Certificate certificate, SSLContext sslContext) {}
+
+    private static ClientCert createClientCert(String principal, String role) throws Exception {
+        final String privateKeyPassword = RandomStringUtils.secure().nextAlphabetic(10);
+        final ValidatableResponse clientCertResponse = api.post("/ca/clientcert", """
+                {
+                    "principal": "%s",
+                    "roles": ["%s"],
+                    "password": "%s",
+                    "certificate_lifetime": "P6M"
+                }
+                """.formatted(principal, role, privateKeyPassword), Response.Status.OK.getStatusCode());
+
+        final GraylogApiResponse parsedResponse = new GraylogApiResponse(clientCertResponse);
+        final X509Certificate caCertificate = decodeCert(parsedResponse.properJSONPath().read("ca_certificate"));
+        final PrivateKey privateKey = decodePrivateKey(parsedResponse.properJSONPath().read("private_key"), privateKeyPassword);
+        final X509Certificate certificate = decodeCert(parsedResponse.properJSONPath().read("certificate"));
+
+        return new ClientCert(certificate, createSslContext(createKeystore(privateKey, certificate), createTruststore(caCertificate)));
+    }
+
+    private record HttpResult(int status, String body) {}
+
+    private static HttpResult request(SSLContext sslContext, String method, String path, String body) throws Exception {
+        final URL url = new URI("https://" + api.backend().searchServerInstance().getHttpHostAddress() + path).toURL();
+        final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.setSSLSocketFactory(sslContext.getSocketFactory());
+        connection.setRequestMethod(method);
+        if (body != null) {
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(body.getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        final int status = connection.getResponseCode();
+        try (InputStream is = status < 400 ? connection.getInputStream() : connection.getErrorStream()) {
+            return new HttpResult(status, is == null ? "" : new String(is.readAllBytes(), StandardCharsets.UTF_8));
         }
     }
 

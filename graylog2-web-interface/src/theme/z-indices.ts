@@ -27,6 +27,7 @@ const zIndices = {
   tableHeaderCellPinned: tableHeaderCell + 100,
   expandButton: 10,
   resizeHandle: 100,
+  navigation,
   navigationDropdown: navigation + 2,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,

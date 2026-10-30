@@ -18,13 +18,12 @@ import React, { useCallback, useEffect } from 'react';
 
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { useStore } from 'stores/connect';
+import CurrentUser from 'logic/users/CurrentUser';
+import useCurrentUser from 'hooks/useCurrentUser';
 import useHistory from 'routing/useHistory';
 
 const StartPage = () => {
-  const { currentUser } = useStore(CurrentUserStore);
-  const isLoading = !currentUser;
+  const currentUser = useCurrentUser();
   const history = useHistory();
 
   const redirect = useCallback(
@@ -58,14 +57,12 @@ const StartPage = () => {
   }, [currentUser?.startpage, redirect]);
 
   useEffect(() => {
-    CurrentUserStore.reload();
+    CurrentUser.reload();
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      redirectToStartPage();
-    }
-  }, [isLoading, redirectToStartPage]);
+    redirectToStartPage();
+  }, [redirectToStartPage]);
 
   return <Spinner />;
 };

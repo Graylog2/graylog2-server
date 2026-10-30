@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
@@ -67,16 +68,24 @@ public abstract class AbstractOpensearchCli {
      * @return All the STDOUT and STDERR of the process merged into one String.
      */
     protected String runWithStdin(List<String> answersToPrompts, String... args) {
+        final byte[] stdin = answersToPrompts.isEmpty() ? null : String.join("\n", answersToPrompts).getBytes(Charset.defaultCharset());
+        return runWithStdin(stdin, args);
+    }
+
+    /**
+     * Runs the command with the given raw bytes as its STDIN, which is closed once all bytes are written.
+     */
+    protected String runWithStdin(@Nullable byte[] stdin, String... args) {
         final CommandLine cmd = new CommandLine(binPath.toFile());
         Arrays.asList(args).forEach(cmd::addArgument);
 
         final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
 
         final PumpStreamHandler pumpStreamHandler;
-        if (answersToPrompts.isEmpty()) {
+        if (stdin == null) {
             pumpStreamHandler = new PumpStreamHandler(stdout, stdout);
         } else {
-            InputStream input = new ByteArrayInputStream(String.join("\n", answersToPrompts).getBytes(Charset.defaultCharset()));
+            InputStream input = new ByteArrayInputStream(stdin);
             pumpStreamHandler = new PumpStreamHandler(stdout, stdout, input);
         }
 

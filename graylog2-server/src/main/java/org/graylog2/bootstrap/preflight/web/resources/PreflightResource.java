@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -91,6 +92,7 @@ public class PreflightResource {
                            String hostname, String shortNodeId, @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS) DataNodeStatus dataNodeStatus) {}
 
     @GET
+    @Operation(summary = "List the active data nodes and their provisioning state")
     @Path("/data_nodes")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public List<DataNode> listDataNodes() {
@@ -124,6 +126,7 @@ public class PreflightResource {
     }
 
     @GET
+    @Operation(summary = "Get information about the certificate authority")
     @Path("/ca")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public CertificateAuthorityInformation get() throws KeyStoreStorageException {
@@ -131,6 +134,7 @@ public class PreflightResource {
     }
 
     @GET
+    @Operation(summary = "Get the PEM-encoded certificate of the certificate authority")
     @Path("/ca/certificate")
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
@@ -140,6 +144,7 @@ public class PreflightResource {
 
 
     @POST
+    @Operation(summary = "Create a self-signed certificate authority")
     @Path("/ca/create")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
@@ -149,6 +154,7 @@ public class PreflightResource {
     }
 
     @POST
+    @Operation(summary = "Create the certificate authority from an uploaded keystore")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/ca/upload")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
@@ -166,6 +172,7 @@ public class PreflightResource {
     }
 
     @DELETE
+    @Operation(summary = "Reset the certificate authority and revoke the certificates of all available data nodes")
     @Path("/startOver")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
@@ -187,6 +194,7 @@ public class PreflightResource {
     }
 
     @DELETE
+    @Operation(summary = "Reset a single data node (not implemented yet)")
     @Path("/startOver/{nodeID}")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
@@ -195,6 +203,7 @@ public class PreflightResource {
     }
 
     @POST
+    @Operation(summary = "Trigger certificate signing requests for all active data nodes")
     @Path("/generate")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
@@ -212,6 +221,7 @@ public class PreflightResource {
     }
 
     @POST
+    @Operation(summary = "Set certificate parameters for a data node (not supported yet)")
     @Path("/{nodeID}")
     @Consumes(MediaType.APPLICATION_JSON)
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
