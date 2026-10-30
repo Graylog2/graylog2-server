@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   ClipboardButton,
@@ -26,7 +26,7 @@ import {
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import { Button, Label, Panel, Table } from 'components/bootstrap';
+import { Button, Panel, Table } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'hooks/useUsers';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
@@ -51,12 +51,6 @@ const StyledCopyTokenButton = styled(ClipboardButton)`
   vertical-align: baseline;
   margin-left: 1em;
 `;
-
-const StyledAudienceLabel = styled(Label)(
-  ({ theme }) => css`
-    margin-left: ${theme.spacings.xs};
-  `,
-);
 
 const StyledSearchForm = styled(SearchForm)`
   margin-bottom: 10px;
@@ -141,10 +135,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
 
               return (
                 <tr key={token.id}>
-                  <td>
-                    {token.name}
-                    {token.audience === 'mcp' && <StyledAudienceLabel bsStyle="info">MCP only</StyledAudienceLabel>}
-                  </td>
+                  <td>{token.name}</td>
                   <td>
                     <Timestamp dateTime={token.created_at} />
                   </td>

@@ -16,12 +16,20 @@
  */
 package org.graylog2.shared.security;
 
-import jakarta.annotation.Nullable;
-
-import java.io.Serializable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Secondary principal added to subjects that authenticated with an access token.
+ * Marks a REST resource that accepts access tokens via {@code Authorization: Bearer <token>}.
+ * <p>
+ * Other resources ignore bearer tokens, so bearer tokens forwarded by reverse proxies don't shadow trusted header
+ * authentication.
  */
-public record AccessTokenPrincipal(String tokenId, @Nullable String audience) implements Serializable {
+@Inherited
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AcceptsBearerAccessToken {
 }

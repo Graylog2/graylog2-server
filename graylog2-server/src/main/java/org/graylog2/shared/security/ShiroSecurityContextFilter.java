@@ -122,9 +122,8 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         requestContext.setSecurityContext(securityContext);
     }
 
-    // Restricted to opted-in resources, so bearer tokens forwarded by reverse proxies don't shadow trusted header auth
     private boolean acceptsBearerAccessToken(Set<Class<?>> matchedResources) {
-        return matchedResources.stream().anyMatch(resource -> resource.isAnnotationPresent(AccessTokenAudience.class));
+        return matchedResources.stream().anyMatch(resource -> resource.isAnnotationPresent(AcceptsBearerAccessToken.class));
     }
 
     private String decodeBase64(String s) {

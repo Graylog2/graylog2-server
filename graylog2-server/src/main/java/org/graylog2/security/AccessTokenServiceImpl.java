@@ -165,13 +165,8 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     }
 
     @Override
-    public AccessToken create(String username, String name, PeriodDuration ttl, String audience, @Nullable String oauthClientId) {
-        final Map<String, Object> restrictions = new HashMap<>();
-        restrictions.put(AccessTokenImpl.AUDIENCE, audience);
-        if (oauthClientId != null) {
-            restrictions.put(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId);
-        }
-        return create(username, name, ttl, restrictions);
+    public AccessToken create(String username, String name, PeriodDuration ttl, String oauthClientId) {
+        return create(username, name, ttl, Map.of(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId));
     }
 
     private AccessToken create(String username, String name, PeriodDuration ttl, Map<String, Object> additionalFields) {

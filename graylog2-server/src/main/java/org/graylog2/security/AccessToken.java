@@ -42,13 +42,6 @@ public interface AccessToken extends Persisted {
 
     void setName(String name);
 
-    /**
-     * @return the audience the token is restricted to, or {@code null} if it is valid for the whole API
-     * @see org.graylog2.shared.security.AccessTokenAudience
-     */
-    @Nullable
-    String getAudience();
-
     @Nullable
     String getOAuthClientId();
 }

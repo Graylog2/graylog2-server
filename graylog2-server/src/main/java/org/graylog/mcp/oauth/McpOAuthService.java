@@ -21,7 +21,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.Response;
 import org.graylog.mcp.config.McpConfiguration;
-import org.graylog.mcp.server.McpRestResource;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
@@ -378,7 +377,6 @@ public class McpOAuthService {
                 user.getName(),
                 truncate(f("MCP: %s", client.clientName()), MAX_CLIENT_NAME_LENGTH + 5),
                 PeriodDuration.of(accessTokenTtl),
-                McpRestResource.ACCESS_TOKEN_AUDIENCE,
                 client.clientId()
         );
         final String refreshToken = OAuthTokens.generate();

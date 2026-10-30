@@ -199,12 +199,12 @@ public class ShiroSecurityContextFilterTest {
     }
 
     @Test
-    public void filterWithBearerTokenOnAudienceResourceShouldCreateAccessTokenAuthToken() throws Exception {
+    public void filterWithBearerTokenOnOptedInResourceShouldCreateAccessTokenAuthToken() throws Exception {
         final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle(HttpHeaders.AUTHORIZATION, "Bearer secret-token");
         when(requestContext.getHeaders()).thenReturn(headers);
         final UriInfo uriInfo = mock(UriInfo.class);
-        when(uriInfo.getMatchedResources()).thenReturn(List.of(new AudienceResource()));
+        when(uriInfo.getMatchedResources()).thenReturn(List.of(new BearerResource()));
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
 
         filter.filter(requestContext);
@@ -229,7 +229,7 @@ public class ShiroSecurityContextFilterTest {
         assertThat(argument.getValue().getToken()).isNotInstanceOf(AccessTokenAuthToken.class);
     }
 
-    @AccessTokenAudience("test")
-    private static class AudienceResource {
+    @AcceptsBearerAccessToken
+    private static class BearerResource {
     }
 }

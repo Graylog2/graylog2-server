@@ -22,7 +22,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.security.AccessTokenAuthToken;
-import org.graylog2.shared.security.AccessTokenPrincipal;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,14 +55,12 @@ class AccessTokenAuthenticatorTest {
     }
 
     @Test
-    void keepsUserIdAsPrimaryPrincipalAndAddsTokenPrincipal() {
-        when(accessToken.getAudience()).thenReturn("mcp");
+    void authenticatesValidToken() {
         when(accessToken.getExpiresAt()).thenReturn(Tools.nowUTC().plusHours(1));
 
         final AuthenticationInfo info = authenticator.doGetAuthenticationInfo(new AccessTokenAuthToken("secret", "127.0.0.1"));
 
         assertThat(info.getPrincipals().getPrimaryPrincipal()).isEqualTo("user-id");
-        assertThat(info.getPrincipals().oneByType(AccessTokenPrincipal.class)).isEqualTo(new AccessTokenPrincipal("token-id", "mcp"));
     }
 
     @Test

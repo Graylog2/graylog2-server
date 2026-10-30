@@ -17,7 +17,6 @@
 package org.graylog.mcp.oauth;
 
 import org.graylog.mcp.config.McpConfiguration;
-import org.graylog.mcp.server.McpRestResource;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
@@ -153,7 +152,7 @@ class McpOAuthServiceTest {
     }
 
     @Test
-    void issuesAudienceRestrictedTokensForValidCode() {
+    void issuesClientBoundTokensForValidCode() {
         final String code = approveAndCaptureCode();
         final AccessToken accessToken = stubAccessTokenCreation();
 
@@ -164,7 +163,7 @@ class McpOAuthServiceTest {
         assertThat(response.expiresIn()).isEqualTo(CONFIG.oauthAccessTokenTtl().toSeconds());
         assertThat(response.refreshToken()).isNotBlank();
         verify(accessTokenService).create(eq("jane"), eq("MCP: Claude Code"), eq(PeriodDuration.of(CONFIG.oauthAccessTokenTtl())),
-                eq(McpRestResource.ACCESS_TOKEN_AUDIENCE), eq(CLIENT.clientId()));
+                eq(CLIENT.clientId()));
 
         final ArgumentCaptor<OAuthRefreshToken> refreshToken = ArgumentCaptor.forClass(OAuthRefreshToken.class);
         verify(refreshTokenService).create(refreshToken.capture());
@@ -181,7 +180,7 @@ class McpOAuthServiceTest {
         assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, REDIRECT_URI,
                 VERIFIER.replace('d', 'e'), null, CONFIG))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
-        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString(), any());
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
     }
 
     @Test
@@ -282,7 +281,7 @@ class McpOAuthServiceTest {
         final AccessToken accessToken = mock(AccessToken.class);
         when(accessToken.getId()).thenReturn("access-token-id");
         when(accessToken.getToken()).thenReturn("access-token");
-        when(accessTokenService.create(anyString(), anyString(), any(), anyString(), any())).thenReturn(accessToken);
+        when(accessTokenService.create(anyString(), anyString(), any(), anyString())).thenReturn(accessToken);
         return accessToken;
     }
 

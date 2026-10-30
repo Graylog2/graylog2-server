@@ -44,17 +44,12 @@ public abstract class TokenSummary {
     @Nullable
     public abstract DateTime expiresAt();
 
-    @JsonProperty("audience")
-    @Nullable
-    public abstract String audience();
-
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
                                       @JsonProperty("last_access") DateTime lastAccess,
                                       @Nullable @JsonProperty("created_at") DateTime createdAt,
-                                      @Nullable @JsonProperty("expires_at") DateTime expiresAt,
-                                      @Nullable @JsonProperty("audience") String audience) {
-        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt, expiresAt, audience);
+                                      @Nullable @JsonProperty("expires_at") DateTime expiresAt) {
+        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt, expiresAt);
     }
 }
