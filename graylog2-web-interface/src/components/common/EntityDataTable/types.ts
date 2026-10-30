@@ -110,6 +110,8 @@ export type ExpandedSectionRenderer<Entity> = {
   content: (entity: Entity) => React.ReactNode;
   actions?: (entity: Entity) => React.ReactNode;
   disableHeader?: boolean;
+  // Hides the section for entities it doesn't apply to, e.g. stream rules for the default stream.
+  isAvailable?: (entity: Entity) => boolean;
 };
 
 export type ExpandedSectionRenderers<Entity> = {

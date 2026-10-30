@@ -18,14 +18,12 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import useInputMetrics from 'hooks/useInputMetrics';
 import useEntityTitles from 'hooks/useEntityTitles';
 
 import MessagesPerStreamSection from './MessagesPerStreamSection';
 
-jest.mock('components/inputs/InputsOveriew/InputMetricsContext', () => ({
-  useInputMetricsFor: jest.fn(),
-}));
+jest.mock('hooks/useInputMetrics');
 jest.mock('hooks/useEntityTitles', () => jest.fn());
 
 const input = {
@@ -55,8 +53,8 @@ describe('MessagesPerStreamSection', () => {
   });
 
   it('renders a row per stream with resolved titles and counts', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: { 'stream-a': 100, 'stream-b': 250 } },
+    asMock(useInputMetrics).mockReturnValue({
+      metricsByInputId: { [input.id]: { messages_per_stream: { 'stream-a': 100, 'stream-b': 250 } } },
       isInitialLoading: false,
       isError: false,
     });
@@ -70,8 +68,8 @@ describe('MessagesPerStreamSection', () => {
   });
 
   it('marks deleted streams as "<id> (deleted)" when no title is returned', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: { 'stream-a': 100, 'stream-deleted': 5 } },
+    asMock(useInputMetrics).mockReturnValue({
+      metricsByInputId: { [input.id]: { messages_per_stream: { 'stream-a': 100, 'stream-deleted': 5 } } },
       isInitialLoading: false,
       isError: false,
     });
@@ -82,8 +80,8 @@ describe('MessagesPerStreamSection', () => {
   });
 
   it('shows an empty-state message when the stream map is empty', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: {} },
+    asMock(useInputMetrics).mockReturnValue({
+      metricsByInputId: { [input.id]: { messages_per_stream: {} } },
       isInitialLoading: false,
       isError: false,
     });
@@ -94,8 +92,8 @@ describe('MessagesPerStreamSection', () => {
   });
 
   it('shows an error message when metrics loading errored', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: undefined,
+    asMock(useInputMetrics).mockReturnValue({
+      metricsByInputId: {},
       isInitialLoading: false,
       isError: true,
     });
