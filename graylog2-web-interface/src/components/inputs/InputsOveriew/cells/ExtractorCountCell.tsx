@@ -39,7 +39,6 @@ const ExtractorCountCell = ({ input }: Props) => {
     return <span aria-label={`No extractor count available for input ${input.title}`}>—</span>;
   }
 
-
   return (
     <ExpandedSectionCount
       entityId={input.id}
