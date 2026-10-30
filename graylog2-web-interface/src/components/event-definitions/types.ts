@@ -98,6 +98,13 @@ export type TacticsTechniquesSummaryPlugin = {
   useCondition?: () => boolean;
 };
 
+export type SigmaImportPlugin = {
+  component: React.FC;
+  key: string;
+  // The import page renders as not found when this returns false.
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
@@ -119,8 +126,8 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
     'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
     'events.components.tacticsTechniquesDetailRow'?: Array<TacticsTechniquesDetailRowPlugin>;
-    'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
-    'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaGitImport'?: Array<SigmaImportPlugin>;
+    'eventDefinitions.components.sigmaFileUpload'?: Array<SigmaImportPlugin>;
     'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.searchQueryPreview'?: Array<{
       component: React.ComponentType<{ queryString: string; filters: SearchFilter[] }>;
