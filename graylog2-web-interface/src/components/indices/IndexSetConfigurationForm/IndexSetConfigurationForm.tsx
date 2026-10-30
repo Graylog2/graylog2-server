@@ -303,6 +303,7 @@ const IndexSetConfigurationForm = ({
                       label="Title"
                       id="title"
                       name="title"
+                      autoFocus
                       help="Descriptive name of the index set."
                       onChange={(event) => handleTitleChange(event, setFieldValue)}
                       required
