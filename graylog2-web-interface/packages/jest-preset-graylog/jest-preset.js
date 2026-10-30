@@ -58,7 +58,7 @@ module.exports = {
     //   files reference variables from hoisted `jest.mock` factories (TDZ-safe only with `var`).
     // - the classic React runtime extracts `key` from spread props like `React.createElement` did.
     // - `useDefineForClassFields: true` keeps babel's define semantics for class fields.
-    '^.+\\.[tj]sx?$': ['@swc/jest', {
+    '^.+\\.m?[tj]sx?$': ['@swc/jest', {
       jsc: {
         parser: { syntax: 'typescript', tsx: true, decorators: true },
         transform: {
@@ -72,6 +72,6 @@ module.exports = {
     }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked|d3-(interpolate|color))/)',
+    'node_modules/(?!(@react-hook|http-proxy-middleware|httpxy|is-plain-obj|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked|d3-(interpolate|color))/)',
   ],
 };
