@@ -101,6 +101,19 @@ class ClusterAdapterES7Test {
     }
 
     @Test
+    void clusterShardAllocationSplitsOffUnassignedShards() {
+        when(catApi.getNodeShardAllocations()).thenReturn(List.of(
+                new NodeShardAllocation("es01", 12),
+                new NodeShardAllocation("UNASSIGNED", 5)));
+
+        final ClusterShardAllocation allocation = clusterAdapter.clusterShardAllocation();
+
+        assertThat(allocation.nodeShardAllocations()).containsExactly(new NodeShardAllocation("es01", 12));
+        assertThat(allocation.unassignedShards()).isEqualTo(5);
+        assertThat(allocation.openShards()).isEqualTo(17);
+    }
+
+    @Test
     void clusterShardAllocationLeavesTheShardMaximumUnbounded() {
         // #22228 scoped its max_shards_per_node notification to OpenSearch. IndexerClusterCheckerThread notifies
         // above a ratio of this maximum, so an unreachable one keeps that notification off on Elasticsearch even
