@@ -17,8 +17,7 @@
 import React from 'react';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { CountBadge } from 'components/common';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 const CustomFieldMappingsCell = ({
   customFieldTypes,
@@ -26,10 +25,13 @@ const CustomFieldMappingsCell = ({
 }: {
   customFieldTypes: Array<CustomFieldMapping>;
   profile: IndexSetFieldTypeProfile;
-}) => {
-  const { toggleSection } = useExpandedSections();
-
-  return <CountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')} count={customFieldTypes.length} />;
-};
+}) => (
+  <ExpandedSectionCount
+    entityId={profile.id}
+    section="customFieldMapping"
+    count={customFieldTypes.length}
+    label="custom field mappings"
+  />
+);
 
 export default CustomFieldMappingsCell;

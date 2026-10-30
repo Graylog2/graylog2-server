@@ -15,7 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { TABLE_BORDER_WIDTH } from 'components/bootstrap/Table';
-import { DEFAULT_COL_WIDTH, ACTIONS_COL_ID, BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
+import {
+  DEFAULT_COL_WIDTH,
+  ACTIONS_COL_ID,
+  BULK_SELECT_COL_ID,
+  ROW_EXPAND_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase, ColumnRenderer, ColumnRenderersByAttribute } from '../types';
 
@@ -45,12 +50,14 @@ const calculateColumnWidths = ({
   bulkSelectColWidth,
   columnWidthPreferences,
   headerMinWidths,
+  rowExpandColWidth,
   scrollContainerWidth,
 }: {
   actionsColMinWidth: number;
   attributeColumnIds: Array<string>;
   attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
   bulkSelectColWidth: number;
+  rowExpandColWidth: number;
   columnWidthPreferences: { [colId: string]: number } | undefined;
   headerMinWidths: { [colId: string]: number };
   scrollContainerWidth: number;
@@ -68,19 +75,22 @@ const calculateColumnWidths = ({
   const attributeColumnsWidth = Object.values(attributeColumnWidths).reduce((total, width) => total + width, 0);
   // The table's own outer border (left edge) is real box-model width under border-collapse: separate,
   // so it must be reserved here or the columns overflow the scroll container.
-  const remainingWidth = scrollContainerWidth - TABLE_BORDER_WIDTH - bulkSelectColWidth - attributeColumnsWidth;
+  const remainingWidth =
+    scrollContainerWidth - TABLE_BORDER_WIDTH - rowExpandColWidth - bulkSelectColWidth - attributeColumnsWidth;
 
   return {
     ...attributeColumnWidths,
     // The actions column is the elastic tail. It fills the remaining space, so the table spans the container.
     [ACTIONS_COL_ID]: Math.max(actionsColMinWidth, remainingWidth),
     ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
+    ...(rowExpandColWidth ? { [ROW_EXPAND_COL_ID]: rowExpandColWidth } : {}),
   };
 };
 
 const useColumnWidths = <Entity extends EntityBase>({
   actionsColMinWidth,
   bulkSelectColWidth,
+  rowExpandColWidth = 0,
   columnRenderersByAttribute,
   columnIds,
   scrollContainerWidth,
@@ -89,6 +99,7 @@ const useColumnWidths = <Entity extends EntityBase>({
 }: {
   actionsColMinWidth: number;
   bulkSelectColWidth: number;
+  rowExpandColWidth?: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnIds: Array<string>;
   scrollContainerWidth: number;
@@ -106,6 +117,7 @@ const useColumnWidths = <Entity extends EntityBase>({
     bulkSelectColWidth,
     columnWidthPreferences,
     headerMinWidths,
+    rowExpandColWidth,
     scrollContainerWidth,
   });
 };

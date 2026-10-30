@@ -71,6 +71,7 @@ const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
     css`
       max-height: ${EXPANDED_MAX_HEIGHT}px;
       overflow: hidden auto;
+
       /* Extends into the cell padding, so the scrollbar sits at the cell border. */
       margin-right: -${CELL_PADDING_HORIZONTAL}px;
       padding-right: ${CELL_PADDING_HORIZONTAL}px;
@@ -88,6 +89,7 @@ const Item = styled.div<{ $layout: Layout }>(
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
       /* With overflow: hidden the item may shrink below its content height, so a capped list would squeeze it. */
       flex-shrink: 0;
     `}

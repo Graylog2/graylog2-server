@@ -15,20 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import { CountBadge } from 'components/common';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 type Props = {
   stream: Stream;
 };
 
 const DestinationFilterRulesCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-  const { toggleSection, expandedSections } = useExpandedSections();
   const hasFilterRules = !stream.is_default && stream.is_editable;
   const { data: destinationFilterRuleCount } = useStreamDestinationFilterRuleCount(stream.id, hasFilterRules);
 
@@ -41,17 +37,12 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
     return null;
   }
 
-  const destinationFilterRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('destination_filters');
-  const destinationFilterRulesSectionTitle = `${destinationFilterRulesSectionIsOpen ? 'Hide' : 'Show'} filter rules`;
-  const toggleDestinationFilterRulesSection = () => toggleSection(stream.id, 'destination_filters');
-
   return (
-    <CountBadge
+    <ExpandedSectionCount
+      entityId={stream.id}
+      section="destination_filters"
       count={filterRuleCount}
-      iconName={destinationFilterRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={toggleDestinationFilterRulesSection}
-      ref={buttonRef}
-      title={destinationFilterRulesSectionTitle}
+      label="filter rules"
     />
   );
 };

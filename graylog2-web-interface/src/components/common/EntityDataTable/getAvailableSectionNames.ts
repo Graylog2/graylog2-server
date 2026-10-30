@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { ExpandedSectionRenderers } from './types';
 
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
+const getAvailableSectionNames = <Entity>(
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined,
+  entity: Entity,
+) =>
+  Object.entries(expandedSectionRenderers ?? {})
+    .filter(([, { isAvailable }]) => isAvailable?.(entity) ?? true)
+    .map(([sectionName]) => sectionName);
 
-import { DETAILS_SECTION } from '../Constants';
-import type { IndexSetEntity } from '../types';
-
-type Props = React.PropsWithChildren<{
-  indexSet: IndexSetEntity;
-  align?: 'right';
-}>;
-
-const DetailsToggle = ({ indexSet, align = undefined, children = undefined }: Props) => (
-  <ExpandedSectionToggleWrapper id={indexSet.id} section={DETAILS_SECTION} align={align}>
-    {children}
-  </ExpandedSectionToggleWrapper>
-);
-
-export default DetailsToggle;
+export default getAvailableSectionNames;
