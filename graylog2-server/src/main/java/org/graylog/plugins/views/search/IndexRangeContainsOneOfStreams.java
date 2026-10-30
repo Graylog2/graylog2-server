@@ -20,6 +20,7 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ public class IndexRangeContainsOneOfStreams {
         if (indexRange.streamIds() == null) {
             return validStreams.stream()
                     .map(Stream::getIndexSet)
+                    // Streams on plugin-provided index sets (no Mongo record) have no IndexSet here.
+                    .filter(Objects::nonNull)
                     .anyMatch(indexSet -> indexSet.isManagedIndex(indexRange.indexName()));
         }
 
