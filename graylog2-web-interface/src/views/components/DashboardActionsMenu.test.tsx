@@ -232,7 +232,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    await userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Control>}s{/Control}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 
@@ -303,7 +303,7 @@ describe('DashboardActionsMenu', () => {
       render(<SUT view={immutableView} />);
 
       await screen.findByRole('button', { name: 'Save dashboard' });
-      await userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Control>}s{/Control}');
 
       expect(OnSaveViewAction).not.toHaveBeenCalled();
     });
