@@ -39,7 +39,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * MCP clients to call the OAuth endpoints.
  */
 public class McpOAuthResponseFilter implements ContainerResponseFilter {
-    private static final Set<Class<?>> CORS_RESOURCES = Set.of(OAuthResource.class, OAuthMetadataResource.class);
+    private static final Set<Class<?>> CORS_RESOURCES = Set.of(OAuthResource.class, OAuthMetadataResource.class, OAuthFallbackResource.class);
 
     private final ResourceInfo resourceInfo;
     private final ClusterConfigService clusterConfigService;

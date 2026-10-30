@@ -56,8 +56,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 /**
  * Unauthenticated OAuth 2.1 endpoints for MCP clients. The consent step happens in the web interface.
  */
-@NonApiResource(prefix = "/oauth")
-@Path("")
+@NonApiResource
+@Path("/oauth")
 public class OAuthResource {
     private static final Logger LOG = LoggerFactory.getLogger(OAuthResource.class);
 
@@ -231,7 +231,7 @@ public class OAuthResource {
         return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES);
     }
 
-    private static Response error(OAuthException e) {
+    static Response error(OAuthException e) {
         return Response.status(e.status())
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .cacheControl(noStore())

@@ -42,8 +42,8 @@ import java.util.List;
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc9728">RFC 9728 - OAuth 2.0 Protected Resource Metadata</a>
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc8414">RFC 8414 - OAuth 2.0 Authorization Server Metadata</a>
  */
-@NonApiResource(prefix = "/.well-known")
-@Path("")
+@NonApiResource
+@Path("/.well-known")
 public class OAuthMetadataResource {
     private final ClusterConfigService clusterConfigService;
     private final McpOAuthUrls urls;
