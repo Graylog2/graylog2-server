@@ -47,6 +47,8 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.configuration.managed.ManagedConfigurationModule;
+import org.graylog2.configuration.managed.NodeType;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
@@ -86,6 +88,7 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
         modules.add(
                 new ConfigurationModule(configuration),
                 new DatanodeServerBindings(),
+                new ManagedConfigurationModule(NodeType.DATANODE),
                 new RestBindings(),
                 new DatanodeProvisioningBindings(),
                 new PeriodicalBindings(),
