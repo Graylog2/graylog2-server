@@ -89,12 +89,15 @@ export type Editor = {
   completers: Array<AutoCompleter>;
   execCommand: (command: string, args?: Record<string, unknown>) => void;
   focus: () => void;
+  on: (event: 'change', callback: () => void) => void;
   session: Session;
   renderer: Renderer;
   setFontSize: (newFontSize: number) => void;
   getValue: () => string;
+  navigateUp: (rows: number) => void;
+  navigateDown: (rows: number) => void;
   tabstopManager: unknown;
-  setValue: (newValue: string) => void;
+  setValue: (newValue: string, cursorPosition?: number) => void;
   isFocused: () => boolean;
 };
 
