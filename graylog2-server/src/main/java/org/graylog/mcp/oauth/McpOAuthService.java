@@ -21,11 +21,13 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.Response;
 import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.security.GranteeAuthorizer;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +94,7 @@ public class McpOAuthService {
     private final OAuthRefreshTokenService refreshTokenService;
     private final AccessTokenService accessTokenService;
     private final UserService userService;
+    private final GranteeAuthorizer.Factory granteeAuthorizerFactory;
     private final AuditEventSender auditEventSender;
     private final Clock clock;
 
@@ -101,6 +104,7 @@ public class McpOAuthService {
                            OAuthRefreshTokenService refreshTokenService,
                            AccessTokenService accessTokenService,
                            UserService userService,
+                           GranteeAuthorizer.Factory granteeAuthorizerFactory,
                            AuditEventSender auditEventSender,
                            Clock clock) {
         this.clientService = clientService;
@@ -108,6 +112,7 @@ public class McpOAuthService {
         this.refreshTokenService = refreshTokenService;
         this.accessTokenService = accessTokenService;
         this.userService = userService;
+        this.granteeAuthorizerFactory = granteeAuthorizerFactory;
         this.auditEventSender = auditEventSender;
         this.clock = clock;
     }
@@ -280,7 +285,7 @@ public class McpOAuthService {
             throw OAuthException.of(INVALID_GRANT, "PKCE verification failed");
         }
         final String effectiveResource = validateResource(resource, authorizationCode.resource());
-        final User user = loadActiveUser(authorizationCode.userId());
+        final User user = loadAuthorizedUser(authorizationCode.userId());
 
         final TokenResponse response = issueTokens(client, user, effectiveResource, UUID.randomUUID().toString(), config);
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_ISSUE, clientContext(client));
@@ -317,7 +322,7 @@ public class McpOAuthService {
             throw OAuthException.of(INVALID_GRANT, "Authorization was revoked");
         }
         final String effectiveResource = validateResource(resource, token.resource());
-        final User user = loadActiveUser(token.userId());
+        final User user = loadAuthorizedUser(token.userId());
 
         final TokenResponse response = issueTokens(client, user, effectiveResource, token.familyId(), config);
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_REFRESH, clientContext(client));
@@ -415,10 +420,15 @@ public class McpOAuthService {
         return clientService.findByClientId(clientId).orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
     }
 
-    private User loadActiveUser(String userId) {
+    private User loadAuthorizedUser(String userId) {
         final User user = userService.loadById(userId);
         if (user == null || user.getAccountStatus() != User.AccountStatus.ENABLED) {
             throw OAuthException.of(INVALID_GRANT, "User does not exist or is disabled");
+        }
+        final GranteeAuthorizer authorizer = granteeAuthorizerFactory.create(user);
+        if (!authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)
+                || !authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, user.getName())) {
+            throw OAuthException.of(INVALID_GRANT, "User is not allowed to access the MCP server or create access tokens");
         }
         return user;
     }

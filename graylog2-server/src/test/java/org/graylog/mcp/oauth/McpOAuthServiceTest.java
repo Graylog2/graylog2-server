@@ -17,10 +17,12 @@
 package org.graylog.mcp.oauth;
 
 import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.security.GranteeAuthorizer;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,6 +63,7 @@ class McpOAuthServiceTest {
     private OAuthRefreshTokenService refreshTokenService;
     private AccessTokenService accessTokenService;
     private UserService userService;
+    private GranteeAuthorizer authorizer;
     private McpOAuthService service;
     private User user;
 
@@ -71,14 +74,19 @@ class McpOAuthServiceTest {
         refreshTokenService = mock(OAuthRefreshTokenService.class);
         accessTokenService = mock(AccessTokenService.class);
         userService = mock(UserService.class);
+        authorizer = mock(GranteeAuthorizer.class);
+        final GranteeAuthorizer.Factory authorizerFactory = mock(GranteeAuthorizer.Factory.class);
         service = new McpOAuthService(clientService, codeService, refreshTokenService, accessTokenService, userService,
-                mock(AuditEventSender.class), Clock.fixed(NOW, ZoneOffset.UTC));
+                authorizerFactory, mock(AuditEventSender.class), Clock.fixed(NOW, ZoneOffset.UTC));
 
         user = mock(User.class);
         when(user.getId()).thenReturn("user-id");
         when(user.getName()).thenReturn("jane");
         when(user.getAccountStatus()).thenReturn(User.AccountStatus.ENABLED);
         when(userService.loadById("user-id")).thenReturn(user);
+        when(authorizerFactory.create(user)).thenReturn(authorizer);
+        when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(true);
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(true);
         when(clientService.findByClientId(CLIENT.clientId())).thenReturn(Optional.of(CLIENT));
     }
 
@@ -184,6 +192,16 @@ class McpOAuthServiceTest {
     }
 
     @Test
+    void rejectsCodeWhenUserMayNotCreateTokens() {
+        final String code = approveAndCaptureCode();
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, REDIRECT_URI, VERIFIER, null, CONFIG))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
     void rejectsCodeForOtherRedirectUri() {
         final String code = approveAndCaptureCode();
 
@@ -251,6 +269,26 @@ class McpOAuthServiceTest {
         stubAccessTokenCreation();
 
         assertThat(service.refresh(CLIENT.clientId(), "refresh", null, CONFIG).accessToken()).isEqualTo("access-token");
+    }
+
+    @Test
+    void rejectsRefreshWhenUserLostMcpAccess() {
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
+        when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null, CONFIG))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsRefreshWhenUserMayNotCreateTokens() {
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null, CONFIG))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
     }
 
     @Test

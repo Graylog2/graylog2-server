@@ -162,6 +162,9 @@ public class McpOAuthResource extends RestResource {
         if (!isPermitted(RestPermissions.MCP_SERVER_ACCESS)) {
             throw new ForbiddenException("You are not allowed to access the MCP server");
         }
+        if (!isPermitted(RestPermissions.USERS_TOKENCREATE, getCurrentUser().getName())) {
+            throw new ForbiddenException("You are not allowed to create access tokens");
+        }
     }
 
     private McpOAuthService.AuthorizationRequest validate(String clientId, String redirectUri, String responseType,
