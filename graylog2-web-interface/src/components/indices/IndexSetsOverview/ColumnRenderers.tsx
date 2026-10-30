@@ -26,7 +26,6 @@ import { formatReadableNumber } from 'util/NumberFormatting';
 
 import { INDEX_SET_CATEGORY_TITLES } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
-import DetailsToggle from './cells/DetailsToggle';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
 import MetricCell from './cells/MetricCell';
