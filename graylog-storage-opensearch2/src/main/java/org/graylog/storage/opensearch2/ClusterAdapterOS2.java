@@ -31,10 +31,14 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.storage.opensearch2.cat.AliasSummaryResponse;
 import org.graylog.storage.opensearch2.cat.CatApi;
@@ -145,7 +149,38 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         } catch (Exception e) {
             LOG.warn("Could not retrieve max_shards_per_node setting from cluster settings. Threshold warnings disabled.", e);
         }
-        return new ClusterShardAllocation(maxShardsPerNode, catApi.getNodeShardAllocations());
+        final int maxShardsPerCluster = clusterShardLimit(response.getSetting("cluster.routing.allocation.total_shards_limit"));
+        // Since OpenSearch 3.4, searchable snapshot shards count toward cluster.max_remote_capable_shards_per_node
+        // instead of cluster.max_shards_per_node.
+        final boolean excludeRemoteSnapshots = response.getSetting("cluster.max_remote_capable_shards_per_node") != null;
+        return ClusterShardAllocation.fromCatAllocation(maxShardsPerNode, maxShardsPerCluster,
+                catApi.getNodeShardAllocations(), openShards(excludeRemoteSnapshots));
+    }
+
+    private static int clusterShardLimit(String setting) {
+        try {
+            return Integer.parseInt(setting);
+        } catch (NumberFormatException e) {
+            return ClusterShardAllocation.NO_CLUSTER_LIMIT;
+        }
+    }
+
+    // Shards of closed indices don't count toward cluster.max_shards_per_node, and _cat/allocation still reports them.
+    private long openShards(boolean excludeRemoteSnapshots) {
+        final GetSettingsRequest request = new GetSettingsRequest()
+                .indices("*")
+                .names("index.number_of_shards", "index.number_of_replicas", "index.store.type")
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_HIDDEN);
+        final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
+                "Unable to retrieve index shard counts");
+        return response.getIndexToSettings().values().stream()
+                .filter(indexSettings -> !(excludeRemoteSnapshots && "remote_snapshot".equals(indexSettings.get("index.store.type"))))
+                .mapToLong(ClusterAdapterOS2::shardCopies)
+                .sum();
+    }
+
+    private static long shardCopies(Settings indexSettings) {
+        return (long) indexSettings.getAsInt("index.number_of_shards", 0) * (1 + indexSettings.getAsInt("index.number_of_replicas", 0));
     }
 
     @Override

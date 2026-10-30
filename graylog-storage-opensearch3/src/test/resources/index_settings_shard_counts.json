@@ -1,0 +1,29 @@
+{
+  "graylog_0": {
+    "settings": {
+      "index": {
+        "number_of_shards": "4",
+        "number_of_replicas": "1"
+      }
+    }
+  },
+  ".hidden_index": {
+    "settings": {
+      "index": {
+        "number_of_shards": "1",
+        "number_of_replicas": "0"
+      }
+    }
+  },
+  "mounted": {
+    "settings": {
+      "index": {
+        "store": {
+          "type": "remote_snapshot"
+        },
+        "number_of_shards": "3",
+        "number_of_replicas": "0"
+      }
+    }
+  }
+}

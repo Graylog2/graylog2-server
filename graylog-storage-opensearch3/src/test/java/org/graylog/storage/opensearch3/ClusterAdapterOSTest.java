@@ -51,6 +51,7 @@ class ClusterAdapterOSTest {
                 .stubResponse("GET", "/_cat/nodes", Resources.getResource("cat_nodes.json"))
                 .stubResponse("GET", "/_cluster/settings", Resources.getResource("cluster_settings.json"))
                 .stubResponse("GET", "/_cat/allocation", Resources.getResource("cat_allocation.json"))
+                .stubResponse("GET", "/*/_settings/*", Resources.getResource("index_settings_shard_counts.json"))
                 .stubResponse("GET", "/_cat/aliases/*", Resources.getResource("cat_aliases.json"))
                 .stubResponse("GET", "/_cat/indices/*", Resources.getResource("cat_indices.json"))
                 .stubError("GET", "/_cluster/health", 500, "Server not responding")
@@ -150,6 +151,31 @@ class ClusterAdapterOSTest {
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::shards)
                 .containsExactly(15, 16);
+        assertThat(clusterShardAllocation.unassignedShards()).isEqualTo(8);
+        // Without cluster.max_remote_capable_shards_per_node (before OpenSearch 3.4), searchable snapshots count too.
+        assertThat(clusterShardAllocation.openShards()).isEqualTo(12);
+        assertThat(clusterShardAllocation.maxShardsPerCluster()).isEqualTo(ClusterShardAllocation.NO_CLUSTER_LIMIT);
+    }
+
+    @Test
+    void testClusterShardAllocationWithRemoteCapableShardPool() {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_cluster/settings", """
+                        {
+                          "persistent": {"cluster.max_shards_per_node": "42", "cluster.routing.allocation.total_shards_limit": "50"},
+                          "transient": {},
+                          "defaults": {"cluster.max_remote_capable_shards_per_node": "1000"}
+                        }""")
+                .stubResponse("GET", "/_cat/allocation", Resources.getResource("cat_allocation.json"))
+                .stubResponse("GET", "/*/_settings/*", Resources.getResource("index_settings_shard_counts.json"))
+                .build();
+
+        final ClusterShardAllocation clusterShardAllocation = new ClusterAdapterOS(client, Duration.seconds(1)).clusterShardAllocation();
+
+        assertThat(clusterShardAllocation.maxShardsPerCluster()).isEqualTo(50);
+        assertThat(clusterShardAllocation.maxShards()).isEqualTo(50);
+        // Searchable snapshot shards count toward cluster.max_remote_capable_shards_per_node instead.
+        assertThat(clusterShardAllocation.openShards()).isEqualTo(9);
     }
 
     @Test
