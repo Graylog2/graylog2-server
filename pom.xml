@@ -169,7 +169,6 @@
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jersey.version>4.0.3</jersey.version>
         <jmte.version>7.0.3</jmte.version>
