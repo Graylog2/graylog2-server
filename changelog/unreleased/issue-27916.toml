@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix false shard allocation maximum notification for the `UNASSIGNED` pseudo node reported for unassigned shards."
+
+issues = ["27916"]
+pulls = []
