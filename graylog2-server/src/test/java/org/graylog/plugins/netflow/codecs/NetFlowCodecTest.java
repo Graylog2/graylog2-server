@@ -18,12 +18,16 @@ package org.graylog.plugins.netflow.codecs;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import org.graylog.plugins.netflow.flows.FlowException;
 import org.graylog.plugins.netflow.flows.NetFlowFormatter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -146,5 +150,67 @@ public class NetFlowCodecTest {
 
         assertThatThrownBy(() -> codec.decodeMessages(new RawMessage(b, source))).isInstanceOf(InputProcessingException.class);
 
+    }
+
+    @Test
+    public void aggregatorReleasesBufferedV9PacketWhenTemplateFromEarlierPacketIsKnown() throws Exception {
+        final byte[] template256 = new byte[]{
+                0x01, 0x00, 0x00, 0x02, // template id 256, 2 fields
+                0x00, 0x08, 0x00, 0x04, // ipv4_src_addr
+                0x00, 0x0c, 0x00, 0x04 // ipv4_dst_addr
+        };
+        final byte[] template257 = new byte[]{
+                0x01, 0x01, 0x00, 0x02, // template id 257, 2 fields
+                0x00, 0x08, 0x00, 0x04, // ipv4_src_addr
+                0x00, 0x0c, 0x00, 0x04 // ipv4_dst_addr
+        };
+
+        // every datagram comes with its own, equal but not identical, address object
+        final CodecAggregator.Result templateResult = codecAggregator.addChunk(
+                netFlowV9Packet(flowSet(0, template256)), exporterAddress());
+        assertThat(templateResult.getMessage()).isNull();
+
+        // template 257 is still unknown, so the whole packet is buffered
+        final CodecAggregator.Result bufferedResult = codecAggregator.addChunk(netFlowV9Packet(
+                flowSet(256, new byte[]{10, 0, 0, 1, 10, 0, 0, 100}),
+                flowSet(257, new byte[]{10, 0, 0, 2, 10, 0, 0, 100})), exporterAddress());
+        assertThat(bufferedResult.isValid()).isTrue();
+        assertThat(bufferedResult.getMessage()).isNull();
+
+        final CodecAggregator.Result releasedResult = codecAggregator.addChunk(
+                netFlowV9Packet(flowSet(0, template257)), exporterAddress());
+        assertThat(releasedResult.isValid()).isTrue();
+        assertThat(releasedResult.getMessage()).as("released buffered packet").isNotNull();
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(ByteBufUtil.getBytes(releasedResult.getMessage()), exporterAddress()));
+        assertThat(messages)
+                .extracting(message -> message.getField("nf_ipv4_src_addr"))
+                .containsExactlyInAnyOrder("10.0.0.1", "10.0.0.2");
+    }
+
+    private static InetSocketAddress exporterAddress() {
+        return new InetSocketAddress("192.168.1.1", 2055);
+    }
+
+    private static ByteBuf flowSet(int flowSetId, byte[] content) {
+        final ByteBuf flowSet = Unpooled.buffer();
+        flowSet.writeShort(flowSetId);
+        flowSet.writeShort(4 + content.length);
+        flowSet.writeBytes(content);
+        return flowSet;
+    }
+
+    private static ByteBuf netFlowV9Packet(ByteBuf... flowSets) {
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(9); // NetFlow version
+        packet.writeShort(flowSets.length); // record count
+        packet.writeInt(1000); // system uptime
+        packet.writeInt(1700000000); // unix seconds
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // source id
+        for (ByteBuf flowSet : flowSets) {
+            packet.writeBytes(flowSet);
+        }
+        return packet;
     }
 }
