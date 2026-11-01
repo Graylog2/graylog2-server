@@ -19,6 +19,7 @@ package org.graylog.integrations.ipfix.codecs;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
@@ -57,6 +58,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class IpfixAggregatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregatorTest.class);
+    private static final int TEMPLATE_SET_ID = 2;
     private final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("192.168.1.1", 999);
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -218,6 +220,71 @@ public class IpfixAggregatorTest {
             fail("Cannot process PCAP stream");
         }
         assertThat(messages).hasSize(2);
+    }
+
+    @Test
+    public void releasesBufferedDataSetsWhoseTemplateArrivedInAnEarlierPacket() throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final byte[] template258 = new byte[]{
+                0x01, 0x02, 0x00, 0x02, // template id 258, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+        final byte[] template259 = new byte[]{
+                0x01, 0x03, 0x00, 0x02, // template id 259, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+
+        // every datagram comes with its own, equal but not identical, address object
+        final CodecAggregator.Result templateResult = ipfixAggregator.addChunk(
+                ipfixMessage(set(TEMPLATE_SET_ID, template258)), exporterAddress());
+        assertThat(templateResult.getMessage()).isNull();
+
+        // template 259 is still unknown, so the whole packet is buffered
+        final CodecAggregator.Result bufferedResult = ipfixAggregator.addChunk(ipfixMessage(
+                set(258, new byte[]{10, 0, 0, 1, 6}),
+                set(259, new byte[]{10, 0, 0, 2, 17})), exporterAddress());
+        assertThat(bufferedResult.isValid()).isTrue();
+        assertThat(bufferedResult.getMessage()).isNull();
+
+        final CodecAggregator.Result releasedResult = ipfixAggregator.addChunk(
+                ipfixMessage(set(TEMPLATE_SET_ID, template259)), exporterAddress());
+        assertThat(releasedResult.isValid()).isTrue();
+        assertThat(releasedResult.getMessage()).isNotNull();
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(ByteBufUtil.getBytes(releasedResult.getMessage())));
+        assertThat(messages)
+                .extracting(message -> message.getField("sourceIPv4Address"))
+                .as("both buffered data sets are released")
+                .containsExactlyInAnyOrder("10.0.0.1", "10.0.0.2");
+    }
+
+    private static InetSocketAddress exporterAddress() {
+        return InetSocketAddress.createUnresolved("192.168.1.1", 4739);
+    }
+
+    private static ByteBuf set(int setId, byte[] content) {
+        final ByteBuf set = Unpooled.buffer();
+        set.writeShort(setId);
+        set.writeShort(4 + content.length);
+        set.writeBytes(content);
+        return set;
+    }
+
+    private static ByteBuf ipfixMessage(ByteBuf... sets) {
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(10); // IPFIX version
+        packet.writeShort(0); // message length, set below
+        packet.writeInt(1700000000); // export time
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // observation domain id
+        for (ByteBuf set : sets) {
+            packet.writeBytes(set);
+        }
+        packet.setShort(2, packet.readableBytes());
+        return packet;
     }
 
     private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {
