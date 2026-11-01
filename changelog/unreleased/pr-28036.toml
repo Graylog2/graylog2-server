@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix IPFIX input dropping flow records from packets that also contain options data."
+
+issues = ["28033"]
+pulls = ["28036"]
