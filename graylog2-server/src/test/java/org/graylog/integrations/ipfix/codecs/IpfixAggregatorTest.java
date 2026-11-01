@@ -18,12 +18,15 @@ package org.graylog.integrations.ipfix.codecs;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
 import org.graylog.integrations.ipfix.InformationElementDefinitions;
+import org.graylog.integrations.ipfix.IpfixJournal;
 import org.graylog.integrations.ipfix.IpfixMessage;
 import org.graylog.integrations.ipfix.IpfixParser;
 import org.graylog.integrations.ipfix.Utils;
@@ -39,6 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +61,10 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class IpfixAggregatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregatorTest.class);
+    private static final int COLLIDING_TEMPLATE_ID = 258;
+    private static final int IE_PROTOCOL_IDENTIFIER = 4;
+    private static final int IE_SOURCE_IPV4_ADDRESS = 8;
+    private static final int IE_DESTINATION_TRANSPORT_PORT = 11;
     private final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("192.168.1.1", 999);
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -218,6 +226,91 @@ public class IpfixAggregatorTest {
             fail("Cannot process PCAP stream");
         }
         assertThat(messages).hasSize(2);
+    }
+
+    @Test
+    public void usesOnlyTemplatesOfTheSendingExporterWhenTemplateIdsCollide() throws IOException {
+        // Two exporters use the same observation domain id and the same template id, but different field layouts.
+        final Exporter exporterA = new Exporter(InetSocketAddress.createUnresolved("192.168.1.1", 4739),
+                templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_PROTOCOL_IDENTIFIER, 1),
+                new byte[]{10, 0, 0, 1, 6},
+                "10.0.0.1", 6L);
+        final Exporter exporterB = new Exporter(InetSocketAddress.createUnresolved("192.168.1.2", 4739),
+                templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_DESTINATION_TRANSPORT_PORT, 2, IE_PROTOCOL_IDENTIFIER, 1),
+                new byte[]{10, 0, 0, 2, 0x01, (byte) 0xbb, 17},
+                "10.0.0.2", 17L);
+
+        // the arrival order of the exporters must not matter
+        assertExportersUseTheirOwnTemplates(exporterA, exporterB);
+        assertExportersUseTheirOwnTemplates(exporterB, exporterA);
+    }
+
+    private void assertExportersUseTheirOwnTemplates(Exporter first, Exporter second) throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+
+        // template and data record in the same packet
+        for (Exporter exporter : List.of(first, second)) {
+            assertAggregatedWithOwnTemplate(ipfixAggregator, codec, exporter, ipfixPacket(exporter.templateRecord(), exporter.dataRecord()));
+        }
+        // data-only packets after the templates of both exporters are known
+        for (Exporter exporter : List.of(first, second)) {
+            assertAggregatedWithOwnTemplate(ipfixAggregator, codec, exporter, ipfixPacket(null, exporter.dataRecord()));
+        }
+    }
+
+    private void assertAggregatedWithOwnTemplate(IpfixAggregator ipfixAggregator, IpfixCodec codec, Exporter exporter, ByteBuf packet) throws IOException {
+        final CodecAggregator.Result result = ipfixAggregator.addChunk(packet, exporter.address());
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getMessage()).isNotNull();
+
+        final byte[] bytes = ByteBufUtil.getBytes(result.getMessage());
+        final IpfixJournal.RawIpfix rawIpfix = IpfixJournal.RawIpfix.parseFrom(bytes);
+        assertThat(rawIpfix.getTemplatesMap())
+                .as("templates sent along with the data of exporter %s", exporter.address())
+                .containsOnlyKeys(COLLIDING_TEMPLATE_ID)
+                .containsEntry(COLLIDING_TEMPLATE_ID, ByteString.copyFrom(exporter.templateRecord()));
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(bytes));
+        assertThat(messages).singleElement().satisfies(message -> {
+            assertThat(message.getField("sourceIPv4Address")).isEqualTo(exporter.expectedSourceAddress());
+            assertThat(message.getField("protocolIdentifier")).isEqualTo(exporter.expectedProtocol());
+        });
+    }
+
+    private static byte[] templateRecord(int templateId, int... fieldIdsAndLengths) {
+        final ByteBuf buf = Unpooled.buffer();
+        buf.writeShort(templateId);
+        buf.writeShort(fieldIdsAndLengths.length / 2);
+        for (int value : fieldIdsAndLengths) {
+            buf.writeShort(value);
+        }
+        return ByteBufUtil.getBytes(buf);
+    }
+
+    private static ByteBuf ipfixPacket(@Nullable byte[] templateRecord, byte[] dataRecord) {
+        final ByteBuf sets = Unpooled.buffer();
+        if (templateRecord != null) {
+            sets.writeShort(2); // template set id
+            sets.writeShort(4 + templateRecord.length);
+            sets.writeBytes(templateRecord);
+        }
+        sets.writeShort(COLLIDING_TEMPLATE_ID); // data set id
+        sets.writeShort(4 + dataRecord.length);
+        sets.writeBytes(dataRecord);
+
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(10); // IPFIX version
+        packet.writeShort(16 + sets.readableBytes());
+        packet.writeInt(1700000000); // export time
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // observation domain id
+        packet.writeBytes(sets);
+        return packet;
+    }
+
+    private record Exporter(InetSocketAddress address, byte[] templateRecord, byte[] dataRecord,
+                            String expectedSourceAddress, long expectedProtocol) {
     }
 
     private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {
