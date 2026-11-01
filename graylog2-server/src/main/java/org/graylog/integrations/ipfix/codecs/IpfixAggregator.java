@@ -28,6 +28,7 @@ import org.graylog.integrations.ipfix.InformationElementDefinitions;
 import org.graylog.integrations.ipfix.IpfixJournal;
 import org.graylog.integrations.ipfix.IpfixParser;
 import org.graylog.integrations.ipfix.ShallowDataSet;
+import org.graylog.integrations.ipfix.ShallowOptionsTemplateSet;
 import org.graylog.integrations.ipfix.ShallowTemplateSet;
 import org.graylog.plugins.netflow.codecs.RemoteAddressCodecAggregator;
 import org.slf4j.Logger;
@@ -44,10 +45,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class IpfixAggregator implements RemoteAddressCodecAggregator {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregator.class);
     private final Cache<TemplateKey, ShallowTemplateSet.Record> templateCache;
+    private final Cache<TemplateKey, ShallowOptionsTemplateSet.Record> optionsTemplateCache;
     private final Cache<TemplateKey, Queue<ShallowDataSet>> packetCache;
     private final IpfixParser shallowParser = new IpfixParser(InformationElementDefinitions.empty());
 
@@ -57,6 +60,10 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
                                          .removalListener(notification -> LOG.debug("Removed [{}] from template cache for reason [{}]", notification.getKey(), notification.getCause()))
                                          .recordStats()
                                          .build();
+        this.optionsTemplateCache = CacheBuilder.newBuilder()
+                                                .maximumSize(5000)
+                                                .removalListener(notification -> LOG.debug("Removed [{}] from options template cache for reason [{}]", notification.getKey(), notification.getCause()))
+                                                .build();
         this.packetCache = CacheBuilder.newBuilder()
                                        .expireAfterWrite(1, TimeUnit.MINUTES)
                                        .maximumWeight(Size.megabytes(1).toBytes())
@@ -76,7 +83,16 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
             final IpfixParser.MessageDescription messageDescription = shallowParser.shallowParseMessage(buf);
             final long observationDomainId = messageDescription.getHeader().observationDomainId();
             addTemplateKeyInCache(remoteAddress, messageDescription, observationDomainId);
-            // TODO handle options templates
+            addOptionsTemplateKeyInCache(remoteAddress, messageDescription, observationDomainId);
+
+            // TODO handle options data sets. They cannot be decoded yet, so they are skipped instead of waiting for a
+            //  template that never arrives in the template cache, which would also hold back the other data sets.
+            final Set<ShallowDataSet> dataSets = messageDescription.dataSets().stream()
+                    .filter(dataSet -> !isOptionsDataSet(remoteAddress, observationDomainId, dataSet))
+                    .collect(Collectors.toSet());
+            final Set<Integer> referencedTemplateIds = dataSets.stream()
+                    .map(ShallowDataSet::templateId)
+                    .collect(Collectors.toSet());
 
             // collects all data records that are now ready to be sent
             final Set<ShallowDataSet> packetsToSendCollection = new HashSet<>();
@@ -97,7 +113,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
             // the list of template keys to return in the result ( TODO this copies all of the templates all the time :( )
             final Set<TemplateKey> templatesList = new HashSet<>(templateCache.asMap().keySet());
 
-            bufferedTemplateIdList.addAll(messageDescription.referencedTemplateIds());
+            bufferedTemplateIdList.addAll(referencedTemplateIds);
             LOG.debug("Finding the needed templates for the buffered and current packets");
             for (int templateId : bufferedTemplateIdList) {
                 final TemplateKey templateKey = new TemplateKey(remoteAddress, observationDomainId, templateId);
@@ -109,7 +125,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
                         final TemplateKey newTemplateKey = TemplateKey.idForExporter(remoteAddress, observationDomainId);
                         final Queue<ShallowDataSet> bufferedPackets = packetCache.get(newTemplateKey, ConcurrentLinkedQueue::new);
                         final byte[] bytes = ByteBufUtil.getBytes(buf);
-                        bufferedPackets.addAll(messageDescription.dataSets());
+                        bufferedPackets.addAll(dataSets);
                         packetBuffered = true;
                     } catch (ExecutionException ignored) {
                         // the loader cannot fail, it only creates a new queue
@@ -117,7 +133,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
                 } else {
                     LOG.debug("Template [{}] has been added to template list.", templateKey);
                     templatesList.add(templateKey);
-                    packetsToSendCollection.addAll(messageDescription.dataSets());
+                    packetsToSendCollection.addAll(dataSets);
                 }
             }
 
@@ -215,7 +231,26 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
                       "template ID [{}].", templateKey.getRemoteAddress(), templateKey.getObservationDomainId(), templateKey.getTemplateId());
 
             templateCache.put(templateKey, messageDescription.getTemplateRecord(templateId));
+            optionsTemplateCache.invalidate(templateKey);
             LOG.debug("Saving templates key (raw bytes) in template cache to combine in new message later.");
         }
+    }
+
+    private void addOptionsTemplateKeyInCache(@Nullable SocketAddress remoteAddress, IpfixParser.MessageDescription messageDescription, long observationDomainId) {
+        for (ShallowOptionsTemplateSet.Record record : messageDescription.optionsTemplateRecords()) {
+            final TemplateKey templateKey = new TemplateKey(remoteAddress, observationDomainId, record.getTemplateId());
+            LOG.debug("Saving options template key [{}] in options template cache.", templateKey);
+            optionsTemplateCache.put(templateKey, record);
+            templateCache.invalidate(templateKey);
+        }
+    }
+
+    private boolean isOptionsDataSet(@Nullable SocketAddress remoteAddress, long observationDomainId, ShallowDataSet dataSet) {
+        final TemplateKey templateKey = new TemplateKey(remoteAddress, observationDomainId, dataSet.templateId());
+        if (optionsTemplateCache.getIfPresent(templateKey) != null) {
+            LOG.debug("Skipping data set for options template [{}], options data is not supported yet.", templateKey);
+            return true;
+        }
+        return false;
     }
 }
