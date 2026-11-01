@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix IPFIX input decoding data records with another exporter's template when multiple exporters use the same template ID."
+
+issues = ["28032"]
+pulls = ["28035"]
