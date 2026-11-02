@@ -69,14 +69,24 @@
       "failed_one": "No se pudo desactivar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
       "failed_other": "No se pudieron desactivar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
       "success_one": "Se ha desactivado correctamente {{count}} definición de evento.",
+      "success_other": "Se han desactivado correctamente {{count}} definiciones de evento.",
       "title": "Desactivar definiciones de evento",
       "confirm_many": "¿Seguro que quieres desactivar {{count}} definiciones de evento?",
       "failed_many": "No se pudieron desactivar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
       "success_many": "Se han desactivado correctamente {{count}} definiciones de evento."
     },
     "enable": {
+      "confirm_one": "¿Seguro que quieres activar {{count}} definición de evento?",
+      "confirm_other": "¿Seguro que quieres activar {{count}} definiciones de evento?",
       "error": "Se produjo un error al activar las definiciones de evento. {{error}}",
-      "title": "Activar definiciones de evento"
+      "failed_one": "No se pudo activar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
+      "failed_other": "No se pudieron activar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
+      "success_one": "Se ha activado correctamente {{count}} definición de evento.",
+      "success_other": "Se han activado correctamente {{count}} definiciones de evento.",
+      "title": "Activar definiciones de evento",
+      "confirm_many": "¿Seguro que quieres activar {{count}} definiciones de evento?",
+      "failed_many": "No se pudieron activar {{failed}} de las {{count}} definiciones de evento seleccionadas.",
+      "success_many": "Se han activado correctamente {{count}} definiciones de evento."
     },
     "success_title": "Correcto"
   },
