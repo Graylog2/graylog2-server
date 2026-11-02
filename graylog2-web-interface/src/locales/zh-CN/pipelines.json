@@ -123,21 +123,136 @@
       "actions": "操作"
     }
   },
-  "stage": {},
-  "stage_form": {},
-  "used_in_pipelines": {},
-  "deprecation": {},
-  "rule_form": {},
-  "rule_list_entry": {},
-  "metrics_config": {},
-  "rule_simulation": {},
-  "convert_modal": {},
-  "block_display": {},
-  "block": {},
-  "builder_form": {},
-  "block_form": {},
-  "block_field": {},
-  "builder": {},
+  "stage": {
+    "last_stage": "此 Pipeline 中没有后续阶段。应用此阶段的规则后，Pipeline 即完成处理。",
+    "continue_all": "满足此阶段中<matchText>全部规则</matchText>的消息将继续进入下一阶段。",
+    "continue_either": "满足此阶段中<matchText>至少一条规则</matchText>的消息将继续进入下一阶段。",
+    "continue_pass": "满足此阶段中<matchText>零条或多条规则</matchText>的消息将继续进入下一阶段。",
+    "continue_unknown": "满足此阶段中 <matchText>UNKNOWN</matchText> 条件的消息将继续进入下一阶段。",
+    "title": "阶段 {{stage}}",
+    "remove_routing_rule_title": "移除路由规则",
+    "remove_routing_rule_confirm": "您确定要移除路由规则 <ruleTitle>{{title}}</ruleTitle> 吗？"
+  },
+  "stage_form": {
+    "rules_help": "选择在此阶段评估的规则，或在 <rulesLink>Pipeline 规则页面</rulesLink>中创建规则。",
+    "add_button": "添加新阶段",
+    "add_title": "添加新阶段 {{stage}}",
+    "edit_title": "编辑阶段 {{stage}}",
+    "add_submit": "添加阶段",
+    "update_submit": "更新阶段",
+    "stage": "阶段",
+    "stage_in_use": "该阶段已被使用，请使用其他编号或编辑现有阶段。",
+    "stage_help": "阶段优先级。数字越小，执行越早。",
+    "continue_when": "在以下情况下继续进入下一阶段处理：",
+    "match_all": "此阶段中的所有规则都匹配该消息",
+    "match_any": "此阶段中至少有一条规则匹配该消息",
+    "match_pass": "此阶段中零条或多条规则匹配",
+    "stage_rules": "阶段规则"
+  },
+  "used_in_pipelines": {
+    "label": "用于 Pipeline",
+    "help": "在一个或多个阶段中使用此规则的 Pipeline。",
+    "none": "此规则未在任何 Pipeline 中使用。"
+  },
+  "deprecation": {
+    "label": "已弃用的函数",
+    "title_rule": "此规则至少包含一个已弃用的函数：",
+    "title_pipeline": "此 Pipeline 至少包含一个已弃用的函数："
+  },
+  "rule_form": {
+    "duplicate_title": "规则标题 \"{{title}}\" 已存在！",
+    "title": "标题",
+    "title_help": "您可以在规则源代码中设置规则标题。更多信息请参阅快速参考。",
+    "leave_question": "您确定要放弃此页面并丢失更改吗？此操作无法撤销。",
+    "description": "描述",
+    "description_help": "规则描述（可选）。",
+    "source": "规则源代码",
+    "source_help": "规则源代码，更多信息请参阅快速参考。",
+    "create_submit": "创建规则",
+    "update_close_submit": "更新规则并关闭",
+    "update": "更新规则"
+  },
+  "rule_list_entry": {
+    "edit": "编辑",
+    "delete_title": "删除规则",
+    "delete": "删除",
+    "managed": "由应用程序管理",
+    "throughput_suffix": "消息/秒",
+    "errors_suffix": "错误/秒"
+  },
+  "metrics_config": {
+    "loading": "正在加载指标配置...",
+    "title": "规则指标配置",
+    "submit": "更新配置",
+    "warning": "规则指标应仅在排查性能问题时启用，因为收集指标会降低消息处理速度并增加内存占用。",
+    "enable": "启用规则指标",
+    "disable": "禁用规则指标",
+    "pipeline_load_info": "启用这些指标后，Pipeline 和 Pipeline 规则页面会新增一列 <columnName>Pipeline 负载</columnName>，以百分比显示各 Pipeline 占用线程时间的相对比例，便于判断哪个 Pipeline 消耗最多。",
+    "rule_load_info": "启用这些指标后，Pipeline 详情页面还会新增一列 <columnName>规则负载</columnName>，用于识别所选 Pipeline 中开销最大的规则。"
+  },
+  "rule_simulation": {
+    "error_builder": "无法运行规则模拟，请先修复规则构建器中的错误。",
+    "placeholder_simple": "简单消息字段",
+    "invalid_json": "JSON 无效！",
+    "title": "规则模拟",
+    "optional": "（可选）",
+    "json": "JSON",
+    "key_value": "键值对",
+    "simple_message": "简单消息",
+    "input_title": "简单消息字段、键值对或 JSON",
+    "input_help": "输入普通字符串可模拟消息字段，输入键值对或 JSON 可模拟整条消息。",
+    "run": "运行规则模拟",
+    "reset": "重置",
+    "conditions_output": "条件输出",
+    "actions_output": "操作输出"
+  },
+  "convert_modal": {
+    "no_title": "<无标题>",
+    "no_code": "<无代码>",
+    "create_rule": "从代码创建新规则",
+    "copied": "规则源代码已复制到剪贴板！",
+    "copy_close": "复制并关闭"
+  },
+  "block_display": {
+    "number": "编号",
+    "not": "非",
+    "deprecated": "已弃用",
+    "edit": "编辑",
+    "delete": "删除",
+    "duplicate": "复制",
+    "insert_above": "在上方插入",
+    "insert_below": "在下方插入"
+  },
+  "block": {
+    "insert_title_above": "在操作 N°{{order}} 上方插入新操作",
+    "insert_title_below": "在操作 N°{{order}} 下方插入新操作"
+  },
+  "builder_form": {
+    "title": "标题",
+    "title_help": "规则标题。",
+    "description": "描述",
+    "description_help": "规则描述（可选）。"
+  },
+  "block_form": {
+    "add_condition": "添加条件",
+    "add_action": "添加操作",
+    "syntax_help": "函数语法帮助",
+    "update": "更新",
+    "add": "添加"
+  },
+  "block_field": {
+    "no_dollar": "不允许以 '$' 开头的字段。",
+    "use_previous_output": "使用前面步骤的输出",
+    "set_custom": "设置自定义 {{name}}",
+    "select_output": "从列表中选择输出",
+    "output_from_step": "步骤 {{step}} 的输出（{{name}}）",
+    "type_not_found": "没有前面的操作返回类型 {{type}}",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "规则构建器"
+  },
   "helper": {},
   "helper_table": {},
   "simulator": {},
