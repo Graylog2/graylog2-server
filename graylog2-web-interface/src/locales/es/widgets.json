@@ -24,7 +24,13 @@
     "aria_label": "Seleccionar campo para ordenar"
   },
   "fields_configuration": {
-    "add_field": "Añadir un campo"
+    "add_field": "Añadir un campo",
+    "hide_selected_one": "Ocultar {{count}} campo seleccionado",
+    "hide_selected_other": "Ocultar {{count}} campos seleccionados",
+    "show_selected_one": "Mostrar {{count}} campo seleccionado",
+    "show_selected_other": "Mostrar {{count}} campos seleccionados",
+    "hide_selected_many": "Ocultar {{count}} campos seleccionados",
+    "show_selected_many": "Mostrar {{count}} campos seleccionados"
   },
   "move_widget": {
     "no_pages": "No se han encontrado páginas",
@@ -137,16 +143,84 @@
     "select_direction": "Seleccionar una dirección",
     "type": "Tipo",
     "add_column": "Añadir una columna",
-    "configure_filter": "Configurar un nuevo filtro"
+    "configure_filter": "Configurar un nuevo filtro",
+    "edit_filter": "Editar filtro de {{column}}",
+    "delete_filter": "Eliminar filtro de {{column}}"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "Fecha única",
+    "range": "Intervalo",
+    "select_single_date": "Seleccionar tipo fecha única",
+    "select_range": "Seleccionar tipo intervalo",
+    "date_range": "De {{from}} a {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "Acciones",
+    "loading": "Cargando",
+    "decorated": "(decorado)",
+    "stopped_node": "nodo detenido",
+    "cluster_node": "Nodo del clúster {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "Crear nuevo {{name}}",
+      "select_decorator": "Seleccionar decorador",
+      "none_configured": "No hay decoradores configurados.",
+      "actions": "Acciones",
+      "edit": "Editar",
+      "edit_named": "Editar {{name}}",
+      "unknown_type": "Tipo de decorador desconocido",
+      "create": "Crear",
+      "update": "Actualizar",
+      "help_title": "¿Qué son los decoradores de mensajes?",
+      "help_description": "Los decoradores pueden modificar al vuelo los mensajes mostrados en los resultados de búsqueda. Estos cambios no se almacenan, solo se muestran en los resultados de búsqueda. La configuración de los decoradores se almacena <strong>por stream</strong>.",
+      "help_order": "Usa arrastrar y soltar para modificar el orden en que se procesan los decoradores.",
+      "help_docs": "Lee más sobre los decoradores de mensajes en la <docsLink>documentación</docsLink>."
+    },
+    "show_message_in_new_row": "Mostrar mensaje en una nueva fila"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "espaciador",
+    "display_name": "Tabla de datos",
+    "pinned_columns_title": "Columnas fijadas",
+    "show_row_numbers_title": "Mostrar números de fila"
+  },
+  "field_types": {
+    "missing_event_definition": "Event Definition no encontrada: {{id}}"
+  },
+  "export": {
+    "title_search": "Exportar todos los resultados de búsqueda",
+    "title_dashboard": "Exportar resultados de búsqueda de la tabla de mensajes",
+    "select_different_table": "Seleccionar otra tabla de mensajes",
+    "downloading": "Descargando...",
+    "start_download": "Iniciar descarga",
+    "settings_based_on": "La siguiente configuración se basa en la tabla de mensajes: {{title}}",
+    "exporting_table": "Actualmente estás exportando los resultados de búsqueda de la tabla de mensajes: {{title}}",
+    "define_fields": "Define los campos de tu archivo.",
+    "decorated_fields_hint": "La exportación admite campos creados por decoradores que forman parte de la tabla de mensajes, pero actualmente no aparecen en la lista de campos. Si quieres exportar un campo decorado, simplemente escribe su nombre.",
+    "finish_hint": "Cuando termines la configuración, haz clic en <quote>Iniciar descarga</quote>.",
+    "fields_to_export": "Campos a exportar",
+    "messages_limit": "Límite de mensajes",
+    "limit_help": "Los mensajes se cargan por fragmentos. Si se define un límite, se recuperarán todos los fragmentos hasta el que alcance el límite. Esto significa que el número total de mensajes entregados puede ser mayor que el límite definido.",
+    "search_contains_all": "La exportación contendrá todos los mensajes de tu búsqueda actual.",
+    "search_select_table": "Selecciona una tabla de mensajes para adoptar sus campos. Podrás ajustar todos los parámetros en el siguiente paso.",
+    "dashboard_select_table": "Selecciona la tabla de mensajes cuyos resultados de búsqueda quieres exportar. Podrás ajustar sus campos en el siguiente paso.",
+    "dashboard_equals_action": "Seleccionar una tabla de mensajes equivale a usar la opción \"Exportar a CSV\" del menú de acciones de una tabla de mensajes.",
+    "select_message_table": "Seleccionar tabla de mensajes",
+    "no_message_table": "Necesitas crear un widget de tabla de mensajes para exportar su resultado.",
+    "output_format": "Formato de salida",
+    "untitled_view": "{{type}} sin título"
+  },
+  "enterprise_widgets": {
+    "message_list": "Lista de mensajes",
+    "results": "Resultados",
+    "events": "Eventos",
+    "text_markdown": "Texto/Markdown"
+  },
+  "comma_separated_values_csv": "Valores separados por comas (CSV)",
+  "error_widget": {
+    "title": "Al recuperar los datos de este widget se produjo el siguiente error o errores:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "¿Seguro que quieres eliminar este decorador?",
+    "unsaved_changes_confirm": "Tienes cambios sin guardar en el formulario de configuración. Esta acción los descartará"
+  }
 }
