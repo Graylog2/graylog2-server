@@ -133,32 +133,148 @@
     },
     "configuration_helper": {
       "filebeat_reference": "Riferimento Filebeat",
-      "nxlog_reference": "Manuale di riferimento NXLog"
+      "nxlog_reference": "Manuale di riferimento NXLog",
+      "reference_help": "Forniamo modelli di configurazione dei collector per iniziare.<lineBreak/>Per maggiori informazioni consulta la documentazione ufficiale del tuo collector.",
+      "runtime_variables_help": "Queste variabili verranno popolate con le informazioni di runtime di ciascun Sidecar",
+      "tab_reference": "Riferimento",
+      "tab_runtime_variables": "Variabili di runtime",
+      "tab_variables": "Variabili",
+      "title": "Riferimento configurazione collector",
+      "variables_help": "Usa le variabili per condividere frammenti di testo tra più configurazioni.<lineBreak/>Se il formato della tua configurazione richiede letterali come <code>${foo}</code>, che non devono agire come variabili, dovrai scriverli come <code>${'$'}{foo}</code>.",
+      "winlogbeat_reference": "Riferimento Winlogbeat"
     },
-    "configuration_tags_select": {},
-    "source_view_modal": {},
-    "configuration_variables_helper": {},
-    "edit_configuration_variable_modal": {},
-    "templates_helper": {}
+    "configuration_tags_select": {
+      "placeholder": "Scegli tag..."
+    },
+    "source_view_modal": {
+      "close": "Chiudi",
+      "empty_template": "<empty template>",
+      "error_fetching_configuration": "Errore durante il recupero della configurazione: {{error}}",
+      "error_rendering_preview": "Errore durante la generazione dell'anteprima: {{error}}",
+      "title": "Configurazione"
+    },
+    "configuration_variables_helper": {
+      "actions": "Azioni",
+      "close": "Chiudi",
+      "delete": "Elimina",
+      "delete_confirm_text": "Sei sicuro di voler rimuovere la variabile di configurazione <strong>{{name}}</strong>?",
+      "delete_confirm_title": "Eliminare la variabile di configurazione?",
+      "description": "Descrizione",
+      "error_delete_title": "Errore durante l'eliminazione della variabile di configurazione <strong>${user.{{name}}}</strong>",
+      "error_in_use": "Impossibile eliminare questa variabile di configurazione perché è ancora in uso. Rimuovi la variabile dalle seguenti configurazioni e riprova.",
+      "name": "Nome"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "Crea",
+      "create_variable": "Crea variabile",
+      "content": "Contenuto",
+      "content_help": "Scrivi il contenuto della variabile",
+      "description": "Descrizione",
+      "description_help": "Digita una descrizione per questa variabile",
+      "edit": "Modifica",
+      "edit_action": "Modifica",
+      "name": "Nome",
+      "name_help": "Digita un nome per questa variabile",
+      "optional": "(Facoltativo)",
+      "title": "{{action}} variabile ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "Descrizione",
+      "name": "Nome",
+      "node_id": "UUID del sidecar.",
+      "node_name": "Il nome del sidecar; se non impostato, viene usato il nome host.",
+      "operating_system": "Nome del sistema operativo su cui è in esecuzione il sidecar, ad esempio <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "Stringa di versione del sidecar in esecuzione.",
+      "spool_dir": "Una directory univoca per ogni configurazione, utilizzabile per memorizzare i dati del collector.",
+      "tags": "Una mappa dei tag impostati per il sidecar. Può essere usata per generare frammenti di configurazione condizionali, ad esempio:"
+    }
   },
   "configurations": {
-    "collector_list": {},
-    "collector_row": {},
-    "configuration_list": {},
-    "configuration_row": {}
+    "collector_list": {
+      "actions": "Azioni",
+      "create_collector": "Crea collector di log",
+      "description": "Gestisci i collector di log che puoi configurare e controllare tramite i sidecar e l'interfaccia web.",
+      "name": "Nome",
+      "no_data": "Non ci sono collector di log da visualizzare. Perché non ne crei uno?",
+      "operating_system": "Sistema operativo",
+      "placeholder": "Trova collector",
+      "title": "Collector di log",
+      "total": "{{total}} in totale"
+    },
+    "collector_row": {
+      "delete_confirm": "Stai per eliminare il collector \"{{name}}\". Sei sicuro?",
+      "edit": "Modifica"
+    },
+    "configuration_list": {
+      "actions": "Azioni",
+      "collector": "Collector",
+      "color": "Colore",
+      "configuration": "Configurazione",
+      "create_configuration": "Crea configurazione",
+      "description": "Queste sono le configurazioni da usare nei tuoi collector. Ricorda di applicare le nuove configurazioni ai collector nella pagina Amministrazione.",
+      "no_data": "Non ci sono configurazioni da visualizzare: prova a crearne una o a modificare la ricerca.",
+      "placeholder": "Trova configurazioni",
+      "title": "Configurazioni",
+      "total": "{{total}} in totale"
+    },
+    "configuration_row": {
+      "clone": "Clona",
+      "delete_confirm": "Stai per eliminare la configurazione \"{{name}}\". Sei sicuro?",
+      "edit": "Modifica",
+      "unknown_collector": "Collector sconosciuto"
+    }
   },
   "failure_tracking": {
     "list": {
-      "columns": {}
+      "columns": {
+        "collector": "Collector",
+        "error_message": "Messaggio di errore",
+        "last_seen": "Ultimo rilevamento",
+        "sidecar": "Sidecar",
+        "status": "Stato",
+        "verbose_message": "Messaggio dettagliato"
+      },
+      "hide_inactive_sidecars": "Nascondi sidecar inattivi",
+      "include_inactive_hint": " e/o clicca su \"Includi sidecar inattivi\"",
+      "include_inactive_sidecars": "Includi sidecar inattivi",
+      "no_failures": "Non ci sono sidecar con errori.",
+      "no_matching_sidecars": "Non ci sono sidecar con errori che corrispondono ai criteri di ricerca. Prova a modificare il filtro di ricerca: {{query}} {{inactiveHint}}"
     },
-    "rows": {}
+    "rows": {
+      "inactive_annotation": " (inattivo)",
+      "show_more": "Mostra altro",
+      "sidecar_version": "v{{version}}"
+    }
   },
-  "basic_sidecar_user": {},
-  "sidecar_status_file_list": {},
+  "basic_sidecar_user": {
+    "load_failed": "Caricamento dell'utente Sidecar non riuscito con stato: {{error}}",
+    "load_failed_title": "Impossibile caricare l'utente Sidecar"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "Filtra file"
+  },
   "sidecars": {
-    "sidecar_list": {},
-    "sidecar_row": {},
-    "sidecar_status": {},
+    "sidecar_list": {
+      "hide_inactive_sidecars": "Nascondi sidecar inattivi",
+      "include_inactive_hint": " e/o clicca su \"Includi sidecar inattivi\"",
+      "include_inactive_sidecars": "Includi sidecar inattivi",
+      "last_seen": "Ultimo rilevamento",
+      "name": "Nome",
+      "no_matching_sidecars": "Non ci sono sidecar che corrispondono ai criteri di ricerca. Prova a modificare il filtro di ricerca{{inactiveHint}}.",
+      "no_sidecars": "Non ci sono sidecar configurati.",
+      "node_id": "ID nodo",
+      "operating_system": "Sistema operativo",
+      "sidecar_version": "Versione del sidecar",
+      "status": "Stato"
+    },
+    "sidecar_row": {
+      "inactive_annotation": " (inattivo)",
+      "manage_sidecar": "Gestisci sidecar",
+      "show_messages": "Mostra messaggi"
+    },
+    "sidecar_status": {
+      "collector_running": "Il collector è in esecuzione."
+    },
     "verbose_message_modal": {}
   },
   "pages": {
