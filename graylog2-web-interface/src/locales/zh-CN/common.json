@@ -22,7 +22,17 @@
   "confirm_leave": {
     "question": "您确定吗？"
   },
-  "duration": {},
+  "duration": {
+    "years_other": "{{count}} 年",
+    "months_other": "{{count}} 个月",
+    "days_other": "{{count}} 天",
+    "hours_other": "{{count}} 小时",
+    "minutes_other": "{{count}} 分钟",
+    "seconds_other": "{{count}} 秒",
+    "milliseconds_other": "{{count}} 毫秒",
+    "nanoseconds_other": "{{count}} 纳秒",
+    "microseconds_other": "{{count}} 微秒"
+  },
   "bulk_actions": {
     "title": "批量操作",
     "cancel": "取消选择"
@@ -102,6 +112,7 @@
     "active_page": "当前页"
   },
   "page_size": {
+    "rows_other": "{{count}} 行",
     "configure": "配置每页条数",
     "show": "每页显示 <select/> 条"
   },
@@ -117,6 +128,7 @@
     "type_to_filter": "输入以过滤"
   },
   "entity_table": {
+    "selected_items_other": "已选择 {{count}} 个条目",
     "columns": "列",
     "configure_columns": "配置可见列",
     "reset_columns": "重置所有列",
@@ -236,7 +248,10 @@
     "not_stored_in_index": "消息未存储",
     "routed_into_streams": "已路由至 Streams",
     "edit_favorite_fields": "编辑收藏字段",
+    "show_remaining_fields_other": "显示其余 {{count}} 个字段",
+    "hide_remaining_fields_other": "隐藏其余 {{count}} 个字段",
     "favorite_fields_configuration": "收藏字段配置",
+    "favorite_fields_hint_other": "收藏字段将显示在此消息所属的所有 Stream 中，包括此消息被路由到的 Streams <streams/>。",
     "save_configuration": "保存配置",
     "reset_to_default": "重置为默认",
     "reset_to_default_title": "重置为默认字段：{{fields}}",
@@ -540,9 +555,27 @@
     "system_info": "{{productName}} {{version}}，运行于 {{hostname}}（{{jvmInfo}}）"
   },
   "notifications": {
-    "download_failed": "下载失败，状态：{{error}}"
+    "download_failed": "下载失败，状态：{{error}}",
+    "download_failed_title": "无法下载",
+    "export_failed": "导出失败",
+    "export_widget_failed": "Widget 导出失败",
+    "telemetry_update_failed": "更新失败：{{error}}",
+    "telemetry_update_failed_title": "无法更新遥测设置。",
+    "delete_property_confirm": "确定要删除属性“{{key}}”吗？",
+    "quick_jump_failed": "获取条目搜索结果失败，状态为",
+    "quick_jump_failed_title": "无法获取条目搜索结果。"
   },
-  "use_favorite_item_mutation_notifications": {},
-  "use_entity_titles_notifications": {},
-  "use_search_version_check_notifications": {}
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "添加条目到收藏失败，状态：{{error}}",
+    "put_failed_title": "无法将条目添加到收藏",
+    "delete_failed": "从收藏中删除条目失败，状态：{{error}}",
+    "delete_failed_title": "无法从收藏中删除条目"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "加载条目标题失败，状态为",
+    "load_failed_title": "无法加载条目标题"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "无法获取覆盖数据"
+  }
 }
