@@ -19,7 +19,6 @@ import styled, { css } from 'styled-components';
 
 import { BetaBadge } from 'components/common';
 
-import LanguageFlag from './LanguageFlag';
 import type { Language } from './Languages';
 
 const Container = styled.span(
@@ -37,7 +36,6 @@ type Props = {
 
 const LanguageLabel = ({ language, showBeta = false }: Props) => (
   <Container>
-    <LanguageFlag code={language.code} />
     <span lang={language.code}>{language.name}</span>
     {showBeta && language.beta && <BetaBadge />}
   </Container>
