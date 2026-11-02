@@ -441,6 +441,7 @@
     "partial_summary": "{{succeeded}} com sucesso, {{failed}} com falha.",
     "partial_more": "...e mais {{count}}.",
     "all_failed_one": "{{count}} índice falhou.",
+    "all_failed_other": "{{count}} índices falharam.",
     "delete": {
       "button": "Excluir",
       "title": "Excluir índice",
@@ -479,7 +480,13 @@
         "button": "Excluir",
         "title": "Excluir índices incompatíveis",
         "confirm": "Excluir todos",
-        "error": "Não foi possível excluir todos."
+        "error": "Não foi possível excluir todos.",
+        "body_one": "Isso excluirá {{count}} índice incompatível.",
+        "body_many": "Isso excluirá {{count}} índices incompatíveis.",
+        "body_other": "Isso excluirá {{count}} índices incompatíveis.",
+        "success_one": "{{count}} índice incompatível foi excluído.",
+        "success_many": "{{count}} índices incompatíveis foram excluídos.",
+        "success_other": "{{count}} índices incompatíveis foram excluídos."
       },
       "delete_partial_title": "Alguns índices não puderam ser excluídos",
       "delete_failure_title": "Não foi possível excluir os índices",
@@ -487,22 +494,43 @@
         "button": "Reindexar índices de sistema",
         "title": "Reindexar índices de sistema",
         "confirm": "Reindexar todos",
-        "error": "Não foi possível reindexar todos."
+        "error": "Não foi possível reindexar todos.",
+        "body_one": "Isso reindexará {{count}} índice incompatível.",
+        "body_many": "Isso reindexará {{count}} índices incompatíveis.",
+        "body_other": "Isso reindexará {{count}} índices incompatíveis.",
+        "success_one": "Reindexação iniciada para {{count}} índice de sistema.",
+        "success_many": "Reindexação iniciada para {{count}} índices de sistema.",
+        "success_other": "Reindexação iniciada para {{count}} índices de sistema."
       },
       "archive_delete": {
         "button": "Arquivar e excluir",
         "title": "Arquivar e excluir índices",
         "confirm": "Arquivar e excluir todos",
-        "error": "Não foi possível arquivar e excluir todos."
+        "error": "Não foi possível arquivar e excluir todos.",
+        "body_one": "Isso arquivará e excluirá {{count}} índice incompatível.",
+        "body_many": "Isso arquivará e excluirá {{count}} índices incompatíveis.",
+        "body_other": "Isso arquivará e excluirá {{count}} índices incompatíveis.",
+        "success_one": "Arquivamento e exclusão iniciados para {{count}} índice.",
+        "success_many": "Arquivamento e exclusão iniciados para {{count}} índices.",
+        "success_other": "Arquivamento e exclusão iniciados para {{count}} índices."
       },
       "rotate": {
         "button": "Rotacionar índices de gravação ativos",
         "title": "Rotacionar índices de gravação ativos",
         "confirm": "Rotacionar todos",
-        "error": "Não foi possível rotacionar todos."
+        "error": "Não foi possível rotacionar todos.",
+        "body_one": "Isso rotacionará {{count}} índice incompatível.",
+        "body_many": "Isso rotacionará {{count}} índices incompatíveis.",
+        "body_other": "Isso rotacionará {{count}} índices incompatíveis.",
+        "success_one": "{{count}} índice foi rotacionado.",
+        "success_many": "{{count}} índices foram rotacionados.",
+        "success_other": "{{count}} índices foram rotacionados."
       },
       "rotate_partial_title": "Alguns índices não puderam ser rotacionados",
-      "rotate_failure_title": "Não foi possível rotacionar os índices"
+      "rotate_failure_title": "Não foi possível rotacionar os índices",
+      "deleted_one": "{{count}} índice foi excluído.",
+      "deleted_many": "{{count}} índices foram excluídos.",
+      "deleted_other": "{{count}} índices foram excluídos."
     },
     "all_failed_many": "{{count}} índices falharam."
   },
@@ -552,7 +580,10 @@
     "rotation_lifetime_error": "Deve haver pelo menos 1 dia de diferença entre o tempo de vida mínimo e o máximo.",
     "rotation_lifetime_help_minimum": "O número mínimo de dias em que os dados deste índice são mantidos antes de serem retidos.",
     "rotation_lifetime_help_range": "O número mínimo / máximo de dias em que os dados deste índice são mantidos antes de serem retidos.",
-    "rotation_lifetime_fixed_leeway": "O número máximo de dias é {{max}}, porque o número fixo de dias entre o mínimo e o máximo está definido como {{leeway}}."
+    "rotation_lifetime_max_rotation_one": "O período máximo de rotação está definido como {{count}} dia pelo administrador.",
+    "rotation_lifetime_max_rotation_other": "O período máximo de rotação está definido como {{count}} dias pelo administrador.",
+    "rotation_lifetime_fixed_leeway": "O número máximo de dias é {{max}}, porque o número fixo de dias entre o mínimo e o máximo está definido como {{leeway}}.",
+    "rotation_lifetime_max_rotation_many": "O período máximo de rotação está definido como {{count}} dias pelo administrador."
   },
   "pages": {
     "configure_index_set": "Configurar Index Set",
@@ -585,9 +616,12 @@
     "templates_default_info": "Defina aqui um modelo padrão para controlar a configuração dos Index Sets criados pelos packs do Illuminate.",
     "failures_title": "Falhas do indexador",
     "failures_description": "Esta é uma lista das tentativas de indexação de mensagens que falharam. Uma falha significa que a mensagem foi processada corretamente, mas a gravação no cluster do indexador falhou. Observe que a lista é limitada a 50 MB; portanto, ela conterá muitos registros de falha, mas não necessariamente todos os que já ocorreram.",
+    "failures_total_one": "Coleção contendo um total de {{formattedCount}} falha do indexador.",
+    "failures_total_other": "Coleção contendo um total de {{formattedCount}} falhas do indexador.",
     "indices_document_title": "Índices e Index Sets",
     "indices_title": "Índices e Index Sets",
-    "indices_description": "Um stream grava mensagens em um index set, que é uma configuração de retenção, sharding e replicação dos dados armazenados. Ao configurar index sets, você pode, por exemplo, ter tempos de retenção diferentes para determinados streams."
+    "indices_description": "Um stream grava mensagens em um index set, que é uma configuração de retenção, sharding e replicação dos dados armazenados. Ao configurar index sets, você pode, por exemplo, ter tempos de retenção diferentes para determinados streams.",
+    "failures_total_many": "Coleção contendo um total de {{formattedCount}} falhas do indexador."
   },
   "navigation": {
     "indices": "Índices",
