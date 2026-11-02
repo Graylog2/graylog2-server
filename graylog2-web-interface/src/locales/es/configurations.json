@@ -117,6 +117,8 @@
     "auto_refresh_options": "Opciones del intervalo de actualización automática",
     "auto_refresh_options_help": "Configura las opciones disponibles para el selector de intervalo de <strong>actualización automática</strong> como <strong>duración ISO8601</strong>",
     "auto_refresh_options_title": "Opciones del intervalo de actualización automática",
+    "cancel_after_seconds_one": "{{count}} segundo",
+    "cancel_after_seconds_other": "{{count}} segundos",
     "cancellation_timeout": "Tiempo límite de cancelación",
     "cancellation_timeout_description": "Tiempo en segundos por widget tras el cual la ejecución de la búsqueda se cancelará automáticamente. Esto reduce el número de búsquedas ejecutadas y mejora el rendimiento.",
     "default_auto_refresh_interval": "Intervalo de actualización automática predeterminado",
@@ -139,7 +141,8 @@
     "surrounding_time_range_options": "Opciones del intervalo de tiempo circundante",
     "time_range_presets": "Preajustes de intervalo de tiempo de búsqueda",
     "title": "Configuración de búsqueda",
-    "update_title": "Actualizar configuración de búsqueda"
+    "update_title": "Actualizar configuración de búsqueda",
+    "cancel_after_seconds_many": "{{count}} segundos"
   },
   "shared": {
     "disabled": "deshabilitado",
@@ -231,7 +234,20 @@
     "description": "La página de bienvenida puede mostrar widgets con el recuento de mensajes, alertas y eventos, además de un gráfico de las principales fuentes. En clústeres grandes o muy cargados, estas consultas añaden carga cada vez que un usuario abre la página de bienvenida. Deshabilítalas a continuación si quieres evitar esa carga. Los widgets se ocultarán y sus consultas no se ejecutarán.",
     "enable_metrics": "Habilitar métricas de la página de bienvenida",
     "enable_metrics_help": "Si está deshabilitado, los widgets de recuento de mensajes, alertas y eventos y el gráfico de las principales fuentes se ocultarán de la página de bienvenida, y sus consultas subyacentes no se ejecutarán. Desactívalo en clústeres grandes o muy cargados para reducir la carga de consultas.",
-    "metrics": "Métricas de la página de bienvenida"
+    "metrics": "Métricas de la página de bienvenida",
+    "title": "Página de bienvenida",
+    "update_title": "Actualizar configuración de la página de bienvenida"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "La configuración predeterminada de índices se ha actualizado correctamente",
+    "index_defaults_failed_title": "Error al actualizar la configuración predeterminada de índices",
+    "update_success": "Configuración actualizada correctamente",
+    "search_update_failed": "Error al actualizar la configuración de búsqueda: {{error}}",
+    "search_update_failed_title": "No se pudo actualizar la configuración de búsqueda: {{configType}}",
+    "allowlist_update_success": "La configuración de la lista de URLs permitidas se ha actualizado correctamente",
+    "allowlist_update_failed": "Error al actualizar la configuración de la lista de URLs permitidas: {{error}}",
+    "allowlist_update_failed_title": "No se pudo actualizar la lista de URLs permitidas: {{configType}}",
+    "processors_update_failed": "Error al actualizar la configuración de procesadores de mensajes: {{error}}",
+    "processors_update_failed_title": "No se pudo actualizar la configuración: {{configType}}"
+  }
 }
