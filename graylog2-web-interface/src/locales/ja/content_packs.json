@@ -1,1 +1,150 @@
-{}
+{
+  "apply_parameter": {
+    "action": "操作",
+    "apply": "適用",
+    "choose": "選択...",
+    "choose_config_key": "設定キーを選択",
+    "clear": "クリア",
+    "config_key": "設定キー",
+    "create_parameter_first": "先にパラメーターを作成してください",
+    "no_parameter_of_type": "タイプ {{type}} のパラメーターはありません",
+    "parameter": "パラメーター"
+  },
+  "constraints": {
+    "fulfilled": "充足",
+    "name": "名前",
+    "title": "制約",
+    "type": "タイプ",
+    "version": "バージョン"
+  },
+  "details": {
+    "description": "説明",
+    "entities": "項目:",
+    "id": "ID:",
+    "name": "名前:",
+    "parameters": "パラメーター:",
+    "summary": "概要:",
+    "title": "詳細",
+    "url": "URL:",
+    "vendor": "ベンダー:",
+    "version": "バージョン:"
+  },
+  "download": {
+    "download": "ダウンロード",
+    "info": "下のダウンロードリンクを右クリックし、「名前を付けてリンク先を保存...」を選択して JSON ファイルをダウンロードしてください。",
+    "title": "コンテンツパックをダウンロード"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "パラメーター",
+      "preview": "プレビュー",
+      "selection": "コンテンツの選択"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "パラメーターを作成",
+    "default_value": "デフォルト値",
+    "default_value_help": "パラメーターが任意でない場合は、デフォルト値を指定してください。",
+    "description": "説明",
+    "description_help": "このパラメーターをどのように使用するかを説明してください。",
+    "description_required": "説明を入力してください。",
+    "edit_title": "パラメーターを編集",
+    "name": "名前",
+    "name_help": "パラメーターの参照に使用されます。スペースを含めることはできません。",
+    "name_invalid": "パラメーター名には A-Z、a-z、0-9、_ のみ使用できます",
+    "name_not_unique": "パラメーター名は一意である必要があります。",
+    "name_required": "名前を入力してください。",
+    "not_boolean": "真偽値ではありません。true または false を指定してください。",
+    "not_double": "倍精度浮動小数点数ではありません。",
+    "not_integer": "整数ではありません。",
+    "title": "タイトル",
+    "title_help": "このコンテンツパックをわかりやすく示すタイトルを入力してください。",
+    "title_required": "タイトルを入力してください。",
+    "value_type": "値のタイプ",
+    "value_type_help": "パラメーターのタイプを指定してください。"
+  },
+  "entities": {
+    "action": "操作",
+    "config_title": "項目の設定",
+    "description": "説明",
+    "edit_title": "編集",
+    "list_title": "項目一覧",
+    "origin": "取得元",
+    "origin_content_pack": "コンテンツパック",
+    "origin_server": "サーバー",
+    "show": "表示",
+    "title": "タイトル",
+    "type": "タイプ",
+    "used_parameters": "使用中のパラメーター"
+  },
+  "entity_config": {
+    "config_key": "設定キー",
+    "parameter_type": "パラメーター ({{type}})",
+    "type": "タイプ",
+    "value": "値"
+  },
+  "entity_index": {
+    "load_failed": "項目インデックスの読み込みに失敗しました。ステータス:",
+    "load_failed_title": "項目インデックスを読み込めませんでした"
+  },
+  "import": {
+    "error_message": "コンテンツパックのインポートに失敗しました。有効な JSON ファイルであることを確認してください。詳細は {{productName}} サーバーのログを確認してください。",
+    "error_title": "コンテンツパックをインポートできませんでした",
+    "success_message": "コンテンツパックをインポートしました",
+    "success_named": "コンテンツパック「{{name}}」をインポートしました",
+    "success_title": "完了しました"
+  },
+  "install": {
+    "comment": "インストールコメント",
+    "comment_help": "このコメントはコンテンツパックのインストールとともに保存され、インストールの理由を説明するために使用できます。",
+    "configure_parameters": "パラメーターを設定:",
+    "needs_to_be_filled": "入力が必要です。",
+    "share_description": "このコンテンツパックの項目の共同編集者として追加するユーザーまたはチームを検索してください。"
+  },
+  "install_entities": {
+    "installed": "インストール済みの項目",
+    "title": "タイトル",
+    "to_be_uninstalled": "アンインストールされる項目",
+    "type": "タイプ"
+  },
+  "install_view": {
+    "comment": "コメント:",
+    "general_information": "一般情報",
+    "installed_at": "インストール日時:",
+    "installed_by": "インストールしたユーザー:"
+  },
+  "installations": {
+    "action": "操作",
+    "comment": "コメント",
+    "uninstall": "アンインストール",
+    "version": "バージョン",
+    "view": "表示",
+    "view_title": "インストールを表示"
+  },
+  "list": {
+    "no_match": "一致するコンテンツパックが見つかりませんでした",
+    "none_found": "コンテンツパックが見つかりません。作成するか、アップロードしてください"
+  },
+  "list_item": {
+    "create_new_version": "新しいバージョンを作成",
+    "delete_all_versions": "すべてのバージョンを削除",
+    "install": "インストール",
+    "install_title": "コンテンツパックをインストール",
+    "latest_version": "最新バージョン: {{rev}}",
+    "show": "表示"
+  },
+  "notifications": {},
+  "overview": {},
+  "pages": {},
+  "parameter_list": {},
+  "parameters": {},
+  "preview": {},
+  "revisions": {},
+  "selection": {},
+  "show": {},
+  "status": {},
+  "upload": {},
+  "value_types": {},
+  "version_item": {},
+  "versions": {}
+}
