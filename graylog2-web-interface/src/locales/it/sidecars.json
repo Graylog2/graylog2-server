@@ -1,1 +1,182 @@
-{}
+{
+  "administration": {
+    "collectors_administration": {
+      "edit_configuration": "Modifica configurazione",
+      "inactive": "inattivo",
+      "no_collectors": "Nessun collector da visualizzare",
+      "no_compatible_collectors": "Nessun collector compatibile con {{operatingSystem}}",
+      "no_filter_matches": "Nessun collector corrisponde ai filtri",
+      "select_all": "Seleziona tutto"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "Assegna configurazioni",
+      "cannot_change_configurations": "Impossibile modificare le configurazioni di {{collectors}} collector contemporaneamente.",
+      "incompatible_collectors": "Collector incompatibili, verifica la configurazione del tuo sidecar."
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Stato del collector",
+      "configuration": "Configurazione",
+      "filter_by_collector": "Filtra per collector",
+      "filter_by_configuration": "Filtra per configurazione",
+      "filter_by_os": "Filtra per OS",
+      "filter_by_status": "Filtra per stato del collector",
+      "os": "OS"
+    },
+    "configuration_modal": {
+      "add_configuration": "Aggiungi una nuova configurazione",
+      "assigned_from_tags": "Assegnata dai tag: {{tags}}",
+      "lock_info": "Le configurazioni dei collector contrassegnate con l'icona del lucchetto  <lockIcon/>  sono state assegnate tramite tag e non possono essere modificate qui.",
+      "no_configurations": "Nessuna configurazione disponibile per il collector di log selezionato.",
+      "remove": "Rimuovi {{name}}",
+      "selected": "{{name}} è selezionato",
+      "title": "Modifica configurazioni di <collectorName>{{name}}</collectorName>",
+      "unknown_collector": "Collector sconosciuto"
+    },
+    "configuration_summary": {
+      "confirm": "Sei sicuro di voler procedere con questa azione per <summaryText>{{summary}}</summaryText>?",
+      "title": "Riepilogo configurazione"
+    },
+    "filters_summary": {
+      "clear_all": "Cancella tutto",
+      "collector_on_os": "{{name}} su {{os}}",
+      "filters": "Filtri"
+    },
+    "loading_collectors": "Caricamento elenco collector...",
+    "process": {
+      "actions": {
+        "restart": "Riavvia",
+        "start": "Avvia",
+        "stop": "Ferma"
+      },
+      "button": "Processo",
+      "confirm": "Sei sicuro di voler procedere con questa azione?",
+      "no_effect": {
+        "restart": "Riavviare un collector senza configurazione non avrà effetto.",
+        "start": "Avviare un collector senza configurazione non avrà effetto.",
+        "stop": "Fermare un collector senza configurazione non avrà effetto."
+      },
+      "summary": {},
+      "summary_title": "Riepilogo azione sui processi",
+      "title": "Gestisci i processi dei collector",
+      "understood": "Ho capito, continua comunque",
+      "warning_text": "Almeno un collector selezionato non è ancora configurato. Per avviare un nuovo collector, assegnagli una configurazione e il Sidecar avvierà il processo per te.",
+      "warning_title": "Collector senza configurazione"
+    }
+  },
+  "common": {
+    "clone_menu": {
+      "done": "Fatto",
+      "name": "Nome",
+      "name_help": "Digita un nome per il nuovo collector",
+      "title": "Clona"
+    },
+    "collector_indicator": {
+      "on_os": "su {{operatingSystem}}"
+    },
+    "save": "Salva",
+    "sidecar_search_form": {
+      "field_last_seen": "Data e ora dell'ultima comunicazione del sidecar con {{productName}}",
+      "field_node_id": "Identificatore del sidecar",
+      "field_operating_system": "Sistema operativo su cui è in esecuzione il sidecar",
+      "field_sidecar_version": "Versione del sidecar",
+      "field_status": "Stato del sidecar come appare nell'elenco, ovvero in esecuzione, in errore o sconosciuto",
+      "last_seen_example": "Trova i sidecar che non comunicano da una data specifica:",
+      "placeholder": "Trova sidecar",
+      "status_example": "Trova i sidecar con stato <code>failing</code> o <code>unknown</code>:"
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "Crea collector",
+      "default_template": "Modello predefinito",
+      "default_template_help": "La configurazione predefinita del collector.",
+      "execute_parameters": "Parametri di esecuzione",
+      "execute_parameters_help": "Parametri con cui viene avviato il collector.<strong> %s verrà sostituito con il percorso del file di configurazione.</strong>",
+      "executable_path": "Percorso dell'eseguibile",
+      "executable_path_help": "Percorso dell'eseguibile del collector",
+      "name": "Nome",
+      "name_help": "Nome di questo collector",
+      "operating_system": "Sistema operativo",
+      "operating_system_help": "Scegli il sistema operativo per cui è destinato questo collector.",
+      "optional": "(Facoltativo)",
+      "process_management": "Gestione dei processi",
+      "service_type": "Tipo di servizio",
+      "service_type_exec": "Esecuzione in primo piano",
+      "service_type_help": "Scegli il tipo di servizio per cui è destinato questo collector.",
+      "service_type_svc": "Servizio Windows",
+      "update_collector": "Aggiorna collector",
+      "validation_parameters": "Parametri per la validazione della configurazione",
+      "validation_parameters_help": "Parametri che validano il file di configurazione. <strong> %s verrà sostituito con il percorso del file di configurazione.</strong>"
+    },
+    "configuration_form": {
+      "change_color": "Cambia colore",
+      "collector": "Collector",
+      "collector_help": "Scegli il collector di log per cui è destinata questa configurazione.",
+      "collector_in_use": "Il collector di log non può essere modificato mentre la configurazione è in uso. Clona la configurazione per testarla con un altro collector.",
+      "collector_on_os": "{{name}} su {{os}}",
+      "collector_placeholder": "Collector",
+      "color": "Colore della configurazione",
+      "color_help": "Scegli un colore da usare per questa configurazione.",
+      "create_configuration": "Crea configurazione",
+      "name": "Nome",
+      "name_help": "Obbligatorio. Nome di questa configurazione",
+      "preview": "Anteprima",
+      "tags": "Tag di assegnazione della configurazione",
+      "tags_help": "I sidecar configurati con un tag corrispondente riceveranno automaticamente questa configurazione.",
+      "template": "Configurazione",
+      "template_help": "Obbligatorio. Configurazione del collector, consulta il riferimento rapido per maggiori informazioni.",
+      "template_required": "Compila il campo della configurazione.",
+      "unknown_collector": "Collector sconosciuto",
+      "update_configuration": "Aggiorna configurazione",
+      "use_default_template_confirm": "Vuoi usare il modello predefinito per la configurazione selezionata?"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Riferimento Filebeat",
+      "nxlog_reference": "Manuale di riferimento NXLog"
+    },
+    "configuration_tags_select": {},
+    "source_view_modal": {},
+    "configuration_variables_helper": {},
+    "edit_configuration_variable_modal": {},
+    "templates_helper": {}
+  },
+  "configurations": {
+    "collector_list": {},
+    "collector_row": {},
+    "configuration_list": {},
+    "configuration_row": {}
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {}
+    },
+    "rows": {}
+  },
+  "basic_sidecar_user": {},
+  "sidecar_status_file_list": {},
+  "sidecars": {
+    "sidecar_list": {},
+    "sidecar_row": {},
+    "sidecar_status": {},
+    "verbose_message_modal": {}
+  },
+  "pages": {
+    "administration": {},
+    "configuration": {},
+    "edit_collector": {},
+    "edit_configuration": {},
+    "failure_tracking": {},
+    "new_collector": {},
+    "new_configuration": {},
+    "overview": {},
+    "status": {}
+  },
+  "notifications": {},
+  "use_sidecars_notifications": {},
+  "use_sidecars_administration_notifications": {
+    "requested": {},
+    "request_failed": {},
+    "request_failed_title": {}
+  }
+}
