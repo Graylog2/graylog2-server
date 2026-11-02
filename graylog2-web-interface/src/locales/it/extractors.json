@@ -245,6 +245,8 @@
     "positions_failed": "Modifica delle posizioni degli estrattori non riuscita: {{error}}",
     "positions_failed_title": "Impossibile aggiornare le posizioni degli estrattori",
     "import_success": "Risultati dell'importazione: {{successful}} estrattore/i importato/i.",
-    "import_success_title": "Importazione completata"
+    "import_success_title": "Importazione completata",
+    "import_warning": "Risultati dell'importazione: {{successful}} estrattore/i importato/i, {{failed}} errore/i.",
+    "import_warning_title": "Importazione completata con avvisi"
   }
 }
