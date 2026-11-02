@@ -6,7 +6,8 @@
       "no_collectors": "沒有可顯示的 Collector",
       "no_compatible_collectors": "沒有與 {{operatingSystem}} 相容的 Collector",
       "no_filter_matches": "沒有符合篩選條件的 Collector",
-      "select_all": "全選"
+      "select_all": "全選",
+      "selected_other": "已選取 {{count}} 個"
     },
     "collectors_administration_actions": {
       "assign_configurations": "指派設定",
@@ -30,11 +31,13 @@
       "no_configurations": "所選的 Log Collector 沒有可用的設定。",
       "remove": "移除 {{name}}",
       "selected": "已選取 {{name}}",
+      "sidecar_count_other": "{{count}} 個 Sidecar： ",
       "title": "編輯 <collectorName>{{name}}</collectorName> 設定",
       "unknown_collector": "未知的 Collector"
     },
     "configuration_summary": {
       "confirm": "您確定要對 <summaryText>{{summary}}</summaryText> 執行此操作嗎？",
+      "sidecars_summary_other": "{{count}} 個 Sidecar",
       "title": "設定摘要"
     },
     "filters_summary": {
@@ -56,7 +59,11 @@
         "start": "在沒有設定的情況下啟動 Collector 不會有任何效果。",
         "stop": "在沒有設定的情況下停止 Collector 不會有任何效果。"
       },
-      "summary": {},
+      "summary": {
+        "restart_other": "您即將在以下 Sidecar 中<action>重新啟動</action> Log Collector：",
+        "start_other": "您即將在以下 Sidecar 中<action>啟動</action> Log Collector：",
+        "stop_other": "您即將在以下 Sidecar 中<action>停止</action> Log Collector："
+      },
       "summary_title": "程序操作摘要",
       "title": "管理 Collector 程序",
       "understood": "了解，仍要繼續",
@@ -273,26 +280,119 @@
       "show_messages": "顯示訊息"
     },
     "sidecar_status": {
-      "collector_running": "Collector 執行中。"
+      "collector_running": "Collector 執行中。",
+      "collector_unknown": "Collector 狀態目前未知。",
+      "collectors_status_title": "Collector 狀態",
+      "collectors_status_unavailable": "目前無法取得 Collector 狀態。請稍候，並確認 Sidecar 已正確連線至伺服器。",
+      "cpu_idle": "CPU 閒置率",
+      "ip_address": "IP 位址",
+      "load": "負載",
+      "log_files_title": "日誌檔案",
+      "node_details_title": "節點詳細資料",
+      "node_details_unavailable": "目前無法取得節點詳細資料。請稍候，並確認 Sidecar 已正確連線至伺服器。",
+      "no_collectors": "此 Sidecar 中沒有設定任何 Collector。",
+      "no_status_received": "未收到 Collector 狀態，請在 Sidecar 設定中加入 <code>send_status: true</code> 選項以查看此資訊。",
+      "none": "無",
+      "not_available": "無法使用",
+      "operating_system": "作業系統",
+      "recently_modified": "最近修改的檔案會以藍色標示。",
+      "show_details": "顯示詳細資料",
+      "volumes_75": "磁碟區使用率超過 75%"
     },
-    "verbose_message_modal": {}
+    "verbose_message_modal": {
+      "close": "關閉",
+      "no_messages": "<no messages>",
+      "title": "<em>{{collectorName}}</em> 的錯誤詳細資料"
+    }
   },
   "pages": {
-    "administration": {},
-    "configuration": {},
-    "edit_collector": {},
-    "edit_configuration": {},
-    "failure_tracking": {},
-    "new_collector": {},
-    "new_configuration": {},
-    "overview": {},
-    "status": {}
+    "administration": {
+      "description": "Collector 可穩定地轉送伺服器上日誌檔案或 Windows EventLog 的內容。",
+      "title": "Collector 管理"
+    },
+    "configuration": {
+      "description": "Collector Sidecar 會與您偏好的 Log Collector 一同執行，並為您設定它。您可以在此管理 Sidecar 設定。",
+      "title": "Collector 設定"
+    },
+    "documentation_title": "Sidecar 說明文件",
+    "edit_collector": {
+      "description": "關於 Log Collector 的一些說明。",
+      "title": "Log Collector"
+    },
+    "edit_configuration": {
+      "description": "關於 Collector 設定的一些說明。",
+      "title": "Collector 設定"
+    },
+    "failure_tracking": {
+      "description": "Sidecar 失敗追蹤提供有關失敗原因的額外實用資訊，可協助您縮短疑難排解時間，並更快讓 Collector 恢復上線。",
+      "document_title": "Sidecar",
+      "title": "失敗追蹤"
+    },
+    "new_collector": {
+      "description": "關於 Log Collector 的一些說明。",
+      "title": "新增 Log Collector"
+    },
+    "new_configuration": {
+      "description": "關於 Collector 設定的一些說明。",
+      "title": "新增 Collector 設定"
+    },
+    "overview": {
+      "description": "Sidecar 可穩定地轉送伺服器上日誌檔案或 Windows EventLog 的內容。",
+      "document_title": "Sidecar",
+      "title": "Sidecar 總覽",
+      "token_hint": "您需要 Sidecar 的 API 權杖嗎？<tokenLink>為 <em>{{username}}</em> 使用者建立或重複使用權杖</tokenLink>"
+    },
+    "status": {
+      "description": "Sidecar 的狀態總覽。",
+      "document_title": "Sidecar 狀態",
+      "document_title_named": "Sidecar {{name}} 狀態",
+      "documentation_title": "Sidecar 說明文件",
+      "title": "Sidecar <em>{{name}} 狀態</em>"
+    }
   },
-  "notifications": {},
-  "use_sidecars_notifications": {},
+  "notifications": {
+    "fetch_failed": "擷取設定變數失敗，狀態：{{error}}",
+    "fetch_failed_title": "無法取得設定變數",
+    "save_success_created": "已成功建立設定變數「{{name}}」",
+    "save_success_updated": "已成功更新設定變數「{{name}}」",
+    "save_failed": "儲存變數「{{name}}」失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存變數",
+    "delete_success": "已成功刪除設定變數「{{name}}」",
+    "delete_failed": "刪除變數「{{name}}」失敗，狀態：{{error}}",
+    "delete_failed_title": "無法刪除變數",
+    "validate_failed": "驗證變數「{{name}}」失敗，狀態：{{error}}",
+    "validate_failed_title": "無法驗證變數",
+    "configurations_fetch_failed": "擷取此變數的設定失敗，狀態：{{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "擷取 Sidecar 失敗，狀態：{{error}}",
+    "fetch_failed_title": "無法取得 Sidecar",
+    "not_found": "找不到 ID 為 <{{sidecarId}}> 的 Sidecar，可能是因為已長時間未使用。",
+    "fetch_actions_failed": "擷取 Sidecar 操作失敗，狀態：{{error}}",
+    "fetch_actions_failed_title": "無法取得 Sidecar 操作",
+    "restart_failed": "重新啟動 Sidecar 失敗，狀態：{{error}}",
+    "restart_failed_title": "無法重新啟動 Sidecar",
+    "configuration_change_requested": "已請求變更 {{amount}} 個 Collector 的設定",
+    "fetch_sidecars_failed": "擷取 Sidecar 失敗，狀態：{{error}}",
+    "fetch_sidecars_failed_title": "無法取得 Sidecar"
+  },
   "use_sidecars_administration_notifications": {
-    "requested": {},
-    "request_failed": {},
-    "request_failed_title": {}
+    "fetch_sidecars_failed": "擷取 Sidecar 失敗，狀態：{{error}}",
+    "fetch_sidecars_failed_title": "無法取得 Sidecar",
+    "requested": {
+      "start": "已請求啟動 {{amount}} 個 Collector",
+      "restart": "已請求重新啟動 {{amount}} 個 Collector",
+      "stop": "已請求停止 {{amount}} 個 Collector"
+    },
+    "request_failed": {
+      "start": "請求啟動失敗，狀態：{{error}}",
+      "restart": "請求重新啟動失敗，狀態：{{error}}",
+      "stop": "請求停止失敗，狀態：{{error}}"
+    },
+    "request_failed_title": {
+      "start": "無法啟動 Collector",
+      "restart": "無法重新啟動 Collector",
+      "stop": "無法停止 Collector"
+    }
   }
 }
