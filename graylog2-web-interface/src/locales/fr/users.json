@@ -136,36 +136,155 @@
       "search_placeholder": "Rechercher des utilisateurs et des équipes",
       "collaborators": "Collaborateurs",
       "direct_collaborators": "Collaborateurs directs",
-      "shared_via_collections": "Partagé via des collections"
+      "shared_via_collections": "Partagé via des collections",
+      "update_sharing": "Mettre à jour le partage",
+      "modal_title": "Partage de {{entityType}} : <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "« {{title}} » a été sélectionné mais n'a jamais été ajouté comme collaborateur. Voulez-vous continuer malgré tout ?",
+      "confirm_not_added_unnamed": "Un élément (nom introuvable) a été sélectionné mais n'a jamais été ajouté comme collaborateur. Voulez-vous continuer malgré tout ?"
     },
-    "grantees": {},
-    "roles_selector": {},
-    "shareable_url": {},
+    "grantees": {
+      "change_capability": "Modifier la capacité pour {{title}}",
+      "remove_sharing": "Supprimer le partage pour {{title}}",
+      "no_collaborators": "Ce {{entityType}} n'a aucun collaborateur."
+    },
+    "roles_selector": {
+      "search_placeholder": "Rechercher des rôles",
+      "assign_role": "Attribuer un rôle"
+    },
+    "shareable_url": {
+      "copy_title": "Copier le paramètre dans le presse-papiers",
+      "hint": "Vous et toute personne autorisée à consulter cet élément pouvez accéder à ce lien."
+    },
     "shared_entities": {
-      "headers": {}
+      "entity_type": "Type d'élément",
+      "filter_entity_types": "Filtrer les types d'éléments",
+      "capability": "Capacité",
+      "filter_capabilities": "Filtrer les capacités",
+      "found": "{{total}} éléments partagés avec le {{entityType}} ont été trouvés.",
+      "no_results": "Aucun élément partagé n'a été trouvé.",
+      "headers": {
+        "entity_name": "Nom de l'élément",
+        "entity_type": "Type d'élément",
+        "owner": "Propriétaire",
+        "capability": "Capacité"
+      },
+      "query_example": "Trouver les éléments partagés dont le titre contient security:"
     },
-    "sharing_disabled": {},
-    "validation_error": {}
-  },
-  "roles": {
-    "profile": {},
-    "users": {},
-    "users_selector": {},
-    "actions": {},
-    "overview": {},
-    "navigation": {}
-  },
-  "security_teaser": {
-    "overview": {},
-    "anomalies": {},
-    "host_activity": {},
-    "network_activity": {},
-    "user_activity": {},
-    "demo": {
-      "items": {}
+    "sharing_disabled": {
+      "title": "Partage impossible",
+      "owners_only": "Seuls les propriétaires de ce {{type}} sont autorisés à le partager."
+    },
+    "validation_error": {
+      "ownerless": "La suppression des propriétaires suivants laissera l'élément sans propriétaire :"
     }
   },
-  "user_fields": {},
+  "roles": {
+    "profile": {
+      "title": "Profil",
+      "name": "Nom",
+      "description": "Description"
+    },
+    "teams": "Équipes",
+    "users": {
+      "title": "Utilisateurs",
+      "none_selected": "Aucun utilisateur sélectionné n'a été trouvé.",
+      "assign_users": "Attribuer des utilisateurs",
+      "selected_users": "Utilisateurs sélectionnés",
+      "needs_reader_or_admin": "L'utilisateur « {{name}} » doit avoir au moins un rôle Reader ou Admin."
+    },
+    "users_selector": {
+      "search_placeholder": "Rechercher des utilisateurs",
+      "assign_user": "Attribuer un utilisateur"
+    },
+    "actions": {
+      "edit_role_title": "Modifier le rôle {{name}}",
+      "delete_role_title": "Supprimer le rôle {{name}}",
+      "edit": "Modifier",
+      "deleting": "Suppression en cours",
+      "delete": "Supprimer",
+      "confirm_delete": "Voulez-vous vraiment supprimer le rôle « {{name}} » ?",
+      "still_assigned": "Il est toujours attribué à {{count}} utilisateurs."
+    },
+    "overview": {
+      "title": "Rôles",
+      "found": "{{total}} rôles trouvés sur le système.",
+      "none_found": "Aucun rôle n'a été trouvé."
+    },
+    "query_example": "Trouver un rôle dont le nom contient manager:",
+    "navigation": {
+      "view_details": "Voir les détails",
+      "edit_role": "Modifier le rôle"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "Trouvez rapidement les informations de sécurité les plus critiques dans l'onglet Overview.",
+      "hotspot_1": "Repérez les alertes élevées, les principales sources d'événements et plus encore, pour mieux comprendre votre posture de sécurité.",
+      "hotspot_2": "Survolez ces info-bulles sur cette page pour en savoir plus sur les fonctionnalités de {{productName}} Security",
+      "title": "Overview"
+    },
+    "anomalies": {
+      "hotspot_0": "Obtenez un résumé des anomalies en cours, du nombre détecté et de sa comparaison avec la période précédente.",
+      "hotspot_1": "Les intervalles de confiance indiquent à quel point le comportement s'écarte de la normale.",
+      "hotspot_2": "Il existe des détecteurs pour différents types d'anomalies : voyez rapidement lesquels génèrent des alertes.",
+      "hotspot_3": "Identifiez les comptes utilisateurs dont le comportement est inhabituel pour eux lors des connexions ou des événements de sécurité.",
+      "title": "Anomalies"
+    },
+    "host_activity": {
+      "hotspot_0": "Obtenez une vue d'ensemble du nombre d'alertes élevées, moyennes et faibles, avec les tendances, pour savoir si la journée est normale . . . ou non.",
+      "hotspot_1": "Identifiez immédiatement les hôtes qui génèrent les alertes élevées, pour réduire le MTTR.",
+      "hotspot_2": "Voyez quelles technologies génèrent le plus de connexions.",
+      "hotspot_3": "Lancez une investigation lorsque des modifications de l'identité et du contrôle d'accès proviennent de machines inattendues.",
+      "hotspot_4": "Le nombre de messages par source d'événements vous donne une vue quotidienne des schémas réguliers dans les données ; les pics anormaux déclencheront des investigations pour en comprendre la cause.",
+      "title": "Activité des hôtes"
+    },
+    "network_activity": {
+      "hotspot_0": "Repérez instantanément les pics de flux de données sur votre réseau.",
+      "hotspot_1": "Voyez rapidement d'où proviennent les données et où elles vont.",
+      "hotspot_2": "Identifiez les utilisateurs qui envoient le plus de données sur le réseau.",
+      "hotspot_3": "Déterminez s'il existe un schéma inhabituel dans les résultats des requêtes DNS, comme un code d'erreur particulier qui apparaît soudainement dans le Top 15. ",
+      "hotspot_4": "Les 15 plateformes qui génèrent le plus de requêtes DNS, par source d'événements.",
+      "title": "Activité réseau"
+    },
+    "user_activity": {
+      "hotspot_0": "Voyez rapidement si des tendances préoccupantes apparaissent dans les échecs de connexion.",
+      "hotspot_1": "Les connexions réussies et échouées par utilisateur vous aident à repérer les comptes problématiques et les activités inhabituelles.",
+      "hotspot_2": "Voici les 15 comptes utilisateurs qui génèrent le plus d'alertes élevées !",
+      "hotspot_3": "Quelles sont les modifications d'identité et de contrôle d'accès les plus courantes dans votre environnement ?",
+      "hotspot_4": "Connaissez la cible des modifications de contrôle d'accès les plus fréquentes.",
+      "title": "Activité des utilisateurs"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "IA de détection d'anomalies",
+        "cloud_option": "Option Cloud",
+        "archiving": "Archivage",
+        "audit_logs_cloud": "Journaux d'audit pour {{productName}} Cloud",
+        "dynamic_lookup_tables": "Tables Lookup dynamiques",
+        "advanced_alerting": "Alertes avancées avec scripting",
+        "compliance_reporting": "Rapports de conformité",
+        "correlation_aggregation": "Corrélation et agrégation d'événements",
+        "threat_intel": "Intégrations de renseignements sur les menaces",
+        "incident_workspaces": "Espaces de travail d'investigation des incidents",
+        "prebuilt_parser_dashboards": "Parser Security et tableaux de bord préconfigurés",
+        "sigma_rules": "Règles Sigma",
+        "parameterized_dashboards": "Tableaux de bord paramétrés",
+        "input_output_integrations": "Intégrations Input et Output",
+        "threat_management": "Gestion des menaces",
+        "search_workflow": "Workflow de recherche, modèles et filtres",
+        "soar_integrations": "Intégrations SOAR"
+      },
+      "title": "Démo Security",
+      "banner_text": "Pour plus d'informations et pour réserver une démo complète du produit, visitez le site web de {{productName}}.",
+      "button": "{{productName}} Security",
+      "overview": "VUE D'ENSEMBLE",
+      "description": "{{productName}} Security est conçu pour révolutionner la cybersécurité des équipes IT, en combinant les fonctionnalités de SIEM, d'analyse de sécurité, d'investigation des incidents et de détection d'anomalies. Grâce à notre plateforme, vous pouvez travailler plus efficacement, traiter plus rapidement les tâches critiques et réduire les risques liés aux acteurs malveillants et aux attaques par identifiants."
+    }
+  },
+  "user_fields": {
+    "username": "Nom d'utilisateur",
+    "first_name": "Prénom"
+  },
   "user_form": {},
   "token_form": {},
   "permissions_info": {},
