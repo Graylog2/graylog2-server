@@ -410,18 +410,84 @@
       "confirm_disable": "您确定要禁用用户 {{name}} 吗？所有当前会话都将被终止。",
       "confirm_delete": "您确定要删除用户 {{name}} 吗？",
       "edit_title": "编辑用户 {{name}}",
-      "edit": "编辑"
+      "edit": "编辑",
+      "set_status_title": "设置 {{name}} 的新账户状态",
+      "disable": "禁用",
+      "enable": "启用",
+      "delete_title": "删除用户 {{name}}"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "已登录",
+      "last_activity": "最后活动：{{activity}}",
+      "client_address": "客户端地址：{{address}}",
+      "not_logged_in": "未登录"
+    },
+    "status": {
+      "user_is": "用户状态：{{status}}",
+      "auth_disabled": "（身份验证服务已禁用）",
+      "enabled": "已启用",
+      "disabled": "已禁用"
+    },
+    "query_example": "查找邮箱包含 example.com 的用户：",
+    "fields": {
+      "full_name": "用户的全名",
+      "username": "用户的登录用户名。",
+      "email": "用户的电子邮件。"
+    },
+    "select_users": "选择用户..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "查看详情",
+    "edit_user": "编辑用户",
+    "edit_tokens": "编辑令牌"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "令牌",
+    "human_name": "令牌",
+    "fields": {
+      "username": "令牌所有者的用户名",
+      "name": "令牌的名称",
+      "created": "令牌的创建日期",
+      "last_access": "令牌最后一次被使用的时间",
+      "external_user": "令牌所有者是否为来自外部身份验证后端的用户",
+      "auth_backend": "用户身份验证后端。内部用户不适用。"
+    },
+    "example_user": "查找由指定用户创建的令牌：",
+    "example_name": "按指定令牌名称查找令牌：",
+    "deleting_title": "正在删除令牌",
+    "delete_confirm": "您即将删除令牌：\"{{name}}\"。您确定吗？",
+    "delete": "删除",
+    "user_not_found": "用户不存在。",
+    "user_error_title": "令牌用户错误",
+    "not_available": "不适用",
+    "delete_failed": "令牌删除失败：{{error}}",
+    "delete_failed_title": "无法删除令牌",
+    "deleted": "令牌已成功删除。",
+    "deleted_title": "成功！"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "用户详情",
+    "title_with_name": "用户详情 {{name}}",
+    "documentation_link_title": "权限文档",
+    "description": "概览个人资料信息、设置、团队和角色等详细信息。"
+  },
+  "password_rules": {
+    "min_length": "密码长度至少为 {{minLength}} 个字符。",
+    "require_uppercase": "密码必须至少包含一个大写字母。",
+    "require_lowercase": "密码必须至少包含一个小写字母。",
+    "require_numbers": "密码必须至少包含一个数字。",
+    "require_special_chars": "密码必须至少包含以下特殊字符之一：{{characters}}"
+  },
+  "notifications": {
+    "save_success": "用户偏好设置已成功保存",
+    "save_failed": "保存\"{{userName}}\"的偏好设置失败，状态：{{error}}",
+    "save_failed_title": "无法保存用户偏好设置",
+    "change_success": "您的起始页已成功更改",
+    "change_failed": "更改起始页失败，错误：{{error}}",
+    "change_failed_title": "无法更改起始页"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "加载用户 {{userId}} 失败，状态：",
+    "load_failed_title": "无法加载用户 {{userId}}"
+  }
 }
