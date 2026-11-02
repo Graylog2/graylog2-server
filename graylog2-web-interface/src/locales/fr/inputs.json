@@ -1,1 +1,163 @@
-{}
+{
+  "create_input": {
+    "select_input": "Sélectionner un Input",
+    "launch_new": "Lancer un nouvel Input",
+    "launch_new_type": "Lancer un nouvel Input <type>{{type}}</type>",
+    "launch": "Lancer l'Input",
+    "no_inputs_available": "Aucun Input disponible"
+  },
+  "edit_input": {
+    "edit": "Modifier l'Input",
+    "editing": "Modification de l'Input {{title}}",
+    "update": "Mettre à jour l'Input"
+  },
+  "input_dropdown": {
+    "label": "Sélection d'Input serveur",
+    "select": "Sélectionner un Input",
+    "unknown_type": "Type d'Input inconnu",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "États de l'Input {{title}}",
+    "CREATED": "Créé",
+    "INITIALIZED": "Initialisé",
+    "INVALID_CONFIGURATION": "Configuration invalide",
+    "STARTING": "Démarrage",
+    "RUNNING": "En cours d'exécution",
+    "FAILED": "Échec",
+    "FAILING": "En échec",
+    "SETUP": "Configuration",
+    "STOPPING": "Arrêt en cours",
+    "STOPPED": "Arrêté",
+    "TERMINATED": "Terminé"
+  },
+  "state_control": {
+    "set_up": "Configurer l'Input",
+    "stopping": "Arrêt...",
+    "stop": "Arrêter l'Input",
+    "starting": "Démarrage...",
+    "start": "Démarrer l'Input"
+  },
+  "static_fields": {
+    "title": "Champs statiques",
+    "add": "Ajouter un champ statique",
+    "add_field": "Ajouter un champ",
+    "add_success": "Champ statique « {{field}} » ajouté avec succès à « {{input}} »",
+    "add_failed": "L'ajout du champ statique à l'Input a échoué : {{error}}",
+    "add_failed_title": "Impossible d'ajouter le champ statique à l'Input « {{input}} »",
+    "remove_success": "Champ statique « {{field}} » supprimé avec succès de « {{input}} »",
+    "remove_failed": "La suppression du champ statique de l'Input a échoué : {{error}}",
+    "remove_failed_title": "Impossible de supprimer le champ statique « {{field}} » de l'Input « {{input}} »",
+    "delete_title": "Supprimer le champ statique",
+    "delete_confirm": "Voulez-vous vraiment supprimer le champ statique « {{field}} » de « {{input}} » ?",
+    "description": "Définissez un champ statique ajouté à chaque message reçu via cet Input. Le champ n'est pas écrasé si le message contient déjà cette clé. La clé ne doit contenir que des caractères alphanumériques ou des tirets bas et ne doit pas être un champ réservé.",
+    "field_name": "Nom du champ",
+    "field_name_title": "Ne doit contenir que des caractères alphanumériques et des tirets bas.",
+    "field_value": "Valeur du champ"
+  },
+  "notifications": {
+    "warning": "Avertissement",
+    "failed": "Les Inputs en échec ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "setup": "Les Inputs actuellement en mode configuration ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "stopped": "Les Inputs actuellement arrêtés ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "show_failed": "Afficher les Inputs en échec",
+    "show_setup": "Afficher les Inputs en mode configuration",
+    "show_stopped": "Afficher les Inputs arrêtés"
+  },
+  "node_select": {
+    "node": "Nœud",
+    "node_help": "Sur quel nœud cet Input doit-il démarrer ?",
+    "select_node": "Sélectionner un nœud",
+    "global": "Global",
+    "global_help": "Cet Input doit-il démarrer sur tous les nœuds ?"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Documentation des Inputs",
+    "description": "Les nœuds {{productName}} reçoivent des données via des Inputs. Lancez ou arrêtez autant d'Inputs que vous le souhaitez ici.",
+    "cloud_description": "Le cloud {{productName}} reçoit des données via des Inputs. Il existe de nombreux types d'Inputs, mais seuls certains peuvent fonctionner directement dans le cloud. Vous pouvez les lancer et les arrêter sur cette page.",
+    "cloud_forwarder_hint": "Si un type d'Input ne figure pas dans la liste des Inputs disponibles sur cette page, vous pouvez démarrer l'Input sur un <forwarderLink>Forwarder</forwarderLink>.",
+    "back": "Retour",
+    "diagnosis_title": "Diagnostic de l'Input : {{name}}",
+    "diagnosis_description": "Le diagnostic d'Input permet de tester les Inputs et l'analyse sans écrire de données dans le cluster de recherche.",
+    "tab_overview": "Vue d'ensemble",
+    "tab_rules": "Règles",
+    "node_inputs_title": "Inputs du nœud {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "Les nœuds {{productName}} reçoivent des données via des Inputs. Sur cette page, vous pouvez voir quels Inputs sont en cours d'exécution sur ce nœud précis.",
+    "node_inputs_hint": "Vous pouvez lancer et arrêter des Inputs sur votre cluster <inputsLink>ici</inputsLink>.",
+    "local_inputs": "Inputs locaux",
+    "global_inputs": "Inputs globaux"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "Cet Input écoute sur :",
+      "listening_on": "Notez que l'adresse de liaison doit pointer vers le service {{productName}}. Notez que le port sélectionné doit être libre et ne pas entrer en conflit avec un autre Input sur chaque nœud. Gardez à l'esprit qu'un Input local sur un seul nœud peut entrer en conflit avec un Input global s'exécutant sur tous les nœuds, ce qui peut faire échouer l'Input sur un seul nœud.",
+      "listening_for_title": "Cet Input écoute pour :",
+      "listening_for": "Notez que le trafic UDP envoyé à un Input TCP, ou le trafic TCP envoyé à un Input UDP, apparaîtra comme des E/S réseau, mais aucun message ne sera reçu.",
+      "empty_messages_discarded_title": "Messages vides ignorés :",
+      "empty_messages_discarded": "Les messages dont la charge utile a une longueur de 0 seront ignorés par l'Input.",
+      "network_io_title": "E/S réseau :",
+      "network_io": "Notez que cette valeur peut servir à détecter les tentatives de connexion et le trafic invalide vers un Input.",
+      "input_state": "Un Input à l'état en cours d'exécution est prêt à recevoir des messages. Un Input à l'état en échec ou en cours d'échec a rencontré un problème ; cliquez sur le bouton ci-dessous pour afficher le message d'erreur associé.",
+      "message_error_at_input_title": "Erreur de message au niveau de l'Input :",
+      "message_error_at_input": "Chaque type d'Input attend de recevoir des messages dans un format particulier. Les messages qui ne respectent pas ce format peuvent être rejetés par l'Input, auquel cas ils ne seront pas traités. Pour résoudre ces cas, examinez les messages envoyés. Des erreurs plus descriptives se trouvent dans le fichier server.log de {{productName}}.",
+      "message_failed_to_process_title": "Échec du traitement du message :",
+      "message_failed_to_process": "Les extracteurs et les pipelines peuvent être utilisés pour effectuer des opérations de traitement sur les messages, comme l'extraction de champs. Une règle de pipeline qui tente une opération absurde, ou qui modifie les propriétés d'un champ du message dans un format en conflit avec le type de données ou les limites de longueur de ce champ, peut échouer au traitement. Les messages qui échouent au traitement de cette manière peuvent être consultés dans le Stream « Processing and Indexing Failures ».",
+      "message_failed_to_index_title": "Erreurs de message :",
+      "message_failed_to_index": "Dans le cluster de recherche, un message ne peut être enregistré dans un index que s'il respecte le schéma de cet index. Chaque champ d'OpenSearch a un type et une limite de caractères ; si l'un ou l'autre est dépassé, le message ne sera pas indexé. Les messages qui échouent à l'indexation de cette manière peuvent être consultés dans le Stream « Processing and Indexing Failures ».",
+      "received_message_count_by_stream": "Utilisez cette vue pour comprendre où les règles de Stream et de pipeline dirigent les messages de cet Input. Un message peut être dupliqué dans plusieurs Streams ; si cela entraîne son enregistrement dans plusieurs index, l'utilisation de la licence peut également être multipliée. Cette vue peut être utile pour détecter ces duplications."
+    },
+    "node": {
+      "node_id": "ID du nœud :",
+      "message": "Message :",
+      "last_failed": "Dernier échec :",
+      "state_label": "{{state}} :",
+      "state_nodes": "{{count}}/{{total}} nœuds",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "Informations",
+      "description": "L'adresse sur laquelle l'Input est exécuté.",
+      "input_title": "Titre de l'Input :",
+      "input_type": "Type d'Input :",
+      "running_on": "Cet Input s'exécute sur :",
+      "all_nodes": "tous les nœuds {{productName}}",
+      "listening_on": "Cet Input écoute sur :"
+    },
+    "state": {},
+    "troubleshooting": {},
+    "received_traffic": {},
+    "message_count_by_stream": {},
+    "message_errors": {},
+    "rules": {},
+    "network_stats": {}
+  },
+  "setup_wizard": {
+    "steps": {},
+    "diagnosis_step": {},
+    "routing": {},
+    "start": {},
+    "progress": {
+      "loading": {},
+      "error": {},
+      "success": {}
+    },
+    "create_stream": {},
+    "input_in_use": {},
+    "index_set_alert": {}
+  },
+  "overview": {
+    "columns": {},
+    "cells": {},
+    "sections": {},
+    "actions": {}
+  },
+  "dot_badge": {},
+  "use_input_notifications": {},
+  "use_input_details_notifications": {},
+  "use_input_metrics_notifications": {},
+  "use_input_state_summary_notifications": {},
+  "use_input_state_mutations_notifications": {},
+  "use_input_mutations_notifications": {},
+  "use_inputs_notifications": {}
+}
