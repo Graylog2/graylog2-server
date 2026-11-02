@@ -17,8 +17,8 @@
 import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Popover from 'components/common/Popover';

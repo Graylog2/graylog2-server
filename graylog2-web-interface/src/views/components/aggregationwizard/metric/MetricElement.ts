@@ -96,9 +96,12 @@ const parameterForMetric = (metric: MetricFormValues) => {
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
+export const seriesFunctionForMetric = (metric: MetricFormValues) =>
+  Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric)).function;
+
 const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) =>
   formMetrics.map((metric) =>
-    Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
+    Series.forFunction(seriesFunctionForMetric(metric))
       .toBuilder()
       .config(
         SeriesConfig.empty()
