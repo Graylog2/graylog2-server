@@ -336,12 +336,33 @@
       "assign_index_set": "Asignar Index Set",
       "assign_loading": "Asignando Index Set...",
       "assign_submit": "Asignar Index Set",
+      "assign_success_one": "El Index Set se ha asignado correctamente a {{count}} stream.",
+      "assign_success_other": "El Index Set se ha asignado correctamente a {{count}} streams.",
+      "assign_title_one": "Asignar Index Set a {{count}} stream",
+      "assign_title_other": "Asignar Index Set a {{count}} streams",
+      "delete_confirm_one": "¿Seguro que quieres eliminar {{count}} stream? Esta acción no se puede deshacer.",
+      "delete_confirm_other": "¿Seguro que quieres eliminar {{count}} streams? Esta acción no se puede deshacer.",
       "delete_error": "Se produjo un error al eliminar los streams. {{error}}",
+      "failed_deleted_one": "No se pudo eliminar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_deleted_other": "No se pudieron eliminar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_started_one": "No se pudo iniciar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_started_other": "No se pudieron iniciar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_stopped_one": "No se pudo detener {{failed}} de los {{count}} streams seleccionados.",
+      "failed_stopped_other": "No se pudieron detener {{failed}} de los {{count}} streams seleccionados.",
       "index_set_required": "El Index Set es obligatorio",
       "search_in_streams": "Buscar en streams",
       "start_error": "Se produjo un error al iniciar los streams. {{error}}",
+      "start_streams_one": "Iniciar stream",
+      "start_streams_other": "Iniciar streams",
       "stop_error": "Se produjo un error al detener los streams. {{error}}",
-      "success_title": "Éxito"
+      "success_title": "Éxito",
+      "assign_success_many": "El Index Set se ha asignado correctamente a {{count}} streams.",
+      "assign_title_many": "Asignar Index Set a {{count}} streams",
+      "delete_confirm_many": "¿Seguro que quieres eliminar {{count}} streams? Esta acción no se puede deshacer.",
+      "failed_deleted_many": "No se pudieron eliminar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_started_many": "No se pudieron iniciar {{failed}} de los {{count}} streams seleccionados.",
+      "failed_stopped_many": "No se pudieron detener {{failed}} de los {{count}} streams seleccionados.",
+      "start_streams_many": "Iniciar streams"
     },
     "cells": {
       "archiving_enabled": "El archivado está activado",
@@ -370,22 +391,116 @@
       "filter_rules_header_status": "Estado",
       "filter_rules_header_title": "Título",
       "manage_filter_rules": "Gestionar reglas de filtro",
-      "manage_outputs": "Gestionar outputs"
+      "manage_outputs": "Gestionar outputs",
+      "manage_pipelines": "Gestionar pipelines",
+      "manage_rules": "Gestionar reglas",
+      "no_filter_rules": "No se han encontrado reglas de filtro.",
+      "pipelines_load_failed": "No se pudieron cargar los pipelines conectados.",
+      "pipelines_none": "Ningún pipeline está conectado a este stream.",
+      "quick_add_rule": "Añadir regla rápida",
+      "routing_pipelines_load_failed": "No se pudieron cargar los pipelines de enrutamiento.",
+      "routing_pipelines_none": "Ningún pipeline de enrutamiento envía mensajes a este stream."
     },
-    "expanded_titles": {},
-    "metric_columns": {}
+    "expanded_titles": {
+      "destination_filters": "Reglas de filtro",
+      "outputs": "Outputs",
+      "rules": "Reglas"
+    },
+    "human_name": "streams",
+    "metric_columns": {
+      "associated_inputs": "Inputs asociados (últimas 24 h)",
+      "avg_processing_time_ms": "Tiempo medio de procesamiento (últimos 15 min)",
+      "max_processing_time_ms": "Tiempo máximo de procesamiento (últimos 15 min)",
+      "message_count": "Número de mensajes (últimas 24 h)",
+      "pipelines": "Pipelines",
+      "routing_pipelines": "Pipelines de enrutamiento"
+    }
   },
-  "streams_page": {},
-  "system_outputs": {},
-  "user_no_stream_access": {},
-  "notifications": {},
-  "use_output_mutations_notifications": {},
-  "use_outputs_notifications": {},
-  "use_stream_notifications": {},
-  "use_stream_metrics_notifications": {},
-  "use_stream_outputs_notifications": {},
-  "use_stream_mutations_notifications": {},
-  "use_stream_output_mutations_notifications": {},
-  "use_stream_rule_mutations_notifications": {},
-  "use_stream_rules_inputs_notifications": {}
+  "streams_page": {
+    "create_loading": "Creando stream...",
+    "create_submit": "Crear stream",
+    "create_success_message": "El stream se ha creado correctamente.",
+    "create_success_title": "Éxito",
+    "create_title": "Crear stream",
+    "description": "Puedes enrutar los mensajes entrantes a streams aplicando reglas sobre ellos. Los mensajes que coinciden con las reglas de un stream se enrutan a él. Un mensaje también puede enrutarse a varios streams.",
+    "documentation_link_title": "Documentación de streams",
+    "title": "Streams"
+  },
+  "system_outputs": {
+    "description": "Los nodos de {{productName}} pueden reenviar mensajes a través de outputs. Aquí puedes lanzar o detener tantos outputs como quieras <highlight>y después asignarlos a streams para reenviar en tiempo real todos los mensajes de un stream.</highlight>",
+    "header_title": "Outputs en el clúster",
+    "marketplace_prefix": "Puedes encontrar plugins de output en",
+    "title": "Outputs"
+  },
+  "user_no_stream_access": {
+    "alert": "En este momento no podemos iniciar una búsqueda, porque no tienes permiso para acceder a ningún stream. Si crees que se trata de un error, ponte en contacto con tu administrador.",
+    "title": "Sin permisos de stream."
+  },
+  "notifications": {
+    "load_failed": "Error al cargar los streams con el estado: {{error}}",
+    "load_failed_title": "No se pudieron cargar los streams",
+    "update_failed": "Error al actualizar el stream con el estado: {{error}}",
+    "update_failed_title": "No se pudo actualizar el stream",
+    "pause_failed": "Error al pausar el stream con el estado: {{error}}",
+    "pause_failed_title": "No se pudo pausar el stream",
+    "resume_failed": "Error al reanudar el stream con el estado: {{error}}",
+    "resume_failed_title": "No se pudo reanudar el stream",
+    "clone_failed": "Error al clonar el stream con el estado: {{error}}",
+    "clone_failed_title": "No se pudo clonar el stream",
+    "test_match_failed": "Error al probar las reglas de stream con el estado: {{error}}",
+    "test_match_failed_title": "No se pudieron probar las reglas de stream",
+    "output_terminate_confirm": "¿Seguro que quieres detener este output?",
+    "output_terminated": "El output se ha detenido.",
+    "output_remove_confirm": "¿Seguro que quieres quitar este output del stream?",
+    "success_title": "Éxito"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "Error al guardar el output \"{{title}}\" con el estado: {{error}}",
+    "save_failed_title": "No se pudo guardar el output",
+    "update_failed": "Error al actualizar el output \"{{title}}\" con el estado: {{error}}",
+    "update_failed_title": "No se pudo actualizar el output",
+    "terminate_failed": "Error al detener el output con el estado: {{error}}",
+    "terminate_failed_title": "No se pudo detener el output"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "Error al cargar los outputs con el estado",
+    "load_failed_title": "No se pudieron cargar los outputs"
+  },
+  "use_stream_notifications": {
+    "load_failed": "Error al cargar el stream con el estado",
+    "load_failed_title": "No se pudo cargar el stream."
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "Error al cargar las métricas del stream con el estado",
+    "load_failed_title": "No se pudieron cargar las métricas del stream"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "Error al cargar los outputs del stream con el estado",
+    "load_failed_title": "No se pudieron cargar los outputs del stream"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "Error al guardar el stream con el estado: {{error}}",
+    "save_failed_title": "No se pudo guardar el stream"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "Error al añadir el output al stream con el estado: {{error}}",
+    "add_failed_title": "No se pudo añadir el output al stream",
+    "remove_failed": "Error al eliminar el output del stream con el estado: {{error}}",
+    "remove_failed_title": "No se pudo eliminar el output del stream",
+    "added_success": "El output se ha añadido correctamente al stream.",
+    "removed_success": "El output se ha quitado correctamente del stream.",
+    "success_title": "¡Éxito!"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "Error al crear la regla de stream con el estado: {{error}}",
+    "create_failed_title": "No se pudo crear la regla de stream",
+    "update_failed": "Error al actualizar la regla de stream con el estado: {{error}}",
+    "update_failed_title": "No se pudo actualizar la regla de stream",
+    "delete_failed": "Error al eliminar la regla de stream con el estado: {{error}}",
+    "delete_failed_title": "No se pudo eliminar la regla de stream"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "Error al obtener la lista de inputs de reglas de stream con el estado: {{error}}",
+    "fetch_failed_title": "No se pudieron obtener los inputs de reglas de stream"
+  }
 }
