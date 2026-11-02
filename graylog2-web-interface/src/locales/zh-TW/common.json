@@ -401,28 +401,147 @@
       "asn_fields": "ASN 資料庫欄位",
       "country_fields": "國家資料庫欄位",
       "city_fields": "城市資料庫欄位",
-      "city_additional_fields": "除了國家資料庫提供的欄位外，城市資料庫還包含下列欄位："
+      "city_additional_fields": "除了國家資料庫提供的欄位外，城市資料庫還包含下列欄位：",
+      "complete_documentation": "如需完整的欄位說明，請參閱 MaxMind 的 <docsLink>開發人員文件</docsLink>"
     },
-    "database_types": {},
-    "field_set": {},
-    "summary": {}
+    "database_types": {
+      "asn": "ASN 資料庫",
+      "city": "城市資料庫",
+      "country": "國家資料庫",
+      "ipinfo_location": "IPinfo 位置資料庫",
+      "ipinfo_asn": "IPinfo ASN 資料庫"
+    },
+    "field_set": {
+      "file_path": "檔案路徑",
+      "file_path_help": "資料庫檔案的路徑。",
+      "database_type": "資料庫類型",
+      "database_type_help": "選擇資料庫檔案的類型",
+      "database_type_placeholder": "選擇資料庫檔案類型",
+      "refresh_file": "重新整理檔案",
+      "refresh_file_help": "啟用後，將檢查資料庫檔案是否有變更，並在磁碟上的檔案變更時重新整理。"
+    },
+    "summary": {
+      "database_file_path": "資料庫檔案路徑",
+      "database_type": "資料庫類型",
+      "check_interval": "檢查間隔"
+    }
   },
-  "abs_geoip": {},
-  "gcs_geoip": {},
-  "geoip_resolver": {},
-  "links": {},
-  "quick_jump": {},
-  "scratchpad": {},
-  "extractor_actions": {},
-  "surrounding_search": {},
-  "support_sources": {},
-  "times_list": {},
-  "widget_visualization_not_found": {},
-  "telemetry": {},
-  "app_facade": {},
-  "suggest_reload": {},
-  "footer": {},
-  "notifications": {},
+  "abs_geoip": {
+    "container_name": "Azure Blob 容器名稱",
+    "container_name_help": "您的 Azure Blob 容器名稱。",
+    "endpoint_url": "Azure Blob 端點 URL",
+    "endpoint_url_help": "您的 Azure Blob 端點 URL，僅在要覆寫預設端點時才需要。",
+    "account_name": "Azure 帳戶名稱",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "您的 Azure 儲存體帳戶名稱。",
+    "account_key_reset": "Azure 帳戶金鑰",
+    "reset_password": "重設密碼",
+    "account_key": "Azure 帳戶金鑰",
+    "account_key_help": "您的 Azure 儲存體帳戶的帳戶金鑰。"
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage 專案 ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor 設定",
+    "description": "Geo-Location Processor 外掛程式會掃描所有訊息，找出<bold>僅</bold>包含 IP 位址的欄位，並將其地理位置資訊（座標、ISO 國家代碼與城市名稱）放入不同的欄位。詳情請參閱<docsLink>文件</docsLink>。",
+    "enabled_summary": "已啟用：",
+    "enforce_schema_summary": "強制使用預設結構描述：",
+    "vendor_type_summary": "資料庫供應商類型：",
+    "city_db_path_summary": "城市資料庫路徑：",
+    "asn_db_path_summary": "ASN 資料庫路徑：",
+    "refresh_interval_summary": "資料庫重新整理間隔：",
+    "pull_from_cloud_summary": "從雲端儲存貯體拉取檔案：",
+    "edit": "編輯設定",
+    "modal_title": "更新 Geo-Location Processor 設定",
+    "enable_processor": "啟用 Geo-Location Processor",
+    "enforce_schema": "強制使用預設結構描述",
+    "vendor_select": "選擇 GeoIP 資料庫供應商",
+    "city_db_path": "城市資料庫路徑",
+    "asn_db_path": "ASN 資料庫路徑",
+    "refresh_interval": "資料庫重新整理間隔",
+    "refresh_interval_help": "檢查資料庫檔案是否有變更的間隔；當磁碟上的檔案有變更時，會偵測並重新整理。",
+    "pull_from_cloud": "從雲端儲存貯體拉取檔案",
+    "select_cloud_storage": "選擇雲端儲存空間",
+    "update_configuration": "更新設定",
+    "updating_configuration": "正在更新設定..."
+  },
+  "links": {
+    "documentation": "文件"
+  },
+  "quick_jump": {
+    "title": "Quick Jump",
+    "open": "開啟 Quick Jump",
+    "search_placeholder": "搜尋頁面、Dashboard、Stream ...",
+    "intro": "請輸入搜尋查詢，以搜尋頁面、Stream、Dashboard、Input 或其他項目。",
+    "intro_hint": "為了方便您快速開始，以下列出您<bold>最近開啟</bold>與<bold>常用</bold>的項目：",
+    "no_results": "找不到搜尋結果，請嘗試其他搜尋字詞。",
+    "recent": "最近"
+  },
+  "scratchpad": {
+    "title": "便條區",
+    "status_cleared": "已清除。",
+    "status_auto_saved": "已自動儲存。",
+    "got_it": "知道了！",
+    "sensitive_warning": "建議您<bold>不要</bold>在此區域儲存任何敏感資訊，例如密碼。",
+    "help_overlay": "您可以使用此區域儲存個人備註及其他資訊，而不必離開瀏覽器視窗。例如，您可以儲存各項調查所需的時間戳記、使用者 ID 或 IP 位址。",
+    "copy": "複製",
+    "clear": "清除",
+    "clear_confirm": "此操作將清除便條區的內容，您確定要繼續嗎？"
+  },
+  "extractor_actions": {
+    "select_type": "選擇擷取器類型",
+    "only_string_fields": "擷取器只能用於字串欄位。"
+  },
+  "surrounding_search": {
+    "button": "顯示前後訊息"
+  },
+  "support_sources": {
+    "title": "需要協助嗎？",
+    "help_text": "如果您的問題未在<docsLink>文件</docsLink>中獲得解答，歡迎諮詢 {{productName}} 社群。",
+    "community_support": "社群支援",
+    "issue_tracker": "問題追蹤系統",
+    "professional_support": "專業支援"
+  },
+  "times_list": {
+    "title": "時間設定",
+    "description": "時區的處理可能令人混淆。您可以在此查看系統各元件所套用的時區。若要檢查特定 {{productName}} 伺服器節點的時區設定，請前往該節點的詳細資料頁面。",
+    "user": "使用者 <bold>{{username}}</bold>：",
+    "web_browser": "您的網頁瀏覽器：",
+    "server": "{{productName}} 伺服器："
+  },
+  "widget_visualization_not_found": {
+    "description": "找不到 Widget 視覺化元件（<italic>{{widgetClassName}}</italic>）。提供此 Widget 的外掛程式似乎未載入。"
+  },
+  "telemetry": {
+    "title": "遙測",
+    "enable_label": "啟用遙測",
+    "enabled_checkbox": "已啟用",
+    "update_preferences": "更新偏好設定",
+    "update_button": "更新遙測設定",
+    "info_modal_title": "協助我們改進 {{productName}}",
+    "ok": "確定",
+    "info": "我們希望收集匿名的使用資料，協助我們排定改進的優先順序，並讓 {{productName}} 在未來變得更好。",
+    "no_personal_data": "我們不會收集您執行個體中的個人資料、敏感資訊或日誌等內容。",
+    "learn_more": "詳情請參閱我們的<privacyLink>隱私權政策</privacyLink>。",
+    "turn_off_profile": "您可以隨時<bold>在使用者設定檔中</bold>開啟或關閉資料收集。",
+    "turn_off_here": "您可以隨時在此開啟或關閉資料收集。"
+  },
+  "app_facade": {
+    "preparing": "我們正在為您準備網頁介面..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}} 版本已變更",
+    "version_changed": "您的 {{productName}} 版本已從 <bold>{{version}}</bold> 變更為 <bold>{{newVersion}}</bold>。",
+    "save_work": "請儲存您的工作並重新載入頁面，以避免發生錯誤。",
+    "reload_now": "立即重新載入"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}}，位於 {{hostname}}（{{jvmInfo}}）"
+  },
+  "notifications": {
+    "download_failed": "下載失敗，狀態為：{{error}}"
+  },
   "use_favorite_item_mutation_notifications": {},
   "use_entity_titles_notifications": {},
   "use_search_version_check_notifications": {}
