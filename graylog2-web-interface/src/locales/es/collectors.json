@@ -53,26 +53,51 @@
       "fleet_with_others_other": "Configuración actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
       "collector": "Configuración actualizada para el collector <targetLink />",
       "collector_with_others_one": "Configuración actualizada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Configuración actualizada para el collector <targetLink /> y {{count}} collectors más",
       "fleet_with_others_many": "Configuración actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
       "collector_with_others_many": "Configuración actualizada para el collector <targetLink /> y {{count}} collectors más"
     },
     "ingest_config_changed": {
       "fleet": "Configuración de ingesta actualizada para el Fleet <targetLink />",
-      "collector": "Configuración de ingesta actualizada para el collector <targetLink />"
+      "fleet_with_others_one": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Configuración de ingesta actualizada para el collector <targetLink />",
+      "collector_with_others_one": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collectors más"
     },
     "restart": {
       "fleet": "Reinicio solicitado para el Fleet <targetLink />",
-      "collector": "Reinicio solicitado para el collector <targetLink />"
+      "fleet_with_others_one": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Reinicio solicitado para el collector <targetLink />",
+      "collector_with_others_one": "Reinicio solicitado para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Reinicio solicitado para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Reinicio solicitado para el collector <targetLink /> y {{count}} collectors más"
     },
     "discovery_run": {
       "fleet": "Ejecución de descubrimiento iniciada para el Fleet <targetLink />",
-      "collector": "Ejecución de descubrimiento iniciada para el collector <targetLink />"
+      "fleet_with_others_one": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Ejecución de descubrimiento iniciada para el collector <targetLink />",
+      "collector_with_others_one": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collectors más"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> reasignado"
+      "collector": "Collector <targetLink /> reasignado",
+      "collector_with_others_one": "Collector <targetLink /> y {{count}} collector más reasignados",
+      "collector_with_others_other": "Collector <targetLink /> y {{count}} collectors más reasignados",
+      "collector_with_others_many": "Collector <targetLink /> y {{count}} collectors más reasignados"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> reasignado al Fleet <destinationLink />"
+      "collector": "Collector <targetLink /> reasignado al Fleet <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> y {{count}} collector más reasignados al Fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> y {{count}} collectors más reasignados al Fleet <destinationLink />",
+      "collector_with_others_many": "Collector <targetLink /> y {{count}} collectors más reasignados al Fleet <destinationLink />"
     }
   },
   "fleet_reference": {
@@ -97,11 +122,14 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "Eliminar tokens de inscripción",
+    "bulk_delete_confirm_one": "¿Seguro que quieres eliminar {{count}} token de inscripción? Los nuevos Collectors no podrán inscribirse con el token eliminado.",
+    "bulk_delete_confirm_other": "¿Seguro que quieres eliminar {{count}} tokens de inscripción? Los nuevos Collectors no podrán inscribirse con los tokens eliminados.",
     "never": "Nunca",
     "expired": "Caducado",
     "human_name": "tokens de inscripción",
     "delete_title": "Eliminar token de inscripción",
-    "delete_confirm": "¿Seguro que quieres eliminar este token de inscripción? Los nuevos Collectors no podrán inscribirse con este token. Los Collectors ya inscritos seguirán funcionando con normalidad."
+    "delete_confirm": "¿Seguro que quieres eliminar este token de inscripción? Los nuevos Collectors no podrán inscribirse con este token. Los Collectors ya inscritos seguirán funcionando con normalidad.",
+    "bulk_delete_confirm_many": "¿Seguro que quieres eliminar {{count}} tokens de inscripción? Los nuevos Collectors no podrán inscribirse con los tokens eliminados."
   },
   "deployment": {
     "select_fleet_step": "Selecciona un Fleet",
@@ -115,6 +143,8 @@
     "receiving": "Recibiendo",
     "listening": "Escuchando…",
     "title": "Inscribiendo hosts",
+    "connected_one": "{{count}} conectado · escuchando más…",
+    "connected_other": "{{count}} conectados · escuchando más…",
     "listening_subtitle": "escuchando…",
     "view_all": "Ver todo en Instancias",
     "host": "Host",
@@ -125,7 +155,8 @@
     "hide_setup": "Ocultar configuración",
     "view_setup": "Ver configuración",
     "empty": "Los hosts que ejecuten el comando aparecerán aquí en cuanto se conecten.",
-    "connection_problem": "Hay problemas para conectar con el servidor; se reintentará automáticamente"
+    "connection_problem": "Hay problemas para conectar con el servidor; se reintentará automáticamente",
+    "connected_many": "{{count}} conectados · escuchando más…"
   },
   "token_step": {
     "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> generado; caduca <expiresAt />",
@@ -150,8 +181,11 @@
   "fleet_actions": {
     "received_messages": "Mensajes recibidos",
     "delete": "Eliminar",
+    "delete_blocked_one": "Este Fleet tiene {{count}} instancia asignada. Reasígnala o elimínala antes de eliminar el Fleet.",
+    "delete_blocked_other": "Este Fleet tiene {{count}} instancias asignadas. Reasígnalas o elimínalas antes de eliminar el Fleet.",
     "delete_title": "Eliminar Fleet",
-    "delete_confirm": "¿Seguro que quieres eliminar el Fleet <emphasis>{{fleetName}}</emphasis>? Se eliminarán sus configuraciones de fuentes y sus tokens de inscripción."
+    "delete_confirm": "¿Seguro que quieres eliminar el Fleet <emphasis>{{fleetName}}</emphasis>? Se eliminarán sus configuraciones de fuentes y sus tokens de inscripción.",
+    "delete_blocked_many": "Este Fleet tiene {{count}} instancias asignadas. Reasígnalas o elimínalas antes de eliminar el Fleet."
   },
   "fleet_form": {
     "name_required": "El nombre es obligatorio",
@@ -211,9 +245,18 @@
   },
   "reassign_fleet": {
     "fleet_required": "El Fleet es obligatorio",
+    "title_one": "Reasignar {{count}} instancia a un Fleet",
+    "title_other": "Reasignar {{count}} instancias a un Fleet",
+    "no_other_fleet_one": "No hay otro Fleet al que asignar este Collector.",
+    "no_other_fleet_other": "No hay otro Fleet al que asignar estos Collectors.",
     "no_permission": "No tienes permiso para asignar Collectors a ningún otro Fleet.",
     "select_placeholder": "Selecciona un Fleet...",
-    "submitting": "Reasignando..."
+    "submit_one": "Reasignar instancia",
+    "submit_other": "Reasignar instancias",
+    "submitting": "Reasignando...",
+    "title_many": "Reasignar {{count}} instancias a un Fleet",
+    "no_other_fleet_many": "No hay otro Fleet al que asignar estos Collectors.",
+    "submit_many": "Reasignar instancias"
   },
   "instance_health": {
     "title": "Estado de salud",
@@ -240,14 +283,20 @@
     "logs": "Logs:",
     "messages": "Mensajes:",
     "attributes": "Atributos",
+    "active_sources_one": "Fuentes activas ({{count}})",
+    "active_sources_other": "Fuentes activas ({{count}})",
     "sources_inherited": "Las fuentes se heredan de la configuración del Fleet de esta instancia.",
     "no_sources": "No hay fuentes configuradas para este Fleet. Añade fuentes en la página de detalle del Fleet para empezar a recopilar datos.",
     "synchronization": "Sincronización",
     "pending_load_error": "No se han podido cargar los cambios pendientes. Inténtalo de nuevo más tarde.",
     "queued_actions": "Las siguientes acciones están en cola hasta que el collector se sincronice:",
     "hide_transactions": "Ocultar transacciones en cola",
+    "show_transactions_one": "Mostrar transacciones en cola ({{count}})",
+    "show_transactions_other": "Mostrar transacciones en cola ({{count}})",
     "changes_queued": "Los cambios están en cola y se aplicarán en la próxima conexión del collector.",
-    "all_applied": "El collector ha aplicado todas las acciones en cola."
+    "all_applied": "El collector ha aplicado todas las acciones en cola.",
+    "active_sources_many": "Fuentes activas ({{count}})",
+    "show_transactions_many": "Mostrar transacciones en cola ({{count}})"
   },
   "overview": {
     "stat_instances_help": "Procesos de Collector en ejecución en todos los Fleets.",
@@ -266,7 +315,19 @@
     "healthy": "Todas las instancias de este Fleet están en línea",
     "degraded": "Algunas instancias de este Fleet están sin conexión",
     "down": "Todas las instancias de este Fleet están sin conexión",
-    "empty": "Todavía no se ha inscrito ninguna instancia de Collector en este Fleet"
+    "empty": "Todavía no se ha inscrito ninguna instancia de Collector en este Fleet",
+    "instances_one": "instancia",
+    "instances_other": "instancias",
+    "online_one": "● {{count}} en línea",
+    "online_other": "● {{count}} en línea",
+    "offline_one": "● {{count}} sin conexión",
+    "offline_other": "● {{count}} sin conexión",
+    "sources_one": "{{count}} fuente",
+    "sources_other": "{{count}} fuentes",
+    "instances_many": "instancias",
+    "online_many": "● {{count}} en línea",
+    "offline_many": "● {{count}} sin conexión",
+    "sources_many": "{{count}} fuentes"
   },
   "fleet_cards": {
     "empty_title": "Todavía no hay Fleets",
@@ -287,7 +348,10 @@
     "fleet": "Fleet",
     "enrolled": "Inscrito",
     "last_seen": "Visto por última vez",
-    "hide_attributes": "Ocultar atributos"
+    "show_attributes_one": "Mostrar el atributo ({{count}})",
+    "show_attributes_other": "Mostrar los {{count}} atributos",
+    "hide_attributes": "Ocultar atributos",
+    "show_attributes_many": "Mostrar los {{count}} atributos"
   },
   "connection_success": {
     "offline": "El collector se conectó una vez, pero no ha enviado información desde <lastSeen />.",
@@ -360,18 +424,26 @@
     "connection_lost": "Conexión perdida",
     "last_heartbeat": "Último heartbeat <lastSeen />",
     "first_messages": "Primeros mensajes",
+    "receiving_one": "Recibiendo: {{count}} mensaje desde hace {{duration}}",
+    "receiving_other": "Recibiendo: {{count}} mensajes desde hace {{duration}}",
     "listening": "Escuchando... normalmente menos de un minuto",
     "enrolled": "Inscrito",
     "enrolled_detail": "Registrado con un token de inscripción - <enrolledAt />",
     "connected": "Conectado",
     "connected_detail": "Heartbeat recibido - <lastSeen />",
-    "sources_configured": "Fuentes configuradas"
+    "sources_configured": "Fuentes configuradas",
+    "sources_detail_one": "{{count}} fuente del Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} fuentes del Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "receiving_many": "Recibiendo: {{count}} mensajes desde hace {{duration}}",
+    "sources_detail_many": "{{count}} fuentes del Fleet <fleetLink>{{fleetName}}</fleetLink>"
   },
   "platform_picker": {
     "title": "Primeros pasos con Collectors",
     "description": "Despliega collectors ligeros en tu infraestructura para reenviar logs a {{productName}}."
   },
   "source_status": {
+    "messages_one": "{{formattedCount}} mensaje",
+    "messages_other": "{{formattedCount}} mensajes",
     "disabled": "Deshabilitada",
     "not_applicable": "No aplicable en {{os}}",
     "unrecognised": "Tipo de fuente no reconocido",
@@ -379,7 +451,8 @@
     "no_messages": "Todavía no hay mensajes",
     "waiting": "Esperando los primeros mensajes...",
     "title": "Fuentes de logs",
-    "no_sources": "Todavía no hay fuentes configuradas para este Fleet."
+    "no_sources": "Todavía no hay fuentes configuradas para este Fleet.",
+    "messages_many": "{{formattedCount}} mensajes"
   },
   "waiting_for_connection": {
     "status": "Esperando la conexión... {{seconds}} s"
@@ -405,14 +478,24 @@
   "ingest_inputs": {
     "title": "Inputs de ingesta",
     "none": "No existe ningún input de ingesta de Collectors. Los Collectors no podrán enviar datos hasta que se cree un input.",
+    "unreadable_one": "Existe {{count}} input de ingesta de Collectors, pero no tienes permiso para verlo.",
+    "unreadable_other": "Existen {{count}} inputs de ingesta de Collectors, pero no tienes permiso para verlos.",
     "none_running": "Existen inputs de ingesta de Collectors, pero ninguno está en ejecución. Los Collectors no podrán enviar datos.",
     "name": "Nombre",
     "status": "Estado",
     "bind_address": "Dirección de enlace",
     "port": "Puerto",
-    "manage": "Gestionar"
+    "manage": "Gestionar",
+    "additional_unreadable_one": "{{count}} input adicional no visible por falta de permisos.",
+    "additional_unreadable_other": "{{count}} inputs adicionales no visibles por falta de permisos.",
+    "unreadable_many": "Existen {{count}} inputs de ingesta de Collectors, pero no tienes permiso para verlos.",
+    "additional_unreadable_many": "{{count}} inputs adicionales no visibles por falta de permisos."
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_one": "Existe un input de ingesta de Collectors en un puerto distinto: {{ports}}. Si el puerto externo es distinto del puerto del input, asegúrate de que tu red encamina el tráfico correctamente.",
+    "message_other": "Existen inputs de ingesta de Collectors en puertos distintos: {{ports}}. Si el puerto externo es distinto del puerto de un input, asegúrate de que tu red encamina el tráfico correctamente.",
+    "message_many": "Existen inputs de ingesta de Collectors en puertos distintos: {{ports}}. Si el puerto externo es distinto del puerto de un input, asegúrate de que tu red encamina el tráfico correctamente."
+  },
   "source_types": {
     "file": "Archivo",
     "journald": "Journald",
@@ -625,8 +708,14 @@
       "datanode_opensearch_version": "Versión de OpenSearch del Data Node",
       "index_version": "Versión del índice",
       "indices": "Índices",
+      "node_title_one": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índice",
+      "node_title_other": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índices",
       "opensearch_data_location": "Ubicación de los datos de OpenSearch",
-      "shards": "Shards"
+      "shard_count_one": "{{count}} shard",
+      "shard_count_other": "{{count}} shards",
+      "shards": "Shards",
+      "node_title_many": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índices",
+      "shard_count_many": "{{count}} shards"
     },
     "in_place_migration": {
       "description": "Sigue estos pasos para migrar tu clúster existente de OpenSearch 2.x o 1.3.x a Data Nodes.",
@@ -634,6 +723,8 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "Certificado válido hasta",
+      "found_one": "Data Nodes encontrados: {{count}}",
+      "found_other": "Data Nodes encontrados: {{count}}",
       "hostname": "Nombre de host",
       "incompatible": "Hay Data Nodes en ejecución con versiones incompatibles con tu versión actual de {{productName}}. Asegúrate de usar la misma versión tanto de {{productName}} como de Data Node.",
       "incompatible_title": "Se han encontrado Data Nodes incompatibles",
@@ -646,7 +737,8 @@
       "status": "Estado",
       "transport_address": "Dirección de transporte",
       "version": "Versión",
-      "version_incompatible": "Esta versión es incompatible con tu versión actual de {{productName}}."
+      "version_incompatible": "Esta versión es incompatible con tu versión actual de {{productName}}.",
+      "found_many": "Data Nodes encontrados: {{count}}"
     },
     "manual_migration": {
       "migration_type": "Tipo de migración",
@@ -773,7 +865,13 @@
         "journal": "Mientras OpenSearch está apagado, los mensajes entrantes se acumulan en el journal de disco de cada nodo de {{productName}}. Si la interrupción supera el límite de tamaño o antigüedad del journal, la ingesta se detendrá y se pueden perder mensajes. Continúa solo si el journal tiene suficiente margen para el tiempo de inactividad previsto.",
         "submitting": "Reiniciando...",
         "title": "¿Reiniciar OpenSearch de los Data Nodes?",
-        "tolerate_downtime": "Continúa solo si puedes tolerar el tiempo de inactividad."
+        "tolerate_downtime": "Continúa solo si puedes tolerar el tiempo de inactividad.",
+        "restart_together_with_versions_one": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_with_versions_other": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_one": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_other": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_with_versions_many": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_many": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán."
       },
       "no_rollback": "Una vez iniciada, no se puede revertir a la versión anterior.",
       "rolling": {
@@ -782,7 +880,13 @@
         "healthy_cluster": "Asegúrate de que el clúster esté en buen estado (verde) antes de continuar.",
         "shard_allocation": "La asignación de shards se pausa durante cada reinicio, así que el clúster sigue disponible; sin embargo, la indexación y la búsqueda pueden verse ligeramente afectadas mientras un nodo sale y vuelve a unirse.",
         "title": "¿Iniciar la actualización progresiva de OpenSearch?",
-        "wait_for_green": "Tras cada nodo, la actualización espera a que el clúster vuelva a estar en verde antes de continuar. Si tarda demasiado, se pausa y espera a que la reanudes."
+        "wait_for_green": "Tras cada nodo, la actualización espera a que el clúster vuelva a estar en verde antes de continuar. Si tarda demasiado, se pausa y espera a que la reanudes.",
+        "each_node_with_versions_one": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_one": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo.",
+        "each_node_other": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo.",
+        "each_node_with_versions_many": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_many": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo."
       },
       "starting": "Iniciando..."
     },
@@ -806,8 +910,11 @@
       "start_upgrade_and_restart": "Iniciar actualización de OpenSearch y reiniciar",
       "starting_rolling_upgrade": "Iniciando la actualización progresiva de OpenSearch...",
       "title": "Actualizar el OpenSearch integrado de los Data Nodes",
+      "unconfirmed_one": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Node no esté disponible; volverán a aparecer cuando todos los Data Nodes estén disponibles.",
+      "unconfirmed_other": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Nodes no estén disponibles; volverán a aparecer cuando todos los Data Nodes estén disponibles.",
       "upgrade_process": "Proceso de actualización",
-      "use_table": "Usa la tabla siguiente para reindexar los índices del sistema y archivar o eliminar los índices de datos antes de continuar."
+      "use_table": "Usa la tabla siguiente para reindexar los índices del sistema y archivar o eliminar los índices de datos antes de continuar.",
+      "unconfirmed_many": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Nodes no estén disponibles; volverán a aparecer cuando todos los Data Nodes estén disponibles."
     },
     "client_certificate": {
       "certificate_lifetime": "Vigencia del certificado",
@@ -869,9 +976,12 @@
       "checking": "Comprobando el estado de OpenSearch...",
       "error": "No se ha podido comprobar la versión del OpenSearch integrado de los Data Nodes.",
       "outdated": "El OpenSearch integrado de los Data Nodes no está actualizado.",
+      "unconfirmed_one": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Node no esté disponible.",
+      "unconfirmed_other": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Nodes no estén disponibles.",
       "up_to_date": "El OpenSearch integrado de los Data Nodes está actualizado.",
       "up_to_date_with_version": "El OpenSearch integrado de los Data Nodes está actualizado <bold>({{version}}).</bold>",
-      "upgrading": "La actualización progresiva de OpenSearch está en curso."
+      "upgrading": "La actualización progresiva de OpenSearch está en curso.",
+      "unconfirmed_many": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Nodes no estén disponibles."
     },
     "upgrade_nodes": {
       "manager": "gestor",
