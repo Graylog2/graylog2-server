@@ -553,32 +553,154 @@
       "title": "登録トークンを削除できませんでした"
     },
     "reassign_instances": {
-      "message": "インスタンスの再割り当てに失敗しました: {{error}}"
+      "message": "インスタンスの再割り当てに失敗しました: {{error}}",
+      "title": "インスタンスを再割り当てできませんでした"
     },
-    "delete_instance": {},
-    "save_config": {},
-    "create_input": {},
-    "update_input": {}
+    "delete_instance": {
+      "message": "インスタンスの削除に失敗しました: {{error}}",
+      "title": "インスタンスを削除できませんでした"
+    },
+    "save_config": {
+      "message": "Collectors の設定の保存に失敗しました: {{error}}",
+      "title": "設定を保存できませんでした"
+    },
+    "create_input": {
+      "message": "Collector の取り込み入力の作成に失敗しました: {{error}}",
+      "title": "Collector の取り込み入力を作成できませんでした"
+    },
+    "update_input": {
+      "message": "Collector の取り込み入力の更新に失敗しました: {{error}}",
+      "title": "Collector の取り込み入力を更新できませんでした"
+    }
   },
-  "notifications": {},
+  "notifications": {
+    "success_title": "成功しました",
+    "fleet_created": "フリート \"{{name}}\" を作成しました。",
+    "fleet_updated": "フリート \"{{name}}\" を更新しました。",
+    "fleet_deleted": "フリートを削除しました。",
+    "source_created": "ソース \"{{name}}\" を作成しました。",
+    "source_updated": "ソース \"{{name}}\" を更新しました。",
+    "source_deleted": "ソースを削除しました。",
+    "enrollment_token_deleted": "登録トークンを削除しました。",
+    "enrollment_tokens_deleted": "登録トークンを削除しました。",
+    "instances_reassigned": "インスタンスを再割り当てしました。",
+    "instance_deleted": "インスタンスを削除しました。",
+    "config_saved": "Collectors の設定を保存しました。",
+    "input_created": "Collector の取り込み入力を作成しました。",
+    "input_moved": "Collector の取り込み入力を新しいポートに移動しました。"
+  },
   "datanode": {
-    "compatibility_check": {},
-    "migration_steps_text": {},
-    "migration_welcome": {},
-    "migration_wizard": {},
-    "compatibility_status": {},
-    "in_place_migration": {},
-    "migration_data_nodes": {},
-    "manual_migration": {},
-    "stop_processing": {},
-    "journal_size_warning": {},
-    "journal_downtime": {},
-    "in_place_welcome": {},
-    "restart_graylog": {},
-    "in_place_migration_info": {},
-    "certificates_provisioning": {},
-    "jwt_authentication": {},
-    "reset_migration": {},
+    "compatibility_check": {
+      "compatible": "既存の OpenSearch データは Data Node に移行できます。",
+      "error": "互換性の確認中にエラーが発生しました",
+      "incompatible": "既存の OpenSearch データは Data Node に移行できません。",
+      "loading": "互換性チェックの結果を読み込み中...",
+      "title": "ディレクトリの互換性チェック",
+      "version_incompatible": "OpenSearch クラスターは互換性がないため、この Data Node バージョンに移行できません。"
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "次に進む前に、証明書の更新ポリシーを作成してください。",
+      "finished": "移行が完了しました！",
+      "ca_step_required": "次に進む前に、証明機関を作成してください。"
+    },
+    "migration_welcome": {
+      "earlier_deployments": "v5.2 より前のデプロイ、または Data Node なしでインストールされたデプロイでは、メッセージデータベースを Data Node に移行する必要があります。",
+      "incompatible_backend": "互換性のない検索バックエンドです。移行ウィザードを使用するには、OpenSearch にアップグレードしてください。",
+      "intro": "{{productName}} Data Node は、{{productName}} で使用するために OpenSearch を設定および最適化する管理コンポーネントです。管理の負荷を軽減し、今後のアップデートを簡素化します。",
+      "more_information": "Data Node への移行については、<docsLink>ドキュメント</docsLink>で詳細を確認できます。",
+      "required_steps": "Data Node への移行には、現在の OS/ES クラスター内と設定ファイルの両方で、OS 上でいくつかの手順を実行する必要があります。",
+      "title": "Data Node の移行",
+      "tool_description": "この移行ツールは、お使いのコンポーネントの互換性を確認し、既存の OpenSearch データを Data Node に移行する手順を案内します。"
+    },
+    "migration_wizard": {
+      "loading": "読み込み中 ..."
+    },
+    "compatibility_status": {
+      "creation_date": "作成日",
+      "datanode_opensearch_version": "Data Node の OpenSearch バージョン",
+      "index_version": "インデックスバージョン",
+      "indices": "インデックス",
+      "opensearch_data_location": "OpenSearch データの場所",
+      "shards": "シャード"
+    },
+    "in_place_migration": {
+      "description": "既存の OpenSearch 2.x または 1.3.x クラスターを Data Node に移行するには、次の手順に従ってください。",
+      "title": "インプレース移行"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "証明書の有効期限",
+      "hostname": "ホスト名",
+      "incompatible": "現在の {{productName}} バージョンと互換性のないバージョンで実行されている Data Node があります。{{productName}} と Data Node で同じバージョンを使用してください。",
+      "incompatible_title": "互換性のない Data Node が見つかりました",
+      "loading": "Data Node を読み込み中",
+      "looking": "Data Node を検索中...",
+      "no_certificate": "証明書なし",
+      "none_found": "Data Node が見つかりません。",
+      "none_found_title": "Data Node が見つかりません",
+      "start_data_node": "移行を続けるには、少なくとも 1 つの Data Node を起動してください。Data Node の起動方法の詳細は、<docsLink>ドキュメント</docsLink>を参照してください。",
+      "status": "ステータス",
+      "transport_address": "トランスポートアドレス",
+      "version": "バージョン",
+      "version_incompatible": "このバージョンは、現在の {{productName}} バージョンと互換性がありません。"
+    },
+    "manual_migration": {
+      "migration_type": "移行タイプ",
+      "migration_type_help": "実行する移行のタイプです。",
+      "select_migration_type": "移行タイプを選択"
+    },
+    "stop_processing": {
+      "change_owner": "Data Node をデータディレクトリに向けて既存の OpenSearch データを移行する場合は、データディレクトリの所有者を Data Node を実行するユーザー（通常は graylog-datanode）に変更し、正しいパーミッションを再設定してください。たとえば、次を実行して",
+      "stop_cluster": "次に進む前に、OpenSearch クラスターを停止してください。",
+      "stop_opensearch": "OpenSearch を停止",
+      "stopped": "{{productName}} の処理が停止しました。"
+    },
+    "journal_size_warning": {
+      "description": "移行中は {{productName}} ノードでの処理を停止する必要があるため、ジャーナルのサイズが増加することにご注意ください。そのため、ジャーナルサイズの縮小ステップまたはそれ以前に、ジャーナルボリュームのサイズを増やす必要があります。",
+      "title": "ジャーナルサイズの警告"
+    },
+    "journal_downtime": {
+      "current_size": "現在のジャーナルサイズは <bold>{{size}} MB</bold>、現在のジャーナルのスループットは <bold>{{throughput}} KB/分</bold> です。",
+      "estimation_error": "ジャーナルのスループットの推定中にエラーが発生しました: {{message}}",
+      "increase_size": "そのため、ジャーナルボリュームのサイズを増やす必要がある場合があります。",
+      "max_downtime": "Data Node を指すように {{productName}} を再構成するための現在の最大ダウンタイムは <bold>{{duration}}</bold> です。",
+      "processing_stops": "移行中は {{productName}} ノードでデータの処理が停止し、ジャーナルのサイズが増加することにご注意ください。",
+      "sufficient_size": "次に進む前に、ジャーナルボリュームのサイズが十分であることを確認してください。",
+      "title": "ジャーナルのダウンタイムサイズの警告"
+    },
+    "in_place_welcome": {
+      "description": "インプレース移行では、既存のクラスターのデータフォルダーを Data Node クラスターに移行します。",
+      "install": "始めるには、以前のセットアップのすべての OS/ES ノードに Data Node をインストールしてください。Data Node のダウンロードとインストールの詳細は、<docsLink>こちら</docsLink>を参照してください。",
+      "title": "ようこそ"
+    },
+    "restart_graylog": {
+      "almost_there": "もうすぐです！",
+      "example": "例:",
+      "remove_hosts": "<codeSnippet>server.conf</codeSnippet> から <codeSnippet>elasticsearch_hosts</codeSnippet> の行を削除してください",
+      "restart": "完了したら、移行を完了するために {{productName}} を再起動してください。",
+      "wait_for_available": "すべての Data Node が「AVAILABLE」になるまで待ってください。1～2 分以内に利用可能にならない場合は、Data Node のログを確認してください。"
+    },
+    "in_place_migration_info": {
+      "configuration": "インプレース移行では、<codeSnippet>datanode.conf</codeSnippet> にある Data Node の設定、特に <codeSnippet>opensearch_data_location</codeSnippet> の設定オプションが、すべてのノードの既存の OpenSearch データディレクトリを正しく指していることを確認してください。",
+      "permissions": "移行中は、Data Node と OpenSearch のシステムユーザーの両方がデータディレクトリにアクセスして書き込めるようにする必要があります。これを確保するために、たとえば次を実行できます"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "証明機関が正常に設定されました。",
+      "finished": "Data Node のプロビジョニングが完了しました。",
+      "loading": "移行の状態を読み込み中。",
+      "provision_now": "Data Node の証明書をプロビジョニングできるようになりました。",
+      "provisioning": "証明書をプロビジョニング中"
+    },
+    "jwt_authentication": {
+      "add_snippet": "これを行うには、次のスニペットを <codeSnippet>opensearch-security/config.yml</codeSnippet> に追加してください",
+      "description": "既存のクラスターの保護方法によっては、セキュリティ設定に事前の変更が必要になる場合があります。{{productName}} から OpenSearch にアクセスするために JWT 認証を使用します。次の手順で、既存の OpenSearch クラスターで JWT 認証を手動で有効にし、Data Node でデータにアクセスできるようにしてください。",
+      "replace_signing_key": "署名キーを、base64 エンコードされた <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> に置き換えてください。エンコードするには、次を実行できます",
+      "title": "JWT 認証"
+    },
+    "reset_migration": {
+      "button": "移行をリセット",
+      "confirm": "移行をリセットしてもよろしいですか？",
+      "failed": "移行の状態のリセットに失敗しました。ステータス: {{error}}"
+    },
     "migration_actions": {},
     "force_start": {},
     "rolling_upgrade_nodes": {
