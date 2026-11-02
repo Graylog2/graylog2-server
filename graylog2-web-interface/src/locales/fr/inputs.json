@@ -19,6 +19,8 @@
   },
   "input_states": {
     "title": "États de l'Input {{title}}",
+    "count_one": "{{count}} {{state}}",
+    "count_other": "{{count}} {{state}}",
     "CREATED": "Créé",
     "INITIALIZED": "Initialisé",
     "INVALID_CONFIGURATION": "Configuration invalide",
@@ -29,7 +31,8 @@
     "SETUP": "Configuration",
     "STOPPING": "Arrêt en cours",
     "STOPPED": "Arrêté",
-    "TERMINATED": "Terminé"
+    "TERMINATED": "Terminé",
+    "count_many": "{{count}} {{state}}"
   },
   "state_control": {
     "set_up": "Configurer l'Input",
@@ -368,16 +371,80 @@
       "no_messages_per_stream": "Aucun Stream n'a reçu de messages de cet Input au cours des dernières 24 heures.",
       "stream": "Stream",
       "messages": "Messages",
-      "network_io": "E/S réseau : "
+      "network_io": "E/S réseau : ",
+      "total_prefix": " (total : ",
+      "total_suffix": " )",
+      "empty_messages_discarded": "Messages vides ignorés : {{value}}",
+      "no_node_metrics": "Aucune métrique disponible pour ce nœud",
+      "no_input_metrics": "Aucune métrique disponible pour cet Input",
+      "show_details": "Afficher les détails",
+      "hide_details": "Masquer les détails"
     },
-    "actions": {}
+    "actions": {
+      "received_messages": "Messages reçus",
+      "input_diagnosis": "Diagnostic d'Input",
+      "exit_setup_mode": "Quitter le mode configuration",
+      "enter_setup_mode": "Passer en mode configuration",
+      "show_metrics": "Afficher les métriques",
+      "delete_input": "Supprimer l'Input",
+      "delete_title": "Suppression de l'Input",
+      "delete_confirm": "Voulez-vous vraiment supprimer l'Input {{title}} ?"
+    }
   },
-  "dot_badge": {},
-  "use_input_notifications": {},
-  "use_input_details_notifications": {},
-  "use_input_metrics_notifications": {},
-  "use_input_state_summary_notifications": {},
-  "use_input_state_mutations_notifications": {},
-  "use_input_mutations_notifications": {},
-  "use_inputs_notifications": {}
+  "dot_badge": {
+    "problematic_inputs": "Certains Inputs sont en échec ou en mode configuration."
+  },
+  "use_input_notifications": {
+    "load_failed": "Le chargement de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger l'Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Le chargement des détails de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger les détails de l'Input"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Le chargement des métriques de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger les métriques de l'Input"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Le chargement du résumé des états de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger le résumé des états de l'Input."
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Erreur lors du démarrage de l'Input « {{title}} » : {{error}}",
+    "start_failed_title": "L'Input « {{title}} » n'a pas pu être démarré",
+    "started_success": "L'Input a été démarré avec succès.",
+    "stop_failed": "Erreur lors de l'arrêt de l'Input « {{title}} » : {{error}}",
+    "stop_failed_title": "L'Input « {{title}} » n'a pas pu être arrêté",
+    "stopped_success": "L'Input a été arrêté avec succès.",
+    "setup_failed": "Erreur lors du passage en mode configuration de « {{title}} » : {{error}}",
+    "setup_failed_title": "L'Input « {{title}} » n'a pas pu être passé en mode configuration",
+    "deleted_success": "L'Input a été supprimé avec succès.",
+    "success_title": "Succès !"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "L'enregistrement de l'Input a échoué avec le statut : {{error}}",
+    "save_failed_title": "Impossible d'enregistrer l'Input",
+    "update_failed": "La mise à jour de l'Input a échoué avec le statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'Input",
+    "delete_failed": "La suppression de l'Input a échoué avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'Input",
+    "created_success": "L'Input a été créé avec succès.",
+    "updated_success": "L'Input a été mis à jour avec succès.",
+    "deleted_success": "L'Input a été supprimé avec succès.",
+    "success_title": "Succès !"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "L'Input « {{title}} » a été lancé avec succès",
+    "launch_failed": "Le lancement de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "launch_failed_title": "Impossible de lancer l'Input",
+    "updated_success": "L'Input « {{title}} » a été mis à jour avec succès",
+    "update_failed": "La mise à jour de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'Input",
+    "deleted_success": "L'Input « {{title}} » a été supprimé avec succès",
+    "delete_failed": "La suppression de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'Input",
+    "fetch_failed": "La récupération des Inputs a échoué avec le statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les Inputs"
+  }
 }
