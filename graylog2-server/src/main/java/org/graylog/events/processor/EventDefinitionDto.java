@@ -191,7 +191,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         final ValidationResult validation = new ValidationResult();
 
         if (title().isEmpty()) {
-            validation.addError(FIELD_TITLE, "Event Definition title cannot be empty.");
+            validation.addError(FIELD_TITLE, "event_definition.title_empty", "Event Definition title cannot be empty.", Map.of());
         }
 
         try {
@@ -200,24 +200,25 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     Optional.ofNullable(oldEventDefinitionDto).map(EventDefinitionDto::config).orElse(null),
                     eventDefinitionConfiguration));
         } catch (UnsupportedOperationException e) {
-            validation.addError(FIELD_CONFIG, "Event Definition config type cannot be empty.");
+            validation.addError(FIELD_CONFIG, "event_definition.config_type_empty", "Event Definition config type cannot be empty.", Map.of());
         }
 
         for (Map.Entry<String, EventFieldSpec> fieldSpecEntry : fieldSpec().entrySet()) {
             final String fieldName = fieldSpecEntry.getKey();
             if (!Message.validKey(fieldName)) {
-                validation.addError(FIELD_FIELD_SPEC,
+                validation.addError(FIELD_FIELD_SPEC, "event_definition.field_spec_invalid_field",
                         "Event Definition field_spec contains invalid message field \"" + fieldName + "\"." +
-                                " Valid message field characters are: a-z, A-Z, 0-9, ., -, and @. No spaces are allowed.");
+                                " Valid message field characters are: a-z, A-Z, 0-9, ., -, and @. No spaces are allowed.",
+                        Map.of("field", fieldName));
             }
         }
 
         if (keySpec().stream().anyMatch(key -> !fieldSpec().containsKey(key))) {
-            validation.addError(FIELD_KEY_SPEC, "Event Definition key_spec can only contain fields defined in field_spec.");
+            validation.addError(FIELD_KEY_SPEC, "event_definition.key_spec_unknown_field", "Event Definition key_spec can only contain fields defined in field_spec.", Map.of());
         }
 
         if (tacticsTechniques().size() > MAX_TACTICS_TECHNIQUES) {
-            validation.addError(FIELD_TACTICS_TECHNIQUES, "Event Definition cannot have more than " + MAX_TACTICS_TECHNIQUES + " tactics/techniques.");
+            validation.addError(FIELD_TACTICS_TECHNIQUES, "event_definition.too_many_tactics_techniques", "Event Definition cannot have more than " + MAX_TACTICS_TECHNIQUES + " tactics/techniques.", Map.of("max", MAX_TACTICS_TECHNIQUES));
         }
         if (eventDefinitionConfiguration.isTacticsTechniquesValidationEnabled()) {
             final List<String> invalidIds = tacticsTechniques().stream()
@@ -232,16 +233,16 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         }
 
         if (tags().stream().anyMatch(tag -> tag.length() > MAX_TAG_LENGTH)) {
-            validation.addError(FIELD_TAGS, "Event Definition tags cannot exceed " + MAX_TAG_LENGTH + " characters.");
+            validation.addError(FIELD_TAGS, "event_definition.tag_too_long", "Event Definition tags cannot exceed " + MAX_TAG_LENGTH + " characters.", Map.of("max", MAX_TAG_LENGTH));
         }
 
         if (tags().size() > MAX_TAGS) {
-            validation.addError(FIELD_TAGS, "Event Definition cannot have more than " + MAX_TAGS + " tags.");
+            validation.addError(FIELD_TAGS, "event_definition.too_many_tags", "Event Definition cannot have more than " + MAX_TAGS + " tags.", Map.of("max", MAX_TAGS));
         }
 
         if (tags().stream().anyMatch(tag -> !TagNormalizer.isValid(tag))) {
-            validation.addError(FIELD_TAGS,
-                    "Event Definition tags may only contain lowercase letters, digits, hyphens, underscores, and dots.");
+            validation.addError(FIELD_TAGS, "event_definition.tag_invalid",
+                    "Event Definition tags may only contain lowercase letters, digits, hyphens, underscores, and dots.", Map.of());
         }
 
         return validation;
