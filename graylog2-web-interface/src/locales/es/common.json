@@ -22,7 +22,35 @@
   "confirm_leave": {
     "question": "¿Estás seguro?"
   },
-  "duration": {},
+  "duration": {
+    "years_one": "{{count}} año",
+    "years_other": "{{count}} años",
+    "months_one": "{{count}} mes",
+    "months_other": "{{count}} meses",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundos",
+    "milliseconds_one": "{{count}} milisegundo",
+    "milliseconds_other": "{{count}} milisegundos",
+    "nanoseconds_one": "{{count}} nanosegundo",
+    "nanoseconds_other": "{{count}} nanosegundos",
+    "microseconds_one": "{{count}} microsegundo",
+    "microseconds_other": "{{count}} microsegundos",
+    "years_many": "{{count}} años",
+    "months_many": "{{count}} meses",
+    "days_many": "{{count}} días",
+    "hours_many": "{{count}} horas",
+    "minutes_many": "{{count}} minutos",
+    "seconds_many": "{{count}} segundos",
+    "milliseconds_many": "{{count}} milisegundos",
+    "nanoseconds_many": "{{count}} nanosegundos",
+    "microseconds_many": "{{count}} microsegundos"
+  },
   "bulk_actions": {
     "title": "Acciones en bloque",
     "cancel": "Cancelar selección"
@@ -102,8 +130,11 @@
     "active_page": "Página activa"
   },
   "page_size": {
+    "rows_one": "{{count}} fila",
+    "rows_other": "{{count}} filas",
     "configure": "Configurar tamaño de página",
-    "show": "Mostrar <select/>"
+    "show": "Mostrar <select/>",
+    "rows_many": "{{count}} filas"
   },
   "search_form": {
     "placeholder": "Introduce la consulta de búsqueda...",
@@ -117,6 +148,8 @@
     "type_to_filter": "Escribe para filtrar"
   },
   "entity_table": {
+    "selected_items_one": "{{count}} elemento seleccionado",
+    "selected_items_other": "{{count}} elementos seleccionados",
     "columns": "Columnas",
     "configure_columns": "Configurar columnas visibles",
     "reset_columns": "Restablecer todas las columnas",
@@ -145,7 +178,8 @@
     "fetch_failed": "Error al obtener {{humanName}}",
     "fetch_failed_with_status": "Error al obtener {{humanName}} con el estado",
     "could_not_retrieve": "No se ha podido obtener {{humanName}}",
-    "no_results": "No se han encontrado {{humanName}}."
+    "no_results": "No se han encontrado {{humanName}}.",
+    "selected_items_many": "{{count}} elementos seleccionados"
   },
   "slicing": {
     "slice_by": "Segmentar por",
@@ -236,7 +270,13 @@
     "not_stored_in_index": "El mensaje no está almacenado",
     "routed_into_streams": "Enrutado a streams",
     "edit_favorite_fields": "Editar campos favoritos",
+    "show_remaining_fields_one": "Mostrar {{count}} campo restante",
+    "show_remaining_fields_other": "Mostrar {{count}} campos restantes",
+    "hide_remaining_fields_one": "Ocultar {{count}} campo restante",
+    "hide_remaining_fields_other": "Ocultar {{count}} campos restantes",
     "favorite_fields_configuration": "Configuración de campos favoritos",
+    "favorite_fields_hint_one": "Los campos favoritos aparecerán en todos los streams a los que pertenece este mensaje, incluido el stream <streams/> en el que se enruta este mensaje.",
+    "favorite_fields_hint_other": "Los campos favoritos aparecerán en todos los streams a los que pertenece este mensaje, incluidos los streams <streams/> en los que se enruta este mensaje.",
     "save_configuration": "Guardar configuración",
     "reset_to_default": "Restablecer valores predeterminados",
     "reset_to_default_title": "Restablecer campos predeterminados: {{fields}}",
@@ -249,7 +289,10 @@
     "remove_favorite_failed": "Error al quitar el campo de favoritos: {{error}}",
     "remove_favorite_failed_title": "No se ha podido quitar el campo de favoritos",
     "field_terms": "Términos del campo:",
-    "received_by_radio_value": "a través de <inputName/> en el radio <node/>"
+    "received_by_radio_value": "a través de <inputName/> en el radio <node/>",
+    "show_remaining_fields_many": "Mostrar {{count}} campos restantes",
+    "hide_remaining_fields_many": "Ocultar {{count}} campos restantes",
+    "favorite_fields_hint_many": "Los campos favoritos aparecerán en todos los streams a los que pertenece este mensaje, incluidos los streams <streams/> en los que se enruta este mensaje."
   },
   "entity_types": {
     "user": "usuario",
@@ -540,9 +583,27 @@
     "system_info": "{{productName}} {{version}} en {{hostname}} ({{jvmInfo}})"
   },
   "notifications": {
-    "download_failed": "Error al descargar con el estado: {{error}}"
+    "download_failed": "Error al descargar con el estado: {{error}}",
+    "download_failed_title": "No se ha podido descargar",
+    "export_failed": "Error al exportar",
+    "export_widget_failed": "Error al exportar el widget",
+    "telemetry_update_failed": "Error al actualizar: {{error}}",
+    "telemetry_update_failed_title": "No se han podido actualizar los ajustes de telemetría.",
+    "delete_property_confirm": "¿Seguro que quieres eliminar la propiedad '{{key}}'?",
+    "quick_jump_failed": "Error al obtener los resultados de búsqueda de elementos con el estado",
+    "quick_jump_failed_title": "No se han podido obtener los resultados de búsqueda de elementos."
   },
-  "use_favorite_item_mutation_notifications": {},
-  "use_entity_titles_notifications": {},
-  "use_search_version_check_notifications": {}
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Error al añadir el elemento a favoritos con el estado: {{error}}",
+    "put_failed_title": "No se ha podido añadir el elemento a favoritos",
+    "delete_failed": "Error al eliminar el elemento de favoritos con el estado: {{error}}",
+    "delete_failed_title": "No se ha podido eliminar el elemento de favoritos"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Error al cargar los títulos de los elementos con el estado",
+    "load_failed_title": "No se han podido cargar los títulos de los elementos"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "No se han podido obtener los datos de sustitución"
+  }
 }
