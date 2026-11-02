@@ -36,7 +36,10 @@
       "timestamp": "Horodatage",
       "index": "Index",
       "letter_id": "Letter ID",
-      "error_message": "Message d'erreur"
+      "error_message": "Message d'erreur",
+      "count_one": "Il y a eu {{formattedCount}} tentative d'indexation échouée au cours des dernières 24 heures.",
+      "count_many": "Il y a eu {{formattedCount}} tentatives d'indexation échouées au cours des dernières 24 heures.",
+      "count_other": "Il y a eu {{formattedCount}} tentatives d'indexation échouées au cours des dernières 24 heures."
     },
     "system_overview": {
       "looking_for_failures": "Recherche des échecs d'indexation...",
@@ -155,8 +158,11 @@
     "shards": "Shards :",
     "replicas": "Réplicas :",
     "field_type_refresh_interval": "Intervalle d'actualisation du type de champ :",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} secondes",
     "field_type_profile": "Profil de type de champ :",
-    "not_set": "Non défini"
+    "not_set": "Non défini",
+    "seconds_many": "{{count}} secondes"
   },
   "profiles": {
     "create": "Créer un profil",
@@ -212,9 +218,15 @@
     "field_errors": "Erreurs de champ :",
     "profile_change_failed_title": "La modification du profil de type de champ a échoué pour certains Index Sets",
     "profile_details_failed": "Impossible de charger les détails de ce profil.",
+    "used_by_one": "Déjà utilisé par {{count}} Index Set.",
+    "used_by_other": "Déjà utilisé par {{count}} Index Sets.",
     "field": "Champ",
     "type": "Type",
     "targets_title": "Index Sets",
+    "targets_summary_one": "S'applique à {{count}} Index Set.",
+    "targets_summary_other": "S'applique à {{count}} Index Sets.",
+    "targets_summary_excluding_one": "S'applique à {{count}} Index Set, à l'exclusion de {{skipped}}.",
+    "targets_summary_excluding_other": "S'applique à {{count}} Index Sets, à l'exclusion de {{skipped}}.",
     "targets_index_set": "Index Set",
     "targets_status": "Statut",
     "targets_note": "Note",
@@ -236,7 +248,10 @@
     "origin_profile": "Le type de champ <i>{{type}}</i> provient du profil <profileLink>{{profileName}}</profileLink>. Il remplace les mappings éventuels du mapping de l'index du moteur de recherche, soit immédiatement (si l'index a fait l'objet d'une rotation), soit lors de la prochaine rotation.",
     "profile_config_info": "Grâce aux <profilesLink>profils</profilesLink> de types de champs d'Index Set, vous pouvez regrouper des types de champs personnalisés dans des profils. Vous pouvez assigner n'importe quel profil à cet Index Set. Pour voir et utiliser le paramètre de profil de l'Index Set, vous devez effectuer une rotation des index.",
     "profile_config_label": "Profil de mapping de type de champ d'index (facultatif)",
-    "profile_config_placeholder": "Sélectionner un profil de type de champ d'index"
+    "profile_config_placeholder": "Sélectionner un profil de type de champ d'index",
+    "used_by_many": "Déjà utilisé par {{count}} Index Sets.",
+    "targets_summary_many": "S'applique à {{count}} Index Sets.",
+    "targets_summary_excluding_many": "S'applique à {{count}} Index Sets, à l'exclusion de {{skipped}}."
   },
   "templates": {
     "create": "Créer un modèle",
@@ -262,6 +277,10 @@
     "max_segments": "Nombre maximal de segments :",
     "optimization_after_rotation": "Optimisation de l'index après rotation :",
     "field_type_refresh_interval": "Intervalle d'actualisation du type de champ :",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} secondes",
     "title_disabled": "{{title}} (désactivé)",
     "form_title_label": "Titre du modèle",
     "form_title_help": "Un titre descriptif du modèle",
@@ -273,7 +292,9 @@
     "error_shards_required": "Le nombre de shards d'index est obligatoire",
     "error_segments_required": "Le nombre maximal de segments est obligatoire",
     "error_retention_required": "Veuillez sélectionner une stratégie de rétention",
-    "error_rotation_required": "Veuillez sélectionner une stratégie de rotation"
+    "error_rotation_required": "Veuillez sélectionner une stratégie de rotation",
+    "minutes_many": "{{count}} minutes",
+    "seconds_many": "{{count}} secondes"
   },
   "overview_table": {
     "field_type_refresh_interval": "Intervalle d'actualisation du type de champ",
@@ -299,6 +320,8 @@
     "hide_streams": "Masquer les streams associés à {{title}}",
     "default": "Par défaut",
     "read_only": "Lecture seule",
+    "hidden_streams_one": "{{count}} stream supplémentaire est routé vers cet Index Set, mais vous n'avez pas la permission de le consulter.",
+    "hidden_streams_other": "{{count}} streams supplémentaires sont routés vers cet Index Set, mais vous n'avez pas la permission de les consulter.",
     "no_streams": "Aucun stream que vous pouvez consulter n'est routé vers cet Index Set.",
     "streams_title": "Titre",
     "streams_status": "Statut",
@@ -325,7 +348,8 @@
       "size_bytes": "Taille sur disque",
       "deflector_health": "Deflector",
       "field_count": "Champs"
-    }
+    },
+    "hidden_streams_many": "{{count}} streams supplémentaires sont routés vers cet Index Set, mais vous n'avez pas la permission de les consulter."
   },
   "index_summary": {
     "label_active_write_index": "index d'écriture actif",
@@ -336,7 +360,10 @@
     "empty": "L'index ne contient aucun message.",
     "range_unknown": "La plage temporelle de l'index est inconnue, car les plages d'index ne sont pas disponibles. Veuillez recalculer manuellement les plages d'index.",
     "hide_details": "Masquer les détails / actions",
-    "show_details": "Afficher les détails / actions"
+    "show_details": "Afficher les détails / actions",
+    "size_one": "({{size}} / {{formattedCount}} message)",
+    "size_other": "({{size}} / {{formattedCount}} messages)",
+    "size_many": "({{size}} / {{formattedCount}} messages)"
   },
   "indices_configuration": {
     "not_writable": "L'Index Set n'est pas accessible en écriture et ne sera pas inclus dans la rotation et la rétention des index. Il n'est pas non plus possible de l'assigner à un stream.",
@@ -344,6 +371,8 @@
     "configure_field_types": "Configurer les types de champs d'index"
   },
   "shards": {
+    "ops_one": "{{formattedCount}} op",
+    "ops_other": "{{formattedCount}} ops",
     "took": "(durée : {{duration}})",
     "index": "Index :",
     "flush": "Flush :",
@@ -356,7 +385,8 @@
     "routing_description": "Les shards en gras sont les primaires, les autres sont des réplicas. Les réplicas sont promus en primaires automatiquement lorsqu'un primaire quitte le cluster. La taille et le nombre de documents ne reflètent que les shards primaires, sans duplication possible par les réplicas.",
     "tooltip": "État : <i>{{state}}</i> sur {{hostname}} ({{name}})",
     "seconds_short": "{{seconds}} s",
-    "shard_id": "S{{id}}"
+    "shard_id": "S{{id}}",
+    "ops_many": "{{formattedCount}} ops"
   },
   "data_tiering": {
     "max_days_label": "Jours max. de stockage",
@@ -372,9 +402,18 @@
     "summary_data_tiering": "Data Tiering",
     "summary_max": "Max. en stockage :",
     "summary_min": "Min. en stockage :",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
     "tooltip_min_storage": "Min. nb de jours en stockage",
     "tooltip_min_hot_and_storage": "Min. nb de jours dans le Hot Tier et en stockage",
-    "tooltip_min_hot": "Min. nb de jours dans le Hot Tier"
+    "tooltip_min_hot": "Min. nb de jours dans le Hot Tier",
+    "archived_deleted_after_one": "Archivé et supprimé après <strong>{{count}} jour</strong>",
+    "archived_deleted_after_other": "Archivé et supprimé après <strong>{{count}} jours</strong>",
+    "deleted_after_one": "Supprimé après <strong>{{count}} jour</strong>",
+    "deleted_after_other": "Supprimé après <strong>{{count}} jours</strong>",
+    "days_many": "{{count}} jours",
+    "archived_deleted_after_many": "Archivé et supprimé après <strong>{{count}} jours</strong>",
+    "deleted_after_many": "Supprimé après <strong>{{count}} jours</strong>"
   },
   "incompatible": {
     "working": "Traitement en cours...",
@@ -401,6 +440,7 @@
     "reindex_requires_data_node": "Les index système ne peuvent être réindexés que lorsque {{productName}} fonctionne avec un backend de recherche Data Node. <migrationLink>Migrez vers Data Nodes</migrationLink> pour les réindexer avant de passer à la version majeure suivante d'OpenSearch.",
     "partial_summary": "{{succeeded}} réussi(s), {{failed}} échoué(s).",
     "partial_more": "...et {{count}} autre(s).",
+    "all_failed_one": "{{count}} index a échoué.",
     "delete": {
       "button": "Supprimer",
       "title": "Supprimer l'index",
@@ -463,7 +503,8 @@
       },
       "rotate_partial_title": "Certains index n'ont pas pu faire l'objet d'une rotation",
       "rotate_failure_title": "Impossible d'effectuer la rotation des index"
-    }
+    },
+    "all_failed_many": "{{count}} index ont échoué."
   },
   "strategies": {
     "name_rotation_message_count": "Nombre de messages par index",
@@ -587,10 +628,73 @@
     "templates_search_placeholder": "Rechercher un modèle d'Index Set",
     "field_types_human_name": "types de champs d'Index Set",
     "origin_explanation": "Explication de l'origine",
-    "category_counts_load_failed": "Le chargement du nombre d'Index Sets a échoué avec le statut"
+    "category_counts_load_failed": "Le chargement du nombre d'Index Sets a échoué avec le statut",
+    "category_counts_load_failed_title": "Impossible de charger le nombre d'Index Sets",
+    "template_create_failed": "La création du modèle d'Index Set a échoué avec le statut : {{error}}",
+    "template_create_failed_title": "Impossible de créer le modèle d'Index Set",
+    "template_create_success": "Le modèle d'Index Set a bien été créé.",
+    "template_update_failed": "La mise à jour du modèle d'Index Set a échoué avec le statut : {{error}}",
+    "template_update_failed_title": "Impossible de mettre à jour le modèle d'Index Set",
+    "template_update_success": "Le modèle d'Index Set a bien été mis à jour.",
+    "template_default_failed": "La définition du modèle par défaut a échoué avec le statut : {{error}}",
+    "template_default_failed_title": "Impossible de définir le modèle par défaut",
+    "template_default_success": "Le modèle a bien été défini par défaut.",
+    "template_delete_failed": "La suppression du modèle d'Index Set a échoué avec le statut : {{error}}",
+    "template_delete_failed_title": "Impossible de supprimer le modèle d'Index Set",
+    "template_delete_success": "Le modèle d'Index Set a bien été supprimé.",
+    "templates_load_failed": "Le chargement des modèles d'Index Set a échoué avec le statut",
+    "templates_load_failed_title": "Impossible de charger les modèles d'Index Set",
+    "template_load_failed": "Le chargement du modèle d'Index Set a échoué avec le statut",
+    "template_load_failed_title": "Impossible de charger le modèle d'Index Set",
+    "built_in_templates_load_failed": "Le chargement des modèles intégrés d'Index Set a échoué avec le statut",
+    "built_in_templates_load_failed_title": "Impossible de charger les modèles intégrés d'Index Set",
+    "template_defaults_load_failed": "Erreur lors de la récupération du modèle par défaut des index",
+    "index_set_load_failed": "Le chargement de l'Index Set avec l'ID {{indexSetId}} a échoué avec le statut",
+    "index_set_load_failed_title": "Impossible de charger l'Index Set",
+    "index_sets_list_load_failed": "Le chargement de la liste des Index Sets a échoué avec le statut",
+    "index_sets_list_load_failed_title": "Impossible de charger la liste des Index Sets",
+    "ranges_recalculation_failed": "Impossible de créer une tâche pour lancer le recalcul des plages d'index",
+    "ranges_recalculation_failed_title": "Erreur lors du lancement du recalcul des plages d'index",
+    "cycle_deflector_failed": "Échec de la rotation du deflector",
+    "field_types_load_failed": "Le chargement des types de champs d'index a échoué avec le statut",
+    "field_types_load_failed_title": "Impossible de charger les types de champs d'index",
+    "custom_field_type_remove_failed": "La suppression du type de champ personnalisé a échoué avec le statut : {{error}}",
+    "custom_field_type_remove_failed_title": "Impossible de supprimer le type de champ personnalisé",
+    "custom_field_type_removed": "Type de champ personnalisé supprimé avec succès",
+    "profile_set_failed": "La définition du profil de l'Index Set a échoué avec le statut : {{error}}",
+    "profile_set_failed_title": "Impossible de définir le profil de l'Index Set",
+    "profile_set_success": "Profil de l'Index Set défini avec succès",
+    "profile_remove_failed": "La suppression du profil de l'index a échoué avec le statut : {{error}}",
+    "profile_remove_failed_title": "Impossible de supprimer le profil de l'index",
+    "profile_removed": "Profil supprimé de l'index avec succès",
+    "failures_list_load_failed": "Le chargement de la liste des échecs de l'indexeur a échoué avec le statut",
+    "failures_list_load_failed_title": "Impossible de charger la liste des échecs de l'indexeur",
+    "failures_count_load_failed": "Le chargement du nombre d'échecs de l'indexeur a échoué avec le statut",
+    "failures_count_load_failed_title": "Impossible de charger le nombre d'échecs de l'indexeur",
+    "indices_multiple_load_failed": "Le chargement de plusieurs index de l'indexeur a échoué avec le statut",
+    "indices_multiple_load_failed_title": "Impossible de charger plusieurs index de l'indexeur"
   },
-  "notifications": {},
-  "use_index_set_stats_notifications": {},
-  "use_indexer_overview_notifications": {},
-  "use_indices_configuration_notifications": {}
+  "notifications": {
+    "create_success": "L'Index Set « {{title}} » a bien été créé",
+    "create_failed": "La création de l'Index Set « {{title}} » a échoué avec le statut : {{error}}",
+    "create_failed_title": "Impossible de créer l'Index Set.",
+    "update_success": "L'Index Set « {{title}} » a bien été mis à jour",
+    "update_failed": "La mise à jour de l'Index Set « {{title}} » a échoué avec le statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'Index Set.",
+    "success_title": "Succès"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Le chargement des statistiques de l'Index Set a échoué avec le statut",
+    "load_failed_title": "Impossible de charger les statistiques de l'Index Set."
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Le chargement de la vue d'ensemble de l'indexeur pour l'Index Set a échoué avec le statut",
+    "load_failed_title": "Impossible de charger la vue d'ensemble de l'indexeur."
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "La récupération des stratégies de rotation a échoué",
+    "fetch_rotation_failed_title": "Impossible de récupérer les stratégies de rotation",
+    "fetch_retention_failed": "La récupération des stratégies de rétention a échoué",
+    "fetch_retention_failed_title": "Impossible de récupérer les stratégies de rétention"
+  }
 }
