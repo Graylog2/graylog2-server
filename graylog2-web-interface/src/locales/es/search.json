@@ -387,25 +387,138 @@
     "highest_aria": "Especifica el valor más alto",
     "highest_label": "Valor más alto",
     "highest_help": "El valor más alto esperado en el campo o serie.",
-    "coloring": "Coloreado"
+    "coloring": "Coloreado",
+    "static_color": "Color estático",
+    "gradient": "Degradado",
+    "must_be_selected": "Debe seleccionarse.",
+    "must_be_present": "Debe estar presente.",
+    "must_be_number": "Debe ser un número.",
+    "must_be_higher": "Debe ser mayor que el valor más bajo.",
+    "coloring_required": "El coloreado es obligatorio",
+    "gradient_numeric_only": "Un degradado solo se puede definir para campos numéricos."
   },
-  "highlighting_rule": {},
-  "change_field_type": {},
-  "value_actions": {},
+  "highlighting_rule": {
+    "edit": "Editar esta regla de resaltado",
+    "remove": "Eliminar esta regla de resaltado",
+    "confirm_remove": "¿Seguro que quieres eliminar este resaltado?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Sin permiso",
+    "no_permission_description": "No tienes permiso para realizar esta acción",
+    "enterprise_plugin_required": "(se requiere el <enterpriseLink>plugin Enterprise</enterpriseLink>)",
+    "modal_title": "Cambiar el tipo del campo {{fieldName}}",
+    "impact_warning": "Cambiar el tipo del campo <bold>{{fieldName}}</bold> puede afectar de forma significativa a la ingestión de futuros mensajes de log. Si declaras que un campo tiene un tipo incompatible con los logs que estás ingiriendo, pueden producirse errores de ingestión.",
+    "failure_processing_hint": "Se recomienda activar el <docsLink>Failure Processing</docsLink> y vigilar de cerca después el stream <failureStream/>.",
+    "select_field_type_for": "Selecciona el tipo de campo para {{fieldName}}",
+    "select_field_type_for_field": "Selecciona el tipo de campo",
+    "select_field_type": "Selecciona el tipo de campo",
+    "select_index_sets": "Selecciona los Index Sets de destino",
+    "index_sets_hint_with_type": "De forma predeterminada, el tipo de campo <bold>{{type}}</bold> se establecerá para el campo <bold>{{fieldName}}</bold> en todos los Index Sets del mensaje o la búsqueda actuales. Puedes seleccionar en qué Index Sets quieres hacer el cambio.",
+    "index_sets_hint": "De forma predeterminada, el tipo de campo seleccionado se establecerá para el campo <bold>{{fieldName}}</bold> en todos los Index Sets del mensaje o la búsqueda actuales. Puedes seleccionar en qué Index Sets quieres hacer el cambio.",
+    "select_rotation_strategy": "Selecciona la estrategia de rotación",
+    "rotation_hint_type_field": "Para ver y usar <bold>{{type}}</bold> como tipo de campo para <bold>{{fieldName}}</bold>, debes rotar los índices. Puedes rotar automáticamente los índices afectados después de enviar este formulario o hacerlo manualmente más tarde.",
+    "rotation_hint_type": "Para ver y usar <bold>{{type}}</bold> como tipo de campo, debes rotar los índices. Puedes rotar automáticamente los índices afectados después de enviar este formulario o hacerlo manualmente más tarde.",
+    "rotation_hint_field": "Para ver y usar el tipo de campo seleccionado como tipo de campo para <bold>{{fieldName}}</bold>, debes rotar los índices. Puedes rotar automáticamente los índices afectados después de enviar este formulario o hacerlo manualmente más tarde.",
+    "rotation_hint": "Para ver y usar el tipo de campo seleccionado, debes rotar los índices. Puedes rotar automáticamente los índices afectados después de enviar este formulario o hacerlo manualmente más tarde.",
+    "rotate_indices": "Rotar los índices afectados tras el cambio",
+    "changing": "Cambiando el tipo de campo...",
+    "change": "Cambiar tipo de campo",
+    "select_field": "Selecciona el campo",
+    "select_field_placeholder": "Selecciona o escribe el campo",
+    "type_not_defined": "el tipo no está definido",
+    "previous_values": "(valores anteriores: {{values}})",
+    "load_index_field_types_failed": "Error al cargar los tipos de campo del índice. Estado:",
+    "could_not_load_index_field_types": "No se pudieron cargar los tipos de campo del índice",
+    "load_field_type_options_failed": "Error al cargar las opciones de tipo de campo. Estado:",
+    "could_not_load_field_type_options": "No se pudieron cargar las opciones de tipo de campo",
+    "load_field_types_failed": "Error al cargar los tipos de {{field}}. Estado:",
+    "could_not_load_field_types": "No se pudieron cargar los tipos de campo",
+    "load_index_sets_failed": "Error al cargar los Index Sets con soporte para cambio de tipo de campo. Estado:",
+    "could_not_load_index_sets": "No se pudieron cargar los Index Sets con soporte para cambio de tipo de campo",
+    "change_failed": "Error al cambiar el tipo de campo. Estado: {{error}}",
+    "change_failed_title": "No se pudo cambiar el tipo de campo",
+    "change_success": "El tipo de campo se ha cambiado correctamente",
+    "success_title": "¡Correcto!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Selecciona el tipo de extractor",
+    "exclude": "Excluir de los resultados",
+    "add_to_query": "Añadir a la consulta",
+    "show_documents": "Mostrar documentos del valor",
+    "create_extractor": "Crear extractor",
+    "highlight_value": "Resaltar este valor",
+    "create_event_definition": "Crear Event Definition",
+    "copy_value": "Copiar valor al portapapeles"
+  },
   "create_event_definition": {
-    "sections": {},
-    "items": {},
+    "title": "Configurar nueva Event Definition",
+    "hide_details": "Ocultar detalles de la estrategia",
+    "show_details": "Mostrar detalles de la estrategia",
+    "continue": "Continuar configuración",
+    "strategy_by": "Estrategia por:",
+    "description": "Descripción:",
+    "sections": {
+      "aggregation": "Ajustes de agregación",
+      "search": "Consulta de búsqueda"
+    },
+    "items": {
+      "rowValuePath": "Consulta desde la fila de la tabla",
+      "columnValuePath": "Consulta desde la columna de la tabla",
+      "columnGroupBy": "Agrupar por valores de columna",
+      "rowGroupBy": "Agrupar por valores de fila",
+      "aggCondition": "Condición",
+      "queryWithReplacedParams": "Consulta desde la búsqueda",
+      "searchFilterQuery": "Consulta desde los filtros de búsqueda",
+      "streams": "Streams",
+      "searchWithinMs": "Buscar dentro de (ms)",
+      "lutParameters": "Parámetros de Lookup Table",
+      "searchFromValue": "Consulta desde el valor"
+    },
+    "item_label": "{{label}}: ",
     "strategies": {
-      "EXACT": {},
-      "ROW": {},
-      "COL": {},
-      "ALL": {},
-      "CUSTOM": {}
+      "EXACT": {
+        "label": "Exactamente este valor",
+        "description": "La estrategia incluye todas las consultas de búsqueda, filtros, etc. relacionados con la vista de búsqueda actual"
+      },
+      "ROW": {
+        "label": "Cualquiera de la fila",
+        "description": "La estrategia incluye los pivotes de fila"
+      },
+      "COL": {
+        "label": "Cualquiera de la columna",
+        "description": "La estrategia incluye los pivotes de columna"
+      },
+      "ALL": {
+        "label": "Cualquiera del widget",
+        "description": "La estrategia incluye todos los valores de pivote de fila y columna relacionados con el valor seleccionado"
+      },
+      "CUSTOM": {
+        "label": "Personalizada",
+        "description": "Puedes seleccionar cualquier parte de la búsqueda"
+      }
     }
   },
-  "view_errors": {},
-  "views_notifications": {},
-  "field_actions": {},
+  "view_errors": {
+    "something_went_wrong": "Algo salió mal",
+    "unknown_error": "Se ha producido un error desconocido. Consulta el siguiente mensaje y el log del servidor de {{productName}} para obtener más información."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Error al eliminar la vista {{title}}. Estado: {{error}}",
+    "delete_view_failed_title": "No se pudo eliminar la vista",
+    "apply_widget_changes_failed": "Error al aplicar los cambios del widget. Estado: {{error}}",
+    "load_message_failed": "Error al cargar la información del mensaje. Estado:",
+    "could_not_load_message": "No se pudo cargar la información del mensaje"
+  },
+  "field_actions": {
+    "chart": "Gráfico",
+    "show_top_values": "Mostrar valores principales",
+    "statistics": "Estadísticas",
+    "add_to_table": "Añadir a la tabla",
+    "remove_from_table": "Quitar de la tabla",
+    "add_to_all_tables": "Añadir a todas las tablas",
+    "remove_from_all_tables": "Quitar de todas las tablas",
+    "change_field_type": "Cambiar tipo de campo"
+  },
   "aggregation": {},
   "widget_creators": {},
   "message_details": {},
