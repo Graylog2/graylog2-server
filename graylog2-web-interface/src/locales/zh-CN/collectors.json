@@ -699,21 +699,130 @@
     "reset_migration": {
       "button": "重置迁移",
       "confirm": "确定要重置迁移吗？",
-      "failed": "重置迁移状态失败，状态码：{{error}}"
+      "failed": "重置迁移状态失败，状态码：{{error}}",
+      "failed_title": "无法重置迁移状态。",
+      "success": "迁移状态已重置。"
     },
-    "migration_actions": {},
-    "force_start": {},
+    "migration_actions": {
+      "next": "下一步",
+      "show_renewal_policy_creation": "配置证书续期策略",
+      "show_migration_selection": "前往迁移步骤",
+      "run_directory_compatibility_check": "运行目录兼容性检查",
+      "provision_datanode_certificates": "为 Data Nodes 配置证书"
+    },
+    "force_start": {
+      "confirm": "仍然启动",
+      "description": "后端报告常规预检未通过。",
+      "submitting": "正在启动...",
+      "title": "仍要启动 OpenSearch 升级吗？"
+    },
     "rolling_upgrade_nodes": {
-      "node_status": {},
-      "state": {}
+      "abort_requested": "已请求中止。升级将在当前步骤完成后停止。",
+      "no_remaining_nodes": "没有剩余节点。",
+      "no_upgraded_nodes": "尚无已升级的节点。",
+      "not_started": "尚未启动 OpenSearch 滚动升级。",
+      "title": "OpenSearch 滚动升级",
+      "upgraded_heading": "已升级到目标 OpenSearch",
+      "waiting_heading": "等待 OpenSearch 升级",
+      "current": "当前",
+      "data_node": "Data Node",
+      "manager": "管理节点",
+      "opensearch_version": "OpenSearch 版本",
+      "status": "状态",
+      "unknown": "未知",
+      "node_status": {
+        "pending": "等待中",
+        "restarting": "重启中",
+        "started": "已启动",
+        "completed": "已升级",
+        "failed": "失败",
+        "skipped": "已跳过"
+      },
+      "state": {
+        "preparing_cluster": "正在准备集群",
+        "selecting_next_node": "正在选择下一个节点",
+        "upgrading_node": "正在升级节点",
+        "waiting_node_joined": "等待节点重新加入",
+        "reenabling_allocation": "正在重新启用分片分配",
+        "waiting_green": "等待集群变为 green",
+        "paused_waiting_green": "已暂停，等待集群变为 green",
+        "finalizing": "正在完成",
+        "completed": "已完成",
+        "aborted": "已中止",
+        "failed": "失败",
+        "in_progress": "进行中"
+      }
     },
-    "opensearch_upgrade_info": {},
+    "opensearch_upgrade_info": {
+      "current_version": "当前 OpenSearch 版本：",
+      "data_nodes": "Data Nodes：",
+      "data_nodes_summary": "{{total}}（{{available}} 个可用）",
+      "loading": "正在加载...",
+      "target_version": "目标 OpenSearch 版本：",
+      "unknown": "未知"
+    },
     "start_upgrade": {
-      "full": {},
-      "rolling": {}
+      "full": {
+        "alert_title": "Data Node 少于 3 个——这将是完全重启，而非滚动重启",
+        "confirm": "重启",
+        "journal": "OpenSearch 停止期间，传入的消息会堆积在每个 {{productName}} 节点的磁盘 Journal 中。如果停机时间超过 Journal 的大小或时间限制，数据摄取将停滞，消息可能会丢失——仅当 Journal 的余量足以覆盖预期停机时间时才继续操作。",
+        "submitting": "正在重启...",
+        "title": "重启 Data Nodes 的 OpenSearch 吗？",
+        "tolerate_downtime": "仅当您能够承受停机时间时才继续。"
+      },
+      "no_rollback": "启动后将无法回滚到之前的版本。",
+      "rolling": {
+        "alert_title": "这将逐个重启每个 Data Node",
+        "confirm": "开始滚动升级",
+        "healthy_cluster": "继续之前，请确保集群健康（green）。",
+        "shard_allocation": "每次重启期间会暂停分片分配，因此集群保持可用——但节点离开并重新加入时，索引和搜索可能会短暂降级。",
+        "title": "开始 OpenSearch 滚动升级吗？",
+        "wait_for_green": "每个节点升级后，升级过程会等待集群恢复为 green 后再继续。如果耗时过长，升级将暂停并等待您恢复。"
+      },
+      "starting": "正在启动..."
     },
-    "opensearch_upgrade": {},
-    "client_certificate": {},
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Nodes 内置的 OpenSearch 已是最新版本。",
+      "automatic_upgrade": "每个 Data Node 会自动将其内置的 OpenSearch 升级到目标版本。",
+      "backup": "升级前请备份 MongoDB、Data Node 和 Data Lake 存储，以确保可以顺利回滚。",
+      "before_upgrading": "升级前",
+      "check_failed": "无法检查 OpenSearch 升级可用性。",
+      "full_restart": "所有 Data Nodes 都必须重启，升级才会生效。",
+      "full_search_unavailable": "Data Nodes 重启期间，搜索和索引不可用。",
+      "incompatible_indices": "不兼容的索引",
+      "old_indices_unreadable": "OpenSearch 3 无法读取由 OpenSearch 2 之前版本创建的索引。如果升级期间这些索引仍然存在，其数据将无法访问。",
+      "resolve_indices_first": "请先处理所有不兼容的索引。",
+      "restarting": "正在重启...",
+      "resume": "继续",
+      "resuming": "正在继续...",
+      "rolling_restart": "Data Nodes 将逐个重启，以将影响降至最低。",
+      "rolling_search_impaired": "Data Nodes 重启期间，搜索功能可能会受到影响。",
+      "start_rolling_upgrade": "开始 OpenSearch 滚动升级",
+      "start_upgrade_and_restart": "开始 OpenSearch 升级并重启",
+      "starting_rolling_upgrade": "正在开始 OpenSearch 滚动升级...",
+      "title": "升级 Data Nodes 内置的 OpenSearch",
+      "upgrade_process": "升级流程",
+      "use_table": "在继续之前，请使用下表重新索引系统索引，并归档或删除数据索引。"
+    },
+    "client_certificate": {
+      "certificate_lifetime": "证书有效期",
+      "close": "关闭",
+      "create_title": "创建客户端证书",
+      "password": "密码",
+      "principal": "Principal",
+      "principal_placeholder": "principal",
+      "role": "角色",
+      "role_help": "表示 OpenSearch 角色映射。",
+      "role_placeholder": "role",
+      "submit": "创建证书",
+      "submitting": "正在创建证书...",
+      "unencrypted": "未加密",
+      "ca_certificate": "CA 证书",
+      "certificate": "证书",
+      "copy_to_clipboard": "复制到剪贴板",
+      "private_key": "私钥",
+      "view_principal": "Principal："
+    },
     "cluster_health": {
       "shard_replication_help": {},
       "state_help": {}
