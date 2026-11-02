@@ -397,37 +397,164 @@
     "expiration_threshold_help": "Les Collectors qui n'ont pas envoyé de signal dans ce délai sont supprimés définitivement.",
     "confirm": "Confirmer les paramètres"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "Inputs d'ingestion",
+    "none": "Aucun input d'ingestion de Collector n'existe. Les Collectors ne pourront pas envoyer de données tant qu'un input n'aura pas été créé.",
+    "none_running": "Des inputs d'ingestion de Collector existent, mais aucun n'est actuellement en cours d'exécution. Les Collectors ne pourront pas envoyer de données.",
+    "name": "Nom",
+    "status": "Statut",
+    "bind_address": "Adresse d'écoute",
+    "port": "Port",
+    "manage": "Gérer"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "Fichier",
+    "journald": "Journald",
+    "windows_event_log": "Journal d'événements Windows",
+    "macos_unified_logging": "Journalisation unifiée macOS"
+  },
+  "source_columns": {
+    "enabled": "Activée"
+  },
+  "source_form": {
+    "max_poll_interval_error": "L'intervalle de scrutation maximal doit être d'au moins 1 seconde.",
+    "max_log_age_error": "L'âge maximal des logs doit être 0 ou une valeur positive.",
+    "read_mode_end": "Depuis la fin (suivi)",
+    "read_mode_beginning": "Depuis le début",
+    "file_paths": "Chemin(s) de fichier",
+    "file_paths_help": "Motifs glob pris en charge (par ex. /var/log/*.log, /var/log/**/*.log). Le Collector surveille les fichiers correspondants pour détecter les nouvelles lignes.",
+    "read_mode": "Mode de lecture",
+    "read_mode_file_help": "Depuis la fin : ne collecte que les nouvelles lignes après le démarrage du Collector. Depuis le début : collecte d'abord toutes les lignes existantes, puis continue le suivi.",
+    "read_mode_journald_help": "Depuis la fin : ne collecte que les nouvelles entrées après le démarrage du Collector. Depuis le début : collecte d'abord toutes les entrées existantes, puis continue le suivi.",
+    "priority": "Priorité",
+    "priority_help": "Niveau de gravité minimal à collecter. Par exemple, sélectionner Erreur collecte aussi les entrées Critique, Alerte et Urgence.",
+    "priority_emerg": "Urgence",
+    "priority_alert": "Alerte",
+    "priority_crit": "Critique",
+    "priority_err": "Erreur",
+    "priority_warning": "Avertissement",
+    "priority_notice": "Notice",
+    "priority_info": "Info",
+    "priority_debug": "Débogage",
+    "match_pattern": "Motif de correspondance",
+    "match_pattern_help": "Expression de correspondance journald facultative pour filtrer les entrées par unité, processus, etc. Exemple : _SYSTEMD_UNIT=nginx.service",
+    "channels": "Canaux",
+    "channels_help": "Noms de canaux séparés par des virgules (par ex. Application, Security, System)",
+    "include_default_channels": "Inclure les canaux par défaut",
+    "include_default_channels_help": "Les canaux par défaut sont : {{channels}}",
+    "predicate": "Prédicat",
+    "predicate_help": "Filtre de prédicat facultatif de la journalisation unifiée macOS, transmis à la commande <code>log</code>. Laisser ce champ vide collecte tous les logs du système ! Les niveaux <code>info</code> et <code>debug</code> ne sont actuellement pas collectés, car ils sont très verbeux et apportent peu d'informations utiles. Exemple : <code>{{example}}</code>",
+    "max_poll_interval": "Intervalle de scrutation maximal",
+    "max_poll_interval_help": "Fréquence à laquelle le Collector vérifie les nouvelles entrées de logs. Doit être d'au moins 1 seconde.",
+    "max_log_age": "Âge maximal des logs",
+    "max_log_age_help": "Au premier démarrage, durée de rétroactivité de la collecte des logs. Mettez 0 pour désactiver la collecte rétroactive.",
+    "edit_title": "Modifier la source",
+    "new_title": "Nouvelle source",
+    "description": "Une source définit les données que les Collectors de cette flotte doivent collecter. Chaque type de source correspond à une méthode de collecte différente.",
+    "source_type": "Type de source",
+    "file_type_help": "Collecte les lignes de logs depuis les fichiers de l'hôte. Prend en charge les motifs glob pour faire correspondre plusieurs fichiers.",
+    "journald_type_help": "Collecte les entrées du journal systemd (Linux uniquement).",
+    "windows_type_help": "Collecte les événements des canaux de l'Observateur d'événements Windows.",
+    "macos_type_help": "Collecte depuis le système de journalisation unifiée macOS via la commande <code>log</code> (macOS uniquement).",
+    "enabled_help": "Les sources désactivées ne sont pas envoyées aux Collectors. Utilisez cette option pour arrêter temporairement la collecte sans supprimer la source.",
+    "update": "Mettre à jour la source",
+    "create": "Créer la source"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "Échec du chargement de l'activité récente, statut :",
+      "title": "Impossible de charger l'activité récente"
+    },
+    "input_ids": {
+      "message": "Échec du chargement des ID des inputs de Collector, statut :",
+      "title": "Impossible de charger les ID des inputs de Collector."
+    },
+    "stats": {
+      "message": "Échec du chargement des statistiques des Collectors, statut :",
+      "title": "Impossible de charger les statistiques des Collectors."
+    },
+    "config": {
+      "message": "Échec du chargement de la configuration des collectors, statut :",
+      "title": "Impossible de charger la configuration des collectors."
+    },
+    "enrollment_tokens": {
+      "message": "Échec du chargement des jetons d'enrôlement, statut :",
+      "title": "Impossible de charger les jetons d'enrôlement"
+    },
+    "pending_changes": {
+      "message": "Échec du chargement des modifications en attente, statut :",
+      "title": "Impossible de charger les modifications en attente"
+    },
+    "instances": {
+      "message": "Échec du chargement des instances, statut :",
+      "title": "Impossible de charger les instances"
+    },
+    "collector_instances": {
+      "message": "Échec du chargement des instances de Collector, statut :",
+      "title": "Impossible de charger les instances de Collector"
+    },
+    "fleets": {
+      "message": "Échec du chargement des flottes, statut :",
+      "title": "Impossible de charger les flottes"
+    },
+    "fleet": {
+      "message": "Échec du chargement de la flotte, statut :",
+      "title": "Impossible de charger la flotte"
+    },
+    "fleet_stats": {
+      "message": "Échec du chargement des statistiques de la flotte, statut :",
+      "title": "Impossible de charger les statistiques de la flotte"
+    },
+    "sources": {
+      "message": "Échec du chargement des sources, statut :",
+      "title": "Impossible de charger les sources"
+    },
+    "input_details": {
+      "message": "Échec du chargement des détails de l'input de Collector, statut : {{error}}",
+      "title": "Impossible de charger les détails de l'input de Collector."
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "Échec de la création de la flotte : {{error}}",
+      "title": "Impossible de créer la flotte"
+    },
+    "update_fleet": {
+      "message": "Échec de la mise à jour de la flotte : {{error}}",
+      "title": "Impossible de mettre à jour la flotte"
+    },
+    "delete_fleet": {
+      "message": "Échec de la suppression de la flotte : {{error}}",
+      "title": "Impossible de supprimer la flotte"
+    },
+    "create_source": {
+      "message": "Échec de la création de la source : {{error}}",
+      "title": "Impossible de créer la source"
+    },
+    "update_source": {
+      "message": "Échec de la mise à jour de la source : {{error}}",
+      "title": "Impossible de mettre à jour la source"
+    },
+    "delete_source": {
+      "message": "Échec de la suppression de la source : {{error}}",
+      "title": "Impossible de supprimer la source"
+    },
+    "create_enrollment_token": {
+      "message": "Échec de la création du jeton d'enrôlement : {{error}}",
+      "title": "Impossible de créer le jeton d'enrôlement"
+    },
+    "delete_enrollment_token": {
+      "message": "Échec de la suppression du jeton d'enrôlement : {{error}}",
+      "title": "Impossible de supprimer le jeton d'enrôlement"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Échec de la suppression des jetons d'enrôlement : {{error}}",
+      "title": "Impossible de supprimer les jetons d'enrôlement"
+    },
+    "reassign_instances": {
+      "message": "Échec de la réaffectation des instances : {{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
