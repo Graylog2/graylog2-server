@@ -355,11 +355,132 @@
     "routing_title": "シャードのルーティング",
     "routing_description": "太字のシャードはプライマリ、それ以外はレプリカです。プライマリがクラスターから離脱すると、レプリカが自動的にプライマリに昇格します。サイズとドキュメント数はプライマリシャードのみを反映し、レプリカによる重複は含みません。",
     "tooltip": "状態: <i>{{state}}</i>（{{hostname}} 上、{{name}}）",
-    "seconds_short": "{{seconds}} 秒"
+    "seconds_short": "{{seconds}} 秒",
+    "shard_id": "S{{id}}"
   },
-  "data_tiering": {},
-  "incompatible": {},
-  "strategies": {},
+  "data_tiering": {
+    "max_days_label": "ストレージ内の最大日数",
+    "max_days_help": "データを削除するまでの日数です。",
+    "min_days_label": "ストレージ内の最小日数",
+    "min_days_help": "データを最低限保存する日数です。",
+    "archive_label": "削除前にアーカイブ",
+    "archive_help": "このインデックスを削除する前にアーカイブしますか？",
+    "error_negative": "負の数は使用できません。",
+    "error_min_smaller": "ストレージ内の最小日数は、ストレージ内の最大日数より小さくする必要があります。",
+    "error_min_bigger_hot": "ストレージ内の最小日数は、Hot Tier 内の最小日数より大きくする必要があります。",
+    "summary_rotation_strategy": "ローテーション戦略:",
+    "summary_data_tiering": "Data Tiering",
+    "summary_max": "ストレージ内の最大:",
+    "summary_min": "ストレージ内の最小:",
+    "tooltip_min_storage": "ストレージ内の最小日数",
+    "tooltip_min_hot_and_storage": "Hot Tier およびストレージ内の最小日数",
+    "tooltip_min_hot": "Hot Tier 内の最小日数"
+  },
+  "incompatible": {
+    "working": "処理中...",
+    "bulk_remaining": "個別のインデックスが失敗しても、残りのインデックスは引き続き処理されます。",
+    "opens_in_new_tab": " （新しいタブで開きます）",
+    "archiving": "アーカイブ中...",
+    "reindexing": "再インデックス中...",
+    "archive_failed": "アーカイブに失敗しました",
+    "reindex_failed": "再インデックスに失敗しました",
+    "archive_conflict": "別のアーカイブジョブがすでに実行中です。新しいアーカイブジョブは、そのジョブが完了した後に開始できます。",
+    "archive_conflict_title": "アーカイブジョブが実行中です",
+    "archive_unavailable": "アーカイブは利用できません。",
+    "bulk_rotation_failed": "一括ローテーションのリクエストに失敗しました。",
+    "cluster_jobs_failed": "クラスタージョブの読み込みに失敗しました",
+    "cluster_jobs_failed_title": "クラスタージョブを読み込めませんでした",
+    "badge_system": "システム",
+    "badge_managed": "管理対象",
+    "badge_foreign": "外部",
+    "badge_warm": "Warm",
+    "badge_active_write_index": "アクティブな書き込みインデックス",
+    "badge_archived": "アーカイブ済み",
+    "version_unknown": "不明",
+    "human_name": "互換性のないインデックス",
+    "reindex_requires_data_node": "システムインデックスの再インデックスは、{{productName}} が Data Node の検索バックエンドで動作している場合にのみ可能です。次の OpenSearch メジャーバージョンにアップグレードする前に、<migrationLink>Data Node に移行</migrationLink>してから再インデックスしてください。",
+    "partial_summary": "{{succeeded}} 件成功、{{failed}} 件失敗。",
+    "partial_more": "ほか {{count}} 件。",
+    "delete": {
+      "button": "削除",
+      "title": "インデックスを削除",
+      "confirm": "削除",
+      "body": "<strong>{{indexName}}</strong> を完全に削除します。",
+      "success": "インデックス「{{indexName}}」を削除しました。",
+      "error": "削除できませんでした。"
+    },
+    "reindex": {
+      "button": "再インデックス",
+      "title": "システムインデックスを再インデックス",
+      "confirm": "システムインデックスを再インデックス",
+      "body": "OpenSearch 3 で使用できるように、<strong>{{indexName}}</strong> を再インデックスします。",
+      "success": "インデックス「{{indexName}}」を再インデックスしました。",
+      "error": "システムインデックスを再インデックスできませんでした。"
+    },
+    "rotate": {
+      "button": "ローテーション",
+      "title": "アクティブな書き込みインデックスをローテーション",
+      "confirm": "ローテーション",
+      "body_active": "<strong>{{indexName}}</strong> は所属する Index Set のアクティブな書き込みインデックスであり、引き続き新しいメッセージを受信しています。ローテーションすると、現在の OpenSearch バージョンで新しい書き込みインデックスが開始されます。",
+      "body_afterwards": "その後、<strong>{{indexName}}</strong> はアーカイブまたは削除できます。",
+      "success": "「{{indexName}}」の Index Set をローテーションしました。このインデックスはメッセージを受信しなくなり、アーカイブまたは削除できるようになりました。",
+      "error": "ローテーションできませんでした。"
+    },
+    "archive_delete": {
+      "button": "アーカイブして削除",
+      "title": "インデックスをアーカイブして削除",
+      "confirm": "アーカイブして削除",
+      "body": "<strong>{{indexName}}</strong> のアーカイブを作成し、その後インデックスを削除します。",
+      "success": "「{{indexName}}」のアーカイブと削除のジョブを開始しました。",
+      "error": "アーカイブして削除できませんでした。"
+    },
+    "bulk": {
+      "delete": {
+        "button": "削除",
+        "title": "互換性のないインデックスを削除",
+        "confirm": "すべて削除",
+        "error": "すべてを削除できませんでした。"
+      },
+      "delete_partial_title": "一部のインデックスを削除できませんでした",
+      "delete_failure_title": "インデックスを削除できませんでした",
+      "reindex": {
+        "button": "システムインデックスを再インデックス",
+        "title": "システムインデックスを再インデックス",
+        "confirm": "すべて再インデックス",
+        "error": "すべてを再インデックスできませんでした。"
+      },
+      "archive_delete": {
+        "button": "アーカイブして削除",
+        "title": "インデックスをアーカイブして削除",
+        "confirm": "すべてアーカイブして削除",
+        "error": "すべてをアーカイブして削除できませんでした。"
+      },
+      "rotate": {
+        "button": "アクティブな書き込みインデックスをローテーション",
+        "title": "アクティブな書き込みインデックスをローテーション",
+        "confirm": "すべてローテーション",
+        "error": "すべてをローテーションできませんでした。"
+      },
+      "rotate_partial_title": "一部のインデックスをローテーションできませんでした",
+      "rotate_failure_title": "インデックスをローテーションできませんでした"
+    }
+  },
+  "strategies": {
+    "name_rotation_message_count": "インデックスのメッセージ数",
+    "name_rotation_size": "インデックスのサイズ",
+    "name_rotation_time": "インデックスの時間",
+    "name_rotation_time_size_optimizing": "インデックスの時間とサイズの最適化",
+    "name_retention_delete": "インデックスを削除",
+    "name_retention_close": "インデックスをクローズ",
+    "name_retention_noop": "何もしない",
+    "retention_max_indices_label": "インデックスの最大数",
+    "retention_closing_help": "古いインデックスを<strong>クローズ</strong>する前に保持するインデックスの最大数",
+    "retention_deleting_help": "古いインデックスを<strong>削除</strong>する前に保持するインデックスの最大数",
+    "retention_noop_help": "この保持戦略は何も行わないため、設定できません。",
+    "retention_summary_strategy": "インデックス保持戦略:",
+    "retention_summary_close": "クローズ",
+    "retention_summary_delete": "削除"
+  },
   "pages": {},
   "navigation": {},
   "maintenance_dialog": {},
