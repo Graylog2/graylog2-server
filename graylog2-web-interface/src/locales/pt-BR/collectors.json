@@ -397,37 +397,164 @@
     "expiration_threshold_help": "Os Collectors que não enviarem informações dentro deste período são removidos permanentemente.",
     "confirm": "Confirmar configurações"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "Entradas de ingestão",
+    "none": "Nenhuma entrada de ingestão de Collector existe. Os Collectors não conseguirão enviar dados até que uma entrada seja criada.",
+    "none_running": "Existem entradas de ingestão de Collectors, mas nenhuma está em execução no momento. Os Collectors não conseguirão enviar dados.",
+    "name": "Nome",
+    "status": "Status",
+    "bind_address": "Endereço de vinculação",
+    "port": "Porta",
+    "manage": "Gerenciar"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "Arquivo",
+    "journald": "Journald",
+    "windows_event_log": "Log de Eventos do Windows",
+    "macos_unified_logging": "Log Unificado do macOS"
+  },
+  "source_columns": {
+    "enabled": "Habilitada"
+  },
+  "source_form": {
+    "max_poll_interval_error": "O intervalo máximo de consulta deve ser de pelo menos 1 segundo.",
+    "max_log_age_error": "A idade máxima do log deve ser 0 ou um valor positivo.",
+    "read_mode_end": "Do fim (tail)",
+    "read_mode_beginning": "Do início",
+    "file_paths": "Caminho(s) do arquivo",
+    "file_paths_help": "São aceitos padrões glob (ex.: /var/log/*.log, /var/log/**/*.log). O Collector monitora os arquivos encontrados em busca de novas linhas.",
+    "read_mode": "Modo de leitura",
+    "read_mode_file_help": "Do fim: coleta apenas as novas linhas após o início do Collector. Do início: coleta primeiro todas as linhas existentes e depois continua acompanhando o arquivo.",
+    "read_mode_journald_help": "Do fim: coleta apenas as novas entradas após o início do Collector. Do início: coleta primeiro todas as entradas existentes e depois continua acompanhando o journal.",
+    "priority": "Prioridade",
+    "priority_help": "Nível mínimo de severidade a ser coletado. Por exemplo, selecionar Erro também coleta entradas Crítico, Alerta e Emergência.",
+    "priority_emerg": "Emergência",
+    "priority_alert": "Alerta",
+    "priority_crit": "Crítico",
+    "priority_err": "Erro",
+    "priority_warning": "Aviso",
+    "priority_notice": "Notificação",
+    "priority_info": "Informação",
+    "priority_debug": "Depuração",
+    "match_pattern": "Padrão de correspondência",
+    "match_pattern_help": "Expressão de correspondência do journald (opcional) para filtrar entradas por unidade, processo etc. Exemplo: _SYSTEMD_UNIT=nginx.service",
+    "channels": "Canais",
+    "channels_help": "Nomes de canais separados por vírgula (ex.: Application, Security, System)",
+    "include_default_channels": "Incluir canais padrão",
+    "include_default_channels_help": "Os padrões são: {{channels}}",
+    "predicate": "Predicado",
+    "predicate_help": "Predicado de filtro opcional do log unificado do macOS, passado ao comando <code>log</code>. Deixar este campo vazio coleta todos os logs do sistema! Os níveis <code>info</code> ou <code>debug</code> não são coletados no momento, pois geram muito ruído e trazem pouca informação útil. Exemplo: <code>{{example}}</code>",
+    "max_poll_interval": "Intervalo máximo de consulta",
+    "max_poll_interval_help": "Com que frequência o Collector verifica novas entradas de log. Deve ser de pelo menos 1 segundo.",
+    "max_log_age": "Idade máxima do log",
+    "max_log_age_help": "Na primeira inicialização, até quanto tempo atrás preencher os logs. Use 0 para desabilitar o preenchimento.",
+    "edit_title": "Editar fonte",
+    "new_title": "Nova fonte",
+    "description": "Uma fonte define quais dados os Collectors desta fleet devem coletar. Cada tipo de fonte corresponde a um método de coleta diferente.",
+    "source_type": "Tipo de fonte",
+    "file_type_help": "Coleta linhas de log de arquivos no host. Aceita padrões glob para encontrar vários arquivos.",
+    "journald_type_help": "Coleta entradas do journal do systemd (somente Linux).",
+    "windows_type_help": "Coleta eventos dos canais do Visualizador de Eventos do Windows.",
+    "macos_type_help": "Coleta do sistema de log unificado do macOS pelo comando <code>log</code> (somente macOS).",
+    "enabled_help": "Fontes desabilitadas não são enviadas aos Collectors. Use esta opção para interromper a coleta temporariamente sem remover a fonte.",
+    "update": "Atualizar fonte",
+    "create": "Criar fonte"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "Falha ao carregar a atividade recente com o status",
+      "title": "Não foi possível carregar a atividade recente"
+    },
+    "input_ids": {
+      "message": "Falha ao carregar os IDs das entradas do Collector com o status",
+      "title": "Não foi possível carregar os IDs das entradas do Collector."
+    },
+    "stats": {
+      "message": "Falha ao carregar as estatísticas dos Collectors com o status",
+      "title": "Não foi possível carregar as estatísticas dos Collectors."
+    },
+    "config": {
+      "message": "Falha ao carregar a configuração dos collectors com o status",
+      "title": "Não foi possível carregar a configuração dos collectors."
+    },
+    "enrollment_tokens": {
+      "message": "Falha ao carregar os tokens de registro com o status",
+      "title": "Não foi possível carregar os tokens de registro"
+    },
+    "pending_changes": {
+      "message": "Falha ao carregar as alterações pendentes com o status",
+      "title": "Não foi possível carregar as alterações pendentes"
+    },
+    "instances": {
+      "message": "Falha ao carregar as instâncias com o status",
+      "title": "Não foi possível carregar as instâncias"
+    },
+    "collector_instances": {
+      "message": "Falha ao carregar as instâncias de Collectors com o status",
+      "title": "Não foi possível carregar as instâncias de Collectors"
+    },
+    "fleets": {
+      "message": "Falha ao carregar as fleets com o status",
+      "title": "Não foi possível carregar as Fleets"
+    },
+    "fleet": {
+      "message": "Falha ao carregar a fleet com o status",
+      "title": "Não foi possível carregar a Fleet"
+    },
+    "fleet_stats": {
+      "message": "Falha ao carregar as estatísticas da fleet com o status",
+      "title": "Não foi possível carregar as estatísticas da Fleet"
+    },
+    "sources": {
+      "message": "Falha ao carregar as fontes com o status",
+      "title": "Não foi possível carregar as fontes"
+    },
+    "input_details": {
+      "message": "Falha ao carregar os detalhes da entrada do Collector com o status: {{error}}",
+      "title": "Não foi possível carregar os detalhes da entrada do Collector."
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "Falha ao criar a fleet: {{error}}",
+      "title": "Não foi possível criar a fleet"
+    },
+    "update_fleet": {
+      "message": "Falha ao atualizar a fleet: {{error}}",
+      "title": "Não foi possível atualizar a fleet"
+    },
+    "delete_fleet": {
+      "message": "Falha ao excluir a fleet: {{error}}",
+      "title": "Não foi possível excluir a fleet"
+    },
+    "create_source": {
+      "message": "Falha ao criar a fonte: {{error}}",
+      "title": "Não foi possível criar a fonte"
+    },
+    "update_source": {
+      "message": "Falha ao atualizar a fonte: {{error}}",
+      "title": "Não foi possível atualizar a fonte"
+    },
+    "delete_source": {
+      "message": "Falha ao excluir a fonte: {{error}}",
+      "title": "Não foi possível excluir a fonte"
+    },
+    "create_enrollment_token": {
+      "message": "Falha ao criar o token de registro: {{error}}",
+      "title": "Não foi possível criar o token de registro"
+    },
+    "delete_enrollment_token": {
+      "message": "Falha ao excluir o token de registro: {{error}}",
+      "title": "Não foi possível excluir o token de registro"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Falha ao excluir os tokens de registro: {{error}}",
+      "title": "Não foi possível excluir os tokens de registro"
+    },
+    "reassign_instances": {
+      "message": "Falha ao reatribuir as instâncias: {{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
