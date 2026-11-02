@@ -355,11 +355,132 @@
     "routing_title": "Roteamento de shards",
     "routing_description": "Shards em negrito são primários; os demais são réplicas. As réplicas são promovidas a primários automaticamente quando os primários saem do cluster. Tamanho e contagem de documentos refletem apenas os shards primários, sem possível duplicação por réplicas.",
     "tooltip": "Estado: <i>{{state}}</i> em {{hostname}} ({{name}})",
-    "seconds_short": "{{seconds}} s"
+    "seconds_short": "{{seconds}} s",
+    "shard_id": "S{{id}}"
   },
-  "data_tiering": {},
-  "incompatible": {},
-  "strategies": {},
+  "data_tiering": {
+    "max_days_label": "Máx. de dias no armazenamento",
+    "max_days_help": "Após quantos dias seus dados devem ser excluídos.",
+    "min_days_label": "Mín. de dias no armazenamento",
+    "min_days_help": "Por quantos dias, no mínimo, seus dados devem ser armazenados.",
+    "archive_label": "Arquivar antes da exclusão",
+    "archive_help": "Arquivar este índice antes de excluí-lo?",
+    "error_negative": "Números negativos não são permitidos.",
+    "error_min_smaller": "O mín. de dias no armazenamento precisa ser menor que o máx. de dias no armazenamento.",
+    "error_min_bigger_hot": "O mín. de dias no armazenamento precisa ser maior que o mín. de dias na camada Hot.",
+    "summary_rotation_strategy": "Estratégia de rotação:",
+    "summary_data_tiering": "Data Tiering",
+    "summary_max": "Máx. no armazenamento:",
+    "summary_min": "Mín. no armazenamento:",
+    "tooltip_min_storage": "Mín. de dias no armazenamento",
+    "tooltip_min_hot_and_storage": "Mín. de dias na camada Hot e no armazenamento",
+    "tooltip_min_hot": "Mín. de dias na camada Hot"
+  },
+  "incompatible": {
+    "working": "Processando...",
+    "bulk_remaining": "Se um índice individual falhar, os índices restantes ainda serão processados.",
+    "opens_in_new_tab": " (abre em uma nova aba)",
+    "archiving": "Arquivando...",
+    "reindexing": "Reindexando...",
+    "archive_failed": "Falha ao arquivar",
+    "reindex_failed": "Falha ao reindexar",
+    "archive_conflict": "Outro job de arquivamento já está em execução. Novos jobs de arquivamento podem ser iniciados após o término dele.",
+    "archive_conflict_title": "Job de arquivamento já em execução",
+    "archive_unavailable": "O arquivamento não está disponível.",
+    "bulk_rotation_failed": "Falha na solicitação de rotação em massa.",
+    "cluster_jobs_failed": "Falha ao carregar os jobs do cluster",
+    "cluster_jobs_failed_title": "Não foi possível carregar os jobs do cluster",
+    "badge_system": "Sistema",
+    "badge_managed": "Gerenciado",
+    "badge_foreign": "Externo",
+    "badge_warm": "Warm",
+    "badge_active_write_index": "índice de gravação ativo",
+    "badge_archived": "já arquivado",
+    "version_unknown": "Desconhecida",
+    "human_name": "índices incompatíveis",
+    "reindex_requires_data_node": "Os índices de sistema só podem ser reindexados quando o {{productName}} é executado com um backend de pesquisa Data Node. <migrationLink>Migre para os Data Nodes</migrationLink> para reindexá-los antes de atualizar para a próxima versão principal do OpenSearch.",
+    "partial_summary": "{{succeeded}} com sucesso, {{failed}} com falha.",
+    "partial_more": "...e mais {{count}}.",
+    "delete": {
+      "button": "Excluir",
+      "title": "Excluir índice",
+      "confirm": "Excluir",
+      "body": "Isso excluirá permanentemente <strong>{{indexName}}</strong>.",
+      "success": "O índice \"{{indexName}}\" foi excluído.",
+      "error": "Não foi possível excluir."
+    },
+    "reindex": {
+      "button": "Reindexar",
+      "title": "Reindexar índice de sistema",
+      "confirm": "Reindexar índice de sistema",
+      "body": "Isso reindexará <strong>{{indexName}}</strong> para que possa ser usado com o OpenSearch 3.",
+      "success": "O índice \"{{indexName}}\" foi reindexado.",
+      "error": "Não foi possível reindexar o índice de sistema."
+    },
+    "rotate": {
+      "button": "Rotacionar",
+      "title": "Rotacionar índice de gravação ativo",
+      "confirm": "Rotacionar",
+      "body_active": "<strong>{{indexName}}</strong> é o índice de gravação ativo do seu index set e ainda recebe novas mensagens. A rotação inicia um novo índice de gravação na versão atual do OpenSearch.",
+      "body_afterwards": "Depois, <strong>{{indexName}}</strong> poderá ser arquivado ou excluído.",
+      "success": "O index set de \"{{indexName}}\" foi rotacionado. O índice não recebe mais mensagens e agora pode ser arquivado ou excluído.",
+      "error": "Não foi possível rotacionar."
+    },
+    "archive_delete": {
+      "button": "Arquivar e excluir",
+      "title": "Arquivar e excluir índice",
+      "confirm": "Arquivar e excluir",
+      "body": "Isso criará um arquivo de <strong>{{indexName}}</strong> e excluirá o índice em seguida.",
+      "success": "O job de arquivamento e exclusão de \"{{indexName}}\" foi iniciado.",
+      "error": "Não foi possível arquivar e excluir."
+    },
+    "bulk": {
+      "delete": {
+        "button": "Excluir",
+        "title": "Excluir índices incompatíveis",
+        "confirm": "Excluir todos",
+        "error": "Não foi possível excluir todos."
+      },
+      "delete_partial_title": "Alguns índices não puderam ser excluídos",
+      "delete_failure_title": "Não foi possível excluir os índices",
+      "reindex": {
+        "button": "Reindexar índices de sistema",
+        "title": "Reindexar índices de sistema",
+        "confirm": "Reindexar todos",
+        "error": "Não foi possível reindexar todos."
+      },
+      "archive_delete": {
+        "button": "Arquivar e excluir",
+        "title": "Arquivar e excluir índices",
+        "confirm": "Arquivar e excluir todos",
+        "error": "Não foi possível arquivar e excluir todos."
+      },
+      "rotate": {
+        "button": "Rotacionar índices de gravação ativos",
+        "title": "Rotacionar índices de gravação ativos",
+        "confirm": "Rotacionar todos",
+        "error": "Não foi possível rotacionar todos."
+      },
+      "rotate_partial_title": "Alguns índices não puderam ser rotacionados",
+      "rotate_failure_title": "Não foi possível rotacionar os índices"
+    }
+  },
+  "strategies": {
+    "name_rotation_message_count": "Contagem de mensagens do índice",
+    "name_rotation_size": "Tamanho do índice",
+    "name_rotation_time": "Tempo do índice",
+    "name_rotation_time_size_optimizing": "Tempo com otimização de tamanho do índice",
+    "name_retention_delete": "Excluir índice",
+    "name_retention_close": "Fechar índice",
+    "name_retention_noop": "Não fazer nada",
+    "retention_max_indices_label": "Número máximo de índices",
+    "retention_closing_help": "Número máximo de índices a manter antes de <strong>fechar</strong> os mais antigos",
+    "retention_deleting_help": "Número máximo de índices a manter antes de <strong>excluir</strong> os mais antigos",
+    "retention_noop_help": "Esta estratégia de retenção não é configurável porque não faz nada.",
+    "retention_summary_strategy": "Estratégia de retenção de índices:",
+    "retention_summary_close": "Fechar",
+    "retention_summary_delete": "Excluir"
+  },
   "pages": {},
   "navigation": {},
   "maintenance_dialog": {},
