@@ -74,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -475,6 +476,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
             // CertificateReloadVerifier is a singleton: queuing this verification automatically supersedes
             // whatever verification was still in flight for a previous reload.
             certificateReloadVerifier.verify(datanodeKeystore.getCertificateSerialNumber(), this::getOpensearchBaseUrl);
+        }
+    }
+
+    @Override
+    public synchronized void updateSeedHosts(Set<String> seedHosts) {
+        if (commandLineProcess != null) {
+            commandLineProcess.updateSeedHosts(seedHosts);
         }
     }
 
