@@ -271,20 +271,132 @@
     "no_match": "Nenhuma fleet corresponde ao filtro"
   },
   "recent_activity": {
-    "title": "Atividade recente"
+    "title": "Atividade recente",
+    "empty": "Nenhuma atividade recente."
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Host",
+    "os": "SO",
+    "version": "Versão",
+    "fleet": "Fleet",
+    "enrolled": "Registrado em",
+    "last_seen": "Visto por último",
+    "hide_attributes": "Ocultar atributos"
+  },
+  "connection_success": {
+    "offline": "O collector se conectou uma vez, mas não envia informações desde <lastSeen />.",
+    "receiving": "O collector está conectado e enviando mensagens.",
+    "waiting": "Quase lá: o collector está conectado e aguardamos suas primeiras mensagens.",
+    "title": "Configurando {{host}}",
+    "view_instances": "Ver instâncias",
+    "check_again": "Verificar novamente",
+    "log_preview": "Pré-visualização de logs",
+    "caption_messages": "Exibindo mensagens recebidas nos últimos {{duration}}",
+    "caption_messages_checking": "Exibindo mensagens recebidas nos últimos {{duration}} - verificando a cada poucos segundos",
+    "caption_system": "Exibindo mensagens de sistema do Collector recebidas nos últimos {{duration}}",
+    "caption_system_checking": "Exibindo mensagens de sistema do Collector recebidas nos últimos {{duration}} - verificando a cada poucos segundos"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet para este Collector",
+    "change": "Alterar fleet",
+    "heading": "Escolha uma fleet para este Collector",
+    "create_new": "Criar nova fleet",
+    "or": "ou",
+    "select_existing": "Selecionar fleet existente",
+    "select_existing_placeholder": "Selecione uma fleet existente..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Configurando os Collectors...",
+    "confirm": "Confirmar endpoint",
+    "create_input": "Criar entrada",
+    "save": "Salvar endpoint",
+    "hostname": "Nome de host externo",
+    "hostname_placeholder": "ex.: otlp.exemplo.com",
+    "port": "Porta externa",
+    "cancel": "Cancelar",
+    "reachability_hint": "Os Collectors enviam seus logs para este endereço. Ele precisa estar acessível a partir de todos os hosts de Collectors: um load balancer ou este servidor.",
+    "confirm_title": "Confirme como os Collectors enviam dados para este cluster",
+    "change": "Alterar endpoint",
+    "sending_to": "Os Collectors enviam dados para este cluster em <endpoint />",
+    "no_input_title": "Nenhuma entrada de ingestão existe",
+    "no_input": "Os Collectors podem se registrar, mas não conseguirão enviar dados até que uma entrada seja criada.",
+    "not_running_title": "A entrada de ingestão em <endpoint /> não está em execução",
+    "not_running": "Os Collectors podem se registrar, mas não conseguirão enviar dados até que uma entrada esteja em execução.",
+    "manage_input": "Gerenciar entrada"
+  },
+  "install_command": {
+    "title": "Execute isto no {{platform}}",
+    "copy": "Copiar comando",
+    "note_expires": "Baixa e instala o collector, registra-o na fleet selecionada e inicia o serviço. Requer privilégios de administrador. O token expira em {{duration}}.",
+    "note_never_expires": "Baixa e instala o collector, registra-o na fleet selecionada e inicia o serviço. Requer privilégios de administrador. Este token nunca expira."
+  },
+  "log_preview": {
+    "unavailable": "Pré-visualização de logs indisponível: {{error}}",
+    "loading": "Carregando pré-visualização de logs...",
+    "empty": "Nenhuma mensagem ainda. Verificando a cada poucos segundos"
+  },
+  "next_steps": {
+    "explore": "Explore seus dados",
+    "explore_description": "Abra a pesquisa filtrada para este collector",
+    "configure_sources": "Configurar fontes",
+    "configure_sources_description": "Adicione ou ajuste o que esta fleet coleta",
+    "manage_fleets": "Gerenciar fleets",
+    "manage_fleets_description": "Mova este collector para uma fleet permanente",
+    "install_another": "Instalar outro collector",
+    "install_another_description": "Repita esta configuração em outro host",
+    "offline_title": "Coloque-o online novamente",
+    "check_service": "Verifique se o serviço do collector está em execução no host.",
+    "check_reachability": "Verifique se o host consegue acessar este servidor {{productName}}.",
+    "check_logs": "Revise os logs do próprio collector na pré-visualização abaixo para ver erros de conexão.",
+    "title": "Próximos passos"
+  },
+  "timeline": {
+    "connection_lost": "Conexão perdida",
+    "last_heartbeat": "Último heartbeat <lastSeen />",
+    "first_messages": "Primeiras mensagens",
+    "listening": "Aguardando... geralmente menos de um minuto",
+    "enrolled": "Registrado",
+    "enrolled_detail": "Registrado com um token de registro - <enrolledAt />",
+    "connected": "Conectado",
+    "connected_detail": "Heartbeat recebido - <lastSeen />",
+    "sources_configured": "Fontes configuradas"
+  },
+  "platform_picker": {
+    "title": "Comece a usar os Collectors",
+    "description": "Implante collectors leves na sua infraestrutura para encaminhar logs para {{productName}}."
+  },
+  "source_status": {
+    "disabled": "Desabilitada",
+    "not_applicable": "Não aplicável em {{os}}",
+    "unrecognised": "Tipo de fonte não reconhecido",
+    "paused": "Pausada: collector offline",
+    "no_messages": "Nenhuma mensagem ainda",
+    "waiting": "Aguardando as primeiras mensagens...",
+    "title": "Fontes de logs",
+    "no_sources": "Nenhuma fonte configurada para esta fleet ainda."
+  },
+  "waiting_for_connection": {
+    "status": "Aguardando conexão... {{seconds}}s"
+  },
+  "settings": {
+    "getting_started": "Primeiros passos com os Collectors",
+    "getting_started_cloud": "Os Collectors se conectam a um endpoint de ingestão gerenciado para enviar seus dados. Salve as configurações dos collectors para inicializar a infraestrutura de collectors. Após a configuração, você pode criar fleets, adicionar fontes e implantar collectors nos seus hosts.",
+    "getting_started_self_managed": "Os Collectors precisam de endpoints de ingestão para receber os dados coletados. Configure o endpoint HTTP abaixo e salve para inicializar a infraestrutura de collectors. Após a configuração, você pode criar fleets, adicionar fontes e implantar collectors nos seus hosts.",
+    "ingest_endpoint": "Endpoint de ingestão",
+    "ingest_endpoint_cloud": "O endpoint de ingestão é gerenciado pelo sistema. Os Collectors se conectam a ele automaticamente.",
+    "ingest_endpoint_help": "Endpoints de ingestão recebem dados de log dos collectors via OpenTelemetry (OTLP). É o endereço externo enviado aos collectors gerenciados como destino dos dados. Ele deve direcionar para uma entrada de ingestão de collector em execução. Normalmente é o endereço de um load balancer ou do próprio servidor.",
+    "hostname_help": "O nome de host ou endereço IP que os Collectors usarão para se conectar. Deve estar acessível a partir dos hosts de Collectors.",
+    "create_input": "Criar entrada de ingestão",
+    "lifecycle": "Ciclo de vida dos Collectors",
+    "offline_threshold": "Limite para offline",
+    "offline_threshold_help": "Os Collectors que não enviarem informações dentro deste período são exibidos como offline.",
+    "default_visibility": "Visibilidade padrão",
+    "default_visibility_help": "Os Collectors que não enviarem informações dentro deste período ficam ocultos na visualização padrão. Os usuários podem ajustar ou remover este filtro na tabela de instâncias.",
+    "expiration_threshold": "Limite de expiração",
+    "expiration_threshold_help": "Os Collectors que não enviarem informações dentro deste período são removidos permanentemente.",
+    "confirm": "Confirmar configurações"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
