@@ -410,18 +410,84 @@
       "confirm_disable": "¿Seguro que quieres desactivar al usuario {{name}}? Se finalizarán todas sus sesiones actuales.",
       "confirm_delete": "¿Seguro que quieres eliminar al usuario {{name}}?",
       "edit_title": "Editar usuario {{name}}",
-      "edit": "Editar"
+      "edit": "Editar",
+      "set_status_title": "Establecer nuevo estado de la cuenta para {{name}}",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "delete_title": "Eliminar usuario {{name}}"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "Sesión iniciada",
+      "last_activity": "Última actividad: {{activity}}",
+      "client_address": "Dirección del cliente: {{address}}",
+      "not_logged_in": "Sin sesión iniciada"
+    },
+    "status": {
+      "user_is": "El usuario está {{status}}",
+      "auth_disabled": " (el servicio de autenticación está desactivado)",
+      "enabled": "activado",
+      "disabled": "desactivado"
+    },
+    "query_example": "Buscar usuarios con un correo electrónico que contenga example.com:",
+    "fields": {
+      "full_name": "Nombre completo del usuario",
+      "username": "Nombre de inicio de sesión del usuario.",
+      "email": "Correo electrónico del usuario."
+    },
+    "select_users": "Seleccionar usuario(s)..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "Ver detalles",
+    "edit_user": "Editar usuario",
+    "edit_tokens": "Editar tokens"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "Tokens",
+    "human_name": "tokens",
+    "fields": {
+      "username": "Nombre de usuario del propietario del token",
+      "name": "Nombre del token",
+      "created": "Fecha de creación del token",
+      "last_access": "Última vez que se usó el token",
+      "external_user": "¿El propietario del token es un usuario de un backend de autenticación externo?",
+      "auth_backend": "Backend de autenticación del usuario. N/A para usuarios internos."
+    },
+    "example_user": "Buscar tokens creados por un usuario concreto:",
+    "example_name": "Buscar token por nombre:",
+    "deleting_title": "Eliminando token",
+    "delete_confirm": "Estás a punto de eliminar el token: \"{{name}}\". ¿Seguro que quieres continuar?",
+    "delete": "Eliminar",
+    "user_not_found": "El usuario no existe.",
+    "user_error_title": "Error de usuario del token",
+    "not_available": "N/A",
+    "delete_failed": "Error al eliminar el token: {{error}}",
+    "delete_failed_title": "No se pudo eliminar el token",
+    "deleted": "El token se ha eliminado correctamente.",
+    "deleted_title": "¡Éxito!"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "Detalles del usuario",
+    "title_with_name": "Detalles del usuario {{name}}",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Resumen de detalles como la información del perfil, la configuración, los equipos y los roles."
+  },
+  "password_rules": {
+    "min_length": "La contraseña debe tener al menos {{minLength}} caracteres.",
+    "require_uppercase": "La contraseña debe contener al menos una letra mayúscula.",
+    "require_lowercase": "La contraseña debe contener al menos una letra minúscula.",
+    "require_numbers": "La contraseña debe contener al menos un número.",
+    "require_special_chars": "La contraseña debe contener al menos un carácter especial de: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Preferencias del usuario guardadas correctamente",
+    "save_failed": "Error al guardar las preferencias de \"{{userName}}\" con el estado: {{error}}",
+    "save_failed_title": "No se pudieron guardar las preferencias del usuario",
+    "change_success": "Tu página de inicio se ha cambiado correctamente",
+    "change_failed": "Error al cambiar tu página de inicio: {{error}}",
+    "change_failed_title": "No se pudo cambiar tu página de inicio"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Error al cargar el usuario {{userId}} con el estado",
+    "load_failed_title": "No se pudo cargar el usuario {{userId}}"
+  }
 }
