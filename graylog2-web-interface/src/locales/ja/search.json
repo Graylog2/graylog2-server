@@ -254,6 +254,7 @@
   },
   "field_charts_migration": {
     "title": "既存の検索ページのチャートを移行",
+    "found_charts_other": "以前のバージョンの検索用に作成された{{count}}件のチャートが見つかりました。これらのチャートを現在の検索に移行しますか？",
     "save_hint": "移行を実行して新しく作成されたチャートを保持する場合は、現在の検索を新しいダッシュボードとして保存する必要があります。保存しないと、検索ページを離れるときにチャートが失われます。",
     "migrate": "移行",
     "discard": "チャートを破棄"
@@ -337,6 +338,9 @@
   },
   "saved_searches": {
     "title": "保存済みの検索",
+    "confirm_bulk_delete_other": "{{count}}件の保存済みの検索を本当に削除しますか？",
+    "bulk_delete_partial_other": "選択した{{count}}件の保存済みの検索のうち、{{failed}}件を削除できませんでした。",
+    "bulk_delete_success_other": "{{count}}件の保存済みの検索が正常に削除されました。",
     "success": "成功",
     "bulk_delete_error": "保存済みの検索の削除中にエラーが発生しました。{{error}}",
     "confirm_delete": "保存済みの検索 \"{{title}}\" を削除しようとしています。よろしいですか？",
@@ -517,10 +521,34 @@
     "remove_from_table": "テーブルから削除",
     "add_to_all_tables": "すべてのテーブルに追加",
     "remove_from_all_tables": "すべてのテーブルから削除",
-    "change_field_type": "フィールドタイプを変更"
+    "change_field_type": "フィールドタイプを変更",
+    "copy_field_name": "フィールド名をクリップボードにコピー",
+    "add_to_favorites": "フィールドをお気に入りに追加",
+    "remove_from_favorites": "フィールドをお気に入りから削除"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "{{series}} を {{fields}} で集計しています",
+    "summary_only": "{{series}} を集計しています"
+  },
+  "widget_creators": {
+    "message_count": "メッセージ数",
+    "message_table": "メッセージテーブル",
+    "custom_aggregation": "カスタム集計",
+    "aggregation": "集計",
+    "events_overview": "イベントの概要",
+    "text_markdown": "テキスト/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "削除された入力",
+    "timestamp": "タイムスタンプ",
+    "not_stored": "保存されていません",
+    "not_stored_message": "メッセージは保存されていません",
+    "received_by": "受信元",
+    "stored_in_index": "保存先インデックス",
+    "routed_into_streams": "ルーティングされたストリーム"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearchは検索結果を{{limit}}件のメッセージに制限します。ページサイズが{{pageSize}}件のメッセージの場合、最初の{{validPages}}ページを使用できます。",
+    "confirm_delete_dashboard_page": "このダッシュボードページを本当に削除しますか？"
+  }
 }
