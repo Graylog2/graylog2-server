@@ -22,7 +22,17 @@
   "confirm_leave": {
     "question": "您確定嗎？"
   },
-  "duration": {},
+  "duration": {
+    "years_other": "{{count}} 年",
+    "months_other": "{{count}} 個月",
+    "days_other": "{{count}} 天",
+    "hours_other": "{{count}} 小時",
+    "minutes_other": "{{count}} 分鐘",
+    "seconds_other": "{{count}} 秒",
+    "milliseconds_other": "{{count}} 毫秒",
+    "nanoseconds_other": "{{count}} 奈秒",
+    "microseconds_other": "{{count}} 微秒"
+  },
   "bulk_actions": {
     "title": "批次操作",
     "cancel": "取消選取"
@@ -102,6 +112,7 @@
     "active_page": "目前頁面"
   },
   "page_size": {
+    "rows_other": "{{count}} 列",
     "configure": "設定每頁顯示筆數",
     "show": "顯示 <select/>"
   },
@@ -117,6 +128,7 @@
     "type_to_filter": "輸入以篩選"
   },
   "entity_table": {
+    "selected_items_other": "已選取 {{count}} 個項目",
     "columns": "欄位",
     "configure_columns": "設定可見欄位",
     "reset_columns": "重設所有欄位",
@@ -236,7 +248,10 @@
     "not_stored_in_index": "訊息未儲存",
     "routed_into_streams": "已路由至 Stream",
     "edit_favorite_fields": "編輯常用欄位",
+    "show_remaining_fields_other": "顯示其餘 {{count}} 個欄位",
+    "hide_remaining_fields_other": "隱藏其餘 {{count}} 個欄位",
     "favorite_fields_configuration": "常用欄位設定",
+    "favorite_fields_hint_other": "常用欄位會顯示在此訊息所屬的所有 Stream 中，包括此訊息被路由至的 Stream <streams/>。",
     "save_configuration": "儲存設定",
     "reset_to_default": "重設為預設值",
     "reset_to_default_title": "重設為預設欄位：{{fields}}",
@@ -540,9 +555,27 @@
     "system_info": "{{productName}} {{version}}，位於 {{hostname}}（{{jvmInfo}}）"
   },
   "notifications": {
-    "download_failed": "下載失敗，狀態為：{{error}}"
+    "download_failed": "下載失敗，狀態為：{{error}}",
+    "download_failed_title": "無法下載",
+    "export_failed": "匯出失敗",
+    "export_widget_failed": "Widget 匯出失敗",
+    "telemetry_update_failed": "更新失敗：{{error}}",
+    "telemetry_update_failed_title": "無法更新遙測設定。",
+    "delete_property_confirm": "您確定要刪除屬性「{{key}}」嗎？",
+    "quick_jump_failed": "擷取項目搜尋結果失敗，狀態為",
+    "quick_jump_failed_title": "無法擷取項目搜尋結果。"
   },
-  "use_favorite_item_mutation_notifications": {},
-  "use_entity_titles_notifications": {},
-  "use_search_version_check_notifications": {}
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "將項目新增至常用項目失敗，狀態為：{{error}}",
+    "put_failed_title": "無法將項目新增至常用項目",
+    "delete_failed": "從常用項目移除失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法從常用項目中移除"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "載入項目標題失敗，狀態為",
+    "load_failed_title": "無法載入項目標題"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "無法擷取覆寫資料"
+  }
 }
