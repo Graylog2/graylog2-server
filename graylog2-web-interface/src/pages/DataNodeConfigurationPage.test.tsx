@@ -532,6 +532,23 @@ describe('DataNodeConfigurationPage', () => {
       await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
     });
 
+    it('accepts watermarks with surrounding whitespace when saving another setting', async () => {
+      mockManagedConfigurationApi([
+        managedConfigurationResponse({
+          [lowWatermarkName]: ' 85% ',
+          'cluster.routing.allocation.disk.watermark.high': ' 90% ',
+          'cluster.routing.allocation.disk.watermark.flood_stage': ' 95% ',
+        }),
+      ]);
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      renderPage();
+
+      await changeConfigurationField('Shard limit per Data Node', '1200');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
+    });
+
     it('rejects a quantity without an amount against the pattern the API provides', async () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
       const error = 'Enter a value in a supported format.';

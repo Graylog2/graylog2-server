@@ -250,6 +250,13 @@ describe('DataNodePage configuration', () => {
       expect(update).toHaveBeenCalledWith({ node_roles: 'data,search,ingest' }, nodeId);
     });
 
+    it('shows a heap size with surrounding whitespace in its unit', async () => {
+      mockManagedConfigurationApi([managedConfigurationResponse({ opensearch_heap: ' 512m ' }, nodeId)]);
+      renderPage();
+
+      expect(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (MB)' })).toHaveValue(512);
+    });
+
     it('opens the category containing the first invalid field and focuses it on save', async () => {
       const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
       const update = jest.spyOn(managedConfigurationApi, 'update');

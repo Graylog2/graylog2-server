@@ -16,8 +16,9 @@
  */
 import type { ConfigurationUnits } from './types';
 
-export const parseQuantityValue = (value: string | undefined, units: ConfigurationUnits) => {
+export const parseQuantityValue = (rawValue: string | undefined, units: ConfigurationUnits) => {
   const suffixes = Object.keys(units);
+  const value = rawValue?.trim();
 
   if (value === undefined) return { amount: '', unit: suffixes[0] ?? '' };
 

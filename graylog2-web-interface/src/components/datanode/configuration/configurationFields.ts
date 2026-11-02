@@ -149,7 +149,7 @@ const parseWatermark = (value: string) => {
 const validateWatermarks = (values: Record<string, string>) => {
   if (watermarkNames.some((name) => values[name] === undefined)) return undefined;
 
-  const [low, high, flood] = watermarkNames.map((name) => parseWatermark(values[name]));
+  const [low, high, flood] = watermarkNames.map((name) => parseWatermark(values[name].trim()));
 
   if (low.kind !== high.kind || high.kind !== flood.kind) {
     return 'Use disk usage units for all three watermarks, or use free-space units for all three.';
