@@ -1,1 +1,275 @@
-{}
+{
+  "pages": {
+    "documentation_title": "Collectors 文件",
+    "deployment": {
+      "title": "部署 Collectors",
+      "description": "在任意數量的主機上執行此指令，它們會加入您選擇的 Fleet，並在回報時顯示。",
+      "deploy_tab": "部署",
+      "tokens_tab": "註冊權杖",
+      "tokens_description": "權杖授權新的 Collector 加入 Fleet。刪除權杖不會影響已註冊的 Collector。"
+    },
+    "fleets": {
+      "document_title": "Collector Fleet",
+      "title": "Fleet",
+      "description": "Fleet 是一組共用相同設定的 Collector。同一個 Fleet 中的所有 Collector 都從相同來源收集資料。可依環境、團隊或用途使用 Fleet 來組織 Collector。"
+    },
+    "fleet_detail": {
+      "title": "Fleet 詳細資訊"
+    },
+    "instances": {
+      "document_title": "Collector 執行個體",
+      "title": "執行個體",
+      "description": "Collector 執行個體代表遠端主機上正在執行的 Collector 程序。執行個體使用註冊權杖加入 Fleet，並自動接收其 Fleet 的來源設定。"
+    },
+    "onboarding": {
+      "title": "Collector 上線設定",
+      "description": "新連線 Collector 的狀態。",
+      "load_error": "無法載入 Collector 執行個體：{{error}}",
+      "not_found": "找不到 Collector 執行個體。它可能已被移除，請查看所有<instancesLink>執行個體</instancesLink>。"
+    },
+    "overview": {
+      "title": "Collectors 總覽",
+      "description": "Collector 是部署在您基礎架構中的輕量型服務，用於收集日誌並轉送至 {{productName}}。它們依 Fleet 組織，並透過定義收集內容的來源進行設定。"
+    },
+    "settings": {
+      "title": "Collectors 設定",
+      "description": "設定受管理 Collector 的端點與生命週期設定。Collector 會連線至這些端點以接收設定更新，並傳送收集到的日誌資料。"
+    }
+  },
+  "navigation": {
+    "overview": "總覽",
+    "fleets": "Fleet",
+    "instances": "執行個體",
+    "deployment": "部署",
+    "settings": "設定"
+  },
+  "activity": {
+    "deleted_target": "[已刪除]",
+    "by_actor": "由 {{name}}",
+    "by_system": "由系統",
+    "config_changed": {
+      "fleet": "已更新 Fleet <targetLink /> 的設定",
+      "collector": "已更新 Collector <targetLink /> 的設定"
+    },
+    "ingest_config_changed": {
+      "fleet": "已更新 Fleet <targetLink /> 的擷取設定",
+      "collector": "已更新 Collector <targetLink /> 的擷取設定"
+    },
+    "restart": {
+      "fleet": "已要求重新啟動 Fleet <targetLink />",
+      "collector": "已要求重新啟動 Collector <targetLink />"
+    },
+    "discovery_run": {
+      "fleet": "已為 Fleet <targetLink /> 觸發探索執行",
+      "collector": "已為 Collector <targetLink /> 觸發探索執行"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> 已重新指派"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> 已重新指派至 Fleet <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "此 Collector 將於下次回報時移至此 Fleet。",
+    "moving_from": "（從 {{fleet}} 移出）",
+    "moving_from_removed": "（從已移除的 Fleet 移出）",
+    "removed_title": "此 Fleet 已被刪除。",
+    "removed": "Fleet 已移除（{{fleetId}}）"
+  },
+  "sync_state": {
+    "pending_title": "同步待處理，變更將於 Collector 下次回報時套用",
+    "pending": "同步待處理",
+    "in_sync_title": "已同步，所有變更皆已套用",
+    "in_sync": "已同步"
+  },
+  "instance_status": {
+    "online": "上線",
+    "offline": "離線"
+  },
+  "os": {
+    "unknown": "未知"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "刪除註冊權杖",
+    "never": "永不",
+    "expired": "已過期",
+    "human_name": "註冊權杖",
+    "delete_title": "刪除註冊權杖",
+    "delete_confirm": "確定要刪除此註冊權杖嗎？新的 Collector 將無法使用此權杖註冊。已註冊的 Collector 將繼續正常運作。"
+  },
+  "deployment": {
+    "select_fleet_step": "選擇 Fleet",
+    "generate_token_step": "產生權杖",
+    "install_step": "安裝 Collector",
+    "open_in_search": "在搜尋中開啟",
+    "generate_token_first": "請先在上方產生權杖，以查看安裝指令。",
+    "copy_token_only": "僅複製權杖"
+  },
+  "enrolling_hosts": {
+    "receiving": "接收中",
+    "listening": "監聽中…",
+    "title": "註冊中的主機",
+    "listening_subtitle": "監聽中…",
+    "view_all": "在執行個體中檢視全部",
+    "host": "主機",
+    "status": "狀態",
+    "first_messages": "首批訊息",
+    "enrolled": "已註冊",
+    "actions": "操作",
+    "hide_setup": "隱藏設定",
+    "view_setup": "檢視設定",
+    "empty": "執行此指令的主機回報時會顯示在這裡。",
+    "connection_problem": "無法連線至伺服器，正在自動重試"
+  },
+  "token_step": {
+    "summary_expires": "已產生權杖 <emphasis>{{tokenName}}</emphasis>，將於 <expiresAt /> 過期",
+    "summary_expires_with_fleet": "已產生權杖 <emphasis>{{tokenName}}</emphasis>，將於 <expiresAt /> 過期，範圍限定為 Fleet <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "已產生權杖 <emphasis>{{tokenName}}</emphasis>，永不過期",
+    "summary_never_expires_with_fleet": "已產生權杖 <emphasis>{{tokenName}}</emphasis>，永不過期，範圍限定為 Fleet <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "變更權杖",
+    "short_lived": "短期權杖（1 天後過期）",
+    "custom": "自訂權杖",
+    "expiry_24_hours": "24 小時",
+    "expiry_7_days": "7 天",
+    "expiry_30_days": "30 天",
+    "expiry_never": "不過期",
+    "name": "名稱",
+    "name_placeholder": "例如：web-servers 部署",
+    "custom_hint": "自訂權杖會顯示在「註冊權杖」索引標籤中，並可隨時撤銷。",
+    "no_permission": "您沒有權限為此 Fleet 建立註冊權杖",
+    "generating": "產生中...",
+    "generate": "產生權杖",
+    "select_fleet_first": "請先在上方選擇 Fleet。"
+  },
+  "fleet_actions": {
+    "received_messages": "已接收訊息",
+    "delete": "刪除",
+    "delete_title": "刪除 Fleet",
+    "delete_confirm": "確定要刪除 Fleet <emphasis>{{fleetName}}</emphasis> 嗎？其來源設定與註冊權杖將一併移除。"
+  },
+  "fleet_form": {
+    "name_required": "必須填寫名稱"
+  },
+  "fleet_settings": {},
+  "fleets": {},
+  "fleet_detail": {},
+  "instance_actions": {},
+  "reassign_fleet": {},
+  "instance_health": {},
+  "instance_drawer": {},
+  "overview": {},
+  "fleet_card": {},
+  "fleet_cards": {},
+  "recent_activity": {},
+  "collector_facts": {},
+  "connection_success": {},
+  "fleet_choice": {},
+  "ingest_endpoint": {},
+  "install_command": {},
+  "log_preview": {},
+  "next_steps": {},
+  "timeline": {},
+  "platform_picker": {},
+  "source_status": {},
+  "waiting_for_connection": {},
+  "settings": {},
+  "ingest_inputs": {},
+  "port_mismatch": {},
+  "source_types": {},
+  "source_columns": {},
+  "source_form": {},
+  "load_errors": {
+    "recent_activity": {},
+    "input_ids": {},
+    "stats": {},
+    "config": {},
+    "enrollment_tokens": {},
+    "pending_changes": {},
+    "instances": {},
+    "collector_instances": {},
+    "fleets": {},
+    "fleet": {},
+    "fleet_stats": {},
+    "sources": {},
+    "input_details": {}
+  },
+  "mutation_errors": {
+    "create_fleet": {},
+    "update_fleet": {},
+    "delete_fleet": {},
+    "create_source": {},
+    "update_source": {},
+    "delete_source": {},
+    "create_enrollment_token": {},
+    "delete_enrollment_token": {},
+    "delete_enrollment_tokens": {},
+    "reassign_instances": {},
+    "delete_instance": {},
+    "save_config": {},
+    "create_input": {},
+    "update_input": {}
+  },
+  "notifications": {},
+  "datanode": {
+    "compatibility_check": {},
+    "migration_steps_text": {},
+    "migration_welcome": {},
+    "migration_wizard": {},
+    "compatibility_status": {},
+    "in_place_migration": {},
+    "migration_data_nodes": {},
+    "manual_migration": {},
+    "stop_processing": {},
+    "journal_size_warning": {},
+    "journal_downtime": {},
+    "in_place_welcome": {},
+    "restart_graylog": {},
+    "in_place_migration_info": {},
+    "certificates_provisioning": {},
+    "jwt_authentication": {},
+    "reset_migration": {},
+    "migration_actions": {},
+    "force_start": {},
+    "rolling_upgrade_nodes": {
+      "node_status": {},
+      "state": {}
+    },
+    "opensearch_upgrade_info": {},
+    "start_upgrade": {
+      "full": {},
+      "rolling": {}
+    },
+    "opensearch_upgrade": {},
+    "client_certificate": {},
+    "cluster_health": {
+      "shard_replication_help": {},
+      "state_help": {}
+    },
+    "upgrade_method": {},
+    "upgrade_status": {},
+    "upgrade_nodes": {},
+    "data_node_actions": {},
+    "data_node_badge": {},
+    "data_node_status": {},
+    "data_node_logs": {},
+    "cluster_management": {},
+    "ca_configuration": {},
+    "ca_upload": {},
+    "ca_create": {},
+    "renewal_policy": {
+      "modes": {}
+    },
+    "details_page": {},
+    "pages": {},
+    "upgrade_page": {},
+    "migration_steps": {},
+    "migration_states": {},
+    "certificate_renewal": {
+      "renew": {},
+      "provision": {}
+    }
+  },
+  "use_collector_configurations_notifications": {},
+  "use_collectors_notifications": {}
+}
