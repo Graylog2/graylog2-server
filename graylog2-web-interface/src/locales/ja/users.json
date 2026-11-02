@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "ユーザーの概要",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "登録済みのすべてのユーザーの概要です。"
+  },
+  "user_create": {
+    "title": "新規ユーザーの作成",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "このページで、Webインターフェースまたは REST API 用の新しいユーザーを作成できます。",
+    "submit_button": "ユーザーを作成",
+    "reader_role_description": "すべての{{productName}}ユーザーに基本的な権限を付与します（組み込み）",
+    "role_required": "<em>Reader</em>ロールまたは<em>Admin</em>ロールのうち、少なくとも1つを選択する必要があります。",
+    "failed_title": "ユーザーの作成に失敗しました",
+    "submit": "ユーザーを作成",
+    "submitting": "ユーザーを作成中..."
+  },
+  "user_edit": {
+    "title": "ユーザー {{username}} の編集",
+    "title_prefix": "ユーザーの編集",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "ここで、ユーザーの詳細情報とパスワードを変更したり、ロールとチームを割り当てたりできます。",
+    "segments": {
+      "profile": "プロフィール",
+      "preferences": "設定",
+      "teams_roles": "チームとロール",
+      "shared_entities": "共有項目"
+    },
+    "password": {
+      "new_password": "新しいパスワード",
+      "repeat_password": "パスワード（確認）",
+      "old_password": "現在のパスワード",
+      "alert_title": "パスワードの変更",
+      "alert_text": "パスワードを変更すると、ユーザーはログアウトされ、現在のすべてのセッションが無効になります。ご自身のパスワードを変更する場合は、保存後すぐにログアウトされます。その場合は、先に未保存の変更を保存してください。",
+      "change": "パスワードを変更"
+    },
+    "profile": {
+      "email": "メールアドレス",
+      "full_name": "氏名",
+      "update": "プロフィールを更新"
+    },
+    "profile_info": {
+      "title": "名と姓",
+      "text": "{{productName}} 4.1 より、名と姓を個別に入力するフィールドが追加されました。プロフィールを保存する前に、これらを入力する必要があります。"
+    },
+    "read_only": "選択されたユーザー {{fullName}} は編集できません。",
+    "roles_required": "ロールには、少なくとも Admin ロールまたは Reader ロールを含める必要があります。",
+    "external": {
+      "title": "外部ユーザー",
+      "text": "このユーザーは外部サーバーから同期されたため、プロフィールもパスワードも変更できません。詳細は管理者にお問い合わせください。"
+    },
+    "preferences": {
+      "language_help": "{{productName}} インターフェースの言語です。ベータ版と表示されている翻訳は、まだレビューされていません。",
+      "enable_autocompletion": "自動補完を有効にする",
+      "search_sidebar": "検索サイドバー",
+      "dashboard_sidebar": "ダッシュボードサイドバー",
+      "is_pinned": "ピン留め済み",
+      "search_sidebar_help": "検索サイドバーのピンアイコンからも変更できます",
+      "dashboard_sidebar_help": "ダッシュボードサイドバーのピンアイコンからも変更できます",
+      "theme_mode_help": "ユーザーのドロップダウンにあるトグルで変更できます",
+      "update": "設定を更新"
+    },
+    "settings": {
+      "select_entity": "項目を選択してください。",
+      "update": "設定を更新"
+    }
+  },
+  "roles_overview": {
+    "title": "ロールの概要",
+    "documentation_link_title": "権限のドキュメント",
+    "button_text": "ロールの概要",
+    "description": "{{productName}} で利用可能なすべてのロールの概要です。ロールを使うと、ダッシュボードやイベント定義の作成などの機能をユーザーに付与できます。",
+    "alert_title": "権限の付与",
+    "alert_body_prefix": "組み込みロールを使うと、ダッシュボードの作成やアーカイブカタログの表示などの機能をユーザーに付与できます。ただし、特定のダッシュボードやストリームに対する権限は付与されません。また、独自のロールを作成することもできません。特定の項目に対する権限は、その項目の",
+    "share_text": "共有",
+    "alert_body_suffix": " ボタンで付与できます。このボタンは、たとえば項目の一覧ページにあります。複数のユーザーに同時に項目の権限を付与したい場合は、チームを使用できます。詳細は",
+    "documentation_text": "ドキュメント"
+  },
+  "role_details": {
+    "title": "ロールの詳細 {{name}}",
+    "title_prefix": "ロールの詳細",
+    "documentation_link_title": "権限のドキュメント",
+    "button_text": "ロールの概要",
+    "description": "名前、説明、割り当てられたユーザーなどの詳細の概要です。"
+  },
+  "role_edit": {
+    "title": "ロール {{name}} の編集",
+    "title_prefix": "ロールの編集",
+    "documentation_link_title": "権限のドキュメント",
+    "button_text": "ロールの概要",
+    "description": "このロールをユーザーに割り当てることができます。"
+  },
+  "user_tokens_edit": {
+    "title": "ユーザー {{username}} のトークンの編集",
+    "title_prefix": "ユーザーのトークンの編集",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "新しいトークンを作成したり、古いトークンを削除したりできます。"
+  },
+  "token_management": {
+    "title": "トークン管理",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "{{productName}} で設定されているアクセストークンの概要です。"
+  },
+  "token_list": {
+    "title": "トークンの作成と編集",
+    "token_created": "トークン {{name}} が作成されました！",
+    "token_created_description": "これが新しいトークンです。今すぐコピーしてください。再度表示することはできません。",
+    "done_button": "完了",
+    "title_list": "トークン",
+    "filter_label": "フィルター",
+    "no_tokens_to_display": "表示するトークンはありません。",
+    "no_tokens_match_filter": "フィルターに一致するトークンはありません。",
+    "column_name": "トークン名",
+    "column_created": "作成日時",
+    "column_last_access": "最終アクセス",
+    "column_expires_at": "有効期限",
+    "column_actions": "アクション",
+    "never_used": "未使用"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "ユーザー",
+      "team": "チーム",
+      "global": "全員",
+      "error": "エラー"
+    },
+    "dependencies_warning": {
+      "title": "現在の共同編集者のセットに、不足している依存関係があります",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> には次へのアクセス権が必要です",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "所有者:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "共同編集者を追加",
+      "search_placeholder": "ユーザーとチームを検索",
+      "collaborators": "共同編集者",
+      "direct_collaborators": "直接の共同編集者",
+      "shared_via_collections": "コレクション経由で共有"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
