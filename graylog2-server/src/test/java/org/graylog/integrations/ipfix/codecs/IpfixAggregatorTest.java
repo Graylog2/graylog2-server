@@ -19,11 +19,13 @@ package org.graylog.integrations.ipfix.codecs;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
 import org.graylog.integrations.ipfix.InformationElementDefinitions;
+import org.graylog.integrations.ipfix.IpfixJournal;
 import org.graylog.integrations.ipfix.IpfixMessage;
 import org.graylog.integrations.ipfix.IpfixParser;
 import org.graylog.integrations.ipfix.Utils;
@@ -57,6 +59,10 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class IpfixAggregatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregatorTest.class);
+    private static final int TEMPLATE_SET_ID = 2;
+    private static final int OPTIONS_TEMPLATE_SET_ID = 3;
+    private static final int DATA_TEMPLATE_ID = 258;
+    private static final int OPTIONS_TEMPLATE_ID = 300;
     private final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("192.168.1.1", 999);
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -218,6 +224,80 @@ public class IpfixAggregatorTest {
             fail("Cannot process PCAP stream");
         }
         assertThat(messages).hasSize(2);
+    }
+
+    @Test
+    public void decodesDataSetsOfPacketsThatAlsoContainOptionsDataSets() throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final byte[] templateRecord = new byte[]{
+                0x01, 0x02, 0x00, 0x02, // template id 258, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+        final byte[] optionsTemplateRecord = new byte[]{
+                0x01, 0x2c, 0x00, 0x02, 0x00, 0x01, // template id 300, 2 fields, 1 scope field
+                0x00, (byte) 0x90, 0x00, 0x04, // exportingProcessId (scope)
+                0x00, 0x28, 0x00, 0x08 // exportedOctetTotalCount
+        };
+        final byte[] dataRecord = new byte[]{10, 0, 0, 1, 6};
+        final byte[] optionsDataRecord = new byte[]{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0x10, 0};
+
+        // template, data, options template and options data in the same packet
+        assertDataSetIsDecoded(ipfixAggregator, codec, ipfixMessage(
+                set(TEMPLATE_SET_ID, templateRecord),
+                set(DATA_TEMPLATE_ID, dataRecord),
+                set(OPTIONS_TEMPLATE_SET_ID, optionsTemplateRecord),
+                set(OPTIONS_TEMPLATE_ID, optionsDataRecord)));
+
+        // options data and data only, both templates are known from the previous packet
+        assertDataSetIsDecoded(ipfixAggregator, codec, ipfixMessage(
+                set(OPTIONS_TEMPLATE_ID, optionsDataRecord),
+                set(DATA_TEMPLATE_ID, dataRecord)));
+
+        // options data only: there is nothing to decode
+        final CodecAggregator.Result optionsOnlyResult = ipfixAggregator.addChunk(ipfixMessage(set(OPTIONS_TEMPLATE_ID, optionsDataRecord)), someAddress);
+        assertThat(optionsOnlyResult.isValid()).isTrue();
+        assertThat(optionsOnlyResult.getMessage()).isNull();
+    }
+
+    private void assertDataSetIsDecoded(IpfixAggregator ipfixAggregator, IpfixCodec codec, ByteBuf packet) throws IOException {
+        final CodecAggregator.Result result = ipfixAggregator.addChunk(packet, someAddress);
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getMessage()).as("aggregated message").isNotNull();
+
+        final byte[] bytes = ByteBufUtil.getBytes(result.getMessage());
+        assertThat(IpfixJournal.RawIpfix.parseFrom(bytes).getDataSetsList())
+                .extracting(IpfixJournal.DataSet::getTemplateId)
+                .containsExactly(DATA_TEMPLATE_ID);
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(bytes));
+        assertThat(messages).singleElement().satisfies(message -> {
+            assertThat(message.getField("sourceIPv4Address")).isEqualTo("10.0.0.1");
+            assertThat(message.getField("protocolIdentifier")).isEqualTo(6L);
+        });
+    }
+
+    private static ByteBuf set(int setId, byte[] content) {
+        final ByteBuf set = Unpooled.buffer();
+        set.writeShort(setId);
+        set.writeShort(4 + content.length);
+        set.writeBytes(content);
+        return set;
+    }
+
+    private static ByteBuf ipfixMessage(ByteBuf... sets) {
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(10); // IPFIX version
+        packet.writeShort(0); // message length, set below
+        packet.writeInt(1700000000); // export time
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // observation domain id
+        for (ByteBuf set : sets) {
+            packet.writeBytes(set);
+        }
+        packet.setShort(2, packet.readableBytes());
+        return packet;
     }
 
     private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {
