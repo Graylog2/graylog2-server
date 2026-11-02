@@ -117,6 +117,8 @@
     "auto_refresh_options": "Opções de intervalo de atualização automática",
     "auto_refresh_options_help": "Configure as opções disponíveis para o seletor de intervalo de <strong>atualização automática</strong> como <strong>duração ISO8601</strong>",
     "auto_refresh_options_title": "Opções de intervalo de atualização automática",
+    "cancel_after_seconds_one": "{{count}} segundo",
+    "cancel_after_seconds_other": "{{count}} segundos",
     "cancellation_timeout": "Tempo limite de cancelamento",
     "cancellation_timeout_description": "O tempo, em segundos por widget, após o qual a execução da pesquisa será cancelada automaticamente. Isso reduz a quantidade de pesquisas executadas e melhora o desempenho.",
     "default_auto_refresh_interval": "Intervalo padrão de atualização automática",
@@ -139,7 +141,8 @@
     "surrounding_time_range_options": "Opções de intervalo de tempo de contexto",
     "time_range_presets": "Predefinições de intervalo de tempo de pesquisa",
     "title": "Configuração de Pesquisa",
-    "update_title": "Atualizar Configuração de Pesquisa"
+    "update_title": "Atualizar Configuração de Pesquisa",
+    "cancel_after_seconds_many": "{{count}} segundos"
   },
   "shared": {
     "disabled": "desabilitado",
@@ -231,7 +234,20 @@
     "description": "A página de boas-vindas pode mostrar widgets com contagens de mensagens, alertas e eventos, além de um gráfico com as principais fontes. Em clusters grandes ou muito movimentados, essas consultas geram carga extra sempre que um usuário abre a página de boas-vindas. Desabilite-as abaixo se quiser evitar essa carga. Os widgets serão ocultados e suas consultas não serão executadas.",
     "enable_metrics": "Habilitar métricas da página de boas-vindas",
     "enable_metrics_help": "Se desabilitado, os widgets de contagem de mensagens, alertas e eventos e o gráfico das principais fontes serão ocultados da página de boas-vindas, e suas consultas subjacentes não serão executadas. Desative esta opção em clusters grandes ou muito movimentados para reduzir a carga de consultas.",
-    "metrics": "Métricas da página de boas-vindas"
+    "metrics": "Métricas da página de boas-vindas",
+    "title": "Página de Boas-vindas",
+    "update_title": "Atualizar Configuração da Página de Boas-vindas"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "Configuração padrão dos índices atualizada com sucesso",
+    "index_defaults_failed_title": "Falha ao atualizar a configuração padrão dos índices",
+    "update_success": "Configuração atualizada com sucesso",
+    "search_update_failed": "Falha ao atualizar a configuração de pesquisa: {{error}}",
+    "search_update_failed_title": "Não foi possível atualizar a configuração de pesquisa: {{configType}}",
+    "allowlist_update_success": "Configuração da lista de permissão de URLs atualizada com sucesso",
+    "allowlist_update_failed": "Falha ao atualizar a configuração da lista de permissão de URLs: {{error}}",
+    "allowlist_update_failed_title": "Não foi possível atualizar a lista de permissão de URLs: {{configType}}",
+    "processors_update_failed": "Falha ao atualizar a configuração dos processadores de mensagens: {{error}}",
+    "processors_update_failed_title": "Não foi possível atualizar a configuração: {{configType}}"
+  }
 }
