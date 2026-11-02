@@ -22,8 +22,9 @@ import { StreamRules } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
+import type { StubResponse } from 'util/UtilityTypes';
 
-type UpdateStreamRuleResponse = Awaited<ReturnType<typeof StreamRules.update>>;
+type UpdateStreamRuleResponse = StubResponse<typeof StreamRules.update>;
 
 jest.mock('@graylog/server-api', () => ({
   StreamRules: {

@@ -79,7 +79,7 @@ export interface PublicNotificationsHooks {
 export interface EmailTemplateHooks {
   useEmailTemplate: () => {
     templateConfig: EmailTemplateConfig;
-    onUpdateEmailTemplates: (config: EmailTemplateConfig) => Promise<void>;
+    onUpdateEmailTemplates: (config: EmailTemplateConfig) => Promise<unknown>;
   };
 }
 

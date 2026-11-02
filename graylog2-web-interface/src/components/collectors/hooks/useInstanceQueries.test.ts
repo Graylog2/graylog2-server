@@ -21,6 +21,7 @@ import { Collectors } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { StubResponse } from 'util/UtilityTypes';
 
 import { fetchPaginatedInstances, useInstance } from './useInstanceQueries';
 
@@ -47,7 +48,7 @@ const dto = (instanceUid: string) => ({
 });
 
 const asInstanceResponse = (instanceUid: string) =>
-  dto(instanceUid) as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>;
+  dto(instanceUid) as unknown as StubResponse<typeof Collectors.getInstance>;
 
 describe('useInstance', () => {
   beforeEach(() => {
@@ -101,7 +102,7 @@ describe('useInstance', () => {
     asMock(Collectors.getInstance).mockResolvedValue({
       ...dto('uid-42'),
       health,
-    } as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>);
+    } as unknown as StubResponse<typeof Collectors.getInstance>);
 
     const { result } = renderHook(() => useInstance('uid-42'));
 
@@ -135,7 +136,7 @@ describe('useInstance', () => {
     asMock(Collectors.getInstance).mockResolvedValue({
       ...dto('uid-42'),
       status: 'offline',
-    } as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>);
+    } as unknown as StubResponse<typeof Collectors.getInstance>);
 
     // Past the fallback heartbeat cadence used until the collectors config has loaded. Wrapped in
     // `act` because the refetch it triggers re-renders the hook outside React's own scheduling.
@@ -166,7 +167,7 @@ describe('fetchPaginatedInstances session extension', () => {
       elements: [],
       pagination: { total: 0, page: 1, per_page: 50, count: 0 },
       attributes: [],
-    } as unknown as Awaited<ReturnType<typeof Collectors.findInstances>>);
+    } as unknown as StubResponse<typeof Collectors.findInstances>);
   });
 
   it('extends the session for user interactions but not for background refreshes', async () => {

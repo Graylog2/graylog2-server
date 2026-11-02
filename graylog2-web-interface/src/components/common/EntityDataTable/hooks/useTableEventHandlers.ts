@@ -33,7 +33,7 @@ const useTableEventHandlers = ({
   paginationQueryParameter: PaginationQueryParameterResult;
   setQuery: (query: string) => void;
   appSection: string;
-  resetTableLayout: () => Promise<void>;
+  resetTableLayout: () => Promise<unknown>;
 }) => {
   const sendTelemetry = useSendTelemetry(appSection);
 

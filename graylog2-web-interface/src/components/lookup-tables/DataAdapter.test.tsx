@@ -105,6 +105,7 @@ describe('DataAdapter', () => {
         pwdLastSet: BigInt('134185088795495957'),
         displayName: 'Test User',
       },
+      string_list_value: [],
       has_error: false,
       ttl: 1000,
     };

@@ -59,7 +59,7 @@ describe('fetchClusterDataNodesWithMetrics', () => {
         createDataNode({ hostname: 'compatible-node', version_compatible: true }),
         createDataNode({ hostname: 'incompatible-node', version_compatible: false }),
       ],
-      pagination: { total: 2, count: 2, page: 1, per_page: 0, query: null },
+      pagination: { total: 2, count: 2, page: 1, per_page: 0 },
       attributes: [],
     });
     asMock(fetch).mockResolvedValue({ metrics: [] });

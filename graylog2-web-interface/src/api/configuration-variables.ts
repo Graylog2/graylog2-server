@@ -18,11 +18,7 @@ import merge from 'lodash/merge';
 
 import { SidecarConfigurationVariables } from '@graylog/server-api';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-
-const SOURCE_URL = '/sidecar/configuration_variables';
 
 export const fetchAllConfigurationVariables = () => {
   const promise = SidecarConfigurationVariables.listConfigurationVariables();
@@ -90,16 +86,19 @@ export const deleteConfigurationVariable = (configurationVariable: { id: string;
   return promise;
 };
 
-export const validateConfigurationVariable = (configurationVariable: { name?: string; [key: string]: unknown }) => {
-  const payload: Record<string, unknown> = {
-    id: ' ',
-    name: ' ',
-    content: ' ',
-  };
+export const validateConfigurationVariable = (
+  configurationVariable: Parameters<typeof SidecarConfigurationVariables.validateConfigurationVariable>[0],
+) => {
+  const payload = merge(
+    {
+      id: ' ',
+      name: ' ',
+      content: ' ',
+    },
+    configurationVariable,
+  );
 
-  merge(payload, configurationVariable);
-
-  const promise = fetch('POST', qualifyUrl(`${SOURCE_URL}/validate`), payload);
+  const promise = SidecarConfigurationVariables.validateConfigurationVariable(payload);
 
   promise.catch((error: { message?: string }) => {
     UserNotification.error(

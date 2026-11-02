@@ -17,36 +17,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import mapValues from 'lodash/mapValues';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import type {
-  RemoveFieldTypeBody,
-  RemoveFieldTypeBodyJson,
-  IndexSetFieldType,
-  IndexSetFieldTypeJson,
-} from 'components/indices/IndexSetFieldTypes/types';
+import type { RemoveFieldTypeBody, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 
-export const urlPrefix = '/system/indices/mappings/remove_mapping';
-
-const putFieldType = async ({ indexSets, fields, rotated }: RemoveFieldTypeBody) => {
-  const url = qualifyUrl(urlPrefix);
-  const body: RemoveFieldTypeBodyJson = {
+const putFieldType = async ({ indexSets, fields, rotated }: RemoveFieldTypeBody) =>
+  SystemFieldTypes.removeCustomMapping({
     index_sets: indexSets,
     fields,
     rotate: rotated,
-  };
-
-  return fetch('PUT', url, body);
-};
-
-type IndexSetResponseJSON = {
-  successfully_performed: number;
-  failures: Array<{ entity_id: string; failure_explanation: string }>;
-  errors: Array<string>;
-  succeeded: Array<IndexSetFieldTypeJson>;
-};
-type RemovalResponseJSON = Record<string, IndexSetResponseJSON>;
+  });
 
 export type IndexSetResponse = {
   indexSetId: string;
@@ -73,7 +54,7 @@ const useRemoveCustomFieldTypeMutation = (params: {
       );
     },
 
-    onSuccess: (response: RemovalResponseJSON) => {
+    onSuccess: (response) => {
       let errorsQuantity: number = 0;
       const mappedResponse: RemovalResponse = mapValues(
         response,

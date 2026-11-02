@@ -48,7 +48,7 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
 
 describe('IndexSetFieldTypesList', () => {
-  const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve());
+  const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve({}));
 
   useViewsPlugin();
 

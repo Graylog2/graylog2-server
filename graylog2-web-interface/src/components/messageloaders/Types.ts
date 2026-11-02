@@ -27,7 +27,7 @@ export interface Input extends InputBase {
   name: string;
   created_at: string;
   creator_user_id: string;
-  content_pack?: boolean;
+  content_pack?: string;
   static_fields: { [field: string]: any };
   attributes: {
     [type: string]: any;

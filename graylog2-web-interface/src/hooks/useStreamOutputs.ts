@@ -17,20 +17,15 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { StreamOutputs } from '@graylog/server-api';
+
 import type { Output } from 'hooks/useOutputs';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = (streamId: string) => [...KEY_PREFIX, streamId];
 
-export const fetchStreamOutputs = (streamId: string) => {
-  const url = qualifyUrl(ApiRoutes.StreamOutputsApiController.index(streamId).url);
-
-  return fetch('GET', url);
-};
+export const fetchStreamOutputs = (streamId: string) => StreamOutputs.get(streamId);
 
 type Options = {
   enabled: boolean;
