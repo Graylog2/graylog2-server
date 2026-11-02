@@ -1,1 +1,5 @@
-{}
+{
+  "title": "Gestión de certificados",
+  "documentation_title": "Documentación de Data Nodes",
+  "description": "<0 /> Data Nodes ofrece una mejor integración con <0 /> y simplifica las actualizaciones futuras. Permite indexar y buscar en todos los mensajes de tu base de datos de mensajes de <0 />."
+}
