@@ -24,7 +24,9 @@
     "aria_label": "選取要排序的欄位"
   },
   "fields_configuration": {
-    "add_field": "新增欄位"
+    "add_field": "新增欄位",
+    "hide_selected_other": "隱藏 {{count}} 個已選取的欄位",
+    "show_selected_other": "顯示 {{count}} 個已選取的欄位"
   },
   "move_widget": {
     "no_pages": "找不到頁面",
@@ -137,16 +139,84 @@
     "select_direction": "選取方向",
     "type": "類型",
     "add_column": "新增欄位",
-    "configure_filter": "設定新篩選器"
+    "configure_filter": "設定新篩選器",
+    "edit_filter": "編輯 {{column}} 篩選器",
+    "delete_filter": "刪除 {{column}} 篩選器"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "單一日期",
+    "range": "範圍",
+    "select_single_date": "選取單一日期類型",
+    "select_range": "選取範圍類型",
+    "date_range": "{{from}} 至 {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "操作",
+    "loading": "載入中",
+    "decorated": "（已套用裝飾器）",
+    "stopped_node": "已停止的節點",
+    "cluster_node": "叢集節點 {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "建立新的 {{name}}",
+      "select_decorator": "選取裝飾器",
+      "none_configured": "尚未設定任何裝飾器。",
+      "actions": "操作",
+      "edit": "編輯",
+      "edit_named": "編輯 {{name}}",
+      "unknown_type": "未知的裝飾器類型",
+      "create": "建立",
+      "update": "更新",
+      "help_title": "什麼是訊息裝飾器？",
+      "help_description": "裝飾器可即時修改搜尋結果中顯示的訊息。這些變更不會被儲存，僅會顯示在搜尋結果中。裝飾器設定會<strong>依串流</strong>儲存。",
+      "help_order": "拖放即可調整裝飾器的處理順序。",
+      "help_docs": "在<docsLink>說明文件</docsLink>中閱讀更多關於訊息裝飾器的資訊。"
+    },
+    "show_message_in_new_row": "在新列中顯示訊息"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "間隔",
+    "display_name": "資料表格",
+    "pinned_columns_title": "固定欄位",
+    "show_row_numbers_title": "顯示列號"
+  },
+  "field_types": {
+    "missing_event_definition": "缺少事件定義：{{id}}"
+  },
+  "export": {
+    "title_search": "匯出所有搜尋結果",
+    "title_dashboard": "匯出訊息表格搜尋結果",
+    "select_different_table": "選取其他訊息表格",
+    "downloading": "下載中...",
+    "start_download": "開始下載",
+    "settings_based_on": "以下設定基於訊息表格：{{title}}",
+    "exporting_table": "您目前正在匯出訊息表格的搜尋結果：{{title}}",
+    "define_fields": "定義要匯出至檔案的欄位。",
+    "decorated_fields_hint": "匯出功能支援由訊息表格中的裝飾器建立的欄位，但這些欄位目前不會出現在欄位清單中。若要匯出已套用裝飾器的欄位，只需輸入其名稱即可。",
+    "finish_hint": "完成設定後，請點擊<quote>開始下載</quote>。",
+    "fields_to_export": "要匯出的欄位",
+    "messages_limit": "訊息數量上限",
+    "limit_help": "訊息會分批載入。若設定了上限，則會擷取所有批次，直到達到上限的那一批為止。因此，實際傳送的訊息總數可能會超過設定的上限。",
+    "search_contains_all": "匯出內容將包含目前搜尋的所有訊息。",
+    "search_select_table": "請選取訊息表格以沿用其欄位。您可以在下一步調整所有設定。",
+    "dashboard_select_table": "請選取要匯出搜尋結果的訊息表格。您可以在下一步調整其欄位。",
+    "dashboard_equals_action": "選取訊息表格等同於使用訊息表格操作選單中的「匯出為 CSV」選項。",
+    "select_message_table": "選取訊息表格",
+    "no_message_table": "您需要建立訊息表格 Widget 才能匯出其結果。",
+    "output_format": "輸出格式",
+    "untitled_view": "未命名的{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "訊息清單",
+    "results": "結果",
+    "events": "事件",
+    "text_markdown": "文字/Markdown"
+  },
+  "comma_separated_values_csv": "逗號分隔值 (CSV)",
+  "error_widget": {
+    "title": "擷取此 Widget 的資料時發生以下錯誤："
+  },
+  "notifications": {
+    "delete_decorator_confirm": "您確定要刪除此裝飾器嗎？",
+    "unsaved_changes_confirm": "設定表單中有未儲存的變更。此操作將會捨棄這些變更。"
+  }
 }
