@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "Panoramica utenti",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica di tutti gli utenti registrati."
+  },
+  "user_create": {
+    "title": "Crea nuovo utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Usa questa pagina per creare nuovi utenti per l'interfaccia web o l'API REST.",
+    "submit_button": "Crea utente",
+    "reader_role_description": "Concede i permessi di base per ogni utente {{productName}} (integrato)",
+    "role_required": "Devi selezionare almeno uno dei ruoli <em>Reader</em> o <em>Admin</em>.",
+    "failed_title": "Creazione dell'utente non riuscita",
+    "submit": "Crea utente",
+    "submitting": "Creazione utente..."
+  },
+  "user_edit": {
+    "title": "Modifica utente {{username}}",
+    "title_prefix": "Modifica utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Qui puoi modificare i dettagli e la password dell'utente e assegnare ruoli e team.",
+    "segments": {
+      "profile": "Profilo",
+      "preferences": "Preferenze",
+      "teams_roles": "Team e ruoli",
+      "shared_entities": "Elementi condivisi"
+    },
+    "password": {
+      "new_password": "Nuova password",
+      "repeat_password": "Ripeti password",
+      "old_password": "Vecchia password",
+      "alert_title": "Modifica della password",
+      "alert_text": "Modificando la password l'utente verrà disconnesso e tutte le sue sessioni attive saranno invalidate. Se modifichi la tua password, verrai disconnesso subito dopo il salvataggio. In tal caso, assicurati di salvare prima eventuali modifiche in sospeso.",
+      "change": "Modifica password"
+    },
+    "profile": {
+      "email": "Email",
+      "full_name": "Nome completo",
+      "update": "Aggiorna profilo"
+    },
+    "profile_info": {
+      "title": "Nome e cognome",
+      "text": "Con {{productName}} 4.1 abbiamo aggiunto campi separati per nome e cognome. Devono essere compilati prima che il profilo dell'utente possa essere salvato."
+    },
+    "read_only": "L'utente selezionato {{fullName}} non può essere modificato.",
+    "roles_required": "I ruoli devono includere almeno il ruolo Admin o Reader.",
+    "external": {
+      "title": "Utente esterno",
+      "text": "Questo utente è stato sincronizzato da un server esterno, pertanto né il profilo né la password possono essere modificati. Contatta il tuo amministratore per maggiori informazioni."
+    },
+    "preferences": {
+      "language_help": "Lingua dell'interfaccia {{productName}}. Le traduzioni contrassegnate come Beta non sono ancora state verificate.",
+      "enable_autocompletion": "Abilita completamento automatico",
+      "search_sidebar": "Barra laterale di ricerca",
+      "dashboard_sidebar": "Barra laterale della dashboard",
+      "is_pinned": "Fissata",
+      "search_sidebar_help": "Può essere modificata anche usando l'icona di fissaggio della barra laterale di ricerca",
+      "dashboard_sidebar_help": "Può essere modificata anche usando l'icona di fissaggio della barra laterale della dashboard",
+      "theme_mode_help": "Può essere modificata usando l'interruttore nel menu utente",
+      "update": "Aggiorna preferenze"
+    },
+    "settings": {
+      "select_entity": "Seleziona un elemento.",
+      "update": "Aggiorna impostazioni"
+    }
+  },
+  "roles_overview": {
+    "title": "Panoramica dei ruoli",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Panoramica di tutti i ruoli disponibili in {{productName}}. I ruoli consentono di concedere agli utenti funzionalità, come creare dashboard o definizioni di evento.",
+    "alert_title": "Concessione di permessi",
+    "alert_body_prefix": "I ruoli integrati consentono di concedere agli utenti funzionalità, come creare dashboard o visualizzare il catalogo degli archivi. Non concedono però permessi per una specifica dashboard o stream. Inoltre non è possibile creare un ruolo personalizzato. La concessione di permessi per un elemento specifico può essere effettuata usando il pulsante ",
+    "share_text": "Condividi",
+    "alert_body_suffix": ". Puoi trovare il pulsante, ad esempio, nella pagina di panoramica degli elementi. Se vuoi concedere permessi per un elemento a più utenti contemporaneamente, puoi usare i team. Maggiori informazioni nella ",
+    "documentation_text": "documentazione"
+  },
+  "role_details": {
+    "title": "Dettagli del ruolo {{name}}",
+    "title_prefix": "Dettagli del ruolo",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Panoramica di dettagli come nome, descrizione e utenti assegnati."
+  },
+  "role_edit": {
+    "title": "Modifica ruolo {{name}}",
+    "title_prefix": "Modifica ruolo",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Puoi assegnare il ruolo agli utenti."
+  },
+  "user_tokens_edit": {
+    "title": "Modifica token dell'utente {{username}}",
+    "title_prefix": "Modifica token dell'utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Puoi creare nuovi token o eliminare quelli esistenti."
+  },
+  "token_management": {
+    "title": "Gestione dei token",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica dei token di accesso configurati per {{productName}}."
+  },
+  "token_list": {
+    "title": "Crea e modifica token",
+    "token_created": "Token {{name}} creato!",
+    "token_created_description": "Questo è il tuo nuovo token. Assicurati di copiarlo ora: non potrai più vederlo.",
+    "done_button": "Fatto",
+    "title_list": "Token",
+    "filter_label": "Filtro",
+    "no_tokens_to_display": "Nessun token da visualizzare.",
+    "no_tokens_match_filter": "Nessun token corrisponde al filtro.",
+    "column_name": "Nome token",
+    "column_created": "Creato",
+    "column_last_access": "Ultimo accesso",
+    "column_expires_at": "Scade il",
+    "column_actions": "Azioni",
+    "never_used": "Mai utilizzato"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "Utente",
+      "team": "Team",
+      "global": "Tutti",
+      "error": "Errore"
+    },
+    "dependencies_warning": {
+      "title": "Mancano dipendenze per l'insieme attuale di collaboratori",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> necessita di accesso a",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Proprietari:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Aggiungi collaboratore",
+      "search_placeholder": "Cerca utenti e team",
+      "collaborators": "Collaboratori",
+      "direct_collaborators": "Collaboratori diretti",
+      "shared_via_collections": "Condivisi tramite raccolte"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
