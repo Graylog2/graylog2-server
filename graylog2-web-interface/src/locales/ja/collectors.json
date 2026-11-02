@@ -49,14 +49,19 @@
     "by_system": "システムによる",
     "config_changed": {
       "fleet": "フリート <targetLink /> の設定が更新されました",
-      "collector": "Collector <targetLink /> の設定が更新されました"
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの設定が更新されました",
+      "collector": "Collector <targetLink /> の設定が更新されました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の設定が更新されました"
     },
     "ingest_config_changed": {
       "fleet": "フリート <targetLink /> の取り込み設定が更新されました",
-      "collector": "Collector <targetLink /> の取り込み設定が更新されました"
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの取り込み設定が更新されました",
+      "collector": "Collector <targetLink /> の取り込み設定が更新されました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の取り込み設定が更新されました"
     },
     "restart": {
       "fleet": "フリート <targetLink /> の再起動が要求されました",
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの再起動が要求されました",
       "collector": "Collector <targetLink /> の再起動が要求されました"
     },
     "discovery_run": {
@@ -955,17 +960,120 @@
       }
     },
     "details_page": {
-      "certificate_valid_until": "証明書の有効期限："
+      "certificate_valid_until": "証明書の有効期限：",
+      "configuration_warnings": "設定の警告",
+      "datanode_version": "Datanode バージョン：",
+      "details": "詳細：",
+      "error": "エラー: {{message}}",
+      "hostname": "ホスト名：",
+      "not_available": "該当なし",
+      "status": "ステータス：",
+      "title": "Data Node: {{hostname}}",
+      "transport_address": "トランスポートアドレス："
     },
-    "pages": {},
-    "upgrade_page": {},
-    "migration_steps": {},
-    "migration_states": {},
+    "pages": {
+      "description": "{{productName}} Data Node は、{{productName}} とのより優れた統合を提供し、今後のアップデートを簡素化します。{{productName}} のメッセージデータベース内のすべてのメッセージを、インデックス作成と検索できるようになります。",
+      "upgrade_title": "Data Node のアップグレード",
+      "cluster_management_title": "Data Node ダッシュボード",
+      "certificate_management_title": "証明書の管理",
+      "migration_title": "Data Node の移行",
+      "documentation_title": "Data Node ドキュメント"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Data Node を手動でアップグレードするには、<docsLink>ドキュメント</docsLink>の手順に従ってください。",
+      "manual_upgrade_title": "Data Node の手動アップグレード",
+      "select_strategy": "アップグレード戦略を選択",
+      "upgrade_data_node": "Data Node をアップグレード",
+      "manual_upgrade_of_node": "システム上で <bold>{{node}}</bold> の手動アップグレードが完了したら、再接続されて <bold>アップグレード済みのノード</bold>パネルに表示されるまで待ち、<confirmButton><bold>アップグレードを確定</bold></confirmButton>をクリックして次のノードに進んでください。",
+      "manual_upgrade_of_data_node": "システム上で Data Node の手動アップグレードが完了したら、再接続されて <bold>アップグレード済みのノード</bold>パネルに表示されるまで待ち、<confirmButton><bold>アップグレードを確定</bold></confirmButton>をクリックして次のノードに進んでください。"
+    },
+    "migration_steps": {
+      "ca_configuration": "証明機関を設定",
+      "renewal_policy_configuration": "更新ポリシーを設定",
+      "compatibility_check": "Data Node との OpenSearch の互換性を確認",
+      "manual_migration_step": "移行の手順。",
+      "migration_finished": "移行が完了しました"
+    },
+    "migration_states": {
+      "new": "移行",
+      "migration_welcome_page": "ようこそ",
+      "ca_creation_page": "証明機関",
+      "renewal_policy_creation_page": "証明書の更新ポリシー",
+      "migration_selection_page": "移行の手順",
+      "rolling_upgrade_migration_welcome_page": "インプレース移行へようこそ",
+      "ask_to_shutdown_old_cluster": "古いクラスターを停止",
+      "manually_remove_old_connection_string_from_config": "接続文字列を削除",
+      "message_processing_stop": "メッセージの処理を停止",
+      "replace_cluster": "既存のクラスターを置き換え",
+      "restart_graylog": "設定ファイルを更新して {{productName}} を再起動",
+      "directory_compatibility_check_page": "ディレクトリの互換性チェック",
+      "provision_rolling_upgrade_nodes_with_certificates": "証明書のプロビジョニングの概要",
+      "provision_rolling_upgrade_nodes_running": "Data Node の証明書をプロビジョニングします。",
+      "journal_size_downtime_warning": "ジャーナルサイズとダウンタイムの警告",
+      "failed": "移行に失敗しました",
+      "finished": "移行が完了しました"
+    },
     "certificate_renewal": {
-      "renew": {},
-      "provision": {}
+      "loading_failed": "Data Node の読み込みに失敗しました。ステータス",
+      "loading_failed_title": "Data Node を読み込めませんでした",
+      "renew": {
+        "button": "証明書を更新",
+        "button_loading": "証明書を更新中",
+        "success": "証明書を更新しました",
+        "failed": "証明書の更新に失敗しました。エラー: {{error}}"
+      },
+      "provision": {
+        "button": "証明書をプロビジョニング",
+        "button_loading": "証明書をプロビジョニング中...",
+        "success": "証明書をプロビジョニングしました",
+        "failed": "証明書のプロビジョニングに失敗しました。エラー: {{error}}"
+      },
+      "title": "証明書の更新とプロビジョニング",
+      "description": "ここでは、{{productName}} Data Node の証明書の更新またはプロビジョニングを手動で開始できます。手動でのプロビジョニングが必要になるのは、更新ポリシーのモードが「Manual」に設定されていて、最初の証明書のプロビジョニング後に Data Node が起動された場合のみです。",
+      "transport_address": "トランスポートアドレス",
+      "hostname": "ホスト名",
+      "valid_until": "{{relativeTime}} まで有効",
+      "no_data_nodes": "Data Node が見つかりませんでした。"
     }
   },
-  "use_collector_configurations_notifications": {},
-  "use_collectors_notifications": {}
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Collector の設定の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "設定を取得できませんでした",
+    "fetch_configuration_failed": "設定の取得に失敗しました。ステータス: {{error}}",
+    "configuration_not_found": "ID <{{configurationId}}> の設定が見つかりません。削除されていないかご確認ください。",
+    "fetch_configuration_failed_title": "設定を取得できませんでした",
+    "preview_failed": "設定のプレビューの取得に失敗しました。ステータス: {{error}}",
+    "preview_failed_title": "プレビューを取得できませんでした",
+    "created_success": "設定を作成しました",
+    "create_failed": "設定の作成に失敗しました。ステータス: {{error}}",
+    "create_failed_title": "設定を保存できませんでした",
+    "updated_success": "設定を更新しました",
+    "update_failed": "設定の更新に失敗しました: {{error}}",
+    "update_failed_title": "設定 {{name}} を更新できませんでした",
+    "copied_success": "設定 \"{{name}}\" をコピーしました",
+    "copy_failed": "設定 \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
+    "copy_failed_title": "設定を保存できませんでした",
+    "deleted_success": "設定 \"{{name}}\" を削除しました",
+    "delete_failed": "設定の削除に失敗しました: {{error}}",
+    "delete_failed_title": "設定 {{name}} を削除できませんでした",
+    "validate_failed": "設定 \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
+    "validate_failed_title": "設定を検証できませんでした"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Collectors の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "Collectors を取得できませんでした",
+    "not_found": "ID <{{collectorId}}> の Collector が見つかりません。削除されていないかご確認ください。",
+    "fetch_collector_failed": "Collector の取得に失敗しました。ステータス: {{error}}",
+    "fetch_collector_failed_title": "Collector を取得できませんでした",
+    "created_success": "Collector を作成しました",
+    "updated_success": "Collector を更新しました",
+    "deleted_success": "Collector \"{{name}}\" を削除しました",
+    "delete_failed": "Collector の削除に失敗しました: {{error}}",
+    "delete_failed_title": "Collector \"{{name}}\" を削除できませんでした",
+    "copied_success": "Collector \"{{name}}\" をコピーしました",
+    "copy_failed": "Collector \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
+    "copy_failed_title": "Collector を保存できませんでした",
+    "validate_failed": "Collector \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
+    "validate_failed_title": "Collector を検証できませんでした"
+  }
 }
