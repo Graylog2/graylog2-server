@@ -62,17 +62,22 @@
     "restart": {
       "fleet": "已要求重新啟動 Fleet <targetLink />",
       "fleet_with_others_other": "已要求重新啟動 Fleet <targetLink /> 及其他 {{count}} 個 Fleet",
-      "collector": "已要求重新啟動 Collector <targetLink />"
+      "collector": "已要求重新啟動 Collector <targetLink />",
+      "collector_with_others_other": "已要求重新啟動 Collector <targetLink /> 及其他 {{count}} 個 Collector"
     },
     "discovery_run": {
       "fleet": "已為 Fleet <targetLink /> 觸發探索執行",
-      "collector": "已為 Collector <targetLink /> 觸發探索執行"
+      "fleet_with_others_other": "已為 Fleet <targetLink /> 及其他 {{count}} 個 Fleet 觸發探索執行",
+      "collector": "已為 Collector <targetLink /> 觸發探索執行",
+      "collector_with_others_other": "已為 Collector <targetLink /> 及其他 {{count}} 個 Collector 觸發探索執行"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> 已重新指派"
+      "collector": "Collector <targetLink /> 已重新指派",
+      "collector_with_others_other": "Collector <targetLink /> 及其他 {{count}} 個 Collector 已重新指派"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> 已重新指派至 Fleet <destinationLink />"
+      "collector": "Collector <targetLink /> 已重新指派至 Fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> 及其他 {{count}} 個 Collector 已重新指派至 Fleet <destinationLink />"
     }
   },
   "fleet_reference": {
@@ -97,6 +102,7 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "刪除註冊權杖",
+    "bulk_delete_confirm_other": "確定要刪除 {{count}} 個註冊權杖嗎？新的 Collector 將無法使用已刪除的權杖註冊。",
     "never": "永不",
     "expired": "已過期",
     "human_name": "註冊權杖",
@@ -115,6 +121,7 @@
     "receiving": "接收中",
     "listening": "監聽中…",
     "title": "註冊中的主機",
+    "connected_other": "{{count}} 個已連線 · 持續監聽中…",
     "listening_subtitle": "監聽中…",
     "view_all": "在執行個體中檢視全部",
     "host": "主機",
@@ -150,6 +157,7 @@
   "fleet_actions": {
     "received_messages": "已接收訊息",
     "delete": "刪除",
+    "delete_blocked_other": "此 Fleet 有 {{count}} 個已指派的執行個體。請先重新指派或刪除這些執行個體，再刪除 Fleet。",
     "delete_title": "刪除 Fleet",
     "delete_confirm": "確定要刪除 Fleet <emphasis>{{fleetName}}</emphasis> 嗎？其來源設定與註冊權杖將一併移除。"
   },
@@ -211,8 +219,11 @@
   },
   "reassign_fleet": {
     "fleet_required": "必須選擇 Fleet",
+    "title_other": "將 {{count}} 個執行個體重新指派至 Fleet",
+    "no_other_fleet_other": "沒有其他可指派這些 Collector 的 Fleet。",
     "no_permission": "您沒有權限將 Collector 指派至其他任何 Fleet。",
     "select_placeholder": "選擇 Fleet...",
+    "submit_other": "重新指派執行個體",
     "submitting": "重新指派中..."
   },
   "instance_health": {
@@ -240,12 +251,14 @@
     "logs": "日誌：",
     "messages": "訊息：",
     "attributes": "屬性",
+    "active_sources_other": "使用中的來源（{{count}}）",
     "sources_inherited": "來源繼承自此執行個體所屬 Fleet 的設定。",
     "no_sources": "此 Fleet 尚未設定來源。請在 Fleet 詳細資訊頁面新增來源以開始收集資料。",
     "synchronization": "同步",
     "pending_load_error": "無法載入待處理的變更，請稍後再試。",
     "queued_actions": "以下操作將排入佇列，直到 Collector 完成同步：",
     "hide_transactions": "隱藏佇列中的交易",
+    "show_transactions_other": "顯示佇列中的交易（{{count}}）",
     "changes_queued": "變更已排入佇列，將於 Collector 下次回報時套用。",
     "all_applied": "Collector 已套用所有佇列中的操作。"
   },
@@ -266,7 +279,11 @@
     "healthy": "此 Fleet 中的所有執行個體皆已上線",
     "degraded": "此 Fleet 中有部分執行個體已離線",
     "down": "此 Fleet 中的所有執行個體皆已離線",
-    "empty": "尚無 Collector 執行個體註冊至此 Fleet"
+    "empty": "尚無 Collector 執行個體註冊至此 Fleet",
+    "instances_other": "執行個體",
+    "online_other": "● {{count}} 個上線",
+    "offline_other": "● {{count}} 個離線",
+    "sources_other": "{{count}} 個來源"
   },
   "fleet_cards": {
     "empty_title": "尚無 Fleet",
@@ -287,6 +304,7 @@
     "fleet": "Fleet",
     "enrolled": "註冊時間",
     "last_seen": "最後上線時間",
+    "show_attributes_other": "顯示全部 {{count}} 個屬性",
     "hide_attributes": "隱藏屬性"
   },
   "connection_success": {
@@ -360,18 +378,21 @@
     "connection_lost": "連線中斷",
     "last_heartbeat": "最後心跳時間 <lastSeen />",
     "first_messages": "首批訊息",
+    "receiving_other": "接收中 - 自 {{duration}} 前起已接收 {{count}} 則訊息",
     "listening": "等待中...通常不到一分鐘",
     "enrolled": "已註冊",
     "enrolled_detail": "已使用註冊權杖登錄 - <enrolledAt />",
     "connected": "已連線",
     "connected_detail": "已收到心跳 - <lastSeen />",
-    "sources_configured": "來源已設定"
+    "sources_configured": "來源已設定",
+    "sources_detail_other": "來自 Fleet <fleetLink>{{fleetName}}</fleetLink> 的 {{count}} 個來源"
   },
   "platform_picker": {
     "title": "開始使用 Collector",
     "description": "在您的基礎架構中部署輕量型 Collector，將日誌轉送至 {{productName}}。"
   },
   "source_status": {
+    "messages_other": "{{formattedCount}} 則訊息",
     "disabled": "已停用",
     "not_applicable": "不適用於 {{os}}",
     "unrecognised": "無法辨識的來源類型",
@@ -405,14 +426,18 @@
   "ingest_inputs": {
     "title": "擷取輸入",
     "none": "不存在 Collector 擷取輸入。在建立輸入之前，Collector 將無法傳送資料。",
+    "unreadable_other": "存在 {{count}} 個 Collector 擷取輸入，但您沒有檢視權限。",
     "none_running": "已存在 Collector 擷取輸入，但目前沒有任何輸入在執行。Collector 將無法傳送資料。",
     "name": "名稱",
     "status": "狀態",
     "bind_address": "繫結位址",
     "port": "連接埠",
-    "manage": "管理"
+    "manage": "管理",
+    "additional_unreadable_other": "另有 {{count}} 個輸入因權限不足而無法檢視。"
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_other": "Collector 擷取輸入位於不同的連接埠：{{ports}}。若外部連接埠與輸入連接埠不同，請確認您的網路正確路由流量。"
+  },
   "source_types": {
     "file": "檔案",
     "journald": "Journald",
@@ -625,7 +650,9 @@
       "datanode_opensearch_version": "Data Node 的 OpenSearch 版本",
       "index_version": "索引版本",
       "indices": "索引",
+      "node_title_other": "節點：{{hostname}}，版本：{{version}}，{{count}} 個索引",
       "opensearch_data_location": "OpenSearch 資料位置",
+      "shard_count_other": "{{count}} 個分片",
       "shards": "分片"
     },
     "in_place_migration": {
@@ -634,6 +661,7 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "憑證有效期限至",
+      "found_other": "找到的 Data Node：{{count}}",
       "hostname": "主機名稱",
       "incompatible": "有 Data Node 正在執行與您目前的 {{productName}} 版本不相容的版本。請確保 {{productName}} 與 Data Node 使用相同版本。",
       "incompatible_title": "發現不相容的 Data Node",
@@ -773,7 +801,9 @@
         "journal": "OpenSearch 停止期間，新進的訊息會在每個 {{productName}} 節點的磁碟日誌佇列（journal）中累積。若停機時間超過日誌佇列的大小或存留時間上限，擷取將會停滯，訊息可能會遺失。僅在日誌佇列有足夠餘裕可容納預期停機時間時才繼續。",
         "submitting": "重新啟動中...",
         "title": "要重新啟動 Data Node 的 OpenSearch 嗎？",
-        "tolerate_downtime": "僅在您可以承受停機時間的情況下繼續。"
+        "tolerate_downtime": "僅在您可以承受停機時間的情況下繼續。",
+        "restart_together_with_versions_other": "Data Node 少於 3 個時，OpenSearch 無法透過逐一重新啟動節點來維持可用。所有 Data Node 將一起重新啟動，以將 OpenSearch 從 <strong>{{currentVersion}}</strong> 升級至 <strong>{{targetVersion}}</strong>，因此在完成之前儲存後端將<strong>無法使用</strong>，搜尋與索引都會中斷。",
+        "restart_together_other": "Data Node 少於 3 個時，OpenSearch 無法透過逐一重新啟動節點來維持可用。所有 Data Node 將一起重新啟動，以將 OpenSearch 升級至目標版本，因此在完成之前儲存後端將<strong>無法使用</strong>，搜尋與索引都會中斷。"
       },
       "no_rollback": "一旦開始，就無法回復至先前的版本。",
       "rolling": {
@@ -782,7 +812,9 @@
         "healthy_cluster": "繼續之前，請確認叢集狀態正常（綠色）。",
         "shard_allocation": "每次重新啟動期間會暫停分片配置，因此叢集保持可用，但在節點離開與重新加入時，索引與搜尋可能會短暫降級。",
         "title": "要開始 OpenSearch 滾動升級嗎？",
-        "wait_for_green": "每個節點完成後，升級程序都會等待叢集恢復為綠色才繼續。若等待時間過長，程序將暫停並等待您繼續。"
+        "wait_for_green": "每個節點完成後，升級程序都會等待叢集恢復為綠色才繼續。若等待時間過長，程序將暫停並等待您繼續。",
+        "each_node_with_versions_other": "您的 {{count}} 個 Data Node 將逐一升級並重新啟動，以將其內嵌的 OpenSearch 從 <strong>{{currentVersion}}</strong> 升級至 <strong>{{targetVersion}}</strong>。",
+        "each_node_other": "您的 {{count}} 個 Data Node 將逐一升級並重新啟動，以將其內嵌的 OpenSearch 升級至目標版本。"
       },
       "starting": "啟動中..."
     },
@@ -806,6 +838,7 @@
       "start_upgrade_and_restart": "開始 OpenSearch 升級並重新啟動",
       "starting_rolling_upgrade": "正在開始 OpenSearch 滾動升級...",
       "title": "升級 Data Node 內嵌的 OpenSearch",
+      "unconfirmed_other": "有 {{count}} 個 Data Node 無法使用時，無法檢查不相容的索引與升級狀態，待所有 Data Node 恢復可用後會再次顯示。",
       "upgrade_process": "升級程序",
       "use_table": "請使用下方的表格，在繼續之前重新建立系統索引，並封存或刪除資料索引。"
     },
@@ -869,6 +902,7 @@
       "checking": "正在檢查 OpenSearch 狀態...",
       "error": "無法檢查 Data Node 內嵌的 OpenSearch 版本。",
       "outdated": "Data Node 內嵌的 OpenSearch 不是最新版本。",
+      "unconfirmed_other": "有 {{count}} 個 Data Node 無法使用時，無法確認 Data Node 內嵌 OpenSearch 的狀態。",
       "up_to_date": "Data Node 內嵌的 OpenSearch 已是最新版本。",
       "up_to_date_with_version": "Data Node 內嵌的 OpenSearch 已是最新版本<bold>（{{version}}）。</bold>",
       "upgrading": "OpenSearch 滾動升級進行中。"
