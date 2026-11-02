@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash on event definition and event pages for event definitions with an unknown priority."
+
+pulls = ["27933"]

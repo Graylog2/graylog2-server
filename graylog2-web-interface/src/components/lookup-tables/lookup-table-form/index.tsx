@@ -34,29 +34,22 @@ import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
 
-export type LookupTableType = LookupTable & {
-  enable_single_value: boolean;
-  enable_multi_value: boolean;
-};
-
-export const INIT_TABLE_VALUES: LookupTableType = {
+export const INIT_TABLE_VALUES: LookupTable = {
   id: undefined,
   title: '',
   description: '',
   name: '',
   cache_id: undefined,
   data_adapter_id: undefined,
-  enable_single_value: false,
   default_single_value: '',
   default_single_value_type: 'NULL',
-  enable_multi_value: false,
   default_multi_value: '',
   default_multi_value_type: 'NULL',
   content_pack: null,
 };
 
-const validations = (values: LookupTableType) => {
-  const errors: FormikErrors<LookupTableType> = {};
+const validations = (values: LookupTable) => {
+  const errors: FormikErrors<LookupTable> = {};
 
   if (!values.title) errors.title = 'Title is required';
   if (!values.name) errors.name = 'Name is required';
@@ -82,11 +75,12 @@ function LookupTableWizard() {
     setActiveStep(newStepKey);
   };
 
-  const handleSubmit = async (values: LookupTableType) => {
-    const payload = { ...values };
-
-    delete payload.enable_multi_value;
-    delete payload.enable_single_value;
+  const handleSubmit = async (values: LookupTable) => {
+    const payload = {
+      ...values,
+      default_single_value: values.default_single_value?.trim(),
+      default_multi_value: values.default_multi_value?.trim(),
+    };
 
     const promise = isCreate ? createLookupTable(payload) : updateLookupTable(payload);
 

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -30,6 +31,9 @@ import { useFetchCache, useFetchDataAdapter } from 'components/lookup-tables/hoo
 import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+
+import useDefaultValueValidation from './use-default-value-validation';
+import type { DefaultValueErrors as DefaultValueErrorsType } from './use-default-value-validation';
 
 const StyledContainer = styled(Row)`
   max-width: 1500px;
@@ -60,7 +64,27 @@ const MuttedText = styled.span`
   width: 50px;
 `;
 
-function TableSummary({ table }: { table: LookupTable }) {
+function DefaultValueErrors({ errors }: { errors: DefaultValueErrorsType }) {
+  const invalidDefaults = [
+    ['Default single value', errors.default_single_value],
+    ['Default multi value', errors.default_multi_value],
+  ].filter(([, error]) => !!error);
+
+  if (invalidDefaults.length === 0) return null;
+
+  return (
+    <Alert style={{ width: '100%' }} bsStyle="danger" title="Invalid default values">
+      {invalidDefaults.map(([label, error]) => (
+        <div key={label}>
+          {label}: {error}
+        </div>
+      ))}
+      <div>Fix them on the Lookup Table step.</div>
+    </Alert>
+  );
+}
+
+function TableSummary({ table, errors }: { table: LookupTable; errors: DefaultValueErrorsType }) {
   return (
     <Col $gap="lg">
       <Col $gap="sm">
@@ -75,6 +99,7 @@ function TableSummary({ table }: { table: LookupTable }) {
         </Row>
       </Col>
       <LookupTableDetails table={table} />
+      <DefaultValueErrors errors={errors} />
       {table.id && (
         <>
           <PurgeCache table={table} />
@@ -109,8 +134,15 @@ function AdapterSummary({ adapter }: { adapter: LookupTableAdapter }) {
 
 function SummaryStep() {
   const { values } = useFormikContext<LookupTable>();
+  const { defaultValueErrors, validateDefaultValues } = useDefaultValueValidation();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
+
+  // Catches defaults the user never blurred, e.g. after leaving the step with an invalid value.
+  useEffect(() => {
+    validateDefaultValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ErrorsProvider>
@@ -120,7 +152,7 @@ function SummaryStep() {
         adapterNames={dataAdapter?.name ? [dataAdapter.name] : undefined}
       />
       <StyledContainer $gap="xl">
-        <TableSummary table={values} />
+        <TableSummary table={values} errors={defaultValueErrors} />
         <Col $gap="lg">
           {loadingCache ? (
             <Spinner text="Loading cache..." />
