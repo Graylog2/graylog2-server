@@ -240,32 +240,155 @@
       "invalid_date_format": "格式必須為：{{format}}。",
       "range_limit": "範圍超出限制時長。",
       "date_limit": "日期超出限制時長。",
-      "until_before_from": "「至」日期必須晚於「從」日期。"
+      "until_before_from": "「至」日期必須晚於「從」日期。",
+      "empty": "不能為空。",
+      "keyword_empty": "關鍵字不能為空！",
+      "keyword_unparsable": "無法解析關鍵字"
     },
-    "view_type": {}
+    "remove_from_favorites": "從我的最愛移除",
+    "add_to_favorites": "加入我的最愛",
+    "view_type": {
+      "search": "搜尋",
+      "dashboard": "Dashboard"
+    }
   },
-  "field_charts_migration": {},
-  "query": {},
-  "widget_query": {},
-  "editable_title": {},
-  "message_permalink": {},
-  "query_title": {},
-  "missing_requirements": {},
-  "view_header": {},
-  "execution": {},
-  "dashboards_page": {},
-  "search_filter_banner": {},
-  "widget_time_range": {},
-  "time_range_presets": {},
-  "move_range": {},
-  "query_validation": {},
-  "saved_searches": {},
-  "search_meta": {},
-  "save_view_notifications": {},
-  "sidebar_layout": {},
-  "search_result_overview": {},
-  "fields_overview": {},
-  "highlighting_color": {},
+  "field_charts_migration": {
+    "title": "遷移現有搜尋頁面的圖表",
+    "save_hint": "完成遷移並想保留新建立的圖表時，必須將目前的搜尋另存為新 Dashboard。否則離開搜尋頁面時，圖表將會遺失。",
+    "migrate": "遷移",
+    "discard": "捨棄圖表"
+  },
+  "query": {
+    "contained_in_enterprise": "（包含於 <enterpriseLink>Graylog Enterprise</enterpriseLink>）",
+    "documentation_hint": "您也可以參閱<docsLink>說明文件</docsLink>，進一步了解如何建立 Widget。"
+  },
+  "widget_query": {
+    "reset_global_filter": "重設全域篩選器"
+  },
+  "editable_title": {
+    "edit": "編輯標題",
+    "hint": "{{value}} - 連按兩下標題即可編輯。"
+  },
+  "message_permalink": {
+    "label": "永久連結"
+  },
+  "query_title": {
+    "page_actions": "頁面動作",
+    "edit_title": "編輯標題",
+    "duplicate": "複製",
+    "copy_to_dashboard": "複製到 Dashboard",
+    "edit_modal_title": "編輯 Dashboard 頁面標題",
+    "update_title": "更新標題",
+    "title_help": "請輸入有意義的 Dashboard 頁面標題，最多 40 個字元。",
+    "title": "標題"
+  },
+  "missing_requirements": {
+    "description_search": "很抱歉，無法執行此搜尋。它使用了下列無法使用的功能：",
+    "description_dashboard": "很抱歉，無法執行此 Dashboard。它使用了下列無法使用的功能：",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - 包含於 <pluginLink>{{plugin}}</pluginLink>",
+    "back": "返回"
+  },
+  "view_header": {
+    "alerts_and_events": "警示與事件",
+    "event_definitions": "事件定義",
+    "edit_search_metadata": "編輯搜尋 {{title}} 的中繼資料",
+    "edit_dashboard_metadata": "編輯 Dashboard {{title}} 的中繼資料",
+    "editing_search": "編輯已儲存的搜尋",
+    "editing_dashboard": "編輯已儲存的 Dashboard",
+    "save_search": "儲存搜尋",
+    "save_dashboard": "儲存 Dashboard"
+  },
+  "execution": {
+    "not_executed": "尚未執行任何查詢。"
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard 說明文件",
+    "description": "使用 Dashboard 建立訊息的特定檢視。在此建立新的 Dashboard，並可一鍵新增您在應用程式其他部分建立的任何圖表或統計圖。"
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>搜尋篩選器</italic>包含各自的查詢，並使用 <bold>AND</bold> 運算子擴充主要查詢。",
+    "explanation_saved": "篩選器可以單獨儲存，並在已儲存的搜尋與 Dashboard 中重複使用。更新已儲存的篩選器，會自動影響包含該篩選器之搜尋的結果。"
+  },
+  "widget_time_range": {
+    "reset_global_override": "重設全域覆寫"
+  },
+  "time_range_presets": {
+    "select_time_range": "選取時間範圍",
+    "open_preset_select": "開啟時間範圍預設集選取器"
+  },
+  "move_range": {
+    "show_previous": "顯示前一段",
+    "show_previous_duration": "顯示前一個 {{duration}}",
+    "show_next": "顯示下一段",
+    "show_next_duration": "顯示下一個 {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "切換驗證警告",
+    "toggle_information": "切換驗證資訊",
+    "toggle_error": "切換驗證錯誤說明",
+    "syntax_documentation": "搜尋查詢語法說明文件",
+    "error_documentation": "查詢錯誤說明文件",
+    "status_warning": "警告",
+    "status_info": "資訊",
+    "status_error": "錯誤",
+    "validation_failed": "驗證搜尋查詢失敗，狀態：{{error}}",
+    "warm_tier_title": "Warm Tier 搜尋",
+    "warm_tier_message": "所選時間範圍包含儲存於 Warm Tier 的資料，擷取速度可能較慢。早於下列時間戳記的資料，在該 Stream 中屬於 Warm Tier："
+  },
+  "saved_searches": {
+    "title": "已儲存的搜尋",
+    "success": "成功",
+    "bulk_delete_error": "刪除已儲存的搜尋時發生錯誤。{{error}}",
+    "confirm_delete": "您即將刪除已儲存的搜尋：「{{title}}」。確定要繼續嗎？",
+    "delete_search": "刪除搜尋 {{title}}",
+    "delete": "刪除"
+  },
+  "search_meta": {
+    "buttons": "搜尋中繼資料按鈕"
+  },
+  "save_view_notifications": {
+    "success_title": "成功！",
+    "error_title": "錯誤！",
+    "plugin_initial_values_failed": "從外掛程式收集搜尋列初始表單值時發生錯誤",
+    "plugin_validation_preparation_failed": "為外掛程式準備搜尋列驗證時發生錯誤",
+    "plugin_validation_failed": "驗證外掛程式的搜尋列值時發生錯誤",
+    "plugin_submit_failed": "執行外掛程式的提交處理常式時發生錯誤：{{error}}",
+    "load_saved_searches_failed": "載入已儲存的搜尋失敗，狀態為",
+    "could_not_load_saved_searches": "無法載入已儲存的搜尋",
+    "load_minimum_refresh_interval_failed": "載入系統設定「minimum_auto_refresh_interval」失敗，狀態為",
+    "could_not_load_configuration": "無法載入設定選項"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "以覆蓋層顯示側邊欄",
+    "display_inline": "以內嵌方式顯示側邊欄"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}} 毫秒，執行時間點為 <timestamp/>",
+    "effective_from": "有效時間範圍起始於",
+    "effective_to": "有效時間範圍結束於"
+  },
+  "fields_overview": {
+    "filter_placeholder": "篩選欄位",
+    "reset": "重設",
+    "list_fields": "列出 <current>目前查詢</current>、<all>所有</all>或<allReserved>包含保留欄位在內的所有</allReserved>欄位。",
+    "current_title": "此處顯示目前查詢中出現的欄位。",
+    "all_title": "此處顯示所有欄位，但不含保留欄位（gl2_*）。",
+    "all_reserved_title": "此處顯示所有欄位，包含保留欄位（gl2_*）。",
+    "no_field_information": "沒有可用的欄位資訊。",
+    "no_fields": "沒有可顯示的欄位。請嘗試變更篩選詞彙，或在上方選取其他欄位集。"
+  },
+  "highlighting_color": {
+    "color": "顏色",
+    "gradient_name": "漸層名稱",
+    "gradient_placeholder": "選取漸層顏色",
+    "lowest_placeholder": "指定最低值",
+    "lowest_label": "最低值",
+    "lowest_help": "欄位／序列中預期的最低值。",
+    "highest_aria": "指定最高值",
+    "highest_label": "最高值",
+    "highest_help": "欄位／序列中預期的最高值。",
+    "coloring": "著色"
+  },
   "highlighting_rule": {},
   "change_field_type": {},
   "value_actions": {},
