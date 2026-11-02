@@ -1,1 +1,129 @@
-{}
+{
+  "navigation": {
+    "initial_setup": "Configuration initiale de {{productName}}",
+    "get_help": "Obtenir de l'aide",
+    "documentation": "Documentation",
+    "changelogs": "Journal des modifications",
+    "operations_changelogs": "Journal des modifications des opérations",
+    "support": "Support"
+  },
+  "setup": {
+    "welcome": "Bienvenue !",
+    "first_start": "Il semble que vous démarriez {{productName}} pour la première fois et que vous n'ayez pas encore configuré de data node.",
+    "data_nodes_allow": "Les data nodes vous permettent d'indexer et de rechercher tous les messages de votre base de données de messages {{productName}}.",
+    "data_node_setup": "Vous pouvez soit mettre en place un <dataNodeLink>data node {{productName}}</dataNodeLink> (recommandé), soit configurer manuellement un nœud <openSearchLink>OpenSearch</openSearchLink>. Pour la configuration manuelle d'OpenSearch, vous devez adapter la configuration de {{productName}} et redémarrer le serveur {{productName}}. Après le redémarrage, cette page ne s'affichera plus.",
+    "data_nodes_title": "Data Nodes {{productName}}"
+  },
+  "data_nodes": {
+    "description": "Les data nodes {{productName}} offrent une meilleure intégration avec {{productName}} et simplifient les futures mises à jour. Une fois qu'un data node {{productName}} est en cours d'exécution et que l'autorité de certification est configurée, vous pouvez reprendre le démarrage.",
+    "registered": "Voici les data nodes actuellement enregistrés. La liste est mise à jour en permanence.",
+    "transport_address": "Adresse de transport",
+    "hostname": "Nom d'hôte",
+    "separator": " – ",
+    "none_found": "Aucun data node n'a été trouvé."
+  },
+  "waiting_for_startup": {
+    "title": "Configuration réussie",
+    "description": "Le serveur {{productName}} est en cours de démarrage. Selon votre configuration, cela peut prendre quelques minutes. Cette page se rafraîchira automatiquement dès que le serveur {{productName}} sera accessible. Vous pouvez toujours actualiser la page manuellement ; elle ne sera plus visible ensuite.",
+    "spinner": "En attente du serveur {{productName}} ..."
+  },
+  "error_boundary": {
+    "title": "Une erreur s'est produite",
+    "description": "Une erreur inconnue s'est produite. Veuillez consulter le message suivant et le journal du serveur {{productName}} pour plus d'informations."
+  },
+  "resume_startup": {
+    "button": "Reprendre le démarrage",
+    "confirm": "Êtes-vous sûr de vouloir reprendre le démarrage sans data node {{productName}} en cours d'exécution ? La configuration reviendra alors à une instance Opensearch sur localhost:9200.",
+    "error": "La reprise du démarrage a échoué avec l'erreur : {{error}}",
+    "error_title": "Impossible de reprendre le démarrage"
+  },
+  "restart_configuration": {
+    "confirm": "Êtes-vous sûr de vouloir redémarrer la configuration ? Toutes les modifications précédentes seront supprimées.",
+    "restart": "redémarrer",
+    "restarting": "redémarrage..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "Vous pouvez toujours <restartButton>redémarrer</restartButton> la configuration",
+    "fetch_error": "Une erreur s'est produite lors de la récupération de {{entityName}} : {{message}}"
+  },
+  "entities": {
+    "data_nodes": "data nodes",
+    "certificate_authority": "autorité de certification",
+    "renewal_policy": "politique de renouvellement"
+  },
+  "steps": {
+    "ca_configuration": "Configurer une autorité de certification",
+    "renewal_policy_configuration": "Configurer une politique de renouvellement",
+    "certificate_provisioning": "Provisionner les certificats de vos data nodes",
+    "configuration_finished": "Configuration terminée"
+  },
+  "ca_configuration": {
+    "title": "Configurer l'autorité de certification",
+    "explanation_upload_or_create": "Dans cette première étape, vous pouvez soit importer, soit créer une nouvelle autorité de certification.",
+    "explanation_provisioning": "Grâce à elle, nous pouvons facilement provisionner vos data nodes avec des certificats.",
+    "create_tab": "Créer une nouvelle CA",
+    "upload_tab": "Importer une CA"
+  },
+  "ca_create": {
+    "description": "Vous pouvez ici créer rapidement une nouvelle autorité de certification. Il vous suffit de cliquer sur le bouton “Créer CA”. Cette CA ne doit servir qu'à sécuriser vos data nodes {{productName}}.",
+    "organization_name": "Nom de l'organisation",
+    "creating": "Création de la CA...",
+    "create": "Créer la CA",
+    "success": "CA créée avec succès",
+    "error": "Échec de la création de la CA avec l'erreur : {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Vous pouvez ici importer votre CA existante. Vous devez importer un seul fichier contenant à la fois la clé privée (chiffrée ou non), le certificat de la CA ainsi que les éventuels certificats intermédiaires. Le fichier peut être au format PEM ou PKCS#12. Si votre clé privée est chiffrée, vous devez également fournir son mot de passe.",
+    "certificate_authority": "Autorité de certification",
+    "drop_hint": "Faites glisser la CA ici ou cliquez pour sélectionner un fichier",
+    "rejected": "Échec de l'importation de la CA",
+    "password": "Mot de passe",
+    "uploading": "Importation de la CA...",
+    "upload": "Importer la CA",
+    "success": "CA importée avec succès",
+    "error": "Échec de l'importation de la CA avec l'erreur : {{error}}",
+    "validation_missing_file": "Veuillez importer un fichier.",
+    "validation_multiple_files": "Veuillez n'importer qu'un seul fichier."
+  },
+  "certificate_provisioning": {
+    "title": "Provisionner les certificats",
+    "configured": "L'autorité de certification a été configurée avec succès.",
+    "ready": "Vous pouvez maintenant provisionner un certificat pour vos data nodes.",
+    "data_node_required": "Au moins un data node {{productName}} doit être en cours d'exécution avant que le certificat puisse être provisionné.",
+    "started": "Provisionnement du certificat démarré avec succès",
+    "error": "Le démarrage du provisionnement du certificat a échoué avec l'erreur : {{error}}",
+    "provisioning": "Provisionnement du certificat...",
+    "provision": "Provisionner le certificat et continuer",
+    "skip": "Ignorer le provisionnement"
+  },
+  "renewal_policy": {
+    "title": "Configurer la politique de renouvellement",
+    "explanation_automatic": "Dans cette étape, vous pouvez définir si les certificats proches de leur expiration doivent être renouvelés automatiquement.",
+    "explanation_manual": "Si vous choisissez le renouvellement manuel, une notification système s'affichera lorsque la date d'expiration approchera, vous demandant de confirmer le renouvellement.",
+    "policy": "Politique de renouvellement",
+    "select_policy": "Sélectionner la politique de renouvellement",
+    "automatic": "Automatique",
+    "manual": "Manuel",
+    "certificate_lifetime": "Durée de vie du certificat",
+    "enter_lifetime": "Saisir la durée de vie",
+    "select_unit": "Sélectionner l'unité",
+    "unit_hours": "Heure(s)",
+    "unit_days": "Jour(s)",
+    "unit_months": "Mois",
+    "unit_years": "Année(s)",
+    "min_lifetime": "Doit être d'au moins {{duration}}",
+    "creating": "Création de la politique...",
+    "create": "Créer la politique",
+    "success": "Politique de renouvellement créée avec succès",
+    "error": "Échec de la création de la politique de renouvellement avec l'erreur : {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "Votre connexion n'est pas sécurisée. Veuillez noter que les informations seront envoyées au serveur non chiffrées.",
+    "maybe_not_secure": "Votre connexion n'est peut-être pas sécurisée. Veuillez noter que les informations pourraient être envoyées au serveur non chiffrées."
+  },
+  "configuration_finished": {
+    "title": "Configuration terminée",
+    "skipped_provisioning": "Vous avez terminé la configuration avec succès. Vous pouvez toujours <goBackButton>revenir en arrière</goBackButton> pour provisionner les certificats.",
+    "provisioned": "Le provisionnement a réussi et tous les data nodes sont sécurisés et accessibles."
+  }
+}
