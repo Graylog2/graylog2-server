@@ -37,6 +37,8 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "filter_label": "Filtrer les services",
+    "found_one": "{{count}} service d'authentification configuré trouvé sur le système.",
+    "found_other": "{{count}} services d'authentification configurés trouvés sur le système.",
     "headers": {
       "actions": "Actions",
       "default_roles": "Rôles par défaut",
@@ -45,7 +47,8 @@
     },
     "query_example": "Trouver les services dont le titre contient LDAP :",
     "role_not_found": "Rôle introuvable",
-    "title": "Services d'authentification configurés"
+    "title": "Services d'authentification configurés",
+    "found_many": "{{count}} services d'authentification configurés trouvés sur le système."
   },
   "config_details": {
     "edit": "Modifier",
@@ -141,17 +144,67 @@
   "synced_users": {
     "edit": "Modifier",
     "filter_label": "Filtrer les utilisateurs",
+    "found_one": "{{count}} utilisateur synchronisé trouvé.",
+    "found_other": "{{count}} utilisateurs synchronisés trouvés.",
     "headers": {
       "actions": "Actions",
       "full_name": "Nom complet",
-      "roles": "Rôles"
+      "roles": "Rôles",
+      "username": "Nom d'utilisateur"
+    },
+    "none_found": "Aucun utilisateur synchronisé n'a été trouvé.",
+    "role_not_found": "Rôle introuvable",
+    "title": "Utilisateurs synchronisés",
+    "found_many": "{{count}} utilisateurs synchronisés trouvés."
+  },
+  "trusted_header": {
+    "description": "Cet authentificateur permet de connecter un utilisateur sur la base d'un en-tête HTTP, sans interaction supplémentaire.",
+    "enable_sso": "Activer le single sign-on via un en-tête HTTP",
+    "enabled": "Activé",
+    "title": "Authentification par en-tête de confiance",
+    "trusted_proxies_hint": "Veuillez configurer le paramètre <code>trusted_proxies</code> dans le fichier de configuration du serveur {{productName}}.",
+    "update_config": "Mettre à jour la configuration",
+    "username_header": "En-tête du nom d'utilisateur",
+    "username_header_help": "En-tête HTTP contenant le nom de l'utilisateur, considéré comme implicitement fiable. (La correspondance de l'en-tête ne tient pas compte de la casse)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Fuseau horaire du navigateur",
+    "default_assignments_hint": "La modification des rôles et fuseaux horaires par défaut n'affectera que les nouveaux utilisateurs créés via {{serviceTitle}} !",
+    "default_roles": "Rôles par défaut",
+    "default_user_time_zone": "Fuseau horaire par défaut des utilisateurs",
+    "email_attribute": "Attribut de l'e-mail",
+    "email_attributes": "Attributs de l'e-mail",
+    "full_name_attribute": "Attribut du nom complet",
+    "id_attribute": "Attribut de l'ID",
+    "name_attribute": "Attribut du nom",
+    "role_not_found": "Rôle introuvable",
+    "search_base_dn": "DN de base de la recherche",
+    "search_pattern": "Modèle de recherche",
+    "search_roles": "Rechercher des rôles",
+    "test_login_hint": "Nous vous recommandons de tester la connexion de votre utilisateur dans le panneau latéral pour vérifier vos paramètres.",
+    "title": "Synchronisation des utilisateurs"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Voulez-vous vraiment supprimer la configuration de synchronisation de groupes de ce service d'authentification ?",
+    "create_failed": "Échec de la création du service d'authentification",
+    "edit_failed": "Échec de la modification du service d'authentification",
+    "finish_and_save": "Terminer et enregistrer le service",
+    "finish_and_save_identity_service": "Terminer et enregistrer le service d'identité",
+    "next_group_sync": "Suivant : synchronisation des groupes",
+    "next_user_sync": "Suivant : synchronisation des utilisateurs",
+    "server_validation_error": "Erreur de validation du serveur : {{errors}}",
+    "steps": {
+      "group_sync": "Synchronisation des groupes (facultatif)",
+      "server_config": "Configuration du serveur",
+      "user_sync": "Synchronisation des utilisateurs"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "Modifier le service d'authentification - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "Le chargement de la configuration de l'authentification par en-tête HTTP a échoué",
+    "update_success": "La configuration de l'authentification par en-tête HTTP a bien été mise à jour",
+    "update_failed": "La mise à jour de la configuration de l'authentification par en-tête HTTP a échoué avec le statut : {{error}}"
+  }
 }
