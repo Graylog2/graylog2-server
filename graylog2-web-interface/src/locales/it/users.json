@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "Nome utente",
-    "first_name": "Nome"
+    "first_name": "Nome",
+    "last_name": "Cognome",
+    "full_name": "Nome completo",
+    "email": "Indirizzo email",
+    "password": "Password",
+    "repeat_password": "Ripeti password",
+    "time_zone": "Fuso orario",
+    "sessions_timeout": "Timeout sessioni",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "roles": "Ruoli",
+    "assign_roles": "Assegna ruoli",
+    "selected_roles": "Ruoli selezionati",
+    "teams": "Team"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "Il nome dell'utente.",
+    "last_name_help": "Il cognome dell'utente.",
+    "email_help": "L'indirizzo email dell'utente.",
+    "username_help": "Scegli un nome utente univoco con cui accedere.",
+    "username_taken": "Il nome utente è già in uso",
+    "passwords_mismatch": "Le password non corrispondono",
+    "time_zone_help": "Scegli il tuo fuso orario locale oppure lascia quello attuale per usare quello predefinito del browser.",
+    "service_account": "Account di servizio",
+    "service_account_label": "L'utente è un account di servizio",
+    "service_account_help": "Se selezionato, l'utente diventa un account di servizio e non potrà accedere all'interfaccia web né modificare le proprie impostazioni. (ad es. token API)",
+    "service_account_confirm_title": "Sei sicuro?",
+    "service_account_confirm": "Trasformare questo utente in un account di servizio gli impedirà di accedere all'interfaccia web e di modificare le proprie impostazioni (ad es. token API). Vuoi procedere?",
+    "global_timeout_message": "Il timeout della sessione utente non è modificabile perché il <timeoutLink>timeout globale delle sessioni</timeoutLink> è abilitato."
+  },
+  "token_form": {
+    "token_name": "Nome token",
+    "placeholder": "A cosa serve questo token?",
+    "ttl_label": "TTL token",
+    "ttl_invalid": "non valido (min: 1 minuto)",
+    "creating": "Creazione in corso...",
+    "create": "Crea token",
+    "ttl_help": "Esempi di sintassi TTL: per 60 secondi: PT60S, per 60 minuti: PT60M, per 24 ore: PT24H, per 30 giorni: P30D"
+  },
+  "permissions_info": {
+    "title": "Concessione di permessi",
+    "text": "La concessione di permessi per elementi come stream e dashboard può essere configurata usando il pulsante <shareLabel>Condividi</shareLabel> di un elemento. Puoi trovare il pulsante, ad esempio, nella pagina di panoramica degli elementi. Maggiori informazioni nella <docsLink>documentazione</docsLink>."
+  },
   "startpage": {
-    "types": {}
+    "label": "Pagina iniziale",
+    "help": "Seleziona la pagina che l'utente vede subito dopo il login. Sono selezionabili solo gli elementi per cui l'utente ha dei permessi.",
+    "select_type": "Seleziona tipo",
+    "select_value": "Seleziona {{type, lowercase}}",
+    "entity": "elemento",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "Ricerca"
+    },
+    "new_search": "Nuova ricerca",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "All'utente mancano i permessi per la pagina configurata"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "Timeout sessioni",
+    "alert_title": "Modifica del timeout di sessione",
+    "alert_text": "Modificando l'impostazione di timeout delle sessioni l'utente verrà disconnesso e tutte le sue sessioni attive saranno invalidate. Se modifichi l'impostazione per il tuo utente, verrai disconnesso nel momento in cui salvi. In tal caso, assicurati di salvare eventuali modifiche in sospeso prima di cambiare il timeout.",
+    "never_label": "Le sessioni non scadono",
+    "never_help": "Se selezionato, le sessioni non scadono mai per inattività.",
+    "amount_placeholder": "Quantità di timeout",
+    "help": "La sessione termina automaticamente dopo questo intervallo di tempo, a meno che non venga usata attivamente.",
+    "unit_label": "Unità di timeout",
+    "units": {
+      "seconds": "Secondi",
+      "minutes": "Minuti",
+      "hours": "Ore",
+      "days": "Giorni"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "Indirizzo client",
+    "last_activity": "Ultima attività",
+    "logged_in": "Connesso",
+    "enabled": "Abilitato",
+    "auth_service_disabled": "Il servizio di autenticazione è disabilitato, l'utente non può accedere",
+    "preferences": {
+      "title": "Preferenze",
+      "search_autocompletion": "Completamento automatico della ricerca",
+      "update_unfocused": "Aggiorna quando non in primo piano",
+      "pin_search_sidebar": "Fissa barra laterale di ricerca",
+      "pin_dashboard_sidebar": "Fissa barra laterale della dashboard",
+      "theme_mode": "Modalità tema",
+      "not_configured": "Non configurato",
+      "language": "Lingua"
+    },
+    "roles_none_selected": "Nessun ruolo selezionato.",
+    "settings": {
+      "timezone": "Fuso orario",
+      "startpage": "Pagina iniziale",
+      "no_startpage": "Nessuna pagina iniziale impostata",
+      "no_timeout": "Le sessioni non scadono",
+      "globally_set": "(<configLink>impostato globalmente</configLink>)"
+    },
+    "shared_entities": "Elementi condivisi"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "L'indirizzo del client usato per stabilire inizialmente la sessione, non necessariamente il suo indirizzo attuale.",
+    "admin": {
+      "title": "Amministratore di sistema",
+      "description": "L'amministratore di sistema può essere modificato solo nel file di configurazione di {{productName}}."
+    },
+    "headers": {
+      "full_name": "Nome completo",
+      "username": "Nome utente",
+      "email": "Indirizzo email",
+      "client_address": "Indirizzo client",
+      "enabled": "Abilitato",
+      "role": "Ruolo",
+      "actions": "Azioni"
+    },
+    "title": "Utenti",
+    "found": "Trovati {{total}} utenti registrati nel sistema.",
+    "none_found": "Nessun utente trovato.",
+    "filter_label": "Filtra utenti",
+    "actions": {
+      "edit_tokens_title": "Modifica token dell'utente {{name}}",
+      "edit_tokens": "Modifica token",
+      "system_user_tooltip": "Gli utenti di sistema possono essere modificati solo nel file di configurazione del server.",
+      "system_user": "Utente di sistema",
+      "confirm_disable": "Vuoi davvero disabilitare l'utente {{name}}? Tutte le sessioni attive verranno terminate.",
+      "confirm_delete": "Vuoi davvero eliminare l'utente {{name}}?",
+      "edit_title": "Modifica utente {{name}}",
+      "edit": "Modifica"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
