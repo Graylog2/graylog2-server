@@ -1,1 +1,200 @@
-{}
+{
+  "shared": {
+    "leader": "Líder",
+    "not_available": "N/D"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Cargando nodos del backend de búsqueda...",
+    "search_backend_unknown": "No se pudo determinar el backend de búsqueda configurado.",
+    "search_placeholder": "Buscar nodos…",
+    "all_nodes": "Todos los nodos",
+    "data_nodes": "Nodos de datos",
+    "opensearch_nodes": "Nodos de OpenSearch",
+    "mongodb_nodes": "Nodos de MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Memoria",
+    "jvm": "JVM",
+    "indexing": "Indexación",
+    "storage": "Almacenamiento",
+    "buffers": "Búferes",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "Rendimiento"
+  },
+  "data_nodes_expandable": {
+    "title": "Nodos de datos"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Documentos",
+    "latency": "Latencia"
+  },
+  "node_actions": {
+    "thread_dump": "Obtener volcado de hilos",
+    "process_buffer_dump": "Obtener volcado del búfer de procesamiento",
+    "metrics": "Métricas"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Pausar el procesamiento de mensajes",
+    "resume_message_processing": "Reanudar el procesamiento de mensajes",
+    "override_load_balancer_dead": "Forzar el estado del balanceador de carga a DEAD",
+    "override_load_balancer_alive": "Forzar el estado del balanceador de carga a ALIVE",
+    "local_message_inputs": "Entradas de mensajes locales",
+    "recent_system_logs": "Obtener mensajes recientes del registro del sistema",
+    "message_processing_title": "Procesamiento de mensajes",
+    "pause_confirm": "Estás a punto de <b>pausar</b> el procesamiento de mensajes en el nodo <b>{{nodeName}}</b>. ¿Seguro que quieres continuar?",
+    "resume_confirm": "Estás a punto de <b>reanudar</b> el procesamiento de mensajes en el nodo <b>{{nodeName}}</b>. ¿Seguro que quieres continuar?",
+    "load_balancer_title": "Balanceador de carga",
+    "load_balancer_confirm": "Estás a punto de cambiar el estado del balanceador de carga del nodo <b>{{nodeName}}</b> a <b>{{status}}</b>. ¿Seguro que quieres continuar?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Nodos de {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Balanceador de carga {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "Procesamiento de mensajes {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Nodos de MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "El perfilado de MongoDB ayuda a identificar consultas lentas y a solucionar problemas de rendimiento en los nodos del clúster.",
+    "enabling_profiling": "Activando el perfilado...",
+    "enable_confirm": "¿Activar el perfilado de <b>Slow Ops</b> ({{threshold}}) en todos los nodos de MongoDB? Se aplica de inmediato sin reiniciar, pero se restablece tras un reinicio a menos que se configure al arrancar."
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Nodos de OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Mostrar {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Carga (1 min)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Clúster",
+    "cluster_id": "ID del clúster:",
+    "not_available": "No disponible",
+    "number_of_nodes": "Número de nodos:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Crea un archivo zip con información útil para depurar tu clúster de Graylog.",
+    "enterprise_customers": "Los clientes de Graylog Enterprise pueden adjuntar los paquetes a su ticket de soporte, lo que ayuda al equipo de soporte técnico de Graylog a analizar y diagnosticar problemas.",
+    "examine_content": "Revisa el contenido del paquete antes de compartirlo. ¡Puede contener datos sensibles como direcciones IP, nombres de host o incluso contraseñas!",
+    "paid_license_only": "Solo los usuarios con licencia de pago tienen derecho a usar el soporte de Graylog Enterprise. Sin embargo, puedes usar este archivo para otros fines de depuración."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Paquete de soporte del clúster",
+    "create": "Crear paquete de soporte",
+    "download": "Descargar",
+    "delete": "Eliminar",
+    "filename": "Nombre de archivo",
+    "size": "Tamaño",
+    "no_bundles": "No se han encontrado paquetes de soporte.",
+    "delete_title": "Eliminar paquete de soporte",
+    "delete_confirm": "¿Seguro que quieres eliminar <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Nivel: {{level}}",
+    "total_written": "Total escrito:",
+    "mean_rate": "Tasa media:",
+    "one_minute_rate": "Tasa de 1 min:",
+    "per_second": "/ segundo"
+  },
+  "logging_subsystem": {
+    "subsystem": "Subsistema: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Mostrar métricas de nivel de registro",
+    "hide_log_level_metrics": "Ocultar métricas de nivel de registro",
+    "total_log_messages": "Ha escrito un total de <strong>{{throughput}} mensajes de registro internos.</strong>"
+  },
+  "metric_details": {
+    "value": "Valor:",
+    "count": "Recuento:",
+    "mean": "Media:",
+    "minimum": "Mínimo:",
+    "maximum": "Máximo:",
+    "standard_deviation": "Desviación estándar:",
+    "percentile_95": "Percentil 95:",
+    "percentile_98": "Percentil 98:",
+    "percentile_99": "Percentil 99:",
+    "invalid_type": "Tipo de métrica no válido: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Total:",
+    "events": "eventos",
+    "one_minute_avg": "Media de 1 minuto:",
+    "five_minute_avg": "Media de 5 minutos:",
+    "fifteen_minute_avg": "Media de 15 minutos:"
+  },
+  "counter_rate": {
+    "calculating": "Calculando...",
+    "total": "({{total}} en total)",
+    "per_second": "por segundo"
+  },
+  "metric_container": {
+    "loading": "Cargando..."
+  },
+  "metrics_component": {
+    "fetch_error": "No se pudieron obtener las métricas del nodo: el servidor devolvió <em>{{responseMessage}}</em> con el código de estado {{status}}.",
+    "fetch_problem": "Se produjo un problema al obtener las métricas del nodo.",
+    "retry_in_background": "Los intentos de recuperarlas continuarán en segundo plano.",
+    "fetch_error_last_metrics": "No se pudieron obtener las métricas del nodo: el servidor devolvió <em>{{responseMessage}}</em> con el código de estado {{status}}. Se muestran las últimas métricas disponibles.",
+    "filter_placeholder": "Escribe un nombre de métrica para filtrar…"
+  },
+  "metrics_list": {
+    "no_metrics": "Ninguna métrica coincide con el filtro indicado. Asegúrate de usar una expresión regular válida"
+  },
+  "buffer_usage": {
+    "metrics": "Métricas",
+    "utilization": "<strong>{{usage}} mensajes</strong> en {{title}}, {{percentage}} utilizados."
+  },
+  "input_types_data_table": {
+    "loading": "Cargando tipos de entrada..."
+  },
+  "journal_details": {},
+  "journal_state": {},
+  "jvm_heap_usage": {},
+  "node_list_item": {},
+  "node_maintenance_dropdown": {},
+  "node_overview": {},
+  "nodes_actions": {},
+  "nodes_list": {},
+  "plugins_data_table": {},
+  "rest_api_overview": {},
+  "system_information": {},
+  "system_overview_details": {},
+  "system_overview_summary": {},
+  "bulk_actions": {},
+  "system_notifications_table": {},
+  "actions_cell": {},
+  "title_cell": {},
+  "system_job": {},
+  "system_jobs_component": {},
+  "system_jobs_list": {},
+  "system_messages_component": {},
+  "system_messages_list": {},
+  "global_throughput": {},
+  "node_throughput": {},
+  "telemetry_debug_entry_row": {},
+  "telemetry_debug_overlay": {},
+  "cluster_configuration_page": {},
+  "configurations_page": {},
+  "enterprise_page": {},
+  "process_buffer_dump_page": {},
+  "show_metrics_page": {},
+  "node_page": {},
+  "system_logs_page": {},
+  "system_notifications_page": {},
+  "system_overview_page": {},
+  "thread_dump_page": {},
+  "notifications": {},
+  "use_cluster_overview_notifications": {},
+  "use_cluster_support_bundle_notifications": {},
+  "use_plugin_list_notifications": {}
+}
