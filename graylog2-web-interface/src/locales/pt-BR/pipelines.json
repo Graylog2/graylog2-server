@@ -123,21 +123,136 @@
       "actions": "Ações"
     }
   },
-  "stage": {},
-  "stage_form": {},
-  "used_in_pipelines": {},
-  "deprecation": {},
-  "rule_form": {},
-  "rule_list_entry": {},
-  "metrics_config": {},
-  "rule_simulation": {},
-  "convert_modal": {},
-  "block_display": {},
-  "block": {},
-  "builder_form": {},
-  "block_form": {},
-  "block_field": {},
-  "builder": {},
+  "stage": {
+    "last_stage": "Não há mais estágios neste pipeline. Assim que as regras deste estágio forem aplicadas, o processamento do pipeline será concluído.",
+    "continue_all": "As mensagens que satisfizerem <matchText>todas as regras</matchText> deste estágio continuarão para o próximo estágio.",
+    "continue_either": "As mensagens que satisfizerem <matchText>pelo menos uma regra</matchText> deste estágio continuarão para o próximo estágio.",
+    "continue_pass": "As mensagens que satisfizerem <matchText>nenhuma ou mais regras</matchText> deste estágio continuarão para o próximo estágio.",
+    "continue_unknown": "As mensagens que satisfizerem <matchText>DESCONHECIDO</matchText> neste estágio continuarão para o próximo estágio.",
+    "title": "Estágio {{stage}}",
+    "remove_routing_rule_title": "Remover regra de roteamento",
+    "remove_routing_rule_confirm": "Você realmente deseja remover a regra de roteamento <ruleTitle>{{title}}</ruleTitle>?"
+  },
+  "stage_form": {
+    "rules_help": "Selecione as regras avaliadas neste estágio ou crie uma na <rulesLink>página Regras de pipeline</rulesLink>.",
+    "add_button": "Adicionar novo estágio",
+    "add_title": "Adicionar novo estágio {{stage}}",
+    "edit_title": "Editar estágio {{stage}}",
+    "add_submit": "Adicionar estágio",
+    "update_submit": "Atualizar estágio",
+    "stage": "Estágio",
+    "stage_in_use": "O estágio já está em uso. Use outro número ou edite o estágio existente.",
+    "stage_help": "Prioridade do estágio. Quanto menor o número, mais cedo ele será executado.",
+    "continue_when": "Continuar o processamento no próximo estágio quando",
+    "match_all": "Todas as regras deste estágio correspondem à mensagem",
+    "match_any": "Pelo menos uma das regras deste estágio corresponde à mensagem",
+    "match_pass": "Nenhuma ou mais regras deste estágio correspondem",
+    "stage_rules": "Regras do estágio"
+  },
+  "used_in_pipelines": {
+    "label": "Usada em pipelines",
+    "help": "Pipelines que usam esta regra em um ou mais de seus estágios.",
+    "none": "Esta regra não está sendo usada em nenhum pipeline."
+  },
+  "deprecation": {
+    "label": "Função obsoleta",
+    "title_rule": "Esta regra contém pelo menos uma função obsoleta:",
+    "title_pipeline": "Este pipeline contém pelo menos uma função obsoleta:"
+  },
+  "rule_form": {
+    "duplicate_title": "O título da regra \"{{title}}\" já existe!",
+    "title": "Título",
+    "title_help": "Você pode definir o título da regra no código-fonte da regra. Consulte a referência rápida para mais informações.",
+    "leave_question": "Você realmente deseja sair desta página e perder suas alterações? Esta ação não pode ser desfeita.",
+    "description": "Descrição",
+    "description_help": "Descrição da regra (opcional).",
+    "source": "Código-fonte da regra",
+    "source_help": "Código-fonte da regra. Consulte a referência rápida para mais informações.",
+    "create_submit": "Criar regra",
+    "update_close_submit": "Atualizar regra e fechar",
+    "update": "Atualizar regra"
+  },
+  "rule_list_entry": {
+    "edit": "Editar",
+    "delete_title": "Excluir regra",
+    "delete": "Excluir",
+    "managed": "Gerenciado pelo Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "erros/s"
+  },
+  "metrics_config": {
+    "loading": "Carregando configuração de métricas...",
+    "title": "Configuração de métricas de regras",
+    "submit": "Atualizar configuração",
+    "warning": "As métricas de regras só devem ser ativadas para depurar um problema de desempenho, pois a coleta das métricas reduz a velocidade do processamento de mensagens e aumenta o uso de memória.",
+    "enable": "Ativar métricas de regras",
+    "disable": "Desativar métricas de regras",
+    "pipeline_load_info": "Ativar estas métricas adicionará uma nova coluna às páginas Pipeline e Regra de pipeline chamada <columnName>Carga do pipeline</columnName>, que mostrará valores percentuais indicando, em termos relativos, qual dos seus pipelines consome mais tempo de thread.",
+    "rule_load_info": "Ativar estas métricas também adicionará uma nova coluna à página de detalhes do pipeline chamada <columnName>Carga de regra</columnName>. Ela identificará quais regras do pipeline selecionado são as mais custosas."
+  },
+  "rule_simulation": {
+    "error_builder": "Não foi possível executar a simulação da regra. Corrija os erros do construtor de regras.",
+    "placeholder_simple": "campo de mensagem simples",
+    "invalid_json": "JSON inválido!",
+    "title": "Simulação de regra",
+    "optional": "(Opcional)",
+    "json": "JSON",
+    "key_value": "Chave-valor",
+    "simple_message": "Mensagem simples",
+    "input_title": "Campo de mensagem simples, pares chave-valor ou JSON",
+    "input_help": "Digite uma string normal para simular o campo de mensagem, pares chave-valor ou um JSON para simular a mensagem inteira.",
+    "run": "Executar simulação de regra",
+    "reset": "Redefinir",
+    "conditions_output": "Saída das condições",
+    "actions_output": "Saída das ações"
+  },
+  "convert_modal": {
+    "no_title": "<sem título>",
+    "no_code": "<sem código>",
+    "create_rule": "Criar nova regra a partir do código",
+    "copied": "Código-fonte da regra copiado para a área de transferência!",
+    "copy_close": "Copiar e fechar"
+  },
+  "block_display": {
+    "number": "Número",
+    "not": "Não",
+    "deprecated": "Obsoleta",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "duplicate": "Duplicar",
+    "insert_above": "Inserir acima",
+    "insert_below": "Inserir abaixo"
+  },
+  "block": {
+    "insert_title_above": "Inserir nova ação acima da ação nº {{order}}",
+    "insert_title_below": "Inserir nova ação abaixo da ação nº {{order}}"
+  },
+  "builder_form": {
+    "title": "Título",
+    "title_help": "Título da regra.",
+    "description": "Descrição",
+    "description_help": "Descrição da regra (opcional)."
+  },
+  "block_form": {
+    "add_condition": "Adicionar condição",
+    "add_action": "Adicionar ação",
+    "syntax_help": "Ajuda de sintaxe de funções",
+    "update": "Atualizar",
+    "add": "Adicionar"
+  },
+  "block_field": {
+    "no_dollar": "Campos que começam com '$' não são permitidos.",
+    "use_previous_output": "Usar saída de etapas anteriores",
+    "set_custom": "Definir {{name}} personalizado",
+    "select_output": "Selecione a saída na lista",
+    "output_from_step": "Saída da etapa {{step}} ({{name}})",
+    "type_not_found": "Nenhuma ação anterior retorna o tipo {{type}}",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "Construtor de regras"
+  },
   "helper": {},
   "helper_table": {},
   "simulator": {},
