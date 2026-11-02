@@ -1,4 +1,8 @@
 {
+  "role.already_exists": "Die Rolle {{name}} existiert bereits.",
+  "role.delete_read_only": "Die schreibgeschützte Systemrolle {{name}} kann nicht gelöscht werden",
+  "role.not_found": "Die Rolle {{name}} wurde nicht gefunden",
+  "role.update_read_only": "Die schreibgeschützte Rolle {{name}} kann nicht geändert werden",
   "stream.filter_id_mismatch": "Die Filter-ID in der URL stimmt nicht mit der Filter-ID im Request überein",
   "stream.filter_not_found": "Filter nicht gefunden",
   "stream.index_set_not_usable": "Das zugewiesene Index Set ist nicht verwendbar",
@@ -7,5 +11,19 @@
   "stream.read_not_allowed": "Keine Berechtigung, die Konfiguration des Streams mit der ID {{streamId}} zu lesen",
   "stream_rule.delete_not_found": "Die Stream-Regel {{streamRuleId}} im Stream {{streamId}} konnte nicht gelöscht werden",
   "stream_rule.unknown_type": "Unbekannter Stream-Regeltyp {{type}}",
-  "stream_rule.update_not_found": "Die Stream-Regel {{streamRuleId}} im Stream {{streamId}} konnte nicht aktualisiert werden"
+  "stream_rule.update_not_found": "Die Stream-Regel {{streamRuleId}} im Stream {{streamId}} konnte nicht aktualisiert werden",
+  "user.admin_to_service_account": "Der Admin-Benutzer kann nicht in ein Service-Konto umgewandelt werden",
+  "user.not_found": "Der Benutzer {{username}} wurde nicht gefunden",
+  "user.not_found_by_id": "Der Benutzer {{userId}} wurde nicht gefunden",
+  "user.not_found_by_name": "Der Benutzer {{username}} wurde nicht gefunden.",
+  "user.not_found_with_id": "Der Benutzer mit der ID <{{userId}}> wurde nicht gefunden",
+  "user.old_password_incorrect": "Das alte Passwort fehlt oder ist falsch.",
+  "user.own_status_not_allowed": "Benutzer dürfen ihren eigenen Status nicht ändern",
+  "user.password_change_not_allowed": "Keine Berechtigung, das Passwort des Benutzers {{username}} zu ändern",
+  "user.read_only": "Der schreibgeschützte Benutzer {{username}} kann nicht geändert werden",
+  "user.service_account_admin_role": "Einem Service-Konto kann die Rolle Admin nicht zugewiesen werden",
+  "user.token_list_not_allowed": "Keine Berechtigung, die Tokens des Benutzers {{username}} aufzulisten",
+  "user.token_not_found": "Der Zugriffstoken des Benutzers wurde nicht gefunden.",
+  "user.view_id_not_allowed": "Keine Berechtigung, den Benutzer {{userId}} anzuzeigen",
+  "user.view_not_allowed": "Keine Berechtigung, den Benutzer {{username}} anzuzeigen"
 }

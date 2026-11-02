@@ -1,4 +1,8 @@
 {
+  "role.already_exists": "Role {{name}} already exists.",
+  "role.delete_read_only": "Cannot delete read only system role {{name}}",
+  "role.not_found": "Couldn't find role {{name}}",
+  "role.update_read_only": "Cannot update read only role {{name}}",
   "stream.filter_id_mismatch": "The filter ID in the URL doesn't match the one in the payload",
   "stream.filter_not_found": "Filter not found",
   "stream.index_set_not_usable": "Assigned index set is not usable",
@@ -7,5 +11,19 @@
   "stream.read_not_allowed": "Not allowed to read configuration for stream with id: {{streamId}}",
   "stream_rule.delete_not_found": "Couldn't delete stream rule {{streamRuleId}}in stream {{streamId}}",
   "stream_rule.unknown_type": "Unknown stream rule type {{type}}",
-  "stream_rule.update_not_found": "Couldn't update stream rule {{streamRuleId}}in stream {{streamId}}"
+  "stream_rule.update_not_found": "Couldn't update stream rule {{streamRuleId}}in stream {{streamId}}",
+  "user.admin_to_service_account": "Cannot make Admin into service account",
+  "user.not_found": "Couldn't find user {{username}}",
+  "user.not_found_by_id": "Couldn't find user {{userId}}",
+  "user.not_found_by_name": "User {{username}} has not been found.",
+  "user.not_found_with_id": "Couldn't find user with ID <{{userId}}>",
+  "user.old_password_incorrect": "Old password is missing or incorrect.",
+  "user.own_status_not_allowed": "Users are not allowed to set their own status",
+  "user.password_change_not_allowed": "Not allowed to change password for user {{username}}",
+  "user.read_only": "Cannot modify readonly user {{username}}",
+  "user.service_account_admin_role": "Cannot assign Admin role to service account",
+  "user.token_list_not_allowed": "Not allowed to list tokens for user {{username}}",
+  "user.token_not_found": "Couldn't find access token for user.",
+  "user.view_id_not_allowed": "Not allowed to view userId {{userId}}",
+  "user.view_not_allowed": "Not allowed to view user {{username}}"
 }
