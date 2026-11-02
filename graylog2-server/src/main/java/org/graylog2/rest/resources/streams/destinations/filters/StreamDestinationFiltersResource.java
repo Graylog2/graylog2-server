@@ -42,6 +42,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Valid
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -132,7 +134,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkStream(streamId);
 
         final var dto = filterService.findByIdForStream(streamId, filterId)
-                .orElseThrow(() -> new NotFoundException("Filter not found"));
+                .orElseThrow(() -> new CodedNotFoundException("stream.filter_not_found", "Filter not found"));
 
         return Response.ok(wrapDto(dto)).build();
     }
@@ -167,7 +169,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         checkStream(streamId);
 
         if (!filterId.equals(dto.id())) {
-            throw new BadRequestException("The filter ID in the URL doesn't match the one in the payload");
+            throw new CodedBadRequestException("stream.filter_id_mismatch", "The filter ID in the URL doesn't match the one in the payload");
         }
 
         validateDto(dto);
@@ -205,7 +207,7 @@ public class StreamDestinationFiltersResource extends RestResource {
         try {
             streamService.load(streamId);
         } catch (org.graylog2.database.NotFoundException e) {
-            throw new NotFoundException(f("Stream not found: %s", streamId));
+            throw new CodedNotFoundException("stream.not_found", f("Stream not found: %s", streamId), Map.of("streamId", streamId));
         }
     }
 

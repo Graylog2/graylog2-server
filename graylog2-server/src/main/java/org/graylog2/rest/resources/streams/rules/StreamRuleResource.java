@@ -43,6 +43,8 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -59,6 +61,7 @@ import org.graylog2.streams.StreamService;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -128,12 +131,12 @@ public class StreamRuleResource extends RestResource {
         streamRule = streamRuleService.load(streamRuleId);
 
         if (!streamRule.getStreamId().equals(streamid)) {
-            throw new NotFoundException("Couldn't update stream rule " + streamRuleId + "in stream " + streamid);
+            throw new CodedNotFoundException("stream_rule.update_not_found", "Couldn't update stream rule " + streamRuleId + "in stream " + streamid, Map.of("streamRuleId", streamRuleId, "streamId", streamid));
         }
 
         final StreamRuleType streamRuleType = StreamRuleType.fromInteger(cr.type());
         if (null == streamRuleType) {
-            throw new BadRequestException("Unknown stream rule type " + cr.type());
+            throw new CodedBadRequestException("stream_rule.unknown_type", "Unknown stream rule type " + cr.type(), Map.of("type", cr.type()));
         }
 
         streamRule.setField(cr.field());
@@ -210,7 +213,7 @@ public class StreamRuleResource extends RestResource {
         if (streamRule.getStreamId().equals(streamid)) {
             streamRuleService.destroy(streamRule);
         } else {
-            throw new NotFoundException("Couldn't delete stream rule " + streamRuleId + "in stream " + streamid);
+            throw new CodedNotFoundException("stream_rule.delete_not_found", "Couldn't delete stream rule " + streamRuleId + "in stream " + streamid, Map.of("streamRuleId", streamRuleId, "streamId", streamid));
         }
     }
 
