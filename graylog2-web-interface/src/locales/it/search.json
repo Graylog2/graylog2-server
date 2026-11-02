@@ -254,9 +254,12 @@
   },
   "field_charts_migration": {
     "title": "Migra i grafici esistenti della pagina di ricerca",
+    "found_charts_one": "Abbiamo trovato {{count}} grafico, creato per una versione precedente della ricerca. Vuoi migrare questo grafico per la ricerca corrente?",
+    "found_charts_other": "Abbiamo trovato {{count}} grafici, creati per una versione precedente della ricerca. Vuoi migrare questi grafici per la ricerca corrente?",
     "save_hint": "Quando hai eseguito la migrazione e vuoi mantenere i nuovi grafici, dovrai salvare la ricerca corrente come nuova dashboard. Altrimenti i grafici andranno persi uscendo dalla pagina di ricerca.",
     "migrate": "Migra",
-    "discard": "Scarta grafici"
+    "discard": "Scarta grafici",
+    "found_charts_many": "Abbiamo trovato {{count}} grafici, creati per una versione precedente della ricerca. Vuoi migrare questi grafici per la ricerca corrente?"
   },
   "query": {
     "contained_in_enterprise": "(incluso in <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
@@ -337,11 +340,20 @@
   },
   "saved_searches": {
     "title": "Ricerche salvate",
+    "confirm_bulk_delete_one": "Vuoi davvero rimuovere {{count}} ricerca salvata?",
+    "confirm_bulk_delete_other": "Vuoi davvero rimuovere {{count}} ricerche salvate?",
+    "bulk_delete_partial_one": "Impossibile eliminare {{failed}} su {{count}} ricerca salvata selezionata.",
+    "bulk_delete_partial_other": "Impossibile eliminare {{failed}} su {{count}} ricerche salvate selezionate.",
+    "bulk_delete_success_one": "{{count}} ricerca salvata è stata eliminata con successo.",
+    "bulk_delete_success_other": "{{count}} ricerche salvate sono state eliminate con successo.",
     "success": "Operazione riuscita",
     "bulk_delete_error": "Si è verificato un errore durante l'eliminazione delle ricerche salvate. {{error}}",
     "confirm_delete": "Stai per eliminare la ricerca salvata: \"{{title}}\". Sei sicuro?",
     "delete_search": "Elimina ricerca {{title}}",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "confirm_bulk_delete_many": "Vuoi davvero rimuovere {{count}} ricerche salvate?",
+    "bulk_delete_partial_many": "Impossibile eliminare {{failed}} su {{count}} ricerche salvate selezionate.",
+    "bulk_delete_success_many": "{{count}} ricerche salvate sono state eliminate con successo."
   },
   "search_meta": {
     "buttons": "Pulsanti meta della ricerca"
@@ -517,10 +529,34 @@
     "remove_from_table": "Rimuovi dalla tabella",
     "add_to_all_tables": "Aggiungi a tutte le tabelle",
     "remove_from_all_tables": "Rimuovi da tutte le tabelle",
-    "change_field_type": "Cambia tipo di campo"
+    "change_field_type": "Cambia tipo di campo",
+    "copy_field_name": "Copia nome del campo negli appunti",
+    "add_to_favorites": "Aggiungi campo ai preferiti",
+    "remove_from_favorites": "Rimuovi campo dai preferiti"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "Aggregazione di {{series}} per {{fields}}",
+    "summary_only": "Aggregazione di {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Conteggio messaggi",
+    "message_table": "Tabella dei messaggi",
+    "custom_aggregation": "Aggregazione personalizzata",
+    "aggregation": "Aggregazione",
+    "events_overview": "Panoramica degli eventi",
+    "text_markdown": "Testo/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "input eliminato",
+    "timestamp": "Timestamp",
+    "not_stored": "Non memorizzato",
+    "not_stored_message": "Il messaggio non è memorizzato",
+    "received_by": "Ricevuto da",
+    "stored_in_index": "Memorizzato nell'indice",
+    "routed_into_streams": "Instradato negli stream"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch limita il risultato della ricerca a {{limit}} messaggi. Con una dimensione di pagina di {{pageSize}} messaggi, puoi usare le prime {{validPages}} pagine.",
+    "confirm_delete_dashboard_page": "Vuoi davvero eliminare questa pagina della dashboard?"
+  }
 }
