@@ -254,9 +254,12 @@
   },
   "field_charts_migration": {
     "title": "Migrar los gráficos de la página de búsqueda existente",
+    "found_charts_one": "Hemos encontrado {{count}} gráfico creado para una versión anterior de la búsqueda. ¿Quieres migrar este gráfico a la búsqueda actual?",
+    "found_charts_other": "Hemos encontrado {{count}} gráficos creados para una versión anterior de la búsqueda. ¿Quieres migrar estos gráficos a la búsqueda actual?",
     "save_hint": "Cuando hayas ejecutado la migración y quieras conservar los gráficos nuevos, deberás guardar la búsqueda actual como un nuevo dashboard. De lo contrario, los gráficos se perderán al salir de la página de búsqueda.",
     "migrate": "Migrar",
-    "discard": "Descartar gráficos"
+    "discard": "Descartar gráficos",
+    "found_charts_many": "Hemos encontrado {{count}} gráficos creados para una versión anterior de la búsqueda. ¿Quieres migrar estos gráficos a la búsqueda actual?"
   },
   "query": {
     "contained_in_enterprise": "(incluido en <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
@@ -337,11 +340,20 @@
   },
   "saved_searches": {
     "title": "Búsquedas guardadas",
+    "confirm_bulk_delete_one": "¿Seguro que quieres eliminar {{count}} búsqueda guardada?",
+    "confirm_bulk_delete_other": "¿Seguro que quieres eliminar {{count}} búsquedas guardadas?",
+    "bulk_delete_partial_one": "No se pudo eliminar {{failed}} de las {{count}} búsquedas guardadas seleccionadas.",
+    "bulk_delete_partial_other": "No se pudieron eliminar {{failed}} de las {{count}} búsquedas guardadas seleccionadas.",
+    "bulk_delete_success_one": "Se ha eliminado correctamente {{count}} búsqueda guardada.",
+    "bulk_delete_success_other": "Se han eliminado correctamente {{count}} búsquedas guardadas.",
     "success": "Éxito",
     "bulk_delete_error": "Se produjo un error al eliminar las búsquedas guardadas. {{error}}",
     "confirm_delete": "Vas a eliminar la búsqueda guardada: \"{{title}}\". ¿Seguro que quieres continuar?",
     "delete_search": "Eliminar búsqueda {{title}}",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "confirm_bulk_delete_many": "¿Seguro que quieres eliminar {{count}} búsquedas guardadas?",
+    "bulk_delete_partial_many": "No se pudieron eliminar {{failed}} de las {{count}} búsquedas guardadas seleccionadas.",
+    "bulk_delete_success_many": "Se han eliminado correctamente {{count}} búsquedas guardadas."
   },
   "search_meta": {
     "buttons": "Botones de metadatos de búsqueda"
@@ -517,10 +529,34 @@
     "remove_from_table": "Quitar de la tabla",
     "add_to_all_tables": "Añadir a todas las tablas",
     "remove_from_all_tables": "Quitar de todas las tablas",
-    "change_field_type": "Cambiar tipo de campo"
+    "change_field_type": "Cambiar tipo de campo",
+    "copy_field_name": "Copiar nombre del campo al portapapeles",
+    "add_to_favorites": "Añadir campo a favoritos",
+    "remove_from_favorites": "Quitar campo de favoritos"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "Agregando {{series}} por {{fields}}",
+    "summary_only": "Agregando {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Recuento de mensajes",
+    "message_table": "Tabla de mensajes",
+    "custom_aggregation": "Agregación personalizada",
+    "aggregation": "Agregación",
+    "events_overview": "Resumen de eventos",
+    "text_markdown": "Texto/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "input eliminado",
+    "timestamp": "Marca de tiempo",
+    "not_stored": "No almacenado",
+    "not_stored_message": "El mensaje no está almacenado",
+    "received_by": "Recibido por",
+    "stored_in_index": "Almacenado en el índice",
+    "routed_into_streams": "Enrutado a los streams"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch limita el resultado de la búsqueda a {{limit}} mensajes. Con un tamaño de página de {{pageSize}} mensajes, puedes usar las primeras {{validPages}} páginas.",
+    "confirm_delete_dashboard_page": "¿Seguro que quieres eliminar esta página del dashboard?"
+  }
 }
