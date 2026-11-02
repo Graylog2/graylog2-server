@@ -39,7 +39,10 @@ const useStreamOutputMutation = () => {
     },
 
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_stream_output_mutations_notifications.added_success', { ns: 'streams' }), i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }));
+      UserNotification.success(
+        i18n.t('use_stream_output_mutations_notifications.added_success', { ns: 'streams' }),
+        i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -54,7 +57,10 @@ const useStreamOutputMutation = () => {
     },
 
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_stream_output_mutations_notifications.removed_success', { ns: 'streams' }), i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }));
+      UserNotification.success(
+        i18n.t('use_stream_output_mutations_notifications.removed_success', { ns: 'streams' }),
+        i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }),
+      );
     },
   });
 

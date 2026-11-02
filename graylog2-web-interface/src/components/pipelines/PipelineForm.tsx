@@ -130,7 +130,10 @@ const PipelineForm = ({
       {content}
       <Row>
         <Col md={12}>
-          <FormSubmit submitButtonText={create ? t('form.create_submit') : t('form.update_submit')} onCancel={onCancel} />
+          <FormSubmit
+            submitButtonText={create ? t('form.create_submit') : t('form.update_submit')}
+            onCancel={onCancel}
+          />
         </Col>
       </Row>
     </form>

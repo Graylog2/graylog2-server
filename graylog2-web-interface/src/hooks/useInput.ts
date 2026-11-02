@@ -25,7 +25,12 @@ const useInput = (inputId: string | null) =>
   useQuery({
     queryKey: ['inputs', inputId],
     queryFn: inputId
-      ? () => defaultOnError(SystemInputs.get(inputId), i18n.t('use_input_notifications.load_failed', { ns: 'inputs' }), i18n.t('use_input_notifications.load_failed_title', { ns: 'inputs' }))
+      ? () =>
+          defaultOnError(
+            SystemInputs.get(inputId),
+            i18n.t('use_input_notifications.load_failed', { ns: 'inputs' }),
+            i18n.t('use_input_notifications.load_failed_title', { ns: 'inputs' }),
+          )
       : skipToken,
   });
 

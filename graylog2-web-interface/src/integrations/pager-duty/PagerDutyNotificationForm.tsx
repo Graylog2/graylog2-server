@@ -122,7 +122,9 @@ const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNo
         label={t('pager_duty_notification_form.client_name_label')}
         type="text"
         bsStyle={validation.errors.client_name ? 'error' : null}
-        help={validation.errors?.client_name?.[0] ?? t('pager_duty_notification_form.client_name_help', { productName })}
+        help={
+          validation.errors?.client_name?.[0] ?? t('pager_duty_notification_form.client_name_help', { productName })
+        }
         value={config.client_name}
         onChange={handleChange}
         required

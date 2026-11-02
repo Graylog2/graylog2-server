@@ -80,9 +80,7 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
                   });
                 }}>
                 <Icon name="speed" />{' '}
-                {showDetails
-                  ? t('node_loggers.hide_log_level_metrics')
-                  : t('node_loggers.show_log_level_metrics')}
+                {showDetails ? t('node_loggers.hide_log_level_metrics') : t('node_loggers.show_log_level_metrics')}
               </Button>
             </div>
             <h2>

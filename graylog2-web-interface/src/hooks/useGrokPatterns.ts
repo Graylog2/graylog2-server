@@ -66,7 +66,10 @@ export const searchGrokPatternsPaginated = (page: number, perPage: number, query
       },
     }))
     .catch((errorThrown) => {
-      UserNotification.error(i18n.t('use_grok_patterns_notifications.load_streams_failed', { ns: 'grokpatterns', error: errorThrown }), i18n.t('use_grok_patterns_notifications.load_streams_failed_title', { ns: 'grokpatterns' }));
+      UserNotification.error(
+        i18n.t('use_grok_patterns_notifications.load_streams_failed', { ns: 'grokpatterns', error: errorThrown }),
+        i18n.t('use_grok_patterns_notifications.load_streams_failed_title', { ns: 'grokpatterns' }),
+      );
     });
 
 export const testGrokPattern = (
@@ -110,7 +113,11 @@ export const saveGrokPattern = (pattern: GrokPattern, callback: () => void) => {
     }
 
     UserNotification.error(
-      i18n.t('use_grok_patterns_notifications.save_failed', { ns: 'grokpatterns', name: pattern.name, error: errorMessage }),
+      i18n.t('use_grok_patterns_notifications.save_failed', {
+        ns: 'grokpatterns',
+        name: pattern.name,
+        error: errorMessage,
+      }),
       i18n.t('use_grok_patterns_notifications.save_failed_title', { ns: 'grokpatterns' }),
     );
   };
@@ -143,14 +150,20 @@ export const saveGrokPattern = (pattern: GrokPattern, callback: () => void) => {
 export const deleteGrokPattern = (pattern: GrokPattern, callback: () => void) => {
   const failCallback = (error) => {
     UserNotification.error(
-      i18n.t('use_grok_patterns_notifications.delete_failed', { ns: 'grokpatterns', name: pattern.name, error: error.message }),
+      i18n.t('use_grok_patterns_notifications.delete_failed', {
+        ns: 'grokpatterns',
+        name: pattern.name,
+        error: error.message,
+      }),
       i18n.t('use_grok_patterns_notifications.delete_failed_title', { ns: 'grokpatterns' }),
     );
   };
 
   SystemGrok.removePattern(pattern.id).then((response) => {
     callback();
-    UserNotification.success(i18n.t('use_grok_patterns_notifications.deleted_success', { ns: 'grokpatterns', name: pattern.name }));
+    UserNotification.success(
+      i18n.t('use_grok_patterns_notifications.deleted_success', { ns: 'grokpatterns', name: pattern.name }),
+    );
 
     return response;
   }, failCallback);

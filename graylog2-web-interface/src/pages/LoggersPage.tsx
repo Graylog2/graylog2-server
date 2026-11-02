@@ -27,9 +27,7 @@ const LoggersPage = () => {
     <DocumentTitle title={t('title')}>
       <span>
         <PageHeader title={t('title')}>
-          <span>
-            {t('description')}
-          </span>
+          <span>{t('description')}</span>
         </PageHeader>
         <LoggerOverview />
         <ClusterSupportBundleOverview />

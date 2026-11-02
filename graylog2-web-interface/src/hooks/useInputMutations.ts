@@ -33,30 +33,48 @@ const useInputMutations = () => {
   const createMutation = useMutation({
     mutationFn: createInput,
     onError: (errorThrown) => {
-      UserNotification.error(i18n.t('use_input_mutations_notifications.save_failed', { ns: 'inputs', error: errorThrown }), i18n.t('use_input_mutations_notifications.save_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_input_mutations_notifications.save_failed', { ns: 'inputs', error: errorThrown }),
+        i18n.t('use_input_mutations_notifications.save_failed_title', { ns: 'inputs' }),
+      );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_mutations_notifications.created_success', { ns: 'inputs' }), i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_mutations_notifications.created_success', { ns: 'inputs' }),
+        i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     },
   });
   const updateMutation = useMutation({
     mutationFn: updateInput,
     onError: (errorThrown) => {
-      UserNotification.error(i18n.t('use_input_mutations_notifications.update_failed', { ns: 'inputs', error: errorThrown }), i18n.t('use_input_mutations_notifications.update_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_input_mutations_notifications.update_failed', { ns: 'inputs', error: errorThrown }),
+        i18n.t('use_input_mutations_notifications.update_failed_title', { ns: 'inputs' }),
+      );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_mutations_notifications.updated_success', { ns: 'inputs' }), i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_mutations_notifications.updated_success', { ns: 'inputs' }),
+        i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: ['inputs'] });
     },
   });
   const deleteMutation = useMutation({
     mutationFn: deleteInput,
     onError: (errorThrown) => {
-      UserNotification.error(i18n.t('use_input_mutations_notifications.delete_failed', { ns: 'inputs', error: errorThrown }), i18n.t('use_input_mutations_notifications.delete_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_input_mutations_notifications.delete_failed', { ns: 'inputs', error: errorThrown }),
+        i18n.t('use_input_mutations_notifications.delete_failed_title', { ns: 'inputs' }),
+      );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_mutations_notifications.deleted_success', { ns: 'inputs' }), i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_mutations_notifications.deleted_success', { ns: 'inputs' }),
+        i18n.t('use_input_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     },
   });

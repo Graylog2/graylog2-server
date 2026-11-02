@@ -260,9 +260,7 @@ const ConfigurationForm = ({
       return (
         <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
-          <InputDescription
-            error={t('configuration_forms.configuration_form.collector_in_use')}
-          />
+          <InputDescription error={t('configuration_forms.configuration_form.collector_in_use')} />
         </>
       );
     }
@@ -327,9 +325,7 @@ const ConfigurationForm = ({
                     onChange={_onTagsChange}
                   />
                 </div>
-                <HelpBlock>
-                  {t('configuration_forms.configuration_form.tags_help')}
-                </HelpBlock>
+                <HelpBlock>{t('configuration_forms.configuration_form.tags_help')}</HelpBlock>
               </FormGroup>
 
               <FormGroup controlId="collector_id">
@@ -349,10 +345,7 @@ const ConfigurationForm = ({
                   {t('configuration_forms.configuration_form.preview')}
                 </Button>
                 <HelpBlock>
-                  {_formatValidationMessage(
-                    'template',
-                    t('configuration_forms.configuration_form.template_help'),
-                  )}
+                  {_formatValidationMessage('template', t('configuration_forms.configuration_form.template_help'))}
                 </HelpBlock>
               </FormGroup>
             </fieldset>

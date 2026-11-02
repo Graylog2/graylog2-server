@@ -88,7 +88,11 @@ export const deleteConfigurationVariable = (configurationVariable: { id: string;
     },
     (error: { message?: string }) => {
       UserNotification.error(
-        i18n.t('notifications.delete_failed', { ns: 'sidecars', name: configurationVariable.name, error: error.message }),
+        i18n.t('notifications.delete_failed', {
+          ns: 'sidecars',
+          name: configurationVariable.name,
+          error: error.message,
+        }),
         i18n.t('notifications.delete_failed_title', { ns: 'sidecars' }),
       );
     },
@@ -110,7 +114,11 @@ export const validateConfigurationVariable = (configurationVariable: { name?: st
 
   promise.catch((error: { message?: string }) => {
     UserNotification.error(
-      i18n.t('notifications.validate_failed', { ns: 'sidecars', name: configurationVariable.name, error: error.message }),
+      i18n.t('notifications.validate_failed', {
+        ns: 'sidecars',
+        name: configurationVariable.name,
+        error: error.message,
+      }),
       i18n.t('notifications.validate_failed_title', { ns: 'sidecars' }),
     );
   });

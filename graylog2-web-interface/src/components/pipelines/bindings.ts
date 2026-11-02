@@ -32,8 +32,16 @@ const bindings: PluginExports = {
           path: Routes.SYSTEM.PIPELINES.OVERVIEW,
           exactPathMatch: true,
         },
-        { description: 'Manage rules', titleKey: 'pipelines:page_navigation.manage_rules', path: Routes.SYSTEM.PIPELINES.RULES },
-        { description: 'Simulator', titleKey: 'pipelines:page_navigation.simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
+        {
+          description: 'Manage rules',
+          titleKey: 'pipelines:page_navigation.manage_rules',
+          path: Routes.SYSTEM.PIPELINES.RULES,
+        },
+        {
+          description: 'Simulator',
+          titleKey: 'pipelines:page_navigation.simulator',
+          path: Routes.SYSTEM.PIPELINES.SIMULATOR,
+        },
       ],
     },
   ],

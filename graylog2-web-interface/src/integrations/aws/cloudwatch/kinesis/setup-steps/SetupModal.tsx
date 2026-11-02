@@ -42,7 +42,8 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
 
-  const buttonOtherText = !error && !success ? t('aws_kinesis_setup_modal.creating_button') : t('aws_kinesis_setup_modal.close_button');
+  const buttonOtherText =
+    !error && !success ? t('aws_kinesis_setup_modal.creating_button') : t('aws_kinesis_setup_modal.close_button');
   const buttonText = success ? t('aws_kinesis_setup_modal.continue_button') : buttonOtherText;
 
   const handleSuccess = () => {

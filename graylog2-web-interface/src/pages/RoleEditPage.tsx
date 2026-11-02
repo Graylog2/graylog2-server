@@ -56,7 +56,7 @@ const RoleEditPage = ({ params }: Props) => {
           title: t('role_edit.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span >{t('role_edit.description')}</span>
+        <span>{t('role_edit.description')}</span>
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

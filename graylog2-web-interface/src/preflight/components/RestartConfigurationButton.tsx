@@ -35,10 +35,7 @@ const ResumeConfigurationButton = () => {
           setIsRestartingConfiguration(true);
         })
         .catch((error) => {
-          UserNotification.error(
-            t('resume_startup.error', { error: String(error) }),
-            t('resume_startup.error_title'),
-          );
+          UserNotification.error(t('resume_startup.error', { error: String(error) }), t('resume_startup.error_title'));
         })
         .finally(() => {
           setIsRestartingConfiguration(false);

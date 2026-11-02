@@ -104,7 +104,11 @@ const StageForm = ({
 
   const rulesHelp = (
     <span>
-      <Trans t={t} i18nKey="stage_form.rules_help" components={{ rulesLink: <Link to={Routes.SYSTEM.PIPELINES.RULES} /> }} />
+      <Trans
+        t={t}
+        i18nKey="stage_form.rules_help"
+        components={{ rulesLink: <Link to={Routes.SYSTEM.PIPELINES.RULES} /> }}
+      />
     </span>
   );
 
@@ -138,11 +142,7 @@ const StageForm = ({
             max={NumberUtils.JAVA_INTEGER_MAX_VALUE}
             onChange={_onChange}
             bsStyle={isOverridingStage ? 'error' : null}
-            help={
-              isOverridingStage
-                ? t('stage_form.stage_in_use')
-                : t('stage_form.stage_help')
-            }
+            help={isOverridingStage ? t('stage_form.stage_in_use') : t('stage_form.stage_help')}
             value={nextStage.stage}
           />
 

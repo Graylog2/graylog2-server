@@ -146,7 +146,10 @@ export const urlAllowListCheck = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.allowlist_check_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.allowlist_check_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;
@@ -166,7 +169,10 @@ export const urlAllowListGenerateRegex = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_generate_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.regex_generate_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;
@@ -189,7 +195,10 @@ export const testRegex = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_try_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.regex_try_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;
@@ -219,7 +228,10 @@ export const testRegexReplace = (
   const promise = ToolsRegexReplaceTester.testRegex(payload);
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_try_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.regex_try_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;
@@ -298,7 +310,10 @@ export const testContainsString = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.contains_string_failed_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.contains_string_failed_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;
@@ -323,7 +338,10 @@ export const testLookupTable = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.lookup_table_failed_title', { ns: 'extractors' }));
+    UserNotification.error(
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.lookup_table_failed_title', { ns: 'extractors' }),
+    );
   });
 
   return promise;

@@ -129,7 +129,11 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
 
     description = (
       <span>
-        <Trans t={t} i18nKey={matchKeys[stage.match] ?? 'stage.continue_unknown'} components={{ matchText: <strong /> }} />
+        <Trans
+          t={t}
+          i18nKey={matchKeys[stage.match] ?? 'stage.continue_unknown'}
+          components={{ matchText: <strong /> }}
+        />
       </span>
     );
   }

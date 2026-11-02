@@ -151,7 +151,7 @@ const matchesFilter = (entry: TelemetryDebugEntry, filter: string) => {
  */
 const TelemetryDebugOverlay = () => {
   const { t } = useTranslation('system');
-  const enabled =useSyncExternalStore(telemetryDebugStore.subscribe, isTelemetryDebugEnabled);
+  const enabled = useSyncExternalStore(telemetryDebugStore.subscribe, isTelemetryDebugEnabled);
   const liveEntries = useSyncExternalStore(telemetryDebugStore.subscribe, telemetryDebugStore.getEntries);
   const [open, setOpen] = useState(false);
   const [frozenEntries, setFrozenEntries] = useState<TelemetryDebugEntry[] | null>(null);

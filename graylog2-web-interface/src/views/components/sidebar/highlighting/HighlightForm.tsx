@@ -198,11 +198,7 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
                 <HighlightingColorForm field={selectedFieldType} />
               </Modal.Body>
               <Modal.Footer>
-                <ModalSubmit
-                  onCancel={onClose}
-                  disabledSubmit={!isValid}
-                  submitButtonText={submitButtonText}
-                />
+                <ModalSubmit onCancel={onClose} disabledSubmit={!isValid} submitButtonText={submitButtonText} />
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>

@@ -49,41 +49,25 @@ const Automatic = () => {
         <tr>
           <th>{t('aws_automatic.env_variables_label')}</th>
           <td>
-            <Trans
-              t={t}
-              i18nKey="aws_automatic.env_variables_value"
-              components={{ code: <code /> }}
-            />
+            <Trans t={t} i18nKey="aws_automatic.env_variables_value" components={{ code: <code /> }} />
           </td>
         </tr>
         <tr>
           <th>{t('aws_automatic.java_properties_label')}</th>
           <td>
-            <Trans
-              t={t}
-              i18nKey="aws_automatic.java_properties_value"
-              components={{ code: <code /> }}
-            />
+            <Trans t={t} i18nKey="aws_automatic.java_properties_value" components={{ code: <code /> }} />
           </td>
         </tr>
         <tr>
           <th>{t('aws_automatic.profiles_label')}</th>
           <td>
-            <Trans
-              t={t}
-              i18nKey="aws_automatic.profiles_value"
-              components={{ code: <code /> }}
-            />
+            <Trans t={t} i18nKey="aws_automatic.profiles_value" components={{ code: <code /> }} />
           </td>
         </tr>
         <tr>
           <th>{t('aws_automatic.ecs_label')}</th>
           <td>
-            <Trans
-              t={t}
-              i18nKey="aws_automatic.ecs_value"
-              components={{ code: <code /> }}
-            />
+            <Trans t={t} i18nKey="aws_automatic.ecs_value" components={{ code: <code /> }} />
           </td>
         </tr>
         <tr>

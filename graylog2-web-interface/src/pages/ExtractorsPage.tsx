@@ -61,11 +61,7 @@ const ExtractorsPage = () => {
     <DocumentTitle title={t('extractors_of', { title: input.title })}>
       <div>
         <PageHeader
-          title={
-            <span>
-              {t('extractors_of', { title: <em key="title">{input.title}</em> })}
-            </span>
-          }
+          title={<span>{t('extractors_of', { title: <em key="title">{input.title}</em> })}</span>}
           actions={
             <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title={t('actions')} pullRight>
               <MenuItem href={Routes.import_extractors(node.node_id, input.id)}>{t('import_extractors')}</MenuItem>
@@ -76,9 +72,7 @@ const ExtractorsPage = () => {
             title: t('documentation_title'),
             path: DocsHelper.PAGES.EXTRACTORS,
           }}>
-          <span>
-            {t('description', { field: 'http_response_code' })}
-          </span>
+          <span>{t('description', { field: 'http_response_code' })}</span>
         </PageHeader>
         <ExtractorsList input={input} node={node} />
       </div>

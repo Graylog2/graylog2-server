@@ -37,11 +37,7 @@ const SidecarQueryHelper = () => {
         <br />
       </p>
       <p>
-        <Trans
-          t={t}
-          i18nKey="common.sidecar_search_form.status_example"
-          components={{ code: <code /> }}
-        />
+        <Trans t={t} i18nKey="common.sidecar_search_form.status_example" components={{ code: <code /> }} />
         <br />
         <kbd>{STATUS_QUERY_EXAMPLE}</kbd>
         <br />
@@ -57,9 +53,7 @@ const SidecarQueryHelper = () => {
     sidecar_version: t('common.sidecar_search_form.field_sidecar_version'),
   };
 
-  return (
-    <QueryHelper entityName="sidecar" example={queryExamples} commonFields={['name']} fieldMap={fieldMap} />
-  );
+  return <QueryHelper entityName="sidecar" example={queryExamples} commonFields={['name']} fieldMap={fieldMap} />;
 };
 
 type Props = React.PropsWithChildren<{

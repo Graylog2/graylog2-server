@@ -47,10 +47,7 @@ const Row = styled.div`
   }
 `;
 
-const ErrorWidget = ({
-  errors,
-  title,
-}: Props) => {
+const ErrorWidget = ({ errors, title }: Props) => {
   const { t } = useTranslation('widgets');
   const displayTitle = title || t('error_widget.title');
 

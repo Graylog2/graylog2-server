@@ -26,9 +26,7 @@ const RolesOverviewPage = () => {
             <Button bsStyle="info">{t('roles_overview.button_text')}</Button>
           </LinkContainer>
         }>
-        <span>
-          {t('roles_overview.description', { productName })}
-        </span>
+        <span>{t('roles_overview.description', { productName })}</span>
       </PageHeader>
 
       <Row className="content">

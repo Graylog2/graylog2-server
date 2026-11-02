@@ -41,21 +41,13 @@ const OTXAdapterDocumentation = (): React.ReactElement => {
 
       <p style={style}>{t('otx_adapter_documentation.indicator_description')}</p>
       <p style={style}>
-        <Trans
-          t={t}
-          i18nKey="otx_adapter_documentation.ip_auto_detect"
-          components={{ code: <code /> }}
-        />
+        <Trans t={t} i18nKey="otx_adapter_documentation.ip_auto_detect" components={{ code: <code /> }} />
       </p>
 
       <h5 style={style}>{t('otx_adapter_documentation.api_key_title')}</h5>
 
       <p style={style}>
-        <Trans
-          t={t}
-          i18nKey="otx_adapter_documentation.api_key_description"
-          components={{ strong: <strong /> }}
-        />
+        <Trans t={t} i18nKey="otx_adapter_documentation.api_key_description" components={{ strong: <strong /> }} />
       </p>
 
       <h5 style={style}>{t('otx_adapter_documentation.api_url_title')}</h5>

@@ -64,11 +64,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
   render() {
     const splitByHelpMessage = (
       <span>
-        <Trans
-          i18nKey="converters.split_by_help"
-          ns="extractors"
-          components={{ strong: <strong />, em: <em /> }}
-        />
+        <Trans i18nKey="converters.split_by_help" ns="extractors" components={{ strong: <strong />, em: <em /> }} />
       </span>
     );
 

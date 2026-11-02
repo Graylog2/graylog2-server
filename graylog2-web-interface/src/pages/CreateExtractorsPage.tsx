@@ -72,12 +72,7 @@ const CreateExtractorsPage = () => {
         <PageHeader
           title={
             <span>
-              <Trans
-                t={t}
-                i18nKey="pages.new_header"
-                values={{ title: input.title }}
-                components={{ em: <em /> }}
-              />
+              <Trans t={t} i18nKey="pages.new_header" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           }
           documentationLink={{

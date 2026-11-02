@@ -71,12 +71,7 @@ class SystemOverviewDetails extends React.Component<
       processingStatus = (
         <span>
           <Icon name="warning" />
-          &nbsp;{' '}
-          <Trans
-            t={t}
-            i18nKey="system_overview_details.not_processing"
-            components={{ strong: <strong /> }}
-          />
+          &nbsp; <Trans t={t} i18nKey="system_overview_details.not_processing" components={{ strong: <strong /> }} />
         </span>
       );
     }
@@ -87,7 +82,10 @@ class SystemOverviewDetails extends React.Component<
           <Alert bsStyle="info">
             <span className="pull-right">
               {' '}
-              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text={t('system_overview_details.what_does_this_mean')} />
+              <DocumentationLink
+                page={DocsHelper.PAGES.LOAD_BALANCERS}
+                text={t('system_overview_details.what_does_this_mean')}
+              />
             </span>
             <Trans
               t={t}
@@ -101,7 +99,10 @@ class SystemOverviewDetails extends React.Component<
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
             <span className="pull-right">
               {' '}
-              <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text={t('system_overview_details.what_does_this_mean')} />
+              <DocumentationLink
+                page={DocsHelper.PAGES.LOAD_BALANCERS}
+                text={t('system_overview_details.what_does_this_mean')}
+              />
             </span>
             <Trans
               t={t}

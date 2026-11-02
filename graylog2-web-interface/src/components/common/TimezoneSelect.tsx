@@ -76,7 +76,6 @@ class TimezoneSelect extends React.Component<
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   _UNCLASSIFIED_AREA = 'Unclassified';
 
-   
   _areaLabel = (area: string) =>
     area === this._UNCLASSIFIED_AREA ? i18n.t('time.unclassified_time_zones', { ns: 'common' }) : area;
 

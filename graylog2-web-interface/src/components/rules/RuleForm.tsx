@@ -94,9 +94,7 @@ const RuleForm = ({ create = false, isManaged = false }: Props) => {
           <FormControl.Static>{t('rule_form.title_help')}</FormControl.Static>
         </FormGroup>
 
-        {isDirty && (
-          <ConfirmLeaveDialog question={t('rule_form.leave_question')} />
-        )}
+        {isDirty && <ConfirmLeaveDialog question={t('rule_form.leave_question')} />}
 
         <Input
           type="textarea"

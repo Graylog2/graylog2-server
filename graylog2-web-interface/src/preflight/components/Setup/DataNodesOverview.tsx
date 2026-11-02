@@ -52,8 +52,7 @@ const DataNodesOverview = () => {
     <>
       <P>{t('data_nodes.description', { productName })}</P>
       <P>
-        {t('data_nodes.registered')}{' '}
-        {isFetchingDataNodes && <Spinner text="" />}
+        {t('data_nodes.registered')} {isFetchingDataNodes && <Spinner text="" />}
       </P>
       {!!dataNodes.length && (
         <>
@@ -71,9 +70,7 @@ const DataNodesOverview = () => {
           </List>
         </>
       )}
-      {!dataNodes.length && !isInitialLoadingDataNodes && (
-        <Alert bsStyle="info">{t('data_nodes.none_found')}</Alert>
-      )}
+      {!dataNodes.length && !isInitialLoadingDataNodes && <Alert bsStyle="info">{t('data_nodes.none_found')}</Alert>}
       <Space h="md" />
     </>
   );

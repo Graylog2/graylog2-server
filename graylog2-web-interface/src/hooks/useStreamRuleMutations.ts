@@ -46,7 +46,10 @@ const useStreamRuleMutations = () => {
       StreamRules.create(streamId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.create_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.create_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_stream_rule_mutations_notifications.create_failed', { ns: 'streams', error }),
+        i18n.t('use_stream_rule_mutations_notifications.create_failed_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -62,7 +65,10 @@ const useStreamRuleMutations = () => {
     }) => StreamRules.update(streamId, streamRuleId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.update_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.update_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_stream_rule_mutations_notifications.update_failed', { ns: 'streams', error }),
+        i18n.t('use_stream_rule_mutations_notifications.update_failed_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -71,7 +77,10 @@ const useStreamRuleMutations = () => {
       StreamRules.remove(streamId, streamRuleId),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.delete_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.delete_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_stream_rule_mutations_notifications.delete_failed', { ns: 'streams', error }),
+        i18n.t('use_stream_rule_mutations_notifications.delete_failed_title', { ns: 'streams' }),
+      );
     },
   });
 

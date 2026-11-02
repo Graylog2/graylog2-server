@@ -56,7 +56,7 @@ const RoleDetailsPage = ({ params }: Props) => {
             <Button bsStyle="info">{t('role_details.button_text')}</Button>
           </LinkContainer>
         }>
-        <span >{t('role_details.description')}</span>
+        <span>{t('role_details.description')}</span>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

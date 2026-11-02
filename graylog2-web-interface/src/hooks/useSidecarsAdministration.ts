@@ -62,7 +62,12 @@ const useSidecarsAdministration = ({ query = '', page = 1, pageSize = 50, filter
     queryFn: () =>
       fetchSidecarsAdministration({ query, page, pageSize, filters }).catch((error) => {
         UserNotification.error(
-          error.status === 400 ? error.responseMessage : i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed', { ns: 'sidecars', error: error.message }),
+          error.status === 400
+            ? error.responseMessage
+            : i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed', {
+                ns: 'sidecars',
+                error: error.message,
+              }),
           i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed_title', { ns: 'sidecars' }),
         );
 
@@ -103,7 +108,10 @@ export const useSetSidecarAction = () => {
       const formattedCollectorsCount = Object.keys(collectors).length;
       UserNotification.success(
         '',
-        i18n.t(`use_sidecars_administration_notifications.requested.${action}`, { ns: 'sidecars', amount: formattedCollectorsCount }),
+        i18n.t(`use_sidecars_administration_notifications.requested.${action}`, {
+          ns: 'sidecars',
+          amount: formattedCollectorsCount,
+        }),
       );
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },

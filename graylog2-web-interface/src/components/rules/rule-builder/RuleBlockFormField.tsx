@@ -135,7 +135,11 @@ const RuleBlockFormField = ({
         name={param.name}
         label={labelText(param)}
         required={!param.optional}
-        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{t('block_field.set_custom', { name: param.name })}</Button>}
+        buttonAfter={
+          <Button onClick={() => onPrimaryInputToggle('custom')}>
+            {t('block_field.set_custom', { name: param.name })}
+          </Button>
+        }
         help={param.description}
         {...field}>
         <>

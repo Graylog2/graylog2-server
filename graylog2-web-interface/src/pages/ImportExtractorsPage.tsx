@@ -50,12 +50,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
         <PageHeader
           title={
             <span>
-              <Trans
-                t={t}
-                i18nKey="pages.import_header"
-                values={{ title: input.title }}
-                components={{ em: <em /> }}
-              />
+              <Trans t={t} i18nKey="pages.import_header" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           }>
           <span>

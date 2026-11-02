@@ -74,7 +74,9 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
                 <Link to={Routes.SYSTEM.SIDECARS.STATUS(node_id)}>{node_name}</Link>
                 <SecondaryText>{annotation}</SecondaryText>
                 <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
-                <SecondaryText>{t('failure_tracking.rows.sidecar_version', { version: sidecar_version })}</SecondaryText>
+                <SecondaryText>
+                  {t('failure_tracking.rows.sidecar_version', { version: sidecar_version })}
+                </SecondaryText>
                 <SecondaryText>{node_id}</SecondaryText>
               </td>
               <td>{collectorData?.name}</td>

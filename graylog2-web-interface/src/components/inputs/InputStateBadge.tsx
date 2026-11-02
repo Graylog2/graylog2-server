@@ -67,7 +67,9 @@ const stateLabel = (state: string) =>
 const getTextForState = (sortedStates, input: InputSummary) =>
   input.global
     ? sortedStates
-        .map((state) => i18n.t('input_states.count', { ns: 'inputs', count: state.count, state: stateLabel(state.state) }))
+        .map((state) =>
+          i18n.t('input_states.count', { ns: 'inputs', count: state.count, state: stateLabel(state.state) }),
+        )
         .join(', ')
     : stateLabel(sortedStates[0].state);
 

@@ -67,9 +67,7 @@ const ShowNodePage = () => {
     return <Spinner />;
   }
 
-  const title = (
-    <span>{t('node_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>
-  );
+  const title = <span>{t('node_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>;
 
   return (
     <DocumentTitle title={t('node_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>

@@ -58,7 +58,9 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
       .then(() => {
         UserNotification.success(
           i18n.t(
-            isProvisioning ? 'notifications.certificate_provisioned_success' : 'notifications.certificate_renewed_success',
+            isProvisioning
+              ? 'notifications.certificate_provisioned_success'
+              : 'notifications.certificate_renewed_success',
             { ns: 'datanode' },
           ),
         );
@@ -66,7 +68,9 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
       .catch((error) => {
         UserNotification.error(
           i18n.t(
-            isProvisioning ? 'notifications.certificate_provisioning_failed' : 'notifications.certificate_renewal_failed',
+            isProvisioning
+              ? 'notifications.certificate_provisioning_failed'
+              : 'notifications.certificate_renewal_failed',
             { ns: 'datanode', error },
           ),
         );

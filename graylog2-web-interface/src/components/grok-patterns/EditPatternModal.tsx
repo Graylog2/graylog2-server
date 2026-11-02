@@ -198,11 +198,7 @@ class EditPatternModal extends React.Component<
               onChange={this._onNameChange}
               value={name}
               bsStyle={error ? 'error' : null}
-              help={
-                error
-                  ? errorMessage
-                  : this.props.t('input_name_help')
-              }
+              help={error ? errorMessage : this.props.t('input_name_help')}
               autoFocus
               required
             />

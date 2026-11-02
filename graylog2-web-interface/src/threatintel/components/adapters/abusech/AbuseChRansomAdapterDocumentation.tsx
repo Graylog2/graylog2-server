@@ -24,7 +24,10 @@ const AbuseChRansomAdapterDocumentation = (): React.ReactElement => {
 
   return (
     <div>
-      <Alert style={{ marginBottom: 10 }} bsStyle="warning" title={t('abusech_ransom_adapter_documentation.deprecation_title')}>
+      <Alert
+        style={{ marginBottom: 10 }}
+        bsStyle="warning"
+        title={t('abusech_ransom_adapter_documentation.deprecation_title')}>
         <p>{t('abusech_ransom_adapter_documentation.deprecation_text')}</p>
       </Alert>
     </div>

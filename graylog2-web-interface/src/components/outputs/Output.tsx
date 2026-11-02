@@ -155,11 +155,7 @@ class Output extends React.Component<
     let configurationWell;
 
     if (this._typeNotAvailable()) {
-      alert = (
-        <Alert bsStyle="danger">
-          {t('outputs.plugin_error')}
-        </Alert>
-      );
+      alert = <Alert bsStyle="danger">{t('outputs.plugin_error')}</Alert>;
     } else {
       configurationWell = (
         <ConfigurationWell

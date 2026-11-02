@@ -59,11 +59,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
 
   const _connectionsWarning = () => {
     if (connections.length === 0) {
-      return (
-        <ConnectionWarning bsStyle="danger">
-          {t('pipeline.not_connected')}
-        </ConnectionWarning>
-      );
+      return <ConnectionWarning bsStyle="danger">{t('pipeline.not_connected')}</ConnectionWarning>;
     }
 
     return null;

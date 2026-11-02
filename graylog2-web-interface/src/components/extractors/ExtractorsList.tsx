@@ -78,11 +78,7 @@ const ExtractorsList = ({ input, node }: Props) => {
             </Col>
             <Col md={4}>{sortExtractorsButton}</Col>
           </Row>
-          <EntityList
-            bsNoItemsStyle="info"
-            noItemsText={t('list.no_extractors')}
-            items={formattedExtractors}
-          />
+          <EntityList bsNoItemsStyle="info" noItemsText={t('list.no_extractors')} items={formattedExtractors} />
         </Col>
       </Row>
       {showSortModal && (

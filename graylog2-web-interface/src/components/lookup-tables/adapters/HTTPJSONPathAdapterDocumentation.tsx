@@ -81,8 +81,7 @@ const HTTPJSONPathAdapterDocumentation = () => {
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            <Trans t={t} i18nKey="http_doc.lookup_url_text" components={{ emphasis: <em />, code: <code /> }} />{' '}
-            <br />
+            <Trans t={t} i18nKey="http_doc.lookup_url_text" components={{ emphasis: <em />, code: <code /> }} /> <br />
             <Trans t={t} i18nKey="http_doc.lookup_url_example" components={{ code: <code /> }} />
           </p>
         </div>

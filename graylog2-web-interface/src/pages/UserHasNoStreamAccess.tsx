@@ -31,9 +31,7 @@ const UserHasNoStreamAccess = () => {
         <PageHeader title={t('user_no_stream_access.title')} />
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="warning">
-              {t('user_no_stream_access.alert')}
-            </Alert>
+            <Alert bsStyle="warning">{t('user_no_stream_access.alert')}</Alert>
           </Col>
         </Row>
       </PageContentLayout>

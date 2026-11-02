@@ -164,7 +164,9 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
         t={t}
         i18nKey="slack_notification_form.custom_message_help"
         components={{
-          docsLink: <DocumentationLink text={t('slack_notification_form.docs_link_text')} page="alerts#notifications" />,
+          docsLink: (
+            <DocumentationLink text={t('slack_notification_form.docs_link_text')} page="alerts#notifications" />
+          ),
         }}
       />
     </p>
@@ -258,9 +260,7 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
             disabled={!isBacklogSizeEnabled}
           />
         </InputGroup>
-        <HelpBlock>
-          {t('slack_notification_form.backlog_limit_help')}
-        </HelpBlock>
+        <HelpBlock>{t('slack_notification_form.backlog_limit_help')}</HelpBlock>
       </FormGroup>
 
       <Input

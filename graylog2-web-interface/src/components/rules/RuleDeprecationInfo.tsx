@@ -87,7 +87,10 @@ const RuleDeprecationInfo = ({ pipelineId = undefined, ruleId = undefined, showF
   return (
     <DeprecatedLabel bsStyle="warning">
       <span>{t('deprecation.label')}</span>
-      <HoverForHelp trigger="hover" type="info" title={showFor === 'pipeline' ? t('deprecation.title_pipeline') : t('deprecation.title_rule')}>
+      <HoverForHelp
+        trigger="hover"
+        type="info"
+        title={showFor === 'pipeline' ? t('deprecation.title_pipeline') : t('deprecation.title_rule')}>
         <StyledList>
           {deprecatedFunctions?.map((func) => (
             <li key={func}>{func}</li>

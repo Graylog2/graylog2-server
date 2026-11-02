@@ -57,7 +57,10 @@ export const fetchCollectorsAll = (): Promise<{ collectors: Array<Collector> }> 
   const promise = _fetch({ pageSize: 0 });
 
   promise.catch((error) => {
-    UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }),
+      i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -75,7 +78,10 @@ export const fetchCollectorsPaginated = ({
   const promise = _fetch({ query, page, pageSize });
 
   promise.catch((error) => {
-    UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }),
+      i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -91,7 +97,10 @@ export const fetchCollector = (collectorId: string): Promise<Collector> => {
       errorMessage = i18n.t('use_collectors_notifications.not_found', { ns: 'collectors', collectorId });
     }
 
-    UserNotification.error(errorMessage, i18n.t('use_collectors_notifications.fetch_collector_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      errorMessage,
+      i18n.t('use_collectors_notifications.fetch_collector_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -103,7 +112,10 @@ export const createCollector = (collector: Collector): Promise<unknown> => {
   promise.then(
     () => UserNotification.success('', i18n.t('use_collectors_notifications.created_success', { ns: 'collectors' })),
     (error) => {
-      UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
+      UserNotification.error(
+        i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }),
+        i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }),
+      );
     },
   );
 
@@ -116,7 +128,10 @@ export const updateCollector = (collector: Collector): Promise<unknown> => {
   promise.then(
     () => UserNotification.success('', i18n.t('use_collectors_notifications.updated_success', { ns: 'collectors' })),
     (error) => {
-      UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
+      UserNotification.error(
+        i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }),
+        i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }),
+      );
     },
   );
 
@@ -127,10 +142,17 @@ export const deleteCollector = (collector: Collector): Promise<unknown> => {
   const promise = SidecarCollectors.deleteCollector(collector.id);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collectors_notifications.deleted_success', { ns: 'collectors', name: collector.name })),
+    () =>
+      UserNotification.success(
+        '',
+        i18n.t('use_collectors_notifications.deleted_success', { ns: 'collectors', name: collector.name }),
+      ),
     (error) => {
       UserNotification.error(
-        i18n.t('use_collectors_notifications.delete_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
+        i18n.t('use_collectors_notifications.delete_failed', {
+          ns: 'collectors',
+          error: error.status === 400 ? error.responseMessage : error.message,
+        }),
         i18n.t('use_collectors_notifications.delete_failed_title', { ns: 'collectors', name: collector.name }),
       );
     },
@@ -143,7 +165,8 @@ export const copyCollector = (collectorId: string, name: string): Promise<unknow
   const promise = SidecarCollectors.copyCollector(collectorId, name);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collectors_notifications.copied_success', { ns: 'collectors', name })),
+    () =>
+      UserNotification.success('', i18n.t('use_collectors_notifications.copied_success', { ns: 'collectors', name })),
     (error) => {
       UserNotification.error(
         i18n.t('use_collectors_notifications.copy_failed', { ns: 'collectors', name, error: error.message }),
@@ -171,7 +194,11 @@ export const validateCollector = (collector: Collector): Promise<{ errors: { nam
     (response) => response,
     (error) =>
       UserNotification.error(
-        i18n.t('use_collectors_notifications.validate_failed', { ns: 'collectors', name: payload.name, error: error.message }),
+        i18n.t('use_collectors_notifications.validate_failed', {
+          ns: 'collectors',
+          name: payload.name,
+          error: error.message,
+        }),
         i18n.t('use_collectors_notifications.validate_failed_title', { ns: 'collectors' }),
       ),
   );

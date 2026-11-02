@@ -42,12 +42,7 @@ const ExportExtractorsPage = () => {
         <PageHeader
           title={
             <span>
-              <Trans
-                t={t}
-                i18nKey="pages.export_header"
-                values={{ title: input.title }}
-                components={{ em: <em /> }}
-              />
+              <Trans t={t} i18nKey="pages.export_header" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           }>
           <span>

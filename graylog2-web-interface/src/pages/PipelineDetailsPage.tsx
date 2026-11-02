@@ -106,8 +106,7 @@ const PipelineDetailsPage = () => {
   const title = isNewPipeline ? (
     t('new_pipeline')
   ) : (
-    <span
-      >{t('pipeline_details_title', { title: pipeline.title })}</span>
+    <span>{t('pipeline_details_title', { title: pipeline.title })}</span>
   );
 
   const content = isNewPipeline ? (
@@ -136,8 +135,7 @@ const PipelineDetailsPage = () => {
             title: t('documentation_link_title'),
             path: DocsHelper.PAGES.PIPELINES,
           }}>
-          <span
-            >{t('pipeline_details_description')}</span>
+          <span>{t('pipeline_details_description')}</span>
         </PageHeader>
 
         <Row className="content">

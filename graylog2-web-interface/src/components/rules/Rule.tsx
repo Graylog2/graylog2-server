@@ -89,9 +89,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           title: t('rules_page_documentation_link'),
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
-        <span>
-          {t('rules_page_description')}
-        </span>
+        <span>{t('rules_page_description')}</span>
       </PageHeader>
       {isRuleBuilder ? (
         <RuleBuilder />

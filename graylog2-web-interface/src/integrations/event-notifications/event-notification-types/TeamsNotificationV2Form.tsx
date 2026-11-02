@@ -240,9 +240,7 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
             disabled={!isBacklogSizeEnabled}
           />
         </InputGroup>
-        <HelpBlock>
-          {t('teams_notification_form.backlog_limit_help')}
-        </HelpBlock>
+        <HelpBlock>{t('teams_notification_form.backlog_limit_help')}</HelpBlock>
       </FormGroup>
     </>
   );

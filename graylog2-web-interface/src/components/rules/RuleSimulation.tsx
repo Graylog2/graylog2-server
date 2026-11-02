@@ -105,9 +105,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
   }, [currentRule, setRuleSimulationResult, simulateRule, simulationFieldType]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const ruleErrorMessage = hasRuleBuilderErrors(currentRule)
-    ? t('rule_simulation.error_builder')
-    : undefined;
+  const ruleErrorMessage = hasRuleBuilderErrors(currentRule) ? t('rule_simulation.error_builder') : undefined;
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort(
     (a, b) => Number(a) - Number(b),
   );

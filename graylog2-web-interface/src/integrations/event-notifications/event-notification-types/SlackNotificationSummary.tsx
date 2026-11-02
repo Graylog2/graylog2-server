@@ -66,11 +66,17 @@ function SlackNotificationSummary({ notification, ...restProps }: SlackNotificat
       </tr>
       <tr>
         <td>{t('slack_notification_details.notify_channel_label')}</td>
-        <td>{notification.config.notify_channel ? t('slack_notification_summary.yes') : t('slack_notification_summary.no')}</td>
+        <td>
+          {notification.config.notify_channel
+            ? t('slack_notification_summary.yes')
+            : t('slack_notification_summary.no')}
+        </td>
       </tr>
       <tr>
         <td>{t('slack_notification_details.link_names_label')}</td>
-        <td>{notification.config.link_names ? t('slack_notification_summary.yes') : t('slack_notification_summary.no')}</td>
+        <td>
+          {notification.config.link_names ? t('slack_notification_summary.yes') : t('slack_notification_summary.no')}
+        </td>
       </tr>
       <tr>
         <td>{t('slack_notification_details.icon_url_label')}</td>

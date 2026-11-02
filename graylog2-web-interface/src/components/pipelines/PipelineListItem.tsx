@@ -133,7 +133,11 @@ const PipelineListItem = ({
           );
         }
 
-        return <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>{t('list_item.stage', { stage: usedStage })}</PipelineStage>;
+        return (
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>
+            {t('list_item.stage', { stage: usedStage })}
+          </PipelineStage>
+        );
       });
   };
   if (loadingScopePermissions) {

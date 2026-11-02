@@ -56,7 +56,11 @@ export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup_tables
 export function useFetchLookupTable(idOrName: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-table-details', idOrName],
-    queryFn: () => defaultOnError(fetchLookupTable(idOrName), i18n.t('notifications.fetch_lookup_table_failed', { ns: 'lookup_tables' })),
+    queryFn: () =>
+      defaultOnError(
+        fetchLookupTable(idOrName),
+        i18n.t('notifications.fetch_lookup_table_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled: !!idOrName,
   });
@@ -173,7 +177,11 @@ export function useTestLookupTableKey() {
 export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-preview', idOrName, size, enabled],
-    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), i18n.t('notifications.fetch_preview_failed', { ns: 'lookup_tables' })),
+    queryFn: () =>
+      defaultOnError(
+        fetchLookupPreview(idOrName, size),
+        i18n.t('notifications.fetch_preview_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled,
   });
@@ -232,7 +240,8 @@ export function useFetchAllCaches() {
 export function useFetchCache(idOrName: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['cache-details', idOrName],
-    queryFn: () => defaultOnError(fetchCache(idOrName), i18n.t('notifications.fetch_cache_failed', { ns: 'lookup_tables' })),
+    queryFn: () =>
+      defaultOnError(fetchCache(idOrName), i18n.t('notifications.fetch_cache_failed', { ns: 'lookup_tables' })),
     retry: false,
     enabled: !!idOrName,
   });
@@ -376,7 +385,11 @@ export function useFetchDataAdapterTypes() {
 export function useFetchDataAdapter(idOrName: string) {
   const { data, isFetching } = useQuery({
     queryKey: ['data-adapter-details', idOrName],
-    queryFn: () => defaultOnError(fetchDataAdapter(idOrName), i18n.t('notifications.fetch_data_adapter_failed', { ns: 'lookup_tables' })),
+    queryFn: () =>
+      defaultOnError(
+        fetchDataAdapter(idOrName),
+        i18n.t('notifications.fetch_data_adapter_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled: !!idOrName,
   });

@@ -101,13 +101,22 @@ export const fetchConfiguration = (configurationId: string): Promise<Configurati
   const promise = SidecarConfigurations.getConfigurations(configurationId);
 
   promise.catch((error) => {
-    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', { ns: 'collectors', error });
+    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', {
+      ns: 'collectors',
+      error,
+    });
 
     if (error.status === 404) {
-      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', { ns: 'collectors', configurationId });
+      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', {
+        ns: 'collectors',
+        configurationId,
+      });
     }
 
-    UserNotification.error(errorMessage, i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      errorMessage,
+      i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -117,13 +126,22 @@ export const fetchConfigurationSidecars = (configurationId: string): Promise<Con
   const promise = SidecarConfigurations.getConfigurationSidecars(configurationId);
 
   promise.catch((error) => {
-    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', { ns: 'collectors', error });
+    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', {
+      ns: 'collectors',
+      error,
+    });
 
     if (error.status === 404) {
-      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', { ns: 'collectors', configurationId });
+      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', {
+        ns: 'collectors',
+        configurationId,
+      });
     }
 
-    UserNotification.error(errorMessage, i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      errorMessage,
+      i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -133,7 +151,10 @@ export const renderConfigurationPreview = (template: string): Promise<{ preview:
   const promise = SidecarConfigurations.renderConfiguration({ template });
 
   promise.catch((error) => {
-    UserNotification.error(i18n.t('use_collector_configurations_notifications.preview_failed', { ns: 'collectors', error }), i18n.t('use_collector_configurations_notifications.preview_failed_title', { ns: 'collectors' }));
+    UserNotification.error(
+      i18n.t('use_collector_configurations_notifications.preview_failed', { ns: 'collectors', error }),
+      i18n.t('use_collector_configurations_notifications.preview_failed_title', { ns: 'collectors' }),
+    );
   });
 
   return promise;
@@ -143,10 +164,19 @@ export const createConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.createConfiguration(configuration);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.created_success', { ns: 'collectors' })),
+    () =>
+      UserNotification.success(
+        '',
+        i18n.t('use_collector_configurations_notifications.created_success', { ns: 'collectors' }),
+      ),
     (error) => {
       UserNotification.error(
-        error.status === 400 ? error.responseMessage : i18n.t('use_collector_configurations_notifications.create_failed', { ns: 'collectors', error: error.message }),
+        error.status === 400
+          ? error.responseMessage
+          : i18n.t('use_collector_configurations_notifications.create_failed', {
+              ns: 'collectors',
+              error: error.message,
+            }),
         i18n.t('use_collector_configurations_notifications.create_failed_title', { ns: 'collectors' }),
       );
     },
@@ -159,11 +189,21 @@ export const updateConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.updateConfiguration(configuration.id, configuration);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.updated_success', { ns: 'collectors' })),
+    () =>
+      UserNotification.success(
+        '',
+        i18n.t('use_collector_configurations_notifications.updated_success', { ns: 'collectors' }),
+      ),
     (error) => {
       UserNotification.error(
-        i18n.t('use_collector_configurations_notifications.update_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
-        i18n.t('use_collector_configurations_notifications.update_failed_title', { ns: 'collectors', name: configuration.name }),
+        i18n.t('use_collector_configurations_notifications.update_failed', {
+          ns: 'collectors',
+          error: error.status === 400 ? error.responseMessage : error.message,
+        }),
+        i18n.t('use_collector_configurations_notifications.update_failed_title', {
+          ns: 'collectors',
+          name: configuration.name,
+        }),
       );
     },
   );
@@ -175,10 +215,18 @@ export const copyConfiguration = (configurationId: string, name: string): Promis
   const promise = SidecarConfigurations.copyConfiguration(configurationId, name);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.copied_success', { ns: 'collectors', name })),
+    () =>
+      UserNotification.success(
+        '',
+        i18n.t('use_collector_configurations_notifications.copied_success', { ns: 'collectors', name }),
+      ),
     (error) => {
       UserNotification.error(
-        i18n.t('use_collector_configurations_notifications.copy_failed', { ns: 'collectors', name, error: error.message }),
+        i18n.t('use_collector_configurations_notifications.copy_failed', {
+          ns: 'collectors',
+          name,
+          error: error.message,
+        }),
         i18n.t('use_collector_configurations_notifications.copy_failed_title', { ns: 'collectors' }),
       );
     },
@@ -191,11 +239,24 @@ export const deleteConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.deleteConfiguration(configuration.id);
 
   promise.then(
-    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.deleted_success', { ns: 'collectors', name: configuration.name })),
+    () =>
+      UserNotification.success(
+        '',
+        i18n.t('use_collector_configurations_notifications.deleted_success', {
+          ns: 'collectors',
+          name: configuration.name,
+        }),
+      ),
     (error) => {
       UserNotification.error(
-        i18n.t('use_collector_configurations_notifications.delete_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
-        i18n.t('use_collector_configurations_notifications.delete_failed_title', { ns: 'collectors', name: configuration.name }),
+        i18n.t('use_collector_configurations_notifications.delete_failed', {
+          ns: 'collectors',
+          error: error.status === 400 ? error.responseMessage : error.message,
+        }),
+        i18n.t('use_collector_configurations_notifications.delete_failed_title', {
+          ns: 'collectors',
+          name: configuration.name,
+        }),
       );
     },
   );
@@ -221,7 +282,11 @@ export const validateConfiguration = (
     (response) => response,
     (error) =>
       UserNotification.error(
-        i18n.t('use_collector_configurations_notifications.validate_failed', { ns: 'collectors', name: payload.name, error: error.message }),
+        i18n.t('use_collector_configurations_notifications.validate_failed', {
+          ns: 'collectors',
+          name: payload.name,
+          error: error.message,
+        }),
         i18n.t('use_collector_configurations_notifications.validate_failed_title', { ns: 'collectors' }),
       ),
   );

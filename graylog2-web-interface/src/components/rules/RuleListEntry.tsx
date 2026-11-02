@@ -88,8 +88,7 @@ const RuleListEntry = ({
       <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
         <Button bsSize="xsmall">{t('rule_list_entry.edit')}</Button>
       </LinkContainer>
-      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)}
-        title={t('rule_list_entry.delete_title')}>
+      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)} title={t('rule_list_entry.delete_title')}>
         {t('rule_list_entry.delete')}
       </Button>
     </ButtonToolbar>

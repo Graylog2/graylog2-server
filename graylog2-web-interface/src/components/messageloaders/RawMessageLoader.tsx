@@ -185,10 +185,7 @@ const parseRawMessage = (
     (response) => MessageFormatter.formatResultMessage(response),
     (error): undefined => {
       if (error.additional && error.additional.status === 400) {
-        UserNotification.error(
-          t('load_raw_message_error_description'),
-          t('load_raw_message_error_title'),
-        );
+        UserNotification.error(t('load_raw_message_error_description'), t('load_raw_message_error_title'));
 
         return undefined;
       }
@@ -378,12 +375,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
           />
           <fieldset>
             <legend>{t('codec_configuration_legend')}</legend>
-            <Input
-              id="codec"
-              name="codec"
-              label={t('message_codec_label')}
-              help={t('message_codec_help')}
-              required>
+            <Input id="codec" name="codec" label={t('message_codec_label')} help={t('message_codec_help')} required>
               <Select
                 id="codec"
                 aria-label={t('message_codec_label')}

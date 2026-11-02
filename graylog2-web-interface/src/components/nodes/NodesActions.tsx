@@ -77,10 +77,7 @@ class NodesActions extends React.Component<
           <Button>{t('nodes_actions.metrics')}</Button>
         </LinkContainer>
 
-        <DropdownButton
-          title={t('nodes_actions.more_actions')}
-          id={`more-actions-dropdown-${node.node_id}`}
-          pullRight>
+        <DropdownButton title={t('nodes_actions.more_actions')} id={`more-actions-dropdown-${node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">
             <MenuItem onSelect={this._toggleMessageProcessing}>
               {systemOverview.is_processing

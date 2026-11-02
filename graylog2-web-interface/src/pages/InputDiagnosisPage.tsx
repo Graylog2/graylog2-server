@@ -127,7 +127,12 @@ const InputDiagnosisPage = () => {
         </LeftCol>
       </Header>
       <ControlsRow>
-        <StyledSegmentedControl<DiagnosisTab> data={TABS.map(({ value, label }) => ({ value, label: t(label) }))} radius="sm" value={currentTab} onChange={setCurrentTab} />
+        <StyledSegmentedControl<DiagnosisTab>
+          data={TABS.map(({ value, label }) => ({ value, label: t(label) }))}
+          radius="sm"
+          value={currentTab}
+          onChange={setCurrentTab}
+        />
         {input && (
           <Actions>
             <EditInputButton input={input} />

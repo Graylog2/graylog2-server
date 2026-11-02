@@ -46,11 +46,7 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, requir
         fieldData={awsKey}
         autoComplete="off"
         maxLength={512}
-        help={
-          required
-            ? t('aws_key_secret.access_key_help')
-            : t('aws_key_secret.access_key_help_optional')
-        }
+        help={required ? t('aws_key_secret.access_key_help') : t('aws_key_secret.access_key_help_optional')}
         required={required}
       />
 
@@ -62,11 +58,7 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, requir
         fieldData={awsSecret}
         autoComplete="off"
         maxLength={512}
-        help={
-          required
-            ? t('aws_key_secret.secret_key_help')
-            : t('aws_key_secret.secret_key_help_optional')
-        }
+        help={required ? t('aws_key_secret.secret_key_help') : t('aws_key_secret.secret_key_help_optional')}
         required={required}
       />
     </>

@@ -70,7 +70,12 @@ class CounterRate extends React.Component<
       return null;
     }
 
-    return <span>{this._prefix()}{this.props.t('counter_rate.calculating')}</span>;
+    return (
+      <span>
+        {this._prefix()}
+        {this.props.t('counter_rate.calculating')}
+      </span>
+    );
   };
 
   _prefix = () => {

@@ -34,7 +34,10 @@ const useOutputMutations = () => {
       SystemOutputs.create(output as any),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error, output) => {
-      UserNotification.error(i18n.t('use_output_mutations_notifications.save_failed', { ns: 'streams', title: output.title, error }), i18n.t('use_output_mutations_notifications.save_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_output_mutations_notifications.save_failed', { ns: 'streams', title: output.title, error }),
+        i18n.t('use_output_mutations_notifications.save_failed_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -43,7 +46,10 @@ const useOutputMutations = () => {
       SystemOutputs.update(outputId, deltas),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error, { title }) => {
-      UserNotification.error(i18n.t('use_output_mutations_notifications.update_failed', { ns: 'streams', title, error }), i18n.t('use_output_mutations_notifications.update_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_output_mutations_notifications.update_failed', { ns: 'streams', title, error }),
+        i18n.t('use_output_mutations_notifications.update_failed_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -51,7 +57,10 @@ const useOutputMutations = () => {
     mutationFn: (outputId: string) => SystemOutputs.remove(outputId),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error) => {
-      UserNotification.error(i18n.t('use_output_mutations_notifications.terminate_failed', { ns: 'streams', error }), i18n.t('use_output_mutations_notifications.terminate_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_output_mutations_notifications.terminate_failed', { ns: 'streams', error }),
+        i18n.t('use_output_mutations_notifications.terminate_failed_title', { ns: 'streams' }),
+      );
     },
   });
 

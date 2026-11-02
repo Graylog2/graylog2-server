@@ -79,7 +79,9 @@ class SystemInformation extends React.Component<
     let jvmInformationText;
 
     if (jvmInformation) {
-      jvmInformationText = <span>{t('system_information.pid_info', { pid: jvmInformation.pid, info: jvmInformation.info })}</span>;
+      jvmInformationText = (
+        <span>{t('system_information.pid_info', { pid: jvmInformation.pid, info: jvmInformation.info })}</span>
+      );
     } else {
       jvmInformationText = <span>{t('system_information.jvm_unavailable')}</span>;
     }

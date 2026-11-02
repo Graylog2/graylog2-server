@@ -87,15 +87,7 @@ class MetricsList extends React.Component<Props> {
       .sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
       .map((metric) => this._formatMetric(metric));
 
-    return (
-      <MetricListWrap>
-        {metrics.length > 0 ? (
-          metrics
-        ) : (
-          <li>{t('metrics_list.no_metrics')}</li>
-        )}
-      </MetricListWrap>
-    );
+    return <MetricListWrap>{metrics.length > 0 ? metrics : <li>{t('metrics_list.no_metrics')}</li>}</MetricListWrap>;
   }
 }
 

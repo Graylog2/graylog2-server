@@ -110,7 +110,10 @@ export const restartCollector = (sidecarId: string, collector: string): Promise<
   const promise = fetch('PUT', qualifyUrl(`${SOURCE_URL}/${sidecarId}/action`), [action]);
 
   promise.catch((error) => {
-    UserNotification.error(i18n.t('use_sidecars_notifications.restart_failed', { ns: 'sidecars', error }), i18n.t('use_sidecars_notifications.restart_failed_title', { ns: 'sidecars' }));
+    UserNotification.error(
+      i18n.t('use_sidecars_notifications.restart_failed', { ns: 'sidecars', error }),
+      i18n.t('use_sidecars_notifications.restart_failed_title', { ns: 'sidecars' }),
+    );
   });
 
   return promise;
@@ -136,7 +139,13 @@ export const assignConfigurations = (
 
   promise.then(
     (response) => {
-      UserNotification.success('', i18n.t('use_sidecars_notifications.configuration_change_requested', { ns: 'sidecars', amount: sidecars.length }));
+      UserNotification.success(
+        '',
+        i18n.t('use_sidecars_notifications.configuration_change_requested', {
+          ns: 'sidecars',
+          amount: sidecars.length,
+        }),
+      );
 
       return response;
     },
@@ -157,7 +166,9 @@ export const useSidecarsListPaginated = (opts: Partial<PaginationOptions>) =>
     queryFn: () =>
       fetchSidecarsList(opts).catch((error) => {
         UserNotification.error(
-          error.status === 400 ? error.responseMessage : i18n.t('use_sidecars_notifications.fetch_sidecars_failed', { ns: 'sidecars', error: error.message }),
+          error.status === 400
+            ? error.responseMessage
+            : i18n.t('use_sidecars_notifications.fetch_sidecars_failed', { ns: 'sidecars', error: error.message }),
           i18n.t('use_sidecars_notifications.fetch_sidecars_failed_title', { ns: 'sidecars' }),
         );
 

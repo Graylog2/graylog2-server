@@ -43,7 +43,10 @@ const useInputStateMutations = (input: InputSummary) => {
       );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_state_mutations_notifications.started_success', { ns: 'inputs' }), i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.started_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });
@@ -56,7 +59,10 @@ const useInputStateMutations = (input: InputSummary) => {
       );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_state_mutations_notifications.stopped_success', { ns: 'inputs' }), i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.stopped_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });
@@ -69,7 +75,10 @@ const useInputStateMutations = (input: InputSummary) => {
       );
     },
     onSuccess: () => {
-      UserNotification.success(i18n.t('use_input_state_mutations_notifications.deleted_success', { ns: 'inputs' }), i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }));
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.deleted_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });

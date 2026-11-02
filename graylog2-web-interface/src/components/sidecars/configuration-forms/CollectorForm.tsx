@@ -72,11 +72,12 @@ const formatOperatingSystems = () => {
   return options;
 };
 
-type CollectorFormProps = HistoryContext & WithTranslation & {
-  action?: 'create' | 'edit';
-  collector?: any;
-  sendTelemetry?: (...args: any[]) => void;
-};
+type CollectorFormProps = HistoryContext &
+  WithTranslation & {
+    action?: 'create' | 'edit';
+    collector?: any;
+    sendTelemetry?: (...args: any[]) => void;
+  };
 
 class CollectorForm extends React.Component<
   CollectorFormProps,

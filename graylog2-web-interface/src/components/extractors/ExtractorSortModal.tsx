@@ -83,12 +83,7 @@ class ExtractorSortModal extends React.Component<
         <Modal.Header>
           <Modal.Title>
             <span>
-              <Trans
-                t={t}
-                i18nKey="sort.title"
-                values={{ title: input.title }}
-                components={{ em: <em /> }}
-              />
+              <Trans t={t} i18nKey="sort.title" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           </Modal.Title>
         </Modal.Header>

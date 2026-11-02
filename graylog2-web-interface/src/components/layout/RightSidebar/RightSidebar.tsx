@@ -171,7 +171,10 @@ const RightSidebar = () => {
   }
 
   return (
-    <Container $width={width} role="complementary" aria-label={t('right_sidebar.sidebar_label', { title: content.title })}>
+    <Container
+      $width={width}
+      role="complementary"
+      aria-label={t('right_sidebar.sidebar_label', { title: content.title })}>
       <SidebarRow className="content">
         <SidebarHeader>
           <NavigationButtons>

@@ -85,9 +85,7 @@ const ClusterConfigurationNodes = () => {
   const nodeTypeOptions: Array<{ label: string; value: NodeType }> = [
     { label: t('cluster_configuration_nodes.all_nodes'), value: 'all' },
     { label: `${productName} Nodes`, value: 'graylog' },
-    ...(searchNodesConfig
-      ? [{ label: t(searchNodesConfig.label), value: searchNodesConfig.nodeType }]
-      : []),
+    ...(searchNodesConfig ? [{ label: t(searchNodesConfig.label), value: searchNodesConfig.nodeType }] : []),
     { label: t('cluster_configuration_nodes.mongodb_nodes'), value: 'mongodb' },
   ];
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);

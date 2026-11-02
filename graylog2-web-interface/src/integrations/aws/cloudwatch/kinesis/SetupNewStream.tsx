@@ -155,11 +155,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
         label={t('aws_kinesis_setup_new_stream.group_name_label')}
         required
         disabled={groupNamesStatus.loading || disabledGroups || disabledForm}>
-        {renderOptions(
-          availableGroups,
-          t('aws_kinesis_setup_new_stream.choose_group'),
-          groupNamesStatus.loading,
-        )}
+        {renderOptions(availableGroups, t('aws_kinesis_setup_new_stream.choose_group'), groupNamesStatus.loading)}
       </ValidatedInput>
 
       {toggleSetup && (

@@ -34,37 +34,44 @@ const TimerDetails = ({
     <dl className="metric-def metric-timer">
       <dt>{t('metric_details.percentile_95')}</dt>
       <dd>
-        <span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.percentile_98')}</dt>
       <dd>
-        <span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.percentile_99')}</dt>
       <dd>
-        <span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.standard_deviation')}</dt>
       <dd>
-        <span>{numeral(timing.std_dev).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing.std_dev).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.mean')}</dt>
       <dd>
-        <span>{numeral(timing.mean).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing.mean).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.minimum')}</dt>
       <dd>
-        <span>{numeral(timing.min).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing.min).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
 
       <dt>{t('metric_details.maximum')}</dt>
       <dd>
-        <span>{numeral(timing.max).format('0,0.[00]')}</span>{t('metric_details.microseconds')}
+        <span>{numeral(timing.max).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
       </dd>
     </dl>
   );

@@ -65,7 +65,10 @@ const useStreamMutations = () => {
       CurrentUserStore.reload();
     },
     onError: (errorThrown) => {
-      UserNotification.error(i18n.t('use_stream_mutations_notifications.save_failed', { ns: 'streams', error: errorThrown }), i18n.t('use_stream_mutations_notifications.save_failed_title', { ns: 'streams' }));
+      UserNotification.error(
+        i18n.t('use_stream_mutations_notifications.save_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('use_stream_mutations_notifications.save_failed_title', { ns: 'streams' }),
+      );
     },
   });
 

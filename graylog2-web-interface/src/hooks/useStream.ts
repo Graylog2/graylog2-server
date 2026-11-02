@@ -36,7 +36,12 @@ const useStream = (
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>({
     queryKey: ['stream', streamId],
-    queryFn: () => defaultOnError(fetchStream(streamId), i18n.t('use_stream_notifications.load_failed', { ns: 'streams' }), i18n.t('use_stream_notifications.load_failed_title', { ns: 'streams' })),
+    queryFn: () =>
+      defaultOnError(
+        fetchStream(streamId),
+        i18n.t('use_stream_notifications.load_failed', { ns: 'streams' }),
+        i18n.t('use_stream_notifications.load_failed_title', { ns: 'streams' }),
+      ),
     notifyOnChangeProps: ['data', 'error'],
   });
 

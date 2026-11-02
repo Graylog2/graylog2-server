@@ -99,11 +99,7 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
         <Row className="row-sm">
           <Col md={8} mdOffset={2}>
             <Panel bsStyle="danger" header={t('simulator.no_streams_title')}>
-              <Trans
-                t={t}
-                i18nKey="simulator.no_streams"
-                components={{ streamsLink: <Link to={Routes.STREAMS} /> }}
-              />
+              <Trans t={t} i18nKey="simulator.no_streams" components={{ streamsLink: <Link to={Routes.STREAMS} /> }} />
             </Panel>
           </Col>
         </Row>

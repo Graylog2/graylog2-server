@@ -58,7 +58,9 @@ const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string 
 
   return (
     <TitleRow>
-      {tableErrorText && <ErrorPopover placement="right" errorText={tableErrorText} title={t('lut_list.problem_title')} />}
+      {tableErrorText && (
+        <ErrorPopover placement="right" errorText={tableErrorText} title={t('lut_list.problem_title')} />
+      )}
       <Title onClick={onClick}>{children}</Title>
     </TitleRow>
   );
@@ -79,7 +81,9 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
 
   return (
     <TitleRow>
-      {cacheErrorText && <ErrorPopover placement="bottom" errorText={cacheErrorText} title={t('lut_list.cache_problem')} />}
+      {cacheErrorText && (
+        <ErrorPopover placement="bottom" errorText={cacheErrorText} title={t('lut_list.cache_problem')} />
+      )}
       <Title onClick={onClick}>{caches[cacheId].title}</Title>
     </TitleRow>
   );

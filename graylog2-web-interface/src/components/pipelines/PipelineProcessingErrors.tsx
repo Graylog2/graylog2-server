@@ -105,9 +105,7 @@ const PipelineProcessingErrors = ({ pipeline }: Props) => {
         suffix={t('processing_errors.rate_suffix')}
       />
       <br />
-      <span className="number-format">
-        {t('processing_errors.total', { total: numeral(totalErrors).format('0') })}
-      </span>
+      <span className="number-format">{t('processing_errors.total', { total: numeral(totalErrors).format('0') })}</span>
     </span>
   );
 };

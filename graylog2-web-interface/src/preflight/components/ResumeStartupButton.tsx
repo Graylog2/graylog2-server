@@ -52,10 +52,7 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children = null, compact 
         .catch((error) => {
           setIsWaitingForStartup(false);
 
-          UserNotification.error(
-            t('resume_startup.error', { error: String(error) }),
-            t('resume_startup.error_title'),
-          );
+          UserNotification.error(t('resume_startup.error', { error: String(error) }), t('resume_startup.error_title'));
         });
     }
   }, [dataNodes?.length, productName, setIsWaitingForStartup, t]);

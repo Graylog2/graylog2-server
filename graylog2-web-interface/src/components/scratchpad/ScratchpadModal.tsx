@@ -240,10 +240,7 @@ const Scratchpad = () => {
         />
 
         <Footer>
-          <OverlayTrigger
-            placement="right"
-            trigger={['hover', 'focus']}
-            overlay={<>{t('scratchpad.help_overlay')}</>}>
+          <OverlayTrigger placement="right" trigger={['hover', 'focus']} overlay={<>{t('scratchpad.help_overlay')}</>}>
             <Button bsStyle="link">
               <Icon name="help" />
             </Button>

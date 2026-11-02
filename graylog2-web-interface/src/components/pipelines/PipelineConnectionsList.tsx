@@ -45,7 +45,11 @@ const PipelineConnectionsList = ({
     .sort((s1, s2) => naturalSort(s1.title, s2.title));
 
   return (
-    <span>{streamsUsingPipeline.length === 0 ? (noConnectionsMessage ?? t('connections_list.not_connected')) : streamsFormatter(streamsUsingPipeline)}</span>
+    <span>
+      {streamsUsingPipeline.length === 0
+        ? (noConnectionsMessage ?? t('connections_list.not_connected'))
+        : streamsFormatter(streamsUsingPipeline)}
+    </span>
   );
 };
 

@@ -38,7 +38,6 @@ const createDefaultSearchPageLayout = (t: TFunction): Partial<LayoutState> => ({
   },
 });
 
-
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
   eventData: Event;

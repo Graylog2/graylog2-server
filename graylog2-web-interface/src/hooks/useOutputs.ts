@@ -59,7 +59,12 @@ const useOutputs = (
 } => {
   const { data, refetch, isInitialLoading } = useQuery({
     queryKey: keyFn(),
-    queryFn: () => defaultOnError(fetchOutputs(), i18n.t('use_outputs_notifications.load_failed', { ns: 'streams' }), i18n.t('use_outputs_notifications.load_failed_title', { ns: 'streams' })),
+    queryFn: () =>
+      defaultOnError(
+        fetchOutputs(),
+        i18n.t('use_outputs_notifications.load_failed', { ns: 'streams' }),
+        i18n.t('use_outputs_notifications.load_failed_title', { ns: 'streams' }),
+      ),
     placeholderData: keepPreviousData,
     enabled,
   });

@@ -38,10 +38,15 @@ export const createInput = (input: ConfiguredInput): Promise<{ id: string }> => 
 
   promise.then(
     () => {
-      UserNotification.success(i18n.t('use_inputs_notifications.launched_success', { ns: 'inputs', title: input.title }));
+      UserNotification.success(
+        i18n.t('use_inputs_notifications.launched_success', { ns: 'inputs', title: input.title }),
+      );
     },
     (error) => {
-      UserNotification.error(i18n.t('use_inputs_notifications.launch_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.launch_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_inputs_notifications.launch_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_inputs_notifications.launch_failed_title', { ns: 'inputs' }),
+      );
     },
   );
 
@@ -53,10 +58,15 @@ export const updateInput = (id: string, input: ConfiguredInput): Promise<void> =
 
   promise.then(
     () => {
-      UserNotification.success(i18n.t('use_inputs_notifications.updated_success', { ns: 'inputs', title: input.title }));
+      UserNotification.success(
+        i18n.t('use_inputs_notifications.updated_success', { ns: 'inputs', title: input.title }),
+      );
     },
     (error) => {
-      UserNotification.error(i18n.t('use_inputs_notifications.update_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.update_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_inputs_notifications.update_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_inputs_notifications.update_failed_title', { ns: 'inputs' }),
+      );
     },
   );
 
@@ -68,10 +78,15 @@ export const deleteInput = (input: Input): Promise<void> => {
 
   promise.then(
     () => {
-      UserNotification.success(i18n.t('use_inputs_notifications.deleted_success', { ns: 'inputs', title: input.title }));
+      UserNotification.success(
+        i18n.t('use_inputs_notifications.deleted_success', { ns: 'inputs', title: input.title }),
+      );
     },
     (error) => {
-      UserNotification.error(i18n.t('use_inputs_notifications.delete_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.delete_failed_title', { ns: 'inputs' }));
+      UserNotification.error(
+        i18n.t('use_inputs_notifications.delete_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_inputs_notifications.delete_failed_title', { ns: 'inputs' }),
+      );
     },
   );
 
@@ -93,7 +108,10 @@ const useInputsList = () =>
     queryKey: INPUTS_QUERY_KEY,
     queryFn: () =>
       fetchInputs().catch((error) => {
-        UserNotification.error(i18n.t('use_inputs_notifications.fetch_failed', { ns: 'inputs', error }), i18n.t('use_inputs_notifications.fetch_failed_title', { ns: 'inputs' }));
+        UserNotification.error(
+          i18n.t('use_inputs_notifications.fetch_failed', { ns: 'inputs', error }),
+          i18n.t('use_inputs_notifications.fetch_failed_title', { ns: 'inputs' }),
+        );
 
         throw error;
       }),

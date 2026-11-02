@@ -36,9 +36,7 @@ type Props = {
 
 const formatNodeDetails = (details: NodeDetails) => {
   if (!details) {
-    return (
-      <p>{i18n.t('sidecars.sidecar_status.node_details_unavailable', { ns: 'sidecars' })}</p>
-    );
+    return <p>{i18n.t('sidecars.sidecar_status.node_details_unavailable', { ns: 'sidecars' })}</p>;
   }
 
   const { metrics } = details;
@@ -77,9 +75,7 @@ const formatCollectorStatus = (
   _onShowVerbose: (name: string, verbose: string) => void,
 ) => {
   if (!details || !collectors) {
-    return (
-      <p>{i18n.t('sidecars.sidecar_status.collectors_status_unavailable', { ns: 'sidecars' })}</p>
-    );
+    return <p>{i18n.t('sidecars.sidecar_status.collectors_status_unavailable', { ns: 'sidecars' })}</p>;
   }
 
   if (!details.status) {

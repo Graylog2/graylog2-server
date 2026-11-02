@@ -85,9 +85,7 @@ function CacheFormFields() {
         required
         error={touched.name && errors.name ? errors.name : null}
         onChange={() => setGenerateName(!touched.name)}
-        help={
-          touched.name && errors.name ? null : t('cache_form.name_help')
-        }
+        help={touched.name && errors.name ? null : t('cache_form.name_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />

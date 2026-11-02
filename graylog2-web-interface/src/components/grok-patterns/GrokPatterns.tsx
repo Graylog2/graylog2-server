@@ -235,9 +235,7 @@ class GrokPatterns extends React.Component<
               </ButtonToolbar>
             </IfPermitted>
           }>
-          <span>
-            {this.props.t('description')}
-          </span>
+          <span>{this.props.t('description')}</span>
         </PageHeader>
 
         <Row className="content">
@@ -276,4 +274,7 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withTranslation('grokpatterns')(withPaginationQueryParameter(GrokPatterns)), 'grokpatterns');
+export default withTelemetry(
+  withTranslation('grokpatterns')(withPaginationQueryParameter(GrokPatterns)),
+  'grokpatterns',
+);

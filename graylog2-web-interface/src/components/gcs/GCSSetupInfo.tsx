@@ -65,7 +65,9 @@ const GCSSetupInfo = () => {
             t={t}
             i18nKey="gcs_setup_info.step_credentials"
             components={{
-              adcLink: <ExternalLink href="https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to" />,
+              adcLink: (
+                <ExternalLink href="https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to" />
+              ),
             }}
           />
         </li>

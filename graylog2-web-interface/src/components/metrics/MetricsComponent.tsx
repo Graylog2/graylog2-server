@@ -121,7 +121,8 @@ class MetricsComponent extends React.Component<Props, State> {
             {error && (
               <>
                 <Icon name="warning" />
-                &nbsp; <Trans
+                &nbsp;{' '}
+                <Trans
                   t={t}
                   i18nKey="metrics_component.fetch_error_last_metrics"
                   values={{ responseMessage: error.responseMessage || '', status: error.status }}

@@ -88,7 +88,10 @@ const useClusterOverview = () =>
     queryKey: ['cluster', 'overview'],
     queryFn: () =>
       fetchClusterOverview().catch((error) => {
-        UserNotification.error(i18n.t('use_cluster_overview_notifications.overview_failed', { ns: 'system', error }), i18n.t('use_cluster_overview_notifications.overview_failed_title', { ns: 'system' }));
+        UserNotification.error(
+          i18n.t('use_cluster_overview_notifications.overview_failed', { ns: 'system', error }),
+          i18n.t('use_cluster_overview_notifications.overview_failed_title', { ns: 'system' }),
+        );
 
         throw error;
       }),

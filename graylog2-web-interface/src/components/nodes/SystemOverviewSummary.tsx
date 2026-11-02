@@ -47,9 +47,7 @@ export const SystemOverviewSummary = ({ information }: SystemOverviewSummaryProp
       <dd>{StringUtils.capitalizeFirstLetter(information.lifecycle)}</dd>
       <dt>{t('system_overview_summary.message_processing')}</dt>
       <dd>
-        {information.is_processing
-          ? t('system_overview_summary.enabled')
-          : t('system_overview_summary.disabled')}
+        {information.is_processing ? t('system_overview_summary.enabled') : t('system_overview_summary.disabled')}
       </dd>
       <dt>{t('system_overview_summary.lb_indication')}</dt>
       <dd className={lbStatus === 'DEAD' ? 'text-danger' : ''}>{lbStatus}</dd>

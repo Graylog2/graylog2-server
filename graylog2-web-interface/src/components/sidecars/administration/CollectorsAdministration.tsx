@@ -362,7 +362,8 @@ const CollectorsAdministration = ({
                 {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
                 &emsp;
                 <small>
-                  {sidecar.node_id} {!sidecar.active && <b>&mdash; {t('administration.collectors_administration.inactive')}</b>}
+                  {sidecar.node_id}{' '}
+                  {!sidecar.active && <b>&mdash; {t('administration.collectors_administration.inactive')}</b>}
                 </small>
               </AlignedInformation>
             </Col>

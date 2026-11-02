@@ -38,7 +38,10 @@ const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType
 
   return (
     <>
-      <ReadOnlyFormGroup label={t('slack_notification_details.webhook_url_label')} value={notification.config.webhook_url} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.webhook_url_label')}
+        value={notification.config.webhook_url}
+      />
       <ReadOnlyFormGroup label={t('slack_notification_details.channel_label')} value={notification.config.channel} />
       <ReadOnlyFormGroup
         label={t('slack_notification_details.custom_message_label')}
@@ -58,7 +61,10 @@ const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType
         label={t('slack_notification_details.backlog_limit_label')}
         value={notification.config.backlog_size}
       />
-      <ReadOnlyFormGroup label={t('slack_notification_details.user_name_label')} value={notification.config.user_name} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.user_name_label')}
+        value={notification.config.user_name}
+      />
       <ReadOnlyFormGroup
         label={t('slack_notification_details.include_title_label')}
         value={notification.config.include_title}
@@ -67,10 +73,19 @@ const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType
         label={t('slack_notification_details.notify_channel_label')}
         value={notification.config.notify_channel}
       />
-      <ReadOnlyFormGroup label={t('slack_notification_details.link_names_label')} value={notification.config.link_names} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.link_names_label')}
+        value={notification.config.link_names}
+      />
       <ReadOnlyFormGroup label={t('slack_notification_details.icon_url_label')} value={notification.config.icon_url} />
-      <ReadOnlyFormGroup label={t('slack_notification_details.icon_emoji_label')} value={notification.config.icon_emoji} />
-      <ReadOnlyFormGroup label={t('slack_notification_details.time_zone_label')} value={notification.config.time_zone} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.icon_emoji_label')}
+        value={notification.config.icon_emoji}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.time_zone_label')}
+        value={notification.config.time_zone}
+      />
     </>
   );
 };

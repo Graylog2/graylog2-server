@@ -435,7 +435,9 @@ const RuleBuilder = () => {
             <Trans
               t={t}
               i18nKey={
-                blockToDelete.type === 'condition' ? 'builder.delete_condition_confirm' : 'builder.delete_action_confirm'
+                blockToDelete.type === 'condition'
+                  ? 'builder.delete_condition_confirm'
+                  : 'builder.delete_action_confirm'
               }
               values={{ order: blockToDelete.orderIndex + 1 }}
               components={{ blockName: <strong /> }}

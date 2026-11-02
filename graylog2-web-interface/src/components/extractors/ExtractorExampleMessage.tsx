@@ -83,9 +83,7 @@ class ExtractorExampleMessage extends React.Component<
       );
     } else {
       messagePreview = (
-        <NoExample className="alert alert-warning">
-          {t('example_message.not_loaded', { field })}
-        </NoExample>
+        <NoExample className="alert alert-warning">{t('example_message.not_loaded', { field })}</NoExample>
       );
     }
 

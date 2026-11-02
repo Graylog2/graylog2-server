@@ -47,8 +47,7 @@ const PipelinesOverviewPage = () => {
           title: t('documentation_link_title'),
           path: DocsHelper.PAGES.PIPELINES,
         }}>
-        <span
-          >{t('overview_description')}</span>
+        <span>{t('overview_description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

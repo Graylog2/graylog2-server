@@ -44,10 +44,7 @@ const PipelinesUsingRule = ({ create }: PipelinesUsingRuleProps) => {
     ));
 
   return (
-    <Input
-      id="used-in-pipelines"
-      label={t('used_in_pipelines.label')}
-      help={t('used_in_pipelines.help')}>
+    <Input id="used-in-pipelines" label={t('used_in_pipelines.label')} help={t('used_in_pipelines.help')}>
       <div className="form-control-static">
         {usedInPipelines.length === 0 ? (
           t('used_in_pipelines.none')

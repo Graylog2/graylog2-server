@@ -191,7 +191,9 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
           <li>
             <Trans
               t={t}
-              i18nKey={extractor.condition_type === 'string' ? 'list_item.condition_string' : 'list_item.condition_regex'}
+              i18nKey={
+                extractor.condition_type === 'string' ? 'list_item.condition_string' : 'list_item.condition_regex'
+              }
               values={{ value: extractor.condition_value }}
               components={{ em: <em /> }}
             />

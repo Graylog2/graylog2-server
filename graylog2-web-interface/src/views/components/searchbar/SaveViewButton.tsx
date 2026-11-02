@@ -56,7 +56,8 @@ const SaveViewButton = (
 
   return (
     <Button title={title} ref={ref} onClick={onClick} disabled={disabled}>
-      <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> {t('save_view.save')}
+      <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} />{' '}
+      {t('save_view.save')}
     </Button>
   );
 };

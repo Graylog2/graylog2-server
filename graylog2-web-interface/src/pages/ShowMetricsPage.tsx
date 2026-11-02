@@ -62,7 +62,9 @@ const ShowMetricsPage = () => {
   }
 
   const node = nodes[nodeId];
-  const title = <span>{t('show_metrics_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>;
+  const title = (
+    <span>{t('show_metrics_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>
+  );
 
   return (
     <DocumentTitle title={t('show_metrics_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>

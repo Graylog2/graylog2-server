@@ -111,9 +111,8 @@ const RulesPage = () => {
           title: t('rules_page_documentation_link'),
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
-        <span
-          >{t('rules_page_description')}</span >
-        </PageHeader>
+        <span>{t('rules_page_description')}</span>
+      </PageHeader>
 
       <Row className="content">
         <Col md={12}>

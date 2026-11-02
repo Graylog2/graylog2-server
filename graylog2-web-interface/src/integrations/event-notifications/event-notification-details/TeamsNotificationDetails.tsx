@@ -38,7 +38,10 @@ const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryType
 
   return (
     <>
-      <ReadOnlyFormGroup label={t('teams_notification_details.webhook_url_label')} value={notification.config.webhook_url} />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.webhook_url_label')}
+        value={notification.config.webhook_url}
+      />
       <ReadOnlyFormGroup
         label={t('teams_notification_details.custom_message_label')}
         value={
@@ -52,7 +55,10 @@ const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryType
         value={notification.config.backlog_size}
       />
       <ReadOnlyFormGroup label={t('teams_notification_details.icon_url_label')} value={notification.config.icon_url} />
-      <ReadOnlyFormGroup label={t('teams_notification_details.time_zone_label')} value={notification.config.time_zone} />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.time_zone_label')}
+        value={notification.config.time_zone}
+      />
     </>
   );
 };

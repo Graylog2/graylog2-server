@@ -88,7 +88,13 @@ const SavedSearchForm = ({
           )}
           <FormGroup>
             <ControlLabel htmlFor="title">{t('save_form.title_label')}</ControlLabel>
-            <FormControl type="text" value={title} id="title" placeholder={t('save_form.title_placeholder')} onChange={onChangeTitle} />
+            <FormControl
+              type="text"
+              value={title}
+              id="title"
+              placeholder={t('save_form.title_placeholder')}
+              onChange={onChangeTitle}
+            />
           </FormGroup>
           {pluggableSaveViewControls?.map(
             ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,

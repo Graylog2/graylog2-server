@@ -123,9 +123,7 @@ const AWSPluginConfiguration = ({
         </dd>
 
         <dt>{t('aws_plugin_configuration.status_lookup_regions')}</dt>
-        <dd>
-          {config.lookup_regions ? config.lookup_regions : t('aws_plugin_configuration.status_not_set')}
-        </dd>
+        <dd>{config.lookup_regions ? config.lookup_regions : t('aws_plugin_configuration.status_not_set')}</dd>
 
         <dt>{t('aws_plugin_configuration.status_access_key')}</dt>
         <dd>{config.access_key ? config.access_key : t('aws_plugin_configuration.status_not_set')}</dd>

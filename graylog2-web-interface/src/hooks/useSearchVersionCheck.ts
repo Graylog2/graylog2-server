@@ -40,7 +40,11 @@ const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'd
   const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: (args) => defaultOnError(fetchSearchVersionCheck(args), i18n.t('use_search_version_check_notifications.fetch_failed_title', { ns: 'common' })),
+    queryFn: (args) =>
+      defaultOnError(
+        fetchSearchVersionCheck(args),
+        i18n.t('use_search_version_check_notifications.fetch_failed_title', { ns: 'common' }),
+      ),
   });
 
   return {

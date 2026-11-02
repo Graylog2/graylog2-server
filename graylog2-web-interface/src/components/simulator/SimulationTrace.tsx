@@ -40,7 +40,11 @@ const SimulationTrace = ({ simulationResults }: Props) => {
 
   simulationTrace.forEach((trace, idx) => {
     // eslint-disable-next-line react/no-array-index-key
-    traceEntries.push(<dt key={`${trace.time}-${idx}-title`}>{NumberUtils.formatNumber(trace.time)} {t('simulation_trace.microseconds')}</dt>);
+    traceEntries.push(
+      <dt key={`${trace.time}-${idx}-title`}>
+        {NumberUtils.formatNumber(trace.time)} {t('simulation_trace.microseconds')}
+      </dt>,
+    );
     traceEntries.push(
       // eslint-disable-next-line react/no-array-index-key
       <dd key={`${trace}-${idx}-description`}>
