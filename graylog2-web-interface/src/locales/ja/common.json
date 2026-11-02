@@ -1,1 +1,198 @@
-{}
+{
+  "actions": {
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "submit": "送信",
+    "delete": "削除",
+    "previous": "前へ",
+    "next": "次へ",
+    "add": "追加",
+    "edit": "編集",
+    "preview": "プレビュー",
+    "close": "閉じる",
+    "done": "完了",
+    "filter": "フィルター",
+    "reset": "リセット",
+    "reset_search": "検索をリセット",
+    "more_actions": "その他の操作",
+    "sort": "並べ替え",
+    "clear_selection": "選択を解除",
+    "remove_item": "{{name}} を削除"
+  },
+  "confirm_leave": {
+    "question": "本当によろしいですか？"
+  },
+  "duration": {},
+  "bulk_actions": {
+    "title": "一括操作",
+    "cancel": "選択をキャンセル"
+  },
+  "refresh": {
+    "not_updating": "更新されていません",
+    "every": "間隔",
+    "pause": "更新を一時停止",
+    "start": "更新を開始"
+  },
+  "create_entity": {
+    "title": "{{entityName}} を作成",
+    "submit": "{{entityName, lowercase}} を作成",
+    "submitting": "{{entityName, lowercase}} を作成中...",
+    "save_failed": "保存に失敗しました",
+    "unknown_error": "エラーが発生しました。もう一度お試しください。"
+  },
+  "key_value_table": {
+    "name": "名前",
+    "value": "値",
+    "actions": "操作"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdownエディター",
+    "preview_title": "Markdownプレビュー",
+    "expand_preview": "プレビューを展開",
+    "expand_content": "コンテンツを展開"
+  },
+  "source_code_editor": {
+    "copy": "コピー (Ctrl+C / ⌘C)",
+    "paste": "貼り付け (Ctrl+V / ⌘V)",
+    "undo": "元に戻す (Ctrl+Z / ⌘Z)",
+    "redo": "やり直し (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Ctrl+V (macOSでは⌘V) を押すか、編集 → 貼り付け を選択して、クリップボードから貼り付けてください。"
+  },
+  "loading": "読み込み中...",
+  "loading_long_wait": "少し時間がかかっています。しばらくお待ちください...",
+  "errors": {
+    "runtime_error": "実行時エラー",
+    "unknown_error": "不明なエラー",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "データの取得エラー",
+    "page_error_description": "このページの構築に必要なデータの一部を取得できませんでした。代わりに画像を表示しています。",
+    "page_error_logs": "詳細は {{productName}} サーバーのログを確認してください。"
+  },
+  "empty": {
+    "no_data": "利用可能なデータがありません。",
+    "no_entities": "項目が存在しません。",
+    "nothing_here": "ここには何もないようです。",
+    "no_items": "表示する項目がありません",
+    "no_items_available": "利用可能な項目がありません",
+    "no_items_found": "表示する項目が見つかりません。",
+    "filter_no_match": "フィルターに一致するデータがありません。"
+  },
+  "badges": {
+    "beta": "ベータ",
+    "preview": "プレビュー",
+    "default": "デフォルト",
+    "optional": "(任意)"
+  },
+  "clipboard": {
+    "copied": "コピーしました！"
+  },
+  "restricted_access": {
+    "view": "この{{entityName}}を表示する権限がありません。"
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise機能",
+    "description": "<bold>{{featureName}}</bold> 機能を使用するには、<licenseLink>Graylog Enterpriseライセンス</licenseLink>と<docsLink>Graylog Enterpriseプラグイン</docsLink>が必要です。"
+  },
+  "pagination": {
+    "first": "最初のページを開く",
+    "previous": "前のページを開く",
+    "next": "次のページを開く",
+    "last": "最後のページを開く",
+    "page": "{{page}} ページを開く",
+    "active_page": "現在のページ"
+  },
+  "page_size": {
+    "configure": "ページサイズを設定",
+    "show": "<select/> 件を表示"
+  },
+  "search_form": {
+    "placeholder": "検索クエリを入力...",
+    "filter_placeholder": "フィルターするクエリを入力"
+  },
+  "select": {
+    "placeholder": "選択...",
+    "no_options": "選択肢がありません",
+    "loading": "読み込み中...",
+    "loading_options": "選択肢を読み込み中...",
+    "type_to_filter": "入力してフィルター"
+  },
+  "entity_table": {
+    "columns": "列",
+    "configure_columns": "表示する列を設定",
+    "reset_columns": "すべての列をリセット",
+    "show_column": "{{column}} を表示",
+    "hide_column_named": "{{column}} を非表示",
+    "show_label": "表示",
+    "show_details": "詳細を表示",
+    "collapse_section": "セクションを折りたたむ",
+    "toggle_column_actions": "{{column}} の操作を切り替え",
+    "sort_ascending": "昇順に並べ替え",
+    "sort_descending": "降順に並べ替え",
+    "sort_column_ascending": "{{column, lowercase}} を昇順に並べ替え",
+    "sort_column_descending": "{{column, lowercase}} を降順に並べ替え",
+    "hide_column": "列を非表示",
+    "resize_column": "{{column}} 列のサイズを変更",
+    "slicing_by": "{{column}} でスライス",
+    "select_entity": "項目を選択",
+    "deselect_entity": "項目の選択を解除",
+    "select_all": "表示中のすべての項目を選択",
+    "deselect_all": "表示中のすべての項目の選択を解除"
+  },
+  "slicing": {},
+  "filters": {},
+  "time_units": {},
+  "time": {},
+  "page_header": {},
+  "message": {},
+  "entity_types": {},
+  "chips_cell": {},
+  "compact_pagination": {},
+  "expandable_checkbox_list_item": {},
+  "traffic_graph": {},
+  "link_to_node": {},
+  "markdown": {},
+  "public_notifications": {},
+  "refresh_controls": {},
+  "scroll_button": {},
+  "section": {},
+  "selectable_list": {},
+  "share_menu_item": {},
+  "status_icon": {},
+  "type_ahead_field_input": {},
+  "query_helper": {
+    "common_fields": {}
+  },
+  "url_allow_list_modal": {},
+  "configuration_well": {},
+  "configuration_forms": {},
+  "enterprise_advertisement": {},
+  "plugin_list": {},
+  "reported_error": {},
+  "hotkeys": {},
+  "right_sidebar": {},
+  "maxmind_adapter": {
+    "documentation": {},
+    "database_types": {},
+    "field_set": {},
+    "summary": {}
+  },
+  "abs_geoip": {},
+  "gcs_geoip": {},
+  "geoip_resolver": {},
+  "links": {},
+  "quick_jump": {},
+  "scratchpad": {},
+  "extractor_actions": {},
+  "surrounding_search": {},
+  "support_sources": {},
+  "times_list": {},
+  "widget_visualization_not_found": {},
+  "telemetry": {},
+  "app_facade": {},
+  "suggest_reload": {},
+  "footer": {},
+  "notifications": {},
+  "use_favorite_item_mutation_notifications": {},
+  "use_entity_titles_notifications": {},
+  "use_search_version_check_notifications": {}
+}
