@@ -477,5 +477,13 @@
     "require_lowercase": "Password must contain at least one lowercase letter.",
     "require_numbers": "Password must contain at least one number.",
     "require_special_chars": "Password must contain at least one special character from: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "User preferences successfully saved",
+    "save_failed": "Saving of preferences for \"{{userName}}\" failed with status: {{error}}",
+    "save_failed_title": "Could not save user preferences",
+    "change_success": "Your start page was changed successfully",
+    "change_failed": "Changing your start page failed with error: {{error}}",
+    "change_failed_title": "Could not change your start page"
   }
 }

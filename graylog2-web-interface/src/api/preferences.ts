@@ -18,6 +18,7 @@ import type { ColorScheme } from '@graylog/sawmill';
 
 import { Users } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import UserNotification from 'util/UserNotification';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -69,7 +70,7 @@ export const saveUserPreferences = (
   return Users.savePreferences(encodeURIComponent(userName), { preferences: convertedPreferences }).then(
     () => {
       if (displaySuccessNotification) {
-        UserNotification.success('User preferences successfully saved');
+        UserNotification.success(i18n.t('notifications.save_success', { ns: 'users' }));
       }
 
       callback(preferences);
@@ -77,8 +78,8 @@ export const saveUserPreferences = (
     },
     (errorThrown) => {
       UserNotification.error(
-        `Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
-        'Could not save user preferences',
+        i18n.t('notifications.save_failed', { ns: 'users', userName, error: errorThrown }),
+        i18n.t('notifications.save_failed_title', { ns: 'users' }),
       );
     },
   );

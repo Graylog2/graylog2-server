@@ -638,5 +638,14 @@
     "failures_count_load_failed_title": "Die Anzahl der Indexer-Fehler konnte nicht geladen werden",
     "indices_multiple_load_failed": "Das Laden mehrerer Indexer-Indizes ist fehlgeschlagen. Status",
     "indices_multiple_load_failed_title": "Mehrere Indexer-Indizes konnten nicht geladen werden"
+  },
+  "notifications": {
+    "create_success": "Index-Set '{{title}}' erfolgreich erstellt",
+    "create_failed": "Erstellen des Index-Sets '{{title}}' fehlgeschlagen mit Status: {{error}}",
+    "create_failed_title": "Index-Set konnte nicht erstellt werden.",
+    "update_success": "Index-Set '{{title}}' erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren des Index-Sets '{{title}}' fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Index-Set konnte nicht aktualisiert werden.",
+    "success_title": "Erfolg"
   }
 }

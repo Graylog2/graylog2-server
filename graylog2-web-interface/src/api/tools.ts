@@ -22,6 +22,7 @@ import {
   ToolsRegexTester,
 } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -39,8 +40,8 @@ export const testNaturalDate = (keyword: string, userTimezone: string): Promise<
   promise.catch((errorThrown) => {
     if (errorThrown.additional.status !== 422) {
       UserNotification.error(
-        `Loading keyword preview failed with status: ${errorThrown}`,
-        'Could not load keyword preview',
+        i18n.t('tools_api.natural_date_failed', { ns: 'extractors', error: errorThrown }),
+        i18n.t('tools_api.natural_date_failed_title', { ns: 'extractors' }),
       );
     }
   });
@@ -69,8 +70,8 @@ export const testGrok = (
 
   promise.catch((errorThrown) => {
     UserNotification.error(
-      `Details: ${errorThrown}`,
-      'We were not able to run the grok extraction. Please check your parameters.',
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.grok_failed_title', { ns: 'extractors' }),
     );
   });
 
@@ -113,8 +114,8 @@ export const testJSON = (
 
   promise.catch((errorThrown) => {
     UserNotification.error(
-      `Details: ${errorThrown}`,
-      'We were not able to run the JSON extraction. Please check your parameters.',
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.json_failed_title', { ns: 'extractors' }),
     );
   });
 
@@ -126,8 +127,8 @@ export const testRegexValidity = (regex: string): Promise<{ is_valid: boolean }>
 
   promise.catch((errorThrown) => {
     UserNotification.error(
-      `Details: ${errorThrown}`,
-      'Could not validate regular expression. Make sure that it is valid.',
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.regex_invalid_title', { ns: 'extractors' }),
     );
   });
 
@@ -145,7 +146,7 @@ export const urlAllowListCheck = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not verify if the url is in the allowlist.');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.allowlist_check_title', { ns: 'extractors' }));
   });
 
   return promise;
@@ -165,7 +166,7 @@ export const urlAllowListGenerateRegex = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not generate regex.');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_generate_title', { ns: 'extractors' }));
   });
 
   return promise;
@@ -188,7 +189,7 @@ export const testRegex = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not try regular expression. Make sure that it is valid.');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_try_title', { ns: 'extractors' }));
   });
 
   return promise;
@@ -218,7 +219,7 @@ export const testRegexReplace = (
   const promise = ToolsRegexReplaceTester.testRegex(payload);
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not try regular expression. Make sure that it is valid.');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.regex_try_title', { ns: 'extractors' }));
   });
 
   return promise;
@@ -246,8 +247,8 @@ export const testSplitAndIndex = (
 
   promise.catch((errorThrown) => {
     UserNotification.error(
-      `Details: ${errorThrown}`,
-      'We were not able to run the split and index extraction. Please check your parameters.',
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.split_index_failed_title', { ns: 'extractors' }),
     );
   });
 
@@ -276,8 +277,8 @@ export const testSubstring = (
 
   promise.catch((errorThrown) => {
     UserNotification.error(
-      `Details: ${errorThrown}`,
-      'We were not able to run the substring extraction. Please check index boundaries.',
+      i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }),
+      i18n.t('tools_api.substring_failed_title', { ns: 'extractors' }),
     );
   });
 
@@ -297,7 +298,7 @@ export const testContainsString = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not check if field contains the string');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.contains_string_failed_title', { ns: 'extractors' }));
   });
 
   return promise;
@@ -322,7 +323,7 @@ export const testLookupTable = (
   });
 
   promise.catch((errorThrown) => {
-    UserNotification.error(`Details: ${errorThrown}`, 'Could not check if lookup table translates the string');
+    UserNotification.error(i18n.t('tools_api.details', { ns: 'extractors', error: errorThrown }), i18n.t('tools_api.lookup_table_failed_title', { ns: 'extractors' }));
   });
 
   return promise;

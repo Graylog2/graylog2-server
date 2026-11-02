@@ -16,6 +16,7 @@
  */
 import { Streams } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -75,7 +76,10 @@ export const fetchStreams = (): Promise<Array<Stream>> =>
   fetch('GET', qualifyUrl('/streams'))
     .then((result: StreamSummaryResponse) => result.streams)
     .catch((errorThrown): never => {
-      UserNotification.error(`Loading streams failed with status: ${errorThrown}`, 'Could not load streams');
+      UserNotification.error(
+        i18n.t('notifications.load_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('notifications.load_failed_title', { ns: 'streams' }),
+      );
 
       throw errorThrown;
     });
@@ -112,7 +116,10 @@ export const searchStreamsPaginated = (
 
 export const updateStream = (streamId: string, data: Partial<Stream>): Promise<Stream> =>
   fetch('PUT', qualifyUrl(ApiRoutes.StreamsApiController.update(streamId).url), data).catch((errorThrown): never => {
-    UserNotification.error(`Updating Stream failed with status: ${errorThrown}`, 'Could not update Stream');
+    UserNotification.error(
+      i18n.t('notifications.update_failed', { ns: 'streams', error: errorThrown }),
+      i18n.t('notifications.update_failed_title', { ns: 'streams' }),
+    );
 
     throw errorThrown;
   });
@@ -122,14 +129,20 @@ export const removeStream = (streamId: string): Promise<unknown> =>
 
 export const pauseStream = (streamId: string): Promise<unknown> =>
   Streams.pause(streamId).catch((errorThrown): never => {
-    UserNotification.error(`Pausing Stream failed with status: ${errorThrown}`, 'Could not pause Stream');
+    UserNotification.error(
+      i18n.t('notifications.pause_failed', { ns: 'streams', error: errorThrown }),
+      i18n.t('notifications.pause_failed_title', { ns: 'streams' }),
+    );
 
     throw errorThrown;
   });
 
 export const resumeStream = (streamId: string): Promise<unknown> =>
   Streams.resume(streamId).catch((errorThrown): never => {
-    UserNotification.error(`Resuming Stream failed with status: ${errorThrown}`, 'Could not resume Stream');
+    UserNotification.error(
+      i18n.t('notifications.resume_failed', { ns: 'streams', error: errorThrown }),
+      i18n.t('notifications.resume_failed_title', { ns: 'streams' }),
+    );
 
     throw errorThrown;
   });
@@ -137,7 +150,10 @@ export const resumeStream = (streamId: string): Promise<unknown> =>
 export const cloneStream = (streamId: string, data: CloneStreamRequest): Promise<unknown> =>
   fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.cloneStream(streamId).url), data)
     .catch((errorThrown): never => {
-      UserNotification.error(`Cloning Stream failed with status: ${errorThrown}`, 'Could not clone Stream');
+      UserNotification.error(
+        i18n.t('notifications.clone_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('notifications.clone_failed_title', { ns: 'streams' }),
+      );
 
       throw errorThrown;
     })
@@ -147,8 +163,8 @@ export const testMatch = (streamId: string, message: TestMatchMessage): Promise<
   fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.testMatch(streamId).url), message).catch(
     (error: Error): never => {
       UserNotification.error(
-        `Testing stream rules of stream failed with status: ${error.message}`,
-        'Could not test stream rules of stream',
+        i18n.t('notifications.test_match_failed', { ns: 'streams', error: error.message }),
+        i18n.t('notifications.test_match_failed_title', { ns: 'streams' }),
       );
 
       throw error;

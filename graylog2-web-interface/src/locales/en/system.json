@@ -408,7 +408,17 @@
     "processing_pause_failed_title": "Could not pause message processing in node '{{nodeId}}'",
     "processing_resume_success": "Message processing resumed successfully in '{{nodeId}}'",
     "processing_resume_failed": "Resuming message processing in '{{nodeId}}' failed: {{error}}",
-    "processing_resume_failed_title": "Could not resume message processing in node '{{nodeId}}'"
+    "processing_resume_failed_title": "Could not resume message processing in node '{{nodeId}}'",
+    "nothing_selected": "No notifications selected.",
+    "nothing_to_dismiss_title": "Nothing to dismiss",
+    "bulk_dismiss_failed": "Failed to dismiss notifications. Please try again.",
+    "dismiss_failed": "Failed to dismiss notification. Please try again.",
+    "dismiss_failed_title": "Dismiss failed",
+    "profiling_enabled": "MongoDB profiling enabled successfully.",
+    "profiling_disabled": "MongoDB profiling disabled successfully.",
+    "profiling_enable_failed": "Failed to enable MongoDB profiling: {{error}}",
+    "profiling_disable_failed": "Failed to disable MongoDB profiling: {{error}}",
+    "profiling_update_failed_title": "Could not update MongoDB profiling."
   },
   "use_cluster_overview_notifications": {
     "jvm_failed": "Getting JVM information for node '{{nodeId}}' failed: {{error}}",

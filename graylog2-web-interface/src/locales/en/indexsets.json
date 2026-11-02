@@ -638,5 +638,14 @@
     "failures_count_load_failed_title": "Could not load indexer failures count",
     "indices_multiple_load_failed": "Loading Indexer multiple indices failed with status",
     "indices_multiple_load_failed_title": "Could not load Indexer multiple indices"
+  },
+  "notifications": {
+    "create_success": "Successfully created index set '{{title}}'",
+    "create_failed": "Creating index set '{{title}}' failed with status: {{error}}",
+    "create_failed_title": "Could not create index set.",
+    "update_success": "Successfully updated index set '{{title}}'",
+    "update_failed": "Updating index set '{{title}}' failed with status: {{error}}",
+    "update_failed_title": "Could not update index set.",
+    "success_title": "Success"
   }
 }

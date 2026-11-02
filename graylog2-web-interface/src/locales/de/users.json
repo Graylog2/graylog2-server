@@ -477,5 +477,13 @@
     "require_lowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
     "require_numbers": "Das Passwort muss mindestens eine Ziffer enthalten.",
     "require_special_chars": "Das Passwort muss mindestens ein Sonderzeichen aus folgender Auswahl enthalten: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Benutzereinstellungen erfolgreich gespeichert",
+    "save_failed": "Speichern der Einstellungen für \"{{userName}}\" fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Benutzereinstellungen konnten nicht gespeichert werden",
+    "change_success": "Ihre Startseite wurde erfolgreich geändert",
+    "change_failed": "Ändern Ihrer Startseite fehlgeschlagen mit Fehler: {{error}}",
+    "change_failed_title": "Ihre Startseite konnte nicht geändert werden"
   }
 }

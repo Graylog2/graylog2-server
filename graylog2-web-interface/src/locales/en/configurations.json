@@ -236,5 +236,17 @@
     "metrics": "Welcome page metrics",
     "title": "Welcome Page",
     "update_title": "Update Welcome Page Configuration"
+  },
+  "notifications": {
+    "index_defaults_success": "Index defaults configuration updated successfully",
+    "index_defaults_failed_title": "Index defaults configuration update failed",
+    "update_success": "Configuration updated successfully",
+    "search_update_failed": "Search config update failed: {{error}}",
+    "search_update_failed_title": "Could not update search config: {{configType}}",
+    "allowlist_update_success": "Url allowlist Configuration updated successfully",
+    "allowlist_update_failed": "Url allowlist config update failed: {{error}}",
+    "allowlist_update_failed_title": "Could not update Url allowlist: {{configType}}",
+    "processors_update_failed": "Message processors config update failed: {{error}}",
+    "processors_update_failed_title": "Could not update config: {{configType}}"
   }
 }

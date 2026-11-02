@@ -16,6 +16,7 @@
  */
 import isArray from 'lodash/isArray';
 
+import i18n from 'i18n';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -109,14 +110,17 @@ export const createIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
 
   return fetch('POST', url, indexSet).then(
     (response: IndexSet) => {
-      UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
+      UserNotification.success(
+        i18n.t('notifications.create_success', { ns: 'indexsets', title: indexSet.title }),
+        i18n.t('notifications.success_title', { ns: 'indexsets' }),
+      );
 
       return response;
     },
     (error) => {
       UserNotification.error(
-        `Creating index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
-        'Could not create index set.',
+        i18n.t('notifications.create_failed', { ns: 'indexsets', title: indexSet.title, error: _errorMessage(error) }),
+        i18n.t('notifications.create_failed_title', { ns: 'indexsets' }),
       );
 
       throw error;
@@ -129,14 +133,17 @@ export const updateIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
 
   return fetch('PUT', url, indexSet).then(
     (response: IndexSet) => {
-      UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
+      UserNotification.success(
+        i18n.t('notifications.update_success', { ns: 'indexsets', title: indexSet.title }),
+        i18n.t('notifications.success_title', { ns: 'indexsets' }),
+      );
 
       return response;
     },
     (error) => {
       UserNotification.error(
-        `Updating index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
-        'Could not update index set.',
+        i18n.t('notifications.update_failed', { ns: 'indexsets', title: indexSet.title, error: _errorMessage(error) }),
+        i18n.t('notifications.update_failed_title', { ns: 'indexsets' }),
       );
 
       throw error;

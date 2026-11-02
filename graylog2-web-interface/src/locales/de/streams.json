@@ -446,5 +446,23 @@
   "user_no_stream_access": {
     "alert": "Wir können im Moment keine Suche starten, da Sie keinen Zugriff auf einen Stream haben. Wenn dies ein Fehler ist, wenden Sie sich bitte an Ihren Administrator.",
     "title": "Keine Stream-Berechtigungen."
+  },
+  "notifications": {
+    "load_failed": "Laden der Streams fehlgeschlagen mit Status: {{error}}",
+    "load_failed_title": "Streams konnten nicht geladen werden",
+    "update_failed": "Aktualisieren des Streams fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Stream konnte nicht aktualisiert werden",
+    "pause_failed": "Pausieren des Streams fehlgeschlagen mit Status: {{error}}",
+    "pause_failed_title": "Stream konnte nicht pausiert werden",
+    "resume_failed": "Fortsetzen des Streams fehlgeschlagen mit Status: {{error}}",
+    "resume_failed_title": "Stream konnte nicht fortgesetzt werden",
+    "clone_failed": "Duplizieren des Streams fehlgeschlagen mit Status: {{error}}",
+    "clone_failed_title": "Stream konnte nicht dupliziert werden",
+    "test_match_failed": "Testen der Stream-Regeln des Streams fehlgeschlagen mit Status: {{error}}",
+    "test_match_failed_title": "Stream-Regeln des Streams konnten nicht getestet werden",
+    "output_terminate_confirm": "Möchten Sie diesen Output wirklich beenden?",
+    "output_terminated": "Output wurde beendet.",
+    "output_remove_confirm": "Möchten Sie diesen Output wirklich aus dem Stream entfernen?",
+    "success_title": "Erfolg"
   }
 }

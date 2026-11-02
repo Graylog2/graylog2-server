@@ -446,5 +446,23 @@
   "user_no_stream_access": {
     "alert": "We cannot start a search right now, because you are not allowed to access any stream. If you feel this is an error, please contact your administrator.",
     "title": "No stream permissions."
+  },
+  "notifications": {
+    "load_failed": "Loading streams failed with status: {{error}}",
+    "load_failed_title": "Could not load streams",
+    "update_failed": "Updating Stream failed with status: {{error}}",
+    "update_failed_title": "Could not update Stream",
+    "pause_failed": "Pausing Stream failed with status: {{error}}",
+    "pause_failed_title": "Could not pause Stream",
+    "resume_failed": "Resuming Stream failed with status: {{error}}",
+    "resume_failed_title": "Could not resume Stream",
+    "clone_failed": "Cloning Stream failed with status: {{error}}",
+    "clone_failed_title": "Could not clone Stream",
+    "test_match_failed": "Testing stream rules of stream failed with status: {{error}}",
+    "test_match_failed_title": "Could not test stream rules of stream",
+    "output_terminate_confirm": "Do you really want to terminate this output?",
+    "output_terminated": "Output was terminated.",
+    "output_remove_confirm": "Do you really want to remove this output from the stream?",
+    "success_title": "Success"
   }
 }

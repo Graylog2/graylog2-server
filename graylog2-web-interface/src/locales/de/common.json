@@ -576,7 +576,8 @@
     "export_failed": "Export fehlgeschlagen",
     "export_widget_failed": "Export für Widget fehlgeschlagen",
     "telemetry_update_failed": "Aktualisierung fehlgeschlagen: {{error}}",
-    "telemetry_update_failed_title": "Telemetrie-Einstellungen konnten nicht aktualisiert werden."
+    "telemetry_update_failed_title": "Telemetrie-Einstellungen konnten nicht aktualisiert werden.",
+    "delete_property_confirm": "Sind Sie sicher, dass Sie die Eigenschaft '{{key}}' löschen möchten?"
   },
   "use_favorite_item_mutation_notifications": {
     "put_failed": "Hinzufügen des Eintrags zu den Favoriten fehlgeschlagen mit Status: {{error}}",

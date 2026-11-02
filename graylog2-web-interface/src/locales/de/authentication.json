@@ -199,5 +199,10 @@
   },
   "wizard_header": {
     "edit_title": "Authentifizierungsdienst bearbeiten - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Laden der HTTP-Header-Authentifizierungskonfiguration fehlgeschlagen",
+    "update_success": "HTTP-Header-Authentifizierungskonfiguration erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren der HTTP-Header-Authentifizierungskonfiguration fehlgeschlagen mit Status: {{error}}"
   }
 }

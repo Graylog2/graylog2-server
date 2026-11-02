@@ -18,6 +18,7 @@ import merge from 'lodash/merge';
 
 import { SidecarConfigurationVariables } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -29,8 +30,8 @@ export const fetchAllConfigurationVariables = () => {
 
   promise.catch((error: unknown) => {
     UserNotification.error(
-      `Fetching configuration variables failed with status: ${error}`,
-      'Could not retrieve configuration variables',
+      i18n.t('notifications.fetch_failed', { ns: 'sidecars', error }),
+      i18n.t('notifications.fetch_failed_title', { ns: 'sidecars' }),
     );
   });
 
@@ -51,7 +52,6 @@ export const saveConfigurationVariable = (configurationVariable: {
   };
 
   const isCreate = configurationVariable.id === '';
-  const action = isCreate ? 'created' : 'updated';
 
   const promise = isCreate
     ? SidecarConfigurationVariables.createConfigurationVariable(request)
@@ -59,12 +59,17 @@ export const saveConfigurationVariable = (configurationVariable: {
 
   promise.then(
     () => {
-      UserNotification.success(`Configuration variable "${configurationVariable.name}" successfully ${action}`);
+      UserNotification.success(
+        i18n.t(isCreate ? 'notifications.save_success_created' : 'notifications.save_success_updated', {
+          ns: 'sidecars',
+          name: configurationVariable.name,
+        }),
+      );
     },
     (error: { message?: string }) => {
       UserNotification.error(
-        `Saving variable "${configurationVariable.name}" failed with status: ${error.message}`,
-        'Could not save variable',
+        i18n.t('notifications.save_failed', { ns: 'sidecars', name: configurationVariable.name, error: error.message }),
+        i18n.t('notifications.save_failed_title', { ns: 'sidecars' }),
       );
     },
   );
@@ -77,12 +82,14 @@ export const deleteConfigurationVariable = (configurationVariable: { id: string;
 
   promise.then(
     () => {
-      UserNotification.success(`Configuration variable "${configurationVariable.name}" successfully deleted`);
+      UserNotification.success(
+        i18n.t('notifications.delete_success', { ns: 'sidecars', name: configurationVariable.name }),
+      );
     },
     (error: { message?: string }) => {
       UserNotification.error(
-        `Deleting variable "${configurationVariable.name}" failed with status: ${error.message}`,
-        'Could not delete variable',
+        i18n.t('notifications.delete_failed', { ns: 'sidecars', name: configurationVariable.name, error: error.message }),
+        i18n.t('notifications.delete_failed_title', { ns: 'sidecars' }),
       );
     },
   );
@@ -103,8 +110,8 @@ export const validateConfigurationVariable = (configurationVariable: { name?: st
 
   promise.catch((error: { message?: string }) => {
     UserNotification.error(
-      `Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,
-      'Could not validate variable',
+      i18n.t('notifications.validate_failed', { ns: 'sidecars', name: configurationVariable.name, error: error.message }),
+      i18n.t('notifications.validate_failed_title', { ns: 'sidecars' }),
     );
   });
 
@@ -115,7 +122,7 @@ export const getConfigurationsForVariable = (configurationVariable: { id: string
   const promise = SidecarConfigurationVariables.getConfigurationVariablesConfigurations(configurationVariable.id);
 
   promise.catch((error: unknown) => {
-    UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
+    UserNotification.error(i18n.t('notifications.configurations_fetch_failed', { ns: 'sidecars', error }));
   });
 
   return promise;

@@ -199,5 +199,10 @@
   },
   "wizard_header": {
     "edit_title": "Edit Authentication Service - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Loading HTTP header authentication config failed",
+    "update_success": "Successfully updated HTTP header authentication config",
+    "update_failed": "Updating HTTP header authentication config failed with status: {{error}}"
   }
 }

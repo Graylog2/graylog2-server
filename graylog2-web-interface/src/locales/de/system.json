@@ -408,7 +408,17 @@
     "processing_pause_failed_title": "Nachrichtenverarbeitung konnte in Knoten '{{nodeId}}' nicht pausiert werden",
     "processing_resume_success": "Nachrichtenverarbeitung erfolgreich in '{{nodeId}}' fortgesetzt",
     "processing_resume_failed": "Fortsetzen der Nachrichtenverarbeitung in '{{nodeId}}' fehlgeschlagen: {{error}}",
-    "processing_resume_failed_title": "Nachrichtenverarbeitung konnte in Knoten '{{nodeId}}' nicht fortgesetzt werden"
+    "processing_resume_failed_title": "Nachrichtenverarbeitung konnte in Knoten '{{nodeId}}' nicht fortgesetzt werden",
+    "nothing_selected": "Keine Benachrichtigungen ausgewählt.",
+    "nothing_to_dismiss_title": "Nichts zu verwerfen",
+    "bulk_dismiss_failed": "Benachrichtigungen konnten nicht verworfen werden. Bitte versuchen Sie es erneut.",
+    "dismiss_failed": "Benachrichtigung konnte nicht verworfen werden. Bitte versuchen Sie es erneut.",
+    "dismiss_failed_title": "Verwerfen fehlgeschlagen",
+    "profiling_enabled": "MongoDB-Profiling erfolgreich aktiviert.",
+    "profiling_disabled": "MongoDB-Profiling erfolgreich deaktiviert.",
+    "profiling_enable_failed": "Aktivieren des MongoDB-Profilings fehlgeschlagen: {{error}}",
+    "profiling_disable_failed": "Deaktivieren des MongoDB-Profilings fehlgeschlagen: {{error}}",
+    "profiling_update_failed_title": "MongoDB-Profiling konnte nicht aktualisiert werden."
   },
   "use_cluster_overview_notifications": {
     "jvm_failed": "Abrufen der JVM-Informationen für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",

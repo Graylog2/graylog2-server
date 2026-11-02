@@ -236,5 +236,17 @@
     "metrics": "Metriken der Startseite",
     "title": "Startseite",
     "update_title": "Konfiguration der Startseite aktualisieren"
+  },
+  "notifications": {
+    "index_defaults_success": "Konfiguration der Index-Standardwerte erfolgreich aktualisiert",
+    "index_defaults_failed_title": "Aktualisierung der Konfiguration der Index-Standardwerte fehlgeschlagen",
+    "update_success": "Konfiguration erfolgreich aktualisiert",
+    "search_update_failed": "Aktualisierung der Sucheinstellungen fehlgeschlagen: {{error}}",
+    "search_update_failed_title": "Sucheinstellungen konnten nicht aktualisiert werden: {{configType}}",
+    "allowlist_update_success": "URL-Allowlist-Konfiguration erfolgreich aktualisiert",
+    "allowlist_update_failed": "Aktualisierung der URL-Allowlist-Konfiguration fehlgeschlagen: {{error}}",
+    "allowlist_update_failed_title": "URL-Allowlist konnte nicht aktualisiert werden: {{configType}}",
+    "processors_update_failed": "Aktualisierung der Konfiguration der Message-Processors fehlgeschlagen: {{error}}",
+    "processors_update_failed_title": "Konfiguration konnte nicht aktualisiert werden: {{configType}}"
   }
 }
