@@ -128,22 +128,134 @@
       "saving": "Enregistrement du stream",
       "submit": "Mettre à jour",
       "success_title": "Succès",
-      "tooltip": "Modifier l'index set"
+      "tooltip": "Modifier l'index set",
+      "updated": "L'Index Set du stream « {{title}} » a été mis à jour avec succès."
     },
-    "output_item": {},
-    "outputs": {},
-    "outputs_list": {},
-    "remove_output": {}
+    "output_item": {
+      "type": "(Type : {{type}})"
+    },
+    "outputs": {
+      "count": "OUTPUTS {{count}}",
+      "title": "Outputs",
+      "toggle_aria": "Basculer l'output"
+    },
+    "outputs_list": {
+      "name": "Nom",
+      "none": "Aucun output défini."
+    },
+    "remove_output": {
+      "confirm": "Voulez-vous vraiment retirer cet output du stream ?",
+      "title": "Retirer l'output"
+    }
   },
-  "stream_details": {},
-  "stream_edit_page": {},
-  "stream_hooks": {},
-  "stream_modal": {},
-  "stream_outputs": {},
-  "stream_permission_error_page": {},
+  "stream_details": {
+    "back": "Retour",
+    "connected_pipelines_human_name": "pipelines",
+    "connected_pipelines_title": "Routage depuis d'autres Streams",
+    "data_routing": "Routage des données",
+    "destination_description": "La page Destinations permet de définir vers où les messages de ce stream doivent être routés. Un stream peut avoir plusieurs destinations. Notez que les messages routés uniquement vers le Data Lake ne comptent pas dans l'utilisation de la licence, sauf s'ils sont ensuite récupérés. Pour chaque destination, des filtres peuvent être appliqués afin de limiter le sous-ensemble de messages reçus par cette destination.",
+    "edit": "Modifier",
+    "edit_modal_title": "Modification du Stream",
+    "heading": "Stream : {{title}}",
+    "intake_description": "Les règles de stream peuvent servir à collecter un sous-ensemble filtré de messages directement depuis les Inputs vers ce Stream. Notez que les règles de stream sont désormais une fonctionnalité héritée ; le moyen recommandé pour gérer le routage des streams est désormais les règles de pipeline.",
+    "no_pipelines": "Ce stream n'est connecté à aucun Pipeline.",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Les pipelines permettent de transformer et de traiter les messages provenant des streams. Un pipeline se compose d'étapes dans lesquelles des règles sont évaluées et appliquées. Les messages peuvent passer par une ou plusieurs étapes.",
+    "processing_title": "Pipelines",
+    "rule_header": "Règle",
+    "rules_info": "Les règles de stream sont appliquées en premier dans l'ordre de traitement par défaut et servent à diriger les messages des Inputs vers les Streams. Tout message qui satisfait aux critères de la ou des règles de stream sera dirigé vers ce Stream.",
+    "rules_title": "Règles de stream",
+    "segment_destinations": "3 : Destinations",
+    "segment_intake": "1 : Entrée",
+    "segment_processing": "2 : Traitement",
+    "success_title": "Succès",
+    "throughput": "Débit",
+    "update_button": "Mettre à jour le stream",
+    "updated": "Le stream « {{title}} » a été mis à jour avec succès.",
+    "updating": "Mise à jour du stream..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "Le stream par défaut ne peut pas être modifié.",
+    "description": "Cet écran est dédié à la création et à la manipulation simples et confortables des règles de stream. Vous pouvez y voir l'effet des règles de stream configurées sur la correspondance des messages.",
+    "documentation_link_title": "Documentation des Streams",
+    "title": "Règles du Stream {{title}}",
+    "title_span": "Règles du Stream « {{title}} »"
+  },
+  "stream_hooks": {
+    "create_rule_failed": "La création de la règle de filtre de sortie du stream a échoué avec le statut : {{error}}",
+    "create_rule_failed_title": "Impossible de créer la règle de filtre de sortie du stream",
+    "create_rule_success": "La règle de filtre de sortie du stream a été créée avec succès.",
+    "delete_rule_failed": "La suppression de la règle de filtre de sortie du stream a échoué avec le statut : {{error}}",
+    "delete_rule_failed_title": "Impossible de supprimer la règle de filtre de sortie du stream",
+    "delete_rule_success": "La règle de filtre de sortie du stream a été supprimée avec succès.",
+    "load_connected_pipelines_failed": "Le chargement des pipelines connectés a échoué avec le statut",
+    "load_connected_pipelines_failed_title": "Impossible de charger les pipelines connectés",
+    "load_output_filters_failed": "Le chargement des filtres de sortie du stream a échoué avec le statut",
+    "load_output_filters_failed_title": "Impossible de charger les filtres de sortie du stream",
+    "load_output_types_failed": "Le chargement des outputs du stream a échoué avec le statut",
+    "load_output_types_failed_title": "Impossible de charger les outputs du stream",
+    "load_rule_builder_failed": "Le chargement de la liste des conditions de l'éditeur de règles de filtre de sortie du stream a échoué avec le statut",
+    "load_rule_builder_failed_title": "Impossible de charger la liste des conditions de l'éditeur de règles de filtre de sortie du stream.",
+    "load_rule_types_failed": "Le chargement des types de règles de stream a échoué avec le statut",
+    "load_rule_types_failed_title": "Impossible de charger les types de règles de stream",
+    "load_stream_failed": "Le chargement du stream a échoué avec le statut",
+    "load_stream_failed_title": "Impossible de charger le Stream",
+    "load_streams_failed": "Le chargement des streams a échoué avec le statut",
+    "load_streams_failed_title": "Impossible de charger les streams",
+    "success_title": "Succès !",
+    "update_rule_failed": "La mise à jour de la règle de filtre de sortie du stream a échoué avec le statut : {{error}}",
+    "update_rule_failed_title": "Impossible de mettre à jour la règle de filtre de sortie du stream",
+    "update_rule_success": "La règle de filtre de sortie du stream a été mise à jour avec succès."
+  },
+  "stream_modal": {
+    "description": "Description",
+    "description_help": "Quel type de messages est routé vers ce stream ?",
+    "index_set_required": "L'Index Set est obligatoire",
+    "remove_matches_help": "Ne pas affecter les messages correspondant à ce stream au ‘Default Stream’.",
+    "remove_matches_label": "Retirer les correspondances du ‘Default Stream’",
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter comme collaborateur de ce stream.",
+    "title": "Titre",
+    "title_help": "Un nom descriptif du nouveau stream",
+    "title_required": "Le titre est obligatoire"
+  },
+  "stream_outputs": {
+    "description": "Les nœuds {{productName}} peuvent transmettre les messages des streams via des outputs. Lancez ou arrêtez autant d'outputs que vous le souhaitez ici. Vous pouvez également réutiliser des outputs déjà en cours d'exécution pour d'autres streams. Une vue globale de tous les outputs configurés est disponible <outputsLink>ici</outputsLink>.",
+    "marketplace_prefix": "Vous pouvez trouver des plugins d'output sur",
+    "removing_description": "<emphasis>Retirer</emphasis> un output le retire de ce stream, mais il restera dans la liste des outputs disponibles. Supprimer un output <emphasis>globalement</emphasis> le retire de ce stream et de tous les autres, et l'arrête. Vous pouvez consulter en détail tous les outputs définis dans la <outputsLink>liste globale des outputs</outputsLink>.",
+    "title": "Outputs du Stream »{{streamTitle}}«"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "Cette ressource comprend des streams pour lesquels vous n'avez pas d'autorisations.",
+    "description_p2": "Veuillez contacter votre administrateur et lui fournir les détails de l'erreur, qui incluent la liste des streams auxquels vous devez avoir accès.",
+    "error_details": "Vous devez disposer des autorisations pour les streams ayant pour ID : {{ids}}.",
+    "title": "Autorisations de stream manquantes"
+  },
   "stream_rules": {
-    "editor": {},
-    "human": {},
+    "create_button": "Créer une règle",
+    "created": "La règle de stream a été créée avec succès.",
+    "creating": "Création de la règle...",
+    "delete_confirm": "Voulez-vous vraiment supprimer cette règle de stream ?",
+    "delete_ok": "OK",
+    "delete_title": "Supprimer la règle de stream.",
+    "delete_tooltip": "Supprimer la règle de stream",
+    "deleted": "La règle de stream a été supprimée avec succès.",
+    "edit_title": "Modifier la règle de stream",
+    "edit_tooltip": "Modifier la règle de stream",
+    "editor": {
+      "add_rule": "Ajouter une règle de stream",
+      "done": "Terminé !",
+      "load_message_hint": "Veuillez charger un message à l'étape 1 ci-dessus pour vérifier s'il correspondrait à ces règles.",
+      "load_message_title": "1. Charger un message pour tester les règles",
+      "manage_title": "2. Gérer les règles de stream",
+      "would_match": "Ce message serait routé vers ce stream !",
+      "would_not_match": "Ce message ne serait pas routé vers ce stream."
+    },
+    "human": {
+      "always_matches": "La règle correspond toujours",
+      "deleted_input": "<deleted input> : {{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> <mustPart>doit </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>"
+    },
     "modal": {},
     "start_dialog": {}
   },
