@@ -441,6 +441,7 @@
     "partial_summary": "{{succeeded}} riusciti, {{failed}} non riusciti.",
     "partial_more": "...e altri {{count}}.",
     "all_failed_one": "{{count}} indice non riuscito.",
+    "all_failed_other": "{{count}} indici non riusciti.",
     "delete": {
       "button": "Elimina",
       "title": "Elimina indice",
@@ -479,7 +480,13 @@
         "button": "Elimina",
         "title": "Elimina indici incompatibili",
         "confirm": "Elimina tutti",
-        "error": "Impossibile eliminare tutti."
+        "error": "Impossibile eliminare tutti.",
+        "body_one": "Questa operazione eliminerà {{count}} indice incompatibile.",
+        "body_many": "Questa operazione eliminerà {{count}} indici incompatibili.",
+        "body_other": "Questa operazione eliminerà {{count}} indici incompatibili.",
+        "success_one": "{{count}} indice incompatibile è stato eliminato.",
+        "success_many": "{{count}} indici incompatibili sono stati eliminati.",
+        "success_other": "{{count}} indici incompatibili sono stati eliminati."
       },
       "delete_partial_title": "Alcuni indici non sono stati eliminati",
       "delete_failure_title": "Impossibile eliminare gli indici",
@@ -487,22 +494,43 @@
         "button": "Reindicizza indici di sistema",
         "title": "Reindicizza indici di sistema",
         "confirm": "Reindicizza tutti",
-        "error": "Impossibile reindicizzare tutti."
+        "error": "Impossibile reindicizzare tutti.",
+        "body_one": "Questa operazione reindicizzerà {{count}} indice incompatibile.",
+        "body_many": "Questa operazione reindicizzerà {{count}} indici incompatibili.",
+        "body_other": "Questa operazione reindicizzerà {{count}} indici incompatibili.",
+        "success_one": "Reindicizzazione avviata per {{count}} indice di sistema.",
+        "success_many": "Reindicizzazione avviata per {{count}} indici di sistema.",
+        "success_other": "Reindicizzazione avviata per {{count}} indici di sistema."
       },
       "archive_delete": {
         "button": "Archivia ed elimina",
         "title": "Archivia ed elimina indici",
         "confirm": "Archivia ed elimina tutti",
-        "error": "Impossibile archiviare ed eliminare tutti."
+        "error": "Impossibile archiviare ed eliminare tutti.",
+        "body_one": "Questa operazione archivierà ed eliminerà {{count}} indice incompatibile.",
+        "body_many": "Questa operazione archivierà ed eliminerà {{count}} indici incompatibili.",
+        "body_other": "Questa operazione archivierà ed eliminerà {{count}} indici incompatibili.",
+        "success_one": "Archiviazione ed eliminazione avviate per {{count}} indice.",
+        "success_many": "Archiviazione ed eliminazione avviate per {{count}} indici.",
+        "success_other": "Archiviazione ed eliminazione avviate per {{count}} indici."
       },
       "rotate": {
         "button": "Ruota gli indici di scrittura attivi",
         "title": "Ruota gli indici di scrittura attivi",
         "confirm": "Ruota tutti",
-        "error": "Impossibile ruotare tutti."
+        "error": "Impossibile ruotare tutti.",
+        "body_one": "Questa operazione ruoterà {{count}} indice incompatibile.",
+        "body_many": "Questa operazione ruoterà {{count}} indici incompatibili.",
+        "body_other": "Questa operazione ruoterà {{count}} indici incompatibili.",
+        "success_one": "{{count}} indice è stato ruotato.",
+        "success_many": "{{count}} indici sono stati ruotati.",
+        "success_other": "{{count}} indici sono stati ruotati."
       },
       "rotate_partial_title": "Alcuni indici non sono stati ruotati",
-      "rotate_failure_title": "Impossibile ruotare gli indici"
+      "rotate_failure_title": "Impossibile ruotare gli indici",
+      "deleted_one": "{{count}} indice è stato eliminato.",
+      "deleted_many": "{{count}} indici sono stati eliminati.",
+      "deleted_other": "{{count}} indici sono stati eliminati."
     },
     "all_failed_many": "{{count}} indici non riusciti."
   },
@@ -552,7 +580,10 @@
     "rotation_lifetime_error": "Tra la durata minima e quella massima deve esserci almeno 1 giorno di differenza.",
     "rotation_lifetime_help_minimum": "Il numero minimo di giorni in cui i dati di questo indice vengono conservati prima di essere trattenuti.",
     "rotation_lifetime_help_range": "Il numero minimo / massimo di giorni in cui i dati di questo indice vengono conservati prima di essere trattenuti.",
-    "rotation_lifetime_fixed_leeway": "Il numero massimo di giorni è {{max}} perché il numero fisso di giorni tra minimo e massimo è impostato a {{leeway}}."
+    "rotation_lifetime_max_rotation_one": "Il periodo di rotazione massimo è impostato a {{count}} giorno dall'amministratore.",
+    "rotation_lifetime_max_rotation_other": "Il periodo di rotazione massimo è impostato a {{count}} giorni dall'amministratore.",
+    "rotation_lifetime_fixed_leeway": "Il numero massimo di giorni è {{max}} perché il numero fisso di giorni tra minimo e massimo è impostato a {{leeway}}.",
+    "rotation_lifetime_max_rotation_many": "Il periodo di rotazione massimo è impostato a {{count}} giorni dall'amministratore."
   },
   "pages": {
     "configure_index_set": "Configura Index Set",
@@ -585,9 +616,12 @@
     "templates_default_info": "Definisci qui un template predefinito per controllare la configurazione degli Index Set creati dai pacchetti Illuminate.",
     "failures_title": "Errori dell'indexer",
     "failures_description": "Questo è un elenco dei tentativi di indicizzazione dei messaggi non riusciti. Un errore significa che un messaggio è stato elaborato correttamente, ma la sua scrittura nel cluster dell'indexer non è riuscita. L'elenco è limitato a una dimensione di 50 MB, quindi conterrà molti log degli errori ma non necessariamente tutti quelli che si sono verificati.",
+    "failures_total_one": "Raccolta che contiene un totale di {{formattedCount}} errore dell'indexer.",
+    "failures_total_other": "Raccolta che contiene un totale di {{formattedCount}} errori dell'indexer.",
     "indices_document_title": "Indici e Index Set",
     "indices_title": "Indici e Index Set",
-    "indices_description": "Uno stream scrive i messaggi in un Index Set, che è una configurazione per la conservazione, lo sharding e la replica dei dati memorizzati. Configurando gli Index Set, ad esempio, puoi avere tempi di conservazione diversi per determinati stream."
+    "indices_description": "Uno stream scrive i messaggi in un Index Set, che è una configurazione per la conservazione, lo sharding e la replica dei dati memorizzati. Configurando gli Index Set, ad esempio, puoi avere tempi di conservazione diversi per determinati stream.",
+    "failures_total_many": "Raccolta che contiene un totale di {{formattedCount}} errori dell'indexer."
   },
   "navigation": {
     "indices": "Indici",
