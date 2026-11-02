@@ -36,7 +36,8 @@
       "timestamp": "时间戳",
       "index": "索引",
       "letter_id": "Letter ID",
-      "error_message": "错误信息"
+      "error_message": "错误信息",
+      "count_other": "在过去 24 小时内共有 {{formattedCount}} 次索引尝试失败。"
     },
     "system_overview": {
       "looking_for_failures": "正在查找索引失败...",
@@ -155,6 +156,7 @@
     "shards": "分片：",
     "replicas": "副本：",
     "field_type_refresh_interval": "字段类型刷新间隔：",
+    "seconds_other": "{{count}} 秒",
     "field_type_profile": "字段类型配置文件：",
     "not_set": "未设置"
   },
@@ -212,9 +214,12 @@
     "field_errors": "字段错误：",
     "profile_change_failed_title": "部分索引集的字段类型配置文件更改失败",
     "profile_details_failed": "无法加载此配置文件的详细信息。",
+    "used_by_other": "已被 {{count}} 个索引集使用。",
     "field": "字段",
     "type": "类型",
     "targets_title": "索引集",
+    "targets_summary_other": "适用于 {{count}} 个索引集。",
+    "targets_summary_excluding_other": "适用于 {{count}} 个索引集，排除 {{skipped}}。",
     "targets_index_set": "索引集",
     "targets_status": "状态",
     "targets_note": "备注",
@@ -262,6 +267,8 @@
     "max_segments": "最大段数：",
     "optimization_after_rotation": "轮转后索引优化：",
     "field_type_refresh_interval": "字段类型刷新间隔：",
+    "minutes_other": "{{count}} 分钟",
+    "seconds_other": "{{count}} 秒",
     "title_disabled": "{{title}}（已禁用）",
     "form_title_label": "模板标题",
     "form_title_help": "模板的描述性标题",
@@ -299,6 +306,7 @@
     "hide_streams": "隐藏 {{title}} 的关联流",
     "default": "默认",
     "read_only": "只读",
+    "hidden_streams_other": "另有 {{count}} 个流被路由到此索引集，但您没有查看权限。",
     "no_streams": "没有您可查看的流被路由到此索引集。",
     "streams_title": "标题",
     "streams_status": "状态",
@@ -336,7 +344,8 @@
     "empty": "索引不包含任何消息。",
     "range_unknown": "由于索引范围不可用，无法确定索引的时间范围。请手动重新计算索引范围。",
     "hide_details": "隐藏详情/操作",
-    "show_details": "显示详情/操作"
+    "show_details": "显示详情/操作",
+    "size_other": "（{{size}} / {{formattedCount}} 条消息）"
   },
   "indices_configuration": {
     "not_writable": "索引集不可写，将不会包含在索引轮转和保留中，也无法分配给流。",
@@ -344,6 +353,7 @@
     "configure_field_types": "配置索引字段类型"
   },
   "shards": {
+    "ops_other": "{{formattedCount}} 次操作",
     "took": "（耗时 {{duration}}）",
     "index": "索引：",
     "flush": "Flush：",
@@ -372,9 +382,12 @@
     "summary_data_tiering": "数据分层",
     "summary_max": "存储中的最长天数：",
     "summary_min": "存储中的最短天数：",
+    "days_other": "{{count}} 天",
     "tooltip_min_storage": "存储中的最短天数",
     "tooltip_min_hot_and_storage": "热层与存储中的最短天数",
-    "tooltip_min_hot": "热层中的最短天数"
+    "tooltip_min_hot": "热层中的最短天数",
+    "archived_deleted_after_other": "归档并在 <strong>{{count}} 天</strong>后删除",
+    "deleted_after_other": "在 <strong>{{count}} 天</strong>后删除"
   },
   "incompatible": {
     "working": "处理中...",
@@ -401,6 +414,7 @@
     "reindex_requires_data_node": "只有当 {{productName}} 连接的是 Data Node 搜索后端时，才能对系统索引进行重新索引。请先 <migrationLink>迁移到 Data Node</migrationLink>，再对其进行重新索引，然后升级到下一个 OpenSearch 主版本。",
     "partial_summary": "{{succeeded}} 个成功，{{failed}} 个失败。",
     "partial_more": "...以及另外 {{count}} 个。",
+    "all_failed_other": "{{count}} 个索引失败。",
     "delete": {
       "button": "删除",
       "title": "删除索引",
@@ -439,7 +453,9 @@
         "button": "删除",
         "title": "删除不兼容的索引",
         "confirm": "全部删除",
-        "error": "无法删除全部。"
+        "error": "无法删除全部。",
+        "body_other": "此操作将删除 {{count}} 个不兼容的索引。",
+        "success_other": "已删除 {{count}} 个不兼容的索引。"
       },
       "delete_partial_title": "部分索引无法删除",
       "delete_failure_title": "无法删除索引",
@@ -447,22 +463,29 @@
         "button": "重新索引系统索引",
         "title": "重新索引系统索引",
         "confirm": "全部重新索引",
-        "error": "无法重新索引全部。"
+        "error": "无法重新索引全部。",
+        "body_other": "此操作将对 {{count}} 个不兼容的索引进行重新索引。",
+        "success_other": "已为 {{count}} 个系统索引启动重新索引。"
       },
       "archive_delete": {
         "button": "归档并删除",
         "title": "归档并删除索引",
         "confirm": "全部归档并删除",
-        "error": "无法归档并删除全部。"
+        "error": "无法归档并删除全部。",
+        "body_other": "此操作将归档并删除 {{count}} 个不兼容的索引。",
+        "success_other": "已为 {{count}} 个索引启动归档并删除。"
       },
       "rotate": {
         "button": "轮转活动写入索引",
         "title": "轮转活动写入索引",
         "confirm": "全部轮转",
-        "error": "无法轮转全部。"
+        "error": "无法轮转全部。",
+        "body_other": "此操作将轮转 {{count}} 个不兼容的索引。",
+        "success_other": "已轮转 {{count}} 个索引。"
       },
       "rotate_partial_title": "部分索引无法轮转",
-      "rotate_failure_title": "无法轮转索引"
+      "rotate_failure_title": "无法轮转索引",
+      "deleted_other": "已删除 {{count}} 个索引。"
     }
   },
   "strategies": {
@@ -511,6 +534,7 @@
     "rotation_lifetime_error": "最短与最长生命周期之间至少需要相隔 1 天。",
     "rotation_lifetime_help_minimum": "此索引中的数据在被保留之前需要保存的最短天数。",
     "rotation_lifetime_help_range": "此索引中的数据在被保留之前需要保存的最短/最长天数。",
+    "rotation_lifetime_max_rotation_other": "管理员已将最大轮转周期设置为 {{count}} 天。",
     "rotation_lifetime_fixed_leeway": "最长天数为 {{max}}，因为最短与最长之间的固定天数已设置为 {{leeway}}。"
   },
   "pages": {
@@ -544,6 +568,7 @@
     "templates_default_info": "在此定义默认模板，以控制由 Illuminate 包创建的索引集的配置。",
     "failures_title": "索引器失败",
     "failures_description": "这是一份索引尝试失败的消息列表。失败表示消息已被正确处理，但写入索引器集群失败。请注意，该列表的大小上限为 50 MB，因此会包含大量失败日志，但不一定包含所有已发生的失败。",
+    "failures_total_other": "共包含 {{formattedCount}} 条索引器失败记录的集合。",
     "indices_document_title": "索引与索引集",
     "indices_title": "索引与索引集",
     "indices_description": "流会将消息写入索引集。索引集是用于配置已存储数据的保留、分片和副本的配置。例如，通过配置索引集，您可以为特定的流设置不同的保留时长。"
@@ -587,10 +612,73 @@
     "templates_search_placeholder": "搜索索引集模板",
     "field_types_human_name": "索引集字段类型",
     "origin_explanation": "来源说明",
-    "category_counts_load_failed": "加载索引集数量失败，状态"
+    "category_counts_load_failed": "加载索引集数量失败，状态",
+    "category_counts_load_failed_title": "无法加载索引集数量",
+    "template_create_failed": "创建索引集模板失败，状态：{{error}}",
+    "template_create_failed_title": "无法创建索引集模板",
+    "template_create_success": "索引集模板已成功创建。",
+    "template_update_failed": "更新索引集模板失败，状态：{{error}}",
+    "template_update_failed_title": "无法更新索引集模板",
+    "template_update_success": "索引集模板已成功更新。",
+    "template_default_failed": "将模板设为默认失败，状态：{{error}}",
+    "template_default_failed_title": "无法将模板设为默认",
+    "template_default_success": "模板已成功设为默认。",
+    "template_delete_failed": "删除索引集模板失败，状态：{{error}}",
+    "template_delete_failed_title": "无法删除索引集模板",
+    "template_delete_success": "索引集模板已成功删除。",
+    "templates_load_failed": "加载索引集模板列表失败，状态",
+    "templates_load_failed_title": "无法加载索引集模板",
+    "template_load_failed": "加载索引集模板失败，状态",
+    "template_load_failed_title": "无法加载索引集模板",
+    "built_in_templates_load_failed": "加载内置索引集模板失败，状态",
+    "built_in_templates_load_failed_title": "无法加载内置索引集模板",
+    "template_defaults_load_failed": "获取索引默认模板时出错",
+    "index_set_load_failed": "加载 ID 为 {{indexSetId}} 的索引集失败，状态",
+    "index_set_load_failed_title": "无法加载索引集",
+    "index_sets_list_load_failed": "加载索引集列表失败，状态",
+    "index_sets_list_load_failed_title": "无法加载索引集列表",
+    "ranges_recalculation_failed": "无法创建索引范围重新计算任务",
+    "ranges_recalculation_failed_title": "启动索引范围重新计算时出错",
+    "cycle_deflector_failed": "轮转 Deflector 失败",
+    "field_types_load_failed": "加载索引字段类型失败，状态",
+    "field_types_load_failed_title": "无法加载索引字段类型",
+    "custom_field_type_remove_failed": "移除自定义字段类型失败，状态：{{error}}",
+    "custom_field_type_remove_failed_title": "无法移除自定义字段类型",
+    "custom_field_type_removed": "已成功移除自定义字段类型",
+    "profile_set_failed": "设置索引集配置文件失败，状态：{{error}}",
+    "profile_set_failed_title": "无法设置索引集配置文件",
+    "profile_set_success": "已成功设置索引集配置文件",
+    "profile_remove_failed": "从索引中移除配置文件失败，状态：{{error}}",
+    "profile_remove_failed_title": "无法从索引中移除配置文件",
+    "profile_removed": "已成功从索引中移除配置文件",
+    "failures_list_load_failed": "加载索引器失败列表失败，状态",
+    "failures_list_load_failed_title": "无法加载索引器失败列表",
+    "failures_count_load_failed": "加载索引器失败数量失败，状态",
+    "failures_count_load_failed_title": "无法加载索引器失败数量",
+    "indices_multiple_load_failed": "加载 Indexer 多个索引失败，状态",
+    "indices_multiple_load_failed_title": "无法加载 Indexer 多个索引"
   },
-  "notifications": {},
-  "use_index_set_stats_notifications": {},
-  "use_indexer_overview_notifications": {},
-  "use_indices_configuration_notifications": {}
+  "notifications": {
+    "create_success": "已成功创建索引集 '{{title}}'",
+    "create_failed": "创建索引集 '{{title}}' 失败，状态：{{error}}",
+    "create_failed_title": "无法创建索引集。",
+    "update_success": "已成功更新索引集 '{{title}}'",
+    "update_failed": "更新索引集 '{{title}}' 失败，状态：{{error}}",
+    "update_failed_title": "无法更新索引集。",
+    "success_title": "成功"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "加载索引集统计信息失败，状态",
+    "load_failed_title": "无法加载索引集统计信息。"
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "加载索引集的索引器概览失败，状态",
+    "load_failed_title": "无法加载索引器概览。"
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "获取轮转策略失败",
+    "fetch_rotation_failed_title": "无法获取轮转策略",
+    "fetch_retention_failed": "获取保留策略失败",
+    "fetch_retention_failed_title": "无法获取保留策略"
+  }
 }
