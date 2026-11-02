@@ -177,19 +177,19 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     private ValidationResult validateConfigurationVariableHelper(ConfigurationVariable confVar) {
         final ValidationResult validationResult = new ValidationResult();
         if (confVar.name().isEmpty()) {
-            validationResult.addError("name", "Variable name can not be empty.");
+            validationResult.addError("name", "sidecar_variable.name_empty", "Variable name can not be empty.", Map.of());
         } else if (!VALID_NAME_PATTERN.matcher(confVar.name()).matches()) {
-            validationResult.addError("name", "Variable name can only contain the following characters: A-Z,a-z,0-9,_");
+            validationResult.addError("name", "sidecar_variable.name_invalid_chars", "Variable name can only contain the following characters: A-Z,a-z,0-9,_", Map.of());
         } else if (INVALID_NAME_PREFIX.matcher(confVar.name()).matches()) {
-            validationResult.addError("name", "Variable name can not start with numbers.");
+            validationResult.addError("name", "sidecar_variable.name_starts_with_number", "Variable name can not start with numbers.", Map.of());
         }
 
         if (configurationVariableService.hasConflict(confVar)) {
-            validationResult.addError("name", "A variable with that name already exists.");
+            validationResult.addError("name", "sidecar_variable.name_exists", "A variable with that name already exists.", Map.of());
         }
 
         if (confVar.content().isEmpty()) {
-            validationResult.addError("content", "Variable content can not be empty.");
+            validationResult.addError("content", "sidecar_variable.content_empty", "Variable content can not be empty.", Map.of());
         }
 
         return validationResult;

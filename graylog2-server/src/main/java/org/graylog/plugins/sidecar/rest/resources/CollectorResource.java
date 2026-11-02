@@ -295,15 +295,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         final ValidationResult validation = new ValidationResult();
 
         if (toValidate.name().isEmpty()) {
-            validation.addError("name", "Collector name cannot be empty.");
+            validation.addError("name", "sidecar_collector.name_empty", "Collector name cannot be empty.", Map.of());
         } else if (!validateCollectorName(toValidate.name())) {
-            validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+            validation.addError("name", "sidecar_collector.name_invalid_chars", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.", Map.of());
         }
 
         if (toValidate.executablePath().isEmpty()) {
-            validation.addError("executable_path", "Collector binary path cannot be empty.");
+            validation.addError("executable_path", "sidecar_collector.path_empty", "Collector binary path cannot be empty.", Map.of());
         } else if (!validatePath(toValidate.executablePath())) {
-            validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
+            validation.addError("executable_path", "sidecar_collector.path_invalid_chars", "Collector binary path cannot contain the following characters: ; * ? \" < > | &", Map.of());
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
@@ -311,7 +311,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                 validation.addError("node_operating_system", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS));
             }
             if (!validateServiceType(toValidate.serviceType(), toValidate.nodeOperatingSystem())) {
-                validation.addError("service_type", "Only Windows collectors support 'Windows service'.");
+                validation.addError("service_type", "sidecar_collector.service_type_windows_only", "Only Windows collectors support 'Windows service'.", Map.of());
             }
             collectorOptional = Optional.ofNullable(collectorService.findByNameAndOs(toValidate.name(), toValidate.nodeOperatingSystem()));
         } else {

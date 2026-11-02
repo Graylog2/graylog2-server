@@ -234,17 +234,17 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
         if (dto.config() instanceof final EmailEventNotificationConfig emailEventNotificationConfig) {
             if (!emailConfiguration.isEnabled()) {
-                validationResult.addError("config", "Email transport is not configured in graylog.conf");
+                validationResult.addError("config", "event_notification.email_transport_missing", "Email transport is not configured in graylog.conf", Map.of());
             }
             if (isNullOrEmpty(emailConfiguration.getFromEmail()) && isNullOrEmpty(emailEventNotificationConfig.sender())) {
-                validationResult.addError("sender", "No default sender specified in graylog.conf. You must specify one here.");
+                validationResult.addError("sender", "event_notification.default_sender_missing", "No default sender specified in graylog.conf. You must specify one here.", Map.of());
             } else {
                 if (!isNullOrEmpty(emailEventNotificationConfig.sender())) {
                     try {
                         InternetAddress email = new InternetAddress(emailEventNotificationConfig.sender());
                         email.validate();
                     } catch (AddressException e) {
-                        validationResult.addError("sender", "Invalid email address.");
+                        validationResult.addError("sender", "event_notification.sender_invalid", "Invalid email address.", Map.of());
                     }
                 }
                 if (!isNullOrEmpty(emailConfiguration.getFromEmail())) {
@@ -252,7 +252,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                         InternetAddress email = new InternetAddress(emailConfiguration.getFromEmail());
                         email.validate();
                     } catch (AddressException e) {
-                        validationResult.addError("sender", "Invalid default sender email address specified in graylog.conf.");
+                        validationResult.addError("sender", "event_notification.default_sender_invalid", "Invalid default sender email address specified in graylog.conf.", Map.of());
                     }
                 }
             }

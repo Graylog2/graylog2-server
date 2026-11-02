@@ -374,26 +374,26 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             configuration = configurationOptional.get();
             if (!configuration.id().equals(toValidate.id())) {
                 // a configuration exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
+                validation.addError("name", "sidecar_configuration.name_exists", "Configuration \"" + toValidate.name() + "\" already exists", Map.of("name", toValidate.name()));
             }
         }
 
         if (toValidate.name().isEmpty()) {
-            validation.addError("name", "Configuration name cannot be empty.");
+            validation.addError("name", "sidecar_configuration.name_empty", "Configuration name cannot be empty.", Map.of());
         } else if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
-            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
+            validation.addError("name", "sidecar_configuration.name_invalid_chars", "Configuration name can not include the following characters: ; * ? \" < > | &", Map.of());
         }
 
         if (toValidate.collectorId().isEmpty()) {
-            validation.addError("collector_id", "Associated collector ID cannot be empty.");
+            validation.addError("collector_id", "sidecar_configuration.collector_empty", "Associated collector ID cannot be empty.", Map.of());
         }
 
         if (toValidate.color().isEmpty()) {
-            validation.addError("color", "Collector color cannot be empty.");
+            validation.addError("color", "sidecar_configuration.color_empty", "Collector color cannot be empty.", Map.of());
         }
 
         if (toValidate.template().isEmpty()) {
-            validation.addError("template", "Collector template cannot be empty.");
+            validation.addError("template", "sidecar_configuration.template_empty", "Collector template cannot be empty.", Map.of());
         }
 
         try {
