@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "執行搜尋",
+    "perform_search_dirty": "執行搜尋（上次執行後有變更）"
+  },
+  "sidebar": {
+    "description": "描述",
+    "create": "建立",
+    "highlighting": "醒目提示",
+    "fields": "欄位"
+  },
+  "empty_state": {
+    "no_widgets_search": "沒有定義任何 Widget 來視覺化搜尋結果",
+    "no_widgets_dashboard": "此 Dashboard 尚無 Widget",
+    "create_widget_hint": "在左側邊欄的「建立」區段中選取 Widget 類型，即可建立新的 Widget。",
+    "tips_title": "建立搜尋與 Dashboard 的幾點建議",
+    "tip_1": "從想回答的<bold>問題</bold>開始，定義要解決的問題。",
+    "tip_2": "<bold>限制</bold>資料範圍，只保留想檢視的資料點。",
+    "tip_3": "<bold>視覺化</bold>資料。它能回答問題嗎？",
+    "tip_4": "與同事<bold>分享</bold> Dashboard，並透過參數使其可供<bold>重複使用</bold>。"
+  },
+  "search_bar": {
+    "streams_placeholder": "選取搜尋應包含的 Stream。若為空，則搜尋所有 Stream。",
+    "refresh_human_name": "搜尋",
+    "query_history_title": "開啟查詢歷程記錄",
+    "filters_label": "篩選器",
+    "filters_tooltip_title": "搜尋篩選器",
+    "filters_enterprise_hint": "搜尋篩選器與參數適用於 Enterprise 版本。",
+    "filters_hide_controls": "隱藏控制項",
+    "scroll_hint": "捲動至搜尋列",
+    "query_placeholder": "在此輸入搜尋查詢並按下 Enter。例如：(\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "已儲存的搜尋",
+    "save_search": "儲存搜尋",
+    "unsaved_changes": "未儲存的變更",
+    "load_title": "載入先前儲存的搜尋",
+    "load": "載入",
+    "share_disabled": "只有已儲存的搜尋可以分享。",
+    "dropdown_aria_label": "開啟搜尋動作下拉選單",
+    "edit_metadata": "編輯中繼資料",
+    "export_to_dashboard": "匯出至 Dashboard",
+    "export": "匯出",
+    "reset_search": "重設搜尋",
+    "editing_modal_title": "編輯已儲存的搜尋",
+    "update_search": "更新搜尋",
+    "share_description": "搜尋使用者或團隊，以新增為此已儲存搜尋的協作者。",
+    "save_success": "成功儲存檢視「{{title}}」！",
+    "save_error": "儲存檢視失敗：{{error}}",
+    "delete_success": "成功刪除已儲存的搜尋「{{title}}」！",
+    "delete_error": "刪除已儲存的搜尋失敗：{{error}}"
+  },
+  "save_form": {
+    "popover_title": "搜尋名稱",
+    "dirty_warning": "搜尋參數（時間範圍、Stream 或查詢）有未確認的變更。現在儲存將會捨棄這些變更。若非刻意為之，請先執行搜尋以套用變更，再進行儲存。",
+    "title_label": "標題",
+    "title_placeholder": "輸入標題",
+    "share_description": "搜尋使用者或團隊，以新增為此搜尋的協作者。",
+    "create_new": "建立新的",
+    "save_as": "另存為",
+    "create_new_title": "建立新搜尋",
+    "save_as_title": "另存為新搜尋",
+    "save": "儲存",
+    "save_title": "儲存搜尋",
+    "cancel": "取消"
+  },
+  "results": {
+    "loading": "正在更新搜尋結果..."
+  },
+  "sidebar_description": {
+    "execution": "執行",
+    "ad_hoc_info": "儲存搜尋或將其匯出至 Dashboard，即可新增自訂摘要與描述。",
+    "edit_metadata_hint": "若要為此{{viewType}}新增描述與摘要，請點擊搜尋列中的 <icon/> 圖示開啟動作選單。動作選單中包含「編輯中繼資料」選項。",
+    "search_section": "搜尋",
+    "no_summary": "此{{viewType}}沒有摘要。",
+    "no_description": "此{{viewType}}沒有描述。",
+    "no_query": "尚未執行任何查詢。",
+    "query_executed_in": "查詢執行時間",
+    "effective_time_range": "有效時間範圍",
+    "varies_per_widget": "依 Widget 而異",
+    "time_from": "從",
+    "time_to": "至",
+    "total_results": "結果總數"
+  },
+  "sidebar_create": {
+    "info": "使用下列選項，將彙總、日誌檢視（Enterprise 功能）或參數（Enterprise 功能）新增至搜尋。",
+    "generic": "一般",
+    "predefined_aggregation": "預先定義的彙總",
+    "investigations": "Investigations",
+    "events": "事件"
+  },
+  "sidebar_highlighting": {
+    "description": "可以醒目提示搜尋詞彙與欄位值。是否在結果中醒目提示搜尋查詢，可在 {{productName}} 伺服器設定中啟用或停用。任何欄位值都可以點擊後選取「醒目提示此值」來醒目提示。\n若某個詞彙或值有多個規則，則使用第一個符合的規則。",
+    "active_highlights": "使用中的醒目提示",
+    "add_rule_title": "新增醒目提示規則",
+    "search_terms": "搜尋詞彙"
+  },
+  "save_view": {
+    "save": "儲存",
+    "save_as": "另存為",
+    "save_as_new_dashboard_title": "另存為新 Dashboard",
+    "save_dashboard_title": "儲存 Dashboard"
+  },
+  "undo_redo": {
+    "undo": "復原",
+    "redo": "重做"
+  },
+  "time_range": {
+    "tab_relative": "相對",
+    "tab_absolute": "絕對",
+    "tab_keyword": "關鍵字",
+    "from_label": "從：",
+    "until_label": "至：",
+    "keyword_label": "關鍵字：",
+    "no_override": "不覆寫",
+    "now": "現在",
+    "all_time": "所有時間",
+    "ago": "前",
+    "range_ago": "{{time}} 前",
+    "range_length_placeholder": "選取範圍長度",
+    "load_preset": "載入預設集",
+    "no_available_presets": "沒有可用的預設集",
+    "loading": "載入中...",
+    "configure_presets": "設定預設集",
+    "insert_current_date": "插入目前日期",
+    "from_hours_label": "起始小時標籤"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
