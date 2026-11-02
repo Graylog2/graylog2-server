@@ -355,5 +355,50 @@
       "documentation_title": "Sidecars-Dokumentation",
       "title": "Status von Sidecar <em>{{name}}</em>"
     }
+  },
+  "notifications": {
+    "fetch_failed": "Abrufen der Konfigurationsvariablen fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Konfigurationsvariablen konnten nicht abgerufen werden",
+    "save_success_created": "Konfigurationsvariable \"{{name}}\" erfolgreich erstellt",
+    "save_success_updated": "Konfigurationsvariable \"{{name}}\" erfolgreich aktualisiert",
+    "save_failed": "Speichern der Variable \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Variable konnte nicht gespeichert werden",
+    "delete_success": "Konfigurationsvariable \"{{name}}\" erfolgreich gelöscht",
+    "delete_failed": "Löschen der Variable \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Variable konnte nicht gelöscht werden",
+    "validate_failed": "Validierung der Variable \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "validate_failed_title": "Variable konnte nicht validiert werden",
+    "configurations_fetch_failed": "Abrufen der Konfigurationen für diese Variable fehlgeschlagen mit Status: {{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "Abrufen des Sidecars fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Das Sidecar konnte nicht abgerufen werden",
+    "not_found": "Ein Sidecar mit der ID <{{sidecarId}}> konnte nicht gefunden werden. Möglicherweise war es zu lange inaktiv.",
+    "fetch_actions_failed": "Abrufen der Sidecar-Aktionen fehlgeschlagen mit Status: {{error}}",
+    "fetch_actions_failed_title": "Die Sidecar-Aktionen konnten nicht abgerufen werden",
+    "restart_failed": "Neustart des Sidecars fehlgeschlagen mit Status: {{error}}",
+    "restart_failed_title": "Das Sidecar konnte nicht neu gestartet werden",
+    "configuration_change_requested": "Konfigurationsänderung für {{amount}} Collectors angefordert",
+    "fetch_sidecars_failed": "Abrufen der Sidecars fehlgeschlagen mit Status: {{error}}",
+    "fetch_sidecars_failed_title": "Die Sidecars konnten nicht abgerufen werden"
+  },
+  "use_sidecars_administration_notifications": {
+    "fetch_sidecars_failed": "Abrufen der Sidecars fehlgeschlagen mit Status: {{error}}",
+    "fetch_sidecars_failed_title": "Die Sidecars konnten nicht abgerufen werden",
+    "requested": {
+      "start": "Start für {{amount}} Collectors angefordert",
+      "restart": "Neustart für {{amount}} Collectors angefordert",
+      "stop": "Stopp für {{amount}} Collectors angefordert"
+    },
+    "request_failed": {
+      "start": "Anfrage für Start fehlgeschlagen mit Status: {{error}}",
+      "restart": "Anfrage für Neustart fehlgeschlagen mit Status: {{error}}",
+      "stop": "Anfrage für Stopp fehlgeschlagen mit Status: {{error}}"
+    },
+    "request_failed_title": {
+      "start": "Collectors konnten nicht gestartet werden",
+      "restart": "Collectors konnten nicht neu gestartet werden",
+      "stop": "Collectors konnten nicht gestoppt werden"
+    }
   }
 }

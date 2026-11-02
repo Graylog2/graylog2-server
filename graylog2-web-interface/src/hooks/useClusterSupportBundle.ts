@@ -24,6 +24,7 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type BundleFile = {
   size: number;
@@ -42,8 +43,8 @@ const createSupportBundle = async (
     await refetchList();
   } catch (errorThrown) {
     UserNotification.error(
-      `Creating the Support Bundle failed with status: ${errorThrown}`,
-      'Could not create the Support Bundle.',
+      i18n.t('use_cluster_support_bundle_notifications.create_failed', { ns: 'system', error: errorThrown }),
+      i18n.t('use_cluster_support_bundle_notifications.create_failed_title', { ns: 'system' }),
     );
   } finally {
     setLoading(false);
@@ -56,8 +57,8 @@ const deleteSupportBundle = async (filename: string, refetchList: () => Promise<
     await refetchList();
   } catch (errorThrown) {
     UserNotification.error(
-      `Deleting the Support Bundle failed with status: ${errorThrown}`,
-      'Could not delete the Support Bundle.',
+      i18n.t('use_cluster_support_bundle_notifications.delete_failed', { ns: 'system', error: errorThrown }),
+      i18n.t('use_cluster_support_bundle_notifications.delete_failed_title', { ns: 'system' }),
     );
   }
 };
@@ -67,8 +68,8 @@ const downloadSupportBundle = async (filename: string) => {
     window.open(qualifyUrl(ApiRoutes.ClusterSupportBundleController.download(filename).url), '_self');
   } catch (errorThrown) {
     UserNotification.error(
-      `Downloading the Support Bundle failed with status: ${errorThrown}`,
-      'Could not download the Support Bundle.',
+      i18n.t('use_cluster_support_bundle_notifications.download_failed', { ns: 'system', error: errorThrown }),
+      i18n.t('use_cluster_support_bundle_notifications.download_failed_title', { ns: 'system' }),
     );
   }
 };
@@ -81,8 +82,8 @@ const useClusterSupportBundle = () => {
     queryFn: () =>
       defaultOnError(
         fetchSupportBundleList(),
-        'Loading Support Bundle list failed with status',
-        'Could not load Support Bundle list.',
+        i18n.t('use_cluster_support_bundle_notifications.load_list_failed', { ns: 'system' }),
+        i18n.t('use_cluster_support_bundle_notifications.load_list_failed_title', { ns: 'system' }),
       ),
 
     placeholderData: keepPreviousData,

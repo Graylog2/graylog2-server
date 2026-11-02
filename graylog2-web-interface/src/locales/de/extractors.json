@@ -215,5 +215,38 @@
     "import_header": "Extractors in <em>{{title}}</em> importieren",
     "import_description": "Exportierte Extractors können in einen Input importiert werden.",
     "import_marketplace_prefix": "Sie benötigen lediglich den JSON-Export der Extractors aus einer anderen {{productName}}-Installation oder aus dem"
+  },
+  "tools_api": {
+    "details": "Details: {{error}}",
+    "natural_date_failed": "Laden der Schlüsselwort-Vorschau fehlgeschlagen mit Status: {{error}}",
+    "natural_date_failed_title": "Schlüsselwort-Vorschau konnte nicht geladen werden",
+    "grok_failed_title": "Die Grok-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "json_failed_title": "Die JSON-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "regex_invalid_title": "Der reguläre Ausdruck konnte nicht validiert werden. Stellen Sie sicher, dass er gültig ist.",
+    "allowlist_check_title": "Es konnte nicht geprüft werden, ob die URL in der Allowlist enthalten ist.",
+    "regex_generate_title": "Der Regex konnte nicht generiert werden.",
+    "regex_try_title": "Der reguläre Ausdruck konnte nicht getestet werden. Stellen Sie sicher, dass er gültig ist.",
+    "split_index_failed_title": "Die Extraktion mit Aufteilen und Index konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "substring_failed_title": "Die Teilstring-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie die Indexgrenzen.",
+    "contains_string_failed_title": "Es konnte nicht geprüft werden, ob das Feld die Zeichenfolge enthält",
+    "lookup_table_failed_title": "Es konnte nicht geprüft werden, ob die Lookup-Tabelle die Zeichenfolge übersetzt"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} erfolgreich erstellt",
+    "create_failed": "Erstellen des Extractors fehlgeschlagen: {{error}}",
+    "create_failed_title": "Der Extractor konnte nicht erstellt werden",
+    "updated_success": "Extractor \"{{title}}\" erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren des Extractors fehlgeschlagen: {{error}}",
+    "update_failed_title": "Der Extractor konnte nicht aktualisiert werden",
+    "deleted_success": "Extractor \"{{title}}\" erfolgreich gelöscht",
+    "delete_failed": "Löschen des Extractors fehlgeschlagen: {{error}}",
+    "delete_failed_title": "Der Extractor {{title}} konnte nicht gelöscht werden",
+    "positions_updated_success": "Reihenfolge der Extractoren erfolgreich aktualisiert",
+    "positions_failed": "Ändern der Reihenfolge der Extractoren fehlgeschlagen: {{error}}",
+    "positions_failed_title": "Die Reihenfolge der Extractoren konnte nicht aktualisiert werden",
+    "import_success": "Importergebnis: {{successful}} Extractor(en) importiert.",
+    "import_success_title": "Import erfolgreich",
+    "import_warning": "Importergebnis: {{successful}} Extractor(en) importiert, {{failed}} Fehler.",
+    "import_warning_title": "Import abgeschlossen"
   }
 }

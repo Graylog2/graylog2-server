@@ -529,5 +529,9 @@
   },
   "validation_summary": {
     "title": "Es wurden Fehler gefunden!"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Laden der Ereignisdefinition fehlgeschlagen mit Status: {{error}}",
+    "load_failed_title": "Die Ereignisdefinition konnte nicht geladen werden"
   }
 }

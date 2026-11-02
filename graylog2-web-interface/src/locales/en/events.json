@@ -121,5 +121,9 @@
     "review_progress": "Review of {{completed}}/{{total}} events completed.",
     "show_selected": "Show Selected Events",
     "unknown_message": "Unknown"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Loading event or alert failed with status: {{error}}",
+    "load_failed_title": "Could not load event or alert"
   }
 }

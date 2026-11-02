@@ -121,5 +121,9 @@
     "review_progress": "Prüfung von {{completed}}/{{total}} Ereignissen abgeschlossen.",
     "show_selected": "Ausgewählte Ereignisse anzeigen",
     "unknown_message": "Unbekannt"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Laden des Ereignisses oder Alarms fehlgeschlagen mit Status: {{error}}",
+    "load_failed_title": "Das Ereignis oder der Alarm konnte nicht geladen werden"
   }
 }

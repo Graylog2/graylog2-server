@@ -566,5 +566,19 @@
   },
   "footer": {
     "system_info": "{{productName}} {{version}} on {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Downloading failed with status: {{error}}",
+    "download_failed_title": "Unable to download",
+    "export_failed": "Export failed",
+    "export_widget_failed": "Export for widget failed",
+    "telemetry_update_failed": "Update failed: {{error}}",
+    "telemetry_update_failed_title": "Could not update telemetry settings."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Adding item to favorites failed with status: {{error}}",
+    "put_failed_title": "Could not add item to favorites",
+    "delete_failed": "Deleting item from favorites failed with status: {{error}}",
+    "delete_failed_title": "Could not delete item from favorites"
   }
 }

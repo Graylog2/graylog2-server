@@ -24,6 +24,7 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
+import i18n from 'i18n';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTOR_CONFIGURATIONS_QUERY_KEY = ['collector-configurations'] as const;
@@ -67,8 +68,8 @@ export const fetchAllConfigurations = (): Promise<{ configurations: Array<Config
 
   promise.catch((error) => {
     UserNotification.error(
-      `Fetching collector configurations failed with status: ${error}`,
-      'Could not retrieve configurations',
+      i18n.t('use_collector_configurations_notifications.fetch_failed', { ns: 'collectors', error }),
+      i18n.t('use_collector_configurations_notifications.fetch_failed_title', { ns: 'collectors' }),
     );
   });
 
@@ -88,8 +89,8 @@ export const fetchConfigurationsPaginated = ({
 
   promise.catch((error) => {
     UserNotification.error(
-      `Fetching collector configurations failed with status: ${error}`,
-      'Could not retrieve configurations',
+      i18n.t('use_collector_configurations_notifications.fetch_failed', { ns: 'collectors', error }),
+      i18n.t('use_collector_configurations_notifications.fetch_failed_title', { ns: 'collectors' }),
     );
   });
 
@@ -100,13 +101,13 @@ export const fetchConfiguration = (configurationId: string): Promise<Configurati
   const promise = SidecarConfigurations.getConfigurations(configurationId);
 
   promise.catch((error) => {
-    let errorMessage = `Fetching Configuration failed with status: ${error}`;
+    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', { ns: 'collectors', error });
 
     if (error.status === 404) {
-      errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', { ns: 'collectors', configurationId });
     }
 
-    UserNotification.error(errorMessage, 'Could not retrieve Configuration');
+    UserNotification.error(errorMessage, i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -116,13 +117,13 @@ export const fetchConfigurationSidecars = (configurationId: string): Promise<Con
   const promise = SidecarConfigurations.getConfigurationSidecars(configurationId);
 
   promise.catch((error) => {
-    let errorMessage = `Fetching Configuration failed with status: ${error}`;
+    let errorMessage = i18n.t('use_collector_configurations_notifications.fetch_configuration_failed', { ns: 'collectors', error });
 
     if (error.status === 404) {
-      errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+      errorMessage = i18n.t('use_collector_configurations_notifications.configuration_not_found', { ns: 'collectors', configurationId });
     }
 
-    UserNotification.error(errorMessage, 'Could not retrieve Configuration');
+    UserNotification.error(errorMessage, i18n.t('use_collector_configurations_notifications.fetch_configuration_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -132,7 +133,7 @@ export const renderConfigurationPreview = (template: string): Promise<{ preview:
   const promise = SidecarConfigurations.renderConfiguration({ template });
 
   promise.catch((error) => {
-    UserNotification.error(`Fetching configuration preview failed with status: ${error}`, 'Could not retrieve preview');
+    UserNotification.error(i18n.t('use_collector_configurations_notifications.preview_failed', { ns: 'collectors', error }), i18n.t('use_collector_configurations_notifications.preview_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -142,11 +143,11 @@ export const createConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.createConfiguration(configuration);
 
   promise.then(
-    () => UserNotification.success('', 'Configuration successfully created'),
+    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.created_success', { ns: 'collectors' })),
     (error) => {
       UserNotification.error(
-        error.status === 400 ? error.responseMessage : `Creating configuration failed with status: ${error.message}`,
-        'Could not save configuration',
+        error.status === 400 ? error.responseMessage : i18n.t('use_collector_configurations_notifications.create_failed', { ns: 'collectors', error: error.message }),
+        i18n.t('use_collector_configurations_notifications.create_failed_title', { ns: 'collectors' }),
       );
     },
   );
@@ -158,11 +159,11 @@ export const updateConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.updateConfiguration(configuration.id, configuration);
 
   promise.then(
-    () => UserNotification.success('', 'Configuration successfully updated'),
+    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.updated_success', { ns: 'collectors' })),
     (error) => {
       UserNotification.error(
-        `Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-        `Could not update Configuration ${configuration.name}`,
+        i18n.t('use_collector_configurations_notifications.update_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
+        i18n.t('use_collector_configurations_notifications.update_failed_title', { ns: 'collectors', name: configuration.name }),
       );
     },
   );
@@ -174,11 +175,11 @@ export const copyConfiguration = (configurationId: string, name: string): Promis
   const promise = SidecarConfigurations.copyConfiguration(configurationId, name);
 
   promise.then(
-    () => UserNotification.success('', `Configuration "${name}" successfully copied`),
+    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.copied_success', { ns: 'collectors', name })),
     (error) => {
       UserNotification.error(
-        `Saving configuration "${name}" failed with status: ${error.message}`,
-        'Could not save Configuration',
+        i18n.t('use_collector_configurations_notifications.copy_failed', { ns: 'collectors', name, error: error.message }),
+        i18n.t('use_collector_configurations_notifications.copy_failed_title', { ns: 'collectors' }),
       );
     },
   );
@@ -190,11 +191,11 @@ export const deleteConfiguration = (configuration: Configuration): Promise<unkno
   const promise = SidecarConfigurations.deleteConfiguration(configuration.id);
 
   promise.then(
-    () => UserNotification.success('', `Configuration "${configuration.name}" successfully deleted`),
+    () => UserNotification.success('', i18n.t('use_collector_configurations_notifications.deleted_success', { ns: 'collectors', name: configuration.name })),
     (error) => {
       UserNotification.error(
-        `Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-        `Could not delete Configuration ${configuration.name}`,
+        i18n.t('use_collector_configurations_notifications.delete_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
+        i18n.t('use_collector_configurations_notifications.delete_failed_title', { ns: 'collectors', name: configuration.name }),
       );
     },
   );
@@ -220,8 +221,8 @@ export const validateConfiguration = (
     (response) => response,
     (error) =>
       UserNotification.error(
-        `Validating configuration "${payload.name}" failed with status: ${error.message}`,
-        'Could not validate configuration',
+        i18n.t('use_collector_configurations_notifications.validate_failed', { ns: 'collectors', name: payload.name, error: error.message }),
+        i18n.t('use_collector_configurations_notifications.validate_failed_title', { ns: 'collectors' }),
       ),
   );
 

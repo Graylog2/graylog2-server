@@ -22,6 +22,7 @@ import fetch, { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import type { SystemOverview } from 'stores/cluster/types';
+import i18n from 'i18n';
 
 const SOURCE_URL = '/cluster';
 
@@ -32,8 +33,8 @@ export const fetchNodeJvm = (nodeId: string) => {
 
   promise.catch((error) =>
     UserNotification.error(
-      `Getting JVM information for node '${nodeId}' failed: ${error}`,
-      'Could not get JVM information',
+      i18n.t('use_cluster_overview_notifications.jvm_failed', { ns: 'system', nodeId, error }),
+      i18n.t('use_cluster_overview_notifications.jvm_failed_title', { ns: 'system' }),
     ),
   );
 
@@ -44,7 +45,10 @@ export const fetchThreadDump = (nodeId: string): Promise<string> =>
   Cluster.threadDump(nodeId).then(
     (response) => response.threaddump,
     (error) => {
-      UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump');
+      UserNotification.error(
+        i18n.t('use_cluster_overview_notifications.thread_dump_failed', { ns: 'system', nodeId, error }),
+        i18n.t('use_cluster_overview_notifications.thread_dump_failed_title', { ns: 'system' }),
+      );
 
       throw error;
     },
@@ -55,8 +59,8 @@ export const fetchProcessBufferDump = (nodeId: string) =>
     (response) => response.processbuffer_dump,
     (error) => {
       UserNotification.error(
-        `Getting process buffer dump for node '${nodeId}' failed: ${error}`,
-        'Could not get process buffer dump',
+        i18n.t('use_cluster_overview_notifications.process_buffer_dump_failed', { ns: 'system', nodeId, error }),
+        i18n.t('use_cluster_overview_notifications.process_buffer_dump_failed_title', { ns: 'system' }),
       );
 
       throw error;
@@ -71,8 +75,8 @@ export const fetchSystemLogs = (nodeId: string, limit: number) =>
     (response) => response,
     (error) => {
       UserNotification.error(
-        `Getting system log messages for node '${nodeId}' failed: ${error}`,
-        'Could not get system log messages',
+        i18n.t('use_cluster_overview_notifications.system_logs_failed', { ns: 'system', nodeId, error }),
+        i18n.t('use_cluster_overview_notifications.system_logs_failed_title', { ns: 'system' }),
       );
 
       throw error;
@@ -84,7 +88,7 @@ const useClusterOverview = () =>
     queryKey: ['cluster', 'overview'],
     queryFn: () =>
       fetchClusterOverview().catch((error) => {
-        UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview');
+        UserNotification.error(i18n.t('use_cluster_overview_notifications.overview_failed', { ns: 'system', error }), i18n.t('use_cluster_overview_notifications.overview_failed_title', { ns: 'system' }));
 
         throw error;
       }),

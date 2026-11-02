@@ -398,5 +398,38 @@
   "thread_dump_page": {
     "title": "Thread dump of node {{shortNodeId}} / {{hostname}}",
     "taken_at": "Taken at <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Load balancer status successfully changed do '{{status}}' in node '{{nodeId}}'",
+    "lb_change_failed": "Changing load balancer status in '{{nodeId}}' failed: {{error}}",
+    "lb_change_failed_title": "Could not change load balancer status to '{{status}}' in node '{{nodeId}}'",
+    "processing_pause_success": "Message processing paused successfully in '{{nodeId}}'",
+    "processing_pause_failed": "Pausing message processing in '{{nodeId}}' failed: {{error}}",
+    "processing_pause_failed_title": "Could not pause message processing in node '{{nodeId}}'",
+    "processing_resume_success": "Message processing resumed successfully in '{{nodeId}}'",
+    "processing_resume_failed": "Resuming message processing in '{{nodeId}}' failed: {{error}}",
+    "processing_resume_failed_title": "Could not resume message processing in node '{{nodeId}}'"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Getting JVM information for node '{{nodeId}}' failed: {{error}}",
+    "jvm_failed_title": "Could not get JVM information",
+    "thread_dump_failed": "Getting thread dump for node '{{nodeId}}' failed: {{error}}",
+    "thread_dump_failed_title": "Could not get thread dump",
+    "process_buffer_dump_failed": "Getting process buffer dump for node '{{nodeId}}' failed: {{error}}",
+    "process_buffer_dump_failed_title": "Could not get process buffer dump",
+    "system_logs_failed": "Getting system log messages for node '{{nodeId}}' failed: {{error}}",
+    "system_logs_failed_title": "Could not get system log messages",
+    "overview_failed": "Getting cluster overview failed: {{error}}",
+    "overview_failed_title": "Could not get cluster overview"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Creating the Support Bundle failed with status: {{error}}",
+    "create_failed_title": "Could not create the Support Bundle.",
+    "delete_failed": "Deleting the Support Bundle failed with status: {{error}}",
+    "delete_failed_title": "Could not delete the Support Bundle.",
+    "download_failed": "Downloading the Support Bundle failed with status: {{error}}",
+    "download_failed_title": "Could not download the Support Bundle.",
+    "load_list_failed": "Loading Support Bundle list failed with status",
+    "load_list_failed_title": "Could not load Support Bundle list."
   }
 }

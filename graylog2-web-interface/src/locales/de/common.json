@@ -569,5 +569,19 @@
   },
   "footer": {
     "system_info": "{{productName}} {{version}} auf {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Herunterladen fehlgeschlagen mit Status: {{error}}",
+    "download_failed_title": "Herunterladen nicht möglich",
+    "export_failed": "Export fehlgeschlagen",
+    "export_widget_failed": "Export für Widget fehlgeschlagen",
+    "telemetry_update_failed": "Aktualisierung fehlgeschlagen: {{error}}",
+    "telemetry_update_failed_title": "Telemetrie-Einstellungen konnten nicht aktualisiert werden."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Hinzufügen des Eintrags zu den Favoriten fehlgeschlagen mit Status: {{error}}",
+    "put_failed_title": "Der Eintrag konnte nicht zu den Favoriten hinzugefügt werden",
+    "delete_failed": "Entfernen des Eintrags aus den Favoriten fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Der Eintrag konnte nicht aus den Favoriten entfernt werden"
   }
 }

@@ -1107,5 +1107,45 @@
       "valid_until": "valid until {{relativeTime}}",
       "no_data_nodes": "No Data Nodes have been found."
     }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Fetching collector configurations failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve configurations",
+    "fetch_configuration_failed": "Fetching Configuration failed with status: {{error}}",
+    "configuration_not_found": "Unable to find a Configuration with ID <{{configurationId}}>, please ensure it was not deleted.",
+    "fetch_configuration_failed_title": "Could not retrieve Configuration",
+    "preview_failed": "Fetching configuration preview failed with status: {{error}}",
+    "preview_failed_title": "Could not retrieve preview",
+    "created_success": "Configuration successfully created",
+    "create_failed": "Creating configuration failed with status: {{error}}",
+    "create_failed_title": "Could not save configuration",
+    "updated_success": "Configuration successfully updated",
+    "update_failed": "Updating Configuration failed: {{error}}",
+    "update_failed_title": "Could not update Configuration {{name}}",
+    "copied_success": "Configuration \"{{name}}\" successfully copied",
+    "copy_failed": "Saving configuration \"{{name}}\" failed with status: {{error}}",
+    "copy_failed_title": "Could not save Configuration",
+    "deleted_success": "Configuration \"{{name}}\" successfully deleted",
+    "delete_failed": "Deleting Configuration failed: {{error}}",
+    "delete_failed_title": "Could not delete Configuration {{name}}",
+    "validate_failed": "Validating configuration \"{{name}}\" failed with status: {{error}}",
+    "validate_failed_title": "Could not validate configuration"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Fetching collectors failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve collectors",
+    "not_found": "Unable to find a collector with ID <{{collectorId}}>, please ensure it was not deleted.",
+    "fetch_collector_failed": "Fetching Collector failed with status: {{error}}",
+    "fetch_collector_failed_title": "Could not retrieve Collector",
+    "created_success": "Collector successfully created",
+    "updated_success": "Collector successfully updated",
+    "deleted_success": "Collector \"{{name}}\" successfully deleted",
+    "delete_failed": "Deleting Collector failed: {{error}}",
+    "delete_failed_title": "Could not delete Collector \"{{name}}\"",
+    "copied_success": "Collector \"{{name}}\" successfully copied",
+    "copy_failed": "Saving collector \"{{name}}\" failed with status: {{error}}",
+    "copy_failed_title": "Could not save Collector",
+    "validate_failed": "Validating collector \"{{name}}\" failed with status: {{error}}",
+    "validate_failed_title": "Could not validate collector"
   }
 }

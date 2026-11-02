@@ -398,5 +398,38 @@
   "thread_dump_page": {
     "title": "Thread-Dump von Knoten {{shortNodeId}} / {{hostname}}",
     "taken_at": "Abgerufen am <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Status des Load Balancers erfolgreich auf '{{status}}' in Knoten '{{nodeId}}' geändert",
+    "lb_change_failed": "Ändern des Load-Balancer-Status in '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "lb_change_failed_title": "Load-Balancer-Status konnte in Knoten '{{nodeId}}' nicht auf '{{status}}' geändert werden",
+    "processing_pause_success": "Nachrichtenverarbeitung erfolgreich in '{{nodeId}}' pausiert",
+    "processing_pause_failed": "Pausieren der Nachrichtenverarbeitung in '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "processing_pause_failed_title": "Nachrichtenverarbeitung konnte in Knoten '{{nodeId}}' nicht pausiert werden",
+    "processing_resume_success": "Nachrichtenverarbeitung erfolgreich in '{{nodeId}}' fortgesetzt",
+    "processing_resume_failed": "Fortsetzen der Nachrichtenverarbeitung in '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "processing_resume_failed_title": "Nachrichtenverarbeitung konnte in Knoten '{{nodeId}}' nicht fortgesetzt werden"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Abrufen der JVM-Informationen für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "jvm_failed_title": "JVM-Informationen konnten nicht abgerufen werden",
+    "thread_dump_failed": "Abrufen des Thread-Dumps für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "thread_dump_failed_title": "Thread-Dump konnte nicht abgerufen werden",
+    "process_buffer_dump_failed": "Abrufen des Process-Buffer-Dumps für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "process_buffer_dump_failed_title": "Process-Buffer-Dump konnte nicht abgerufen werden",
+    "system_logs_failed": "Abrufen der Systemlog-Nachrichten für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",
+    "system_logs_failed_title": "Systemlog-Nachrichten konnten nicht abgerufen werden",
+    "overview_failed": "Abrufen der Cluster-Übersicht fehlgeschlagen: {{error}}",
+    "overview_failed_title": "Cluster-Übersicht konnte nicht abgerufen werden"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Erstellen des Support Bundles fehlgeschlagen mit Status: {{error}}",
+    "create_failed_title": "Das Support Bundle konnte nicht erstellt werden.",
+    "delete_failed": "Löschen des Support Bundles fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Das Support Bundle konnte nicht gelöscht werden.",
+    "download_failed": "Herunterladen des Support Bundles fehlgeschlagen mit Status: {{error}}",
+    "download_failed_title": "Das Support Bundle konnte nicht heruntergeladen werden.",
+    "load_list_failed": "Laden der Liste der Support Bundles fehlgeschlagen mit Status",
+    "load_list_failed_title": "Die Liste der Support Bundles konnte nicht geladen werden."
   }
 }

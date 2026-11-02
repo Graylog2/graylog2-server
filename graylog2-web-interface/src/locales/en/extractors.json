@@ -215,5 +215,38 @@
     "import_header": "Import extractors to <em>{{title}}</em>",
     "import_description": "Exported extractors can be imported to an input.",
     "import_marketplace_prefix": "All you need is the JSON export of extractors from any other {{productName}} setup or from"
+  },
+  "tools_api": {
+    "details": "Details: {{error}}",
+    "natural_date_failed": "Loading keyword preview failed with status: {{error}}",
+    "natural_date_failed_title": "Could not load keyword preview",
+    "grok_failed_title": "We were not able to run the grok extraction. Please check your parameters.",
+    "json_failed_title": "We were not able to run the JSON extraction. Please check your parameters.",
+    "regex_invalid_title": "Could not validate regular expression. Make sure that it is valid.",
+    "allowlist_check_title": "Could not verify if the url is in the allowlist.",
+    "regex_generate_title": "Could not generate regex.",
+    "regex_try_title": "Could not try regular expression. Make sure that it is valid.",
+    "split_index_failed_title": "We were not able to run the split and index extraction. Please check your parameters.",
+    "substring_failed_title": "We were not able to run the substring extraction. Please check index boundaries.",
+    "contains_string_failed_title": "Could not check if field contains the string",
+    "lookup_table_failed_title": "Could not check if lookup table translates the string"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} created successfully",
+    "create_failed": "Creating extractor failed: {{error}}",
+    "create_failed_title": "Could not create extractor",
+    "updated_success": "Extractor \"{{title}}\" updated successfully",
+    "update_failed": "Updating extractor failed: {{error}}",
+    "update_failed_title": "Could not update extractor",
+    "deleted_success": "Extractor \"{{title}}\" deleted successfully",
+    "delete_failed": "Deleting extractor failed: {{error}}",
+    "delete_failed_title": "Could not delete extractor {{title}}",
+    "positions_updated_success": "Extractor positions updated successfully",
+    "positions_failed": "Changing extractor positions failed: {{error}}",
+    "positions_failed_title": "Could not update extractor positions",
+    "import_success": "Import results: {{successful}} extractor(s) imported.",
+    "import_success_title": "Import operation successful",
+    "import_warning": "Import results: {{successful}} extractor(s) imported, {{failed}} error(s).",
+    "import_warning_title": "Import operation completed"
   }
 }

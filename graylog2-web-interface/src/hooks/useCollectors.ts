@@ -23,6 +23,7 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { Collector } from 'components/sidecars/types';
+import i18n from 'i18n';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTORS_QUERY_KEY = ['collectors'] as const;
@@ -56,7 +57,7 @@ export const fetchCollectorsAll = (): Promise<{ collectors: Array<Collector> }> 
   const promise = _fetch({ pageSize: 0 });
 
   promise.catch((error) => {
-    UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+    UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -74,7 +75,7 @@ export const fetchCollectorsPaginated = ({
   const promise = _fetch({ query, page, pageSize });
 
   promise.catch((error) => {
-    UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+    UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -84,13 +85,13 @@ export const fetchCollector = (collectorId: string): Promise<Collector> => {
   const promise = SidecarCollectors.getCollector(collectorId);
 
   promise.catch((error) => {
-    let errorMessage = `Fetching Collector failed with status: ${error}`;
+    let errorMessage = i18n.t('use_collectors_notifications.fetch_collector_failed', { ns: 'collectors', error });
 
     if (error.status === 404) {
-      errorMessage = `Unable to find a collector with ID <${collectorId}>, please ensure it was not deleted.`;
+      errorMessage = i18n.t('use_collectors_notifications.not_found', { ns: 'collectors', collectorId });
     }
 
-    UserNotification.error(errorMessage, 'Could not retrieve Collector');
+    UserNotification.error(errorMessage, i18n.t('use_collectors_notifications.fetch_collector_failed_title', { ns: 'collectors' }));
   });
 
   return promise;
@@ -100,9 +101,9 @@ export const createCollector = (collector: Collector): Promise<unknown> => {
   const promise = fetch('POST', URLUtils.qualifyUrl(`${SOURCE_URL}/collectors`), collector);
 
   promise.then(
-    () => UserNotification.success('', 'Collector successfully created'),
+    () => UserNotification.success('', i18n.t('use_collectors_notifications.created_success', { ns: 'collectors' })),
     (error) => {
-      UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+      UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
     },
   );
 
@@ -113,9 +114,9 @@ export const updateCollector = (collector: Collector): Promise<unknown> => {
   const promise = fetch('PUT', URLUtils.qualifyUrl(`${SOURCE_URL}/collectors/${collector.id}`), collector);
 
   promise.then(
-    () => UserNotification.success('', 'Collector successfully updated'),
+    () => UserNotification.success('', i18n.t('use_collectors_notifications.updated_success', { ns: 'collectors' })),
     (error) => {
-      UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+      UserNotification.error(i18n.t('use_collectors_notifications.fetch_failed', { ns: 'collectors', error }), i18n.t('use_collectors_notifications.fetch_failed_title', { ns: 'collectors' }));
     },
   );
 
@@ -126,11 +127,11 @@ export const deleteCollector = (collector: Collector): Promise<unknown> => {
   const promise = SidecarCollectors.deleteCollector(collector.id);
 
   promise.then(
-    () => UserNotification.success('', `Collector "${collector.name}" successfully deleted`),
+    () => UserNotification.success('', i18n.t('use_collectors_notifications.deleted_success', { ns: 'collectors', name: collector.name })),
     (error) => {
       UserNotification.error(
-        `Deleting Collector failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-        `Could not delete Collector "${collector.name}"`,
+        i18n.t('use_collectors_notifications.delete_failed', { ns: 'collectors', error: error.status === 400 ? error.responseMessage : error.message }),
+        i18n.t('use_collectors_notifications.delete_failed_title', { ns: 'collectors', name: collector.name }),
       );
     },
   );
@@ -142,11 +143,11 @@ export const copyCollector = (collectorId: string, name: string): Promise<unknow
   const promise = SidecarCollectors.copyCollector(collectorId, name);
 
   promise.then(
-    () => UserNotification.success('', `Collector "${name}" successfully copied`),
+    () => UserNotification.success('', i18n.t('use_collectors_notifications.copied_success', { ns: 'collectors', name })),
     (error) => {
       UserNotification.error(
-        `Saving collector "${name}" failed with status: ${error.message}`,
-        'Could not save Collector',
+        i18n.t('use_collectors_notifications.copy_failed', { ns: 'collectors', name, error: error.message }),
+        i18n.t('use_collectors_notifications.copy_failed_title', { ns: 'collectors' }),
       );
     },
   );
@@ -170,8 +171,8 @@ export const validateCollector = (collector: Collector): Promise<{ errors: { nam
     (response) => response,
     (error) =>
       UserNotification.error(
-        `Validating collector "${payload.name}" failed with status: ${error.message}`,
-        'Could not validate collector',
+        i18n.t('use_collectors_notifications.validate_failed', { ns: 'collectors', name: payload.name, error: error.message }),
+        i18n.t('use_collectors_notifications.validate_failed_title', { ns: 'collectors' }),
       ),
   );
 

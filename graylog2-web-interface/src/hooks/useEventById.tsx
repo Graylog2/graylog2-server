@@ -22,6 +22,7 @@ import UserNotification from 'util/UserNotification';
 import type { Event } from 'components/events/events/types';
 import type FetchError from 'logic/errors/FetchError';
 import { onError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 const fetchEvent = (eventId: string) => Events.getById(eventId).then((data) => data.event);
 
@@ -42,8 +43,8 @@ const useEventById = (
         if (onErrorHandler) onErrorHandler(errorThrown);
 
         UserNotification.error(
-          `Loading event or alert failed with status: ${errorThrown}`,
-          'Could not load event or alert',
+          i18n.t('use_event_by_id_notifications.load_failed', { ns: 'events', error: errorThrown }),
+          i18n.t('use_event_by_id_notifications.load_failed_title', { ns: 'events' }),
         );
       }),
 

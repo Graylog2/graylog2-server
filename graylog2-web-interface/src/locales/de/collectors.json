@@ -1107,5 +1107,45 @@
       "migration_title": "Data-Node-Migration",
       "documentation_title": "Data-Nodes-Dokumentation"
     }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Abrufen der Collector-Konfigurationen fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Die Konfigurationen konnten nicht abgerufen werden",
+    "fetch_configuration_failed": "Abrufen der Konfiguration fehlgeschlagen mit Status: {{error}}",
+    "configuration_not_found": "Die Konfiguration mit der ID <{{configurationId}}> konnte nicht gefunden werden. Bitte stellen Sie sicher, dass sie nicht gelöscht wurde.",
+    "fetch_configuration_failed_title": "Die Konfiguration konnte nicht abgerufen werden",
+    "preview_failed": "Abrufen der Konfigurationsvorschau fehlgeschlagen mit Status: {{error}}",
+    "preview_failed_title": "Die Vorschau konnte nicht abgerufen werden",
+    "created_success": "Konfiguration erfolgreich erstellt",
+    "create_failed": "Erstellen der Konfiguration fehlgeschlagen mit Status: {{error}}",
+    "create_failed_title": "Die Konfiguration konnte nicht gespeichert werden",
+    "updated_success": "Konfiguration erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren der Konfiguration fehlgeschlagen: {{error}}",
+    "update_failed_title": "Die Konfiguration {{name}} konnte nicht aktualisiert werden",
+    "copied_success": "Konfiguration \"{{name}}\" erfolgreich kopiert",
+    "copy_failed": "Speichern der Konfiguration \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "copy_failed_title": "Die Konfiguration konnte nicht gespeichert werden",
+    "deleted_success": "Konfiguration \"{{name}}\" erfolgreich gelöscht",
+    "delete_failed": "Löschen der Konfiguration fehlgeschlagen: {{error}}",
+    "delete_failed_title": "Die Konfiguration {{name}} konnte nicht gelöscht werden",
+    "validate_failed": "Validieren der Konfiguration \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "validate_failed_title": "Die Konfiguration konnte nicht validiert werden"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Abrufen der Collectors fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Die Collectors konnten nicht abgerufen werden",
+    "not_found": "Der Collector mit der ID <{{collectorId}}> konnte nicht gefunden werden. Bitte stellen Sie sicher, dass er nicht gelöscht wurde.",
+    "fetch_collector_failed": "Abrufen des Collectors fehlgeschlagen mit Status: {{error}}",
+    "fetch_collector_failed_title": "Der Collector konnte nicht abgerufen werden",
+    "created_success": "Collector erfolgreich erstellt",
+    "updated_success": "Collector erfolgreich aktualisiert",
+    "deleted_success": "Collector \"{{name}}\" erfolgreich gelöscht",
+    "delete_failed": "Löschen des Collectors fehlgeschlagen: {{error}}",
+    "delete_failed_title": "Der Collector \"{{name}}\" konnte nicht gelöscht werden",
+    "copied_success": "Collector \"{{name}}\" erfolgreich kopiert",
+    "copy_failed": "Speichern des Collectors \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "copy_failed_title": "Der Collector konnte nicht gespeichert werden",
+    "validate_failed": "Validieren des Collectors \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "validate_failed_title": "Der Collector konnte nicht validiert werden"
   }
 }

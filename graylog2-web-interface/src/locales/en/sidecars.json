@@ -355,5 +355,50 @@
       "documentation_title": "Sidecars documentation",
       "title": "Sidecar <em>{{name}} status</em>"
     }
+  },
+  "notifications": {
+    "fetch_failed": "Fetching configuration variables failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve configuration variables",
+    "save_success_created": "Configuration variable \"{{name}}\" successfully created",
+    "save_success_updated": "Configuration variable \"{{name}}\" successfully updated",
+    "save_failed": "Saving variable \"{{name}}\" failed with status: {{error}}",
+    "save_failed_title": "Could not save variable",
+    "delete_success": "Configuration variable \"{{name}}\" successfully deleted",
+    "delete_failed": "Deleting variable \"{{name}}\" failed with status: {{error}}",
+    "delete_failed_title": "Could not delete variable",
+    "validate_failed": "Validating variable \"{{name}}\" failed with status: {{error}}",
+    "validate_failed_title": "Could not validate variable",
+    "configurations_fetch_failed": "Fetching configurations for this variable failed with status: {{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "Fetching Sidecar failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve Sidecar",
+    "not_found": "Unable to find a sidecar with ID <{{sidecarId}}>, maybe it was inactive for too long.",
+    "fetch_actions_failed": "Fetching Sidecar actions failed with status: {{error}}",
+    "fetch_actions_failed_title": "Could not retrieve Sidecar actions",
+    "restart_failed": "Restarting Sidecar failed with status: {{error}}",
+    "restart_failed_title": "Could not restart Sidecar",
+    "configuration_change_requested": "Configuration change for {{amount}} collectors requested",
+    "fetch_sidecars_failed": "Fetching Sidecars failed with status: {{error}}",
+    "fetch_sidecars_failed_title": "Could not retrieve Sidecars"
+  },
+  "use_sidecars_administration_notifications": {
+    "fetch_sidecars_failed": "Fetching Sidecars failed with status: {{error}}",
+    "fetch_sidecars_failed_title": "Could not retrieve Sidecars",
+    "requested": {
+      "start": "Start for {{amount}} collectors requested",
+      "restart": "Restart for {{amount}} collectors requested",
+      "stop": "Stop for {{amount}} collectors requested"
+    },
+    "request_failed": {
+      "start": "Requesting start failed with status: {{error}}",
+      "restart": "Requesting restart failed with status: {{error}}",
+      "stop": "Requesting stop failed with status: {{error}}"
+    },
+    "request_failed_title": {
+      "start": "Could not start collectors",
+      "restart": "Could not restart collectors",
+      "stop": "Could not stop collectors"
+    }
   }
 }

@@ -20,6 +20,7 @@ import { Extractors } from '@graylog/server-api';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 export const EXTRACTORS_QUERY_KEY = ['extractors'] as const;
 
@@ -152,8 +153,8 @@ export const createExtractor = (inputId: string, extractor: ExtractorType): Prom
   const promise = Extractors.create(inputId, getExtractorDTO(extractor));
 
   promise.then(
-    () => UserNotification.success(`Extractor ${extractor.title} created successfully`),
-    (error) => UserNotification.error(`Creating extractor failed: ${error}`, 'Could not create extractor'),
+    () => UserNotification.success(i18n.t('use_extractors_notifications.created_success', { ns: 'extractors', title: extractor.title })),
+    (error) => UserNotification.error(i18n.t('use_extractors_notifications.create_failed', { ns: 'extractors', error }), i18n.t('use_extractors_notifications.create_failed_title', { ns: 'extractors' })),
   );
 
   return promise;
@@ -163,8 +164,8 @@ export const updateExtractor = (inputId: string, extractor: ExtractorType): Prom
   const promise = Extractors.update(inputId, extractor.id, getExtractorDTO(extractor));
 
   promise.then(
-    () => UserNotification.success(`Extractor "${extractor.title}" updated successfully`),
-    (error) => UserNotification.error(`Updating extractor failed: ${error}`, 'Could not update extractor'),
+    () => UserNotification.success(i18n.t('use_extractors_notifications.updated_success', { ns: 'extractors', title: extractor.title })),
+    (error) => UserNotification.error(i18n.t('use_extractors_notifications.update_failed', { ns: 'extractors', error }), i18n.t('use_extractors_notifications.update_failed_title', { ns: 'extractors' })),
   );
 
   return promise;
@@ -182,9 +183,9 @@ export const deleteExtractor = (inputId: string, extractor: ExtractorType): Prom
   const promise = Extractors.terminate(inputId, extractor.id);
 
   promise.then(
-    () => UserNotification.success(`Extractor "${extractor.title}" deleted successfully`),
+    () => UserNotification.success(i18n.t('use_extractors_notifications.deleted_success', { ns: 'extractors', title: extractor.title })),
     (error) =>
-      UserNotification.error(`Deleting extractor failed: ${error}`, `Could not delete extractor ${extractor.title}`),
+      UserNotification.error(i18n.t('use_extractors_notifications.delete_failed', { ns: 'extractors', error }), i18n.t('use_extractors_notifications.delete_failed_title', { ns: 'extractors', title: extractor.title })),
   );
 
   return promise;
@@ -200,9 +201,9 @@ export const orderExtractors = (inputId: string, orderedExtractors: Array<Extrac
   const promise = Extractors.order(inputId, { order: orderedExtractorsMap });
 
   promise.then(
-    () => UserNotification.success('Extractor positions updated successfully'),
+    () => UserNotification.success(i18n.t('use_extractors_notifications.positions_updated_success', { ns: 'extractors' })),
     (error) =>
-      UserNotification.error(`Changing extractor positions failed: ${error}`, 'Could not update extractor positions'),
+      UserNotification.error(i18n.t('use_extractors_notifications.positions_failed', { ns: 'extractors', error }), i18n.t('use_extractors_notifications.positions_failed_title', { ns: 'extractors' })),
   );
 
   return promise;
@@ -228,13 +229,13 @@ export const importExtractors = async (
 
   if (failedImports === 0) {
     UserNotification.success(
-      `Import results: ${successfulImports} extractor(s) imported.`,
-      'Import operation successful',
+      i18n.t('use_extractors_notifications.import_success', { ns: 'extractors', successful: successfulImports }),
+      i18n.t('use_extractors_notifications.import_success_title', { ns: 'extractors' }),
     );
   } else {
     UserNotification.warning(
-      `Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
-      'Import operation completed',
+      i18n.t('use_extractors_notifications.import_warning', { ns: 'extractors', successful: successfulImports, failed: failedImports }),
+      i18n.t('use_extractors_notifications.import_warning_title', { ns: 'extractors' }),
     );
   }
 

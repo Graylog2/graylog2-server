@@ -529,5 +529,9 @@
   },
   "validation_summary": {
     "title": "We found some errors!"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Loading event definition failed with status: {{error}}",
+    "load_failed_title": "Could not load event definition"
   }
 }
