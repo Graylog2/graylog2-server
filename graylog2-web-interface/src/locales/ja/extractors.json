@@ -111,23 +111,140 @@
     "try_example": "サンプルに対して試行"
   },
   "converters_editor": {
-    "not_supported": "<em>{{type}}</em> エクストラクターにはコンバーターを追加できません。"
+    "not_supported": "<em>{{type}}</em> エクストラクターにはコンバーターを追加できません。",
+    "add_label": "コンバーターを追加",
+    "add_help": "抽出された値を変換するコンバーターを追加します。",
+    "select_placeholder": "コンバーターを選択",
+    "add": "追加"
   },
-  "export": {},
-  "example_message": {},
-  "sort": {},
-  "list": {},
-  "import": {},
-  "message_loader": {},
-  "copy_input": {},
-  "grok": {},
-  "json": {},
-  "lookup_table": {},
-  "regex": {},
-  "regex_replace": {},
-  "split_and_index": {},
-  "substring": {},
-  "pages": {},
-  "tools_api": {},
-  "use_extractors_notifications": {}
+  "export": {
+    "json_title": "エクストラクターの JSON",
+    "copy": "エクストラクターをコピー"
+  },
+  "example_message": {
+    "not_loaded": "フィールド「{{field}}」のサンプルを読み込めませんでした。更新前にエクストラクターをテストすることはできません。"
+  },
+  "sort": {
+    "title": "<em>{{title}}</em> のエクストラクターの並べ替え",
+    "description": "リスト内でエクストラクターをドラッグ＆ドロップして、適用される順序を変更します。",
+    "submit": "並べ替えを更新"
+  },
+  "list": {
+    "sort": "エクストラクターを並べ替え",
+    "title": "設定済みのエクストラクター",
+    "no_extractors": "この入力には設定済みのエクストラクターがありません。"
+  },
+  "import": {
+    "parse_error": "エクストラクターの解析中にエラーが発生しました。JSON 形式になっていますか？ {{error}}",
+    "parse_error_title": "エクストラクターをインポートできませんでした",
+    "submit": "入力にエクストラクターを追加"
+  },
+  "message_loader": {
+    "load": "メッセージを読み込む",
+    "loading": "メッセージを読み込んでいます...",
+    "wrong_example": "サンプルが正しくありませんか？",
+    "load_another": "別のメッセージを読み込む",
+    "message_id": "メッセージ ID",
+    "index": "インデックス"
+  },
+  "copy_input": {
+    "description": "入力全体がそのままコピーされます。"
+  },
+  "grok": {
+    "error": "次のエラーのため、grok による抽出を実行できませんでした: {{error}}",
+    "no_match": "grok による抽出を実行できませんでした。パラメーターを確認してください。",
+    "named_captures_only": "名前付きキャプチャのみ",
+    "named_captures_only_help": "明示的に名前が付けられたキャプチャのみをメッセージに格納します。",
+    "pattern": "Grok パターン"
+  },
+  "json": {
+    "flatten": "構造を平坦化",
+    "flatten_help": "JSON オブジェクトを 1 つのメッセージフィールドに平坦化するか、複数のフィールドに展開するかを指定します。",
+    "list_separator": "リスト項目の区切り文字",
+    "list_separator_help": "JSON リストの項目を連結する際に使用する文字列です。",
+    "key_separator": "キーの区切り文字",
+    "key_separator_help": "ネストされた JSON オブジェクトの異なるキーを連結する際に使用する文字列です（<em>平坦化しない</em>場合のみ使用されます）。",
+    "kv_separator": "キー/値の区切り文字",
+    "kv_separator_help": "JSON オブジェクトのキー/値のペアを連結する際に使用する文字列です（平坦化する場合のみ使用されます）。",
+    "key_prefix": "キーの接頭辞",
+    "key_prefix_help": "JSON オブジェクトから抽出された各キーの先頭に付加するテキストです。",
+    "replace_key_whitespace": "キー内の空白を置換",
+    "replace_key_whitespace_help": "空白を含むフィールドキーは、抽出したメッセージを格納する際に破棄されます。このチェックボックスをオンにすると、JSON キー内の空白を別の文字に置き換えます。",
+    "key_whitespace_replacement": "キーの空白の置換文字",
+    "key_whitespace_replacement_help": "メッセージのキー内の空白を置き換える際に使用する文字です。置換文字が Lucene で有効であることを確認してください（例: 「-」や「_」）。"
+  },
+  "lookup_table": {
+    "error": "ルックアップを実行できませんでした: {{error}}"
+  },
+  "regex": {
+    "no_match": "正規表現に一致しませんでした。",
+    "no_group": "正規表現に、抽出するマッチャーグループが含まれていません。",
+    "help": "抽出に使用する正規表現です。最初のマッチャーグループが使用されます。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "label": "正規表現"
+  },
+  "regex_replace": {
+    "regex_help": "抽出に使用する正規表現です。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "replacement_help": "一致したテキストの置換文字列です。指定可能なオプションについては <matcherLink>Matcher</matcherLink> API のドキュメントを参照してください。",
+    "replacement": "置換文字列",
+    "replace_all": "パターンのすべての出現箇所を置換",
+    "replace_all_help": "指定したパターンのすべての出現箇所を置換するか、最初の出現箇所のみを置換するかを指定します。"
+  },
+  "split_and_index": {
+    "no_match": "分割とインデックスによる抽出を実行できませんでした。パラメーターを確認してください。",
+    "split_by_help": "分割に使用する文字です。<strong>例:</strong> 空白文字を指定すると、<em>foo bar baz</em> は <em>[foo,bar,baz]</em> に分割されます。",
+    "index_help": "分割された文字列のどの部分を使用しますか？ <strong>例:</strong> 空白で分割した場合、<em>2</em> を指定すると <em>foo bar baz</em> から <em>bar</em> が選択されます。",
+    "index": "対象のインデックス"
+  },
+  "substring": {
+    "no_match": "部分文字列による抽出を実行できませんでした。インデックスの範囲を確認してください。",
+    "end_index_help": "抽出を終了する位置です（この位置は含まれません）。<strong>例:</strong> <em>1,5</em> を指定すると、文字列 <em>ilovelogs</em> から <em>love</em> が切り出されます。",
+    "begin_index": "開始インデックス",
+    "begin_index_help": "抽出を開始する文字の位置です（この位置を含みます）。",
+    "end_index": "終了インデックス"
+  },
+  "pages": {
+    "new_title": "入力 {{title}} の新しいエクストラクター",
+    "new_header": "入力 <em>{{title}}</em> の新しいエクストラクター",
+    "edit_title": "エクストラクター {{title}} を編集",
+    "edit_header": "入力 <em>{{inputTitle}}</em> のエクストラクター <em>{{title}}</em> を編集",
+    "description": "エクストラクターは、入力で受信するすべてのメッセージに適用されます。テキストデータからフィールドを抽出・変換することで、後で簡単にフィルタリングや分析ができるようになります。",
+    "export_title": "{{title}} のエクストラクターをエクスポート",
+    "export_header": "<em>{{title}}</em> のエクストラクターをエクスポート",
+    "export_marketplace_prefix": "入力のエクストラクターは JSON 形式でエクスポートし、他の環境にインポートしたり、以下で共有したりできます:",
+    "import_title": "{{title}} にエクストラクターをインポート",
+    "import_header": "<em>{{title}}</em> にエクストラクターをインポート",
+    "import_description": "エクスポートされたエクストラクターを入力にインポートできます。",
+    "import_marketplace_prefix": "必要なのは、他の {{productName}} 環境からエクスポートしたエクストラクターの JSON ファイル、または以下からのファイルです:"
+  },
+  "tools_api": {
+    "details": "詳細: {{error}}",
+    "natural_date_failed": "キーワードプレビューの読み込みに失敗しました。ステータス: {{error}}",
+    "natural_date_failed_title": "キーワードプレビューを読み込めませんでした",
+    "grok_failed_title": "grok による抽出を実行できませんでした。パラメーターを確認してください。",
+    "json_failed_title": "JSON による抽出を実行できませんでした。パラメーターを確認してください。",
+    "regex_invalid_title": "正規表現を検証できませんでした。有効な正規表現か確認してください。",
+    "allowlist_check_title": "URL が許可リストに含まれているか確認できませんでした。",
+    "regex_generate_title": "正規表現を生成できませんでした。",
+    "regex_try_title": "正規表現を試行できませんでした。有効な正規表現か確認してください。",
+    "split_index_failed_title": "分割とインデックスによる抽出を実行できませんでした。パラメーターを確認してください。",
+    "substring_failed_title": "部分文字列による抽出を実行できませんでした。インデックスの範囲を確認してください。",
+    "contains_string_failed_title": "フィールドに文字列が含まれているか確認できませんでした",
+    "lookup_table_failed_title": "ルックアップテーブルで文字列が変換されるか確認できませんでした"
+  },
+  "use_extractors_notifications": {
+    "created_success": "エクストラクター {{title}} を作成しました",
+    "create_failed": "エクストラクターの作成に失敗しました: {{error}}",
+    "create_failed_title": "エクストラクターを作成できませんでした",
+    "updated_success": "エクストラクター「{{title}}」を更新しました",
+    "update_failed": "エクストラクターの更新に失敗しました: {{error}}",
+    "update_failed_title": "エクストラクターを更新できませんでした",
+    "deleted_success": "エクストラクター「{{title}}」を削除しました",
+    "delete_failed": "エクストラクターの削除に失敗しました: {{error}}",
+    "delete_failed_title": "エクストラクター {{title}} を削除できませんでした",
+    "positions_updated_success": "エクストラクターの順序を更新しました",
+    "positions_failed": "エクストラクターの順序の変更に失敗しました: {{error}}",
+    "positions_failed_title": "エクストラクターの順序を更新できませんでした",
+    "import_success": "インポート結果: {{successful}} 件のエクストラクターをインポートしました。",
+    "import_success_title": "インポートが完了しました"
+  }
 }
