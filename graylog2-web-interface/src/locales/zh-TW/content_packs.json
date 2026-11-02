@@ -32,7 +32,7 @@
   "download": {
     "download": "下載",
     "info": "請在下方的下載連結上按右鍵，然後選擇「另存連結為...」以下載 JSON 檔案。",
-    "title": "下載內容包"
+    "title": "下載 Content Pack"
   },
   "edit": {
     "steps": {
@@ -58,7 +58,7 @@
     "not_double": "這不是雙精度浮點數值。",
     "not_integer": "這不是整數值。",
     "title": "標題",
-    "title_help": "請為此內容包提供描述性的標題。",
+    "title_help": "請為此 Content Pack 提供描述性的標題。",
     "title_required": "必須設定標題。",
     "value_type": "值類型",
     "value_type_help": "請指定參數的類型。"
@@ -70,7 +70,7 @@
     "edit_title": "編輯",
     "list_title": "項目清單",
     "origin": "來源",
-    "origin_content_pack": "內容包",
+    "origin_content_pack": "Content Pack",
     "origin_server": "伺服器",
     "show": "顯示",
     "title": "標題",
@@ -88,18 +88,18 @@
     "load_failed_title": "無法載入項目索引"
   },
   "import": {
-    "error_message": "匯入內容包時發生錯誤，請確認檔案為有效的 JSON 檔案。詳細資訊請查看 {{productName}} 伺服器日誌。",
-    "error_title": "無法匯入內容包",
-    "success_message": "內容包匯入成功",
-    "success_named": "內容包「{{name}}」匯入成功",
+    "error_message": "匯入 Content Pack 時發生錯誤，請確認檔案為有效的 JSON 檔案。詳細資訊請查看 {{productName}} 伺服器日誌。",
+    "error_title": "無法匯入 Content Pack",
+    "success_message": "Content Pack 匯入成功",
+    "success_named": "Content Pack「{{name}}」匯入成功",
     "success_title": "成功！"
   },
   "install": {
     "comment": "安裝註解",
-    "comment_help": "此註解將與內容包安裝一併儲存，可用來說明此次安裝的原因。",
+    "comment_help": "此註解將與 Content Pack 安裝一併儲存，可用來說明此次安裝的原因。",
     "configure_parameters": "設定參數：",
     "needs_to_be_filled": "需要填寫。",
-    "share_description": "搜尋要新增為此內容包項目協作者的使用者或團隊。"
+    "share_description": "搜尋要新增為此 Content Pack 項目協作者的使用者或團隊。"
   },
   "install_entities": {
     "installed": "已安裝的項目",
@@ -122,14 +122,14 @@
     "view_title": "檢視安裝"
   },
   "list": {
-    "no_match": "找不到符合的內容包",
-    "none_found": "找不到內容包，請建立或上傳內容包"
+    "no_match": "找不到符合的 Content Pack",
+    "none_found": "找不到 Content Pack，請建立或上傳 Content Pack"
   },
   "list_item": {
     "create_new_version": "建立新版本",
     "delete_all_versions": "刪除所有版本",
     "install": "安裝",
-    "install_title": "安裝內容包",
+    "install_title": "安裝 Content Pack",
     "latest_version": "最新版本：{{rev}}",
     "show": "顯示",
     "update": "更新"
