@@ -1,1 +1,11 @@
-{}
+{
+  "stream.filter_id_mismatch": "Die Filter-ID in der URL stimmt nicht mit der Filter-ID im Request überein",
+  "stream.filter_not_found": "Filter nicht gefunden",
+  "stream.index_set_not_usable": "Das zugewiesene Index Set ist nicht verwendbar",
+  "stream.index_set_not_writable": "Das zugewiesene Index Set muss beschreibbar sein!",
+  "stream.not_found": "Stream nicht gefunden: {{streamId}}",
+  "stream.read_not_allowed": "Keine Berechtigung, die Konfiguration des Streams mit der ID {{streamId}} zu lesen",
+  "stream_rule.delete_not_found": "Die Stream-Regel {{streamRuleId}} im Stream {{streamId}} konnte nicht gelöscht werden",
+  "stream_rule.unknown_type": "Unbekannter Stream-Regeltyp {{type}}",
+  "stream_rule.update_not_found": "Die Stream-Regel {{streamRuleId}} im Stream {{streamId}} konnte nicht aktualisiert werden"
+}

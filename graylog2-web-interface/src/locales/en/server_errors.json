@@ -1,1 +1,11 @@
-{}
+{
+  "stream.filter_id_mismatch": "The filter ID in the URL doesn't match the one in the payload",
+  "stream.filter_not_found": "Filter not found",
+  "stream.index_set_not_usable": "Assigned index set is not usable",
+  "stream.index_set_not_writable": "Assigned index set must be writable!",
+  "stream.not_found": "Stream not found: {{streamId}}",
+  "stream.read_not_allowed": "Not allowed to read configuration for stream with id: {{streamId}}",
+  "stream_rule.delete_not_found": "Couldn't delete stream rule {{streamRuleId}}in stream {{streamId}}",
+  "stream_rule.unknown_type": "Unknown stream rule type {{type}}",
+  "stream_rule.update_not_found": "Couldn't update stream rule {{streamRuleId}}in stream {{streamId}}"
+}
