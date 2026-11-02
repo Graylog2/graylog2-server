@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -270,9 +271,30 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return executeSyncJobInner(search, searchUser);
     }
 
+    @POST
+    @Operation(summary = "Execute an unsaved search synchronously with an execution state",
+               description = "Executes the given search without storing it and waits for its result. "
+                       + "The execution state allows e.g. paging through message lists.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Search executed successfully",
+                    content = @Content(schema = @Schema(implementation = SearchJobDTO.class)))
+    })
+    @Path("sync/execute")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response executeSyncJobWithExecutionState(@RequestBody(required = true) @NotNull(message = "Request body is mandatory") @Valid SyncSearchExecutionRequest request,
+                                                     @Context SearchUser searchUser) {
+        return executeSyncJobInner(request.search().toSearch(), searchUser, request.executionState());
+    }
+
     private Response executeSyncJobInner(final Search search, final SearchUser searchUser) {
+        return executeSyncJobInner(search, searchUser, ExecutionState.empty());
+    }
+
+    private Response executeSyncJobInner(final Search search, final SearchUser searchUser, final ExecutionState executionState) {
         final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
-        final ExecutionState enrichedExecutionState = ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
+        final ExecutionState enrichedExecutionState = executionState.withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
         final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
