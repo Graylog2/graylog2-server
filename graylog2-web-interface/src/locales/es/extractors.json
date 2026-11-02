@@ -111,23 +111,140 @@
     "try_example": "Probar con el ejemplo"
   },
   "converters_editor": {
-    "not_supported": "No se pueden añadir convertidores a extractores de tipo <em>{{type}}</em>."
+    "not_supported": "No se pueden añadir convertidores a extractores de tipo <em>{{type}}</em>.",
+    "add_label": "Añadir convertidor",
+    "add_help": "Añade convertidores para transformar el valor extraído.",
+    "select_placeholder": "Selecciona un convertidor",
+    "add": "Añadir"
   },
-  "export": {},
-  "example_message": {},
-  "sort": {},
-  "list": {},
-  "import": {},
-  "message_loader": {},
-  "copy_input": {},
-  "grok": {},
-  "json": {},
-  "lookup_table": {},
-  "regex": {},
-  "regex_replace": {},
-  "split_and_index": {},
-  "substring": {},
-  "pages": {},
-  "tools_api": {},
-  "use_extractors_notifications": {}
+  "export": {
+    "json_title": "JSON de extractores",
+    "copy": "Copiar extractores"
+  },
+  "example_message": {
+    "not_loaded": "No se pudo cargar un ejemplo del campo ‘{{field}}’. No es posible probar el extractor antes de actualizarlo."
+  },
+  "sort": {
+    "title": "Ordenar extractores de <em>{{title}}</em>",
+    "description": "Arrastra y suelta los extractores en la lista para cambiar el orden en que se aplicarán.",
+    "submit": "Actualizar orden"
+  },
+  "list": {
+    "sort": "Ordenar extractores",
+    "title": "Extractores configurados",
+    "no_extractors": "Esta entrada no tiene extractores configurados."
+  },
+  "import": {
+    "parse_error": "Se ha producido un error al analizar los extractores. ¿Están en formato JSON? {{error}}",
+    "parse_error_title": "No se pudieron importar los extractores",
+    "submit": "Añadir extractores a la entrada"
+  },
+  "message_loader": {
+    "load": "Cargar mensaje",
+    "loading": "Cargando mensaje...",
+    "wrong_example": "¿Ejemplo incorrecto?",
+    "load_another": "Cargar otro mensaje",
+    "message_id": "ID del mensaje",
+    "index": "Índice"
+  },
+  "copy_input": {
+    "description": "Toda la entrada se copiará tal cual."
+  },
+  "grok": {
+    "error": "No pudimos ejecutar la extracción grok debido al siguiente error: {{error}}",
+    "no_match": "No pudimos ejecutar la extracción grok. Revisa tus parámetros.",
+    "named_captures_only": "Solo capturas con nombre",
+    "named_captures_only_help": "Incluir en el mensaje solo las capturas con nombre explícito.",
+    "pattern": "Patrón grok"
+  },
+  "json": {
+    "flatten": "Aplanar estructuras",
+    "flatten_help": "Si se deben aplanar los objetos JSON en un único campo de mensaje o expandirlos en varios campos.",
+    "list_separator": "Separador de elementos de lista",
+    "list_separator_help": "Qué cadena usar para concatenar los elementos de una lista JSON.",
+    "key_separator": "Separador de claves",
+    "key_separator_help": "Qué cadena usar para concatenar las distintas claves de un objeto JSON anidado (solo se usa si <em>no</em> está aplanado).",
+    "kv_separator": "Separador de clave/valor",
+    "kv_separator_help": "Qué cadena usar al concatenar los pares clave/valor de un objeto JSON (solo se usa si está aplanado).",
+    "key_prefix": "Prefijo de clave",
+    "key_prefix_help": "Texto que se antepondrá a cada clave extraída del objeto JSON.",
+    "replace_key_whitespace": "Reemplazar espacios en las claves",
+    "replace_key_whitespace_help": "Las claves de campo que contengan espacios se descartarán al almacenar el mensaje extraído. Marca esta casilla para reemplazar los espacios de las claves JSON por otro carácter.",
+    "key_whitespace_replacement": "Reemplazo de espacios en claves",
+    "key_whitespace_replacement_help": "Qué carácter usar al reemplazar los espacios en las claves del mensaje. Asegúrate de que el carácter de reemplazo sea válido en Lucene, por ejemplo '-' o '_'."
+  },
+  "lookup_table": {
+    "error": "No pudimos ejecutar la búsqueda: {{error}}"
+  },
+  "regex": {
+    "no_match": "La expresión regular no coincide.",
+    "no_group": "La expresión regular no contiene ningún grupo de captura para extraer.",
+    "help": "La expresión regular usada para la extracción. Se usa el primer grupo de captura. Más información en la <docsLink>documentación</docsLink>.",
+    "label": "Expresión regular"
+  },
+  "regex_replace": {
+    "regex_help": "La expresión regular usada para la extracción. Más información en la <docsLink>documentación</docsLink>.",
+    "replacement_help": "El texto que sustituirá al texto coincidente. Consulta la documentación de la API de <matcherLink>Matcher</matcherLink> para ver las opciones disponibles.",
+    "replacement": "Reemplazo",
+    "replace_all": "Reemplazar todas las apariciones del patrón",
+    "replace_all_help": "Si se deben reemplazar todas las apariciones del patrón indicado o solo la primera."
+  },
+  "split_and_index": {
+    "no_match": "No pudimos ejecutar la extracción de división e índice. Revisa tus parámetros.",
+    "split_by_help": "En qué carácter dividir. <strong>Ejemplo:</strong> un carácter de espacio dividirá <em>foo bar baz</em> en <em>[foo,bar,baz]</em>.",
+    "index_help": "¿Qué parte de la cadena dividida quieres usar? <strong>Ejemplo:</strong> <em>2</em> selecciona <em>bar</em> de <em>foo bar baz</em> al dividir por espacios.",
+    "index": "Índice de destino"
+  },
+  "substring": {
+    "no_match": "No pudimos ejecutar la extracción de subcadena. Revisa los límites de los índices.",
+    "end_index_help": "Dónde terminar la extracción. (Exclusivo) <strong>Ejemplo:</strong> <em>1,5</em> recorta <em>love</em> de la cadena <em>ilovelogs</em>.",
+    "begin_index": "Índice inicial",
+    "begin_index_help": "Posición de carácter desde la que empezar la extracción. (Inclusivo)",
+    "end_index": "Índice final"
+  },
+  "pages": {
+    "new_title": "Nuevo extractor para la entrada {{title}}",
+    "new_header": "Nuevo extractor para la entrada <em>{{title}}</em>",
+    "edit_title": "Editar extractor {{title}}",
+    "edit_header": "Editar extractor <em>{{title}}</em> de la entrada <em>{{inputTitle}}</em>",
+    "description": "Los extractores se aplican a cada mensaje que recibe una entrada. Úsalos para extraer y transformar cualquier dato de texto en campos que permitan filtrar y analizar fácilmente después.",
+    "export_title": "Exportar extractores de {{title}}",
+    "export_header": "Exportar extractores de <em>{{title}}</em>",
+    "export_marketplace_prefix": "Los extractores de una entrada se pueden exportar a JSON para importarlos en otras configuraciones o compartirlos en",
+    "import_title": "Importar extractores a {{title}}",
+    "import_header": "Importar extractores a <em>{{title}}</em>",
+    "import_description": "Los extractores exportados se pueden importar a una entrada.",
+    "import_marketplace_prefix": "Solo necesitas la exportación JSON de extractores de cualquier otra configuración de {{productName}} o de"
+  },
+  "tools_api": {
+    "details": "Detalles: {{error}}",
+    "natural_date_failed": "Error al cargar la vista previa de palabras clave con estado: {{error}}",
+    "natural_date_failed_title": "No se pudo cargar la vista previa de palabras clave",
+    "grok_failed_title": "No pudimos ejecutar la extracción grok. Revisa tus parámetros.",
+    "json_failed_title": "No pudimos ejecutar la extracción JSON. Revisa tus parámetros.",
+    "regex_invalid_title": "No se pudo validar la expresión regular. Asegúrate de que sea válida.",
+    "allowlist_check_title": "No se pudo comprobar si la URL está en la lista de permitidos.",
+    "regex_generate_title": "No se pudo generar la expresión regular.",
+    "regex_try_title": "No se pudo probar la expresión regular. Asegúrate de que sea válida.",
+    "split_index_failed_title": "No pudimos ejecutar la extracción de división e índice. Revisa tus parámetros.",
+    "substring_failed_title": "No pudimos ejecutar la extracción de subcadena. Revisa los límites de los índices.",
+    "contains_string_failed_title": "No se pudo comprobar si el campo contiene la cadena",
+    "lookup_table_failed_title": "No se pudo comprobar si la tabla de búsqueda traduce la cadena"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} creado correctamente",
+    "create_failed": "Error al crear el extractor: {{error}}",
+    "create_failed_title": "No se pudo crear el extractor",
+    "updated_success": "Extractor \"{{title}}\" actualizado correctamente",
+    "update_failed": "Error al actualizar el extractor: {{error}}",
+    "update_failed_title": "No se pudo actualizar el extractor",
+    "deleted_success": "Extractor \"{{title}}\" eliminado correctamente",
+    "delete_failed": "Error al eliminar el extractor: {{error}}",
+    "delete_failed_title": "No se pudo eliminar el extractor {{title}}",
+    "positions_updated_success": "Posiciones de los extractores actualizadas correctamente",
+    "positions_failed": "Error al cambiar las posiciones de los extractores: {{error}}",
+    "positions_failed_title": "No se pudieron actualizar las posiciones de los extractores",
+    "import_success": "Resultados de la importación: {{successful}} extractor(es) importado(s).",
+    "import_success_title": "Importación realizada correctamente"
+  }
 }
