@@ -4,7 +4,7 @@ Lists the places in the Java REST layer which throw an error with a literal Engl
 translate once the exception carries an error code (see CodedBadRequestException etc.).
 
 Usage (from graylog2-web-interface):
-  python3 dev/i18n/list-api-errors.py [--repo core|enterprise] [--files]   # counts per package (default) or every site
+  python3 dev/i18n/list-api-errors.py [--repo core|enterprise] [--root DIR] [--files]   # counts per package (default) or every site
 """
 import os, re, sys, collections
 
@@ -18,6 +18,8 @@ SITE = re.compile(r'new\s+(' + EXC + r')\s*\(\s*("(?:[^"\\]|\\.)*"(?:\s*\+\s*[^;
 
 def main():
     repo = REPOS[sys.argv[sys.argv.index('--repo') + 1]] if '--repo' in sys.argv else CORE
+    if '--root' in sys.argv:
+        repo = sys.argv[sys.argv.index('--root') + 1]
     show = '--files' in sys.argv
     counts = collections.Counter()
     for d, dirs, files in os.walk(repo):

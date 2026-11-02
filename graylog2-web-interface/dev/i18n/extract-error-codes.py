@@ -55,7 +55,7 @@ def unq(s):
 
 def message_template(expr, keys):
     """English text with {{key}} for every non-literal part, or None."""
-    m = re.match(r'^f\(\s*(' + STR + r')\s*,(.*)\)$', expr, re.S)
+    m = re.match(r'^(?:StringUtils\.)?f\(\s*(' + STR + r')\s*,(.*)\)$', expr, re.S)
     if m:
         fmt = unq(m.group(1))
         it = iter(keys)
@@ -105,7 +105,7 @@ def collect(root):
                 if len(args) < 2 or not re.fullmatch(STR, args[0]):
                     problems.append(f'{where}: code is not a literal'); continue
                 code = unq(args[0])
-                keys = re.findall(r'"(\w+)"\s*,', args[2]) if len(args) > 2 and args[2].startswith('Map.of') else []
+                keys = re.findall(r'"(\w+)"\s*,', args[2]) if len(args) > 2 and args[2].startswith(('Map.of', 'CodedException.paramsOf')) else []
                 keys = keys[::1]
                 text = message_template(args[1], keys)
                 if text is None or (len(args) > 2 and keys and len(re.findall(r'\{\{', text)) != len(keys)):
