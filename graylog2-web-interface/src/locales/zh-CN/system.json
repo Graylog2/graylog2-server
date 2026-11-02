@@ -291,28 +291,149 @@
     "cancel_confirm": "确定要取消系统任务“{{info}}”吗？",
     "on_node": "- 在",
     "runtime": "运行时长：{{duration}}",
-    "cancel": "取消"
+    "cancel": "取消",
+    "acknowledge": "确认"
   },
-  "system_jobs_component": {},
-  "system_jobs_list": {},
-  "system_messages_component": {},
-  "system_messages_list": {},
-  "global_throughput": {},
-  "node_throughput": {},
-  "telemetry_debug_entry_row": {},
-  "telemetry_debug_overlay": {},
-  "cluster_configuration_page": {},
-  "configurations_page": {},
-  "enterprise_page": {},
-  "process_buffer_dump_page": {},
-  "show_metrics_page": {},
-  "node_page": {},
-  "system_logs_page": {},
-  "system_notifications_page": {},
-  "system_overview_page": {},
-  "thread_dump_page": {},
-  "notifications": {},
-  "use_cluster_overview_notifications": {},
-  "use_cluster_support_bundle_notifications": {},
+  "system_jobs_component": {
+    "title": "系统任务",
+    "description": "系统任务是 {{productName}} 服务器节点为维护目的而执行的长时间运行任务。部分任务会提供进度信息，或可以被停止。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "没有正在运行的系统任务。"
+  },
+  "system_messages_component": {
+    "title": "系统消息",
+    "description": "系统消息由 {{productName}} 服务器节点在某些事件发生时生成，这些事件可能对 {{productName}} 管理员有参考价值。您无需主动处理此处的任何事件，因为需要采取行动的事件都会触发通知。"
+  },
+  "system_messages_list": {
+    "timestamp": "时间戳",
+    "node": "节点",
+    "message": "消息"
+  },
+  "global_throughput": {
+    "aria_label": "吞吐量：输入 {{input}} / 输出 {{output}} 条消息/秒",
+    "in": "输入",
+    "out": "输出"
+  },
+  "node_throughput": {
+    "loading": "正在加载吞吐量...",
+    "unable_to_load": "无法加载吞吐量。",
+    "processing_long": "正在处理 <strong>{{totalIn}}</strong> 条/秒的传入消息和 <strong>{{totalOut}}</strong> 条/秒的传出消息。",
+    "short": "输入 {{totalIn}} / 输出 {{totalOut}} 条消息/秒。"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "疑似个人信息：{{suspect}}",
+    "copy_as_json": "以 JSON 格式复制事件"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "遥测调试",
+    "badge": "遥测调试：{{count}}",
+    "drawer_label": "遥测调试面板",
+    "resize_label": "调整遥测调试面板大小",
+    "title": "遥测调试（{{count}}）",
+    "filter_label": "过滤事件",
+    "filter_placeholder": "按事件名称或负载过滤...",
+    "resume": "继续",
+    "pause": "暂停",
+    "clear": "清空",
+    "export_session": "导出会话",
+    "collapse": "收起",
+    "no_events": "尚未记录任何遥测事件，与应用交互后即可在此处查看。",
+    "time": "时间",
+    "event": "事件",
+    "action": "操作",
+    "status": "状态"
+  },
+  "cluster_configuration_page": {
+    "title": "集群配置",
+    "description": "此页面实时展示集群中各节点的概况。您可以随时暂停消息处理。在恢复之前，处理缓冲区将不再接收任何新消息。如果节点启用了消息 Journal（默认启用），即使处理已暂停，传入的消息仍会持久化到磁盘。"
+  },
+  "configurations_page": {
+    "title": "配置",
+    "description": "您可以在此页面配置不同子系统的系统设置。"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>试用</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>了解更多</productLink>关于 {{productName}} Enterprise 的功能。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的处理缓冲区转储",
+    "taken_at": "获取时间：<0/>"
+  },
+  "show_metrics_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的指标",
+    "description": "所有 {{productName}} 节点都提供一组用于诊断、调试和监控的内部指标。您也可以通过 JMX 访问所有指标。"
+  },
+  "node_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}}",
+    "description": "此页面展示集群中处于活动且可访问状态的 {{productName}} 服务器节点的详细信息。",
+    "leader_node": "这是 Leader 节点。",
+    "not_leader_node": "这<em>不是</em> Leader 节点。"
+  },
+  "system_logs_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 最近的系统日志（最多 {{limit}} 条）",
+    "taken_at": "获取时间：<0/>",
+    "reload": "重新加载",
+    "back": "返回",
+    "document_title": "节点 {{shortNodeId}} / {{hostname}} 的系统日志"
+  },
+  "system_notifications_page": {
+    "title": "系统通知"
+  },
+  "system_overview_page": {
+    "title": "系统概览"
+  },
+  "thread_dump_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的线程转储",
+    "taken_at": "获取时间：<0/>"
+  },
+  "notifications": {
+    "lb_change_success": "已成功将节点“{{nodeId}}”的负载均衡器状态更改为“{{status}}”",
+    "lb_change_failed": "更改节点“{{nodeId}}”的负载均衡器状态失败：{{error}}",
+    "lb_change_failed_title": "无法将节点“{{nodeId}}”的负载均衡器状态更改为“{{status}}”",
+    "processing_pause_success": "已成功暂停节点“{{nodeId}}”的消息处理",
+    "processing_pause_failed": "暂停节点“{{nodeId}}”的消息处理失败：{{error}}",
+    "processing_pause_failed_title": "无法暂停节点“{{nodeId}}”的消息处理",
+    "processing_resume_success": "已成功恢复节点“{{nodeId}}”的消息处理",
+    "processing_resume_failed": "恢复节点“{{nodeId}}”的消息处理失败：{{error}}",
+    "processing_resume_failed_title": "无法恢复节点“{{nodeId}}”的消息处理",
+    "nothing_selected": "未选择任何通知。",
+    "nothing_to_dismiss_title": "没有可忽略的内容",
+    "bulk_dismiss_failed": "忽略通知失败，请重试。",
+    "dismiss_failed": "忽略通知失败，请重试。",
+    "dismiss_failed_title": "忽略失败",
+    "profiling_enabled": "已成功启用 MongoDB 性能分析。",
+    "profiling_disabled": "已成功禁用 MongoDB 性能分析。",
+    "profiling_enable_failed": "启用 MongoDB 性能分析失败：{{error}}",
+    "profiling_disable_failed": "禁用 MongoDB 性能分析失败：{{error}}",
+    "profiling_update_failed_title": "无法更新 MongoDB 性能分析设置。",
+    "data_node_metrics_failed": "加载数据节点“{{hostname}}”的指标失败",
+    "data_node_metrics_failed_title": "无法加载数据节点指标。",
+    "graylog_node_metrics_failed": "加载 Graylog 节点指标失败，状态为",
+    "graylog_node_metrics_failed_title": "无法加载 Graylog 节点指标。",
+    "cluster_traffic_failed": "加载集群流量失败，状态为",
+    "cluster_traffic_failed_title": "无法加载集群流量",
+    "journal_failed": "无法获取 Journal 信息",
+    "system_jobs_failed": "加载系统任务失败，状态为",
+    "system_jobs_failed_title": "无法加载系统任务"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "获取节点“{{nodeId}}”的 JVM 信息失败：{{error}}",
+    "jvm_failed_title": "无法获取 JVM 信息",
+    "thread_dump_failed": "获取节点“{{nodeId}}”的线程转储失败：{{error}}",
+    "thread_dump_failed_title": "无法获取线程转储",
+    "process_buffer_dump_failed": "获取节点“{{nodeId}}”的处理缓冲区转储失败：{{error}}",
+    "process_buffer_dump_failed_title": "无法获取处理缓冲区转储",
+    "system_logs_failed": "获取节点“{{nodeId}}”的系统日志消息失败：{{error}}",
+    "system_logs_failed_title": "无法获取系统日志消息",
+    "overview_failed": "获取集群概览失败：{{error}}",
+    "overview_failed_title": "无法获取集群概览"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "创建支持包失败，状态：{{error}}",
+    "create_failed_title": "无法创建支持包。"
+  },
   "use_plugin_list_notifications": {}
 }
