@@ -182,7 +182,10 @@
   },
   "journal_state": {
     "loading": "Chargement des métriques du journal...",
-    "unavailable": "Métriques du journal indisponibles."
+    "unavailable": "Métriques du journal indisponibles.",
+    "summary_one": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segment. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde.",
+    "summary_other": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segments. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde.",
+    "summary_many": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segments. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde."
   },
   "jvm_heap_usage": {
     "loading": "Chargement des informations d'utilisation du heap...",
@@ -197,6 +200,10 @@
     "configure_internal_logging": "Configurer la journalisation interne"
   },
   "node_overview": {
+    "plugins_installed_one": "{{count}} plugin installé",
+    "plugins_installed_other": "{{count}} plugins installés",
+    "inputs_running_one": "{{count}} entrée en cours d'exécution sur ce nœud",
+    "inputs_running_other": "{{count}} entrées en cours d'exécution sur ce nœud",
     "memory_heap_usage": "Utilisation mémoire / heap",
     "buffers": "Tampons",
     "buffers_description": "Les tampons sont conçus pour mettre en cache de petites quantités de messages pendant une très courte durée (généralement quelques millisecondes) lors de leur passage dans les différents processeurs.",
@@ -209,7 +216,9 @@
     "rest_api": "API REST",
     "installed_plugins": "Plugins installés",
     "manage_inputs": "Gérer les entrées",
-    "available_input_types": "Types d'entrées disponibles"
+    "available_input_types": "Types d'entrées disponibles",
+    "plugins_installed_many": "{{count}} plugins installés",
+    "inputs_running_many": "{{count}} entrées en cours d'exécution sur ce nœud"
   },
   "nodes_actions": {
     "details": "Détails",
@@ -229,7 +238,10 @@
     "recent_system_logs": "Obtenir les messages de journal système récents"
   },
   "nodes_list": {
-    "no_active_nodes": "Aucun nœud actif."
+    "active_nodes_one": "Il y a {{count}} nœud actif",
+    "active_nodes_other": "Il y a {{count}} nœuds actifs",
+    "no_active_nodes": "Aucun nœud actif.",
+    "active_nodes_many": "Il y a {{count}} nœuds actifs"
   },
   "plugins_data_table": {
     "loading": "Chargement des plugins sur ce nœud...",
@@ -364,7 +376,10 @@
   },
   "show_metrics_page": {
     "title": "Métriques du nœud {{shortNodeId}} / {{hostname}}",
-    "description": "Tous les nœuds {{productName}} fournissent un ensemble de métriques internes pour le diagnostic, le débogage et la supervision. Notez que vous pouvez également accéder à toutes les métriques via JMX."
+    "description": "Tous les nœuds {{productName}} fournissent un ensemble de métriques internes pour le diagnostic, le débogage et la supervision. Notez que vous pouvez également accéder à toutes les métriques via JMX.",
+    "total_metrics_one": "Ce nœud remonte un total de {{count}} métrique.",
+    "total_metrics_other": "Ce nœud remonte un total de {{count}} métriques.",
+    "total_metrics_many": "Ce nœud remonte un total de {{count}} métriques."
   },
   "node_page": {
     "title": "Nœud {{shortNodeId}} / {{hostname}}",
@@ -433,7 +448,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "Échec de la création du bundle de support, statut : {{error}}",
-    "create_failed_title": "Impossible de créer le bundle de support."
+    "create_failed_title": "Impossible de créer le bundle de support.",
+    "delete_failed": "Échec de la suppression du bundle de support, statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer le bundle de support.",
+    "download_failed": "Échec du téléchargement du bundle de support, statut : {{error}}",
+    "download_failed_title": "Impossible de télécharger le bundle de support.",
+    "load_list_failed": "Échec du chargement de la liste des bundles de support, statut :",
+    "load_list_failed_title": "Impossible de charger la liste des bundles de support."
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Échec de la récupération des plugins sur le nœud \"{{nodeId}}\"",
+    "fetch_failed_title": "Impossible de récupérer les plugins"
+  }
 }
