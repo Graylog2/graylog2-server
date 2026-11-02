@@ -821,27 +821,142 @@
       "certificate": "Certificado",
       "copy_to_clipboard": "Copiar para a área de transferência",
       "private_key": "Chave privada",
-      "view_principal": "Principal:"
+      "view_principal": "Principal:",
+      "view_role": "Função:",
+      "generate": "Gerar certificado de cliente",
+      "description": "Gere certificados de cliente para ferramentas de terceiros",
+      "title": "Certificado de cliente"
     },
     "cluster_health": {
-      "shard_replication_help": {},
-      "state_help": {}
+      "cluster_manager": "Gerenciador do cluster:",
+      "disabled": "Desabilitada",
+      "enabled": "Habilitada",
+      "nodes_summary": "{{total}} ({{outdated}} desatualizados, {{upgraded}} atualizados)",
+      "number_of_nodes": "Número de nós:",
+      "number_of_shards": "Número de shards:",
+      "server_version": "Versão do servidor:",
+      "shard_replication": "Replicação de shards:",
+      "shard_replication_help": {
+        "confirm": "Depois que um nó for atualizado e você clicar em <emphasis><bold>Confirmar atualização</bold></emphasis>, a replicação de shards será reabilitada e todos os shards que ficaram indisponíveis por causa da atualização do nó serão realocados.",
+        "force_disabled": "Desabilitada à força",
+        "force_enabled": "Habilitada à força",
+        "start": "Depois que você clicar em <emphasis><bold>Iniciar processo de atualização</bold></emphasis> de um nó, a alocação de shards será configurada sem replicação, para que o OpenSearch use somente os shards disponíveis."
+      },
+      "shards_summary": "{{active}} ativos, {{initializing}} inicializando, {{relocating}} realocando, {{unassigned}} não atribuídos",
+      "state_help": {
+        "green": "Depois que um nó for atualizado e você clicar em <emphasis>Confirmar atualização</emphasis>, a replicação de shards será reabilitada, todos os shards que ficaram indisponíveis por causa da atualização do nó serão realocados e o cluster voltará ao estado VERDE.",
+        "question": "Como meu cluster muda de estado durante a atualização contínua?",
+        "red": "VERMELHO: se você estiver usando índices sem replicação e atualizar o nó que hospeda os shards desses índices, o cluster passará para o estado vermelho e nenhum dado será ingerido nesses índices nem poderá ser pesquisado neles.",
+        "yellow": "AMARELO: depois de iniciar a atualização de um nó, a alocação de shards será configurada sem replicação, para que o OpenSearch use somente os shards disponíveis."
+      }
     },
-    "upgrade_method": {},
-    "upgrade_status": {},
-    "upgrade_nodes": {},
-    "data_node_actions": {},
-    "data_node_badge": {},
-    "data_node_status": {},
-    "data_node_logs": {},
-    "cluster_management": {},
-    "ca_configuration": {},
-    "ca_upload": {},
-    "ca_create": {},
+    "upgrade_method": {
+      "cluster_restart": "Reinicialização do cluster",
+      "cluster_restart_description": "Ao usar o método de reinicialização do cluster, você atualizará todos os Data Nodes de uma só vez. Durante esse período, as mensagens serão armazenadas no journal e processadas quando o cluster de Data Nodes voltar a ficar online. Não há perda de dados, desde que o tamanho do journal esteja configurado para o volume de mensagens esperado durante a indisponibilidade dos Data Nodes.",
+      "cluster_restart_less_than_three": "Se você executar um cluster de Data Nodes com menos de três nós, o método de reinicialização do cluster é o único disponível.",
+      "cluster_restart_three_or_more": "Se você executar um cluster de Data Nodes com três ou mais nós, pode optar pelo método de reinicialização do cluster após avaliar o tamanho do journal e a taxa de transferência de mensagens.",
+      "rolling_upgrade": "Atualização contínua",
+      "rolling_upgrade_description": "Atualizações contínuas podem ser realizadas em um cluster de Data Nodes em execução somente com <bold>três ou mais nós</bold>, com praticamente nenhuma indisponibilidade.",
+      "rolling_upgrade_process": "Os Data Nodes são parados e atualizados no local, um por vez. Como alternativa, os Data Nodes podem ser parados e substituídos, um por vez, por hosts que executam a nova versão. Durante esse processo, você pode continuar indexando e consultando dados no seu cluster."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "Todos os seus Data Nodes estão atualizados.",
+      "checking": "Verificando o status do OpenSearch...",
+      "error": "Não foi possível verificar a versão do OpenSearch embutido dos Data Nodes.",
+      "outdated": "O OpenSearch embutido dos Data Nodes não está atualizado.",
+      "up_to_date": "O OpenSearch embutido dos Data Nodes está atualizado.",
+      "up_to_date_with_version": "O OpenSearch embutido dos Data Nodes está atualizado <bold>({{version}}).</bold>",
+      "upgrading": "A atualização contínua do OpenSearch está em andamento."
+    },
+    "upgrade_nodes": {
+      "manager": "gerenciador",
+      "no_outdated_nodes": "Nenhum nó desatualizado encontrado.",
+      "no_upgraded_nodes": "Nenhum nó atualizado encontrado.",
+      "outdated_nodes": "Nós desatualizados",
+      "start_upgrade": "Iniciar processo de atualização",
+      "upgraded": "Atualizado",
+      "upgraded_nodes": "Nós atualizados"
+    },
+    "data_node_actions": {
+      "rejoin": "Reingressar",
+      "remove": "Remover",
+      "renew_certificate": "Renovar certificado",
+      "show_logs": "Mostrar logs",
+      "start": "Iniciar",
+      "stop": "Parar",
+      "rejoin_title": "Reingressar Data Node",
+      "rejoin_confirm": "Tem certeza de que deseja reingressar o Data Node \"{{hostname}}\"?",
+      "remove_title": "Remover Data Node",
+      "remove_confirm": "Tem certeza de que deseja remover o Data Node \"{{hostname}}\"?",
+      "stop_title": "Parar Data Node",
+      "stop_confirm": "Tem certeza de que deseja parar o Data Node \"{{hostname}}\"?"
+    },
+    "data_node_badge": {
+      "short_node_id": "ID curto do nó"
+    },
+    "data_node_status": {
+      "queued_for": "na fila para {{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "Nenhum log.",
+      "title": "Logs de {{hostname}}"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Mostra as métricas de desempenho do seu Data Node e do cluster OpenSearch gerenciado.",
+      "teaser_license_warning": "Certifique-se de ter uma licença válida e um Data Node configurado para visualizar as métricas de desempenho do seu Data Node e do seu cluster OpenSearch gerenciado."
+    },
+    "ca_configuration": {
+      "create_tab": "Criar nova CA",
+      "description_provision": "A autoridade certificadora provisionará e gerenciará os certificados dos seus Data Nodes com mais facilidade.",
+      "description_upload_or_create": "Nesta etapa, você pode enviar ou criar uma nova autoridade certificadora.",
+      "reusing_certificates": "Se o seu cluster existente usar certificados, por padrão eles serão substituídos pela CA do {{productName}} e por certificados gerados automaticamente durante o provisionamento dos data nodes na próxima etapa. Se quiser incluir sua própria CA, você pode enviar um certificado existente. Consulte <docsLink>{{productName}} Data Node - Primeiros passos</docsLink> para mais informações.",
+      "reusing_certificates_title": "Reutilização de certificados",
+      "title": "Configurar autoridade certificadora",
+      "upload_tab": "Enviar CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "Autoridade certificadora",
+      "dropzone": "Arraste a CA até aqui ou clique para selecionar o arquivo",
+      "explanation": "Aqui você pode enviar sua CA existente. É necessário enviar um único arquivo que contenha a chave privada (criptografada ou não), o certificado da CA e quaisquer certificados intermediários. O arquivo pode estar no formato PEM ou PKCS#12. Se a sua chave privada estiver criptografada, também será necessário informar a senha.",
+      "failed": "Falha ao enviar a CA com o erro: {{error}}",
+      "password": "Senha",
+      "rejected": "Falha ao enviar a CA",
+      "submit": "Enviar CA",
+      "submitting": "Enviando CA...",
+      "success": "CA enviada com sucesso"
+    },
+    "ca_create": {
+      "description": "Clique no botão “Criar CA” para criar rapidamente uma nova autoridade certificadora para os seus Data Nodes do {{productName}}.",
+      "failed": "Falha ao criar a CA com o erro: {{error}}",
+      "organization_name": "Nome da organização",
+      "submit": "Criar CA",
+      "submitting": "Criando CA...",
+      "success": "CA criada com sucesso"
+    },
     "renewal_policy": {
-      "modes": {}
+      "certificate_lifetime": "Validade do certificado:",
+      "certificate_lifetime_label": "Validade do certificado",
+      "configure": "Configurar política de renovação de certificados",
+      "description": "Estas configurações serão usadas ao detectar a expiração de certificados e/ou ao renová-los.",
+      "edit": "Editar configuração",
+      "lifetime_explanation": "A validade do certificado será usada para definir o período de validade dos certificados recém-criados.",
+      "mode_explanation": "Definir a política de renovação como \"Automática\" renovará todos os certificados prestes a expirar sem nenhuma interação do usuário. Defini-la como \"Manual\" criará uma notificação do sistema quando um ou mais certificados estiverem prestes a expirar, permitindo que você confirme a renovação.",
+      "renewal_mode": "Modo de renovação:",
+      "renewal_mode_label": "Modo de renovação do certificado",
+      "select_mode": "Selecione o modo de renovação do certificado",
+      "submit": "Atualizar configuração",
+      "submitting": "Atualizando configuração",
+      "title": "Configuração da política de renovação de certificados",
+      "update_failed": "Erro ao atualizar a política de renovação de certificados: {{error}}",
+      "update_failed_title": "Não foi possível atualizar a política de renovação de certificados",
+      "modes": {
+        "automatic": "Automática",
+        "manual": "Manual"
+      }
     },
-    "details_page": {},
+    "details_page": {
+      "certificate_valid_until": "Certificado válido até:"
+    },
     "pages": {},
     "upgrade_page": {},
     "migration_steps": {},
