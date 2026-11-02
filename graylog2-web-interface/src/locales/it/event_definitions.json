@@ -1,1 +1,177 @@
-{}
+{
+  "add_notification_form": {
+    "add": "Aggiungi notifica",
+    "choose": "Scegli notifica",
+    "create_new": "Crea nuova notifica...",
+    "help": "Seleziona una notifica da usare per gli Avvisi di questo tipo oppure crea una nuova notifica da usare in seguito in altri Avvisi.",
+    "select": "Seleziona notifica",
+    "title": "Aggiungi notifica"
+  },
+  "aggregation_form": {
+    "description": "Riassumi i messaggi di log che corrispondono al Filtro definito sopra usando una funzione. Puoi facoltativamente raggruppare i risultati del Filtro in base a valori identici di un campo.",
+    "group_by_example": "Supponi di aver creato un Filtro con tutti i tentativi di accesso non riusciti nella tua rete: un avviso potrebbe essere attivato quando ci sono più di 5 tentativi di accesso non riusciti in totale. Ora aggiungi <code>username</code> come campo di raggruppamento e un avviso verrà attivato <em>per ogni <code>username</code></em> con più di 5 tentativi di accesso non riusciti.",
+    "group_by_help": "Seleziona i campi per raggruppare i risultati del filtro quando hanno valori identici. <bold>Esempio:</bold>",
+    "title": "Aggregazione"
+  },
+  "bulk_actions": {
+    "delete": {
+      "error": "Si è verificato un errore durante l'eliminazione delle Event Definitions. {{error}}",
+      "title": "Elimina Event Definitions"
+    },
+    "disable": {
+      "error": "Si è verificato un errore durante la disattivazione delle Event Definitions. {{error}}",
+      "title": "Disattiva Event Definitions"
+    },
+    "disable_action": "Disattiva",
+    "enable": {
+      "error": "Si è verificato un errore durante l'attivazione delle Event Definitions. {{error}}",
+      "title": "Attiva Event Definitions"
+    },
+    "enable_action": "Attiva",
+    "success_title": "Operazione riuscita"
+  },
+  "condition_form": {
+    "available_conditions": "Condizioni disponibili",
+    "condition_type": "Tipo di condizione",
+    "condition_type_help": "Scegli il tipo di Condizione per questo Evento.",
+    "description": "Definisci come devono essere creati gli Eventi di questo tipo. In seguito potrai usare questi Eventi come input in altre Condizioni, così da costruire Condizioni potenti basate su altre.",
+    "no_description": "Nessuna descrizione disponibile.",
+    "not_editable": "Le condizioni di questo tipo di Event Definition non possono essere modificate.",
+    "select_condition_type": "Seleziona un tipo di condizione",
+    "title": "Condizione dell'evento"
+  },
+  "condition_summary": {
+    "and": "E",
+    "create_events": "Crea Eventi per Event Definition",
+    "errors_found": "Errori trovati",
+    "hide_errors": "Nascondi errori",
+    "invalid": "La condizione non è valida",
+    "no_condition": "Nessuna condizione configurata",
+    "no_series": "Nessuna serie selezionata",
+    "or": "O",
+    "preview": "Anteprima:",
+    "show_errors": "Mostra errori",
+    "title": "Riepilogo della condizione",
+    "valid": "La condizione è valida"
+  },
+  "conditions": {
+    "add_expression": "Aggiungi espressione",
+    "add_group": "Aggiungi gruppo",
+    "all": "tutte",
+    "any": "qualsiasi",
+    "boolean_operator": "Operatore booleano",
+    "boolean_operator_group": "Gruppo operatore booleano {{level}}",
+    "delete_expression": "Elimina espressione",
+    "global_boolean_operator": "Operatore booleano globale",
+    "if": "Se",
+    "is": "è",
+    "messages_must_meet": "I messaggi devono soddisfare",
+    "of_the_following_rules": "delle seguenti regole:",
+    "select_condition": "Seleziona condizione",
+    "select_field": "Seleziona campo (facoltativo)",
+    "select_function": "Seleziona funzione",
+    "select_percentile": "Seleziona percentile",
+    "select_strategy": "Seleziona strategia (facoltativo)",
+    "threshold": "Soglia"
+  },
+  "definition_summary": {
+    "details": "Dettagli",
+    "no_description": "Nessuna descrizione fornita",
+    "no_tags": "Nessun tag",
+    "no_title": "Nessun titolo fornito",
+    "title": "Riepilogo evento"
+  },
+  "details_form": {
+    "add_event_procedure": "Aggiungi procedura dell'evento",
+    "description": "Descrizione",
+    "description_help": "Descrizione più dettagliata per questa Event Definition.",
+    "no_event_procedures": "Questa Event Definition non ha ancora procedure dell'evento.",
+    "no_remediation_steps": "Nessun passo di risoluzione fornito",
+    "optional": "(Facoltativo)",
+    "priority": "Priorità",
+    "priority_help": "Scegli la priorità per gli Eventi creati da questa Definition.",
+    "remediation_steps": "Passi di risoluzione",
+    "remediation_steps_help": "Passi per risolvere questo Evento. È supportata la formattazione Markdown.",
+    "summary_template": "Modello di riepilogo dell'evento",
+    "summary_template_help": "Modello usato per generare i riepiloghi di Evento e Avviso.",
+    "title": "Dettagli evento",
+    "title_help": "Titolo per questa Event Definition.",
+    "title_label": "Titolo"
+  },
+  "event_key_help": {
+    "event_count": "Per controllare quanti Eventi crea una definizione <bold>Filter & Aggregation</bold>, usa \"Crea Eventi per Event Definition se...\" con \"L'aggregazione dei risultati raggiunge una soglia\" e configura i Campi di raggruppamento.",
+    "example": "<bold>Esempio:</bold> due definizioni, <em>Login failure</em> e <em>Privilege escalation</em>, entrambe con Event Key <code>username</code>. Una correlazione tra le due si attiva solo quando entrambi gli Eventi hanno lo stesso username.",
+    "intro": "Le Event Key sono campi personalizzati i cui valori vengono combinati nella chiave dell'Evento (valori uniti con <code>|</code>). La chiave identifica l'entità a cui si riferisce un Evento. Non cambia il numero di Eventi creati.",
+    "where_it_matters": "<bold>Dove conta la chiave:</bold> <bold>Event Correlation</bold> abbina solo gli Eventi di origine che condividono la stessa chiave e crea al massimo un Evento per chiave entro la propria finestra di ricerca. Imposta le Key sulle Event Definition che intendi correlare, non sulla correlazione stessa."
+  },
+  "expanded_notifications": {
+    "description": "Notifiche attivate quando questa Event Definition si attiva.",
+    "loading": "Caricamento notifiche...",
+    "missing_permissions": "Permessi per le notifiche mancanti per:"
+  },
+  "field_form": {
+    "add": "Aggiungi campo personalizzato",
+    "data_type": "Tipo di dato del campo",
+    "data_type_string": "Stringa",
+    "key_help": "Indica se questo campo deve essere una Key e il relativo ordine.",
+    "more_about_keys": "Maggiori informazioni sulle Event Key",
+    "name": "Nome",
+    "name_help": "Nome per questo campo.",
+    "provider_unavailable": "Il provider selezionato non è disponibile.",
+    "select_value_source": "Seleziona origine del valore",
+    "set_value_from": "Imposta valore da",
+    "title_edit": "Campo personalizzato \"{{fieldName}}\"",
+    "title_new": "Nuovo campo personalizzato",
+    "update": "Aggiorna campo personalizzato",
+    "use_as_key": "Usa campo come Event Key",
+    "value_source_help": "Seleziona un'origine per il valore di questo campo."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {}
+  },
+  "fields_form": {},
+  "fields_list": {},
+  "filter_aggregation_form": {},
+  "filter_form": {},
+  "filter_preview": {},
+  "form_container": {},
+  "form_controls": {},
+  "hook_notifications": {},
+  "notification_list": {},
+  "notification_settings": {},
+  "notifications_form": {},
+  "overview": {},
+  "page": {},
+  "priorities": {},
+  "provider_summary": {},
+  "query_parameter_modal": {
+    "types": {}
+  },
+  "replay_search": {
+    "attributes": {}
+  },
+  "row_actions": {},
+  "scheduling": {},
+  "share": {},
+  "sidebar": {},
+  "status_cell": {},
+  "steps": {},
+  "summary": {
+    "condition_types": {}
+  },
+  "summary_renders": {},
+  "summary_template_help": {},
+  "tags_editor": {},
+  "template_preview": {},
+  "template_provider_form": {},
+  "types": {
+    "aggregation": {},
+    "system": {}
+  },
+  "validation": {},
+  "validation_summary": {},
+  "use_event_definition_notifications": {}
+}
