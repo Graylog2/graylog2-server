@@ -1,1 +1,177 @@
-{}
+{
+  "add_notification_form": {
+    "add": "添加通知",
+    "choose": "选择通知",
+    "create_new": "创建新通知...",
+    "help": "选择用于此类告警的通知，或创建一个可在其他告警中复用的新通知。",
+    "select": "选择通知",
+    "title": "添加通知"
+  },
+  "aggregation_form": {
+    "description": "使用函数汇总与上方定义的过滤器匹配的日志消息。您可以选择按相同字段值对过滤结果进行分组。",
+    "group_by_example": "假设您创建了一个过滤器，用于匹配网络中所有登录失败的尝试，那么当登录失败总次数超过 5 次时即可触发告警。现在，将 <code>username</code> 添加为分组字段，则告警会<em>针对每个 <code>username</code></em>（登录失败次数超过 5 次）触发。",
+    "group_by_help": "选择字段，当过滤结果的这些字段值相同时将其分组。<bold>示例：</bold>",
+    "title": "聚合"
+  },
+  "bulk_actions": {
+    "delete": {
+      "error": "删除 Event Definitions 时发生错误。{{error}}",
+      "title": "删除 Event Definitions"
+    },
+    "disable": {
+      "error": "禁用 Event Definitions 时发生错误。{{error}}",
+      "title": "禁用 Event Definitions"
+    },
+    "disable_action": "禁用",
+    "enable": {
+      "error": "启用 Event Definitions 时发生错误。{{error}}",
+      "title": "启用 Event Definitions"
+    },
+    "enable_action": "启用",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "可用条件",
+    "condition_type": "条件类型",
+    "condition_type_help": "为此事件选择条件类型。",
+    "description": "定义此类事件的创建方式。之后可将这些事件用作其他条件的输入，从而基于其他条件构建功能强大的条件。",
+    "no_description": "暂无描述。",
+    "not_editable": "此事件定义类型的条件无法编辑。",
+    "select_condition_type": "选择条件类型",
+    "title": "事件条件"
+  },
+  "condition_summary": {
+    "and": "与",
+    "create_events": "为 Event Definition 创建事件",
+    "errors_found": "发现错误",
+    "hide_errors": "隐藏错误",
+    "invalid": "条件无效",
+    "no_condition": "未配置条件",
+    "no_series": "未选择序列",
+    "or": "或",
+    "preview": "预览：",
+    "show_errors": "显示错误",
+    "title": "条件摘要",
+    "valid": "条件有效"
+  },
+  "conditions": {
+    "add_expression": "添加表达式",
+    "add_group": "添加分组",
+    "all": "全部",
+    "any": "任意",
+    "boolean_operator": "布尔运算符",
+    "boolean_operator_group": "第 {{level}} 级布尔运算符分组",
+    "delete_expression": "删除表达式",
+    "global_boolean_operator": "全局布尔运算符",
+    "if": "如果",
+    "is": "是",
+    "messages_must_meet": "消息必须满足",
+    "of_the_following_rules": "以下规则：",
+    "select_condition": "选择条件",
+    "select_field": "选择字段（可选）",
+    "select_function": "选择函数",
+    "select_percentile": "选择百分位数",
+    "select_strategy": "选择策略（可选）",
+    "threshold": "阈值"
+  },
+  "definition_summary": {
+    "details": "详细信息",
+    "no_description": "未提供描述",
+    "no_tags": "无标签",
+    "no_title": "未提供标题",
+    "title": "事件摘要"
+  },
+  "details_form": {
+    "add_event_procedure": "添加事件处理流程",
+    "description": "描述",
+    "description_help": "此 Event Definition 的详细描述。",
+    "no_event_procedures": "此 Event Definition 尚无任何事件处理流程。",
+    "no_remediation_steps": "未提供修复步骤",
+    "optional": "（可选）",
+    "priority": "优先级",
+    "priority_help": "为从此 Event Definition 创建的事件选择优先级。",
+    "remediation_steps": "修复步骤",
+    "remediation_steps_help": "用于修复此事件的步骤。支持 Markdown 格式。",
+    "summary_template": "事件摘要模板",
+    "summary_template_help": "用于生成事件和告警摘要的模板。",
+    "title": "事件详情",
+    "title_help": "此 Event Definition 的标题。",
+    "title_label": "标题"
+  },
+  "event_key_help": {
+    "event_count": "要控制 <bold>过滤与聚合</bold>类 Event Definition 创建的事件数量，请在“为定义创建事件（如果…）”中选择“聚合结果达到阈值”，并配置分组字段。",
+    "example": "<bold>示例：</bold>两个 Event Definition，<em>登录失败</em>和<em>权限提升</em>，均将事件键设为 <code>username</code>。只有当两个事件携带相同的用户名时，二者的关联才会触发。",
+    "intro": "事件键是自定义字段，其值会组合成事件的键（值之间以 <code>|</code> 连接）。事件键用于标识事件所涉及的实体，它不会改变创建的事件数量。",
+    "where_it_matters": "<bold>事件键的作用：</bold><bold>事件关联</bold>仅匹配具有相同键的源事件，并且在其搜索窗口内每个键最多只创建一个事件。请在您打算关联的 Event Definition 上设置键，而不是在关联本身上设置。"
+  },
+  "expanded_notifications": {
+    "description": "此 Event Definition 触发时发出的通知。",
+    "loading": "正在加载通知...",
+    "missing_permissions": "缺少以下通知的权限："
+  },
+  "field_form": {
+    "add": "添加自定义字段",
+    "data_type": "字段数据类型",
+    "data_type_string": "字符串",
+    "key_help": "指示此字段是否应作为键及其顺序。",
+    "more_about_keys": "关于事件键的更多信息",
+    "name": "名称",
+    "name_help": "此字段的名称。",
+    "provider_unavailable": "所选提供方不可用。",
+    "select_value_source": "选择值来源",
+    "set_value_from": "设置值来源",
+    "title_edit": "自定义字段“{{fieldName}}”",
+    "title_new": "新建自定义字段",
+    "update": "更新自定义字段",
+    "use_as_key": "将字段用作事件键",
+    "value_source_help": "为此字段的值选择来源。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {}
+  },
+  "fields_form": {},
+  "fields_list": {},
+  "filter_aggregation_form": {},
+  "filter_form": {},
+  "filter_preview": {},
+  "form_container": {},
+  "form_controls": {},
+  "hook_notifications": {},
+  "notification_list": {},
+  "notification_settings": {},
+  "notifications_form": {},
+  "overview": {},
+  "page": {},
+  "priorities": {},
+  "provider_summary": {},
+  "query_parameter_modal": {
+    "types": {}
+  },
+  "replay_search": {
+    "attributes": {}
+  },
+  "row_actions": {},
+  "scheduling": {},
+  "share": {},
+  "sidebar": {},
+  "status_cell": {},
+  "steps": {},
+  "summary": {
+    "condition_types": {}
+  },
+  "summary_renders": {},
+  "summary_template_help": {},
+  "tags_editor": {},
+  "template_preview": {},
+  "template_provider_form": {},
+  "types": {
+    "aggregation": {},
+    "system": {}
+  },
+  "validation": {},
+  "validation_summary": {},
+  "use_event_definition_notifications": {}
+}
