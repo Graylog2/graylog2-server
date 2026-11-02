@@ -36,7 +36,10 @@
       "timestamp": "Marca de tiempo",
       "index": "Índice",
       "letter_id": "ID de letra",
-      "error_message": "Mensaje de error"
+      "error_message": "Mensaje de error",
+      "count_one": "Hubo {{formattedCount}} intento de indexación fallido en las últimas 24 horas.",
+      "count_many": "Hubo {{formattedCount}} intentos de indexación fallidos en las últimas 24 horas.",
+      "count_other": "Hubo {{formattedCount}} intentos de indexación fallidos en las últimas 24 horas."
     },
     "system_overview": {
       "looking_for_failures": "Buscando fallos de indexación...",
@@ -155,8 +158,11 @@
     "shards": "Shards:",
     "replicas": "Réplicas:",
     "field_type_refresh_interval": "Intervalo de actualización del tipo de campo:",
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundos",
     "field_type_profile": "Perfil de tipos de campo:",
-    "not_set": "No definido"
+    "not_set": "No definido",
+    "seconds_many": "{{count}} segundos"
   },
   "profiles": {
     "create": "Crear perfil",
@@ -212,9 +218,15 @@
     "field_errors": "Errores de campos:",
     "profile_change_failed_title": "Error al cambiar el perfil de tipos de campo en algunos conjuntos de índices",
     "profile_details_failed": "No se pudieron cargar los detalles de este perfil.",
+    "used_by_one": "Ya utilizado por {{count}} conjunto de índices.",
+    "used_by_other": "Ya utilizado por {{count}} conjuntos de índices.",
     "field": "Campo",
     "type": "Tipo",
     "targets_title": "Conjuntos de índices",
+    "targets_summary_one": "Se aplica a {{count}} conjunto de índices.",
+    "targets_summary_other": "Se aplica a {{count}} conjuntos de índices.",
+    "targets_summary_excluding_one": "Se aplica a {{count}} conjunto de índices, excluye {{skipped}}.",
+    "targets_summary_excluding_other": "Se aplica a {{count}} conjuntos de índices, excluye {{skipped}}.",
     "targets_index_set": "Conjunto de índices",
     "targets_status": "Estado",
     "targets_note": "Nota",
@@ -236,7 +248,10 @@
     "origin_profile": "El tipo de campo <i>{{type}}</i> proviene del perfil <profileLink>{{profileName}}</profileLink>. Sobrescribe los posibles mapeos del índice del motor de búsqueda, ya sea de inmediato (si el índice se rotó) o durante la siguiente rotación.",
     "profile_config_info": "Con los <profilesLink>perfiles</profilesLink> de tipos de campo del conjunto de índices puedes agrupar tipos de campo personalizados en perfiles. Puedes asignar cualquier perfil a este conjunto de índices. Para ver y usar la configuración del perfil en el conjunto de índices, debes rotar los índices.",
     "profile_config_label": "Perfil de mapeo de tipos de campo del índice (opcional)",
-    "profile_config_placeholder": "Selecciona un perfil de tipos de campo del índice"
+    "profile_config_placeholder": "Selecciona un perfil de tipos de campo del índice",
+    "used_by_many": "Ya utilizado por {{count}} conjuntos de índices.",
+    "targets_summary_many": "Se aplica a {{count}} conjuntos de índices.",
+    "targets_summary_excluding_many": "Se aplica a {{count}} conjuntos de índices, excluye {{skipped}}."
   },
   "templates": {
     "create": "Crear plantilla",
@@ -262,6 +277,10 @@
     "max_segments": "Número máximo de segmentos:",
     "optimization_after_rotation": "Optimización de índice tras la rotación:",
     "field_type_refresh_interval": "Intervalo de actualización del tipo de campo:",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundos",
     "title_disabled": "{{title}} (desactivada)",
     "form_title_label": "Título de la plantilla",
     "form_title_help": "Título descriptivo de la plantilla",
@@ -273,7 +292,9 @@
     "error_shards_required": "Los shards de índice son obligatorios",
     "error_segments_required": "El número máximo de segmentos es obligatorio",
     "error_retention_required": "Selecciona una estrategia de retención",
-    "error_rotation_required": "Selecciona una estrategia de rotación"
+    "error_rotation_required": "Selecciona una estrategia de rotación",
+    "minutes_many": "{{count}} minutos",
+    "seconds_many": "{{count}} segundos"
   },
   "overview_table": {
     "field_type_refresh_interval": "Intervalo de actualización del tipo de campo",
@@ -299,6 +320,8 @@
     "hide_streams": "Ocultar streams asociados a {{title}}",
     "default": "Predeterminado",
     "read_only": "Solo lectura",
+    "hidden_streams_one": "{{count}} stream más está enrutado a este conjunto de índices, pero no tienes permiso para verlo.",
+    "hidden_streams_other": "{{count}} streams más están enrutados a este conjunto de índices, pero no tienes permiso para verlos.",
     "no_streams": "Ningún stream que puedas ver está enrutado a este conjunto de índices.",
     "streams_title": "Título",
     "streams_status": "Estado",
@@ -325,7 +348,8 @@
       "size_bytes": "Tamaño en disco",
       "deflector_health": "Deflector",
       "field_count": "Campos"
-    }
+    },
+    "hidden_streams_many": "{{count}} streams más están enrutados a este conjunto de índices, pero no tienes permiso para verlos."
   },
   "index_summary": {
     "label_active_write_index": "índice de escritura activo",
@@ -336,7 +360,10 @@
     "empty": "El índice no contiene ningún mensaje.",
     "range_unknown": "El intervalo de tiempo del índice es desconocido, porque el rango del índice no está disponible. Recalcula los rangos de índices manualmente.",
     "hide_details": "Ocultar detalles / acciones",
-    "show_details": "Mostrar detalles / acciones"
+    "show_details": "Mostrar detalles / acciones",
+    "size_one": "({{size}} / {{formattedCount}} mensaje)",
+    "size_other": "({{size}} / {{formattedCount}} mensajes)",
+    "size_many": "({{size}} / {{formattedCount}} mensajes)"
   },
   "indices_configuration": {
     "not_writable": "El conjunto de índices no admite escritura y no se incluirá en la rotación ni en la retención de índices. Tampoco es posible asignarlo a un stream.",
@@ -344,6 +371,8 @@
     "configure_field_types": "Configurar tipos de campo de índices"
   },
   "shards": {
+    "ops_one": "{{formattedCount}} operación",
+    "ops_other": "{{formattedCount}} operaciones",
     "took": "(tardó {{duration}})",
     "index": "Índice:",
     "flush": "Flush:",
@@ -356,7 +385,8 @@
     "routing_description": "Los shards en negrita son primarios; los demás son réplicas. Las réplicas se promueven automáticamente a primarias cuando los primarios abandonan el clúster. El tamaño y el número de documentos solo reflejan los shards primarios, sin duplicación posible por réplicas.",
     "tooltip": "Estado: <i>{{state}}</i> en {{hostname}} ({{name}})",
     "seconds_short": "{{seconds}} s",
-    "shard_id": "S{{id}}"
+    "shard_id": "S{{id}}",
+    "ops_many": "{{formattedCount}} operaciones"
   },
   "data_tiering": {
     "max_days_label": "Máx. días en almacenamiento",
@@ -372,9 +402,18 @@
     "summary_data_tiering": "Data Tiering",
     "summary_max": "Máx. en almacenamiento:",
     "summary_min": "Mín. en almacenamiento:",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
     "tooltip_min_storage": "Mín. n.º de días en almacenamiento",
     "tooltip_min_hot_and_storage": "Mín. n.º de días en Hot Tier y almacenamiento",
-    "tooltip_min_hot": "Mín. n.º de días en Hot Tier"
+    "tooltip_min_hot": "Mín. n.º de días en Hot Tier",
+    "archived_deleted_after_one": "Archivado y eliminado después de <strong>{{count}} día</strong>",
+    "archived_deleted_after_other": "Archivado y eliminado después de <strong>{{count}} días</strong>",
+    "deleted_after_one": "Eliminado después de <strong>{{count}} día</strong>",
+    "deleted_after_other": "Eliminado después de <strong>{{count}} días</strong>",
+    "days_many": "{{count}} días",
+    "archived_deleted_after_many": "Archivado y eliminado después de <strong>{{count}} días</strong>",
+    "deleted_after_many": "Eliminado después de <strong>{{count}} días</strong>"
   },
   "incompatible": {
     "working": "Procesando...",
@@ -401,6 +440,7 @@
     "reindex_requires_data_node": "Los índices del sistema solo se pueden reindexar cuando {{productName}} se ejecuta con un backend de búsqueda Data Node. <migrationLink>Migra a Data Nodes</migrationLink> para reindexarlos antes de actualizar a la siguiente versión mayor de OpenSearch.",
     "partial_summary": "{{succeeded}} correctos, {{failed}} fallidos.",
     "partial_more": "...y {{count}} más.",
+    "all_failed_one": "{{count}} índice ha fallado.",
     "delete": {
       "button": "Eliminar",
       "title": "Eliminar índice",
@@ -463,7 +503,8 @@
       },
       "rotate_partial_title": "Algunos índices no se pudieron rotar",
       "rotate_failure_title": "No se pudieron rotar los índices"
-    }
+    },
+    "all_failed_many": "{{count}} índices han fallado."
   },
   "strategies": {
     "name_rotation_message_count": "Número de mensajes del índice",
@@ -587,10 +628,73 @@
     "templates_search_placeholder": "Buscar plantilla de conjunto de índices",
     "field_types_human_name": "tipos de campo de conjuntos de índices",
     "origin_explanation": "Explicación del origen",
-    "category_counts_load_failed": "Error al cargar los recuentos de conjuntos de índices. Estado"
+    "category_counts_load_failed": "Error al cargar los recuentos de conjuntos de índices. Estado",
+    "category_counts_load_failed_title": "No se pudieron cargar los recuentos de conjuntos de índices",
+    "template_create_failed": "Error al crear la plantilla de conjunto de índices. Estado: {{error}}",
+    "template_create_failed_title": "No se pudo crear la plantilla de conjunto de índices",
+    "template_create_success": "La plantilla de conjunto de índices se ha creado correctamente.",
+    "template_update_failed": "Error al actualizar la plantilla de conjunto de índices. Estado: {{error}}",
+    "template_update_failed_title": "No se pudo actualizar la plantilla de conjunto de índices",
+    "template_update_success": "La plantilla de conjunto de índices se ha actualizado correctamente.",
+    "template_default_failed": "Error al establecer la plantilla como predeterminada. Estado: {{error}}",
+    "template_default_failed_title": "No se pudo establecer la plantilla como predeterminada",
+    "template_default_success": "La plantilla se ha establecido correctamente como predeterminada.",
+    "template_delete_failed": "Error al eliminar la plantilla de conjunto de índices. Estado: {{error}}",
+    "template_delete_failed_title": "No se pudo eliminar la plantilla de conjunto de índices",
+    "template_delete_success": "La plantilla de conjunto de índices se ha eliminado correctamente.",
+    "templates_load_failed": "Error al cargar las plantillas de conjuntos de índices. Estado",
+    "templates_load_failed_title": "No se pudieron cargar las plantillas de conjuntos de índices",
+    "template_load_failed": "Error al cargar la plantilla de conjunto de índices. Estado",
+    "template_load_failed_title": "No se pudo cargar la plantilla de conjunto de índices",
+    "built_in_templates_load_failed": "Error al cargar las plantillas integradas de conjuntos de índices. Estado",
+    "built_in_templates_load_failed_title": "No se pudieron cargar las plantillas integradas de conjuntos de índices",
+    "template_defaults_load_failed": "Error al obtener la plantilla predeterminada del índice",
+    "index_set_load_failed": "Error al cargar el conjunto de índices con el ID: {{indexSetId}}. Estado",
+    "index_set_load_failed_title": "No se pudo cargar el conjunto de índices",
+    "index_sets_list_load_failed": "Error al cargar la lista de conjuntos de índices. Estado",
+    "index_sets_list_load_failed_title": "No se pudo cargar la lista de conjuntos de índices",
+    "ranges_recalculation_failed": "No se pudo crear un trabajo para iniciar el recálculo de rangos de índices",
+    "ranges_recalculation_failed_title": "Error al iniciar el recálculo de rangos de índices",
+    "cycle_deflector_failed": "Error al rotar el deflector",
+    "field_types_load_failed": "Error al cargar los tipos de campo del índice. Estado",
+    "field_types_load_failed_title": "No se pudieron cargar los tipos de campo del índice",
+    "custom_field_type_remove_failed": "Error al eliminar el tipo de campo personalizado. Estado: {{error}}",
+    "custom_field_type_remove_failed_title": "No se pudo eliminar el tipo de campo personalizado",
+    "custom_field_type_removed": "El tipo de campo personalizado se ha eliminado correctamente",
+    "profile_set_failed": "Error al establecer el perfil del conjunto de índices. Estado: {{error}}",
+    "profile_set_failed_title": "No se pudo establecer el perfil del conjunto de índices",
+    "profile_set_success": "El perfil del conjunto de índices se ha establecido correctamente",
+    "profile_remove_failed": "Error al quitar el perfil del índice. Estado: {{error}}",
+    "profile_remove_failed_title": "No se pudo quitar el perfil del índice",
+    "profile_removed": "El perfil se ha quitado del índice correctamente",
+    "failures_list_load_failed": "Error al cargar la lista de fallos del indexador. Estado",
+    "failures_list_load_failed_title": "No se pudo cargar la lista de fallos del indexador",
+    "failures_count_load_failed": "Error al cargar el recuento de fallos del indexador. Estado",
+    "failures_count_load_failed_title": "No se pudo cargar el recuento de fallos del indexador",
+    "indices_multiple_load_failed": "Error al cargar varios índices del indexador. Estado",
+    "indices_multiple_load_failed_title": "No se pudieron cargar varios índices del indexador"
   },
-  "notifications": {},
-  "use_index_set_stats_notifications": {},
-  "use_indexer_overview_notifications": {},
-  "use_indices_configuration_notifications": {}
+  "notifications": {
+    "create_success": "El conjunto de índices '{{title}}' se ha creado correctamente",
+    "create_failed": "Error al crear el conjunto de índices '{{title}}'. Estado: {{error}}",
+    "create_failed_title": "No se pudo crear el conjunto de índices.",
+    "update_success": "El conjunto de índices '{{title}}' se ha actualizado correctamente",
+    "update_failed": "Error al actualizar el conjunto de índices '{{title}}'. Estado: {{error}}",
+    "update_failed_title": "No se pudo actualizar el conjunto de índices.",
+    "success_title": "Éxito"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Error al cargar las estadísticas del conjunto de índices. Estado",
+    "load_failed_title": "No se pudieron cargar las estadísticas del conjunto de índices."
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Error al cargar el resumen del indexador del conjunto de índices. Estado",
+    "load_failed_title": "No se pudo cargar el resumen del indexador."
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "Error al obtener las estrategias de rotación",
+    "fetch_rotation_failed_title": "No se pudieron obtener las estrategias de rotación",
+    "fetch_retention_failed": "Error al obtener las estrategias de retención",
+    "fetch_retention_failed_title": "No se pudieron obtener las estrategias de retención"
+  }
 }
