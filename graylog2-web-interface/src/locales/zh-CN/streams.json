@@ -128,22 +128,134 @@
       "saving": "正在保存流",
       "submit": "更新",
       "success_title": "成功",
-      "tooltip": "编辑索引集"
+      "tooltip": "编辑索引集",
+      "updated": "Stream \"{{title}}\" 的索引集已成功更新。"
     },
-    "output_item": {},
-    "outputs": {},
-    "outputs_list": {},
-    "remove_output": {}
+    "output_item": {
+      "type": "（类型：{{type}}）"
+    },
+    "outputs": {
+      "count": "OUTPUTS {{count}}",
+      "title": "Outputs",
+      "toggle_aria": "切换 Output"
+    },
+    "outputs_list": {
+      "name": "名称",
+      "none": "未定义任何 Output。"
+    },
+    "remove_output": {
+      "confirm": "您确定要从流中移除此 Output 吗？",
+      "title": "移除 Output"
+    }
   },
-  "stream_details": {},
-  "stream_edit_page": {},
-  "stream_hooks": {},
-  "stream_modal": {},
-  "stream_outputs": {},
-  "stream_permission_error_page": {},
+  "stream_details": {
+    "back": "返回",
+    "connected_pipelines_human_name": "Pipelines",
+    "connected_pipelines_title": "来自其他 Stream 的路由",
+    "data_routing": "数据路由",
+    "destination_description": "Destinations 页面用于定义此流中的消息应路由到何处。一个流可以有多个 Destination。请注意，仅路由到 Data Lake 的消息不计入许可证用量，除非之后被检索。您可以针对每个 Destination 应用过滤器，以限定该 Destination 接收的消息子集。",
+    "edit": "编辑",
+    "edit_modal_title": "编辑 Stream",
+    "heading": "Stream：{{title}}",
+    "intake_description": "Stream 规则可用于将输入中经过过滤的消息子集直接收集到此 Stream。请注意，Stream 规则现已成为旧版功能，管理流路由的推荐方式是使用 Pipeline 规则。",
+    "no_pipelines": "此 Stream 未连接到任何 Pipeline。",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Pipelines 允许您转换和处理来自流的消息。Pipelines 由多个阶段组成，每个阶段中会评估并应用规则。消息可以经过一个或多个阶段。",
+    "processing_title": "Pipelines",
+    "rule_header": "规则",
+    "rules_info": "Stream 规则会在默认处理顺序中优先生效，用于将输入中的消息导入 Stream。任何符合 Stream 规则条件的消息都将被导入此 Stream。",
+    "rules_title": "Stream 规则",
+    "segment_destinations": "3：Destinations",
+    "segment_intake": "1：接入",
+    "segment_processing": "2：处理",
+    "success_title": "成功",
+    "throughput": "吞吐量",
+    "update_button": "更新 Stream",
+    "updated": "Stream \"{{title}}\" 已成功更新。",
+    "updating": "正在更新 Stream..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "无法编辑默认 Stream。",
+    "description": "此页面专门用于便捷地创建和管理 Stream 规则。您可以在此查看已配置的 Stream 规则对消息匹配的影响。",
+    "documentation_link_title": "Streams 文档",
+    "title": "Stream {{title}} 的规则",
+    "title_span": "Stream \"{{title}}\" 的规则"
+  },
+  "stream_hooks": {
+    "create_rule_failed": "创建 Stream Output 过滤规则失败，状态：{{error}}",
+    "create_rule_failed_title": "无法创建 Stream Output 过滤规则",
+    "create_rule_success": "Stream Output 过滤规则已成功创建。",
+    "delete_rule_failed": "删除 Stream Output 过滤规则失败，状态：{{error}}",
+    "delete_rule_failed_title": "无法删除 Stream Output 过滤规则",
+    "delete_rule_success": "Stream Output 过滤规则已成功移除。",
+    "load_connected_pipelines_failed": "加载已连接的 Pipelines 失败，状态",
+    "load_connected_pipelines_failed_title": "无法加载已连接的 Pipelines",
+    "load_output_filters_failed": "加载 Stream Output 过滤器失败，状态",
+    "load_output_filters_failed_title": "无法加载 Stream Output 过滤器",
+    "load_output_types_failed": "加载 Stream Output 失败，状态",
+    "load_output_types_failed_title": "无法加载 Stream Output",
+    "load_rule_builder_failed": "加载 Stream Output 过滤规则构建器条件列表失败，状态",
+    "load_rule_builder_failed_title": "无法加载 Stream Output 过滤规则构建器条件列表。",
+    "load_rule_types_failed": "加载 Stream 规则类型失败，状态",
+    "load_rule_types_failed_title": "无法加载 Stream 规则类型",
+    "load_stream_failed": "加载 Stream 失败，状态",
+    "load_stream_failed_title": "无法加载 Stream",
+    "load_streams_failed": "加载 Streams 失败，状态",
+    "load_streams_failed_title": "无法加载 Streams",
+    "success_title": "成功！",
+    "update_rule_failed": "更新 Stream Output 过滤规则失败，状态：{{error}}",
+    "update_rule_failed_title": "无法更新 Stream Output 过滤规则",
+    "update_rule_success": "Stream Output 过滤规则已成功更新。"
+  },
+  "stream_modal": {
+    "description": "描述",
+    "description_help": "哪类消息会被路由到此 Stream？",
+    "index_set_required": "必须选择索引集",
+    "remove_matches_help": "不要将与此 Stream 匹配的消息分配到“Default Stream”。",
+    "remove_matches_label": "从“Default Stream”中移除匹配项",
+    "share_description": "搜索用户或团队，将其添加为此 Stream 的协作者。",
+    "title": "标题",
+    "title_help": "新 Stream 的描述性名称",
+    "title_required": "标题为必填项"
+  },
+  "stream_outputs": {
+    "description": "{{productName}} 节点可以通过 Outputs 转发流中的消息。您可以在此处启动或终止任意数量的 Outputs。您也可以复用其他流中已在运行的 Outputs。所有已配置 Outputs 的全局视图可在 <outputsLink>此处</outputsLink>查看。",
+    "marketplace_prefix": "您可以在以下位置找到 Output 插件：",
+    "removing_description": "<emphasis>移除</emphasis> Output 会将其从此流中移除，但它仍会保留在可用 Outputs 列表中。<emphasis>全局删除</emphasis> Output 会将其从此流及所有其他流中移除并终止。您可以在 <outputsLink>全局 Output 列表</outputsLink>中查看所有已定义 Outputs 的详细信息。",
+    "title": "Stream »{{streamTitle}}« 的 Outputs"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "此资源包含您没有权限访问的 Stream。",
+    "description_p2": "请联系您的管理员，并提供错误详情，其中包括您需要访问权限的 Stream 列表。",
+    "error_details": "您需要以下 ID 的 Stream 的权限：{{ids}}。",
+    "title": "缺少 Stream 权限"
+  },
   "stream_rules": {
-    "editor": {},
-    "human": {},
+    "create_button": "创建规则",
+    "created": "Stream 规则已成功创建。",
+    "creating": "正在创建规则...",
+    "delete_confirm": "您确定要删除此 Stream 规则吗？",
+    "delete_ok": "确定",
+    "delete_title": "删除 Stream 规则。",
+    "delete_tooltip": "删除 Stream 规则",
+    "deleted": "Stream 规则已成功删除。",
+    "edit_title": "编辑 Stream 规则",
+    "edit_tooltip": "编辑 Stream 规则",
+    "editor": {
+      "add_rule": "添加 Stream 规则",
+      "done": "完成！",
+      "load_message_hint": "请在上方步骤 1 中加载一条消息，以检查其是否匹配这些规则。",
+      "load_message_title": "1. 加载消息以测试规则",
+      "manage_title": "2. 管理 Stream 规则",
+      "would_match": "此消息将被路由到此 Stream！",
+      "would_not_match": "此消息不会被路由到此 Stream。"
+    },
+    "human": {
+      "always_matches": "规则始终匹配",
+      "deleted_input": "<deleted input>：{{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> <mustPart>必须 </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>"
+    },
     "modal": {},
     "start_dialog": {}
   },
