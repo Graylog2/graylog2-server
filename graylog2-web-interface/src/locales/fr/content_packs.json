@@ -19,7 +19,7 @@
   },
   "details": {
     "description": "Description",
-    "entities": "Entités :",
+    "entities": "Éléments :",
     "id": "ID :",
     "name": "Nom :",
     "parameters": "Paramètres :",
@@ -32,7 +32,7 @@
   "download": {
     "download": "Télécharger",
     "info": "Veuillez faire un clic droit sur le lien de téléchargement ci-dessous et choisir « Enregistrer la cible sous... » pour télécharger le fichier JSON.",
-    "title": "Télécharger le pack de contenu"
+    "title": "Télécharger le Content Pack"
   },
   "edit": {
     "steps": {
@@ -58,19 +58,19 @@
     "not_double": "Ce n'est pas une valeur décimale.",
     "not_integer": "Ce n'est pas un nombre entier.",
     "title": "Titre",
-    "title_help": "Indiquez un titre descriptif pour ce pack de contenu.",
+    "title_help": "Indiquez un titre descriptif pour ce Content Pack.",
     "title_required": "Le titre doit être renseigné.",
     "value_type": "Type de valeur",
     "value_type_help": "Indiquez le type du paramètre."
   },
   "entities": {
     "action": "Action",
-    "config_title": "Configuration de l'entité",
+    "config_title": "Configuration de l'élément",
     "description": "Description",
     "edit_title": "Modifier",
-    "list_title": "Liste des entités",
+    "list_title": "Liste des éléments",
     "origin": "Origine",
-    "origin_content_pack": "Pack de contenu",
+    "origin_content_pack": "Content Pack",
     "origin_server": "Serveur",
     "show": "Afficher",
     "title": "Titre",
@@ -84,27 +84,27 @@
     "value": "Valeur"
   },
   "entity_index": {
-    "load_failed": "Échec du chargement de l'index des entités, statut :",
-    "load_failed_title": "Impossible de charger l'index des entités"
+    "load_failed": "Échec du chargement de l'index des éléments, statut :",
+    "load_failed_title": "Impossible de charger l'index des éléments"
   },
   "import": {
-    "error_message": "Erreur lors de l'importation du pack de contenu. Vérifiez qu'il s'agit d'un fichier JSON valide. Consultez les journaux de votre serveur {{productName}} pour plus d'informations.",
-    "error_title": "Impossible d'importer le pack de contenu",
-    "success_message": "Pack de contenu importé avec succès",
-    "success_named": "Pack de contenu « {{name}} » importé avec succès",
+    "error_message": "Erreur lors de l'importation du Content Pack. Vérifiez qu'il s'agit d'un fichier JSON valide. Consultez les journaux de votre serveur {{productName}} pour plus d'informations.",
+    "error_title": "Impossible d'importer le Content Pack",
+    "success_message": "Content Pack importé avec succès",
+    "success_named": "Content Pack « {{name}} » importé avec succès",
     "success_title": "Succès !"
   },
   "install": {
     "comment": "Commentaire d'installation",
-    "comment_help": "Ce commentaire sera enregistré avec l'installation du pack de contenu et peut servir à décrire la raison de cette installation.",
+    "comment_help": "Ce commentaire sera enregistré avec l'installation du Content Pack et peut servir à décrire la raison de cette installation.",
     "configure_parameters": "Configurer le ou les paramètres :",
     "needs_to_be_filled": "Doit être renseigné.",
-    "share_description": "Recherchez un utilisateur ou une équipe à ajouter en tant que collaborateur sur les entités de ce pack de contenu."
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter en tant que collaborateur sur les éléments de ce Content Pack."
   },
   "install_entities": {
-    "installed": "Entités installées",
+    "installed": "Éléments installés",
     "title": "Titre",
-    "to_be_uninstalled": "Entités à désinstaller",
+    "to_be_uninstalled": "Éléments à désinstaller",
     "type": "Type"
   },
   "install_view": {
@@ -122,14 +122,14 @@
     "view_title": "Afficher l'installation"
   },
   "list": {
-    "no_match": "Aucun pack de contenu correspondant n'a été trouvé",
-    "none_found": "Aucun pack de contenu trouvé. Veuillez en créer un ou en importer un"
+    "no_match": "Aucun Content Pack correspondant n'a été trouvé",
+    "none_found": "Aucun Content Pack trouvé. Veuillez en créer un ou en importer un"
   },
   "list_item": {
     "create_new_version": "Créer une nouvelle version",
     "delete_all_versions": "Supprimer toutes les versions",
     "install": "Installer",
-    "install_title": "Installer le pack de contenu",
+    "install_title": "Installer le Content Pack",
     "latest_version": "Dernière version : {{rev}}",
     "show": "Afficher"
   },
