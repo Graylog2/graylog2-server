@@ -271,20 +271,132 @@
     "no_match": "No hay Fleets que coincidan con el filtro"
   },
   "recent_activity": {
-    "title": "Actividad reciente"
+    "title": "Actividad reciente",
+    "empty": "No hay actividad reciente."
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Host",
+    "os": "SO",
+    "version": "Versión",
+    "fleet": "Fleet",
+    "enrolled": "Inscrito",
+    "last_seen": "Visto por última vez",
+    "hide_attributes": "Ocultar atributos"
+  },
+  "connection_success": {
+    "offline": "El collector se conectó una vez, pero no ha enviado información desde <lastSeen />.",
+    "receiving": "El collector está conectado y envía mensajes.",
+    "waiting": "Casi listo: el collector está conectado y estamos a la espera de sus primeros mensajes.",
+    "title": "Configurando {{host}}",
+    "view_instances": "Ver instancias",
+    "check_again": "Comprobar de nuevo",
+    "log_preview": "Vista previa de logs",
+    "caption_messages": "Mostrando los mensajes recibidos desde hace {{duration}}",
+    "caption_messages_checking": "Mostrando los mensajes recibidos desde hace {{duration}}; comprobando cada pocos segundos",
+    "caption_system": "Mostrando los mensajes de sistema del Collector recibidos desde hace {{duration}}",
+    "caption_system_checking": "Mostrando los mensajes de sistema del Collector recibidos desde hace {{duration}}; comprobando cada pocos segundos"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet para este Collector",
+    "change": "Cambiar Fleet",
+    "heading": "Elige un Fleet para este Collector",
+    "create_new": "Crear nuevo Fleet",
+    "or": "o",
+    "select_existing": "Seleccionar un Fleet existente",
+    "select_existing_placeholder": "Selecciona un Fleet existente..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Configurando Collectors...",
+    "confirm": "Confirmar endpoint",
+    "create_input": "Crear input",
+    "save": "Guardar endpoint",
+    "hostname": "Nombre de host externo",
+    "hostname_placeholder": "p. ej., otlp.example.com",
+    "port": "Puerto externo",
+    "cancel": "Cancelar",
+    "reachability_hint": "Los Collectors envían sus logs a esta dirección. Debe ser accesible desde todos los hosts de Collectors: un balanceador de carga o este servidor.",
+    "confirm_title": "Confirma cómo envían los Collectors los datos a este clúster",
+    "change": "Cambiar endpoint",
+    "sending_to": "Los Collectors envían datos a este clúster en <endpoint />",
+    "no_input_title": "No existe ningún input de ingesta",
+    "no_input": "Los Collectors pueden inscribirse, pero no podrán enviar datos hasta que se cree un input.",
+    "not_running_title": "El input de ingesta en <endpoint /> no está en ejecución",
+    "not_running": "Los Collectors pueden inscribirse, pero no podrán enviar datos hasta que haya un input en ejecución.",
+    "manage_input": "Gestionar input"
+  },
+  "install_command": {
+    "title": "Ejecuta esto en {{platform}}",
+    "copy": "Copiar comando",
+    "note_expires": "Descarga e instala el collector, lo inscribe en el Fleet seleccionado e inicia el servicio. Requiere privilegios de administrador. El token caduca en {{duration}}.",
+    "note_never_expires": "Descarga e instala el collector, lo inscribe en el Fleet seleccionado e inicia el servicio. Requiere privilegios de administrador. Este token no caduca nunca."
+  },
+  "log_preview": {
+    "unavailable": "Vista previa de logs no disponible: {{error}}",
+    "loading": "Cargando la vista previa de logs...",
+    "empty": "Todavía no hay mensajes; comprobando cada pocos segundos"
+  },
+  "next_steps": {
+    "explore": "Explora tus datos",
+    "explore_description": "Abre la búsqueda filtrada por este collector",
+    "configure_sources": "Configurar fuentes",
+    "configure_sources_description": "Añade o ajusta lo que recopila este Fleet",
+    "manage_fleets": "Gestionar Fleets",
+    "manage_fleets_description": "Mueve este collector a un Fleet permanente",
+    "install_another": "Instalar otro collector",
+    "install_another_description": "Repite esta configuración en otro host",
+    "offline_title": "Vuelve a ponerlo en línea",
+    "check_service": "Comprueba que el servicio del collector se está ejecutando en el host.",
+    "check_reachability": "Verifica que el host puede acceder a este servidor de {{productName}}.",
+    "check_logs": "Revisa los logs propios del collector en la vista previa siguiente por si hay errores de conexión.",
+    "title": "Próximos pasos"
+  },
+  "timeline": {
+    "connection_lost": "Conexión perdida",
+    "last_heartbeat": "Último heartbeat <lastSeen />",
+    "first_messages": "Primeros mensajes",
+    "listening": "Escuchando... normalmente menos de un minuto",
+    "enrolled": "Inscrito",
+    "enrolled_detail": "Registrado con un token de inscripción - <enrolledAt />",
+    "connected": "Conectado",
+    "connected_detail": "Heartbeat recibido - <lastSeen />",
+    "sources_configured": "Fuentes configuradas"
+  },
+  "platform_picker": {
+    "title": "Primeros pasos con Collectors",
+    "description": "Despliega collectors ligeros en tu infraestructura para reenviar logs a {{productName}}."
+  },
+  "source_status": {
+    "disabled": "Deshabilitada",
+    "not_applicable": "No aplicable en {{os}}",
+    "unrecognised": "Tipo de fuente no reconocido",
+    "paused": "En pausa: collector sin conexión",
+    "no_messages": "Todavía no hay mensajes",
+    "waiting": "Esperando los primeros mensajes...",
+    "title": "Fuentes de logs",
+    "no_sources": "Todavía no hay fuentes configuradas para este Fleet."
+  },
+  "waiting_for_connection": {
+    "status": "Esperando la conexión... {{seconds}} s"
+  },
+  "settings": {
+    "getting_started": "Primeros pasos con Collectors",
+    "getting_started_cloud": "Los Collectors se conectan a un endpoint de ingesta gestionado para enviar sus datos. Guarda la configuración de tus collectors para inicializar la infraestructura de collectors. Después de la configuración, podrás crear Fleets, añadir fuentes y desplegar collectors en tus hosts.",
+    "getting_started_self_managed": "Los Collectors necesitan endpoints de ingesta para recibir los datos recopilados. Configura el endpoint HTTP que aparece abajo y guarda para inicializar la infraestructura de collectors. Después de la configuración, podrás crear Fleets, añadir fuentes y desplegar collectors en tus hosts.",
+    "ingest_endpoint": "Endpoint de ingesta",
+    "ingest_endpoint_cloud": "El endpoint de ingesta lo gestiona el sistema. Los Collectors se conectan aquí automáticamente.",
+    "ingest_endpoint_help": "Los endpoints de ingesta reciben datos de log de los collectors mediante OpenTelemetry (OTLP). Es la dirección externa que se envía a los collectors gestionados como destino de sus datos. Debe apuntar a un input de ingesta de collectors en ejecución. Normalmente es la dirección de un balanceador de carga o del propio servidor.",
+    "hostname_help": "El nombre de host o la dirección IP que usarán los Collectors para conectarse. Debe ser accesible desde los hosts de Collectors.",
+    "create_input": "Crear input de ingesta",
+    "lifecycle": "Ciclo de vida de los Collectors",
+    "offline_threshold": "Umbral de desconexión",
+    "offline_threshold_help": "Los Collectors que no hayan enviado información en este tiempo se mostrarán como sin conexión.",
+    "default_visibility": "Visibilidad predeterminada",
+    "default_visibility_help": "Los Collectors que no hayan enviado información en este tiempo se ocultan de la vista predeterminada. Los usuarios pueden ajustar o quitar este filtro en la tabla de instancias.",
+    "expiration_threshold": "Umbral de caducidad",
+    "expiration_threshold_help": "Los Collectors que no hayan enviado información en este tiempo se eliminarán de forma permanente.",
+    "confirm": "Confirmar configuración"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
