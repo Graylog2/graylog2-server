@@ -227,7 +227,21 @@
     "load_failed_title": "Não foi possível carregar a notificação de evento"
   },
   "test": {
-    "success": "A notificação foi executada com sucesso."
+    "success": "A notificação foi executada com sucesso.",
+    "validation_failed": "A validação falhou. Corrija os erros do formulário antes de continuar.",
+    "unknown_error": "Erro desconhecido. Verifique os logs do servidor.",
+    "unknown_error_product": "Erro desconhecido. Verifique os logs do servidor do {{productName}}."
   },
-  "bulk": {}
+  "bulk": {
+    "delete_confirm_one": "Você realmente deseja remover {{count}} notificação de evento?",
+    "delete_confirm_other": "Você realmente deseja remover {{count}} notificações de evento?",
+    "delete_failed_one": "{{failed}} de {{count}} notificação de evento selecionada não pôde ser excluída. Status: {{status}}",
+    "delete_failed_other": "{{failed}} de {{count}} notificações de evento selecionadas não puderam ser excluídas. Status: {{status}}",
+    "delete_success_one": "{{count}} notificação de evento foi excluída com sucesso.",
+    "delete_success_other": "{{count}} notificações de evento foram excluídas com sucesso.",
+    "success_title": "Sucesso",
+    "delete_confirm_many": "Você realmente deseja remover {{count}} notificações de evento?",
+    "delete_failed_many": "{{failed}} de {{count}} notificações de evento selecionadas não puderam ser excluídas. Status: {{status}}",
+    "delete_success_many": "{{count}} notificações de evento foram excluídas com sucesso."
+  }
 }
