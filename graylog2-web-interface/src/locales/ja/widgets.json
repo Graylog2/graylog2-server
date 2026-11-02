@@ -24,7 +24,9 @@
     "aria_label": "並べ替えに使用するフィールドを選択"
   },
   "fields_configuration": {
-    "add_field": "フィールドを追加"
+    "add_field": "フィールドを追加",
+    "hide_selected_other": "選択した {{count}} 個のフィールドを非表示",
+    "show_selected_other": "選択した {{count}} 個のフィールドを表示"
   },
   "move_widget": {
     "no_pages": "ページが見つかりません",
@@ -137,16 +139,84 @@
     "select_direction": "方向を選択",
     "type": "種類",
     "add_column": "列を追加",
-    "configure_filter": "新しいフィルターを設定"
+    "configure_filter": "新しいフィルターを設定",
+    "edit_filter": "{{column}} フィルターを編集",
+    "delete_filter": "{{column}} フィルターを削除"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "単一の日付",
+    "range": "範囲",
+    "select_single_date": "単一の日付の種類を選択",
+    "select_range": "範囲の種類を選択",
+    "date_range": "{{from}} から {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "操作",
+    "loading": "読み込み中",
+    "decorated": "（デコレーター適用済み）",
+    "stopped_node": "停止中のノード",
+    "cluster_node": "クラスターノード {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "{{name}} を新規作成",
+      "select_decorator": "デコレーターを選択",
+      "none_configured": "設定されたデコレーターはありません。",
+      "actions": "操作",
+      "edit": "編集",
+      "edit_named": "{{name}} を編集",
+      "unknown_type": "不明なデコレーターの種類",
+      "create": "作成",
+      "update": "更新",
+      "help_title": "メッセージデコレーターとは何ですか？",
+      "help_description": "デコレーターは、検索結果に表示されるメッセージをその場で変更できます。この変更は保存されず、検索結果にのみ表示されます。デコレーターの設定は<strong>ストリームごと</strong>に保存されます。",
+      "help_order": "ドラッグアンドドロップで、デコレーターの処理順序を変更できます。",
+      "help_docs": "メッセージデコレーターの詳細は、<docsLink>ドキュメント</docsLink>を参照してください。"
+    },
+    "show_message_in_new_row": "メッセージを新しい行に表示"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "スペーサー",
+    "display_name": "データテーブル",
+    "pinned_columns_title": "固定列",
+    "show_row_numbers_title": "行番号を表示"
+  },
+  "field_types": {
+    "missing_event_definition": "イベント定義が見つかりません: {{id}}"
+  },
+  "export": {
+    "title_search": "すべての検索結果をエクスポート",
+    "title_dashboard": "メッセージテーブルの検索結果をエクスポート",
+    "select_different_table": "別のメッセージテーブルを選択",
+    "downloading": "ダウンロード中...",
+    "start_download": "ダウンロードを開始",
+    "settings_based_on": "次の設定はメッセージテーブル {{title}} に基づいています",
+    "exporting_table": "現在、メッセージテーブル {{title}} の検索結果をエクスポートしています",
+    "define_fields": "ファイルのフィールドを定義してください。",
+    "decorated_fields_hint": "エクスポートでは、メッセージテーブルに含まれるデコレーターで作成されたフィールドもサポートしていますが、現在はフィールドの一覧には表示されません。デコレーターで作成されたフィールドをエクスポートする場合は、その名前を入力してください。",
+    "finish_hint": "設定が完了したら、<quote>ダウンロードを開始</quote>をクリックしてください。",
+    "fields_to_export": "エクスポートするフィールド",
+    "messages_limit": "メッセージの上限",
+    "limit_help": "メッセージはチャンク単位で読み込まれます。上限を設定すると、上限に達したチャンクまでのすべてのチャンクが取得されます。そのため、出力されるメッセージの合計数が設定した上限を超える場合があります。",
+    "search_contains_all": "エクスポートには、現在の検索に一致するすべてのメッセージが含まれます。",
+    "search_select_table": "フィールドを反映させるメッセージテーブルを選択してください。次の手順で、すべての設定を調整できます。",
+    "dashboard_select_table": "検索結果をエクスポートするメッセージテーブルを選択してください。次の手順で、フィールドを調整できます。",
+    "dashboard_equals_action": "メッセージテーブルを選択することは、メッセージテーブルの操作メニューで「CSV にエクスポート」を選択することと同じです。",
+    "select_message_table": "メッセージテーブルを選択",
+    "no_message_table": "結果をエクスポートするには、メッセージテーブルのウィジェットを作成する必要があります。",
+    "output_format": "出力形式",
+    "untitled_view": "無題の{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "メッセージリスト",
+    "results": "結果",
+    "events": "イベント",
+    "text_markdown": "テキスト/Markdown"
+  },
+  "comma_separated_values_csv": "カンマ区切り値 (CSV)",
+  "error_widget": {
+    "title": "このウィジェットのデータ取得中に、次のエラーが発生しました:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "このデコレーターを本当に削除しますか？",
+    "unsaved_changes_confirm": "設定フォームに未保存の変更があります。この操作を行うと、変更は破棄されます"
+  }
 }
