@@ -19,6 +19,8 @@
   },
   "input_states": {
     "title": "Estados do Input para {{title}}",
+    "count_one": "{{count}} {{state}}",
+    "count_other": "{{count}} {{state}}",
     "CREATED": "Criado",
     "INITIALIZED": "Inicializado",
     "INVALID_CONFIGURATION": "Configuração inválida",
@@ -29,7 +31,8 @@
     "SETUP": "Configuração",
     "STOPPING": "Parando",
     "STOPPED": "Parado",
-    "TERMINATED": "Encerrado"
+    "TERMINATED": "Encerrado",
+    "count_many": "{{count}} {{state}}"
   },
   "state_control": {
     "set_up": "Configurar Input",
@@ -368,16 +371,80 @@
       "no_messages_per_stream": "Nenhum stream recebeu mensagens deste input nas últimas 24 horas.",
       "stream": "Stream",
       "messages": "Mensagens",
-      "network_io": "E/S de rede: "
+      "network_io": "E/S de rede: ",
+      "total_prefix": " (total: ",
+      "total_suffix": " )",
+      "empty_messages_discarded": "Mensagens vazias descartadas: {{value}}",
+      "no_node_metrics": "Nenhuma métrica disponível para este nó",
+      "no_input_metrics": "Nenhuma métrica disponível para este input",
+      "show_details": "Mostrar detalhes",
+      "hide_details": "Ocultar detalhes"
     },
-    "actions": {}
+    "actions": {
+      "received_messages": "Mensagens recebidas",
+      "input_diagnosis": "Diagnóstico do Input",
+      "exit_setup_mode": "Sair do modo de configuração",
+      "enter_setup_mode": "Entrar no modo de configuração",
+      "show_metrics": "Mostrar métricas",
+      "delete_input": "Excluir input",
+      "delete_title": "Excluindo Input",
+      "delete_confirm": "Você realmente deseja excluir o input {{title}}?"
+    }
   },
-  "dot_badge": {},
-  "use_input_notifications": {},
-  "use_input_details_notifications": {},
-  "use_input_metrics_notifications": {},
-  "use_input_state_summary_notifications": {},
-  "use_input_state_mutations_notifications": {},
-  "use_input_mutations_notifications": {},
-  "use_inputs_notifications": {}
+  "dot_badge": {
+    "problematic_inputs": "Alguns inputs estão em estado de falha ou em modo de configuração."
+  },
+  "use_input_notifications": {
+    "load_failed": "Falha ao carregar o input com o status",
+    "load_failed_title": "Não foi possível carregar o input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Falha ao carregar os detalhes do input com o status",
+    "load_failed_title": "Não foi possível carregar os detalhes do input"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Falha ao carregar as métricas do input com o status",
+    "load_failed_title": "Não foi possível carregar as métricas do input"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Falha ao carregar o resumo de estados do input com o status",
+    "load_failed_title": "Não foi possível carregar o resumo de estados do input."
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Erro ao iniciar o input '{{title}}': {{error}}",
+    "start_failed_title": "Não foi possível iniciar o input '{{title}}'",
+    "started_success": "O input foi iniciado com sucesso.",
+    "stop_failed": "Erro ao parar o input '{{title}}': {{error}}",
+    "stop_failed_title": "Não foi possível parar o input '{{title}}'",
+    "stopped_success": "O input foi parado com sucesso.",
+    "setup_failed": "Erro ao entrar no modo de configuração do input '{{title}}': {{error}}",
+    "setup_failed_title": "Não foi possível colocar o input '{{title}}' no modo de configuração",
+    "deleted_success": "O input foi excluído com sucesso.",
+    "success_title": "Sucesso!"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "Falha ao salvar o input com o status: {{error}}",
+    "save_failed_title": "Não foi possível salvar o input",
+    "update_failed": "Falha ao atualizar o input com o status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o input",
+    "delete_failed": "Falha ao excluir o input com o status: {{error}}",
+    "delete_failed_title": "Não foi possível excluir o input",
+    "created_success": "O input foi criado com sucesso.",
+    "updated_success": "O input foi atualizado com sucesso.",
+    "deleted_success": "O input foi excluído com sucesso.",
+    "success_title": "Sucesso!"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input '{{title}}' iniciado com sucesso",
+    "launch_failed": "Falha ao iniciar o input '{{title}}' com o status: {{error}}",
+    "launch_failed_title": "Não foi possível iniciar o input",
+    "updated_success": "Input '{{title}}' atualizado com sucesso",
+    "update_failed": "Falha ao atualizar o input '{{title}}' com o status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o input",
+    "deleted_success": "Input '{{title}}' excluído com sucesso",
+    "delete_failed": "Falha ao excluir o input '{{title}}' com o status: {{error}}",
+    "delete_failed_title": "Não foi possível excluir o input",
+    "fetch_failed": "Falha ao buscar os Inputs com o status: {{error}}",
+    "fetch_failed_title": "Não foi possível obter os Inputs"
+  }
 }
