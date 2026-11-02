@@ -54,6 +54,7 @@
     "not_connected": "此 Pipeline 目前未連接任何 Stream。若要讓它處理進入的訊息，必須至少連接一個 Stream。若僅打算透過 Decorator 轉換搜尋結果，則不需要連接。",
     "delete_stage_confirm": "即將刪除階段 {{stage}}，確定要繼續嗎？",
     "list_and": " 及 ",
+    "processing_streams_other": "此 Pipeline 正在處理來自 Stream {{streams}} 的訊息。",
     "managed_1": "此 Pipeline 由系統管理，僅能進行有限的編輯。",
     "managed_2": "只能透過 Input 精靈將 Pipeline 規則新增至此 Pipeline。",
     "managed_3": "此 Pipeline 中的 Pipeline 規則會隨對應 Input 名稱的變更自動重新命名。",
@@ -124,6 +125,7 @@
     }
   },
   "stage": {
+    "contains_rules_other": "包含 {{count}} 項規則",
     "last_stage": "此 Pipeline 沒有後續階段。此階段的規則套用後，Pipeline 即完成處理。",
     "continue_all": "符合此階段<matchText>全部規則</matchText>的訊息，將繼續進入下一階段。",
     "continue_either": "符合此階段<matchText>至少一項規則</matchText>的訊息，將繼續進入下一階段。",
@@ -294,7 +296,8 @@
     "dropped": "原始訊息在處理期間將被捨棄。",
     "not_modified": "原始訊息在處理期間不會被修改。",
     "original_changes": "原始訊息 <idSmall><idEm>{{id}}</idEm></idSmall> 中的變更",
-    "other_changes": "其他變更"
+    "other_changes": "其他變更",
+    "other_changes_description_other": "將會建立 {{count}} 則訊息。切換至<previewOption>結果預覽</previewOption>檢視選項即可查看。"
   },
   "simulation_preview": {
     "dropped_title": "訊息將被捨棄",
@@ -373,11 +376,34 @@
     "connections_updated": "已成功更新 Pipeline 連線",
     "connections_update_failed": "更新 Pipeline 連線失敗，狀態碼：{{error}}",
     "connections_update_failed_title": "無法更新 Pipeline 連線",
-    "create_failed": "建立 Pipeline 失敗，狀態碼：{{error}}"
+    "create_failed": "建立 Pipeline 失敗，狀態碼：{{error}}",
+    "create_failed_title": "無法建立 Pipeline",
+    "create_success": "Pipeline 已成功建立。",
+    "update_failed": "更新 Pipeline 失敗，狀態碼：{{error}}",
+    "update_failed_title": "無法更新 Pipeline",
+    "update_success": "Pipeline 已成功更新。",
+    "delete_failed": "刪除 Pipeline 失敗，狀態碼：{{error}}",
+    "delete_failed_title": "無法刪除 Pipeline",
+    "delete_success": "Pipeline 已成功刪除。",
+    "success_title": "成功！"
   },
-  "connections_list": {},
+  "connections_list": {
+    "not_connected": "Pipeline 未連接任何 Stream"
+  },
   "rule_list": {
-    "headers": {}
+    "headers": {
+      "title": "標題",
+      "description": "描述",
+      "created": "建立時間",
+      "last_modified": "最後修改",
+      "throughput": "處理量",
+      "errors": "錯誤",
+      "pipeline_load": "Pipeline 負載（15 分鐘）",
+      "pipelines": "Pipelines",
+      "actions": "動作"
+    }
   },
-  "load_cell": {}
+  "load_cell": {
+    "error_tooltip": "無法取得 Pipeline 負載：無法載入處理負載指標。"
+  }
 }
