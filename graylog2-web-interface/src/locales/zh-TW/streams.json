@@ -1,1 +1,172 @@
-{}
+{
+  "destination_permission_alert": {
+    "data_lake": "您目前沒有檢視或管理 Data Lake 目的地的權限。",
+    "index_set": "您目前沒有檢視或管理 Index Set 目的地的權限。",
+    "outputs": "您目前沒有檢視或管理 Outputs 目的地的權限。"
+  },
+  "index_set_select": {
+    "help": "符合此串流的訊息將寫入已設定的 Index Set。",
+    "label": "Index Set",
+    "placeholder": "選擇 Index Set"
+  },
+  "matching_type": {
+    "all": "訊息必須符合以下所有規則",
+    "any": "訊息必須至少符合以下一項規則",
+    "confirm": "您即將變更此串流套用規則的方式，是否繼續？變更將立即生效。",
+    "success_all": "當符合所有規則時，訊息將路由至此串流",
+    "success_any": "當符合任一規則時，訊息將路由至此串流",
+    "success_title": "成功",
+    "switch_title_all": "將比對類型切換為全部",
+    "switch_title_any": "將比對類型切換為任一"
+  },
+  "output_filter": {
+    "create_button": "建立規則",
+    "create_title": "建立篩選規則",
+    "delete_confirm": "確定要刪除 {{title}} 規則嗎？",
+    "delete_title": "刪除規則",
+    "delete_tooltip": "刪除",
+    "edit_title": "編輯篩選規則",
+    "edit_tooltip": "編輯",
+    "fields": {
+      "and": "且",
+      "block_action": "動作",
+      "block_condition": "條件",
+      "delete_confirm": "確定要刪除 <blockLabel>{{blockType}} 編號 {{number}}</blockLabel>嗎？",
+      "delete_title": "刪除 {{blockType}}",
+      "or": "或",
+      "then": "接著",
+      "when": "當"
+    },
+    "form": {
+      "condition_required": "規則至少需要包含一個條件。",
+      "create": "建立",
+      "description": "描述",
+      "description_help": "規則描述",
+      "enabled": "已啟用",
+      "rule_builder": "規則建構器",
+      "saving": "正在儲存篩選器",
+      "title": "標題",
+      "title_help": "規則標題",
+      "title_required": "「標題」欄位為必填。",
+      "update": "更新",
+      "updating": "正在更新篩選器"
+    },
+    "item": {
+      "enabled": "已啟用",
+      "errors": "錯誤",
+      "throughput": "吞吐量"
+    },
+    "list": {
+      "header_status": "狀態",
+      "header_title": "標題",
+      "info_data_lake": "符合以下篩選規則條件的訊息將不會路由至 Data Lake。",
+      "info_indexer": "符合以下篩選規則條件的訊息將不會路由至 Index Set。",
+      "no_filters": "找不到任何篩選器。",
+      "title": "篩選規則"
+    }
+  },
+  "outputs": {
+    "assign_existing": "指派現有 Output",
+    "content_pack_title": "由內容包建立",
+    "create_submit": "建立 Output",
+    "create_title": "建立新 Output",
+    "delete_from_stream": "從串流刪除",
+    "delete_globally": "全域刪除",
+    "edit": "編輯",
+    "edit_title": "編輯 Output {{title}}",
+    "id_label": "ID：{{id}}",
+    "launch_new": "啟動新 Output",
+    "name_help": "為新的 Output 選擇一個能描述其用途的名稱。",
+    "none_available": "沒有可用的 Output",
+    "none_configured": "尚未設定任何 Output。",
+    "plugin_error": "此 Output 所需的外掛程式未載入，無法編輯。請載入外掛程式或刪除此 Output。",
+    "select_existing": "選擇現有 Output",
+    "select_type": "選擇 Output 類型",
+    "type_label": "類型：{{type}}",
+    "update_submit": "更新 Output"
+  },
+  "pipelines_connection_form": {
+    "edit_button": "編輯 Pipelines 連線",
+    "help": "選擇要連接至此串流的 Pipelines，或前往 <pipelinesLink>Pipelines 頁面</pipelinesLink>建立新的 Pipeline。",
+    "label": "Pipelines",
+    "modal_title": "編輯 <streamLabel>串流</streamLabel> 的連線",
+    "save_failed": "儲存串流 Pipelines 連線失敗，狀態：{{error}}",
+    "save_success": "儲存串流 Pipelines 連線成功。",
+    "save_title": "正在儲存串流 Pipeline 連線。",
+    "submit": "更新連線"
+  },
+  "routing_destination": {
+    "add_output": {
+      "assign_segment": "指派現有 Output",
+      "button": "新增 Output",
+      "create_segment": "建立新 Output",
+      "modal_title": "將 Output 新增至串流",
+      "tooltip": "編輯 Output"
+    },
+    "archiving": {
+      "disabled": "封存已停用",
+      "enabled": "封存已啟用"
+    },
+    "edit_output": {
+      "tooltip": "編輯 Output"
+    },
+    "index_set": {
+      "col_archiving": "封存",
+      "col_name": "名稱",
+      "col_oldest": "最舊訊息（日期）",
+      "col_size": "總大小",
+      "disabled": "已停用",
+      "enabled": "已啟用",
+      "filters": "篩選器 {{count}}",
+      "info": "路由至 <boldText>搜尋叢集</boldText> 的訊息可供搜尋，並計入 {{productName}} 授權用量。這些訊息會保存在指定的 Index Set 中，直到符合保留政策條件為止。注意：未路由至 <boldText>搜尋叢集</boldText> 的訊息將無法搜尋。",
+      "title": "Index Set",
+      "toggle_aria": "切換 Index Set"
+    },
+    "index_set_update": {
+      "button": "編輯 Index Set",
+      "modal_title": "編輯串流 Index Set",
+      "saving": "正在儲存串流",
+      "submit": "更新",
+      "success_title": "成功",
+      "tooltip": "編輯 Index Set"
+    },
+    "output_item": {},
+    "outputs": {},
+    "outputs_list": {},
+    "remove_output": {}
+  },
+  "stream_details": {},
+  "stream_edit_page": {},
+  "stream_hooks": {},
+  "stream_modal": {},
+  "stream_outputs": {},
+  "stream_permission_error_page": {},
+  "stream_rules": {
+    "editor": {},
+    "human": {},
+    "modal": {},
+    "start_dialog": {}
+  },
+  "streams_overview": {
+    "actions": {},
+    "bulk": {},
+    "cells": {},
+    "columns": {},
+    "expanded": {},
+    "expanded_titles": {},
+    "metric_columns": {}
+  },
+  "streams_page": {},
+  "system_outputs": {},
+  "user_no_stream_access": {},
+  "notifications": {},
+  "use_output_mutations_notifications": {},
+  "use_outputs_notifications": {},
+  "use_stream_notifications": {},
+  "use_stream_metrics_notifications": {},
+  "use_stream_outputs_notifications": {},
+  "use_stream_mutations_notifications": {},
+  "use_stream_output_mutations_notifications": {},
+  "use_stream_rule_mutations_notifications": {},
+  "use_stream_rules_inputs_notifications": {}
+}
