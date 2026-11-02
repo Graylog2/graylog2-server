@@ -1,1 +1,554 @@
-{}
+{
+  "button": {
+    "perform_search": "执行搜索",
+    "perform_search_dirty": "执行搜索（上次搜索后有更改）"
+  },
+  "sidebar": {
+    "description": "描述",
+    "create": "创建",
+    "highlighting": "高亮",
+    "fields": "字段"
+  },
+  "empty_state": {
+    "no_widgets_search": "没有可用于可视化搜索结果的 Widget",
+    "no_widgets_dashboard": "此 Dashboard 还没有 Widget",
+    "create_widget_hint": "在左侧边栏的“创建”部分选择 Widget 类型，即可创建新的 Widget。",
+    "tips_title": "创建搜索和 Dashboard 的一些提示",
+    "tip_1": "从想要回答的<bold>问题</bold>开始，明确需要解决的问题。",
+    "tip_2": "<bold>限定</bold>数据范围，只保留想要查看的数据点。",
+    "tip_3": "<bold>可视化</bold>数据，看看它能否回答问题。",
+    "tip_4": "与同事<bold>共享</bold> Dashboard，并通过设置参数使其便于<bold>复用</bold>。"
+  },
+  "search_bar": {
+    "streams_placeholder": "选择搜索应包含的 Stream。若为空，则搜索所有 Stream。",
+    "refresh_human_name": "搜索",
+    "query_history_title": "打开查询历史",
+    "filters_label": "过滤器",
+    "filters_tooltip_title": "搜索过滤器",
+    "filters_enterprise_hint": "搜索过滤器和参数可在 Enterprise 版本中使用。",
+    "filters_hide_controls": "隐藏控件",
+    "scroll_hint": "滚动到搜索栏",
+    "query_placeholder": "在此输入搜索查询并按回车键。例如：(\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "已保存的搜索",
+    "save_search": "保存搜索",
+    "unsaved_changes": "未保存的更改",
+    "load_title": "加载之前保存的搜索",
+    "load": "加载",
+    "share_disabled": "只有已保存的搜索可以共享。",
+    "dropdown_aria_label": "打开搜索操作下拉菜单",
+    "edit_metadata": "编辑元数据",
+    "export_to_dashboard": "导出到 Dashboard",
+    "export": "导出",
+    "reset_search": "重置搜索",
+    "editing_modal_title": "编辑已保存的搜索",
+    "update_search": "更新搜索",
+    "share_description": "搜索用户或团队，将其添加为此已保存搜索的协作者。",
+    "save_success": "视图“{{title}}”保存成功！",
+    "save_error": "保存视图失败：{{error}}",
+    "delete_success": "已保存的搜索“{{title}}”删除成功！",
+    "delete_error": "删除已保存的搜索失败：{{error}}"
+  },
+  "save_form": {
+    "popover_title": "搜索名称",
+    "dirty_warning": "搜索参数（时间范围、Stream 或查询）有未确认的更改。现在保存将丢弃这些更改。如非本意，请先执行搜索以应用更改，再进行保存。",
+    "title_label": "标题",
+    "title_placeholder": "输入标题",
+    "share_description": "搜索用户或团队，将其添加为此搜索的协作者。",
+    "create_new": "新建",
+    "save_as": "另存为",
+    "create_new_title": "创建新搜索",
+    "save_as_title": "另存为新搜索",
+    "save": "保存",
+    "save_title": "保存搜索",
+    "cancel": "取消"
+  },
+  "results": {
+    "loading": "正在更新搜索结果..."
+  },
+  "sidebar_description": {
+    "execution": "执行",
+    "ad_hoc_info": "保存搜索或将其导出到 Dashboard，即可添加自定义摘要和描述。",
+    "edit_metadata_hint": "要为此{{viewType}}添加描述和摘要，请点击搜索栏中的 <icon/> 图标打开操作菜单，其中包含“编辑元数据”选项。",
+    "search_section": "搜索",
+    "no_summary": "此{{viewType}}没有摘要。",
+    "no_description": "此{{viewType}}没有描述。",
+    "no_query": "尚未执行任何查询。",
+    "query_executed_in": "查询执行耗时",
+    "effective_time_range": "实际时间范围",
+    "varies_per_widget": "因 Widget 而异",
+    "time_from": "开始",
+    "time_to": "结束",
+    "total_results": "结果总数"
+  },
+  "sidebar_create": {
+    "info": "使用以下选项为搜索添加聚合、日志视图（Enterprise 功能）或参数（Enterprise 功能）。",
+    "generic": "通用",
+    "predefined_aggregation": "预定义聚合",
+    "investigations": "Investigations",
+    "events": "事件"
+  },
+  "sidebar_highlighting": {
+    "description": "可以高亮显示搜索词和字段值。搜索查询结果的高亮可在服务器配置的 {{productName}} 中启用或禁用。点击任意字段值并选择“高亮此值”即可高亮该值。\n如果某个词或值有多条规则，则使用第一条匹配的规则。",
+    "active_highlights": "已启用的高亮",
+    "add_rule_title": "添加高亮规则",
+    "search_terms": "搜索词"
+  },
+  "save_view": {
+    "save": "保存",
+    "save_as": "另存为",
+    "save_as_new_dashboard_title": "另存为新 Dashboard",
+    "save_dashboard_title": "保存 Dashboard"
+  },
+  "undo_redo": {
+    "undo": "撤销",
+    "redo": "重做"
+  },
+  "time_range": {
+    "tab_relative": "相对",
+    "tab_absolute": "绝对",
+    "tab_keyword": "关键词",
+    "from_label": "开始：",
+    "until_label": "结束：",
+    "keyword_label": "关键词：",
+    "no_override": "不覆盖",
+    "now": "现在",
+    "all_time": "全部时间",
+    "ago": "前",
+    "range_ago": "{{time}} 前",
+    "range_length_placeholder": "选择时间长度",
+    "load_preset": "加载预设",
+    "no_available_presets": "没有可用的预设",
+    "loading": "加载中...",
+    "configure_presets": "配置预设",
+    "insert_current_date": "插入当前日期",
+    "from_hours_label": "从小时标签",
+    "from_minutes_label": "从分钟标签",
+    "from_seconds_label": "从秒标签",
+    "to_hours_label": "到小时标签",
+    "to_minutes_label": "到分钟标签",
+    "to_seconds_label": "到秒标签",
+    "from_hour": "开始小时",
+    "from_minutes": "开始分钟",
+    "from_seconds": "开始秒",
+    "to_hour": "结束小时",
+    "to_minutes": "结束分钟",
+    "to_seconds": "结束秒",
+    "toggle_day_boundary": "在一天的开始和结束之间切换",
+    "set_current_time": "设为当前本地时间",
+    "set_range_value": "设置范围值",
+    "set_from_value": "设置开始值",
+    "set_to_value": "设置结束值",
+    "save_as_preset": "另存为预设",
+    "save_current_as_preset": "将当前时间范围另存为预设",
+    "preset_description_placeholder": "添加描述...",
+    "preset_description_label": "时间范围描述",
+    "preset_description_required": "描述为必填项",
+    "preset_similar": "<configurationsLink>范围配置</configurationsLink>中已存在类似的时间范围",
+    "save_preset": "保存预设",
+    "calendar": "日历",
+    "timestamp": "时间戳",
+    "date_format": "日期格式应为 <code>{{format}}</code>。",
+    "from_timestamp": "开始时间戳",
+    "to_timestamp": "结束时间戳",
+    "no_override_title": "未选择日期/时间覆盖。",
+    "no_override_hint": "使用上方的选项卡选择要搜索的日期和时间范围。",
+    "keyword_from": "从",
+    "keyword_to": "到",
+    "keyword_headline": "时间范围：",
+    "keyword_input": "关键词输入",
+    "keyword_help": "用自然语言指定搜索的时间范围。",
+    "keyword_preview": "预览",
+    "keyword_example_last_month": "<code>{{keyword}}</code> 搜索从一个月前到现在的内容",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> 搜索从四小时前到现在的内容",
+    "keyword_example_range": "<code>{{keyword}}</code> 搜索从 4 月 1 日到 2 天前的内容",
+    "keyword_example_timezone": "<code>{{keyword}}</code> 在时区 +0200 中搜索从昨天午夜到今天午夜的内容，即 UTC 时间 22:00",
+    "keyword_docs": "更多详情请参阅<docsLink>文档</docsLink>。",
+    "keyword_docs_title": "关键词时间范围文档",
+    "display_label": "搜索时间范围，点击即可打开时间范围选择器",
+    "picker_title": "搜索时间范围",
+    "admin_limit": "管理员已将搜索限制为 {{duration}}",
+    "update": "更新时间范围",
+    "open_selector": "打开时间范围选择器",
+    "timezones_using": "使用 <bold>{{timezone}}</bold> 的所有时区",
+    "unit_seconds": "秒",
+    "unit_minutes": "分钟",
+    "unit_hours": "小时",
+    "unit_days": "天"
+  },
+  "execution_info": {
+    "query_executed": "查询执行耗时 {{duration}} 毫秒，执行时间：",
+    "total_results": "结果总数：{{total}}",
+    "no_query": "尚未执行任何查询。"
+  },
+  "highlight_form": {
+    "edit_title": "编辑高亮规则",
+    "create_title": "创建高亮规则",
+    "field_label": "字段",
+    "field_placeholder": "选择或输入字段名称",
+    "field_required": "字段为必填项",
+    "condition_label": "条件",
+    "condition_placeholder": "选择条件",
+    "condition_required": "条件为必填项",
+    "value_label": "值",
+    "value_required": "值为必填项",
+    "update_rule": "更新规则",
+    "create_rule": "创建规则"
+  },
+  "query_tabs": {
+    "create_page": "创建新页面",
+    "more_pages": "更多 Dashboard 页面",
+    "open_configuration": "打开页面配置",
+    "copy_page": "复制页面",
+    "copying_page": "正在复制页面...",
+    "copy_page_failed": "复制 Dashboard 页面失败：{{error}}",
+    "remove_page": "删除页面 {{title}}",
+    "configuration_title": "更新 Dashboard 页面配置",
+    "update_configuration": "更新配置",
+    "order": "顺序",
+    "order_help": "拖放即可更改 Dashboard 页面的顺序。双击 Dashboard 标题即可修改标题。"
+  },
+  "widget_creation": {
+    "title": "创建新 Widget",
+    "create_widget": "创建 {{title}} Widget",
+    "placeholder": "在此创建新 Widget",
+    "scroll_to_new_widget": "滚动到新 Widget"
+  },
+  "dashboard_actions": {
+    "immutable": "此 Dashboard 由 {{productName}} 管理，为只读。使用“另存为”可创建可编辑的副本。",
+    "debug": "调试",
+    "share_unsaved": "只有已保存的 Dashboard 可以共享。",
+    "edit_metadata": "编辑元数据",
+    "export": "导出",
+    "save_new_title": "保存新 Dashboard",
+    "create": "创建 Dashboard",
+    "edit_title": "编辑 Dashboard",
+    "update": "更新 Dashboard",
+    "share_description": "搜索用户或团队，将其添加为此 Dashboard 的协作者。"
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "将过滤器应用于所有 Widget"
+  },
+  "debug": {
+    "title": "调试信息"
+  },
+  "common_views": {
+    "empty_value": "<空值>",
+    "add_to_query": "添加到查询",
+    "time_range_validation": {
+      "invalid_date_format": "格式必须为：{{format}}。",
+      "range_limit": "时间范围超出限制时长。",
+      "date_limit": "日期超出限制时长。",
+      "until_before_from": "“结束”日期必须晚于“开始”日期。",
+      "empty": "不能为空。",
+      "keyword_empty": "关键词不能为空！",
+      "keyword_unparsable": "无法解析关键词"
+    },
+    "remove_from_favorites": "从收藏中移除",
+    "add_to_favorites": "添加到收藏",
+    "view_type": {
+      "search": "搜索",
+      "dashboard": "Dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "迁移现有搜索页面的图表",
+    "found_charts_other": "发现 {{count}} 个为旧版搜索创建的图表。是否要为当前搜索迁移这些图表？",
+    "save_hint": "运行迁移并希望保留新创建的图表时，需要将当前搜索另存为新的 Dashboard。否则离开搜索页面时图表将丢失。",
+    "migrate": "迁移",
+    "discard": "丢弃图表"
+  },
+  "query": {
+    "contained_in_enterprise": "（包含于 <enterpriseLink>Graylog Enterprise</enterpriseLink>）",
+    "documentation_hint": "也可以查阅<docsLink>文档</docsLink>，了解有关创建 Widget 的更多信息。"
+  },
+  "widget_query": {
+    "reset_global_filter": "重置全局过滤器"
+  },
+  "editable_title": {
+    "edit": "编辑标题",
+    "hint": "{{value}} - 双击标题即可编辑。"
+  },
+  "message_permalink": {
+    "label": "永久链接"
+  },
+  "query_title": {
+    "page_actions": "页面操作",
+    "edit_title": "编辑标题",
+    "duplicate": "复制",
+    "copy_to_dashboard": "复制到 Dashboard",
+    "edit_modal_title": "编辑 Dashboard 页面标题",
+    "update_title": "更新标题",
+    "title_help": "输入便于理解的 Dashboard 页面标题，最多 40 个字符。",
+    "title": "标题"
+  },
+  "missing_requirements": {
+    "description_search": "很遗憾，无法执行此搜索。它使用了以下不可用的功能：",
+    "description_dashboard": "很遗憾，无法执行此 Dashboard。它使用了以下不可用的功能：",
+    "included_in": "<requirementName>{{requirement}}</requirementName> — 包含于 <pluginLink>{{plugin}}</pluginLink>",
+    "back": "返回"
+  },
+  "view_header": {
+    "alerts_and_events": "告警和事件",
+    "event_definitions": "事件定义",
+    "edit_search_metadata": "编辑搜索 {{title}} 的元数据",
+    "edit_dashboard_metadata": "编辑 Dashboard {{title}} 的元数据",
+    "editing_search": "编辑已保存的搜索",
+    "editing_dashboard": "编辑已保存的 Dashboard",
+    "save_search": "保存搜索",
+    "save_dashboard": "保存 Dashboard"
+  },
+  "execution": {
+    "not_executed": "尚未执行任何查询。"
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard 文档",
+    "description": "使用 Dashboard 可以为消息创建特定视图。在此创建新的 Dashboard，并可一键添加在应用其他部分创建的任何图形或图表。"
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>搜索过滤器</italic>包含各自的查询，并通过 <bold>AND</bold> 运算符扩展主查询。",
+    "explanation_saved": "过滤器可单独保存，并在已保存的搜索和 Dashboard 中复用。更新已保存的过滤器将自动影响包含该过滤器的搜索结果。"
+  },
+  "widget_time_range": {
+    "reset_global_override": "重置全局覆盖"
+  },
+  "time_range_presets": {
+    "select_time_range": "选择时间范围",
+    "open_preset_select": "打开时间范围预设选择"
+  },
+  "move_range": {
+    "show_previous": "显示上一个",
+    "show_previous_duration": "显示上一个 {{duration}}",
+    "show_next": "显示下一个",
+    "show_next_duration": "显示下一个 {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "切换警告显示",
+    "toggle_information": "切换信息显示",
+    "toggle_error": "切换错误说明显示",
+    "syntax_documentation": "搜索查询语法文档",
+    "error_documentation": "查询错误文档",
+    "status_warning": "警告",
+    "status_info": "信息",
+    "status_error": "错误",
+    "validation_failed": "验证搜索查询失败，状态：{{error}}",
+    "warm_tier_title": "Warm Tier 搜索",
+    "warm_tier_message": "所选时间范围包含存储在 Warm Tier 中的数据，检索可能较慢。早于以下时间戳的数据位于该 Stream 的 Warm Tier 中："
+  },
+  "saved_searches": {
+    "title": "已保存的搜索",
+    "confirm_bulk_delete_other": "确定要移除 {{count}} 个已保存的搜索吗？",
+    "bulk_delete_partial_other": "所选的 {{count}} 个已保存的搜索中，有 {{failed}} 个无法删除。",
+    "bulk_delete_success_other": "已成功删除 {{count}} 个已保存的搜索。",
+    "success": "成功",
+    "bulk_delete_error": "删除已保存的搜索时出错。{{error}}",
+    "confirm_delete": "即将删除已保存的搜索“{{title}}”，确定吗？",
+    "delete_search": "删除搜索 {{title}}",
+    "delete": "删除"
+  },
+  "search_meta": {
+    "buttons": "搜索元数据按钮"
+  },
+  "save_view_notifications": {
+    "success_title": "成功！",
+    "error_title": "错误！",
+    "plugin_initial_values_failed": "从插件收集搜索栏初始表单值时出错",
+    "plugin_validation_preparation_failed": "为插件准备搜索栏验证时出错",
+    "plugin_validation_failed": "验证插件的搜索栏值时出错",
+    "plugin_submit_failed": "执行插件提交处理程序时出错：{{error}}",
+    "load_saved_searches_failed": "加载已保存的搜索失败，状态码",
+    "could_not_load_saved_searches": "无法加载已保存的搜索",
+    "load_minimum_refresh_interval_failed": "加载系统配置“minimum_auto_refresh_interval”失败，状态码",
+    "could_not_load_configuration": "无法加载配置项"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "以浮层形式显示侧边栏",
+    "display_inline": "内嵌显示侧边栏"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}} 毫秒，执行时间 <timestamp/>",
+    "effective_from": "实际时间范围开始",
+    "effective_to": "实际时间范围结束"
+  },
+  "fields_overview": {
+    "filter_placeholder": "过滤字段",
+    "reset": "重置",
+    "list_fields": "列出<current>当前查询</current>的字段、<all>所有</all>字段，或<allReserved>包括保留字段在内的所有</allReserved>字段。",
+    "current_title": "此处显示当前查询中出现的字段。",
+    "all_title": "此处显示所有字段，但不包括保留字段（gl2_*）。",
+    "all_reserved_title": "此处显示所有字段，包括保留字段（gl2_*）。",
+    "no_field_information": "没有可用的字段信息。",
+    "no_fields": "没有可显示的字段。请尝试更改过滤词，或在上方选择其他字段集。"
+  },
+  "highlighting_color": {
+    "color": "颜色",
+    "gradient_name": "渐变名称",
+    "gradient_placeholder": "选择渐变颜色",
+    "lowest_placeholder": "指定最低值",
+    "lowest_label": "最低值",
+    "lowest_help": "字段/系列中预期的最低值。",
+    "highest_aria": "指定最高值",
+    "highest_label": "最高值",
+    "highest_help": "字段/系列中预期的最高值。",
+    "coloring": "着色",
+    "static_color": "纯色",
+    "gradient": "渐变",
+    "must_be_selected": "必须选择。",
+    "must_be_present": "必须填写。",
+    "must_be_number": "必须为数字。",
+    "must_be_higher": "必须高于最低值。",
+    "coloring_required": "着色为必填项",
+    "gradient_numeric_only": "渐变只能为数值字段定义。"
+  },
+  "highlighting_rule": {
+    "edit": "编辑此高亮规则",
+    "remove": "移除此高亮规则",
+    "confirm_remove": "确定要移除此高亮吗？"
+  },
+  "change_field_type": {
+    "no_permission_title": "没有权限",
+    "no_permission_description": "没有执行此操作的权限",
+    "enterprise_plugin_required": "（需要 <enterpriseLink>Enterprise 插件</enterpriseLink>）",
+    "modal_title": "更改 {{fieldName}} 字段类型",
+    "impact_warning": "更改字段 <bold>{{fieldName}}</bold> 的类型可能会对后续日志消息的采集产生重大影响。如果为字段声明的类型与所采集的日志不兼容，可能导致采集错误。",
+    "failure_processing_hint": "建议启用<docsLink>失败处理</docsLink>，并在之后密切关注 <failureStream/> Stream。",
+    "select_field_type_for": "为 {{fieldName}} 选择字段类型",
+    "select_field_type_for_field": "为字段选择字段类型",
+    "select_field_type": "选择字段类型",
+    "select_index_sets": "选择目标索引集",
+    "index_sets_hint_with_type": "默认情况下，将在当前消息/搜索的所有索引集中为字段 <bold>{{fieldName}}</bold> 设置字段类型 <bold>{{type}}</bold>。可以选择要应用此更改的索引集。",
+    "index_sets_hint": "默认情况下，将在当前消息/搜索的所有索引集中为字段 <bold>{{fieldName}}</bold> 设置所选字段类型。可以选择要应用此更改的索引集。",
+    "select_rotation_strategy": "选择轮换策略",
+    "rotation_hint_type_field": "要在字段 <bold>{{fieldName}}</bold> 中查看并使用字段类型 <bold>{{type}}</bold>，需要轮换索引。提交此表单后可自动轮换受影响的索引，也可稍后手动操作。",
+    "rotation_hint_type": "要查看并使用字段类型 <bold>{{type}}</bold>，需要轮换索引。提交此表单后可自动轮换受影响的索引，也可稍后手动操作。",
+    "rotation_hint_field": "要在字段 <bold>{{fieldName}}</bold> 中查看并使用所选字段类型，需要轮换索引。提交此表单后可自动轮换受影响的索引，也可稍后手动操作。",
+    "rotation_hint": "要查看并使用所选字段类型，需要轮换索引。提交此表单后可自动轮换受影响的索引，也可稍后手动操作。",
+    "rotate_indices": "更改后轮换受影响的索引",
+    "changing": "正在更改字段类型...",
+    "change": "更改字段类型",
+    "select_field": "选择字段",
+    "select_field_placeholder": "选择或输入字段",
+    "type_not_defined": "未定义类型",
+    "previous_values": "（之前的值：{{values}}）",
+    "load_index_field_types_failed": "加载索引字段类型失败，状态码",
+    "could_not_load_index_field_types": "无法加载索引字段类型",
+    "load_field_type_options_failed": "加载字段类型选项失败，状态码",
+    "could_not_load_field_type_options": "无法加载字段类型选项",
+    "load_field_types_failed": "加载 {{field}} 类型失败，状态码",
+    "could_not_load_field_types": "无法加载字段类型",
+    "load_index_sets_failed": "加载支持字段类型更改的索引集失败，状态码",
+    "could_not_load_index_sets": "无法加载支持字段类型更改的索引集",
+    "change_failed": "更改字段类型失败，状态：{{error}}",
+    "change_failed_title": "无法更改字段类型",
+    "change_success": "字段类型已成功更改",
+    "success_title": "成功！"
+  },
+  "value_actions": {
+    "select_extractor_type": "选择 Extractor 类型",
+    "exclude": "从结果中排除",
+    "add_to_query": "添加到查询",
+    "show_documents": "显示该值的文档",
+    "create_extractor": "创建 Extractor",
+    "highlight_value": "高亮此值",
+    "create_event_definition": "创建事件定义",
+    "copy_value": "复制值到剪贴板"
+  },
+  "create_event_definition": {
+    "title": "配置新的事件定义",
+    "hide_details": "隐藏策略详情",
+    "show_details": "显示策略详情",
+    "continue": "继续配置",
+    "strategy_by": "策略：",
+    "description": "描述：",
+    "sections": {
+      "aggregation": "聚合设置",
+      "search": "搜索查询"
+    },
+    "items": {
+      "rowValuePath": "从表格行查询",
+      "columnValuePath": "从表格列查询",
+      "columnGroupBy": "按列值分组",
+      "rowGroupBy": "按行值分组",
+      "aggCondition": "条件",
+      "queryWithReplacedParams": "从搜索查询",
+      "searchFilterQuery": "从搜索过滤器查询",
+      "streams": "Stream",
+      "searchWithinMs": "搜索窗口（毫秒）",
+      "lutParameters": "Lookup Table 参数",
+      "searchFromValue": "从值查询"
+    },
+    "item_label": "{{label}}： ",
+    "strategies": {
+      "EXACT": {
+        "label": "仅此值",
+        "description": "该策略包括与当前搜索视图相关的所有搜索查询、过滤器等"
+      },
+      "ROW": {
+        "label": "行中任意值",
+        "description": "该策略包括行透视"
+      },
+      "COL": {
+        "label": "列中任意值",
+        "description": "该策略包括列透视"
+      },
+      "ALL": {
+        "label": "Widget 中任意值",
+        "description": "该策略包括与所选值相关的所有行和列透视值"
+      },
+      "CUSTOM": {
+        "label": "自定义",
+        "description": "可以选择任意搜索部分"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "出现错误",
+    "unknown_error": "发生未知错误。请查看以下消息及 {{productName}} 服务器日志以获取更多信息。"
+  },
+  "views_notifications": {
+    "delete_view_failed": "删除视图 {{title}} 失败，状态：{{error}}",
+    "delete_view_failed_title": "无法删除视图",
+    "apply_widget_changes_failed": "应用 Widget 更改失败，状态：{{error}}",
+    "load_message_failed": "加载消息信息失败，状态码",
+    "could_not_load_message": "无法加载消息信息"
+  },
+  "field_actions": {
+    "chart": "图表",
+    "show_top_values": "显示热门值",
+    "statistics": "统计",
+    "add_to_table": "添加到表格",
+    "remove_from_table": "从表格中移除",
+    "add_to_all_tables": "添加到所有表格",
+    "remove_from_all_tables": "从所有表格中移除",
+    "change_field_type": "更改字段类型",
+    "copy_field_name": "复制字段名称到剪贴板",
+    "add_to_favorites": "将字段添加到收藏",
+    "remove_from_favorites": "从收藏中移除字段"
+  },
+  "aggregation": {
+    "summary_by": "按 {{fields}} 聚合 {{series}}",
+    "summary_only": "聚合 {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "消息计数",
+    "message_table": "消息表格",
+    "custom_aggregation": "自定义聚合",
+    "aggregation": "聚合",
+    "events_overview": "事件概览",
+    "text_markdown": "文本/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "已删除的 Input",
+    "timestamp": "时间戳",
+    "not_stored": "未存储",
+    "not_stored_message": "消息未存储",
+    "received_by": "接收方",
+    "stored_in_index": "存储于索引",
+    "routed_into_streams": "路由到 Stream"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch 将搜索结果限制为 {{limit}} 条消息。每页 {{pageSize}} 条消息时，可使用前 {{validPages}} 页。",
+    "confirm_delete_dashboard_page": "确定要删除此 Dashboard 页面吗？"
+  }
+}

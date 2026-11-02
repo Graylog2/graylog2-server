@@ -1,1 +1,521 @@
-{}
+{
+  "aws_plugin_configuration": {
+    "title": "AWS 插件配置",
+    "description": "AWS 模块提供的所有插件的基础配置。请注意，部分参数将以未加密的形式存储在 MongoDB 中。具有相应权限的用户可以在本页面的配置对话框中查看这些参数。",
+    "status_instance_detail_lookups": "实例详情查询：",
+    "status_connect_through_proxy": "通过代理连接：",
+    "status_lookup_regions": "查询区域：",
+    "status_access_key": "Access Key：",
+    "status_secret_key": "Secret Key：",
+    "status_enabled": "已启用",
+    "status_disabled": "已禁用",
+    "status_not_set": "[未设置]",
+    "edit_configuration": "编辑配置",
+    "modal_title": "更新 AWS 插件配置",
+    "submit_configuration": "更新配置",
+    "lookups_enabled_label": "是否对 IP 地址运行 AWS 实例详情查询？",
+    "lookups_enabled_help": "启用后，消息处理器将尝试识别您的 AWS 实体（如 EC2、ELB、RDS 等）的 IP 地址，并添加其背后的服务或实例的附加信息。此更改最多可能需要一分钟才能生效。",
+    "access_key_label": "AWS Access Key",
+    "access_key_help": "注意：此密钥仅用于加密连接，但会以明文形式存储。有关为底层 IAM 用户分配的建议权限，请参阅文档。",
+    "secret_key_label": "AWS Secret Key",
+    "secret_key_help": "注意：此密钥仅用于加密连接，并会使用系统密钥加密存储。有关为底层 IAM 用户分配的建议权限，请参阅文档。",
+    "lookup_regions_label": "查询区域",
+    "lookup_regions_help": "AWS 实例查询消息处理器会维护一张实例表，用于快速进行地址转换。请定义要包含在表中的 AWS 区域，应包括您运行 AWS 服务的所有区域。请记住，您的 IAM 用户需要这些区域的权限，否则您将在 {{productName}} 服务器日志中看到警告。",
+    "proxy_enabled_label": "使用 HTTP 代理？",
+    "proxy_enabled_help": "启用后，我们将通过 {{productName}} 配置文件中配置的 HTTP 代理（<code>http_proxy_uri</code>）访问 AWS API。<lineBreak/><em>重要：</em>您必须重启所有 AWS 输入，此配置才会生效。",
+    "save_error_message": "AWS 插件配置失败，状态：{{error}}",
+    "save_error_title": "无法保存 AWS 插件配置。"
+  },
+  "gcs_setup_info": {
+    "intro": "设置 Google Cloud Storage 后端的步骤如下：",
+    "step_bucket": "创建一个名称唯一的 Google Cloud Storage 存储桶，参见 Google 关于 <bucketsLink>存储桶</bucketsLink>的文档。建议使用默认的 Standard 存储类别。",
+    "step_service_account": "创建一个 Google Cloud 服务账号，并授予其对该存储桶的读取、写入和删除权限，参见 Google 关于 <serviceAccountsLink>服务账号</serviceAccountsLink>的文档。",
+    "step_credentials": "在所有 Graylog 节点上设置应用默认凭据（Application Default credentials）。具体方法取决于您的集群托管方式，参见 Google 关于<adcLink>设置应用默认凭据</adcLink>的文档。",
+    "step_setup_backend": "现在您可以在本页面设置 Google Cloud Storage 后端。您需要提供在第一步中创建的 Google Cloud 存储的唯一名称。"
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "AWS Key 无效，请在您的 AWS 账户中查找一个 20 个字符长、由字母和数字组成、通常以 “AK” 开头的字符串",
+    "invalid_secret_message": "AWS Secret 无效，它通常是一个 40 个字符长、经过 Base64 编码的字符串，但创建密钥时只能查看一次",
+    "authorize_button": "授权并选择 Stream",
+    "title": "创建输入并授权 AWS",
+    "description": "此集成允许直接从 Kinesis 流读取消息。CloudWatch 消息可以通过 CloudWatch 订阅可选地转发到 Kinesis，然后再进行处理。",
+    "input_name": "输入名称",
+    "aws_region": "AWS 区域",
+    "aws_region_help": "您的服务所在的 AWS 区域。",
+    "choose_region": "选择 AWS 区域"
+  },
+  "aws_arn": {
+    "assume_role_label": "AWS Assume Role (ARN)",
+    "assume_role_help": "包含所需跨账户权限的 Amazon 资源名称",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "AWS External ID（可选）",
+    "external_id_help": "添加到 AssumeRole 请求中的外部 ID，用于防止混淆代理问题（confused deputy problem）。仅当您的角色信任策略强制要求时才需要。"
+  },
+  "aws_authentication_types": {
+    "label": "AWS 认证类型"
+  },
+  "aws_custom_endpoints": {
+    "title": "可选的 AWS VPC 端点",
+    "section_title": "覆盖 {{productName}} 与之通信的默认 AWS API 端点 URL。",
+    "note": "仅当您为 AWS 服务使用 <vpcEndpointsLink>VPC 端点</vpcEndpointsLink>时，才需要指定这些配置。",
+    "input_message": "域名应以 'https://' 开头",
+    "cloudwatch_label": "CloudWatch API 端点覆盖",
+    "iam_label": "IAM API 端点覆盖",
+    "dynamodb_label": "DynamoDB API 端点覆盖",
+    "kinesis_label": "Kinesis API 端点覆盖"
+  },
+  "aws_automatic": {
+    "section_title": "自动认证将按以下列出的顺序依次尝试：",
+    "env_variables_label": "环境变量",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> 和 <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Java 系统属性",
+    "java_properties_value": "<code>aws.accessKeyId</code> 和 <code>aws.secretKey</code>",
+    "profiles_label": "默认凭据配置文件",
+    "profiles_value": "通常位于 <code>~/.aws/credentials</code>",
+    "ecs_label": "Amazon ECS 容器凭据",
+    "ecs_value": "如果设置了环境变量 <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code>，则从 Amazon ECS 加载",
+    "instance_label": "实例配置文件凭据",
+    "instance_value": "用于 EC2 实例，通过 Amazon EC2 元数据服务提供",
+    "more_info": "更多信息请参阅 <docsLink>AWS 凭据配置文档 <openIcon/></docsLink>。"
+  },
+  "aws_key_secret": {
+    "access_key_label": "AWS Access Key",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "您的 AWS Key 应为 20 个字符长、由字母和数字组成、以 “AK” 开头的字符串。",
+    "access_key_help_optional": "您的 AWS Key 应为 20 个字符长、由字母和数字组成、以 “AK” 开头的字符串。（可选，未提供时将使用旧版 AWS 插件配置）",
+    "secret_key_label": "AWS Secret Key",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "您的 AWS Secret 通常是一个 40 个字符长、经过 Base64 编码的字符串。",
+    "secret_key_help_optional": "您的 AWS Secret 通常是一个 40 个字符长、经过 Base64 编码的字符串。（可选，未提供时将使用旧版 AWS 插件配置）"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "AWS CloudTrail 连接配置",
+    "step_subscribe_title": "AWS CloudTrail 输入配置",
+    "step_review_title": "AWS CloudTrail 最终检查"
+  },
+  "aws_cloudtrail_app": {
+    "title": "AWS CloudTrail 集成",
+    "description": "此功能从 AWS CloudTrail 平台获取日志记录。",
+    "requirement": "您需要具备 <cloudTrailLink>AWS CloudTrail</cloudTrailLink>。"
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "高级选项",
+    "sqs_batch_size_error": "请选择 1 到 10 之间的 SQS 消息批量大小。",
+    "override_source_label": "覆盖 Source（可选）",
+    "override_source_help": "Source 默认设置为 aws-cloudtrail。如有需要，您可以使用自定义值覆盖它。",
+    "sqs_batch_size_label": "SQS 消息批量大小",
+    "sqs_batch_size_help": "每次从 SQS 查询的最大消息数。可接受的最大值为 10。",
+    "include_full_message_json_label": "包含 full_message_json？",
+    "include_full_message_json_help": "是否将完整的 CloudTrail 事件以 JSON 格式存储在 full_message_json 字段中？"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "无法使用提供的配置连接 AWS CloudTrail。",
+    "verify_button": "验证连接并继续",
+    "input_name": "输入名称",
+    "input_name_help": "请为新输入选择一个能够描述其用途的名称。",
+    "sqs_region_help": "SQS 队列所在的 AWS 区域。",
+    "sqs_region_label": "AWS SQS 区域",
+    "choose_sqs_region": "选择 SQS 区域",
+    "s3_region_help": "S3 存储桶所在的 AWS 区域。",
+    "s3_region_label": "AWS S3 区域",
+    "choose_s3_region": "选择 S3 区域",
+    "sqs_queue_name_help": "由 CloudTrail Subscriber 创建的 SQS 队列名称",
+    "sqs_queue_name_label": "SQS 队列名称"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "无法保存您的输入，请稍后再试。",
+    "save_button": "保存并启动输入",
+    "description": "请检查以下所有内容是否正确，然后点击下方按钮完成 AWS CloudTrail 设置！",
+    "input_configuration": "输入配置",
+    "label_name": "名称",
+    "label_access_key": "AWS Access Key",
+    "label_sqs_region": "SQS 区域",
+    "label_s3_region": "S3 区域",
+    "label_assume_role_arn": "AWS Assume Role (ARN)",
+    "label_external_id": "AWS External ID",
+    "label_sqs_queue_name": "AWS SQS 队列名称",
+    "label_sqs_batch_size": "SQS 消息批量大小",
+    "label_polling_interval": "轮询间隔",
+    "label_enable_throttling": "启用限流"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "请提供有效的轮询间隔",
+    "polling_interval_error": "最小允许的轮询间隔为 1 分钟。",
+    "batch_size_error_full": "请提供有效的 SQS 消息批量大小。",
+    "batch_size_error": "请选择 1 到 10 之间的 SQS 消息批量大小。",
+    "proceed_button": "继续",
+    "polling_interval_help": "决定多久（以分钟为单位）检查一次 AWS CloudTrail 中的新数据。最小允许间隔为 1 分钟。",
+    "polling_interval_label": "轮询间隔"
+  },
+  "aws_cloudwatch_app": {
+    "title": "AWS 集成",
+    "description": "此功能从各种 AWS 来源获取日志消息。"
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "高级选项",
+    "flow_log_prefix_label": "为 Flow Log 字段名添加前缀",
+    "flow_log_prefix_help": "为字段添加 Flow Log 前缀，例如 \"src_addr\" -> \"flow_log_src_addr\"。",
+    "store_full_message_label": "存储完整消息？",
+    "store_full_message_help": "将原始 Kinesis/CloudWatch 日志事件负载存储在 full_message 字段中。",
+    "override_source_label": "覆盖 Source（可选）",
+    "override_source_help": "消息 Source 默认设置为 aws-kinesis-raw-logs。如有需要，您可以使用自定义值覆盖它。",
+    "batch_size_label": "Kinesis 记录批量大小",
+    "batch_size_help": "每次获取的 Kinesis 记录数。每条记录最大可达 1MB。AWS 默认值为 10,000。输入较小的值可以每次处理更小的数据块。"
+  },
+  "aws_sidebar_permissions": {
+    "title": "AWS 策略权限",
+    "description": "有关所需 AWS 权限的信息，请参阅<docsLink/>。",
+    "docs_link_text": "官方文档"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "我们尚未收到 Amazon 的响应。",
+    "waiting_description": "请稍候片刻，我们正在持续检查您的 AWS 流中是否有日志。Amazon 的服务器每 10 分钟解析一次日志，因此请先去喝杯咖啡，这可能需要一些时间！",
+    "checking_again_in": "将在 <countdown/> 后再次检查",
+    "checking_button": "检查中…",
+    "check_now_button": "立即检查",
+    "do_not_refresh": "请勿刷新浏览器。我们会持续检查您的日志，日志可用时此页面将自动刷新。",
+    "review_button": "检查并完成",
+    "title": "创建 Kinesis 流",
+    "sample_description": "如果可用，流中解析后的 {{logType}} 消息示例将显示在下方。",
+    "formatted_log_label": "格式化的日志消息",
+    "no_messages": "流中未找到消息。"
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "（默认）",
+    "save_error": "无法保存您的输入，请稍后再试。",
+    "complete_button": "完成 CloudWatch 设置",
+    "title": "最终检查",
+    "description": "请检查以下所有内容是否正确，然后点击下方按钮完成 CloudWatch 设置！",
+    "setting_up_cloudwatch": "正在设置 CloudWatch",
+    "edit": "编辑",
+    "label_name": "名称",
+    "label_authorization_type": "授权类型",
+    "label_aws_key": "AWS Key",
+    "label_assumed_role_arn": "AWS Assumed ARN Role",
+    "label_external_id": "AWS External ID",
+    "label_cloudwatch_endpoint": "CloudWatch VPC 端点",
+    "label_dynamodb_endpoint": "DynamoDB VPC 端点",
+    "label_iam_endpoint": "IAM VPC 端点",
+    "label_kinesis_endpoint": "Kinesis VPC 端点",
+    "label_aws_region": "AWS 区域",
+    "setting_up_kinesis": "正在设置 Kinesis",
+    "label_kinesis_stream": "Kinesis 流",
+    "label_kinesis_stream_arn": "Kinesis 流 ARN",
+    "stream_arn_error": "错误：无法获取流 ARN。请确保 IAM 角色包含 kinesis:DescribeStream 权限。",
+    "label_global_input": "全局输入",
+    "label_record_batch_size": "记录批量大小",
+    "label_enable_throttling": "启用限流",
+    "label_flow_log_prefix": "为字段名添加 Flow Log 前缀",
+    "label_store_full_message": "存储完整消息",
+    "label_override_source": "覆盖 Source",
+    "formatting": "格式化",
+    "label_log_type": "日志类型",
+    "pipeline_hint": "如果您需要以不同方式解析日志，请参阅我们的 <pipelineLink>Pipeline Rule</pipelineLink> 以获取更多详细信息和说明。",
+    "no_response": "我们尚未收到 Amazon 的响应。"
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "没有看到您需要的流？",
+    "sidebar_requirement": "指定区域中至少需要存在一个 Kinesis 流，才能继续设置。该日志流必须至少包含几条日志消息。",
+    "sidebar_auto_setup": "{{productName}} 还支持为您创建 Kinesis 流，并将其订阅到您选择的 CloudWatch 日志组。请注意，此选项将在您的 AWS 环境中创建额外的资源，并会产生费用。",
+    "setup_automatically_button": "自动设置 Kinesis",
+    "no_logs_error": "在此 Kinesis 流中未找到任何日志。请选择其他 Kinesis 流。",
+    "loading_message": "此请求可能需要一些时间。",
+    "verify_button": "验证流和格式",
+    "title": "选择 Kinesis 流",
+    "description_list": "以下是在指定 AWS 账户中找到的所有 Kinesis 流的列表。",
+    "description_docs": "请选择您希望读取消息的流，或参阅<docsLink/>文档以了解此设置的更多详细信息。",
+    "docs_link_text": "AWS Kinesis/CloudWatch 输入",
+    "select_stream_label": "选择流",
+    "select_stream_placeholder": "选择 Kinesis 流"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "无法在您所选区域中找到任何组。请尝试选择其他区域。",
+    "begin_button": "开始自动设置",
+    "title": "自动设置 Kinesis",
+    "intro": "填写以下字段以开始自动设置 Kinesis。这将在您的 AWS 账户中执行以下操作。更多信息请参阅 AWS 文档中的<docsLink>使用 CloudWatch Logs 订阅过滤器</docsLink>。",
+    "step_create_stream": "使用指定名称创建一个新的 Kinesis 流。",
+    "step_create_role": "创建将 Kinesis 流订阅到 CloudWatch 日志组所需的 IAM 角色/策略。",
+    "step_subscribe": "将新的 Kinesis 流订阅到日志组。",
+    "stream_name_label": "Kinesis 流名称",
+    "stream_name_placeholder": "流名称",
+    "stream_name_help": "1-128 个字母数字字符，以及特殊字符下划线 (_)、句点 (.) 和连字符 (-)。",
+    "group_name_label": "CloudWatch 组名称",
+    "choose_group": "选择 CloudWatch 组",
+    "back_button": "返回选择流"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "此自动设置将创建以下 AWS 资源。点击下方即表示您理解这些资源将被创建，并且您对由此产生的任何相关 AWS 费用承担全部责任。如果不再需要这些资源，您必须手动删除所有资源。",
+    "step_stream": "创建一个具有 <strong>1</strong> 个分片的 Kinesis 流。",
+    "step_role": "创建一个 IAM 角色和策略，允许指定的 CloudWatch 组 <strong>{{groupName}}</strong> 向 Kinesis 流 <strong>{{streamName}}</strong> 发布日志消息。",
+    "step_subscription": "创建一个 CloudWatch 订阅，将日志消息发布到 Kinesis 流。"
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "等待中…",
+    "creating": "正在创建{{label}}",
+    "create": "创建{{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis 流",
+    "policy_label": "订阅策略",
+    "subscription_label": "订阅"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "创建中…",
+    "close_button": "关闭",
+    "continue_button": "继续设置",
+    "executing_title": "正在执行自动设置",
+    "agreement_title": "Kinesis 自动设置协议",
+    "delayed_logs": "第一条消息可能需要长达十分钟才能到达 Kinesis 流。在流中出现消息之前，下一步的 Kinesis 健康检查将无法成功完成。更多信息请参阅官方的 <cloudWatchLink>CloudWatch 订阅</cloudWatchLink>文档。",
+    "agree_button": "我同意！立即创建这些 AWS 资源。"
+  },
+  "form_wrap": {
+    "more_info": "更多信息",
+    "additional_information": "附加信息：",
+    "loading_button": "加载中…",
+    "submit_button": "提交"
+  },
+  "aws_skip_health_check": {
+    "title": "跳过健康检查",
+    "confirm_button": "确认",
+    "form_title": "选择日志类型并跳过健康检查",
+    "description": "如果您确定新建的 <strong>{{streamName}}</strong> 流中包含的数据，请选择下方选项以跳过自动检查。",
+    "input_type_label": "选择 AWS 输入类型",
+    "choose_log_type": "选择日志类型"
+  },
+  "throttling_checkbox": {
+    "label": "启用限流",
+    "help": "启用后，在 {{productName}} 服务器处理完当前消息负载之前，此输入将不再读取新消息。这通常适用于从文件或 AMQP、Kafka 等消息队列系统读取数据的输入。如果您定期轮询外部系统（例如通过 HTTP），通常应保持此选项关闭。"
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup 数据适配器使用 <greynoiseLink>GreyNoise API</greynoiseLink> 为给定的键查询指标，并返回 IP Quick Context 端点的值。参见 <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "用户密码",
+    "reset_token_button": "重置令牌",
+    "api_token_label": "API 令牌",
+    "undo_reset_button": "撤销重置",
+    "api_token_help": "API 令牌。"
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API 令牌"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "频道",
+    "custom_message_label": "自定义消息模板",
+    "empty_body": "空正文",
+    "include_event_procedure_label": "在邮件正文中包含事件处理流程",
+    "backlog_limit_label": "消息积压上限",
+    "user_name_label": "用户名",
+    "include_title_label": "包含标题",
+    "notify_channel_label": "通知频道",
+    "link_names_label": "链接名称",
+    "icon_url_label": "图标 URL",
+    "icon_emoji_label": "图标表情",
+    "time_zone_label": "时区"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "自定义消息模板",
+    "empty_body": "空正文",
+    "backlog_limit_label": "消息积压上限",
+    "icon_url_label": "图标 URL",
+    "time_zone_label": "时区"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "Adaptive Card 模板",
+    "backlog_limit_label": "消息积压上限"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "配置颜色",
+    "change_color_button": "更改颜色",
+    "color_help": "选择此配置使用的颜色。",
+    "custom_message_help": "将显示在告警标题下方的自定义消息。更多详细信息请参阅<docsLink/>。",
+    "docs_link_text": "文档",
+    "webhook_url_help": "Slack \"Incoming Webhook\" URL",
+    "channel_help": "Slack #频道名称，或用于私信的 @用户",
+    "custom_message_label": "自定义消息（可选）",
+    "time_zone_help": "用于通知正文中时间戳的时区。",
+    "time_zone_label": "日期/时间值的时区",
+    "backlog_limit_label": "消息积压上限（可选）",
+    "backlog_limit_help": "限制作为 Slack 通知一部分发送的积压消息数量。设置为 0 时不限制。",
+    "user_name_label": "用户名（可选）",
+    "user_name_help": "Slack 中发送者的用户名",
+    "include_title_help": "在通知中包含事件定义的标题和描述",
+    "notify_channel_help": "在消息中添加 @channel 以通知频道中的所有用户",
+    "notify_here_label": "通知在线成员",
+    "notify_here_help": "在消息中添加 @here 以通知频道中的在线用户",
+    "link_names_help": "查找并链接频道名称和用户名",
+    "icon_url_label": "图标 URL（可选）",
+    "icon_url_help": "用作此消息图标的图片",
+    "icon_emoji_label": "图标表情（可选）",
+    "icon_emoji_help": "用作此消息图标的表情（优先于图标 URL）"
+  },
+  "event_procedure_checkbox": {
+    "label": "包含事件处理流程",
+    "help": "将事件定义的事件处理流程的格式化版本附加到通知正文末尾。"
+  },
+  "slack_notification_summary": {
+    "color_label": "颜色",
+    "custom_message_label": "自定义消息",
+    "yes": "是",
+    "no": "否"
+  },
+  "teams_notification_summary": {
+    "color_label": "颜色",
+    "custom_message_label": "自定义消息"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams \"Incoming Webhook\" URL",
+    "backlog_limit_help": "限制作为 Microsoft Teams 通知一部分发送的积压消息数量。设置为 0 时不限制。"
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "要发布到 Teams 的 Adaptive Card。更多详细信息请参阅<docsLink/>。",
+    "backlog_toggle_aria_label": "启用消息积压上限"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "路由密钥",
+    "incident_title_label": "事件标题",
+    "custom_incident_label": "自定义事件",
+    "key_prefix_label": "键前缀",
+    "incident_key_label": "事件键",
+    "client_name_label": "客户端名称",
+    "client_url_label": "客户端 URL"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "路由密钥",
+    "routing_key_help": "PagerDuty 集成的路由密钥。",
+    "incident_title_label": "事件标题",
+    "incident_title_help": "PagerDuty 中事件的自定义标题。如未设置，将使用 {{productName}} 中显示的事件标题。",
+    "custom_incident_label": "使用自定义事件键",
+    "custom_incident_help": "生成自定义事件键。",
+    "key_prefix_label": "事件键前缀",
+    "key_prefix_help": "事件键前缀，之后将依次附加流和事件定义的标题。如需自定义整个键，请使用事件键。",
+    "incident_key_label": "事件键",
+    "incident_key_help": "用于标识事件的完整键。如已提供，将代替前缀使用。",
+    "client_name_label": "客户端名称",
+    "client_name_help": "触发 PagerDuty 事件的 {{productName}} 系统名称。",
+    "client_url_label": "客户端 URL",
+    "client_url_help": "触发 PagerDuty 事件的 {{productName}} 系统的 URL。"
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "路由密钥",
+    "incident_title_label": "事件标题",
+    "default_value": "默认",
+    "use_custom_incident_key_label": "使用自定义事件键",
+    "yes": "是",
+    "no": "否",
+    "key_prefix_label": "事件键前缀",
+    "incident_key_label": "事件键",
+    "client_name_label": "客户端名称",
+    "client_url_label": "客户端 URL"
+  },
+  "threat_intel_plugin_config": {
+    "title": "威胁情报查询配置",
+    "description": "威胁情报查询插件的配置。",
+    "tor_exit_nodes_label": "Tor 出口节点：",
+    "spamhaus_label": "Spamhaus：",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "modal_title": "更新威胁情报插件配置",
+    "tor_checkbox_label": "允许查询 Tor 出口节点？",
+    "tor_checkbox_help": "启用后，全局流水线函数将包含 Tor 出口节点查询；禁用后也将停止刷新数据。",
+    "spamhaus_checkbox_label": "允许查询 Spamhaus DROP/EDROP？",
+    "spamhaus_checkbox_help": "启用后，全局流水线函数将包含 Spamhaus 查询；禁用后也将停止刷新数据。"
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "弃用警告",
+    "deprecation_text": "abuse.ch Ransomware Tracker 已于 2019-12-08 关闭。不应使用此数据适配器。"
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "域名黑名单",
+    "urls_blocklist": "URL 黑名单",
+    "ips_blocklist": "IP 黑名单",
+    "blocklist_type_label": "黑名单类型",
+    "blocklist_type_help": "选择 abuse.ch 勒索软件黑名单的类型",
+    "blocklist_type_placeholder": "选择黑名单类型",
+    "refresh_blocklist_label": "刷新黑名单",
+    "refresh_blocklist_help": "启用后，当 abuse.ch 勒索软件黑名单发生变化时将进行刷新。"
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "域名黑名单",
+    "urls_blocklist": "URL 黑名单",
+    "ips_blocklist": "IP 黑名单",
+    "blocklist_type_label": "黑名单类型",
+    "update_interval_label": "更新间隔",
+    "deprecation_title": "弃用警告",
+    "deprecation_text": "abuse.ch Ransomware Tracker 已于 2019-12-08 关闭。不应使用此数据适配器。"
+  },
+  "otx_adapter_documentation": {
+    "intro": "AlienVault OTX 数据适配器使用 <otxLink>OTX API</otxLink> 为给定的键查询指标。",
+    "configuration_title": "配置",
+    "indicator_title": "指标",
+    "indicator_description": "OTX API 提供多种不同的入侵指标（IOC）。您必须选择此数据适配器应使用哪种指标。",
+    "ip_auto_detect": "<code>IP Auto-Detect</code> 指标并非官方指标。我们添加它是为了自动检测 IP 地址类型，从而使同一数据适配器能够同时用于 IPv4 和 IPv6 地址。",
+    "api_key_title": "OTX API 密钥",
+    "api_key_description": "OTX API 密钥用于对 API 请求进行身份验证。即使不输入 API 密钥，请求也能正常工作，但您很可能会遇到更低的请求限制。<strong>如果您将此数据适配器用于生产环境流量，请注册 OTX 账户并获取 API 密钥。</strong>",
+    "api_url_title": "OTX API URL",
+    "api_url_description": "OTX API 服务器的 HTTP URL。除非您想使用自定义服务器进行一些测试，否则不应更改默认设置 <code>https://otx.alienvault.com</code>。",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "此设置将为 OTX API 请求设置 <code>User-Agent</code> HTTP 标头。您可以修改它以包含您的联系方式，以便 OTX API 运营方在您的 API 请求出现问题时与您联系。",
+    "connection_timeout_title": "HTTP 连接超时",
+    "connection_timeout_description": "OTX API 请求的 HTTP 连接超时时间（毫秒）。如果将其设置得过高，而 OTX API 连接较慢，处理性能可能会受到影响。",
+    "write_timeout_title": "HTTP 写入超时",
+    "write_timeout_description": "OTX API 请求的 HTTP 写入超时时间（毫秒）。如果将其设置得过高，而 OTX API 连接较慢，处理性能可能会受到影响。",
+    "read_timeout_title": "HTTP 读取超时",
+    "read_timeout_description": "OTX API 请求的 HTTP 读取超时时间（毫秒）。如果将其设置得过高，而 OTX API 连接较慢，处理性能可能会受到影响。"
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP 自动检测",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "域名",
+    "option_hostname": "主机名",
+    "option_file": "文件",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "关联规则",
+    "indicator_label": "指标",
+    "indicator_help": "查询时使用的 OTX 指标类型。",
+    "indicator_placeholder": "选择指标",
+    "api_key_label": "OTX API 密钥",
+    "api_key_help": "您的 OTX API 密钥。",
+    "api_url_label": "OTX API URL",
+    "api_url_help": "OTX API 服务器的 URL。",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "HTTP 请求应使用的 User-Agent 标头。",
+    "connect_timeout_label": "HTTP 连接超时",
+    "connect_timeout_help": "HTTP 连接超时时间（毫秒）。",
+    "write_timeout_label": "HTTP 写入超时",
+    "write_timeout_help": "HTTP 写入超时时间（毫秒）。",
+    "read_timeout_label": "HTTP 读取超时",
+    "read_timeout_help": "HTTP 读取超时时间（毫秒）。"
+  },
+  "otx_adapter_summary": {
+    "not_available": "无",
+    "unit_ms": "毫秒"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "无需配置。"
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "无需配置"
+  },
+  "whois_adapter_documentation": {
+    "intro": "Whois IP 查询数据适配器可以请求 IP 地址的网络归属信息。",
+    "configuration_title": "配置",
+    "connect_timeout_description": "与 whois 服务器之间套接字的连接超时时间（毫秒）。如果将其设置得过高，可能会影响处理性能。",
+    "read_timeout_description": "与 whois 服务器之间套接字的连接读取超时时间（毫秒）。如果将其设置得过高，可能会影响处理性能。"
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "连接超时",
+    "connect_timeout_help": "WHOIS 连接超时时间（毫秒）。",
+    "read_timeout_label": "读取超时",
+    "read_timeout_help": "WHOIS 连接读取超时时间（毫秒）。"
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "毫秒"
+  }
+}

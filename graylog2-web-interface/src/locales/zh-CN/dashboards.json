@@ -1,1 +1,42 @@
-{}
+{
+  "human_name": "Dashboards",
+  "full_screen": {
+    "menu": "全屏",
+    "title": "配置全屏",
+    "start": "开始全屏视图",
+    "refresh_interval": "刷新间隔",
+    "refresh_interval_help": "经过多少秒后刷新 Dashboard？",
+    "tabs": "标签页",
+    "tabs_help": "选择要轮换显示的查询标签页。",
+    "cycle_interval": "标签页轮换间隔",
+    "cycle_interval_help": "经过多少秒后显示下一个标签页？"
+  },
+  "properties": {
+    "title": "标题",
+    "title_help": "Dashboard 的标题。",
+    "summary": "摘要",
+    "summary_help": "Dashboard 的简要摘要。",
+    "description": "描述",
+    "description_help": "关于此 Dashboard 及其功能的较详细说明。"
+  },
+  "overview": {
+    "missing_requirements": "缺少必要条件",
+    "user_defined": "用户自定义",
+    "load_failed": "加载 Dashboards 失败，状态码：",
+    "could_not_load": "无法加载 Dashboards"
+  },
+  "delete": {
+    "confirm": "您确定要删除“{{title}}”吗？",
+    "success": "删除 Dashboard “{{title}}”成功！",
+    "success_title": "成功！",
+    "failed": "删除 Dashboard 失败：{{error}}",
+    "failed_title": "错误！"
+  },
+  "bulk_delete": {
+    "confirm_other": "您确定要删除 {{count}} 个 Dashboard 吗？",
+    "partial_failure_other": "所选的 {{count}} 个 Dashboard 中有 {{failed}} 个无法删除。",
+    "success_other": "已成功删除 {{count}} 个 Dashboard。",
+    "success_title": "成功",
+    "failed": "删除 Dashboard 时发生错误。{{error}}"
+  }
+}

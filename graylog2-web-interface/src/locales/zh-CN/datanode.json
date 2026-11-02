@@ -1,1 +1,93 @@
-{}
+{
+  "pages": {
+    "description": "{{productName}} 数据节点与 {{productName}} 集成更紧密，并简化了后续更新。它们可让您对 {{productName}} 消息数据库中的所有消息进行索引和搜索。",
+    "documentation_title": "数据节点文档",
+    "cluster_management_title": "数据节点 Dashboard",
+    "certificate_management_title": "证书管理",
+    "migration_title": "数据节点迁移",
+    "upgrade_title": "数据节点升级"
+  },
+  "details_page": {
+    "error": "错误：{{message}}",
+    "title": "数据节点：{{hostname}}",
+    "details": "详情：",
+    "hostname": "主机名：",
+    "transport_address": "传输地址：",
+    "status": "状态：",
+    "not_available": "不适用",
+    "certificate_valid_until": "证书有效期至：",
+    "datanode_version": "数据节点版本：",
+    "configuration_warnings": "配置警告"
+  },
+  "upgrade_status": {
+    "title": "升级状态",
+    "message": "节点正在升级..."
+  },
+  "upgrade_complete": {
+    "title": "升级完成",
+    "message": "所有节点均已是最新版本。"
+  },
+  "data_node_notifications": {
+    "start_replication_success": "复制已成功启动。",
+    "start_replication_failure": "启动复制失败。",
+    "replication_in_progress": "复制进行中...",
+    "replication_complete": "复制完成。",
+    "replication_failed": "复制失败。",
+    "replication_error": "复制错误：{{error}}",
+    "status_unknown": "未知状态",
+    "loading_rolling_upgrade_failed": "加载 OpenSearch 滚动升级状态失败",
+    "loading_rolling_upgrade_failed_title": "无法加载 OpenSearch 滚动升级状态",
+    "resume_rolling_upgrade_failed_title": "无法恢复 OpenSearch 滚动升级",
+    "resume_rolling_upgrade_success": "OpenSearch 滚动升级已恢复。",
+    "start_rolling_upgrade_failed_title": "无法启动 OpenSearch 滚动升级",
+    "loading_versions_failed": "加载 OpenSearch 版本概览失败",
+    "loading_versions_failed_title": "无法加载 OpenSearch 版本概览",
+    "loading_journal_estimate_failed": "加载数据节点迁移日志估算失败",
+    "loading_journal_estimate_failed_title": "无法加载数据节点日志大小估算",
+    "bulk_remove_failed_title": "无法移除数据节点。",
+    "bulk_remove_success_other": "已成功移除 {{count}} 个数据节点。",
+    "bulk_start_failed_title": "无法启动数据节点。",
+    "bulk_start_success_other": "已成功启动 {{count}} 个数据节点。",
+    "bulk_stop_failed_title": "无法停止数据节点。",
+    "bulk_stop_success_other": "已成功停止 {{count}} 个数据节点。",
+    "loading_failed": "加载数据节点失败，状态为",
+    "loading_failed_title": "无法加载数据节点。",
+    "rejoin_failed": "重新加入数据节点失败，状态：{{status}}",
+    "rejoin_failed_title": "无法重新加入数据节点。",
+    "rejoin_success": "数据节点 \"{{datanodeId}}\" 已成功重新加入。",
+    "remove_failed": "移除数据节点失败，状态：{{status}}",
+    "remove_failed_title": "无法移除数据节点。",
+    "remove_success": "数据节点 \"{{datanodeId}}\" 已成功移除。",
+    "renew_certificate_failed": "证书续期失败，错误：{{error}}",
+    "renew_certificate_success": "证书已成功续期。",
+    "start_failed": "启动数据节点失败，状态：{{status}}",
+    "start_failed_title": "无法启动数据节点。",
+    "start_success": "数据节点 \"{{datanodeId}}\" 已成功启动。",
+    "stop_failed": "停止数据节点失败，状态：{{status}}",
+    "stop_failed_title": "无法停止数据节点。",
+    "stop_success": "数据节点 \"{{datanodeId}}\" 已成功停止。",
+    "loading_node_failed": "加载数据节点失败，状态为",
+    "loading_node_failed_title": "无法加载数据节点",
+    "loading_upgrade_status_failed": "加载数据节点升级状态失败",
+    "loading_upgrade_status_failed_title": "无法加载数据节点升级状态",
+    "start_replication_failed": "启动分片复制失败，状态：{{status}}",
+    "start_replication_failed_title": "无法启动分片复制。",
+    "stop_replication_failed": "停止分片复制失败，状态：{{status}}",
+    "stop_replication_failed_title": "无法停止分片复制。",
+    "stop_replication_success": "分片复制已成功停止",
+    "loading_stderr_failed": "加载数据节点 stderr 日志失败，状态为",
+    "loading_stderr_failed_title": "无法加载数据节点 stderr 日志",
+    "loading_stdout_failed": "加载数据节点 stdout 日志失败，状态为",
+    "loading_stdout_failed_title": "无法加载数据节点 stdout 日志"
+  },
+  "ca_upload": {
+    "file_required": "请上传文件。",
+    "single_file": "请仅上传一个文件。"
+  },
+  "notifications": {
+    "certificate_provisioned_success": "证书已成功配置",
+    "certificate_renewed_success": "证书已成功续期",
+    "certificate_provisioning_failed": "证书配置失败，错误：{{error}}",
+    "certificate_renewal_failed": "证书续期失败，错误：{{error}}"
+  }
+}

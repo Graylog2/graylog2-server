@@ -1,1 +1,57 @@
-{}
+{
+  "main": {
+    "search": "搜索",
+    "streams": "Streams",
+    "alerts": "告警",
+    "dashboards": "Dashboards",
+    "system": "系统",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "概览",
+    "configurations": "配置",
+    "cluster_configuration": "集群配置",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "indices": "索引",
+    "logging": "日志",
+    "users_and_teams": "用户和团队",
+    "roles": "角色",
+    "authentication": "认证",
+    "content_packs": "Content Packs",
+    "grok_patterns": "Grok 模式",
+    "lookup_tables": "Lookup Tables",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors"
+  },
+  "security": {
+    "overview": "概览",
+    "user_activity": "用户活动",
+    "host_activity": "主机活动",
+    "network_activity": "网络活动",
+    "anomalies": "异常"
+  },
+  "help": {
+    "title": "帮助",
+    "documentation": "文档",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "键盘快捷键",
+    "api_browser": "API 浏览器"
+  },
+  "user_menu": {
+    "title": "{{name}} 的用户菜单",
+    "language": "语言",
+    "show_profile": "显示个人资料",
+    "edit_profile": "编辑个人资料",
+    "log_out": "退出登录"
+  },
+  "shell": {
+    "welcome": "欢迎",
+    "main": "主要",
+    "utility": "实用工具",
+    "toggle_navigation": "切换导航",
+    "scratchpad": "草稿本"
+  }
+}

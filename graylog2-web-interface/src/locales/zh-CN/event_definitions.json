@@ -1,1 +1,525 @@
-{}
+{
+  "add_notification_form": {
+    "add": "添加通知",
+    "choose": "选择通知",
+    "create_new": "创建新通知...",
+    "help": "选择用于此类告警的通知，或创建一个可在其他告警中复用的新通知。",
+    "select": "选择通知",
+    "title": "添加通知"
+  },
+  "aggregation_form": {
+    "description": "使用函数汇总与上方定义的过滤器匹配的日志消息。您可以选择按相同字段值对过滤结果进行分组。",
+    "group_by_example": "假设您创建了一个过滤器，用于匹配网络中所有登录失败的尝试，那么当登录失败总次数超过 5 次时即可触发告警。现在，将 <code>username</code> 添加为分组字段，则告警会<em>针对每个 <code>username</code></em>（登录失败次数超过 5 次）触发。",
+    "group_by_help": "选择字段，当过滤结果的这些字段值相同时将其分组。<bold>示例：</bold>",
+    "title": "聚合"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_other": "您确定要删除 {{count}} 个 Event Definitions 吗？",
+      "error": "删除 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法删除。",
+      "success_other": "已成功删除 {{count}} 个 Event Definitions。",
+      "title": "删除 Event Definitions"
+    },
+    "disable": {
+      "confirm_other": "您确定要禁用 {{count}} 个 Event Definitions 吗？",
+      "error": "禁用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法禁用。",
+      "success_other": "已成功禁用 {{count}} 个 Event Definitions。",
+      "title": "禁用 Event Definitions"
+    },
+    "disable_action": "禁用",
+    "enable": {
+      "confirm_other": "您确定要启用 {{count}} 个 Event Definitions 吗？",
+      "error": "启用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法启用。",
+      "success_other": "已成功启用 {{count}} 个 Event Definitions。",
+      "title": "启用 Event Definitions"
+    },
+    "enable_action": "启用",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "可用条件",
+    "condition_type": "条件类型",
+    "condition_type_help": "为此事件选择条件类型。",
+    "description": "定义此类事件的创建方式。之后可将这些事件用作其他条件的输入，从而基于其他条件构建功能强大的条件。",
+    "no_description": "暂无描述。",
+    "not_editable": "此事件定义类型的条件无法编辑。",
+    "select_condition_type": "选择条件类型",
+    "title": "事件条件"
+  },
+  "condition_summary": {
+    "and": "与",
+    "create_events": "为 Event Definition 创建事件",
+    "errors_found": "发现错误",
+    "hide_errors": "隐藏错误",
+    "invalid": "条件无效",
+    "no_condition": "未配置条件",
+    "no_series": "未选择序列",
+    "or": "或",
+    "preview": "预览：",
+    "show_errors": "显示错误",
+    "title": "条件摘要",
+    "valid": "条件有效"
+  },
+  "conditions": {
+    "add_expression": "添加表达式",
+    "add_group": "添加分组",
+    "all": "全部",
+    "any": "任意",
+    "boolean_operator": "布尔运算符",
+    "boolean_operator_group": "第 {{level}} 级布尔运算符分组",
+    "delete_expression": "删除表达式",
+    "global_boolean_operator": "全局布尔运算符",
+    "if": "如果",
+    "is": "是",
+    "messages_must_meet": "消息必须满足",
+    "of_the_following_rules": "以下规则：",
+    "select_condition": "选择条件",
+    "select_field": "选择字段（可选）",
+    "select_function": "选择函数",
+    "select_percentile": "选择百分位数",
+    "select_strategy": "选择策略（可选）",
+    "threshold": "阈值"
+  },
+  "definition_summary": {
+    "details": "详细信息",
+    "no_description": "未提供描述",
+    "no_tags": "无标签",
+    "no_title": "未提供标题",
+    "title": "事件摘要"
+  },
+  "details_form": {
+    "add_event_procedure": "添加事件处理流程",
+    "description": "描述",
+    "description_help": "此 Event Definition 的详细描述。",
+    "no_event_procedures": "此 Event Definition 尚无任何事件处理流程。",
+    "no_remediation_steps": "未提供修复步骤",
+    "optional": "（可选）",
+    "priority": "优先级",
+    "priority_help": "为从此 Event Definition 创建的事件选择优先级。",
+    "remediation_steps": "修复步骤",
+    "remediation_steps_help": "用于修复此事件的步骤。支持 Markdown 格式。",
+    "summary_template": "事件摘要模板",
+    "summary_template_help": "用于生成事件和告警摘要的模板。",
+    "title": "事件详情",
+    "title_help": "此 Event Definition 的标题。",
+    "title_label": "标题"
+  },
+  "event_key_help": {
+    "event_count": "要控制 <bold>过滤与聚合</bold>类 Event Definition 创建的事件数量，请在“为定义创建事件（如果…）”中选择“聚合结果达到阈值”，并配置分组字段。",
+    "example": "<bold>示例：</bold>两个 Event Definition，<em>登录失败</em>和<em>权限提升</em>，均将事件键设为 <code>username</code>。只有当两个事件携带相同的用户名时，二者的关联才会触发。",
+    "intro": "事件键是自定义字段，其值会组合成事件的键（值之间以 <code>|</code> 连接）。事件键用于标识事件所涉及的实体，它不会改变创建的事件数量。",
+    "where_it_matters": "<bold>事件键的作用：</bold><bold>事件关联</bold>仅匹配具有相同键的源事件，并且在其搜索窗口内每个键最多只创建一个事件。请在您打算关联的 Event Definition 上设置键，而不是在关联本身上设置。"
+  },
+  "expanded_notifications": {
+    "description": "此 Event Definition 触发时发出的通知。",
+    "loading": "正在加载通知...",
+    "missing_permissions": "缺少以下通知的权限："
+  },
+  "field_form": {
+    "add": "添加自定义字段",
+    "data_type": "字段数据类型",
+    "data_type_string": "字符串",
+    "key_help": "指示此字段是否应作为键及其顺序。",
+    "more_about_keys": "关于事件键的更多信息",
+    "name": "名称",
+    "name_help": "此字段的名称。",
+    "provider_unavailable": "所选提供方不可用。",
+    "select_value_source": "选择值来源",
+    "set_value_from": "设置值来源",
+    "title_edit": "自定义字段“{{fieldName}}”",
+    "title_new": "新建自定义字段",
+    "update": "更新自定义字段",
+    "use_as_key": "将字段用作事件键",
+    "value_source_help": "为此字段的值选择来源。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {
+      "title": "模板"
+    }
+  },
+  "fields_form": {
+    "description": "通过添加自定义字段，在由此 Event Definition 生成的事件中包含更多信息。这有助于您搜索事件，或在接收通知时获得更多上下文。",
+    "errors_description": "保存此 Event Definition 之前，请更正以下错误：",
+    "errors_title": "存在错误的字段",
+    "event_fields": "事件字段",
+    "no_keys": "尚未配置任何键。",
+    "not_editable": "此 Event Definition 类型的事件字段无法编辑。",
+    "optional": "（可选）",
+    "tags": "标签",
+    "tags_description": "为此 Event Definition 附加标签。标签会传递到其生成的每个事件上，并便于在告警与事件列表中进行过滤和分组。"
+  },
+  "fields_list": {
+    "configuration": "配置",
+    "data_type": "数据类型",
+    "field_name": "字段名称",
+    "is_key": "是否为键？",
+    "no": "否",
+    "no_fields": "此事件尚无任何自定义字段。",
+    "remove": "移除字段",
+    "value_source": "值来源",
+    "yes": "是"
+  },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "聚合结果达到阈值",
+    "create_events_if": "为 Event Definition 创建事件（如果…）",
+    "event_limit": "事件数量上限",
+    "event_limit_help": "每次执行此 Event Definition 最多创建的事件数量。超出的事件将被抑制。",
+    "filter_has_results": "过滤器有结果"
+  },
+  "filter_form": {
+    "cron_expression": "Cron 表达式",
+    "cron_expression_help": "用于确定事件运行时间的 Quartz Cron 表达式。",
+    "cron_time_zone": "Cron 时区",
+    "declare_missing_parameters": "请点击上方按钮声明缺失的查询参数。",
+    "description": "添加信息以过滤与此 Event Definition 相关的日志消息。",
+    "enable": "启用",
+    "enable_help": "是否自动执行此 Event Definition？",
+    "execute_every": "执行搜索间隔",
+    "lookup_table_permission_missing": "此账户缺少从 Lookup Table 声明查询参数的权限。",
+    "optional": "（可选）",
+    "query_parameters": "查询参数",
+    "search_filters": "搜索过滤器",
+    "search_query": "搜索查询",
+    "search_query_help": "消息应匹配的搜索查询。您可以使用与搜索页面相同的语法，包括使用 <code>{{syntax}}</code> 语法从 Lookup Table 声明查询参数。",
+    "search_within": "搜索最近",
+    "streams_and_categories": "Stream 与分类",
+    "streams_help": "选择搜索应包含的 Stream。",
+    "title": "过滤器",
+    "use_cron": "使用 Cron 调度",
+    "use_cron_help": "使用 Quartz Cron 表达式调度此事件",
+    "warm_tier_title": "Warm Tier 警告",
+    "warm_tier_warning": "所选时间范围将包含存储在 Warm Tier 中的数据。需要频繁从 Warm Tier 检索数据的事件可能导致性能问题。<strong>搜索最近</strong>的值超过以下时长时将进入 Warm Tier：<timestamp></timestamp>。"
+  },
+  "filter_preview": {
+    "help_aggregation": "每当聚合结果满足条件时创建一个事件",
+    "help_aggregation_groups": "每个满足条件的聚合结果分组创建一个事件",
+    "help_aggregation_groups_label": "带分组的聚合：",
+    "help_aggregation_label": "不带分组的聚合：",
+    "help_description": "“过滤与聚合”条件生成的事件数量取决于其配置方式：",
+    "help_filter": "每条匹配过滤器的消息创建一个事件",
+    "help_filter_label": "过滤器：",
+    "help_title": "“过滤与聚合”将创建多少个事件？",
+    "loading": "正在加载过滤器预览...",
+    "message": "消息",
+    "no_messages": "使用当前搜索条件未找到任何消息。",
+    "no_streams_access": "无法预览过滤器，用户没有任何 Stream 的访问权限。",
+    "timestamp": "时间戳",
+    "title": "过滤器预览"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "聚合条件无效",
+    "loading": "正在加载事件信息...",
+    "query_parameters_undeclared": "必须声明查询参数"
+  },
+  "form_controls": {
+    "create": "创建 Event Definition",
+    "creating": "正在创建...",
+    "previous": "上一步",
+    "update": "更新 Event Definition",
+    "updating": "正在更新..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "清除排队的通知失败，状态：{{error}}",
+    "clear_queue_failed_title": "无法清除排队的通知",
+    "clear_queue_success": "已成功清除排队的通知。",
+    "clear_queue_success_title": "排队的通知已清除。",
+    "cluster_config_failed": "加载 Event Definition 列表事件集群配置失败，状态码：",
+    "cluster_config_failed_title": "无法加载 Event Definition 列表事件集群配置",
+    "create_failed": "创建 Event Definition “{{title}}”失败，状态：{{error}}",
+    "create_failed_title": "无法保存 Event Definition",
+    "create_success": "Event Definition “{{title}}”已成功创建。",
+    "create_success_title": "Event Definition 创建成功",
+    "disable_failed": "禁用 Event Definition “{{title}}”失败，状态：{{error}}",
+    "disable_failed_title": "无法禁用 Event Definition",
+    "disable_success": "Event Definition “{{title}}”已成功禁用。",
+    "disable_success_title": "Event Definition 已成功禁用",
+    "duplicate_failed": "复制 Event Definition “{{title}}”失败，状态：{{error}}",
+    "duplicate_failed_title": "无法复制 Event Definition",
+    "duplicate_success": "Event Definition “{{title}}”已成功创建。",
+    "duplicate_success_title": "Event Definition 复制成功",
+    "enable_failed": "启用 Event Definition “{{title}}”失败，状态：{{error}}",
+    "enable_failed_title": "无法启用 Event Definition",
+    "enable_success": "Event Definition “{{title}}”已成功启用。",
+    "enable_success_title": "Event Definition 已成功启用",
+    "entity_types_failed": "加载 Event Definition 实体类型失败，状态码：",
+    "entity_types_failed_title": "无法加载 Event Definition 实体类型",
+    "load_failed_title": "无法加载 Event Definition",
+    "load_list_failed": "加载 Event Definitions 失败，状态码：",
+    "load_one_failed": "加载 Event Definition 失败，状态码：",
+    "not_found": "无法找到 ID 为 <{{id}}> 的 Event Definition，请确认其未被删除。",
+    "not_found_title": "无法获取 Event Definition",
+    "save_failed": "保存 EventDefinition 失败，状态：{{error}}",
+    "save_failed_title": "无法保存 EventDefinition",
+    "update_failed": "更新 Event Definition “{{title}}”失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Event Definition",
+    "update_success": "Event Definition “{{title}}”已成功更新。",
+    "update_success_title": "Event Definition 更新成功"
+  },
+  "notification_list": {
+    "no_notifications": "此事件尚未配置任何触发的通知。",
+    "not_found": "无法找到通知 <em>{{title}}</em> 的信息",
+    "notification": "通知",
+    "type": "类型"
+  },
+  "notification_settings": {
+    "grace_period": "宽限期",
+    "grace_period_help": "告警每次发生时都会发送通知。设置宽限期以控制再次发送通知前需要等待的时长。请注意，带有键的事件会为每个不同的键值设置一个宽限期。",
+    "message_backlog": "消息积压",
+    "message_backlog_help": "通知中包含的消息数量。",
+    "toggle_message_backlog": "切换消息积压"
+  },
+  "notifications_form": {
+    "description": "此事件是否重要到需要您关注？为其添加通知，即可将其设为告警。",
+    "manage": "管理通知"
+  },
+  "overview": {
+    "human_name": "Event Definitions",
+    "user_defined": "用户自定义"
+  },
+  "page": {
+    "alerts_docs": "告警文档",
+    "copy_confirm": "您确定要创建“{{title}}”的副本吗？",
+    "copy_title": "复制 Event Definition",
+    "create_multiple": "创建 Event Definitions",
+    "description_alerts": "Event Definitions 可让您基于不同条件创建告警并进行告警。",
+    "description_events": "Event Definitions 可让您基于不同条件创建事件并进行告警。",
+    "description_list": "创建新的 Event Definitions，以便搜索不同条件并对其进行告警。",
+    "duplicate": "复制 Event Definition",
+    "edit": "编辑 Event Definition",
+    "edit_named": "编辑 “{{title}}” Event Definition",
+    "file_import": "创建 Event Definitions - 文件导入",
+    "git_import": "创建 Event Definitions - Git 导入",
+    "loading": "正在加载 Event Definition...",
+    "new": "新建 Event Definition",
+    "new_named": "新建 Event Definition “{{title}}”",
+    "title": "Event Definitions",
+    "view": "查看 Event Definition",
+    "view_named": "查看 “{{title}}” Event Definition"
+  },
+  "priorities": {
+    "critical": "严重",
+    "high": "高",
+    "info": "信息",
+    "low": "低",
+    "medium": "中"
+  },
+  "provider_summary": {
+    "less_details": "收起详细信息",
+    "lookup_table_key_field": "Lookup Table 键字段",
+    "more_details": "更多详细信息",
+    "validate_template_values": "验证所有模板值均已设置",
+    "value_source": "值来源"
+  },
+  "query_parameter_modal": {
+    "save": "保存",
+    "title": "声明查询参数 “{{name}}”",
+    "type": "类型",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": "：未声明"
+  },
+  "replay_search": {
+    "attributes": {
+      "description": "描述",
+      "edited_after_event": "此事件发生后，Event definition <definitionTitle>{{title}}</definitionTitle> 已被编辑。部分聚合组件可能无法代表此事件。",
+      "event_definition": "Event definition",
+      "execute_every": "执行搜索间隔",
+      "notifications": "通知",
+      "priority": "优先级",
+      "search_within": "搜索范围",
+      "timestamp": "时间戳",
+      "updated_at": "Event definition 更新时间"
+    },
+    "not_provided": "未提供",
+    "replay_link": "重放搜索"
+  },
+  "row_actions": {
+    "delete_confirm": "您确定要删除“{{title}}”吗？",
+    "delete_failed": "删除 Event Definition “{{title}}”失败，状态：{{status}}",
+    "delete_failed_title": "无法删除 Event Definition",
+    "delete_success": "Event Definition “{{title}}”已成功删除。",
+    "delete_success_title": "Event Definition 删除成功",
+    "delete_title": "删除 Event Definition",
+    "disable": "禁用",
+    "disable_confirm": "您确定要禁用“{{title}}”吗？",
+    "disable_title": "禁用 Event Definition",
+    "duplicate": "复制",
+    "edit": "编辑",
+    "enable": "启用",
+    "enable_confirm": "您确定要启用“{{title}}”吗？",
+    "enable_title": "启用 Event Definition",
+    "entity_type_title": "Event Definition",
+    "share_description": "搜索用户或团队，将其添加为此 Event Definition 的协作者。",
+    "system_cannot_be_deleted": "系统 Event Definition 无法删除",
+    "system_cannot_be_disabled": "系统 Event Definition 无法禁用"
+  },
+  "scheduling": {
+    "clear": "清除",
+    "clear_confirm": "您确定要清除“{{title}}”的排队通知吗？",
+    "details": "{{title}} 详细信息。",
+    "every": "每 {{duration}}",
+    "last_execution": "上次执行：",
+    "next_execution": "下次执行：",
+    "next_time_range": "下一时间范围：",
+    "not_scheduled": "未调度。",
+    "queued_notifications": "排队的通知：",
+    "runs": "运行 {{schedule}}。",
+    "runs_searching_within": "运行 {{schedule}}，搜索最近 {{duration}}。",
+    "status": "状态："
+  },
+  "share": {
+    "collaborators": "协作者",
+    "description": "搜索用户或团队，将其添加为此 Event Definition 的协作者。",
+    "no_collaborators": "此 Event Definition 没有协作者。"
+  },
+  "sidebar": {
+    "details_title": "定义详情"
+  },
+  "status_cell": {
+    "disable": "禁用",
+    "disable_confirm": "您确定要禁用 Event Definition “{{title}}”吗？",
+    "disable_title": "禁用 Event Definition",
+    "disabled": "已禁用",
+    "enable": "启用",
+    "enabled": "已启用"
+  },
+  "steps": {
+    "additional_details": "附加详细信息",
+    "condition": "条件",
+    "notifications": "通知",
+    "share": "共享",
+    "summary": "摘要"
+  },
+  "summary": {
+    "actions": "操作",
+    "condition_invalid": "条件无效：{{errors}}",
+    "condition_types": {
+      "aggregation": "聚合",
+      "filter": "过滤器"
+    },
+    "create_events_if": "在以下情况下创建事件",
+    "cron_description": "Cron 描述",
+    "cron_expression": "Cron 表达式",
+    "enable_scheduling": "启用调度",
+    "event_limit": "事件数量上限",
+    "execute_every": "执行搜索间隔",
+    "group_by": "分组字段",
+    "missing_stream_permissions": "缺少以下 Stream 的权限：",
+    "no": "否",
+    "no_cron_expression": "错误：未指定 Cron 表达式！",
+    "no_filters": "未配置过滤器",
+    "no_group_by": "未配置分组",
+    "no_streams": "未选择 Stream，将搜索所有 Stream",
+    "search_filters": "搜索过滤器",
+    "search_query": "搜索查询",
+    "search_within": "搜索最近",
+    "stream_categories": "Stream 分类",
+    "streams": "Stream",
+    "time_zone": "时区",
+    "type": "类型",
+    "undeclared_parameters": "存在未声明的查询参数：{{parameters}}",
+    "use_cron": "使用 Cron 调度",
+    "yes": "是"
+  },
+  "summary_renders": {
+    "backlog_included_other": "通知将包含 {{count}} 条消息",
+    "backlog_none": "通知将不包含任何消息。",
+    "condition_plugin_no_summary": "条件插件 <em>{{type}}</em> 未提供摘要。",
+    "event_procedure_summary": "事件处理流程摘要",
+    "event_procedure_summary_unavailable": "事件处理流程摘要组件不可用。",
+    "fields": "字段",
+    "grace_period_disabled": "宽限期已禁用",
+    "grace_period_set": "宽限期设置为 {{duration}}",
+    "keys": "键",
+    "missing_notification_permissions": "缺少以下通知的权限：",
+    "no_event_procedures": "此事件没有任何事件处理流程。",
+    "no_field_value_provider": "未配置字段值提供方。",
+    "no_fields": "未为基于此定义的事件配置字段。",
+    "no_keys": "未为基于此定义的事件配置键。",
+    "no_notifications": "此事件未配置任何触发的通知。",
+    "no_remediation_steps": "未提供修复步骤",
+    "notification_not_found": "无法找到通知 <em>{{id}}</em> 的信息。",
+    "notification_plugin_no_summary": "通知插件 <em>{{type}}</em> 未提供摘要。",
+    "notifications": "通知",
+    "provider_plugin_no_summary": "提供方插件 <em>{{type}}</em> 未提供摘要。",
+    "remediation_steps": "修复步骤",
+    "settings": "设置"
+  },
+  "summary_template_help": {
+    "aggregation_events": "聚合事件：分组值和聚合结果。",
+    "aggregation_example": "按用户统计登录失败次数的聚合：",
+    "aggregation_example_template": "<userVariable></userVariable> 登录失败 <countVariable></countVariable> 次",
+    "button_aria_label": "显示事件摘要模板帮助",
+    "button_title": "摘要模板帮助",
+    "custom_fields": "自定义字段",
+    "custom_fields_description": "在 Event Definition 上定义的自定义字段可通过 <code>fields</code> 访问。",
+    "event_definition_variables": "Event Definition 变量",
+    "examples": "示例",
+    "filter_events": "过滤事件：原始日志消息字段。",
+    "filter_example": "过滤特定日志消息：",
+    "filter_example_template": "<hostVariable></hostVariable> 上的错误：<messageVariable></messageVariable>",
+    "group_by_field": "（分组字段）",
+    "hostname": "（主机名）",
+    "intro": "使用模板自定义事件创建时在告警与事件页面中显示的描述。模板使用 <jmteLink>JMTE</jmteLink> 替换，变量需包裹在 <variable></variable> 中。",
+    "source_context": "源上下文",
+    "source_context_description": "<code>source</code> 变量包含触发数据的上下文。其内容取决于 Event Definition 类型：",
+    "title": "事件摘要模板"
+  },
+  "tags_editor": {
+    "aria_label": "Event Definition 标签",
+    "duplicate": "标签“{{tag}}”已添加。",
+    "help": "按 Enter 或 Tab 添加。标签会转换为小写并去除重复项。仅允许小写字母、数字、连字符、下划线和点。",
+    "invalid_characters_other": "标签 {{tags}} 包含无效字符。仅允许小写字母、数字、连字符、下划线和点。",
+    "max_reached": "已达到最多 {{max}} 个标签。",
+    "placeholder": "例如 authentication, brute-force, compliance",
+    "too_long_other": "标签 {{tags}} 超过最大长度 {{max}} 个字符。"
+  },
+  "template_preview": {
+    "aggregation": "在分组中设置的字段，保留其原始名称",
+    "aggregation_label": "聚合：",
+    "available_fields": "模板中可用的字段取决于创建事件的条件：",
+    "correlation": "最后一个匹配且未取反的事件中的所有字段",
+    "correlation_label": "关联：",
+    "description": "可以使用动态值丰富生成的事件。您可以使用 <code>{{syntax}}</code> 访问事件上下文中的字段。",
+    "filter": "原始日志消息中的所有字段",
+    "filter_label": "过滤器：",
+    "title": "模板中可用的字段"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "排除空字段",
+    "exclude_empty_fields_help": "勾选此选项后，当模板渲染为空值时，将不在事件中包含该字段。未勾选时，字段将以空值添加到事件中。当所有模板值均为必填时，此选项始终开启。",
+    "require_values": "要求设置所有模板值",
+    "require_values_help": "勾选此选项以验证模板中使用的所有变量均已设置值。",
+    "template": "模板",
+    "template_help": "输入要设置到此字段的纯文本，或使用 <jmteLink>JMTE 语法</jmteLink> 添加动态值。"
+  },
+  "types": {
+    "aggregation": {
+      "description": "通过过滤日志消息并（可选）聚合其结果以匹配给定条件，从而创建事件。这些事件可用作关联规则的输入。",
+      "title": "过滤与聚合"
+    },
+    "system": {
+      "description": "{{productName}} 用于将系统通知报告为事件的内置 Event Definition。",
+      "title": "系统 Event Definition"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "不能为空",
+    "field_cannot_be_empty": "字段不能为空。",
+    "field_positive_number": "字段必须为正数。"
+  },
+  "validation_summary": {
+    "title": "发现一些错误！"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "加载 Event Definition 失败，状态：{{error}}",
+    "load_failed_title": "无法加载 Event Definition"
+  }
+}

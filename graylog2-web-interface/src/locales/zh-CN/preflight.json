@@ -1,1 +1,129 @@
-{}
+{
+  "navigation": {
+    "initial_setup": "{{productName}} 初始设置",
+    "get_help": "获取帮助",
+    "documentation": "文档",
+    "changelogs": "更新日志",
+    "operations_changelogs": "运维更新日志",
+    "support": "支持"
+  },
+  "setup": {
+    "welcome": "欢迎！",
+    "first_start": "看起来您是首次启动 {{productName}}，并且尚未配置数据节点。",
+    "data_nodes_allow": "数据节点可让您对 {{productName}} 消息数据库中的所有消息进行索引和搜索。",
+    "data_node_setup": "您可以部署 <dataNodeLink>{{productName}} 数据节点</dataNodeLink>（推荐），也可以手动配置 <openSearchLink>OpenSearch</openSearchLink> 节点。若要手动配置 OpenSearch，您需要修改 {{productName}} 配置并重启 {{productName}} 服务器。重启后，此页面将不再显示。",
+    "data_nodes_title": "{{productName}} 数据节点"
+  },
+  "data_nodes": {
+    "description": "{{productName}} 数据节点与 {{productName}} 的集成度更高，并可简化后续更新。一旦 {{productName}} 数据节点开始运行，并且您已配置证书颁发机构，即可继续启动。",
+    "registered": "以下是当前已注册的数据节点。列表会持续更新。",
+    "transport_address": "传输地址",
+    "hostname": "主机名",
+    "separator": " – ",
+    "none_found": "未找到任何数据节点。"
+  },
+  "waiting_for_startup": {
+    "title": "配置成功",
+    "description": "{{productName}} 服务器正在启动。根据您的环境，可能需要几分钟。{{productName}} 服务器可访问后，此页面将自动刷新。您也可以随时手动刷新，但请注意，之后将不再显示此页面。",
+    "spinner": "正在等待 {{productName}} 服务器..."
+  },
+  "error_boundary": {
+    "title": "出现错误",
+    "description": "发生未知错误。请查看以下消息以及 {{productName}} 服务器日志以获取更多信息。"
+  },
+  "resume_startup": {
+    "button": "继续启动",
+    "confirm": "确定要在没有运行中的 {{productName}} 数据节点的情况下继续启动吗？这将导致配置回退为使用 localhost:9200 上的 OpenSearch 实例。",
+    "error": "继续启动失败，错误信息：{{error}}",
+    "error_title": "无法继续启动"
+  },
+  "restart_configuration": {
+    "confirm": "确定要重新开始配置吗？所有先前的更改都将被删除。",
+    "restart": "重新开始",
+    "restarting": "正在重新开始..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "您随时可以<restartButton>重新开始</restartButton>配置",
+    "fetch_error": "获取{{entityName}}时出错：{{message}}"
+  },
+  "entities": {
+    "data_nodes": "数据节点",
+    "certificate_authority": "证书颁发机构",
+    "renewal_policy": "续期策略"
+  },
+  "steps": {
+    "ca_configuration": "配置证书颁发机构",
+    "renewal_policy_configuration": "配置续期策略",
+    "certificate_provisioning": "为数据节点配置证书",
+    "configuration_finished": "配置完成"
+  },
+  "ca_configuration": {
+    "title": "配置证书颁发机构",
+    "explanation_upload_or_create": "在此第一步中，您可以上传或创建新的证书颁发机构。",
+    "explanation_provisioning": "通过它，我们可以轻松地为您的数据节点配置证书。",
+    "create_tab": "创建新 CA",
+    "upload_tab": "上传 CA"
+  },
+  "ca_create": {
+    "description": "您可以在此快速创建新的证书颁发机构。只需点击“创建 CA”按钮即可。该 CA 仅应用于保护您的 {{productName}} 数据节点。",
+    "organization_name": "组织名称",
+    "creating": "正在创建 CA...",
+    "create": "创建 CA",
+    "success": "CA 创建成功",
+    "error": "CA 创建失败，错误信息：{{error}}"
+  },
+  "ca_upload": {
+    "explanation": "您可以在此上传现有的 CA。您需要上传一个文件，其中同时包含私钥（加密或未加密）、CA 证书以及所有中间证书。文件可以是 PEM 或 PKCS#12 格式。如果私钥已加密，您还需要提供其密码。",
+    "certificate_authority": "证书颁发机构",
+    "drop_hint": "将 CA 拖拽到此处，或点击选择文件",
+    "rejected": "CA 上传失败",
+    "password": "密码",
+    "uploading": "正在上传 CA...",
+    "upload": "上传 CA",
+    "success": "CA 上传成功",
+    "error": "CA 上传失败，错误信息：{{error}}",
+    "validation_missing_file": "请上传文件。",
+    "validation_multiple_files": "请仅上传一个文件。"
+  },
+  "certificate_provisioning": {
+    "title": "配置证书",
+    "configured": "证书颁发机构已成功配置。",
+    "ready": "您现在可以为数据节点配置证书。",
+    "data_node_required": "在配置证书之前，至少需要运行一个 {{productName}} 数据节点。",
+    "started": "证书配置已成功开始",
+    "error": "启动证书配置失败，错误信息：{{error}}",
+    "provisioning": "正在配置证书...",
+    "provision": "配置证书并继续",
+    "skip": "跳过证书配置"
+  },
+  "renewal_policy": {
+    "title": "配置续期策略",
+    "explanation_automatic": "在此步骤中，您可以配置即将过期的证书是否自动续期。",
+    "explanation_manual": "如果您选择手动续期，当到期日临近时将显示系统通知，要求您确认续期。",
+    "policy": "续期策略",
+    "select_policy": "选择续期策略",
+    "automatic": "自动",
+    "manual": "手动",
+    "certificate_lifetime": "证书有效期",
+    "enter_lifetime": "输入有效期",
+    "select_unit": "选择单位",
+    "unit_hours": "小时",
+    "unit_days": "天",
+    "unit_months": "月",
+    "unit_years": "年",
+    "min_lifetime": "必须至少为 {{duration}}",
+    "creating": "正在创建策略...",
+    "create": "创建策略",
+    "success": "续期策略创建成功",
+    "error": "续期策略创建失败，错误信息：{{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "您的连接不安全。请注意，信息将以未加密的方式发送到服务器。",
+    "maybe_not_secure": "您的连接可能不安全。请注意，信息可能会以未加密的方式发送到服务器。"
+  },
+  "configuration_finished": {
+    "title": "配置完成",
+    "skipped_provisioning": "您已成功完成配置。您仍可以<goBackButton>返回</goBackButton>配置证书。",
+    "provisioned": "证书配置成功，所有数据节点均已受到保护且可访问。"
+  }
+}

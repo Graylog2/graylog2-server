@@ -1,1 +1,120 @@
-{}
+{
+  "alerts_attributes": {
+    "additional_fields": "附加字段",
+    "aggregation_time_range": "聚合时间范围",
+    "description": "描述",
+    "event_definition": "Event Definition",
+    "event_definition_type": "Event Definition 类型",
+    "event_procedures": "事件处理流程",
+    "group_by_fields": "分组字段",
+    "id": "ID",
+    "key": "键",
+    "message": "消息",
+    "priority": "优先级",
+    "tags": "标签",
+    "timestamp": "时间戳",
+    "type": "类型"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "分片期间已关闭自动刷新，以避免性能问题。",
+    "auto_refresh_unavailable_title": "自动刷新不可用",
+    "bulk_replay_search": "重放搜索",
+    "collapse_metrics": "收起指标",
+    "details": "详细信息",
+    "expand_metrics": "展开指标",
+    "histogram_failed": "加载事件直方图失败：{{error}}",
+    "metrics_title": "指标",
+    "no_additional_fields": "此事件未添加附加字段。",
+    "no_further_details": "没有更多详细信息",
+    "no_group_by_fields": "此事件没有分组字段。",
+    "no_key": "此事件未设置键。",
+    "no_time_range": "没有时间范围",
+    "refresh_human_name": "事件",
+    "replay_search": "重放搜索"
+  },
+  "alerts_replay": {
+    "cannot_replay": "无法重放此事件：{{reason}} 请选择其他事件。",
+    "close_section": "关闭 {{title}} 部分",
+    "details_title": "告警/事件详情",
+    "event_definition_details": "Event Definition 详情",
+    "event_details": "事件详情",
+    "no_remediation_steps": "没有修复步骤",
+    "open_section": "展开 {{title}} 部分",
+    "replay_details": "重放详情",
+    "replayed_search": "重放的搜索",
+    "system_event": "该事件为系统事件，没有关联的查询、Stream 或时间范围。"
+  },
+  "alerts_types": {
+    "alert": "告警",
+    "event": "事件"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_other": "您确定要删除 {{count}} 个 Event Definitions 吗？",
+      "error": "删除 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法删除。",
+      "success_other": "{{count}} 个 Event Definitions 已成功删除。",
+      "title": "删除 Event Definitions"
+    },
+    "disable": {
+      "confirm_other": "您确定要禁用 {{count}} 个 Event Definitions 吗？",
+      "error": "禁用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法禁用。",
+      "success_other": "{{count}} 个 Event Definitions 已成功禁用。",
+      "title": "禁用 Event Definitions"
+    },
+    "enable": {
+      "confirm_other": "您确定要启用 {{count}} 个 Event Definitions 吗？",
+      "error": "启用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法启用。",
+      "success_other": "{{count}} 个 Event Definitions 已成功启用。",
+      "title": "启用 Event Definitions"
+    },
+    "success_title": "成功"
+  },
+  "definitions_list": {
+    "disable": "禁用",
+    "enable": "启用"
+  },
+  "definitions_page": {
+    "alerts_docs": "告警文档",
+    "copy_confirm": "您确定要创建“{{title}}”的副本吗？",
+    "copy_title": "复制 Event Definition",
+    "create_multiple": "创建 Event Definitions",
+    "description_alerts": "Event Definitions 允许您根据不同条件创建告警并对其发出通知。",
+    "description_events": "Event Definitions 允许您根据不同条件创建事件并对其发出通知。",
+    "description_list": "创建新的 Event Definitions，用于搜索不同条件并对其发出告警。",
+    "duplicate": "复制 Event Definition",
+    "edit": "编辑 Event Definition",
+    "edit_named": "编辑 “{{title}}” Event Definition",
+    "file_import": "创建 Event Definitions - 文件导入",
+    "git_import": "创建 Event Definitions - Git 导入",
+    "loading": "正在加载 Event Definition...",
+    "new": "新建 Event Definition",
+    "new_named": "新建 Event Definition “{{title}}”",
+    "title": "Event Definitions",
+    "view": "查看 Event Definition",
+    "view_named": "查看 “{{title}}” Event Definition"
+  },
+  "alerts_page": {
+    "description": "通过不同条件定义事件。为需要您关注的事件添加通知，即可创建告警。",
+    "documentation_title": "告警文档",
+    "title": "告警与事件"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "您已从列表中移除所有事件。您可以点击 <backButton>返回事件</backButton> 返回。",
+    "all_reviewed": "您已审阅所有事件。现在可以选择要应用于下方所有事件的批量操作。",
+    "list_description": "以下列表包含您在上一步中选择的所有事件/告警，您可以审阅其中每个事件的重放搜索。",
+    "mark_not_reviewed": "将事件 “{{id}}” 标记为未审阅",
+    "mark_reviewed": "将事件 “{{id}}” 标记为已审阅",
+    "remove_event": "从列表中移除事件 “{{id}}”",
+    "replay_search": "重放搜索",
+    "review_progress": "已完成 {{completed}}/{{total}} 个事件的审阅。",
+    "show_selected": "显示所选事件",
+    "unknown_message": "未知"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "加载事件或告警失败，状态：{{error}}",
+    "load_failed_title": "无法加载事件或告警"
+  }
+}
