@@ -182,7 +182,10 @@
   },
   "journal_state": {
     "loading": "Cargando métricas del journal...",
-    "unavailable": "Métricas del journal no disponibles."
+    "unavailable": "Métricas del journal no disponibles.",
+    "summary_one": "El journal contiene <strong>{{messages}} mensajes sin procesar</strong> en {{count}} segmento. Se han añadido <strong>{{appended}} mensajes</strong> y se han leído <strong>{{read}} mensajes</strong> en el último segundo.",
+    "summary_other": "El journal contiene <strong>{{messages}} mensajes sin procesar</strong> en {{count}} segmentos. Se han añadido <strong>{{appended}} mensajes</strong> y se han leído <strong>{{read}} mensajes</strong> en el último segundo.",
+    "summary_many": "El journal contiene <strong>{{messages}} mensajes sin procesar</strong> en {{count}} segmentos. Se han añadido <strong>{{appended}} mensajes</strong> y se han leído <strong>{{read}} mensajes</strong> en el último segundo."
   },
   "jvm_heap_usage": {
     "loading": "Cargando información del uso del heap...",
@@ -197,6 +200,10 @@
     "configure_internal_logging": "Configurar el registro interno"
   },
   "node_overview": {
+    "plugins_installed_one": "{{count}} plugin instalado",
+    "plugins_installed_other": "{{count}} plugins instalados",
+    "inputs_running_one": "{{count}} entrada en ejecución en este nodo",
+    "inputs_running_other": "{{count}} entradas en ejecución en este nodo",
     "memory_heap_usage": "Uso de memoria/heap",
     "buffers": "Búferes",
     "buffers_description": "Los búferes están diseñados para almacenar en caché pequeñas cantidades de mensajes durante muy poco tiempo (normalmente milisegundos) mientras atraviesan los distintos procesadores.",
@@ -209,7 +216,9 @@
     "rest_api": "API REST",
     "installed_plugins": "Plugins instalados",
     "manage_inputs": "Gestionar entradas",
-    "available_input_types": "Tipos de entrada disponibles"
+    "available_input_types": "Tipos de entrada disponibles",
+    "plugins_installed_many": "{{count}} plugins instalados",
+    "inputs_running_many": "{{count}} entradas en ejecución en este nodo"
   },
   "nodes_actions": {
     "details": "Detalles",
@@ -229,7 +238,10 @@
     "recent_system_logs": "Obtener mensajes recientes del registro del sistema"
   },
   "nodes_list": {
-    "no_active_nodes": "No hay nodos activos."
+    "active_nodes_one": "Hay {{count}} nodo activo",
+    "active_nodes_other": "Hay {{count}} nodos activos",
+    "no_active_nodes": "No hay nodos activos.",
+    "active_nodes_many": "Hay {{count}} nodos activos"
   },
   "plugins_data_table": {
     "loading": "Cargando los plugins de este nodo...",
@@ -364,7 +376,10 @@
   },
   "show_metrics_page": {
     "title": "Métricas del nodo {{shortNodeId}} / {{hostname}}",
-    "description": "Todos los nodos de {{productName}} ofrecen un conjunto de métricas internas para diagnóstico, depuración y monitorización. Ten en cuenta que también puedes acceder a todas las métricas mediante JMX."
+    "description": "Todos los nodos de {{productName}} ofrecen un conjunto de métricas internas para diagnóstico, depuración y monitorización. Ten en cuenta que también puedes acceder a todas las métricas mediante JMX.",
+    "total_metrics_one": "Este nodo informa de un total de {{count}} métrica.",
+    "total_metrics_other": "Este nodo informa de un total de {{count}} métricas.",
+    "total_metrics_many": "Este nodo informa de un total de {{count}} métricas."
   },
   "node_page": {
     "title": "Nodo {{shortNodeId}} / {{hostname}}",
@@ -433,7 +448,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "Error al crear el paquete de soporte con el estado: {{error}}",
-    "create_failed_title": "No se pudo crear el paquete de soporte."
+    "create_failed_title": "No se pudo crear el paquete de soporte.",
+    "delete_failed": "Error al eliminar el paquete de soporte con el estado: {{error}}",
+    "delete_failed_title": "No se pudo eliminar el paquete de soporte.",
+    "download_failed": "Error al descargar el paquete de soporte con el estado: {{error}}",
+    "download_failed_title": "No se pudo descargar el paquete de soporte.",
+    "load_list_failed": "Error al cargar la lista de paquetes de soporte con el estado",
+    "load_list_failed_title": "No se pudo cargar la lista de paquetes de soporte."
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Error al obtener los plugins del nodo \"{{nodeId}}\"",
+    "fetch_failed_title": "No se pudieron obtener los plugins"
+  }
 }
