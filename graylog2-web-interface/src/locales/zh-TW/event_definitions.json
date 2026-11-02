@@ -1,1 +1,177 @@
-{}
+{
+  "add_notification_form": {
+    "add": "新增通知",
+    "choose": "選擇通知",
+    "create_new": "建立新通知...",
+    "help": "選擇要用於此類警示的通知，或建立新的通知以供日後其他警示使用。",
+    "select": "選取通知",
+    "title": "新增通知"
+  },
+  "aggregation_form": {
+    "description": "使用函式彙總符合上方所定義篩選器的日誌訊息。您可以選擇依相同的欄位值對篩選器結果進行分組。",
+    "group_by_example": "假設您建立了一個篩選器，用來擷取網路中所有登入失敗的嘗試，則可以設定當登入失敗總次數超過 5 次時觸發警示。接著，將 <code>username</code> 新增為分組欄位，警示就會<em>針對每個登入失敗次數超過 5 次的 <code>username</code></em> 分別觸發。",
+    "group_by_help": "選取欄位，當篩選結果的欄位值相同時進行分組。<bold>範例：</bold>",
+    "title": "彙總"
+  },
+  "bulk_actions": {
+    "delete": {
+      "error": "刪除 Event Definitions 時發生錯誤。{{error}}",
+      "title": "刪除 Event Definitions"
+    },
+    "disable": {
+      "error": "停用 Event Definitions 時發生錯誤。{{error}}",
+      "title": "停用 Event Definitions"
+    },
+    "disable_action": "停用",
+    "enable": {
+      "error": "啟用 Event Definitions 時發生錯誤。{{error}}",
+      "title": "啟用 Event Definitions"
+    },
+    "enable_action": "啟用",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "可用條件",
+    "condition_type": "條件類型",
+    "condition_type_help": "選擇此事件的條件類型。",
+    "description": "定義此類型的事件應如何建立。日後您可以將這些事件作為其他條件的輸入，藉此建立以其他條件為基礎的強大條件。",
+    "no_description": "沒有可用的說明。",
+    "not_editable": "此事件定義類型的條件無法編輯。",
+    "select_condition_type": "選取條件類型",
+    "title": "事件條件"
+  },
+  "condition_summary": {
+    "and": "AND",
+    "create_events": "為 Event Definition 建立事件",
+    "errors_found": "發現錯誤",
+    "hide_errors": "隱藏錯誤",
+    "invalid": "條件無效",
+    "no_condition": "未設定條件",
+    "no_series": "未選取序列",
+    "or": "OR",
+    "preview": "預覽：",
+    "show_errors": "顯示錯誤",
+    "title": "條件摘要",
+    "valid": "條件有效"
+  },
+  "conditions": {
+    "add_expression": "新增運算式",
+    "add_group": "新增群組",
+    "all": "全部",
+    "any": "任一",
+    "boolean_operator": "布林運算子",
+    "boolean_operator_group": "布林運算子群組 {{level}}",
+    "delete_expression": "刪除運算式",
+    "global_boolean_operator": "全域布林運算子",
+    "if": "若",
+    "is": "是",
+    "messages_must_meet": "訊息必須符合",
+    "of_the_following_rules": "下列規則：",
+    "select_condition": "選取條件",
+    "select_field": "選取欄位（選填）",
+    "select_function": "選取函式",
+    "select_percentile": "選取百分位數",
+    "select_strategy": "選取策略（選填）",
+    "threshold": "閾值"
+  },
+  "definition_summary": {
+    "details": "詳細資料",
+    "no_description": "未提供說明",
+    "no_tags": "沒有標籤",
+    "no_title": "未提供標題",
+    "title": "事件摘要"
+  },
+  "details_form": {
+    "add_event_procedure": "新增事件程序",
+    "description": "說明",
+    "description_help": "此 Event Definition 的較詳細說明。",
+    "no_event_procedures": "此 Event Definition 尚無任何事件程序。",
+    "no_remediation_steps": "未提供修復步驟",
+    "optional": "（選填）",
+    "priority": "優先順序",
+    "priority_help": "選擇由此 Event Definition 建立的事件之優先順序。",
+    "remediation_steps": "修復步驟",
+    "remediation_steps_help": "用於修復此事件的步驟。支援 Markdown 格式。",
+    "summary_template": "事件摘要範本",
+    "summary_template_help": "用於產生事件與警示摘要的範本。",
+    "title": "事件詳細資料",
+    "title_help": "此 Event Definition 的標題。",
+    "title_label": "標題"
+  },
+  "event_key_help": {
+    "event_count": "若要控制 <bold>篩選與彙總</bold> 定義建立的事件數量，請使用「若彙總結果達到閾值則建立 Event Definition 事件」，並設定分組欄位。",
+    "example": "<bold>範例：</bold>兩個定義，<em>登入失敗</em>與<em>權限提升</em>，都將事件鍵設為 <code>username</code>。只有當兩個事件帶有相同的 username 時，關聯才會觸發。",
+    "intro": "事件鍵是自訂欄位，其值會合併為事件的鍵（值以 <code>|</code> 連接）。事件鍵用來識別事件所涉及的實體，不會改變建立的事件數量。",
+    "where_it_matters": "<bold>事件鍵的重要性：</bold><bold>事件關聯</bold>只會比對具有相同鍵的來源事件，並且在其搜尋時間窗口內，每個鍵最多建立一個事件。請在您打算進行關聯的 Event Definitions 上設定鍵，而不是在關聯本身上設定。"
+  },
+  "expanded_notifications": {
+    "description": "此 Event Definition 觸發時所發送的通知。",
+    "loading": "正在載入通知...",
+    "missing_permissions": "缺少以下通知的權限："
+  },
+  "field_form": {
+    "add": "新增自訂欄位",
+    "data_type": "欄位資料類型",
+    "data_type_string": "字串",
+    "key_help": "指定此欄位是否為鍵，以及其順序。",
+    "more_about_keys": "關於事件鍵的更多資訊",
+    "name": "名稱",
+    "name_help": "此欄位的名稱。",
+    "provider_unavailable": "所選的提供者無法使用。",
+    "select_value_source": "選取值來源",
+    "set_value_from": "設定值來源",
+    "title_edit": "自訂欄位「{{fieldName}}」",
+    "title_new": "新增自訂欄位",
+    "update": "更新自訂欄位",
+    "use_as_key": "將欄位用作事件鍵",
+    "value_source_help": "選取此欄位值的來源。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {}
+  },
+  "fields_form": {},
+  "fields_list": {},
+  "filter_aggregation_form": {},
+  "filter_form": {},
+  "filter_preview": {},
+  "form_container": {},
+  "form_controls": {},
+  "hook_notifications": {},
+  "notification_list": {},
+  "notification_settings": {},
+  "notifications_form": {},
+  "overview": {},
+  "page": {},
+  "priorities": {},
+  "provider_summary": {},
+  "query_parameter_modal": {
+    "types": {}
+  },
+  "replay_search": {
+    "attributes": {}
+  },
+  "row_actions": {},
+  "scheduling": {},
+  "share": {},
+  "sidebar": {},
+  "status_cell": {},
+  "steps": {},
+  "summary": {
+    "condition_types": {}
+  },
+  "summary_renders": {},
+  "summary_template_help": {},
+  "tags_editor": {},
+  "template_preview": {},
+  "template_provider_form": {},
+  "types": {
+    "aggregation": {},
+    "system": {}
+  },
+  "validation": {},
+  "validation_summary": {},
+  "use_event_definition_notifications": {}
+}
