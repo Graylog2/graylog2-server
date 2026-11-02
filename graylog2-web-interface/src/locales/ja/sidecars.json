@@ -133,32 +133,148 @@
     },
     "configuration_helper": {
       "filebeat_reference": "Filebeat リファレンス",
-      "nxlog_reference": "NXLog リファレンスマニュアル"
+      "nxlog_reference": "NXLog リファレンスマニュアル",
+      "reference_help": "コレクター設定のテンプレートを用意しています。<lineBreak/>詳細は、お使いのコレクターの公式ドキュメントを参照してください。",
+      "runtime_variables_help": "これらの変数には、各 Sidecar の実行時情報が設定されます。",
+      "tab_reference": "リファレンス",
+      "tab_runtime_variables": "実行時変数",
+      "tab_variables": "変数",
+      "title": "コレクター設定リファレンス",
+      "variables_help": "変数を使うと、複数の設定で共通のテキストを共有できます。<lineBreak/>変数として扱わず <code>${foo}</code> のようなリテラルを使う必要がある場合は、<code>${'$'}{foo}</code> と記述してください。",
+      "winlogbeat_reference": "Winlogbeat リファレンス"
     },
-    "configuration_tags_select": {},
-    "source_view_modal": {},
-    "configuration_variables_helper": {},
-    "edit_configuration_variable_modal": {},
-    "templates_helper": {}
+    "configuration_tags_select": {
+      "placeholder": "タグを選択..."
+    },
+    "source_view_modal": {
+      "close": "閉じる",
+      "empty_template": "<empty template>",
+      "error_fetching_configuration": "設定の取得中にエラーが発生しました: {{error}}",
+      "error_rendering_preview": "プレビューの表示中にエラーが発生しました: {{error}}",
+      "title": "設定"
+    },
+    "configuration_variables_helper": {
+      "actions": "操作",
+      "close": "閉じる",
+      "delete": "削除",
+      "delete_confirm_text": "設定変数 <strong>{{name}}</strong> を削除してもよろしいですか？",
+      "delete_confirm_title": "設定変数を削除しますか？",
+      "description": "説明",
+      "error_delete_title": "設定変数 <strong>${user.{{name}}}</strong> の削除中にエラーが発生しました",
+      "error_in_use": "この設定変数はまだ使用中のため、削除できません。次の設定から変数を削除してから、もう一度お試しください。",
+      "name": "名前"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "作成",
+      "create_variable": "変数を作成",
+      "content": "内容",
+      "content_help": "変数の内容を入力",
+      "description": "説明",
+      "description_help": "この変数の説明を入力",
+      "edit": "編集",
+      "edit_action": "編集",
+      "name": "名前",
+      "name_help": "この変数の名前を入力",
+      "optional": "（任意）",
+      "title": "変数 ${user.{{name}}} を{{action}}"
+    },
+    "templates_helper": {
+      "description": "説明",
+      "name": "名前",
+      "node_id": "Sidecar の UUID です。",
+      "node_name": "Sidecar の名前です。未設定の場合はホスト名になります。",
+      "operating_system": "Sidecar が実行されている OS の名前（例: <code>\"Linux\", \"Windows\"</code>）",
+      "sidecar_version": "実行中の Sidecar のバージョン文字列です。",
+      "spool_dir": "設定ごとに固有のディレクトリで、コレクターのデータを保存するために使用できます。",
+      "tags": "Sidecar に設定されたタグのマップです。条件付きの設定スニペットの生成に使用できます。例:"
+    }
   },
   "configurations": {
-    "collector_list": {},
-    "collector_row": {},
-    "configuration_list": {},
-    "configuration_row": {}
+    "collector_list": {
+      "actions": "操作",
+      "create_collector": "ログコレクターを作成",
+      "description": "Sidecar と Web インターフェースを通じて設定および監視できるログコレクターを管理します。",
+      "name": "名前",
+      "no_data": "表示するログコレクターがありません。作成してみてはいかがですか？",
+      "operating_system": "オペレーティングシステム",
+      "placeholder": "コレクターを検索",
+      "title": "ログコレクター",
+      "total": "合計 {{total}} 件"
+    },
+    "collector_row": {
+      "delete_confirm": "コレクター \"{{name}}\" を削除しようとしています。よろしいですか？",
+      "edit": "編集"
+    },
+    "configuration_list": {
+      "actions": "操作",
+      "collector": "コレクター",
+      "color": "色",
+      "configuration": "設定",
+      "create_configuration": "設定を作成",
+      "description": "コレクターで使用する設定です。新しい設定を適用するには、管理ページでコレクターに割り当ててください。",
+      "no_data": "表示する設定がありません。設定を作成するか、クエリを変更してください。",
+      "placeholder": "設定を検索",
+      "title": "設定",
+      "total": "合計 {{total}} 件"
+    },
+    "configuration_row": {
+      "clone": "複製",
+      "delete_confirm": "設定 \"{{name}}\" を削除しようとしています。よろしいですか？",
+      "edit": "編集",
+      "unknown_collector": "不明なコレクター"
+    }
   },
   "failure_tracking": {
     "list": {
-      "columns": {}
+      "columns": {
+        "collector": "コレクター",
+        "error_message": "エラーメッセージ",
+        "last_seen": "最終確認",
+        "sidecar": "Sidecar",
+        "status": "ステータス",
+        "verbose_message": "詳細メッセージ"
+      },
+      "hide_inactive_sidecars": "非アクティブな Sidecar を非表示",
+      "include_inactive_hint": "、または「非アクティブな Sidecar を含める」をクリックしてください",
+      "include_inactive_sidecars": "非アクティブな Sidecar を含める",
+      "no_failures": "失敗が発生している Sidecar はありません。",
+      "no_matching_sidecars": "検索条件に一致する、失敗が発生している Sidecar はありません。検索フィルターを調整してください: {{query}} {{inactiveHint}}"
     },
-    "rows": {}
+    "rows": {
+      "inactive_annotation": "（非アクティブ）",
+      "show_more": "さらに表示",
+      "sidecar_version": "v{{version}}"
+    }
   },
-  "basic_sidecar_user": {},
-  "sidecar_status_file_list": {},
+  "basic_sidecar_user": {
+    "load_failed": "Sidecar ユーザーの読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "Sidecar ユーザーを読み込めませんでした"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "ファイルをフィルター"
+  },
   "sidecars": {
-    "sidecar_list": {},
-    "sidecar_row": {},
-    "sidecar_status": {},
+    "sidecar_list": {
+      "hide_inactive_sidecars": "非アクティブな Sidecar を非表示",
+      "include_inactive_hint": "、または「非アクティブな Sidecar を含める」をクリックしてください",
+      "include_inactive_sidecars": "非アクティブな Sidecar を含める",
+      "last_seen": "最終確認",
+      "name": "名前",
+      "no_matching_sidecars": "検索条件に一致する Sidecar はありません。検索フィルターを調整してください{{inactiveHint}}。",
+      "no_sidecars": "設定されている Sidecar はありません。",
+      "node_id": "ノード ID",
+      "operating_system": "オペレーティングシステム",
+      "sidecar_version": "Sidecar のバージョン",
+      "status": "ステータス"
+    },
+    "sidecar_row": {
+      "inactive_annotation": "（非アクティブ）",
+      "manage_sidecar": "Sidecar を管理",
+      "show_messages": "メッセージを表示"
+    },
+    "sidecar_status": {
+      "collector_running": "コレクターは実行中です。"
+    },
     "verbose_message_modal": {}
   },
   "pages": {
