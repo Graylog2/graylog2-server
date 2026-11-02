@@ -381,20 +381,132 @@
     "enable": "Ativar",
     "enabled": "Ativada"
   },
-  "steps": {},
+  "steps": {
+    "additional_details": "Detalhes adicionais",
+    "condition": "Condição",
+    "notifications": "Notificações",
+    "share": "Compartilhar",
+    "summary": "Resumo"
+  },
   "summary": {
-    "condition_types": {}
+    "actions": "Ações",
+    "condition_invalid": "A condição não é válida: {{errors}}",
+    "condition_types": {
+      "aggregation": "Agregação",
+      "filter": "Filtro"
+    },
+    "create_events_if": "Criar eventos se",
+    "cron_description": "Descrição do cron",
+    "cron_expression": "Expressão cron",
+    "enable_scheduling": "Ativar agendamento",
+    "event_limit": "Limite de eventos",
+    "execute_every": "Executar pesquisa a cada",
+    "group_by": "Campo(s) de agrupamento",
+    "missing_stream_permissions": "Faltam permissões de Stream para:",
+    "no": "não",
+    "no_cron_expression": "Erro: nenhuma expressão cron especificada!",
+    "no_filters": "Nenhum filtro configurado",
+    "no_group_by": "Nenhum agrupamento configurado",
+    "no_streams": "Nenhum Stream selecionado, pesquisa em todos os Streams",
+    "search_filters": "Filtros de pesquisa",
+    "search_query": "Consulta de pesquisa",
+    "search_within": "Pesquisar nos últimos",
+    "stream_categories": "Categorias de Streams",
+    "streams": "Streams",
+    "time_zone": "Fuso horário",
+    "type": "Tipo",
+    "undeclared_parameters": "Há parâmetros de consulta não declarados: {{parameters}}",
+    "use_cron": "Usar agendamento cron",
+    "yes": "sim"
   },
-  "summary_renders": {},
-  "summary_template_help": {},
-  "tags_editor": {},
-  "template_preview": {},
-  "template_provider_form": {},
+  "summary_renders": {
+    "backlog_none": "As notificações não incluirão nenhuma mensagem.",
+    "condition_plugin_no_summary": "O plugin de condição <em>{{type}}</em> não fornece um resumo.",
+    "event_procedure_summary": "Resumo do procedimento de evento",
+    "event_procedure_summary_unavailable": "O componente de resumo do procedimento de evento não está disponível.",
+    "fields": "Campos",
+    "grace_period_disabled": "O Período de carência está desativado",
+    "grace_period_set": "O Período de carência está definido como {{duration}}",
+    "keys": "Chaves",
+    "missing_notification_permissions": "Faltam permissões de Notificações para:",
+    "no_event_procedures": "Este Evento não possui Procedimentos de evento.",
+    "no_field_value_provider": "Nenhum provedor de valor de campo configurado.",
+    "no_fields": "Nenhum campo configurado para Eventos baseados nesta definição.",
+    "no_keys": "Nenhuma chave configurada para Eventos baseados nesta definição.",
+    "no_notifications": "Este Evento não está configurado para disparar Notificações.",
+    "no_remediation_steps": "Nenhuma etapa de correção informada",
+    "notification_not_found": "Não foi possível encontrar informações para a Notificação <em>{{id}}</em>.",
+    "notification_plugin_no_summary": "O plugin de notificação <em>{{type}}</em> não fornece um resumo.",
+    "notifications": "Notificações",
+    "provider_plugin_no_summary": "O plugin provedor <em>{{type}}</em> não fornece um resumo.",
+    "remediation_steps": "Etapas de correção",
+    "settings": "Configurações"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Eventos de agregação: valores de agrupamento e resultados da agregação.",
+    "aggregation_example": "Agregação da contagem de logins malsucedidos por usuário:",
+    "aggregation_example_template": "<userVariable></userVariable> falhou ao fazer login <countVariable></countVariable> vezes",
+    "button_aria_label": "Exibir ajuda do modelo de resumo do evento",
+    "button_title": "Ajuda do modelo de resumo",
+    "custom_fields": "Campos personalizados",
+    "custom_fields_description": "Os campos personalizados definidos na Event Definition ficam disponíveis em <code>fields</code>.",
+    "event_definition_variables": "Variáveis da Event Definition",
+    "examples": "Exemplos",
+    "filter_events": "Eventos de filtro: campos originais da mensagem de log.",
+    "filter_example": "Filtro de uma mensagem de log específica:",
+    "filter_example_template": "Erro em <hostVariable></hostVariable>: <messageVariable></messageVariable>",
+    "group_by_field": "(campo de agrupamento)",
+    "hostname": "(nome do host)",
+    "intro": "Use um modelo para personalizar a descrição exibida na página Alertas e Eventos quando um evento for criado. Os modelos usam substituição <jmteLink>JMTE</jmteLink>, com variáveis envolvidas por <variable></variable>.",
+    "source_context": "Contexto da origem",
+    "source_context_description": "A variável <code>source</code> contém o contexto dos dados que dispararam o evento. Seu conteúdo depende do tipo da Event Definition:",
+    "title": "Modelo de resumo do evento"
+  },
+  "tags_editor": {
+    "aria_label": "Tags da Event Definition",
+    "duplicate": "A tag \"{{tag}}\" já foi adicionada.",
+    "help": "Pressione Enter ou Tab para adicionar. As tags são convertidas para minúsculas e sem duplicatas. Somente letras minúsculas, dígitos, hífens, sublinhados e pontos são permitidos.",
+    "max_reached": "Máximo de {{max}} tags atingido.",
+    "placeholder": "ex.: autenticação, força-bruta, conformidade"
+  },
+  "template_preview": {
+    "aggregation": "Campos definidos em Group By com seus nomes originais",
+    "aggregation_label": "Agregação:",
+    "available_fields": "Os campos disponíveis no Modelo dependem da condição que criou o Evento:",
+    "correlation": "Todos os campos do último Evento correspondente e não negado",
+    "correlation_label": "Correlação:",
+    "description": "É possível enriquecer os Eventos gerados com valores dinâmicos. Você pode acessar os campos do contexto do Evento com <code>{{syntax}}</code>.",
+    "filter": "Todos os campos da mensagem de log original",
+    "filter_label": "Filtro:",
+    "title": "Campos disponíveis no modelo"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Excluir campos vazios",
+    "exclude_empty_fields_help": "Marque esta opção para deixar o campo fora do Evento quando o Modelo renderizar um valor vazio. Quando desmarcada, o campo é adicionado ao Evento com valor vazio. Fica sempre ativa quando todos os valores do Modelo são obrigatórios.",
+    "require_values": "Exigir que todos os valores do modelo sejam definidos",
+    "require_values_help": "Marque esta opção para validar se todas as variáveis usadas no Modelo têm valores.",
+    "template": "Modelo",
+    "template_help": "Digite um texto literal para definir neste campo ou use a <jmteLink>sintaxe JMTE</jmteLink> para adicionar um valor dinâmico."
+  },
   "types": {
-    "aggregation": {},
-    "system": {}
+    "aggregation": {
+      "description": "Crie Eventos a partir de mensagens de log, filtrando-as e (opcionalmente) agregando seus resultados para atender a uma condição definida. Esses Eventos podem ser usados como entrada para uma Regra de correlação.",
+      "title": "Filtro e Agregação"
+    },
+    "system": {
+      "description": "Event Definition integrada que o {{productName}} usa para reportar notificações do sistema como Eventos.",
+      "title": "Event Definition do sistema"
+    }
   },
-  "validation": {},
-  "validation_summary": {},
-  "use_event_definition_notifications": {}
+  "validation": {
+    "cannot_be_empty": "Não pode estar vazio",
+    "field_cannot_be_empty": "O campo não pode estar vazio.",
+    "field_positive_number": "O campo deve ser um número positivo."
+  },
+  "validation_summary": {
+    "title": "Encontramos alguns erros!"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Falha ao carregar a Event Definition com status: {{error}}"
+  }
 }
