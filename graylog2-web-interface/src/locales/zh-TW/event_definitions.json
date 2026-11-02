@@ -15,16 +15,25 @@
   },
   "bulk_actions": {
     "delete": {
+      "confirm_other": "您確定要刪除 {{count}} 個 Event Definitions 嗎？",
       "error": "刪除 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法刪除。",
+      "success_other": "已成功刪除 {{count}} 個 Event Definitions。",
       "title": "刪除 Event Definitions"
     },
     "disable": {
+      "confirm_other": "您確定要停用 {{count}} 個 Event Definitions 嗎？",
       "error": "停用 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法停用。",
+      "success_other": "已成功停用 {{count}} 個 Event Definitions。",
       "title": "停用 Event Definitions"
     },
     "disable_action": "停用",
     "enable": {
+      "confirm_other": "您確定要啟用 {{count}} 個 Event Definitions 嗎？",
       "error": "啟用 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法啟用。",
+      "success_other": "已成功啟用 {{count}} 個 Event Definitions。",
       "title": "啟用 Event Definitions"
     },
     "enable_action": "啟用",
@@ -420,6 +429,7 @@
     "yes": "是"
   },
   "summary_renders": {
+    "backlog_included_other": "通知將包含 {{count}} 則訊息",
     "backlog_none": "通知將不包含任何訊息。",
     "condition_plugin_no_summary": "條件外掛程式 <em>{{type}}</em> 未提供摘要。",
     "event_procedure_summary": "事件程序摘要",
@@ -466,8 +476,10 @@
     "aria_label": "Event Definition 標籤",
     "duplicate": "標籤「{{tag}}」已新增。",
     "help": "按下 Enter 或 Tab 鍵即可新增。標籤會轉換為小寫並去除重複項目。僅允許小寫字母、數字、連字號、底線與點。",
+    "invalid_characters_other": "標籤 {{tags}} 包含無效字元。僅允許小寫字母、數字、連字號、底線與點。",
     "max_reached": "已達到標籤數量上限 {{max}} 個。",
-    "placeholder": "例如：authentication、brute-force、compliance"
+    "placeholder": "例如：authentication、brute-force、compliance",
+    "too_long_other": "標籤 {{tags}} 超過 {{max}} 個字元的長度上限。"
   },
   "template_preview": {
     "aggregation": "在分組中設定的欄位，保留其原始名稱",
@@ -507,6 +519,7 @@
     "title": "發現一些錯誤！"
   },
   "use_event_definition_notifications": {
-    "load_failed": "載入 Event Definition 失敗，狀態：{{error}}"
+    "load_failed": "載入 Event Definition 失敗，狀態：{{error}}",
+    "load_failed_title": "無法載入 Event Definition"
   }
 }
