@@ -1,1 +1,158 @@
-{}
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "インデックスの概要を利用できません",
+      "description": "インデックスの概要情報を取得できませんでした。通常は、インデクサーへの接続に問題があることを意味します。<strong>{{productName}} からインデクサーに接続できることを確認してください</strong>。",
+      "journal_info": "メッセージは引き続きジャーナルに保存されますが、インデクサーに再び接続できるようになるまで検索はできません。"
+    },
+    "header": {
+      "index_set_title": "Index Set: {{title}}",
+      "documentation_link": "インデックスモデルのドキュメント",
+      "edit_button": "Index Set を編集",
+      "description": "この Index Set 内で現在検索と分析の対象となっているすべてのインデックス（メッセージストア）の概要です。"
+    },
+    "indices_info": {
+      "summary": "{{count}} 個のインデックスで、合計 {{messageCount}} 件のメッセージを管理しています。現在の書き込み対象インデックスは <i>{{currentTarget}}</i> です。"
+    },
+    "document_title": "Index Set - {{title}}"
+  },
+  "indexers": {
+    "cluster_health": {
+      "title": "{{distribution}} クラスター",
+      "docs_open_search": "OpenSearch セットアップのドキュメント",
+      "docs_elasticsearch": "Elasticsearch セットアップのドキュメント",
+      "error": "{{distribution}} クラスターの状態を取得できませんでした。{{distribution}} クラスターの状態の取得に失敗しました: {{message}}",
+      "status": "{{distribution}} クラスター {{name}} は {{status}} です。",
+      "shards": "シャード: アクティブ {{active}}、初期化中 {{initializing}}、再配置中 {{relocating}}、未割り当て {{unassigned}}、",
+      "what_does_this_mean": "これはどういう意味ですか？"
+    },
+    "failures": {
+      "none": "過去 24 時間にインデックス作成の失敗はありません。",
+      "show_errors": "エラーを表示",
+      "title": "インデクサーの失敗",
+      "docs": "インデクサーの失敗に関するドキュメント",
+      "description": "正常にインデックス化されなかったすべてのメッセージは、インデクサーの失敗としてログに記録されます。",
+      "none_hurray": "やった！ インデクサーの失敗はありません。",
+      "timestamp": "タイムスタンプ",
+      "index": "インデックス",
+      "letter_id": "Letter ID",
+      "error_message": "エラーメッセージ"
+    },
+    "system_overview": {
+      "looking_for_failures": "インデックスの失敗を検索しています...",
+      "license_load_failed": "ライセンス情報を読み込めませんでした",
+      "error_title": "エラー"
+    }
+  },
+  "indices": {
+    "maintenance": {
+      "title": "メンテナンス",
+      "recalculate_all": "すべてのインデックス範囲のクリーンアップと再計算",
+      "check_versions": "インデックスのバージョンを確認",
+      "confirm_recalculate_all": "既存のすべてのインデックス範囲をクリーンアップして再計算します。続行しますか？"
+    },
+    "closed_index": {
+      "info": "このインデックスは閉じられています。現在インデックス情報は利用できません。インデックスを再度開いてから、もう一度お試しください。",
+      "reopen": "インデックスを再度開く",
+      "delete": "インデックスを削除",
+      "confirm_delete": "インデックス {{indexName}} を本当に削除しますか？"
+    },
+    "create_index_set": {
+      "submit": "Index Set を作成",
+      "submit_loading": "Index Set を作成しています..."
+    },
+    "incompatible_modal": {
+      "title": "インデックスのバージョン",
+      "upgrade_blocked": "互換性のないインデックスが存在するため、現時点ではこのクラスターを OpenSearch 3.x にアップグレードできません。アップグレードは破壊的な操作になるためです。",
+      "upgrade_path": "推奨されるアップグレード方法は、提供されているウィザードを使用して <migrationLink>OpenSearch から Data Node へ移行</migrationLink>し（<docsLink>ドキュメント</docsLink>）、その後、組み込みの Data Node アップグレード自動化機能でアップグレードを進めることです。",
+      "opens_in_new_tab": " （新しいタブで開きます）",
+      "unsupported_direct_upgrade": "{{productName}} は、リスクがあるため、互換性のないインデックスが存在する場合の OpenSearch 2.x から 3.x への直接アップグレードを現在サポートしていません。今後のリリースでこのパスのサポートが追加される予定です。急ぎの場合は、{{productName}} にお問い合わせのうえ、プロフェッショナルサービスについてご相談ください。",
+      "support_until": "OpenSearch 2.x は 2027 年 11 月までサポートされます。",
+      "info": "以前のメジャーバージョンの OpenSearch で作成された互換性のないインデックスは、検索バックエンドを次のメジャーバージョンにアップグレードする前に、アーカイブ、削除、または再インデックスする必要があります。",
+      "close": "閉じる"
+    },
+    "details": {
+      "confirm_recalculate": "インデックス {{indexName}} のインデックス範囲を本当に再計算しますか？",
+      "recalculate_failed": "{{indexName}} のインデックス範囲の再計算を開始するジョブを作成できませんでした",
+      "recalculate_failed_title": "{{indexName}} のインデックス範囲の再計算の開始中にエラーが発生しました",
+      "confirm_delete": "インデックス {{indexName}} を本当に削除しますか？",
+      "active_write_index": "アクティブな書き込みインデックスは削除できません",
+      "recalculate": "インデックス範囲を再計算",
+      "delete": "インデックスを削除",
+      "stats": "セグメント {{segments}} 個、開いている検索コンテキスト {{contexts}} 個、削除済みメッセージ {{deleted}} 件",
+      "primary_shard_operations": "プライマリシャードの操作",
+      "total_shard_operations": "シャードの操作の合計"
+    },
+    "maintenance_strategies": {
+      "time_based_size_optimizing_help": "時間ベースのサイズ最適化ローテーション戦略は、インデックスを毎日ローテーションしようとします。ただし、シャードサイズを許容範囲内に保つことで最適なサイズのインデックスを実現するため、ローテーションをスキップする場合があります。この最適化により、保持期間の最小値と最大値の範囲内でローテーションが遅れることがあります。インデックスが最小値と最大値の範囲を超えて古くなった場合は、現在のサイズに関係なくローテーションされます。",
+      "max_retention_warning": "<b>ローテーション期間</b>と<b>インデックスの最大数</b>から計算される実効保持期間は、管理者が設定した <b>{{maxRetentionPeriod}}</b> の<b>最大保持期間</b>を超えないようにしてください。",
+      "deactivated": "{{name}} 戦略は無効化されました。有効な保持戦略を設定してください。",
+      "summary_not_found": "戦略 {{strategy}} の概要が見つかりません！"
+    },
+    "range_summary": {
+      "none": "利用可能なインデックス範囲がありません。",
+      "recalculated": "範囲を再計算しました（<relativeTime />、{{ms}} ミリ秒）。"
+    },
+    "section": {
+      "indices": "インデックス:",
+      "shards": "シャード:",
+      "total_size": "合計サイズ:"
+    }
+  },
+  "index_set_form": {
+    "configuration_information": "設定情報",
+    "title_label": "タイトル",
+    "title_help": "Index Set のわかりやすい名前です。",
+    "description_label": "説明",
+    "description_help": "この Index Set の説明を追加します。",
+    "details": "詳細",
+    "shards_label": "インデックスシャード",
+    "shards_help": "この Index Set 内のインデックスごとに使用する検索クラスターのシャード数です。インデックスシャードを増やすと、アクティブな書き込みインデックスが複数の検索ノードに分散されるため、この Index Set に保存されるデータの検索クラスターへの書き込み速度が向上します。ただし、インデックスシャードを増やすと検索パフォーマンスが低下する場合があり、インデックスのメモリフットプリントも増加します。この値は検索ノードの数より大きく設定しないでください。",
+    "replicas_label": "インデックスレプリカ",
+    "replicas_help": "この Index Set 内のインデックスごとに使用する検索クラスターのレプリカシャード数です。レプリカシャードを追加すると、ダッシュボードなどで発生する並列読み取り時の検索パフォーマンスが向上し、HA およびバックアップ戦略の一要素にもなります。レプリカシャードのセットを増やすごとに、インデックスのストレージ要件とメモリフットプリントが増加します。この値は検索ノードの数より大きく、通常は 1 より大きく設定しないでください。",
+    "max_segments_label": "セグメントの最大数",
+    "max_segments_help": "<em>詳細オプション。</em>最適化（強制マージ）後の検索クラスターインデックスごとの最大セグメント数です。値を大きくすると、インデックス最適化による圧縮率が低下します。",
+    "disable_optimization_label": "ローテーション後のインデックス最適化を無効にする",
+    "disable_optimization_help": "<em>詳細オプション。</em>インデックス最適化は、アクティブなインデックスがローテーションされた後に行われる圧縮処理で、ディスク上のインデックスサイズを縮小します。インデックスのローテーション後に検索クラスターが実行する、CPU 負荷の高いメンテナンスタスクとして現れます。インデックスを圧縮すると検索パフォーマンスが向上し、Index Set のストレージ使用量が減少します。",
+    "field_type_refresh_label": "フィールドタイプの更新間隔",
+    "field_type_refresh_help": "<em>詳細オプション。</em>アクティブな書き込みインデックスのフィールドタイプ情報を更新する頻度です。この値を大きくすると検索クラスターの負荷をわずかに減らし、パフォーマンスを向上できますが、新しいデータメッセージが {{productName}} で検索可能になるまでの時間が長くなります。",
+    "field_type_profile": "フィールドタイププロファイル",
+    "important_note": "重要な注意事項",
+    "important_note_text": "これらの変更は既存のインデックスには適用されません。新しく作成されるインデックスにのみ適用されます。この変更を現在の Index Set にすぐに適用するには、インデックスをローテーションしてください。",
+    "save": "保存",
+    "prefix_label": "インデックスプレフィックス",
+    "prefix_help": "この Index Set に属するインデックスに使用される<strong>一意の</strong>プレフィックスです。プレフィックスは英字または数字で始まる必要があり、英字、数字、'_'、'-'、'+' のみを含めることができます。",
+    "prefix_error_empty": "無効なインデックスプレフィックス: 空にすることはできません",
+    "prefix_error_start": "無効なインデックスプレフィックス: 英字または数字で始まる必要があります",
+    "prefix_error_lower_case": "無効なインデックスプレフィックス: 小文字である必要があります",
+    "prefix_error_chars": "無効なインデックスプレフィックス: 英字、数字、'_'、'-'、'+' のみを含める必要があります",
+    "analyzer_label": "アナライザー",
+    "analyzer_help": "この Index Set のアナライザーです。",
+    "rotation_retention": "ローテーションと保持",
+    "segment_data_tiering": "Data Tiering",
+    "segment_legacy": "レガシー（非推奨）",
+    "rotation_title": "インデックスローテーションの設定",
+    "rotation_description": "ドキュメントの保存には複数のインデックスが使用されます。ローテーション戦略を設定して、現在アクティブな書き込みインデックスをいつローテーションするかを決定できます。",
+    "rotation_placeholder": "ローテーション戦略を選択"
+  },
+  "deletion_form": {},
+  "set_details": {},
+  "profiles": {},
+  "field_types": {},
+  "templates": {},
+  "overview_table": {},
+  "index_summary": {},
+  "indices_configuration": {},
+  "shards": {},
+  "data_tiering": {},
+  "incompatible": {},
+  "strategies": {},
+  "pages": {},
+  "navigation": {},
+  "maintenance_dialog": {},
+  "hooks": {},
+  "notifications": {},
+  "use_index_set_stats_notifications": {},
+  "use_indexer_overview_notifications": {},
+  "use_indices_configuration_notifications": {}
+}
