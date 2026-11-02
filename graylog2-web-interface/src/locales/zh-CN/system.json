@@ -1,1 +1,200 @@
-{}
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "正在加载搜索后端节点...",
+    "search_backend_unknown": "无法确定已配置的搜索后端。",
+    "search_placeholder": "搜索节点…",
+    "all_nodes": "所有节点",
+    "data_nodes": "数据节点",
+    "opensearch_nodes": "OpenSearch 节点",
+    "mongodb_nodes": "MongoDB 节点"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "内存",
+    "jvm": "JVM",
+    "indexing": "索引",
+    "storage": "存储",
+    "buffers": "缓冲区",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "吞吐量"
+  },
+  "data_nodes_expandable": {
+    "title": "数据节点"
+  },
+  "indexing_metrics_cell": {
+    "docs": "文档数",
+    "latency": "延迟"
+  },
+  "node_actions": {
+    "thread_dump": "获取线程转储",
+    "process_buffer_dump": "获取处理缓冲区转储",
+    "metrics": "指标"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "暂停消息处理",
+    "resume_message_processing": "恢复消息处理",
+    "override_load_balancer_dead": "将负载均衡器状态覆盖为 DEAD",
+    "override_load_balancer_alive": "将负载均衡器状态覆盖为 ALIVE",
+    "local_message_inputs": "本地消息输入",
+    "recent_system_logs": "获取最近的系统日志消息",
+    "message_processing_title": "消息处理",
+    "pause_confirm": "即将<b>暂停</b> <b>{{nodeName}}</b> 节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将<b>恢复</b> <b>{{nodeName}}</b> 节点上的消息处理，确定继续吗？",
+    "load_balancer_title": "负载均衡器",
+    "load_balancer_confirm": "即将把 <b>{{nodeName}}</b> 节点的负载均衡器状态更改为 <b>{{status}}</b>，确定继续吗？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} 节点"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "负载均衡器 {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "消息处理 {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB 节点"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB 性能分析有助于识别慢查询，并排查集群各节点的性能问题。",
+    "enabling_profiling": "正在启用性能分析...",
+    "enable_confirm": "要在所有 MongoDB 节点上启用 <b>Slow Ops</b> 性能分析（{{threshold}}）吗？设置会立即生效且无需重启，但重启后会重置，除非在启动时进行配置。"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch 节点"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "显示{{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "负载（1 分钟）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "集群",
+    "cluster_id": "集群 ID：",
+    "not_available": "不可用",
+    "number_of_nodes": "节点数量："
+  },
+  "cluster_support_bundle_info": {
+    "description": "创建一个包含 Graylog 集群调试信息的 zip 文件。",
+    "enterprise_customers": "Graylog Enterprise 客户可以将支持包附加到支持工单中，以帮助 Graylog 技术支持团队分析和诊断问题。",
+    "examine_content": "分享前请仔细检查支持包内容，其中可能包含 IP 地址、主机名甚至密码等敏感数据！",
+    "paid_license_only": "只有付费许可用户才能使用 Graylog Enterprise 支持。您也可以将此文件用于其他调试用途。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "集群支持包",
+    "create": "创建支持包",
+    "download": "下载",
+    "delete": "删除",
+    "filename": "文件名",
+    "size": "大小",
+    "no_bundles": "未找到任何支持包。",
+    "delete_title": "删除支持包",
+    "delete_confirm": "确定要删除 <strong>{{name}}</strong> 吗？"
+  },
+  "log_level_metrics": {
+    "level": "级别：{{level}}",
+    "total_written": "写入总数：",
+    "mean_rate": "平均速率：",
+    "one_minute_rate": "1 分钟速率：",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "子系统：{{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "显示日志级别指标",
+    "hide_log_level_metrics": "隐藏日志级别指标",
+    "total_log_messages": "共写入 <strong>{{throughput}} 条内部日志消息。</strong>"
+  },
+  "metric_details": {
+    "value": "值：",
+    "count": "计数：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "standard_deviation": "标准差：",
+    "percentile_95": "第 95 百分位：",
+    "percentile_98": "第 98 百分位：",
+    "percentile_99": "第 99 百分位：",
+    "invalid_type": "无效的指标类型：{{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "总计：",
+    "events": "事件",
+    "one_minute_avg": "1 分钟平均值：",
+    "five_minute_avg": "5 分钟平均值：",
+    "fifteen_minute_avg": "15 分钟平均值："
+  },
+  "counter_rate": {
+    "calculating": "计算中...",
+    "total": "（共 {{total}}）",
+    "per_second": "每秒"
+  },
+  "metric_container": {
+    "loading": "加载中..."
+  },
+  "metrics_component": {
+    "fetch_error": "无法从节点获取指标：服务器返回了 {{status}} 状态码，响应消息为 <em>{{responseMessage}}</em>。",
+    "fetch_problem": "获取节点指标时出现问题。",
+    "retry_in_background": "系统将在后台继续尝试获取。",
+    "fetch_error_last_metrics": "无法从节点获取指标：服务器返回了 {{status}} 状态码，响应消息为 <em>{{responseMessage}}</em>。正在显示最近一次可用的指标。",
+    "filter_placeholder": "输入指标名称进行过滤…"
+  },
+  "metrics_list": {
+    "no_metrics": "没有与给定过滤条件匹配的指标。请确保使用有效的正则表达式"
+  },
+  "buffer_usage": {
+    "metrics": "指标",
+    "utilization": "<strong>{{usage}} 条消息</strong>位于 {{title}} 中，利用率为 {{percentage}}。"
+  },
+  "input_types_data_table": {
+    "loading": "正在加载输入类型..."
+  },
+  "journal_details": {},
+  "journal_state": {},
+  "jvm_heap_usage": {},
+  "node_list_item": {},
+  "node_maintenance_dropdown": {},
+  "node_overview": {},
+  "nodes_actions": {},
+  "nodes_list": {},
+  "plugins_data_table": {},
+  "rest_api_overview": {},
+  "system_information": {},
+  "system_overview_details": {},
+  "system_overview_summary": {},
+  "bulk_actions": {},
+  "system_notifications_table": {},
+  "actions_cell": {},
+  "title_cell": {},
+  "system_job": {},
+  "system_jobs_component": {},
+  "system_jobs_list": {},
+  "system_messages_component": {},
+  "system_messages_list": {},
+  "global_throughput": {},
+  "node_throughput": {},
+  "telemetry_debug_entry_row": {},
+  "telemetry_debug_overlay": {},
+  "cluster_configuration_page": {},
+  "configurations_page": {},
+  "enterprise_page": {},
+  "process_buffer_dump_page": {},
+  "show_metrics_page": {},
+  "node_page": {},
+  "system_logs_page": {},
+  "system_notifications_page": {},
+  "system_overview_page": {},
+  "thread_dump_page": {},
+  "notifications": {},
+  "use_cluster_overview_notifications": {},
+  "use_cluster_support_bundle_notifications": {},
+  "use_plugin_list_notifications": {}
+}
