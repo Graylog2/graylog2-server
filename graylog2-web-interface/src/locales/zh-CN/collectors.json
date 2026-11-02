@@ -821,27 +821,142 @@
       "certificate": "证书",
       "copy_to_clipboard": "复制到剪贴板",
       "private_key": "私钥",
-      "view_principal": "Principal："
+      "view_principal": "Principal：",
+      "view_role": "Role：",
+      "generate": "生成客户端证书",
+      "description": "为第三方工具生成客户端证书",
+      "title": "客户端证书"
     },
     "cluster_health": {
-      "shard_replication_help": {},
-      "state_help": {}
+      "cluster_manager": "Cluster Manager：",
+      "disabled": "已禁用",
+      "enabled": "已启用",
+      "nodes_summary": "{{total}}（{{outdated}} 个过期，{{upgraded}} 个已升级）",
+      "number_of_nodes": "节点数：",
+      "number_of_shards": "分片数：",
+      "server_version": "服务器版本：",
+      "shard_replication": "分片复制：",
+      "shard_replication_help": {
+        "confirm": "节点升级后，点击<emphasis><bold>确认升级</bold></emphasis>，分片复制将重新启用，因节点升级而不可用的所有分片都将重新分配。",
+        "force_disabled": "强制禁用",
+        "force_enabled": "强制启用",
+        "start": "点击某个节点的<emphasis><bold>开始升级流程</bold></emphasis>后，分片分配将设置为无复制，以便 OpenSearch 仅使用可用的分片。"
+      },
+      "shards_summary": "{{active}} 个活动，{{initializing}} 个初始化中，{{relocating}} 个迁移中，{{unassigned}} 个未分配",
+      "state_help": {
+        "green": "节点升级后，点击<emphasis>确认升级</emphasis>，分片复制将重新启用，因节点升级而不可用的所有分片都将重新分配，集群将恢复为 GREEN 状态。",
+        "question": "滚动升级期间，我的集群状态会如何变化？",
+        "red": "RED——如果您使用的索引没有副本，并升级了承载这些索引分片的节点，集群将进入 red 状态，这些索引将无法写入数据，也无法搜索。",
+        "yellow": "YELLOW——开始升级某个节点后，分片分配将设置为无复制，以便 OpenSearch 仅使用可用的分片。"
+      }
     },
-    "upgrade_method": {},
-    "upgrade_status": {},
-    "upgrade_nodes": {},
-    "data_node_actions": {},
-    "data_node_badge": {},
-    "data_node_status": {},
-    "data_node_logs": {},
-    "cluster_management": {},
-    "ca_configuration": {},
-    "ca_upload": {},
-    "ca_create": {},
+    "upgrade_method": {
+      "cluster_restart": "集群重启",
+      "cluster_restart_description": "使用集群重启方式时，您将一次性升级所有 Data Nodes。在此期间，消息将缓存在 Journal 中，并在 Data Node 集群重新上线后进行处理。只要 Journal 大小配置能够容纳 Data Node 停机期间预期的消息量，就不会丢失数据。",
+      "cluster_restart_less_than_three": "如果您运行的 Data Node 集群少于三个节点，集群重启是唯一可用的方式。",
+      "cluster_restart_three_or_more": "如果您运行的 Data Node 集群有三个或更多节点，在考虑 Journal 大小和消息吞吐量后，您可以选择使用集群重启方式。",
+      "rolling_upgrade": "滚动升级",
+      "rolling_upgrade_description": "滚动升级只能在运行中的 Data Node 集群上进行，且需要<bold>三个或更多节点</bold>，几乎无停机时间。",
+      "rolling_upgrade_process": "Data Nodes 将逐个停止并原地升级。或者，也可以逐个停止 Data Nodes，并由运行新版本的主机替换。在此过程中，您可以继续在集群中写入和查询数据。"
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "所有 Data Nodes 均为最新版本。",
+      "checking": "正在检查 OpenSearch 状态...",
+      "error": "无法检查 Data Nodes 内置的 OpenSearch 版本。",
+      "outdated": "Data Nodes 内置的 OpenSearch 不是最新版本。",
+      "up_to_date": "Data Nodes 内置的 OpenSearch 为最新版本。",
+      "up_to_date_with_version": "Data Nodes 内置的 OpenSearch 为最新版本<bold>（{{version}}）。</bold>",
+      "upgrading": "OpenSearch 滚动升级正在进行中。"
+    },
+    "upgrade_nodes": {
+      "manager": "管理节点",
+      "no_outdated_nodes": "未找到过期的节点。",
+      "no_upgraded_nodes": "未找到已升级的节点。",
+      "outdated_nodes": "过期节点",
+      "start_upgrade": "开始升级流程",
+      "upgraded": "已升级",
+      "upgraded_nodes": "已升级节点"
+    },
+    "data_node_actions": {
+      "rejoin": "重新加入",
+      "remove": "移除",
+      "renew_certificate": "续期证书",
+      "show_logs": "查看日志",
+      "start": "启动",
+      "stop": "停止",
+      "rejoin_title": "重新加入 Data Node",
+      "rejoin_confirm": "确定要让 Data Node “{{hostname}}” 重新加入吗？",
+      "remove_title": "移除 Data Node",
+      "remove_confirm": "确定要移除 Data Node “{{hostname}}” 吗？",
+      "stop_title": "停止 Data Node",
+      "stop_confirm": "确定要停止 Data Node “{{hostname}}” 吗？"
+    },
+    "data_node_badge": {
+      "short_node_id": "节点 ID（短）"
+    },
+    "data_node_status": {
+      "queued_for": "已排队等待{{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "无日志。",
+      "title": "{{hostname}} 日志"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "查看 Data Node 和受管 OpenSearch 集群的性能指标。",
+      "teaser_license_warning": "请确保您拥有有效的许可证，并已配置 Data Node，以查看 Data Node 和受管 OpenSearch 集群的性能指标。"
+    },
+    "ca_configuration": {
+      "create_tab": "创建新的 CA",
+      "description_provision": "证书颁发机构将更轻松地为您的 Data Nodes 配置和管理证书。",
+      "description_upload_or_create": "在此步骤中，您可以上传或创建新的证书颁发机构。",
+      "reusing_certificates": "如果现有集群使用证书，在下一步配置 Data Nodes 时，这些证书默认会被 {{productName}} CA 和自动生成的证书替换。如果您希望使用自己的 CA，可以上传现有证书。更多信息请参阅 <docsLink>{{productName}} Data Node - 入门指南</docsLink>。",
+      "reusing_certificates_title": "复用证书",
+      "title": "配置证书颁发机构",
+      "upload_tab": "上传 CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "证书颁发机构",
+      "dropzone": "将 CA 拖放到此处，或点击选择文件",
+      "explanation": "您可以在此上传现有的 CA。需要上传一个包含私钥（加密或未加密）、CA 证书以及所有中间证书的文件。文件可以是 PEM 或 PKCS#12 格式。如果私钥已加密，还需提供其密码。",
+      "failed": "CA 上传失败：{{error}}",
+      "password": "密码",
+      "rejected": "CA 上传失败",
+      "submit": "上传 CA",
+      "submitting": "正在上传 CA...",
+      "success": "CA 上传成功"
+    },
+    "ca_create": {
+      "description": "点击“创建 CA”按钮，即可快速为您的 {{productName}} Data Nodes 创建新的证书颁发机构。",
+      "failed": "CA 创建失败：{{error}}",
+      "organization_name": "组织名称",
+      "submit": "创建 CA",
+      "submitting": "正在创建 CA...",
+      "success": "CA 创建成功"
+    },
     "renewal_policy": {
-      "modes": {}
+      "certificate_lifetime": "证书有效期：",
+      "certificate_lifetime_label": "证书有效期",
+      "configure": "配置证书续期策略",
+      "description": "这些设置将在检测证书过期和/或续期证书时使用。",
+      "edit": "编辑配置",
+      "lifetime_explanation": "证书有效期将用于确定新创建证书的有效时长。",
+      "mode_explanation": "将续期策略设置为“自动”后，将在无需用户操作的情况下续期所有即将过期的证书。设置为“手动”后，当一个或多个证书即将过期时，将创建系统通知，供您确认续期。",
+      "renewal_mode": "续期模式：",
+      "renewal_mode_label": "证书续期模式",
+      "select_mode": "选择证书续期模式",
+      "submit": "更新配置",
+      "submitting": "正在更新配置",
+      "title": "证书续期策略配置",
+      "update_failed": "更新证书续期策略时出错：{{error}}",
+      "update_failed_title": "无法更新证书续期策略",
+      "modes": {
+        "automatic": "自动",
+        "manual": "手动"
+      }
     },
-    "details_page": {},
+    "details_page": {
+      "certificate_valid_until": "证书有效期至："
+    },
     "pages": {},
     "upgrade_page": {},
     "migration_steps": {},
