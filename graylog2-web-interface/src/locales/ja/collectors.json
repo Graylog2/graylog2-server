@@ -1,1 +1,275 @@
-{}
+{
+  "pages": {
+    "documentation_title": "Collectors ドキュメント",
+    "deployment": {
+      "title": "Collectors のデプロイ",
+      "description": "任意の台数のホストでコマンドを実行します。ホストは選択したフリートに登録され、チェックインすると表示されます。",
+      "deploy_tab": "デプロイ",
+      "tokens_tab": "登録トークン",
+      "tokens_description": "トークンは、新しい Collectors がフリートに登録することを許可します。トークンを削除しても、登録済みの Collectors には影響しません。"
+    },
+    "fleets": {
+      "document_title": "Collector フリート",
+      "title": "フリート",
+      "description": "フリートは、同じ設定を共有する Collectors のグループです。フリート内のすべての Collectors は同じソースからデータを収集します。環境、チーム、用途ごとに Collectors を整理するためにフリートを使用します。"
+    },
+    "fleet_detail": {
+      "title": "フリートの詳細"
+    },
+    "instances": {
+      "document_title": "Collector インスタンス",
+      "title": "インスタンス",
+      "description": "Collector インスタンスは、リモートホスト上で実行中の Collector プロセスを表します。インスタンスは登録トークンを使ってフリートに登録され、フリートのソース設定を自動的に受け取ります。"
+    },
+    "onboarding": {
+      "title": "Collector オンボーディング",
+      "description": "新しく接続された Collector のステータスです。",
+      "load_error": "Collector インスタンスを読み込めませんでした: {{error}}",
+      "not_found": "Collector インスタンスが見つかりません。削除された可能性があります。すべての<instancesLink>インスタンス</instancesLink>を確認してください。"
+    },
+    "overview": {
+      "title": "Collectors の概要",
+      "description": "Collectors は、インフラストラクチャ全体に配置される軽量のサービスで、ログを収集して {{productName}} に転送します。フリートに編成され、収集するデータを定義するソースで設定されます。"
+    },
+    "settings": {
+      "title": "Collectors の設定",
+      "description": "管理対象の Collectors のエンドポイントとライフサイクル設定を構成します。Collectors はこれらのエンドポイントに接続して設定の更新を受け取り、収集したログデータを送信します。"
+    }
+  },
+  "navigation": {
+    "overview": "概要",
+    "fleets": "フリート",
+    "instances": "インスタンス",
+    "deployment": "デプロイ",
+    "settings": "設定"
+  },
+  "activity": {
+    "deleted_target": "[削除済み]",
+    "by_actor": "{{name}} による",
+    "by_system": "システムによる",
+    "config_changed": {
+      "fleet": "フリート <targetLink /> の設定が更新されました",
+      "collector": "Collector <targetLink /> の設定が更新されました"
+    },
+    "ingest_config_changed": {
+      "fleet": "フリート <targetLink /> の取り込み設定が更新されました",
+      "collector": "Collector <targetLink /> の取り込み設定が更新されました"
+    },
+    "restart": {
+      "fleet": "フリート <targetLink /> の再起動が要求されました",
+      "collector": "Collector <targetLink /> の再起動が要求されました"
+    },
+    "discovery_run": {
+      "fleet": "フリート <targetLink /> の検出実行がトリガーされました",
+      "collector": "Collector <targetLink /> の検出実行がトリガーされました"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> が再割り当てされました"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> がフリート <destinationLink /> に再割り当てされました"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "Collector は次回チェックイン時にこのフリートに移動します。",
+    "moving_from": "({{fleet}} から移動中)",
+    "moving_from_removed": "(削除されたフリートから移動中)",
+    "removed_title": "このフリートは削除されました。",
+    "removed": "フリートが削除されました ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "同期保留中 — 変更は Collector の次回チェックイン時に適用されます",
+    "pending": "同期保留中",
+    "in_sync_title": "同期済み — すべての変更が適用されています",
+    "in_sync": "同期済み"
+  },
+  "instance_status": {
+    "online": "オンライン",
+    "offline": "オフライン"
+  },
+  "os": {
+    "unknown": "不明"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "登録トークンを削除",
+    "never": "なし",
+    "expired": "期限切れ",
+    "human_name": "登録トークン",
+    "delete_title": "登録トークンを削除",
+    "delete_confirm": "この登録トークンを削除してもよろしいですか？ 新しい Collectors はこのトークンを使用して登録できなくなります。登録済みの Collectors は引き続き正常に動作します。"
+  },
+  "deployment": {
+    "select_fleet_step": "フリートを選択",
+    "generate_token_step": "トークンを生成",
+    "install_step": "Collector をインストール",
+    "open_in_search": "検索で開く",
+    "generate_token_first": "上でトークンを生成すると、インストールコマンドが表示されます。",
+    "copy_token_only": "トークンのみコピー"
+  },
+  "enrolling_hosts": {
+    "receiving": "受信中",
+    "listening": "待機中…",
+    "title": "登録中のホスト",
+    "listening_subtitle": "待機中…",
+    "view_all": "インスタンスですべて表示",
+    "host": "ホスト",
+    "status": "ステータス",
+    "first_messages": "最初のメッセージ",
+    "enrolled": "登録済み",
+    "actions": "操作",
+    "hide_setup": "セットアップを非表示",
+    "view_setup": "セットアップを表示",
+    "empty": "コマンドを実行したホストは、チェックインするとここに表示されます。",
+    "connection_problem": "サーバーに接続できません — 自動的に再試行しています"
+  },
+  "token_step": {
+    "summary_expires": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 期限 <expiresAt />",
+    "summary_expires_with_fleet": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 期限 <expiresAt /> — フリート <emphasis>{{fleetName}}</emphasis> にスコープ設定済み",
+    "summary_never_expires": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 無期限",
+    "summary_never_expires_with_fleet": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 無期限 — フリート <emphasis>{{fleetName}}</emphasis> にスコープ設定済み",
+    "change_token": "トークンを変更",
+    "short_lived": "短期間のトークン (1 日で期限切れ)",
+    "custom": "カスタムトークン",
+    "expiry_24_hours": "24 時間",
+    "expiry_7_days": "7 日",
+    "expiry_30_days": "30 日",
+    "expiry_never": "有効期限なし",
+    "name": "名前",
+    "name_placeholder": "例: web-servers rollout",
+    "custom_hint": "カスタムトークンは登録トークンタブに表示され、いつでも取り消すことができます。",
+    "no_permission": "このフリートの登録トークンを作成する権限がありません",
+    "generating": "生成中...",
+    "generate": "トークンを生成",
+    "select_fleet_first": "まず上でフリートを選択してください。"
+  },
+  "fleet_actions": {
+    "received_messages": "受信したメッセージ",
+    "delete": "削除",
+    "delete_title": "フリートを削除",
+    "delete_confirm": "フリート <emphasis>{{fleetName}}</emphasis> を削除してもよろしいですか？ そのソース設定と登録トークンも削除されます。"
+  },
+  "fleet_form": {
+    "name_required": "名前は必須です"
+  },
+  "fleet_settings": {},
+  "fleets": {},
+  "fleet_detail": {},
+  "instance_actions": {},
+  "reassign_fleet": {},
+  "instance_health": {},
+  "instance_drawer": {},
+  "overview": {},
+  "fleet_card": {},
+  "fleet_cards": {},
+  "recent_activity": {},
+  "collector_facts": {},
+  "connection_success": {},
+  "fleet_choice": {},
+  "ingest_endpoint": {},
+  "install_command": {},
+  "log_preview": {},
+  "next_steps": {},
+  "timeline": {},
+  "platform_picker": {},
+  "source_status": {},
+  "waiting_for_connection": {},
+  "settings": {},
+  "ingest_inputs": {},
+  "port_mismatch": {},
+  "source_types": {},
+  "source_columns": {},
+  "source_form": {},
+  "load_errors": {
+    "recent_activity": {},
+    "input_ids": {},
+    "stats": {},
+    "config": {},
+    "enrollment_tokens": {},
+    "pending_changes": {},
+    "instances": {},
+    "collector_instances": {},
+    "fleets": {},
+    "fleet": {},
+    "fleet_stats": {},
+    "sources": {},
+    "input_details": {}
+  },
+  "mutation_errors": {
+    "create_fleet": {},
+    "update_fleet": {},
+    "delete_fleet": {},
+    "create_source": {},
+    "update_source": {},
+    "delete_source": {},
+    "create_enrollment_token": {},
+    "delete_enrollment_token": {},
+    "delete_enrollment_tokens": {},
+    "reassign_instances": {},
+    "delete_instance": {},
+    "save_config": {},
+    "create_input": {},
+    "update_input": {}
+  },
+  "notifications": {},
+  "datanode": {
+    "compatibility_check": {},
+    "migration_steps_text": {},
+    "migration_welcome": {},
+    "migration_wizard": {},
+    "compatibility_status": {},
+    "in_place_migration": {},
+    "migration_data_nodes": {},
+    "manual_migration": {},
+    "stop_processing": {},
+    "journal_size_warning": {},
+    "journal_downtime": {},
+    "in_place_welcome": {},
+    "restart_graylog": {},
+    "in_place_migration_info": {},
+    "certificates_provisioning": {},
+    "jwt_authentication": {},
+    "reset_migration": {},
+    "migration_actions": {},
+    "force_start": {},
+    "rolling_upgrade_nodes": {
+      "node_status": {},
+      "state": {}
+    },
+    "opensearch_upgrade_info": {},
+    "start_upgrade": {
+      "full": {},
+      "rolling": {}
+    },
+    "opensearch_upgrade": {},
+    "client_certificate": {},
+    "cluster_health": {
+      "shard_replication_help": {},
+      "state_help": {}
+    },
+    "upgrade_method": {},
+    "upgrade_status": {},
+    "upgrade_nodes": {},
+    "data_node_actions": {},
+    "data_node_badge": {},
+    "data_node_status": {},
+    "data_node_logs": {},
+    "cluster_management": {},
+    "ca_configuration": {},
+    "ca_upload": {},
+    "ca_create": {},
+    "renewal_policy": {
+      "modes": {}
+    },
+    "details_page": {},
+    "pages": {},
+    "upgrade_page": {},
+    "migration_steps": {},
+    "migration_states": {},
+    "certificate_renewal": {
+      "renew": {},
+      "provision": {}
+    }
+  },
+  "use_collector_configurations_notifications": {},
+  "use_collectors_notifications": {}
+}
