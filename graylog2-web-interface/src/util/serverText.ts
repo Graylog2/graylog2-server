@@ -16,6 +16,7 @@
  */
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TOptions } from 'i18next';
 
 import i18n from 'i18n';
 
@@ -37,7 +38,7 @@ const SERVER_TEXT_NAMESPACES = [
 ];
 
 const lookup =
-  (translate: (key: string, options: object) => string, exists: (key: string, options: object) => boolean) =>
+  (translate: (key: string, options: TOptions) => string, exists: (key: string, options: TOptions) => boolean) =>
   (namespaces: Array<string>, text: string | undefined): string | undefined => {
     if (!text) {
       return text;

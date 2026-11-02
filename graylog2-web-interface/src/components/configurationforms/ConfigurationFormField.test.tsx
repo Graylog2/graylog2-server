@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { screen, render, waitFor } from 'wrappedTestingLibrary';
+import { screen, render } from 'wrappedTestingLibrary';
 
 import { textField } from 'fixtures/configurationforms';
 import { changeLanguage } from 'i18n';
@@ -48,7 +48,7 @@ describe('<ConfigurationFormField>', () => {
 
     render(<SUT />);
 
-    await waitFor(() => expect(screen.getByLabelText(/Bind-Adresse/)).toBeInTheDocument());
+    expect(await screen.findByLabelText(/Bind-Adresse/)).toBeInTheDocument();
     expect(screen.getByText('TLS-Verbindungen akzeptieren')).toBeInTheDocument();
   });
 });

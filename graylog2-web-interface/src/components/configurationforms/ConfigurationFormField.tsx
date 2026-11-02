@@ -50,16 +50,17 @@ const ConfigurationFormField = ({
   const serverText = useServerText();
   // Labels and descriptions of the fields are sent by the server in English
   const field = useMemo(
-    () => ({
-      ...configField,
-      human_name: serverText(configField.human_name),
-      description: serverText(configField.description),
-    }),
+    () =>
+      ({
+        ...configField,
+        human_name: serverText(configField.human_name),
+        description: serverText(configField.description),
+      }) as ConfigurationField,
     [configField, serverText],
   );
   const elementKey = `${typeName}-${configKey}`;
 
-  switch (configField.type) {
+  switch (field.type) {
     case 'text':
       return (
         <TextField
