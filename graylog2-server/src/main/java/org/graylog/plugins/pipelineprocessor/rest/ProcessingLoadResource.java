@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -31,6 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadService.ActiveCombination;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
@@ -76,7 +76,7 @@ public class ProcessingLoadResource extends ProxiedResource {
             return ProcessingLoadResponse.unavailable();
         }
         if (combinations.stream().noneMatch(c -> canReadPipeline(c.pipelineId()) || canReadRule(c.ruleId()))) {
-            throw new ForbiddenException("No read permission on any active pipeline or rule.");
+            throw new CodedForbiddenException("processing_load.not_allowed", "No read permission on any active pipeline or rule.");
         }
 
         final ProcessingLoadResponse full = processingLoadBuilder.buildUnfiltered(combinations, this::fetchPerNodeMetrics);

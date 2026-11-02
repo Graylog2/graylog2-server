@@ -41,6 +41,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -210,7 +211,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
     private void checkScope(PipelineDao pipelineDao) {
         if (!entityScopeService.isMutable(pipelineDao)) {
-            throw new BadRequestException("Cannot modify connections for immutable pipeline");
+            throw new CodedBadRequestException("pipeline.connections_immutable", "Cannot modify connections for immutable pipeline");
         }
     }
 }

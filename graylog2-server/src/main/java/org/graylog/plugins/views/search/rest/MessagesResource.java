@@ -28,7 +28,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -60,6 +59,7 @@ import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -68,6 +68,7 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -220,7 +221,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
                                                                   @PathParam("filename") String filename,
                                                                   @Context SearchUser searchUser) {
         final ExportJob exportJob = exportJobService.get(exportJobId)
-                .orElseThrow(() -> new NotFoundException("Unable to find export job with id <" + exportJobId + ">!"));
+                .orElseThrow(() -> new CodedNotFoundException("export_job.not_found", "Unable to find export job with id <" + exportJobId + ">!", Map.of("exportJobId", exportJobId)));
 
         return outputFor(exportJob, searchUser);
     }
@@ -266,7 +267,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     private Search loadSearch(String searchId, ExecutionState executionState, SearchUser searchUser) {
         Search search = searchDomain.getForUser(searchId, searchUser)
-                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+                .orElseThrow(() -> new CodedNotFoundException("search.not_found", "Search with id " + searchId + " does not exist", Map.of("searchId", searchId)));
 
         search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
         search = search.addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser);

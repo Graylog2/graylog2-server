@@ -26,12 +26,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -60,6 +58,8 @@ import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -181,7 +181,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     public NotificationDto get(@Parameter(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
-                .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+                .orElseThrow(() -> new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId)));
     }
 
     @POST
@@ -214,11 +214,11 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         if (dbNotificationService.get(notificationId).isEmpty()) {
-            throw new NotFoundException("Notification " + notificationId + " doesn't exist");
+            throw new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId));
         }
 
         if (!notificationId.equals(dto.id())) {
-            throw new BadRequestException("Notification IDs don't match");
+            throw new CodedBadRequestException("event_notification.id_mismatch", "Notification IDs don't match");
         }
 
         final ValidationResult validationResult = dto.validate();
@@ -286,7 +286,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                          @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         final NotificationDto notificationDto =
-                dbNotificationService.get(notificationId).orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+                dbNotificationService.get(notificationId).orElseThrow(() -> new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId)));
 
         resourceHandler.test(notificationDto, getSubject().getPrincipal().toString());
 

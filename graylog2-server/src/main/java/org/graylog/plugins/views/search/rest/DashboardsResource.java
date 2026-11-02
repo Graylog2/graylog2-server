@@ -44,6 +44,7 @@ import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -55,6 +56,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
@@ -80,7 +82,7 @@ public class DashboardsResource extends RestResource {
                 case "read" -> READ;
                 case "update" -> UPDATE;
                 // throwing an IllegalArgumentException here would have Jersey abort with a 404
-                default -> throw new BadRequestException("Unknown scope: " + scope);
+                default -> throw new CodedBadRequestException("dashboard.unknown_scope", "Unknown scope: " + scope, Map.of("scope", scope));
             };
         }
     }

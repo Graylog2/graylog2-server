@@ -28,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DeletableSystemScope;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -83,7 +84,7 @@ public class PipelineUtils {
                 .filter(ruleRef -> isSystemRule(ruleService, ruleRef))
                 .findAny()
                 .ifPresent(rule -> {
-                    throw new BadRequestException("System rules cannot be assigned to other pipelines.");
+                    throw new CodedBadRequestException("pipeline.system_rule_assignment", "System rules cannot be assigned to other pipelines.");
                 });
     }
 

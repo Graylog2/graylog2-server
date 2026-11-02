@@ -42,7 +42,6 @@ import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -84,6 +83,9 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -348,7 +350,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto get(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
-                .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+                .orElseThrow(() -> new CodedNotFoundException("event_definition.not_found", "Event definition <" + definitionId + "> doesn't exist", Map.of("definitionId", definitionId)));
     }
 
     public record EventDefinitionWithContext(@JsonProperty("event_definition") EventDefinitionDto eventDefinition,
@@ -362,7 +364,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
                 .map(eventDefinition -> new EventDefinitionWithContext(eventDefinition, contextService.contextFor(eventDefinition), dbService.isMutable(eventDefinition)))
-                .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+                .orElseThrow(() -> new CodedNotFoundException("event_definition.not_found", "Event definition <" + definitionId + "> doesn't exist", Map.of("definitionId", definitionId)));
     }
 
     public record GetByIdRequest(List<String> eventDefinitionIds) {}
@@ -424,7 +426,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
         EventDefinitionDto oldDto = dbService.get(definitionId)
-                .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+                .orElseThrow(() -> new CodedNotFoundException("event_definition.not_found", "Event definition <" + definitionId + "> doesn't exist", Map.of("definitionId", definitionId)));
         checkProcessorConfig(oldDto, dto);
 
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
@@ -504,7 +506,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(f("Unable to find event definition '%s' to enable", definitionId)));
+                new CodedBadRequestException("event_definition.enable_not_found", f("Unable to find event definition '%s' to enable", definitionId), Map.of("definitionId", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
@@ -535,7 +537,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(f("Unable to find event definition '%s' to disable", definitionId)));
+                new CodedBadRequestException("event_definition.disable_not_found", f("Unable to find event definition '%s' to disable", definitionId), Map.of("definitionId", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
@@ -575,7 +577,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                         @Parameter(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EXECUTE, definitionId);
         if (parameters instanceof EventProcessorParametersWithTimerange.FallbackParameters) {
-            throw new BadRequestException("Unknown parameters type");
+            throw new CodedBadRequestException("event_definition.unknown_parameters_type", "Unknown parameters type");
         }
 
         try {
@@ -594,7 +596,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto duplicate(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
+                new CodedBadRequestException("event_definition.duplicate_not_found", f("Unable to find event definition '%s' to duplicate", definitionId), Map.of("definitionId", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
         return eventDefinitionHandler.duplicate(eventDefinitionDto, userContext.getUser());
@@ -653,7 +655,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 && !oldEventDefinition.config().type().equals(updatedEventDefinition.config().type())) {
             LOG.error("Not allowed to change event definition condition type from <{}> to <{}>.",
                     oldEventDefinition.config().type(), updatedEventDefinition.config().type());
-            throw new ForbiddenException("Condition type not changeable");
+            throw new CodedForbiddenException("event_definition.condition_type_not_changeable", "Condition type not changeable");
         }
     }
 

@@ -84,6 +84,9 @@ import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
@@ -203,7 +206,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
                     .filter(searchUser::canReadView)
-                    .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
+                    .orElseThrow(() -> new CodedNotFoundException("view.default_not_found", "Default view doesn't exist"));
         }
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
@@ -224,7 +227,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
             if (viewResolver != null) {
-                ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+                ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new CodedNotFoundException("view.resolve_failed", "Failed to resolve view:" + id, Map.of("id", id)));
                 if (searchUser.canReadView(view)) {
                     startPageService.addLastOpenedFor(view, searchUser);
                     return view;
@@ -282,7 +285,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
 
         if (!searchUser.canCreateView(dto)) {
-            throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
+            throw new CodedForbiddenException("view.create_not_allowed", "User is not allowed to create view of type " + dto.type(), Map.of("type", dto.type()));
         }
 
         validateIntegrity(dto, searchUser, true);
@@ -312,7 +315,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         validateSearchProperties(dto, search);
 
         if (!newCreation) {
-            final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
+            final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new CodedBadRequestException("view.update_not_found", "Cannot update a view that does not exist : id = " + dto.id(), Map.of("id", dto.id())));
             final String originalViewSearchId = originalView.searchId();
             final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
                     .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
@@ -410,7 +413,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         // the ID from the path always has to match the id from the request body for an update.
         // currently, the FE always uses it like that, so mismatches should only occur when using the API directly
         if (!id.equals(createEntityRequest.entity().id())) {
-           throw new BadRequestException("Invalid update request");
+           throw new CodedBadRequestException("view.invalid_update", "Invalid update request");
         }
 
         final ViewDTO originalDto = createEntityRequest.entity();
@@ -522,6 +525,6 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
     }
 
     private NotFoundException viewNotFoundException(String id) {
-        return new NotFoundException("View " + id + " doesn't exist");
+        return new CodedNotFoundException("view.not_found", "View " + id + " doesn't exist", Map.of("id", id));
     }
 }
