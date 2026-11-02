@@ -6,7 +6,8 @@
       "no_collectors": "没有可显示的 Collector",
       "no_compatible_collectors": "没有与 {{operatingSystem}} 兼容的 Collector",
       "no_filter_matches": "没有 Collector 符合过滤条件",
-      "select_all": "全选"
+      "select_all": "全选",
+      "selected_other": "已选择 {{count}} 个"
     },
     "collectors_administration_actions": {
       "assign_configurations": "分配配置",
@@ -30,11 +31,13 @@
       "no_configurations": "所选 Collector 没有可用的配置。",
       "remove": "移除 {{name}}",
       "selected": "已选择 {{name}}",
+      "sidecar_count_other": "{{count}} 个 Sidecar： ",
       "title": "编辑 <collectorName>{{name}}</collectorName> 配置",
       "unknown_collector": "未知 Collector"
     },
     "configuration_summary": {
       "confirm": "确定要对 <summaryText>{{summary}}</summaryText> 执行此操作吗？",
+      "sidecars_summary_other": "{{count}} 个 Sidecar",
       "title": "配置摘要"
     },
     "filters_summary": {
@@ -56,7 +59,11 @@
         "start": "在没有配置的情况下启动 Collector 不会产生任何效果。",
         "stop": "在没有配置的情况下停止 Collector 不会产生任何效果。"
       },
-      "summary": {},
+      "summary": {
+        "restart_other": "即将在以下 Sidecar 中<action>重启</action>日志 Collector：",
+        "start_other": "即将在以下 Sidecar 中<action>启动</action>日志 Collector：",
+        "stop_other": "即将在以下 Sidecar 中<action>停止</action>日志 Collector："
+      },
       "summary_title": "进程操作摘要",
       "title": "管理 Collector 进程",
       "understood": "知道了，仍然继续",
@@ -273,26 +280,119 @@
       "show_messages": "显示消息"
     },
     "sidecar_status": {
-      "collector_running": "Collector 正在运行。"
+      "collector_running": "Collector 正在运行。",
+      "collector_unknown": "Collector 状态当前未知。",
+      "collectors_status_title": "Collector 状态",
+      "collectors_status_unavailable": "Collector 状态当前不可用。请稍候，并确保 Sidecar 已正确连接到服务器。",
+      "cpu_idle": "CPU 空闲",
+      "ip_address": "IP 地址",
+      "load": "负载",
+      "log_files_title": "日志文件",
+      "node_details_title": "节点详情",
+      "node_details_unavailable": "节点详情当前不可用。请稍候，并确保 Sidecar 已正确连接到服务器。",
+      "no_collectors": "此 Sidecar 中没有配置 Collector。",
+      "no_status_received": "未收到 Collector 状态。请在 Sidecar 配置中设置 <code>send_status: true</code> 以查看此信息。",
+      "none": "无",
+      "not_available": "不可用",
+      "operating_system": "操作系统",
+      "recently_modified": "最近修改的文件将以蓝色高亮显示。",
+      "show_details": "显示详情",
+      "volumes_75": "卷使用率超过 75%"
     },
-    "verbose_message_modal": {}
+    "verbose_message_modal": {
+      "close": "关闭",
+      "no_messages": "<无消息>",
+      "title": "<em>{{collectorName}}</em> 的错误详情"
+    }
   },
   "pages": {
-    "administration": {},
-    "configuration": {},
-    "edit_collector": {},
-    "edit_configuration": {},
-    "failure_tracking": {},
-    "new_collector": {},
-    "new_configuration": {},
-    "overview": {},
-    "status": {}
+    "administration": {
+      "description": "Collector 可以可靠地转发服务器上日志文件或 Windows EventLog 的内容。",
+      "title": "Collector 管理"
+    },
+    "configuration": {
+      "description": "Collector Sidecar 与日志 Collector 并行运行并为其进行配置。在此可以管理 Sidecar 配置。",
+      "title": "Collector 配置"
+    },
+    "documentation_title": "Sidecar 文档",
+    "edit_collector": {
+      "description": "关于日志 Collector 的一些说明。",
+      "title": "日志 Collector"
+    },
+    "edit_configuration": {
+      "description": "关于 Collector 配置的一些说明。",
+      "title": "Collector 配置"
+    },
+    "failure_tracking": {
+      "description": "Sidecar 故障跟踪提供有关故障原因的额外有用信息，可帮助缩短排障时间，更快地让 Collector 重新上线。",
+      "document_title": "Sidecar",
+      "title": "故障跟踪"
+    },
+    "new_collector": {
+      "description": "关于日志 Collector 的一些说明。",
+      "title": "新建日志 Collector"
+    },
+    "new_configuration": {
+      "description": "关于 Collector 配置的一些说明。",
+      "title": "新建 Collector 配置"
+    },
+    "overview": {
+      "description": "Sidecar 可以可靠地转发服务器上日志文件或 Windows EventLog 的内容。",
+      "document_title": "Sidecar",
+      "title": "Sidecar 概览",
+      "token_hint": "需要 Sidecar 的 API 令牌吗？<tokenLink>为 <em>{{username}}</em> 用户创建或复用令牌</tokenLink>"
+    },
+    "status": {
+      "description": "Sidecar 的状态概览。",
+      "document_title": "Sidecar 状态",
+      "document_title_named": "Sidecar {{name}} 状态",
+      "documentation_title": "Sidecar 文档",
+      "title": "Sidecar <em>{{name}} 状态</em>"
+    }
   },
-  "notifications": {},
-  "use_sidecars_notifications": {},
+  "notifications": {
+    "fetch_failed": "获取配置变量失败，状态：{{error}}",
+    "fetch_failed_title": "无法获取配置变量",
+    "save_success_created": "配置变量 “{{name}}” 已成功创建",
+    "save_success_updated": "配置变量 “{{name}}” 已成功更新",
+    "save_failed": "保存变量 “{{name}}” 失败，状态：{{error}}",
+    "save_failed_title": "无法保存变量",
+    "delete_success": "配置变量 “{{name}}” 已成功删除",
+    "delete_failed": "删除变量 “{{name}}” 失败，状态：{{error}}",
+    "delete_failed_title": "无法删除变量",
+    "validate_failed": "验证变量 “{{name}}” 失败，状态：{{error}}",
+    "validate_failed_title": "无法验证变量",
+    "configurations_fetch_failed": "获取此变量的配置失败，状态：{{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "获取 Sidecar 失败，状态：{{error}}",
+    "fetch_failed_title": "无法获取 Sidecar",
+    "not_found": "无法找到 ID 为 <{{sidecarId}}> 的 Sidecar，可能是因为其长时间未激活。",
+    "fetch_actions_failed": "获取 Sidecar 操作失败，状态：{{error}}",
+    "fetch_actions_failed_title": "无法获取 Sidecar 操作",
+    "restart_failed": "重启 Sidecar 失败，状态：{{error}}",
+    "restart_failed_title": "无法重启 Sidecar",
+    "configuration_change_requested": "已请求更改 {{amount}} 个 Collector 的配置",
+    "fetch_sidecars_failed": "获取 Sidecar 失败，状态：{{error}}",
+    "fetch_sidecars_failed_title": "无法获取 Sidecar"
+  },
   "use_sidecars_administration_notifications": {
-    "requested": {},
-    "request_failed": {},
-    "request_failed_title": {}
+    "fetch_sidecars_failed": "获取 Sidecar 失败，状态：{{error}}",
+    "fetch_sidecars_failed_title": "无法获取 Sidecar",
+    "requested": {
+      "start": "已请求启动 {{amount}} 个 Collector",
+      "restart": "已请求重启 {{amount}} 个 Collector",
+      "stop": "已请求停止 {{amount}} 个 Collector"
+    },
+    "request_failed": {
+      "start": "请求启动失败，状态：{{error}}",
+      "restart": "请求重启失败，状态：{{error}}",
+      "stop": "请求停止失败，状态：{{error}}"
+    },
+    "request_failed_title": {
+      "start": "无法启动 Collector",
+      "restart": "无法重启 Collector",
+      "stop": "无法停止 Collector"
+    }
   }
 }
