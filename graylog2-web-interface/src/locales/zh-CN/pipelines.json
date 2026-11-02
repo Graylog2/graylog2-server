@@ -54,6 +54,7 @@
     "not_connected": "此 Pipeline 当前未连接任何 Stream。需要将 Pipeline 连接到至少一个 Stream，才能处理传入的消息。如果您只打算通过装饰器转换搜索结果，则无需连接。",
     "delete_stage_confirm": "您即将删除阶段 {{stage}}，确定要继续吗？",
     "list_and": " 和 ",
+    "processing_streams_other": "此 Pipeline 正在处理来自 Stream {{streams}} 的消息。",
     "managed_1": "此 Pipeline 由系统管理，只能进行有限的编辑。",
     "managed_2": "只能通过 Input 向导向此 Pipeline 添加 Pipeline 规则。",
     "managed_3": "此 Pipeline 中的 Pipeline 规则会自动重命名，以反映对应 Input 名称的更改。",
@@ -124,6 +125,7 @@
     }
   },
   "stage": {
+    "contains_rules_other": "包含 {{count}} 条规则",
     "last_stage": "此 Pipeline 中没有后续阶段。应用此阶段的规则后，Pipeline 即完成处理。",
     "continue_all": "满足此阶段中<matchText>全部规则</matchText>的消息将继续进入下一阶段。",
     "continue_either": "满足此阶段中<matchText>至少一条规则</matchText>的消息将继续进入下一阶段。",
@@ -294,7 +296,8 @@
     "dropped": "处理过程中原始消息将被丢弃。",
     "not_modified": "处理过程中原始消息将不会被修改。",
     "original_changes": "原始消息 <idSmall><idEm>{{id}}</idEm></idSmall> 中的更改",
-    "other_changes": "其他更改"
+    "other_changes": "其他更改",
+    "other_changes_description_other": "将会创建 {{count}} 条消息。切换到<previewOption>结果预览</previewOption>视图选项即可查看。"
   },
   "simulation_preview": {
     "dropped_title": "消息将被丢弃",
@@ -373,11 +376,34 @@
     "connections_updated": "Pipeline 连接已成功更新",
     "connections_update_failed": "更新 Pipeline 连接失败，状态：{{error}}",
     "connections_update_failed_title": "无法更新 Pipeline 连接",
-    "create_failed": "创建 Pipeline 失败，状态：{{error}}"
+    "create_failed": "创建 Pipeline 失败，状态：{{error}}",
+    "create_failed_title": "无法创建 Pipeline",
+    "create_success": "Pipeline 已成功创建。",
+    "update_failed": "更新 Pipeline 失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Pipeline",
+    "update_success": "Pipeline 已成功更新。",
+    "delete_failed": "删除 Pipeline 失败，状态：{{error}}",
+    "delete_failed_title": "无法删除 Pipeline",
+    "delete_success": "Pipeline 已成功删除。",
+    "success_title": "成功！"
   },
-  "connections_list": {},
+  "connections_list": {
+    "not_connected": "Pipeline 未连接到任何 Stream"
+  },
   "rule_list": {
-    "headers": {}
+    "headers": {
+      "title": "标题",
+      "description": "描述",
+      "created": "创建时间",
+      "last_modified": "最后修改时间",
+      "throughput": "吞吐量",
+      "errors": "错误",
+      "pipeline_load": "Pipeline 负载（15 分钟）",
+      "pipelines": "Pipeline",
+      "actions": "操作"
+    }
   },
-  "load_cell": {}
+  "load_cell": {
+    "error_tooltip": "Pipeline 负载不可用：加载处理负载指标失败。"
+  }
 }
