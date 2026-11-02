@@ -15,7 +15,8 @@
     "color_hint": "色のヒント",
     "select_all_fields": "すべてのフィールドを選択",
     "deselect_all_fields": "すべてのフィールドの選択を解除",
-    "field_required": "フィールドは必須です。"
+    "field_required": "フィールドは必須です。",
+    "must_be_greater_than_other": "0 より大きい値を指定してください。"
   },
   "wizard_grouping": {
     "settings": "設定",
@@ -115,24 +116,121 @@
     "axis_label_or_color": "少なくとも 1 つの軸にラベルまたは色を設定してください。",
     "type_required": "タイプを入力してください。"
   },
-  "builder_empty": {},
-  "vis_types": {},
-  "vis_validation": {},
-  "vis_common": {
-    "interpolation_types": {},
-    "axis_types": {}
+  "builder_empty": {
+    "title": "集計が空です",
+    "editing": "ウィジェットを編集中です。",
+    "add_metric_hint": "結果を表示するには、少なくとも 1 つのメトリックを追加してください。行や列を追加してデータをグループ化することもできます。",
+    "preview_hint": "「{{button}}」をクリックすると、ウィジェットの検索結果をプレビューできます。",
+    "finish_hint": "完了するには「{{update}}」をクリックして保存するか、「{{cancel}}」をクリックして変更を破棄してください。",
+    "edit_hint_interactive": "結果をここに表示するには、ウィジェットを<editButton>編集</editButton>してください。",
+    "edit_hint": "結果をここに表示するには、ウィジェットを編集してください。"
   },
-  "vis_heatmap": {},
-  "vis_worldmap": {},
+  "vis_types": {
+    "area_chart": "エリアチャート",
+    "bar_chart": "棒グラフ",
+    "heatmap": "ヒートマップ",
+    "line_chart": "折れ線グラフ",
+    "network_graph": "ネットワークグラフ",
+    "pie_chart": "円グラフ",
+    "sankey": "サンキー",
+    "scatter_plot": "散布図",
+    "single_number": "単一の数値",
+    "world_map": "世界地図"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "エリアチャートには少なくとも 1 つのメトリックが必要です",
+    "bar_chart_requires_metric": "棒グラフには少なくとも 1 つのメトリックが必要です",
+    "line_chart_requires_metric": "折れ線グラフには少なくとも 1 つのメトリックが必要です",
+    "pie_chart_requires_metric": "円グラフには少なくとも 1 つのメトリックが必要です",
+    "scatter_plot_requires_metric": "散布図には少なくとも 1 つのメトリックが必要です",
+    "sankey_requires_groupings": "サンキーには少なくとも 2 つのグループ化フィールドが必要です。",
+    "sankey_single_metric": "サンキーは単一のメトリックのみサポートします。",
+    "network_requires_groupings": "ネットワークグラフには少なくとも 2 つのグループ化フィールドが必要です。"
+  },
+  "vis_common": {
+    "interpolation": "補間",
+    "interpolation_types": {
+      "linear": "直線",
+      "step-after": "ステップ（後）",
+      "spline": "スプライン"
+    },
+    "axis_type": "軸のタイプ",
+    "axis_types": {
+      "linear": "線形",
+      "logarithmic": "対数"
+    },
+    "color_scale": "色のスケール",
+    "reverse_scale": "スケールを反転",
+    "show_axis_labels": "軸ラベルを表示",
+    "x_axis": "X 軸",
+    "y_axis_number": "Y 軸: 数値",
+    "y_axis_percent": "Y 軸: パーセント",
+    "y_axis_time": "Y 軸: 時間",
+    "y_axis_size": "Y 軸: サイズ",
+    "color_hint": "色のヒント",
+    "legend_configuration": "{{label}} の設定"
+  },
+  "vis_heatmap": {
+    "auto_scale": "自動スケール",
+    "min": "最小",
+    "max": "最大",
+    "use_smallest_as_default": "最小値をデフォルトとして使用",
+    "default_value": "デフォルト値"
+  },
+  "vis_worldmap": {
+    "zoom": "ズーム",
+    "latitude": "緯度",
+    "longitude": "経度",
+    "name": "名前",
+    "coordinates": "座標:",
+    "value": "値:"
+  },
   "vis_bar": {
-    "modes": {},
-    "mode_help": {}
+    "mode": "モード",
+    "modes": {
+      "group": "グループ",
+      "stack": "積み上げ",
+      "relative": "相対",
+      "overlay": "重ね合わせ"
+    },
+    "mode_help": {
+      "group": "すべての系列がグラフ内で個別の棒として表示されます。",
+      "stack": "すべての系列が積み上げられ、1 本の棒として表示されます。",
+      "relative": "すべての系列が積み上げられ、1 つのグラフとして表示されます。ただし、負の系列はゼロより下に配置されます。",
+      "overlay": "すべての系列が棒として重ねて配置されます。棒が見えるように、不透明度は 75% に下げられます。このオプションは 3 系列以下での使用を推奨します。"
+    }
   },
   "vis_number": {
-    "trend_preferences": {},
-    "highlight_options": {}
+    "trend": "トレンド",
+    "trend_description": "この数値のトレンド情報を表示します。",
+    "trend_help_enabled": "ユーザーがトレンド表示を有効にすると、現在の値の下に別のボックスが表示されます。このボックスには、アイコンで変化の方向が示され、現在の値と前の値の絶対差と相対差が表示されます。",
+    "trend_help_previous": "前の値は、バックグラウンドで 2 つの検索を実行して計算されます。2 つの検索は期間以外すべて同一です。1 つ目の検索の期間は、このクエリ/このウィジェットに設定された期間と同じです。2 つ目の検索は同じ期間ですが、期間の長さ分だけ過去にずらされています。",
+    "trend_preference": "トレンドの優先設定",
+    "trend_preferences": {
+      "LOWER": "低い方",
+      "NEUTRAL": "中立",
+      "HIGHER": "高い方"
+    },
+    "highlight": "強調表示",
+    "highlight_options": {
+      "TREND_ONLY": "トレンド情報のみ",
+      "FULL_WIDGET": "ウィジェット全体"
+    },
+    "not_available": "N/A",
+    "trend_label": "トレンド: {{absolute}} ({{relative}})、前の値 {{previous}} との比較",
+    "previous_value": "前の値: {{previous}}"
   },
-  "vis_popover": {},
-  "vis_network": {},
-  "vis_sankey": {}
+  "vis_popover": {
+    "related_values": "関連する値",
+    "data_points": "データポイント",
+    "metric": "メトリック",
+    "groupings": "グループ化",
+    "back": "戻る"
+  },
+  "vis_network": {
+    "no_connections": "表示する接続がありません。検索またはグループ化を調整して結果を確認してください。"
+  },
+  "vis_sankey": {
+    "no_flows": "表示するフローがありません。検索またはグループ化を調整して結果を確認してください。"
+  }
 }
