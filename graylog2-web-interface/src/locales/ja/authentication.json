@@ -37,6 +37,7 @@
     "delete": "削除",
     "edit": "編集",
     "filter_label": "サービスをフィルター",
+    "found_other": "システム上で設定済みの認証サービスを{{count}}件見つけました。",
     "headers": {
       "actions": "操作",
       "default_roles": "デフォルトロール",
@@ -141,17 +142,65 @@
   "synced_users": {
     "edit": "編集",
     "filter_label": "ユーザーをフィルター",
+    "found_other": "同期されたユーザーを{{count}}件見つけました。",
     "headers": {
       "actions": "操作",
       "full_name": "氏名",
-      "roles": "ロール"
+      "roles": "ロール",
+      "username": "ユーザー名"
+    },
+    "none_found": "同期されたユーザーは見つかりませんでした。",
+    "role_not_found": "ロールが見つかりません",
+    "title": "同期されたユーザー"
+  },
+  "trusted_header": {
+    "description": "この認証機能により、HTTPヘッダーに基づいて、追加の操作なしでユーザーをログインさせることができます。",
+    "enable_sso": "HTTPヘッダーによるシングルサインオンを有効化",
+    "enabled": "有効",
+    "title": "信頼されたヘッダー認証",
+    "trusted_proxies_hint": "{{productName}}サーバーの設定ファイルで <code>trusted_proxies</code> 設定を行ってください。",
+    "update_config": "設定を更新",
+    "username_header": "ユーザー名ヘッダー",
+    "username_header_help": "ユーザーの暗黙的に信頼される名前を含むHTTPヘッダーです。（ヘッダーの照合では大文字と小文字を区別しません）"
+  },
+  "user_sync": {
+    "browser_time_zone": "ブラウザーのタイムゾーン",
+    "default_assignments_hint": "デフォルトのロールとタイムゾーンの割り当てを変更すると、{{serviceTitle}}経由で新しく作成されたユーザーのみに影響します！",
+    "default_roles": "デフォルトロール",
+    "default_user_time_zone": "デフォルトのユーザータイムゾーン",
+    "email_attribute": "メール属性",
+    "email_attributes": "メール属性",
+    "full_name_attribute": "氏名属性",
+    "id_attribute": "ID属性",
+    "name_attribute": "名前属性",
+    "role_not_found": "ロールが見つかりません",
+    "search_base_dn": "検索ベースDN",
+    "search_pattern": "検索パターン",
+    "search_roles": "ロールを検索",
+    "test_login_hint": "設定を確認するため、サイドバーパネルでユーザーログインをテストすることをお勧めします。",
+    "title": "ユーザー同期"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "この認証サービスのグループ同期設定を本当に削除しますか？",
+    "create_failed": "認証サービスの作成に失敗しました",
+    "edit_failed": "認証サービスの編集に失敗しました",
+    "finish_and_save": "完了してサービスを保存",
+    "finish_and_save_identity_service": "完了してIDサービスを保存",
+    "next_group_sync": "次へ: グループ同期",
+    "next_user_sync": "次へ: ユーザー同期",
+    "server_validation_error": "サーバーの検証エラー: {{errors}}",
+    "steps": {
+      "group_sync": "グループ同期（任意）",
+      "server_config": "サーバー設定",
+      "user_sync": "ユーザー同期"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "認証サービスを編集 - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "HTTPヘッダー認証の設定の読み込みに失敗しました",
+    "update_success": "HTTPヘッダー認証の設定を更新しました",
+    "update_failed": "HTTPヘッダー認証の設定の更新に失敗しました。ステータス: {{error}}"
+  }
 }
