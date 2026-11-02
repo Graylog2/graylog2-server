@@ -182,7 +182,8 @@
   },
   "journal_state": {
     "loading": "正在載入 Journal 指標...",
-    "unavailable": "無法使用 Journal 指標。"
+    "unavailable": "無法使用 Journal 指標。",
+    "summary_other": "Journal 中有 {{count}} 個區段，共含 <strong>{{messages}} 則未處理的訊息</strong>。過去一秒內已寫入 <strong>{{appended}} 則訊息</strong>，已讀取 <strong>{{read}} 則訊息</strong>。"
   },
   "jvm_heap_usage": {
     "loading": "正在載入堆積記憶體使用資訊...",
@@ -197,6 +198,8 @@
     "configure_internal_logging": "設定內部日誌"
   },
   "node_overview": {
+    "plugins_installed_other": "已安裝 {{count}} 個外掛",
+    "inputs_running_other": "此節點上有 {{count}} 個輸入正在執行",
     "memory_heap_usage": "記憶體 / 堆積使用量",
     "buffers": "緩衝區",
     "buffers_description": "緩衝區用於在訊息經過不同處理器時，以極短時間（通常為毫秒）暫存少量訊息。",
@@ -229,6 +232,7 @@
     "recent_system_logs": "取得最近的系統日誌訊息"
   },
   "nodes_list": {
+    "active_nodes_other": "目前有 {{count}} 個作用中的節點",
     "no_active_nodes": "目前沒有任何作用中的節點。"
   },
   "plugins_data_table": {
@@ -364,7 +368,8 @@
   },
   "show_metrics_page": {
     "title": "節點 {{shortNodeId}} / {{hostname}} 的指標",
-    "description": "所有 {{productName}} 節點都提供一組內部指標，用於診斷、除錯與監控。您也可以透過 JMX 存取所有指標。"
+    "description": "所有 {{productName}} 節點都提供一組內部指標，用於診斷、除錯與監控。您也可以透過 JMX 存取所有指標。",
+    "total_metrics_other": "此節點總共回報 {{count}} 個指標。"
   },
   "node_page": {
     "title": "節點 {{shortNodeId}} / {{hostname}}",
@@ -433,7 +438,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "建立支援套件失敗，狀態為：{{error}}",
-    "create_failed_title": "無法建立支援套件。"
+    "create_failed_title": "無法建立支援套件。",
+    "delete_failed": "刪除支援套件失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除支援套件。",
+    "download_failed": "下載支援套件失敗，狀態為：{{error}}",
+    "download_failed_title": "無法下載支援套件。",
+    "load_list_failed": "載入支援套件清單失敗，狀態為",
+    "load_list_failed_title": "無法載入支援套件清單。"
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "取得節點 \"{{nodeId}}\" 上的外掛失敗",
+    "fetch_failed_title": "無法取得外掛"
+  }
 }
