@@ -1,0 +1,4 @@
+type = "s"
+message = "Update to okhttp 5.5.1 which adds a TLS blocklist for 8 compromised eMudhra intermediate CA certificates."
+
+pulls = ["28043"]
