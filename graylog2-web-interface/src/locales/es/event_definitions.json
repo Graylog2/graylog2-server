@@ -15,17 +15,44 @@
   },
   "bulk_actions": {
     "delete": {
+      "confirm_one": "¿Seguro que quieres eliminar {{count}} Event Definition?",
+      "confirm_other": "¿Seguro que quieres eliminar {{count}} Event Definitions?",
       "error": "Se produjo un error al eliminar los Event Definitions. {{error}}",
-      "title": "Eliminar Event Definitions"
+      "failed_one": "{{failed}} de {{count}} Event Definition seleccionado no se pudo eliminar.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron eliminar.",
+      "success_one": "Se eliminó correctamente {{count}} Event Definition.",
+      "success_other": "Se eliminaron correctamente {{count}} Event Definitions.",
+      "title": "Eliminar Event Definitions",
+      "confirm_many": "¿Seguro que quieres eliminar {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron eliminar.",
+      "success_many": "Se eliminaron correctamente {{count}} Event Definitions."
     },
     "disable": {
+      "confirm_one": "¿Seguro que quieres deshabilitar {{count}} Event Definition?",
+      "confirm_other": "¿Seguro que quieres deshabilitar {{count}} Event Definitions?",
       "error": "Se produjo un error al deshabilitar los Event Definitions. {{error}}",
-      "title": "Deshabilitar Event Definitions"
+      "failed_one": "{{failed}} de {{count}} Event Definition seleccionado no se pudo deshabilitar.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron deshabilitar.",
+      "success_one": "Se deshabilitó correctamente {{count}} Event Definition.",
+      "success_other": "Se deshabilitaron correctamente {{count}} Event Definitions.",
+      "title": "Deshabilitar Event Definitions",
+      "confirm_many": "¿Seguro que quieres deshabilitar {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron deshabilitar.",
+      "success_many": "Se deshabilitaron correctamente {{count}} Event Definitions."
     },
     "disable_action": "Deshabilitar",
     "enable": {
+      "confirm_one": "¿Seguro que quieres habilitar {{count}} Event Definition?",
+      "confirm_other": "¿Seguro que quieres habilitar {{count}} Event Definitions?",
       "error": "Se produjo un error al habilitar los Event Definitions. {{error}}",
-      "title": "Habilitar Event Definitions"
+      "failed_one": "{{failed}} de {{count}} Event Definition seleccionado no se pudo habilitar.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron habilitar.",
+      "success_one": "Se habilitó correctamente {{count}} Event Definition.",
+      "success_other": "Se habilitaron correctamente {{count}} Event Definitions.",
+      "title": "Habilitar Event Definitions",
+      "confirm_many": "¿Seguro que quieres habilitar {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions seleccionados no se pudieron habilitar.",
+      "success_many": "Se habilitaron correctamente {{count}} Event Definitions."
     },
     "enable_action": "Habilitar",
     "success_title": "Éxito"
@@ -420,6 +447,8 @@
     "yes": "sí"
   },
   "summary_renders": {
+    "backlog_included_one": "Las notificaciones incluirán {{count}} mensaje",
+    "backlog_included_other": "Las notificaciones incluirán {{count}} mensajes",
     "backlog_none": "Las notificaciones no incluirán ningún mensaje.",
     "condition_plugin_no_summary": "El plugin de condición <em>{{type}}</em> no proporciona un resumen.",
     "event_procedure_summary": "Resumen del procedimiento de evento",
@@ -440,7 +469,8 @@
     "notifications": "Notificaciones",
     "provider_plugin_no_summary": "El plugin de proveedor <em>{{type}}</em> no proporciona un resumen.",
     "remediation_steps": "Pasos de corrección",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "backlog_included_many": "Las notificaciones incluirán {{count}} mensajes"
   },
   "summary_template_help": {
     "aggregation_events": "Eventos de agregación: valores de agrupación y resultados de la agregación.",
@@ -466,8 +496,14 @@
     "aria_label": "Etiquetas del Event Definition",
     "duplicate": "La etiqueta \"{{tag}}\" ya se ha añadido.",
     "help": "Pulsa Intro o Tab para añadir. Las etiquetas se convierten a minúsculas y se eliminan los duplicados. Solo se permiten letras minúsculas, dígitos, guiones, guiones bajos y puntos.",
+    "invalid_characters_one": "La etiqueta {{tags}} contiene caracteres no válidos. Solo se permiten letras minúsculas, dígitos, guiones, guiones bajos y puntos.",
+    "invalid_characters_other": "Las etiquetas {{tags}} contienen caracteres no válidos. Solo se permiten letras minúsculas, dígitos, guiones, guiones bajos y puntos.",
     "max_reached": "Se ha alcanzado el máximo de {{max}} etiquetas.",
-    "placeholder": "p. ej. authentication, brute-force, compliance"
+    "placeholder": "p. ej. authentication, brute-force, compliance",
+    "too_long_one": "La etiqueta {{tags}} supera la longitud máxima de {{max}} caracteres.",
+    "too_long_other": "Las etiquetas {{tags}} superan la longitud máxima de {{max}} caracteres.",
+    "invalid_characters_many": "Las etiquetas {{tags}} contienen caracteres no válidos. Solo se permiten letras minúsculas, dígitos, guiones, guiones bajos y puntos.",
+    "too_long_many": "Las etiquetas {{tags}} superan la longitud máxima de {{max}} caracteres."
   },
   "template_preview": {
     "aggregation": "Campos definidos en Agrupar por con sus nombres originales",
@@ -507,6 +543,7 @@
     "title": "¡Se han encontrado errores!"
   },
   "use_event_definition_notifications": {
-    "load_failed": "Error al cargar el Event Definition con el estado: {{error}}"
+    "load_failed": "Error al cargar el Event Definition con el estado: {{error}}",
+    "load_failed_title": "No se pudo cargar el Event Definition"
   }
 }
