@@ -397,37 +397,164 @@
     "expiration_threshold_help": "I Collector che non inviano dati entro questo tempo vengono rimossi in modo permanente.",
     "confirm": "Conferma impostazioni"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "Input di ingestione",
+    "none": "Non esiste alcun input di ingestione dei Collector. I Collector non potranno inviare dati finché non viene creato un input.",
+    "none_running": "Esistono input di ingestione dei Collector, ma nessuno è attualmente in esecuzione. I Collector non potranno inviare dati.",
+    "name": "Nome",
+    "status": "Stato",
+    "bind_address": "Indirizzo di bind",
+    "port": "Porta",
+    "manage": "Gestisci"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "File",
+    "journald": "Journald",
+    "windows_event_log": "Log eventi di Windows",
+    "macos_unified_logging": "Unified Logging di macOS"
+  },
+  "source_columns": {
+    "enabled": "Abilitata"
+  },
+  "source_form": {
+    "max_poll_interval_error": "L'intervallo massimo di polling deve essere di almeno 1 secondo.",
+    "max_log_age_error": "L'età massima dei log deve essere 0 o un valore positivo.",
+    "read_mode_end": "Dalla fine (tail)",
+    "read_mode_beginning": "Dall'inizio",
+    "file_paths": "Percorso/i del file",
+    "file_paths_help": "Sono supportati i pattern glob (es. /var/log/*.log, /var/log/**/*.log). Il Collector controlla i file trovati alla ricerca di nuove righe.",
+    "read_mode": "Modalità di lettura",
+    "read_mode_file_help": "Dalla fine: raccoglie solo le nuove righe dopo l'avvio del Collector. Dall'inizio: raccoglie prima tutte le righe esistenti, poi continua a leggere le nuove.",
+    "read_mode_journald_help": "Dalla fine: raccoglie solo le nuove voci dopo l'avvio del Collector. Dall'inizio: raccoglie prima tutte le voci esistenti, poi continua a leggere le nuove.",
+    "priority": "Priorità",
+    "priority_help": "Livello minimo di gravità da raccogliere. Ad esempio, selezionando Error vengono raccolte anche le voci Critical, Alert ed Emergency.",
+    "priority_emerg": "Emergenza",
+    "priority_alert": "Allerta",
+    "priority_crit": "Critico",
+    "priority_err": "Errore",
+    "priority_warning": "Avviso",
+    "priority_notice": "Notifica",
+    "priority_info": "Info",
+    "priority_debug": "Debug",
+    "match_pattern": "Pattern di corrispondenza",
+    "match_pattern_help": "Espressione di corrispondenza journald facoltativa per filtrare le voci per unit, processo, ecc. Esempio: _SYSTEMD_UNIT=nginx.service",
+    "channels": "Canali",
+    "channels_help": "Nomi dei canali separati da virgole (es. Application, Security, System)",
+    "include_default_channels": "Includi i canali predefiniti",
+    "include_default_channels_help": "I canali predefiniti sono: {{channels}}",
+    "predicate": "Predicato",
+    "predicate_help": "Filtro predicato facoltativo per il Unified Logging di macOS, passato al comando <code>log</code>. Lasciandolo vuoto vengono raccolti tutti i log del sistema! I livelli <code>info</code> e <code>debug</code> al momento non vengono raccolti, perché sono molto rumorosi e contengono pochissime informazioni utili. Esempio: <code>{{example}}</code>",
+    "max_poll_interval": "Intervallo massimo di polling",
+    "max_poll_interval_help": "Con quale frequenza il Collector controlla nuove voci di log. Deve essere di almeno 1 secondo.",
+    "max_log_age": "Età massima dei log",
+    "max_log_age_help": "Al primo avvio, fino a quanto indietro recuperare i log. Imposta 0 per disattivare il recupero.",
+    "edit_title": "Modifica sorgente",
+    "new_title": "Nuova sorgente",
+    "description": "Una sorgente definisce quali dati devono raccogliere i Collector di questa fleet. Ogni tipo di sorgente corrisponde a un metodo di raccolta diverso.",
+    "source_type": "Tipo di sorgente",
+    "file_type_help": "Raccoglie righe di log dai file dell'host. Supporta i pattern glob per trovare più file.",
+    "journald_type_help": "Raccoglie voci dal journal di systemd (solo Linux).",
+    "windows_type_help": "Raccoglie eventi dai canali di Visualizzatore eventi di Windows.",
+    "macos_type_help": "Raccoglie dal sistema Unified Logging di macOS tramite il comando <code>log</code> (solo macOS).",
+    "enabled_help": "Le sorgenti disabilitate non vengono inviate ai Collector. Usalo per interrompere temporaneamente la raccolta senza rimuovere la sorgente.",
+    "update": "Aggiorna sorgente",
+    "create": "Crea sorgente"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "Caricamento dell'attività recente non riuscito con stato",
+      "title": "Impossibile caricare l'attività recente"
+    },
+    "input_ids": {
+      "message": "Caricamento degli ID degli input dei Collector non riuscito con stato",
+      "title": "Impossibile caricare gli ID degli input dei Collector."
+    },
+    "stats": {
+      "message": "Caricamento delle statistiche dei Collector non riuscito con stato",
+      "title": "Impossibile caricare le statistiche dei Collector."
+    },
+    "config": {
+      "message": "Caricamento della configurazione dei collector non riuscito con stato",
+      "title": "Impossibile caricare la configurazione dei collector."
+    },
+    "enrollment_tokens": {
+      "message": "Caricamento dei token di registrazione non riuscito con stato",
+      "title": "Impossibile caricare i token di registrazione"
+    },
+    "pending_changes": {
+      "message": "Caricamento delle modifiche in attesa non riuscito con stato",
+      "title": "Impossibile caricare le modifiche in attesa"
+    },
+    "instances": {
+      "message": "Caricamento delle istanze non riuscito con stato",
+      "title": "Impossibile caricare le istanze"
+    },
+    "collector_instances": {
+      "message": "Caricamento delle istanze dei Collector non riuscito con stato",
+      "title": "Impossibile caricare le istanze dei Collector"
+    },
+    "fleets": {
+      "message": "Caricamento delle fleet non riuscito con stato",
+      "title": "Impossibile caricare le fleet"
+    },
+    "fleet": {
+      "message": "Caricamento della fleet non riuscito con stato",
+      "title": "Impossibile caricare la fleet"
+    },
+    "fleet_stats": {
+      "message": "Caricamento delle statistiche della fleet non riuscito con stato",
+      "title": "Impossibile caricare le statistiche della fleet"
+    },
+    "sources": {
+      "message": "Caricamento delle sorgenti non riuscito con stato",
+      "title": "Impossibile caricare le sorgenti"
+    },
+    "input_details": {
+      "message": "Caricamento dei dettagli dell'input del Collector non riuscito con stato: {{error}}",
+      "title": "Impossibile caricare i dettagli dell'input del Collector."
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "Creazione della fleet non riuscita: {{error}}",
+      "title": "Impossibile creare la fleet"
+    },
+    "update_fleet": {
+      "message": "Aggiornamento della fleet non riuscito: {{error}}",
+      "title": "Impossibile aggiornare la fleet"
+    },
+    "delete_fleet": {
+      "message": "Eliminazione della fleet non riuscita: {{error}}",
+      "title": "Impossibile eliminare la fleet"
+    },
+    "create_source": {
+      "message": "Creazione della sorgente non riuscita: {{error}}",
+      "title": "Impossibile creare la sorgente"
+    },
+    "update_source": {
+      "message": "Aggiornamento della sorgente non riuscito: {{error}}",
+      "title": "Impossibile aggiornare la sorgente"
+    },
+    "delete_source": {
+      "message": "Eliminazione della sorgente non riuscita: {{error}}",
+      "title": "Impossibile eliminare la sorgente"
+    },
+    "create_enrollment_token": {
+      "message": "Creazione del token di registrazione non riuscita: {{error}}",
+      "title": "Impossibile creare il token di registrazione"
+    },
+    "delete_enrollment_token": {
+      "message": "Eliminazione del token di registrazione non riuscita: {{error}}",
+      "title": "Impossibile eliminare il token di registrazione"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Eliminazione dei token di registrazione non riuscita: {{error}}",
+      "title": "Impossibile eliminare i token di registrazione"
+    },
+    "reassign_instances": {
+      "message": "Riassegnazione delle istanze non riuscita: {{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
