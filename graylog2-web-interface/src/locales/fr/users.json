@@ -410,18 +410,84 @@
       "confirm_disable": "Voulez-vous vraiment désactiver l'utilisateur {{name}} ? Toutes les sessions en cours seront interrompues.",
       "confirm_delete": "Voulez-vous vraiment supprimer l'utilisateur {{name}} ?",
       "edit_title": "Modifier l'utilisateur {{name}}",
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "set_status_title": "Définir le nouveau statut du compte pour {{name}}",
+      "disable": "Désactiver",
+      "enable": "Activer",
+      "delete_title": "Supprimer l'utilisateur {{name}}"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "Connecté",
+      "last_activity": "Dernière activité : {{activity}}",
+      "client_address": "Adresse du client : {{address}}",
+      "not_logged_in": "Non connecté"
+    },
+    "status": {
+      "user_is": "L'utilisateur est {{status}}",
+      "auth_disabled": " (le service d'authentification est désactivé)",
+      "enabled": "activé",
+      "disabled": "désactivé"
+    },
+    "query_example": "Trouver les utilisateurs dont l'e-mail contient example.com:",
+    "fields": {
+      "full_name": "Le nom complet d'un utilisateur",
+      "username": "Le nom d'utilisateur de connexion de l'utilisateur.",
+      "email": "L'adresse e-mail de l'utilisateur."
+    },
+    "select_users": "Sélectionner un ou plusieurs utilisateurs..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "Voir les détails",
+    "edit_user": "Modifier l'utilisateur",
+    "edit_tokens": "Modifier les jetons"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "Jetons",
+    "human_name": "jetons",
+    "fields": {
+      "username": "Le nom d'utilisateur du propriétaire du jeton",
+      "name": "Le nom du jeton",
+      "created": "La date de création du jeton",
+      "last_access": "La dernière utilisation du jeton",
+      "external_user": "Le propriétaire du jeton est-il un utilisateur issu d'un backend d'authentification externe ?",
+      "auth_backend": "Le backend d'authentification de l'utilisateur. N/A pour les utilisateurs internes."
+    },
+    "example_user": "Trouver les jetons créés par un utilisateur donné :",
+    "example_name": "Trouver un jeton par son nom :",
+    "deleting_title": "Suppression du jeton",
+    "delete_confirm": "Vous êtes sur le point de supprimer le jeton : « {{name}} ». Êtes-vous sûr ?",
+    "delete": "Supprimer",
+    "user_not_found": "L'utilisateur n'existe pas.",
+    "user_error_title": "Erreur d'utilisateur du jeton",
+    "not_available": "N/A",
+    "delete_failed": "Échec de la suppression du jeton : {{error}}",
+    "delete_failed_title": "Impossible de supprimer le jeton",
+    "deleted": "Le jeton a été supprimé avec succès.",
+    "deleted_title": "Succès !"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "Détails de l'utilisateur",
+    "title_with_name": "Détails de l'utilisateur {{name}}",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Vue d'ensemble des informations telles que les données de profil, les paramètres, les équipes et les rôles."
+  },
+  "password_rules": {
+    "min_length": "Le mot de passe doit comporter au moins {{minLength}} caractères.",
+    "require_uppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
+    "require_lowercase": "Le mot de passe doit contenir au moins une lettre minuscule.",
+    "require_numbers": "Le mot de passe doit contenir au moins un chiffre.",
+    "require_special_chars": "Le mot de passe doit contenir au moins un caractère spécial parmi : {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Préférences utilisateur enregistrées avec succès",
+    "save_failed": "L'enregistrement des préférences de « {{userName}} » a échoué avec le statut : {{error}}",
+    "save_failed_title": "Impossible d'enregistrer les préférences utilisateur",
+    "change_success": "Votre page d'accueil a été modifiée avec succès",
+    "change_failed": "La modification de votre page d'accueil a échoué avec l'erreur : {{error}}",
+    "change_failed_title": "Impossible de modifier votre page d'accueil"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Le chargement de l'utilisateur {{userId}} a échoué avec le statut",
+    "load_failed_title": "Impossible de charger l'utilisateur {{userId}}"
+  }
 }
