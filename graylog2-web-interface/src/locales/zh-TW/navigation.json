@@ -1,1 +1,57 @@
-{}
+{
+  "main": {
+    "search": "搜尋",
+    "streams": "Streams",
+    "alerts": "警示",
+    "dashboards": "Dashboards",
+    "system": "系統",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "總覽",
+    "configurations": "設定",
+    "cluster_configuration": "叢集設定",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "indices": "索引",
+    "logging": "日誌記錄",
+    "users_and_teams": "使用者與團隊",
+    "roles": "角色",
+    "authentication": "驗證",
+    "content_packs": "Content Packs",
+    "grok_patterns": "Grok Patterns",
+    "lookup_tables": "Lookup Tables",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors"
+  },
+  "security": {
+    "overview": "總覽",
+    "user_activity": "使用者活動",
+    "host_activity": "主機活動",
+    "network_activity": "網路活動",
+    "anomalies": "異常"
+  },
+  "help": {
+    "title": "說明",
+    "documentation": "文件",
+    "design_system": "設計系統",
+    "keyboard_shortcuts": "鍵盤快速鍵",
+    "api_browser": "API 瀏覽器"
+  },
+  "user_menu": {
+    "title": "{{name}} 的使用者選單",
+    "language": "語言",
+    "show_profile": "顯示個人資料",
+    "edit_profile": "編輯個人資料",
+    "log_out": "登出"
+  },
+  "shell": {
+    "welcome": "歡迎",
+    "main": "主要",
+    "utility": "工具",
+    "toggle_navigation": "切換導覽",
+    "scratchpad": "草稿區"
+  }
+}
