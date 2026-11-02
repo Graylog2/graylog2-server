@@ -248,36 +248,161 @@
     "add_favorite_failed_title": "フィールドをお気に入りに追加できませんでした",
     "remove_favorite_failed": "フィールドをお気に入りから削除できませんでした。エラー: {{error}}",
     "remove_favorite_failed_title": "フィールドをお気に入りから削除できませんでした",
-    "field_terms": "フィールドの値:"
+    "field_terms": "フィールドの値:",
+    "received_by_radio_value": "ラジオ <node/> 上の <inputName/> 経由"
   },
-  "entity_types": {},
-  "chips_cell": {},
-  "compact_pagination": {},
-  "expandable_checkbox_list_item": {},
-  "traffic_graph": {},
-  "link_to_node": {},
-  "markdown": {},
-  "public_notifications": {},
-  "refresh_controls": {},
-  "scroll_button": {},
-  "section": {},
-  "selectable_list": {},
-  "share_menu_item": {},
-  "status_icon": {},
-  "type_ahead_field_input": {},
+  "entity_types": {
+    "user": "ユーザー",
+    "team": "チーム",
+    "dashboard": "Dashboard",
+    "event_definition": "Event Definition",
+    "notification": "通知",
+    "search": "検索",
+    "stream": "Stream",
+    "search_filter": "検索フィルター",
+    "report": "レポート",
+    "role": "ロール",
+    "output": "Output",
+    "sigma_rule": "Sigma ルール",
+    "event_procedure": "イベントプロシージャ",
+    "event_procedure_step": "イベントプロシージャのステップ",
+    "collection": "コレクション",
+    "collection_entities": "コレクションの項目"
+  },
+  "marketplace_link": "{{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "一部を表示",
+    "show_all": "すべて表示",
+    "filter_by": "{{itemLabel}} 「{{value}}」でフィルター"
+  },
+  "compact_pagination": {
+    "previous_page": "前のページ",
+    "select_page": "ページを選択",
+    "next_page": "次のページ",
+    "of_pages": "/ {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "項目を選択"
+  },
+  "traffic_graph": {
+    "days": "日数",
+    "incoming": "受信トラフィック",
+    "outgoing": "送信トラフィック",
+    "last_days": "過去 {{days}} 日間: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "不明なノード"
+  },
+  "markdown": {
+    "images_unsupported": "セキュリティ上の理由から画像はサポートされていません。許可するソースを有効にするには、<configurationLink>こちら</configurationLink>を参照してください"
+  },
+  "public_notifications": {
+    "read_less": "折りたたむ",
+    "read_more": "続きを読む"
+  },
+  "refresh_controls": {
+    "controls_label": "{{humanName}} の更新コントロール",
+    "below_minimum": "<intervalDuration /> ({{interval}}) の間隔は、設定された最小間隔の <minimumDuration /> ({{minimum}}) を下回っています。"
+  },
+  "scroll_button": {
+    "back_to_top": "トップに戻る"
+  },
+  "section": {
+    "toggle_section": "{{title, lowercase}} セクションを切り替え"
+  },
+  "selectable_list": {
+    "remove": "削除"
+  },
+  "share_menu_item": {
+    "share": "共有"
+  },
+  "status_icon": {
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "type_ahead_field_input": {
+    "select_field": "フィールドを選択"
+  },
   "query_helper": {
-    "common_fields": {}
+    "title": "検索構文のヘルプ",
+    "show_help": "検索構文のヘルプを表示",
+    "available_fields": "使用可能な検索フィールド",
+    "field": "フィールド",
+    "description": "説明",
+    "examples": "例",
+    "example_description": "説明に security を含むすべての {{entityName}} を検索:",
+    "example_id": "ID が 5f4dfb9c69be46153b9a9a7b の {{entityName}} を検索:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "{{entityName}} の ID（一意の参照子）です。",
+      "title": "{{entityName}} のタイトルです。",
+      "name": "{{entityName}} の名前です。",
+      "description": "{{entityName}} の短い説明です。",
+      "summary": "{{entityName}} の詳しい概要です。"
+    }
   },
-  "url_allow_list_modal": {},
-  "configuration_well": {},
-  "configuration_forms": {},
-  "enterprise_advertisement": {},
-  "plugin_list": {},
-  "reported_error": {},
-  "hotkeys": {},
-  "right_sidebar": {},
+  "url_allow_list_modal": {
+    "add": "URL許可リストに追加",
+    "title": "許可リストの設定を更新",
+    "submit": "設定を更新",
+    "urls": "許可リストのURL"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<アップロードされたファイルの内容>",
+    "no_configuration": "-- 設定なし --"
+  },
+  "configuration_forms": {
+    "undo_reset": "リセットを元に戻す",
+    "remove": "削除",
+    "title": "タイトル",
+    "optional": "任意"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "リソースが限られたITオペレーションおよびソフトウェアエンジニアリングのチーム向けに設計された {{productName}} Enterprise は、ログデータの収集と分析に費やす時間を年間で何千時間も削減し、パフォーマンス、障害、エラーの根本原因を特定するための多くの生産性向上機能を提供します。",
+    "security_title": "{{productName}} Security",
+    "security_description": "{{productName}} Open の機能を拡張し、セキュリティ専用のダッシュボードとアラート、異常検知のAI/MLエンジン、他のセキュリティツールとの連携、SOAR機能、多数のコンプライアンスレポート機能により、サイバーセキュリティの脅威を検知、調査、対応できます。",
+    "request_now": "今すぐリクエスト"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Plugin Enterprise",
+    "installed": "{{pluginName}} はインストールされています",
+    "not_installed": "{{pluginName}} はインストールされていません",
+    "status": "このクラスターの {{productName}} Enterprise モジュールのステータスです:"
+  },
+  "reported_error": {
+    "title": "問題が発生しました",
+    "description": "不明なエラーが発生しました。詳細については、次のメッセージと {{productName}} サーバーのログを確認してください。"
+  },
+  "hotkeys": {
+    "or": "または",
+    "title": "キーボードショートカット",
+    "view_all": "すべてのキーボードショートカットを表示"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}} サイドバー",
+    "sidebar_label_collapsed": "{{title}} サイドバー（折りたたみ済み）",
+    "close": "サイドバーを閉じる",
+    "expand": "サイドバーを展開",
+    "collapse": "サイドバーを折りたたむ",
+    "go_back": "戻る",
+    "go_back_label": "前のコンテンツに戻る",
+    "go_forward": "進む",
+    "go_forward_label": "次のコンテンツに進む"
+  },
   "maxmind_adapter": {
-    "documentation": {},
+    "documentation": {
+      "intro": "GeoIP データアダプターは、MaxMind の GeoIP2 データベースの読み込みに対応しています。",
+      "limitations_title": "制限事項",
+      "limitations_supported": "現在、ASN、都市、国のデータベースに対応しています。",
+      "limitations_more": "その他のデータベースタイプへの対応については、サポートチャネルをご確認ください。",
+      "asn_fields": "ASN データベースのフィールド",
+      "country_fields": "国データベースのフィールド",
+      "city_fields": "都市データベースのフィールド",
+      "city_additional_fields": "都市データベースには、国データベースのフィールドに加えて、次のフィールドも含まれます:"
+    },
     "database_types": {},
     "field_set": {},
     "summary": {}
