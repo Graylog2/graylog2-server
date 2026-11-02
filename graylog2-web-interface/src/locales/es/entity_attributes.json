@@ -98,5 +98,9 @@
   "Transport address": "Dirección de transporte",
   "Triggered": "Disparado",
   "Type": "Tipo",
-  "Usages": "Usos"
+  "Usages": "Usos",
+  "User ID": "ID de usuario",
+  "Username": "Nombre de usuario",
+  "Version": "Versión",
+  "id": "id"
 }
