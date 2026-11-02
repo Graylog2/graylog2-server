@@ -355,11 +355,132 @@
     "routing_title": "Routage des shards",
     "routing_description": "Les shards en gras sont les primaires, les autres sont des réplicas. Les réplicas sont promus en primaires automatiquement lorsqu'un primaire quitte le cluster. La taille et le nombre de documents ne reflètent que les shards primaires, sans duplication possible par les réplicas.",
     "tooltip": "État : <i>{{state}}</i> sur {{hostname}} ({{name}})",
-    "seconds_short": "{{seconds}} s"
+    "seconds_short": "{{seconds}} s",
+    "shard_id": "S{{id}}"
   },
-  "data_tiering": {},
-  "incompatible": {},
-  "strategies": {},
+  "data_tiering": {
+    "max_days_label": "Jours max. de stockage",
+    "max_days_help": "Au bout de combien de jours vos données doivent être supprimées.",
+    "min_days_label": "Jours min. de stockage",
+    "min_days_help": "Pendant combien de jours au minimum vos données doivent être conservées.",
+    "archive_label": "Archiver avant suppression",
+    "archive_help": "Archiver cet index avant sa suppression ?",
+    "error_negative": "Les nombres négatifs ne sont pas autorisés.",
+    "error_min_smaller": "Le nombre minimal de jours de stockage doit être inférieur au nombre maximal de jours de stockage.",
+    "error_min_bigger_hot": "Le nombre minimal de jours de stockage doit être supérieur au nombre minimal de jours dans le Hot Tier.",
+    "summary_rotation_strategy": "Stratégie de rotation :",
+    "summary_data_tiering": "Data Tiering",
+    "summary_max": "Max. en stockage :",
+    "summary_min": "Min. en stockage :",
+    "tooltip_min_storage": "Min. nb de jours en stockage",
+    "tooltip_min_hot_and_storage": "Min. nb de jours dans le Hot Tier et en stockage",
+    "tooltip_min_hot": "Min. nb de jours dans le Hot Tier"
+  },
+  "incompatible": {
+    "working": "Traitement en cours...",
+    "bulk_remaining": "Si un index échoue, les index restants seront tout de même traités.",
+    "opens_in_new_tab": " (s'ouvre dans un nouvel onglet)",
+    "archiving": "Archivage en cours...",
+    "reindexing": "Réindexation en cours...",
+    "archive_failed": "Échec de l'archivage",
+    "reindex_failed": "Échec de la réindexation",
+    "archive_conflict": "Une autre tâche d'archivage est déjà en cours. De nouvelles tâches d'archivage pourront être lancées une fois celle-ci terminée.",
+    "archive_conflict_title": "Tâche d'archivage déjà en cours",
+    "archive_unavailable": "L'archivage n'est pas disponible.",
+    "bulk_rotation_failed": "La demande de rotation groupée a échoué.",
+    "cluster_jobs_failed": "Échec du chargement des tâches du cluster",
+    "cluster_jobs_failed_title": "Impossible de charger les tâches du cluster",
+    "badge_system": "Système",
+    "badge_managed": "Géré",
+    "badge_foreign": "Externe",
+    "badge_warm": "Warm",
+    "badge_active_write_index": "index d'écriture actif",
+    "badge_archived": "déjà archivé",
+    "version_unknown": "Inconnue",
+    "human_name": "index incompatibles",
+    "reindex_requires_data_node": "Les index système ne peuvent être réindexés que lorsque {{productName}} fonctionne avec un backend de recherche Data Node. <migrationLink>Migrez vers Data Nodes</migrationLink> pour les réindexer avant de passer à la version majeure suivante d'OpenSearch.",
+    "partial_summary": "{{succeeded}} réussi(s), {{failed}} échoué(s).",
+    "partial_more": "...et {{count}} autre(s).",
+    "delete": {
+      "button": "Supprimer",
+      "title": "Supprimer l'index",
+      "confirm": "Supprimer",
+      "body": "Cette action supprimera définitivement <strong>{{indexName}}</strong>.",
+      "success": "L'index « {{indexName}} » a été supprimé.",
+      "error": "Impossible de supprimer."
+    },
+    "reindex": {
+      "button": "Réindexer",
+      "title": "Réindexer l'index système",
+      "confirm": "Réindexer l'index système",
+      "body": "Cette action réindexera <strong>{{indexName}}</strong> afin qu'il puisse être utilisé avec OpenSearch 3.",
+      "success": "L'index « {{indexName}} » a été réindexé.",
+      "error": "Impossible de réindexer l'index système."
+    },
+    "rotate": {
+      "button": "Effectuer une rotation",
+      "title": "Effectuer la rotation de l'index d'écriture actif",
+      "confirm": "Effectuer la rotation",
+      "body_active": "<strong>{{indexName}}</strong> est l'index d'écriture actif de son Index Set et reçoit toujours de nouveaux messages. La rotation démarre un nouvel index d'écriture sur la version actuelle d'OpenSearch.",
+      "body_afterwards": "Ensuite, <strong>{{indexName}}</strong> pourra être archivé ou supprimé.",
+      "success": "L'Index Set de « {{indexName}} » a fait l'objet d'une rotation. L'index ne reçoit plus de messages et peut maintenant être archivé ou supprimé.",
+      "error": "Impossible d'effectuer la rotation."
+    },
+    "archive_delete": {
+      "button": "Archiver et supprimer",
+      "title": "Archiver et supprimer l'index",
+      "confirm": "Archiver et supprimer",
+      "body": "Cette action créera une archive de <strong>{{indexName}}</strong> puis supprimera l'index.",
+      "success": "La tâche d'archivage et de suppression de « {{indexName}} » a été lancée.",
+      "error": "Impossible d'archiver et de supprimer."
+    },
+    "bulk": {
+      "delete": {
+        "button": "Supprimer",
+        "title": "Supprimer les index incompatibles",
+        "confirm": "Tout supprimer",
+        "error": "Impossible de tout supprimer."
+      },
+      "delete_partial_title": "Certains index n'ont pas pu être supprimés",
+      "delete_failure_title": "Impossible de supprimer les index",
+      "reindex": {
+        "button": "Réindexer les index système",
+        "title": "Réindexer les index système",
+        "confirm": "Tout réindexer",
+        "error": "Impossible de tout réindexer."
+      },
+      "archive_delete": {
+        "button": "Archiver et supprimer",
+        "title": "Archiver et supprimer les index",
+        "confirm": "Tout archiver et supprimer",
+        "error": "Impossible d'archiver et de supprimer tout."
+      },
+      "rotate": {
+        "button": "Effectuer la rotation des index d'écriture actifs",
+        "title": "Effectuer la rotation des index d'écriture actifs",
+        "confirm": "Effectuer la rotation de tous",
+        "error": "Impossible d'effectuer la rotation de tous."
+      },
+      "rotate_partial_title": "Certains index n'ont pas pu faire l'objet d'une rotation",
+      "rotate_failure_title": "Impossible d'effectuer la rotation des index"
+    }
+  },
+  "strategies": {
+    "name_rotation_message_count": "Nombre de messages par index",
+    "name_rotation_size": "Taille de l'index",
+    "name_rotation_time": "Durée de l'index",
+    "name_rotation_time_size_optimizing": "Durée de l'index avec optimisation de la taille",
+    "name_retention_delete": "Supprimer l'index",
+    "name_retention_close": "Fermer l'index",
+    "name_retention_noop": "Ne rien faire",
+    "retention_max_indices_label": "Nombre maximal d'index",
+    "retention_closing_help": "Nombre maximal d'index à conserver avant de <strong>fermer</strong> les plus anciens",
+    "retention_deleting_help": "Nombre maximal d'index à conserver avant de <strong>supprimer</strong> les plus anciens",
+    "retention_noop_help": "Cette stratégie de rétention n'est pas configurable, car elle n'effectue aucune action.",
+    "retention_summary_strategy": "Stratégie de rétention des index :",
+    "retention_summary_close": "Fermer",
+    "retention_summary_delete": "Supprimer"
+  },
   "pages": {},
   "navigation": {},
   "maintenance_dialog": {},
