@@ -32,7 +32,7 @@
   "download": {
     "download": "Baixar",
     "info": "Clique com o botão direito no link de download abaixo e escolha \"Salvar link como...\" para baixar o arquivo JSON.",
-    "title": "Baixar pacote de conteúdo"
+    "title": "Baixar Content Pack"
   },
   "edit": {
     "steps": {
@@ -58,7 +58,7 @@
     "not_double": "Este não é um valor double.",
     "not_integer": "Este não é um valor inteiro.",
     "title": "Título",
-    "title_help": "Informe um título descritivo para este pacote de conteúdo.",
+    "title_help": "Informe um título descritivo para este Content Pack.",
     "title_required": "O título deve ser definido.",
     "value_type": "Tipo de valor",
     "value_type_help": "Informe o tipo do parâmetro."
@@ -70,7 +70,7 @@
     "edit_title": "Editar",
     "list_title": "Lista de entidades",
     "origin": "Origem",
-    "origin_content_pack": "Pacote de conteúdo",
+    "origin_content_pack": "Content Pack",
     "origin_server": "Servidor",
     "show": "Exibir",
     "title": "Título",
@@ -88,18 +88,18 @@
     "load_failed_title": "Não foi possível carregar o índice de entidades"
   },
   "import": {
-    "error_message": "Erro ao importar o pacote de conteúdo. Verifique se é um arquivo JSON válido. Consulte os logs do servidor {{productName}} para mais informações.",
-    "error_title": "Não foi possível importar o pacote de conteúdo",
-    "success_message": "Pacote de conteúdo importado com sucesso",
-    "success_named": "Pacote de conteúdo \"{{name}}\" importado com sucesso",
+    "error_message": "Erro ao importar o Content Pack. Verifique se é um arquivo JSON válido. Consulte os logs do servidor {{productName}} para mais informações.",
+    "error_title": "Não foi possível importar o Content Pack",
+    "success_message": "Content Pack importado com sucesso",
+    "success_named": "Content Pack \"{{name}}\" importado com sucesso",
     "success_title": "Sucesso!"
   },
   "install": {
     "comment": "Comentário da instalação",
-    "comment_help": "Este comentário será armazenado junto com a instalação do pacote de conteúdo e pode ser usado para descrever o motivo desta instalação.",
+    "comment_help": "Este comentário será armazenado junto com a instalação do Content Pack e pode ser usado para descrever o motivo desta instalação.",
     "configure_parameters": "Configurar parâmetro(s):",
     "needs_to_be_filled": "Precisa ser preenchido.",
-    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador nas entidades deste pacote de conteúdo."
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador nas entidades deste Content Pack."
   },
   "install_entities": {
     "installed": "Entidades instaladas",
@@ -122,14 +122,14 @@
     "view_title": "Visualizar instalação"
   },
   "list": {
-    "no_match": "Nenhum pacote de conteúdo correspondente foi encontrado",
-    "none_found": "Nenhum pacote de conteúdo encontrado. Crie ou envie um."
+    "no_match": "Nenhum Content Pack correspondente foi encontrado",
+    "none_found": "Nenhum Content Pack encontrado. Crie ou envie um."
   },
   "list_item": {
     "create_new_version": "Criar nova versão",
     "delete_all_versions": "Excluir todas as versões",
     "install": "Instalar",
-    "install_title": "Instalar pacote de conteúdo",
+    "install_title": "Instalar Content Pack",
     "latest_version": "Versão mais recente: {{rev}}",
     "show": "Exibir",
     "update": "Atualizar"
