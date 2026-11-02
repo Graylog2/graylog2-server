@@ -47,6 +47,7 @@ import {
   EVENT_DEFINITIONS_QUERY_KEY,
 } from '../hooks/useEventDefinitions';
 import { eventDefinitionTypeTitle } from '../pluginTitles';
+import { translateValidationResult } from 'util/translateApiError';
 
 const STEP_KEYS = {
   EVENT_DETAILS: 'event-details',
@@ -196,7 +197,7 @@ const EventDefinitionFormContainer = ({
   };
 
   const showValidationErrors = (errors: { errors: unknown }) => {
-    setValidation(errors);
+    setValidation(translateValidationResult(errors as Parameters<typeof translateValidationResult>[0]) as typeof errors);
     setActiveStep(currentStepKeys[currentStepKeys.length - 1]);
   };
 

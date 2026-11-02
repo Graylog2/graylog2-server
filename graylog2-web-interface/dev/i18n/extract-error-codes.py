@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Collects the error codes of `Coded{BadRequest,NotFound,Forbidden}Exception("code", "English message"[, Map.of("param", value, ...)])`
+Collects the error codes of `Coded{BadRequest,NotFound,Forbidden}Exception("code", "English message"[, Map.of("param", value, ...)])` and
+`ValidationResult.addError(field, "code", "English message", Map.of(...))`
 from the Java sources and writes/checks the English catalog `src/locales/en/server_errors.json` (code -> English
 message with {{param}} placeholders).
 
@@ -18,7 +19,7 @@ CORE = os.path.dirname(WEB)
 ENT = os.path.join(os.path.dirname(CORE), 'graylog-plugin-enterprise')
 TARGETS = {'core': (CORE, os.path.join(WEB, 'src/locales/en/server_errors.json')),
            'enterprise': (ENT, os.path.join(ENT, 'enterprise/src/web/locales/en/enterprise_server_errors.json'))}
-SITE = re.compile(r'new\s+Coded(?:BadRequest|NotFound|Forbidden)Exception\s*\(')
+SITE = re.compile(r'new\s+Coded(?:BadRequest|NotFound|Forbidden)Exception\s*\(|\.addError\s*\(')
 STR = r'"(?:[^"\\]|\\.)*"'
 
 
@@ -95,6 +96,10 @@ def collect(root):
             src = open(p, encoding='utf-8', errors='ignore').read()
             for m in SITE.finditer(src):
                 args = split_args(src, m.end())
+                if m.group(0).startswith('.addError'):
+                    if len(args) != 4:
+                        continue  # plain addError(field, message) without code
+                    args = args[1:]  # (code, message, params)
                 line = src.count('\n', 0, m.start()) + 1
                 where = f'{os.path.relpath(p, root)}:{line}'
                 if len(args) < 2 or not re.fullmatch(STR, args[0]):

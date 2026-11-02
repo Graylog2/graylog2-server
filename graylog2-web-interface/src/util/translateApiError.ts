@@ -48,4 +48,41 @@ const translateApiError = (error: unknown): string | undefined => {
   return i18n.t(code, { ...params, ...LOOKUP_OPTIONS }) as string;
 };
 
+type ErrorDetail = { code?: string; message?: string; params?: Record<string, unknown> };
+type ValidationResultBody = { errors?: Record<string, Array<string>>; error_details?: Record<string, Array<ErrorDetail>> };
+
+const translateDetail = (detail: ErrorDetail): string | undefined => {
+  if (typeof detail.code !== 'string' || !i18n.exists(detail.code, LOOKUP_OPTIONS)) {
+    return undefined;
+  }
+
+  return i18n.t(detail.code, { ...detail.params, ...LOOKUP_OPTIONS }) as string;
+};
+
+/**
+ * Validation results of the server (\`{ errors: { field: [message] }, error_details: { field: [{ code, message, params }] } }\`)
+ * with the messages of coded errors translated. Errors without a code or without a translation keep the English
+ * message the server sent. The result has the same shape as the input, so forms keep reading \`errors\`.
+ */
+export const translateValidationResult = <T extends ValidationResultBody>(validation: T): T => {
+  const details = validation?.error_details;
+
+  if (!validation?.errors || !details) {
+    return validation;
+  }
+
+  const errors = Object.fromEntries(
+    Object.entries(validation.errors).map(([field, messages]) => [
+      field,
+      messages.map((message) => {
+        const detail = details[field]?.find((candidate) => candidate.message === message);
+
+        return (detail && translateDetail(detail)) ?? message;
+      }),
+    ]),
+  );
+
+  return { ...validation, errors };
+};
+
 export default translateApiError;

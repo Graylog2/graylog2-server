@@ -17,7 +17,7 @@
 import i18n from 'i18n';
 import FetchError from 'logic/errors/FetchError';
 
-import translateApiError from './translateApiError';
+import translateApiError, { translateValidationResult } from './translateApiError';
 import extractErrorMessage from './extractErrorMessage';
 
 describe('translateApiError', () => {
@@ -56,5 +56,30 @@ describe('translateApiError', () => {
     expect(extractErrorMessage(error({ code: 'test.unknown', message: 'English from server' }))).toBe(
       'English from server',
     );
+  });
+
+  describe('translateValidationResult', () => {
+    const validation = {
+      failed: true,
+      errors: { title: ['Title "Foo" exists', 'Other problem'], tags: ['Plain'] },
+      error_details: { title: [{ code: 'test.title_exists', message: 'Title "Foo" exists', params: { title: 'Foo' } }] },
+    };
+
+    it('translates coded errors and keeps the others', async () => {
+      await i18n.changeLanguage('de');
+
+      expect(translateValidationResult(validation).errors).toEqual({
+        title: ['Titel "Foo" existiert', 'Other problem'],
+        tags: ['Plain'],
+      });
+
+      await i18n.changeLanguage('en');
+    });
+
+    it('returns results without error details unchanged', () => {
+      const plain = { errors: { title: ['x'] } };
+
+      expect(translateValidationResult(plain)).toBe(plain);
+    });
   });
 });
