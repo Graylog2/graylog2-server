@@ -1,1 +1,172 @@
-{}
+{
+  "destination_permission_alert": {
+    "data_lake": "Al momento non disponi delle autorizzazioni per visualizzare o gestire la destinazione Data Lake.",
+    "index_set": "Al momento non disponi delle autorizzazioni per visualizzare o gestire la destinazione Index Set.",
+    "outputs": "Al momento non disponi delle autorizzazioni per visualizzare o gestire la destinazione Outputs."
+  },
+  "index_set_select": {
+    "help": "I messaggi che corrispondono a questo stream verranno scritti nell'index set configurato.",
+    "label": "Index Set",
+    "placeholder": "Seleziona un index set"
+  },
+  "matching_type": {
+    "all": "Un messaggio deve corrispondere a tutte le seguenti regole",
+    "any": "Un messaggio deve corrispondere ad almeno una delle seguenti regole",
+    "confirm": "Stai per modificare il modo in cui le regole vengono applicate a questo stream. Vuoi continuare? Le modifiche avranno effetto immediatamente.",
+    "success_all": "I messaggi verranno ora instradati nello stream quando corrispondono a tutte le regole",
+    "success_any": "I messaggi verranno ora instradati nello stream quando corrispondono a una qualsiasi delle regole",
+    "success_title": "Successo",
+    "switch_title_all": "Passa al tipo di corrispondenza ALL",
+    "switch_title_any": "Passa al tipo di corrispondenza ANY"
+  },
+  "output_filter": {
+    "create_button": "Crea regola",
+    "create_title": "Crea regola di filtro",
+    "delete_confirm": "Sei sicuro di voler eliminare la regola {{title}}?",
+    "delete_title": "Elimina regola",
+    "delete_tooltip": "Elimina",
+    "edit_title": "Modifica regola di filtro",
+    "edit_tooltip": "Modifica",
+    "fields": {
+      "and": "e",
+      "block_action": "azione",
+      "block_condition": "condizione",
+      "delete_confirm": "Sei sicuro di voler eliminare <blockLabel>{{blockType}} N° {{number}}</blockLabel>?",
+      "delete_title": "Elimina {{blockType}}",
+      "or": "o",
+      "then": "Poi",
+      "when": "Quando"
+    },
+    "form": {
+      "condition_required": "La regola deve contenere almeno una condizione.",
+      "create": "Crea",
+      "description": "Descrizione",
+      "description_help": "Descrizione della regola",
+      "enabled": "Abilitata",
+      "rule_builder": "Costruttore di regole",
+      "saving": "Salvataggio del filtro in corso",
+      "title": "Titolo",
+      "title_help": "Titolo della regola",
+      "title_required": "Il campo \"Titolo\" è obbligatorio.",
+      "update": "Aggiorna",
+      "updating": "Aggiornamento del filtro in corso"
+    },
+    "item": {
+      "enabled": "abilitata",
+      "errors": "errori",
+      "throughput": "throughput"
+    },
+    "list": {
+      "header_status": "Stato",
+      "header_title": "Titolo",
+      "info_data_lake": "I messaggi che soddisfano i criteri delle seguenti regole di filtro non verranno instradati verso il Data Lake.",
+      "info_indexer": "I messaggi che soddisfano i criteri delle seguenti regole di filtro non verranno instradati verso l'Index Set.",
+      "no_filters": "Nessun filtro trovato.",
+      "title": "Regole di filtro"
+    }
+  },
+  "outputs": {
+    "assign_existing": "Assegna un Output esistente",
+    "content_pack_title": "Creato da content pack",
+    "create_submit": "Crea output",
+    "create_title": "Crea nuovo Output",
+    "delete_from_stream": "Elimina dallo stream",
+    "delete_globally": "Elimina globalmente",
+    "edit": "Modifica",
+    "edit_title": "Modifica Output {{title}}",
+    "id_label": "ID: {{id}}",
+    "launch_new": "Avvia nuovo output",
+    "name_help": "Seleziona un nome per il nuovo output che lo descriva.",
+    "none_available": "Nessun output disponibile",
+    "none_configured": "Nessun output configurato.",
+    "plugin_error": "Il plugin richiesto per questo output non è caricato. Non è possibile modificarlo. Carica il plugin o elimina l'output.",
+    "select_existing": "Seleziona un output esistente",
+    "select_type": "Seleziona tipo di Output",
+    "type_label": "Tipo: {{type}}",
+    "update_submit": "Aggiorna output"
+  },
+  "pipelines_connection_form": {
+    "edit_button": "Modifica connessioni delle pipeline",
+    "help": "Seleziona le pipeline da collegare a questo stream, oppure creane una nella <pipelinesLink>pagina Pipeline</pipelinesLink>.",
+    "label": "Pipeline",
+    "modal_title": "Modifica connessioni per lo <streamLabel>stream</streamLabel>",
+    "save_failed": "Il salvataggio della connessione delle pipeline dello stream non è riuscito con stato: {{error}}",
+    "save_success": "Il salvataggio della connessione delle pipeline dello stream è riuscito.",
+    "save_title": "Salvataggio della connessione delle pipeline dello stream in corso.",
+    "submit": "Aggiorna connessioni"
+  },
+  "routing_destination": {
+    "add_output": {
+      "assign_segment": "Assegna output esistente",
+      "button": "Aggiungi output",
+      "create_segment": "Crea nuovo output",
+      "modal_title": "Aggiungi output allo stream",
+      "tooltip": "Modifica Output"
+    },
+    "archiving": {
+      "disabled": "L'archiviazione è disattivata",
+      "enabled": "L'archiviazione è attiva"
+    },
+    "edit_output": {
+      "tooltip": "Modifica Output"
+    },
+    "index_set": {
+      "col_archiving": "Archiviazione",
+      "col_name": "Nome",
+      "col_oldest": "Messaggio più vecchio (data)",
+      "col_size": "Dimensione totale",
+      "disabled": "Disabilitato",
+      "enabled": "Abilitato",
+      "filters": "FILTRI {{count}}",
+      "info": "I messaggi instradati verso il <boldText>Search Cluster</boldText> saranno ricercabili e concorreranno all'utilizzo della licenza {{productName}}. Questi messaggi verranno memorizzati nell'Index Set definito finché non sono soddisfatti i criteri della politica di conservazione. Nota: i messaggi non instradati verso il <boldText>Search Cluster</boldText> non saranno ricercabili.",
+      "title": "Index Set",
+      "toggle_aria": "Attiva/disattiva index set"
+    },
+    "index_set_update": {
+      "button": "Modifica Index Set",
+      "modal_title": "Modifica Index Set dello stream",
+      "saving": "Salvataggio dello stream in corso",
+      "submit": "Aggiorna",
+      "success_title": "Successo",
+      "tooltip": "Modifica index set"
+    },
+    "output_item": {},
+    "outputs": {},
+    "outputs_list": {},
+    "remove_output": {}
+  },
+  "stream_details": {},
+  "stream_edit_page": {},
+  "stream_hooks": {},
+  "stream_modal": {},
+  "stream_outputs": {},
+  "stream_permission_error_page": {},
+  "stream_rules": {
+    "editor": {},
+    "human": {},
+    "modal": {},
+    "start_dialog": {}
+  },
+  "streams_overview": {
+    "actions": {},
+    "bulk": {},
+    "cells": {},
+    "columns": {},
+    "expanded": {},
+    "expanded_titles": {},
+    "metric_columns": {}
+  },
+  "streams_page": {},
+  "system_outputs": {},
+  "user_no_stream_access": {},
+  "notifications": {},
+  "use_output_mutations_notifications": {},
+  "use_outputs_notifications": {},
+  "use_stream_notifications": {},
+  "use_stream_metrics_notifications": {},
+  "use_stream_outputs_notifications": {},
+  "use_stream_mutations_notifications": {},
+  "use_stream_output_mutations_notifications": {},
+  "use_stream_rule_mutations_notifications": {},
+  "use_stream_rules_inputs_notifications": {}
+}
