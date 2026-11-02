@@ -291,28 +291,149 @@
     "cancel_confirm": "システムジョブ \"{{info}}\" をキャンセルしてもよろしいですか？",
     "on_node": "- ノード:",
     "runtime": "実行時間: {{duration}}",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "acknowledge": "確認"
   },
-  "system_jobs_component": {},
-  "system_jobs_list": {},
-  "system_messages_component": {},
-  "system_messages_list": {},
-  "global_throughput": {},
-  "node_throughput": {},
-  "telemetry_debug_entry_row": {},
-  "telemetry_debug_overlay": {},
-  "cluster_configuration_page": {},
-  "configurations_page": {},
-  "enterprise_page": {},
-  "process_buffer_dump_page": {},
-  "show_metrics_page": {},
-  "node_page": {},
-  "system_logs_page": {},
-  "system_notifications_page": {},
-  "system_overview_page": {},
-  "thread_dump_page": {},
-  "notifications": {},
-  "use_cluster_overview_notifications": {},
-  "use_cluster_support_bundle_notifications": {},
+  "system_jobs_component": {
+    "title": "システムジョブ",
+    "description": "システムジョブは、メンテナンスのために {{productName}} サーバーノードが実行する長時間のタスクです。一部のジョブは進捗情報を提供するか、停止できます。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "アクティブなシステムジョブはありません。"
+  },
+  "system_messages_component": {
+    "title": "システムメッセージ",
+    "description": "システムメッセージは、{{productName}} サーバーノードが特定のイベントで生成するもので、{{productName}} 管理者にとって重要な場合があります。ここにあるイベントに対して操作を行う必要はありません。対応が必要なイベントについては通知が表示されます。"
+  },
+  "system_messages_list": {
+    "timestamp": "タイムスタンプ",
+    "node": "ノード",
+    "message": "メッセージ"
+  },
+  "global_throughput": {
+    "aria_label": "スループット: 入力 {{input}} / 出力 {{output}} メッセージ/秒",
+    "in": "入力",
+    "out": "出力"
+  },
+  "node_throughput": {
+    "loading": "スループットを読み込んでいます...",
+    "unable_to_load": "スループットを読み込めませんでした。",
+    "processing_long": "受信 <strong>{{totalIn}}</strong> / 送信 <strong>{{totalOut}}</strong> メッセージ/秒を処理しています。",
+    "short": "入力 {{totalIn}} / 出力 {{totalOut}} メッセージ/秒"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "個人情報の疑い: {{suspect}}",
+    "copy_as_json": "イベントをJSONとしてコピー"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "テレメトリーのデバッグ",
+    "badge": "テレメトリーのデバッグ: {{count}}",
+    "drawer_label": "テレメトリーのデバッグパネル",
+    "resize_label": "テレメトリーのデバッグパネルのサイズを変更",
+    "title": "テレメトリーのデバッグ ({{count}})",
+    "filter_label": "イベントをフィルター",
+    "filter_placeholder": "イベント名またはペイロードでフィルター...",
+    "resume": "再開",
+    "pause": "一時停止",
+    "clear": "クリア",
+    "export_session": "セッションをエクスポート",
+    "collapse": "折りたたむ",
+    "no_events": "テレメトリーイベントはまだ記録されていません。アプリを操作すると、ここに表示されます。",
+    "time": "時刻",
+    "event": "イベント",
+    "action": "アクション",
+    "status": "ステータス"
+  },
+  "cluster_configuration_page": {
+    "title": "クラスター設定",
+    "description": "このページでは、クラスター内のノードのリアルタイムの概要を確認できます。メッセージ処理はいつでも一時停止できます。再開するまで、処理バッファーは新しいメッセージを受け付けません。ノードでメッセージジャーナルが有効になっている場合（デフォルトで有効です）、処理が無効になっていても、受信メッセージはディスクに保存されます。"
+  },
+  "configurations_page": {
+    "title": "設定",
+    "description": "このページでは、さまざまなサブシステムのシステム設定を行えます。"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "{{productName}} Enterprise を<upsell>お試しください</upsell>",
+    "learn_more": "<upsell>{{productName}} Enterpriseの機能について<productLink>詳しく見る</productLink>。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} の処理バッファーダンプ",
+    "taken_at": "取得日時: <0/>"
+  },
+  "show_metrics_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} のメトリクス",
+    "description": "すべての {{productName}} ノードは、診断、デバッグ、モニタリングのための内部メトリクスを提供しています。JMX経由でもすべてのメトリクスにアクセスできることに注意してください。"
+  },
+  "node_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}}",
+    "description": "このページでは、クラスター内でアクティブかつ到達可能な {{productName}} サーバーノードの詳細を表示します。",
+    "leader_node": "これはリーダーノードです。",
+    "not_leader_node": "これは<em>リーダーノードではありません</em>。"
+  },
+  "system_logs_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} の最新のシステムログ（{{limit}} 件まで）",
+    "taken_at": "取得日時: <0/>",
+    "reload": "再読み込み",
+    "back": "戻る",
+    "document_title": "ノード {{shortNodeId}} / {{hostname}} のシステムログ"
+  },
+  "system_notifications_page": {
+    "title": "システム通知"
+  },
+  "system_overview_page": {
+    "title": "システムの概要"
+  },
+  "thread_dump_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} のスレッドダンプ",
+    "taken_at": "取得日時: <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "ノード '{{nodeId}}' のロードバランサーのステータスを '{{status}}' に変更しました",
+    "lb_change_failed": "'{{nodeId}}' のロードバランサーのステータスの変更に失敗しました: {{error}}",
+    "lb_change_failed_title": "ノード '{{nodeId}}' のロードバランサーのステータスを '{{status}}' に変更できませんでした",
+    "processing_pause_success": "'{{nodeId}}' のメッセージ処理を一時停止しました",
+    "processing_pause_failed": "'{{nodeId}}' のメッセージ処理の一時停止に失敗しました: {{error}}",
+    "processing_pause_failed_title": "ノード '{{nodeId}}' のメッセージ処理を一時停止できませんでした",
+    "processing_resume_success": "'{{nodeId}}' のメッセージ処理を再開しました",
+    "processing_resume_failed": "'{{nodeId}}' のメッセージ処理の再開に失敗しました: {{error}}",
+    "processing_resume_failed_title": "ノード '{{nodeId}}' のメッセージ処理を再開できませんでした",
+    "nothing_selected": "通知が選択されていません。",
+    "nothing_to_dismiss_title": "閉じる通知がありません",
+    "bulk_dismiss_failed": "通知を閉じられませんでした。もう一度お試しください。",
+    "dismiss_failed": "通知を閉じられませんでした。もう一度お試しください。",
+    "dismiss_failed_title": "閉じる操作に失敗しました",
+    "profiling_enabled": "MongoDBのプロファイリングを有効にしました。",
+    "profiling_disabled": "MongoDBのプロファイリングを無効にしました。",
+    "profiling_enable_failed": "MongoDBのプロファイリングを有効にできませんでした: {{error}}",
+    "profiling_disable_failed": "MongoDBのプロファイリングを無効にできませんでした: {{error}}",
+    "profiling_update_failed_title": "MongoDBのプロファイリングを更新できませんでした。",
+    "data_node_metrics_failed": "データノード \"{{hostname}}\" のメトリクスの読み込みに失敗しました",
+    "data_node_metrics_failed_title": "データノードのメトリクスを読み込めませんでした。",
+    "graylog_node_metrics_failed": "Graylogノードのメトリクスの読み込みがステータス付きで失敗しました",
+    "graylog_node_metrics_failed_title": "Graylogノードのメトリクスを読み込めませんでした。",
+    "cluster_traffic_failed": "クラスタートラフィックの読み込みがステータス付きで失敗しました",
+    "cluster_traffic_failed_title": "クラスタートラフィックを読み込めませんでした",
+    "journal_failed": "ジャーナルの情報を取得できませんでした",
+    "system_jobs_failed": "システムジョブの読み込みがステータス付きで失敗しました",
+    "system_jobs_failed_title": "システムジョブを読み込めませんでした"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "ノード '{{nodeId}}' のJVM情報の取得に失敗しました: {{error}}",
+    "jvm_failed_title": "JVM情報を取得できませんでした",
+    "thread_dump_failed": "ノード '{{nodeId}}' のスレッドダンプの取得に失敗しました: {{error}}",
+    "thread_dump_failed_title": "スレッドダンプを取得できませんでした",
+    "process_buffer_dump_failed": "ノード '{{nodeId}}' の処理バッファーダンプの取得に失敗しました: {{error}}",
+    "process_buffer_dump_failed_title": "処理バッファーダンプを取得できませんでした",
+    "system_logs_failed": "ノード '{{nodeId}}' のシステムログメッセージの取得に失敗しました: {{error}}",
+    "system_logs_failed_title": "システムログメッセージを取得できませんでした",
+    "overview_failed": "クラスターの概要の取得に失敗しました: {{error}}",
+    "overview_failed_title": "クラスターの概要を取得できませんでした"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "サポートバンドルの作成がステータス {{error}} で失敗しました",
+    "create_failed_title": "サポートバンドルを作成できませんでした。"
+  },
   "use_plugin_list_notifications": {}
 }
