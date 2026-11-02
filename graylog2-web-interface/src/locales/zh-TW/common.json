@@ -248,36 +248,161 @@
     "add_favorite_failed_title": "無法將欄位新增至常用欄位",
     "remove_favorite_failed": "將欄位從常用欄位移除失敗，錯誤：{{error}}",
     "remove_favorite_failed_title": "無法將欄位從常用欄位移除",
-    "field_terms": "欄位詞彙："
+    "field_terms": "欄位詞彙：",
+    "received_by_radio_value": "透過 radio <node/> 上的 <inputName/>"
   },
-  "entity_types": {},
-  "chips_cell": {},
-  "compact_pagination": {},
-  "expandable_checkbox_list_item": {},
-  "traffic_graph": {},
-  "link_to_node": {},
-  "markdown": {},
-  "public_notifications": {},
-  "refresh_controls": {},
-  "scroll_button": {},
-  "section": {},
-  "selectable_list": {},
-  "share_menu_item": {},
-  "status_icon": {},
-  "type_ahead_field_input": {},
+  "entity_types": {
+    "user": "使用者",
+    "team": "團隊",
+    "dashboard": "Dashboard",
+    "event_definition": "Event Definition",
+    "notification": "通知",
+    "search": "搜尋",
+    "stream": "Stream",
+    "search_filter": "搜尋篩選器",
+    "report": "報告",
+    "role": "角色",
+    "output": "Output",
+    "sigma_rule": "Sigma 規則",
+    "event_procedure": "事件程序",
+    "event_procedure_step": "事件程序步驟",
+    "collection": "集合",
+    "collection_entities": "集合項目"
+  },
+  "marketplace_link": "{{productName}} 市集",
+  "chips_cell": {
+    "show_fewer": "顯示較少",
+    "show_all": "顯示全部",
+    "filter_by": "依{{itemLabel}}「{{value}}」篩選"
+  },
+  "compact_pagination": {
+    "previous_page": "上一頁",
+    "select_page": "選擇頁面",
+    "next_page": "下一頁",
+    "of_pages": "共 {{totalPages}} 頁"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "選擇項目"
+  },
+  "traffic_graph": {
+    "days": "天",
+    "incoming": "流入流量",
+    "outgoing": "流出流量",
+    "last_days": "最近 {{days}} 天：{{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "未知節點"
+  },
+  "markdown": {
+    "images_unsupported": "基於安全考量，不支援圖片。請在 <configurationLink>這裡</configurationLink> 啟用允許的來源。"
+  },
+  "public_notifications": {
+    "read_less": "顯示較少",
+    "read_more": "顯示更多"
+  },
+  "refresh_controls": {
+    "controls_label": "{{humanName}}重新整理控制項",
+    "below_minimum": "<intervalDuration /> ({{interval}}) 的間隔低於設定的最小間隔 <minimumDuration /> ({{minimum}})。"
+  },
+  "scroll_button": {
+    "back_to_top": "返回頂端"
+  },
+  "section": {
+    "toggle_section": "切換{{title, lowercase}}區段"
+  },
+  "selectable_list": {
+    "remove": "移除"
+  },
+  "share_menu_item": {
+    "share": "分享"
+  },
+  "status_icon": {
+    "yes": "是",
+    "no": "否"
+  },
+  "type_ahead_field_input": {
+    "select_field": "選擇欄位"
+  },
   "query_helper": {
-    "common_fields": {}
+    "title": "搜尋語法說明",
+    "show_help": "顯示搜尋語法說明",
+    "available_fields": "可用的搜尋欄位",
+    "field": "欄位",
+    "description": "說明",
+    "examples": "範例",
+    "example_description": "尋找所有 description 包含 security 的{{entityName}}：",
+    "example_id": "尋找 ID 為 5f4dfb9c69be46153b9a9a7b 的{{entityName}}：",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "{{entityName}}的 ID，為唯一的參照。",
+      "title": "{{entityName}}的標題。",
+      "name": "{{entityName}}的名稱。",
+      "description": "{{entityName}}的簡短說明。",
+      "summary": "{{entityName}}的詳細摘要。"
+    }
   },
-  "url_allow_list_modal": {},
-  "configuration_well": {},
-  "configuration_forms": {},
-  "enterprise_advertisement": {},
-  "plugin_list": {},
-  "reported_error": {},
-  "hotkeys": {},
-  "right_sidebar": {},
+  "url_allow_list_modal": {
+    "add": "新增至 URL 允許清單",
+    "title": "更新允許清單設定",
+    "submit": "更新設定",
+    "urls": "允許清單 URL"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- 無設定 --"
+  },
+  "configuration_forms": {
+    "undo_reset": "復原重設",
+    "remove": "移除",
+    "title": "標題",
+    "optional": "選填"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "專為資源有限的 IT 維運與軟體工程團隊所設計，{{productName}} Enterprise 提供多項生產力強化功能，讓您在收集與分析日誌資料、找出效能、服務中斷與錯誤問題的根本原因時，每年可節省數千小時。",
+    "security_title": "{{productName}} Security",
+    "security_description": "擴充 {{productName}} Open 的功能，透過專屬的安全儀表板與警示、異常偵測 AI/ML 引擎、與其他安全工具的整合、SOAR 功能，以及多項合規報告功能，偵測、調查並回應網路安全威脅。",
+    "request_now": "立即申請"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Enterprise 外掛程式",
+    "installed": "{{pluginName}} 已安裝",
+    "not_installed": "{{pluginName}} 未安裝",
+    "status": "此叢集中 {{productName}} Enterprise 模組的狀態如下："
+  },
+  "reported_error": {
+    "title": "發生錯誤",
+    "description": "發生未知錯誤。請查看以下訊息以及 {{productName}} 伺服器日誌以取得更多資訊。"
+  },
+  "hotkeys": {
+    "or": "或",
+    "title": "鍵盤快速鍵",
+    "view_all": "檢視所有鍵盤快速鍵"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}}側邊欄",
+    "sidebar_label_collapsed": "{{title}}側邊欄（已收合）",
+    "close": "關閉側邊欄",
+    "expand": "展開側邊欄",
+    "collapse": "收合側邊欄",
+    "go_back": "返回",
+    "go_back_label": "返回上一個內容",
+    "go_forward": "前往",
+    "go_forward_label": "前往下一個內容"
+  },
   "maxmind_adapter": {
-    "documentation": {},
+    "documentation": {
+      "intro": "GeoIP 資料適配器支援讀取 MaxMind 的 GeoIP2 資料庫。",
+      "limitations_title": "限制",
+      "limitations_supported": "目前支援 ASN、城市及國家資料庫。",
+      "limitations_more": "如需支援其他資料庫類型，請造訪我們的支援管道。",
+      "asn_fields": "ASN 資料庫欄位",
+      "country_fields": "國家資料庫欄位",
+      "city_fields": "城市資料庫欄位",
+      "city_additional_fields": "除了國家資料庫提供的欄位外，城市資料庫還包含下列欄位："
+    },
     "database_types": {},
     "field_set": {},
     "summary": {}
