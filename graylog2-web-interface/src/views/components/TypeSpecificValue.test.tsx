@@ -51,6 +51,35 @@ describe('TypeSpecificValue', () => {
     await screen.findByText('6.5 s');
   });
 
+  it('should render decorated link with its URL as text', async () => {
+    render(
+      <TypeSpecificValue
+        field="field1"
+        value={{ type: 'a', href: 'https://ipam.example.com/search?ip=10.0.0.1' }}
+        type={FieldType.Decorated}
+      />,
+    );
+
+    const link = await screen.findByRole('link', { name: 'https://ipam.example.com/search?ip=10.0.0.1' });
+
+    expect(link).toHaveAttribute('href', 'https://ipam.example.com/search?ip=10.0.0.1');
+  });
+
+  it('should render decorated link with custom link text and URL as tooltip', async () => {
+    render(
+      <TypeSpecificValue
+        field="field1"
+        value={{ type: 'a', href: 'https://ipam.example.com/search?ip=10.0.0.1', text: 'Open in IPAM' }}
+        type={FieldType.Decorated}
+      />,
+    );
+
+    const link = await screen.findByTitle('https://ipam.example.com/search?ip=10.0.0.1');
+
+    expect(link).toHaveTextContent('Open in IPAM');
+    expect(link).toHaveAttribute('href', 'https://ipam.example.com/search?ip=10.0.0.1');
+  });
+
   it('should render original value if unit not defined', async () => {
     render(<TypeSpecificValue field="field1" value={6543.21} />);
 
