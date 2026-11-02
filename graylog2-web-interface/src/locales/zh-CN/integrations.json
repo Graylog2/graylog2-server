@@ -503,7 +503,19 @@
   "tor_exit_node_adapter_summary": {
     "no_configuration": "无需配置"
   },
-  "whois_adapter_documentation": {},
-  "whois_adapter_field_set": {},
-  "whois_adapter_summary": {}
+  "whois_adapter_documentation": {
+    "intro": "Whois IP 查询数据适配器可以请求 IP 地址的网络归属信息。",
+    "configuration_title": "配置",
+    "connect_timeout_description": "与 whois 服务器之间套接字的连接超时时间（毫秒）。如果将其设置得过高，可能会影响处理性能。",
+    "read_timeout_description": "与 whois 服务器之间套接字的连接读取超时时间（毫秒）。如果将其设置得过高，可能会影响处理性能。"
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "连接超时",
+    "connect_timeout_help": "WHOIS 连接超时时间（毫秒）。",
+    "read_timeout_label": "读取超时",
+    "read_timeout_help": "WHOIS 连接读取超时时间（毫秒）。"
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "毫秒"
+  }
 }
