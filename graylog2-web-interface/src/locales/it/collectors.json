@@ -883,7 +883,10 @@
         "wait_for_green": "Dopo ogni nodo, l'aggiornamento attende che il cluster torni verde prima di continuare. Se l'attesa dura troppo, l'operazione si mette in pausa e attende che tu la riprenda.",
         "each_node_with_versions_one": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
         "each_node_with_versions_other": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
-        "each_node_with_versions_many": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>."
+        "each_node_one": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato alla versione di destinazione.",
+        "each_node_other": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato alla versione di destinazione.",
+        "each_node_with_versions_many": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_many": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato alla versione di destinazione."
       },
       "starting": "Avvio..."
     },
@@ -907,8 +910,11 @@
       "start_upgrade_and_restart": "Avvia aggiornamento di OpenSearch e riavvia",
       "starting_rolling_upgrade": "Avvio dell'aggiornamento progressivo di OpenSearch...",
       "title": "Aggiorna OpenSearch integrato nei Data Node",
+      "unconfirmed_one": "Gli indici non compatibili e lo stato dell'aggiornamento non possono essere verificati mentre {{count}} Data Node non è disponibile: verranno mostrati di nuovo quando tutti i Data Node saranno disponibili.",
+      "unconfirmed_other": "Gli indici non compatibili e lo stato dell'aggiornamento non possono essere verificati mentre {{count}} Data Node non sono disponibili: verranno mostrati di nuovo quando tutti i Data Node saranno disponibili.",
       "upgrade_process": "Processo di aggiornamento",
-      "use_table": "Usa la tabella qui sotto per reindicizzare gli indici di sistema e archiviare o eliminare gli indici dei dati prima di continuare."
+      "use_table": "Usa la tabella qui sotto per reindicizzare gli indici di sistema e archiviare o eliminare gli indici dei dati prima di continuare.",
+      "unconfirmed_many": "Gli indici non compatibili e lo stato dell'aggiornamento non possono essere verificati mentre {{count}} Data Node non sono disponibili: verranno mostrati di nuovo quando tutti i Data Node saranno disponibili."
     },
     "client_certificate": {
       "certificate_lifetime": "Durata del certificato",
@@ -970,9 +976,12 @@
       "checking": "Verifica dello stato di OpenSearch in corso...",
       "error": "Impossibile verificare la versione di OpenSearch integrata nei Data Node.",
       "outdated": "OpenSearch integrato nei Data Node non è aggiornato.",
+      "unconfirmed_one": "Lo stato di OpenSearch integrato nei Data Node non può essere confermato mentre {{count}} Data Node non è disponibile.",
+      "unconfirmed_other": "Lo stato di OpenSearch integrato nei Data Node non può essere confermato mentre {{count}} Data Node non sono disponibili.",
       "up_to_date": "OpenSearch integrato nei Data Node è aggiornato.",
       "up_to_date_with_version": "OpenSearch integrato nei Data Node è aggiornato <bold>({{version}}).</bold>",
-      "upgrading": "È in corso un aggiornamento progressivo di OpenSearch."
+      "upgrading": "È in corso un aggiornamento progressivo di OpenSearch.",
+      "unconfirmed_many": "Lo stato di OpenSearch integrato nei Data Node non può essere confermato mentre {{count}} Data Node non sono disponibili."
     },
     "upgrade_nodes": {
       "manager": "manager",
