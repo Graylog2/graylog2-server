@@ -1,1 +1,409 @@
-{}
+{
+  "title": "パイプライン",
+  "overview_header_title": "パイプラインの概要",
+  "documentation_link_title": "パイプラインのドキュメント",
+  "overview_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。",
+  "new_pipeline": "新しいパイプライン",
+  "pipeline_details_title": "パイプライン {{title}}",
+  "pipeline_details_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。\n各ステージが完了した後、すべてのルールに一致するメッセージ、またはいずれかのルールに一致するメッセージを次のステージに進めるかどうかを決めることができます。",
+  "rules_page_title": "パイプラインルール",
+  "rules_page_header_title": "パイプラインルール",
+  "rules_page_documentation_link": "パイプラインルールのドキュメント",
+  "rules_page_description": "ルールは、メッセージに変更を適用する方法です。ルールは条件とアクションのリストで構成されます。条件はメッセージに対して評価され、条件を満たした場合にアクションが実行されます。",
+  "rules_delete_confirm": "ルール「{{title}}」を本当に削除しますか？",
+  "rule_details_new_title": "新しいパイプラインルール",
+  "rule_details_title": "パイプラインルール {{title}}",
+  "rule_details_loading": "ルールの詳細を読み込んでいます...",
+  "loading_rule": "ルールを読み込んでいます",
+  "create_pipeline_rule": "パイプラインルールを作成",
+  "pipeline_rule": "パイプラインルール <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "ソースコードエディターを使用",
+  "rule_is_managed_warning": "このルールはアプリケーションによって管理されています。編集できません。",
+  "switch_to_source_code_editor": "ソースコードエディターに切り替え",
+  "switch_to_source_code_editor_confirm_text": "このページを離れて、ソースコードエディターに移動します。",
+  "switch_to_source_code_editor_confirm_warning": "保存されていない変更がないことを確認してください。",
+  "pipeline_new": {
+    "description": "新しいパイプラインに名前と説明を付けてください。変更を保存した後にステージを追加できます。"
+  },
+  "processing_errors": {
+    "rate_suffix": "errors/s",
+    "total": "（合計 {{total}} 件）"
+  },
+  "timeline": {
+    "entity_name": "パイプライン",
+    "delete_confirm": "パイプライン「{{title}}」を本当に削除しますか？この操作は取り消せません。",
+    "filter_label": "パイプラインをフィルター",
+    "no_pipelines": "パイプラインが見つかりませんでした",
+    "headers": {
+      "pipeline": "パイプライン",
+      "connected_streams": "接続先のストリーム",
+      "processing_errors": "処理エラー",
+      "pipeline_load": "パイプライン負荷 (15m)",
+      "processing_timeline": "処理タイムライン",
+      "actions": "アクション"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "デバッグメトリクスが有効です",
+    "banner_text": "デバッグメトリクスはメッセージ処理にオーバーヘッドを加え、メモリー使用量を増やします。トラブルシューティングが終わったら無効にしてください。パイプライン負荷の値は15分間のウィンドウで平均化されるため、有効化後に安定するまで数分かかる場合があります。",
+    "disable": "デバッグメトリクスを無効化",
+    "enable": "デバッグメトリクスを有効化",
+    "help": "パイプライン負荷 (15m) は、クラスター全体でパイプラインルールの実行時間が占める相対的な割合を示します。デバッグメトリクスを有効にすると、タイマーデータの収集が始まります。有効化後、値が表示されるまで約15分かかる場合があり、収集はメッセージ処理にオーバーヘッドを加えます。"
+  },
+  "pipeline": {
+    "not_connected": "このパイプラインは現在どのストリームにも接続されていません。受信メッセージを処理させるには、少なくとも1つのストリームに接続する必要があります。デコレーターを使って検索結果の変換のみに使用する場合は、接続は不要です。",
+    "delete_stage_confirm": "ステージ {{stage}} を削除しようとしています。続行しますか？",
+    "list_and": " および ",
+    "processing_streams_other": "このパイプラインは、ストリーム {{streams}} からのメッセージを処理しています。",
+    "managed_1": "このパイプラインはシステムで管理されており、編集は一部に制限されています。",
+    "managed_2": "パイプラインルールは、入力ウィザードを通してのみこのパイプラインに追加できます。",
+    "managed_3": "このパイプラインのパイプラインルールは、対応する入力名の変更に合わせて自動的に名前が変更されます。",
+    "managed_4": "パイプラインルールはこのパイプラインから手動で削除できますが、手動で追加することはできません。",
+    "connections_title": "パイプラインの接続",
+    "no_connections": "このパイプラインで処理するストリームを選択してください。",
+    "stages_title": "パイプラインのステージ",
+    "stages_description": "ステージは、順番に実行する必要がある条件とアクションのグループです。パイプラインの残りを実行するかどうかを決める制御フローを提供します。",
+    "no_rules_on_stage": "このステージにはルールがありません。"
+  },
+  "connections_form": {
+    "streams_help": "このパイプラインに接続するストリームを選択するか、<streamsLink>ストリームページ</streamsLink>で作成してください。",
+    "edit": "接続を編集",
+    "title": "<pipelineTitle>{{title}}</pipelineTitle> の接続を編集",
+    "submit": "接続を更新",
+    "streams": "ストリーム"
+  },
+  "details": {
+    "title": "詳細",
+    "title_label": "タイトル",
+    "description": "説明",
+    "created": "作成日時",
+    "last_modified": "最終更新日時",
+    "throughput": "現在のスループット",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "タイトル",
+    "title_help": "パイプライン名です。",
+    "description": "説明",
+    "description_help": "パイプラインの説明です。",
+    "add_button": "新しいパイプラインを追加",
+    "edit_button": "パイプラインの詳細を編集",
+    "add_title": "新しいパイプライン {{title}} を追加",
+    "edit_title": "パイプライン {{title}} を編集",
+    "add_submit": "パイプラインを追加",
+    "update_submit": "パイプラインを更新",
+    "create_submit": "パイプラインを作成"
+  },
+  "list_item": {
+    "idle": "アイドル",
+    "stage": "ステージ {{stage}}",
+    "loading": "パイプラインを読み込んでいます...",
+    "managed": "アプリケーションによって管理",
+    "throughput_prefix": "スループット:",
+    "throughput_suffix": "msg/s",
+    "not_connected": "未接続",
+    "edit_aria": "パイプラインを編集",
+    "edit": "編集",
+    "delete_aria": "パイプラインを削除",
+    "delete": "削除"
+  },
+  "stage_rules": {
+    "invalid_rule": "ルール {{name}} の名前が変更されたか、削除されました。このルールはスキップされます。",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s",
+    "remove_title": "{{title}} を削除",
+    "removing": "削除しています...",
+    "remove": "削除",
+    "no_rules": "このステージにはまだルールがありません。編集をクリックして追加してください。",
+    "headers": {
+      "title": "タイトル",
+      "description": "説明",
+      "throughput": "スループット",
+      "errors": "エラー",
+      "rule_load": "ルール負荷 (15m)",
+      "actions": "アクション"
+    }
+  },
+  "stage": {
+    "contains_rules_other": "{{count}} 件のルールを含みます",
+    "last_stage": "このパイプラインにはこれ以上ステージがありません。このステージのルールが適用されると、パイプラインの処理は完了します。",
+    "continue_all": "このステージの<matchText>すべてのルール</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_either": "このステージの<matchText>少なくとも1つのルール</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_pass": "このステージの<matchText>いずれかのルール、またはルールなし</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_unknown": "このステージの<matchText>UNKNOWN</matchText>に一致するメッセージは、次のステージに進みます。",
+    "title": "ステージ {{stage}}",
+    "remove_routing_rule_title": "ルーティングルールを削除",
+    "remove_routing_rule_confirm": "ルーティングルール <ruleTitle>{{title}}</ruleTitle> を本当に削除しますか？"
+  },
+  "stage_form": {
+    "rules_help": "このステージで評価するルールを選択するか、<rulesLink>パイプラインルールページ</rulesLink>で作成してください。",
+    "add_button": "新しいステージを追加",
+    "add_title": "新しいステージ {{stage}} を追加",
+    "edit_title": "ステージ {{stage}} を編集",
+    "add_submit": "ステージを追加",
+    "update_submit": "ステージを更新",
+    "stage": "ステージ",
+    "stage_in_use": "このステージ番号は既に使用されています。別の番号を使用するか、既存のステージを編集してください。",
+    "stage_help": "ステージの優先度です。番号が小さいほど先に実行されます。",
+    "continue_when": "次のステージへの処理を続行する条件",
+    "match_all": "このステージのすべてのルールがメッセージに一致する",
+    "match_any": "このステージのルールの少なくとも1つがメッセージに一致する",
+    "match_pass": "このステージのルールがいずれも一致しない、またはルールが1つ以上一致する",
+    "stage_rules": "ステージのルール"
+  },
+  "used_in_pipelines": {
+    "label": "使用中のパイプライン",
+    "help": "1つ以上のステージでこのルールを使用しているパイプラインです。",
+    "none": "このルールはどのパイプラインでも使用されていません。"
+  },
+  "deprecation": {
+    "label": "非推奨の関数",
+    "title_rule": "このルールには、少なくとも1つの非推奨の関数が含まれています:",
+    "title_pipeline": "このパイプラインには、少なくとも1つの非推奨の関数が含まれています:"
+  },
+  "rule_form": {
+    "duplicate_title": "ルールのタイトル「{{title}}」は既に存在します。",
+    "title": "タイトル",
+    "title_help": "ルールのソースでルールのタイトルを設定できます。詳細はクイックリファレンスをご覧ください。",
+    "leave_question": "このページを離れて変更を破棄しますか？この操作は取り消せません。",
+    "description": "説明",
+    "description_help": "ルールの説明です（任意）。",
+    "source": "ルールのソース",
+    "source_help": "ルールのソースです。詳細はクイックリファレンスをご覧ください。",
+    "create_submit": "ルールを作成",
+    "update_close_submit": "ルールを更新して閉じる",
+    "update": "ルールを更新"
+  },
+  "rule_list_entry": {
+    "edit": "編集",
+    "delete_title": "ルールを削除",
+    "delete": "削除",
+    "managed": "アプリケーションによって管理",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s"
+  },
+  "metrics_config": {
+    "loading": "メトリクス設定を読み込んでいます...",
+    "title": "ルールメトリクスの設定",
+    "submit": "設定を更新",
+    "warning": "ルールメトリクスは、パフォーマンスの問題をデバッグする場合にのみ有効にしてください。メトリクスを収集するとメッセージ処理が遅くなり、メモリー使用量が増えます。",
+    "enable": "ルールメトリクスを有効化",
+    "disable": "ルールメトリクスを無効化",
+    "pipeline_load_info": "これらのメトリクスを有効にすると、パイプラインとパイプラインルールのページに<columnName>パイプライン負荷</columnName>という新しい列が追加されます。この列には、どのパイプラインがスレッド時間を最も多く消費しているかを相対的に示す割合（%）が表示されます。",
+    "rule_load_info": "これらのメトリクスを有効にすると、パイプラインの詳細ページにも<columnName>ルール負荷</columnName>という新しい列が追加されます。これにより、選択したパイプライン内のどのパイプラインルールが最も高コストかを特定できます。"
+  },
+  "rule_simulation": {
+    "error_builder": "ルールのシミュレーションを実行できませんでした。ルールビルダーのエラーを修正してください。",
+    "placeholder_simple": "シンプルなメッセージフィールド",
+    "invalid_json": "無効なJSONです。",
+    "title": "ルールのシミュレーション",
+    "optional": "（任意）",
+    "json": "JSON",
+    "key_value": "キーと値",
+    "simple_message": "シンプルなメッセージ",
+    "input_title": "シンプルなメッセージフィールド、キーと値のペア、またはJSON",
+    "input_help": "メッセージフィールドをシミュレートする場合は通常の文字列を、メッセージ全体をシミュレートする場合はキーと値のペアまたはJSONを入力してください。",
+    "run": "ルールのシミュレーションを実行",
+    "reset": "リセット",
+    "conditions_output": "条件の出力",
+    "actions_output": "アクションの出力"
+  },
+  "convert_modal": {
+    "no_title": "<no title>",
+    "no_code": "<no code>",
+    "create_rule": "コードから新しいルールを作成",
+    "copied": "ルールのソースコードをクリップボードにコピーしました。",
+    "copy_close": "コピーして閉じる"
+  },
+  "block_display": {
+    "number": "番号",
+    "not": "否定",
+    "deprecated": "非推奨",
+    "edit": "編集",
+    "delete": "削除",
+    "duplicate": "複製",
+    "insert_above": "上に挿入",
+    "insert_below": "下に挿入"
+  },
+  "block": {
+    "insert_title_above": "アクション N°{{order}} の上に新しいアクションを挿入",
+    "insert_title_below": "アクション N°{{order}} の下に新しいアクションを挿入"
+  },
+  "builder_form": {
+    "title": "タイトル",
+    "title_help": "ルールのタイトルです。",
+    "description": "説明",
+    "description_help": "ルールの説明です（任意）。"
+  },
+  "block_form": {
+    "add_condition": "条件を追加",
+    "add_action": "アクションを追加",
+    "syntax_help": "関数の構文ヘルプ",
+    "update": "更新",
+    "add": "追加"
+  },
+  "block_field": {
+    "no_dollar": "「$」で始まるフィールドは使用できません。",
+    "use_previous_output": "前のステップの出力を使用",
+    "set_custom": "カスタム {{name}} を設定",
+    "select_output": "一覧から出力を選択",
+    "output_from_step": "ステップ {{step}} の出力（{{name}}）",
+    "type_not_found": "{{type}} 型を返す前のアクションはありません",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "ルールビルダー",
+    "when": "条件",
+    "and": "かつ",
+    "or": "または",
+    "then": "アクション",
+    "convert_title": "ルールビルダーをソースコードに変換",
+    "convert": "ソースコードに変換",
+    "delete_condition": "条件を削除",
+    "delete_action": "アクションを削除",
+    "delete_condition_confirm": "<blockName>条件 N°{{order}}</blockName> を本当に削除しますか？",
+    "delete_action_confirm": "<blockName>アクション N°{{order}}</blockName> を本当に削除しますか？"
+  },
+  "helper": {
+    "title": "ルールのクイックリファレンス",
+    "docs_hint": "パイプラインルールの仕組みをより深く理解するには、<docsLink>ドキュメント全体</docsLink>をお読みください。",
+    "functions": "関数",
+    "example": "例",
+    "functions_description": "パイプラインルールで使用できるすべての関数の一覧です。行をクリックすると、関数のパラメーターの詳細が表示されます。",
+    "filter_rules": "ルールをフィルター",
+    "example_description": "パイプラインルールがどのように見えるか確認しますか？次の例をご覧ください:"
+  },
+  "helper_table": {
+    "parameter": "パラメーター",
+    "type": "型",
+    "required": "必須",
+    "description": "説明",
+    "function": "関数"
+  },
+  "simulator": {
+    "no_streams_title": "ストリームが見つかりません",
+    "no_streams": "パイプラインはストリームに対して動作しますが、現在システムにストリームがありません。<streamsLink>ストリームを作成</streamsLink>してから、新しいストリームで受信メッセージを処理するパイプラインをテストするためにここに戻ってきてください。",
+    "stream_help": "シミュレーションで使用するストリームを選択してください。デフォルトでは <streamTitle>{{title}}</streamTitle> ストリームが使用されます。",
+    "load_message": "メッセージを読み込む",
+    "load_message_description": "シミュレーションで使用するサンプルメッセージを作成します。<notice>実際のメッセージは変更されません。すべてのアクションは、以下で入力する一時的な入力に対してのみシミュレートされます。</notice>",
+    "stream": "ストリーム"
+  },
+  "simulation_changes": {
+    "added_fields": "追加されたフィールド",
+    "removed_fields": "削除されたフィールド",
+    "mutated_fields": "変更されたフィールド",
+    "dropped": "元のメッセージは、処理中に破棄されます。",
+    "not_modified": "元のメッセージは、処理中に変更されません。",
+    "original_changes": "元のメッセージ <idSmall><idEm>{{id}}</idEm></idSmall> の変更",
+    "other_changes": "その他の変更",
+    "other_changes_description_other": "{{count}} 件のメッセージが作成される予定です。<previewOption>結果のプレビュー</previewOption>の表示オプションに切り替えると確認できます。"
+  },
+  "simulation_preview": {
+    "dropped_title": "メッセージは破棄されます",
+    "dropped": "パイプラインプロセッサーはこのようなメッセージを破棄します。つまり、メッセージは<notStored>保存されず</notStored>、検索、アラート、出力、ダッシュボードで利用できなくなります。"
+  },
+  "simulation_trace": {
+    "microseconds": "μs"
+  },
+  "simulation_results": {
+    "changes_summary": "変更の概要",
+    "results_preview": "結果のプレビュー",
+    "simulation_trace": "シミュレーションのトレース",
+    "error_title": "メッセージ処理のシミュレーションでエラーが発生しました",
+    "error": "ストリーム <emphasis>{{stream}}</emphasis> のメッセージ <emphasis>{{id}}</emphasis> の処理をシミュレートできませんでした。<lineBreak />メッセージを再度読み込むか、別のメッセージでシミュレーションしてください。",
+    "original_message": "元のメッセージ",
+    "more_results": "その他の結果",
+    "title": "シミュレーション結果",
+    "simulating": "メッセージ処理をシミュレートしています。しばらくお待ちください。",
+    "results_description": "これは、読み込んだメッセージの処理結果です。処理には {{took}} µs かかりました。"
+  },
+  "simulator_page": {
+    "title": "処理をシミュレート",
+    "documentation_title": "パイプラインのドキュメント",
+    "description": "メッセージの処理は複雑になることがあります。このページを使うと、現在のパイプラインとルールのセットを使って、受信メッセージの処理結果をシミュレートできます。"
+  },
+  "rule_notifications": {
+    "fetch_failed": "ステータス {{error}} でルールの取得に失敗しました",
+    "fetch_failed_title": "処理ルールを取得できませんでした",
+    "list_failed": "ステータス {{error}} でルール一覧の読み込みに失敗しました",
+    "list_failed_title": "ルールを読み込めませんでした。",
+    "fetch_rule_failed": "ステータス {{error}} でルール \"{{id}}\" の取得に失敗しました",
+    "fetch_rule_failed_title": "処理ルール \"{{id}}\" を取得できませんでした",
+    "create_success": "ルール \"{{title}}\" を作成しました",
+    "create_failed": "ステータス {{error}} でルール \"{{title}}\" の保存に失敗しました",
+    "create_failed_title": "処理ルール \"{{title}}\" を保存できませんでした",
+    "update_success": "ルール \"{{title}}\" を更新しました",
+    "update_failed": "ステータス {{error}} でルール \"{{title}}\" の更新に失敗しました",
+    "update_failed_title": "処理ルール \"{{title}}\" を更新できませんでした",
+    "delete_success": "ルール \"{{title}}\" を削除しました",
+    "delete_failed": "ステータス {{error}} でルール \"{{title}}\" の削除に失敗しました",
+    "delete_failed_title": "処理ルール \"{{title}}\" を削除できませんでした",
+    "metrics_load_failed": "ルールメトリクスの設定を読み込めませんでした: {{error}}",
+    "metrics_load_failed_title": "ルールメトリクスの設定を読み込めませんでした",
+    "metrics_update_success": "ルールメトリクスの設定を更新しました",
+    "metrics_update_failed": "ルールメトリクスの設定を更新できませんでした: {{error}}",
+    "metrics_update_failed_title": "ルールメトリクスの設定を更新できませんでした",
+    "metadata_failed": "ステータス付きでパイプラインルールのメタデータの読み込みに失敗しました",
+    "metadata_failed_title": "パイプラインルールのメタデータを読み込めませんでした",
+    "deprecated_failed": "ステータス付きでルールの非推奨の関数の読み込みに失敗しました",
+    "deprecated_failed_title": "ルールメタデータの非推奨の関数を読み込めませんでした",
+    "builder_create_failed": "ステータス {{error}} でルールビルダーのルールの作成に失敗しました",
+    "builder_create_failed_title": "ルールビルダーのルールを作成できませんでした。",
+    "builder_update_failed": "ステータス {{error}} でルールビルダーのルールの更新に失敗しました",
+    "builder_update_failed_title": "ルールビルダーのルールを更新できませんでした。",
+    "builder_load_failed": "ステータス付きでルールビルダーのルールの読み込みに失敗しました",
+    "builder_load_failed_title": "ルールビルダーのルールを読み込めませんでした。",
+    "builder_conditions_failed": "ステータス付きでルールビルダーの条件一覧の読み込みに失敗しました",
+    "builder_conditions_failed_title": "ルールビルダーの条件一覧を読み込めませんでした。",
+    "builder_actions_failed": "ステータス付きでルールビルダーのアクション一覧の読み込みに失敗しました",
+    "builder_actions_failed_title": "ルールビルダーのアクション一覧を読み込めませんでした。"
+  },
+  "page_navigation": {
+    "manage_pipelines": "パイプラインを管理",
+    "manage_rules": "ルールを管理",
+    "simulator": "シミュレーター"
+  },
+  "pipeline_notifications": {
+    "load_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_failed_title": "パイプラインを読み込めませんでした",
+    "load_paginated_failed": "ステータス付きでページ分割されたパイプラインの読み込みに失敗しました",
+    "load_paginated_failed_title": "ページ分割されたパイプラインを読み込めませんでした",
+    "load_single_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_single_failed_title": "パイプラインを読み込めませんでした",
+    "connections_failed": "ステータス付きでパイプラインの接続の取得に失敗しました",
+    "connections_failed_title": "パイプラインの接続を取得できませんでした",
+    "connections_updated": "パイプラインの接続を更新しました",
+    "connections_update_failed": "ステータス {{error}} でパイプラインの接続の更新に失敗しました",
+    "connections_update_failed_title": "パイプラインの接続を更新できませんでした",
+    "create_failed": "ステータス {{error}} でパイプラインの作成に失敗しました",
+    "create_failed_title": "パイプラインを作成できませんでした",
+    "create_success": "パイプラインを作成しました。",
+    "update_failed": "ステータス {{error}} でパイプラインの更新に失敗しました",
+    "update_failed_title": "パイプラインを更新できませんでした",
+    "update_success": "パイプラインを更新しました。",
+    "delete_failed": "ステータス {{error}} でパイプラインの削除に失敗しました",
+    "delete_failed_title": "パイプラインを削除できませんでした",
+    "delete_success": "パイプラインを削除しました。",
+    "success_title": "成功しました！"
+  },
+  "connections_list": {
+    "not_connected": "このパイプラインはどのストリームにも接続されていません"
+  },
+  "rule_list": {
+    "headers": {
+      "title": "タイトル",
+      "description": "説明",
+      "created": "作成日時",
+      "last_modified": "最終更新日時",
+      "throughput": "スループット",
+      "errors": "エラー",
+      "pipeline_load": "パイプライン負荷 (15m)",
+      "pipelines": "パイプライン",
+      "actions": "アクション"
+    }
+  },
+  "load_cell": {
+    "error_tooltip": "パイプライン負荷を利用できません。処理負荷のメトリクスを読み込めませんでした。"
+  }
+}

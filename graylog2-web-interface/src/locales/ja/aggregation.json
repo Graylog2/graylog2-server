@@ -1,1 +1,236 @@
-{}
+{
+  "wizard_common": {
+    "grouping": "グループ化",
+    "group_by": "グループ化の基準",
+    "metric": "メトリック",
+    "metrics": "メトリック",
+    "sort": "並べ替え",
+    "visualization": "可視化",
+    "add": "追加",
+    "add_element": "要素を追加",
+    "add_named": "{{element}} を追加",
+    "remove_named": "{{element}} を削除",
+    "update_preview": "プレビューを更新",
+    "updating_preview": "プレビューを更新中...",
+    "color_hint": "色のヒント",
+    "select_all_fields": "すべてのフィールドを選択",
+    "deselect_all_fields": "すべてのフィールドの選択を解除",
+    "field_required": "フィールドは必須です。",
+    "must_be_greater_than_other": "0 より大きい値を指定してください。"
+  },
+  "wizard_grouping": {
+    "settings": "設定",
+    "skip_empty_values": "空の値をスキップ",
+    "skip_empty_values_help": "有効にすると、設定したフィールドを含まないメッセージはスキップされます。",
+    "skip_empty_values_help_otherwise": "無効にすると、「(空の値)」のバケットが作成されます。",
+    "limit": "上限",
+    "rollup_columns": "ロールアップ列",
+    "rollup_columns_help": "ロールアップを有効にすると、個々のサブトレースを合計した追加のトレースが含まれます。",
+    "direction": "方向",
+    "row": "行",
+    "column": "列",
+    "fields": "フィールド",
+    "add_field": "フィールドを追加",
+    "add_another_date_field": "別の日付フィールドを追加",
+    "add_another_field": "別のフィールドを追加",
+    "interval": "間隔",
+    "auto": "自動",
+    "interval_types": "間隔のタイプ",
+    "auto_bucket_size": "バケットサイズを自動設定",
+    "auto_bucket_size_help": "例: 1.5x。粒度を小さくすると<strong>少なく</strong>、大きくすると<strong>多く</strong>の値が表示されます。",
+    "fixed_bucket_size": "固定バケットサイズ",
+    "fixed_bucket_size_help": "例: 2 分。この時間が、このタイムスタンプタイプのバケットのサイズを決定します。",
+    "scale": "{{scale}}x",
+    "scaling_required": "倍率を入力してください。",
+    "scaling_range": "0 より大きく、10 以下である必要があります。",
+    "value_required": "値を入力してください。",
+    "limit_required": "上限を入力してください。"
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "秒",
+      "minutes": "分",
+      "hours": "時間",
+      "days": "日",
+      "weeks": "週",
+      "months": "月"
+    },
+    "unit_settings": "{{field}} の単位設定",
+    "type": "タイプ",
+    "select_unit_type": "単位のタイプを選択",
+    "unit": "単位",
+    "unit_help": "グラフに表示される値の計算に使用される単位です。",
+    "select_unit": "単位を選択",
+    "predefined_unit": "フィールド <bold>{{field}}</bold> には単位 <bold>{{unit}}</bold> が設定されています。単位を変更すると、グラフ上でデータが正しく表示されない場合があります。",
+    "clear": "クリア",
+    "ok": "OK"
+  },
+  "wizard_metric": {
+    "function": "関数",
+    "select_function": "関数を選択",
+    "field": "フィールド",
+    "select_field": "フィールドを選択",
+    "percentile": "パーセンタイル",
+    "select_percentile": "パーセンタイルを選択",
+    "strategy": "方式",
+    "select_strategy": "方式を選択",
+    "strategies": {
+      "COUNT": "ドキュメント数",
+      "SUM": "フィールドの合計"
+    },
+    "name": "名前",
+    "display_name_placeholder": "表示名を指定",
+    "show_thresholds": "しきい値の線を表示",
+    "add_threshold": "しきい値を追加",
+    "threshold_title": "タイトル",
+    "threshold_name_placeholder": "しきい値の名前を指定",
+    "remove_threshold": "しきい値を削除",
+    "threshold_value": "値",
+    "threshold_value_placeholder": "しきい値を指定",
+    "value_unit": "値の単位: {{unit}}",
+    "threshold_color": "しきい値の色の設定",
+    "function_required": "関数を選択してください。",
+    "field_required_for_function": "関数 {{function}} にはフィールドが必要です。",
+    "percentile_required": "パーセンタイルを入力してください。",
+    "name_unique": "名前は一意である必要があります。",
+    "threshold_value_required": "しきい値を入力してください。"
+  },
+  "wizard_sort": {
+    "field": "フィールド",
+    "field_placeholder": "並べ替えるフィールドまたはメトリックを指定",
+    "select_field": "並べ替えるフィールドを選択",
+    "direction": "方向",
+    "select_direction": "並べ替えの方向を選択",
+    "ascending": "昇順",
+    "descending": "降順",
+    "direction_required": "方向を選択してください。",
+    "time_row_unsupported": "時間ベースの行グループ化を使用している場合、データテーブル以外での並べ替えは機能しません。"
+  },
+  "wizard_visualization": {
+    "type": "タイプ",
+    "select_type": "可視化のタイプを選択",
+    "show_event_annotations": "イベントの注釈を表示",
+    "help_for": "{{field}} のヘルプ",
+    "select_field": "{{field}} を選択",
+    "color_for": "{{field}} の色の設定",
+    "axis_label_or_color": "少なくとも 1 つの軸にラベルまたは色を設定してください。",
+    "type_required": "タイプを入力してください。"
+  },
+  "builder_empty": {
+    "title": "集計が空です",
+    "editing": "ウィジェットを編集中です。",
+    "add_metric_hint": "結果を表示するには、少なくとも 1 つのメトリックを追加してください。行や列を追加してデータをグループ化することもできます。",
+    "preview_hint": "「{{button}}」をクリックすると、ウィジェットの検索結果をプレビューできます。",
+    "finish_hint": "完了するには「{{update}}」をクリックして保存するか、「{{cancel}}」をクリックして変更を破棄してください。",
+    "edit_hint_interactive": "結果をここに表示するには、ウィジェットを<editButton>編集</editButton>してください。",
+    "edit_hint": "結果をここに表示するには、ウィジェットを編集してください。"
+  },
+  "vis_types": {
+    "area_chart": "エリアチャート",
+    "bar_chart": "棒グラフ",
+    "heatmap": "ヒートマップ",
+    "line_chart": "折れ線グラフ",
+    "network_graph": "ネットワークグラフ",
+    "pie_chart": "円グラフ",
+    "sankey": "サンキー",
+    "scatter_plot": "散布図",
+    "single_number": "単一の数値",
+    "world_map": "世界地図"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "エリアチャートには少なくとも 1 つのメトリックが必要です",
+    "bar_chart_requires_metric": "棒グラフには少なくとも 1 つのメトリックが必要です",
+    "line_chart_requires_metric": "折れ線グラフには少なくとも 1 つのメトリックが必要です",
+    "pie_chart_requires_metric": "円グラフには少なくとも 1 つのメトリックが必要です",
+    "scatter_plot_requires_metric": "散布図には少なくとも 1 つのメトリックが必要です",
+    "sankey_requires_groupings": "サンキーには少なくとも 2 つのグループ化フィールドが必要です。",
+    "sankey_single_metric": "サンキーは単一のメトリックのみサポートします。",
+    "network_requires_groupings": "ネットワークグラフには少なくとも 2 つのグループ化フィールドが必要です。"
+  },
+  "vis_common": {
+    "interpolation": "補間",
+    "interpolation_types": {
+      "linear": "直線",
+      "step-after": "ステップ（後）",
+      "spline": "スプライン"
+    },
+    "axis_type": "軸のタイプ",
+    "axis_types": {
+      "linear": "線形",
+      "logarithmic": "対数"
+    },
+    "color_scale": "色のスケール",
+    "reverse_scale": "スケールを反転",
+    "show_axis_labels": "軸ラベルを表示",
+    "x_axis": "X 軸",
+    "y_axis_number": "Y 軸: 数値",
+    "y_axis_percent": "Y 軸: パーセント",
+    "y_axis_time": "Y 軸: 時間",
+    "y_axis_size": "Y 軸: サイズ",
+    "color_hint": "色のヒント",
+    "legend_configuration": "{{label}} の設定"
+  },
+  "vis_heatmap": {
+    "auto_scale": "自動スケール",
+    "min": "最小",
+    "max": "最大",
+    "use_smallest_as_default": "最小値をデフォルトとして使用",
+    "default_value": "デフォルト値"
+  },
+  "vis_worldmap": {
+    "zoom": "ズーム",
+    "latitude": "緯度",
+    "longitude": "経度",
+    "name": "名前",
+    "coordinates": "座標:",
+    "value": "値:"
+  },
+  "vis_bar": {
+    "mode": "モード",
+    "modes": {
+      "group": "グループ",
+      "stack": "積み上げ",
+      "relative": "相対",
+      "overlay": "重ね合わせ"
+    },
+    "mode_help": {
+      "group": "すべての系列がグラフ内で個別の棒として表示されます。",
+      "stack": "すべての系列が積み上げられ、1 本の棒として表示されます。",
+      "relative": "すべての系列が積み上げられ、1 つのグラフとして表示されます。ただし、負の系列はゼロより下に配置されます。",
+      "overlay": "すべての系列が棒として重ねて配置されます。棒が見えるように、不透明度は 75% に下げられます。このオプションは 3 系列以下での使用を推奨します。"
+    }
+  },
+  "vis_number": {
+    "trend": "トレンド",
+    "trend_description": "この数値のトレンド情報を表示します。",
+    "trend_help_enabled": "ユーザーがトレンド表示を有効にすると、現在の値の下に別のボックスが表示されます。このボックスには、アイコンで変化の方向が示され、現在の値と前の値の絶対差と相対差が表示されます。",
+    "trend_help_previous": "前の値は、バックグラウンドで 2 つの検索を実行して計算されます。2 つの検索は期間以外すべて同一です。1 つ目の検索の期間は、このクエリ/このウィジェットに設定された期間と同じです。2 つ目の検索は同じ期間ですが、期間の長さ分だけ過去にずらされています。",
+    "trend_preference": "トレンドの優先設定",
+    "trend_preferences": {
+      "LOWER": "低い方",
+      "NEUTRAL": "中立",
+      "HIGHER": "高い方"
+    },
+    "highlight": "強調表示",
+    "highlight_options": {
+      "TREND_ONLY": "トレンド情報のみ",
+      "FULL_WIDGET": "ウィジェット全体"
+    },
+    "not_available": "N/A",
+    "trend_label": "トレンド: {{absolute}} ({{relative}})、前の値 {{previous}} との比較",
+    "previous_value": "前の値: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "関連する値",
+    "data_points": "データポイント",
+    "metric": "メトリック",
+    "groupings": "グループ化",
+    "back": "戻る"
+  },
+  "vis_network": {
+    "no_connections": "表示する接続がありません。検索またはグループ化を調整して結果を確認してください。"
+  },
+  "vis_sankey": {
+    "no_flows": "表示するフローがありません。検索またはグループ化を調整して結果を確認してください。"
+  }
+}

@@ -1,1 +1,42 @@
-{}
+{
+  "human_name": "ダッシュボード",
+  "full_screen": {
+    "menu": "全画面表示",
+    "title": "全画面表示の設定",
+    "start": "全画面表示を開始",
+    "refresh_interval": "更新間隔",
+    "refresh_interval_help": "ダッシュボードを何秒ごとに更新しますか？",
+    "tabs": "タブ",
+    "tabs_help": "切り替えの対象に含めるクエリタブを選択します。",
+    "cycle_interval": "タブの切り替え間隔",
+    "cycle_interval_help": "次のタブを何秒後に表示しますか？"
+  },
+  "properties": {
+    "title": "タイトル",
+    "title_help": "ダッシュボードのタイトルです。",
+    "summary": "概要",
+    "summary_help": "ダッシュボードの役立つ概要です。",
+    "description": "説明",
+    "description_help": "ダッシュボードとその機能の、より詳しく役立つ説明です。"
+  },
+  "overview": {
+    "missing_requirements": "不足している要件",
+    "user_defined": "ユーザー定義",
+    "load_failed": "ダッシュボードの読み込みに失敗しました。ステータス:",
+    "could_not_load": "ダッシュボードを読み込めませんでした"
+  },
+  "delete": {
+    "confirm": "\"{{title}}\" を削除してもよろしいですか？",
+    "success": "ダッシュボード \"{{title}}\" の削除が完了しました！",
+    "success_title": "成功！",
+    "failed": "ダッシュボードの削除に失敗しました: {{error}}",
+    "failed_title": "エラー！"
+  },
+  "bulk_delete": {
+    "confirm_other": "{{count}} 個のダッシュボードを本当に削除しますか？",
+    "partial_failure_other": "選択されたダッシュボード {{count}} 個のうち {{failed}} 個を削除できませんでした。",
+    "success_other": "{{count}} 個のダッシュボードを正常に削除しました。",
+    "success_title": "成功",
+    "failed": "ダッシュボードの削除中にエラーが発生しました。{{error}}"
+  }
+}

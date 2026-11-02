@@ -1,1 +1,252 @@
-{}
+{
+  "extractors_of": "{{title}} のエクストラクター",
+  "actions": "操作",
+  "import_extractors": "エクストラクターをインポート",
+  "export_extractors": "エクストラクターをエクスポート",
+  "documentation_title": "エクストラクターのドキュメント",
+  "description": "エクストラクターは、この入力で受信するすべてのメッセージに適用されます。テキストデータからフィールドを抽出・変換することで、後で簡単にフィルタリングや分析ができるようになります。例: ログメッセージから HTTP レスポンスコードを抽出し、数値フィールドに変換して {{field}} としてメッセージに追加します。",
+  "list_item": {
+    "subtitle_copy": "<em>{{source}}</em> からデータを抽出して <em>{{target}}</em> に格納します。元のデータはそのまま残ります。",
+    "subtitle_cut": "<em>{{source}}</em> からデータを抽出して <em>{{target}}</em> に格納します。元のデータは残りません。",
+    "condition": "条件",
+    "condition_string": "メッセージに文字列 <em>{{value}}</em> が含まれる場合にのみ実行されます",
+    "condition_regex": "メッセージが正規表現 <em>{{value}}</em> に一致する場合にのみ実行されます",
+    "confirm_delete": "エクストラクター「{{title}}」を本当に削除しますか？",
+    "details": "詳細",
+    "edit": "編集",
+    "delete": "削除",
+    "no_configuration": "設定オプションはありません",
+    "configuration": "設定",
+    "converters": "コンバーター"
+  },
+  "metrics": {
+    "title": "メトリクス",
+    "percentile_95": "95パーセンタイル：",
+    "percentile_98": "98パーセンタイル：",
+    "percentile_99": "99パーセンタイル：",
+    "std_dev": "標準偏差：",
+    "mean": "平均：",
+    "minimum": "最小：",
+    "maximum": "最大：",
+    "invocations": "起動後の合計実行回数: {{total}}、平均: {{oneMinute}}、{{fiveMinutes}}、{{fifteenMinutes}}。",
+    "hits_misses": "ヒット {{hits}} 件、ミス {{misses}} 件",
+    "no_messages": "まだ、ここを通過したメッセージはありません。",
+    "total_time": "合計時間",
+    "condition_time": "条件の処理時間",
+    "execution_time": "実行時間",
+    "converter_time": "コンバーターの処理時間",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "フィールドに文字列が含まれる",
+    "condition_string_help": "抽出を実行する条件として、フィールドに含まれているべき文字列を入力します。",
+    "condition_regex_label": "フィールドが正規表現に一致する",
+    "condition_regex_help": "抽出を実行する条件として、フィールドが一致すべき正規表現を入力します。",
+    "condition_matches": "一致しました！このサンプルに対してエクストラクターが実行されます。",
+    "condition_no_match": "一致しません！エクストラクターは実行されません。",
+    "try": "試行",
+    "condition_type_help": "特定の条件に一致するメッセージからのみ抽出することで、誤った抽出や不要な抽出を防ぎ、CPU リソースも節約できます。",
+    "cursor_strategy_help": "ソースからコピーしますか、それとも切り取りますか？ <em>message</em> や <em>source</em> などの標準フィールドでは切り取り機能は使用できません。",
+    "target_field_help": "抽出した値を格納するフィールド名を選択します。使用できるのは <b>英数字とアンダースコア</b> のみです。例: <em>http_response_code</em>。",
+    "store_as_field": "フィールドとして格納",
+    "example_message": "サンプルメッセージ",
+    "configuration": "エクストラクターの設定",
+    "extractor_type": "エクストラクタータイプ",
+    "source_field": "ソースフィールド",
+    "condition": "条件",
+    "condition_none": "常に抽出を試行",
+    "condition_string": "フィールドに文字列が含まれる場合にのみ抽出を試行",
+    "condition_regex": "フィールドが正規表現に一致する場合にのみ抽出を試行",
+    "extraction_strategy": "抽出方法",
+    "copy": "コピー",
+    "cut": "切り取り",
+    "title": "エクストラクターのタイトル",
+    "title_help": "このエクストラクターのわかりやすい名前です。",
+    "create": "エクストラクターを作成",
+    "update": "エクストラクターを更新"
+  },
+  "converters": {
+    "csv_enable": "CSV の列をフィールドとして追加",
+    "csv_field_names": "フィールド名",
+    "csv_separator": "区切り文字",
+    "csv_quote": "引用符文字",
+    "csv_escape": "エスケープ文字",
+    "csv_escape_help": "区切り文字と引用符文字をエスケープするために使用される文字です。",
+    "csv_strict_quotes": "厳密な引用符を使用",
+    "csv_strict_quotes_help": "引用符の外側にある内容は無視します。",
+    "csv_trim": "先頭の空白を削除",
+    "date_enable": "日付型に変換",
+    "date_format": "フォーマット文字列",
+    "time_zone": "タイムゾーン",
+    "locale": "ロケール",
+    "flexdate_enable": "柔軟に日付を解析",
+    "hash": "値から MD5 ハッシュを生成",
+    "ip_anonymizer": "IPv4 アドレスの末尾のオクテットを置き換えて匿名化",
+    "lookup_table_enable": "ルックアップテーブルを使用して値を変換",
+    "lookup_table": "ルックアップテーブル",
+    "lookup_table_placeholder": "ルックアップテーブルを選択",
+    "lowercase": "値を小文字に変換",
+    "numeric": "数値に変換",
+    "split_and_count": "分割してカウント",
+    "split_by": "分割文字",
+    "syslog_pri_facility": "PRI を syslog ファシリティに変換",
+    "syslog_pri_level": "PRI を syslog レベルに変換",
+    "tokenizer": "Key=Value のペアをフィールドとして追加",
+    "uppercase": "値を大文字に変換",
+    "csv_separator_help": "例えば <code>,</code>、<code>\\n</code>、<code>\\t</code> はそれぞれ 1 文字として変換されます。",
+    "date_format_help": "日付で使用される文字列フォーマットです。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "time_zone_help": "日付に適用するタイムゾーンです。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "locale_help": "日付を解析する際に使用するロケールです。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "lookup_table_help": "ルックアップテーブルは <lookupTablesLink>こちら</lookupTablesLink> から作成できます。",
+    "split_by_help": "「分割してカウント」コンバーターは、抽出された部分を指定した文字で分割し、トークンの数をフィールドとして格納します。<strong>例:</strong> <em>?fields=first_name,last_name,zip</em> を <em>,</em> で分割すると、結果は <em>3</em> になります。これは GET ユーザー REST リクエストで要求されたフィールドの数をカウントしたことになります。"
+  },
+  "wizard": {
+    "title": "エクストラクターを追加",
+    "description": "まず、作業用のサンプルとしてメッセージを読み込みます。この入力で受信した最近のメッセージを選択するか、ID を指定してメッセージを手動で選択できます。",
+    "create": "エクストラクターを作成"
+  },
+  "configuration": {
+    "preview": "エクストラクターのプレビュー",
+    "nothing_extracted": "何も抽出されません",
+    "try_example": "サンプルに対して試行"
+  },
+  "converters_editor": {
+    "not_supported": "<em>{{type}}</em> エクストラクターにはコンバーターを追加できません。",
+    "add_label": "コンバーターを追加",
+    "add_help": "抽出された値を変換するコンバーターを追加します。",
+    "select_placeholder": "コンバーターを選択",
+    "add": "追加"
+  },
+  "export": {
+    "json_title": "エクストラクターの JSON",
+    "copy": "エクストラクターをコピー"
+  },
+  "example_message": {
+    "not_loaded": "フィールド「{{field}}」のサンプルを読み込めませんでした。更新前にエクストラクターをテストすることはできません。"
+  },
+  "sort": {
+    "title": "<em>{{title}}</em> のエクストラクターの並べ替え",
+    "description": "リスト内でエクストラクターをドラッグ＆ドロップして、適用される順序を変更します。",
+    "submit": "並べ替えを更新"
+  },
+  "list": {
+    "sort": "エクストラクターを並べ替え",
+    "title": "設定済みのエクストラクター",
+    "no_extractors": "この入力には設定済みのエクストラクターがありません。"
+  },
+  "import": {
+    "parse_error": "エクストラクターの解析中にエラーが発生しました。JSON 形式になっていますか？ {{error}}",
+    "parse_error_title": "エクストラクターをインポートできませんでした",
+    "submit": "入力にエクストラクターを追加"
+  },
+  "message_loader": {
+    "load": "メッセージを読み込む",
+    "loading": "メッセージを読み込んでいます...",
+    "wrong_example": "サンプルが正しくありませんか？",
+    "load_another": "別のメッセージを読み込む",
+    "message_id": "メッセージ ID",
+    "index": "インデックス"
+  },
+  "copy_input": {
+    "description": "入力全体がそのままコピーされます。"
+  },
+  "grok": {
+    "error": "次のエラーのため、grok による抽出を実行できませんでした: {{error}}",
+    "no_match": "grok による抽出を実行できませんでした。パラメーターを確認してください。",
+    "named_captures_only": "名前付きキャプチャのみ",
+    "named_captures_only_help": "明示的に名前が付けられたキャプチャのみをメッセージに格納します。",
+    "pattern": "Grok パターン"
+  },
+  "json": {
+    "flatten": "構造を平坦化",
+    "flatten_help": "JSON オブジェクトを 1 つのメッセージフィールドに平坦化するか、複数のフィールドに展開するかを指定します。",
+    "list_separator": "リスト項目の区切り文字",
+    "list_separator_help": "JSON リストの項目を連結する際に使用する文字列です。",
+    "key_separator": "キーの区切り文字",
+    "key_separator_help": "ネストされた JSON オブジェクトの異なるキーを連結する際に使用する文字列です（<em>平坦化しない</em>場合のみ使用されます）。",
+    "kv_separator": "キー/値の区切り文字",
+    "kv_separator_help": "JSON オブジェクトのキー/値のペアを連結する際に使用する文字列です（平坦化する場合のみ使用されます）。",
+    "key_prefix": "キーの接頭辞",
+    "key_prefix_help": "JSON オブジェクトから抽出された各キーの先頭に付加するテキストです。",
+    "replace_key_whitespace": "キー内の空白を置換",
+    "replace_key_whitespace_help": "空白を含むフィールドキーは、抽出したメッセージを格納する際に破棄されます。このチェックボックスをオンにすると、JSON キー内の空白を別の文字に置き換えます。",
+    "key_whitespace_replacement": "キーの空白の置換文字",
+    "key_whitespace_replacement_help": "メッセージのキー内の空白を置き換える際に使用する文字です。置換文字が Lucene で有効であることを確認してください（例: 「-」や「_」）。"
+  },
+  "lookup_table": {
+    "error": "ルックアップを実行できませんでした: {{error}}"
+  },
+  "regex": {
+    "no_match": "正規表現に一致しませんでした。",
+    "no_group": "正規表現に、抽出するマッチャーグループが含まれていません。",
+    "help": "抽出に使用する正規表現です。最初のマッチャーグループが使用されます。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "label": "正規表現"
+  },
+  "regex_replace": {
+    "regex_help": "抽出に使用する正規表現です。詳しくは <docsLink>ドキュメント</docsLink> を参照してください。",
+    "replacement_help": "一致したテキストの置換文字列です。指定可能なオプションについては <matcherLink>Matcher</matcherLink> API のドキュメントを参照してください。",
+    "replacement": "置換文字列",
+    "replace_all": "パターンのすべての出現箇所を置換",
+    "replace_all_help": "指定したパターンのすべての出現箇所を置換するか、最初の出現箇所のみを置換するかを指定します。"
+  },
+  "split_and_index": {
+    "no_match": "分割とインデックスによる抽出を実行できませんでした。パラメーターを確認してください。",
+    "split_by_help": "分割に使用する文字です。<strong>例:</strong> 空白文字を指定すると、<em>foo bar baz</em> は <em>[foo,bar,baz]</em> に分割されます。",
+    "index_help": "分割された文字列のどの部分を使用しますか？ <strong>例:</strong> 空白で分割した場合、<em>2</em> を指定すると <em>foo bar baz</em> から <em>bar</em> が選択されます。",
+    "index": "対象のインデックス"
+  },
+  "substring": {
+    "no_match": "部分文字列による抽出を実行できませんでした。インデックスの範囲を確認してください。",
+    "end_index_help": "抽出を終了する位置です（この位置は含まれません）。<strong>例:</strong> <em>1,5</em> を指定すると、文字列 <em>ilovelogs</em> から <em>love</em> が切り出されます。",
+    "begin_index": "開始インデックス",
+    "begin_index_help": "抽出を開始する文字の位置です（この位置を含みます）。",
+    "end_index": "終了インデックス"
+  },
+  "pages": {
+    "new_title": "入力 {{title}} の新しいエクストラクター",
+    "new_header": "入力 <em>{{title}}</em> の新しいエクストラクター",
+    "edit_title": "エクストラクター {{title}} を編集",
+    "edit_header": "入力 <em>{{inputTitle}}</em> のエクストラクター <em>{{title}}</em> を編集",
+    "description": "エクストラクターは、入力で受信するすべてのメッセージに適用されます。テキストデータからフィールドを抽出・変換することで、後で簡単にフィルタリングや分析ができるようになります。",
+    "export_title": "{{title}} のエクストラクターをエクスポート",
+    "export_header": "<em>{{title}}</em> のエクストラクターをエクスポート",
+    "export_marketplace_prefix": "入力のエクストラクターは JSON 形式でエクスポートし、他の環境にインポートしたり、以下で共有したりできます:",
+    "import_title": "{{title}} にエクストラクターをインポート",
+    "import_header": "<em>{{title}}</em> にエクストラクターをインポート",
+    "import_description": "エクスポートされたエクストラクターを入力にインポートできます。",
+    "import_marketplace_prefix": "必要なのは、他の {{productName}} 環境からエクスポートしたエクストラクターの JSON ファイル、または以下からのファイルです:"
+  },
+  "tools_api": {
+    "details": "詳細: {{error}}",
+    "natural_date_failed": "キーワードプレビューの読み込みに失敗しました。ステータス: {{error}}",
+    "natural_date_failed_title": "キーワードプレビューを読み込めませんでした",
+    "grok_failed_title": "grok による抽出を実行できませんでした。パラメーターを確認してください。",
+    "json_failed_title": "JSON による抽出を実行できませんでした。パラメーターを確認してください。",
+    "regex_invalid_title": "正規表現を検証できませんでした。有効な正規表現か確認してください。",
+    "allowlist_check_title": "URL が許可リストに含まれているか確認できませんでした。",
+    "regex_generate_title": "正規表現を生成できませんでした。",
+    "regex_try_title": "正規表現を試行できませんでした。有効な正規表現か確認してください。",
+    "split_index_failed_title": "分割とインデックスによる抽出を実行できませんでした。パラメーターを確認してください。",
+    "substring_failed_title": "部分文字列による抽出を実行できませんでした。インデックスの範囲を確認してください。",
+    "contains_string_failed_title": "フィールドに文字列が含まれているか確認できませんでした",
+    "lookup_table_failed_title": "ルックアップテーブルで文字列が変換されるか確認できませんでした"
+  },
+  "use_extractors_notifications": {
+    "created_success": "エクストラクター {{title}} を作成しました",
+    "create_failed": "エクストラクターの作成に失敗しました: {{error}}",
+    "create_failed_title": "エクストラクターを作成できませんでした",
+    "updated_success": "エクストラクター「{{title}}」を更新しました",
+    "update_failed": "エクストラクターの更新に失敗しました: {{error}}",
+    "update_failed_title": "エクストラクターを更新できませんでした",
+    "deleted_success": "エクストラクター「{{title}}」を削除しました",
+    "delete_failed": "エクストラクターの削除に失敗しました: {{error}}",
+    "delete_failed_title": "エクストラクター {{title}} を削除できませんでした",
+    "positions_updated_success": "エクストラクターの順序を更新しました",
+    "positions_failed": "エクストラクターの順序の変更に失敗しました: {{error}}",
+    "positions_failed_title": "エクストラクターの順序を更新できませんでした",
+    "import_success": "インポート結果: {{successful}} 件のエクストラクターをインポートしました。",
+    "import_success_title": "インポートが完了しました",
+    "import_warning": "インポート結果: {{successful}} 件のエクストラクターをインポートしました。エラーが {{failed}} 件あります。",
+    "import_warning_title": "インポートが完了しました"
+  }
+}

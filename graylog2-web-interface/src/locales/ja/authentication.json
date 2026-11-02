@@ -1,1 +1,206 @@
-{}
+{
+  "action_links": {
+    "create": "サービスを作成",
+    "edit_active": "有効なサービスを編集",
+    "view_active": "有効なサービスを表示"
+  },
+  "active_directory": {
+    "create_title": "Active Directory認証サービスを作成",
+    "edit_title": "Active Directory認証サービスを編集",
+    "help": {
+      "system_user_dn": "Active Directoryサーバーへの初期接続に使用するユーザー名です。例: <code>ldapbind@some.domain</code>。<lineBreak/>これはそのユーザーの<code>userPrincipalName</code>と一致する必要があります。",
+      "system_user_password": "Active Directoryサーバーへの初期接続に使用するパスワードです。",
+      "user_full_name_attribute": "同期されたユーザーの氏名に使用するActive Directory属性です。例: <code>displayName</code>。<lineBreak/>",
+      "user_name_attribute": "同期されたユーザーの氏名に使用するActive Directory属性です。例: <code>userPrincipalName</code>。<lineBreak/>どの属性を使用すればよいか分からない場合は、サイドバーの<emphasis>ユーザーログインテスト</emphasis>セクションでテストユーザーを読み込んでみてください。",
+      "user_search_base": "Active Directoryの検索クエリを制限するベースツリーです。例: <code>cn=users,dc=example,dc=com</code>。"
+    }
+  },
+  "active_page": {
+    "title": "有効な認証サービス"
+  },
+  "authenticators": {
+    "description": "信頼されたヘッダー認証を設定します。",
+    "documentation_title": "認証機能のドキュメント",
+    "edit": "認証機能を編集",
+    "title": "認証機能の詳細"
+  },
+  "backend_details_page": {
+    "edit_service": "サービスを編集",
+    "title": "認証サービスの詳細"
+  },
+  "backends_overview": {
+    "activate": "有効化",
+    "confirm_activate": "認証サービス「{{title}}」を本当に有効化しますか",
+    "confirm_deactivate": "認証サービス「{{title}}」を本当に無効化しますか",
+    "confirm_delete": "認証サービス「{{title}}」を本当に削除しますか",
+    "deactivate": "無効化",
+    "delete": "削除",
+    "edit": "編集",
+    "filter_label": "サービスをフィルター",
+    "found_other": "システム上で設定済みの認証サービスを{{count}}件見つけました。",
+    "headers": {
+      "actions": "操作",
+      "default_roles": "デフォルトロール",
+      "description": "説明",
+      "title": "タイトル"
+    },
+    "query_example": "タイトルにLDAPを含むバックエンドを検索:",
+    "role_not_found": "ロールが見つかりません",
+    "title": "設定済みの認証サービス"
+  },
+  "config_details": {
+    "edit": "編集",
+    "group_sync_feature_name": "グループ同期",
+    "group_sync_title": "グループ同期"
+  },
+  "connection_test": {
+    "default_error": "エラーが発生しました",
+    "description": "「サーバー設定」ステップで定義したアドレスと認証情報を使用して、バックグラウンドで接続確認を実行します。",
+    "submit": "サーバー接続をテスト",
+    "title": "サーバー接続の確認"
+  },
+  "create_page": {
+    "getting_started_title": "新しい認証サービスを作成",
+    "title": "認証サービスを作成"
+  },
+  "directory_help": {
+    "default_roles": "同期されたユーザーが取得するデフォルトのロールです。Webインターフェースを使用するには、すべてのユーザーに<code>Reader</code>ロールが必要です",
+    "default_user_timezone": "新規ユーザーのデフォルトのタイムゾーンを選択します。",
+    "user_search_pattern": "例: <exampleCode>{{example}}</exampleCode>。文字列<code>{{placeholder}}</code>は、入力されたユーザー名に置き換えられます。"
+  },
+  "getting_started": {
+    "description": "内部ユーザーデータベースやLDAP/Active Directoryなどの組み込み認証の仕組みに加えて、認証サービスはプラグインによって他の認証の仕組みにも拡張できます。認証サービスを選択して、新しく設定してください。",
+    "select_service": "サービスを選択",
+    "submit": "始める"
+  },
+  "ldap": {
+    "create_title": "LDAP認証サービスを作成",
+    "edit_title": "LDAP認証サービスを編集",
+    "help": {
+      "email_attributes": "同期されたユーザーのメールアドレスに使用するLDAP属性です。例: <code>mail</code>。<lineBreak/>複数の属性を指定できます。値を確定するには<kbd>Tab</kbd>または<kbd>Enter</kbd>を押してください。",
+      "system_user_dn": "LDAPサーバーへの初期接続に使用するユーザー名です。例: <code>cn=admin,dc=example,dc=com</code>。LDAPサーバーによっては省略可能です。",
+      "system_user_password": "LDAPサーバーへの初期接続に使用するパスワードです。",
+      "user_full_name_attribute": "同期されたユーザーの氏名に使用するLDAP属性です。例: <code>cn</code>。<lineBreak/>",
+      "user_name_attribute": "同期されたユーザーのユーザー名に使用するLDAP属性です。例: <code>uid</code>。<lineBreak/>どの属性を使用すればよいか分からない場合は、サイドバーの<emphasis>ユーザーログインテスト</emphasis>セクションでテストユーザーを読み込んでみてください。",
+      "user_search_base": "LDAPの検索クエリを制限するベースツリーです。例: <code>cn=users,dc=example,dc=com</code>。",
+      "user_unique_id_attribute": "同期されたユーザーのIDに使用するLDAP属性です。例: <code>entryUUID</code>。<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "指定したユーザー名のエントリを読み込んで設定を確認します。パスワードを省略すると、認証は試行されません。",
+    "login_failed": "ログインに失敗しました",
+    "password": "パスワード",
+    "submit": "ユーザーログインをテスト",
+    "title": "ユーザーログインテスト",
+    "user_attribute": "ユーザー属性",
+    "user_does_not_exist": "ユーザーが存在しません",
+    "username": "ユーザー名",
+    "value": "値"
+  },
+  "no_service_plugin": "タイプ「{{type}}」に対して設定された認証サービスプラグインがありません",
+  "no_service_plugin_for": "「{{type}}」に対して設定された認証サービスプラグインがありません",
+  "notifications": {
+    "create_failed": "認証サービスの作成に失敗しました。ステータス: {{error}}",
+    "create_success": "認証サービスが正常に作成されました。",
+    "error_title": "エラー",
+    "success_title": "成功",
+    "update_failed": "認証サービスの更新に失敗しました。ステータス: {{error}}",
+    "update_success": "認証サービスが正常に更新されました。"
+  },
+  "overview_page": {
+    "no_active_backend": "設定済みの認証サービスのいずれも、現在有効ではありません。",
+    "title": "すべての認証サービス"
+  },
+  "page": {
+    "description": "このクラスターの認証サービスを設定します。",
+    "documentation_title": "認証のドキュメント"
+  },
+  "page_navigation": {
+    "authenticators": "認証機能",
+    "services": "認証サービス"
+  },
+  "server_config": {
+    "description_label": "説明",
+    "hostname": "ホスト名",
+    "port": "ポート",
+    "reset_password": "パスワードをリセット",
+    "server_address": "サーバーアドレス",
+    "system_password": "システムパスワード",
+    "system_user_dn": "システムユーザーDN",
+    "system_username": "システムユーザー名",
+    "title": "サーバー設定",
+    "title_label": "タイトル",
+    "transport_security": "トランスポートセキュリティ",
+    "transport_security_none": "なし",
+    "undo_reset": "リセットを取り消す",
+    "verify_certificates": "証明書を検証"
+  },
+  "synced_teams": {
+    "feature_name": "チーム",
+    "title": "同期されたチーム"
+  },
+  "synced_users": {
+    "edit": "編集",
+    "filter_label": "ユーザーをフィルター",
+    "found_other": "同期されたユーザーを{{count}}件見つけました。",
+    "headers": {
+      "actions": "操作",
+      "full_name": "氏名",
+      "roles": "ロール",
+      "username": "ユーザー名"
+    },
+    "none_found": "同期されたユーザーは見つかりませんでした。",
+    "role_not_found": "ロールが見つかりません",
+    "title": "同期されたユーザー"
+  },
+  "trusted_header": {
+    "description": "この認証機能により、HTTPヘッダーに基づいて、追加の操作なしでユーザーをログインさせることができます。",
+    "enable_sso": "HTTPヘッダーによるシングルサインオンを有効化",
+    "enabled": "有効",
+    "title": "信頼されたヘッダー認証",
+    "trusted_proxies_hint": "{{productName}}サーバーの設定ファイルで <code>trusted_proxies</code> 設定を行ってください。",
+    "update_config": "設定を更新",
+    "username_header": "ユーザー名ヘッダー",
+    "username_header_help": "ユーザーの暗黙的に信頼される名前を含むHTTPヘッダーです。（ヘッダーの照合では大文字と小文字を区別しません）"
+  },
+  "user_sync": {
+    "browser_time_zone": "ブラウザーのタイムゾーン",
+    "default_assignments_hint": "デフォルトのロールとタイムゾーンの割り当てを変更すると、{{serviceTitle}}経由で新しく作成されたユーザーのみに影響します！",
+    "default_roles": "デフォルトロール",
+    "default_user_time_zone": "デフォルトのユーザータイムゾーン",
+    "email_attribute": "メール属性",
+    "email_attributes": "メール属性",
+    "full_name_attribute": "氏名属性",
+    "id_attribute": "ID属性",
+    "name_attribute": "名前属性",
+    "role_not_found": "ロールが見つかりません",
+    "search_base_dn": "検索ベースDN",
+    "search_pattern": "検索パターン",
+    "search_roles": "ロールを検索",
+    "test_login_hint": "設定を確認するため、サイドバーパネルでユーザーログインをテストすることをお勧めします。",
+    "title": "ユーザー同期"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "この認証サービスのグループ同期設定を本当に削除しますか？",
+    "create_failed": "認証サービスの作成に失敗しました",
+    "edit_failed": "認証サービスの編集に失敗しました",
+    "finish_and_save": "完了してサービスを保存",
+    "finish_and_save_identity_service": "完了してIDサービスを保存",
+    "next_group_sync": "次へ: グループ同期",
+    "next_user_sync": "次へ: ユーザー同期",
+    "server_validation_error": "サーバーの検証エラー: {{errors}}",
+    "steps": {
+      "group_sync": "グループ同期（任意）",
+      "server_config": "サーバー設定",
+      "user_sync": "ユーザー同期"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "認証サービスを編集 - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "HTTPヘッダー認証の設定の読み込みに失敗しました",
+    "update_success": "HTTPヘッダー認証の設定を更新しました",
+    "update_failed": "HTTPヘッダー認証の設定の更新に失敗しました。ステータス: {{error}}"
+  }
+}

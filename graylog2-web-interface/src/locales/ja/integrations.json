@@ -1,1 +1,521 @@
-{}
+{
+  "aws_plugin_configuration": {
+    "title": "AWS プラグイン設定",
+    "description": "AWS モジュールが提供するすべてのプラグインの基本設定です。一部のパラメーターは暗号化されずに MongoDB に保存されることにご注意ください。必要な権限を持つユーザーは、このページの設定ダイアログでこれらを読み取ることができます。",
+    "status_instance_detail_lookups": "インスタンス詳細ルックアップ:",
+    "status_connect_through_proxy": "プロキシ経由で接続:",
+    "status_lookup_regions": "ルックアップリージョン:",
+    "status_access_key": "アクセスキー:",
+    "status_secret_key": "シークレットキー:",
+    "status_enabled": "有効",
+    "status_disabled": "無効",
+    "status_not_set": "[未設定]",
+    "edit_configuration": "設定を編集",
+    "modal_title": "AWS プラグイン設定を更新",
+    "submit_configuration": "設定を更新",
+    "lookups_enabled_label": "IP アドレスに対して AWS インスタンス詳細ルックアップを実行しますか？",
+    "lookups_enabled_help": "有効にすると、メッセージプロセッサーが AWS のエンティティ（EC2、ELB、RDS など）の IP アドレスを特定し、背後にあるサービスやインスタンスに関する追加情報を付加しようとします。この変更が反映されるまでに最大 1 分かかる場合があります。",
+    "access_key_label": "AWS アクセスキー",
+    "access_key_help": "暗号化された接続でのみ使用されますが、平文で保存されることにご注意ください。基になる IAM ユーザーに割り当てる推奨権限については、ドキュメントを参照してください。",
+    "secret_key_label": "AWS シークレットキー",
+    "secret_key_help": "暗号化された接続でのみ使用され、（システムシークレットを使用して）暗号化された状態で保存されることにご注意ください。基になる IAM ユーザーに割り当てる推奨権限については、ドキュメントを参照してください。",
+    "lookup_regions_label": "ルックアップリージョン",
+    "lookup_regions_help": "AWS インスタンスルックアップのメッセージプロセッサーは、高速なアドレス変換のためにインスタンスのテーブルを保持します。テーブルに含める AWS リージョンを定義してください。AWS サービスを実行しているすべてのリージョンを指定する必要があります。IAM ユーザーにこれらのリージョンの権限が必要であることにご注意ください。権限がない場合、{{productName}} サーバーのログに警告が表示されます。",
+    "proxy_enabled_label": "HTTP プロキシを使用しますか？",
+    "proxy_enabled_help": "有効にすると、{{productName}} の設定ファイルで構成された HTTP プロキシ（<code>http_proxy_uri</code>）を経由して AWS API にアクセスします。<lineBreak/><em>重要:</em> この設定を反映するには、すべての AWS 入力を再起動する必要があります。",
+    "save_error_message": "AWS プラグインの設定に失敗しました。ステータス: {{error}}",
+    "save_error_title": "AWS プラグインの設定を保存できませんでした。"
+  },
+  "gcs_setup_info": {
+    "intro": "Google Cloud Storage バックエンドを設定するには、次の手順に従ってください:",
+    "step_bucket": "一意の名前で Google Cloud Storage バケットを作成します。詳細は Google のドキュメント <bucketsLink>バケット</bucketsLink> を参照してください。デフォルトの Standard ストレージクラスを推奨します。",
+    "step_service_account": "そのバケットに対する読み取り・書き込み・削除の権限を持つ Google Cloud サービスアカウントを作成します。詳細は Google のドキュメント <serviceAccountsLink>サービスアカウント</serviceAccountsLink> を参照してください。",
+    "step_credentials": "すべての Graylog ノードでアプリケーションのデフォルト認証情報を設定します。方法はクラスターのホスティング環境によって異なります。詳細は Google のドキュメント <adcLink>アプリケーションのデフォルト認証情報の設定</adcLink> を参照してください。",
+    "step_setup_backend": "このページで Google Cloud Storage バックエンドを設定する準備が整いました。最初の手順で作成した Google Cloud Storage の一意の名前を入力する必要があります。"
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "AWS キーが無効です。AWS アカウントで、通常「AK」で始まる 20 文字の英数字の文字列を確認してください",
+    "invalid_secret_message": "AWS シークレットが無効です。通常は 40 文字の Base64 エンコードされた文字列ですが、キーの作成時に一度しか表示されません",
+    "authorize_button": "認証してストリームを選択",
+    "title": "入力を作成して AWS を認証",
+    "description": "この連携により、Kinesis ストリームからメッセージを直接読み取ることができます。CloudWatch のメッセージは、必要に応じて CloudWatch サブスクリプション経由で Kinesis に転送し、処理することもできます。",
+    "input_name": "入力名",
+    "aws_region": "AWS リージョン",
+    "aws_region_help": "サービスが実行されている AWS リージョンです。",
+    "choose_region": "AWS リージョンを選択"
+  },
+  "aws_arn": {
+    "assume_role_label": "AWS ロールの引き受け (ARN)",
+    "assume_role_help": "必要なクロスアカウント権限を持つ Amazon リソースネーム",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "AWS 外部 ID (任意)",
+    "external_id_help": "混乱した代理人問題を防ぐため、AssumeRole リクエストに追加される外部 ID です。ロールの信頼ポリシーで必須となっている場合のみ必要です。"
+  },
+  "aws_authentication_types": {
+    "label": "AWS 認証タイプ"
+  },
+  "aws_custom_endpoints": {
+    "title": "AWS VPC エンドポイント (任意)",
+    "section_title": "{{productName}} が通信する AWS API のデフォルトのエンドポイント URL を上書きします。",
+    "note": "AWS サービスで <vpcEndpointsLink>VPC エンドポイント</vpcEndpointsLink> を使用している場合にのみ指定してください。",
+    "input_message": "ドメインは「https://」で始める必要があります",
+    "cloudwatch_label": "CloudWatch API エンドポイントの上書き",
+    "iam_label": "IAM API エンドポイントの上書き",
+    "dynamodb_label": "DynamoDB API エンドポイントの上書き",
+    "kinesis_label": "Kinesis API エンドポイントの上書き"
+  },
+  "aws_automatic": {
+    "section_title": "自動認証では、以下の方法が記載された順序で試行されます。",
+    "env_variables_label": "環境変数",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> および <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Java システムプロパティ",
+    "java_properties_value": "<code>aws.accessKeyId</code> および <code>aws.secretKey</code>",
+    "profiles_label": "デフォルトの認証情報プロファイルファイル",
+    "profiles_value": "通常は <code>~/.aws/credentials</code> にあります",
+    "ecs_label": "Amazon ECS コンテナーの認証情報",
+    "ecs_value": "環境変数 <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code> が設定されている場合、Amazon ECS から読み込まれます",
+    "instance_label": "インスタンスプロファイルの認証情報",
+    "instance_value": "EC2 インスタンスで使用され、Amazon EC2 メタデータサービスを通じて提供されます",
+    "more_info": "詳細は <docsLink>AWS 認証情報の設定に関するドキュメント <openIcon/></docsLink> を参照してください。"
+  },
+  "aws_key_secret": {
+    "access_key_label": "AWS アクセスキー",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "AWS キーは、「AK」で始まる 20 文字の英数字の文字列である必要があります。",
+    "access_key_help_optional": "AWS キーは、「AK」で始まる 20 文字の英数字の文字列である必要があります。（任意 - 指定しない場合は、従来の AWS プラグイン設定が使用されます）",
+    "secret_key_label": "AWS シークレットキー",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "AWS シークレットは通常、40 文字の Base64 エンコードされた文字列です。",
+    "secret_key_help_optional": "AWS シークレットは通常、40 文字の Base64 エンコードされた文字列です。（任意 - 指定しない場合は、従来の AWS プラグイン設定が使用されます）"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "AWS CloudTrail 接続設定",
+    "step_subscribe_title": "AWS CloudTrail 入力設定",
+    "step_review_title": "AWS CloudTrail 最終確認"
+  },
+  "aws_cloudtrail_app": {
+    "title": "AWS CloudTrail 連携",
+    "description": "この機能は AWS CloudTrail プラットフォームからログレコードを取得します。",
+    "requirement": "<cloudTrailLink>AWS CloudTrail</cloudTrailLink> が必要です。"
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "詳細オプション",
+    "sqs_batch_size_error": "SQS メッセージのバッチサイズは 1～10 の範囲で選択してください。",
+    "override_source_label": "ソースの上書き (任意)",
+    "override_source_help": "ソースはデフォルトで aws-cloudtrail に設定されています。必要に応じて、任意の値で上書きできます。",
+    "sqs_batch_size_label": "SQS メッセージのバッチサイズ",
+    "sqs_batch_size_help": "一度に SQS から取得するメッセージの最大数です。指定できる最大値は 10 です。",
+    "include_full_message_json_label": "full_message_json を含めますか？",
+    "include_full_message_json_help": "完全な CloudTrail イベントを JSON として full_message_json フィールドに保存しますか？"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "指定された設定を使用して AWS CloudTrail に接続できません。",
+    "verify_button": "接続を確認して次へ",
+    "input_name": "入力名",
+    "input_name_help": "新しい入力の内容を説明する名前を選択してください。",
+    "sqs_region_help": "SQS キューが配置されている AWS リージョンです。",
+    "sqs_region_label": "AWS SQS リージョン",
+    "choose_sqs_region": "SQS リージョンを選択",
+    "s3_region_help": "S3 バケットが配置されている AWS リージョンです。",
+    "s3_region_label": "AWS S3 リージョン",
+    "choose_s3_region": "S3 リージョンを選択",
+    "sqs_queue_name_help": "CloudTrail Subscriber によって作成された SQS キューの名前",
+    "sqs_queue_name_label": "SQS キュー名"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "入力を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "save_button": "保存して入力を開始",
+    "description": "以下の内容に誤りがないか確認してから、下のボタンをクリックして AWS CloudTrail の設定を完了してください。",
+    "input_configuration": "入力の設定",
+    "label_name": "名前",
+    "label_access_key": "AWS アクセスキー",
+    "label_sqs_region": "SQS リージョン",
+    "label_s3_region": "S3 リージョン",
+    "label_assume_role_arn": "AWS ロールの引き受け (ARN)",
+    "label_external_id": "AWS 外部 ID",
+    "label_sqs_queue_name": "AWS SQS キュー名",
+    "label_sqs_batch_size": "SQS メッセージのバッチサイズ",
+    "label_polling_interval": "ポーリング間隔",
+    "label_enable_throttling": "スロットリングを有効化"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "有効なポーリング間隔を入力してください",
+    "polling_interval_error": "ポーリング間隔の最小値は 1 分です。",
+    "batch_size_error_full": "有効な SQS メッセージのバッチサイズを入力してください。",
+    "batch_size_error": "SQS メッセージのバッチサイズは 1～10 の範囲で選択してください。",
+    "proceed_button": "次へ",
+    "polling_interval_help": "AWS CloudTrail で新しいデータを確認する頻度（分単位）を指定します。指定できる最小の間隔は 1 分です。",
+    "polling_interval_label": "ポーリング間隔"
+  },
+  "aws_cloudwatch_app": {
+    "title": "AWS 連携",
+    "description": "この機能は、さまざまな AWS ソースからログメッセージを取得します。"
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "詳細オプション",
+    "flow_log_prefix_label": "フローログのフィールド名にプレフィックスを追加",
+    "flow_log_prefix_help": "フローログのプレフィックスを付けたフィールドを追加します。例: \"src_addr\" -> \"flow_log_src_addr\"",
+    "store_full_message_label": "完全なメッセージを保存しますか？",
+    "store_full_message_help": "元の Kinesis/CloudWatch ログイベントのペイロードを full_message フィールドに保存します。",
+    "override_source_label": "ソースの上書き (任意)",
+    "override_source_help": "メッセージのソースはデフォルトで aws-kinesis-raw-logs に設定されています。必要に応じて、任意の値で上書きできます。",
+    "batch_size_label": "Kinesis レコードのバッチサイズ",
+    "batch_size_help": "一度に取得する Kinesis レコードの数です。各レコードのサイズは最大 1 MB です。AWS のデフォルトは 10,000 です。一度に処理するチャンクを小さくするには、より小さい値を入力してください。"
+  },
+  "aws_sidebar_permissions": {
+    "title": "AWS ポリシーの権限",
+    "description": "必要な AWS 権限については、<docsLink/> を参照してください。",
+    "docs_link_text": "公式ドキュメント"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "Amazon からまだ応答を受信していません。",
+    "waiting_description": "AWS ストリームでログを確認し続けている間、しばらくお待ちください。Amazon のサーバーは 10 分ごとにログを解析するため、時間がかかる場合があります。コーヒーでも飲みながらお待ちください。",
+    "checking_again_in": "次回の確認まで: <countdown/>",
+    "checking_button": "確認中...",
+    "check_now_button": "今すぐ確認",
+    "do_not_refresh": "ブラウザーを更新しないでください。ログを継続的に確認しており、ログが利用可能になるとこのページは自動的に更新されます。",
+    "review_button": "確認して完了",
+    "title": "Kinesis ストリームを作成",
+    "sample_description": "利用可能な場合、ストリームから解析された {{logType}} メッセージのサンプルが以下に表示されます。",
+    "formatted_log_label": "整形済みログメッセージ",
+    "no_messages": "ストリームにメッセージが見つかりません。"
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "(デフォルト)",
+    "save_error": "入力を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "complete_button": "CloudWatch の設定を完了",
+    "title": "最終確認",
+    "description": "以下の内容に誤りがないか確認してから、下のボタンをクリックして CloudWatch の設定を完了してください。",
+    "setting_up_cloudwatch": "CloudWatch を設定中",
+    "edit": "編集",
+    "label_name": "名前",
+    "label_authorization_type": "認証タイプ",
+    "label_aws_key": "AWS キー",
+    "label_assumed_role_arn": "AWS 引き受けロール ARN",
+    "label_external_id": "AWS 外部 ID",
+    "label_cloudwatch_endpoint": "CloudWatch VPC エンドポイント",
+    "label_dynamodb_endpoint": "DynamoDB VPC エンドポイント",
+    "label_iam_endpoint": "IAM VPC エンドポイント",
+    "label_kinesis_endpoint": "Kinesis VPC エンドポイント",
+    "label_aws_region": "AWS リージョン",
+    "setting_up_kinesis": "Kinesis を設定中",
+    "label_kinesis_stream": "Kinesis ストリーム",
+    "label_kinesis_stream_arn": "Kinesis ストリーム ARN",
+    "stream_arn_error": "エラー: ストリーム ARN を取得できませんでした。IAM ロールに kinesis:DescribeStream 権限が含まれていることを確認してください。",
+    "label_global_input": "グローバル入力",
+    "label_record_batch_size": "レコードのバッチサイズ",
+    "label_enable_throttling": "スロットリングを有効化",
+    "label_flow_log_prefix": "フィールド名にフローログのプレフィックスを追加",
+    "label_store_full_message": "完全なメッセージを保存",
+    "label_override_source": "ソースの上書き",
+    "formatting": "フォーマット",
+    "label_log_type": "ログタイプ",
+    "pipeline_hint": "ログを別の方法で解析する必要がある場合は、詳細と手順について <pipelineLink>パイプラインルール</pipelineLink> を確認してください。",
+    "no_response": "Amazon からまだ応答を受信していません。"
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "必要なストリームが表示されませんか？",
+    "sidebar_requirement": "設定を続行するには、指定したリージョンに少なくとも 1 つの Kinesis ストリームが存在している必要があります。ログストリームには、少なくとも数件のログメッセージが含まれている必要があります。",
+    "sidebar_auto_setup": "{{productName}} では、Kinesis ストリームを作成し、任意の CloudWatch ロググループにサブスクライブすることもできます。このオプションでは AWS 環境に追加のリソースが作成され、課金が発生する点にご注意ください。",
+    "setup_automatically_button": "Kinesis を自動で設定",
+    "no_logs_error": "この Kinesis ストリームでログが見つかりませんでした。別の Kinesis ストリームを選択してください。",
+    "loading_message": "この処理には数分かかる場合があります。",
+    "verify_button": "ストリームと形式を検証",
+    "title": "Kinesis ストリームを選択",
+    "description_list": "指定した AWS アカウント内で見つかったすべての Kinesis ストリームの一覧です。",
+    "description_docs": "メッセージを読み取るストリームを選択するか、設定の詳細については <docsLink/> を参照してください。",
+    "docs_link_text": "AWS Kinesis/CloudWatch 入力",
+    "select_stream_label": "ストリームを選択",
+    "select_stream_placeholder": "Kinesis ストリームを選択"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "選択したリージョンでグループが見つかりません。別のリージョンを選択してください。",
+    "begin_button": "自動設定を開始",
+    "title": "Kinesis を自動で設定",
+    "intro": "以下の項目を入力して、Kinesis の自動設定を開始してください。これにより、AWS アカウント内で以下の操作が実行されます。詳細は AWS ドキュメントの <docsLink>CloudWatch Logs サブスクリプションフィルターの使用</docsLink> を参照してください。",
+    "step_create_stream": "指定した名前で新しい Kinesis ストリームを作成します。",
+    "step_create_role": "新しい Kinesis ストリームを CloudWatch ロググループにサブスクライブするために必要な IAM ロールとポリシーを作成します。",
+    "step_subscribe": "新しい Kinesis ストリームをロググループにサブスクライブします。",
+    "stream_name_label": "Kinesis ストリーム名",
+    "stream_name_placeholder": "ストリーム名",
+    "stream_name_help": "1～128 文字の英数字と、特殊文字のアンダースコア (_)、ピリオド (.)、ハイフン (-) を使用できます。",
+    "group_name_label": "CloudWatch グループ名",
+    "choose_group": "CloudWatch グループを選択",
+    "back_button": "ストリームの選択に戻る"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "この自動設定により、以下の AWS リソースが作成されます。これらのリソースが作成されること、および作成によって発生する AWS 料金について自身が全責任を負うことを理解した場合は、下のボタンをクリックしてください。不要になったリソースは、必ず手動で削除してください。",
+    "step_stream": "<strong>1</strong> 個のシャードを持つ Kinesis ストリームを作成します。",
+    "step_role": "指定した CloudWatch グループ <strong>{{groupName}}</strong> が Kinesis ストリーム <strong>{{streamName}}</strong> にログメッセージを発行できるようにする IAM ロールとポリシーを作成します",
+    "step_subscription": "ログメッセージを Kinesis ストリームに発行する CloudWatch サブスクリプションを作成します。"
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "待機中...",
+    "creating": "{{label}} を作成中",
+    "create": "{{label}} を作成"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis ストリーム",
+    "policy_label": "サブスクリプションポリシー",
+    "subscription_label": "サブスクリプション"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "作成中...",
+    "close_button": "閉じる",
+    "continue_button": "設定を続行",
+    "executing_title": "自動設定を実行中",
+    "agreement_title": "Kinesis 自動設定の同意",
+    "delayed_logs": "最初のメッセージが Kinesis ストリームに到着するまで最大 10 分かかる場合があります。ストリームにメッセージが届くまで、次の手順の Kinesis ヘルスチェックは正常に完了しません。詳細は公式の <cloudWatchLink>CloudWatch サブスクリプション</cloudWatchLink> のドキュメントを参照してください。",
+    "agree_button": "同意して、これらの AWS リソースを今すぐ作成します。"
+  },
+  "form_wrap": {
+    "more_info": "詳細情報",
+    "additional_information": "追加情報:",
+    "loading_button": "読み込み中...",
+    "submit_button": "送信"
+  },
+  "aws_skip_health_check": {
+    "title": "ヘルスチェックをスキップ",
+    "confirm_button": "確認",
+    "form_title": "ログタイプを選択してヘルスチェックをスキップ",
+    "description": "新しい <strong>{{streamName}}</strong> ストリームに含まれるデータに確信がある場合は、以下のオプションを選択して自動チェックをスキップしてください。",
+    "input_type_label": "AWS 入力タイプを選択",
+    "choose_log_type": "ログタイプを選択"
+  },
+  "throttling_checkbox": {
+    "label": "スロットリングを有効化",
+    "help": "有効にすると、{{productName}} サーバーのメッセージ負荷が処理されるまで、この入力から新しいメッセージは読み取られません。これは通常、ファイルや AMQP、Kafka などのメッセージキューシステムから読み取る入力で役立ちます。HTTP などで外部システムを定期的にポーリングする場合は、通常は無効のままにしてください。"
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup データアダプターは、<greynoiseLink>GreyNoise API</greynoiseLink> を使用して、指定されたキーの指標を検索し、IP Quick Context エンドポイントの値を返します。詳細は <quickContextLink>IP Quick Context</quickContextLink> を参照してください"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "ユーザーパスワード",
+    "reset_token_button": "トークンをリセット",
+    "api_token_label": "API トークン",
+    "undo_reset_button": "リセットを取り消す",
+    "api_token_help": "API トークンです。"
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API トークン"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "チャンネル",
+    "custom_message_label": "カスタムメッセージテンプレート",
+    "empty_body": "本文なし",
+    "include_event_procedure_label": "メール本文にイベント手順を含める",
+    "backlog_limit_label": "メッセージのバックログ上限",
+    "user_name_label": "ユーザー名",
+    "include_title_label": "タイトルを含める",
+    "notify_channel_label": "チャンネルに通知",
+    "link_names_label": "名前をリンク",
+    "icon_url_label": "アイコン URL",
+    "icon_emoji_label": "アイコンの絵文字",
+    "time_zone_label": "タイムゾーン"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "カスタムメッセージテンプレート",
+    "empty_body": "本文なし",
+    "backlog_limit_label": "メッセージのバックログ上限",
+    "icon_url_label": "アイコン URL",
+    "time_zone_label": "タイムゾーン"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "アダプティブカードテンプレート",
+    "backlog_limit_label": "メッセージのバックログ上限"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "設定の色",
+    "change_color_button": "色を変更",
+    "color_help": "この設定で使用する色を選択してください。",
+    "custom_message_help": "アラートのタイトルの下に追加するカスタムメッセージです。詳細は <docsLink/> を参照してください。",
+    "docs_link_text": "ドキュメント",
+    "webhook_url_help": "Slack の「Incoming Webhook」URL",
+    "channel_help": "Slack の #チャンネル名、またはダイレクトメッセージの送信先の @ユーザー名",
+    "custom_message_label": "カスタムメッセージ (任意)",
+    "time_zone_help": "通知本文のタイムスタンプに使用されるタイムゾーンです。",
+    "time_zone_label": "日時の値のタイムゾーン",
+    "backlog_limit_label": "メッセージのバックログ上限 (任意)",
+    "backlog_limit_help": "Slack 通知で送信されるバックログメッセージの数を制限します。0 に設定すると、上限は適用されません。",
+    "user_name_label": "ユーザー名 (任意)",
+    "user_name_help": "Slack での送信者のユーザー名",
+    "include_title_help": "イベント定義のタイトルと説明を通知に含めます",
+    "notify_channel_help": "メッセージに @channel を追加して、チャンネル内のすべてのユーザーに通知します",
+    "notify_here_label": "ここに通知",
+    "notify_here_help": "メッセージに @here を追加して、チャンネル内のアクティブなユーザーに通知します",
+    "link_names_help": "チャンネル名とユーザー名を検出してリンクします",
+    "icon_url_label": "アイコン URL (任意)",
+    "icon_url_help": "このメッセージのアイコンとして使用する画像",
+    "icon_emoji_label": "アイコンの絵文字 (任意)",
+    "icon_emoji_help": "このメッセージのアイコンとして使用する絵文字 (アイコン URL より優先されます)"
+  },
+  "event_procedure_checkbox": {
+    "label": "イベント手順を含める",
+    "help": "イベント定義のイベント手順を整形したものを、通知本文の末尾に追加します。"
+  },
+  "slack_notification_summary": {
+    "color_label": "色",
+    "custom_message_label": "カスタムメッセージ",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "teams_notification_summary": {
+    "color_label": "色",
+    "custom_message_label": "カスタムメッセージ"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams の「Incoming Webhook」URL",
+    "backlog_limit_help": "Microsoft Teams 通知で送信されるバックログメッセージの数を制限します。0 に設定すると、上限は適用されません。"
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Teams に投稿するアダプティブカードです。詳細は <docsLink/> を参照してください。",
+    "backlog_toggle_aria_label": "メッセージのバックログ上限を有効化"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "ルーティングキー",
+    "incident_title_label": "インシデントのタイトル",
+    "custom_incident_label": "カスタムインシデント",
+    "key_prefix_label": "キーのプレフィックス",
+    "incident_key_label": "インシデントキー",
+    "client_name_label": "クライアント名",
+    "client_url_label": "クライアント URL"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "ルーティングキー",
+    "routing_key_help": "PagerDuty 連携のルーティングキーです。",
+    "incident_title_label": "インシデントのタイトル",
+    "incident_title_help": "PagerDuty でのインシデントのカスタムタイトルです。設定しない場合は、{{productName}} に表示されるイベントのタイトルが使用されます。",
+    "custom_incident_label": "カスタムインシデントキーを使用",
+    "custom_incident_help": "カスタムのインシデントキーを生成します。",
+    "key_prefix_label": "インシデントキーのプレフィックス",
+    "key_prefix_help": "インシデントキーのプレフィックスの後に、ストリームとイベント定義のタイトルが続きます。キー全体をカスタマイズするには、インシデントキーを使用してください。",
+    "incident_key_label": "インシデントキー",
+    "incident_key_help": "インシデントを識別する完全なキーです。指定した場合は、プレフィックスの代わりに使用されます。",
+    "client_name_label": "クライアント名",
+    "client_name_help": "PagerDuty イベントをトリガーする {{productName}} システムの名前です。",
+    "client_url_label": "クライアント URL",
+    "client_url_help": "PagerDuty イベントをトリガーする {{productName}} システムの URL です。"
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "ルーティングキー",
+    "incident_title_label": "インシデントのタイトル",
+    "default_value": "デフォルト",
+    "use_custom_incident_key_label": "カスタムインシデントキーを使用",
+    "yes": "はい",
+    "no": "いいえ",
+    "key_prefix_label": "インシデントキーのプレフィックス",
+    "incident_key_label": "インシデントキー",
+    "client_name_label": "クライアント名",
+    "client_url_label": "クライアント URL"
+  },
+  "threat_intel_plugin_config": {
+    "title": "脅威インテリジェンスルックアップの設定",
+    "description": "脅威インテリジェンスルックアッププラグインの設定です。",
+    "tor_exit_nodes_label": "Tor 出口ノード:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "有効",
+    "disabled": "無効",
+    "modal_title": "脅威インテリジェンスプラグインの設定を更新",
+    "tor_checkbox_label": "Tor 出口ノードのルックアップを許可しますか？",
+    "tor_checkbox_help": "有効にすると、グローバルパイプライン関数に Tor 出口ノードのルックアップが含まれます。無効にすると、データの更新も停止します。",
+    "spamhaus_checkbox_label": "Spamhaus DROP/EDROP のルックアップを許可しますか？",
+    "spamhaus_checkbox_help": "有効にすると、グローバルパイプライン関数に Spamhaus のルックアップが含まれます。無効にすると、データの更新も停止します。"
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "非推奨の警告",
+    "deprecation_text": "abuse.ch Ransomware Tracker は 2019-12-08 に終了しました。このデータアダプターは使用しないでください。"
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "ドメインのブロックリスト",
+    "urls_blocklist": "URL のブロックリスト",
+    "ips_blocklist": "IP のブロックリスト",
+    "blocklist_type_label": "ブロックリストの種類",
+    "blocklist_type_help": "abuse.ch ランサムウェアのブロックリストの種類を選択してください",
+    "blocklist_type_placeholder": "ブロックリストの種類を選択",
+    "refresh_blocklist_label": "ブロックリストを更新",
+    "refresh_blocklist_help": "有効にすると、abuse.ch ランサムウェアのブロックリストが変更された場合に更新されます。"
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "ドメインのブロックリスト",
+    "urls_blocklist": "URL のブロックリスト",
+    "ips_blocklist": "IP のブロックリスト",
+    "blocklist_type_label": "ブロックリストの種類",
+    "update_interval_label": "更新間隔",
+    "deprecation_title": "非推奨の警告",
+    "deprecation_text": "abuse.ch Ransomware Tracker は 2019-12-08 に終了しました。このデータアダプターは使用しないでください。"
+  },
+  "otx_adapter_documentation": {
+    "intro": "AlienVault OTX データアダプターは、<otxLink>OTX API</otxLink> を使用して、指定されたキーの侵害指標を検索します。",
+    "configuration_title": "設定",
+    "indicator_title": "指標",
+    "indicator_description": "OTX API には、いくつかの異なる侵害指標 (IOC) があります。このデータアダプターで使用する指標を選択する必要があります。",
+    "ip_auto_detect": "<code>IP Auto-Detect</code> 指標は公式のものではありません。IPv4 と IPv6 の両方のアドレスに同じデータアダプターを使用できるように、IP アドレスの種類を自動検出する目的で追加されました。",
+    "api_key_title": "OTX API キー",
+    "api_key_description": "OTX API キーは、API リクエストの認証に使用されます。API キーを入力しなくてもリクエストは機能しますが、リクエストの上限が小さくなる可能性が高いです。<strong>このデータアダプターを本番環境のトラフィックに使用する場合は、OTX アカウントを登録して API キーを取得してください。</strong>",
+    "api_url_title": "OTX API URL",
+    "api_url_description": "OTX API サーバーの HTTP URL です。カスタムサーバーでテストを行う場合を除き、<code>https://otx.alienvault.com</code> のデフォルト設定は変更しないでください。",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "OTX API リクエストの <code>User-Agent</code> HTTP ヘッダーを設定します。OTX API のリクエストで問題が発生した場合に OTX API の運用者が連絡できるよう、連絡先の詳細を含めるように変更することができます。",
+    "connection_timeout_title": "HTTP 接続タイムアウト",
+    "connection_timeout_description": "OTX API リクエストの HTTP 接続タイムアウト (ミリ秒) です。値を大きく設定しすぎると、OTX API への接続が遅い場合に処理のパフォーマンスに影響する可能性があります。",
+    "write_timeout_title": "HTTP 書き込みタイムアウト",
+    "write_timeout_description": "OTX API リクエストの HTTP 書き込みタイムアウト (ミリ秒) です。値を大きく設定しすぎると、OTX API への接続が遅い場合に処理のパフォーマンスに影響する可能性があります。",
+    "read_timeout_title": "HTTP 読み取りタイムアウト",
+    "read_timeout_description": "OTX API リクエストの HTTP 読み取りタイムアウト (ミリ秒) です。値を大きく設定しすぎると、OTX API への接続が遅い場合に処理のパフォーマンスに影響する可能性があります。"
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP 自動検出",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "ドメイン",
+    "option_hostname": "ホスト名",
+    "option_file": "ファイル",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "相関ルール",
+    "indicator_label": "指標",
+    "indicator_help": "ルックアップに使用する OTX 指標の種類です。",
+    "indicator_placeholder": "指標を選択",
+    "api_key_label": "OTX API キー",
+    "api_key_help": "OTX API キーです。",
+    "api_url_label": "OTX API URL",
+    "api_url_help": "OTX API サーバーの URL です。",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "HTTP リクエストに使用する User-Agent ヘッダーです。",
+    "connect_timeout_label": "HTTP 接続タイムアウト",
+    "connect_timeout_help": "HTTP 接続のタイムアウト (ミリ秒) です。",
+    "write_timeout_label": "HTTP 書き込みタイムアウト",
+    "write_timeout_help": "HTTP 書き込みのタイムアウト (ミリ秒) です。",
+    "read_timeout_label": "HTTP 読み取りタイムアウト",
+    "read_timeout_help": "HTTP 読み取りのタイムアウト (ミリ秒) です。"
+  },
+  "otx_adapter_summary": {
+    "not_available": "該当なし",
+    "unit_ms": "ms"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "設定は不要です。"
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "設定は不要です"
+  },
+  "whois_adapter_documentation": {
+    "intro": "whois IP ルックアップデータアダプターは、IP アドレスのネットワーク所有者情報を要求できます。",
+    "configuration_title": "設定",
+    "connect_timeout_description": "whois サーバーへのソケットの接続タイムアウト (ミリ秒) です。値を大きく設定すると、処理のパフォーマンスに影響する可能性があります。",
+    "read_timeout_description": "whois サーバーへのソケットの接続読み取りタイムアウト (ミリ秒) です。値を大きく設定すると、処理のパフォーマンスに影響する可能性があります。"
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "接続タイムアウト",
+    "connect_timeout_help": "WHOIS の接続タイムアウト (ミリ秒) です。",
+    "read_timeout_label": "読み取りタイムアウト",
+    "read_timeout_help": "WHOIS の接続読み取りタイムアウト (ミリ秒) です。"
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
+}

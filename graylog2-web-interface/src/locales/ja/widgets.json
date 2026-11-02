@@ -1,1 +1,222 @@
-{}
+{
+  "copy_to_dashboard": {
+    "title": "ウィジェットをダッシュボードにコピー",
+    "no_dashboards": "ダッシュボードが見つかりません。",
+    "create_new": "新しいダッシュボードを作成"
+  },
+  "edit_message_list": {
+    "fields": "フィールド",
+    "message_preview": "メッセージのプレビュー",
+    "sorting": "並べ替え",
+    "direction": "方向",
+    "decorators": "デコレーター"
+  },
+  "widget_frame": {
+    "loading": "ウィジェットを読み込んでいます ..."
+  },
+  "export_widget": {
+    "export_all": "すべての検索結果をエクスポート",
+    "title": "ウィジェットをエクスポート",
+    "enterprise_explanation": "集計ウィジェットのエクスポート機能は Enterprise 版でご利用いただけます。この機能では、データを CSV、JSON、YAML、XML などの一般的なファイル形式でエクスポートできます。"
+  },
+  "field_sort": {
+    "placeholder": "なし: クリックしてフィールドを追加",
+    "aria_label": "並べ替えに使用するフィールドを選択"
+  },
+  "fields_configuration": {
+    "add_field": "フィールドを追加",
+    "hide_selected_other": "選択した {{count}} 個のフィールドを非表示",
+    "show_selected_other": "選択した {{count}} 個のフィールドを表示"
+  },
+  "move_widget": {
+    "no_pages": "ページが見つかりません",
+    "copy": "ウィジェットをコピー",
+    "move": "ウィジェットを移動",
+    "title": "移動先のページを選択",
+    "keep_copy": "このページにコピーを残す",
+    "keep_copy_help": "「このページにコピーを残す」を有効にすると、ウィジェットは移動されず、別のページにコピーされます。"
+  },
+  "widget_edit": {
+    "update": "ウィジェットを更新",
+    "updating": "ウィジェットを更新しています..."
+  },
+  "execution_info": {
+    "executed_at": "実行日時:",
+    "executed_at_label": "実行日時",
+    "executed_in": "実行時間:",
+    "duration": "{{duration}} ms",
+    "effective_time_range": "有効な期間:",
+    "from": "開始",
+    "to": "終了",
+    "from_label": "有効な期間の開始",
+    "to_label": "有効な期間の終了",
+    "total_results": "結果の合計:",
+    "title": "実行情報",
+    "no_query_executed": "まだクエリが実行されていません。"
+  },
+  "selected_fields": {
+    "fields": "フィールド",
+    "edit_field": "{{field}} フィールドを編集",
+    "remove_field": "{{field}} フィールドを削除"
+  },
+  "sort_direction": {
+    "ascending": "昇順",
+    "descending": "降順",
+    "no_sorting": "並べ替えが選択されていません",
+    "select_direction": "クリックして方向を選択"
+  },
+  "timerange_info": {
+    "global_override": "グローバルの上書き: {{timerange}}",
+    "effective_unavailable": "ウィジェットの有効な期間は現在利用できません。",
+    "independent": "このウィジェットの結果は、現在の検索とは無関係です。",
+    "all_time": "全期間"
+  },
+  "unknown_widget": {
+    "title": "不明なウィジェット: {{type}}",
+    "cannot_render": "申し訳ありませんが、このウィジェットは表示できません。<strong>{{type}}</strong> 型のウィジェットの処理方法がわからないためです。原因として、次のいずれかが考えられます:",
+    "missing_plugin": "このウィジェットは、現在は利用できないプラグインを使用して作成されました。",
+    "legacy_dashboard": "このウィジェットは旧バージョンのダッシュボードの一部で、現在は利用できないプラグインによって作成されました。",
+    "what_to_do": "対処方法: プラグインを再度読み込む、現在のバージョンの {{productName}} に対応したプラグインについて元の作成者に問い合わせる、またはウィジェットが不要であれば削除してください。",
+    "copy_config": "いずれの場合も、ウィジェットの設定をクリップボードにコピーできます:"
+  },
+  "widget_actions": {
+    "open_dropdown": "操作のドロップダウンを開く",
+    "unfocus": "ウィジェットのフォーカスを解除",
+    "focus": "このウィジェットにフォーカス",
+    "edit": "編集",
+    "duplicate": "複製",
+    "copy_to_dashboard": "ダッシュボードにコピー",
+    "move_to_page": "ページに移動",
+    "copying": "ウィジェットをコピーしています...",
+    "copy": "ウィジェットをコピー",
+    "confirm_remove": "ウィジェット \"{{title}}\" を削除してもよろしいですか？",
+    "compress_width": "幅を縮小",
+    "stretch_width": "幅を拡大",
+    "replay_search": "検索を再実行"
+  },
+  "widget_loading": {
+    "content": "ウィジェットのコンテンツを読み込んでいます"
+  },
+  "widget_errors": {
+    "render_error": "このウィジェットの描画中に、次のエラーが発生しました:"
+  },
+  "widget_header": {
+    "no_description": "ウィジェットの説明はありません",
+    "show_description": "ウィジェットの説明を表示",
+    "description_placeholder": "ウィジェットに役立つ説明を追加してください",
+    "drag_handle": "{{title}} のドラッグハンドル"
+  },
+  "warm_tier": {
+    "info": "情報",
+    "loading_slow": "このウィジェットはウォームティアからデータを取得しているため、読み込みに時間がかかる場合があります。"
+  },
+  "events_widget": {
+    "actions": "操作",
+    "replay_search": "検索を再実行",
+    "view_details": "イベントの詳細を表示",
+    "toggle_actions": "イベントの操作を切り替え",
+    "details_title": "イベントの詳細",
+    "close": "閉じる",
+    "unknown_visualization": "不明なウィジェットの可視化タイプ {{mode}}",
+    "mode_list": "リスト",
+    "mode_count": "件数",
+    "visualization": "可視化",
+    "columns": "列",
+    "select_column": "新しい列を選択",
+    "filter": "フィルター",
+    "sorting": "並べ替え",
+    "unknown_attribute": "不明",
+    "unknown_attribute_help": "この属性は有効なライセンスが必要なため、現在利用できません。",
+    "select_event_definition": "イベント定義を選択",
+    "alert": "アラート",
+    "event": "イベント"
+  },
+  "overview_configuration": {
+    "remove_column": "{{column}} 列を削除",
+    "column": "列",
+    "select_column": "列を選択",
+    "direction": "方向",
+    "select_direction": "方向を選択",
+    "type": "種類",
+    "add_column": "列を追加",
+    "configure_filter": "新しいフィルターを設定",
+    "edit_filter": "{{column}} フィルターを編集",
+    "delete_filter": "{{column}} フィルターを削除"
+  },
+  "date_filter": {
+    "single_date": "単一の日付",
+    "range": "範囲",
+    "select_single_date": "単一の日付の種類を選択",
+    "select_range": "範囲の種類を選択",
+    "date_range": "{{from}} から {{to}}"
+  },
+  "message_table": {
+    "actions": "操作",
+    "loading": "読み込み中",
+    "decorated": "（デコレーター適用済み）",
+    "stopped_node": "停止中のノード",
+    "cluster_node": "クラスターノード {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "{{name}} を新規作成",
+      "select_decorator": "デコレーターを選択",
+      "none_configured": "設定されたデコレーターはありません。",
+      "actions": "操作",
+      "edit": "編集",
+      "edit_named": "{{name}} を編集",
+      "unknown_type": "不明なデコレーターの種類",
+      "create": "作成",
+      "update": "更新",
+      "help_title": "メッセージデコレーターとは何ですか？",
+      "help_description": "デコレーターは、検索結果に表示されるメッセージをその場で変更できます。この変更は保存されず、検索結果にのみ表示されます。デコレーターの設定は<strong>ストリームごと</strong>に保存されます。",
+      "help_order": "ドラッグアンドドロップで、デコレーターの処理順序を変更できます。",
+      "help_docs": "メッセージデコレーターの詳細は、<docsLink>ドキュメント</docsLink>を参照してください。"
+    },
+    "show_message_in_new_row": "メッセージを新しい行に表示"
+  },
+  "data_table": {
+    "spacer": "スペーサー",
+    "display_name": "データテーブル",
+    "pinned_columns_title": "固定列",
+    "show_row_numbers_title": "行番号を表示"
+  },
+  "field_types": {
+    "missing_event_definition": "イベント定義が見つかりません: {{id}}"
+  },
+  "export": {
+    "title_search": "すべての検索結果をエクスポート",
+    "title_dashboard": "メッセージテーブルの検索結果をエクスポート",
+    "select_different_table": "別のメッセージテーブルを選択",
+    "downloading": "ダウンロード中...",
+    "start_download": "ダウンロードを開始",
+    "settings_based_on": "次の設定はメッセージテーブル {{title}} に基づいています",
+    "exporting_table": "現在、メッセージテーブル {{title}} の検索結果をエクスポートしています",
+    "define_fields": "ファイルのフィールドを定義してください。",
+    "decorated_fields_hint": "エクスポートでは、メッセージテーブルに含まれるデコレーターで作成されたフィールドもサポートしていますが、現在はフィールドの一覧には表示されません。デコレーターで作成されたフィールドをエクスポートする場合は、その名前を入力してください。",
+    "finish_hint": "設定が完了したら、<quote>ダウンロードを開始</quote>をクリックしてください。",
+    "fields_to_export": "エクスポートするフィールド",
+    "messages_limit": "メッセージの上限",
+    "limit_help": "メッセージはチャンク単位で読み込まれます。上限を設定すると、上限に達したチャンクまでのすべてのチャンクが取得されます。そのため、出力されるメッセージの合計数が設定した上限を超える場合があります。",
+    "search_contains_all": "エクスポートには、現在の検索に一致するすべてのメッセージが含まれます。",
+    "search_select_table": "フィールドを反映させるメッセージテーブルを選択してください。次の手順で、すべての設定を調整できます。",
+    "dashboard_select_table": "検索結果をエクスポートするメッセージテーブルを選択してください。次の手順で、フィールドを調整できます。",
+    "dashboard_equals_action": "メッセージテーブルを選択することは、メッセージテーブルの操作メニューで「CSV にエクスポート」を選択することと同じです。",
+    "select_message_table": "メッセージテーブルを選択",
+    "no_message_table": "結果をエクスポートするには、メッセージテーブルのウィジェットを作成する必要があります。",
+    "output_format": "出力形式",
+    "untitled_view": "無題の{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "メッセージリスト",
+    "results": "結果",
+    "events": "イベント",
+    "text_markdown": "テキスト/Markdown"
+  },
+  "comma_separated_values_csv": "カンマ区切り値 (CSV)",
+  "error_widget": {
+    "title": "このウィジェットのデータ取得中に、次のエラーが発生しました:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "このデコレーターを本当に削除しますか？",
+    "unsaved_changes_confirm": "設定フォームに未保存の変更があります。この操作を行うと、変更は破棄されます"
+  }
+}

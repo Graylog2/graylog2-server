@@ -1,1 +1,501 @@
-{}
+{
+  "destination_permission_alert": {
+    "data_lake": "現在、Data Lake の宛先を表示または管理する権限がありません。",
+    "index_set": "現在、Index Set の宛先を表示または管理する権限がありません。",
+    "outputs": "現在、Outputs の宛先を表示または管理する権限がありません。"
+  },
+  "index_set_select": {
+    "help": "このストリームに一致するメッセージは、設定された Index Set に書き込まれます。",
+    "label": "Index Set",
+    "placeholder": "Index Set を選択"
+  },
+  "matching_type": {
+    "all": "メッセージは次のルールすべてに一致する必要があります",
+    "any": "メッセージは次のルールのうち少なくとも 1 つに一致する必要があります",
+    "confirm": "このストリームのルールの適用方法を変更しようとしています。続行しますか？変更は直ちに有効になります。",
+    "success_all": "すべてのルールに一致した場合にメッセージがストリームにルーティングされるようになりました",
+    "success_any": "いずれかのルールに一致した場合にメッセージがストリームにルーティングされるようになりました",
+    "success_title": "成功",
+    "switch_title_all": "一致条件を ALL に切り替え",
+    "switch_title_any": "一致条件を ANY に切り替え"
+  },
+  "output_filter": {
+    "create_button": "ルールを作成",
+    "create_title": "フィルタールールを作成",
+    "delete_confirm": "{{title}} ルールを削除してもよろしいですか？",
+    "delete_title": "ルールを削除",
+    "delete_tooltip": "削除",
+    "edit_title": "フィルタールールを編集",
+    "edit_tooltip": "編集",
+    "fields": {
+      "and": "かつ",
+      "block_action": "アクション",
+      "block_condition": "条件",
+      "delete_confirm": "<blockLabel>{{blockType}} N° {{number}}</blockLabel> を削除してもよろしいですか？",
+      "delete_title": "{{blockType}} を削除",
+      "or": "または",
+      "then": "次に",
+      "when": "次の場合"
+    },
+    "form": {
+      "condition_required": "ルールには少なくとも 1 つの条件が必要です。",
+      "create": "作成",
+      "description": "説明",
+      "description_help": "ルールの説明",
+      "enabled": "有効",
+      "rule_builder": "ルールビルダー",
+      "saving": "フィルターを保存中",
+      "title": "タイトル",
+      "title_help": "ルールのタイトル",
+      "title_required": "「タイトル」フィールドは必須です。",
+      "update": "更新",
+      "updating": "フィルターを更新中"
+    },
+    "item": {
+      "enabled": "有効",
+      "errors": "エラー",
+      "throughput": "スループット"
+    },
+    "list": {
+      "header_status": "ステータス",
+      "header_title": "タイトル",
+      "info_data_lake": "次のフィルタールールの条件に一致するメッセージは、Data Lake にルーティングされません。",
+      "info_indexer": "次のフィルタールールの条件に一致するメッセージは、Index Set にルーティングされません。",
+      "no_filters": "フィルターが見つかりません。",
+      "title": "フィルタールール"
+    }
+  },
+  "outputs": {
+    "assign_existing": "既存の Output を割り当て",
+    "content_pack_title": "コンテンツパックから作成",
+    "create_submit": "Output を作成",
+    "create_title": "新しい Output を作成",
+    "delete_from_stream": "ストリームから削除",
+    "delete_globally": "全体から削除",
+    "edit": "編集",
+    "edit_title": "Output {{title}} を編集",
+    "id_label": "ID: {{id}}",
+    "launch_new": "新しい Output を起動",
+    "name_help": "作成する Output の内容がわかる名前を選択してください。",
+    "none_available": "利用可能な Output がありません",
+    "none_configured": "設定された Output がありません。",
+    "plugin_error": "この Output に必要なプラグインが読み込まれていないため、編集できません。プラグインを読み込むか、Output を削除してください。",
+    "select_existing": "既存の Output を選択",
+    "select_type": "Output の種類を選択",
+    "type_label": "種類: {{type}}",
+    "update_submit": "Output を更新"
+  },
+  "pipelines_connection_form": {
+    "edit_button": "パイプライン接続を編集",
+    "help": "このストリームに接続するパイプラインを選択するか、<pipelinesLink>パイプラインページ</pipelinesLink>で作成してください。",
+    "label": "パイプライン",
+    "modal_title": "<streamLabel>ストリーム</streamLabel> の接続を編集",
+    "save_failed": "ストリームのパイプライン接続の保存に失敗しました。ステータス: {{error}}",
+    "save_success": "ストリームのパイプライン接続を保存しました。",
+    "save_title": "ストリームのパイプライン接続を保存中。",
+    "submit": "接続を更新"
+  },
+  "routing_destination": {
+    "add_output": {
+      "assign_segment": "既存の Output を割り当て",
+      "button": "Output を追加",
+      "create_segment": "新しい Output を作成",
+      "modal_title": "ストリームに Output を追加",
+      "tooltip": "Output を編集"
+    },
+    "archiving": {
+      "disabled": "アーカイブは無効です",
+      "enabled": "アーカイブは有効です"
+    },
+    "edit_output": {
+      "tooltip": "Output を編集"
+    },
+    "index_set": {
+      "col_archiving": "アーカイブ",
+      "col_name": "名前",
+      "col_oldest": "最古のメッセージ（日付）",
+      "col_size": "合計サイズ",
+      "disabled": "無効",
+      "enabled": "有効",
+      "filters": "フィルター {{count}}",
+      "info": "<boldText>Search Cluster</boldText> にルーティングされたメッセージは検索可能になり、{{productName}} のライセンス使用量に含まれます。これらのメッセージは、保持ポリシーの条件を満たすまで定義済みの Index Set に保存されます。注: <boldText>Search Cluster</boldText> にルーティングされなかったメッセージは検索できません。",
+      "title": "Index Set",
+      "toggle_aria": "Index Set を切り替え"
+    },
+    "index_set_update": {
+      "button": "Index Set を編集",
+      "modal_title": "ストリームの Index Set を編集",
+      "saving": "ストリームを保存中",
+      "submit": "更新",
+      "success_title": "成功",
+      "tooltip": "Index Set を編集",
+      "updated": "ストリーム '{{title}}' の Index Set を更新しました。"
+    },
+    "output_item": {
+      "type": "（種類: {{type}}）"
+    },
+    "outputs": {
+      "count": "Output {{count}}",
+      "title": "Output",
+      "toggle_aria": "Output を切り替え"
+    },
+    "outputs_list": {
+      "name": "名前",
+      "none": "Output が定義されていません。"
+    },
+    "remove_output": {
+      "confirm": "この Output をストリームから本当に削除しますか？",
+      "title": "Output を削除"
+    }
+  },
+  "stream_details": {
+    "back": "戻る",
+    "connected_pipelines_human_name": "パイプライン",
+    "connected_pipelines_title": "他のストリームからのルーティング",
+    "data_routing": "データのルーティング",
+    "destination_description": "宛先ページでは、このストリームのメッセージをルーティングする先を定義できます。ストリームには複数の宛先を設定できます。Data Lake のみにルーティングされたメッセージは、後で取得されない限りライセンス使用量に含まれません。宛先ごとにフィルターを適用し、その宛先が受信するメッセージの範囲を制限することもできます。",
+    "edit": "編集",
+    "edit_modal_title": "ストリームを編集",
+    "heading": "ストリーム: {{title}}",
+    "intake_description": "ストリームルールを使用すると、フィルターされたメッセージの一部を Input から直接このストリームに収集できます。ストリームルールは現在レガシー機能であり、ストリームのルーティングを管理するには Pipeline Rules の使用が推奨されます。",
+    "no_pipelines": "このストリームはどの Pipeline にも接続されていません。",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Pipeline を使用すると、ストリームから届くメッセージを変換・処理できます。Pipeline はステージで構成され、各ステージでルールが評価・適用されます。メッセージは 1 つ以上のステージを通過できます。",
+    "processing_title": "Pipeline",
+    "rule_header": "ルール",
+    "rules_info": "ストリームルールは、デフォルトの処理順序で最初に適用され、Input からのメッセージをストリームに振り分けるために使用されます。ストリームルールの条件に一致するメッセージは、このストリームに振り分けられます。",
+    "rules_title": "ストリームルール",
+    "segment_destinations": "3: 宛先",
+    "segment_intake": "1: 取り込み",
+    "segment_processing": "2: 処理",
+    "success_title": "成功",
+    "throughput": "スループット",
+    "update_button": "ストリームを更新",
+    "updated": "ストリーム '{{title}}' を更新しました。",
+    "updating": "ストリームを更新中..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "デフォルトストリームは編集できません。",
+    "description": "この画面では、ストリームルールを簡単かつ快適に作成・編集できます。設定したストリームルールがメッセージの一致にどのような影響を与えるかをここで確認できます。",
+    "documentation_link_title": "Streams ドキュメント",
+    "title": "ストリーム {{title}} のルール",
+    "title_span": "ストリーム \"{{title}}\" のルール"
+  },
+  "stream_hooks": {
+    "create_rule_failed": "ストリーム Output フィルタールールの作成に失敗しました。ステータス: {{error}}",
+    "create_rule_failed_title": "ストリーム Output フィルタールールを作成できませんでした",
+    "create_rule_success": "ストリーム Output フィルタールールを作成しました。",
+    "delete_rule_failed": "ストリーム Output フィルタールールの削除に失敗しました。ステータス: {{error}}",
+    "delete_rule_failed_title": "ストリーム Output フィルタールールを削除できませんでした",
+    "delete_rule_success": "ストリーム Output フィルタールールを削除しました。",
+    "load_connected_pipelines_failed": "接続された Pipeline の読み込みに失敗しました。ステータス",
+    "load_connected_pipelines_failed_title": "接続された Pipeline を読み込めませんでした",
+    "load_output_filters_failed": "ストリーム Output フィルターの読み込みに失敗しました。ステータス",
+    "load_output_filters_failed_title": "ストリーム Output フィルターを読み込めませんでした",
+    "load_output_types_failed": "ストリーム Output の読み込みに失敗しました。ステータス",
+    "load_output_types_failed_title": "ストリーム Output を読み込めませんでした",
+    "load_rule_builder_failed": "ストリーム Output フィルタールールビルダーの条件リストの読み込みに失敗しました。ステータス",
+    "load_rule_builder_failed_title": "ストリーム Output フィルタールールビルダーの条件リストを読み込めませんでした。",
+    "load_rule_types_failed": "ストリームルールの種類の読み込みに失敗しました。ステータス",
+    "load_rule_types_failed_title": "ストリームルールの種類を読み込めませんでした",
+    "load_stream_failed": "ストリームの読み込みに失敗しました。ステータス",
+    "load_stream_failed_title": "ストリームを読み込めませんでした",
+    "load_streams_failed": "ストリームの読み込みに失敗しました。ステータス",
+    "load_streams_failed_title": "ストリームを読み込めませんでした",
+    "success_title": "成功しました！",
+    "update_rule_failed": "ストリーム Output フィルタールールの更新に失敗しました。ステータス: {{error}}",
+    "update_rule_failed_title": "ストリーム Output フィルタールールを更新できませんでした",
+    "update_rule_success": "ストリーム Output フィルタールールを更新しました。"
+  },
+  "stream_modal": {
+    "description": "説明",
+    "description_help": "このストリームにはどのような種類のメッセージがルーティングされますか？",
+    "index_set_required": "Index Set は必須です",
+    "remove_matches_help": "このストリームに一致するメッセージを「Default Stream」に割り当てないでください。",
+    "remove_matches_label": "「Default Stream」から一致するメッセージを削除",
+    "share_description": "このストリームの共同編集者として追加するユーザーまたはチームを検索してください。",
+    "title": "タイトル",
+    "title_help": "新しいストリームの説明的な名前",
+    "title_required": "タイトルは必須です"
+  },
+  "stream_outputs": {
+    "description": "{{productName}} ノードは、Output を経由してストリームのメッセージを転送できます。ここで必要な数の Output を起動または停止できます。他のストリーム用に既に実行中の Output を再利用することもできます。設定されたすべての Output の全体一覧は<outputsLink>こちら</outputsLink>で確認できます。",
+    "marketplace_prefix": "Output プラグインは次で見つけられます:",
+    "removing_description": "Output を<emphasis>削除</emphasis>すると、そのストリームからは外れますが、利用可能な Output の一覧には残ります。Output を<emphasis>全体で削除</emphasis>すると、このストリームと他のすべてのストリームから削除され、停止します。定義済みの Output はすべて、<outputsLink>全体の Output 一覧</outputsLink>で詳細を確認できます。",
+    "title": "ストリーム »{{streamTitle}}« の Output"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "このリソースには、権限のないストリームが含まれています。",
+    "description_p2": "管理者に連絡し、必要なストリームの一覧を含むエラーの詳細を伝えてください。",
+    "error_details": "ID が {{ids}} のストリームに対する権限が必要です。",
+    "title": "ストリームの権限がありません"
+  },
+  "stream_rules": {
+    "create_button": "ルールを作成",
+    "created": "ストリームルールを作成しました。",
+    "creating": "ルールを作成中...",
+    "delete_confirm": "このストリームルールを本当に削除しますか？",
+    "delete_ok": "OK",
+    "delete_title": "ストリームルールを削除。",
+    "delete_tooltip": "ストリームルールを削除",
+    "deleted": "ストリームルールを削除しました。",
+    "edit_title": "ストリームルールを編集",
+    "edit_tooltip": "ストリームルールを編集",
+    "editor": {
+      "add_rule": "ストリームルールを追加",
+      "done": "完了",
+      "load_message_hint": "上のステップ 1 でメッセージを読み込み、これらのルールに一致するか確認してください。",
+      "load_message_title": "1. メッセージを読み込んでルールをテスト",
+      "manage_title": "2. ストリームルールを管理",
+      "would_match": "このメッセージはこのストリームにルーティングされます！",
+      "would_not_match": "このメッセージはこのストリームにルーティングされません。"
+    },
+    "human": {
+      "always_matches": "ルールは常に一致します",
+      "deleted_input": "<deleted input>: {{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> は {{description}} <ruleValue>{{value}}</ruleValue> <mustPart>必要があります</mustPart>",
+      "must_not": "<ruleField>{{field}}</ruleField> は {{description}} <ruleValue>{{value}}</ruleValue> <mustPart>してはなりません</mustPart>"
+    },
+    "modal": {
+      "description": "説明",
+      "field": "フィールド",
+      "field_required": "フィールドは必須です",
+      "input": "Input",
+      "inverted": "反転",
+      "matcher_code_link": "GitHub でマッチャーのコードを確認",
+      "matcher_info": "サーバーは、マッチャーの種類に応じて、可能な限り文字列または数値への変換を試みます。",
+      "more_information": "詳細情報",
+      "regex_info": "正規表現は Java の構文を使用します。",
+      "result": "結果:",
+      "select_input": "Input を選択",
+      "select_type": "種類を選択",
+      "type": "種類",
+      "type_required": "種類は必須です",
+      "value": "値",
+      "value_required": "値は必須です"
+    },
+    "new_title": "新しいストリームルール",
+    "no_rules": "ルールが定義されていません。",
+    "start_dialog": {
+      "ask_named": "ストリーム <streamTitle>{{title}}</streamTitle> を開始しますか？",
+      "ask_unnamed": "このストリームを開始しますか？",
+      "confirm": "ストリームを開始",
+      "loading": "ストリームを開始中...",
+      "paused": "このストリームのストリームルールは現在一時停止中のため、有効になりません。",
+      "title": "ストリームを開始しますか？"
+    },
+    "success_title": "成功",
+    "update_button": "ルールを更新",
+    "updated": "ストリームルールを更新しました。",
+    "updating": "ルールを更新中..."
+  },
+  "streams_overview": {
+    "actions": {
+      "clone_button": "ストリームを複製",
+      "clone_stream": "ストリームを複製",
+      "clone_title": "ストリームを複製中",
+      "cloned": "ストリームを '{{title}}' として複製しました。",
+      "cloning": "ストリームを複製中...",
+      "data_routing": "データのルーティング",
+      "delete_failed": "ストリームの削除中にエラーが発生しました。{{error}}",
+      "delete_modal_confirm": "ストリーム {{title}} を本当に削除しますか？",
+      "delete_modal_title": "ストリームを削除",
+      "delete_stream": "ストリームを削除",
+      "deleted": "ストリーム '{{title}}' を削除しました。",
+      "edit_stream": "ストリームを編集",
+      "edit_title": "ストリームを編集中",
+      "manage_alerts": "アラートを管理",
+      "manage_outputs": "Output を管理",
+      "manage_rules": "ルールを管理",
+      "not_available_default": "デフォルトストリームではこの操作は利用できません",
+      "pause_confirm": "ストリーム '{{title}}' を本当に一時停止しますか？",
+      "quick_add_rule": "ルールをすばやく追加",
+      "set_start_page": "スタートページに設定",
+      "start": "ストリームを開始",
+      "starting": "ストリームを開始中...",
+      "status_pause": "ストリームを一時停止",
+      "status_paused": "一時停止中",
+      "status_running": "実行中",
+      "status_start": "ストリームを開始",
+      "stop": "ストリームを停止",
+      "stopping": "ストリームを停止中...",
+      "success_title": "成功",
+      "update_button": "ストリームを更新",
+      "updated": "ストリーム '{{title}}' を更新しました。",
+      "updating": "ストリームを更新中...",
+      "view_default": "デフォルト",
+      "view_label": "表示:",
+      "view_performance": "パフォーマンス",
+      "view_routing": "ルーティング"
+    },
+    "bulk": {
+      "assign_failed": "Index Set の割り当てに失敗しました。ステータス: {{error}}",
+      "assign_failed_title": "エラー",
+      "assign_help": "選択したストリームに一致するメッセージは、設定された Index Set に書き込まれます。",
+      "assign_index_set": "Index Set を割り当て",
+      "assign_loading": "Index Set を割り当て中...",
+      "assign_submit": "Index Set を割り当て",
+      "assign_success_other": "{{count}} 件のストリームに Index Set を割り当てました。",
+      "assign_title_other": "{{count}} 件のストリームに Index Set を割り当て",
+      "delete_confirm_other": "{{count}} 件のストリームを本当に削除しますか？この操作は元に戻せません。",
+      "delete_error": "ストリームの削除中にエラーが発生しました。{{error}}",
+      "failed_deleted_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を削除できませんでした。",
+      "failed_started_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を開始できませんでした。",
+      "failed_stopped_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を停止できませんでした。",
+      "index_set_required": "Index Set は必須です",
+      "search_in_streams": "ストリームで検索",
+      "start_error": "ストリームの開始中にエラーが発生しました。{{error}}",
+      "start_streams_other": "ストリームを開始",
+      "stop_error": "ストリームの停止中にエラーが発生しました。{{error}}",
+      "stop_streams_other": "ストリームを停止",
+      "success_deleted_other": "{{count}} 件のストリームを削除しました。",
+      "success_started_other": "{{count}} 件のストリームを開始しました。",
+      "success_stopped_other": "{{count}} 件のストリームを停止しました。",
+      "success_title": "成功"
+    },
+    "cells": {
+      "archiving_enabled": "アーカイブは有効です",
+      "avg_processing_time": "平均処理時間: {{ms}} ms（過去 15 分）",
+      "index_set_not_found": "見つかりません",
+      "max_processing_time": "最大処理時間: {{ms}} ms（過去 15 分）",
+      "message_count_other": "過去 24 時間で {{count}} 件のメッセージ",
+      "throughput": "{{throughput}} msg/s"
+    },
+    "columns": {
+      "archiving": "アーカイブ",
+      "destination_filters": "フィルタールール",
+      "index_set_title": "Index Set",
+      "outputs": "Output",
+      "pipelines": "Pipeline",
+      "rules": "ストリームルール",
+      "throughput": "スループット"
+    },
+    "expanded": {
+      "associated_inputs_load_failed": "関連する Input を読み込めませんでした。",
+      "associated_inputs_none": "過去 24 時間にこのストリームへメッセージを送信した Input はありません。",
+      "deleted": "{{id}}（削除済み）",
+      "destination_data_lake": "Data Lake",
+      "destination_index_set": "Index Set",
+      "destination_output": "Output",
+      "filter_rules_header_destination": "宛先",
+      "filter_rules_header_status": "ステータス",
+      "filter_rules_header_title": "タイトル",
+      "filter_rules_summary_other": "すべての宛先に設定された {{count}} 件のフィルタールールを表示しています。",
+      "manage_filter_rules": "フィルタールールを管理",
+      "manage_outputs": "Output を管理",
+      "manage_pipelines": "Pipeline を管理",
+      "manage_rules": "ルールを管理",
+      "no_filter_rules": "フィルタールールが見つかりません。",
+      "outputs_summary_other": "接続された Output が {{count}} 件あります。",
+      "pipelines_load_failed": "接続された Pipeline を読み込めませんでした。",
+      "pipelines_none": "このストリームに接続されている Pipeline はありません。",
+      "quick_add_rule": "ルールをすばやく追加",
+      "routing_pipelines_load_failed": "ルーティング Pipeline を読み込めませんでした。",
+      "routing_pipelines_none": "このストリームにメッセージをルーティングしている Pipeline はありません。",
+      "rules_summary_and_other": "設定された {{count}} 件のストリームルールすべてに一致する必要があります。",
+      "rules_summary_or_other": "設定された {{count}} 件のストリームルールのうち少なくとも 1 つに一致する必要があります。"
+    },
+    "expanded_titles": {
+      "destination_filters": "フィルタールール",
+      "outputs": "Output",
+      "rules": "ルール"
+    },
+    "human_name": "ストリーム",
+    "metric_columns": {
+      "associated_inputs": "関連する Input（過去 24 時間）",
+      "avg_processing_time_ms": "平均処理時間（過去 15 分）",
+      "max_processing_time_ms": "最大処理時間（過去 15 分）",
+      "message_count": "メッセージ数（過去 24 時間）",
+      "pipelines": "Pipeline",
+      "routing_pipelines": "ルーティング Pipeline"
+    }
+  },
+  "streams_page": {
+    "create_loading": "ストリームを作成中...",
+    "create_submit": "ストリームを作成",
+    "create_success_message": "ストリームを作成しました。",
+    "create_success_title": "成功",
+    "create_title": "ストリームを作成",
+    "description": "受信メッセージにルールを適用して、ストリームにルーティングできます。ストリームのルールに一致するメッセージはそのストリームにルーティングされます。1 つのメッセージを複数のストリームにルーティングすることもできます。",
+    "documentation_link_title": "Streams ドキュメント",
+    "title": "ストリーム"
+  },
+  "system_outputs": {
+    "description": "{{productName}} ノードは、Output を経由してメッセージを転送できます。ここで必要な数の Output を起動または停止し、<highlight>ストリームに割り当てることで、そのストリームのすべてのメッセージをリアルタイムで転送できます。</highlight>",
+    "header_title": "クラスター内の Output",
+    "marketplace_prefix": "Output プラグインは次で見つけられます:",
+    "title": "Output"
+  },
+  "user_no_stream_access": {
+    "alert": "現在、ストリームへのアクセス権限がないため、検索を開始できません。これがエラーだと思われる場合は、管理者に連絡してください。",
+    "title": "ストリームの権限がありません。"
+  },
+  "notifications": {
+    "load_failed": "ストリームの読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "ストリームを読み込めませんでした",
+    "update_failed": "ストリームの更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "ストリームを更新できませんでした",
+    "pause_failed": "ストリームの一時停止に失敗しました。ステータス: {{error}}",
+    "pause_failed_title": "ストリームを一時停止できませんでした",
+    "resume_failed": "ストリームの再開に失敗しました。ステータス: {{error}}",
+    "resume_failed_title": "ストリームを再開できませんでした",
+    "clone_failed": "ストリームの複製に失敗しました。ステータス: {{error}}",
+    "clone_failed_title": "ストリームを複製できませんでした",
+    "test_match_failed": "ストリームのストリームルールのテストに失敗しました。ステータス: {{error}}",
+    "test_match_failed_title": "ストリームのストリームルールをテストできませんでした",
+    "output_terminate_confirm": "この Output を本当に停止しますか？",
+    "output_terminated": "Output を停止しました。",
+    "output_remove_confirm": "この Output をストリームから本当に削除しますか？",
+    "success_title": "成功"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "Output \"{{title}}\" の保存に失敗しました。ステータス: {{error}}",
+    "save_failed_title": "Output を保存できませんでした",
+    "update_failed": "Output \"{{title}}\" の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "Output を更新できませんでした",
+    "terminate_failed": "Output の停止に失敗しました。ステータス: {{error}}",
+    "terminate_failed_title": "Output を停止できませんでした"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "Output の読み込みに失敗しました。ステータス",
+    "load_failed_title": "Output を読み込めませんでした"
+  },
+  "use_stream_notifications": {
+    "load_failed": "ストリームの読み込みに失敗しました。ステータス",
+    "load_failed_title": "ストリームを読み込めませんでした。"
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "ストリームのメトリクスの読み込みに失敗しました。ステータス",
+    "load_failed_title": "ストリームのメトリクスを読み込めませんでした"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "ストリーム Output の読み込みに失敗しました。ステータス",
+    "load_failed_title": "ストリーム Output を読み込めませんでした"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "ストリームの保存に失敗しました。ステータス: {{error}}",
+    "save_failed_title": "ストリームを保存できませんでした"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "ストリームへの Output の追加に失敗しました。ステータス: {{error}}",
+    "add_failed_title": "ストリームに Output を追加できませんでした",
+    "remove_failed": "ストリームからの Output の削除に失敗しました。ステータス: {{error}}",
+    "remove_failed_title": "ストリームから Output を削除できませんでした",
+    "added_success": "Output をストリームに追加しました。",
+    "removed_success": "Output をストリームから削除しました。",
+    "success_title": "成功しました！"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "ストリームルールの作成に失敗しました。ステータス: {{error}}",
+    "create_failed_title": "ストリームルールを作成できませんでした",
+    "update_failed": "ストリームルールの更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "ストリームルールを更新できませんでした",
+    "delete_failed": "ストリームルールの削除に失敗しました。ステータス: {{error}}",
+    "delete_failed_title": "ストリームルールを削除できませんでした"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "ストリームルールの Input 一覧の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "ストリームルールの Input を取得できませんでした"
+  }
+}

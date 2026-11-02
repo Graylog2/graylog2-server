@@ -1,1 +1,93 @@
-{}
+{
+  "pages": {
+    "description": "{{productName}} Data Nodes は、{{productName}} とのより良い統合を提供し、今後のアップデートを簡素化します。これにより、{{productName}} のメッセージデータベース内のすべてのメッセージをインデックス化して検索できます。",
+    "documentation_title": "Data Nodes のドキュメント",
+    "cluster_management_title": "Data Node Dashboard",
+    "certificate_management_title": "証明書管理",
+    "migration_title": "Data Node マイグレーション",
+    "upgrade_title": "Data Node アップグレード"
+  },
+  "details_page": {
+    "error": "エラー: {{message}}",
+    "title": "Data Nodes: {{hostname}}",
+    "details": "詳細:",
+    "hostname": "ホスト名:",
+    "transport_address": "トランスポートアドレス:",
+    "status": "ステータス:",
+    "not_available": "該当なし",
+    "certificate_valid_until": "証明書の有効期限:",
+    "datanode_version": "Datanode バージョン:",
+    "configuration_warnings": "設定の警告"
+  },
+  "upgrade_status": {
+    "title": "アップグレードステータス",
+    "message": "ノードをアップグレード中..."
+  },
+  "upgrade_complete": {
+    "title": "アップグレードが完了しました",
+    "message": "すべてのノードが最新です。"
+  },
+  "data_node_notifications": {
+    "start_replication_success": "レプリケーションを開始しました。",
+    "start_replication_failure": "レプリケーションの開始に失敗しました。",
+    "replication_in_progress": "レプリケーションを実行中...",
+    "replication_complete": "レプリケーションが完了しました。",
+    "replication_failed": "レプリケーションに失敗しました。",
+    "replication_error": "レプリケーションエラー: {{error}}",
+    "status_unknown": "不明なステータス",
+    "loading_rolling_upgrade_failed": "OpenSearch のローリングアップグレードステータスの読み込みに失敗しました",
+    "loading_rolling_upgrade_failed_title": "OpenSearch のローリングアップグレードステータスを読み込めませんでした",
+    "resume_rolling_upgrade_failed_title": "OpenSearch のローリングアップグレードを再開できませんでした",
+    "resume_rolling_upgrade_success": "OpenSearch のローリングアップグレードを再開しました。",
+    "start_rolling_upgrade_failed_title": "OpenSearch のローリングアップグレードを開始できませんでした",
+    "loading_versions_failed": "OpenSearch のバージョン概要の読み込みに失敗しました",
+    "loading_versions_failed_title": "OpenSearch のバージョン概要を読み込めませんでした",
+    "loading_journal_estimate_failed": "Data Node マイグレーションのジャーナル見積もりの読み込みに失敗しました",
+    "loading_journal_estimate_failed_title": "Data Node のジャーナルサイズの見積もりを読み込めませんでした",
+    "bulk_remove_failed_title": "Data Nodes を削除できませんでした。",
+    "bulk_remove_success_other": "{{count}} 件の Data Nodes を削除しました。",
+    "bulk_start_failed_title": "Data Nodes を開始できませんでした。",
+    "bulk_start_success_other": "{{count}} 件の Data Nodes を開始しました。",
+    "bulk_stop_failed_title": "Data Nodes を停止できませんでした。",
+    "bulk_stop_success_other": "{{count}} 件の Data Nodes を停止しました。",
+    "loading_failed": "Data Nodes の読み込みに失敗しました。ステータス:",
+    "loading_failed_title": "Data Nodes を読み込めませんでした。",
+    "rejoin_failed": "Data Node の再参加に失敗しました。ステータス: {{status}}",
+    "rejoin_failed_title": "Data Node を再参加できませんでした。",
+    "rejoin_success": "Data Node \"{{datanodeId}}\" が正常に再参加しました。",
+    "remove_failed": "Data Node の削除に失敗しました。ステータス: {{status}}",
+    "remove_failed_title": "Data Node を削除できませんでした。",
+    "remove_success": "Data Node \"{{datanodeId}}\" を削除しました。",
+    "renew_certificate_failed": "証明書の更新に失敗しました。エラー: {{error}}",
+    "renew_certificate_success": "証明書を更新しました。",
+    "start_failed": "Data Node の開始に失敗しました。ステータス: {{status}}",
+    "start_failed_title": "Data Node を開始できませんでした。",
+    "start_success": "Data Node \"{{datanodeId}}\" を開始しました。",
+    "stop_failed": "Data Node の停止に失敗しました。ステータス: {{status}}",
+    "stop_failed_title": "Data Node を停止できませんでした。",
+    "stop_success": "Data Node \"{{datanodeId}}\" を停止しました。",
+    "loading_node_failed": "Data Node の読み込みに失敗しました。ステータス:",
+    "loading_node_failed_title": "Data Node を読み込めませんでした",
+    "loading_upgrade_status_failed": "Data Node のアップグレードステータスの読み込みに失敗しました",
+    "loading_upgrade_status_failed_title": "Data Node のアップグレードステータスを読み込めませんでした",
+    "start_replication_failed": "シャードレプリケーションの開始に失敗しました。ステータス: {{status}}",
+    "start_replication_failed_title": "シャードレプリケーションを開始できませんでした。",
+    "stop_replication_failed": "シャードレプリケーションの停止に失敗しました。ステータス: {{status}}",
+    "stop_replication_failed_title": "シャードレプリケーションを停止できませんでした。",
+    "stop_replication_success": "シャードレプリケーションを停止しました",
+    "loading_stderr_failed": "Data Node の stderr ログの読み込みに失敗しました。ステータス:",
+    "loading_stderr_failed_title": "Data Node の stderr ログを読み込めませんでした",
+    "loading_stdout_failed": "Data Node の stdout ログの読み込みに失敗しました。ステータス:",
+    "loading_stdout_failed_title": "Data Node の stdout ログを読み込めませんでした"
+  },
+  "ca_upload": {
+    "file_required": "ファイルをアップロードしてください。",
+    "single_file": "ファイルは 1 つだけアップロードしてください。"
+  },
+  "notifications": {
+    "certificate_provisioned_success": "証明書をプロビジョニングしました",
+    "certificate_renewed_success": "証明書を更新しました",
+    "certificate_provisioning_failed": "証明書のプロビジョニングに失敗しました。エラー: {{error}}",
+    "certificate_renewal_failed": "証明書の更新に失敗しました。エラー: {{error}}"
+  }
+}

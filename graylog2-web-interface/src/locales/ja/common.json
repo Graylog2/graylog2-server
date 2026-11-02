@@ -1,1 +1,581 @@
-{}
+{
+  "actions": {
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "submit": "送信",
+    "delete": "削除",
+    "previous": "前へ",
+    "next": "次へ",
+    "add": "追加",
+    "edit": "編集",
+    "preview": "プレビュー",
+    "close": "閉じる",
+    "done": "完了",
+    "filter": "フィルター",
+    "reset": "リセット",
+    "reset_search": "検索をリセット",
+    "more_actions": "その他の操作",
+    "sort": "並べ替え",
+    "clear_selection": "選択を解除",
+    "remove_item": "{{name}} を削除"
+  },
+  "confirm_leave": {
+    "question": "本当によろしいですか？"
+  },
+  "duration": {
+    "years_other": "{{count}} 年",
+    "months_other": "{{count}} か月",
+    "days_other": "{{count}} 日",
+    "hours_other": "{{count}} 時間",
+    "minutes_other": "{{count}} 分",
+    "seconds_other": "{{count}} 秒",
+    "milliseconds_other": "{{count}} ミリ秒",
+    "nanoseconds_other": "{{count}} ナノ秒",
+    "microseconds_other": "{{count}} マイクロ秒"
+  },
+  "bulk_actions": {
+    "title": "一括操作",
+    "cancel": "選択をキャンセル"
+  },
+  "refresh": {
+    "not_updating": "更新されていません",
+    "every": "間隔",
+    "pause": "更新を一時停止",
+    "start": "更新を開始"
+  },
+  "create_entity": {
+    "title": "{{entityName}} を作成",
+    "submit": "{{entityName, lowercase}} を作成",
+    "submitting": "{{entityName, lowercase}} を作成中...",
+    "save_failed": "保存に失敗しました",
+    "unknown_error": "エラーが発生しました。もう一度お試しください。"
+  },
+  "key_value_table": {
+    "name": "名前",
+    "value": "値",
+    "actions": "操作"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdownエディター",
+    "preview_title": "Markdownプレビュー",
+    "expand_preview": "プレビューを展開",
+    "expand_content": "コンテンツを展開"
+  },
+  "source_code_editor": {
+    "copy": "コピー (Ctrl+C / ⌘C)",
+    "paste": "貼り付け (Ctrl+V / ⌘V)",
+    "undo": "元に戻す (Ctrl+Z / ⌘Z)",
+    "redo": "やり直し (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Ctrl+V (macOSでは⌘V) を押すか、編集 → 貼り付け を選択して、クリップボードから貼り付けてください。"
+  },
+  "loading": "読み込み中...",
+  "loading_long_wait": "少し時間がかかっています。しばらくお待ちください...",
+  "errors": {
+    "runtime_error": "実行時エラー",
+    "unknown_error": "不明なエラー",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "データの取得エラー",
+    "page_error_description": "このページの構築に必要なデータの一部を取得できませんでした。代わりに画像を表示しています。",
+    "page_error_logs": "詳細は {{productName}} サーバーのログを確認してください。"
+  },
+  "empty": {
+    "no_data": "利用可能なデータがありません。",
+    "no_entities": "項目が存在しません。",
+    "nothing_here": "ここには何もないようです。",
+    "no_items": "表示する項目がありません",
+    "no_items_available": "利用可能な項目がありません",
+    "no_items_found": "表示する項目が見つかりません。",
+    "filter_no_match": "フィルターに一致するデータがありません。"
+  },
+  "badges": {
+    "beta": "ベータ",
+    "preview": "プレビュー",
+    "default": "デフォルト",
+    "optional": "(任意)"
+  },
+  "clipboard": {
+    "copied": "コピーしました！"
+  },
+  "restricted_access": {
+    "view": "この{{entityName}}を表示する権限がありません。"
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise機能",
+    "description": "<bold>{{featureName}}</bold> 機能を使用するには、<licenseLink>Graylog Enterpriseライセンス</licenseLink>と<docsLink>Graylog Enterpriseプラグイン</docsLink>が必要です。"
+  },
+  "pagination": {
+    "first": "最初のページを開く",
+    "previous": "前のページを開く",
+    "next": "次のページを開く",
+    "last": "最後のページを開く",
+    "page": "{{page}} ページを開く",
+    "active_page": "現在のページ"
+  },
+  "page_size": {
+    "rows_other": "{{count}} 行",
+    "configure": "ページサイズを設定",
+    "show": "<select/> 件を表示"
+  },
+  "search_form": {
+    "placeholder": "検索クエリを入力...",
+    "filter_placeholder": "フィルターするクエリを入力"
+  },
+  "select": {
+    "placeholder": "選択...",
+    "no_options": "選択肢がありません",
+    "loading": "読み込み中...",
+    "loading_options": "選択肢を読み込み中...",
+    "type_to_filter": "入力してフィルター"
+  },
+  "entity_table": {
+    "selected_items_other": "{{count}} 件の項目を選択中",
+    "columns": "列",
+    "configure_columns": "表示する列を設定",
+    "reset_columns": "すべての列をリセット",
+    "show_column": "{{column}} を表示",
+    "hide_column_named": "{{column}} を非表示",
+    "show_label": "表示",
+    "show_details": "詳細を表示",
+    "collapse_section": "セクションを折りたたむ",
+    "toggle_column_actions": "{{column}} の操作を切り替え",
+    "sort_ascending": "昇順に並べ替え",
+    "sort_descending": "降順に並べ替え",
+    "sort_column_ascending": "{{column, lowercase}} を昇順に並べ替え",
+    "sort_column_descending": "{{column, lowercase}} を降順に並べ替え",
+    "hide_column": "列を非表示",
+    "resize_column": "{{column}} 列のサイズを変更",
+    "slicing_by": "{{column}} でスライス",
+    "select_entity": "項目を選択",
+    "deselect_entity": "項目の選択を解除",
+    "select_all": "表示中のすべての項目を選択",
+    "deselect_all": "表示中のすべての項目の選択を解除",
+    "more": "その他",
+    "more_actions": "その他の操作",
+    "load_layout_failed": "「{{entityId}}」の概要のレイアウト設定の読み込みに次のエラーで失敗しました:",
+    "update_layout_failed": "テーブルのレイアウト設定の更新に失敗しました。エラー: {{error}}",
+    "search_placeholder": "{{humanName}} を検索",
+    "fetch_failed": "{{humanName}} の取得に失敗しました",
+    "fetch_failed_with_status": "{{humanName}} の取得に次のステータスで失敗しました:",
+    "could_not_retrieve": "{{humanName}} を取得できませんでした",
+    "no_results": "{{humanName}} が見つかりませんでした。"
+  },
+  "slicing": {
+    "slice_by": "スライス別",
+    "slice_by_values": "値でスライス",
+    "no_slicing": "スライスなし",
+    "unselect_slice": "スライスの選択を解除",
+    "sort_by": "{{option}} で並べ替え",
+    "filter": "{{column}} をフィルター",
+    "filter_slices": "スライスをフィルター",
+    "sort_ascending": "昇順に並べ替え",
+    "sort_descending": "降順に並べ替え",
+    "hide_empty": "空のスライスを非表示 ({{count}})",
+    "show_empty": "空のスライスを表示 ({{count}})",
+    "hide_empty_title": "空のスライスを非表示",
+    "show_empty_title": "空のスライスを表示",
+    "no_empty": "空のスライス (0)",
+    "fetch_failed": "テーブルのスライスの取得中にエラーが発生しました"
+  },
+  "filters": {
+    "filters": "フィルター",
+    "create_filter": "フィルターを作成",
+    "change_value": "フィルターの値を変更",
+    "delete_filter": "フィルターを削除",
+    "filter_ignored": "フィルターは無視されています",
+    "slice_conflict": "この属性にはスライスが有効なため、このフィルターは無視されます。フィルターを適用するには、スライスを解除してください。",
+    "single_filter_only": "この属性に作成できるフィルターは1つだけです。",
+    "update_existing": "フィルターの値を変更するには、既存のフィルターを更新してください。",
+    "create_attribute_filter": "{{attribute, lowercase}} のフィルターを作成",
+    "edit_attribute_filter": "{{attribute, lowercase}} のフィルターを編集",
+    "create_submit": "フィルターを作成",
+    "update_submit": "フィルターを更新",
+    "value_placeholder": "フィルターする値を入力",
+    "must_not_be_empty": "空にすることはできません。",
+    "search_attribute": "{{attribute, lowercase}} を検索",
+    "no_entities_found": "項目が見つかりません",
+    "hold_shift": "Shiftキーを押しながらクリックして複数選択",
+    "load_suggestions_failed": "フィルターの候補の読み込みに次のステータスで失敗しました:",
+    "could_not_load_suggestions": "フィルターの候補を読み込めませんでした",
+    "load_titles_failed": "フィルターのタイトルの読み込みに次のステータスで失敗しました:",
+    "could_not_load_titles": "フィルターのタイトルを読み込めませんでした",
+    "all_time": "全期間",
+    "now": "現在",
+    "now_lowercase": "現在",
+    "relative_range": "{{from}} から {{until}} まで"
+  },
+  "time_units": {
+    "nanoseconds": "ナノ秒",
+    "microseconds": "マイクロ秒",
+    "milliseconds": "ミリ秒",
+    "seconds": "秒",
+    "minutes": "分",
+    "hours": "時間",
+    "days": "日",
+    "months": "か月",
+    "years": "年"
+  },
+  "time": {
+    "never": "なし",
+    "toggle_time": "時刻を切り替え",
+    "time_unit_input": "時間単位の入力",
+    "browser_time_zone": "ブラウザーのタイムゾーン",
+    "pick_time_zone": "タイムゾーンを選択",
+    "unclassified_time_zones": "未分類",
+    "default_locale": "デフォルトのロケール",
+    "pick_locale": "ロケールを選択"
+  },
+  "page_header": {
+    "experimental": "実験的",
+    "legacy": "レガシー",
+    "experimental_message": "この機能は新しく、実験的なものとして扱ってください。",
+    "legacy_message": "この機能は廃止されており、将来のバージョンで削除される予定です。"
+  },
+  "message": {
+    "collector_ingest": "Collector Ingest",
+    "deleted_input": "削除された入力",
+    "received_by": "受信元",
+    "received_by_value": "<node/> 上の <inputName/>",
+    "filter_streams": "ストリームをフィルター",
+    "default_stream_not_testable": "デフォルトのストリームに対してテストすることはできません",
+    "no_streams": "利用可能なストリームがありません",
+    "test_against_stream": "ストリームに対してテスト",
+    "show_changes": "変更を表示",
+    "copy_id": "IDをコピー",
+    "copy_message": "メッセージをコピー",
+    "not_stored": "保存されていません",
+    "timestamp": "タイムスタンプ",
+    "stored_in_index": "インデックスに保存済み",
+    "not_stored_in_index": "メッセージは保存されていません",
+    "routed_into_streams": "ストリームに振り分け済み",
+    "edit_favorite_fields": "お気に入りフィールドを編集",
+    "show_remaining_fields_other": "残り {{count}} 個のフィールドを表示",
+    "hide_remaining_fields_other": "残り {{count}} 個のフィールドを非表示",
+    "favorite_fields_configuration": "お気に入りフィールドの設定",
+    "favorite_fields_hint_other": "お気に入りのフィールドは、このメッセージが属するすべてのストリーム（このメッセージが振り分けられている <streams/> を含む）に表示されます。",
+    "save_configuration": "設定を保存",
+    "reset_to_default": "デフォルトにリセット",
+    "reset_to_default_title": "デフォルトのフィールドにリセット: {{fields}}",
+    "favorite_fields": "お気に入りフィールド",
+    "remaining_fields": "残りのフィールド",
+    "set_favorites_failed": "フィールドをお気に入りに設定できませんでした。エラー: {{error}}",
+    "set_favorites_failed_title": "フィールドをお気に入りに設定できませんでした",
+    "add_favorite_failed": "フィールドをお気に入りに追加できませんでした。エラー: {{error}}",
+    "add_favorite_failed_title": "フィールドをお気に入りに追加できませんでした",
+    "remove_favorite_failed": "フィールドをお気に入りから削除できませんでした。エラー: {{error}}",
+    "remove_favorite_failed_title": "フィールドをお気に入りから削除できませんでした",
+    "field_terms": "フィールドの値:",
+    "received_by_radio_value": "ラジオ <node/> 上の <inputName/> 経由"
+  },
+  "entity_types": {
+    "user": "ユーザー",
+    "team": "チーム",
+    "dashboard": "Dashboard",
+    "event_definition": "Event Definition",
+    "notification": "通知",
+    "search": "検索",
+    "stream": "Stream",
+    "search_filter": "検索フィルター",
+    "report": "レポート",
+    "role": "ロール",
+    "output": "Output",
+    "sigma_rule": "Sigma ルール",
+    "event_procedure": "イベントプロシージャ",
+    "event_procedure_step": "イベントプロシージャのステップ",
+    "collection": "コレクション",
+    "collection_entities": "コレクションの項目"
+  },
+  "marketplace_link": "{{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "一部を表示",
+    "show_all": "すべて表示",
+    "filter_by": "{{itemLabel}} 「{{value}}」でフィルター"
+  },
+  "compact_pagination": {
+    "previous_page": "前のページ",
+    "select_page": "ページを選択",
+    "next_page": "次のページ",
+    "of_pages": "/ {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "項目を選択"
+  },
+  "traffic_graph": {
+    "days": "日数",
+    "incoming": "受信トラフィック",
+    "outgoing": "送信トラフィック",
+    "last_days": "過去 {{days}} 日間: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "不明なノード"
+  },
+  "markdown": {
+    "images_unsupported": "セキュリティ上の理由から画像はサポートされていません。許可するソースを有効にするには、<configurationLink>こちら</configurationLink>を参照してください"
+  },
+  "public_notifications": {
+    "read_less": "折りたたむ",
+    "read_more": "続きを読む"
+  },
+  "refresh_controls": {
+    "controls_label": "{{humanName}} の更新コントロール",
+    "below_minimum": "<intervalDuration /> ({{interval}}) の間隔は、設定された最小間隔の <minimumDuration /> ({{minimum}}) を下回っています。"
+  },
+  "scroll_button": {
+    "back_to_top": "トップに戻る"
+  },
+  "section": {
+    "toggle_section": "{{title, lowercase}} セクションを切り替え"
+  },
+  "selectable_list": {
+    "remove": "削除"
+  },
+  "share_menu_item": {
+    "share": "共有"
+  },
+  "status_icon": {
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "type_ahead_field_input": {
+    "select_field": "フィールドを選択"
+  },
+  "query_helper": {
+    "title": "検索構文のヘルプ",
+    "show_help": "検索構文のヘルプを表示",
+    "available_fields": "使用可能な検索フィールド",
+    "field": "フィールド",
+    "description": "説明",
+    "examples": "例",
+    "example_description": "説明に security を含むすべての {{entityName}} を検索:",
+    "example_id": "ID が 5f4dfb9c69be46153b9a9a7b の {{entityName}} を検索:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "{{entityName}} の ID（一意の参照子）です。",
+      "title": "{{entityName}} のタイトルです。",
+      "name": "{{entityName}} の名前です。",
+      "description": "{{entityName}} の短い説明です。",
+      "summary": "{{entityName}} の詳しい概要です。"
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "URL許可リストに追加",
+    "title": "許可リストの設定を更新",
+    "submit": "設定を更新",
+    "urls": "許可リストのURL"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<アップロードされたファイルの内容>",
+    "no_configuration": "-- 設定なし --"
+  },
+  "configuration_forms": {
+    "undo_reset": "リセットを元に戻す",
+    "remove": "削除",
+    "title": "タイトル",
+    "optional": "任意"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "リソースが限られたITオペレーションおよびソフトウェアエンジニアリングのチーム向けに設計された {{productName}} Enterprise は、ログデータの収集と分析に費やす時間を年間で何千時間も削減し、パフォーマンス、障害、エラーの根本原因を特定するための多くの生産性向上機能を提供します。",
+    "security_title": "{{productName}} Security",
+    "security_description": "{{productName}} Open の機能を拡張し、セキュリティ専用のダッシュボードとアラート、異常検知のAI/MLエンジン、他のセキュリティツールとの連携、SOAR機能、多数のコンプライアンスレポート機能により、サイバーセキュリティの脅威を検知、調査、対応できます。",
+    "request_now": "今すぐリクエスト"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Plugin Enterprise",
+    "installed": "{{pluginName}} はインストールされています",
+    "not_installed": "{{pluginName}} はインストールされていません",
+    "status": "このクラスターの {{productName}} Enterprise モジュールのステータスです:"
+  },
+  "reported_error": {
+    "title": "問題が発生しました",
+    "description": "不明なエラーが発生しました。詳細については、次のメッセージと {{productName}} サーバーのログを確認してください。"
+  },
+  "hotkeys": {
+    "or": "または",
+    "title": "キーボードショートカット",
+    "view_all": "すべてのキーボードショートカットを表示"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}} サイドバー",
+    "sidebar_label_collapsed": "{{title}} サイドバー（折りたたみ済み）",
+    "close": "サイドバーを閉じる",
+    "expand": "サイドバーを展開",
+    "collapse": "サイドバーを折りたたむ",
+    "go_back": "戻る",
+    "go_back_label": "前のコンテンツに戻る",
+    "go_forward": "進む",
+    "go_forward_label": "次のコンテンツに進む"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "GeoIP データアダプターは、MaxMind の GeoIP2 データベースの読み込みに対応しています。",
+      "limitations_title": "制限事項",
+      "limitations_supported": "現在、ASN、都市、国のデータベースに対応しています。",
+      "limitations_more": "その他のデータベースタイプへの対応については、サポートチャネルをご確認ください。",
+      "asn_fields": "ASN データベースのフィールド",
+      "country_fields": "国データベースのフィールド",
+      "city_fields": "都市データベースのフィールド",
+      "city_additional_fields": "都市データベースには、国データベースのフィールドに加えて、次のフィールドも含まれます:",
+      "complete_documentation": "フィールドの詳細なドキュメントについては、MaxMind の <docsLink>開発者向けドキュメント</docsLink>を参照してください"
+    },
+    "database_types": {
+      "asn": "ASN データベース",
+      "city": "都市データベース",
+      "country": "国データベース",
+      "ipinfo_location": "IPinfo 位置情報データベース",
+      "ipinfo_asn": "IPinfo ASN データベース"
+    },
+    "field_set": {
+      "file_path": "ファイルパス",
+      "file_path_help": "データベースファイルのパスです。",
+      "database_type": "データベースの種類",
+      "database_type_help": "データベースファイルの種類を選択してください",
+      "database_type_placeholder": "データベースファイルの種類を選択",
+      "refresh_file": "ファイルを更新",
+      "refresh_file_help": "有効にすると、データベースファイルの変更を確認し、ディスク上で変更された場合は更新します。"
+    },
+    "summary": {
+      "database_file_path": "データベースファイルのパス",
+      "database_type": "データベースの種類",
+      "check_interval": "チェック間隔"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Azure Blob コンテナー名",
+    "container_name_help": "Azure Blob コンテナーの名前です。",
+    "endpoint_url": "Azure Blob エンドポイント URL",
+    "endpoint_url_help": "Azure Blob エンドポイントの URL です。既定のエンドポイントを上書きする場合にのみ必要です。",
+    "account_name": "Azure アカウント名",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "Azure ストレージアカウントの名前です。",
+    "account_key_reset": "Azure アカウントキー",
+    "reset_password": "パスワードをリセット",
+    "account_key": "Azure アカウントキー",
+    "account_key_help": "Azure ストレージアカウントのアカウントキーです。"
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage プロジェクト ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor の設定",
+    "description": "Geo-Location Processor プラグインは、すべてのメッセージをスキャンし、<bold>IP アドレスのみ</bold>を含むフィールドを検出して、その位置情報（座標、ISO 国コード、都市名）を別のフィールドに格納します。詳細は<docsLink>ドキュメント</docsLink>を参照してください。",
+    "enabled_summary": "有効:",
+    "enforce_schema_summary": "デフォルトのスキーマを適用:",
+    "vendor_type_summary": "データベースのベンダー種別:",
+    "city_db_path_summary": "都市データベースのパス:",
+    "asn_db_path_summary": "ASN データベースのパス:",
+    "refresh_interval_summary": "データベースの更新間隔:",
+    "pull_from_cloud_summary": "クラウドストレージバケットからファイルを取得:",
+    "edit": "設定を編集",
+    "modal_title": "Geo-Location Processor の設定を更新",
+    "enable_processor": "Geo-Location Processor を有効にする",
+    "enforce_schema": "デフォルトのスキーマを適用",
+    "vendor_select": "GeoIP データベースのベンダーを選択",
+    "city_db_path": "都市データベースのパス",
+    "asn_db_path": "ASN データベースのパス",
+    "refresh_interval": "データベースの更新間隔",
+    "refresh_interval_help": "データベースファイルの変更を確認する間隔です。ディスク上で変更が検出されると更新されます。",
+    "pull_from_cloud": "クラウドストレージバケットからファイルを取得",
+    "select_cloud_storage": "クラウドストレージを選択",
+    "update_configuration": "設定を更新",
+    "updating_configuration": "設定を更新中..."
+  },
+  "links": {
+    "documentation": "ドキュメント"
+  },
+  "quick_jump": {
+    "title": "クイックジャンプ",
+    "open": "クイックジャンプを開く",
+    "search_placeholder": "ページ/ダッシュボード/ストリームを検索 ...",
+    "intro": "ページ、ストリーム、ダッシュボード、入力、その他の項目を検索するには、検索クエリを入力してください。",
+    "intro_hint": "手早く始められるように、<bold>最近開いた</bold>項目と<bold>お気に入り</bold>の項目の一覧を以下に表示します:",
+    "no_results": "検索結果が見つかりませんでした。別の検索語句を試してください。",
+    "recent": "最近"
+  },
+  "scratchpad": {
+    "title": "スクラッチパッド",
+    "status_cleared": "クリアしました。",
+    "status_auto_saved": "自動保存されました。",
+    "got_it": "了解",
+    "sensitive_warning": "パスワードなどの機密情報は、この領域に<bold>保存しないでください</bold>。",
+    "help_overlay": "ブラウザーのウィンドウを離れずに、個人的なメモやその他の情報をこの領域に保存できます。例えば、各種調査で必要になるタイムスタンプ、ユーザー ID、IP アドレスなどを保存できます。",
+    "copy": "コピー",
+    "clear": "クリア",
+    "clear_confirm": "スクラッチパッドの内容が消去されます。続行しますか？"
+  },
+  "extractor_actions": {
+    "select_type": "Extractor の種類を選択",
+    "only_string_fields": "Extractor は文字列フィールドにのみ使用できます。"
+  },
+  "surrounding_search": {
+    "button": "前後のメッセージを表示"
+  },
+  "support_sources": {
+    "title": "サポートが必要ですか？",
+    "help_text": "<docsLink>ドキュメント</docsLink>で質問への回答が見つからない場合は、遠慮なく {{productName}} コミュニティにご相談ください。",
+    "community_support": "コミュニティサポート",
+    "issue_tracker": "課題トラッカー",
+    "professional_support": "プロフェッショナルサポート"
+  },
+  "times_list": {
+    "title": "時刻の設定",
+    "description": "タイムゾーンの扱いは分かりにくい場合があります。ここでは、システムの各コンポーネントに適用されているタイムゾーンを確認できます。特定の {{productName}} サーバーノードのタイムゾーン設定は、各ノードの詳細ページで確認できます。",
+    "user": "ユーザー <bold>{{username}}</bold>:",
+    "web_browser": "お使いの Web ブラウザー:",
+    "server": "{{productName}} サーバー:"
+  },
+  "widget_visualization_not_found": {
+    "description": "ウィジェットの可視化 (<italic>{{widgetClassName}}</italic>) が見つかりません。このウィジェットを提供するプラグインが読み込まれていない可能性があります。"
+  },
+  "telemetry": {
+    "title": "テレメトリー",
+    "enable_label": "テレメトリーを有効にする",
+    "enabled_checkbox": "有効",
+    "update_preferences": "設定を更新",
+    "update_button": "テレメトリーを更新",
+    "info_modal_title": "{{productName}} の改善にご協力ください",
+    "ok": "OK",
+    "info": "匿名の利用データを収集し、今後の改善の優先順位付けや {{productName}} の品質向上に役立てたいと考えています。",
+    "no_personal_data": "お使いのインスタンスで、個人データ、機密情報、ログなどのコンテンツは収集しません。",
+    "learn_more": "詳しくは<privacyLink>プライバシーポリシー</privacyLink>をご覧ください。",
+    "turn_off_profile": "データ収集は、いつでも<bold>ユーザープロフィール</bold>から無効または有効にできます。",
+    "turn_off_here": "データ収集は、いつでもここから無効または有効にできます。"
+  },
+  "app_facade": {
+    "preparing": "Web インターフェースを準備しています..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}} のバージョンが変更されました",
+    "version_changed": "{{productName}} のバージョンが <bold>{{version}}</bold> から <bold>{{newVersion}}</bold> に変更されました。",
+    "save_work": "エラーを避けるため、作業内容を保存してからページを再読み込みしてください。",
+    "reload_now": "今すぐ再読み込み"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}}（{{hostname}} 上、{{jvmInfo}}）"
+  },
+  "notifications": {
+    "download_failed": "ダウンロードに失敗しました。ステータス: {{error}}",
+    "download_failed_title": "ダウンロードできません",
+    "export_failed": "エクスポートに失敗しました",
+    "export_widget_failed": "ウィジェットのエクスポートに失敗しました",
+    "telemetry_update_failed": "更新に失敗しました: {{error}}",
+    "telemetry_update_failed_title": "テレメトリーの設定を更新できませんでした。",
+    "delete_property_confirm": "プロパティ「{{key}}」を削除してもよろしいですか？",
+    "quick_jump_failed": "項目の検索結果の取得に次のステータスで失敗しました:",
+    "quick_jump_failed_title": "項目の検索結果を取得できませんでした。"
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "項目をお気に入りに追加できませんでした。ステータス: {{error}}",
+    "put_failed_title": "項目をお気に入りに追加できませんでした",
+    "delete_failed": "項目をお気に入りから削除できませんでした。ステータス: {{error}}",
+    "delete_failed_title": "項目をお気に入りから削除できませんでした"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "項目のタイトルの読み込みに次のステータスで失敗しました:",
+    "load_failed_title": "項目のタイトルを読み込めませんでした"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "上書きデータを取得できませんでした"
+  }
+}
