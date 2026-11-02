@@ -22,7 +22,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
+import org.bouncycastle.crypto.params.HKDFParameters;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.util.encoders.Hex;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -35,11 +39,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -53,7 +61,9 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -72,17 +82,42 @@ public class DatanodeKeystore {
     public static String DATANODE_KEY_ALIAS = "datanode";
     public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
+    /**
+     * HKDF info parameter used to derive the keystore password from the password_secret. Changing this value
+     * invalidates all existing keystores, introduce a new version and a migration path instead.
+     */
+    private static final byte[] KEYSTORE_PASSWORD_HKDF_INFO = "graylog-datanode-keystore-password-v1".getBytes(StandardCharsets.UTF_8);
+    private static final int KEYSTORE_PASSWORD_LENGTH_BYTES = 32;
+
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
     private final Path keystoreFile;
-    private final String passwordSecret;
+    /**
+     * Password used by keystores created before the HKDF derivation was introduced. Used only to read and
+     * re-encrypt them.
+     */
+    private final char[] legacyPassword;
+    private final char[] keystorePassword;
 
     private final EventBus eventBus;
 
     @Inject
     public DatanodeKeystore(DatanodeDirectories datanodeDirectories, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
         this.keystoreFile = datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
-        this.passwordSecret = passwordSecret;
+        this.legacyPassword = passwordSecret.toCharArray();
+        this.keystorePassword = deriveKeystorePassword(passwordSecret);
         this.eventBus = eventBus;
+    }
+
+    /**
+     * Derive a dedicated keystore password from the password_secret, so the secret itself is not reused
+     * as a keystore password.
+     */
+    static char[] deriveKeystorePassword(String passwordSecret) {
+        final HKDFBytesGenerator hkdf = new HKDFBytesGenerator(new SHA256Digest());
+        hkdf.init(new HKDFParameters(passwordSecret.getBytes(StandardCharsets.UTF_8), null, KEYSTORE_PASSWORD_HKDF_INFO));
+        final byte[] derived = new byte[KEYSTORE_PASSWORD_LENGTH_BYTES];
+        hkdf.generateBytes(derived, 0, derived.length);
+        return Hex.toHexString(derived).toCharArray();
     }
 
     public synchronized boolean exists() {
@@ -130,26 +165,22 @@ public class DatanodeKeystore {
 
     public synchronized KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
         try {
-            return create(keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray()));
+            return persistKeystore(keyPair.toKeystore(DATANODE_KEY_ALIAS, keystorePassword), true);
         } catch (Exception e) {
             throw new DatanodeKeystoreException(e);
         }
     }
 
-    public synchronized KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
-        return persistKeystore(keystore, true);
-    }
-
     public synchronized void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
         try {
             final KeyStore keystore = loadKeystore();
-            Key privateKey = keystore.getKey(DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
+            Key privateKey = keystore.getKey(DATANODE_KEY_ALIAS, keystorePassword);
 
             final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
             boolean hasIssuerChanged = !isSameIssuer(datanodeCert, certificateChain.signedCertificate());
 
             // replace the existing self-signed certificates chain with the signed chain from the event
-            keystore.setKeyEntry(DATANODE_KEY_ALIAS, privateKey, passwordSecret.toCharArray(), certificateChain.toCertificateChainArray());
+            keystore.setKeyEntry(DATANODE_KEY_ALIAS, privateKey, keystorePassword, certificateChain.toCertificateChainArray());
             persistKeystore(keystore, hasIssuerChanged);
             LOG.info("Persisting signed certificates to the datanode keystore finished");
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
@@ -162,13 +193,68 @@ public class DatanodeKeystore {
     }
 
     private synchronized KeyStore persistKeystore(KeyStore keystore, boolean issuerChanged) throws DatanodeKeystoreException {
-        try (FileOutputStream fos = new FileOutputStream(keystoreFile.toFile())) {
-            keystore.store(fos, passwordSecret.toCharArray());
-        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new DatanodeKeystoreException(e);
-        }
+        writeKeystoreFile(keystore);
         triggerChangeEvent(keystore, issuerChanged);
         return keystore;
+    }
+
+    /**
+     * Write to a temporary file first and then replace the keystore, so a failure during writing can't
+     * leave a corrupted keystore (and lost private key) behind. The temporary file gets the same permissions
+     * as the existing keystore, so replacing it doesn't change who can access it.
+     */
+    private void writeKeystoreFile(KeyStore keystore) throws DatanodeKeystoreException {
+        final Path tmpFile = keystoreFile.resolveSibling(keystoreFile.getFileName() + ".tmp");
+        try {
+            final Optional<Set<PosixFilePermission>> originalPermissions = readPosixPermissions(keystoreFile);
+            Files.deleteIfExists(tmpFile);
+            Files.createFile(tmpFile);
+            if (originalPermissions.isPresent()) {
+                // make sure we can write the content even if the original keystore is read-only
+                final Set<PosixFilePermission> writablePermissions = EnumSet.copyOf(originalPermissions.get());
+                writablePermissions.add(PosixFilePermission.OWNER_WRITE);
+                Files.setPosixFilePermissions(tmpFile, writablePermissions);
+            }
+            try (OutputStream os = Files.newOutputStream(tmpFile)) {
+                keystore.store(os, keystorePassword);
+            }
+            if (originalPermissions.isPresent()) {
+                Files.setPosixFilePermissions(tmpFile, originalPermissions.get());
+            }
+            replaceFile(tmpFile, keystoreFile);
+        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            deleteQuietly(tmpFile, e);
+            throw new DatanodeKeystoreException(e);
+        }
+    }
+
+    private static Optional<Set<PosixFilePermission>> readPosixPermissions(Path file) throws IOException {
+        if (Files.exists(file) && file.getFileSystem().supportedFileAttributeViews().contains("posix")) {
+            final Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(file);
+            return Optional.of(permissions.isEmpty() ? EnumSet.noneOf(PosixFilePermission.class) : EnumSet.copyOf(permissions));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Prefer an atomic move, but fall back to a regular one on file systems that don't support it (e.g. some
+     * network or volume mounts).
+     */
+    private static void replaceFile(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            LOG.debug("Atomic move of {} not supported, falling back to non-atomic move", target);
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private static void deleteQuietly(Path file, Exception originalException) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            originalException.addSuppressed(e);
+        }
     }
 
     private void triggerChangeEvent(KeyStore keystore, boolean issuerChanged) throws DatanodeKeystoreException {
@@ -194,19 +280,52 @@ public class DatanodeKeystore {
     }
 
     private synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
-        try (FileInputStream fis = new FileInputStream(keystoreFile .toFile())) {
-            KeyStore keystore = KeyStore.getInstance(PKCS12);
-            keystore.load(fis, passwordSecret.toCharArray());
-            return keystore;
-        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+        try {
+            return readKeystoreFile(keystorePassword);
+        } catch (IOException e) {
+            // Wrong password is reported as an IOException caused by an UnrecoverableKeyException. The keystore
+            // may still be encrypted with the password_secret, created before the HKDF derivation was introduced.
+            // Other IO errors (e.g. a missing or truncated file) are not related to the password.
+            if (e.getCause() instanceof UnrecoverableKeyException) {
+                return migrateLegacyKeystore(e);
+            }
             throw new DatanodeKeystoreException(e);
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new DatanodeKeystoreException(e);
+        }
+    }
+
+    private KeyStore migrateLegacyKeystore(IOException originalException) throws DatanodeKeystoreException {
+        final KeyStore legacyKeystore;
+        try {
+            legacyKeystore = readKeystoreFile(legacyPassword);
+        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            originalException.addSuppressed(e);
+            throw new DatanodeKeystoreException(originalException);
+        }
+
+        LOG.info("Re-encrypting datanode keystore with a password derived from password_secret");
+        try {
+            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(legacyKeystore, legacyPassword, keystorePassword);
+            writeKeystoreFile(reencrypted);
+            return reencrypted;
+        } catch (GeneralSecurityException | IOException e) {
+            throw new DatanodeKeystoreException("Failed to re-encrypt datanode keystore", e);
+        }
+    }
+
+    private KeyStore readKeystoreFile(char[] password) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
+        try (FileInputStream fis = new FileInputStream(keystoreFile.toFile())) {
+            KeyStore keystore = KeyStore.getInstance(PKCS12);
+            keystore.load(fis, password);
+            return keystore;
         }
     }
 
     public synchronized InMemoryKeystoreInformation getSafeCopy() throws DatanodeKeystoreException {
         final char[] randomKeystorePassword = RANDOM_STRING_UTILS.nextAlphanumeric(256).toCharArray();
         try {
-            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(loadKeystore(), passwordSecret.toCharArray(), randomKeystorePassword);
+            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(loadKeystore(), keystorePassword, randomKeystorePassword);
             return new InMemoryKeystoreInformation(reencrypted, randomKeystorePassword);
         } catch (GeneralSecurityException | IOException e) {
             throw new DatanodeKeystoreException(e);
@@ -214,7 +333,7 @@ public class DatanodeKeystore {
     }
 
     public synchronized PKCS10CertificationRequest createCertificateSigningRequest(String hostname, List<String> altNames) throws DatanodeKeystoreException, CSRGenerationException {
-        final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(loadKeystore(), passwordSecret.toCharArray());
+        final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(loadKeystore(), keystorePassword);
         return CsrGenerator.generateCSR(keystore, DATANODE_KEY_ALIAS, hostname, altNames);
     }
 
