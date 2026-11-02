@@ -155,26 +155,144 @@
     "utilization": "<strong>{{usage}} mensagens</strong> em {{title}}, {{percentage}} utilizado."
   },
   "input_types_data_table": {
-    "loading": "Carregando tipos de input..."
+    "loading": "Carregando tipos de input...",
+    "unavailable": "Os tipos de input não estão disponíveis.",
+    "documentation": "Documentação",
+    "name": "Nome",
+    "type": "Tipo",
+    "filter": "Filtrar"
   },
-  "journal_details": {},
-  "journal_state": {},
-  "jvm_heap_usage": {},
-  "node_list_item": {},
-  "node_maintenance_dropdown": {},
-  "node_overview": {},
-  "nodes_actions": {},
-  "nodes_list": {},
-  "plugins_data_table": {},
-  "rest_api_overview": {},
-  "system_information": {},
-  "system_overview_details": {},
-  "system_overview_summary": {},
-  "bulk_actions": {},
-  "system_notifications_table": {},
-  "actions_cell": {},
-  "title_cell": {},
-  "system_job": {},
+  "journal_details": {
+    "loading": "Carregando métricas do journal...",
+    "disabled": "O journal em disco está desativado neste nó.",
+    "unavailable": "Métricas do journal indisponíveis.",
+    "overcommitted": "<strong>Atenção!</strong> A utilização do journal está excedendo o tamanho máximo definido. <overviewLink>Clique aqui</overviewLink> para mais informações.",
+    "configuration": "Configuração",
+    "path": "Caminho:",
+    "earliest_entry": "Entrada mais antiga:",
+    "maximum_size": "Tamanho máximo:",
+    "maximum_age": "Idade máxima:",
+    "flush_policy": "Política de flush:",
+    "flush_policy_value": "A cada {{messages}} mensagens ou {{duration}}",
+    "maximum_age_format": "d [dias] h [horas] m [minutos]",
+    "flush_duration_format": "h [horas] m [minutos] s [segundos]",
+    "utilization": "Utilização",
+    "unprocessed_messages": "<strong>{{messages}} mensagens não processadas</strong> estão atualmente no journal, em {{segments}} segmentos.",
+    "appended_and_read": "<strong>{{appended}} mensagens</strong> foram anexadas no último segundo, <strong>{{read}} mensagens</strong> foram lidas no último segundo."
+  },
+  "journal_state": {
+    "loading": "Carregando métricas do journal...",
+    "unavailable": "Métricas do journal indisponíveis."
+  },
+  "jvm_heap_usage": {
+    "loading": "Carregando informações de uso do heap...",
+    "unavailable": "Informações de heap indisponíveis.",
+    "usage": "A JVM está usando <usedBlob /><strong> {{used}}</strong> de <committedBlob /><strong> {{committed}}</strong> do espaço de heap e não tentará usar mais do que <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "As informações do sistema estão indisponíveis no momento."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Ações",
+    "configure_internal_logging": "Configurar log interno"
+  },
+  "node_overview": {
+    "memory_heap_usage": "Uso de memória/heap",
+    "buffers": "Buffers",
+    "buffers_description": "Os buffers são criados para armazenar em cache pequenas quantidades de mensagens por um período muito curto (geralmente milissegundos) enquanto passam pelos diferentes processadores.",
+    "input_buffer": "Buffer de input",
+    "process_buffer": "Buffer de processamento",
+    "output_buffer": "Buffer de output",
+    "disk_journal": "Journal em disco",
+    "disk_journal_description": "As mensagens recebidas são gravadas no journal em disco para garantir que sejam mantidas em segurança em caso de falha do servidor. O journal também ajuda a manter a funcionalidade caso algum dos outputs seja lento demais para acompanhar a taxa de mensagens ou sempre que houver um pico de mensagens recebidas. Ele garante que a memória não seja sobrecarregada e evita pausas excessivamente longas do coletor de lixo.",
+    "system": "Sistema",
+    "rest_api": "API REST",
+    "installed_plugins": "Plugins instalados",
+    "manage_inputs": "Gerenciar inputs",
+    "available_input_types": "Tipos de input disponíveis"
+  },
+  "nodes_actions": {
+    "details": "Detalhes",
+    "metrics": "Métricas",
+    "more_actions": "Mais ações",
+    "pause_message_processing": "Pausar processamento de mensagens",
+    "resume_message_processing": "Retomar processamento de mensagens",
+    "pause_confirm": "Você está prestes a pausar o processamento de mensagens neste nó. Tem certeza?",
+    "resume_confirm": "Você está prestes a retomar o processamento de mensagens neste nó. Tem certeza?",
+    "override_lb_status": "Substituir status do LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Você está prestes a alterar o status do load balancer deste nó para {{status}}. Tem certeza?",
+    "local_message_inputs": "Inputs de mensagens locais",
+    "thread_dump": "Obter dump de threads",
+    "process_buffer_dump": "Obter dump do buffer de processamento",
+    "recent_system_logs": "Obter mensagens recentes do log do sistema"
+  },
+  "nodes_list": {
+    "no_active_nodes": "Não há nós ativos."
+  },
+  "plugins_data_table": {
+    "loading": "Carregando plugins neste nó...",
+    "no_plugins": "Este nó não possui plugins instalados.",
+    "name": "Nome",
+    "version": "Versão",
+    "author": "Autor",
+    "description": "Descrição",
+    "website": "Site",
+    "filter": "Filtrar"
+  },
+  "rest_api_overview": {
+    "transport_address": "Endereço de transporte:",
+    "last_seen": "Visto por último:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "As informações da JVM deste nó não estão disponíveis.",
+    "hostname": "Nome do host:",
+    "node_id": "ID do nó:",
+    "version": "Versão:",
+    "version_codename": "{{version}}, codinome <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Hora:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Você está prestes a pausar o processamento de mensagens neste nó. Tem certeza?",
+    "resume_confirm": "Você está prestes a retomar o processamento de mensagens neste nó. Tem certeza?",
+    "what_does_this_mean": "O que isso significa?",
+    "lifecycle_state": "Estado do ciclo de vida: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Marcado como <strong>{{status}}</strong> para load balancers",
+    "pause_processing": "Pausar processamento",
+    "resume_processing": "Retomar processamento",
+    "not_processing": "O nó <strong>não</strong> está processando mensagens"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Estado atual do ciclo de vida:",
+    "message_processing": "Processamento de mensagens:",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "lb_indication": "Indicação do load balancer:"
+  },
+  "bulk_actions": {
+    "dismiss": "Dispensar"
+  },
+  "system_notifications_table": {
+    "title": "Notificações",
+    "human_name": "notificações"
+  },
+  "actions_cell": {
+    "dismiss": "Dispensar"
+  },
+  "title_cell": {
+    "show_full_message": "Exibir mensagem completa para: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Não foi possível confirmar o job",
+    "cancel_failed": "Não foi possível cancelar o job",
+    "cancel_confirm": "Tem certeza de que deseja cancelar o job de sistema \"{{info}}\"?",
+    "on_node": "- em",
+    "runtime": "tempo de execução: {{duration}}",
+    "cancel": "Cancelar"
+  },
   "system_jobs_component": {},
   "system_jobs_list": {},
   "system_messages_component": {},
