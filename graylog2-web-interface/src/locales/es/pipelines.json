@@ -123,21 +123,136 @@
       "actions": "Acciones"
     }
   },
-  "stage": {},
-  "stage_form": {},
-  "used_in_pipelines": {},
-  "deprecation": {},
-  "rule_form": {},
-  "rule_list_entry": {},
-  "metrics_config": {},
-  "rule_simulation": {},
-  "convert_modal": {},
-  "block_display": {},
-  "block": {},
-  "builder_form": {},
-  "block_form": {},
-  "block_field": {},
-  "builder": {},
+  "stage": {
+    "last_stage": "No hay más etapas en este pipeline. Una vez aplicadas las reglas de esta etapa, el pipeline habrá terminado de procesar los mensajes.",
+    "continue_all": "Los mensajes que cumplen <matchText>todas las reglas</matchText> de esta etapa pasarán a la siguiente etapa.",
+    "continue_either": "Los mensajes que cumplen <matchText>al menos una regla</matchText> de esta etapa pasarán a la siguiente etapa.",
+    "continue_pass": "Los mensajes que cumplen <matchText>ninguna o más reglas</matchText> de esta etapa pasarán a la siguiente etapa.",
+    "continue_unknown": "Los mensajes que cumplen <matchText>DESCONOCIDO</matchText> en esta etapa pasarán a la siguiente etapa.",
+    "title": "Etapa {{stage}}",
+    "remove_routing_rule_title": "Eliminar regla de enrutamiento",
+    "remove_routing_rule_confirm": "¿Seguro que quieres eliminar la regla de enrutamiento <ruleTitle>{{title}}</ruleTitle>?"
+  },
+  "stage_form": {
+    "rules_help": "Selecciona las reglas que se evaluarán en esta etapa, o crea una en la <rulesLink>página de reglas de pipeline</rulesLink>.",
+    "add_button": "Añadir nueva etapa",
+    "add_title": "Añadir nueva etapa {{stage}}",
+    "edit_title": "Editar etapa {{stage}}",
+    "add_submit": "Añadir etapa",
+    "update_submit": "Actualizar etapa",
+    "stage": "Etapa",
+    "stage_in_use": "La etapa ya está en uso. Usa otro número o edita la etapa existente.",
+    "stage_help": "Prioridad de la etapa. Cuanto menor sea el número, antes se ejecutará.",
+    "continue_when": "Continuar el procesamiento en la siguiente etapa cuando",
+    "match_all": "Todas las reglas de esta etapa coinciden con el mensaje",
+    "match_any": "Al menos una de las reglas de esta etapa coincide con el mensaje",
+    "match_pass": "Ninguna o varias reglas de esta etapa coinciden",
+    "stage_rules": "Reglas de la etapa"
+  },
+  "used_in_pipelines": {
+    "label": "Usada en pipelines",
+    "help": "Pipelines que usan esta regla en una o más de sus etapas.",
+    "none": "Esta regla no se usa en ningún pipeline."
+  },
+  "deprecation": {
+    "label": "Función obsoleta",
+    "title_rule": "Esta regla contiene al menos una función obsoleta:",
+    "title_pipeline": "Este pipeline contiene al menos una función obsoleta:"
+  },
+  "rule_form": {
+    "duplicate_title": "¡El título de regla \"{{title}}\" ya existe!",
+    "title": "Título",
+    "title_help": "Puedes definir el título de la regla en el código fuente de la regla. Consulta la referencia rápida para más información.",
+    "leave_question": "¿Seguro que quieres abandonar esta página y perder tus cambios? Esta acción no se puede deshacer.",
+    "description": "Descripción",
+    "description_help": "Descripción de la regla (opcional).",
+    "source": "Código fuente de la regla",
+    "source_help": "Código fuente de la regla. Consulta la referencia rápida para más información.",
+    "create_submit": "Crear regla",
+    "update_close_submit": "Actualizar regla y cerrar",
+    "update": "Actualizar regla"
+  },
+  "rule_list_entry": {
+    "edit": "Editar",
+    "delete_title": "Eliminar regla",
+    "delete": "Eliminar",
+    "managed": "Gestionada por Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errores/s"
+  },
+  "metrics_config": {
+    "loading": "Cargando configuración de métricas...",
+    "title": "Configuración de métricas de reglas",
+    "submit": "Actualizar configuración",
+    "warning": "Las métricas de reglas solo deben activarse para depurar un problema de rendimiento, porque recopilarlas ralentiza el procesamiento de mensajes y aumenta el uso de memoria.",
+    "enable": "Activar métricas de reglas",
+    "disable": "Desactivar métricas de reglas",
+    "pipeline_load_info": "Activar estas métricas añadirá una nueva columna a las páginas de Pipeline y de Reglas de pipeline llamada <columnName>Carga del pipeline</columnName>, que mostrará valores en % que indican qué pipeline consume más tiempo de hilo en comparación con los demás.",
+    "rule_load_info": "Activar estas métricas también añadirá una nueva columna a la página de detalles del pipeline llamada <columnName>Carga de regla</columnName>. Sirve para identificar qué reglas del pipeline seleccionado son las más costosas."
+  },
+  "rule_simulation": {
+    "error_builder": "No se pudo ejecutar la simulación de la regla. Corrige los errores del generador de reglas.",
+    "placeholder_simple": "campo de mensaje simple",
+    "invalid_json": "¡JSON no válido!",
+    "title": "Simulación de regla",
+    "optional": "(Opcional)",
+    "json": "JSON",
+    "key_value": "Clave-valor",
+    "simple_message": "Mensaje simple",
+    "input_title": "Campo de mensaje simple, pares clave-valor o JSON",
+    "input_help": "Introduce una cadena normal para simular el campo de mensaje, pares clave-valor o un JSON para simular el mensaje completo.",
+    "run": "Ejecutar simulación de regla",
+    "reset": "Restablecer",
+    "conditions_output": "Salida de condiciones",
+    "actions_output": "Salida de acciones"
+  },
+  "convert_modal": {
+    "no_title": "<sin título>",
+    "no_code": "<sin código>",
+    "create_rule": "Crear nueva regla a partir de código",
+    "copied": "¡Código fuente de la regla copiado al portapapeles!",
+    "copy_close": "Copiar y cerrar"
+  },
+  "block_display": {
+    "number": "Número",
+    "not": "No",
+    "deprecated": "Obsoleta",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "insert_above": "Insertar encima",
+    "insert_below": "Insertar debajo"
+  },
+  "block": {
+    "insert_title_above": "Insertar nueva acción encima de la acción N.º {{order}}",
+    "insert_title_below": "Insertar nueva acción debajo de la acción N.º {{order}}"
+  },
+  "builder_form": {
+    "title": "Título",
+    "title_help": "Título de la regla.",
+    "description": "Descripción",
+    "description_help": "Descripción de la regla (opcional)."
+  },
+  "block_form": {
+    "add_condition": "Añadir condición",
+    "add_action": "Añadir acción",
+    "syntax_help": "Ayuda de sintaxis de funciones",
+    "update": "Actualizar",
+    "add": "Añadir"
+  },
+  "block_field": {
+    "no_dollar": "No se permiten campos que empiecen por '$'.",
+    "use_previous_output": "Usar la salida de los pasos anteriores",
+    "set_custom": "Definir {{name}} personalizado",
+    "select_output": "Selecciona la salida de la lista",
+    "output_from_step": "Salida del paso {{step}} ({{name}})",
+    "type_not_found": "Ninguna acción anterior devuelve el tipo {{type}}",
+    "true": "verdadero",
+    "false": "falso"
+  },
+  "builder": {
+    "title": "Generador de reglas"
+  },
   "helper": {},
   "helper_table": {},
   "simulator": {},
