@@ -182,7 +182,8 @@
   },
   "journal_state": {
     "loading": "正在加载 Journal 指标...",
-    "unavailable": "Journal 指标不可用。"
+    "unavailable": "Journal 指标不可用。",
+    "summary_other": "Journal 中包含 {{count}} 个分段，其中有 <strong>{{messages}} 条未处理消息</strong>。过去一秒内已追加 <strong>{{appended}} 条消息</strong>，已读取 <strong>{{read}} 条消息</strong>。"
   },
   "jvm_heap_usage": {
     "loading": "正在加载堆内存使用信息...",
@@ -197,6 +198,8 @@
     "configure_internal_logging": "配置内部日志"
   },
   "node_overview": {
+    "plugins_installed_other": "已安装 {{count}} 个插件",
+    "inputs_running_other": "此节点上正在运行 {{count}} 个输入",
     "memory_heap_usage": "内存/堆使用情况",
     "buffers": "缓冲区",
     "buffers_description": "缓冲区用于在消息经过各处理器时，短时间（通常为毫秒级）缓存少量消息。",
@@ -229,6 +232,7 @@
     "recent_system_logs": "获取最近的系统日志消息"
   },
   "nodes_list": {
+    "active_nodes_other": "当前有 {{count}} 个活动节点",
     "no_active_nodes": "没有活动节点。"
   },
   "plugins_data_table": {
@@ -364,7 +368,8 @@
   },
   "show_metrics_page": {
     "title": "节点 {{shortNodeId}} / {{hostname}} 的指标",
-    "description": "所有 {{productName}} 节点都提供一组用于诊断、调试和监控的内部指标。您也可以通过 JMX 访问所有指标。"
+    "description": "所有 {{productName}} 节点都提供一组用于诊断、调试和监控的内部指标。您也可以通过 JMX 访问所有指标。",
+    "total_metrics_other": "此节点共报告 {{count}} 个指标。"
   },
   "node_page": {
     "title": "节点 {{shortNodeId}} / {{hostname}}",
@@ -433,7 +438,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "创建支持包失败，状态：{{error}}",
-    "create_failed_title": "无法创建支持包。"
+    "create_failed_title": "无法创建支持包。",
+    "delete_failed": "删除支持包失败，状态：{{error}}",
+    "delete_failed_title": "无法删除支持包。",
+    "download_failed": "下载支持包失败，状态：{{error}}",
+    "download_failed_title": "无法下载支持包。",
+    "load_list_failed": "加载支持包列表失败，状态为",
+    "load_list_failed_title": "无法加载支持包列表。"
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "获取节点“{{nodeId}}”上的插件失败",
+    "fetch_failed_title": "无法获取插件"
+  }
 }
