@@ -117,6 +117,7 @@
     "auto_refresh_options": "自動重新整理間隔選項",
     "auto_refresh_options_help": "將 <strong>自動重新整理</strong>間隔選擇器的可用選項設定為 <strong>ISO8601 持續時間</strong>",
     "auto_refresh_options_title": "自動重新整理間隔選項",
+    "cancel_after_seconds_other": "{{count}} 秒",
     "cancellation_timeout": "取消逾時",
     "cancellation_timeout_description": "每個小工具在此秒數後將自動取消搜尋執行。這可減少執行的搜尋數量並提升效能。",
     "default_auto_refresh_interval": "預設自動重新整理間隔",
@@ -231,7 +232,20 @@
     "description": "歡迎頁面可顯示訊息、警示及事件數量的小工具，以及熱門來源圖表。在大型或繁忙的叢集上，每當使用者開啟歡迎頁面時，這些查詢都會增加額外負載。若要避免此負載，請在下方停用。小工具將被隱藏，且其查詢將不會執行。",
     "enable_metrics": "啟用歡迎頁面指標",
     "enable_metrics_help": "若停用，訊息、警示及事件數量小工具以及熱門來源圖表將從歡迎頁面隱藏，其底層查詢也將不會執行。在大型或繁忙的叢集上請關閉此選項，以減少查詢負載。",
-    "metrics": "歡迎頁面指標"
+    "metrics": "歡迎頁面指標",
+    "title": "歡迎頁面",
+    "update_title": "更新歡迎頁面設定"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "索引預設設定已成功更新",
+    "index_defaults_failed_title": "索引預設設定更新失敗",
+    "update_success": "設定已成功更新",
+    "search_update_failed": "搜尋設定更新失敗：{{error}}",
+    "search_update_failed_title": "無法更新搜尋設定：{{configType}}",
+    "allowlist_update_success": "URL 允許清單設定已成功更新",
+    "allowlist_update_failed": "URL 允許清單設定更新失敗：{{error}}",
+    "allowlist_update_failed_title": "無法更新 URL 允許清單：{{configType}}",
+    "processors_update_failed": "訊息處理器設定更新失敗：{{error}}",
+    "processors_update_failed_title": "無法更新設定：{{configType}}"
+  }
 }
