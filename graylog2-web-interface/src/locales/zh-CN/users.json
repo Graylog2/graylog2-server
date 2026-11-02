@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "用户概览",
+    "documentation_link_title": "权限文档",
+    "description": "所有已注册用户的概览。"
+  },
+  "user_create": {
+    "title": "创建新用户",
+    "documentation_link_title": "权限文档",
+    "description": "使用此页面为 Web 界面或 REST API 创建新用户。",
+    "submit_button": "创建用户",
+    "reader_role_description": "为每个 {{productName}} 用户授予基本权限（内置）",
+    "role_required": "您需要至少选择 <em>Reader</em> 或 <em>Admin</em> 角色之一。",
+    "failed_title": "创建用户失败",
+    "submit": "创建用户",
+    "submitting": "正在创建用户..."
+  },
+  "user_edit": {
+    "title": "编辑用户 {{username}}",
+    "title_prefix": "编辑用户",
+    "documentation_link_title": "权限文档",
+    "description": "您可以在此更改用户详细信息和密码，并分配角色和团队。",
+    "segments": {
+      "profile": "个人资料",
+      "preferences": "偏好设置",
+      "teams_roles": "团队和角色",
+      "shared_entities": "共享条目"
+    },
+    "password": {
+      "new_password": "新密码",
+      "repeat_password": "重复密码",
+      "old_password": "旧密码",
+      "alert_title": "更改密码",
+      "alert_text": "更改密码将使该用户退出登录，并使其所有当前会话失效。如果您正在更改自己的密码，保存后将立即退出登录。在这种情况下，请先保存所有待处理的更改。",
+      "change": "更改密码"
+    },
+    "profile": {
+      "email": "电子邮件",
+      "full_name": "全名",
+      "update": "更新个人资料"
+    },
+    "profile_info": {
+      "title": "名和姓",
+      "text": "从 {{productName}} 4.1 开始，我们新增了独立的名和姓字段。保存用户个人资料前必须填写这些字段。"
+    },
+    "read_only": "所选用户 {{fullName}} 无法编辑。",
+    "roles_required": "角色必须至少包含 Admin 或 Reader 角色之一。",
+    "external": {
+      "title": "外部用户",
+      "text": "该用户是从外部服务器同步而来的，因此无法更改其个人资料或密码。如需更多信息，请联系管理员。"
+    },
+    "preferences": {
+      "language_help": "{{productName}} 界面的语言。标记为 Beta 的翻译尚未经过审核。",
+      "enable_autocompletion": "启用自动补全",
+      "search_sidebar": "搜索侧边栏",
+      "dashboard_sidebar": "仪表板侧边栏",
+      "is_pinned": "已固定",
+      "search_sidebar_help": "也可以通过搜索侧边栏的固定图标进行更改",
+      "dashboard_sidebar_help": "也可以通过仪表板侧边栏的固定图标进行更改",
+      "theme_mode_help": "可以通过用户下拉菜单中的切换开关进行更改",
+      "update": "更新偏好设置"
+    },
+    "settings": {
+      "select_entity": "请选择一个条目。",
+      "update": "更新设置"
+    }
+  },
+  "roles_overview": {
+    "title": "角色概览",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "{{productName}} 中所有可用角色的概览。角色允许向用户授予功能权限，例如创建仪表板或事件定义。",
+    "alert_title": "授予权限",
+    "alert_body_prefix": "内置角色允许向用户授予功能权限，例如创建仪表板或查看归档目录。但它们不会授予对特定仪表板或数据流的权限，也无法创建自定义角色。要为特定条目授予权限，可以使用其 ",
+    "share_text": "共享",
+    "alert_body_suffix": " 按钮。例如，您可以在条目概览页面上找到该按钮。如果要同时为多个用户授予某个条目的权限，可以使用团队。更多信息请参阅",
+    "documentation_text": "文档"
+  },
+  "role_details": {
+    "title": "角色详情 {{name}}",
+    "title_prefix": "角色详情",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "概览名称、描述和已分配用户等详细信息。"
+  },
+  "role_edit": {
+    "title": "编辑角色 {{name}}",
+    "title_prefix": "编辑角色",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "您可以将该角色分配给用户。"
+  },
+  "user_tokens_edit": {
+    "title": "编辑用户 {{username}} 的令牌",
+    "title_prefix": "编辑用户的令牌",
+    "documentation_link_title": "权限文档",
+    "description": "您可以创建新令牌或删除旧令牌。"
+  },
+  "token_management": {
+    "title": "令牌管理",
+    "documentation_link_title": "权限文档",
+    "description": "为 {{productName}} 配置的访问令牌概览。"
+  },
+  "token_list": {
+    "title": "创建和编辑令牌",
+    "token_created": "令牌 {{name}} 已创建！",
+    "token_created_description": "这是您的新令牌。请立即复制，关闭后将无法再次查看。",
+    "done_button": "完成",
+    "title_list": "令牌",
+    "filter_label": "过滤器",
+    "no_tokens_to_display": "没有可显示的令牌。",
+    "no_tokens_match_filter": "没有与过滤器匹配的令牌。",
+    "column_name": "令牌名称",
+    "column_created": "创建时间",
+    "column_last_access": "最后访问",
+    "column_expires_at": "过期时间",
+    "column_actions": "操作",
+    "never_used": "从未使用"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "用户",
+      "team": "团队",
+      "global": "所有人",
+      "error": "错误"
+    },
+    "dependencies_warning": {
+      "title": "当前协作者缺少依赖项",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> 需要访问",
+      "dependency": "{{type}}：<dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "所有者：",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "添加协作者",
+      "search_placeholder": "搜索用户和团队",
+      "collaborators": "协作者",
+      "direct_collaborators": "直接协作者",
+      "shared_via_collections": "通过集合共享"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
