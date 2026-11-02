@@ -46,8 +46,8 @@ public class AWSAuthProviderTest {
 
         AWSAuthProvider authProvider = createForConfig(config);
 
-        assertThat(authProvider.getCredentials().getAWSSecretKey()).isEqualTo("aVerySecretKey");
-        assertThat(authProvider.getCredentials().getAWSAccessKeyId()).isEqualTo("MyAccessKey");
+        assertThat(authProvider.resolveCredentials().secretAccessKey()).isEqualTo("aVerySecretKey");
+        assertThat(authProvider.resolveCredentials().accessKeyId()).isEqualTo("MyAccessKey");
     }
 
     private AWSAuthProvider createForConfig(AWSPluginConfiguration config) {

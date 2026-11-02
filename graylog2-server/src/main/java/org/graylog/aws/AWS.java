@@ -16,8 +16,9 @@
  */
 package org.graylog.aws;
 
-import com.amazonaws.regions.Regions;
 import com.google.common.collect.Maps;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.RegionMetadata;
 
 import java.util.Map;
 
@@ -40,15 +41,15 @@ public class AWS {
      * Build a list of region choices with both a value (persisted in configuration) and display value (shown to the user).
      *
      * The display value is formatted nicely: "EU (London): eu-west-2"
-     * The value is eventually passed to Regions.fromName() to get the actual region object: eu-west-2
+     * The value is eventually passed to Region.of() to get the actual region object: eu-west-2
      * @return a choices map with configuration value map keys and display value map values.
      */
     public static Map<String, String> buildRegionChoices() {
         Map<String, String> regions = Maps.newHashMap();
-        for (Regions region : Regions.values()) {
-
-            String displayValue = f("%s: %s", region.getDescription(), region.getName());
-            regions.put(region.getName(), displayValue);
+        for (Region region : Region.regions()) {
+            RegionMetadata regionMetadata = RegionMetadata.of(region);
+            String displayValue = f("%s: %s", regionMetadata.description(), region.id());
+            regions.put(region.id(), displayValue);
         }
         return regions;
     }
