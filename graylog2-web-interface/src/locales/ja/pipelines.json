@@ -1,1 +1,157 @@
-{}
+{
+  "title": "パイプライン",
+  "overview_header_title": "パイプラインの概要",
+  "documentation_link_title": "パイプラインのドキュメント",
+  "overview_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。",
+  "new_pipeline": "新しいパイプライン",
+  "pipeline_details_title": "パイプライン {{title}}",
+  "pipeline_details_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。\n各ステージが完了した後、すべてのルールに一致するメッセージ、またはいずれかのルールに一致するメッセージを次のステージに進めるかどうかを決めることができます。",
+  "rules_page_title": "パイプラインルール",
+  "rules_page_header_title": "パイプラインルール",
+  "rules_page_documentation_link": "パイプラインルールのドキュメント",
+  "rules_page_description": "ルールは、メッセージに変更を適用する方法です。ルールは条件とアクションのリストで構成されます。条件はメッセージに対して評価され、条件を満たした場合にアクションが実行されます。",
+  "rules_delete_confirm": "ルール「{{title}}」を本当に削除しますか？",
+  "rule_details_new_title": "新しいパイプラインルール",
+  "rule_details_title": "パイプラインルール {{title}}",
+  "rule_details_loading": "ルールの詳細を読み込んでいます...",
+  "loading_rule": "ルールを読み込んでいます",
+  "create_pipeline_rule": "パイプラインルールを作成",
+  "pipeline_rule": "パイプラインルール <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "ソースコードエディターを使用",
+  "rule_is_managed_warning": "このルールはアプリケーションによって管理されています。編集できません。",
+  "switch_to_source_code_editor": "ソースコードエディターに切り替え",
+  "switch_to_source_code_editor_confirm_text": "このページを離れて、ソースコードエディターに移動します。",
+  "switch_to_source_code_editor_confirm_warning": "保存されていない変更がないことを確認してください。",
+  "pipeline_new": {
+    "description": "新しいパイプラインに名前と説明を付けてください。変更を保存した後にステージを追加できます。"
+  },
+  "processing_errors": {
+    "rate_suffix": "errors/s",
+    "total": "（合計 {{total}} 件）"
+  },
+  "timeline": {
+    "entity_name": "パイプライン",
+    "delete_confirm": "パイプライン「{{title}}」を本当に削除しますか？この操作は取り消せません。",
+    "filter_label": "パイプラインをフィルター",
+    "no_pipelines": "パイプラインが見つかりませんでした",
+    "headers": {
+      "pipeline": "パイプライン",
+      "connected_streams": "接続先のストリーム",
+      "processing_errors": "処理エラー",
+      "pipeline_load": "パイプライン負荷 (15m)",
+      "processing_timeline": "処理タイムライン",
+      "actions": "アクション"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "デバッグメトリクスが有効です",
+    "banner_text": "デバッグメトリクスはメッセージ処理にオーバーヘッドを加え、メモリー使用量を増やします。トラブルシューティングが終わったら無効にしてください。パイプライン負荷の値は15分間のウィンドウで平均化されるため、有効化後に安定するまで数分かかる場合があります。",
+    "disable": "デバッグメトリクスを無効化",
+    "enable": "デバッグメトリクスを有効化",
+    "help": "パイプライン負荷 (15m) は、クラスター全体でパイプラインルールの実行時間が占める相対的な割合を示します。デバッグメトリクスを有効にすると、タイマーデータの収集が始まります。有効化後、値が表示されるまで約15分かかる場合があり、収集はメッセージ処理にオーバーヘッドを加えます。"
+  },
+  "pipeline": {
+    "not_connected": "このパイプラインは現在どのストリームにも接続されていません。受信メッセージを処理させるには、少なくとも1つのストリームに接続する必要があります。デコレーターを使って検索結果の変換のみに使用する場合は、接続は不要です。",
+    "delete_stage_confirm": "ステージ {{stage}} を削除しようとしています。続行しますか？",
+    "list_and": " および ",
+    "managed_1": "このパイプラインはシステムで管理されており、編集は一部に制限されています。",
+    "managed_2": "パイプラインルールは、入力ウィザードを通してのみこのパイプラインに追加できます。",
+    "managed_3": "このパイプラインのパイプラインルールは、対応する入力名の変更に合わせて自動的に名前が変更されます。",
+    "managed_4": "パイプラインルールはこのパイプラインから手動で削除できますが、手動で追加することはできません。",
+    "connections_title": "パイプラインの接続",
+    "no_connections": "このパイプラインで処理するストリームを選択してください。",
+    "stages_title": "パイプラインのステージ",
+    "stages_description": "ステージは、順番に実行する必要がある条件とアクションのグループです。パイプラインの残りを実行するかどうかを決める制御フローを提供します。",
+    "no_rules_on_stage": "このステージにはルールがありません。"
+  },
+  "connections_form": {
+    "streams_help": "このパイプラインに接続するストリームを選択するか、<streamsLink>ストリームページ</streamsLink>で作成してください。",
+    "edit": "接続を編集",
+    "title": "<pipelineTitle>{{title}}</pipelineTitle> の接続を編集",
+    "submit": "接続を更新",
+    "streams": "ストリーム"
+  },
+  "details": {
+    "title": "詳細",
+    "title_label": "タイトル",
+    "description": "説明",
+    "created": "作成日時",
+    "last_modified": "最終更新日時",
+    "throughput": "現在のスループット",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "タイトル",
+    "title_help": "パイプライン名です。",
+    "description": "説明",
+    "description_help": "パイプラインの説明です。",
+    "add_button": "新しいパイプラインを追加",
+    "edit_button": "パイプラインの詳細を編集",
+    "add_title": "新しいパイプライン {{title}} を追加",
+    "edit_title": "パイプライン {{title}} を編集",
+    "add_submit": "パイプラインを追加",
+    "update_submit": "パイプラインを更新",
+    "create_submit": "パイプラインを作成"
+  },
+  "list_item": {
+    "idle": "アイドル",
+    "stage": "ステージ {{stage}}",
+    "loading": "パイプラインを読み込んでいます...",
+    "managed": "アプリケーションによって管理",
+    "throughput_prefix": "スループット:",
+    "throughput_suffix": "msg/s",
+    "not_connected": "未接続",
+    "edit_aria": "パイプラインを編集",
+    "edit": "編集",
+    "delete_aria": "パイプラインを削除",
+    "delete": "削除"
+  },
+  "stage_rules": {
+    "invalid_rule": "ルール {{name}} の名前が変更されたか、削除されました。このルールはスキップされます。",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s",
+    "remove_title": "{{title}} を削除",
+    "removing": "削除しています...",
+    "remove": "削除",
+    "no_rules": "このステージにはまだルールがありません。編集をクリックして追加してください。",
+    "headers": {
+      "title": "タイトル",
+      "description": "説明",
+      "throughput": "スループット",
+      "errors": "エラー",
+      "rule_load": "ルール負荷 (15m)",
+      "actions": "アクション"
+    }
+  },
+  "stage": {},
+  "stage_form": {},
+  "used_in_pipelines": {},
+  "deprecation": {},
+  "rule_form": {},
+  "rule_list_entry": {},
+  "metrics_config": {},
+  "rule_simulation": {},
+  "convert_modal": {},
+  "block_display": {},
+  "block": {},
+  "builder_form": {},
+  "block_form": {},
+  "block_field": {},
+  "builder": {},
+  "helper": {},
+  "helper_table": {},
+  "simulator": {},
+  "simulation_changes": {},
+  "simulation_preview": {},
+  "simulation_trace": {},
+  "simulation_results": {},
+  "simulator_page": {},
+  "rule_notifications": {},
+  "page_navigation": {},
+  "pipeline_notifications": {},
+  "connections_list": {},
+  "rule_list": {
+    "headers": {}
+  },
+  "load_cell": {}
+}
