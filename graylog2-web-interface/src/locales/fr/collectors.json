@@ -821,27 +821,142 @@
       "certificate": "Certificat",
       "copy_to_clipboard": "Copier dans le presse-papiers",
       "private_key": "Clé privée",
-      "view_principal": "Principal :"
+      "view_principal": "Principal :",
+      "view_role": "Rôle :",
+      "generate": "Générer un certificat client",
+      "description": "Générer des certificats clients pour un outil tiers",
+      "title": "Certificat client"
     },
     "cluster_health": {
-      "shard_replication_help": {},
-      "state_help": {}
+      "cluster_manager": "Cluster Manager :",
+      "disabled": "Désactivée",
+      "enabled": "Activée",
+      "nodes_summary": "{{total}} ({{outdated}} obsolète(s), {{upgraded}} mis à niveau(x))",
+      "number_of_nodes": "Nombre de nœuds :",
+      "number_of_shards": "Nombre de shards :",
+      "server_version": "Version du serveur :",
+      "shard_replication": "Réplication des shards :",
+      "shard_replication_help": {
+        "confirm": "Une fois qu'un nœud a été mis à niveau et que vous cliquez sur <emphasis><bold>Confirmer la mise à niveau</bold></emphasis>, la réplication des shards est réactivée et tous les shards devenus indisponibles à cause de la mise à niveau du nœud sont réalloués.",
+        "force_disabled": "Forcée désactivée",
+        "force_enabled": "Forcée activée",
+        "start": "Après avoir cliqué sur <emphasis><bold>Démarrer le processus de mise à niveau</bold></emphasis> pour un nœud, l'allocation des shards est configurée sans réplication, afin qu'OpenSearch n'utilise que les shards disponibles."
+      },
+      "shards_summary": "{{active}} actif(s), {{initializing}} en initialisation, {{relocating}} en relocalisation, {{unassigned}} non assigné(s)",
+      "state_help": {
+        "green": "Une fois qu'un nœud a été mis à niveau et que vous cliquez sur <emphasis>Confirmer la mise à niveau</emphasis>, la réplication des shards est réactivée, tous les shards devenus indisponibles à cause de la mise à niveau du nœud sont réalloués et le cluster revient à l'état VERT.",
+        "question": "Comment l'état de mon cluster change-t-il pendant la mise à niveau progressive ?",
+        "red": "ROUGE : si vous utilisez des index sans réplication et mettez à niveau le nœud qui héberge les shards de ces index, le cluster passera à l'état rouge et aucune donnée ne sera ingérée dans ces index ni recherchable.",
+        "yellow": "JAUNE : après le lancement de la mise à niveau d'un nœud, l'allocation des shards est configurée sans réplication, afin qu'OpenSearch n'utilise que les shards disponibles."
+      }
     },
-    "upgrade_method": {},
-    "upgrade_status": {},
-    "upgrade_nodes": {},
-    "data_node_actions": {},
-    "data_node_badge": {},
-    "data_node_status": {},
-    "data_node_logs": {},
-    "cluster_management": {},
-    "ca_configuration": {},
-    "ca_upload": {},
-    "ca_create": {},
+    "upgrade_method": {
+      "cluster_restart": "Redémarrage du cluster",
+      "cluster_restart_description": "Avec la méthode de redémarrage du cluster, vous mettez à niveau tous les Data Nodes en une seule fois. Pendant ce temps, les messages sont mis en mémoire tampon dans le journal, puis traités lorsque le cluster de Data Nodes redevient disponible. Aucune donnée n'est perdue, à condition que la taille du journal soit configurée pour le volume de messages attendu pendant l'arrêt des Data Nodes.",
+      "cluster_restart_less_than_three": "Si votre cluster de Data Nodes compte moins de trois nœuds, la méthode de redémarrage du cluster est la seule disponible.",
+      "cluster_restart_three_or_more": "Si votre cluster de Data Nodes compte trois nœuds ou plus, vous pouvez choisir la méthode de redémarrage du cluster après avoir évalué la taille de votre journal et votre débit de messages.",
+      "rolling_upgrade": "Mise à niveau progressive",
+      "rolling_upgrade_description": "Les mises à niveau progressives ne peuvent être effectuées sur un cluster de Data Nodes en cours d'exécution qu'avec <bold>trois nœuds ou plus</bold>, avec pratiquement aucune interruption.",
+      "rolling_upgrade_process": "Les Data Nodes sont arrêtés et mis à niveau individuellement sur place. Vous pouvez aussi arrêter les Data Nodes et les remplacer un par un par des hôtes exécutant la nouvelle version. Pendant ce processus, vous pouvez continuer à indexer et interroger les données de votre cluster."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "Tous vos Data Nodes sont à jour.",
+      "checking": "Vérification de l'état d'OpenSearch...",
+      "error": "Impossible de vérifier la version d'OpenSearch intégrée aux Data Nodes.",
+      "outdated": "L'OpenSearch intégré aux Data Nodes n'est pas à jour.",
+      "up_to_date": "L'OpenSearch intégré aux Data Nodes est à jour.",
+      "up_to_date_with_version": "L'OpenSearch intégré aux Data Nodes est à jour <bold>({{version}}).</bold>",
+      "upgrading": "La mise à niveau progressive d'OpenSearch est en cours."
+    },
+    "upgrade_nodes": {
+      "manager": "manager",
+      "no_outdated_nodes": "Aucun nœud obsolète trouvé.",
+      "no_upgraded_nodes": "Aucun nœud mis à niveau trouvé.",
+      "outdated_nodes": "Nœuds obsolètes",
+      "start_upgrade": "Démarrer le processus de mise à niveau",
+      "upgraded": "Mis à niveau",
+      "upgraded_nodes": "Nœuds mis à niveau"
+    },
+    "data_node_actions": {
+      "rejoin": "Rejoindre",
+      "remove": "Retirer",
+      "renew_certificate": "Renouveler le certificat",
+      "show_logs": "Afficher les logs",
+      "start": "Démarrer",
+      "stop": "Arrêter",
+      "rejoin_title": "Rejoindre le Data Node",
+      "rejoin_confirm": "Voulez-vous vraiment faire rejoindre le Data Node \"{{hostname}}\" ?",
+      "remove_title": "Retirer le Data Node",
+      "remove_confirm": "Voulez-vous vraiment retirer le Data Node \"{{hostname}}\" ?",
+      "stop_title": "Arrêter le Data Node",
+      "stop_confirm": "Voulez-vous vraiment arrêter le Data Node \"{{hostname}}\" ?"
+    },
+    "data_node_badge": {
+      "short_node_id": "ID court du nœud"
+    },
+    "data_node_status": {
+      "queued_for": "en file d'attente pour {{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "Aucun log.",
+      "title": "Logs de {{hostname}}"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Affichez les métriques de performance de votre Data Node et de votre cluster OpenSearch géré.",
+      "teaser_license_warning": "Veuillez vous assurer de disposer d'une licence valide et d'un Data Node configuré pour afficher les métriques de performance de votre Data Node et de votre cluster OpenSearch géré."
+    },
+    "ca_configuration": {
+      "create_tab": "Créer une nouvelle CA",
+      "description_provision": "L'autorité de certification provisionnera et gérera plus facilement les certificats de vos Data Nodes.",
+      "description_upload_or_create": "À cette étape, vous pouvez soit importer, soit créer une nouvelle autorité de certification.",
+      "reusing_certificates": "Si votre cluster existant utilise des certificats, ceux-ci seront par défaut remplacés par la CA de {{productName}} et par des certificats générés automatiquement lors du provisionnement des Data Nodes à l'étape suivante. Si vous souhaitez inclure votre propre CA, vous pouvez importer un certificat existant. Pour plus d'informations, consultez <docsLink>{{productName}} Data Node - Prise en main</docsLink>.",
+      "reusing_certificates_title": "Réutilisation des certificats",
+      "title": "Configurer l'autorité de certification",
+      "upload_tab": "Importer une CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "Autorité de certification",
+      "dropzone": "Glissez la CA ici ou cliquez pour sélectionner un fichier",
+      "explanation": "Vous pouvez ici importer votre CA existante. Vous devez importer un fichier unique contenant la clé privée (chiffrée ou non), le certificat de la CA ainsi que les éventuels certificats intermédiaires. Le fichier peut être au format PEM ou PKCS#12. Si votre clé privée est chiffrée, vous devez également fournir son mot de passe.",
+      "failed": "Échec de l'import de la CA : {{error}}",
+      "password": "Mot de passe",
+      "rejected": "Échec de l'import de la CA",
+      "submit": "Importer la CA",
+      "submitting": "Import de la CA...",
+      "success": "CA importée avec succès"
+    },
+    "ca_create": {
+      "description": "Cliquez sur le bouton « Créer la CA » pour créer rapidement une nouvelle autorité de certification pour vos Data Nodes {{productName}}.",
+      "failed": "Échec de la création de la CA : {{error}}",
+      "organization_name": "Nom de l'organisation",
+      "submit": "Créer la CA",
+      "submitting": "Création de la CA...",
+      "success": "CA créée avec succès"
+    },
     "renewal_policy": {
-      "modes": {}
+      "certificate_lifetime": "Durée de validité du certificat :",
+      "certificate_lifetime_label": "Durée de validité du certificat",
+      "configure": "Configurer la politique de renouvellement des certificats",
+      "description": "Ces paramètres seront utilisés pour détecter l'expiration des certificats et/ou pour les renouveler.",
+      "edit": "Modifier la configuration",
+      "lifetime_explanation": "La durée de validité du certificat sera utilisée pour la validité des certificats nouvellement créés.",
+      "mode_explanation": "Si la politique de renouvellement est définie sur « Automatique », tous les certificats arrivant à expiration seront renouvelés sans aucune intervention de l'utilisateur. Si elle est définie sur « Manuel », une notification système sera créée lorsqu'un ou plusieurs certificats sont sur le point d'expirer, afin que vous puissiez confirmer leur renouvellement.",
+      "renewal_mode": "Mode de renouvellement :",
+      "renewal_mode_label": "Mode de renouvellement des certificats",
+      "select_mode": "Sélectionner le mode de renouvellement des certificats",
+      "submit": "Mettre à jour la configuration",
+      "submitting": "Mise à jour de la configuration",
+      "title": "Configuration de la politique de renouvellement des certificats",
+      "update_failed": "Erreur lors de la mise à jour de la politique de renouvellement des certificats : {{error}}",
+      "update_failed_title": "Impossible de mettre à jour la politique de renouvellement des certificats",
+      "modes": {
+        "automatic": "Automatique",
+        "manual": "Manuel"
+      }
     },
-    "details_page": {},
+    "details_page": {
+      "certificate_valid_until": "Certificat valable jusqu'au :"
+    },
     "pages": {},
     "upgrade_page": {},
     "migration_steps": {},
