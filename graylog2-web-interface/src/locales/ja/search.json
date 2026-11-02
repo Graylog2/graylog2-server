@@ -387,25 +387,138 @@
     "highest_aria": "最大値を指定",
     "highest_label": "最大値",
     "highest_help": "フィールドまたは系列で想定される最大値です。",
-    "coloring": "配色"
+    "coloring": "配色",
+    "static_color": "固定の色",
+    "gradient": "グラデーション",
+    "must_be_selected": "選択してください。",
+    "must_be_present": "入力してください。",
+    "must_be_number": "数値である必要があります。",
+    "must_be_higher": "最小値より大きい値である必要があります。",
+    "coloring_required": "配色は必須です",
+    "gradient_numeric_only": "グラデーションは数値フィールドに対してのみ定義できます。"
   },
-  "highlighting_rule": {},
-  "change_field_type": {},
-  "value_actions": {},
+  "highlighting_rule": {
+    "edit": "このハイライトルールを編集",
+    "remove": "このハイライトルールを削除",
+    "confirm_remove": "このハイライトを本当に削除しますか？"
+  },
+  "change_field_type": {
+    "no_permission_title": "権限がありません",
+    "no_permission_description": "この操作を実行する権限がありません",
+    "enterprise_plugin_required": "（<enterpriseLink>Enterpriseプラグイン</enterpriseLink>が必要です）",
+    "modal_title": "{{fieldName}} フィールドのタイプを変更",
+    "impact_warning": "フィールド <bold>{{fieldName}}</bold> のタイプを変更すると、今後取り込まれるログメッセージに大きな影響を与える可能性があります。取り込んでいるログと互換性のないタイプをフィールドに設定すると、取り込みエラーが発生する可能性があります。",
+    "failure_processing_hint": "<docsLink>Failure Processing</docsLink>を有効にし、その後は<failureStream/>ストリームを注意深く監視することをお勧めします。",
+    "select_field_type_for": "{{fieldName}} のフィールドタイプを選択",
+    "select_field_type_for_field": "フィールドのフィールドタイプを選択",
+    "select_field_type": "フィールドタイプを選択",
+    "select_index_sets": "対象のインデックスセットを選択",
+    "index_sets_hint_with_type": "デフォルトでは、現在のメッセージ/検索のすべてのインデックスセットで、<bold>{{fieldName}}</bold> フィールドに <bold>{{type}}</bold> フィールドタイプが設定されます。変更を適用するインデックスセットを選択できます。",
+    "index_sets_hint": "デフォルトでは、現在のメッセージ/検索のすべてのインデックスセットで、<bold>{{fieldName}}</bold> フィールドに選択したフィールドタイプが設定されます。変更を適用するインデックスセットを選択できます。",
+    "select_rotation_strategy": "ローテーション戦略を選択",
+    "rotation_hint_type_field": "<bold>{{fieldName}}</bold> のフィールドタイプとして <bold>{{type}}</bold> を表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint_type": "フィールドタイプとして <bold>{{type}}</bold> を表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint_field": "<bold>{{fieldName}}</bold> のフィールドタイプとして選択したフィールドタイプを表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint": "フィールドタイプとして選択したフィールドタイプを表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotate_indices": "変更後に影響を受けるインデックスをローテーション",
+    "changing": "フィールドタイプを変更しています...",
+    "change": "フィールドタイプを変更",
+    "select_field": "フィールドを選択",
+    "select_field_placeholder": "フィールドを選択または入力",
+    "type_not_defined": "タイプが定義されていません",
+    "previous_values": "（以前の値: {{values}}）",
+    "load_index_field_types_failed": "インデックスのフィールドタイプの読み込みに失敗しました。ステータス:",
+    "could_not_load_index_field_types": "インデックスのフィールドタイプを読み込めませんでした",
+    "load_field_type_options_failed": "フィールドタイプのオプションの読み込みに失敗しました。ステータス:",
+    "could_not_load_field_type_options": "フィールドタイプのオプションを読み込めませんでした",
+    "load_field_types_failed": "{{field}} のタイプの読み込みに失敗しました。ステータス:",
+    "could_not_load_field_types": "フィールドタイプを読み込めませんでした",
+    "load_index_sets_failed": "フィールドタイプの変更に対応したインデックスセットの読み込みに失敗しました。ステータス:",
+    "could_not_load_index_sets": "フィールドタイプの変更に対応したインデックスセットを読み込めませんでした",
+    "change_failed": "フィールドタイプの変更に失敗しました。ステータス: {{error}}",
+    "change_failed_title": "フィールドタイプを変更できませんでした",
+    "change_success": "フィールドタイプが正常に変更されました",
+    "success_title": "成功しました！"
+  },
+  "value_actions": {
+    "select_extractor_type": "エクストラクタータイプを選択",
+    "exclude": "結果から除外",
+    "add_to_query": "クエリに追加",
+    "show_documents": "この値のドキュメントを表示",
+    "create_extractor": "エクストラクターを作成",
+    "highlight_value": "この値をハイライト",
+    "create_event_definition": "イベント定義を作成",
+    "copy_value": "値をクリップボードにコピー"
+  },
   "create_event_definition": {
-    "sections": {},
-    "items": {},
+    "title": "新しいイベント定義を設定",
+    "hide_details": "ストラテジーの詳細を非表示",
+    "show_details": "ストラテジーの詳細を表示",
+    "continue": "設定を続行",
+    "strategy_by": "ストラテジー:",
+    "description": "説明:",
+    "sections": {
+      "aggregation": "集計の設定",
+      "search": "検索クエリ"
+    },
+    "items": {
+      "rowValuePath": "テーブルの行からのクエリ",
+      "columnValuePath": "テーブルの列からのクエリ",
+      "columnGroupBy": "列の値でグループ化",
+      "rowGroupBy": "行の値でグループ化",
+      "aggCondition": "条件",
+      "queryWithReplacedParams": "検索からのクエリ",
+      "searchFilterQuery": "検索フィルターからのクエリ",
+      "streams": "ストリーム",
+      "searchWithinMs": "検索範囲（ミリ秒）",
+      "lutParameters": "ルックアップテーブルのパラメーター",
+      "searchFromValue": "値からのクエリ"
+    },
+    "item_label": "{{label}}: ",
     "strategies": {
-      "EXACT": {},
-      "ROW": {},
-      "COL": {},
-      "ALL": {},
-      "CUSTOM": {}
+      "EXACT": {
+        "label": "この値のみ",
+        "description": "ストラテジーには、現在の検索ビューに関連するすべての検索クエリ、フィルターなどが含まれます"
+      },
+      "ROW": {
+        "label": "行内のいずれか",
+        "description": "ストラテジーには行のピボットが含まれます"
+      },
+      "COL": {
+        "label": "列内のいずれか",
+        "description": "ストラテジーには列のピボットが含まれます"
+      },
+      "ALL": {
+        "label": "ウィジェット内のいずれか",
+        "description": "ストラテジーには、選択した値に関連するすべての行と列のピボット値が含まれます"
+      },
+      "CUSTOM": {
+        "label": "カスタム",
+        "description": "任意の検索部分を選択できます"
+      }
     }
   },
-  "view_errors": {},
-  "views_notifications": {},
-  "field_actions": {},
+  "view_errors": {
+    "something_went_wrong": "問題が発生しました",
+    "unknown_error": "不明なエラーが発生しました。詳細については、次のメッセージと{{productName}}サーバーのログを確認してください。"
+  },
+  "views_notifications": {
+    "delete_view_failed": "ビュー {{title}} の削除に失敗しました。ステータス: {{error}}",
+    "delete_view_failed_title": "ビューを削除できませんでした",
+    "apply_widget_changes_failed": "ウィジェットの変更の適用に失敗しました。ステータス: {{error}}",
+    "load_message_failed": "メッセージ情報の読み込みに失敗しました。ステータス:",
+    "could_not_load_message": "メッセージ情報を読み込めませんでした"
+  },
+  "field_actions": {
+    "chart": "チャート",
+    "show_top_values": "上位の値を表示",
+    "statistics": "統計",
+    "add_to_table": "テーブルに追加",
+    "remove_from_table": "テーブルから削除",
+    "add_to_all_tables": "すべてのテーブルに追加",
+    "remove_from_all_tables": "すべてのテーブルから削除",
+    "change_field_type": "フィールドタイプを変更"
+  },
   "aggregation": {},
   "widget_creators": {},
   "message_details": {},
