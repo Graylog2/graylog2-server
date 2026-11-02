@@ -1,1 +1,129 @@
-{}
+{
+  "navigation": {
+    "initial_setup": "Configuração inicial do {{productName}}",
+    "get_help": "Obter ajuda",
+    "documentation": "Documentação",
+    "changelogs": "Notas de versão",
+    "operations_changelogs": "Notas de versão do Operations",
+    "support": "Suporte"
+  },
+  "setup": {
+    "welcome": "Bem-vindo!",
+    "first_start": "Parece que você está iniciando o {{productName}} pela primeira vez e ainda não configurou um data node.",
+    "data_nodes_allow": "Os data nodes permitem indexar e pesquisar todas as mensagens no banco de dados de mensagens do {{productName}}.",
+    "data_node_setup": "Você pode implementar um <dataNodeLink>data node do {{productName}}</dataNodeLink> (recomendado) ou configurar manualmente um nó do <openSearchLink>OpenSearch</openSearchLink>. Para a configuração manual do OpenSearch, é preciso ajustar a configuração do {{productName}} e reiniciar o servidor do {{productName}}. Após a reinicialização, esta página não será mais exibida.",
+    "data_nodes_title": "Data Nodes do {{productName}}"
+  },
+  "data_nodes": {
+    "description": "Os data nodes do {{productName}} oferecem melhor integração com o {{productName}} e simplificam atualizações futuras. Quando um data node do {{productName}} estiver em execução e você tiver configurado a autoridade certificadora, poderá retomar a inicialização.",
+    "registered": "Estes são os data nodes atualmente registrados. A lista é atualizada constantemente.",
+    "transport_address": "Endereço de transporte",
+    "hostname": "Nome do host",
+    "separator": " – ",
+    "none_found": "Nenhum data node foi encontrado."
+  },
+  "waiting_for_startup": {
+    "title": "Configuração concluída com sucesso",
+    "description": "O servidor do {{productName}} está iniciando. Dependendo da sua configuração, isso pode levar alguns minutos. Esta página será atualizada automaticamente assim que o servidor do {{productName}} estiver acessível. Você pode atualizar manualmente a qualquer momento, mas esteja ciente de que esta página não ficará mais visível depois.",
+    "spinner": "Aguardando o servidor do {{productName}} ..."
+  },
+  "error_boundary": {
+    "title": "Algo deu errado",
+    "description": "Ocorreu um erro desconhecido. Consulte a mensagem a seguir e o log do servidor do {{productName}} para mais informações."
+  },
+  "resume_startup": {
+    "button": "Retomar inicialização",
+    "confirm": "Tem certeza de que deseja retomar a inicialização sem um data node do {{productName}} em execução? Isso fará com que a configuração volte a usar uma instância do Opensearch em localhost:9200.",
+    "error": "A retomada da inicialização falhou com o erro: {{error}}",
+    "error_title": "Não foi possível retomar a inicialização"
+  },
+  "restart_configuration": {
+    "confirm": "Tem certeza de que deseja reiniciar a configuração? Todas as alterações anteriores serão excluídas.",
+    "restart": "reiniciar",
+    "restarting": "reiniciando..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "Você pode sempre <restartButton>reiniciar</restartButton> a configuração",
+    "fetch_error": "Ocorreu um erro ao buscar {{entityName}}: {{message}}"
+  },
+  "entities": {
+    "data_nodes": "data nodes",
+    "certificate_authority": "autoridade certificadora",
+    "renewal_policy": "política de renovação"
+  },
+  "steps": {
+    "ca_configuration": "Configurar uma autoridade certificadora",
+    "renewal_policy_configuration": "Configurar uma política de renovação",
+    "certificate_provisioning": "Provisionar certificados para os seus data nodes",
+    "configuration_finished": "Configuração concluída"
+  },
+  "ca_configuration": {
+    "title": "Configurar autoridade certificadora",
+    "explanation_upload_or_create": "Nesta primeira etapa, você pode fazer upload ou criar uma nova autoridade certificadora.",
+    "explanation_provisioning": "Com ela, podemos provisionar facilmente certificados para os seus data nodes.",
+    "create_tab": "Criar nova CA",
+    "upload_tab": "Fazer upload de CA"
+  },
+  "ca_create": {
+    "description": "Aqui você pode criar rapidamente uma nova autoridade certificadora. Basta clicar no botão “Criar CA”. A CA deve ser usada apenas para proteger os seus data nodes do {{productName}}.",
+    "organization_name": "Nome da organização",
+    "creating": "Criando CA...",
+    "create": "Criar CA",
+    "success": "CA criada com sucesso",
+    "error": "Falha ao criar a CA com o erro: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Aqui você pode fazer upload da sua CA existente. É necessário enviar um único arquivo contendo a chave privada (criptografada ou não), o certificado da CA e quaisquer certificados intermediários. O arquivo pode estar no formato PEM ou PKCS#12. Se a sua chave privada estiver criptografada, também será necessário informar a senha dela.",
+    "certificate_authority": "Autoridade certificadora",
+    "drop_hint": "Arraste a CA até aqui ou clique para selecionar o arquivo",
+    "rejected": "Falha no upload da CA",
+    "password": "Senha",
+    "uploading": "Fazendo upload da CA...",
+    "upload": "Fazer upload da CA",
+    "success": "CA enviada com sucesso",
+    "error": "Falha no upload da CA com o erro: {{error}}",
+    "validation_missing_file": "Faça upload de um arquivo.",
+    "validation_multiple_files": "Faça upload de apenas um arquivo."
+  },
+  "certificate_provisioning": {
+    "title": "Provisionar certificados",
+    "configured": "A autoridade certificadora foi configurada com sucesso.",
+    "ready": "Agora você pode provisionar certificados para os seus data nodes.",
+    "data_node_required": "Pelo menos um data node do {{productName}} precisa estar em execução antes que o certificado possa ser provisionado.",
+    "started": "Provisionamento de certificado iniciado com sucesso",
+    "error": "Falha ao iniciar o provisionamento de certificado com o erro: {{error}}",
+    "provisioning": "Provisionando certificado...",
+    "provision": "Provisionar certificado e continuar",
+    "skip": "Pular provisionamento"
+  },
+  "renewal_policy": {
+    "title": "Configurar política de renovação",
+    "explanation_automatic": "Nesta etapa, você pode configurar se os certificados próximos da expiração devem ser renovados automaticamente.",
+    "explanation_manual": "Se você escolher a renovação manual, uma notificação do sistema será exibida quando a data de expiração estiver próxima, exigindo que você confirme a renovação.",
+    "policy": "Política de renovação",
+    "select_policy": "Selecionar política de renovação",
+    "automatic": "Automática",
+    "manual": "Manual",
+    "certificate_lifetime": "Validade do certificado",
+    "enter_lifetime": "Informar validade",
+    "select_unit": "Selecionar unidade",
+    "unit_hours": "Hora(s)",
+    "unit_days": "Dia(s)",
+    "unit_months": "Mês(es)",
+    "unit_years": "Ano(s)",
+    "min_lifetime": "Deve ser de pelo menos {{duration}}",
+    "creating": "Criando política...",
+    "create": "Criar política",
+    "success": "Política de renovação criada com sucesso",
+    "error": "Falha ao criar a política de renovação com o erro: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "Sua conexão não é segura. Esteja ciente de que as informações serão enviadas ao servidor sem criptografia.",
+    "maybe_not_secure": "Sua conexão pode não ser segura. Esteja ciente de que as informações podem ser enviadas ao servidor sem criptografia."
+  },
+  "configuration_finished": {
+    "title": "Configuração concluída",
+    "skipped_provisioning": "Você concluiu a configuração com sucesso. Você ainda pode <goBackButton>voltar</goBackButton> para provisionar os certificados.",
+    "provisioned": "O provisionamento foi bem-sucedido e todos os data nodes estão protegidos e acessíveis."
+  }
+}

@@ -1,1 +1,562 @@
-{}
+{
+  "button": {
+    "perform_search": "Executar pesquisa",
+    "perform_search_dirty": "Executar pesquisa (alterações feitas após a última execução)"
+  },
+  "sidebar": {
+    "description": "Descrição",
+    "create": "Criar",
+    "highlighting": "Destaque",
+    "fields": "Campos"
+  },
+  "empty_state": {
+    "no_widgets_search": "Não há widgets definidos para visualizar o resultado da pesquisa",
+    "no_widgets_dashboard": "Este dashboard ainda não tem widgets",
+    "create_widget_hint": "Crie um novo widget selecionando um tipo de widget na seção \"Criar\" da barra lateral esquerda.",
+    "tips_title": "Algumas dicas para criar pesquisas e dashboards",
+    "tip_1": "Comece com uma <bold>pergunta</bold> que você deseja responder. Defina o problema que você quer resolver.",
+    "tip_2": "<bold>Limite</bold> os dados apenas aos pontos de dados que você quer ver.",
+    "tip_3": "<bold>Visualize</bold> os dados. Eles respondem à sua pergunta?",
+    "tip_4": "<bold>Compartilhe</bold> o dashboard com seus colegas. Prepare-o para <bold>reutilização</bold> usando parâmetros"
+  },
+  "search_bar": {
+    "streams_placeholder": "Selecione os streams que a pesquisa deve incluir. Pesquisa em todos os streams se vazio.",
+    "refresh_human_name": "Pesquisar",
+    "query_history_title": "Abrir histórico de consultas",
+    "filters_label": "Filtros",
+    "filters_tooltip_title": "Filtros de pesquisa",
+    "filters_enterprise_hint": "Filtros e parâmetros de pesquisa estão disponíveis na versão Enterprise.",
+    "filters_hide_controls": "Ocultar controles",
+    "scroll_hint": "Rolar até a barra de pesquisa",
+    "query_placeholder": "Digite sua consulta de pesquisa aqui e pressione Enter. Ex.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Pesquisa salva",
+    "save_search": "Salvar pesquisa",
+    "unsaved_changes": "Alterações não salvas",
+    "load_title": "Carregar uma pesquisa salva anteriormente",
+    "load": "Carregar",
+    "share_disabled": "Somente pesquisas salvas podem ser compartilhadas.",
+    "dropdown_aria_label": "Abrir menu de ações da pesquisa",
+    "edit_metadata": "Editar metadados",
+    "export_to_dashboard": "Exportar para dashboard",
+    "export": "Exportar",
+    "reset_search": "Redefinir pesquisa",
+    "editing_modal_title": "Editando pesquisa salva",
+    "update_search": "Atualizar pesquisa",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta pesquisa salva.",
+    "save_success": "A visualização \"{{title}}\" foi salva com sucesso!",
+    "save_error": "Falha ao salvar a visualização: {{error}}",
+    "delete_success": "A pesquisa salva \"{{title}}\" foi excluída com sucesso!",
+    "delete_error": "Falha ao excluir a pesquisa salva: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Nome da pesquisa",
+    "dirty_warning": "Há alterações não confirmadas nos parâmetros da pesquisa (intervalo de tempo, streams ou consulta). Salvar agora as descartará. Se não for intencional, execute a pesquisa para aplicar suas alterações antes de salvar.",
+    "title_label": "Título",
+    "title_placeholder": "Digite o título",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta pesquisa.",
+    "create_new": "Criar nova",
+    "save_as": "Salvar como",
+    "create_new_title": "Criar nova pesquisa",
+    "save_as_title": "Salvar como nova pesquisa",
+    "save": "Salvar",
+    "save_title": "Salvar pesquisa",
+    "cancel": "Cancelar"
+  },
+  "results": {
+    "loading": "Atualizando resultados da pesquisa..."
+  },
+  "sidebar_description": {
+    "execution": "Execução",
+    "ad_hoc_info": "Salve a pesquisa ou exporte-a para um dashboard para adicionar um resumo e uma descrição personalizados.",
+    "edit_metadata_hint": "Para adicionar uma descrição e um resumo para este {{viewType}}, clique no ícone <icon/> na barra de pesquisa para abrir o menu de ações. O menu inclui a opção \"Editar metadados\".",
+    "search_section": "Pesquisa",
+    "no_summary": "Este {{viewType}} não tem resumo.",
+    "no_description": "Este {{viewType}} não tem descrição.",
+    "no_query": "Nenhuma consulta executada ainda.",
+    "query_executed_in": "Consulta executada em",
+    "effective_time_range": "Intervalo de tempo efetivo",
+    "varies_per_widget": "Varia por widget",
+    "time_from": "De",
+    "time_to": "Até",
+    "total_results": "Total de resultados"
+  },
+  "sidebar_create": {
+    "info": "Use as opções a seguir para adicionar uma agregação, uma visualização de logs (recurso Enterprise) ou parâmetros (recurso Enterprise) à sua pesquisa.",
+    "generic": "Genérico",
+    "predefined_aggregation": "Agregação predefinida",
+    "investigations": "Investigações",
+    "events": "Eventos"
+  },
+  "sidebar_highlighting": {
+    "description": "Termos de pesquisa e valores de campos podem ser destacados. O destaque da consulta de pesquisa nos resultados pode ser ativado/desativado na configuração do servidor {{productName}}. Qualquer valor de campo pode ser destacado clicando no valor e selecionando \"Destacar este valor\".\nSe um termo ou um valor tiver mais de uma regra, a primeira regra correspondente é usada.",
+    "active_highlights": "Destaques ativos",
+    "add_rule_title": "Adicionar regra de destaque",
+    "search_terms": "Termos de pesquisa"
+  },
+  "save_view": {
+    "save": "Salvar",
+    "save_as": "Salvar como",
+    "save_as_new_dashboard_title": "Salvar como novo dashboard",
+    "save_dashboard_title": "Salvar dashboard"
+  },
+  "undo_redo": {
+    "undo": "Desfazer",
+    "redo": "Refazer"
+  },
+  "time_range": {
+    "tab_relative": "Relativo",
+    "tab_absolute": "Absoluto",
+    "tab_keyword": "Palavra-chave",
+    "from_label": "De:",
+    "until_label": "Até:",
+    "keyword_label": "Palavra-chave:",
+    "no_override": "Sem substituição",
+    "now": "Agora",
+    "all_time": "Todo o período",
+    "ago": "atrás",
+    "range_ago": "{{time}} atrás",
+    "range_length_placeholder": "Selecione a duração do intervalo",
+    "load_preset": "Carregar predefinição",
+    "no_available_presets": "Nenhuma predefinição disponível",
+    "loading": "Carregando...",
+    "configure_presets": "Configurar predefinições",
+    "insert_current_date": "Inserir data atual",
+    "from_hours_label": "rótulo de horas (de)",
+    "from_minutes_label": "rótulo de minutos (de)",
+    "from_seconds_label": "rótulo de segundos (de)",
+    "to_hours_label": "rótulo de horas (até)",
+    "to_minutes_label": "rótulo de minutos (até)",
+    "to_seconds_label": "rótulo de segundos (até)",
+    "from_hour": "de hora",
+    "from_minutes": "de minutos",
+    "from_seconds": "de segundos",
+    "to_hour": "até hora",
+    "to_minutes": "até minutos",
+    "to_seconds": "até segundos",
+    "toggle_day_boundary": "Alternar entre início e fim do dia",
+    "set_current_time": "Definir para o horário local atual",
+    "set_range_value": "Definir o valor do intervalo",
+    "set_from_value": "Definir o valor inicial",
+    "set_to_value": "Definir o valor final",
+    "save_as_preset": "Salvar como predefinição",
+    "save_current_as_preset": "Salvar intervalo de tempo atual como predefinição",
+    "preset_description_placeholder": "Adicionar descrição...",
+    "preset_description_label": "Descrição do intervalo de tempo",
+    "preset_description_required": "A descrição é obrigatória",
+    "preset_similar": "Você já tem um intervalo de tempo semelhante em <configurationsLink>Configuração de intervalos</configurationsLink>",
+    "save_preset": "Salvar predefinição",
+    "calendar": "Calendário",
+    "timestamp": "Timestamp",
+    "date_format": "A data deve estar no formato <code>{{format}}</code>.",
+    "from_timestamp": "Timestamp inicial",
+    "to_timestamp": "Timestamp final",
+    "no_override_title": "Nenhuma substituição de data/hora escolhida.",
+    "no_override_hint": "Use as abas acima para escolher um intervalo de data e hora para pesquisar.",
+    "keyword_from": "De",
+    "keyword_to": "Até",
+    "keyword_headline": "Intervalo de tempo:",
+    "keyword_input": "Entrada de palavra-chave",
+    "keyword_help": "Especifique o período da pesquisa em linguagem natural.",
+    "keyword_preview": "Pré-visualização",
+    "keyword_example_last_month": "<code>{{keyword}}</code> pesquisa entre um mês atrás e agora",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> pesquisa entre quatro horas atrás e agora",
+    "keyword_example_range": "<code>{{keyword}}</code> pesquisa entre 1º de abril e 2 dias atrás",
+    "keyword_example_timezone": "<code>{{keyword}}</code> pesquisa entre a meia-noite de ontem e a meia-noite de hoje no fuso +0200 — será 22:00 em UTC",
+    "keyword_docs": "Consulte a <docsLink>documentação</docsLink> para mais detalhes.",
+    "keyword_docs_title": "Documentação do intervalo de tempo por palavra-chave",
+    "display_label": "Intervalo de tempo da pesquisa, abre o seletor de intervalo ao clicar",
+    "picker_title": "Intervalo de tempo da pesquisa",
+    "admin_limit": "O administrador limitou a pesquisa a {{duration}}",
+    "update": "Atualizar intervalo de tempo",
+    "open_selector": "Abrir seletor de intervalo de tempo",
+    "timezones_using": "Todos os fusos horários usando: <bold>{{timezone}}</bold>",
+    "unit_seconds": "Segundos",
+    "unit_minutes": "Minutos",
+    "unit_hours": "Horas",
+    "unit_days": "Dias"
+  },
+  "execution_info": {
+    "query_executed": "Consulta executada em {{duration}}ms às",
+    "total_results": "Total de resultados: {{total}}",
+    "no_query": "Nenhuma consulta executada ainda."
+  },
+  "highlight_form": {
+    "edit_title": "Editar regra de destaque",
+    "create_title": "Criar regra de destaque",
+    "field_label": "Campo",
+    "field_placeholder": "Selecione ou digite o nome do campo",
+    "field_required": "O campo é obrigatório",
+    "condition_label": "Condição",
+    "condition_placeholder": "Escolha uma condição",
+    "condition_required": "A condição é obrigatória",
+    "value_label": "Valor",
+    "value_required": "O valor é obrigatório",
+    "update_rule": "Atualizar regra",
+    "create_rule": "Criar regra"
+  },
+  "query_tabs": {
+    "create_page": "Criar nova página",
+    "more_pages": "Mais páginas do dashboard",
+    "open_configuration": "Abrir configuração de páginas",
+    "copy_page": "Copiar página",
+    "copying_page": "Copiando página...",
+    "copy_page_failed": "Falha ao copiar a página do dashboard com o erro {{error}}",
+    "remove_page": "Remover página {{title}}",
+    "configuration_title": "Atualizar configuração das páginas do dashboard",
+    "update_configuration": "Atualizar configuração",
+    "order": "Ordem",
+    "order_help": "Use arrastar e soltar para alterar a ordem das páginas do dashboard. Clique duas vezes no título de um dashboard para alterá-lo."
+  },
+  "widget_creation": {
+    "title": "Criar novo widget",
+    "create_widget": "Criar widget {{title}}",
+    "placeholder": "Crie um novo widget aqui",
+    "scroll_to_new_widget": "Rolar até o novo widget"
+  },
+  "dashboard_actions": {
+    "immutable": "Este dashboard é somente leitura porque é gerenciado pelo {{productName}}. Use \"Salvar como\" para criar uma cópia editável.",
+    "debug": "Depurar",
+    "share_unsaved": "Somente dashboards salvos podem ser compartilhados.",
+    "edit_metadata": "Editar metadados",
+    "export": "Exportar",
+    "save_new_title": "Salvar novo dashboard",
+    "create": "Criar dashboard",
+    "edit_title": "Editando dashboard",
+    "update": "Atualizar dashboard",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador deste dashboard."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Aplicar filtro a todos os widgets"
+  },
+  "debug": {
+    "title": "Informações de depuração"
+  },
+  "common_views": {
+    "empty_value": "<Valor vazio>",
+    "add_to_query": "Adicionar à consulta",
+    "time_range_validation": {
+      "invalid_date_format": "O formato deve ser: {{format}}.",
+      "range_limit": "O intervalo está fora da duração limite.",
+      "date_limit": "A data está fora da duração limite.",
+      "until_before_from": "A data \"Até\" deve vir depois da data \"De\".",
+      "empty": "Não pode estar vazio.",
+      "keyword_empty": "A palavra-chave não pode estar vazia!",
+      "keyword_unparsable": "Não foi possível interpretar a palavra-chave"
+    },
+    "remove_from_favorites": "Remover dos favoritos",
+    "add_to_favorites": "Adicionar aos favoritos",
+    "view_type": {
+      "search": "pesquisa",
+      "dashboard": "dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Migrar gráficos existentes da página de pesquisa",
+    "found_charts_one": "Encontramos {{count}} gráfico criado para uma versão anterior da pesquisa. Deseja migrar este gráfico para a pesquisa atual?",
+    "found_charts_other": "Encontramos {{count}} gráficos criados para uma versão anterior da pesquisa. Deseja migrar esses gráficos para a pesquisa atual?",
+    "save_hint": "Quando você executar a migração e quiser manter os gráficos recém-criados, será necessário salvar a pesquisa atual como um novo dashboard. Caso contrário, os gráficos serão perdidos ao sair da página de pesquisa.",
+    "migrate": "Migrar",
+    "discard": "Descartar gráficos",
+    "found_charts_many": "Encontramos {{count}} gráficos criados para uma versão anterior da pesquisa. Deseja migrar esses gráficos para a pesquisa atual?"
+  },
+  "query": {
+    "contained_in_enterprise": "(incluído no <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "Você também pode consultar a <docsLink>documentação</docsLink> para saber mais sobre a criação de widgets."
+  },
+  "widget_query": {
+    "reset_global_filter": "Redefinir filtro global"
+  },
+  "editable_title": {
+    "edit": "Editar título",
+    "hint": "{{value}} - Clique duas vezes no título para editá-lo."
+  },
+  "message_permalink": {
+    "label": "Link permanente"
+  },
+  "query_title": {
+    "page_actions": "Ações da página",
+    "edit_title": "Editar título",
+    "duplicate": "Duplicar",
+    "copy_to_dashboard": "Copiar para dashboard",
+    "edit_modal_title": "Editando título da página do dashboard",
+    "update_title": "Atualizar título",
+    "title_help": "Digite um título útil para a página do dashboard. Ele tem no máximo 40 caracteres.",
+    "title": "Título"
+  },
+  "missing_requirements": {
+    "description_search": "Infelizmente, não é possível executar esta pesquisa. Ela usa os seguintes recursos, que não estão disponíveis:",
+    "description_dashboard": "Infelizmente, não é possível executar este dashboard. Ele usa os seguintes recursos, que não estão disponíveis:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - incluído em <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Voltar"
+  },
+  "view_header": {
+    "alerts_and_events": "Alertas e eventos",
+    "event_definitions": "Definições de evento",
+    "edit_search_metadata": "Editar metadados da pesquisa {{title}}",
+    "edit_dashboard_metadata": "Editar metadados do dashboard {{title}}",
+    "editing_search": "Editando pesquisa salva",
+    "editing_dashboard": "Editando dashboard salvo",
+    "save_search": "Salvar pesquisa",
+    "save_dashboard": "Salvar dashboard"
+  },
+  "execution": {
+    "not_executed": "Nenhuma consulta executada ainda."
+  },
+  "dashboards_page": {
+    "documentation": "Documentação de dashboards",
+    "description": "Use dashboards para criar visualizações específicas das suas mensagens. Crie um novo dashboard aqui e adicione com um clique qualquer gráfico criado em outras partes do aplicativo."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Filtros de pesquisa</italic> contêm sua própria consulta e estendem a consulta principal usando o operador <bold>AND</bold>.",
+    "explanation_saved": "Os filtros podem ser salvos separadamente e reutilizados em pesquisas salvas e dashboards. Atualizar um filtro salvo afetará automaticamente os resultados das pesquisas que incluem o filtro."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Redefinir substituição global"
+  },
+  "time_range_presets": {
+    "select_time_range": "Selecionar intervalo de tempo",
+    "open_preset_select": "Abrir seleção de predefinição de intervalo de tempo"
+  },
+  "move_range": {
+    "show_previous": "Mostrar anterior",
+    "show_previous_duration": "Mostrar {{duration}} anteriores",
+    "show_next": "Mostrar próximo",
+    "show_next_duration": "Mostrar próximos {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "Alternar aviso de validação",
+    "toggle_information": "Alternar informações de validação",
+    "toggle_error": "Alternar explicação do erro de validação",
+    "syntax_documentation": "Documentação da sintaxe da consulta de pesquisa",
+    "error_documentation": "Documentação de erros de consulta",
+    "status_warning": "Aviso",
+    "status_info": "Informação",
+    "status_error": "Erro",
+    "validation_failed": "Falha ao validar a consulta de pesquisa com o status: {{error}}",
+    "warm_tier_title": "Pesquisa no Warm Tier",
+    "warm_tier_message": "O intervalo de tempo selecionado inclui dados armazenados no Warm Tier, que podem demorar para ser recuperados. Dados mais antigos que o timestamp listado estão no Warm Tier para esse stream:"
+  },
+  "saved_searches": {
+    "title": "Pesquisas salvas",
+    "confirm_bulk_delete_one": "Você realmente deseja remover {{count}} pesquisa salva?",
+    "confirm_bulk_delete_other": "Você realmente deseja remover {{count}} pesquisas salvas?",
+    "bulk_delete_partial_one": "{{failed}} de {{count}} pesquisa salva selecionada não pôde ser excluída.",
+    "bulk_delete_partial_other": "{{failed}} de {{count}} pesquisas salvas selecionadas não puderam ser excluídas.",
+    "bulk_delete_success_one": "{{count}} pesquisa salva foi excluída com sucesso.",
+    "bulk_delete_success_other": "{{count}} pesquisas salvas foram excluídas com sucesso.",
+    "success": "Sucesso",
+    "bulk_delete_error": "Ocorreu um erro ao excluir as pesquisas salvas. {{error}}",
+    "confirm_delete": "Você está prestes a excluir a pesquisa salva: \"{{title}}\". Tem certeza?",
+    "delete_search": "Excluir pesquisa {{title}}",
+    "delete": "Excluir",
+    "confirm_bulk_delete_many": "Você realmente deseja remover {{count}} pesquisas salvas?",
+    "bulk_delete_partial_many": "{{failed}} de {{count}} pesquisas salvas selecionadas não puderam ser excluídas.",
+    "bulk_delete_success_many": "{{count}} pesquisas salvas foram excluídas com sucesso."
+  },
+  "search_meta": {
+    "buttons": "Botões de metadados da pesquisa"
+  },
+  "save_view_notifications": {
+    "success_title": "Sucesso!",
+    "error_title": "Erro!",
+    "plugin_initial_values_failed": "Ocorreu um erro ao coletar os valores iniciais do formulário da barra de pesquisa de um plugin",
+    "plugin_validation_preparation_failed": "Ocorreu um erro ao preparar a validação da barra de pesquisa de um plugin",
+    "plugin_validation_failed": "Ocorreu um erro ao validar os valores da barra de pesquisa de um plugin",
+    "plugin_submit_failed": "Ocorreu um erro ao executar um manipulador de envio de um plugin: {{error}}",
+    "load_saved_searches_failed": "Falha ao carregar pesquisas salvas com o status",
+    "could_not_load_saved_searches": "Não foi possível carregar as pesquisas salvas",
+    "load_minimum_refresh_interval_failed": "Falha ao carregar a configuração do sistema \"minimum_auto_refresh_interval\" com o status",
+    "could_not_load_configuration": "Não foi possível carregar a opção de configuração"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Exibir barra lateral como sobreposição",
+    "display_inline": "Exibir barra lateral em linha"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms às <timestamp/>",
+    "effective_from": "Intervalo de tempo efetivo, de",
+    "effective_to": "Intervalo de tempo efetivo, até"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Filtrar campos",
+    "reset": "Redefinir",
+    "list_fields": "Listar campos de <current>consulta atual</current>, <all>todos</all> ou <allReserved>todos, incluindo os reservados</allReserved>.",
+    "current_title": "Mostra os campos que ocorrem na sua consulta atual.",
+    "all_title": "Mostra todos os campos, exceto os reservados (gl2_*).",
+    "all_reserved_title": "Mostra todos os campos, incluindo os reservados (gl2_*).",
+    "no_field_information": "Nenhuma informação de campo disponível.",
+    "no_fields": "Nenhum campo para mostrar. Tente alterar o termo do filtro ou selecione um conjunto de campos diferente acima."
+  },
+  "highlighting_color": {
+    "color": "Cor",
+    "gradient_name": "Nome do gradiente",
+    "gradient_placeholder": "Selecione as cores do gradiente",
+    "lowest_placeholder": "Especifique o valor mínimo",
+    "lowest_label": "Valor mínimo",
+    "lowest_help": "O menor valor esperado no campo/série.",
+    "highest_aria": "Especifique o valor máximo",
+    "highest_label": "Valor máximo",
+    "highest_help": "O maior valor esperado no campo/série.",
+    "coloring": "Coloração",
+    "static_color": "Cor fixa",
+    "gradient": "Gradiente",
+    "must_be_selected": "Deve ser selecionado.",
+    "must_be_present": "Deve ser informado.",
+    "must_be_number": "Deve ser um número.",
+    "must_be_higher": "Deve ser maior que o valor mínimo.",
+    "coloring_required": "A coloração é obrigatória",
+    "gradient_numeric_only": "Um gradiente só pode ser definido para campos numéricos."
+  },
+  "highlighting_rule": {
+    "edit": "Editar esta regra de destaque",
+    "remove": "Remover esta regra de destaque",
+    "confirm_remove": "Você realmente deseja remover este destaque?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Sem permissão",
+    "no_permission_description": "Você não tem permissão para realizar esta ação",
+    "enterprise_plugin_required": "(é necessário o <enterpriseLink>plugin Enterprise</enterpriseLink>)",
+    "modal_title": "Alterar tipo do campo {{fieldName}}",
+    "impact_warning": "Alterar o tipo do campo <bold>{{fieldName}}</bold> pode ter um impacto significativo na ingestão de mensagens de log futuras. Se você declarar um campo com um tipo incompatível com os logs que está ingerindo, isso pode causar erros de ingestão.",
+    "failure_processing_hint": "Recomenda-se ativar o <docsLink>Failure Processing</docsLink> e acompanhar de perto o stream <failureStream/> depois.",
+    "select_field_type_for": "Selecionar tipo de campo para {{fieldName}}",
+    "select_field_type_for_field": "Selecionar tipo de campo para o campo",
+    "select_field_type": "Selecionar tipo de campo",
+    "select_index_sets": "Selecionar index sets de destino",
+    "index_sets_hint_with_type": "Por padrão, o tipo de campo <bold>{{type}}</bold> será definido para o campo <bold>{{fieldName}}</bold> em todos os index sets da mensagem/pesquisa atual. Você pode selecionar para quais index sets deseja fazer a alteração.",
+    "index_sets_hint": "Por padrão, o tipo de campo selecionado será definido para o campo <bold>{{fieldName}}</bold> em todos os index sets da mensagem/pesquisa atual. Você pode selecionar para quais index sets deseja fazer a alteração.",
+    "select_rotation_strategy": "Selecionar estratégia de rotação",
+    "rotation_hint_type_field": "Para ver e usar o <bold>{{type}}</bold> como tipo de campo para <bold>{{fieldName}}</bold>, é necessário rotacionar os índices. Você pode rotacionar automaticamente os índices afetados após enviar este formulário ou fazer isso manualmente depois.",
+    "rotation_hint_type": "Para ver e usar o <bold>{{type}}</bold> como tipo de campo, é necessário rotacionar os índices. Você pode rotacionar automaticamente os índices afetados após enviar este formulário ou fazer isso manualmente depois.",
+    "rotation_hint_field": "Para ver e usar o tipo de campo selecionado como tipo de campo para <bold>{{fieldName}}</bold>, é necessário rotacionar os índices. Você pode rotacionar automaticamente os índices afetados após enviar este formulário ou fazer isso manualmente depois.",
+    "rotation_hint": "Para ver e usar o tipo de campo selecionado, é necessário rotacionar os índices. Você pode rotacionar automaticamente os índices afetados após enviar este formulário ou fazer isso manualmente depois.",
+    "rotate_indices": "Rotacionar índices afetados após a alteração",
+    "changing": "Alterando tipo de campo...",
+    "change": "Alterar tipo de campo",
+    "select_field": "Selecionar campo",
+    "select_field_placeholder": "Selecione ou digite o campo",
+    "type_not_defined": "tipo não definido",
+    "previous_values": "(valores anteriores: {{values}})",
+    "load_index_field_types_failed": "Falha ao carregar os tipos de campo do índice com o status",
+    "could_not_load_index_field_types": "Não foi possível carregar os tipos de campo do índice",
+    "load_field_type_options_failed": "Falha ao carregar as opções de tipo de campo com o status",
+    "could_not_load_field_type_options": "Não foi possível carregar as opções de tipo de campo",
+    "load_field_types_failed": "Falha ao carregar os tipos de {{field}} com o status",
+    "could_not_load_field_types": "Não foi possível carregar os tipos de campo",
+    "load_index_sets_failed": "Falha ao carregar os index sets com suporte à alteração de tipo de campo com o status",
+    "could_not_load_index_sets": "Não foi possível carregar os index sets com suporte à alteração de tipo de campo",
+    "change_failed": "Falha ao alterar o tipo de campo com o status: {{error}}",
+    "change_failed_title": "Não foi possível alterar o tipo de campo",
+    "change_success": "O tipo de campo foi alterado com sucesso",
+    "success_title": "Sucesso!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Selecionar tipo de extractor",
+    "exclude": "Excluir dos resultados",
+    "add_to_query": "Adicionar à consulta",
+    "show_documents": "Mostrar documentos com o valor",
+    "create_extractor": "Criar extractor",
+    "highlight_value": "Destacar este valor",
+    "create_event_definition": "Criar definição de evento",
+    "copy_value": "Copiar valor para a área de transferência"
+  },
+  "create_event_definition": {
+    "title": "Configurar nova definição de evento",
+    "hide_details": "Ocultar detalhes da estratégia",
+    "show_details": "Exibir detalhes da estratégia",
+    "continue": "Continuar configuração",
+    "strategy_by": "Estratégia por:",
+    "description": "Descrição:",
+    "sections": {
+      "aggregation": "Configurações de agregação",
+      "search": "Consulta de pesquisa"
+    },
+    "items": {
+      "rowValuePath": "Consulta a partir da linha da tabela",
+      "columnValuePath": "Consulta a partir da coluna da tabela",
+      "columnGroupBy": "Agrupar por valores da coluna",
+      "rowGroupBy": "Agrupar por valores da linha",
+      "aggCondition": "Condição",
+      "queryWithReplacedParams": "Consulta a partir da pesquisa",
+      "searchFilterQuery": "Consulta a partir dos filtros de pesquisa",
+      "streams": "Streams",
+      "searchWithinMs": "Pesquisar em ms",
+      "lutParameters": "Parâmetros da tabela de consulta (lookup table)",
+      "searchFromValue": "Consulta a partir do valor"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Exatamente este valor",
+        "description": "A estratégia inclui todas as consultas de pesquisa, filtros etc. relacionados à visualização de pesquisa atual"
+      },
+      "ROW": {
+        "label": "Qualquer na linha",
+        "description": "A estratégia inclui pivôs de linha"
+      },
+      "COL": {
+        "label": "Qualquer na coluna",
+        "description": "A estratégia inclui pivôs de coluna"
+      },
+      "ALL": {
+        "label": "Qualquer no widget",
+        "description": "A estratégia inclui todos os valores de pivô de linha e coluna relacionados ao valor selecionado"
+      },
+      "CUSTOM": {
+        "label": "Personalizada",
+        "description": "Você pode selecionar qualquer parte da pesquisa"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Algo deu errado",
+    "unknown_error": "Ocorreu um erro desconhecido. Consulte a mensagem a seguir e o log do servidor {{productName}} para mais informações."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Falha ao excluir a visualização {{title}} com o status: {{error}}",
+    "delete_view_failed_title": "Não foi possível excluir a visualização",
+    "apply_widget_changes_failed": "Falha ao aplicar as alterações do widget com o status: {{error}}",
+    "load_message_failed": "Falha ao carregar as informações da mensagem com o status",
+    "could_not_load_message": "Não foi possível carregar as informações da mensagem"
+  },
+  "field_actions": {
+    "chart": "Gráfico",
+    "show_top_values": "Mostrar valores mais frequentes",
+    "statistics": "Estatísticas",
+    "add_to_table": "Adicionar à tabela",
+    "remove_from_table": "Remover da tabela",
+    "add_to_all_tables": "Adicionar a todas as tabelas",
+    "remove_from_all_tables": "Remover de todas as tabelas",
+    "change_field_type": "Alterar tipo de campo",
+    "copy_field_name": "Copiar nome do campo para a área de transferência",
+    "add_to_favorites": "Adicionar campo aos favoritos",
+    "remove_from_favorites": "Remover campo dos favoritos"
+  },
+  "aggregation": {
+    "summary_by": "Agregando {{series}} por {{fields}}",
+    "summary_only": "Agregando {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Contagem de mensagens",
+    "message_table": "Tabela de mensagens",
+    "custom_aggregation": "Agregação personalizada",
+    "aggregation": "Agregação",
+    "events_overview": "Visão geral de eventos",
+    "text_markdown": "Texto/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "input excluído",
+    "timestamp": "Timestamp",
+    "not_stored": "Não armazenada",
+    "not_stored_message": "A mensagem não está armazenada",
+    "received_by": "Recebida por",
+    "stored_in_index": "Armazenada no índice",
+    "routed_into_streams": "Encaminhada para os streams"
+  },
+  "views_logic": {
+    "result_window_limit": "O Elasticsearch limita o resultado da pesquisa a {{limit}} mensagens. Com um tamanho de página de {{pageSize}} mensagens, você pode usar as primeiras {{validPages}} páginas.",
+    "confirm_delete_dashboard_page": "Você realmente deseja excluir esta página do dashboard?"
+  }
+}

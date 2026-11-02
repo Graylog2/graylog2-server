@@ -1,1 +1,4 @@
-{}
+{
+  "title": "Logs",
+  "description": "Esta seção controla os logs da arquitetura do Graylog e permite alterar os níveis de log em tempo real. Observe que os níveis de log são redefinidos para os valores padrão após reiniciar o serviço afetado."
+}

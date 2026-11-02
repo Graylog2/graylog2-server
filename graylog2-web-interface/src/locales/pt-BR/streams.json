@@ -1,1 +1,533 @@
-{}
+{
+  "destination_permission_alert": {
+    "data_lake": "Você não tem permissão para visualizar ou gerenciar o destino Data Lake no momento.",
+    "index_set": "Você não tem permissão para visualizar ou gerenciar o destino Index Set no momento.",
+    "outputs": "Você não tem permissão para visualizar ou gerenciar o destino Outputs no momento."
+  },
+  "index_set_select": {
+    "help": "As mensagens que correspondem a este stream serão gravadas no index set configurado.",
+    "label": "Index Set",
+    "placeholder": "Selecione um index set"
+  },
+  "matching_type": {
+    "all": "Uma mensagem deve corresponder a todas as regras a seguir",
+    "any": "Uma mensagem deve corresponder a pelo menos uma das regras a seguir",
+    "confirm": "Você está prestes a alterar como as regras são aplicadas a este stream. Deseja continuar? As alterações terão efeito imediatamente.",
+    "success_all": "As mensagens agora serão direcionadas ao stream quando todas as regras forem correspondidas",
+    "success_any": "As mensagens agora serão direcionadas ao stream quando qualquer regra for correspondida",
+    "success_title": "Sucesso",
+    "switch_title_all": "Alternar tipo de correspondência para TODAS",
+    "switch_title_any": "Alternar tipo de correspondência para QUALQUER"
+  },
+  "output_filter": {
+    "create_button": "Criar regra",
+    "create_title": "Criar regra de filtro",
+    "delete_confirm": "Tem certeza de que deseja excluir a regra {{title}}?",
+    "delete_title": "Excluir regra",
+    "delete_tooltip": "Excluir",
+    "edit_title": "Editar regra de filtro",
+    "edit_tooltip": "Editar",
+    "fields": {
+      "and": "e",
+      "block_action": "ação",
+      "block_condition": "condição",
+      "delete_confirm": "Tem certeza de que deseja excluir <blockLabel>{{blockType}} nº {{number}}</blockLabel>?",
+      "delete_title": "Excluir {{blockType}}",
+      "or": "ou",
+      "then": "Então",
+      "when": "Quando"
+    },
+    "form": {
+      "condition_required": "A regra precisa conter pelo menos uma condição.",
+      "create": "Criar",
+      "description": "Descrição",
+      "description_help": "Descrição da regra",
+      "enabled": "Habilitado",
+      "rule_builder": "Construtor de regras",
+      "saving": "Salvando filtro",
+      "title": "Título",
+      "title_help": "Título da regra",
+      "title_required": "O campo \"Título\" é obrigatório.",
+      "update": "Atualizar",
+      "updating": "Atualizando filtro"
+    },
+    "item": {
+      "enabled": "habilitado",
+      "errors": "erros",
+      "throughput": "taxa de transferência"
+    },
+    "list": {
+      "header_status": "Status",
+      "header_title": "Título",
+      "info_data_lake": "As mensagens que atendem aos critérios da(s) seguinte(s) regra(s) de filtro não serão direcionadas ao Data Lake.",
+      "info_indexer": "As mensagens que atendem aos critérios da(s) seguinte(s) regra(s) de filtro não serão direcionadas ao Index Set.",
+      "no_filters": "Nenhum filtro encontrado.",
+      "title": "Regras de filtro"
+    }
+  },
+  "outputs": {
+    "assign_existing": "Atribuir output existente",
+    "content_pack_title": "Criado a partir de content pack",
+    "create_submit": "Criar output",
+    "create_title": "Criar novo Output",
+    "delete_from_stream": "Excluir do stream",
+    "delete_globally": "Excluir globalmente",
+    "edit": "Editar",
+    "edit_title": "Editando Output {{title}}",
+    "id_label": "ID: {{id}}",
+    "launch_new": "Iniciar novo output",
+    "name_help": "Selecione um nome para o seu novo output que o descreva.",
+    "none_available": "Nenhum output disponível",
+    "none_configured": "Nenhum output configurado.",
+    "plugin_error": "O plugin necessário para este output não está carregado. Não é possível editá-lo. Carregue o plugin ou exclua o output.",
+    "select_existing": "Selecionar output existente",
+    "select_type": "Selecionar tipo de Output",
+    "type_label": "Tipo: {{type}}",
+    "update_submit": "Atualizar output"
+  },
+  "pipelines_connection_form": {
+    "edit_button": "Editar conexão de pipelines",
+    "help": "Selecione os pipelines que deseja conectar a este stream ou crie um na <pipelinesLink>página Pipelines</pipelinesLink>.",
+    "label": "Pipelines",
+    "modal_title": "Editar conexões do <streamLabel>stream</streamLabel>",
+    "save_failed": "Falha ao salvar a conexão de pipelines do stream com o status: {{error}}",
+    "save_success": "A conexão de pipelines do stream foi salva com sucesso.",
+    "save_title": "Salvando conexão de pipelines do stream.",
+    "submit": "Atualizar conexões"
+  },
+  "routing_destination": {
+    "add_output": {
+      "assign_segment": "Atribuir output existente",
+      "button": "Adicionar output",
+      "create_segment": "Criar novo output",
+      "modal_title": "Adicionar output ao stream",
+      "tooltip": "Editar Output"
+    },
+    "archiving": {
+      "disabled": "O arquivamento está desabilitado",
+      "enabled": "O arquivamento está habilitado"
+    },
+    "edit_output": {
+      "tooltip": "Editar Output"
+    },
+    "index_set": {
+      "col_archiving": "Arquivamento",
+      "col_name": "Nome",
+      "col_oldest": "Mensagem mais antiga (data)",
+      "col_size": "Tamanho total",
+      "disabled": "Desabilitado",
+      "enabled": "Habilitado",
+      "filters": "FILTROS {{count}}",
+      "info": "As mensagens direcionadas ao <boldText>Search Cluster</boldText> poderão ser pesquisadas e contam para o uso da licença do {{productName}}. Essas mensagens serão armazenadas no Index Set definido até que os critérios da política de retenção sejam atendidos. Observação: mensagens não direcionadas ao <boldText>Search Cluster</boldText> não poderão ser pesquisadas.",
+      "title": "Index Set",
+      "toggle_aria": "Alternar index set"
+    },
+    "index_set_update": {
+      "button": "Editar Index Set",
+      "modal_title": "Editar Index Set do Stream",
+      "saving": "Salvando stream",
+      "submit": "Atualizar",
+      "success_title": "Sucesso",
+      "tooltip": "Editar index set",
+      "updated": "O IndexSet do stream '{{title}}' foi atualizado com sucesso."
+    },
+    "output_item": {
+      "type": "(Tipo: {{type}})"
+    },
+    "outputs": {
+      "count": "OUTPUTS {{count}}",
+      "title": "Outputs",
+      "toggle_aria": "Alternar Output"
+    },
+    "outputs_list": {
+      "name": "Nome",
+      "none": "Nenhum output definido."
+    },
+    "remove_output": {
+      "confirm": "Você realmente deseja remover este output do stream?",
+      "title": "Remover Output"
+    }
+  },
+  "stream_details": {
+    "back": "Voltar",
+    "connected_pipelines_human_name": "pipelines",
+    "connected_pipelines_title": "Roteamento a partir de outros Streams",
+    "data_routing": "Roteamento de dados",
+    "destination_description": "A página Destinations permite definir para onde as mensagens deste stream devem ser direcionadas. Um stream pode ter vários destinos. Observe que mensagens direcionadas apenas ao Data Lake não contam para o uso da licença, a menos que sejam recuperadas posteriormente. Em cada destino, filtros podem ser aplicados para limitar o subconjunto de mensagens que esse destino recebe.",
+    "edit": "Editar",
+    "edit_modal_title": "Editando Stream",
+    "heading": "Stream: {{title}}",
+    "intake_description": "As Stream Rules podem ser usadas para coletar um subconjunto filtrado de mensagens diretamente dos Inputs para este Stream. Observe que as Stream Rules agora são um recurso legado; o método recomendado para gerenciar o roteamento de streams agora são as Pipeline Rules.",
+    "no_pipelines": "Este stream não está conectado a nenhum Pipeline.",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Os pipelines permitem transformar e processar mensagens provenientes de streams. Os pipelines são compostos por estágios nos quais as regras são avaliadas e aplicadas. As mensagens podem passar por um ou mais estágios.",
+    "processing_title": "Pipelines",
+    "rule_header": "Regra",
+    "rules_info": "As Stream Rules têm efeito primeiro na ordem de processamento padrão e são usadas para direcionar mensagens dos Inputs para os Streams. Qualquer mensagem que atenda aos critérios das Stream Rules será direcionada para este Stream.",
+    "rules_title": "Regras do stream",
+    "segment_destinations": "3: Destinos",
+    "segment_intake": "1: Entrada",
+    "segment_processing": "2: Processamento",
+    "success_title": "Sucesso",
+    "throughput": "Taxa de transferência",
+    "update_button": "Atualizar stream",
+    "updated": "O stream '{{title}}' foi atualizado com sucesso.",
+    "updating": "Atualizando stream..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "O stream padrão não pode ser editado.",
+    "description": "Esta tela é dedicada à criação e manipulação simples e prática de stream rules. Aqui você pode ver o efeito que as stream rules configuradas têm na correspondência de mensagens.",
+    "documentation_link_title": "Documentação de Streams",
+    "title": "Regras do Stream {{title}}",
+    "title_span": "Regras do Stream \"{{title}}\""
+  },
+  "stream_hooks": {
+    "create_rule_failed": "Falha ao criar a regra de filtro de output do stream com o status: {{error}}",
+    "create_rule_failed_title": "Não foi possível criar a regra de filtro de output do stream",
+    "create_rule_success": "A regra de filtro de output do stream foi criada com sucesso.",
+    "delete_rule_failed": "Falha ao excluir a regra de filtro de output do stream com o status: {{error}}",
+    "delete_rule_failed_title": "Não foi possível excluir a regra de filtro de output do stream",
+    "delete_rule_success": "A regra de filtro de output do stream foi removida com sucesso.",
+    "load_connected_pipelines_failed": "Falha ao carregar os pipelines conectados com o status",
+    "load_connected_pipelines_failed_title": "Não foi possível carregar os pipelines conectados",
+    "load_output_filters_failed": "Falha ao carregar os filtros de output do stream com o status",
+    "load_output_filters_failed_title": "Não foi possível carregar os filtros de output do stream",
+    "load_output_types_failed": "Falha ao carregar os outputs do stream com o status",
+    "load_output_types_failed_title": "Não foi possível carregar os outputs do stream",
+    "load_rule_builder_failed": "Falha ao carregar a lista de condições do Construtor de regras de filtro de output do stream com o status",
+    "load_rule_builder_failed_title": "Não foi possível carregar a lista de condições do Construtor de regras de filtro de output do stream.",
+    "load_rule_types_failed": "Falha ao carregar os tipos de stream rule com o status",
+    "load_rule_types_failed_title": "Não foi possível carregar os tipos de stream rule",
+    "load_stream_failed": "Falha ao carregar o stream com o status",
+    "load_stream_failed_title": "Não foi possível carregar o Stream",
+    "load_streams_failed": "Falha ao carregar os streams com o status",
+    "load_streams_failed_title": "Não foi possível carregar os streams",
+    "success_title": "Sucesso!",
+    "update_rule_failed": "Falha ao atualizar a regra de filtro de output do stream com o status: {{error}}",
+    "update_rule_failed_title": "Não foi possível atualizar a regra de filtro de output do stream",
+    "update_rule_success": "A regra de filtro de output do stream foi atualizada com sucesso."
+  },
+  "stream_modal": {
+    "description": "Descrição",
+    "description_help": "Que tipo de mensagens é direcionado para este stream?",
+    "index_set_required": "O index set é obrigatório",
+    "remove_matches_help": "Não atribuir as mensagens que correspondem a este stream ao ‘Default Stream’.",
+    "remove_matches_label": "Remover correspondências do ‘Default Stream’",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador deste stream.",
+    "title": "Título",
+    "title_help": "Um nome descritivo do novo stream",
+    "title_required": "O título é obrigatório"
+  },
+  "stream_outputs": {
+    "description": "Os nós do {{productName}} podem encaminhar mensagens dos streams por meio de outputs. Inicie ou encerre quantos outputs desejar aqui. Você também pode reutilizar outputs que já estão em execução para outros streams. Uma visão global de todos os outputs configurados está disponível <outputsLink>aqui</outputsLink>.",
+    "marketplace_prefix": "Você pode encontrar plugins de output em",
+    "removing_description": "<emphasis>Remover</emphasis> um output o retira deste stream, mas ele continuará na lista de outputs disponíveis. Excluir um output <emphasis>globalmente</emphasis> o removerá deste e de todos os outros streams e o encerrará. Você pode ver todos os outputs definidos em detalhes na <outputsLink>lista global de outputs</outputsLink>.",
+    "title": "Outputs do Stream »{{streamTitle}}«"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "Este recurso inclui streams para os quais você não tem permissão.",
+    "description_p2": "Entre em contato com seu administrador e informe os detalhes do erro, incluindo a lista de streams aos quais você precisa de acesso.",
+    "error_details": "Você precisa de permissões para os streams com o ID: {{ids}}.",
+    "title": "Permissões de stream ausentes"
+  },
+  "stream_rules": {
+    "create_button": "Criar regra",
+    "created": "A stream rule foi criada com sucesso.",
+    "creating": "Criando regra...",
+    "delete_confirm": "Você realmente deseja excluir esta stream rule?",
+    "delete_ok": "OK",
+    "delete_title": "Excluir stream rule.",
+    "delete_tooltip": "Excluir stream rule",
+    "deleted": "A stream rule foi excluída com sucesso.",
+    "edit_title": "Editar Stream Rule",
+    "edit_tooltip": "Editar stream rule",
+    "editor": {
+      "add_rule": "Adicionar stream rule",
+      "done": "Concluído!",
+      "load_message_hint": "Carregue uma mensagem na Etapa 1 acima para verificar se ela corresponderia a estas regras.",
+      "load_message_title": "1. Carregar uma mensagem para testar as regras",
+      "manage_title": "2. Gerenciar stream rules",
+      "would_match": "Esta mensagem seria direcionada para este stream!",
+      "would_not_match": "Esta mensagem não seria direcionada para este stream."
+    },
+    "human": {
+      "always_matches": "A regra sempre corresponde",
+      "deleted_input": "<deleted input>: {{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> <mustPart>deve </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>",
+      "must_not": "<ruleField>{{field}}</ruleField> <mustPart>não deve </mustPart>{{description}} <ruleValue>{{value}}</ruleValue>"
+    },
+    "modal": {
+      "description": "Descrição",
+      "field": "Campo",
+      "field_required": "O campo é obrigatório",
+      "input": "Input",
+      "inverted": "Invertida",
+      "matcher_code_link": "Veja o código do matcher no GitHub",
+      "matcher_info": "O servidor tentará converter para strings ou números, com base no tipo de matcher, da melhor forma possível.",
+      "more_information": "Mais informações",
+      "regex_info": "As expressões regulares usam a sintaxe Java.",
+      "result": "Resultado:",
+      "select_input": "Selecione um input",
+      "select_type": "Selecione um tipo",
+      "type": "Tipo",
+      "type_required": "O tipo é obrigatório",
+      "value": "Valor",
+      "value_required": "O valor é obrigatório"
+    },
+    "new_title": "Nova Stream Rule",
+    "no_rules": "Nenhuma regra definida.",
+    "start_dialog": {
+      "ask_named": "Deseja iniciar o stream <streamTitle>{{title}}</streamTitle>?",
+      "ask_unnamed": "Deseja iniciar este stream?",
+      "confirm": "Iniciar Stream",
+      "loading": "Iniciando Stream...",
+      "paused": "As Stream Rules deste stream estão pausadas no momento e não terão efeito.",
+      "title": "Iniciar stream?"
+    },
+    "success_title": "Sucesso",
+    "update_button": "Atualizar regra",
+    "updated": "A stream rule foi atualizada com sucesso.",
+    "updating": "Atualizando regra..."
+  },
+  "streams_overview": {
+    "actions": {
+      "clone_button": "Clonar stream",
+      "clone_stream": "Clonar Stream",
+      "clone_title": "Clonando Stream",
+      "cloned": "O stream foi clonado com sucesso como '{{title}}'.",
+      "cloning": "Clonando stream...",
+      "data_routing": "Roteamento de dados",
+      "delete_failed": "Ocorreu um erro ao excluir o stream. {{error}}",
+      "delete_modal_confirm": "Você realmente deseja remover o stream: {{title}}?",
+      "delete_modal_title": "Excluir Stream",
+      "delete_stream": "Excluir Stream",
+      "deleted": "O stream '{{title}}' foi excluído com sucesso.",
+      "edit_stream": "Editar Stream",
+      "edit_title": "Editando Stream",
+      "manage_alerts": "Gerenciar alertas",
+      "manage_outputs": "Gerenciar Outputs",
+      "manage_rules": "Gerenciar regras",
+      "not_available_default": "Ação não disponível para o stream padrão",
+      "pause_confirm": "Você realmente deseja pausar o stream '{{title}}'?",
+      "quick_add_rule": "Adicionar regra rapidamente",
+      "set_start_page": "Definir como página inicial",
+      "start": "Iniciar Stream",
+      "starting": "Iniciando Stream...",
+      "status_pause": "Pausar stream",
+      "status_paused": "Pausado",
+      "status_running": "Em execução",
+      "status_start": "Iniciar stream",
+      "stop": "Parar Stream",
+      "stopping": "Parando Stream...",
+      "success_title": "Sucesso",
+      "update_button": "Atualizar stream",
+      "updated": "O stream '{{title}}' foi atualizado com sucesso.",
+      "updating": "Atualizando stream...",
+      "view_default": "Padrão",
+      "view_label": "Visualização:",
+      "view_performance": "Desempenho",
+      "view_routing": "Roteamento"
+    },
+    "bulk": {
+      "assign_failed": "Falha ao atribuir o index set com o status: {{error}}",
+      "assign_failed_title": "Erro",
+      "assign_help": "As mensagens que correspondem aos streams selecionados serão gravadas no index set configurado.",
+      "assign_index_set": "Atribuir index set",
+      "assign_loading": "Atribuindo index set...",
+      "assign_submit": "Atribuir index set",
+      "assign_success_one": "O index set foi atribuído com sucesso a {{count}} stream.",
+      "assign_success_other": "O index set foi atribuído com sucesso a {{count}} streams.",
+      "assign_title_one": "Atribuir Index Set a {{count}} Stream",
+      "assign_title_other": "Atribuir Index Set a {{count}} Streams",
+      "delete_confirm_one": "Você realmente deseja remover {{count}} stream? Esta ação não pode ser desfeita.",
+      "delete_confirm_other": "Você realmente deseja remover {{count}} streams? Esta ação não pode ser desfeita.",
+      "delete_error": "Ocorreu um erro ao excluir os streams. {{error}}",
+      "failed_deleted_one": "{{failed}} de {{count}} stream selecionado não pôde ser excluído.",
+      "failed_deleted_other": "{{failed}} de {{count}} streams selecionados não puderam ser excluídos.",
+      "failed_started_one": "{{failed}} de {{count}} stream selecionado não pôde ser iniciado.",
+      "failed_started_other": "{{failed}} de {{count}} streams selecionados não puderam ser iniciados.",
+      "failed_stopped_one": "{{failed}} de {{count}} stream selecionado não pôde ser parado.",
+      "failed_stopped_other": "{{failed}} de {{count}} streams selecionados não puderam ser parados.",
+      "index_set_required": "O index set é obrigatório",
+      "search_in_streams": "Pesquisar nos streams",
+      "start_error": "Ocorreu um erro ao iniciar os streams. {{error}}",
+      "start_streams_one": "Iniciar stream",
+      "start_streams_other": "Iniciar streams",
+      "stop_error": "Ocorreu um erro ao parar os streams. {{error}}",
+      "stop_streams_one": "Parar stream",
+      "stop_streams_other": "Parar streams",
+      "success_deleted_one": "{{count}} stream foi excluído com sucesso.",
+      "success_deleted_other": "{{count}} streams foram excluídos com sucesso.",
+      "success_started_one": "{{count}} stream foi iniciado com sucesso.",
+      "success_started_other": "{{count}} streams foram iniciados com sucesso.",
+      "success_stopped_one": "{{count}} stream foi parado com sucesso.",
+      "success_stopped_other": "{{count}} streams foram parados com sucesso.",
+      "success_title": "Sucesso",
+      "assign_success_many": "O index set foi atribuído com sucesso a {{count}} streams.",
+      "assign_title_many": "Atribuir Index Set a {{count}} Streams",
+      "delete_confirm_many": "Você realmente deseja remover {{count}} streams? Esta ação não pode ser desfeita.",
+      "failed_deleted_many": "{{failed}} de {{count}} streams selecionados não puderam ser excluídos.",
+      "failed_started_many": "{{failed}} de {{count}} streams selecionados não puderam ser iniciados.",
+      "failed_stopped_many": "{{failed}} de {{count}} streams selecionados não puderam ser parados.",
+      "start_streams_many": "Iniciar streams",
+      "stop_streams_many": "Parar streams",
+      "success_deleted_many": "{{count}} streams foram excluídos com sucesso.",
+      "success_started_many": "{{count}} streams foram iniciados com sucesso.",
+      "success_stopped_many": "{{count}} streams foram parados com sucesso."
+    },
+    "cells": {
+      "archiving_enabled": "O arquivamento está habilitado",
+      "avg_processing_time": "Tempo médio de processamento: {{ms}} ms (últimos 15 minutos)",
+      "index_set_not_found": "não encontrado",
+      "max_processing_time": "Tempo máximo de processamento: {{ms}} ms (últimos 15 minutos)",
+      "message_count_one": "{{count}} mensagem nas últimas 24 horas",
+      "message_count_other": "{{count}} mensagens nas últimas 24 horas",
+      "throughput": "{{throughput}} msg/s",
+      "message_count_many": "{{count}} mensagens nas últimas 24 horas"
+    },
+    "columns": {
+      "archiving": "Arquivamento",
+      "destination_filters": "Regras de filtro",
+      "index_set_title": "Index Set",
+      "outputs": "Outputs",
+      "pipelines": "Pipelines",
+      "rules": "Stream Rules",
+      "throughput": "Taxa de transferência"
+    },
+    "expanded": {
+      "associated_inputs_load_failed": "Não foi possível carregar os inputs associados.",
+      "associated_inputs_none": "Nenhum input enviou mensagens para este stream nas últimas 24 horas.",
+      "deleted": "{{id}} (excluído)",
+      "destination_data_lake": "Data Lake",
+      "destination_index_set": "Index Set",
+      "destination_output": "Output",
+      "filter_rules_header_destination": "Destino",
+      "filter_rules_header_status": "Status",
+      "filter_rules_header_title": "Título",
+      "filter_rules_summary_one": "Exibindo {{count}} regra de filtro configurada em todos os destinos.",
+      "filter_rules_summary_other": "Exibindo {{count}} regras de filtro configuradas em todos os destinos.",
+      "manage_filter_rules": "Gerenciar regras de filtro",
+      "manage_outputs": "Gerenciar Outputs",
+      "manage_pipelines": "Gerenciar Pipelines",
+      "manage_rules": "Gerenciar regras",
+      "no_filter_rules": "Nenhuma regra de filtro foi encontrada.",
+      "outputs_summary_one": "{{count}} output conectado.",
+      "outputs_summary_other": "{{count}} outputs conectados.",
+      "pipelines_load_failed": "Não foi possível carregar os pipelines conectados.",
+      "pipelines_none": "Nenhum pipeline está conectado a este stream.",
+      "quick_add_rule": "Adicionar regra rapidamente",
+      "routing_pipelines_load_failed": "Não foi possível carregar os pipelines de roteamento.",
+      "routing_pipelines_none": "Nenhum pipeline de roteamento direciona mensagens para este stream.",
+      "rules_summary_and_one": "Deve corresponder a todas as {{count}} stream rule configurada.",
+      "rules_summary_and_other": "Deve corresponder a todas as {{count}} stream rules configuradas.",
+      "rules_summary_or_one": "Deve corresponder a pelo menos uma das {{count}} stream rule configurada.",
+      "rules_summary_or_other": "Deve corresponder a pelo menos uma das {{count}} stream rules configuradas.",
+      "filter_rules_summary_many": "Exibindo {{count}} regras de filtro configuradas em todos os destinos.",
+      "outputs_summary_many": "{{count}} outputs conectados.",
+      "rules_summary_and_many": "Deve corresponder a todas as {{count}} stream rules configuradas.",
+      "rules_summary_or_many": "Deve corresponder a pelo menos uma das {{count}} stream rules configuradas."
+    },
+    "expanded_titles": {
+      "destination_filters": "Regras de filtro",
+      "outputs": "Outputs",
+      "rules": "Regras"
+    },
+    "human_name": "streams",
+    "metric_columns": {
+      "associated_inputs": "Inputs associados (últimas 24 h)",
+      "avg_processing_time_ms": "Tempo médio de processamento (últimos 15 min)",
+      "max_processing_time_ms": "Tempo máximo de processamento (últimos 15 min)",
+      "message_count": "Quantidade de mensagens (últimas 24 h)",
+      "pipelines": "Pipelines",
+      "routing_pipelines": "Pipelines de roteamento"
+    }
+  },
+  "streams_page": {
+    "create_loading": "Criando stream...",
+    "create_submit": "Criar stream",
+    "create_success_message": "O stream foi criado com sucesso.",
+    "create_success_title": "Sucesso",
+    "create_title": "Criar stream",
+    "description": "Você pode direcionar as mensagens recebidas para streams aplicando regras sobre elas. As mensagens que correspondem às regras de um stream são direcionadas para ele. Uma mensagem também pode ser direcionada para vários streams.",
+    "documentation_link_title": "Documentação de Streams",
+    "title": "Streams"
+  },
+  "system_outputs": {
+    "description": "Os nós do {{productName}} podem encaminhar mensagens por meio de outputs. Inicie ou encerre quantos outputs desejar aqui <highlight>e depois atribua-os a streams para encaminhar todas as mensagens de um stream em tempo real.</highlight>",
+    "header_title": "Outputs no cluster",
+    "marketplace_prefix": "Você pode encontrar plugins de output em",
+    "title": "Outputs"
+  },
+  "user_no_stream_access": {
+    "alert": "Não é possível iniciar uma pesquisa agora, porque você não tem permissão para acessar nenhum stream. Se acredita que se trata de um erro, entre em contato com seu administrador.",
+    "title": "Sem permissões de stream."
+  },
+  "notifications": {
+    "load_failed": "Falha ao carregar os streams com o status: {{error}}",
+    "load_failed_title": "Não foi possível carregar os streams",
+    "update_failed": "Falha ao atualizar o Stream com o status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o Stream",
+    "pause_failed": "Falha ao pausar o Stream com o status: {{error}}",
+    "pause_failed_title": "Não foi possível pausar o Stream",
+    "resume_failed": "Falha ao retomar o Stream com o status: {{error}}",
+    "resume_failed_title": "Não foi possível retomar o Stream",
+    "clone_failed": "Falha ao clonar o Stream com o status: {{error}}",
+    "clone_failed_title": "Não foi possível clonar o Stream",
+    "test_match_failed": "Falha ao testar as stream rules do stream com o status: {{error}}",
+    "test_match_failed_title": "Não foi possível testar as stream rules do stream",
+    "output_terminate_confirm": "Você realmente deseja encerrar este output?",
+    "output_terminated": "O output foi encerrado.",
+    "output_remove_confirm": "Você realmente deseja remover este output do stream?",
+    "success_title": "Sucesso"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "Falha ao salvar o Output \"{{title}}\" com o status: {{error}}",
+    "save_failed_title": "Não foi possível salvar o Output",
+    "update_failed": "Falha ao atualizar o Output \"{{title}}\" com o status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o Output",
+    "terminate_failed": "Falha ao encerrar o output com o status: {{error}}",
+    "terminate_failed_title": "Não foi possível encerrar o output"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "Falha ao carregar os outputs com o status",
+    "load_failed_title": "Não foi possível carregar os outputs"
+  },
+  "use_stream_notifications": {
+    "load_failed": "Falha ao carregar o stream com o status",
+    "load_failed_title": "Não foi possível carregar o stream."
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "Falha ao carregar as métricas do stream com o status",
+    "load_failed_title": "Não foi possível carregar as métricas do stream"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "Falha ao carregar os outputs do stream com o status",
+    "load_failed_title": "Não foi possível carregar os outputs do stream"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "Falha ao salvar o Stream com o status: {{error}}",
+    "save_failed_title": "Não foi possível salvar o Stream"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "Falha ao adicionar o output ao stream com o status: {{error}}",
+    "add_failed_title": "Não foi possível adicionar o output ao stream",
+    "remove_failed": "Falha ao excluir o output do stream com o status: {{error}}",
+    "remove_failed_title": "Não foi possível excluir o output do stream",
+    "added_success": "O output foi adicionado ao Stream com sucesso.",
+    "removed_success": "O output foi removido do stream com sucesso.",
+    "success_title": "Sucesso!"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "Falha ao criar a Stream Rule com o status: {{error}}",
+    "create_failed_title": "Não foi possível criar a Stream Rule",
+    "update_failed": "Falha ao atualizar a Stream Rule com o status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar a Stream Rule",
+    "delete_failed": "Falha ao excluir a Stream Rule com o status: {{error}}",
+    "delete_failed_title": "Não foi possível excluir a Stream Rule"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "Falha ao buscar a lista de inputs da Stream Rule com o status: {{error}}",
+    "fetch_failed_title": "Não foi possível obter os inputs da Stream Rule"
+  }
+}
