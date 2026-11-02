@@ -239,28 +239,148 @@
     "stream_name_label": "Kinesis 流名称",
     "stream_name_placeholder": "流名称",
     "stream_name_help": "1-128 个字母数字字符，以及特殊字符下划线 (_)、句点 (.) 和连字符 (-)。",
-    "group_name_label": "CloudWatch 组名称"
+    "group_name_label": "CloudWatch 组名称",
+    "choose_group": "选择 CloudWatch 组",
+    "back_button": "返回选择流"
   },
-  "aws_kinesis_setup_agree": {},
-  "aws_kinesis_setup_step": {},
-  "aws_kinesis_setup_steps": {},
-  "aws_kinesis_setup_modal": {},
-  "form_wrap": {},
-  "aws_skip_health_check": {},
-  "throttling_checkbox": {},
-  "grey_noise_adapter_documentation": {},
-  "grey_noise_adapter_field_set": {},
-  "grey_noise_adapter_summary": {},
-  "slack_notification_details": {},
-  "teams_notification_details": {},
-  "teams_notification_v2_details": {},
-  "slack_notification_form": {},
-  "event_procedure_checkbox": {},
-  "slack_notification_summary": {},
-  "teams_notification_summary": {},
-  "teams_notification_form": {},
-  "teams_notification_v2_form": {},
-  "pager_duty_notification_details": {},
+  "aws_kinesis_setup_agree": {
+    "description": "此自动设置将创建以下 AWS 资源。点击下方即表示您理解这些资源将被创建，并且您对由此产生的任何相关 AWS 费用承担全部责任。如果不再需要这些资源，您必须手动删除所有资源。",
+    "step_stream": "创建一个具有 <strong>1</strong> 个分片的 Kinesis 流。",
+    "step_role": "创建一个 IAM 角色和策略，允许指定的 CloudWatch 组 <strong>{{groupName}}</strong> 向 Kinesis 流 <strong>{{streamName}}</strong> 发布日志消息。",
+    "step_subscription": "创建一个 CloudWatch 订阅，将日志消息发布到 Kinesis 流。"
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "等待中…",
+    "creating": "正在创建{{label}}",
+    "create": "创建{{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis 流",
+    "policy_label": "订阅策略",
+    "subscription_label": "订阅"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "创建中…",
+    "close_button": "关闭",
+    "continue_button": "继续设置",
+    "executing_title": "正在执行自动设置",
+    "agreement_title": "Kinesis 自动设置协议",
+    "delayed_logs": "第一条消息可能需要长达十分钟才能到达 Kinesis 流。在流中出现消息之前，下一步的 Kinesis 健康检查将无法成功完成。更多信息请参阅官方的 <cloudWatchLink>CloudWatch 订阅</cloudWatchLink>文档。",
+    "agree_button": "我同意！立即创建这些 AWS 资源。"
+  },
+  "form_wrap": {
+    "more_info": "更多信息",
+    "additional_information": "附加信息：",
+    "loading_button": "加载中…",
+    "submit_button": "提交"
+  },
+  "aws_skip_health_check": {
+    "title": "跳过健康检查",
+    "confirm_button": "确认",
+    "form_title": "选择日志类型并跳过健康检查",
+    "description": "如果您确定新建的 <strong>{{streamName}}</strong> 流中包含的数据，请选择下方选项以跳过自动检查。",
+    "input_type_label": "选择 AWS 输入类型",
+    "choose_log_type": "选择日志类型"
+  },
+  "throttling_checkbox": {
+    "label": "启用限流",
+    "help": "启用后，在 {{productName}} 服务器处理完当前消息负载之前，此输入将不再读取新消息。这通常适用于从文件或 AMQP、Kafka 等消息队列系统读取数据的输入。如果您定期轮询外部系统（例如通过 HTTP），通常应保持此选项关闭。"
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup 数据适配器使用 <greynoiseLink>GreyNoise API</greynoiseLink> 为给定的键查询指标，并返回 IP Quick Context 端点的值。参见 <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "用户密码",
+    "reset_token_button": "重置令牌",
+    "api_token_label": "API 令牌",
+    "undo_reset_button": "撤销重置",
+    "api_token_help": "API 令牌。"
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API 令牌"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "频道",
+    "custom_message_label": "自定义消息模板",
+    "empty_body": "空正文",
+    "include_event_procedure_label": "在邮件正文中包含事件处理流程",
+    "backlog_limit_label": "消息积压上限",
+    "user_name_label": "用户名",
+    "include_title_label": "包含标题",
+    "notify_channel_label": "通知频道",
+    "link_names_label": "链接名称",
+    "icon_url_label": "图标 URL",
+    "icon_emoji_label": "图标表情",
+    "time_zone_label": "时区"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "自定义消息模板",
+    "empty_body": "空正文",
+    "backlog_limit_label": "消息积压上限",
+    "icon_url_label": "图标 URL",
+    "time_zone_label": "时区"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "Adaptive Card 模板",
+    "backlog_limit_label": "消息积压上限"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "配置颜色",
+    "change_color_button": "更改颜色",
+    "color_help": "选择此配置使用的颜色。",
+    "custom_message_help": "将显示在告警标题下方的自定义消息。更多详细信息请参阅<docsLink/>。",
+    "docs_link_text": "文档",
+    "webhook_url_help": "Slack \"Incoming Webhook\" URL",
+    "channel_help": "Slack #频道名称，或用于私信的 @用户",
+    "custom_message_label": "自定义消息（可选）",
+    "time_zone_help": "用于通知正文中时间戳的时区。",
+    "time_zone_label": "日期/时间值的时区",
+    "backlog_limit_label": "消息积压上限（可选）",
+    "backlog_limit_help": "限制作为 Slack 通知一部分发送的积压消息数量。设置为 0 时不限制。",
+    "user_name_label": "用户名（可选）",
+    "user_name_help": "Slack 中发送者的用户名",
+    "include_title_help": "在通知中包含事件定义的标题和描述",
+    "notify_channel_help": "在消息中添加 @channel 以通知频道中的所有用户",
+    "notify_here_label": "通知在线成员",
+    "notify_here_help": "在消息中添加 @here 以通知频道中的在线用户",
+    "link_names_help": "查找并链接频道名称和用户名",
+    "icon_url_label": "图标 URL（可选）",
+    "icon_url_help": "用作此消息图标的图片",
+    "icon_emoji_label": "图标表情（可选）",
+    "icon_emoji_help": "用作此消息图标的表情（优先于图标 URL）"
+  },
+  "event_procedure_checkbox": {
+    "label": "包含事件处理流程",
+    "help": "将事件定义的事件处理流程的格式化版本附加到通知正文末尾。"
+  },
+  "slack_notification_summary": {
+    "color_label": "颜色",
+    "custom_message_label": "自定义消息",
+    "yes": "是",
+    "no": "否"
+  },
+  "teams_notification_summary": {
+    "color_label": "颜色",
+    "custom_message_label": "自定义消息"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams \"Incoming Webhook\" URL",
+    "backlog_limit_help": "限制作为 Microsoft Teams 通知一部分发送的积压消息数量。设置为 0 时不限制。"
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "要发布到 Teams 的 Adaptive Card。更多详细信息请参阅<docsLink/>。",
+    "backlog_toggle_aria_label": "启用消息积压上限"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "路由密钥",
+    "incident_title_label": "事件标题",
+    "custom_incident_label": "自定义事件",
+    "key_prefix_label": "键前缀",
+    "incident_key_label": "事件键"
+  },
   "pager_duty_notification_form": {},
   "pager_duty_notification_summary": {},
   "threat_intel_plugin_config": {},
