@@ -24,7 +24,13 @@
     "aria_label": "Sélectionner le champ pour le tri"
   },
   "fields_configuration": {
-    "add_field": "Ajouter un champ"
+    "add_field": "Ajouter un champ",
+    "hide_selected_one": "Masquer {{count}} champ sélectionné",
+    "hide_selected_other": "Masquer {{count}} champs sélectionnés",
+    "show_selected_one": "Afficher {{count}} champ sélectionné",
+    "show_selected_other": "Afficher {{count}} champs sélectionnés",
+    "hide_selected_many": "Masquer {{count}} champs sélectionnés",
+    "show_selected_many": "Afficher {{count}} champs sélectionnés"
   },
   "move_widget": {
     "no_pages": "Aucune page trouvée",
@@ -137,16 +143,84 @@
     "select_direction": "Sélectionner un sens",
     "type": "Type",
     "add_column": "Ajouter une colonne",
-    "configure_filter": "Configurer un nouveau filtre"
+    "configure_filter": "Configurer un nouveau filtre",
+    "edit_filter": "Modifier le filtre {{column}}",
+    "delete_filter": "Supprimer le filtre {{column}}"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "Date unique",
+    "range": "Plage",
+    "select_single_date": "Sélectionner le type date unique",
+    "select_range": "Sélectionner le type plage",
+    "date_range": "{{from}} à {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "Actions",
+    "loading": "Chargement",
+    "decorated": "(décoré)",
+    "stopped_node": "nœud arrêté",
+    "cluster_node": "Nœud du cluster {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "Créer un nouveau {{name}}",
+      "select_decorator": "Sélectionner un décorateur",
+      "none_configured": "Aucun décorateur configuré.",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "edit_named": "Modifier {{name}}",
+      "unknown_type": "Type de décorateur inconnu",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "help_title": "Que sont les décorateurs de messages ?",
+      "help_description": "Les décorateurs peuvent modifier à la volée les messages affichés dans les résultats de recherche. Ces modifications ne sont pas enregistrées et ne sont affichées que dans les résultats de recherche. La configuration des décorateurs est enregistrée <strong>par Stream</strong>.",
+      "help_order": "Utilisez le glisser-déposer pour modifier l'ordre de traitement des décorateurs.",
+      "help_docs": "En savoir plus sur les décorateurs de messages dans la <docsLink>documentation</docsLink>."
+    },
+    "show_message_in_new_row": "Afficher le message sur une nouvelle ligne"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "espace",
+    "display_name": "Tableau de données",
+    "pinned_columns_title": "Colonnes épinglées",
+    "show_row_numbers_title": "Afficher les numéros de ligne"
+  },
+  "field_types": {
+    "missing_event_definition": "Event Definition introuvable : {{id}}"
+  },
+  "export": {
+    "title_search": "Exporter tous les résultats de recherche",
+    "title_dashboard": "Exporter les résultats de recherche de la table de messages",
+    "select_different_table": "Sélectionner une autre table de messages",
+    "downloading": "Téléchargement...",
+    "start_download": "Lancer le téléchargement",
+    "settings_based_on": "Les paramètres suivants sont basés sur la table de messages : {{title}}",
+    "exporting_table": "Vous exportez actuellement les résultats de recherche de la table de messages : {{title}}",
+    "define_fields": "Définissez les champs de votre fichier.",
+    "decorated_fields_hint": "L'export prend en charge les champs créés par les décorateurs faisant partie de la table de messages, mais ils n'apparaissent pas actuellement dans la liste des champs. Si vous souhaitez exporter un champ décoré, saisissez simplement son nom.",
+    "finish_hint": "Une fois la configuration terminée, cliquez sur <quote>Lancer le téléchargement</quote>.",
+    "fields_to_export": "Champs à exporter",
+    "messages_limit": "Limite de messages",
+    "limit_help": "Les messages sont chargés par blocs. Si une limite est définie, tous les blocs jusqu'à celui où la limite est atteinte seront récupérés. Le nombre total de messages livrés peut donc être supérieur à la limite définie.",
+    "search_contains_all": "L'export contiendra tous les messages de votre recherche actuelle.",
+    "search_select_table": "Veuillez sélectionner une table de messages pour reprendre ses champs. Vous pourrez ajuster tous les paramètres à l'étape suivante.",
+    "dashboard_select_table": "Veuillez sélectionner la table de messages dont vous souhaitez exporter les résultats de recherche. Vous pourrez ajuster ses champs à l'étape suivante.",
+    "dashboard_equals_action": "Sélectionner une table de messages revient à utiliser l'option « Exporter en CSV » du menu d'actions d'une table de messages.",
+    "select_message_table": "Sélectionner une table de messages",
+    "no_message_table": "Vous devez créer un widget de table de messages pour exporter ses résultats.",
+    "output_format": "Format de sortie",
+    "untitled_view": "{{type}} sans titre"
+  },
+  "enterprise_widgets": {
+    "message_list": "Liste de messages",
+    "results": "Résultats",
+    "events": "Événements",
+    "text_markdown": "Texte/Markdown"
+  },
+  "comma_separated_values_csv": "Valeurs séparées par des virgules (CSV)",
+  "error_widget": {
+    "title": "Lors de la récupération des données de ce widget, les erreurs suivantes se sont produites :"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "Voulez-vous vraiment supprimer ce décorateur ?",
+    "unsaved_changes_confirm": "Vous avez des modifications non enregistrées dans le formulaire de configuration. Cette action les annulera."
+  }
 }
