@@ -883,7 +883,10 @@
         "wait_for_green": "Após cada nó, a atualização aguarda o cluster voltar ao estado verde antes de continuar. Se isso demorar demais, ela é pausada e aguarda que você retome.",
         "each_node_with_versions_one": "Cada um dos seus {{count}} Data Node será atualizado e reiniciado um por vez para levar seu OpenSearch embutido de <strong>{{currentVersion}}</strong> para <strong>{{targetVersion}}</strong>.",
         "each_node_with_versions_other": "Cada um dos seus {{count}} Data Nodes será atualizado e reiniciado um por vez para levar seu OpenSearch embutido de <strong>{{currentVersion}}</strong> para <strong>{{targetVersion}}</strong>.",
-        "each_node_with_versions_many": "Cada um dos seus {{count}} Data Nodes será atualizado e reiniciado um por vez para levar seu OpenSearch embutido de <strong>{{currentVersion}}</strong> para <strong>{{targetVersion}}</strong>."
+        "each_node_one": "Cada um dos seus {{count}} Data Node será atualizado e reiniciado um por vez para levar seu OpenSearch embutido para a versão de destino.",
+        "each_node_other": "Cada um dos seus {{count}} Data Nodes será atualizado e reiniciado um por vez para levar seu OpenSearch embutido para a versão de destino.",
+        "each_node_with_versions_many": "Cada um dos seus {{count}} Data Nodes será atualizado e reiniciado um por vez para levar seu OpenSearch embutido de <strong>{{currentVersion}}</strong> para <strong>{{targetVersion}}</strong>.",
+        "each_node_many": "Cada um dos seus {{count}} Data Nodes será atualizado e reiniciado um por vez para levar seu OpenSearch embutido para a versão de destino."
       },
       "starting": "Iniciando..."
     },
@@ -907,8 +910,11 @@
       "start_upgrade_and_restart": "Iniciar atualização do OpenSearch e reiniciar",
       "starting_rolling_upgrade": "Iniciando atualização contínua do OpenSearch...",
       "title": "Atualizar o OpenSearch embutido dos Data Nodes",
+      "unconfirmed_one": "Índices incompatíveis e o status da atualização não podem ser verificados enquanto {{count}} Data Node estiver indisponível. Eles aparecerão novamente quando todos os Data Nodes estiverem disponíveis.",
+      "unconfirmed_other": "Índices incompatíveis e o status da atualização não podem ser verificados enquanto {{count}} Data Nodes estiverem indisponíveis. Eles aparecerão novamente quando todos os Data Nodes estiverem disponíveis.",
       "upgrade_process": "Processo de atualização",
-      "use_table": "Use a tabela abaixo para reindexar os índices do sistema e arquivar ou excluir os índices de dados antes de continuar."
+      "use_table": "Use a tabela abaixo para reindexar os índices do sistema e arquivar ou excluir os índices de dados antes de continuar.",
+      "unconfirmed_many": "Índices incompatíveis e o status da atualização não podem ser verificados enquanto {{count}} Data Nodes estiverem indisponíveis. Eles aparecerão novamente quando todos os Data Nodes estiverem disponíveis."
     },
     "client_certificate": {
       "certificate_lifetime": "Validade do certificado",
@@ -970,9 +976,12 @@
       "checking": "Verificando o status do OpenSearch...",
       "error": "Não foi possível verificar a versão do OpenSearch embutido dos Data Nodes.",
       "outdated": "O OpenSearch embutido dos Data Nodes não está atualizado.",
+      "unconfirmed_one": "O estado do OpenSearch embutido dos Data Nodes não pode ser confirmado enquanto {{count}} Data Node estiver indisponível.",
+      "unconfirmed_other": "O estado do OpenSearch embutido dos Data Nodes não pode ser confirmado enquanto {{count}} Data Nodes estiverem indisponíveis.",
       "up_to_date": "O OpenSearch embutido dos Data Nodes está atualizado.",
       "up_to_date_with_version": "O OpenSearch embutido dos Data Nodes está atualizado <bold>({{version}}).</bold>",
-      "upgrading": "A atualização contínua do OpenSearch está em andamento."
+      "upgrading": "A atualização contínua do OpenSearch está em andamento.",
+      "unconfirmed_many": "O estado do OpenSearch embutido dos Data Nodes não pode ser confirmado enquanto {{count}} Data Nodes estiverem indisponíveis."
     },
     "upgrade_nodes": {
       "manager": "gerenciador",
