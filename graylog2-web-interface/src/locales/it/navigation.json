@@ -1,1 +1,57 @@
-{}
+{
+  "main": {
+    "search": "Ricerca",
+    "streams": "Stream",
+    "alerts": "Avvisi",
+    "dashboards": "Dashboard",
+    "system": "Sistema",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "Panoramica",
+    "configurations": "Configurazioni",
+    "cluster_configuration": "Configurazione del cluster",
+    "inputs": "Input",
+    "outputs": "Output",
+    "indices": "Indici",
+    "logging": "Registrazione",
+    "users_and_teams": "Utenti e team",
+    "roles": "Ruoli",
+    "authentication": "Autenticazione",
+    "content_packs": "Content Pack",
+    "grok_patterns": "Pattern Grok",
+    "lookup_tables": "Lookup Table",
+    "pipelines": "Pipeline",
+    "sidecars": "Sidecar",
+    "collectors": "Collector"
+  },
+  "security": {
+    "overview": "Panoramica",
+    "user_activity": "Attività utente",
+    "host_activity": "Attività host",
+    "network_activity": "Attività di rete",
+    "anomalies": "Anomalie"
+  },
+  "help": {
+    "title": "Aiuto",
+    "documentation": "Documentazione",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Scorciatoie da tastiera",
+    "api_browser": "Browser API"
+  },
+  "user_menu": {
+    "title": "Menu utente di {{name}}",
+    "language": "Lingua",
+    "show_profile": "Mostra profilo",
+    "edit_profile": "Modifica profilo",
+    "log_out": "Esci"
+  },
+  "shell": {
+    "welcome": "Benvenuto",
+    "main": "Principale",
+    "utility": "Utilità",
+    "toggle_navigation": "Mostra/nascondi navigazione",
+    "scratchpad": "Blocco appunti"
+  }
+}

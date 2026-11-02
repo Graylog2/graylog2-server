@@ -1,1 +1,138 @@
-{}
+{
+  "alerts_attributes": {
+    "additional_fields": "Campi aggiuntivi",
+    "aggregation_time_range": "Intervallo di tempo di aggregazione",
+    "description": "Descrizione",
+    "event_definition": "Definizione di evento",
+    "event_definition_type": "Tipo di definizione di evento",
+    "event_procedures": "Procedure dell'evento",
+    "group_by_fields": "Campi di raggruppamento",
+    "id": "ID",
+    "key": "Chiave",
+    "message": "Messaggio",
+    "priority": "Priorità",
+    "tags": "Tag",
+    "timestamp": "Timestamp",
+    "type": "Tipo"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "L'aggiornamento automatico è disattivato durante la segmentazione per evitare problemi di prestazioni.",
+    "auto_refresh_unavailable_title": "Aggiornamento automatico non disponibile",
+    "bulk_replay_search": "Riesegui ricerca",
+    "collapse_metrics": "Comprimi metriche",
+    "details": "Dettagli",
+    "expand_metrics": "Espandi metriche",
+    "histogram_failed": "Caricamento dell'istogramma degli eventi non riuscito: {{error}}",
+    "metrics_title": "Metriche",
+    "no_additional_fields": "A questo evento non sono stati aggiunti campi aggiuntivi.",
+    "no_further_details": "Nessun ulteriore dettaglio",
+    "no_group_by_fields": "Questo evento non ha campi di raggruppamento.",
+    "no_key": "Nessuna chiave impostata per questo evento.",
+    "no_time_range": "Nessun intervallo di tempo",
+    "refresh_human_name": "Eventi",
+    "replay_search": "Riesegui ricerca"
+  },
+  "alerts_replay": {
+    "cannot_replay": "Impossibile rieseguire questo evento: {{reason}} Seleziona un evento diverso.",
+    "close_section": "Chiudi la sezione {{title}}",
+    "details_title": "Dettagli di avviso/evento",
+    "event_definition_details": "Dettagli della definizione di evento",
+    "event_details": "Dettagli dell'evento",
+    "no_remediation_steps": "Nessun passaggio di risoluzione",
+    "open_section": "Apri la sezione {{title}}",
+    "replay_details": "Dettagli della riesecuzione",
+    "replayed_search": "Ricerca rieseguita",
+    "system_event": "L'evento è un evento di sistema: questi non hanno una query, uno stream o un intervallo di tempo associati."
+  },
+  "alerts_types": {
+    "alert": "Avviso",
+    "event": "Evento"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_one": "Sei sicuro di voler eliminare {{count}} definizione di evento?",
+      "confirm_other": "Sei sicuro di voler eliminare {{count}} definizioni di evento?",
+      "error": "Si è verificato un errore durante l'eliminazione delle definizioni di evento. {{error}}",
+      "failed_one": "{{failed}} su {{count}} definizione di evento selezionata non è stata eliminata.",
+      "failed_other": "{{failed}} su {{count}} definizioni di evento selezionate non sono state eliminate.",
+      "success_one": "{{count}} definizione di evento è stata eliminata correttamente.",
+      "success_other": "{{count}} definizioni di evento sono state eliminate correttamente.",
+      "title": "Elimina definizioni di evento",
+      "confirm_many": "Sei sicuro di voler eliminare {{count}} definizioni di evento?",
+      "failed_many": "{{failed}} su {{count}} definizioni di evento selezionate non sono state eliminate.",
+      "success_many": "{{count}} definizioni di evento sono state eliminate correttamente."
+    },
+    "disable": {
+      "confirm_one": "Sei sicuro di voler disattivare {{count}} definizione di evento?",
+      "confirm_other": "Sei sicuro di voler disattivare {{count}} definizioni di evento?",
+      "error": "Si è verificato un errore durante la disattivazione delle definizioni di evento. {{error}}",
+      "failed_one": "{{failed}} su {{count}} definizione di evento selezionata non è stata disattivata.",
+      "failed_other": "{{failed}} su {{count}} definizioni di evento selezionate non sono state disattivate.",
+      "success_one": "{{count}} definizione di evento è stata disattivata correttamente.",
+      "success_other": "{{count}} definizioni di evento sono state disattivate correttamente.",
+      "title": "Disattiva definizioni di evento",
+      "confirm_many": "Sei sicuro di voler disattivare {{count}} definizioni di evento?",
+      "failed_many": "{{failed}} su {{count}} definizioni di evento selezionate non sono state disattivate.",
+      "success_many": "{{count}} definizioni di evento sono state disattivate correttamente."
+    },
+    "enable": {
+      "confirm_one": "Sei sicuro di voler attivare {{count}} definizione di evento?",
+      "confirm_other": "Sei sicuro di voler attivare {{count}} definizioni di evento?",
+      "error": "Si è verificato un errore durante l'attivazione delle definizioni di evento. {{error}}",
+      "failed_one": "{{failed}} su {{count}} definizione di evento selezionata non è stata attivata.",
+      "failed_other": "{{failed}} su {{count}} definizioni di evento selezionate non sono state attivate.",
+      "success_one": "{{count}} definizione di evento è stata attivata correttamente.",
+      "success_other": "{{count}} definizioni di evento sono state attivate correttamente.",
+      "title": "Attiva definizioni di evento",
+      "confirm_many": "Sei sicuro di voler attivare {{count}} definizioni di evento?",
+      "failed_many": "{{failed}} su {{count}} definizioni di evento selezionate non sono state attivate.",
+      "success_many": "{{count}} definizioni di evento sono state attivate correttamente."
+    },
+    "success_title": "Operazione riuscita"
+  },
+  "definitions_list": {
+    "disable": "Disattiva",
+    "enable": "Attiva"
+  },
+  "definitions_page": {
+    "alerts_docs": "Documentazione sugli avvisi",
+    "copy_confirm": "Vuoi davvero creare una copia di \"{{title}}\"?",
+    "copy_title": "Copia definizione di evento",
+    "create_multiple": "Crea definizioni di evento",
+    "description_alerts": "Le definizioni di evento consentono di creare avvisi a partire da diverse condizioni e di generare notifiche su di essi.",
+    "description_events": "Le definizioni di evento consentono di creare eventi a partire da diverse condizioni e di generare avvisi su di essi.",
+    "description_list": "Crea nuove definizioni di evento che ti permetteranno di cercare diverse condizioni e generare avvisi su di esse.",
+    "duplicate": "Duplica definizione di evento",
+    "edit": "Modifica definizione di evento",
+    "edit_named": "Modifica la definizione di evento \"{{title}}\"",
+    "file_import": "Crea definizioni di evento - Importazione da file",
+    "git_import": "Crea definizioni di evento - Importazione da Git",
+    "loading": "Caricamento della definizione di evento...",
+    "new": "Nuova definizione di evento",
+    "new_named": "Nuova definizione di evento \"{{title}}\"",
+    "title": "Definizioni di evento",
+    "view": "Visualizza definizione di evento",
+    "view_named": "Visualizza la definizione di evento \"{{title}}\""
+  },
+  "alerts_page": {
+    "description": "Definisci eventi tramite diverse condizioni. Aggiungi notifiche agli eventi che richiedono la tua attenzione per creare avvisi.",
+    "documentation_title": "Documentazione sugli avvisi",
+    "title": "Avvisi ed eventi"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Hai rimosso tutti gli eventi dall'elenco. Puoi tornare indietro cliccando su <backButton>Torna agli eventi</backButton>",
+    "all_reviewed": "Hai esaminato tutti gli eventi. Ora puoi selezionare un'azione di massa da applicare a tutti gli eventi elencati di seguito.",
+    "list_description": "L'elenco seguente contiene tutti gli eventi/avvisi selezionati nel passaggio precedente e ti consente di esaminare la ricerca rieseguita per ciascuno di essi.",
+    "mark_not_reviewed": "Contrassegna l'evento \"{{id}}\" come non esaminato",
+    "mark_reviewed": "Contrassegna l'evento \"{{id}}\" come esaminato",
+    "remove_event": "Rimuovi l'evento \"{{id}}\" dall'elenco",
+    "replay_search": "Riesegui ricerca",
+    "review_progress": "Esaminati {{completed}}/{{total}} eventi.",
+    "show_selected": "Mostra eventi selezionati",
+    "unknown_message": "Sconosciuto"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Caricamento dell'evento o dell'avviso non riuscito con stato: {{error}}",
+    "load_failed_title": "Impossibile caricare l'evento o l'avviso"
+  }
+}

@@ -1,1 +1,410 @@
-{}
+{
+  "administration": {
+    "collectors_administration": {
+      "edit_configuration": "Modifica configurazione",
+      "inactive": "inattivo",
+      "no_collectors": "Nessun collector da visualizzare",
+      "no_compatible_collectors": "Nessun collector compatibile con {{operatingSystem}}",
+      "no_filter_matches": "Nessun collector corrisponde ai filtri",
+      "select_all": "Seleziona tutto",
+      "selected_one": "{{count}} selezionato",
+      "selected_other": "{{count}} selezionati",
+      "selected_many": "{{count}} selezionati"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "Assegna configurazioni",
+      "cannot_change_configurations": "Impossibile modificare le configurazioni di {{collectors}} collector contemporaneamente.",
+      "incompatible_collectors": "Collector incompatibili, verifica la configurazione del tuo sidecar."
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Stato del collector",
+      "configuration": "Configurazione",
+      "filter_by_collector": "Filtra per collector",
+      "filter_by_configuration": "Filtra per configurazione",
+      "filter_by_os": "Filtra per OS",
+      "filter_by_status": "Filtra per stato del collector",
+      "os": "OS"
+    },
+    "configuration_modal": {
+      "add_configuration": "Aggiungi una nuova configurazione",
+      "assigned_from_tags": "Assegnata dai tag: {{tags}}",
+      "lock_info": "Le configurazioni dei collector contrassegnate con l'icona del lucchetto  <lockIcon/>  sono state assegnate tramite tag e non possono essere modificate qui.",
+      "no_configurations": "Nessuna configurazione disponibile per il collector di log selezionato.",
+      "remove": "Rimuovi {{name}}",
+      "selected": "{{name}} è selezionato",
+      "sidecar_count_one": "{{count}} sidecar: ",
+      "sidecar_count_other": "{{count}} sidecar: ",
+      "title": "Modifica configurazioni di <collectorName>{{name}}</collectorName>",
+      "unknown_collector": "Collector sconosciuto",
+      "sidecar_count_many": "{{count}} sidecar: "
+    },
+    "configuration_summary": {
+      "confirm": "Sei sicuro di voler procedere con questa azione per <summaryText>{{summary}}</summaryText>?",
+      "sidecars_summary_one": "{{count}} sidecar",
+      "sidecars_summary_other": "{{count}} sidecar",
+      "title": "Riepilogo configurazione",
+      "sidecars_summary_many": "{{count}} sidecar"
+    },
+    "filters_summary": {
+      "clear_all": "Cancella tutto",
+      "collector_on_os": "{{name}} su {{os}}",
+      "filters": "Filtri"
+    },
+    "loading_collectors": "Caricamento elenco collector...",
+    "process": {
+      "actions": {
+        "restart": "Riavvia",
+        "start": "Avvia",
+        "stop": "Ferma"
+      },
+      "button": "Processo",
+      "confirm": "Sei sicuro di voler procedere con questa azione?",
+      "no_effect": {
+        "restart": "Riavviare un collector senza configurazione non avrà effetto.",
+        "start": "Avviare un collector senza configurazione non avrà effetto.",
+        "stop": "Fermare un collector senza configurazione non avrà effetto."
+      },
+      "summary": {
+        "restart_one": "Stai per <action>riavviare</action> i collector di log in questo sidecar:",
+        "restart_other": "Stai per <action>riavviare</action> i collector di log in questi sidecar:",
+        "start_one": "Stai per <action>avviare</action> i collector di log in questo sidecar:",
+        "start_other": "Stai per <action>avviare</action> i collector di log in questi sidecar:",
+        "stop_one": "Stai per <action>arrestare</action> i collector di log in questo sidecar:",
+        "stop_other": "Stai per <action>arrestare</action> i collector di log in questi sidecar:",
+        "restart_many": "Stai per <action>riavviare</action> i collector di log in questi sidecar:",
+        "start_many": "Stai per <action>avviare</action> i collector di log in questi sidecar:",
+        "stop_many": "Stai per <action>arrestare</action> i collector di log in questi sidecar:"
+      },
+      "summary_title": "Riepilogo azione sui processi",
+      "title": "Gestisci i processi dei collector",
+      "understood": "Ho capito, continua comunque",
+      "warning_text": "Almeno un collector selezionato non è ancora configurato. Per avviare un nuovo collector, assegnagli una configurazione e il Sidecar avvierà il processo per te.",
+      "warning_title": "Collector senza configurazione"
+    }
+  },
+  "common": {
+    "clone_menu": {
+      "done": "Fatto",
+      "name": "Nome",
+      "name_help": "Digita un nome per il nuovo collector",
+      "title": "Clona"
+    },
+    "collector_indicator": {
+      "on_os": "su {{operatingSystem}}"
+    },
+    "save": "Salva",
+    "sidecar_search_form": {
+      "field_last_seen": "Data e ora dell'ultima comunicazione del sidecar con {{productName}}",
+      "field_node_id": "Identificatore del sidecar",
+      "field_operating_system": "Sistema operativo su cui è in esecuzione il sidecar",
+      "field_sidecar_version": "Versione del sidecar",
+      "field_status": "Stato del sidecar come appare nell'elenco, ovvero in esecuzione, in errore o sconosciuto",
+      "last_seen_example": "Trova i sidecar che non comunicano da una data specifica:",
+      "placeholder": "Trova sidecar",
+      "status_example": "Trova i sidecar con stato <code>failing</code> o <code>unknown</code>:"
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "Crea collector",
+      "default_template": "Modello predefinito",
+      "default_template_help": "La configurazione predefinita del collector.",
+      "execute_parameters": "Parametri di esecuzione",
+      "execute_parameters_help": "Parametri con cui viene avviato il collector.<strong> %s verrà sostituito con il percorso del file di configurazione.</strong>",
+      "executable_path": "Percorso dell'eseguibile",
+      "executable_path_help": "Percorso dell'eseguibile del collector",
+      "name": "Nome",
+      "name_help": "Nome di questo collector",
+      "operating_system": "Sistema operativo",
+      "operating_system_help": "Scegli il sistema operativo per cui è destinato questo collector.",
+      "optional": "(Facoltativo)",
+      "process_management": "Gestione dei processi",
+      "service_type": "Tipo di servizio",
+      "service_type_exec": "Esecuzione in primo piano",
+      "service_type_help": "Scegli il tipo di servizio per cui è destinato questo collector.",
+      "service_type_svc": "Servizio Windows",
+      "update_collector": "Aggiorna collector",
+      "validation_parameters": "Parametri per la validazione della configurazione",
+      "validation_parameters_help": "Parametri che validano il file di configurazione. <strong> %s verrà sostituito con il percorso del file di configurazione.</strong>"
+    },
+    "configuration_form": {
+      "change_color": "Cambia colore",
+      "collector": "Collector",
+      "collector_help": "Scegli il collector di log per cui è destinata questa configurazione.",
+      "collector_in_use": "Il collector di log non può essere modificato mentre la configurazione è in uso. Clona la configurazione per testarla con un altro collector.",
+      "collector_on_os": "{{name}} su {{os}}",
+      "collector_placeholder": "Collector",
+      "color": "Colore della configurazione",
+      "color_help": "Scegli un colore da usare per questa configurazione.",
+      "create_configuration": "Crea configurazione",
+      "name": "Nome",
+      "name_help": "Obbligatorio. Nome di questa configurazione",
+      "preview": "Anteprima",
+      "tags": "Tag di assegnazione della configurazione",
+      "tags_help": "I sidecar configurati con un tag corrispondente riceveranno automaticamente questa configurazione.",
+      "template": "Configurazione",
+      "template_help": "Obbligatorio. Configurazione del collector, consulta il riferimento rapido per maggiori informazioni.",
+      "template_required": "Compila il campo della configurazione.",
+      "unknown_collector": "Collector sconosciuto",
+      "update_configuration": "Aggiorna configurazione",
+      "use_default_template_confirm": "Vuoi usare il modello predefinito per la configurazione selezionata?"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Riferimento Filebeat",
+      "nxlog_reference": "Manuale di riferimento NXLog",
+      "reference_help": "Forniamo modelli di configurazione dei collector per iniziare.<lineBreak/>Per maggiori informazioni consulta la documentazione ufficiale del tuo collector.",
+      "runtime_variables_help": "Queste variabili verranno popolate con le informazioni di runtime di ciascun Sidecar",
+      "tab_reference": "Riferimento",
+      "tab_runtime_variables": "Variabili di runtime",
+      "tab_variables": "Variabili",
+      "title": "Riferimento configurazione collector",
+      "variables_help": "Usa le variabili per condividere frammenti di testo tra più configurazioni.<lineBreak/>Se il formato della tua configurazione richiede letterali come <code>${foo}</code>, che non devono agire come variabili, dovrai scriverli come <code>${'$'}{foo}</code>.",
+      "winlogbeat_reference": "Riferimento Winlogbeat"
+    },
+    "configuration_tags_select": {
+      "placeholder": "Scegli tag..."
+    },
+    "source_view_modal": {
+      "close": "Chiudi",
+      "empty_template": "<empty template>",
+      "error_fetching_configuration": "Errore durante il recupero della configurazione: {{error}}",
+      "error_rendering_preview": "Errore durante la generazione dell'anteprima: {{error}}",
+      "title": "Configurazione"
+    },
+    "configuration_variables_helper": {
+      "actions": "Azioni",
+      "close": "Chiudi",
+      "delete": "Elimina",
+      "delete_confirm_text": "Sei sicuro di voler rimuovere la variabile di configurazione <strong>{{name}}</strong>?",
+      "delete_confirm_title": "Eliminare la variabile di configurazione?",
+      "description": "Descrizione",
+      "error_delete_title": "Errore durante l'eliminazione della variabile di configurazione <strong>${user.{{name}}}</strong>",
+      "error_in_use": "Impossibile eliminare questa variabile di configurazione perché è ancora in uso. Rimuovi la variabile dalle seguenti configurazioni e riprova.",
+      "name": "Nome"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "Crea",
+      "create_variable": "Crea variabile",
+      "content": "Contenuto",
+      "content_help": "Scrivi il contenuto della variabile",
+      "description": "Descrizione",
+      "description_help": "Digita una descrizione per questa variabile",
+      "edit": "Modifica",
+      "edit_action": "Modifica",
+      "name": "Nome",
+      "name_help": "Digita un nome per questa variabile",
+      "optional": "(Facoltativo)",
+      "title": "{{action}} variabile ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "Descrizione",
+      "name": "Nome",
+      "node_id": "UUID del sidecar.",
+      "node_name": "Il nome del sidecar; se non impostato, viene usato il nome host.",
+      "operating_system": "Nome del sistema operativo su cui è in esecuzione il sidecar, ad esempio <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "Stringa di versione del sidecar in esecuzione.",
+      "spool_dir": "Una directory univoca per ogni configurazione, utilizzabile per memorizzare i dati del collector.",
+      "tags": "Una mappa dei tag impostati per il sidecar. Può essere usata per generare frammenti di configurazione condizionali, ad esempio:"
+    }
+  },
+  "configurations": {
+    "collector_list": {
+      "actions": "Azioni",
+      "create_collector": "Crea collector di log",
+      "description": "Gestisci i collector di log che puoi configurare e controllare tramite i sidecar e l'interfaccia web.",
+      "name": "Nome",
+      "no_data": "Non ci sono collector di log da visualizzare. Perché non ne crei uno?",
+      "operating_system": "Sistema operativo",
+      "placeholder": "Trova collector",
+      "title": "Collector di log",
+      "total": "{{total}} in totale"
+    },
+    "collector_row": {
+      "delete_confirm": "Stai per eliminare il collector \"{{name}}\". Sei sicuro?",
+      "edit": "Modifica"
+    },
+    "configuration_list": {
+      "actions": "Azioni",
+      "collector": "Collector",
+      "color": "Colore",
+      "configuration": "Configurazione",
+      "create_configuration": "Crea configurazione",
+      "description": "Queste sono le configurazioni da usare nei tuoi collector. Ricorda di applicare le nuove configurazioni ai collector nella pagina Amministrazione.",
+      "no_data": "Non ci sono configurazioni da visualizzare: prova a crearne una o a modificare la ricerca.",
+      "placeholder": "Trova configurazioni",
+      "title": "Configurazioni",
+      "total": "{{total}} in totale"
+    },
+    "configuration_row": {
+      "clone": "Clona",
+      "delete_confirm": "Stai per eliminare la configurazione \"{{name}}\". Sei sicuro?",
+      "edit": "Modifica",
+      "unknown_collector": "Collector sconosciuto"
+    }
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {
+        "collector": "Collector",
+        "error_message": "Messaggio di errore",
+        "last_seen": "Ultimo rilevamento",
+        "sidecar": "Sidecar",
+        "status": "Stato",
+        "verbose_message": "Messaggio dettagliato"
+      },
+      "hide_inactive_sidecars": "Nascondi sidecar inattivi",
+      "include_inactive_hint": " e/o clicca su \"Includi sidecar inattivi\"",
+      "include_inactive_sidecars": "Includi sidecar inattivi",
+      "no_failures": "Non ci sono sidecar con errori.",
+      "no_matching_sidecars": "Non ci sono sidecar con errori che corrispondono ai criteri di ricerca. Prova a modificare il filtro di ricerca: {{query}} {{inactiveHint}}"
+    },
+    "rows": {
+      "inactive_annotation": " (inattivo)",
+      "show_more": "Mostra altro",
+      "sidecar_version": "v{{version}}"
+    }
+  },
+  "basic_sidecar_user": {
+    "load_failed": "Caricamento dell'utente Sidecar non riuscito con stato: {{error}}",
+    "load_failed_title": "Impossibile caricare l'utente Sidecar"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "Filtra file"
+  },
+  "sidecars": {
+    "sidecar_list": {
+      "hide_inactive_sidecars": "Nascondi sidecar inattivi",
+      "include_inactive_hint": " e/o clicca su \"Includi sidecar inattivi\"",
+      "include_inactive_sidecars": "Includi sidecar inattivi",
+      "last_seen": "Ultimo rilevamento",
+      "name": "Nome",
+      "no_matching_sidecars": "Non ci sono sidecar che corrispondono ai criteri di ricerca. Prova a modificare il filtro di ricerca{{inactiveHint}}.",
+      "no_sidecars": "Non ci sono sidecar configurati.",
+      "node_id": "ID nodo",
+      "operating_system": "Sistema operativo",
+      "sidecar_version": "Versione del sidecar",
+      "status": "Stato"
+    },
+    "sidecar_row": {
+      "inactive_annotation": " (inattivo)",
+      "manage_sidecar": "Gestisci sidecar",
+      "show_messages": "Mostra messaggi"
+    },
+    "sidecar_status": {
+      "collector_running": "Il collector è in esecuzione.",
+      "collector_unknown": "Lo stato del collector non è attualmente noto.",
+      "collectors_status_title": "Stato dei collector",
+      "collectors_status_unavailable": "Lo stato dei collector non è attualmente disponibile. Attendi un momento e verifica che il sidecar sia connesso correttamente al server.",
+      "cpu_idle": "CPU inattiva",
+      "ip_address": "Indirizzo IP",
+      "load": "Carico",
+      "log_files_title": "File di log",
+      "node_details_title": "Dettagli del nodo",
+      "node_details_unavailable": "I dettagli del nodo non sono attualmente disponibili. Attendi un momento e verifica che il sidecar sia connesso correttamente al server.",
+      "no_collectors": "Nessun collector configurato in questo sidecar.",
+      "no_status_received": "Stato dei collector non ricevuto. Imposta l'opzione <code>send_status: true</code> nella configurazione del sidecar per visualizzare queste informazioni.",
+      "none": "Nessuno",
+      "not_available": "Non disponibile",
+      "operating_system": "Sistema operativo",
+      "recently_modified": "I file modificati di recente saranno evidenziati in blu.",
+      "show_details": "Mostra dettagli",
+      "volumes_75": "Volumi pieni al di sopra del 75%"
+    },
+    "verbose_message_modal": {
+      "close": "Chiudi",
+      "no_messages": "<no messages>",
+      "title": "Dettagli errore per <em>{{collectorName}}</em>"
+    }
+  },
+  "pages": {
+    "administration": {
+      "description": "I collector possono inoltrare in modo affidabile il contenuto dei file di log o dell'EventLog di Windows dai tuoi server.",
+      "title": "Amministrazione dei collector"
+    },
+    "configuration": {
+      "description": "Il Collector Sidecar viene eseguito accanto al tuo collector di log preferito e lo configura per te. Qui puoi gestire le configurazioni dei sidecar.",
+      "title": "Configurazione dei collector"
+    },
+    "documentation_title": "Documentazione del Sidecar",
+    "edit_collector": {
+      "description": "Alcune informazioni sui collector di log.",
+      "title": "Collector di log"
+    },
+    "edit_configuration": {
+      "description": "Alcune informazioni sulle configurazioni dei collector.",
+      "title": "Configurazione del collector"
+    },
+    "failure_tracking": {
+      "description": "Il Sidecar Failure Tracking fornisce informazioni utili aggiuntive sulle cause degli errori, che possono aiutarti a ridurre i tempi di risoluzione dei problemi e a riportare i collector online più rapidamente.",
+      "document_title": "Sidecar",
+      "title": "Monitoraggio errori"
+    },
+    "new_collector": {
+      "description": "Alcune informazioni sui collector di log.",
+      "title": "Nuovo collector di log"
+    },
+    "new_configuration": {
+      "description": "Alcune informazioni sulle configurazioni dei collector.",
+      "title": "Nuova configurazione del collector"
+    },
+    "overview": {
+      "description": "I sidecar possono inoltrare in modo affidabile il contenuto dei file di log o dell'EventLog di Windows dai tuoi server.",
+      "document_title": "Sidecar",
+      "title": "Panoramica dei Sidecar",
+      "token_hint": "Ti serve un token API per un sidecar? <tokenLink>Crea o riutilizza un token per l'utente <em>{{username}}</em></tokenLink>"
+    },
+    "status": {
+      "description": "Una panoramica dello stato del Sidecar.",
+      "document_title": "Stato del Sidecar",
+      "document_title_named": "Stato del Sidecar {{name}}",
+      "documentation_title": "Documentazione dei Sidecar",
+      "title": "Stato del Sidecar <em>{{name}}</em>"
+    }
+  },
+  "notifications": {
+    "fetch_failed": "Recupero delle variabili di configurazione non riuscito con stato: {{error}}",
+    "fetch_failed_title": "Impossibile recuperare le variabili di configurazione",
+    "save_success_created": "Variabile di configurazione \"{{name}}\" creata con successo",
+    "save_success_updated": "Variabile di configurazione \"{{name}}\" aggiornata con successo",
+    "save_failed": "Salvataggio della variabile \"{{name}}\" non riuscito con stato: {{error}}",
+    "save_failed_title": "Impossibile salvare la variabile",
+    "delete_success": "Variabile di configurazione \"{{name}}\" eliminata con successo",
+    "delete_failed": "Eliminazione della variabile \"{{name}}\" non riuscita con stato: {{error}}",
+    "delete_failed_title": "Impossibile eliminare la variabile",
+    "validate_failed": "Convalida della variabile \"{{name}}\" non riuscita con stato: {{error}}",
+    "validate_failed_title": "Impossibile convalidare la variabile",
+    "configurations_fetch_failed": "Recupero delle configurazioni per questa variabile non riuscito con stato: {{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "Recupero del Sidecar non riuscito con stato: {{error}}",
+    "fetch_failed_title": "Impossibile recuperare il Sidecar",
+    "not_found": "Impossibile trovare un sidecar con ID <{{sidecarId}}>; potrebbe essere stato inattivo per troppo tempo.",
+    "fetch_actions_failed": "Recupero delle azioni del Sidecar non riuscito con stato: {{error}}",
+    "fetch_actions_failed_title": "Impossibile recuperare le azioni del Sidecar",
+    "restart_failed": "Riavvio del Sidecar non riuscito con stato: {{error}}",
+    "restart_failed_title": "Impossibile riavviare il Sidecar",
+    "configuration_change_requested": "Richiesta di modifica della configurazione per {{amount}} collector",
+    "fetch_sidecars_failed": "Recupero dei Sidecar non riuscito con stato: {{error}}",
+    "fetch_sidecars_failed_title": "Impossibile recuperare i Sidecar"
+  },
+  "use_sidecars_administration_notifications": {
+    "fetch_sidecars_failed": "Recupero dei Sidecar non riuscito con stato: {{error}}",
+    "fetch_sidecars_failed_title": "Impossibile recuperare i Sidecar",
+    "requested": {
+      "start": "Richiesta di avvio per {{amount}} collector",
+      "restart": "Richiesta di riavvio per {{amount}} collector",
+      "stop": "Richiesta di arresto per {{amount}} collector"
+    },
+    "request_failed": {
+      "start": "Richiesta di avvio non riuscita con stato: {{error}}",
+      "restart": "Richiesta di riavvio non riuscita con stato: {{error}}",
+      "stop": "Richiesta di arresto non riuscita con stato: {{error}}"
+    },
+    "request_failed_title": {
+      "start": "Impossibile avviare i collector",
+      "restart": "Impossibile riavviare i collector",
+      "stop": "Impossibile arrestare i collector"
+    }
+  }
+}

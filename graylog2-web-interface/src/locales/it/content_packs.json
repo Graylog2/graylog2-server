@@ -1,1 +1,249 @@
-{}
+{
+  "apply_parameter": {
+    "action": "Azione",
+    "apply": "Applica",
+    "choose": "Scegli...",
+    "choose_config_key": "Scegli chiave di configurazione",
+    "clear": "Cancella",
+    "config_key": "Chiave di configurazione",
+    "create_parameter_first": "Crea prima un parametro",
+    "no_parameter_of_type": "Nessun parametro di tipo {{type}}",
+    "parameter": "Parametro"
+  },
+  "constraints": {
+    "fulfilled": "Soddisfatto",
+    "name": "Nome",
+    "title": "Vincoli",
+    "type": "Tipo",
+    "version": "Versione"
+  },
+  "details": {
+    "description": "Descrizione",
+    "entities": "Entità:",
+    "id": "ID:",
+    "name": "Nome:",
+    "parameters": "Parametri:",
+    "summary": "Riepilogo:",
+    "title": "Dettagli",
+    "url": "URL:",
+    "vendor": "Fornitore:",
+    "version": "Versione:"
+  },
+  "download": {
+    "download": "Scarica",
+    "info": "Fai clic con il tasto destro sul link di download qui sotto e scegli \"Salva link con nome...\" per scaricare il file JSON.",
+    "title": "Scarica content pack"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parametri",
+      "preview": "Anteprima",
+      "selection": "Selezione dei contenuti"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Crea parametro",
+    "default_value": "Valore predefinito",
+    "default_value_help": "Indica un valore predefinito se il parametro non è opzionale.",
+    "description": "Descrizione",
+    "description_help": "Descrivi cosa verrà fatto con questo parametro.",
+    "description_required": "La descrizione è obbligatoria.",
+    "edit_title": "Modifica parametro",
+    "name": "Nome",
+    "name_help": "Viene usato come riferimento al parametro e non deve contenere spazi.",
+    "name_invalid": "Il nome del parametro deve contenere solo A-Z, a-z, 0-9 e _",
+    "name_not_unique": "Il nome del parametro deve essere univoco.",
+    "name_required": "Il nome è obbligatorio.",
+    "not_boolean": "Non è un valore booleano. Deve essere true o false.",
+    "not_double": "Non è un valore decimale.",
+    "not_integer": "Non è un valore intero.",
+    "title": "Titolo",
+    "title_help": "Indica un titolo descrittivo per questo content pack.",
+    "title_required": "Il titolo è obbligatorio.",
+    "value_type": "Tipo di valore",
+    "value_type_help": "Indica il tipo del parametro."
+  },
+  "entities": {
+    "action": "Azione",
+    "config_title": "Configurazione entità",
+    "description": "Descrizione",
+    "edit_title": "Modifica",
+    "list_title": "Elenco entità",
+    "origin": "Origine",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "Server",
+    "show": "Mostra",
+    "title": "Titolo",
+    "type": "Tipo",
+    "used_parameters": "Parametri utilizzati"
+  },
+  "entity_config": {
+    "config_key": "Chiave di configurazione",
+    "parameter_type": "parametro ({{type}})",
+    "type": "Tipo",
+    "value": "Valore"
+  },
+  "entity_index": {
+    "load_failed": "Caricamento dell'indice delle entità non riuscito con stato",
+    "load_failed_title": "Impossibile caricare l'indice delle entità"
+  },
+  "import": {
+    "error_message": "Errore durante l'importazione del content pack: verifica che sia un file JSON valido. Consulta i log del server {{productName}} per maggiori informazioni.",
+    "error_title": "Impossibile importare il content pack",
+    "success_message": "Content pack importato correttamente",
+    "success_named": "Content pack \"{{name}}\" importato correttamente",
+    "success_title": "Operazione riuscita!"
+  },
+  "install": {
+    "comment": "Commento di installazione",
+    "comment_help": "Questo commento verrà salvato con l'installazione del content pack e può essere usato per descrivere il motivo di questa installazione.",
+    "configure_parameters": "Configura parametro/i:",
+    "needs_to_be_filled": "Da compilare.",
+    "share_description": "Cerca un utente o un team da aggiungere come collaboratore alle entità di questo content pack."
+  },
+  "install_entities": {
+    "installed": "Entità installate",
+    "title": "Titolo",
+    "to_be_uninstalled": "Entità da disinstallare",
+    "type": "Tipo"
+  },
+  "install_view": {
+    "comment": "Commento:",
+    "general_information": "Informazioni generali",
+    "installed_at": "Installato il:",
+    "installed_by": "Installato da:"
+  },
+  "installations": {
+    "action": "Azione",
+    "comment": "Commento",
+    "uninstall": "Disinstalla",
+    "version": "Versione",
+    "view": "Visualizza",
+    "view_title": "Visualizza installazione"
+  },
+  "list": {
+    "no_match": "Nessun content pack corrispondente è stato trovato",
+    "none_found": "Nessun content pack trovato. Crea o carica un content pack"
+  },
+  "list_item": {
+    "create_new_version": "Crea nuova versione",
+    "delete_all_versions": "Elimina tutte le versioni",
+    "install": "Installa",
+    "install_title": "Installa content pack",
+    "latest_version": "Ultima versione: {{rev}}",
+    "show": "Mostra",
+    "update": "Aggiorna"
+  },
+  "notifications": {
+    "error": "Errore",
+    "success": "Operazione riuscita"
+  },
+  "overview": {
+    "button_text": "Content Pack",
+    "delete_confirmation": "Stai per eliminare questo Content Pack, sei sicuro?",
+    "delete_error_message": "Eliminazione del bundle non riuscita: {{error}}",
+    "delete_success": "Content Pack eliminato correttamente.",
+    "description": "I Content Pack velocizzano la configurazione per una specifica sorgente di dati. Un Content Pack può includere input/estrattori, stream e dashboard.",
+    "install_error_message": "Installazione del content pack non riuscita con stato: {{status}}. Impossibile installare il Content Pack con ID: {{id}}",
+    "install_success": "Content Pack installato correttamente.",
+    "title": "Content Pack",
+    "marketplace_prefix": "Trova altri Content Pack in"
+  },
+  "pages": {
+    "back_button": "Content Pack",
+    "create_title": "Crea content pack",
+    "description": "I content pack velocizzano la configurazione per una specifica sorgente di dati. Un content pack può includere input/estrattori, stream e dashboard.",
+    "document_title": "Content pack",
+    "edit_title": "Modifica content pack",
+    "marketplace_prefix": "Trova altri content pack in"
+  },
+  "parameter_list": {
+    "action": "Azione",
+    "default_value": "Valore predefinito",
+    "delete_parameter": "Elimina parametro",
+    "description": "Descrizione",
+    "edit_modal": "Finestra di modifica",
+    "list_title": "Elenco parametri",
+    "modal_title": "Parametro",
+    "name": "Nome",
+    "no_data": "Per usare i parametri nei content pack, è necessario prima creare un parametro, che potrà poi essere applicato a un'entità.",
+    "still_in_use": "Ancora in uso",
+    "title": "Titolo",
+    "used": "Utilizzato",
+    "value_type": "Tipo di valore"
+  },
+  "parameters": {
+    "confirm_deletion": "Conferma eliminazione",
+    "delete_confirmation": "Sei sicuro di voler eliminare questo parametro: {{title}}?"
+  },
+  "preview": {
+    "create": "Crea",
+    "create_and_download": "Crea e scarica"
+  },
+  "revisions": {
+    "fetch_error": "Errore durante il recupero delle revisioni del content pack: {{error}}",
+    "fetch_error_title": "Impossibile recuperare il content pack"
+  },
+  "selection": {
+    "description": "Descrizione",
+    "description_help": "Fornisci una descrizione dettagliata del content pack in markdown.",
+    "general_information": "Informazioni generali",
+    "must_be_filled": "Campo obbligatorio.",
+    "name": "Nome",
+    "name_help": "Obbligatorio. Indica un nome descrittivo per questo content pack.",
+    "no_pairs_hint": "Le entità di questa versione del content pack non sono mai state installate, quindi non ci sono entità installate da selezionare.",
+    "select_entity": "Seleziona almeno un'entità.",
+    "select_latest": "Seleziona le ultime versioni installate",
+    "select_older": "Seleziona le versioni precedenti del content pack",
+    "summary": "Riepilogo",
+    "summary_help": "Obbligatorio. Fornisci un breve riepilogo del content pack.",
+    "title": "Selezione Content Pack",
+    "url": "URL",
+    "url_help": "Dove trovare il content pack, ad esempio un URL di GitHub.",
+    "url_invalid": "URL non valido",
+    "url_protocol": "Deve essere un URL che inizia con http o https.",
+    "vendor": "Fornitore",
+    "vendor_help": "Obbligatorio. Chi ha creato questo content pack e come può essere contattato, ad esempio nome ed email.",
+    "version_help": "Per ogni entità puoi selezionare l'ultima versione installata (<latestIcon />) oppure la versione precedente del content pack (<olderIcon />)."
+  },
+  "show": {
+    "delete_revision_confirmation": "Stai per eliminare questa revisione del content pack, sei sicuro?",
+    "delete_revision_error": "Eliminazione del content pack non riuscita: {{error}}",
+    "delete_revision_success": "Revisione del content pack eliminata correttamente.",
+    "install_error": "Installazione del content pack non riuscita con stato: {{status}}. Impossibile installare il content pack con ID: {{id}}",
+    "installations": "Installazioni",
+    "not_found": "Impossibile trovare il Content Pack con ID {{id}}; potrebbe essere stato eliminato.",
+    "server_error": "Si è verificato un errore interno del server. Consulta i file di log per maggiori informazioni",
+    "uninstall_confirmation": "Vuoi davvero disinstallare questo Content Pack?",
+    "uninstall_error": "Disinstallazione del content pack non riuscita, consulta i log per maggiori informazioni.",
+    "uninstall_success": "Content Pack disinstallato correttamente.",
+    "versions": "Versioni"
+  },
+  "status": {
+    "edited": "modificato",
+    "error": "errore",
+    "installed": "installato",
+    "updatable": "aggiornabile"
+  },
+  "upload": {
+    "button": "Carica",
+    "choose_file": "Scegli file",
+    "choose_file_help": "Scegli un Content Pack dal disco",
+    "title": "Carica Content Pack"
+  },
+  "value_types": {
+    "boolean": "Booleano",
+    "double": "Decimale",
+    "integer": "Intero",
+    "string": "Stringa"
+  },
+  "version_item": {
+    "actions": "Azioni",
+    "create_from_revision": "Crea nuovo da revisione"
+  },
+  "versions": {
+    "action": "Azione",
+    "revision": "Revisione",
+    "select": "Seleziona"
+  }
+}

@@ -1,1 +1,415 @@
-{}
+{
+  "title": "Pipeline",
+  "overview_header_title": "Panoramica delle pipeline",
+  "documentation_link_title": "Documentazione sulle pipeline",
+  "overview_description": "Le pipeline consentono di trasformare ed elaborare i messaggi provenienti dagli stream. Una pipeline è composta da stage in cui le regole vengono valutate e applicate. I messaggi possono attraversare uno o più stage.",
+  "new_pipeline": "Nuova pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Le pipeline consentono di trasformare ed elaborare i messaggi provenienti dagli stream. Una pipeline è composta da stage in cui le regole vengono valutate e applicate. I messaggi possono attraversare uno o più stage.\nAl termine di ogni stage puoi decidere se i messaggi che corrispondono a tutte le regole o a una sola di esse proseguono verso lo stage successivo.",
+  "rules_page_title": "Regole della pipeline",
+  "rules_page_header_title": "Regole della pipeline",
+  "rules_page_documentation_link": "Documentazione sulle regole della pipeline",
+  "rules_page_description": "Le regole sono un modo per applicare modifiche ai messaggi. Una regola è composta da una condizione e da un elenco di azioni. La condizione viene valutata sul messaggio e le azioni vengono eseguite se la condizione è soddisfatta.",
+  "rules_delete_confirm": "Vuoi davvero eliminare la regola \"{{title}}\"?",
+  "rule_details_new_title": "Nuova regola della pipeline",
+  "rule_details_title": "Regola della pipeline {{title}}",
+  "rule_details_loading": "Caricamento dei dettagli della regola...",
+  "loading_rule": "Caricamento della regola",
+  "create_pipeline_rule": "Crea regola della pipeline",
+  "pipeline_rule": "Regola della pipeline <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "Usa l'editor del codice sorgente",
+  "rule_is_managed_warning": "Questa regola è gestita da Application. Non puoi modificarla.",
+  "switch_to_source_code_editor": "Passa all'editor del codice sorgente",
+  "switch_to_source_code_editor_confirm_text": "Stai per lasciare questa pagina e passare all'editor del codice sorgente.",
+  "switch_to_source_code_editor_confirm_warning": "Assicurati di non avere modifiche non salvate.",
+  "pipeline_new": {
+    "description": "Assegna un nome e una descrizione alla nuova pipeline. Puoi aggiungere degli stage quando salvi le modifiche."
+  },
+  "processing_errors": {
+    "rate_suffix": "errori/s",
+    "total": "({{total}} in totale)"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "Vuoi davvero eliminare la pipeline \"{{title}}\"? Questa azione non può essere annullata.",
+    "filter_label": "Filtra pipeline",
+    "no_pipelines": "Nessuna pipeline trovata",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "Collegata agli stream",
+      "processing_errors": "Errori di elaborazione",
+      "pipeline_load": "Carico della pipeline (15m)",
+      "processing_timeline": "Cronologia di elaborazione",
+      "actions": "Azioni"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "Le metriche di debug sono attive",
+    "banner_text": "Le metriche di debug aumentano il carico sull'elaborazione dei messaggi e l'uso della memoria. Disattivale al termine della risoluzione dei problemi. I valori del Carico della pipeline sono calcolati su una finestra di 15 minuti e potrebbero richiedere alcuni minuti per stabilizzarsi dopo l'attivazione.",
+    "disable": "Disattiva metriche di debug",
+    "enable": "Attiva metriche di debug",
+    "help": "Il Carico della pipeline (15m) mostra la quota relativa del tempo di esecuzione delle regole della pipeline nell'intero cluster. Attiva le metriche di debug per iniziare a raccogliere i dati dei timer. I valori possono impiegare fino a circa 15 minuti per essere visualizzati dopo l'attivazione, e la raccolta aggiunge overhead all'elaborazione dei messaggi."
+  },
+  "pipeline": {
+    "not_connected": "Questa pipeline non è attualmente collegata ad alcuno stream. Devi collegare la pipeline ad almeno uno stream affinché elabori i messaggi in arrivo. Non è necessario se intendi usare questa pipeline solo per trasformare i risultati di ricerca tramite decorator.",
+    "delete_stage_confirm": "Stai per eliminare lo stage {{stage}}, vuoi continuare?",
+    "list_and": " e ",
+    "processing_streams_one": "Questa pipeline elabora i messaggi dello stream {{streams}}.",
+    "processing_streams_other": "Questa pipeline elabora i messaggi degli stream {{streams}}.",
+    "managed_1": "Questa pipeline è gestita dal sistema e può essere modificata solo in parte.",
+    "managed_2": "Alla pipeline possono essere aggiunte regole solo tramite l'Input Wizard.",
+    "managed_3": "Le regole della pipeline contenute in questa pipeline verranno rinominate automaticamente per riflettere le modifiche al nome dell'input corrispondente.",
+    "managed_4": "Le regole della pipeline possono essere rimosse manualmente da questa pipeline, ma non aggiunte manualmente.",
+    "connections_title": "Collegamenti della pipeline",
+    "no_connections": "Seleziona gli stream che saranno elaborati da questa pipeline.",
+    "stages_title": "Stage della pipeline",
+    "stages_description": "Gli stage sono gruppi di condizioni e azioni che devono essere eseguiti in ordine e che determinano il flusso di controllo, ovvero se eseguire o meno il resto della pipeline.",
+    "no_rules_on_stage": "In questo stage non ci sono regole.",
+    "processing_streams_many": "Questa pipeline elabora i messaggi degli stream {{streams}}."
+  },
+  "connections_form": {
+    "streams_help": "Seleziona gli stream che vuoi collegare a questa pipeline, oppure creane uno nella <streamsLink>pagina Stream</streamsLink>.",
+    "edit": "Modifica collegamenti",
+    "title": "Modifica i collegamenti per <pipelineTitle>{{title}}</pipelineTitle>",
+    "submit": "Aggiorna collegamenti",
+    "streams": "Stream"
+  },
+  "details": {
+    "title": "Dettagli",
+    "title_label": "Titolo",
+    "description": "Descrizione",
+    "created": "Creata",
+    "last_modified": "Ultima modifica",
+    "throughput": "Throughput attuale",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "Titolo",
+    "title_help": "Nome della pipeline.",
+    "description": "Descrizione",
+    "description_help": "Descrizione della pipeline.",
+    "add_button": "Aggiungi nuova pipeline",
+    "edit_button": "Modifica dettagli della pipeline",
+    "add_title": "Aggiungi nuova pipeline {{title}}",
+    "edit_title": "Modifica pipeline {{title}}",
+    "add_submit": "Aggiungi pipeline",
+    "update_submit": "Aggiorna pipeline",
+    "create_submit": "Crea pipeline"
+  },
+  "list_item": {
+    "idle": "Inattiva",
+    "stage": "Stage {{stage}}",
+    "loading": "Caricamento della pipeline...",
+    "managed": "Gestita da Application",
+    "throughput_prefix": "Throughput:",
+    "throughput_suffix": "msg/s",
+    "not_connected": "Non collegata",
+    "edit_aria": "Modifica pipeline",
+    "edit": "Modifica",
+    "delete_aria": "Elimina pipeline",
+    "delete": "Elimina"
+  },
+  "stage_rules": {
+    "invalid_rule": "La regola {{name}} è stata rinominata o rimossa. Questa regola verrà ignorata.",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errori/s",
+    "remove_title": "Rimuovi {{title}}",
+    "removing": "Rimozione...",
+    "remove": "Rimuovi",
+    "no_rules": "Questo stage non ha ancora regole. Fai clic su Modifica per aggiungerne.",
+    "headers": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "throughput": "Throughput",
+      "errors": "Errori",
+      "rule_load": "Carico della regola (15m)",
+      "actions": "Azioni"
+    }
+  },
+  "stage": {
+    "contains_rules_one": "Contiene {{count}} regola",
+    "contains_rules_other": "Contiene {{count}} regole",
+    "last_stage": "Non ci sono altri stage in questa pipeline. Una volta applicate le regole di questo stage, l'elaborazione della pipeline sarà terminata.",
+    "continue_all": "I messaggi che soddisfano <matchText>tutte le regole</matchText> di questo stage proseguiranno allo stage successivo.",
+    "continue_either": "I messaggi che soddisfano <matchText>almeno una regola</matchText> di questo stage proseguiranno allo stage successivo.",
+    "continue_pass": "I messaggi che soddisfano <matchText>nessuna o più regole</matchText> di questo stage proseguiranno allo stage successivo.",
+    "continue_unknown": "I messaggi che soddisfano <matchText>SCONOSCIUTO</matchText> in questo stage proseguiranno allo stage successivo.",
+    "title": "Stage {{stage}}",
+    "remove_routing_rule_title": "Rimuovi regola di instradamento",
+    "remove_routing_rule_confirm": "Vuoi davvero rimuovere la regola di instradamento <ruleTitle>{{title}}</ruleTitle>?",
+    "contains_rules_many": "Contiene {{count}} regole"
+  },
+  "stage_form": {
+    "rules_help": "Seleziona le regole valutate in questo stage, oppure creane una nella <rulesLink>pagina Regole della pipeline</rulesLink>.",
+    "add_button": "Aggiungi nuovo stage",
+    "add_title": "Aggiungi nuovo stage {{stage}}",
+    "edit_title": "Modifica stage {{stage}}",
+    "add_submit": "Aggiungi stage",
+    "update_submit": "Aggiorna stage",
+    "stage": "Stage",
+    "stage_in_use": "Lo stage è già in uso: usa un altro numero oppure modifica lo stage esistente.",
+    "stage_help": "Priorità dello stage. Più il numero è basso, prima viene eseguito.",
+    "continue_when": "Continua l'elaborazione allo stage successivo quando",
+    "match_all": "Tutte le regole di questo stage corrispondono al messaggio",
+    "match_any": "Almeno una delle regole di questo stage corrisponde al messaggio",
+    "match_pass": "Nessuna o più regole di questo stage corrispondono",
+    "stage_rules": "Regole dello stage"
+  },
+  "used_in_pipelines": {
+    "label": "Usata nelle pipeline",
+    "help": "Pipeline che usano questa regola in uno o più dei loro stage.",
+    "none": "Questa regola non è usata in nessuna pipeline."
+  },
+  "deprecation": {
+    "label": "Funzione obsoleta",
+    "title_rule": "Questa regola contiene almeno una funzione obsoleta:",
+    "title_pipeline": "Questa pipeline contiene almeno una funzione obsoleta:"
+  },
+  "rule_form": {
+    "duplicate_title": "Il titolo della regola \"{{title}}\" esiste già!",
+    "title": "Titolo",
+    "title_help": "Puoi impostare il titolo della regola nel sorgente della regola. Consulta il riferimento rapido per maggiori informazioni.",
+    "leave_question": "Vuoi davvero abbandonare questa pagina e perdere le modifiche? Questa azione non può essere annullata.",
+    "description": "Descrizione",
+    "description_help": "Descrizione della regola (facoltativa).",
+    "source": "Sorgente della regola",
+    "source_help": "Sorgente della regola: consulta il riferimento rapido per maggiori informazioni.",
+    "create_submit": "Crea regola",
+    "update_close_submit": "Aggiorna regola e chiudi",
+    "update": "Aggiorna regola"
+  },
+  "rule_list_entry": {
+    "edit": "Modifica",
+    "delete_title": "Elimina regola",
+    "delete": "Elimina",
+    "managed": "Gestita da Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errori/s"
+  },
+  "metrics_config": {
+    "loading": "Caricamento della configurazione delle metriche...",
+    "title": "Configurazione delle metriche delle regole",
+    "submit": "Aggiorna configurazione",
+    "warning": "Le metriche delle regole vanno attivate solo per risolvere un problema di prestazioni, perché la raccolta delle metriche rallenta l'elaborazione dei messaggi e aumenta l'uso della memoria.",
+    "enable": "Attiva metriche delle regole",
+    "disable": "Disattiva metriche delle regole",
+    "pipeline_load_info": "Attivando queste metriche verrà aggiunta una nuova colonna alle pagine Pipeline e Regole della pipeline, denominata <columnName>Carico della pipeline</columnName>, che conterrà valori percentuali relativi che indicano quale delle tue pipeline consuma più tempo di thread.",
+    "rule_load_info": "Attivando queste metriche verrà aggiunta anche una nuova colonna alla pagina dei dettagli della pipeline, denominata <columnName>Carico della regola</columnName>. Indicherà quali regole della pipeline selezionata sono le più costose."
+  },
+  "rule_simulation": {
+    "error_builder": "Impossibile eseguire la simulazione della regola. Correggi gli errori nel generatore di regole.",
+    "placeholder_simple": "campo semplice del messaggio",
+    "invalid_json": "JSON non valido!",
+    "title": "Simulazione della regola",
+    "optional": "(Facoltativo)",
+    "json": "JSON",
+    "key_value": "Chiave-valore",
+    "simple_message": "Messaggio semplice",
+    "input_title": "Campo semplice del messaggio, coppie chiave-valore o JSON",
+    "input_help": "Inserisci una stringa normale per simulare il campo del messaggio, delle coppie chiave-valore oppure un JSON per simulare l'intero messaggio.",
+    "run": "Esegui simulazione della regola",
+    "reset": "Reimposta",
+    "conditions_output": "Output delle condizioni",
+    "actions_output": "Output delle azioni"
+  },
+  "convert_modal": {
+    "no_title": "<nessun titolo>",
+    "no_code": "<nessun codice>",
+    "create_rule": "Crea nuova regola dal codice",
+    "copied": "Codice sorgente della regola copiato negli appunti!",
+    "copy_close": "Copia e chiudi"
+  },
+  "block_display": {
+    "number": "Numero",
+    "not": "Non",
+    "deprecated": "Obsoleta",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "duplicate": "Duplica",
+    "insert_above": "Inserisci sopra",
+    "insert_below": "Inserisci sotto"
+  },
+  "block": {
+    "insert_title_above": "Inserisci una nuova azione sopra l'azione n. {{order}}",
+    "insert_title_below": "Inserisci una nuova azione sotto l'azione n. {{order}}"
+  },
+  "builder_form": {
+    "title": "Titolo",
+    "title_help": "Titolo della regola.",
+    "description": "Descrizione",
+    "description_help": "Descrizione della regola (facoltativa)."
+  },
+  "block_form": {
+    "add_condition": "Aggiungi condizione",
+    "add_action": "Aggiungi azione",
+    "syntax_help": "Guida alla sintassi delle funzioni",
+    "update": "Aggiorna",
+    "add": "Aggiungi"
+  },
+  "block_field": {
+    "no_dollar": "Non sono consentiti campi che iniziano con '$'.",
+    "use_previous_output": "Usa l'output dei passaggi precedenti",
+    "set_custom": "Imposta {{name}} personalizzato",
+    "select_output": "Seleziona l'output dall'elenco",
+    "output_from_step": "Output dal passaggio {{step}} ({{name}})",
+    "type_not_found": "Nessuna azione precedente restituisce il tipo {{type}}",
+    "true": "vero",
+    "false": "falso"
+  },
+  "builder": {
+    "title": "Generatore di regole",
+    "when": "Quando",
+    "and": "e",
+    "or": "o",
+    "then": "Quindi",
+    "convert_title": "Converti il generatore di regole in codice sorgente",
+    "convert": "Converti in codice sorgente",
+    "delete_condition": "Elimina condizione",
+    "delete_action": "Elimina azione",
+    "delete_condition_confirm": "Vuoi davvero eliminare la <blockName>condizione n. {{order}}</blockName>?",
+    "delete_action_confirm": "Vuoi davvero eliminare l'<blockName>azione n. {{order}}</blockName>?"
+  },
+  "helper": {
+    "title": "Riferimento rapido alle regole",
+    "docs_hint": "Leggi la <docsLink>documentazione completa</docsLink> per capire meglio come funzionano le regole delle pipeline.",
+    "functions": "Funzioni",
+    "example": "Esempio",
+    "functions_description": "Questo è l'elenco di tutte le funzioni disponibili nelle regole delle pipeline. Fai clic su una riga per vedere maggiori informazioni sui parametri della funzione.",
+    "filter_rules": "Filtra regole",
+    "example_description": "Vuoi vedere com'è fatta una regola della pipeline? Dai un'occhiata a questo esempio:"
+  },
+  "helper_table": {
+    "parameter": "Parametro",
+    "type": "Tipo",
+    "required": "Obbligatorio",
+    "description": "Descrizione",
+    "function": "Funzione"
+  },
+  "simulator": {
+    "no_streams_title": "Nessuno stream trovato",
+    "no_streams": "Le pipeline operano sugli stream, ma al momento il sistema non ha stream. <streamsLink>Crea uno stream</streamsLink> e torna qui più tardi per testare l'elaborazione dei messaggi della pipeline nel nuovo stream.",
+    "stream_help": "Seleziona uno stream da usare durante la simulazione: per impostazione predefinita viene usato lo stream <streamTitle>{{title}}</streamTitle>.",
+    "load_message": "Carica un messaggio",
+    "load_message_description": "Crea un messaggio di esempio da usare nella simulazione. <notice>Nessun messaggio reale verrà modificato. Tutte le azioni sono solo simulate sull'input temporaneo che fornisci qui sotto.</notice>",
+    "stream": "Stream"
+  },
+  "simulation_changes": {
+    "added_fields": "Campi aggiunti",
+    "removed_fields": "Campi rimossi",
+    "mutated_fields": "Campi modificati",
+    "dropped": "Il messaggio originale verrebbe scartato durante l'elaborazione.",
+    "not_modified": "Il messaggio originale non verrebbe modificato durante l'elaborazione.",
+    "original_changes": "Modifiche al messaggio originale <idSmall><idEm>{{id}}</idEm></idSmall>",
+    "other_changes": "Altre modifiche",
+    "other_changes_description_one": "Verrebbe creato {{count}} messaggio. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederlo.",
+    "other_changes_description_other": "Verrebbero creati {{count}} messaggi. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederli.",
+    "other_changes_description_many": "Verrebbero creati {{count}} messaggi. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederli."
+  },
+  "simulation_preview": {
+    "dropped_title": "Il messaggio verrebbe scartato",
+    "dropped": "Il processore della pipeline scarterebbe un messaggio del genere. Ciò significa che il messaggio <notStored>non verrebbe memorizzato</notStored> e non sarebbe disponibile per ricerche, avvisi, output o dashboard."
+  },
+  "simulation_trace": {
+    "microseconds": "μs"
+  },
+  "simulation_results": {
+    "changes_summary": "Riepilogo delle modifiche",
+    "results_preview": "Anteprima dei risultati",
+    "simulation_trace": "Traccia della simulazione",
+    "error_title": "Errore durante la simulazione dell'elaborazione del messaggio",
+    "error": "Impossibile simulare l'elaborazione del messaggio <emphasis>{{id}}</emphasis> nello stream <emphasis>{{stream}}</emphasis>.<lineBreak />Prova a caricare di nuovo il messaggio oppure usane un altro per la simulazione.",
+    "original_message": "Messaggio originale",
+    "more_results": "Altri risultati",
+    "title": "Risultati della simulazione",
+    "simulating": "Simulazione dell'elaborazione del messaggio in corso, attendi un momento.",
+    "results_description": "Questi sono i risultati dell'elaborazione del messaggio caricato. L'elaborazione ha richiesto {{took}} µs."
+  },
+  "simulator_page": {
+    "title": "Simula elaborazione",
+    "documentation_title": "Documentazione sulle pipeline",
+    "description": "L'elaborazione dei messaggi può essere complessa. Usa questa pagina per simulare il risultato dell'elaborazione di un messaggio in arrivo con l'insieme attuale di pipeline e regole."
+  },
+  "rule_notifications": {
+    "fetch_failed": "Recupero delle regole non riuscito con stato: {{error}}",
+    "fetch_failed_title": "Impossibile recuperare le regole di elaborazione",
+    "list_failed": "Caricamento dell'elenco delle regole non riuscito con stato: {{error}}",
+    "list_failed_title": "Impossibile caricare le regole.",
+    "fetch_rule_failed": "Recupero della regola \"{{id}}\" non riuscito con stato: {{error}}",
+    "fetch_rule_failed_title": "Impossibile recuperare la regola di elaborazione \"{{id}}\"",
+    "create_success": "Regola \"{{title}}\" creata correttamente",
+    "create_failed": "Salvataggio della regola \"{{title}}\" non riuscito con stato: {{error}}",
+    "create_failed_title": "Impossibile salvare la regola di elaborazione \"{{title}}\"",
+    "update_success": "Regola \"{{title}}\" aggiornata correttamente",
+    "update_failed": "Aggiornamento della regola \"{{title}}\" non riuscito con stato: {{error}}",
+    "update_failed_title": "Impossibile aggiornare la regola di elaborazione \"{{title}}\"",
+    "delete_success": "La regola \"{{title}}\" è stata eliminata correttamente",
+    "delete_failed": "Eliminazione della regola \"{{title}}\" non riuscita con stato: {{error}}",
+    "delete_failed_title": "Impossibile eliminare la regola di elaborazione \"{{title}}\"",
+    "metrics_load_failed": "Impossibile caricare la configurazione delle metriche delle regole: {{error}}",
+    "metrics_load_failed_title": "Impossibile caricare la configurazione delle metriche delle regole",
+    "metrics_update_success": "Configurazione delle metriche delle regole aggiornata correttamente",
+    "metrics_update_failed": "Impossibile aggiornare la configurazione delle metriche delle regole: {{error}}",
+    "metrics_update_failed_title": "Impossibile aggiornare la configurazione delle metriche delle regole",
+    "metadata_failed": "Caricamento dei metadati delle regole della pipeline non riuscito con stato",
+    "metadata_failed_title": "Impossibile caricare i metadati delle regole della pipeline",
+    "deprecated_failed": "Caricamento delle funzioni obsolete della regola non riuscito con stato",
+    "deprecated_failed_title": "Impossibile caricare i metadati delle funzioni obsolete della regola",
+    "builder_create_failed": "Creazione della regola del generatore di regole non riuscita con stato: {{error}}",
+    "builder_create_failed_title": "Impossibile creare la regola del generatore di regole.",
+    "builder_update_failed": "Aggiornamento della regola del generatore di regole non riuscito con stato: {{error}}",
+    "builder_update_failed_title": "Impossibile aggiornare la regola del generatore di regole.",
+    "builder_load_failed": "Caricamento della regola del generatore di regole non riuscito con stato",
+    "builder_load_failed_title": "Impossibile caricare la regola del generatore di regole.",
+    "builder_conditions_failed": "Caricamento dell'elenco delle condizioni del generatore di regole non riuscito con stato",
+    "builder_conditions_failed_title": "Impossibile caricare l'elenco delle condizioni del generatore di regole.",
+    "builder_actions_failed": "Caricamento dell'elenco delle azioni del generatore di regole non riuscito con stato",
+    "builder_actions_failed_title": "Impossibile caricare l'elenco delle azioni del generatore di regole."
+  },
+  "page_navigation": {
+    "manage_pipelines": "Gestisci pipeline",
+    "manage_rules": "Gestisci regole",
+    "simulator": "Simulatore"
+  },
+  "pipeline_notifications": {
+    "load_failed": "Caricamento delle pipeline non riuscito con stato",
+    "load_failed_title": "Impossibile caricare le pipeline",
+    "load_paginated_failed": "Caricamento delle pipeline paginate non riuscito con stato",
+    "load_paginated_failed_title": "Impossibile caricare le pipeline paginate",
+    "load_single_failed": "Caricamento della pipeline non riuscito con stato",
+    "load_single_failed_title": "Impossibile caricare la pipeline",
+    "connections_failed": "Recupero dei collegamenti della pipeline non riuscito con stato",
+    "connections_failed_title": "Impossibile recuperare i collegamenti della pipeline",
+    "connections_updated": "Collegamenti della pipeline aggiornati correttamente",
+    "connections_update_failed": "Aggiornamento dei collegamenti della pipeline non riuscito con stato: {{error}}",
+    "connections_update_failed_title": "Impossibile aggiornare i collegamenti della pipeline",
+    "create_failed": "Creazione della pipeline non riuscita con stato: {{error}}",
+    "create_failed_title": "Impossibile creare la pipeline",
+    "create_success": "Pipeline creata correttamente.",
+    "update_failed": "Aggiornamento della pipeline non riuscito con stato: {{error}}",
+    "update_failed_title": "Impossibile aggiornare la pipeline",
+    "update_success": "Pipeline aggiornata correttamente.",
+    "delete_failed": "Eliminazione della pipeline non riuscita con stato: {{error}}",
+    "delete_failed_title": "Impossibile eliminare la pipeline",
+    "delete_success": "Pipeline eliminata correttamente.",
+    "success_title": "Operazione riuscita!"
+  },
+  "connections_list": {
+    "not_connected": "Pipeline non collegata ad alcuno stream"
+  },
+  "rule_list": {
+    "headers": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "created": "Creata",
+      "last_modified": "Ultima modifica",
+      "throughput": "Throughput",
+      "errors": "Errori",
+      "pipeline_load": "Carico della pipeline (15m)",
+      "pipelines": "Pipeline",
+      "actions": "Azioni"
+    }
+  },
+  "load_cell": {
+    "error_tooltip": "Il Carico della pipeline non è disponibile: caricamento delle metriche di carico dell'elaborazione non riuscito."
+  }
+}

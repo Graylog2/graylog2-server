@@ -1,1 +1,129 @@
-{}
+{
+  "navigation": {
+    "initial_setup": "Configurazione iniziale di {{productName}}",
+    "get_help": "Ottieni aiuto",
+    "documentation": "Documentazione",
+    "changelogs": "Note di rilascio",
+    "operations_changelogs": "Note di rilascio di Operations",
+    "support": "Supporto"
+  },
+  "setup": {
+    "welcome": "Benvenuto!",
+    "first_start": "Sembra che tu stia avviando {{productName}} per la prima volta e non hai ancora configurato un data node.",
+    "data_nodes_allow": "I data node ti permettono di indicizzare e cercare tutti i messaggi nel database dei messaggi di {{productName}}.",
+    "data_node_setup": "Puoi installare un <dataNodeLink>data node di {{productName}}</dataNodeLink> (consigliato) oppure configurare manualmente un nodo <openSearchLink>OpenSearch</openSearchLink>. Per la configurazione manuale di OpenSearch devi modificare la configurazione di {{productName}} e riavviare il server {{productName}}. Dopo il riavvio questa pagina non verrà più mostrata.",
+    "data_nodes_title": "Data node di {{productName}}"
+  },
+  "data_nodes": {
+    "description": "I data node di {{productName}} offrono una migliore integrazione con {{productName}} e semplificano gli aggiornamenti futuri. Una volta che un data node di {{productName}} è in esecuzione e hai configurato la certificate authority, puoi riprendere l'avvio.",
+    "registered": "Questi sono i data node attualmente registrati. L'elenco viene aggiornato continuamente.",
+    "transport_address": "Indirizzo di trasporto",
+    "hostname": "Nome host",
+    "separator": " – ",
+    "none_found": "Nessun data node trovato."
+  },
+  "waiting_for_startup": {
+    "title": "Configurazione completata",
+    "description": "Il server {{productName}} è in fase di avvio. A seconda della configurazione, potrebbe richiedere alcuni minuti. Questa pagina si aggiornerà automaticamente non appena il server {{productName}} sarà raggiungibile. Puoi sempre aggiornare manualmente, ma tieni presente che questa pagina non sarà più visibile in seguito.",
+    "spinner": "Attesa del server {{productName}} ..."
+  },
+  "error_boundary": {
+    "title": "Si è verificato un errore",
+    "description": "Si è verificato un errore sconosciuto. Consulta il messaggio seguente e il log del server {{productName}} per maggiori informazioni."
+  },
+  "resume_startup": {
+    "button": "Riprendi avvio",
+    "confirm": "Sei sicuro di voler riprendere l'avvio senza un data node di {{productName}} in esecuzione? La configurazione tornerà a utilizzare un'istanza di Opensearch su localhost:9200.",
+    "error": "Ripresa dell'avvio non riuscita con errore: {{error}}",
+    "error_title": "Impossibile riprendere l'avvio"
+  },
+  "restart_configuration": {
+    "confirm": "Sei sicuro di voler riavviare la configurazione? Tutte le modifiche precedenti verranno eliminate.",
+    "restart": "riavvia",
+    "restarting": "riavvio in corso..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "Puoi sempre <restartButton>riavviare</restartButton> la configurazione",
+    "fetch_error": "Si è verificato un errore durante il recupero di {{entityName}}: {{message}}"
+  },
+  "entities": {
+    "data_nodes": "data node",
+    "certificate_authority": "certificate authority",
+    "renewal_policy": "criterio di rinnovo"
+  },
+  "steps": {
+    "ca_configuration": "Configura una certificate authority",
+    "renewal_policy_configuration": "Configura un criterio di rinnovo",
+    "certificate_provisioning": "Fornisci i certificati ai tuoi data node",
+    "configuration_finished": "Configurazione completata"
+  },
+  "ca_configuration": {
+    "title": "Configura certificate authority",
+    "explanation_upload_or_create": "In questo primo passaggio puoi caricare o creare una nuova certificate authority.",
+    "explanation_provisioning": "Grazie a questa possiamo fornire facilmente certificati ai tuoi data node.",
+    "create_tab": "Crea nuova CA",
+    "upload_tab": "Carica CA"
+  },
+  "ca_create": {
+    "description": "Qui puoi creare rapidamente una nuova certificate authority. Devi solo fare clic sul pulsante “Crea CA”. La CA deve essere utilizzata esclusivamente per proteggere i tuoi data node di {{productName}}.",
+    "organization_name": "Nome dell'organizzazione",
+    "creating": "Creazione della CA...",
+    "create": "Crea CA",
+    "success": "CA creata correttamente",
+    "error": "Creazione della CA non riuscita con errore: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Qui puoi caricare la tua CA esistente. Devi caricare un unico file contenente sia la chiave privata (cifrata o non cifrata), sia il certificato della CA, sia eventuali certificati intermedi. Il file può essere in formato PEM o PKCS#12. Se la chiave privata è cifrata, devi anche fornirne la password.",
+    "certificate_authority": "Certificate authority",
+    "drop_hint": "Trascina qui la CA oppure fai clic per selezionare un file",
+    "rejected": "Caricamento della CA non riuscito",
+    "password": "Password",
+    "uploading": "Caricamento della CA...",
+    "upload": "Carica CA",
+    "success": "CA caricata correttamente",
+    "error": "Caricamento della CA non riuscito con errore: {{error}}",
+    "validation_missing_file": "Carica un file.",
+    "validation_multiple_files": "Carica un solo file."
+  },
+  "certificate_provisioning": {
+    "title": "Fornisci certificati",
+    "configured": "La certificate authority è stata configurata correttamente.",
+    "ready": "Ora puoi fornire i certificati ai tuoi data node.",
+    "data_node_required": "Prima di poter fornire il certificato, è necessario che sia in esecuzione almeno un data node di {{productName}}.",
+    "started": "Fornitura dei certificati avviata correttamente",
+    "error": "Avvio della fornitura dei certificati non riuscito con errore: {{error}}",
+    "provisioning": "Fornitura del certificato...",
+    "provision": "Fornisci certificato e continua",
+    "skip": "Salta fornitura"
+  },
+  "renewal_policy": {
+    "title": "Configura criterio di rinnovo",
+    "explanation_automatic": "In questo passaggio puoi configurare se i certificati prossimi alla scadenza devono essere rinnovati automaticamente.",
+    "explanation_manual": "Se scegli il rinnovo manuale, quando la data di scadenza si avvicina comparirà una notifica di sistema che ti chiederà di confermare il rinnovo.",
+    "policy": "Criterio di rinnovo",
+    "select_policy": "Seleziona criterio di rinnovo",
+    "automatic": "Automatico",
+    "manual": "Manuale",
+    "certificate_lifetime": "Durata del certificato",
+    "enter_lifetime": "Inserisci durata",
+    "select_unit": "Seleziona unità",
+    "unit_hours": "Ora/e",
+    "unit_days": "Giorno/i",
+    "unit_months": "Mese/i",
+    "unit_years": "Anno/i",
+    "min_lifetime": "Deve essere di almeno {{duration}}",
+    "creating": "Creazione del criterio...",
+    "create": "Crea criterio",
+    "success": "Criterio di rinnovo creato correttamente",
+    "error": "Creazione del criterio di rinnovo non riuscita con errore: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "La tua connessione non è sicura. Tieni presente che le informazioni verranno inviate al server senza cifratura.",
+    "maybe_not_secure": "La tua connessione potrebbe non essere sicura. Tieni presente che le informazioni potrebbero essere inviate al server senza cifratura."
+  },
+  "configuration_finished": {
+    "title": "Configurazione completata",
+    "skipped_provisioning": "Hai completato la configurazione con successo. Puoi comunque <goBackButton>tornare indietro</goBackButton> per fornire i certificati.",
+    "provisioned": "La fornitura è riuscita e tutti i data node sono protetti e raggiungibili."
+  }
+}

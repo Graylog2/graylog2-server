@@ -1,1 +1,48 @@
-{}
+{
+  "human_name": "dashboard",
+  "full_screen": {
+    "menu": "Schermo intero",
+    "title": "Configurazione schermo intero",
+    "start": "Avvia visualizzazione a schermo intero",
+    "refresh_interval": "Intervallo di aggiornamento",
+    "refresh_interval_help": "Dopo quanti secondi il dashboard deve aggiornarsi?",
+    "tabs": "Schede",
+    "tabs_help": "Seleziona le schede di query da includere nella rotazione.",
+    "cycle_interval": "Intervallo di cambio scheda",
+    "cycle_interval_help": "Dopo quanti secondi deve essere mostrata la scheda successiva?"
+  },
+  "properties": {
+    "title": "Titolo",
+    "title_help": "Il titolo del dashboard.",
+    "summary": "Riepilogo",
+    "summary_help": "Un riepilogo utile del dashboard.",
+    "description": "Descrizione",
+    "description_help": "Una descrizione più lunga e utile del dashboard e delle sue funzionalità."
+  },
+  "overview": {
+    "missing_requirements": "Requisiti mancanti",
+    "user_defined": "Definiti dall'utente",
+    "load_failed": "Caricamento dei dashboard non riuscito con stato",
+    "could_not_load": "Impossibile caricare i dashboard"
+  },
+  "delete": {
+    "confirm": "Sei sicuro di voler eliminare \"{{title}}\"?",
+    "success": "Eliminazione del dashboard \"{{title}}\" riuscita!",
+    "success_title": "Operazione riuscita!",
+    "failed": "Eliminazione del dashboard non riuscita: {{error}}",
+    "failed_title": "Errore!"
+  },
+  "bulk_delete": {
+    "confirm_one": "Vuoi davvero rimuovere {{count}} dashboard?",
+    "confirm_other": "Vuoi davvero rimuovere {{count}} dashboard?",
+    "partial_failure_one": "Impossibile eliminare {{failed}} su {{count}} dashboard selezionato.",
+    "partial_failure_other": "Impossibile eliminare {{failed}} su {{count}} dashboard selezionati.",
+    "success_one": "{{count}} dashboard è stato eliminato con successo.",
+    "success_other": "{{count}} dashboard sono stati eliminati con successo.",
+    "success_title": "Operazione riuscita",
+    "failed": "Si è verificato un errore durante l'eliminazione dei dashboard. {{error}}",
+    "confirm_many": "Vuoi davvero rimuovere {{count}} dashboard?",
+    "partial_failure_many": "Impossibile eliminare {{failed}} su {{count}} dashboard selezionati.",
+    "success_many": "{{count}} dashboard sono stati eliminati con successo."
+  }
+}

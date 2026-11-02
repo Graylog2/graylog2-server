@@ -1,1 +1,252 @@
-{}
+{
+  "extractors_of": "Estrattori di {{title}}",
+  "actions": "Azioni",
+  "import_extractors": "Importa estrattori",
+  "export_extractors": "Esporta estrattori",
+  "documentation_title": "Documentazione sugli estrattori",
+  "description": "Gli estrattori vengono applicati a ogni messaggio ricevuto da questo input. Usali per estrarre e trasformare qualsiasi dato testuale in campi che ti permettono di filtrare e analizzare facilmente in seguito. Esempio: estrai il codice di risposta HTTP da un messaggio di log, trasformalo in un campo numerico e allegalo al messaggio come {{field}}.",
+  "list_item": {
+    "subtitle_copy": "Tentativo di estrarre dati da <em>{{source}}</em> in <em>{{target}}</em>, mantenendo intatto l'originale.",
+    "subtitle_cut": "Tentativo di estrarre dati da <em>{{source}}</em> in <em>{{target}}</em>, senza mantenere intatto l'originale.",
+    "condition": "Condizione",
+    "condition_string": "Verrà eseguito solo se il messaggio contiene la stringa <em>{{value}}</em>",
+    "condition_regex": "Verrà eseguito solo se il messaggio corrisponde all'espressione regolare <em>{{value}}</em>",
+    "confirm_delete": "Rimuovere davvero l'estrattore \"{{title}}\"?",
+    "details": "Dettagli",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "no_configuration": "Nessuna opzione di configurazione",
+    "configuration": "Configurazione",
+    "converters": "Convertitori"
+  },
+  "metrics": {
+    "title": "Metriche",
+    "percentile_95": "95° percentile:",
+    "percentile_98": "98° percentile:",
+    "percentile_99": "99° percentile:",
+    "std_dev": "Deviazione standard:",
+    "mean": "Media:",
+    "minimum": "Minimo:",
+    "maximum": "Massimo:",
+    "invocations": "{{total}} invocazioni totali dall'avvio, medie: {{oneMinute}}, {{fiveMinutes}}, {{fifteenMinutes}}.",
+    "hits_misses": "{{hits}} riscontri, {{misses}} mancati",
+    "no_messages": "Nessun messaggio è ancora passato da qui.",
+    "total_time": "Tempo totale",
+    "condition_time": "Tempo della condizione",
+    "execution_time": "Tempo di esecuzione",
+    "converter_time": "Tempo del convertitore",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "Il campo contiene la stringa",
+    "condition_string_help": "Inserisci una stringa che il campo deve contenere per tentare l'estrazione.",
+    "condition_regex_label": "Il campo corrisponde all'espressione regolare",
+    "condition_regex_help": "Inserisci un'espressione regolare che il campo deve contenere per tentare l'estrazione.",
+    "condition_matches": "Corrisponde! L'estrattore verrebbe eseguito su questo esempio.",
+    "condition_no_match": "Non corrisponde! L'estrattore non verrebbe eseguito.",
+    "try": "Prova",
+    "condition_type_help": "Estrarre solo dai messaggi che corrispondono a una certa condizione aiuta a evitare estrazioni errate o non necessarie e può anche far risparmiare risorse della CPU.",
+    "cursor_strategy_help": "Vuoi copiare o tagliare dall'origine? Non puoi usare la funzione di taglio sui campi standard come <em>message</em> e <em>source</em>.",
+    "target_field_help": "Scegli un nome di campo in cui memorizzare il valore estratto. Può contenere solo <b>caratteri alfanumerici e trattini bassi</b>. Esempio: <em>http_response_code</em>.",
+    "store_as_field": "Memorizza come campo",
+    "example_message": "Messaggio di esempio",
+    "configuration": "Configurazione dell'estrattore",
+    "extractor_type": "Tipo di estrattore",
+    "source_field": "Campo di origine",
+    "condition": "Condizione",
+    "condition_none": "Tenta sempre l'estrazione",
+    "condition_string": "Tenta l'estrazione solo se il campo contiene la stringa",
+    "condition_regex": "Tenta l'estrazione solo se il campo corrisponde all'espressione regolare",
+    "extraction_strategy": "Strategia di estrazione",
+    "copy": "Copia",
+    "cut": "Taglia",
+    "title": "Titolo dell'estrattore",
+    "title_help": "Un nome descrittivo per questo estrattore.",
+    "create": "Crea estrattore",
+    "update": "Aggiorna estrattore"
+  },
+  "converters": {
+    "csv_enable": "Aggiungi colonne CSV come campi",
+    "csv_field_names": "Nomi dei campi",
+    "csv_separator": "Carattere separatore",
+    "csv_quote": "Carattere di virgolette",
+    "csv_escape": "Carattere di escape",
+    "csv_escape_help": "Carattere usato per l'escape dei caratteri separatore e virgolette.",
+    "csv_strict_quotes": "Usa virgolette rigorose",
+    "csv_strict_quotes_help": "Ignora il contenuto esterno alle virgolette.",
+    "csv_trim": "Rimuovi spazi iniziali",
+    "date_enable": "Converti in tipo data",
+    "date_format": "Stringa di formato",
+    "time_zone": "Fuso orario",
+    "locale": "Locale",
+    "flexdate_enable": "Analizza la data in modo flessibile",
+    "hash": "Calcola hash MD5 dal valore",
+    "ip_anonymizer": "Anonimizza gli indirizzi IPv4 sostituendo l'ultimo ottetto",
+    "lookup_table_enable": "Converti il valore usando una lookup table",
+    "lookup_table": "Lookup Table",
+    "lookup_table_placeholder": "Seleziona una lookup table",
+    "lowercase": "Converti il valore in minuscolo",
+    "numeric": "Converti in valore numerico",
+    "split_and_count": "Dividi e conta",
+    "split_by": "Dividi per",
+    "syslog_pri_facility": "Converti da PRI a facility syslog",
+    "syslog_pri_level": "Converti da PRI a livello syslog",
+    "tokenizer": "Aggiungi coppie Chiave=Valore come campi",
+    "uppercase": "Converti il valore in maiuscolo",
+    "csv_separator_help": "Ad esempio <code>,</code>, <code>\\n</code> e <code>\\t</code> verranno convertiti in un singolo carattere.",
+    "date_format_help": "Formato della data come stringa. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "time_zone_help": "Fuso orario da applicare alla data. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "locale_help": "Locale da usare per analizzare la data. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "lookup_table_help": "Le lookup table possono essere create <lookupTablesLink>qui</lookupTablesLink>.",
+    "split_by_help": "Il convertitore Dividi e conta divide la parte estratta in base al carattere definito e memorizza il numero di token come campo. <strong>Esempio:</strong> <em>?fields=first_name,last_name,zip</em> diviso per <em>,</em> dà come risultato <em>3</em>. Hai contato i campi richiesti in una richiesta REST GET utente."
+  },
+  "wizard": {
+    "title": "Aggiungi estrattore",
+    "description": "Inizia caricando un messaggio come esempio su cui lavorare. Puoi scegliere se caricare un messaggio recente ricevuto da questo input oppure selezionare manualmente un messaggio tramite il suo ID.",
+    "create": "Crea estrattore"
+  },
+  "configuration": {
+    "preview": "Anteprima dell'estrattore",
+    "nothing_extracted": "Non verrà estratto nulla",
+    "try_example": "Prova con l'esempio"
+  },
+  "converters_editor": {
+    "not_supported": "Impossibile aggiungere convertitori agli estrattori di tipo <em>{{type}}</em>.",
+    "add_label": "Aggiungi convertitore",
+    "add_help": "Aggiungi convertitori per trasformare il valore estratto.",
+    "select_placeholder": "Seleziona un convertitore",
+    "add": "Aggiungi"
+  },
+  "export": {
+    "json_title": "JSON degli estrattori",
+    "copy": "Copia estrattori"
+  },
+  "example_message": {
+    "not_loaded": "Impossibile caricare un esempio del campo ‘{{field}}’. Non è possibile testare l'estrattore prima di averlo aggiornato."
+  },
+  "sort": {
+    "title": "Ordina gli estrattori per <em>{{title}}</em>",
+    "description": "Trascina gli estrattori nell'elenco per cambiare l'ordine in cui verranno applicati.",
+    "submit": "Aggiorna ordinamento"
+  },
+  "list": {
+    "sort": "Ordina estrattori",
+    "title": "Estrattori configurati",
+    "no_extractors": "Questo input non ha estrattori configurati."
+  },
+  "import": {
+    "parse_error": "Si è verificato un errore durante l'analisi degli estrattori. Sono in formato JSON? {{error}}",
+    "parse_error_title": "Impossibile importare gli estrattori",
+    "submit": "Aggiungi estrattori all'input"
+  },
+  "message_loader": {
+    "load": "Carica messaggio",
+    "loading": "Caricamento del messaggio...",
+    "wrong_example": "Esempio sbagliato?",
+    "load_another": "Carica un altro messaggio",
+    "message_id": "ID messaggio",
+    "index": "Indice"
+  },
+  "copy_input": {
+    "description": "L'intero input verrà copiato alla lettera."
+  },
+  "grok": {
+    "error": "Non è stato possibile eseguire l'estrazione grok a causa del seguente errore: {{error}}",
+    "no_match": "Non è stato possibile eseguire l'estrazione grok. Controlla i parametri.",
+    "named_captures_only": "Solo catture con nome",
+    "named_captures_only_help": "Inserisci nel messaggio solo le catture esplicitamente denominate.",
+    "pattern": "Pattern grok"
+  },
+  "json": {
+    "flatten": "Appiattisci strutture",
+    "flatten_help": "Indica se appiattire gli oggetti JSON in un unico campo messaggio oppure espanderli in più campi.",
+    "list_separator": "Separatore degli elementi di lista",
+    "list_separator_help": "Stringa da usare per concatenare gli elementi di una lista JSON.",
+    "key_separator": "Separatore delle chiavi",
+    "key_separator_help": "Stringa da usare per concatenare le diverse chiavi di un oggetto JSON annidato (usata solo se <em>non</em> appiattito).",
+    "kv_separator": "Separatore chiave/valore",
+    "kv_separator_help": "Stringa da usare per concatenare le coppie chiave/valore di un oggetto JSON (usata solo se appiattito).",
+    "key_prefix": "Prefisso della chiave",
+    "key_prefix_help": "Testo da anteporre a ogni chiave estratta dall'oggetto JSON.",
+    "replace_key_whitespace": "Sostituisci gli spazi nelle chiavi",
+    "replace_key_whitespace_help": "Le chiavi dei campi che contengono spazi verranno scartate durante la memorizzazione del messaggio estratto. Seleziona questa casella per sostituire gli spazi nelle chiavi JSON con un altro carattere.",
+    "key_whitespace_replacement": "Sostituzione degli spazi nelle chiavi",
+    "key_whitespace_replacement_help": "Carattere da usare per sostituire gli spazi nelle chiavi del messaggio. Assicurati che il carattere sostitutivo sia valido in Lucene, ad esempio '-' o '_'."
+  },
+  "lookup_table": {
+    "error": "Non è stato possibile eseguire la ricerca: {{error}}"
+  },
+  "regex": {
+    "no_match": "L'espressione regolare non corrisponde.",
+    "no_group": "L'espressione regolare non contiene alcun gruppo di corrispondenza da estrarre.",
+    "help": "L'espressione regolare usata per l'estrazione. Viene usato il primo gruppo di corrispondenza. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "label": "Espressione regolare"
+  },
+  "regex_replace": {
+    "regex_help": "L'espressione regolare usata per l'estrazione. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "replacement_help": "La sostituzione usata per il testo corrispondente. Consulta la documentazione dell'API <matcherLink>Matcher</matcherLink> per le opzioni disponibili.",
+    "replacement": "Sostituzione",
+    "replace_all": "Sostituisci tutte le occorrenze del pattern",
+    "replace_all_help": "Indica se sostituire tutte le occorrenze del pattern indicato o solo la prima."
+  },
+  "split_and_index": {
+    "no_match": "Non è stato possibile eseguire l'estrazione Dividi e indicizza. Controlla i parametri.",
+    "split_by_help": "Carattere su cui dividere. <strong>Esempio:</strong> un carattere di spazio divide <em>foo bar baz</em> in <em>[foo,bar,baz]</em>.",
+    "index_help": "Quale parte della stringa divisa vuoi usare? <strong>Esempio:</strong> <em>2</em> seleziona <em>bar</em> da <em>foo bar baz</em> quando si divide per spazio.",
+    "index": "Indice di destinazione"
+  },
+  "substring": {
+    "no_match": "Non è stato possibile eseguire l'estrazione di sottostringa. Controlla i limiti degli indici.",
+    "end_index_help": "Dove terminare l'estrazione (escluso). <strong>Esempio:</strong> <em>1,5</em> ritaglia <em>love</em> dalla stringa <em>ilovelogs</em>.",
+    "begin_index": "Indice iniziale",
+    "begin_index_help": "Posizione del carattere da cui iniziare l'estrazione (incluso).",
+    "end_index": "Indice finale"
+  },
+  "pages": {
+    "new_title": "Nuovo estrattore per l'input {{title}}",
+    "new_header": "Nuovo estrattore per l'input <em>{{title}}</em>",
+    "edit_title": "Modifica estrattore {{title}}",
+    "edit_header": "Modifica estrattore <em>{{title}}</em> per l'input <em>{{inputTitle}}</em>",
+    "description": "Gli estrattori vengono applicati a ogni messaggio ricevuto da un input. Usali per estrarre e trasformare qualsiasi dato testuale in campi che ti permettono di filtrare e analizzare facilmente in seguito.",
+    "export_title": "Esporta estrattori di {{title}}",
+    "export_header": "Esporta estrattori di <em>{{title}}</em>",
+    "export_marketplace_prefix": "Gli estrattori di un input possono essere esportati in JSON per importarli in altre configurazioni o condividerli in",
+    "import_title": "Importa estrattori in {{title}}",
+    "import_header": "Importa estrattori in <em>{{title}}</em>",
+    "import_description": "Gli estrattori esportati possono essere importati in un input.",
+    "import_marketplace_prefix": "Ti basta il JSON esportato degli estrattori di qualsiasi altra configurazione di {{productName}} oppure da"
+  },
+  "tools_api": {
+    "details": "Dettagli: {{error}}",
+    "natural_date_failed": "Caricamento dell'anteprima della parola chiave non riuscito con stato: {{error}}",
+    "natural_date_failed_title": "Impossibile caricare l'anteprima della parola chiave",
+    "grok_failed_title": "Non è stato possibile eseguire l'estrazione grok. Controlla i parametri.",
+    "json_failed_title": "Non è stato possibile eseguire l'estrazione JSON. Controlla i parametri.",
+    "regex_invalid_title": "Impossibile validare l'espressione regolare. Assicurati che sia valida.",
+    "allowlist_check_title": "Impossibile verificare se l'URL è nella lista consentita.",
+    "regex_generate_title": "Impossibile generare l'espressione regolare.",
+    "regex_try_title": "Impossibile provare l'espressione regolare. Assicurati che sia valida.",
+    "split_index_failed_title": "Non è stato possibile eseguire l'estrazione Dividi e indicizza. Controlla i parametri.",
+    "substring_failed_title": "Non è stato possibile eseguire l'estrazione di sottostringa. Controlla i limiti degli indici.",
+    "contains_string_failed_title": "Impossibile verificare se il campo contiene la stringa",
+    "lookup_table_failed_title": "Impossibile verificare se la lookup table traduce la stringa"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Estrattore {{title}} creato con successo",
+    "create_failed": "Creazione dell'estrattore non riuscita: {{error}}",
+    "create_failed_title": "Impossibile creare l'estrattore",
+    "updated_success": "Estrattore \"{{title}}\" aggiornato con successo",
+    "update_failed": "Aggiornamento dell'estrattore non riuscito: {{error}}",
+    "update_failed_title": "Impossibile aggiornare l'estrattore",
+    "deleted_success": "Estrattore \"{{title}}\" eliminato con successo",
+    "delete_failed": "Eliminazione dell'estrattore non riuscita: {{error}}",
+    "delete_failed_title": "Impossibile eliminare l'estrattore {{title}}",
+    "positions_updated_success": "Posizioni degli estrattori aggiornate con successo",
+    "positions_failed": "Modifica delle posizioni degli estrattori non riuscita: {{error}}",
+    "positions_failed_title": "Impossibile aggiornare le posizioni degli estrattori",
+    "import_success": "Risultati dell'importazione: {{successful}} estrattore/i importato/i.",
+    "import_success_title": "Importazione completata",
+    "import_warning": "Risultati dell'importazione: {{successful}} estrattore/i importato/i, {{failed}} errore/i.",
+    "import_warning_title": "Importazione completata con avvisi"
+  }
+}
