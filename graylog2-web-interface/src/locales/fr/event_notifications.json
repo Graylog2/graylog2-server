@@ -227,7 +227,21 @@
     "load_failed_title": "Impossible de charger la notification d'événement"
   },
   "test": {
-    "success": "La notification a été exécutée avec succès."
+    "success": "La notification a été exécutée avec succès.",
+    "validation_failed": "La validation a échoué, veuillez corriger les erreurs du formulaire avant de continuer.",
+    "unknown_error": "Erreur inconnue, veuillez consulter les journaux de votre serveur.",
+    "unknown_error_product": "Erreur inconnue, veuillez consulter les journaux de votre serveur {{productName}}."
   },
-  "bulk": {}
+  "bulk": {
+    "delete_confirm_one": "Voulez-vous vraiment supprimer {{count}} notification d'événement ?",
+    "delete_confirm_other": "Voulez-vous vraiment supprimer {{count}} notifications d'événements ?",
+    "delete_failed_one": "{{failed}} notification d'événement sur {{count}} sélectionnée n'a pas pu être supprimée. Statut : {{status}}",
+    "delete_failed_other": "{{failed}} notifications d'événements sur {{count}} sélectionnées n'ont pas pu être supprimées. Statut : {{status}}",
+    "delete_success_one": "{{count}} notification d'événement a été supprimée avec succès.",
+    "delete_success_other": "{{count}} notifications d'événements ont été supprimées avec succès.",
+    "success_title": "Succès",
+    "delete_confirm_many": "Voulez-vous vraiment supprimer {{count}} notifications d'événements ?",
+    "delete_failed_many": "{{failed}} notifications d'événements sur {{count}} sélectionnées n'ont pas pu être supprimées. Statut : {{status}}",
+    "delete_success_many": "{{count}} notifications d'événements ont été supprimées avec succès."
+  }
 }
