@@ -15,7 +15,10 @@
     "color_hint": "Indicación de color",
     "select_all_fields": "Seleccionar todos los campos",
     "deselect_all_fields": "Deseleccionar todos los campos",
-    "field_required": "El campo es obligatorio."
+    "field_required": "El campo es obligatorio.",
+    "must_be_greater_than_one": "Debe ser mayor que 0.",
+    "must_be_greater_than_many": "Debe ser mayor que 0.",
+    "must_be_greater_than_other": "Debe ser mayor que 0."
   },
   "wizard_grouping": {
     "settings": "Configuración",
@@ -115,24 +118,121 @@
     "axis_label_or_color": "Al menos para un eje debe definirse una etiqueta o un color.",
     "type_required": "El tipo es obligatorio."
   },
-  "builder_empty": {},
-  "vis_types": {},
-  "vis_validation": {},
-  "vis_common": {
-    "interpolation_types": {},
-    "axis_types": {}
+  "builder_empty": {
+    "title": "Agregación vacía",
+    "editing": "Ahora estás editando el widget.",
+    "add_metric_hint": "Para ver resultados, añade al menos una métrica. Puedes agrupar los datos añadiendo filas o columnas.",
+    "preview_hint": "Puedes previsualizar los resultados de búsqueda del widget haciendo clic en \"{{button}}\".",
+    "finish_hint": "Para terminar, haz clic en \"{{update}}\" para guardar o en \"{{cancel}}\" para descartar los cambios.",
+    "edit_hint_interactive": "Por favor, pulsa <editButton>Editar</editButton> en el widget para ver los resultados aquí.",
+    "edit_hint": "Por favor, edita el widget para ver los resultados aquí."
   },
-  "vis_heatmap": {},
-  "vis_worldmap": {},
+  "vis_types": {
+    "area_chart": "Gráfico de áreas",
+    "bar_chart": "Gráfico de barras",
+    "heatmap": "Mapa de calor",
+    "line_chart": "Gráfico de líneas",
+    "network_graph": "Gráfico de red",
+    "pie_chart": "Gráfico circular",
+    "sankey": "Sankey",
+    "scatter_plot": "Gráfico de dispersión",
+    "single_number": "Número único",
+    "world_map": "Mapa mundial"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "El gráfico de áreas requiere al menos una métrica",
+    "bar_chart_requires_metric": "El gráfico de barras requiere al menos una métrica",
+    "line_chart_requires_metric": "El gráfico de líneas requiere al menos una métrica",
+    "pie_chart_requires_metric": "El gráfico circular requiere al menos una métrica",
+    "scatter_plot_requires_metric": "El gráfico de dispersión requiere al menos una métrica",
+    "sankey_requires_groupings": "Sankey requiere al menos dos campos de agrupación.",
+    "sankey_single_metric": "Sankey admite una única métrica.",
+    "network_requires_groupings": "El gráfico de red requiere al menos dos campos de agrupación."
+  },
+  "vis_common": {
+    "interpolation": "Interpolación",
+    "interpolation_types": {
+      "linear": "lineal",
+      "step-after": "escalonada posterior",
+      "spline": "spline"
+    },
+    "axis_type": "Tipo de eje",
+    "axis_types": {
+      "linear": "lineal",
+      "logarithmic": "logarítmico"
+    },
+    "color_scale": "Escala de color",
+    "reverse_scale": "Invertir escala",
+    "show_axis_labels": "Mostrar etiquetas de ejes",
+    "x_axis": "Eje X",
+    "y_axis_number": "Y-Número",
+    "y_axis_percent": "Y-Porcentaje",
+    "y_axis_time": "Y-Tiempo",
+    "y_axis_size": "Y-Tamaño",
+    "color_hint": "Indicación de color",
+    "legend_configuration": "Configuración de {{label}}"
+  },
+  "vis_heatmap": {
+    "auto_scale": "Escala automática",
+    "min": "Mín.",
+    "max": "Máx.",
+    "use_smallest_as_default": "Usar el menor como predeterminado",
+    "default_value": "Valor predeterminado"
+  },
+  "vis_worldmap": {
+    "zoom": "Zoom",
+    "latitude": "Latitud",
+    "longitude": "Longitud",
+    "name": "Nombre",
+    "coordinates": "Coordenadas:",
+    "value": "Valor:"
+  },
   "vis_bar": {
-    "modes": {},
-    "mode_help": {}
+    "mode": "Modo",
+    "modes": {
+      "group": "Agrupar",
+      "stack": "Apilar",
+      "relative": "Relativo",
+      "overlay": "Superponer"
+    },
+    "mode_help": {
+      "group": "Cada serie se representa con su propia barra en el gráfico.",
+      "stack": "Todas las series se apilan unas sobre otras, dando como resultado una sola barra.",
+      "relative": "Todas las series se apilan unas sobre otras, dando como resultado un único gráfico. Las series negativas se colocan por debajo de cero.",
+      "overlay": "Todas las series se colocan como barras superpuestas. Para poder verlas, la opacidad se reduce al 75 %. Se recomienda usar esta opción con no más de 3 series."
+    }
   },
   "vis_number": {
-    "trend_preferences": {},
-    "highlight_options": {}
+    "trend": "Tendencia",
+    "trend_description": "Mostrar información de tendencia para este número.",
+    "trend_help_enabled": "Si el usuario activa la tendencia, se muestra un recuadro separado debajo del valor actual, que indica la dirección del cambio mediante un icono, así como las diferencias absoluta y relativa entre el valor actual y el anterior.",
+    "trend_help_previous": "El valor anterior se calcula realizando en segundo plano dos búsquedas idénticas salvo por el intervalo de tiempo. El intervalo de tiempo de la primera búsqueda es el mismo que el configurado para esta consulta o este widget; la segunda usa el mismo intervalo, pero desplazado hacia el pasado en una longitud igual al propio intervalo.",
+    "trend_preference": "Preferencia de tendencia",
+    "trend_preferences": {
+      "LOWER": "Menor",
+      "NEUTRAL": "Neutral",
+      "HIGHER": "Mayor"
+    },
+    "highlight": "Resaltar",
+    "highlight_options": {
+      "TREND_ONLY": "Solo información de tendencia",
+      "FULL_WIDGET": "Widget completo"
+    },
+    "not_available": "N/D",
+    "trend_label": "Tendencia: {{absolute}} ({{relative}}) en comparación con el valor anterior de {{previous}}",
+    "previous_value": "Valor anterior: {{previous}}"
   },
-  "vis_popover": {},
-  "vis_network": {},
-  "vis_sankey": {}
+  "vis_popover": {
+    "related_values": "Valores relacionados",
+    "data_points": "Puntos de datos",
+    "metric": "Métrica",
+    "groupings": "Agrupaciones",
+    "back": "Volver"
+  },
+  "vis_network": {
+    "no_connections": "No hay conexiones que mostrar. Ajusta tu búsqueda o agrupación para ver resultados."
+  },
+  "vis_sankey": {
+    "no_flows": "No hay flujos que mostrar. Ajusta tu búsqueda o agrupación para ver resultados."
+  }
 }
