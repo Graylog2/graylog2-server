@@ -271,20 +271,132 @@
     "no_match": "フィルターに一致するフリートはありません"
   },
   "recent_activity": {
-    "title": "最近のアクティビティ"
+    "title": "最近のアクティビティ",
+    "empty": "最近のアクティビティはありません。"
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "ホスト",
+    "os": "OS",
+    "version": "バージョン",
+    "fleet": "フリート",
+    "enrolled": "登録日時",
+    "last_seen": "最終確認",
+    "hide_attributes": "属性を非表示"
+  },
+  "connection_success": {
+    "offline": "Collector は一度接続しましたが、<lastSeen /> 以降レポートがありません。",
+    "receiving": "Collector は接続されており、メッセージを送信しています。",
+    "waiting": "もうすぐです。Collector は接続されており、最初のメッセージを待機しています。",
+    "title": "{{host}} をセットアップ中",
+    "view_instances": "インスタンスを表示",
+    "check_again": "再確認",
+    "log_preview": "ログプレビュー",
+    "caption_messages": "{{duration}} 以内に受信したメッセージを表示しています",
+    "caption_messages_checking": "{{duration}} 以内に受信したメッセージを表示しています - 数秒ごとに確認中",
+    "caption_system": "{{duration}} 以内に受信した Collector のシステムメッセージを表示しています",
+    "caption_system_checking": "{{duration}} 以内に受信した Collector のシステムメッセージを表示しています - 数秒ごとに確認中"
+  },
+  "fleet_choice": {
+    "selected_heading": "この Collector のフリート",
+    "change": "フリートを変更",
+    "heading": "この Collector のフリートを選択",
+    "create_new": "新しいフリートを作成",
+    "or": "または",
+    "select_existing": "既存のフリートを選択",
+    "select_existing_placeholder": "既存のフリートを選択..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Collectors をセットアップ中...",
+    "confirm": "エンドポイントを確認",
+    "create_input": "入力を作成",
+    "save": "エンドポイントを保存",
+    "hostname": "外部ホスト名",
+    "hostname_placeholder": "例: otlp.example.com",
+    "port": "外部ポート",
+    "cancel": "キャンセル",
+    "reachability_hint": "Collectors はこのアドレスにログを送信します。すべての Collector ホストから到達可能である必要があります。ロードバランサー、またはこのサーバーのアドレスを指定してください。",
+    "confirm_title": "Collectors がこのクラスターにデータを送信する方法を確認",
+    "change": "エンドポイントを変更",
+    "sending_to": "Collectors は <endpoint /> のこのクラスターにデータを送信します",
+    "no_input_title": "取り込み入力が存在しません",
+    "no_input": "Collectors は登録できますが、入力が作成されるまでデータを送信できません。",
+    "not_running_title": "<endpoint /> の取り込み入力が実行されていません",
+    "not_running": "Collectors は登録できますが、入力が実行されるまでデータを送信できません。",
+    "manage_input": "入力を管理"
+  },
+  "install_command": {
+    "title": "{{platform}} でこのコマンドを実行",
+    "copy": "コマンドをコピー",
+    "note_expires": "Collector をダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。トークンの有効期限は {{duration}} です。",
+    "note_never_expires": "Collector をダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。このトークンに有効期限はありません。"
+  },
+  "log_preview": {
+    "unavailable": "ログプレビューを利用できません — {{error}}",
+    "loading": "ログプレビューを読み込み中...",
+    "empty": "まだメッセージはありません — 数秒ごとに確認中"
+  },
+  "next_steps": {
+    "explore": "データを探索",
+    "explore_description": "この Collector で絞り込んだ検索を開きます",
+    "configure_sources": "ソースを設定",
+    "configure_sources_description": "このフリートが収集する対象を追加または調整します",
+    "manage_fleets": "フリートを管理",
+    "manage_fleets_description": "この Collector を恒久的なフリートに移動します",
+    "install_another": "別の Collector をインストール",
+    "install_another_description": "別のホストで同じセットアップを繰り返します",
+    "offline_title": "オンラインに戻す",
+    "check_service": "ホスト上で Collector サービスが実行中かどうかを確認してください。",
+    "check_reachability": "ホストがこの {{productName}} サーバーに到達できることを確認してください。",
+    "check_logs": "接続エラーがないか、下のプレビューで Collector 自身のログを確認してください。",
+    "title": "次のステップ"
+  },
+  "timeline": {
+    "connection_lost": "接続が失われました",
+    "last_heartbeat": "最終ハートビート <lastSeen />",
+    "first_messages": "最初のメッセージ",
+    "listening": "待機中... 通常は1分以内です",
+    "enrolled": "登録済み",
+    "enrolled_detail": "登録トークンで登録されました - <enrolledAt />",
+    "connected": "接続済み",
+    "connected_detail": "ハートビートを受信しました - <lastSeen />",
+    "sources_configured": "ソースを設定済み"
+  },
+  "platform_picker": {
+    "title": "Collectors を始める",
+    "description": "インフラストラクチャ全体に軽量の Collectors をデプロイし、ログを {{productName}} に転送します。"
+  },
+  "source_status": {
+    "disabled": "無効",
+    "not_applicable": "{{os}} では対象外です",
+    "unrecognised": "認識されないソースタイプです",
+    "paused": "一時停止中 — Collector がオフラインです",
+    "no_messages": "まだメッセージはありません",
+    "waiting": "最初のメッセージを待機中...",
+    "title": "ログソース",
+    "no_sources": "このフリートにはまだソースが設定されていません。"
+  },
+  "waiting_for_connection": {
+    "status": "接続を待機中... {{seconds}} 秒"
+  },
+  "settings": {
+    "getting_started": "Collectors を始める",
+    "getting_started_cloud": "Collectors は、データを送信するためにマネージドの取り込みエンドポイントに接続します。Collector の設定を保存すると、Collector インフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、Collectors をホストにデプロイできます。",
+    "getting_started_self_managed": "Collectors は、収集したデータを受信するために取り込みエンドポイントが必要です。以下で HTTP エンドポイントを設定して保存すると、Collector インフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、Collectors をホストにデプロイできます。",
+    "ingest_endpoint": "取り込みエンドポイント",
+    "ingest_endpoint_cloud": "取り込みエンドポイントはシステムによって管理されます。Collectors はここに自動的に接続します。",
+    "ingest_endpoint_help": "取り込みエンドポイントは、OpenTelemetry (OTLP) を介して Collectors からログデータを受信します。マネージド Collectors にデータの送信先として通知される外部アドレスです。実行中の Collector 取り込み入力に到達する必要があります。通常は、ロードバランサーまたはサーバー自体のアドレスです。",
+    "hostname_help": "Collectors が接続に使用するホスト名または IP アドレスです。Collector ホストから到達可能である必要があります。",
+    "create_input": "取り込み入力を作成",
+    "lifecycle": "Collector のライフサイクル",
+    "offline_threshold": "オフラインのしきい値",
+    "offline_threshold_help": "この時間内にレポートしなかった Collectors は、オフラインとして表示されます。",
+    "default_visibility": "既定の表示設定",
+    "default_visibility_help": "この時間内にレポートしなかった Collectors は、既定のビューから非表示になります。ユーザーはインスタンステーブルでこのフィルターを調整または削除できます。",
+    "expiration_threshold": "有効期限のしきい値",
+    "expiration_threshold_help": "この時間内にレポートしなかった Collectors は、完全に削除されます。",
+    "confirm": "設定を確定"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
