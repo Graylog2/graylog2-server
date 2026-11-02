@@ -271,20 +271,132 @@
     "no_match": "没有匹配过滤条件的 Fleet"
   },
   "recent_activity": {
-    "title": "最近活动"
+    "title": "最近活动",
+    "empty": "暂无最近活动。"
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "主机",
+    "os": "操作系统",
+    "version": "版本",
+    "fleet": "Fleet",
+    "enrolled": "注册时间",
+    "last_seen": "最后在线",
+    "hide_attributes": "隐藏属性"
+  },
+  "connection_success": {
+    "offline": "该 Collector 曾连接过，但自 <lastSeen /> 起未再报告。",
+    "receiving": "该 Collector 已连接并正在传送消息。",
+    "waiting": "即将完成——Collector 已连接，我们正在等待其首批消息。",
+    "title": "正在设置 {{host}}",
+    "view_instances": "查看实例",
+    "check_again": "重新检查",
+    "log_preview": "日志预览",
+    "caption_messages": "显示自 {{duration}} 以来收到的消息",
+    "caption_messages_checking": "显示自 {{duration}} 以来收到的消息 - 每隔几秒检查一次",
+    "caption_system": "显示自 {{duration}} 以来收到的 Collector 系统消息",
+    "caption_system_checking": "显示自 {{duration}} 以来收到的 Collector 系统消息 - 每隔几秒检查一次"
+  },
+  "fleet_choice": {
+    "selected_heading": "此 Collector 所属的 Fleet",
+    "change": "更改 Fleet",
+    "heading": "为此 Collector 选择 Fleet",
+    "create_new": "新建 Fleet",
+    "or": "或",
+    "select_existing": "选择现有 Fleet",
+    "select_existing_placeholder": "选择现有 Fleet..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "正在设置 Collectors...",
+    "confirm": "确认端点",
+    "create_input": "创建 Input",
+    "save": "保存端点",
+    "hostname": "外部主机名",
+    "hostname_placeholder": "例如 otlp.example.com",
+    "port": "外部端口",
+    "cancel": "取消",
+    "reachability_hint": "Collectors 会将日志发送到此地址。每台 Collector 主机都必须能够访问该地址：可以是负载均衡器，也可以是此服务器。",
+    "confirm_title": "确认 Collectors 如何向此集群发送数据",
+    "change": "更改端点",
+    "sending_to": "Collectors 正通过 <endpoint /> 向此集群发送数据",
+    "no_input_title": "不存在接收 Input",
+    "no_input": "Collectors 可以注册，但在创建 Input 之前将无法发送数据。",
+    "not_running_title": "<endpoint /> 上的接收 Input 未运行",
+    "not_running": "Collectors 可以注册，但在 Input 运行之前将无法发送数据。",
+    "manage_input": "管理 Input"
+  },
+  "install_command": {
+    "title": "在 {{platform}} 上运行此命令",
+    "copy": "复制命令",
+    "note_expires": "将下载并安装 Collector，将其注册到所选 Fleet，并启动服务。需要管理员权限。令牌将在 {{duration}} 后过期。",
+    "note_never_expires": "将下载并安装 Collector，将其注册到所选 Fleet，并启动服务。需要管理员权限。此令牌永不过期。"
+  },
+  "log_preview": {
+    "unavailable": "日志预览不可用——{{error}}",
+    "loading": "正在加载日志预览...",
+    "empty": "暂无消息——每隔几秒检查一次"
+  },
+  "next_steps": {
+    "explore": "探索您的数据",
+    "explore_description": "打开已按此 Collector 过滤的搜索",
+    "configure_sources": "配置数据源",
+    "configure_sources_description": "添加或调整此 Fleet 收集的内容",
+    "manage_fleets": "管理 Fleets",
+    "manage_fleets_description": "将此 Collector 移至永久 Fleet",
+    "install_another": "安装另一个 Collector",
+    "install_another_description": "在其他主机上重复此设置",
+    "offline_title": "让它重新上线",
+    "check_service": "检查主机上的 Collector 服务是否正在运行。",
+    "check_reachability": "验证主机能否访问此 {{productName}} 服务器。",
+    "check_logs": "在下方的预览中查看 Collector 自身日志，查找连接错误。",
+    "title": "后续步骤"
+  },
+  "timeline": {
+    "connection_lost": "连接已断开",
+    "last_heartbeat": "最后心跳 <lastSeen />",
+    "first_messages": "首批消息",
+    "listening": "正在监听...通常不到一分钟",
+    "enrolled": "已注册",
+    "enrolled_detail": "已使用注册令牌注册 - <enrolledAt />",
+    "connected": "已连接",
+    "connected_detail": "已收到心跳 - <lastSeen />",
+    "sources_configured": "数据源已配置"
+  },
+  "platform_picker": {
+    "title": "开始使用 Collectors",
+    "description": "在您的基础设施中部署轻量级 Collectors，将日志转发到 {{productName}}。"
+  },
+  "source_status": {
+    "disabled": "已禁用",
+    "not_applicable": "在 {{os}} 上不适用",
+    "unrecognised": "无法识别的数据源类型",
+    "paused": "已暂停——Collector 离线",
+    "no_messages": "暂无消息",
+    "waiting": "正在等待首批消息...",
+    "title": "日志数据源",
+    "no_sources": "此 Fleet 尚未配置数据源。"
+  },
+  "waiting_for_connection": {
+    "status": "正在等待连接... {{seconds}} 秒"
+  },
+  "settings": {
+    "getting_started": "开始使用 Collectors",
+    "getting_started_cloud": "Collectors 连接到托管的接收端点以发送数据。保存 Collector 设置以初始化 Collector 基础设施。设置完成后，您可以创建 Fleet、添加数据源，并将 Collectors 部署到您的主机上。",
+    "getting_started_self_managed": "Collectors 需要接收端点来接收收集的数据。请在下方配置 HTTP 端点并保存，以初始化 Collector 基础设施。设置完成后，您可以创建 Fleet、添加数据源，并将 Collectors 部署到您的主机上。",
+    "ingest_endpoint": "接收端点",
+    "ingest_endpoint_cloud": "接收端点由系统管理，Collectors 会自动连接到此处。",
+    "ingest_endpoint_help": "接收端点通过 OpenTelemetry (OTLP) 接收来自 Collectors 的日志数据。这是推送给托管 Collectors 的外部数据目标地址，必须路由到正在运行的 Collector 接收 Input。通常为负载均衡器或服务器本身的地址。",
+    "hostname_help": "Collectors 用于连接的主机名或 IP 地址。Collector 主机必须能够访问该地址。",
+    "create_input": "创建接收 Input",
+    "lifecycle": "Collector 生命周期",
+    "offline_threshold": "离线阈值",
+    "offline_threshold_help": "在此时间内未报告的 Collectors 将显示为离线。",
+    "default_visibility": "默认可见性",
+    "default_visibility_help": "在此时间内未报告的 Collectors 将从默认视图中隐藏。用户可以在实例表格中调整或移除此过滤器。",
+    "expiration_threshold": "过期阈值",
+    "expiration_threshold_help": "在此时间内未报告的 Collectors 将被永久删除。",
+    "confirm": "确认设置"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
