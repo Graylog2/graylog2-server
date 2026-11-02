@@ -49,14 +49,19 @@
     "by_system": "由系统",
     "config_changed": {
       "fleet": "已更新 Fleet <targetLink /> 的配置",
-      "collector": "已更新 Collector <targetLink /> 的配置"
+      "fleet_with_others_other": "已更新 Fleet <targetLink /> 及其他 {{count}} 个 Fleet 的配置",
+      "collector": "已更新 Collector <targetLink /> 的配置",
+      "collector_with_others_other": "已更新 Collector <targetLink /> 及其他 {{count}} 个 Collector 的配置"
     },
     "ingest_config_changed": {
       "fleet": "已更新 Fleet <targetLink /> 的接收配置",
-      "collector": "已更新 Collector <targetLink /> 的接收配置"
+      "fleet_with_others_other": "已更新 Fleet <targetLink /> 及其他 {{count}} 个 Fleet 的接收配置",
+      "collector": "已更新 Collector <targetLink /> 的接收配置",
+      "collector_with_others_other": "已更新 Collector <targetLink /> 及其他 {{count}} 个 Collector 的接收配置"
     },
     "restart": {
       "fleet": "已请求重启 Fleet <targetLink />",
+      "fleet_with_others_other": "已请求重启 Fleet <targetLink /> 及其他 {{count}} 个 Fleet",
       "collector": "已请求重启 Collector <targetLink />"
     },
     "discovery_run": {
@@ -955,17 +960,120 @@
       }
     },
     "details_page": {
-      "certificate_valid_until": "证书有效期至："
+      "certificate_valid_until": "证书有效期至：",
+      "configuration_warnings": "配置警告",
+      "datanode_version": "Datanode 版本：",
+      "details": "详情：",
+      "error": "错误：{{message}}",
+      "hostname": "主机名：",
+      "not_available": "不可用",
+      "status": "状态：",
+      "title": "Data Nodes：{{hostname}}",
+      "transport_address": "传输地址："
     },
-    "pages": {},
-    "upgrade_page": {},
-    "migration_steps": {},
-    "migration_states": {},
+    "pages": {
+      "description": "{{productName}} Data Nodes 与 {{productName}} 的集成更好，并简化了后续升级。它们使您能够对 {{productName}} 消息数据库中的所有消息进行索引和搜索。",
+      "upgrade_title": "Data Node 升级",
+      "cluster_management_title": "Data Node 仪表板",
+      "certificate_management_title": "证书管理",
+      "migration_title": "Data Node 迁移",
+      "documentation_title": "Data Nodes 文档"
+    },
+    "upgrade_page": {
+      "manual_instructions": "如需手动升级 Data Nodes，请按照<docsLink>文档</docsLink>中的说明操作。",
+      "manual_upgrade_title": "Data Node 手动升级",
+      "select_strategy": "选择升级策略",
+      "upgrade_data_node": "升级 Data Node",
+      "manual_upgrade_of_node": "在系统上完成 <bold>{{node}}</bold> 的手动升级后，请等待其重新连接并出现在<bold>已升级节点</bold>面板中，然后点击<confirmButton><bold>确认升级</bold></confirmButton>，并继续处理下一个节点。",
+      "manual_upgrade_of_data_node": "在系统上完成 Data Node 的手动升级后，请等待其重新连接并出现在<bold>已升级节点</bold>面板中，然后点击<confirmButton><bold>确认升级</bold></confirmButton>，并继续处理下一个节点。"
+    },
+    "migration_steps": {
+      "ca_configuration": "配置证书颁发机构",
+      "renewal_policy_configuration": "配置续期策略",
+      "compatibility_check": "检查 OpenSearch 与 Datanode 的兼容性",
+      "manual_migration_step": "迁移步骤。",
+      "migration_finished": "迁移已完成"
+    },
+    "migration_states": {
+      "new": "迁移",
+      "migration_welcome_page": "欢迎",
+      "ca_creation_page": "证书颁发机构",
+      "renewal_policy_creation_page": "证书续期策略",
+      "migration_selection_page": "迁移步骤",
+      "rolling_upgrade_migration_welcome_page": "欢迎使用原地迁移",
+      "ask_to_shutdown_old_cluster": "关闭旧集群",
+      "manually_remove_old_connection_string_from_config": "移除连接字符串",
+      "message_processing_stop": "停止消息处理",
+      "replace_cluster": "替换现有集群",
+      "restart_graylog": "更新配置文件并重启 {{productName}}",
+      "directory_compatibility_check_page": "目录兼容性检查",
+      "provision_rolling_upgrade_nodes_with_certificates": "证书配置概览",
+      "provision_rolling_upgrade_nodes_running": "为 Data Node 配置证书。",
+      "journal_size_downtime_warning": "Journal 大小停机警告",
+      "failed": "迁移失败",
+      "finished": "迁移已完成"
+    },
     "certificate_renewal": {
-      "renew": {},
-      "provision": {}
+      "loading_failed": "加载 Data Nodes 失败，状态码：",
+      "loading_failed_title": "无法加载 Data Nodes",
+      "renew": {
+        "button": "续期证书",
+        "button_loading": "正在续期证书",
+        "success": "证书续期成功",
+        "failed": "证书续期失败：{{error}}"
+      },
+      "provision": {
+        "button": "配置证书",
+        "button_loading": "正在配置证书...",
+        "success": "证书配置成功",
+        "failed": "证书配置失败：{{error}}"
+      },
+      "title": "证书续期与配置",
+      "description": "您可以在此手动触发 {{productName}} Data Nodes 的证书续期或配置。仅当续期策略模式配置为“手动”，并且 Data Nodes 在初次证书配置后才启动时，才需要手动配置证书。",
+      "transport_address": "传输地址",
+      "hostname": "主机名",
+      "valid_until": "有效期至 {{relativeTime}}",
+      "no_data_nodes": "未找到任何 Data Nodes。"
     }
   },
-  "use_collector_configurations_notifications": {},
-  "use_collectors_notifications": {}
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "获取 Collector 配置失败，状态码：{{error}}",
+    "fetch_failed_title": "无法获取配置",
+    "fetch_configuration_failed": "获取配置失败，状态码：{{error}}",
+    "configuration_not_found": "无法找到 ID 为 <{{configurationId}}> 的配置，请确认该配置未被删除。",
+    "fetch_configuration_failed_title": "无法获取配置",
+    "preview_failed": "获取配置预览失败，状态码：{{error}}",
+    "preview_failed_title": "无法获取预览",
+    "created_success": "配置已成功创建",
+    "create_failed": "创建配置失败，状态码：{{error}}",
+    "create_failed_title": "无法保存配置",
+    "updated_success": "配置已成功更新",
+    "update_failed": "更新配置失败：{{error}}",
+    "update_failed_title": "无法更新配置 {{name}}",
+    "copied_success": "配置“{{name}}”已成功复制",
+    "copy_failed": "保存配置“{{name}}”失败，状态码：{{error}}",
+    "copy_failed_title": "无法保存配置",
+    "deleted_success": "配置“{{name}}”已成功删除",
+    "delete_failed": "删除配置失败：{{error}}",
+    "delete_failed_title": "无法删除配置 {{name}}",
+    "validate_failed": "验证配置“{{name}}”失败，状态码：{{error}}",
+    "validate_failed_title": "无法验证配置"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "获取 Collectors 失败，状态码：{{error}}",
+    "fetch_failed_title": "无法获取 Collectors",
+    "not_found": "无法找到 ID 为 <{{collectorId}}> 的 Collector，请确认该 Collector 未被删除。",
+    "fetch_collector_failed": "获取 Collector 失败，状态码：{{error}}",
+    "fetch_collector_failed_title": "无法获取 Collector",
+    "created_success": "Collector 已成功创建",
+    "updated_success": "Collector 已成功更新",
+    "deleted_success": "Collector “{{name}}” 已成功删除",
+    "delete_failed": "删除 Collector 失败：{{error}}",
+    "delete_failed_title": "无法删除 Collector “{{name}}”",
+    "copied_success": "Collector “{{name}}” 已成功复制",
+    "copy_failed": "保存 Collector “{{name}}” 失败，状态码：{{error}}",
+    "copy_failed_title": "无法保存 Collector",
+    "validate_failed": "验证 Collector “{{name}}” 失败，状态码：{{error}}",
+    "validate_failed_title": "无法验证 Collector"
+  }
 }
