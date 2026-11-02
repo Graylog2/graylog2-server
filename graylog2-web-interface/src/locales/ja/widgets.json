@@ -1,1 +1,152 @@
-{}
+{
+  "copy_to_dashboard": {
+    "title": "ウィジェットをダッシュボードにコピー",
+    "no_dashboards": "ダッシュボードが見つかりません。",
+    "create_new": "新しいダッシュボードを作成"
+  },
+  "edit_message_list": {
+    "fields": "フィールド",
+    "message_preview": "メッセージのプレビュー",
+    "sorting": "並べ替え",
+    "direction": "方向",
+    "decorators": "デコレーター"
+  },
+  "widget_frame": {
+    "loading": "ウィジェットを読み込んでいます ..."
+  },
+  "export_widget": {
+    "export_all": "すべての検索結果をエクスポート",
+    "title": "ウィジェットをエクスポート",
+    "enterprise_explanation": "集計ウィジェットのエクスポート機能は Enterprise 版でご利用いただけます。この機能では、データを CSV、JSON、YAML、XML などの一般的なファイル形式でエクスポートできます。"
+  },
+  "field_sort": {
+    "placeholder": "なし: クリックしてフィールドを追加",
+    "aria_label": "並べ替えに使用するフィールドを選択"
+  },
+  "fields_configuration": {
+    "add_field": "フィールドを追加"
+  },
+  "move_widget": {
+    "no_pages": "ページが見つかりません",
+    "copy": "ウィジェットをコピー",
+    "move": "ウィジェットを移動",
+    "title": "移動先のページを選択",
+    "keep_copy": "このページにコピーを残す",
+    "keep_copy_help": "「このページにコピーを残す」を有効にすると、ウィジェットは移動されず、別のページにコピーされます。"
+  },
+  "widget_edit": {
+    "update": "ウィジェットを更新",
+    "updating": "ウィジェットを更新しています..."
+  },
+  "execution_info": {
+    "executed_at": "実行日時:",
+    "executed_at_label": "実行日時",
+    "executed_in": "実行時間:",
+    "duration": "{{duration}} ms",
+    "effective_time_range": "有効な期間:",
+    "from": "開始",
+    "to": "終了",
+    "from_label": "有効な期間の開始",
+    "to_label": "有効な期間の終了",
+    "total_results": "結果の合計:",
+    "title": "実行情報",
+    "no_query_executed": "まだクエリが実行されていません。"
+  },
+  "selected_fields": {
+    "fields": "フィールド",
+    "edit_field": "{{field}} フィールドを編集",
+    "remove_field": "{{field}} フィールドを削除"
+  },
+  "sort_direction": {
+    "ascending": "昇順",
+    "descending": "降順",
+    "no_sorting": "並べ替えが選択されていません",
+    "select_direction": "クリックして方向を選択"
+  },
+  "timerange_info": {
+    "global_override": "グローバルの上書き: {{timerange}}",
+    "effective_unavailable": "ウィジェットの有効な期間は現在利用できません。",
+    "independent": "このウィジェットの結果は、現在の検索とは無関係です。",
+    "all_time": "全期間"
+  },
+  "unknown_widget": {
+    "title": "不明なウィジェット: {{type}}",
+    "cannot_render": "申し訳ありませんが、このウィジェットは表示できません。<strong>{{type}}</strong> 型のウィジェットの処理方法がわからないためです。原因として、次のいずれかが考えられます:",
+    "missing_plugin": "このウィジェットは、現在は利用できないプラグインを使用して作成されました。",
+    "legacy_dashboard": "このウィジェットは旧バージョンのダッシュボードの一部で、現在は利用できないプラグインによって作成されました。",
+    "what_to_do": "対処方法: プラグインを再度読み込む、現在のバージョンの {{productName}} に対応したプラグインについて元の作成者に問い合わせる、またはウィジェットが不要であれば削除してください。",
+    "copy_config": "いずれの場合も、ウィジェットの設定をクリップボードにコピーできます:"
+  },
+  "widget_actions": {
+    "open_dropdown": "操作のドロップダウンを開く",
+    "unfocus": "ウィジェットのフォーカスを解除",
+    "focus": "このウィジェットにフォーカス",
+    "edit": "編集",
+    "duplicate": "複製",
+    "copy_to_dashboard": "ダッシュボードにコピー",
+    "move_to_page": "ページに移動",
+    "copying": "ウィジェットをコピーしています...",
+    "copy": "ウィジェットをコピー",
+    "confirm_remove": "ウィジェット \"{{title}}\" を削除してもよろしいですか？",
+    "compress_width": "幅を縮小",
+    "stretch_width": "幅を拡大",
+    "replay_search": "検索を再実行"
+  },
+  "widget_loading": {
+    "content": "ウィジェットのコンテンツを読み込んでいます"
+  },
+  "widget_errors": {
+    "render_error": "このウィジェットの描画中に、次のエラーが発生しました:"
+  },
+  "widget_header": {
+    "no_description": "ウィジェットの説明はありません",
+    "show_description": "ウィジェットの説明を表示",
+    "description_placeholder": "ウィジェットに役立つ説明を追加してください",
+    "drag_handle": "{{title}} のドラッグハンドル"
+  },
+  "warm_tier": {
+    "info": "情報",
+    "loading_slow": "このウィジェットはウォームティアからデータを取得しているため、読み込みに時間がかかる場合があります。"
+  },
+  "events_widget": {
+    "actions": "操作",
+    "replay_search": "検索を再実行",
+    "view_details": "イベントの詳細を表示",
+    "toggle_actions": "イベントの操作を切り替え",
+    "details_title": "イベントの詳細",
+    "close": "閉じる",
+    "unknown_visualization": "不明なウィジェットの可視化タイプ {{mode}}",
+    "mode_list": "リスト",
+    "mode_count": "件数",
+    "visualization": "可視化",
+    "columns": "列",
+    "select_column": "新しい列を選択",
+    "filter": "フィルター",
+    "sorting": "並べ替え",
+    "unknown_attribute": "不明",
+    "unknown_attribute_help": "この属性は有効なライセンスが必要なため、現在利用できません。",
+    "select_event_definition": "イベント定義を選択",
+    "alert": "アラート",
+    "event": "イベント"
+  },
+  "overview_configuration": {
+    "remove_column": "{{column}} 列を削除",
+    "column": "列",
+    "select_column": "列を選択",
+    "direction": "方向",
+    "select_direction": "方向を選択",
+    "type": "種類",
+    "add_column": "列を追加",
+    "configure_filter": "新しいフィルターを設定"
+  },
+  "date_filter": {},
+  "message_table": {
+    "decorators": {}
+  },
+  "data_table": {},
+  "field_types": {},
+  "export": {},
+  "enterprise_widgets": {},
+  "error_widget": {},
+  "notifications": {}
+}
