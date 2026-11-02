@@ -336,11 +336,22 @@
       "assign_index_set": "指派 Index Set",
       "assign_loading": "正在指派 Index Set...",
       "assign_submit": "指派 Index Set",
+      "assign_success_other": "已成功將 Index Set 指派給 {{count}} 個串流。",
+      "assign_title_other": "將 Index Set 指派給 {{count}} 個串流",
+      "delete_confirm_other": "確定要移除 {{count}} 個串流嗎？此操作無法復原。",
       "delete_error": "刪除串流時發生錯誤。{{error}}",
+      "failed_deleted_other": "所選的 {{count}} 個串流中，有 {{failed}} 個無法刪除。",
+      "failed_started_other": "所選的 {{count}} 個串流中，有 {{failed}} 個無法啟動。",
+      "failed_stopped_other": "所選的 {{count}} 個串流中，有 {{failed}} 個無法停止。",
       "index_set_required": "必須選擇 Index Set",
       "search_in_streams": "在串流中搜尋",
       "start_error": "啟動串流時發生錯誤。{{error}}",
+      "start_streams_other": "啟動串流",
       "stop_error": "停止串流時發生錯誤。{{error}}",
+      "stop_streams_other": "停止串流",
+      "success_deleted_other": "已成功刪除 {{count}} 個串流。",
+      "success_started_other": "已成功啟動 {{count}} 個串流。",
+      "success_stopped_other": "已成功停止 {{count}} 個串流。",
       "success_title": "成功"
     },
     "cells": {
@@ -348,6 +359,7 @@
       "avg_processing_time": "平均處理時間：{{ms}} ms（過去 15 分鐘）",
       "index_set_not_found": "找不到",
       "max_processing_time": "最長處理時間：{{ms}} ms（過去 15 分鐘）",
+      "message_count_other": "過去 24 小時內有 {{count}} 則訊息",
       "throughput": "{{throughput}} msg/s"
     },
     "columns": {
@@ -369,23 +381,121 @@
       "filter_rules_header_destination": "目的地",
       "filter_rules_header_status": "狀態",
       "filter_rules_header_title": "標題",
+      "filter_rules_summary_other": "顯示所有目的地中已設定的 {{count}} 條篩選規則。",
       "manage_filter_rules": "管理篩選規則",
-      "manage_outputs": "管理 Output"
+      "manage_outputs": "管理 Output",
+      "manage_pipelines": "管理 Pipelines",
+      "manage_rules": "管理規則",
+      "no_filter_rules": "找不到任何篩選規則。",
+      "outputs_summary_other": "已連接 {{count}} 個 Output。",
+      "pipelines_load_failed": "無法載入已連接的 Pipelines。",
+      "pipelines_none": "沒有任何 Pipeline 連接至此串流。",
+      "quick_add_rule": "快速新增規則",
+      "routing_pipelines_load_failed": "無法載入路由 Pipelines。",
+      "routing_pipelines_none": "沒有任何路由 Pipeline 將訊息路由至此串流。",
+      "rules_summary_and_other": "必須符合已設定的 {{count}} 個串流規則中的全部規則。",
+      "rules_summary_or_other": "必須至少符合已設定的 {{count}} 個串流規則中的一項。"
     },
-    "expanded_titles": {},
-    "metric_columns": {}
+    "expanded_titles": {
+      "destination_filters": "篩選規則",
+      "outputs": "Outputs",
+      "rules": "規則"
+    },
+    "human_name": "串流",
+    "metric_columns": {
+      "associated_inputs": "相關聯的 Input（過去 24 小時）",
+      "avg_processing_time_ms": "平均處理時間（過去 15 分鐘）",
+      "max_processing_time_ms": "最長處理時間（過去 15 分鐘）",
+      "message_count": "訊息數量（過去 24 小時）",
+      "pipelines": "Pipelines",
+      "routing_pipelines": "路由 Pipelines"
+    }
   },
-  "streams_page": {},
-  "system_outputs": {},
-  "user_no_stream_access": {},
-  "notifications": {},
-  "use_output_mutations_notifications": {},
-  "use_outputs_notifications": {},
-  "use_stream_notifications": {},
-  "use_stream_metrics_notifications": {},
-  "use_stream_outputs_notifications": {},
-  "use_stream_mutations_notifications": {},
-  "use_stream_output_mutations_notifications": {},
-  "use_stream_rule_mutations_notifications": {},
-  "use_stream_rules_inputs_notifications": {}
+  "streams_page": {
+    "create_loading": "正在建立串流...",
+    "create_submit": "建立串流",
+    "create_success_message": "已成功建立串流。",
+    "create_success_title": "成功",
+    "create_title": "建立串流",
+    "description": "您可以透過套用規則，將傳入的訊息路由至串流。符合串流規則的訊息會被路由至該串流。一則訊息也可以同時路由至多個串流。",
+    "documentation_link_title": "串流文件",
+    "title": "串流"
+  },
+  "system_outputs": {
+    "description": "{{productName}} 節點可透過 Output 轉送訊息。您可以在此啟動或終止任意數量的 Output，<highlight>然後將其指派至串流，以即時轉送該串流的所有訊息。</highlight>",
+    "header_title": "叢集中的 Output",
+    "marketplace_prefix": "您可以在以下位置找到 Output 外掛程式：",
+    "title": "Outputs"
+  },
+  "user_no_stream_access": {
+    "alert": "目前無法開始搜尋，因為您無權存取任何串流。若您認為這是錯誤，請聯絡您的管理員。",
+    "title": "沒有串流權限。"
+  },
+  "notifications": {
+    "load_failed": "載入串流失敗，狀態：{{error}}",
+    "load_failed_title": "無法載入串流",
+    "update_failed": "更新串流失敗，狀態：{{error}}",
+    "update_failed_title": "無法更新串流",
+    "pause_failed": "暫停串流失敗，狀態：{{error}}",
+    "pause_failed_title": "無法暫停串流",
+    "resume_failed": "恢復串流失敗，狀態：{{error}}",
+    "resume_failed_title": "無法恢復串流",
+    "clone_failed": "複製串流失敗，狀態：{{error}}",
+    "clone_failed_title": "無法複製串流",
+    "test_match_failed": "測試串流的串流規則失敗，狀態：{{error}}",
+    "test_match_failed_title": "無法測試串流的串流規則",
+    "output_terminate_confirm": "確定要終止此 Output 嗎？",
+    "output_terminated": "Output 已終止。",
+    "output_remove_confirm": "確定要從串流中移除此 Output 嗎？",
+    "success_title": "成功"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "儲存 Output「{{title}}」失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存 Output",
+    "update_failed": "更新 Output「{{title}}」失敗，狀態：{{error}}",
+    "update_failed_title": "無法更新 Output",
+    "terminate_failed": "終止 Output 失敗，狀態：{{error}}",
+    "terminate_failed_title": "無法終止 Output"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "載入 Output 失敗，狀態為",
+    "load_failed_title": "無法載入 Output"
+  },
+  "use_stream_notifications": {
+    "load_failed": "載入串流失敗，狀態為",
+    "load_failed_title": "無法載入串流。"
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "載入串流指標失敗，狀態為",
+    "load_failed_title": "無法載入串流指標"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "載入串流 Output 失敗，狀態為",
+    "load_failed_title": "無法載入串流 Output"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "儲存串流失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存串流"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "將 Output 新增至串流失敗，狀態：{{error}}",
+    "add_failed_title": "無法將 Output 新增至串流",
+    "remove_failed": "從串流中刪除 Output 失敗，狀態：{{error}}",
+    "remove_failed_title": "無法從串流中刪除 Output",
+    "added_success": "已成功將 Output 新增至串流。",
+    "removed_success": "已成功從串流中移除 Output。",
+    "success_title": "成功！"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "建立串流規則失敗，狀態：{{error}}",
+    "create_failed_title": "無法建立串流規則",
+    "update_failed": "更新串流規則失敗，狀態：{{error}}",
+    "update_failed_title": "無法更新串流規則",
+    "delete_failed": "刪除串流規則失敗，狀態：{{error}}",
+    "delete_failed_title": "無法刪除串流規則"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "擷取串流規則 Input 清單失敗，狀態：{{error}}",
+    "fetch_failed_title": "無法取得串流規則 Input"
+  }
 }
