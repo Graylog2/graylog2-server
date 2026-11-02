@@ -245,6 +245,8 @@
     "positions_failed": "Falha ao alterar as posições dos extratores: {{error}}",
     "positions_failed_title": "Não foi possível atualizar as posições dos extratores",
     "import_success": "Resultado da importação: {{successful}} extrator(es) importado(s).",
-    "import_success_title": "Operação de importação concluída com sucesso"
+    "import_success_title": "Operação de importação concluída com sucesso",
+    "import_warning": "Resultado da importação: {{successful}} extrator(es) importado(s), {{failed}} erro(s).",
+    "import_warning_title": "Operação de importação concluída"
   }
 }
