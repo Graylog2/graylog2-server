@@ -111,23 +111,140 @@
     "try_example": "Tester avec l'exemple"
   },
   "converters_editor": {
-    "not_supported": "Impossible d'ajouter des convertisseurs aux extracteurs <em>{{type}}</em>."
+    "not_supported": "Impossible d'ajouter des convertisseurs aux extracteurs <em>{{type}}</em>.",
+    "add_label": "Ajouter un convertisseur",
+    "add_help": "Ajoutez des convertisseurs pour transformer la valeur extraite.",
+    "select_placeholder": "Sélectionner un convertisseur",
+    "add": "Ajouter"
   },
-  "export": {},
-  "example_message": {},
-  "sort": {},
-  "list": {},
-  "import": {},
-  "message_loader": {},
-  "copy_input": {},
-  "grok": {},
-  "json": {},
-  "lookup_table": {},
-  "regex": {},
-  "regex_replace": {},
-  "split_and_index": {},
-  "substring": {},
-  "pages": {},
-  "tools_api": {},
-  "use_extractors_notifications": {}
+  "export": {
+    "json_title": "JSON des extracteurs",
+    "copy": "Copier les extracteurs"
+  },
+  "example_message": {
+    "not_loaded": "Impossible de charger un exemple du champ « {{field}} ». Il n'est pas possible de tester l'extracteur avant de le mettre à jour."
+  },
+  "sort": {
+    "title": "Trier les extracteurs de <em>{{title}}</em>",
+    "description": "Glissez-déposez les extracteurs dans la liste pour modifier l'ordre dans lequel ils seront appliqués.",
+    "submit": "Mettre à jour le tri"
+  },
+  "list": {
+    "sort": "Trier les extracteurs",
+    "title": "Extracteurs configurés",
+    "no_extractors": "Cette Input n'a aucun extracteur configuré."
+  },
+  "import": {
+    "parse_error": "Une erreur s'est produite lors de l'analyse des extracteurs. Sont-ils au format JSON ? {{error}}",
+    "parse_error_title": "Impossible d'importer les extracteurs",
+    "submit": "Ajouter les extracteurs à l'Input"
+  },
+  "message_loader": {
+    "load": "Charger le message",
+    "loading": "Chargement du message...",
+    "wrong_example": "Mauvais exemple ?",
+    "load_another": "Charger un autre message",
+    "message_id": "ID du message",
+    "index": "Index"
+  },
+  "copy_input": {
+    "description": "L'intégralité de l'Input sera copiée à l'identique."
+  },
+  "grok": {
+    "error": "Impossible d'exécuter l'extraction grok en raison de l'erreur suivante : {{error}}",
+    "no_match": "Impossible d'exécuter l'extraction grok. Veuillez vérifier vos paramètres.",
+    "named_captures_only": "Uniquement les captures nommées",
+    "named_captures_only_help": "Ne placer dans le message que les captures explicitement nommées.",
+    "pattern": "Modèle Grok"
+  },
+  "json": {
+    "flatten": "Aplatir les structures",
+    "flatten_help": "Indique s'il faut aplatir les objets JSON dans un seul champ de message ou les développer en plusieurs champs.",
+    "list_separator": "Séparateur d'éléments de liste",
+    "list_separator_help": "Chaîne utilisée pour concaténer les éléments d'une liste JSON.",
+    "key_separator": "Séparateur de clés",
+    "key_separator_help": "Chaîne utilisée pour concaténer les différentes clés d'un objet JSON imbriqué (utilisée uniquement si l'objet n'est <em>pas</em> aplati).",
+    "kv_separator": "Séparateur clé/valeur",
+    "kv_separator_help": "Chaîne utilisée pour concaténer les paires clé/valeur d'un objet JSON (utilisée uniquement si l'objet est aplati).",
+    "key_prefix": "Préfixe de clé",
+    "key_prefix_help": "Texte à placer devant chaque clé extraite de l'objet JSON.",
+    "replace_key_whitespace": "Remplacer les espaces dans les clés",
+    "replace_key_whitespace_help": "Les clés de champs contenant des espaces seront ignorées lors du stockage du message extrait. Cochez cette case pour remplacer les espaces dans les clés JSON par un autre caractère.",
+    "key_whitespace_replacement": "Remplacement des espaces dans les clés",
+    "key_whitespace_replacement_help": "Caractère à utiliser pour remplacer les espaces dans les clés du message. Assurez-vous que ce caractère est valide dans Lucene, par exemple « - » ou « _ »."
+  },
+  "lookup_table": {
+    "error": "Impossible d'exécuter la recherche : {{error}}"
+  },
+  "regex": {
+    "no_match": "L'expression régulière ne correspond à aucun élément.",
+    "no_group": "L'expression régulière ne contient aucun groupe de capture à extraire.",
+    "help": "L'expression régulière utilisée pour l'extraction. Le premier groupe de capture est utilisé. Pour en savoir plus, consultez la <docsLink>documentation</docsLink>.",
+    "label": "Expression régulière"
+  },
+  "regex_replace": {
+    "regex_help": "L'expression régulière utilisée pour l'extraction. Pour en savoir plus, consultez la <docsLink>documentation</docsLink>.",
+    "replacement_help": "Le remplacement appliqué au texte correspondant. Consultez la documentation de l'API <matcherLink>Matcher</matcherLink> pour connaître les options possibles.",
+    "replacement": "Remplacement",
+    "replace_all": "Remplacer toutes les occurrences du motif",
+    "replace_all_help": "Indique s'il faut remplacer toutes les occurrences du motif donné ou seulement la première."
+  },
+  "split_and_index": {
+    "no_match": "Impossible d'exécuter l'extraction par découpage et indexation. Veuillez vérifier vos paramètres.",
+    "split_by_help": "Caractère sur lequel découper. <strong>Exemple :</strong> un caractère d'espacement découpera <em>foo bar baz</em> en <em>[foo,bar,baz]</em>.",
+    "index_help": "Quelle partie de la chaîne découpée souhaitez-vous utiliser ? <strong>Exemple :</strong> <em>2</em> sélectionne <em>bar</em> dans <em>foo bar baz</em> lorsque le découpage se fait sur les espaces.",
+    "index": "Index cible"
+  },
+  "substring": {
+    "no_match": "Impossible d'exécuter l'extraction de sous-chaîne. Veuillez vérifier les bornes d'index.",
+    "end_index_help": "Position de fin de l'extraction (exclue). <strong>Exemple :</strong> <em>1,5</em> extrait <em>love</em> de la chaîne <em>ilovelogs</em>.",
+    "begin_index": "Index de début",
+    "begin_index_help": "Position du caractère à partir de laquelle commencer l'extraction (incluse)",
+    "end_index": "Index de fin"
+  },
+  "pages": {
+    "new_title": "Nouvel extracteur pour l'Input {{title}}",
+    "new_header": "Nouvel extracteur pour l'Input <em>{{title}}</em>",
+    "edit_title": "Modifier l'extracteur {{title}}",
+    "edit_header": "Modifier l'extracteur <em>{{title}}</em> de l'Input <em>{{inputTitle}}</em>",
+    "description": "Les extracteurs sont appliqués à chaque message reçu par une Input. Utilisez-les pour extraire et transformer des données textuelles en champs, afin de faciliter le filtrage et l'analyse par la suite.",
+    "export_title": "Exporter les extracteurs de {{title}}",
+    "export_header": "Exporter les extracteurs de <em>{{title}}</em>",
+    "export_marketplace_prefix": "Les extracteurs d'une Input peuvent être exportés au format JSON pour être importés dans d'autres configurations ou partagés dans",
+    "import_title": "Importer des extracteurs dans {{title}}",
+    "import_header": "Importer des extracteurs dans <em>{{title}}</em>",
+    "import_description": "Les extracteurs exportés peuvent être importés dans une Input.",
+    "import_marketplace_prefix": "Il vous suffit de l'export JSON des extracteurs issu de toute autre configuration {{productName}} ou de"
+  },
+  "tools_api": {
+    "details": "Détails : {{error}}",
+    "natural_date_failed": "Échec du chargement de l'aperçu des mots-clés, statut : {{error}}",
+    "natural_date_failed_title": "Impossible de charger l'aperçu des mots-clés",
+    "grok_failed_title": "Impossible d'exécuter l'extraction grok. Veuillez vérifier vos paramètres.",
+    "json_failed_title": "Impossible d'exécuter l'extraction JSON. Veuillez vérifier vos paramètres.",
+    "regex_invalid_title": "Impossible de valider l'expression régulière. Assurez-vous qu'elle est valide.",
+    "allowlist_check_title": "Impossible de vérifier si l'URL figure dans la liste d'autorisation.",
+    "regex_generate_title": "Impossible de générer l'expression régulière.",
+    "regex_try_title": "Impossible de tester l'expression régulière. Assurez-vous qu'elle est valide.",
+    "split_index_failed_title": "Impossible d'exécuter l'extraction par découpage et indexation. Veuillez vérifier vos paramètres.",
+    "substring_failed_title": "Impossible d'exécuter l'extraction de sous-chaîne. Veuillez vérifier les bornes d'index.",
+    "contains_string_failed_title": "Impossible de vérifier si le champ contient la chaîne",
+    "lookup_table_failed_title": "Impossible de vérifier si la Lookup Table traduit la chaîne"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extracteur {{title}} créé avec succès",
+    "create_failed": "Échec de la création de l'extracteur : {{error}}",
+    "create_failed_title": "Impossible de créer l'extracteur",
+    "updated_success": "Extracteur \"{{title}}\" mis à jour avec succès",
+    "update_failed": "Échec de la mise à jour de l'extracteur : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'extracteur",
+    "deleted_success": "Extracteur \"{{title}}\" supprimé avec succès",
+    "delete_failed": "Échec de la suppression de l'extracteur : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'extracteur {{title}}",
+    "positions_updated_success": "Ordre des extracteurs mis à jour avec succès",
+    "positions_failed": "Échec de la modification de l'ordre des extracteurs : {{error}}",
+    "positions_failed_title": "Impossible de mettre à jour l'ordre des extracteurs",
+    "import_success": "Résultats de l'import : {{successful}} extracteur(s) importé(s).",
+    "import_success_title": "Import réussi"
+  }
 }
