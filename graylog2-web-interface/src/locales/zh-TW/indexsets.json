@@ -355,11 +355,132 @@
     "routing_title": "分片路由",
     "routing_description": "粗體的分片為主要分片，其餘為副本。當主要分片離開叢集時，副本會自動升格為主要分片。大小與文件數僅反映主要分片，不包含可能的副本重複計算。",
     "tooltip": "狀態：<i>{{state}}</i>，位於 {{hostname}}（{{name}}）",
-    "seconds_short": "{{seconds}} 秒"
+    "seconds_short": "{{seconds}} 秒",
+    "shard_id": "S{{id}}"
   },
-  "data_tiering": {},
-  "incompatible": {},
-  "strategies": {},
+  "data_tiering": {
+    "max_days_label": "儲存期限上限（天）",
+    "max_days_help": "資料應在幾天後刪除。",
+    "min_days_label": "儲存期限下限（天）",
+    "min_days_help": "資料至少應保留幾天。",
+    "archive_label": "刪除前封存",
+    "archive_help": "是否在刪除此索引前將其封存？",
+    "error_negative": "不允許負數。",
+    "error_min_smaller": "儲存期限下限必須小於儲存期限上限。",
+    "error_min_bigger_hot": "儲存期限下限必須大於 Hot Tier 的期限下限。",
+    "summary_rotation_strategy": "輪替策略：",
+    "summary_data_tiering": "Data Tiering",
+    "summary_max": "儲存期限上限：",
+    "summary_min": "儲存期限下限：",
+    "tooltip_min_storage": "儲存期限下限（天數）",
+    "tooltip_min_hot_and_storage": "Hot Tier 與儲存期限下限（天數）",
+    "tooltip_min_hot": "Hot Tier 期限下限（天數）"
+  },
+  "incompatible": {
+    "working": "處理中...",
+    "bulk_remaining": "若個別索引失敗，其餘索引仍會繼續處理。",
+    "opens_in_new_tab": " （在新分頁中開啟）",
+    "archiving": "封存中...",
+    "reindexing": "重新索引中...",
+    "archive_failed": "封存失敗",
+    "reindex_failed": "重新索引失敗",
+    "archive_conflict": "已有另一個封存工作正在執行。待其完成後，才能開始新的封存工作。",
+    "archive_conflict_title": "封存工作已在執行中",
+    "archive_unavailable": "無法使用封存功能。",
+    "bulk_rotation_failed": "批次輪替要求失敗。",
+    "cluster_jobs_failed": "載入叢集工作失敗",
+    "cluster_jobs_failed_title": "無法載入叢集工作",
+    "badge_system": "系統",
+    "badge_managed": "受管理",
+    "badge_foreign": "外部",
+    "badge_warm": "Warm",
+    "badge_active_write_index": "目前寫入中的索引",
+    "badge_archived": "已封存",
+    "version_unknown": "未知",
+    "human_name": "不相容的索引",
+    "reindex_requires_data_node": "只有當 {{productName}} 連接的搜尋後端為 Data Node 時，才能重新索引系統索引。請在升級至下一個 OpenSearch 主要版本前，<migrationLink>遷移至 Data Node</migrationLink>，再重新索引這些索引。",
+    "partial_summary": "{{succeeded}} 個成功，{{failed}} 個失敗。",
+    "partial_more": "...另有 {{count}} 個。",
+    "delete": {
+      "button": "刪除",
+      "title": "刪除索引",
+      "confirm": "刪除",
+      "body": "此操作將永久刪除 <strong>{{indexName}}</strong>。",
+      "success": "索引「{{indexName}}」已刪除。",
+      "error": "無法刪除。"
+    },
+    "reindex": {
+      "button": "重新索引",
+      "title": "重新索引系統索引",
+      "confirm": "重新索引系統索引",
+      "body": "此操作將重新索引 <strong>{{indexName}}</strong>，使其可搭配 OpenSearch 3 使用。",
+      "success": "索引「{{indexName}}」已重新索引。",
+      "error": "無法重新索引系統索引。"
+    },
+    "rotate": {
+      "button": "輪替",
+      "title": "輪替目前寫入中的索引",
+      "confirm": "輪替",
+      "body_active": "<strong>{{indexName}}</strong> 是其 Index Set 目前寫入中的索引，仍會接收新訊息。輪替將在目前的 OpenSearch 版本上建立新的寫入索引。",
+      "body_afterwards": "之後，<strong>{{indexName}}</strong> 即可封存或刪除。",
+      "success": "「{{indexName}}」所屬的 Index Set 已完成輪替。此索引不再接收訊息，現在可以封存或刪除。",
+      "error": "無法輪替。"
+    },
+    "archive_delete": {
+      "button": "封存並刪除",
+      "title": "封存並刪除索引",
+      "confirm": "封存並刪除",
+      "body": "此操作將為 <strong>{{indexName}}</strong> 建立封存，並於之後刪除該索引。",
+      "success": "已開始「{{indexName}}」的封存並刪除工作。",
+      "error": "無法封存並刪除。"
+    },
+    "bulk": {
+      "delete": {
+        "button": "刪除",
+        "title": "刪除不相容的索引",
+        "confirm": "全部刪除",
+        "error": "無法全部刪除。"
+      },
+      "delete_partial_title": "部分索引無法刪除",
+      "delete_failure_title": "無法刪除索引",
+      "reindex": {
+        "button": "重新索引系統索引",
+        "title": "重新索引系統索引",
+        "confirm": "全部重新索引",
+        "error": "無法全部重新索引。"
+      },
+      "archive_delete": {
+        "button": "封存並刪除",
+        "title": "封存並刪除索引",
+        "confirm": "全部封存並刪除",
+        "error": "無法全部封存並刪除。"
+      },
+      "rotate": {
+        "button": "輪替目前寫入中的索引",
+        "title": "輪替目前寫入中的索引",
+        "confirm": "全部輪替",
+        "error": "無法全部輪替。"
+      },
+      "rotate_partial_title": "部分索引無法輪替",
+      "rotate_failure_title": "無法輪替索引"
+    }
+  },
+  "strategies": {
+    "name_rotation_message_count": "索引訊息數",
+    "name_rotation_size": "索引大小",
+    "name_rotation_time": "索引時間",
+    "name_rotation_time_size_optimizing": "依時間與大小最佳化的索引",
+    "name_retention_delete": "刪除索引",
+    "name_retention_close": "關閉索引",
+    "name_retention_noop": "不做任何動作",
+    "retention_max_indices_label": "索引數量上限",
+    "retention_closing_help": "在<strong>關閉</strong>最舊索引前可保留的索引數量上限",
+    "retention_deleting_help": "在<strong>刪除</strong>最舊索引前可保留的索引數量上限",
+    "retention_noop_help": "此保留策略無法設定，因為它不會執行任何動作。",
+    "retention_summary_strategy": "索引保留策略：",
+    "retention_summary_close": "關閉",
+    "retention_summary_delete": "刪除"
+  },
   "pages": {},
   "navigation": {},
   "maintenance_dialog": {},
