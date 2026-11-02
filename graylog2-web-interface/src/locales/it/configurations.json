@@ -117,6 +117,8 @@
     "auto_refresh_options": "Opzioni dell'intervallo di aggiornamento automatico",
     "auto_refresh_options_help": "Configura le opzioni disponibili per il selettore dell'intervallo di <strong>aggiornamento automatico</strong> come <strong>durata ISO8601</strong>",
     "auto_refresh_options_title": "Opzioni dell'intervallo di aggiornamento automatico",
+    "cancel_after_seconds_one": "{{count}} secondo",
+    "cancel_after_seconds_other": "{{count}} secondi",
     "cancellation_timeout": "Timeout di annullamento",
     "cancellation_timeout_description": "Il tempo in secondi per ciascun widget, dopo il quale l'esecuzione della ricerca viene annullata automaticamente. Questo riduce il numero di ricerche eseguite e migliora le prestazioni.",
     "default_auto_refresh_interval": "Intervallo predefinito di aggiornamento automatico",
@@ -139,7 +141,8 @@
     "surrounding_time_range_options": "Opzioni dell'intervallo di tempo circostante",
     "time_range_presets": "Preimpostazioni dell'intervallo di tempo per le ricerche",
     "title": "Configurazione delle ricerche",
-    "update_title": "Aggiorna la configurazione delle ricerche"
+    "update_title": "Aggiorna la configurazione delle ricerche",
+    "cancel_after_seconds_many": "{{count}} secondi"
   },
   "shared": {
     "disabled": "disabilitato",
@@ -231,7 +234,20 @@
     "description": "La pagina di benvenuto può mostrare widget con i conteggi di messaggi, avvisi ed eventi, oltre a un grafico delle principali sorgenti. Su cluster grandi o molto attivi, queste query aggiungono carico ogni volta che un utente apre la pagina di benvenuto. Disabilitale qui sotto se vuoi evitare questo carico. I widget verranno nascosti e le relative query non verranno eseguite.",
     "enable_metrics": "Abilita le metriche della pagina di benvenuto",
     "enable_metrics_help": "Se disabilitato, i widget dei conteggi di messaggi, avvisi ed eventi e il grafico delle principali sorgenti verranno nascosti dalla pagina di benvenuto, e le relative query non verranno eseguite. Disattivalo su cluster grandi o molto attivi per ridurre il carico delle query.",
-    "metrics": "Metriche della pagina di benvenuto"
+    "metrics": "Metriche della pagina di benvenuto",
+    "title": "Pagina di benvenuto",
+    "update_title": "Aggiorna la configurazione della pagina di benvenuto"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "Configurazione predefinita degli indici aggiornata con successo",
+    "index_defaults_failed_title": "Aggiornamento della configurazione predefinita degli indici non riuscito",
+    "update_success": "Configurazione aggiornata con successo",
+    "search_update_failed": "Aggiornamento della configurazione della ricerca non riuscito: {{error}}",
+    "search_update_failed_title": "Impossibile aggiornare la configurazione della ricerca: {{configType}}",
+    "allowlist_update_success": "Configurazione della allowlist degli URL aggiornata con successo",
+    "allowlist_update_failed": "Aggiornamento della configurazione della allowlist degli URL non riuscito: {{error}}",
+    "allowlist_update_failed_title": "Impossibile aggiornare la allowlist degli URL: {{configType}}",
+    "processors_update_failed": "Aggiornamento della configurazione dei message processor non riuscito: {{error}}",
+    "processors_update_failed_title": "Impossibile aggiornare la configurazione: {{configType}}"
+  }
 }
