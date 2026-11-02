@@ -699,21 +699,130 @@
     "reset_migration": {
       "button": "重設遷移",
       "confirm": "確定要重設遷移嗎？",
-      "failed": "重設遷移狀態失敗，狀態為：{{error}}"
+      "failed": "重設遷移狀態失敗，狀態為：{{error}}",
+      "failed_title": "無法重設遷移狀態。",
+      "success": "已成功重設遷移狀態。"
     },
-    "migration_actions": {},
-    "force_start": {},
+    "migration_actions": {
+      "next": "下一步",
+      "show_renewal_policy_creation": "設定憑證更新政策",
+      "show_migration_selection": "前往遷移步驟",
+      "run_directory_compatibility_check": "執行目錄相容性檢查",
+      "provision_datanode_certificates": "為 Data Node 佈建憑證"
+    },
+    "force_start": {
+      "confirm": "仍要啟動",
+      "description": "後端回報一般的預檢查未通過。",
+      "submitting": "啟動中...",
+      "title": "仍要開始 OpenSearch 升級嗎？"
+    },
     "rolling_upgrade_nodes": {
-      "node_status": {},
-      "state": {}
+      "abort_requested": "已要求中止。升級將在目前步驟完成後停止。",
+      "no_remaining_nodes": "沒有剩餘的節點。",
+      "no_upgraded_nodes": "尚無已升級的節點。",
+      "not_started": "尚未開始 OpenSearch 滾動升級。",
+      "title": "OpenSearch 滾動升級",
+      "upgraded_heading": "已升級至目標 OpenSearch",
+      "waiting_heading": "等待 OpenSearch 升級",
+      "current": "目前",
+      "data_node": "Data Node",
+      "manager": "管理員",
+      "opensearch_version": "OpenSearch 版本",
+      "status": "狀態",
+      "unknown": "未知",
+      "node_status": {
+        "pending": "等待中",
+        "restarting": "重新啟動中",
+        "started": "已啟動",
+        "completed": "已升級",
+        "failed": "失敗",
+        "skipped": "已略過"
+      },
+      "state": {
+        "preparing_cluster": "正在準備叢集",
+        "selecting_next_node": "正在選擇下一個節點",
+        "upgrading_node": "正在升級節點",
+        "waiting_node_joined": "等待節點重新加入",
+        "reenabling_allocation": "正在重新啟用分片配置",
+        "waiting_green": "等待叢集變為綠色",
+        "paused_waiting_green": "已暫停，等待叢集變為綠色",
+        "finalizing": "正在完成",
+        "completed": "已完成",
+        "aborted": "已中止",
+        "failed": "失敗",
+        "in_progress": "進行中"
+      }
     },
-    "opensearch_upgrade_info": {},
+    "opensearch_upgrade_info": {
+      "current_version": "目前的 OpenSearch 版本：",
+      "data_nodes": "Data Node：",
+      "data_nodes_summary": "{{total}}（{{available}} 個可用）",
+      "loading": "載入中...",
+      "target_version": "目標 OpenSearch 版本：",
+      "unknown": "未知"
+    },
     "start_upgrade": {
-      "full": {},
-      "rolling": {}
+      "full": {
+        "alert_title": "Data Node 少於 3 個，這將是完整重新啟動，而非滾動式重新啟動",
+        "confirm": "重新啟動",
+        "journal": "OpenSearch 停止期間，新進的訊息會在每個 {{productName}} 節點的磁碟日誌佇列（journal）中累積。若停機時間超過日誌佇列的大小或存留時間上限，擷取將會停滯，訊息可能會遺失。僅在日誌佇列有足夠餘裕可容納預期停機時間時才繼續。",
+        "submitting": "重新啟動中...",
+        "title": "要重新啟動 Data Node 的 OpenSearch 嗎？",
+        "tolerate_downtime": "僅在您可以承受停機時間的情況下繼續。"
+      },
+      "no_rollback": "一旦開始，就無法回復至先前的版本。",
+      "rolling": {
+        "alert_title": "此操作會逐一重新啟動每個 Data Node",
+        "confirm": "開始滾動升級",
+        "healthy_cluster": "繼續之前，請確認叢集狀態正常（綠色）。",
+        "shard_allocation": "每次重新啟動期間會暫停分片配置，因此叢集保持可用，但在節點離開與重新加入時，索引與搜尋可能會短暫降級。",
+        "title": "要開始 OpenSearch 滾動升級嗎？",
+        "wait_for_green": "每個節點完成後，升級程序都會等待叢集恢復為綠色才繼續。若等待時間過長，程序將暫停並等待您繼續。"
+      },
+      "starting": "啟動中..."
     },
-    "opensearch_upgrade": {},
-    "client_certificate": {},
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Node 內嵌的 OpenSearch 已是最新版本。",
+      "automatic_upgrade": "每個 Data Node 會自動將其內嵌的 OpenSearch 升級至目標版本。",
+      "backup": "升級前請備份 MongoDB、Data Node 與 Data Lake 儲存空間，以確保可順利回復。",
+      "before_upgrading": "升級前",
+      "check_failed": "無法檢查 OpenSearch 升級的可用性。",
+      "full_restart": "所有 Data Node 都必須重新啟動，升級才會生效。",
+      "full_search_unavailable": "Data Node 重新啟動期間，搜尋與索引功能無法使用。",
+      "incompatible_indices": "不相容的索引",
+      "old_indices_unreadable": "OpenSearch 3 無法讀取以早於 OpenSearch 2 的版本建立的索引。若這些索引在升級期間仍然存在，其資料將無法存取。",
+      "resolve_indices_first": "請先處理所有不相容的索引。",
+      "restarting": "重新啟動中...",
+      "resume": "繼續",
+      "resuming": "繼續中...",
+      "rolling_restart": "Data Node 會逐一重新啟動，以將影響降至最低。",
+      "rolling_search_impaired": "Data Node 重新啟動期間，搜尋功能可能會受到影響。",
+      "start_rolling_upgrade": "開始 OpenSearch 滾動升級",
+      "start_upgrade_and_restart": "開始 OpenSearch 升級並重新啟動",
+      "starting_rolling_upgrade": "正在開始 OpenSearch 滾動升級...",
+      "title": "升級 Data Node 內嵌的 OpenSearch",
+      "upgrade_process": "升級程序",
+      "use_table": "請使用下方的表格，在繼續之前重新建立系統索引，並封存或刪除資料索引。"
+    },
+    "client_certificate": {
+      "certificate_lifetime": "憑證有效期",
+      "close": "關閉",
+      "create_title": "建立用戶端憑證",
+      "password": "密碼",
+      "principal": "主體",
+      "principal_placeholder": "principal",
+      "role": "角色",
+      "role_help": "代表 OpenSearch 角色對應。",
+      "role_placeholder": "role",
+      "submit": "建立憑證",
+      "submitting": "正在建立憑證...",
+      "unencrypted": "未加密",
+      "ca_certificate": "CA 憑證",
+      "certificate": "憑證",
+      "copy_to_clipboard": "複製到剪貼簿",
+      "private_key": "私密金鑰",
+      "view_principal": "主體："
+    },
     "cluster_health": {
       "shard_replication_help": {},
       "state_help": {}
