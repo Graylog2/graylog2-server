@@ -15,16 +15,25 @@
   },
   "bulk_actions": {
     "delete": {
+      "confirm_other": "{{count}} 件の Event Definition を削除してもよろしいですか？",
       "error": "イベント定義の削除中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を削除できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に削除しました。",
       "title": "イベント定義を削除"
     },
     "disable": {
+      "confirm_other": "{{count}} 件の Event Definition を無効化してもよろしいですか？",
       "error": "イベント定義の無効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を無効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に無効化しました。",
       "title": "イベント定義を無効化"
     },
     "disable_action": "無効化",
     "enable": {
+      "confirm_other": "{{count}} 件の Event Definition を有効化してもよろしいですか？",
       "error": "イベント定義の有効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を有効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に有効化しました。",
       "title": "イベント定義を有効化"
     },
     "enable_action": "有効化",
@@ -420,6 +429,7 @@
     "yes": "はい"
   },
   "summary_renders": {
+    "backlog_included_other": "通知には {{count}} 件のメッセージが含まれます",
     "backlog_none": "通知にはメッセージが含まれません。",
     "condition_plugin_no_summary": "条件プラグイン <em>{{type}}</em> は概要を提供していません。",
     "event_procedure_summary": "イベント手順の概要",
@@ -466,8 +476,10 @@
     "aria_label": "イベント定義のタグ",
     "duplicate": "タグ \"{{tag}}\" はすでに追加されています。",
     "help": "Enter キーまたは Tab キーを押して追加します。タグは小文字に変換され、重複は除外されます。使用できるのは、小文字の英字、数字、ハイフン、アンダースコア、ドットのみです。",
+    "invalid_characters_other": "タグ {{tags}} に無効な文字が含まれています。使用できるのは、小文字の英字、数字、ハイフン、アンダースコア、ドットのみです。",
     "max_reached": "タグの上限 {{max}} 個に達しました。",
-    "placeholder": "例: authentication, brute-force, compliance"
+    "placeholder": "例: authentication, brute-force, compliance",
+    "too_long_other": "タグ {{tags}} が最大文字数 {{max}} を超えています。"
   },
   "template_preview": {
     "aggregation": "グループ化で設定されたフィールド（元の名前のまま）",
@@ -507,6 +519,7 @@
     "title": "いくつかのエラーが見つかりました。"
   },
   "use_event_definition_notifications": {
-    "load_failed": "イベント定義の読み込みに失敗しました。ステータス: {{error}}"
+    "load_failed": "イベント定義の読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "Event Definition を読み込めませんでした"
   }
 }
