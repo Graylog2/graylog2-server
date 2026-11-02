@@ -418,7 +418,16 @@
     "profiling_disabled": "MongoDB-Profiling erfolgreich deaktiviert.",
     "profiling_enable_failed": "Aktivieren des MongoDB-Profilings fehlgeschlagen: {{error}}",
     "profiling_disable_failed": "Deaktivieren des MongoDB-Profilings fehlgeschlagen: {{error}}",
-    "profiling_update_failed_title": "MongoDB-Profiling konnte nicht aktualisiert werden."
+    "profiling_update_failed_title": "MongoDB-Profiling konnte nicht aktualisiert werden.",
+    "data_node_metrics_failed": "Laden der Metriken für Data Node \"{{hostname}}\" fehlgeschlagen",
+    "data_node_metrics_failed_title": "Metriken des Data Nodes konnten nicht geladen werden.",
+    "graylog_node_metrics_failed": "Laden der Metriken des Graylog-Knotens fehlgeschlagen mit Status",
+    "graylog_node_metrics_failed_title": "Metriken des Graylog-Knotens konnten nicht geladen werden.",
+    "cluster_traffic_failed": "Laden des Cluster-Datenverkehrs fehlgeschlagen mit Status",
+    "cluster_traffic_failed_title": "Cluster-Datenverkehr konnte nicht geladen werden",
+    "journal_failed": "Journal-Informationen konnten nicht abgerufen werden",
+    "system_jobs_failed": "Laden der Systemjobs fehlgeschlagen mit Status",
+    "system_jobs_failed_title": "Systemjobs konnten nicht geladen werden"
   },
   "use_cluster_overview_notifications": {
     "jvm_failed": "Abrufen der JVM-Informationen für Knoten '{{nodeId}}' fehlgeschlagen: {{error}}",

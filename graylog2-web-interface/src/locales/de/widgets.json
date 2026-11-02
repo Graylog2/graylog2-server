@@ -216,5 +216,9 @@
   "error_widget": {
     "title": "Beim Abrufen der Daten für dieses Widget sind die folgenden Fehler(s) aufgetreten:"
   },
-  "comma_separated_values_csv": "Kommagetrennte Werte (CSV)"
+  "comma_separated_values_csv": "Kommagetrennte Werte (CSV)",
+  "notifications": {
+    "delete_decorator_confirm": "Möchten Sie diesen Decorator wirklich löschen?",
+    "unsaved_changes_confirm": "Sie haben nicht gespeicherte Änderungen im Konfigurationsformular. Diese Aktion verwirft sie."
+  }
 }

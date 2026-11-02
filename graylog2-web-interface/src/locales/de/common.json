@@ -577,7 +577,9 @@
     "export_widget_failed": "Export für Widget fehlgeschlagen",
     "telemetry_update_failed": "Aktualisierung fehlgeschlagen: {{error}}",
     "telemetry_update_failed_title": "Telemetrie-Einstellungen konnten nicht aktualisiert werden.",
-    "delete_property_confirm": "Sind Sie sicher, dass Sie die Eigenschaft '{{key}}' löschen möchten?"
+    "delete_property_confirm": "Sind Sie sicher, dass Sie die Eigenschaft '{{key}}' löschen möchten?",
+    "quick_jump_failed": "Abrufen der Entitäten-Suchergebnisse fehlgeschlagen mit Status",
+    "quick_jump_failed_title": "Entitäten-Suchergebnisse konnten nicht abgerufen werden."
   },
   "use_favorite_item_mutation_notifications": {
     "put_failed": "Hinzufügen des Eintrags zu den Favoriten fehlgeschlagen mit Status: {{error}}",

@@ -18,6 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Button, Input, Table } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -102,7 +103,7 @@ class KeyValueTableComponent extends React.Component<
 
   _deleteRow = (key) => () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
+    if (window.confirm(i18n.t('notifications.delete_property_confirm', { ns: 'common', key }))) {
       const newPairs = ObjectUtils.clone(this.props.pairs);
 
       delete newPairs[key];

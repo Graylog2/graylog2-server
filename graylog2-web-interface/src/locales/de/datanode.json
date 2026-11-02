@@ -86,5 +86,11 @@
   "upgrade_status": {
     "message": "Nodes werden aktualisiert...",
     "title": "Upgrade-Status"
+  },
+  "notifications": {
+    "certificate_provisioned_success": "Zertifikat erfolgreich bereitgestellt",
+    "certificate_renewed_success": "Zertifikat erfolgreich erneuert",
+    "certificate_provisioning_failed": "Bereitstellung des Zertifikats fehlgeschlagen mit Fehler: {{error}}",
+    "certificate_renewal_failed": "Erneuerung des Zertifikats fehlgeschlagen mit Fehler: {{error}}"
   }
 }

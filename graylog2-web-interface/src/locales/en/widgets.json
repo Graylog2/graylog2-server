@@ -216,5 +216,9 @@
   "comma_separated_values_csv": "Comma-Separated Values (CSV)",
   "error_widget": {
     "title": "While retrieving data for this widget, the following error(s) occurred:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "Do you really want to delete this decorator?",
+    "unsaved_changes_confirm": "You have unsaved changes in configuration form. This action will rollback them"
   }
 }

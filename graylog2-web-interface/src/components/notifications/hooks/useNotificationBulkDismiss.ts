@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SystemNotifications } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type FetchError from 'logic/errors/FetchError';
 import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY, TABLE_KEY } from 'components/notifications/constants';
@@ -39,12 +40,18 @@ const useNotificationBulkDismiss = () => {
       if (error?.status === 403) return;
 
       if (error?.status === 400) {
-        UserNotification.warning('No notifications selected.', 'Nothing to dismiss');
+        UserNotification.warning(
+          i18n.t('notifications.nothing_selected', { ns: 'system' }),
+          i18n.t('notifications.nothing_to_dismiss_title', { ns: 'system' }),
+        );
 
         return;
       }
 
-      UserNotification.error('Failed to dismiss notifications. Please try again.', 'Dismiss failed');
+      UserNotification.error(
+        i18n.t('notifications.bulk_dismiss_failed', { ns: 'system' }),
+        i18n.t('notifications.dismiss_failed_title', { ns: 'system' }),
+      );
     },
   });
 };

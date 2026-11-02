@@ -574,7 +574,9 @@
     "export_widget_failed": "Export for widget failed",
     "telemetry_update_failed": "Update failed: {{error}}",
     "telemetry_update_failed_title": "Could not update telemetry settings.",
-    "delete_property_confirm": "Are you sure you want to delete property '{{key}}'?"
+    "delete_property_confirm": "Are you sure you want to delete property '{{key}}'?",
+    "quick_jump_failed": "Fetch Entities Search Results failed with status",
+    "quick_jump_failed_title": "Could not Fetch Entity Search Results."
   },
   "use_favorite_item_mutation_notifications": {
     "put_failed": "Adding item to favorites failed with status: {{error}}",

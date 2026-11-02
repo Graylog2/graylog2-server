@@ -59,7 +59,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { onDelete, decorator } = this.props;
 
     // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to delete this decorator?')) {
+    if (window.confirm(i18n.t('notifications.delete_decorator_confirm', { ns: 'widgets' }))) {
       onDelete(decorator.id);
     }
   };

@@ -418,7 +418,16 @@
     "profiling_disabled": "MongoDB profiling disabled successfully.",
     "profiling_enable_failed": "Failed to enable MongoDB profiling: {{error}}",
     "profiling_disable_failed": "Failed to disable MongoDB profiling: {{error}}",
-    "profiling_update_failed_title": "Could not update MongoDB profiling."
+    "profiling_update_failed_title": "Could not update MongoDB profiling.",
+    "data_node_metrics_failed": "Loading metrics for Data Node \"{{hostname}}\" failed",
+    "data_node_metrics_failed_title": "Could not load Data Node metrics.",
+    "graylog_node_metrics_failed": "Loading Graylog node metrics failed with status",
+    "graylog_node_metrics_failed_title": "Could not load Graylog node metrics.",
+    "cluster_traffic_failed": "Loading cluster traffic failed with status",
+    "cluster_traffic_failed_title": "Could not load cluster traffic",
+    "journal_failed": "Could not get journal information",
+    "system_jobs_failed": "Loading system jobs failed with status",
+    "system_jobs_failed_title": "Could not load system jobs"
   },
   "use_cluster_overview_notifications": {
     "jvm_failed": "Getting JVM information for node '{{nodeId}}' failed: {{error}}",

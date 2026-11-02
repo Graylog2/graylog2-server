@@ -24,6 +24,7 @@ import type { OrderedMap } from 'immutable';
 import { FormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
+import i18n from 'i18n';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -171,7 +172,7 @@ const DataTable = ({
       }
 
       // eslint-disable-next-line no-alert
-      if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+      if (window.confirm(i18n.t('notifications.unsaved_changes_confirm', { ns: 'widgets' }))) {
         return updateWidget();
       }
 
@@ -207,7 +208,7 @@ const DataTable = ({
       }
 
       // eslint-disable-next-line no-alert
-      if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+      if (window.confirm(i18n.t('notifications.unsaved_changes_confirm', { ns: 'widgets' }))) {
         return updateWidget();
       }
 
