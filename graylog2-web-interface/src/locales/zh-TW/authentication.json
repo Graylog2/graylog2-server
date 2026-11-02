@@ -37,6 +37,7 @@
     "delete": "刪除",
     "edit": "編輯",
     "filter_label": "篩選服務",
+    "found_other": "系統上找到 {{count}} 個已設定的驗證服務。",
     "headers": {
       "actions": "動作",
       "default_roles": "預設角色",
@@ -141,17 +142,65 @@
   "synced_users": {
     "edit": "編輯",
     "filter_label": "篩選使用者",
+    "found_other": "找到 {{count}} 個已同步的使用者。",
     "headers": {
       "actions": "動作",
       "full_name": "全名",
-      "roles": "角色"
+      "roles": "角色",
+      "username": "使用者名稱"
+    },
+    "none_found": "找不到已同步的使用者。",
+    "role_not_found": "找不到角色",
+    "title": "已同步的使用者"
+  },
+  "trusted_header": {
+    "description": "此驗證器可讓使用者透過 HTTP 標頭登入，無需其他互動。",
+    "enable_sso": "透過 HTTP 標頭啟用單一登入",
+    "enabled": "已啟用",
+    "title": "信任標頭驗證",
+    "trusted_proxies_hint": "請在 {{productName}} 伺服器設定檔中設定 <code>trusted_proxies</code> 設定。",
+    "update_config": "更新設定",
+    "username_header": "使用者名稱標頭",
+    "username_header_help": "包含使用者隱含信任名稱的 HTTP 標頭。（標頭比對不區分大小寫）"
+  },
+  "user_sync": {
+    "browser_time_zone": "瀏覽器時區",
+    "default_assignments_hint": "變更預設角色與時區設定，僅會影響透過 {{serviceTitle}} 新建立的使用者！",
+    "default_roles": "預設角色",
+    "default_user_time_zone": "預設使用者時區",
+    "email_attribute": "電子郵件屬性",
+    "email_attributes": "電子郵件屬性",
+    "full_name_attribute": "全名屬性",
+    "id_attribute": "ID 屬性",
+    "name_attribute": "名稱屬性",
+    "role_not_found": "找不到角色",
+    "search_base_dn": "搜尋基底 DN",
+    "search_pattern": "搜尋模式",
+    "search_roles": "搜尋角色",
+    "test_login_hint": "建議您在側邊欄面板中測試使用者登入，以驗證設定。",
+    "title": "使用者同步"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "您確定要移除此驗證服務的群組同步設定嗎？",
+    "create_failed": "建立驗證服務失敗",
+    "edit_failed": "編輯驗證服務失敗",
+    "finish_and_save": "完成並儲存服務",
+    "finish_and_save_identity_service": "完成並儲存身分服務",
+    "next_group_sync": "下一步：群組同步",
+    "next_user_sync": "下一步：使用者同步",
+    "server_validation_error": "伺服器驗證錯誤：{{errors}}",
+    "steps": {
+      "group_sync": "群組同步（選填）",
+      "server_config": "伺服器設定",
+      "user_sync": "使用者同步"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "編輯驗證服務 - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "載入 HTTP 標頭驗證設定失敗",
+    "update_success": "已成功更新 HTTP 標頭驗證設定",
+    "update_failed": "更新 HTTP 標頭驗證設定失敗，狀態：{{error}}"
+  }
 }
