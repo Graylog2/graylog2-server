@@ -291,28 +291,149 @@
     "cancel_confirm": "確定要取消系統工作「{{info}}」嗎？",
     "on_node": "- 位於",
     "runtime": "執行時間：{{duration}}",
-    "cancel": "取消"
+    "cancel": "取消",
+    "acknowledge": "確認"
   },
-  "system_jobs_component": {},
-  "system_jobs_list": {},
-  "system_messages_component": {},
-  "system_messages_list": {},
-  "global_throughput": {},
-  "node_throughput": {},
-  "telemetry_debug_entry_row": {},
-  "telemetry_debug_overlay": {},
-  "cluster_configuration_page": {},
-  "configurations_page": {},
-  "enterprise_page": {},
-  "process_buffer_dump_page": {},
-  "show_metrics_page": {},
-  "node_page": {},
-  "system_logs_page": {},
-  "system_notifications_page": {},
-  "system_overview_page": {},
-  "thread_dump_page": {},
-  "notifications": {},
-  "use_cluster_overview_notifications": {},
-  "use_cluster_support_bundle_notifications": {},
+  "system_jobs_component": {
+    "title": "系統工作",
+    "description": "系統工作是 {{productName}} 伺服器節點為了維護而執行的長時間任務。部分工作會提供進度資訊，或可以停止。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "目前沒有作用中的系統工作。"
+  },
+  "system_messages_component": {
+    "title": "系統訊息",
+    "description": "系統訊息由 {{productName}} 伺服器節點在特定事件發生時產生，這些事件可能對 {{productName}} 管理員有參考價值。您無須主動處理此處的任何事件，因為需要採取行動的事件都會發出通知。"
+  },
+  "system_messages_list": {
+    "timestamp": "時間戳記",
+    "node": "節點",
+    "message": "訊息"
+  },
+  "global_throughput": {
+    "aria_label": "吞吐量：輸入 {{input}} / 輸出 {{output}} 則訊息/秒",
+    "in": "輸入",
+    "out": "輸出"
+  },
+  "node_throughput": {
+    "loading": "正在載入吞吐量...",
+    "unable_to_load": "無法載入吞吐量。",
+    "processing_long": "正在處理 <strong>{{totalIn}}</strong> 則傳入訊息與 <strong>{{totalOut}}</strong> 則傳出訊息/秒。",
+    "short": "輸入 {{totalIn}} / 輸出 {{totalOut}} 則訊息/秒。"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "疑似個資：{{suspect}}",
+    "copy_as_json": "將事件複製為 JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "遙測除錯",
+    "badge": "遙測除錯：{{count}}",
+    "drawer_label": "遙測除錯面板",
+    "resize_label": "調整遙測除錯面板大小",
+    "title": "遙測除錯（{{count}}）",
+    "filter_label": "篩選事件",
+    "filter_placeholder": "依事件名稱或酬載篩選...",
+    "resume": "繼續",
+    "pause": "暫停",
+    "clear": "清除",
+    "export_session": "匯出工作階段",
+    "collapse": "收合",
+    "no_events": "尚未記錄任何遙測事件，請操作應用程式即可在此查看。",
+    "time": "時間",
+    "event": "事件",
+    "action": "動作",
+    "status": "狀態"
+  },
+  "cluster_configuration_page": {
+    "title": "叢集設定",
+    "description": "此頁面提供叢集中各節點的即時總覽。您可以隨時暫停訊息處理。在恢復之前，處理緩衝區不會接受任何新訊息。若節點已啟用訊息 Journal（預設即為啟用），即使處理已停用，傳入的訊息仍會持久化寫入磁碟。"
+  },
+  "configurations_page": {
+    "title": "設定",
+    "description": "您可以在此頁面為不同子系統設定系統設定。"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>試用</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>進一步了解</productLink> {{productName}} Enterprise 功能。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的處理緩衝區傾印",
+    "taken_at": "擷取時間：<0/>"
+  },
+  "show_metrics_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的指標",
+    "description": "所有 {{productName}} 節點都提供一組內部指標，用於診斷、除錯與監控。您也可以透過 JMX 存取所有指標。"
+  },
+  "node_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}}",
+    "description": "此頁面顯示叢集中作用中且可連線的 {{productName}} 伺服器節點詳細資料。",
+    "leader_node": "這是領導者節點。",
+    "not_leader_node": "這<em>不是</em>領導者節點。"
+  },
+  "system_logs_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 最近的系統日誌（上限 {{limit}} 筆）",
+    "taken_at": "擷取時間：<0/>",
+    "reload": "重新載入",
+    "back": "返回",
+    "document_title": "節點 {{shortNodeId}} / {{hostname}} 的系統日誌"
+  },
+  "system_notifications_page": {
+    "title": "系統通知"
+  },
+  "system_overview_page": {
+    "title": "系統總覽"
+  },
+  "thread_dump_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的執行緒傾印",
+    "taken_at": "擷取時間：<0/>"
+  },
+  "notifications": {
+    "lb_change_success": "已成功將節點 '{{nodeId}}' 的負載平衡器狀態變更為 '{{status}}'",
+    "lb_change_failed": "變更節點 '{{nodeId}}' 的負載平衡器狀態失敗：{{error}}",
+    "lb_change_failed_title": "無法將節點 '{{nodeId}}' 的負載平衡器狀態變更為 '{{status}}'",
+    "processing_pause_success": "已成功暫停 '{{nodeId}}' 的訊息處理",
+    "processing_pause_failed": "暫停 '{{nodeId}}' 的訊息處理失敗：{{error}}",
+    "processing_pause_failed_title": "無法暫停節點 '{{nodeId}}' 的訊息處理",
+    "processing_resume_success": "已成功恢復 '{{nodeId}}' 的訊息處理",
+    "processing_resume_failed": "恢復 '{{nodeId}}' 的訊息處理失敗：{{error}}",
+    "processing_resume_failed_title": "無法恢復節點 '{{nodeId}}' 的訊息處理",
+    "nothing_selected": "未選取任何通知。",
+    "nothing_to_dismiss_title": "沒有可關閉的項目",
+    "bulk_dismiss_failed": "關閉通知失敗，請再試一次。",
+    "dismiss_failed": "關閉通知失敗，請再試一次。",
+    "dismiss_failed_title": "關閉失敗",
+    "profiling_enabled": "已成功啟用 MongoDB 效能分析。",
+    "profiling_disabled": "已成功停用 MongoDB 效能分析。",
+    "profiling_enable_failed": "啟用 MongoDB 效能分析失敗：{{error}}",
+    "profiling_disable_failed": "停用 MongoDB 效能分析失敗：{{error}}",
+    "profiling_update_failed_title": "無法更新 MongoDB 效能分析。",
+    "data_node_metrics_failed": "載入資料節點 \"{{hostname}}\" 的指標失敗",
+    "data_node_metrics_failed_title": "無法載入資料節點指標。",
+    "graylog_node_metrics_failed": "載入 Graylog 節點指標失敗，狀態為",
+    "graylog_node_metrics_failed_title": "無法載入 Graylog 節點指標。",
+    "cluster_traffic_failed": "載入叢集流量失敗，狀態為",
+    "cluster_traffic_failed_title": "無法載入叢集流量",
+    "journal_failed": "無法取得 Journal 資訊",
+    "system_jobs_failed": "載入系統工作失敗，狀態為",
+    "system_jobs_failed_title": "無法載入系統工作"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "取得節點 '{{nodeId}}' 的 JVM 資訊失敗：{{error}}",
+    "jvm_failed_title": "無法取得 JVM 資訊",
+    "thread_dump_failed": "取得節點 '{{nodeId}}' 的執行緒傾印失敗：{{error}}",
+    "thread_dump_failed_title": "無法取得執行緒傾印",
+    "process_buffer_dump_failed": "取得節點 '{{nodeId}}' 的處理緩衝區傾印失敗：{{error}}",
+    "process_buffer_dump_failed_title": "無法取得處理緩衝區傾印",
+    "system_logs_failed": "取得節點 '{{nodeId}}' 的系統日誌訊息失敗：{{error}}",
+    "system_logs_failed_title": "無法取得系統日誌訊息",
+    "overview_failed": "取得叢集總覽失敗：{{error}}",
+    "overview_failed_title": "無法取得叢集總覽"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "建立支援套件失敗，狀態為：{{error}}",
+    "create_failed_title": "無法建立支援套件。"
+  },
   "use_plugin_list_notifications": {}
 }
