@@ -28,8 +28,13 @@ import AppConfig from 'util/AppConfig';
 import { isTelemetryDebugEnabled, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
 import { ACTION_TYPE } from 'components/quick-jump/Constants';
 import { prefixUrl } from 'routing/Routes';
+import useRuntimeTunables from 'components/configurations/runtime-tunables/useRuntimeTunables';
 
 import useNavItems from './useNavItems';
+
+jest.mock('components/configurations/runtime-tunables/useRuntimeTunables', () =>
+  jest.fn(() => ({ features: [], isLoading: false, isError: false })),
+);
 
 const helpMenuItemWithPath: PluginExports = {
   helpMenu: [
@@ -323,5 +328,40 @@ describe('useNavItems dropdown permissions', () => {
 
   it('hides the children of a dropdown the user is not permitted to see', () => {
     expect(titlesFor(alice)).not.toContain('Admin menu / Child');
+  });
+});
+
+describe('useNavItems configurations', () => {
+  const configurations: PluginExports = {
+    coreSystemConfigurations: [
+      {
+        name: 'Search',
+        feature: 'search',
+        SectionComponent: () => null,
+        props: { ConfigurationComponent: () => null, title: 'Search' },
+      },
+    ],
+    systemConfigurations: [{ component: () => null, displayName: 'Legacy Plugin', configType: 'legacy.Config' }],
+  };
+
+  usePluginExports(configurations);
+
+  beforeEach(() => {
+    asMock(useRuntimeTunables).mockReturnValue({
+      features: [
+        { id: 'search', title: 'Search', tunableCount: 0 },
+        { id: 'sidecars', title: 'Sidecars', tunableCount: 1 },
+        { id: 'events', title: 'Events', tunableCount: 0 },
+      ],
+      isLoading: false,
+      isError: false,
+    });
+  });
+
+  it('includes sections of runtime tunables and remaining plugin configurations', () => {
+    const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+    const titles = result.current.map(({ title }) => title).filter((title) => title?.startsWith('Configurations'));
+
+    expect(titles).toEqual(['Configurations / Search', 'Configurations / Sidecars', 'Configurations / Legacy Plugin']);
   });
 });

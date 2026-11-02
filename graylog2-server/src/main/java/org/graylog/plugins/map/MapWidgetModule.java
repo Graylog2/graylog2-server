@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpDbFileChangeMonitorService;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
@@ -56,5 +57,7 @@ public class MapWidgetModule extends PluginModule {
                 .build(GeoIpResolverFactory.class));
 
         serviceBinder().addBinding().to(GeoIpDbFileChangeMonitorService.class).in(Scopes.SINGLETON);
+
+        addRuntimeTunable(GeoIpResolverConfig.class);
     }
 }

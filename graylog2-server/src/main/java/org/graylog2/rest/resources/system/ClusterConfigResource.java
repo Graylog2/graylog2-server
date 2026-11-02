@@ -43,6 +43,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.configuration.tunables.RuntimeTunableRegistry;
+import org.graylog2.configuration.tunables.RuntimeTunableService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.validate.ClusterConfigValidatorService;
 import org.graylog2.plugin.validate.ConfigValidationException;
@@ -63,6 +65,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Tag(name = "System/ClusterConfig", description = "Graylog Cluster Configuration")
 @RequiresAuthentication
@@ -76,16 +79,22 @@ public class ClusterConfigResource extends RestResource {
     private final RestrictedChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
     private final ClusterConfigValidatorService clusterConfigValidatorService;
+    private final RuntimeTunableRegistry runtimeTunableRegistry;
+    private final RuntimeTunableService runtimeTunableService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
                                  RestrictedChainingClassLoader chainingClassLoader,
                                  ObjectMapper objectMapper,
-                                 ClusterConfigValidatorService clusterConfigValidatorService) {
+                                 ClusterConfigValidatorService clusterConfigValidatorService,
+                                 RuntimeTunableRegistry runtimeTunableRegistry,
+                                 RuntimeTunableService runtimeTunableService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
         this.chainingClassLoader = chainingClassLoader;
         this.objectMapper = objectMapper;
         this.clusterConfigValidatorService = clusterConfigValidatorService;
+        this.runtimeTunableRegistry = runtimeTunableRegistry;
+        this.runtimeTunableService = runtimeTunableService;
     }
 
     @GET
@@ -110,6 +119,7 @@ public class ClusterConfigResource extends RestResource {
             String error = createNoClassMsg(configClass);
             throw new NotFoundException(error);
         }
+        runtimeTunableRegistry.byType(cls).ifPresent(tunable -> checkPermission(tunable.readPermission()));
 
         return clusterConfigService.get(cls);
     }
@@ -131,6 +141,15 @@ public class ClusterConfigResource extends RestResource {
         }
 
         final Object updatedConfigObject = parseConfigObject(configClass, body, cls);
+        final var tunable = runtimeTunableRegistry.byType(cls);
+        if (tunable.isPresent()) {
+            checkPermission(tunable.get().readPermission());
+            checkPermission(tunable.get().editPermission());
+            if (updatedConfigObject == null) {
+                throw new BadRequestException(f("Missing configuration for runtime tunable \"%s\"", tunable.get().id()));
+            }
+            return Response.accepted(runtimeTunableService.update(tunable.get(), updatedConfigObject)).build();
+        }
         final Object preparedConfig;
         final Object existingConfig = clusterConfigService.get(cls);
         if (existingConfig != null && updatedConfigObject instanceof ConfigUpdatePreparation encryptedConfig) {
@@ -187,6 +206,12 @@ public class ClusterConfigResource extends RestResource {
         if (cls == null) {
             throw new NotFoundException(createNoClassMsg(configClass));
         }
+        final var tunable = runtimeTunableRegistry.byType(cls);
+        if (tunable.isPresent()) {
+            checkPermission(tunable.get().editPermission());
+            runtimeTunableService.reset(tunable.get());
+            return;
+        }
 
         clusterConfigService.remove(cls);
     }
@@ -203,6 +228,7 @@ public class ClusterConfigResource extends RestResource {
         if (cls == null) {
             throw new NotFoundException(createNoClassMsg(configClass));
         }
+        runtimeTunableRegistry.byType(cls).ifPresent(tunable -> checkPermission(tunable.readPermission()));
 
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         try {

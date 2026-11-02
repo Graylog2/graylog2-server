@@ -19,12 +19,15 @@ package org.graylog2.rest.resources.system;
 
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.users.UserConfiguration;
+import org.graylog2.users.UserConfigurationValidator;
 
 public class ClusterConfigValidatorModule extends PluginModule {
     @Override
     public void configure() {
 
         addClusterConfigValidator(GeoIpResolverConfig.class, GeoIpResolverConfigValidator.class);
+        addClusterConfigValidator(UserConfiguration.class, UserConfigurationValidator.class);
     }
 
 }

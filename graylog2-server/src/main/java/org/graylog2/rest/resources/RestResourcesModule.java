@@ -22,6 +22,7 @@ import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog.security.rest.CertificatesResource;
 import org.graylog.security.rest.ClientCertResource;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.tunables.rest.RuntimeTunablesResource;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
@@ -150,6 +151,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(HelloWorldResource.class);
         addSystemRestResource(RolesResource.class);
         addSystemRestResource(ClusterConfigResource.class);
+        addSystemRestResource(RuntimeTunablesResource.class);
         addSystemRestResource(ClusterResource.class);
         addSystemRestResource(ClusterStatsResource.class);
         addSystemRestResource(ConfigurationResource.class);
