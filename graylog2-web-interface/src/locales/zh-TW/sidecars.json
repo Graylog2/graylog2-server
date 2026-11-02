@@ -1,1 +1,182 @@
-{}
+{
+  "administration": {
+    "collectors_administration": {
+      "edit_configuration": "編輯設定",
+      "inactive": "非使用中",
+      "no_collectors": "沒有可顯示的 Collector",
+      "no_compatible_collectors": "沒有與 {{operatingSystem}} 相容的 Collector",
+      "no_filter_matches": "沒有符合篩選條件的 Collector",
+      "select_all": "全選"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "指派設定",
+      "cannot_change_configurations": "無法同時變更 {{collectors}} 個 Collector 的設定。",
+      "incompatible_collectors": "不相容的 Collector，請檢查您的 Sidecar 設定。"
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Collector 狀態",
+      "configuration": "設定",
+      "filter_by_collector": "依 Collector 篩選",
+      "filter_by_configuration": "依設定篩選",
+      "filter_by_os": "依作業系統篩選",
+      "filter_by_status": "依 Collector 狀態篩選",
+      "os": "作業系統"
+    },
+    "configuration_modal": {
+      "add_configuration": "新增設定",
+      "assigned_from_tags": "由標籤指派：{{tags}}",
+      "lock_info": "帶有鎖定圖示 <lockIcon/> 的 Collector 設定是透過標籤指派的，無法在此變更。",
+      "no_configurations": "所選的 Log Collector 沒有可用的設定。",
+      "remove": "移除 {{name}}",
+      "selected": "已選取 {{name}}",
+      "title": "編輯 <collectorName>{{name}}</collectorName> 設定",
+      "unknown_collector": "未知的 Collector"
+    },
+    "configuration_summary": {
+      "confirm": "您確定要對 <summaryText>{{summary}}</summaryText> 執行此操作嗎？",
+      "title": "設定摘要"
+    },
+    "filters_summary": {
+      "clear_all": "全部清除",
+      "collector_on_os": "{{name}}（{{os}}）",
+      "filters": "篩選器"
+    },
+    "loading_collectors": "正在載入 Collector 清單...",
+    "process": {
+      "actions": {
+        "restart": "重新啟動",
+        "start": "啟動",
+        "stop": "停止"
+      },
+      "button": "程序管理",
+      "confirm": "您確定要執行此操作嗎？",
+      "no_effect": {
+        "restart": "在沒有設定的情況下重新啟動 Collector 不會有任何效果。",
+        "start": "在沒有設定的情況下啟動 Collector 不會有任何效果。",
+        "stop": "在沒有設定的情況下停止 Collector 不會有任何效果。"
+      },
+      "summary": {},
+      "summary_title": "程序操作摘要",
+      "title": "管理 Collector 程序",
+      "understood": "了解，仍要繼續",
+      "warning_text": "至少有一個已選取的 Collector 尚未設定。若要啟動新的 Collector，請為其指派設定，Sidecar 便會為您啟動程序。",
+      "warning_title": "沒有設定的 Collector"
+    }
+  },
+  "common": {
+    "clone_menu": {
+      "done": "完成",
+      "name": "名稱",
+      "name_help": "請輸入新 Collector 的名稱",
+      "title": "複製"
+    },
+    "collector_indicator": {
+      "on_os": "於 {{operatingSystem}}"
+    },
+    "save": "儲存",
+    "sidecar_search_form": {
+      "field_last_seen": "Sidecar 最後與 {{productName}} 通訊的日期和時間",
+      "field_node_id": "Sidecar 的識別碼",
+      "field_operating_system": "Sidecar 執行所在的作業系統",
+      "field_sidecar_version": "Sidecar 版本",
+      "field_status": "Sidecar 在清單中顯示的狀態，即執行中、失敗或未知",
+      "last_seen_example": "尋找自特定日期後未通訊的 Sidecar：",
+      "placeholder": "尋找 Sidecar",
+      "status_example": "尋找狀態為 <code>failing</code> 或 <code>unknown</code> 的 Sidecar："
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "建立 Collector",
+      "default_template": "預設範本",
+      "default_template_help": "預設的 Collector 設定。",
+      "execute_parameters": "執行參數",
+      "execute_parameters_help": "啟動 Collector 時使用的參數。<strong> %s 會被替換為設定檔的路徑。</strong>",
+      "executable_path": "執行檔路徑",
+      "executable_path_help": "Collector 執行檔的路徑",
+      "name": "名稱",
+      "name_help": "此 Collector 的名稱",
+      "operating_system": "作業系統",
+      "operating_system_help": "選擇此 Collector 適用的作業系統。",
+      "optional": "（選填）",
+      "process_management": "程序管理",
+      "service_type": "服務類型",
+      "service_type_exec": "前景執行",
+      "service_type_help": "選擇此 Collector 適用的服務類型。",
+      "service_type_svc": "Windows 服務",
+      "update_collector": "更新 Collector",
+      "validation_parameters": "設定驗證參數",
+      "validation_parameters_help": "用於驗證設定檔的參數。<strong> %s 會被替換為設定檔的路徑。</strong>"
+    },
+    "configuration_form": {
+      "change_color": "變更顏色",
+      "collector": "Collector",
+      "collector_help": "選擇此設定適用的 Log Collector。",
+      "collector_in_use": "設定使用中時無法變更 Log Collector。請複製此設定，以便使用其他 Collector 進行測試。",
+      "collector_on_os": "{{name}}（{{os}}）",
+      "collector_placeholder": "Collector",
+      "color": "設定顏色",
+      "color_help": "選擇此設定要使用的顏色。",
+      "create_configuration": "建立設定",
+      "name": "名稱",
+      "name_help": "必填。此設定的名稱",
+      "preview": "預覽",
+      "tags": "設定指派標籤",
+      "tags_help": "設定了相符標籤的 Sidecar 會自動套用此設定。",
+      "template": "設定",
+      "template_help": "必填。Collector 設定，詳見快速參考。",
+      "template_required": "請填寫設定欄位。",
+      "unknown_collector": "未知的 Collector",
+      "update_configuration": "更新設定",
+      "use_default_template_confirm": "您要對所選設定使用預設範本嗎？"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Filebeat 參考資料",
+      "nxlog_reference": "NXLog 參考手冊"
+    },
+    "configuration_tags_select": {},
+    "source_view_modal": {},
+    "configuration_variables_helper": {},
+    "edit_configuration_variable_modal": {},
+    "templates_helper": {}
+  },
+  "configurations": {
+    "collector_list": {},
+    "collector_row": {},
+    "configuration_list": {},
+    "configuration_row": {}
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {}
+    },
+    "rows": {}
+  },
+  "basic_sidecar_user": {},
+  "sidecar_status_file_list": {},
+  "sidecars": {
+    "sidecar_list": {},
+    "sidecar_row": {},
+    "sidecar_status": {},
+    "verbose_message_modal": {}
+  },
+  "pages": {
+    "administration": {},
+    "configuration": {},
+    "edit_collector": {},
+    "edit_configuration": {},
+    "failure_tracking": {},
+    "new_collector": {},
+    "new_configuration": {},
+    "overview": {},
+    "status": {}
+  },
+  "notifications": {},
+  "use_sidecars_notifications": {},
+  "use_sidecars_administration_notifications": {
+    "requested": {},
+    "request_failed": {},
+    "request_failed_title": {}
+  }
+}
