@@ -227,7 +227,15 @@
     "load_failed_title": "イベント通知を読み込めませんでした"
   },
   "test": {
-    "success": "通知が正常に実行されました。"
+    "success": "通知が正常に実行されました。",
+    "validation_failed": "検証に失敗しました。続行する前に、フォームのエラーを修正してください。",
+    "unknown_error": "不明なエラーです。サーバーのログを確認してください。",
+    "unknown_error_product": "不明なエラーです。{{productName}}サーバーのログを確認してください。"
   },
-  "bulk": {}
+  "bulk": {
+    "delete_confirm_other": "{{count}}件のイベント通知を本当に削除しますか？",
+    "delete_failed_other": "選択した{{count}}件のイベント通知のうち{{failed}}件を削除できませんでした。ステータス：{{status}}",
+    "delete_success_other": "{{count}}件のイベント通知を正常に削除しました。",
+    "success_title": "成功"
+  }
 }
