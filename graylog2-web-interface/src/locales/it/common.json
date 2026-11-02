@@ -401,28 +401,147 @@
       "asn_fields": "Campi del database ASN",
       "country_fields": "Campi del database dei paesi",
       "city_fields": "Campi del database delle città",
-      "city_additional_fields": "Oltre ai campi forniti dal database dei paesi, il database delle città include anche i seguenti campi:"
+      "city_additional_fields": "Oltre ai campi forniti dal database dei paesi, il database delle città include anche i seguenti campi:",
+      "complete_documentation": "Per la documentazione completa dei campi, consulta la <docsLink>documentazione per sviluppatori</docsLink> di MaxMind"
     },
-    "database_types": {},
-    "field_set": {},
-    "summary": {}
+    "database_types": {
+      "asn": "Database ASN",
+      "city": "Database delle città",
+      "country": "Database dei paesi",
+      "ipinfo_location": "Database di posizione IPinfo",
+      "ipinfo_asn": "Database ASN IPinfo"
+    },
+    "field_set": {
+      "file_path": "Percorso del file",
+      "file_path_help": "Il percorso del file del database.",
+      "database_type": "Tipo di database",
+      "database_type_help": "Seleziona il tipo del file del database",
+      "database_type_placeholder": "Seleziona il tipo di file del database",
+      "refresh_file": "Aggiorna file",
+      "refresh_file_help": "Se abilitato, il file del database viene controllato per eventuali modifiche e aggiornato quando cambia sul disco."
+    },
+    "summary": {
+      "database_file_path": "Percorso del file del database",
+      "database_type": "Tipo di database",
+      "check_interval": "Intervallo di controllo"
+    }
   },
-  "abs_geoip": {},
-  "gcs_geoip": {},
-  "geoip_resolver": {},
-  "links": {},
-  "quick_jump": {},
-  "scratchpad": {},
-  "extractor_actions": {},
-  "surrounding_search": {},
-  "support_sources": {},
-  "times_list": {},
-  "widget_visualization_not_found": {},
-  "telemetry": {},
-  "app_facade": {},
-  "suggest_reload": {},
-  "footer": {},
-  "notifications": {},
+  "abs_geoip": {
+    "container_name": "Nome del contenitore Azure Blob",
+    "container_name_help": "Il nome del tuo contenitore Azure Blob.",
+    "endpoint_url": "URL dell'endpoint Azure Blob",
+    "endpoint_url_help": "L'URL del tuo endpoint Azure Blob, richiesto solo se vuoi sostituire l'endpoint predefinito.",
+    "account_name": "Nome dell'account Azure",
+    "account_name_placeholder": "il-tuo-nome-account",
+    "account_name_help": "Il nome del tuo account di archiviazione Azure.",
+    "account_key_reset": "Chiave dell'account Azure",
+    "reset_password": "Reimposta password",
+    "account_key": "Chiave dell'account Azure",
+    "account_key_help": "La chiave dell'account per il tuo account di archiviazione Azure."
+  },
+  "gcs_geoip": {
+    "project_id": "ID progetto Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Configurazione del processore di geolocalizzazione",
+    "description": "Il plugin del processore di geolocalizzazione analizza tutti i messaggi alla ricerca di campi che contengono <bold>esclusivamente</bold> un indirizzo IP e inserisce le relative informazioni di geolocalizzazione (coordinate, codice paese ISO e nome della città) in campi diversi. Maggiori informazioni nella <docsLink>documentazione</docsLink>.",
+    "enabled_summary": "Abilitato:",
+    "enforce_schema_summary": "Applica schema predefinito:",
+    "vendor_type_summary": "Tipo di fornitore del database:",
+    "city_db_path_summary": "Percorso del database delle città:",
+    "asn_db_path_summary": "Percorso del database ASN:",
+    "refresh_interval_summary": "Intervallo di aggiornamento del database:",
+    "pull_from_cloud_summary": "Scarica i file dal bucket di archiviazione cloud:",
+    "edit": "Modifica configurazione",
+    "modal_title": "Aggiorna configurazione del processore di geolocalizzazione",
+    "enable_processor": "Abilita processore di geolocalizzazione",
+    "enforce_schema": "Applica schema predefinito",
+    "vendor_select": "Seleziona il fornitore del database GeoIP",
+    "city_db_path": "Percorso del database delle città",
+    "asn_db_path": "Percorso del database ASN",
+    "refresh_interval": "Intervallo di aggiornamento del database",
+    "refresh_interval_help": "Intervallo con cui i file del database vengono controllati per eventuali modifiche; le modifiche rilevate sul disco vengono applicate.",
+    "pull_from_cloud": "Scarica i file dal bucket di archiviazione cloud",
+    "select_cloud_storage": "Seleziona archiviazione cloud",
+    "update_configuration": "Aggiorna configurazione",
+    "updating_configuration": "Aggiornamento della configurazione..."
+  },
+  "links": {
+    "documentation": "documentazione"
+  },
+  "quick_jump": {
+    "title": "Salto rapido",
+    "open": "Apri Salto rapido",
+    "search_placeholder": "Cerca pagine/dashboard/stream ...",
+    "intro": "Inserisci una query di ricerca per trovare una pagina, uno stream, un dashboard, un input o altri elementi.",
+    "intro_hint": "Per iniziare, qui sotto trovi l'elenco degli elementi <bold>aperti di recente</bold> e dei <bold>preferiti</bold>:",
+    "no_results": "Nessun risultato trovato. Prova con termini di ricerca diversi.",
+    "recent": "Recenti"
+  },
+  "scratchpad": {
+    "title": "Blocco note",
+    "status_cleared": "Cancellato.",
+    "status_auto_saved": "Salvato automaticamente.",
+    "got_it": "Ho capito!",
+    "sensitive_warning": "Ti consigliamo di <bold>non</bold> memorizzare in quest'area informazioni sensibili, come le password.",
+    "help_overlay": "Puoi usare questo spazio per memorizzare note personali e altre informazioni, senza lasciare la finestra del browser. Ad esempio, puoi memorizzare timestamp, ID utente o indirizzi IP necessari per varie indagini.",
+    "copy": "Copia",
+    "clear": "Cancella",
+    "clear_confirm": "Il contenuto del blocco note verrà cancellato. Vuoi continuare?"
+  },
+  "extractor_actions": {
+    "select_type": "Seleziona tipo di estrattore",
+    "only_string_fields": "Gli estrattori possono essere usati solo con campi di tipo stringa."
+  },
+  "surrounding_search": {
+    "button": "Mostra messaggi circostanti"
+  },
+  "support_sources": {
+    "title": "Hai bisogno di aiuto?",
+    "help_text": "Non esitare a consultare la community di {{productName}} se le tue domande non trovano risposta nella <docsLink>documentazione</docsLink>.",
+    "community_support": "Supporto della community",
+    "issue_tracker": "Issue tracker",
+    "professional_support": "Supporto professionale"
+  },
+  "times_list": {
+    "title": "Configurazione dell'orario",
+    "description": "I fusi orari possono creare confusione. Qui puoi vedere il fuso orario applicato ai vari componenti del sistema. Puoi controllare le impostazioni del fuso orario dei singoli nodi del server {{productName}} nella rispettiva pagina dei dettagli.",
+    "user": "Utente <bold>{{username}}</bold>:",
+    "web_browser": "Il tuo browser web:",
+    "server": "Server {{productName}}:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Visualizzazione del widget (<italic>{{widgetClassName}}</italic>) non trovata. Probabilmente il plugin che fornisce questo widget non è caricato."
+  },
+  "telemetry": {
+    "title": "Telemetria",
+    "enable_label": "Abilita telemetria",
+    "enabled_checkbox": "abilitata",
+    "update_preferences": "Aggiorna preferenze",
+    "update_button": "Aggiorna telemetria",
+    "info_modal_title": "Aiutaci a migliorare {{productName}}",
+    "ok": "OK",
+    "info": "Vorremmo raccogliere dati di utilizzo anonimi per aiutarci a stabilire le priorità dei miglioramenti e a rendere {{productName}} migliore in futuro.",
+    "no_personal_data": "Non raccogliamo dati personali, informazioni sensibili o contenuti come i log delle tue istanze.",
+    "learn_more": "Scopri di più nella nostra <privacyLink>Informativa sulla privacy</privacyLink>.",
+    "turn_off_profile": "Puoi disattivare o attivare la raccolta dei dati in qualsiasi momento <bold>nel profilo utente</bold>.",
+    "turn_off_here": "Puoi disattivare o attivare la raccolta dei dati in qualsiasi momento da qui."
+  },
+  "app_facade": {
+    "preparing": "Stiamo preparando l'interfaccia web per te..."
+  },
+  "suggest_reload": {
+    "title": "La versione di {{productName}} è cambiata",
+    "version_changed": "La tua versione di {{productName}} è passata da <bold>{{version}}</bold> a <bold>{{newVersion}}</bold>.",
+    "save_work": "Salva il lavoro e ricarica la pagina per evitare errori.",
+    "reload_now": "Ricarica ora"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} su {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Il download non è riuscito con stato: {{error}}"
+  },
   "use_favorite_item_mutation_notifications": {},
   "use_entity_titles_notifications": {},
   "use_search_version_check_notifications": {}
