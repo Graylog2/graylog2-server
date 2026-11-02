@@ -1,1 +1,14 @@
-{}
+{
+  "title": "Navigateur d'API",
+  "description": "Parcourez l'API REST de Graylog",
+  "search_placeholder": "Rechercher un point de terminaison...",
+  "no_results": "Aucun point de terminaison ne correspond à votre recherche.",
+  "error_loading": "Erreur lors du chargement du navigateur d'API.",
+  "error_fetching_endpoint": "Erreur lors de la récupération des détails du point de terminaison.",
+  "endpoint_name": "Nom du point de terminaison",
+  "endpoint_path": "Chemin",
+  "endpoint_method": "Méthode",
+  "endpoint_description": "Description",
+  "endpoint_parameters": "Paramètres",
+  "endpoint_response": "Réponse"
+}
