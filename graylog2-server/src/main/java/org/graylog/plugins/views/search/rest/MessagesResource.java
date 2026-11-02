@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -59,6 +58,8 @@ import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -142,7 +143,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         final ValidationResponse validationResponse = queryValidationService.validate(validationReq.build());
         if (validationResponse.status().equals(ValidationStatus.ERROR)) {
             validationResponse.explanations().stream().findFirst().map(ValidationMessage::errorMessage).ifPresent(message -> {
-                throw new BadRequestException("Request validation failed: " + message);
+                throw new CodedBadRequestException("messages.request_validation_failed", "Request validation failed: " + message, CodedException.paramsOf("message", message));
             });
         }
 

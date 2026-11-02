@@ -27,11 +27,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -60,6 +58,8 @@ import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse;
@@ -227,8 +227,8 @@ public class ContentPackResource extends RestResource {
             @NotNull @Valid final ContentPack contentPack) {
         checkPermission(RestPermissions.CONTENT_PACK_CREATE);
         final ContentPack pack = contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)
-                .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.name()
-                        + " with id " + contentPack.id() + " and revision " + contentPack.revision() + " already exists."));
+                .orElseThrow(() -> new CodedBadRequestException("content_pack.content_pack_with_id_and_revision_already", "Content pack " + contentPack.name()
+                        + " with id " + contentPack.id() + " and revision " + contentPack.revision() + " already exists.", CodedException.paramsOf("name", contentPack.name(), "id", contentPack.id(), "revision", contentPack.revision())));
 
         final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
                 .path("{contentPackId}")
@@ -255,8 +255,8 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
         if (!contentPackInstallationPersistenceService.findByContentPackId(contentPackId).isEmpty()) {
-            throw new BadRequestException("Content pack " + contentPackId +
-                    " with all its revisions can't be deleted: There are still installations of this content pack");
+            throw new CodedBadRequestException("content_pack.content_pack_with_all_its_revisions_cant", "Content pack " + contentPackId +
+                    " with all its revisions can't be deleted: There are still installations of this content pack", CodedException.paramsOf("contentPackId", contentPackId));
         }
         final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
@@ -282,8 +282,8 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
 
         if (!contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision).isEmpty()) {
-            throw new BadRequestException("Content pack " + contentPackId + " and revision " + revision +
-                    " can't be deleted: There are still installations of this content pack revision.");
+            throw new CodedBadRequestException("content_pack.content_pack_and_revision_cant_be_deleted", "Content pack " + contentPackId + " and revision " + revision +
+                    " can't be deleted: There are still installations of this content pack revision.", CodedException.paramsOf("contentPackId", contentPackId, "revision", revision));
         }
 
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
@@ -364,7 +364,7 @@ public class ContentPackResource extends RestResource {
                 .orElseThrow(() -> new CodedNotFoundException("content_pack.installation_not_found", "Couldn't find installation " + installationId, Map.of("installationId", installationId)));
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
-                .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.couldnt_find_content_pack_rev", "Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision(), CodedException.paramsOf("contentPackId", installation.contentPackId(), "contentPackRevision", installation.contentPackRevision())));
 
         return contentPackService.getUninstallDetails(contentPack, installation);
     }
@@ -390,7 +390,7 @@ public class ContentPackResource extends RestResource {
                 .orElseThrow(() -> new CodedNotFoundException("content_pack.installation_not_found", "Couldn't find installation " + installationId, Map.of("installationId", installationId)));
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
-                .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.couldnt_find_content_pack_rev", "Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision(), CodedException.paramsOf("contentPackId", installation.contentPackId(), "contentPackRevision", installation.contentPackRevision())));
 
         final ContentPackUninstallation removedInstallation = contentPackService.uninstallContentPack(contentPack, installation);
 

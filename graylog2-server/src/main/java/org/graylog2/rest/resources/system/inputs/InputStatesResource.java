@@ -43,6 +43,8 @@ import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStopped;
@@ -116,7 +118,7 @@ public class InputStatesResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final IOState<MessageInput> inputState = this.inputRegistry.getInputState(inputId);
         if (inputState == null) {
-            throw new NotFoundException("No input state for input id <" + inputId + "> on this node.");
+            throw new CodedNotFoundException("input_states.no_input_state_for_input_id_on", "No input state for input id <" + inputId + "> on this node.", CodedException.paramsOf("inputId", inputId));
         }
         return getInputStateSummary(inputState);
     }

@@ -27,7 +27,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -48,6 +47,8 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
@@ -222,7 +223,7 @@ public class IndicesResource extends RestResource {
         }
 
         if (indexSetRegistry.isCurrentWriteIndex(index)) {
-            throw new ForbiddenException("The current deflector target index (" + index + ") cannot be closed");
+            throw new CodedForbiddenException("indices.the_current_deflector_target_index_cannot_be", "The current deflector target index (" + index + ") cannot be closed", CodedException.paramsOf("index", index));
         }
 
         indices.close(index);
@@ -248,7 +249,7 @@ public class IndicesResource extends RestResource {
         }
 
         if (indexSetRegistry.isCurrentWriteIndex(index)) {
-            throw new ForbiddenException("The current deflector target index (" + index + ") cannot be deleted");
+            throw new CodedForbiddenException("indices.the_current_deflector_target_index_cannot_be_2", "The current deflector target index (" + index + ") cannot be deleted", CodedException.paramsOf("index", index));
         }
 
         indices.delete(index);

@@ -40,6 +40,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.inputs.extractors.RegexReplaceExtractor;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.models.tools.requests.RegexReplaceTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexReplaceTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -111,7 +112,7 @@ public class RegexReplaceTesterResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         } catch (TimeLimitedCharSequence.TimeoutException e) {
-            throw new BadRequestException("Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
+            throw new CodedBadRequestException("regex_replace_tester.regular_expression_matching_timed_out_the_pattern", "Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
         } catch (RuntimeException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof IndexOutOfBoundsException || cause instanceof IllegalArgumentException) {

@@ -35,11 +35,9 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
@@ -84,6 +82,7 @@ import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -256,8 +255,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .filter(id -> !TacticsTechniquesNormalizer.isValid(id))
                     .toList();
             if (!invalidIds.isEmpty()) {
-                throw new BadRequestException("Invalid tactic/technique filter value(s): " + String.join(", ", invalidIds)
-                        + ". Expected format: TA0000, T0000, or T0000.000.");
+                throw new CodedBadRequestException("event_definitions.invalid_tactic_technique_filter_value_s_expected", "Invalid tactic/technique filter value(s): " + String.join(", ", invalidIds)
+                        + ". Expected format: TA0000, T0000, or T0000.000.", CodedException.paramsOf("ids", String.join(", ", invalidIds)));
             }
         }
 
@@ -432,7 +431,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         tacticsTechniquesValidator.validate(dto, result);
         if (!definitionId.equals(dto.id())) {
-            result.addError("id", "Event definition IDs don't match");
+            result.addError("id", "event_definitions.event_definition_ids_dont_match", "Event definition IDs don't match", Map.of());
         }
 
         if (result.failed()) {
@@ -639,7 +638,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
         if (!missingPermissions.isEmpty()) {
             LOG.info("Not authorized to {} event definition. User <{}> is missing permissions: {}", action, getSubject().getPrincipal(), missingPermissions);
-            throw new ForbiddenException("Not authorized");
+            throw new CodedForbiddenException("event_definitions.not_authorized", "Not authorized");
         }
     }
 

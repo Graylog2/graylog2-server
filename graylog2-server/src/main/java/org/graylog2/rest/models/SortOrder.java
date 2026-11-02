@@ -19,8 +19,9 @@ package org.graylog2.rest.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.client.model.Sorts;
-import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 
 import java.util.List;
 import java.util.Locale;
@@ -62,7 +63,7 @@ public enum SortOrder {
             case "asc", "ascending" -> ASCENDING;
             case "desc", "descending" -> DESCENDING;
             // throwing an IllegalArgumentException here would have Jersey abort with a 404
-            default -> throw new BadRequestException("Unknown sort order: " + order);
+            default -> throw new CodedBadRequestException("sort_order.unknown_sort_order", "Unknown sort order: " + order, CodedException.paramsOf("order", order));
         };
     }
 

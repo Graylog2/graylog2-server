@@ -72,6 +72,7 @@ import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -523,7 +524,7 @@ public class InputsResource extends AbstractInputsResource {
 
     private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
         if ((config.isCloud() || config.isGlobalInputsOnly()) && !lr.global()) {
-            throw new BadRequestException("Only global inputs are allowed!");
+            throw new CodedBadRequestException("inputs.only_global_inputs_are_allowed", "Only global inputs are allowed!");
         }
     }
 }

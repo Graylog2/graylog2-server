@@ -29,9 +29,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -50,6 +48,9 @@ import org.graylog.security.shares.EntitySharesService;
 import org.graylog.security.shares.GranteeSharesService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -99,11 +100,11 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
         final User user = userService.loadById(userId);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user <" + userId + ">");
+            throw new CodedNotFoundException("entity_shares.couldnt_find_user", "Couldn't find user <" + userId + ">", CodedException.paramsOf("userId", userId));
         }
 
         if (!isPermitted(USERS_EDIT, user.getName())) {
-            throw new ForbiddenException("Couldn't access user <" + userId + ">");
+            throw new CodedForbiddenException("entity_shares.couldnt_access_user", "Couldn't access user <" + userId + ">", CodedException.paramsOf("userId", userId));
         }
 
         final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(grnRegistry.ofUser(user), paginationParameters, capabilityFilter, entityTypeFilter);

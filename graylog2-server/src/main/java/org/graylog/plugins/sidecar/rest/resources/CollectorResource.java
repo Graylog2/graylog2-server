@@ -61,6 +61,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -308,7 +309,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
         if (toValidate.nodeOperatingSystem() != null) {
             if (!validateOperatingSystem(toValidate.nodeOperatingSystem())) {
-                validation.addError("node_operating_system", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS));
+                validation.addError("node_operating_system", "collector.operating_system_can_only_be_one_of", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS), CodedException.paramsOf("valid_operating_systems", VALID_OPERATING_SYSTEMS));
             }
             if (!validateServiceType(toValidate.serviceType(), toValidate.nodeOperatingSystem())) {
                 validation.addError("service_type", "sidecar_collector.service_type_windows_only", "Only Windows collectors support 'Windows service'.", Map.of());
@@ -321,7 +322,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             collector = collectorOptional.get();
             if (!collector.id().equals(toValidate.id())) {
                 // a collector exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Collector \"" + toValidate.name() + "\" already exists for the \"" + collector.nodeOperatingSystem() + "\" operating system.");
+                validation.addError("name", "collector.collector_already_exists_for_the_operating_system", "Collector \"" + toValidate.name() + "\" already exists for the \"" + collector.nodeOperatingSystem() + "\" operating system.", CodedException.paramsOf("name", toValidate.name(), "nodeOperatingSystem", collector.nodeOperatingSystem()));
             }
         }
         return validation;

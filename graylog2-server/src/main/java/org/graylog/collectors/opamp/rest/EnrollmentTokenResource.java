@@ -27,7 +27,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -151,7 +150,7 @@ public class EnrollmentTokenResource extends RestResource {
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
         if (collectorsConfigService.get().isEmpty()) {
-            throw new BadRequestException("Collectors must be configured before creating enrollment tokens. " +
+            throw new CodedBadRequestException("enrollment_token.collectors_must_be_configured_before_creating_enrollment", "Collectors must be configured before creating enrollment tokens. " +
                     "Configure collectors at /api/collectors/config first.");
         }
 

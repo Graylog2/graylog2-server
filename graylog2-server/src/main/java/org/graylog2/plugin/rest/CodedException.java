@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.rest;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,4 +34,18 @@ public interface CodedException {
      * Values of the placeholders of the translated error text.
      */
     Map<String, Object> params();
+
+    /**
+     * Parameters from alternating names and values. In contrast to {@link Map#of(Object, Object)} values which are
+     * {@code null} are left out, so building the parameters of an error never fails with a {@link NullPointerException}.
+     */
+    static Map<String, Object> paramsOf(Object... namesAndValues) {
+        final Map<String, Object> params = new LinkedHashMap<>();
+        for (int i = 0; i + 1 < namesAndValues.length; i += 2) {
+            if (namesAndValues[i + 1] != null) {
+                params.put((String) namesAndValues[i], namesAndValues[i + 1]);
+            }
+        }
+        return Map.copyOf(params);
+    }
 }

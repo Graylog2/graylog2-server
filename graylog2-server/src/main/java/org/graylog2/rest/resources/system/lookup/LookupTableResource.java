@@ -405,7 +405,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!tableDto.id().equals(toValidate.id())) {
                 // a table exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The lookup table name is already in use.");
+                validation.addError("name", "lookup_table.the_lookup_table_name_is_already_in", "The lookup table name is already in use.", Map.of());
             }
         }
 
@@ -720,7 +720,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!adapterDto.id().equals(toValidate.id())) {
                 // an adapter exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The data adapter name is already in use.");
+                validation.addError("name", "lookup_table.the_data_adapter_name_is_already_in", "The data adapter name is already in use.", Map.of());
             }
         }
 
@@ -876,7 +876,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!cacheDto.id().equals(toValidate.id())) {
                 // a ache exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The cache name is already in use.");
+                validation.addError("name", "lookup_table.the_cache_name_is_already_in_use", "The cache name is already in use.", Map.of());
             }
         }
 

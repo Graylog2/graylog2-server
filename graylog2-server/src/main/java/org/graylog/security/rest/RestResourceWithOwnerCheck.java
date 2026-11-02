@@ -16,13 +16,15 @@
  */
 package org.graylog.security.rest;
 
-import jakarta.ws.rs.ForbiddenException;
 import org.graylog.grn.GRN;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 // TODO: Move contents of this to RestResource in server
 public abstract class RestResourceWithOwnerCheck extends RestResource implements PluginRestResource {
@@ -32,7 +34,7 @@ public abstract class RestResourceWithOwnerCheck extends RestResource implements
         if (!isOwner(entity)) {
             LOG.info("Not authorized to access entity <{}>. User <{}> is missing permission <{}:{}>",
                     entity, getSubject().getPrincipal(), Permission.ENTITY_OWN.permission(), entity);
-            throw new ForbiddenException("Not authorized to access entity <" + entity + ">");
+            throw new CodedForbiddenException("rest_with_owner_check.not_authorized_to_access_entity", "Not authorized to access entity <" + entity + ">", CodedException.paramsOf("entity", entity));
         }
     }
 

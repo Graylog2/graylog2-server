@@ -57,6 +57,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.rest.models.system.inputs.extractors.requests.OrderExtractorsRequest;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorCreated;
@@ -407,14 +409,14 @@ public class ExtractorsResource extends RestResource {
         // on the LookupTableExtractor constructor to reject bad input: issue #26122 loosened that constructor, and a
         // non-string value would slip past it into an uncaught ClassCastException (HTTP 500) anyway.
         if (lookupTableName != null && !(lookupTableName instanceof String)) {
-            throw new BadRequestException("Configured lookup table name must be a string");
+            throw new CodedBadRequestException("extractors.configured_lookup_table_name_must_be_a", "Configured lookup table name must be a string");
         }
         final String name = (String) lookupTableName;
         if (name == null || name.isEmpty()) {
-            throw new BadRequestException("Missing lookup table extractor configuration field: " + LookupTableExtractor.CONFIG_LUT_NAME);
+            throw new CodedBadRequestException("extractors.missing_lookup_table_extractor_configuration_field", "Missing lookup table extractor configuration field: " + LookupTableExtractor.CONFIG_LUT_NAME, CodedException.paramsOf("field", LookupTableExtractor.CONFIG_LUT_NAME));
         }
         if (!lookupTableService.hasTable(name)) {
-            throw new BadRequestException("Configured lookup table <" + name + "> doesn't exist");
+            throw new CodedBadRequestException("extractors.configured_lookup_table_doesnt_exist", "Configured lookup table <" + name + "> doesn't exist", CodedException.paramsOf("name", name));
         }
     }
 }

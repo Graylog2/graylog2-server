@@ -63,6 +63,7 @@ import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -385,7 +386,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .filter(title -> pipelineSource.source().contains(title))
                 .toList();
         if (!usedSystemRules.isEmpty()) {
-            throw new BadRequestException("Pipeline cannot use system rules: " + usedSystemRules);
+            throw new CodedBadRequestException("pipeline.pipeline_cannot_use_system_rules", "Pipeline cannot use system rules: " + usedSystemRules, CodedException.paramsOf("usedSystemRules", usedSystemRules));
         }
 
     }

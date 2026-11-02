@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -46,6 +45,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -59,6 +60,7 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @RequiresAuthentication
 @Tag(name = "System/Deflector", description = "Index deflector management")
@@ -177,7 +179,7 @@ public class DeflectorResource extends RestResource {
         if (!indexSet.getConfig().isWritable()) {
             final String id = indexSet.getConfig().id();
             final String title = indexSet.getConfig().title();
-            throw new BadRequestException("Unable to cycle non-writable index set <" + id + "> (" + title + ")");
+            throw new CodedBadRequestException("deflector.unable_to_cycle_non_writable_index_set", "Unable to cycle non-writable index set <" + id + "> (" + title + ")", CodedException.paramsOf("id", id, "title", title));
         }
     }
 }

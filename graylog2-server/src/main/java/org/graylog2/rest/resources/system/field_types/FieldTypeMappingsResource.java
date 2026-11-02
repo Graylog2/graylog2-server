@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -46,6 +45,7 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -213,7 +213,7 @@ public class FieldTypeMappingsResource extends RestResource {
         if (permittedIds.isEmpty()) {
             auditEventSender.failure(actor, INDEX_SET_UPDATE, ImmutableMap.<String, Object>builder()
                     .putAll(auditContext).put("index_sets", indexSetsIds).build());
-            throw new ForbiddenException("Not authorized");
+            throw new CodedForbiddenException("field_type_mappings.not_authorized", "Not authorized");
         }
 
         final Map<String, String> titles = indexSetService.findByIds(indexSetsIds)

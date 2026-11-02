@@ -34,7 +34,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -77,6 +76,9 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -368,14 +370,14 @@ public class IndexSetsResource extends RestResource {
     public IndexSetResponse get(@Parameter(name = "id", required = true)
                                 @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
-        final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
+        final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new CodedNotFoundException("index_sets.couldnt_find_index_set_with_id", "Couldn't find index set with ID <" + id + ">", CodedException.paramsOf("id", id)));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
                 .map(config -> IndexSetResponse.fromIndexSetConfig(
                         config,
                         config.equals(defaultIndexSet),
                         tieringStatusService.getStatus(indexSet, config)))
-                .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
+                .orElseThrow(() -> new CodedNotFoundException("index_sets.couldnt_load_index_set_with_id", "Couldn't load index set with ID <" + id + ">", CodedException.paramsOf("id", id)));
     }
 
     @GET
@@ -392,7 +394,7 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
         return indexSetRegistry.get(id)
                 .map(indexSetStatsCreator::getForIndexSet)
-                .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
+                .orElseThrow(() -> new CodedNotFoundException("index_sets.couldnt_load_index_set_with_id", "Couldn't load index set with ID <" + id + ">", CodedException.paramsOf("id", id)));
     }
 
     @POST
@@ -440,7 +442,7 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
         final IndexSetConfig oldConfig = indexSetService.get(id)
-                .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
+                .orElseThrow(() -> new CodedNotFoundException("index_sets.index_set_not_found", "Index set <" + id + "> not found", CodedException.paramsOf("id", id)));
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         final boolean isDefaultSet = oldConfig.equals(defaultIndexSet);
@@ -505,7 +507,7 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
         final IndexSetConfig indexSet = indexSetService.get(id)
-                .orElseThrow(() -> new NotFoundException("Index set <" + id + "> does not exist"));
+                .orElseThrow(() -> new CodedNotFoundException("index_sets.index_set_does_not_exist", "Index set <" + id + "> does not exist", CodedException.paramsOf("id", id)));
 
         if (!indexSet.isRegularIndex()) {
             throw new ClientErrorException("Index set not eligible as default", Response.Status.CONFLICT);
@@ -538,11 +540,11 @@ public class IndexSetsResource extends RestResource {
         final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
 
         if (indexSet.equals(defaultIndexSet)) {
-            throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
+            throw new CodedBadRequestException("index_sets.default_index_set_cannot_be_deleted", "Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!", CodedException.paramsOf("id", indexSet.getConfig().id()));
         }
 
         if (indexSetService.delete(id) == 0) {
-            throw new NotFoundException("Couldn't delete index set with ID <" + id + ">");
+            throw new CodedNotFoundException("index_sets.couldnt_delete_index_set_with_id", "Couldn't delete index set with ID <" + id + ">", CodedException.paramsOf("id", id));
         } else {
             if (deleteIndices) {
                 try {

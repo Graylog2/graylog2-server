@@ -36,6 +36,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
+import java.util.Map;
 import javax.annotation.Nullable;
 import java.util.Set;
 
@@ -236,10 +237,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             validation.addError(FIELD_SUBJECT, "Email Notification subject cannot be empty.");
         }
         if (bodyTemplate().isEmpty() && htmlBodyTemplate().isEmpty()) {
-            validation.addError("body", "One of Email Notification body template or Email Notification HTML body must not be empty.");
+            validation.addError("body", "email_event_notification_config.one_of_email_notification_body_template_or", "One of Email Notification body template or Email Notification HTML body must not be empty.", Map.of());
         }
         if (!lookupRecipientEmails() && emailRecipients().isEmpty() && userRecipients().isEmpty()) {
-            validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
+            validation.addError("recipients", "email_event_notification_config.email_notification_must_have_email_recipients_or", "Email Notification must have email recipients or user recipients.", Map.of());
         }
         if (lookupRecipientEmails()) {
             if (Strings.isNullOrEmpty(recipientsLUTName())) {

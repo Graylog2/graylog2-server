@@ -72,6 +72,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -871,7 +872,7 @@ public class UsersResource extends RestResource {
         final User futureOwner = loadUserById(userId);
 
         if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {
-            throw new ForbiddenException("You are not allowed to create a token for user " + futureOwner.getName() + ".");
+            throw new CodedForbiddenException("users.you_are_not_allowed_to_create_a", "You are not allowed to create a token for user " + futureOwner.getName() + ".", CodedException.paramsOf("name", futureOwner.getName()));
         }
 
         if (body == null) {
@@ -904,7 +905,7 @@ public class UsersResource extends RestResource {
         }
 
         if (!isPermitted(USERS_TOKENREMOVE, accessToken.getUserName())) {
-            throw new ForbiddenException("Not allowed to remove token for user " + accessToken.getUserName());
+            throw new CodedForbiddenException("users.not_allowed_to_remove_token_for_user", "Not allowed to remove token for user " + accessToken.getUserName(), CodedException.paramsOf("userName", accessToken.getUserName()));
         }
 
         accessTokenService.destroy(accessToken);

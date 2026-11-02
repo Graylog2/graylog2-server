@@ -44,6 +44,7 @@ import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedException;
 import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -161,8 +162,8 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         final List<Configuration> configurations = this.configurationService.findByConfigurationVariable(configurationVariable);
         if (!configurations.isEmpty()) {
             final ValidationResult validationResult = new ValidationResult();
-            validationResult.addError("name", "Variable is still used in the following configurations: " +
-                    configurations.stream().map(c -> c.name()).collect(Collectors.joining(", ")));
+            validationResult.addError("name", "configuration_variable.variable_is_still_used_in_the_following", "Variable is still used in the following configurations: " +
+                    configurations.stream().map(c -> c.name()).collect(Collectors.joining(", ")), CodedException.paramsOf("configurations", configurations.stream().map(c -> c.name()).collect(Collectors.joining(", "))));
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 

@@ -21,8 +21,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jakarta.rs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jakarta.rs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jakarta.rs.cfg.ObjectWriterModifier;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -34,6 +32,9 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -101,7 +102,7 @@ public abstract class RestResource {
     protected void checkPermission(String permission) {
         if (!isPermitted(permission)) {
             LOG.info("Not authorized. User <{}> is missing permission <{}>", getSubject().getPrincipal(), permission);
-            throw new ForbiddenException("Not authorized");
+            throw new CodedForbiddenException("rest.not_authorized", "Not authorized");
         }
     }
 
@@ -113,7 +114,7 @@ public abstract class RestResource {
         if (!isPermitted(permission, instanceId)) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
                     instanceId, getSubject().getPrincipal(), permission, instanceId);
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
+            throw new CodedForbiddenException("rest.not_authorized_to_access_resource_id", "Not authorized to access resource id <" + instanceId + ">", CodedException.paramsOf("instanceId", instanceId));
         }
     }
 
@@ -138,7 +139,7 @@ public abstract class RestResource {
         if (!isAnyPermitted(permissions, instanceId)) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permissions {} on instance <{}>",
                     instanceId, getSubject().getPrincipal(), Arrays.toString(permissions), instanceId);
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
+            throw new CodedForbiddenException("rest.not_authorized_to_access_resource_id", "Not authorized to access resource id <" + instanceId + ">", CodedException.paramsOf("instanceId", instanceId));
         }
     }
 
@@ -165,6 +166,6 @@ public abstract class RestResource {
 
     protected IndexSet getIndexSet(final IndexSetRegistry indexSetRegistry, final String indexSetId) {
         return indexSetRegistry.get(indexSetId)
-                .orElseThrow(() -> new NotFoundException("Index set <" + indexSetId + "> not found."));
+                .orElseThrow(() -> new CodedNotFoundException("rest.index_set_not_found", "Index set <" + indexSetId + "> not found.", CodedException.paramsOf("indexSetId", indexSetId)));
     }
 }

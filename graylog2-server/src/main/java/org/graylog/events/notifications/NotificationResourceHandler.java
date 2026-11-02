@@ -25,6 +25,8 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -198,7 +200,7 @@ public class NotificationResourceHandler {
         NotificationDto dto = prepareUpdate(notificationDto);
         final EventNotification.Factory eventNotificationFactory = eventNotificationFactories.get(dto.config().type());
         if (eventNotificationFactory == null) {
-            throw new NotFoundException("Couldn't find factory for notification type <" + dto.config().type() + ">");
+            throw new CodedNotFoundException("notification_handler.couldnt_find_factory_for_notification_type", "Couldn't find factory for notification type <" + dto.config().type() + ">", CodedException.paramsOf("type", dto.config().type()));
         }
         final EventNotificationContext notificationContext = NotificationTestData.getDummyContext(dto, userName);
         final EventNotification eventNotification = eventNotificationFactory.create();
