@@ -254,6 +254,7 @@
   },
   "field_charts_migration": {
     "title": "遷移現有搜尋頁面的圖表",
+    "found_charts_other": "我們找到 {{count}} 個為舊版搜尋建立的圖表。您要為目前的搜尋遷移這些圖表嗎？",
     "save_hint": "完成遷移並想保留新建立的圖表時，必須將目前的搜尋另存為新 Dashboard。否則離開搜尋頁面時，圖表將會遺失。",
     "migrate": "遷移",
     "discard": "捨棄圖表"
@@ -337,6 +338,9 @@
   },
   "saved_searches": {
     "title": "已儲存的搜尋",
+    "confirm_bulk_delete_other": "您確定要移除 {{count}} 個已儲存的搜尋嗎？",
+    "bulk_delete_partial_other": "所選的 {{count}} 個已儲存搜尋中，有 {{failed}} 個無法刪除。",
+    "bulk_delete_success_other": "已成功刪除 {{count}} 個已儲存的搜尋。",
     "success": "成功",
     "bulk_delete_error": "刪除已儲存的搜尋時發生錯誤。{{error}}",
     "confirm_delete": "您即將刪除已儲存的搜尋：「{{title}}」。確定要繼續嗎？",
@@ -517,10 +521,34 @@
     "remove_from_table": "從表格移除",
     "add_to_all_tables": "新增至所有表格",
     "remove_from_all_tables": "從所有表格移除",
-    "change_field_type": "變更欄位類型"
+    "change_field_type": "變更欄位類型",
+    "copy_field_name": "將欄位名稱複製到剪貼簿",
+    "add_to_favorites": "將欄位加入我的最愛",
+    "remove_from_favorites": "將欄位從我的最愛移除"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "正在依 {{fields}} 彙總 {{series}}",
+    "summary_only": "正在彙總 {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "訊息數量",
+    "message_table": "訊息表格",
+    "custom_aggregation": "自訂彙總",
+    "aggregation": "彙總",
+    "events_overview": "事件總覽",
+    "text_markdown": "文字／Markdown"
+  },
+  "message_details": {
+    "deleted_input": "已刪除的輸入",
+    "timestamp": "時間戳記",
+    "not_stored": "未儲存",
+    "not_stored_message": "訊息未儲存",
+    "received_by": "接收來源",
+    "stored_in_index": "儲存於索引",
+    "routed_into_streams": "路由至 Stream"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch 將搜尋結果限制為 {{limit}} 則訊息。以每頁 {{pageSize}} 則訊息計算，您可以使用前 {{validPages}} 頁。",
+    "confirm_delete_dashboard_page": "您確定要刪除此 Dashboard 頁面嗎？"
+  }
 }
