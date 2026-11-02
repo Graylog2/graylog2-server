@@ -381,20 +381,132 @@
     "enable": "启用",
     "enabled": "已启用"
   },
-  "steps": {},
+  "steps": {
+    "additional_details": "附加详细信息",
+    "condition": "条件",
+    "notifications": "通知",
+    "share": "共享",
+    "summary": "摘要"
+  },
   "summary": {
-    "condition_types": {}
+    "actions": "操作",
+    "condition_invalid": "条件无效：{{errors}}",
+    "condition_types": {
+      "aggregation": "聚合",
+      "filter": "过滤器"
+    },
+    "create_events_if": "在以下情况下创建事件",
+    "cron_description": "Cron 描述",
+    "cron_expression": "Cron 表达式",
+    "enable_scheduling": "启用调度",
+    "event_limit": "事件数量上限",
+    "execute_every": "执行搜索间隔",
+    "group_by": "分组字段",
+    "missing_stream_permissions": "缺少以下 Stream 的权限：",
+    "no": "否",
+    "no_cron_expression": "错误：未指定 Cron 表达式！",
+    "no_filters": "未配置过滤器",
+    "no_group_by": "未配置分组",
+    "no_streams": "未选择 Stream，将搜索所有 Stream",
+    "search_filters": "搜索过滤器",
+    "search_query": "搜索查询",
+    "search_within": "搜索最近",
+    "stream_categories": "Stream 分类",
+    "streams": "Stream",
+    "time_zone": "时区",
+    "type": "类型",
+    "undeclared_parameters": "存在未声明的查询参数：{{parameters}}",
+    "use_cron": "使用 Cron 调度",
+    "yes": "是"
   },
-  "summary_renders": {},
-  "summary_template_help": {},
-  "tags_editor": {},
-  "template_preview": {},
-  "template_provider_form": {},
+  "summary_renders": {
+    "backlog_none": "通知将不包含任何消息。",
+    "condition_plugin_no_summary": "条件插件 <em>{{type}}</em> 未提供摘要。",
+    "event_procedure_summary": "事件处理流程摘要",
+    "event_procedure_summary_unavailable": "事件处理流程摘要组件不可用。",
+    "fields": "字段",
+    "grace_period_disabled": "宽限期已禁用",
+    "grace_period_set": "宽限期设置为 {{duration}}",
+    "keys": "键",
+    "missing_notification_permissions": "缺少以下通知的权限：",
+    "no_event_procedures": "此事件没有任何事件处理流程。",
+    "no_field_value_provider": "未配置字段值提供方。",
+    "no_fields": "未为基于此定义的事件配置字段。",
+    "no_keys": "未为基于此定义的事件配置键。",
+    "no_notifications": "此事件未配置任何触发的通知。",
+    "no_remediation_steps": "未提供修复步骤",
+    "notification_not_found": "无法找到通知 <em>{{id}}</em> 的信息。",
+    "notification_plugin_no_summary": "通知插件 <em>{{type}}</em> 未提供摘要。",
+    "notifications": "通知",
+    "provider_plugin_no_summary": "提供方插件 <em>{{type}}</em> 未提供摘要。",
+    "remediation_steps": "修复步骤",
+    "settings": "设置"
+  },
+  "summary_template_help": {
+    "aggregation_events": "聚合事件：分组值和聚合结果。",
+    "aggregation_example": "按用户统计登录失败次数的聚合：",
+    "aggregation_example_template": "<userVariable></userVariable> 登录失败 <countVariable></countVariable> 次",
+    "button_aria_label": "显示事件摘要模板帮助",
+    "button_title": "摘要模板帮助",
+    "custom_fields": "自定义字段",
+    "custom_fields_description": "在 Event Definition 上定义的自定义字段可通过 <code>fields</code> 访问。",
+    "event_definition_variables": "Event Definition 变量",
+    "examples": "示例",
+    "filter_events": "过滤事件：原始日志消息字段。",
+    "filter_example": "过滤特定日志消息：",
+    "filter_example_template": "<hostVariable></hostVariable> 上的错误：<messageVariable></messageVariable>",
+    "group_by_field": "（分组字段）",
+    "hostname": "（主机名）",
+    "intro": "使用模板自定义事件创建时在告警与事件页面中显示的描述。模板使用 <jmteLink>JMTE</jmteLink> 替换，变量需包裹在 <variable></variable> 中。",
+    "source_context": "源上下文",
+    "source_context_description": "<code>source</code> 变量包含触发数据的上下文。其内容取决于 Event Definition 类型：",
+    "title": "事件摘要模板"
+  },
+  "tags_editor": {
+    "aria_label": "Event Definition 标签",
+    "duplicate": "标签“{{tag}}”已添加。",
+    "help": "按 Enter 或 Tab 添加。标签会转换为小写并去除重复项。仅允许小写字母、数字、连字符、下划线和点。",
+    "max_reached": "已达到最多 {{max}} 个标签。",
+    "placeholder": "例如 authentication, brute-force, compliance"
+  },
+  "template_preview": {
+    "aggregation": "在分组中设置的字段，保留其原始名称",
+    "aggregation_label": "聚合：",
+    "available_fields": "模板中可用的字段取决于创建事件的条件：",
+    "correlation": "最后一个匹配且未取反的事件中的所有字段",
+    "correlation_label": "关联：",
+    "description": "可以使用动态值丰富生成的事件。您可以使用 <code>{{syntax}}</code> 访问事件上下文中的字段。",
+    "filter": "原始日志消息中的所有字段",
+    "filter_label": "过滤器：",
+    "title": "模板中可用的字段"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "排除空字段",
+    "exclude_empty_fields_help": "勾选此选项后，当模板渲染为空值时，将不在事件中包含该字段。未勾选时，字段将以空值添加到事件中。当所有模板值均为必填时，此选项始终开启。",
+    "require_values": "要求设置所有模板值",
+    "require_values_help": "勾选此选项以验证模板中使用的所有变量均已设置值。",
+    "template": "模板",
+    "template_help": "输入要设置到此字段的纯文本，或使用 <jmteLink>JMTE 语法</jmteLink> 添加动态值。"
+  },
   "types": {
-    "aggregation": {},
-    "system": {}
+    "aggregation": {
+      "description": "通过过滤日志消息并（可选）聚合其结果以匹配给定条件，从而创建事件。这些事件可用作关联规则的输入。",
+      "title": "过滤与聚合"
+    },
+    "system": {
+      "description": "{{productName}} 用于将系统通知报告为事件的内置 Event Definition。",
+      "title": "系统 Event Definition"
+    }
   },
-  "validation": {},
-  "validation_summary": {},
-  "use_event_definition_notifications": {}
+  "validation": {
+    "cannot_be_empty": "不能为空",
+    "field_cannot_be_empty": "字段不能为空。",
+    "field_positive_number": "字段必须为正数。"
+  },
+  "validation_summary": {
+    "title": "发现一些错误！"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "加载 Event Definition 失败，状态：{{error}}"
+  }
 }
