@@ -108,7 +108,7 @@ public class DecoratorResource extends RestResource {
     @Timed
     @Operation(summary = "Create a decorator")
     @AuditEvent(type = AuditEventTypes.MESSAGE_DECORATOR_DELETE)
-    public void delete(@Parameter(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) throws NotFoundException {
+    public void delete(@Parameter(name = "decoratorId", required = true) @PathParam("decoratorId") final String decoratorId) throws NotFoundException {
         checkPermission(RestPermissions.DECORATORS_EDIT);
         final Decorator decorator = this.decoratorService.findById(decoratorId);
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix incorrect parameter names in the API browser for `GET /api/search/aggregate` (`groups`) and `DELETE /api/search/decorators/{decoratorId}`."
+
+issues = ["28047"]
+pulls = []
