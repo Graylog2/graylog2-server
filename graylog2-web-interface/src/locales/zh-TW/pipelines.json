@@ -1,1 +1,157 @@
-{}
+{
+  "title": "Pipelines",
+  "overview_header_title": "Pipelines 總覽",
+  "documentation_link_title": "Pipelines 文件",
+  "overview_description": "Pipelines 可用於轉換及處理來自 Stream 的訊息。Pipelines 由多個階段組成，規則會在各階段中評估並套用。訊息可經過一或多個階段。",
+  "new_pipeline": "新增 Pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipelines 可用於轉換及處理來自 Stream 的訊息。Pipelines 由多個階段組成，規則會在各階段中評估並套用。訊息可經過一或多個階段。\n各階段完成後，可決定符合全部或任一規則的訊息是否繼續進入下一階段。",
+  "rules_page_title": "Pipeline 規則",
+  "rules_page_header_title": "Pipeline 規則",
+  "rules_page_documentation_link": "Pipeline 規則文件",
+  "rules_page_description": "規則是一種對訊息套用變更的方式。規則包含一個條件及一組動作。系統會以條件評估訊息，若條件成立，即執行動作。",
+  "rules_delete_confirm": "確定要刪除規則「{{title}}」嗎？",
+  "rule_details_new_title": "新增 Pipeline 規則",
+  "rule_details_title": "Pipeline 規則 {{title}}",
+  "rule_details_loading": "正在載入規則詳細資訊...",
+  "loading_rule": "正在載入規則",
+  "create_pipeline_rule": "建立 Pipeline 規則",
+  "pipeline_rule": "Pipeline 規則 <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "使用原始碼編輯器",
+  "rule_is_managed_warning": "此規則由 Application 管理，無法編輯。",
+  "switch_to_source_code_editor": "切換至原始碼編輯器",
+  "switch_to_source_code_editor_confirm_text": "即將離開此頁面並前往原始碼編輯器。",
+  "switch_to_source_code_editor_confirm_warning": "請確認沒有未儲存的變更。",
+  "pipeline_new": {
+    "description": "為新的 Pipeline 設定名稱與描述。儲存變更後即可新增階段。"
+  },
+  "processing_errors": {
+    "rate_suffix": "錯誤/秒",
+    "total": "（共 {{total}}）"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "確定要刪除 Pipeline「{{title}}」嗎？此操作無法復原。",
+    "filter_label": "篩選 Pipelines",
+    "no_pipelines": "找不到任何 Pipeline",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "已連接的 Streams",
+      "processing_errors": "處理錯誤",
+      "pipeline_load": "Pipeline 負載（15 分鐘）",
+      "processing_timeline": "處理時間軸",
+      "actions": "動作"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "已啟用除錯指標",
+    "banner_text": "除錯指標會增加訊息處理的負擔並提高記憶體使用量。排除問題後請停用。Pipeline 負載值以 15 分鐘為區間進行平滑計算，啟用後可能需要數分鐘才會穩定。",
+    "disable": "停用除錯指標",
+    "enable": "啟用除錯指標",
+    "help": "Pipeline 負載（15 分鐘）顯示叢集中 Pipeline 規則執行時間的相對占比。啟用除錯指標後才會開始收集計時資料。啟用後數值可能需要約 15 分鐘才會出現，且收集作業會增加訊息處理的負擔。"
+  },
+  "pipeline": {
+    "not_connected": "此 Pipeline 目前未連接任何 Stream。若要讓它處理進入的訊息，必須至少連接一個 Stream。若僅打算透過 Decorator 轉換搜尋結果，則不需要連接。",
+    "delete_stage_confirm": "即將刪除階段 {{stage}}，確定要繼續嗎？",
+    "list_and": " 及 ",
+    "managed_1": "此 Pipeline 由系統管理，僅能進行有限的編輯。",
+    "managed_2": "只能透過 Input 精靈將 Pipeline 規則新增至此 Pipeline。",
+    "managed_3": "此 Pipeline 中的 Pipeline 規則會隨對應 Input 名稱的變更自動重新命名。",
+    "managed_4": "Pipeline 規則可手動從此 Pipeline 移除，但無法手動新增。",
+    "connections_title": "Pipeline 連線",
+    "no_connections": "選取將由此 Pipeline 處理的 Stream。",
+    "stages_title": "Pipeline 階段",
+    "stages_description": "階段是一組需依序執行的條件與動作，用來控制流程，決定是否繼續執行 Pipeline 的其餘部分。",
+    "no_rules_on_stage": "此階段沒有任何規則。"
+  },
+  "connections_form": {
+    "streams_help": "選取要連接至此 Pipeline 的 Stream，或前往 <streamsLink>Streams 頁面</streamsLink>建立。",
+    "edit": "編輯連線",
+    "title": "編輯 <pipelineTitle>{{title}}</pipelineTitle> 的連線",
+    "submit": "更新連線",
+    "streams": "Streams"
+  },
+  "details": {
+    "title": "詳細資訊",
+    "title_label": "標題",
+    "description": "描述",
+    "created": "建立時間",
+    "last_modified": "最後修改",
+    "throughput": "目前處理量",
+    "throughput_suffix": "訊息/秒"
+  },
+  "form": {
+    "title": "標題",
+    "title_help": "Pipeline 名稱。",
+    "description": "描述",
+    "description_help": "Pipeline 描述。",
+    "add_button": "新增 Pipeline",
+    "edit_button": "編輯 Pipeline 詳細資訊",
+    "add_title": "新增 Pipeline {{title}}",
+    "edit_title": "編輯 Pipeline {{title}}",
+    "add_submit": "新增 Pipeline",
+    "update_submit": "更新 Pipeline",
+    "create_submit": "建立 Pipeline"
+  },
+  "list_item": {
+    "idle": "閒置",
+    "stage": "階段 {{stage}}",
+    "loading": "正在載入 Pipeline...",
+    "managed": "由 Application 管理",
+    "throughput_prefix": "處理量：",
+    "throughput_suffix": "訊息/秒",
+    "not_connected": "未連接",
+    "edit_aria": "編輯 Pipeline",
+    "edit": "編輯",
+    "delete_aria": "刪除 Pipeline",
+    "delete": "刪除"
+  },
+  "stage_rules": {
+    "invalid_rule": "規則 {{name}} 已重新命名或移除，此規則將被略過。",
+    "throughput_suffix": "訊息/秒",
+    "errors_suffix": "錯誤/秒",
+    "remove_title": "移除 {{title}}",
+    "removing": "移除中...",
+    "remove": "移除",
+    "no_rules": "此階段尚無規則。點選編輯即可新增。",
+    "headers": {
+      "title": "標題",
+      "description": "描述",
+      "throughput": "處理量",
+      "errors": "錯誤",
+      "rule_load": "規則負載（15 分鐘）",
+      "actions": "動作"
+    }
+  },
+  "stage": {},
+  "stage_form": {},
+  "used_in_pipelines": {},
+  "deprecation": {},
+  "rule_form": {},
+  "rule_list_entry": {},
+  "metrics_config": {},
+  "rule_simulation": {},
+  "convert_modal": {},
+  "block_display": {},
+  "block": {},
+  "builder_form": {},
+  "block_form": {},
+  "block_field": {},
+  "builder": {},
+  "helper": {},
+  "helper_table": {},
+  "simulator": {},
+  "simulation_changes": {},
+  "simulation_preview": {},
+  "simulation_trace": {},
+  "simulation_results": {},
+  "simulator_page": {},
+  "rule_notifications": {},
+  "page_navigation": {},
+  "pipeline_notifications": {},
+  "connections_list": {},
+  "rule_list": {
+    "headers": {}
+  },
+  "load_cell": {}
+}
