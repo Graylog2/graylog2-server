@@ -1,1 +1,56 @@
-{}
+{
+  "loading_inputs": "正在載入 Input...",
+  "no_inputs_available": "沒有可用的 Input",
+  "message_input_label": "訊息 Input",
+  "message_input_optional": "（選填）",
+  "message_input_help": "選擇應指派給已解析訊息的訊息 Input ID。",
+  "message_input_aria_label": "訊息 Input",
+  "select_input_placeholder": "選擇 Input",
+  "forwarder_input_selection_label": "Forwarder Input 選擇",
+  "forwarder_input_selection_optional": "（選填）",
+  "forwarder_input_selection_description": "從下方清單選擇一個 Input 設定檔，然後選擇一個 Input。",
+  "input_selection_legend": "Input 選擇",
+  "input_selection_optional": "（選填）",
+  "select_input_type_label": "選擇 Input 類型",
+  "select_input_type_optional": "（選填）",
+  "select_input_type_help": "選擇要從中載入訊息的 Input 類型。",
+  "select_input_type_placeholder": "選擇 Input 類型",
+  "server_input": "Server Input",
+  "forwarder_input": "Forwarder Input",
+  "load_raw_message_error_title": "無法載入原始訊息",
+  "load_raw_message_error_description": "請確認所選的 Codec 及其設定正確無誤。詳細資訊請查看伺服器日誌。",
+  "load_raw_message_failed_status": "載入原始訊息失敗，狀態為：{{error}}",
+  "loading_codec_types": "正在載入 Codec 類型...",
+  "no_codecs_available": "沒有可用的 Codec",
+  "raw_message_label": "原始訊息",
+  "source_ip_address_label": "來源 IP 位址",
+  "source_ip_address_optional": "（選填）",
+  "source_ip_address_help": "用作訊息來源的遠端 IP 位址。{{productName}} 預設將使用 {{defaultRemoteAddress}}。",
+  "codec_configuration_legend": "Codec 設定",
+  "message_codec_label": "訊息 Codec",
+  "message_codec_help": "選擇用於解碼訊息的 Codec。",
+  "select_codec_placeholder": "選擇 Codec",
+  "load_message_button": "載入訊息",
+  "loading_message_button": "正在載入訊息...",
+  "tabs": {
+    "recent": "最近的訊息",
+    "message_id": "訊息 ID",
+    "raw": "原始訊息",
+    "message_id_description": "請在此表單中提供要載入的訊息 ID 與索引：",
+    "raw_description": "從文字載入訊息，如同由日誌來源所傳送。"
+  },
+  "recent": {
+    "load_message": "載入訊息",
+    "server_description_selected": "點擊「載入訊息」，以載入此 Input 在過去一小時內收到的最新訊息。",
+    "server_description": "從下方清單選擇一個 Input，然後點擊「載入訊息」，以載入此 Input 在過去一小時內收到的最新訊息。",
+    "forwarder_description": "從下方清單選擇一個 Input 設定檔，接著選擇一個 Input 並點擊「載入訊息」，以載入此 Input 在過去一小時內收到的最新訊息。",
+    "invalid_input_selected": "選取的 Input 無效：{{inputId}}",
+    "invalid_input_title": "無法從無效的 Input {{inputId}} 載入訊息",
+    "no_recent_message": "Input 未回傳最近的訊息。",
+    "input_type_select_label": "Input 類型選擇"
+  },
+  "notifications": {
+    "codec_types_failed": "擷取 Codec 類型失敗，狀態為",
+    "codec_types_failed_title": "無法取得 Codec 類型"
+  }
+}
