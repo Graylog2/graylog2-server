@@ -122,23 +122,135 @@
       "input_type": "Input 類型：",
       "running_on": "此 Input 執行於：",
       "all_nodes": "所有 {{productName}} 節點",
-      "listening_on": "此 Input 監聽於："
+      "listening_on": "此 Input 監聽於：",
+      "listening_on_value": "綁定位址 {{bindAddress}}，連接埠 {{port}}。",
+      "listening_for": "此 Input 監聽的對象："
     },
-    "state": {},
-    "troubleshooting": {},
-    "received_traffic": {},
-    "message_count_by_stream": {},
-    "message_errors": {},
-    "rules": {},
-    "network_stats": {}
+    "state": {
+      "title": "狀態",
+      "description": "此 Input 設定執行的 {{productName}} 節點數，以及實際正在執行的節點數。若有任何節點未在執行，請點擊以查看相關的錯誤訊息。",
+      "failed_starts": "啟動失敗次數（過去 15 分鐘）：",
+      "not_running": "Input 未在執行。"
+    },
+    "troubleshooting": {
+      "title": "疑難排解",
+      "failed_title": "若 Input 處於失敗狀態。",
+      "failed_message_field": "當 Input 在一個或多個 {{productName}} 節點上失敗時，狀態面板的訊息欄位會顯示簡短的錯誤訊息；完整的錯誤訊息可在 {{productName}} 的 server.log 檔案中找到。",
+      "failed_port": "若設定使用的連接埠為特權連接埠（且 {{productName}} 並非以 root 身分執行），或該連接埠已被其他 Input 或應用程式使用，則 Input 會失敗。",
+      "failed_route": "若 Input 無法路由至指定的 IP，則 Input 會失敗。",
+      "failed_internet": "若 Input 需要網際網路連線才能連接 API，但沒有網際網路連線或無法路由至該 API，則 Input 會失敗。",
+      "failed_certificate": "若 TCP Input 的憑證無效或已過期，則 Input 會失敗。",
+      "failed_external_api": "連接外部 API 的 Input（例如 Microsoft Azure Input）需要在來源端進行設定變更，{{productName}} 才能收集日誌。所需步驟會詳列於該 Input 對應的文件子頁面中。若在 {{productName}} 端或（如適用）API 所在端的設定有誤，連接外部 API 的 Input 會失敗。",
+      "no_messages_title": "若 Input 已在所有節點上執行，但訊息未能傳送到 Input。",
+      "no_messages_network_io": "請檢查接收流量面板的網路 I/O 欄位。若此處未顯示任何流量，則表示可能存在連線問題。",
+      "no_messages_connectivity": "若未顯示任何流量，請先排除 {{productName}} 伺服器與日誌來源之間的網路連線問題。可執行 ping、telnet 或 tracert 指令來進行檢查。",
+      "no_messages_external_api": "對於連接外部 API 的 Input，請檢查 {{productName}} 的 server.log 檔案。驗證失敗（登入資訊無效，或沒有在 API 上執行該操作的權限）會完整記錄於此。",
+      "no_messages_format": "若接收流量面板的網路 I/O 欄位有顯示流量，但未接收到任何訊息，則表示訊息的傳送格式可能不符合 Input 的要求。",
+      "no_messages_protocol": "TCP Input 無法讀取 UDP 流量，反之亦然。",
+      "no_messages_empty": "沒有內容的訊息會被捨棄。可透過「已捨棄的空訊息」欄位進行監控。",
+      "no_messages_listener": "Listener Input 只接受有限範圍內的格式，可能無法讀取其他格式的訊息。為便於疑難排解，Raw Text Input 的要求最為寬鬆。",
+      "message_errors_title": "若 Input 已在所有節點上執行，訊息也已到達 Input，但部分（或全部）訊息顯示為訊息錯誤。",
+      "message_errors_failure_processing": "在已授權的 Enterprise 叢集上，可啟用 Failure Processing，以儲存在各階段（Input、處理，以及寫入搜尋叢集）發生錯誤的訊息，並保留失敗的詳細資訊，請參閱 failure_cause 和 failure_details 欄位。前往訊息錯誤面板，點擊訊息數量即可檢查個別失敗的訊息。"
+    },
+    "received_traffic": {
+      "title": "接收流量",
+      "description": "已到達此 Input 的訊息和網路流量。注意：指標僅顯示過去 15 分鐘的資料。",
+      "total_messages": "Input 接收的訊息總數：",
+      "events": "{{count}} 個事件",
+      "empty_messages": "已捨棄的空訊息：",
+      "active_connections": "作用中的連線：",
+      "connections_value": "{{open}}（共 {{total}} 個）",
+      "network_io": "網路 I/O："
+    },
+    "message_count_by_stream": {
+      "title": "依 Stream 統計的接收訊息數",
+      "description": "過去 15 分鐘從此 Input 成功擷取的訊息。點擊 Stream 即可檢視其中的訊息。",
+      "stream": "{{streamName}}：",
+      "none": "過去 15 分鐘內，沒有來自此 Input 的訊息被導入 Stream。"
+    },
+    "message_errors": {
+      "title": "訊息錯誤",
+      "description": "訊息可能在 Input、處理 Pipeline，或寫入搜尋叢集時處理失敗。",
+      "at_input": "Input 的訊息錯誤：",
+      "failed_to_process": "訊息處理失敗：",
+      "failed_to_index": "訊息建立索引失敗："
+    },
+    "rules": {
+      "pipeline_rules_title": "Input 出現在 Pipeline 規則中",
+      "pipeline_rules_description": "以下列出明確參照此 Input 的 Pipeline 規則（例如透過 from_input、from_forwarder_input，或比對 gl2_source_input／gl2_forwarder_input）。",
+      "pipeline_rules_human_name": "Pipeline 規則",
+      "pipeline_rules_search": "搜尋 Pipeline 規則",
+      "stream_rules_title": "Input 出現在 Stream 規則中",
+      "stream_rules_description": "以下列出的 Stream 規則包含明確指向此 Input 的 match input 函式。注意：未明確使用 match input 函式、但可能擷取此 Input 訊息的 Stream 規則不會列出。",
+      "stream_rules_human_name": "Stream 規則",
+      "stream_rules_search": "搜尋 Stream 規則",
+      "load_pipeline_rules_failed": "載入 Input 的 Pipeline 規則失敗，狀態為",
+      "could_not_load_pipeline_rules": "無法載入 Input 的 Pipeline 規則",
+      "load_stream_rules_failed": "載入 Input 的 Stream 規則失敗，狀態為",
+      "could_not_load_stream_rules": "無法載入 Input 的 Stream 規則"
+    },
+    "network_stats": {
+      "total_prefix": " （總計：",
+      "total_suffix": "）"
+    },
+    "show_received_messages": "顯示接收的訊息",
+    "fetch_failed": "擷取 Input 診斷資訊失敗，狀態為",
+    "could_not_fetch": "無法擷取 Input 診斷資訊"
   },
   "setup_wizard": {
-    "steps": {},
-    "diagnosis_step": {},
-    "routing": {},
-    "start": {},
+    "title": "Input 設定精靈",
+    "back": "返回",
+    "finish": "完成",
+    "steps": {
+      "routing": "路由",
+      "launch": "啟動",
+      "diagnosis": "診斷"
+    },
+    "diagnosis_step": {
+      "description": "在不將任何資料寫入搜尋叢集的情況下，測試 Input 和解析。",
+      "go_to_diagnosis": "前往 Input 診斷"
+    },
+    "load_streams_failed": "載入 Stream 失敗：{{error}}",
+    "load_input_references_failed": "載入 Input 參照失敗：{{error}}",
+    "load_streams_by_index_set_failed": "依索引集載入 Stream 失敗：{{error}}",
+    "routing": {
+      "connected_pipelines_title": "連接至目標 Stream 的 Pipeline",
+      "connected_pipelines": "建議在完成 Input 設定前，先檢查這些 Pipeline 的影響。目標 Stream 已連接以下 Pipeline：",
+      "select_destination": "選擇目標 Stream，以將此 Input 的訊息路由至該處。",
+      "recommend_new_stream": "<strong>建議為每個新的 Input 建立新的 Stream。</strong>這有助於將訊息分類為基本的結構描述。",
+      "default_stream_fallback": "未路由至任何 Stream 的訊息將會路由至 <strong>Default Stream</strong>。",
+      "pipeline_rules_info": "本精靈可自動建立 Pipeline 規則，並附加至 <strong>Default Stream</strong>。這些規則會放置於系統管理的 Default Routing Pipeline 中，並會自動重新命名（或刪除），以準確反映此 Input 的狀態。",
+      "new_stream_heading": "路由至新的 Stream",
+      "recommended": "建議！",
+      "create_stream": "建立 Stream",
+      "existing_stream_heading": "路由至現有的 Stream",
+      "select_stream": "選擇 Stream",
+      "create_new_stream": "建立新的 Stream",
+      "choose_existing_stream": "選擇現有的 Stream",
+      "existing_stream_selected": "已選取將此 Input 的訊息路由至現有 Stream。",
+      "pipeline_rules_created": "按下 <strong>Start Input</strong> 按鈕時會建立 Pipeline 規則。",
+      "default_stream": "Default Stream",
+      "remove_from_default": "從「Default Stream」移除符合項目",
+      "remove_from_default_help": "不要將符合此 Stream 的訊息指派至「Default Stream」。"
+    },
+    "start": {
+      "description": "依照所做的設定來設定並啟動 Input。",
+      "rolling_back": "正在復原 Input...",
+      "setting_up": "正在設定 Input...",
+      "not_ready": "您的 Input 尚未準備好進行設定。請完成先前的步驟。",
+      "start_input": "啟動 Input",
+      "rollback_input": "復原 Input",
+      "launch_diagnosis": "啟動 Input 診斷"
+    },
     "progress": {
-      "loading": {},
+      "details": "詳細資訊：",
+      "loading": {
+        "create_stream": "正在建立 Stream...",
+        "create_stream_named": "正在建立 Stream「{{name}}」...",
+        "start_stream": "正在啟動 Stream...",
+        "start_stream_named": "正在啟動 Stream「{{name}}」...",
+        "create_pipeline": "正在建立 Pipeline..."
+      },
       "error": {},
       "success": {}
     },
