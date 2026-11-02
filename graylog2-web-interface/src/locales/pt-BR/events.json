@@ -1,1 +1,128 @@
-{}
+{
+  "alerts_attributes": {
+    "additional_fields": "Campos adicionais",
+    "aggregation_time_range": "Intervalo de tempo de agregação",
+    "description": "Descrição",
+    "event_definition": "Event Definition",
+    "event_definition_type": "Tipo de Event Definition",
+    "event_procedures": "Procedimentos de evento",
+    "group_by_fields": "Campos de agrupamento",
+    "id": "ID",
+    "key": "Chave",
+    "message": "Mensagem",
+    "priority": "Prioridade",
+    "tags": "Tags",
+    "timestamp": "Timestamp",
+    "type": "Tipo"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "A atualização automática é desativada durante a segmentação para evitar problemas de desempenho.",
+    "auto_refresh_unavailable_title": "Atualização automática indisponível",
+    "bulk_replay_search": "Repetir pesquisa",
+    "collapse_metrics": "Recolher métricas",
+    "details": "Detalhes",
+    "expand_metrics": "Expandir métricas",
+    "histogram_failed": "Falha ao carregar o histograma de eventos: {{error}}",
+    "metrics_title": "Métricas",
+    "no_additional_fields": "Nenhum campo adicional foi adicionado a este evento.",
+    "no_further_details": "Nenhum outro detalhe",
+    "no_group_by_fields": "Este evento não possui campos de agrupamento.",
+    "no_key": "Nenhuma chave definida para este evento.",
+    "no_time_range": "Nenhum intervalo de tempo",
+    "refresh_human_name": "Eventos",
+    "replay_search": "Repetir pesquisa"
+  },
+  "alerts_replay": {
+    "cannot_replay": "Não é possível repetir este evento: {{reason}} Selecione outro.",
+    "close_section": "Fechar seção {{title}}",
+    "details_title": "Detalhes do alerta/evento",
+    "event_definition_details": "Detalhes da Event Definition",
+    "event_details": "Detalhes do evento",
+    "no_remediation_steps": "Nenhuma etapa de correção",
+    "open_section": "Abrir seção {{title}}",
+    "replay_details": "Detalhes da repetição",
+    "replayed_search": "Pesquisa repetida",
+    "system_event": "O evento é um evento do sistema e não possui consulta, stream ou intervalo de tempo associados."
+  },
+  "alerts_types": {
+    "alert": "Alerta",
+    "event": "Evento"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_one": "Tem certeza de que deseja excluir {{count}} event definition?",
+      "confirm_other": "Tem certeza de que deseja excluir {{count}} event definitions?",
+      "error": "Ocorreu um erro ao excluir as event definitions. {{error}}",
+      "failed_one": "{{failed}} de {{count}} event definition selecionada não pôde ser excluída.",
+      "failed_other": "{{failed}} de {{count}} event definitions selecionadas não puderam ser excluídas.",
+      "success_one": "{{count}} event definition foi excluída com sucesso.",
+      "success_other": "{{count}} event definitions foram excluídas com sucesso.",
+      "title": "Excluir Event Definitions",
+      "confirm_many": "Tem certeza de que deseja excluir {{count}} event definitions?",
+      "failed_many": "{{failed}} de {{count}} event definitions selecionadas não puderam ser excluídas.",
+      "success_many": "{{count}} event definitions foram excluídas com sucesso."
+    },
+    "disable": {
+      "confirm_one": "Tem certeza de que deseja desativar {{count}} event definition?",
+      "confirm_other": "Tem certeza de que deseja desativar {{count}} event definitions?",
+      "error": "Ocorreu um erro ao desativar as event definitions. {{error}}",
+      "failed_one": "{{failed}} de {{count}} event definition selecionada não pôde ser desativada.",
+      "failed_other": "{{failed}} de {{count}} event definitions selecionadas não puderam ser desativadas.",
+      "success_one": "{{count}} event definition foi desativada com sucesso.",
+      "title": "Desativar Event Definitions",
+      "confirm_many": "Tem certeza de que deseja desativar {{count}} event definitions?",
+      "failed_many": "{{failed}} de {{count}} event definitions selecionadas não puderam ser desativadas.",
+      "success_many": "{{count}} event definitions foram desativadas com sucesso."
+    },
+    "enable": {
+      "error": "Ocorreu um erro ao ativar as event definitions. {{error}}",
+      "title": "Ativar Event Definitions"
+    },
+    "success_title": "Sucesso"
+  },
+  "definitions_list": {
+    "disable": "Desativar",
+    "enable": "Ativar"
+  },
+  "definitions_page": {
+    "alerts_docs": "Documentação de alertas",
+    "copy_confirm": "Tem certeza de que deseja criar uma cópia de \"{{title}}\"?",
+    "copy_title": "Copiar Event Definition",
+    "create_multiple": "Criar Event Definitions",
+    "description_alerts": "As Event Definitions permitem criar alertas a partir de diferentes condições e gerar notificações sobre eles.",
+    "description_events": "As Event Definitions permitem criar eventos a partir de diferentes condições e gerar alertas sobre eles.",
+    "description_list": "Crie novas Event Definitions que permitirão pesquisar diferentes condições e gerar alertas sobre elas.",
+    "duplicate": "Duplicar Event Definition",
+    "edit": "Editar Event Definition",
+    "edit_named": "Editar a Event Definition \"{{title}}\"",
+    "file_import": "Criar Event Definitions - Importação de arquivo",
+    "git_import": "Criar Event Definitions - Importação do Git",
+    "loading": "Carregando Event Definition...",
+    "new": "Nova Event Definition",
+    "new_named": "Nova Event Definition \"{{title}}\"",
+    "title": "Event Definitions",
+    "view": "Ver Event Definition",
+    "view_named": "Ver a Event Definition \"{{title}}\""
+  },
+  "alerts_page": {
+    "description": "Defina eventos por meio de diferentes condições. Adicione notificações aos eventos que exigem sua atenção para criar alertas.",
+    "documentation_title": "Documentação de alertas",
+    "title": "Alertas e eventos"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Você removeu todos os eventos da lista. Agora você pode voltar clicando em <backButton>Voltar para eventos</backButton>",
+    "all_reviewed": "Você revisou todos os eventos. Agora você pode selecionar uma ação em massa para aplicar a todos os eventos listados abaixo.",
+    "list_description": "A lista a seguir contém todos os eventos/alertas que você selecionou na etapa anterior, permitindo revisar a pesquisa repetida de cada um deles.",
+    "mark_not_reviewed": "Marcar evento \"{{id}}\" como não revisado",
+    "mark_reviewed": "Marcar evento \"{{id}}\" como revisado",
+    "remove_event": "Remover evento \"{{id}}\" da lista",
+    "replay_search": "Repetir pesquisa",
+    "review_progress": "Revisão de {{completed}}/{{total}} eventos concluída.",
+    "show_selected": "Mostrar eventos selecionados",
+    "unknown_message": "Desconhecido"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Falha ao carregar o evento ou alerta com o status: {{error}}",
+    "load_failed_title": "Não foi possível carregar o evento ou alerta"
+  }
+}
