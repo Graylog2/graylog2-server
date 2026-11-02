@@ -69,14 +69,24 @@
       "failed_one": "{{failed}} sur {{count}} définition d'événement sélectionnée n'a pas pu être désactivée.",
       "failed_other": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être désactivées.",
       "success_one": "{{count}} définition d'événement a été désactivée avec succès.",
+      "success_other": "{{count}} définitions d'événement ont été désactivées avec succès.",
       "title": "Désactiver les définitions d'événement",
       "confirm_many": "Voulez-vous vraiment désactiver {{count}} définitions d'événement ?",
       "failed_many": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être désactivées.",
       "success_many": "{{count}} définitions d'événement ont été désactivées avec succès."
     },
     "enable": {
+      "confirm_one": "Voulez-vous vraiment activer {{count}} définition d'événement ?",
+      "confirm_other": "Voulez-vous vraiment activer {{count}} définitions d'événement ?",
       "error": "Une erreur s'est produite lors de l'activation des définitions d'événement. {{error}}",
-      "title": "Activer les définitions d'événement"
+      "failed_one": "{{failed}} sur {{count}} définition d'événement sélectionnée n'a pas pu être activée.",
+      "failed_other": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être activées.",
+      "success_one": "{{count}} définition d'événement a été activée avec succès.",
+      "success_other": "{{count}} définitions d'événement ont été activées avec succès.",
+      "title": "Activer les définitions d'événement",
+      "confirm_many": "Voulez-vous vraiment activer {{count}} définitions d'événement ?",
+      "failed_many": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être activées.",
+      "success_many": "{{count}} définitions d'événement ont été activées avec succès."
     },
     "success_title": "Succès"
   },
