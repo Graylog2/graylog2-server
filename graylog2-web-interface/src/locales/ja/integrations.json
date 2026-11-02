@@ -239,28 +239,148 @@
     "stream_name_label": "Kinesis ストリーム名",
     "stream_name_placeholder": "ストリーム名",
     "stream_name_help": "1～128 文字の英数字と、特殊文字のアンダースコア (_)、ピリオド (.)、ハイフン (-) を使用できます。",
-    "group_name_label": "CloudWatch グループ名"
+    "group_name_label": "CloudWatch グループ名",
+    "choose_group": "CloudWatch グループを選択",
+    "back_button": "ストリームの選択に戻る"
   },
-  "aws_kinesis_setup_agree": {},
-  "aws_kinesis_setup_step": {},
-  "aws_kinesis_setup_steps": {},
-  "aws_kinesis_setup_modal": {},
-  "form_wrap": {},
-  "aws_skip_health_check": {},
-  "throttling_checkbox": {},
-  "grey_noise_adapter_documentation": {},
-  "grey_noise_adapter_field_set": {},
-  "grey_noise_adapter_summary": {},
-  "slack_notification_details": {},
-  "teams_notification_details": {},
-  "teams_notification_v2_details": {},
-  "slack_notification_form": {},
-  "event_procedure_checkbox": {},
-  "slack_notification_summary": {},
-  "teams_notification_summary": {},
-  "teams_notification_form": {},
-  "teams_notification_v2_form": {},
-  "pager_duty_notification_details": {},
+  "aws_kinesis_setup_agree": {
+    "description": "この自動設定により、以下の AWS リソースが作成されます。これらのリソースが作成されること、および作成によって発生する AWS 料金について自身が全責任を負うことを理解した場合は、下のボタンをクリックしてください。不要になったリソースは、必ず手動で削除してください。",
+    "step_stream": "<strong>1</strong> 個のシャードを持つ Kinesis ストリームを作成します。",
+    "step_role": "指定した CloudWatch グループ <strong>{{groupName}}</strong> が Kinesis ストリーム <strong>{{streamName}}</strong> にログメッセージを発行できるようにする IAM ロールとポリシーを作成します",
+    "step_subscription": "ログメッセージを Kinesis ストリームに発行する CloudWatch サブスクリプションを作成します。"
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "待機中...",
+    "creating": "{{label}} を作成中",
+    "create": "{{label}} を作成"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis ストリーム",
+    "policy_label": "サブスクリプションポリシー",
+    "subscription_label": "サブスクリプション"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "作成中...",
+    "close_button": "閉じる",
+    "continue_button": "設定を続行",
+    "executing_title": "自動設定を実行中",
+    "agreement_title": "Kinesis 自動設定の同意",
+    "delayed_logs": "最初のメッセージが Kinesis ストリームに到着するまで最大 10 分かかる場合があります。ストリームにメッセージが届くまで、次の手順の Kinesis ヘルスチェックは正常に完了しません。詳細は公式の <cloudWatchLink>CloudWatch サブスクリプション</cloudWatchLink> のドキュメントを参照してください。",
+    "agree_button": "同意して、これらの AWS リソースを今すぐ作成します。"
+  },
+  "form_wrap": {
+    "more_info": "詳細情報",
+    "additional_information": "追加情報:",
+    "loading_button": "読み込み中...",
+    "submit_button": "送信"
+  },
+  "aws_skip_health_check": {
+    "title": "ヘルスチェックをスキップ",
+    "confirm_button": "確認",
+    "form_title": "ログタイプを選択してヘルスチェックをスキップ",
+    "description": "新しい <strong>{{streamName}}</strong> ストリームに含まれるデータに確信がある場合は、以下のオプションを選択して自動チェックをスキップしてください。",
+    "input_type_label": "AWS 入力タイプを選択",
+    "choose_log_type": "ログタイプを選択"
+  },
+  "throttling_checkbox": {
+    "label": "スロットリングを有効化",
+    "help": "有効にすると、{{productName}} サーバーのメッセージ負荷が処理されるまで、この入力から新しいメッセージは読み取られません。これは通常、ファイルや AMQP、Kafka などのメッセージキューシステムから読み取る入力で役立ちます。HTTP などで外部システムを定期的にポーリングする場合は、通常は無効のままにしてください。"
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup データアダプターは、<greynoiseLink>GreyNoise API</greynoiseLink> を使用して、指定されたキーの指標を検索し、IP Quick Context エンドポイントの値を返します。詳細は <quickContextLink>IP Quick Context</quickContextLink> を参照してください"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "ユーザーパスワード",
+    "reset_token_button": "トークンをリセット",
+    "api_token_label": "API トークン",
+    "undo_reset_button": "リセットを取り消す",
+    "api_token_help": "API トークンです。"
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API トークン"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "チャンネル",
+    "custom_message_label": "カスタムメッセージテンプレート",
+    "empty_body": "本文なし",
+    "include_event_procedure_label": "メール本文にイベント手順を含める",
+    "backlog_limit_label": "メッセージのバックログ上限",
+    "user_name_label": "ユーザー名",
+    "include_title_label": "タイトルを含める",
+    "notify_channel_label": "チャンネルに通知",
+    "link_names_label": "名前をリンク",
+    "icon_url_label": "アイコン URL",
+    "icon_emoji_label": "アイコンの絵文字",
+    "time_zone_label": "タイムゾーン"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "カスタムメッセージテンプレート",
+    "empty_body": "本文なし",
+    "backlog_limit_label": "メッセージのバックログ上限",
+    "icon_url_label": "アイコン URL",
+    "time_zone_label": "タイムゾーン"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "アダプティブカードテンプレート",
+    "backlog_limit_label": "メッセージのバックログ上限"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "設定の色",
+    "change_color_button": "色を変更",
+    "color_help": "この設定で使用する色を選択してください。",
+    "custom_message_help": "アラートのタイトルの下に追加するカスタムメッセージです。詳細は <docsLink/> を参照してください。",
+    "docs_link_text": "ドキュメント",
+    "webhook_url_help": "Slack の「Incoming Webhook」URL",
+    "channel_help": "Slack の #チャンネル名、またはダイレクトメッセージの送信先の @ユーザー名",
+    "custom_message_label": "カスタムメッセージ (任意)",
+    "time_zone_help": "通知本文のタイムスタンプに使用されるタイムゾーンです。",
+    "time_zone_label": "日時の値のタイムゾーン",
+    "backlog_limit_label": "メッセージのバックログ上限 (任意)",
+    "backlog_limit_help": "Slack 通知で送信されるバックログメッセージの数を制限します。0 に設定すると、上限は適用されません。",
+    "user_name_label": "ユーザー名 (任意)",
+    "user_name_help": "Slack での送信者のユーザー名",
+    "include_title_help": "イベント定義のタイトルと説明を通知に含めます",
+    "notify_channel_help": "メッセージに @channel を追加して、チャンネル内のすべてのユーザーに通知します",
+    "notify_here_label": "ここに通知",
+    "notify_here_help": "メッセージに @here を追加して、チャンネル内のアクティブなユーザーに通知します",
+    "link_names_help": "チャンネル名とユーザー名を検出してリンクします",
+    "icon_url_label": "アイコン URL (任意)",
+    "icon_url_help": "このメッセージのアイコンとして使用する画像",
+    "icon_emoji_label": "アイコンの絵文字 (任意)",
+    "icon_emoji_help": "このメッセージのアイコンとして使用する絵文字 (アイコン URL より優先されます)"
+  },
+  "event_procedure_checkbox": {
+    "label": "イベント手順を含める",
+    "help": "イベント定義のイベント手順を整形したものを、通知本文の末尾に追加します。"
+  },
+  "slack_notification_summary": {
+    "color_label": "色",
+    "custom_message_label": "カスタムメッセージ",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "teams_notification_summary": {
+    "color_label": "色",
+    "custom_message_label": "カスタムメッセージ"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams の「Incoming Webhook」URL",
+    "backlog_limit_help": "Microsoft Teams 通知で送信されるバックログメッセージの数を制限します。0 に設定すると、上限は適用されません。"
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Teams に投稿するアダプティブカードです。詳細は <docsLink/> を参照してください。",
+    "backlog_toggle_aria_label": "メッセージのバックログ上限を有効化"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "ルーティングキー",
+    "incident_title_label": "インシデントのタイトル",
+    "custom_incident_label": "カスタムインシデント",
+    "key_prefix_label": "キーのプレフィックス",
+    "incident_key_label": "インシデントキー"
+  },
   "pager_duty_notification_form": {},
   "pager_duty_notification_summary": {},
   "threat_intel_plugin_config": {},
