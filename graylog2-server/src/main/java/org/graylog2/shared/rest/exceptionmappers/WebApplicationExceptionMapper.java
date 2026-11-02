@@ -32,7 +32,7 @@ public class WebApplicationExceptionMapper implements ExtendedExceptionMapper<We
 
     @Override
     public Response toResponse(WebApplicationException e) {
-        final ApiError apiError = ApiError.create(e.getMessage());
+        final ApiError apiError = ApiError.from(e);
 
         return Response.fromResponse(e.getResponse())
                 .type(MediaType.APPLICATION_JSON_TYPE)
