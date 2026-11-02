@@ -98,5 +98,9 @@
   "Transport address": "传输地址",
   "Triggered": "已触发",
   "Type": "类型",
-  "Usages": "使用情况"
+  "Usages": "使用情况",
+  "User ID": "用户 ID",
+  "Username": "用户名",
+  "Version": "版本",
+  "id": "ID"
 }
