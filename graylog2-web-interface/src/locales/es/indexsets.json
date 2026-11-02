@@ -1,1 +1,158 @@
-{}
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "Resumen de índices no disponible",
+      "description": "No pudimos obtener la información del resumen de índices. Normalmente esto significa que hubo un problema al conectar con el indexador, así que <strong>debes asegurarte de que el indexador esté activo y sea accesible desde {{productName}}</strong>.",
+      "journal_info": "Los mensajes seguirán almacenándose en el journal, pero no será posible buscarlos hasta que el indexador vuelva a ser accesible."
+    },
+    "header": {
+      "index_set_title": "Conjunto de índices: {{title}}",
+      "documentation_link": "Documentación del modelo de índices",
+      "edit_button": "Editar conjunto de índices",
+      "description": "Este es un resumen de todos los índices (almacenes de mensajes) de este conjunto de índices que se consideran actualmente para búsquedas y análisis."
+    },
+    "indices_info": {
+      "summary": "{{count}} índices con un total de {{messageCount}} mensajes gestionados; el índice de escritura activo actual es <i>{{currentTarget}}</i>."
+    },
+    "document_title": "Conjunto de índices - {{title}}"
+  },
+  "indexers": {
+    "cluster_health": {
+      "title": "Clúster de {{distribution}}",
+      "docs_open_search": "Documentación de configuración de OpenSearch",
+      "docs_elasticsearch": "Documentación de configuración de Elasticsearch",
+      "error": "No se pudo obtener el estado del clúster de {{distribution}}. Error al obtener el estado del clúster de {{distribution}}: {{message}}",
+      "status": "El clúster {{name}} de {{distribution}} está {{status}}.",
+      "shards": "Shards: {{active}} activos, {{initializing}} inicializando, {{relocating}} reubicando, {{unassigned}} sin asignar,",
+      "what_does_this_mean": "¿Qué significa esto?"
+    },
+    "failures": {
+      "none": "No hay intentos de indexación fallidos en las últimas 24 horas.",
+      "show_errors": "Mostrar errores",
+      "title": "Fallos del indexador",
+      "docs": "Documentación de fallos del indexador",
+      "description": "Cada mensaje que no se haya indexado correctamente se registrará como fallo del indexador.",
+      "none_hurray": "¡Hurra! No hay fallos del indexador.",
+      "timestamp": "Marca de tiempo",
+      "index": "Índice",
+      "letter_id": "ID de letra",
+      "error_message": "Mensaje de error"
+    },
+    "system_overview": {
+      "looking_for_failures": "Buscando fallos de indexación...",
+      "license_load_failed": "No se pudo cargar la información de la licencia",
+      "error_title": "Error"
+    }
+  },
+  "indices": {
+    "maintenance": {
+      "title": "Mantenimiento",
+      "recalculate_all": "Limpiar y recalcular todos los rangos de índices",
+      "check_versions": "Comprobar versiones de índices",
+      "confirm_recalculate_all": "Esto limpiará y recalculará todos los rangos de índices existentes. ¿Quieres continuar?"
+    },
+    "closed_index": {
+      "info": "Este índice está cerrado. La información del índice no está disponible por el momento; vuelve a abrir el índice e inténtalo de nuevo.",
+      "reopen": "Reabrir índice",
+      "delete": "Eliminar índice",
+      "confirm_delete": "¿Seguro que quieres eliminar el índice {{indexName}}?"
+    },
+    "create_index_set": {
+      "submit": "Crear conjunto de índices",
+      "submit_loading": "Creando conjunto de índices..."
+    },
+    "incompatible_modal": {
+      "title": "Versiones de índices",
+      "upgrade_blocked": "La presencia de índices incompatibles impide actualizar este clúster a OpenSearch 3.x en este momento, ya que hacerlo sería una acción destructiva.",
+      "upgrade_path": "La ruta de actualización recomendada es <migrationLink>migrar de OpenSearch a Data Node</migrationLink> usando el asistente disponible (<docsLink>documentación</docsLink>) y, después, usar la automatización de actualización integrada de Data Node para continuar.",
+      "opens_in_new_tab": " (se abre en una pestaña nueva)",
+      "unsupported_direct_upgrade": "{{productName}} no admite actualmente el proceso de actualización directa de OpenSearch 2.x a 3.x cuando hay índices incompatibles, debido a los riesgos que implica. Una versión posterior añadirá soporte para esta ruta; si es urgente, ponte en contacto con {{productName}} para hablar sobre un servicio de Professional Services.",
+      "support_until": "OpenSearch 2.x sigue siendo compatible hasta noviembre de 2027.",
+      "info": "Los índices creados con una versión mayor anterior e incompatible de OpenSearch deben archivarse, eliminarse o reindexarse antes de que el backend de búsqueda pueda actualizarse a la siguiente versión mayor.",
+      "close": "Cerrar"
+    },
+    "details": {
+      "confirm_recalculate": "¿Seguro que quieres recalcular los rangos de índices del índice {{indexName}}?",
+      "recalculate_failed": "No se pudo crear un trabajo para iniciar el recálculo de rangos de índices de {{indexName}}",
+      "recalculate_failed_title": "Error al iniciar el recálculo de rangos de índices de {{indexName}}",
+      "confirm_delete": "¿Seguro que quieres eliminar el índice {{indexName}}?",
+      "active_write_index": "No se puede eliminar el índice de escritura activo",
+      "recalculate": "Recalcular rangos de índices",
+      "delete": "Eliminar índice",
+      "stats": "{{segments}} segmentos, {{contexts}} contextos de búsqueda abiertos, {{deleted}} mensajes eliminados",
+      "primary_shard_operations": "Operaciones de shards primarios",
+      "total_shard_operations": "Operaciones totales de shards"
+    },
+    "maintenance_strategies": {
+      "time_based_size_optimizing_help": "La estrategia de rotación Time Based Size Optimizing intenta rotar el índice a diario. Sin embargo, puede omitir la rotación para conseguir índices de tamaño óptimo, manteniendo el tamaño de los shards dentro de un rango aceptable. La optimización puede retrasar la rotación dentro del rango de la retención mínima/máxima configurada. Si un índice es más antiguo que el rango entre el mínimo y el máximo, se rotará independientemente de su tamaño actual.",
+      "max_retention_warning": "El periodo de retención efectivo calculado a partir del <b>Periodo de rotación</b> y del <b>número máximo de índices</b> no debería ser mayor que el <b>Periodo máximo de retención</b> de <b>{{maxRetentionPeriod}}</b> establecido por el administrador.",
+      "deactivated": "La estrategia {{name}} se ha desactivado. Configura una estrategia de retención válida.",
+      "summary_not_found": "¡No se encontró el resumen de la estrategia {{strategy}}!"
+    },
+    "range_summary": {
+      "none": "No hay ningún rango de índices disponible.",
+      "recalculated": "Rango recalculado <relativeTime /> en {{ms}} ms."
+    },
+    "section": {
+      "indices": "Índices:",
+      "shards": "Shards:",
+      "total_size": "Tamaño total:"
+    }
+  },
+  "index_set_form": {
+    "configuration_information": "Información de configuración",
+    "title_label": "Título",
+    "title_help": "Nombre descriptivo del conjunto de índices.",
+    "description_label": "Descripción",
+    "description_help": "Añade una descripción de este conjunto de índices.",
+    "details": "Detalles",
+    "shards_label": "Shards de índice",
+    "shards_help": "Número de shards del clúster de búsqueda utilizados por cada índice de este conjunto de índices. Aumentar los shards de índice mejora la velocidad de escritura en el clúster de búsqueda para los datos almacenados en este conjunto, al distribuir el índice de escritura activo entre varios nodos de búsqueda. Aumentarlos puede degradar el rendimiento de búsqueda y aumenta la huella de memoria del índice. Este valor no debería ser mayor que el número de nodos de búsqueda.",
+    "replicas_label": "Réplicas de índice",
+    "replicas_help": "Número de shards réplica del clúster de búsqueda utilizados por cada índice de este conjunto de índices. Añadir shards réplica mejora el rendimiento de búsqueda durante las lecturas paralelas del índice, como ocurre en los dashboards, y forma parte de la estrategia de alta disponibilidad y copia de seguridad. Cada conjunto de shards réplica multiplica los requisitos de almacenamiento y la huella de memoria del índice. Este valor no debería ser mayor que el número de nodos de búsqueda, y normalmente no mayor que 1.",
+    "max_segments_label": "Número máximo de segmentos",
+    "max_segments_help": "<em>Opción avanzada.</em> Número máximo de segmentos por índice del clúster de búsqueda tras la optimización (force merge). Valores más altos reducen la tasa de compresión de la optimización de índices.",
+    "disable_optimization_label": "Desactivar la optimización de índices tras la rotación",
+    "disable_optimization_help": "<em>Opción avanzada.</em> La optimización de índices es un proceso de compresión que se produce tras rotar un índice activo y reduce su tamaño en disco. Es una tarea de mantenimiento intensiva en CPU que realiza el clúster de búsqueda tras la rotación. Comprimir los índices mejora el rendimiento de búsqueda y reduce la huella de almacenamiento de los conjuntos de índices.",
+    "field_type_refresh_label": "Intervalo de actualización del tipo de campo",
+    "field_type_refresh_help": "<em>Opción avanzada.</em> Frecuencia con la que se actualiza la información de tipos de campo del índice de escritura activo. Valores más altos pueden reducir ligeramente la carga del clúster de búsqueda y mejorar el rendimiento, pero harán que los nuevos mensajes tarden más en poder buscarse en {{productName}}.",
+    "field_type_profile": "Perfil de tipos de campo",
+    "important_note": "Nota importante",
+    "important_note_text": "Estos cambios no se aplican a los índices existentes; solo se aplican a los índices creados a partir de ahora. Para aplicarlos de inmediato al conjunto de índices actual, rota el índice.",
+    "save": "Guardar",
+    "prefix_label": "Prefijo de índice",
+    "prefix_help": "Prefijo <strong>único</strong> utilizado para los índices de este conjunto de índices. El prefijo debe empezar por una letra o número y solo puede contener letras, números, '_', '-' y '+'.",
+    "prefix_error_empty": "Prefijo de índice no válido: no puede estar vacío",
+    "prefix_error_start": "Prefijo de índice no válido: debe empezar por una letra o número",
+    "prefix_error_lower_case": "Prefijo de índice no válido: debe estar en minúsculas",
+    "prefix_error_chars": "Prefijo de índice no válido: solo puede contener letras, números, '_', '-' y '+'",
+    "analyzer_label": "Analizador",
+    "analyzer_help": "Analizador para este conjunto de índices.",
+    "rotation_retention": "Rotación y retención",
+    "segment_data_tiering": "Data Tiering",
+    "segment_legacy": "Heredado (obsoleto)",
+    "rotation_title": "Configuración de rotación de índices",
+    "rotation_description": "Se utilizan varios índices para almacenar documentos, y puedes configurar la estrategia que determina cuándo se rota el índice de escritura activo actual.",
+    "rotation_placeholder": "Selecciona una estrategia de rotación"
+  },
+  "deletion_form": {},
+  "set_details": {},
+  "profiles": {},
+  "field_types": {},
+  "templates": {},
+  "overview_table": {},
+  "index_summary": {},
+  "indices_configuration": {},
+  "shards": {},
+  "data_tiering": {},
+  "incompatible": {},
+  "strategies": {},
+  "pages": {},
+  "navigation": {},
+  "maintenance_dialog": {},
+  "hooks": {},
+  "notifications": {},
+  "use_index_set_stats_notifications": {},
+  "use_indexer_overview_notifications": {},
+  "use_indices_configuration_notifications": {}
+}
