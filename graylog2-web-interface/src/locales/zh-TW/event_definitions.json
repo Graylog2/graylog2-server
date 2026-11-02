@@ -381,20 +381,132 @@
     "enable": "啟用",
     "enabled": "已啟用"
   },
-  "steps": {},
+  "steps": {
+    "additional_details": "其他詳細資料",
+    "condition": "條件",
+    "notifications": "通知",
+    "share": "分享",
+    "summary": "摘要"
+  },
   "summary": {
-    "condition_types": {}
+    "actions": "動作",
+    "condition_invalid": "條件無效：{{errors}}",
+    "condition_types": {
+      "aggregation": "彙總",
+      "filter": "篩選器"
+    },
+    "create_events_if": "若符合以下條件則建立事件",
+    "cron_description": "Cron 說明",
+    "cron_expression": "Cron 運算式",
+    "enable_scheduling": "啟用排程",
+    "event_limit": "事件數量上限",
+    "execute_every": "搜尋執行間隔",
+    "group_by": "分組欄位",
+    "missing_stream_permissions": "缺少以下 Stream 的權限：",
+    "no": "否",
+    "no_cron_expression": "錯誤：未指定 Cron 運算式！",
+    "no_filters": "未設定篩選器",
+    "no_group_by": "未設定分組",
+    "no_streams": "未選取 Stream，將搜尋所有 Stream",
+    "search_filters": "搜尋篩選器",
+    "search_query": "搜尋查詢",
+    "search_within": "搜尋範圍為過去",
+    "stream_categories": "Stream 分類",
+    "streams": "Streams",
+    "time_zone": "時區",
+    "type": "類型",
+    "undeclared_parameters": "有未宣告的查詢參數：{{parameters}}",
+    "use_cron": "使用 Cron 排程",
+    "yes": "是"
   },
-  "summary_renders": {},
-  "summary_template_help": {},
-  "tags_editor": {},
-  "template_preview": {},
-  "template_provider_form": {},
+  "summary_renders": {
+    "backlog_none": "通知將不包含任何訊息。",
+    "condition_plugin_no_summary": "條件外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "event_procedure_summary": "事件程序摘要",
+    "event_procedure_summary_unavailable": "事件程序摘要元件無法使用。",
+    "fields": "欄位",
+    "grace_period_disabled": "寬限期已停用",
+    "grace_period_set": "寬限期設定為 {{duration}}",
+    "keys": "鍵",
+    "missing_notification_permissions": "缺少以下通知的權限：",
+    "no_event_procedures": "此事件沒有任何事件程序。",
+    "no_field_value_provider": "未設定欄位值提供者。",
+    "no_fields": "此 Event Definition 所產生的事件未設定任何欄位。",
+    "no_keys": "此 Event Definition 所產生的事件未設定任何鍵。",
+    "no_notifications": "此事件未設定任何會觸發的通知。",
+    "no_remediation_steps": "未提供修復步驟",
+    "notification_not_found": "找不到通知 <em>{{id}}</em> 的相關資訊。",
+    "notification_plugin_no_summary": "通知外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "notifications": "通知",
+    "provider_plugin_no_summary": "提供者外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "remediation_steps": "修復步驟",
+    "settings": "設定"
+  },
+  "summary_template_help": {
+    "aggregation_events": "彙總事件：分組值與彙總結果。",
+    "aggregation_example": "每位使用者登入失敗次數的彙總：",
+    "aggregation_example_template": "<userVariable></userVariable> 登入失敗 <countVariable></countVariable> 次",
+    "button_aria_label": "顯示事件摘要範本說明",
+    "button_title": "摘要範本說明",
+    "custom_fields": "自訂欄位",
+    "custom_fields_description": "在 Event Definition 中定義的自訂欄位可透過 <code>fields</code> 存取。",
+    "event_definition_variables": "Event Definition 變數",
+    "examples": "範例",
+    "filter_events": "篩選事件：原始日誌訊息的欄位。",
+    "filter_example": "篩選特定日誌訊息：",
+    "filter_example_template": "<hostVariable></hostVariable> 發生錯誤：<messageVariable></messageVariable>",
+    "group_by_field": "（分組欄位）",
+    "hostname": "（主機名稱）",
+    "intro": "使用範本自訂事件建立時，在「警示與事件」頁面上顯示的說明。範本使用 <jmteLink>JMTE</jmteLink> 替換語法，變數需以 <variable></variable> 包起來。",
+    "source_context": "來源背景資訊",
+    "source_context_description": "<code>source</code> 變數包含觸發資料的背景資訊，其內容取決於 Event Definition 類型：",
+    "title": "事件摘要範本"
+  },
+  "tags_editor": {
+    "aria_label": "Event Definition 標籤",
+    "duplicate": "標籤「{{tag}}」已新增。",
+    "help": "按下 Enter 或 Tab 鍵即可新增。標籤會轉換為小寫並去除重複項目。僅允許小寫字母、數字、連字號、底線與點。",
+    "max_reached": "已達到標籤數量上限 {{max}} 個。",
+    "placeholder": "例如：authentication、brute-force、compliance"
+  },
+  "template_preview": {
+    "aggregation": "在分組中設定的欄位，保留其原始名稱",
+    "aggregation_label": "彙總：",
+    "available_fields": "範本中可用的欄位取決於建立事件的條件：",
+    "correlation": "最後一個符合且未被否定的事件中的所有欄位",
+    "correlation_label": "關聯：",
+    "description": "您可以使用動態值豐富產生的事件內容。使用 <code>{{syntax}}</code> 即可存取事件內容中的欄位。",
+    "filter": "原始日誌訊息中的所有欄位",
+    "filter_label": "篩選器：",
+    "title": "範本中可用的欄位"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "排除空白欄位",
+    "exclude_empty_fields_help": "勾選此選項後，當範本轉譯出空值時，將完全不在事件中包含該欄位。未勾選時，欄位會以空值加入事件。當所有範本值皆為必填時，此選項一律啟用。",
+    "require_values": "要求設定所有範本值",
+    "require_values_help": "勾選此選項以驗證範本中使用的所有變數皆已設定值。",
+    "template": "範本",
+    "template_help": "輸入要設定給此欄位的文字，或使用 <jmteLink>JMTE 語法</jmteLink> 新增動態值。"
+  },
   "types": {
-    "aggregation": {},
-    "system": {}
+    "aggregation": {
+      "description": "透過篩選日誌訊息，並（選擇性地）彙總其結果以符合特定條件，從而建立事件。這些事件可作為關聯規則的輸入。",
+      "title": "篩選與彙總"
+    },
+    "system": {
+      "description": "內建的 Event Definition，{{productName}} 用以將系統通知以事件形式回報。",
+      "title": "系統 Event Definition"
+    }
   },
-  "validation": {},
-  "validation_summary": {},
-  "use_event_definition_notifications": {}
+  "validation": {
+    "cannot_be_empty": "不可為空",
+    "field_cannot_be_empty": "欄位不可為空。",
+    "field_positive_number": "欄位必須為正數。"
+  },
+  "validation_summary": {
+    "title": "發現一些錯誤！"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "載入 Event Definition 失敗，狀態：{{error}}"
+  }
 }
