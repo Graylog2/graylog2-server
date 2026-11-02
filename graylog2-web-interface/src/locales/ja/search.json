@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "検索を実行",
+    "perform_search_dirty": "検索を実行（前回の検索後に変更があります）"
+  },
+  "sidebar": {
+    "description": "説明",
+    "create": "作成",
+    "highlighting": "ハイライト",
+    "fields": "フィールド"
+  },
+  "empty_state": {
+    "no_widgets_search": "検索結果を可視化するウィジェットが定義されていません",
+    "no_widgets_dashboard": "このダッシュボードにはまだウィジェットがありません",
+    "create_widget_hint": "左側のサイドバーの「作成」セクションでウィジェットタイプを選択して、新しいウィジェットを作成します。",
+    "tips_title": "検索とダッシュボードを作成するためのヒント",
+    "tip_1": "まず、答えたい<bold>質問</bold>から始めます。解決したい問題を定義します。",
+    "tip_2": "<bold>制限</bold>して、表示したいデータポイントのみにデータを絞り込みます。",
+    "tip_3": "データを<bold>可視化</bold>します。質問に答えられていますか？",
+    "tip_4": "ダッシュボードを同僚と<bold>共有</bold>します。パラメーターを使用して<bold>再利用</bold>できるように準備します。"
+  },
+  "search_bar": {
+    "streams_placeholder": "検索に含めるストリームを選択します。空の場合はすべてのストリームを検索します。",
+    "refresh_human_name": "検索",
+    "query_history_title": "クエリ履歴を開く",
+    "filters_label": "フィルター",
+    "filters_tooltip_title": "検索フィルター",
+    "filters_enterprise_hint": "検索フィルターとパラメーターはEnterpriseバージョンで利用できます。",
+    "filters_hide_controls": "コントロールを非表示",
+    "scroll_hint": "検索バーまでスクロール",
+    "query_placeholder": "検索クエリを入力してEnterキーを押します。例: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "保存済みの検索",
+    "save_search": "検索を保存",
+    "unsaved_changes": "未保存の変更",
+    "load_title": "以前に保存した検索を読み込む",
+    "load": "読み込み",
+    "share_disabled": "保存済みの検索のみ共有できます。",
+    "dropdown_aria_label": "検索アクションのドロップダウンを開く",
+    "edit_metadata": "メタデータを編集",
+    "export_to_dashboard": "ダッシュボードにエクスポート",
+    "export": "エクスポート",
+    "reset_search": "検索をリセット",
+    "editing_modal_title": "保存済みの検索を編集",
+    "update_search": "検索を更新",
+    "share_description": "この保存済みの検索の共同編集者として追加するユーザーまたはチームを検索します。",
+    "save_success": "ビュー \"{{title}}\" の保存に成功しました。",
+    "save_error": "ビューの保存に失敗しました: {{error}}",
+    "delete_success": "保存済みの検索 \"{{title}}\" の削除に成功しました。",
+    "delete_error": "保存済みの検索の削除に失敗しました: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "検索名",
+    "dirty_warning": "検索パラメーター（期間、ストリーム、またはクエリ）に未確定の変更があります。今保存すると、これらの変更は破棄されます。意図したものでない場合は、保存する前に検索を実行して変更を適用してください。",
+    "title_label": "タイトル",
+    "title_placeholder": "タイトルを入力",
+    "share_description": "この検索の共同編集者として追加するユーザーまたはチームを検索します。",
+    "create_new": "新規作成",
+    "save_as": "名前を付けて保存",
+    "create_new_title": "新しい検索を作成",
+    "save_as_title": "新しい検索として名前を付けて保存",
+    "save": "保存",
+    "save_title": "検索を保存",
+    "cancel": "キャンセル"
+  },
+  "results": {
+    "loading": "検索結果を更新しています..."
+  },
+  "sidebar_description": {
+    "execution": "実行",
+    "ad_hoc_info": "検索を保存するか、ダッシュボードにエクスポートすると、カスタムの概要と説明を追加できます。",
+    "edit_metadata_hint": "この{{viewType}}の説明と概要を追加するには、検索バーの <icon/> アイコンをクリックしてアクションメニューを開きます。アクションメニューには「メタデータを編集」オプションがあります。",
+    "search_section": "検索",
+    "no_summary": "この{{viewType}}には概要がありません。",
+    "no_description": "この{{viewType}}には説明がありません。",
+    "no_query": "クエリはまだ実行されていません。",
+    "query_executed_in": "クエリの実行時間",
+    "effective_time_range": "有効な期間",
+    "varies_per_widget": "ウィジェットごとに異なります",
+    "time_from": "開始",
+    "time_to": "終了",
+    "total_results": "検索結果の合計"
+  },
+  "sidebar_create": {
+    "info": "以下のオプションを使用して、集計、ログビュー（Enterpriseの機能）、またはパラメーター（Enterpriseの機能）を検索に追加します。",
+    "generic": "汎用",
+    "predefined_aggregation": "定義済みの集計",
+    "investigations": "調査",
+    "events": "イベント"
+  },
+  "sidebar_highlighting": {
+    "description": "検索語とフィールド値をハイライトできます。検索クエリのハイライトを結果に表示するかどうかは、{{productName}}サーバーの設定で有効または無効にできます。任意のフィールド値は、その値をクリックして「この値をハイライト」を選択するとハイライトできます。\n用語または値に複数のルールがある場合は、最初に一致したルールが使用されます。",
+    "active_highlights": "有効なハイライト",
+    "add_rule_title": "ハイライトルールを追加",
+    "search_terms": "検索語"
+  },
+  "save_view": {
+    "save": "保存",
+    "save_as": "名前を付けて保存",
+    "save_as_new_dashboard_title": "新しいダッシュボードとして名前を付けて保存",
+    "save_dashboard_title": "ダッシュボードを保存"
+  },
+  "undo_redo": {
+    "undo": "元に戻す",
+    "redo": "やり直す"
+  },
+  "time_range": {
+    "tab_relative": "相対",
+    "tab_absolute": "絶対",
+    "tab_keyword": "キーワード",
+    "from_label": "開始:",
+    "until_label": "終了:",
+    "keyword_label": "キーワード:",
+    "no_override": "上書きなし",
+    "now": "現在",
+    "all_time": "全期間",
+    "ago": "前",
+    "range_ago": "{{time}}前",
+    "range_length_placeholder": "期間の長さを選択",
+    "load_preset": "プリセットを読み込む",
+    "no_available_presets": "利用可能なプリセットがありません",
+    "loading": "読み込み中...",
+    "configure_presets": "プリセットを設定",
+    "insert_current_date": "現在の日付を挿入",
+    "from_hours_label": "時間ラベルから"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
