@@ -53,26 +53,51 @@
       "fleet_with_others_other": "Configuration mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
       "collector": "Configuration mise à jour pour le collector <targetLink />",
       "collector_with_others_one": "Configuration mise à jour pour le collector <targetLink /> et {{count}} autre collector",
+      "collector_with_others_other": "Configuration mise à jour pour le collector <targetLink /> et {{count}} autres collectors",
       "fleet_with_others_many": "Configuration mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
       "collector_with_others_many": "Configuration mise à jour pour le collector <targetLink /> et {{count}} autres collectors"
     },
     "ingest_config_changed": {
       "fleet": "Configuration d'ingestion mise à jour pour la flotte <targetLink />",
-      "collector": "Configuration d'ingestion mise à jour pour le collector <targetLink />"
+      "fleet_with_others_one": "Configuration d'ingestion mise à jour pour la flotte <targetLink /> et {{count}} autre flotte",
+      "fleet_with_others_other": "Configuration d'ingestion mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector": "Configuration d'ingestion mise à jour pour le collector <targetLink />",
+      "collector_with_others_one": "Configuration d'ingestion mise à jour pour le collector <targetLink /> et {{count}} autre collector",
+      "collector_with_others_other": "Configuration d'ingestion mise à jour pour le collector <targetLink /> et {{count}} autres collectors",
+      "fleet_with_others_many": "Configuration d'ingestion mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector_with_others_many": "Configuration d'ingestion mise à jour pour le collector <targetLink /> et {{count}} autres collectors"
     },
     "restart": {
       "fleet": "Redémarrage demandé pour la flotte <targetLink />",
-      "collector": "Redémarrage demandé pour le collector <targetLink />"
+      "fleet_with_others_one": "Redémarrage demandé pour la flotte <targetLink /> et {{count}} autre flotte",
+      "fleet_with_others_other": "Redémarrage demandé pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector": "Redémarrage demandé pour le collector <targetLink />",
+      "collector_with_others_one": "Redémarrage demandé pour le collector <targetLink /> et {{count}} autre collector",
+      "collector_with_others_other": "Redémarrage demandé pour le collector <targetLink /> et {{count}} autres collectors",
+      "fleet_with_others_many": "Redémarrage demandé pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector_with_others_many": "Redémarrage demandé pour le collector <targetLink /> et {{count}} autres collectors"
     },
     "discovery_run": {
       "fleet": "Exécution de la découverte déclenchée pour la flotte <targetLink />",
-      "collector": "Exécution de la découverte déclenchée pour le collector <targetLink />"
+      "fleet_with_others_one": "Exécution de la découverte déclenchée pour la flotte <targetLink /> et {{count}} autre flotte",
+      "fleet_with_others_other": "Exécution de la découverte déclenchée pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector": "Exécution de la découverte déclenchée pour le collector <targetLink />",
+      "collector_with_others_one": "Exécution de la découverte déclenchée pour le collector <targetLink /> et {{count}} autre collector",
+      "collector_with_others_other": "Exécution de la découverte déclenchée pour le collector <targetLink /> et {{count}} autres collectors",
+      "fleet_with_others_many": "Exécution de la découverte déclenchée pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector_with_others_many": "Exécution de la découverte déclenchée pour le collector <targetLink /> et {{count}} autres collectors"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> réaffecté"
+      "collector": "Collector <targetLink /> réaffecté",
+      "collector_with_others_one": "Collector <targetLink /> et {{count}} autre collector réaffecté",
+      "collector_with_others_other": "Collector <targetLink /> et {{count}} autres collectors réaffectés",
+      "collector_with_others_many": "Collector <targetLink /> et {{count}} autres collectors réaffectés"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> réaffecté à la flotte <destinationLink />"
+      "collector": "Collector <targetLink /> réaffecté à la flotte <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> et {{count}} autre collector réaffecté à la flotte <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> et {{count}} autres collectors réaffectés à la flotte <destinationLink />",
+      "collector_with_others_many": "Collector <targetLink /> et {{count}} autres collectors réaffectés à la flotte <destinationLink />"
     }
   },
   "fleet_reference": {
@@ -97,11 +122,14 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "Supprimer les jetons d'enrôlement",
+    "bulk_delete_confirm_one": "Voulez-vous vraiment supprimer {{count}} jeton d'enrôlement ? Les nouveaux Collectors ne pourront pas s'enrôler avec le jeton supprimé.",
+    "bulk_delete_confirm_other": "Voulez-vous vraiment supprimer {{count}} jetons d'enrôlement ? Les nouveaux Collectors ne pourront pas s'enrôler avec les jetons supprimés.",
     "never": "Jamais",
     "expired": "Expiré",
     "human_name": "jetons d'enrôlement",
     "delete_title": "Supprimer le jeton d'enrôlement",
-    "delete_confirm": "Voulez-vous vraiment supprimer ce jeton d'enrôlement ? Les nouveaux Collectors ne pourront plus s'enrôler avec ce jeton. Les Collectors déjà enrôlés continueront de fonctionner normalement."
+    "delete_confirm": "Voulez-vous vraiment supprimer ce jeton d'enrôlement ? Les nouveaux Collectors ne pourront plus s'enrôler avec ce jeton. Les Collectors déjà enrôlés continueront de fonctionner normalement.",
+    "bulk_delete_confirm_many": "Voulez-vous vraiment supprimer {{count}} jetons d'enrôlement ? Les nouveaux Collectors ne pourront pas s'enrôler avec les jetons supprimés."
   },
   "deployment": {
     "select_fleet_step": "Sélectionner la flotte",
@@ -115,6 +143,8 @@
     "receiving": "Réception",
     "listening": "En écoute…",
     "title": "Hôtes en cours d'enrôlement",
+    "connected_one": "{{count}} connecté · en écoute d'autres hôtes…",
+    "connected_other": "{{count}} connectés · en écoute d'autres hôtes…",
     "listening_subtitle": "en écoute…",
     "view_all": "Voir tout dans les Instances",
     "host": "Hôte",
@@ -125,7 +155,8 @@
     "hide_setup": "Masquer la configuration",
     "view_setup": "Voir la configuration",
     "empty": "Les hôtes exécutant la commande apparaissent ici dès leur première connexion.",
-    "connection_problem": "Impossible de joindre le serveur — nouvelle tentative automatique"
+    "connection_problem": "Impossible de joindre le serveur — nouvelle tentative automatique",
+    "connected_many": "{{count}} connectés · en écoute d'autres hôtes…"
   },
   "token_step": {
     "summary_expires": "Jeton <emphasis>{{tokenName}}</emphasis> généré - expire <expiresAt />",
@@ -150,8 +181,11 @@
   "fleet_actions": {
     "received_messages": "Messages reçus",
     "delete": "Supprimer",
+    "delete_blocked_one": "Cette flotte compte {{count}} instance affectée. Réaffectez-la ou supprimez-la avant de supprimer la flotte.",
+    "delete_blocked_other": "Cette flotte compte {{count}} instances affectées. Réaffectez-les ou supprimez-les avant de supprimer la flotte.",
     "delete_title": "Supprimer la flotte",
-    "delete_confirm": "Voulez-vous vraiment supprimer la flotte <emphasis>{{fleetName}}</emphasis> ? Ses configurations de sources et ses jetons d'enrôlement seront supprimés."
+    "delete_confirm": "Voulez-vous vraiment supprimer la flotte <emphasis>{{fleetName}}</emphasis> ? Ses configurations de sources et ses jetons d'enrôlement seront supprimés.",
+    "delete_blocked_many": "Cette flotte compte {{count}} instances affectées. Réaffectez-les ou supprimez-les avant de supprimer la flotte."
   },
   "fleet_form": {
     "name_required": "Le nom est obligatoire",
@@ -211,9 +245,18 @@
   },
   "reassign_fleet": {
     "fleet_required": "La flotte est obligatoire",
+    "title_one": "Réaffecter {{count}} instance à une flotte",
+    "title_other": "Réaffecter {{count}} instances à une flotte",
+    "no_other_fleet_one": "Il n'existe aucune autre flotte à laquelle affecter ce Collector.",
+    "no_other_fleet_other": "Il n'existe aucune autre flotte à laquelle affecter ces Collectors.",
     "no_permission": "Vous n'avez pas la permission d'affecter des Collectors à une autre flotte.",
     "select_placeholder": "Sélectionner une flotte...",
-    "submitting": "Réaffectation..."
+    "submit_one": "Réaffecter l'instance",
+    "submit_other": "Réaffecter les instances",
+    "submitting": "Réaffectation...",
+    "title_many": "Réaffecter {{count}} instances à une flotte",
+    "no_other_fleet_many": "Il n'existe aucune autre flotte à laquelle affecter ces Collectors.",
+    "submit_many": "Réaffecter les instances"
   },
   "instance_health": {
     "title": "Santé",
@@ -240,14 +283,20 @@
     "logs": "Logs :",
     "messages": "Messages :",
     "attributes": "Attributs",
+    "active_sources_one": "Sources actives ({{count}})",
+    "active_sources_other": "Sources actives ({{count}})",
     "sources_inherited": "Les sources sont héritées de la configuration de la flotte de cette instance.",
     "no_sources": "Aucune source configurée pour cette flotte. Ajoutez des sources dans la page de détail de la flotte pour commencer la collecte de données.",
     "synchronization": "Synchronisation",
     "pending_load_error": "Impossible de charger les modifications en attente. Veuillez réessayer plus tard.",
     "queued_actions": "Les actions suivantes sont en file d'attente jusqu'à la synchronisation du collector :",
     "hide_transactions": "Masquer les transactions en file d'attente",
+    "show_transactions_one": "Afficher la transaction en file d'attente ({{count}})",
+    "show_transactions_other": "Afficher les transactions en file d'attente ({{count}})",
     "changes_queued": "Les modifications sont mises en file d'attente et seront appliquées à la prochaine connexion du collector.",
-    "all_applied": "Le collector a appliqué toutes les actions en file d'attente."
+    "all_applied": "Le collector a appliqué toutes les actions en file d'attente.",
+    "active_sources_many": "Sources actives ({{count}})",
+    "show_transactions_many": "Afficher les transactions en file d'attente ({{count}})"
   },
   "overview": {
     "stat_instances_help": "Processus Collector en cours d'exécution, toutes flottes confondues.",
@@ -266,7 +315,19 @@
     "healthy": "Toutes les instances de cette flotte sont en ligne",
     "degraded": "Certaines instances de cette flotte sont hors ligne",
     "down": "Toutes les instances de cette flotte sont hors ligne",
-    "empty": "Aucune instance de Collector ne s'est encore enrôlée dans cette flotte"
+    "empty": "Aucune instance de Collector ne s'est encore enrôlée dans cette flotte",
+    "instances_one": "instance",
+    "instances_other": "instances",
+    "online_one": "● {{count}} en ligne",
+    "online_other": "● {{count}} en ligne",
+    "offline_one": "● {{count}} hors ligne",
+    "offline_other": "● {{count}} hors ligne",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "instances_many": "instances",
+    "online_many": "● {{count}} en ligne",
+    "offline_many": "● {{count}} hors ligne",
+    "sources_many": "{{count}} sources"
   },
   "fleet_cards": {
     "empty_title": "Aucune flotte pour le moment",
@@ -287,7 +348,10 @@
     "fleet": "Flotte",
     "enrolled": "Enrôlé",
     "last_seen": "Dernière activité",
-    "hide_attributes": "Masquer les attributs"
+    "show_attributes_one": "Afficher l'attribut ({{count}})",
+    "show_attributes_other": "Afficher les {{count}} attributs",
+    "hide_attributes": "Masquer les attributs",
+    "show_attributes_many": "Afficher les {{count}} attributs"
   },
   "connection_success": {
     "offline": "Le collector s'est connecté une fois mais n'a plus envoyé de signal depuis <lastSeen />.",
@@ -360,18 +424,26 @@
     "connection_lost": "Connexion perdue",
     "last_heartbeat": "Dernier signal de vie <lastSeen />",
     "first_messages": "Premiers messages",
+    "receiving_one": "Réception - {{count}} message depuis {{duration}}",
+    "receiving_other": "Réception - {{count}} messages depuis {{duration}}",
     "listening": "En écoute... généralement moins d'une minute",
     "enrolled": "Enrôlé",
     "enrolled_detail": "Enregistré avec un jeton d'enrôlement - <enrolledAt />",
     "connected": "Connecté",
     "connected_detail": "Signal de vie reçu - <lastSeen />",
-    "sources_configured": "Sources configurées"
+    "sources_configured": "Sources configurées",
+    "sources_detail_one": "{{count}} source de la flotte <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} sources de la flotte <fleetLink>{{fleetName}}</fleetLink>",
+    "receiving_many": "Réception - {{count}} messages depuis {{duration}}",
+    "sources_detail_many": "{{count}} sources de la flotte <fleetLink>{{fleetName}}</fleetLink>"
   },
   "platform_picker": {
     "title": "Premiers pas avec les Collectors",
     "description": "Déployez des collectors légers dans votre infrastructure pour transmettre les logs à {{productName}}."
   },
   "source_status": {
+    "messages_one": "{{formattedCount}} message",
+    "messages_other": "{{formattedCount}} messages",
     "disabled": "Désactivée",
     "not_applicable": "Non applicable sur {{os}}",
     "unrecognised": "Type de source non reconnu",
@@ -379,7 +451,8 @@
     "no_messages": "Aucun message pour le moment",
     "waiting": "En attente des premiers messages...",
     "title": "Sources de logs",
-    "no_sources": "Aucune source configurée pour cette flotte pour le moment."
+    "no_sources": "Aucune source configurée pour cette flotte pour le moment.",
+    "messages_many": "{{formattedCount}} messages"
   },
   "waiting_for_connection": {
     "status": "En attente de connexion... {{seconds}} s"
@@ -405,14 +478,24 @@
   "ingest_inputs": {
     "title": "Inputs d'ingestion",
     "none": "Aucun input d'ingestion de Collector n'existe. Les Collectors ne pourront pas envoyer de données tant qu'un input n'aura pas été créé.",
+    "unreadable_one": "{{count}} input d'ingestion de Collector existe, mais vous n'avez pas la permission de le consulter.",
+    "unreadable_other": "{{count}} inputs d'ingestion de Collector existent, mais vous n'avez pas la permission de les consulter.",
     "none_running": "Des inputs d'ingestion de Collector existent, mais aucun n'est actuellement en cours d'exécution. Les Collectors ne pourront pas envoyer de données.",
     "name": "Nom",
     "status": "Statut",
     "bind_address": "Adresse d'écoute",
     "port": "Port",
-    "manage": "Gérer"
+    "manage": "Gérer",
+    "additional_unreadable_one": "{{count}} input supplémentaire non visible en raison des permissions.",
+    "additional_unreadable_other": "{{count}} inputs supplémentaires non visibles en raison des permissions.",
+    "unreadable_many": "{{count}} inputs d'ingestion de Collector existent, mais vous n'avez pas la permission de les consulter.",
+    "additional_unreadable_many": "{{count}} inputs supplémentaires non visibles en raison des permissions."
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_one": "Un input d'ingestion de Collector existe sur un port différent : {{ports}}. Si le port externe diffère du port d'un input, assurez-vous que votre réseau achemine correctement le trafic.",
+    "message_other": "Des inputs d'ingestion de Collector existent sur des ports différents : {{ports}}. Si le port externe diffère du port d'un input, assurez-vous que votre réseau achemine correctement le trafic.",
+    "message_many": "Des inputs d'ingestion de Collector existent sur des ports différents : {{ports}}. Si le port externe diffère du port d'un input, assurez-vous que votre réseau achemine correctement le trafic."
+  },
   "source_types": {
     "file": "Fichier",
     "journald": "Journald",
@@ -625,8 +708,14 @@
       "datanode_opensearch_version": "Version d'OpenSearch du Data Node",
       "index_version": "Version de l'index",
       "indices": "Index",
+      "node_title_one": "Nœud : {{hostname}}, Version : {{version}}, {{count}} index",
+      "node_title_other": "Nœud : {{hostname}}, Version : {{version}}, {{count}} index",
       "opensearch_data_location": "Emplacement des données OpenSearch",
-      "shards": "Shards"
+      "shard_count_one": "{{count}} shard",
+      "shard_count_other": "{{count}} shards",
+      "shards": "Shards",
+      "node_title_many": "Nœud : {{hostname}}, Version : {{version}}, {{count}} index",
+      "shard_count_many": "{{count}} shards"
     },
     "in_place_migration": {
       "description": "Suivez ces étapes pour migrer votre cluster OpenSearch 2.x ou 1.3.x existant vers des Data Nodes.",
@@ -634,6 +723,8 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "Certificat valable jusqu'au",
+      "found_one": "Data Node trouvé : {{count}}",
+      "found_other": "Data Nodes trouvés : {{count}}",
       "hostname": "Nom d'hôte",
       "incompatible": "Des Data Nodes fonctionnent avec des versions incompatibles avec votre version actuelle de {{productName}}. Veillez à utiliser la même version pour {{productName}} et pour le Data Node.",
       "incompatible_title": "Data Nodes incompatibles détectés",
@@ -646,7 +737,8 @@
       "status": "Statut",
       "transport_address": "Adresse de transport",
       "version": "Version",
-      "version_incompatible": "Cette version est incompatible avec votre version actuelle de {{productName}}."
+      "version_incompatible": "Cette version est incompatible avec votre version actuelle de {{productName}}.",
+      "found_many": "Data Nodes trouvés : {{count}}"
     },
     "manual_migration": {
       "migration_type": "Type de migration",
@@ -773,7 +865,13 @@
         "journal": "Pendant l'arrêt d'OpenSearch, les messages entrants s'accumulent dans le journal sur disque de chaque nœud {{productName}}. Si l'interruption dépasse la taille ou la durée maximale du journal, l'ingestion se bloque et des messages peuvent être perdus. Ne poursuivez que si le journal dispose d'une marge suffisante pour la durée d'arrêt prévue.",
         "submitting": "Redémarrage...",
         "title": "Redémarrer l'OpenSearch des Data Nodes ?",
-        "tolerate_downtime": "Poursuivez uniquement si vous pouvez supporter l'interruption."
+        "tolerate_downtime": "Poursuivez uniquement si vous pouvez supporter l'interruption.",
+        "restart_together_with_versions_one": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour faire passer OpenSearch de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong> ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues.",
+        "restart_together_with_versions_other": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour faire passer OpenSearch de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong> ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues.",
+        "restart_together_one": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour passer à la version cible d'OpenSearch ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues.",
+        "restart_together_other": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour passer à la version cible d'OpenSearch ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues.",
+        "restart_together_with_versions_many": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour faire passer OpenSearch de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong> ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues.",
+        "restart_together_many": "Avec moins de 3 Data Nodes, OpenSearch ne peut pas rester disponible en redémarrant un nœud à la fois. Tous vos Data Nodes redémarrent ensemble pour passer à la version cible d'OpenSearch ; le backend de stockage est donc <strong>indisponible</strong> jusqu'à la fin du processus. La recherche et l'indexation sont interrompues."
       },
       "no_rollback": "Une fois démarrée, la mise à niveau ne peut pas être annulée vers la version précédente.",
       "rolling": {
@@ -782,7 +880,10 @@
         "healthy_cluster": "Assurez-vous que le cluster est en bon état (vert) avant de continuer.",
         "shard_allocation": "L'allocation des shards est suspendue pendant chaque redémarrage, afin que le cluster reste disponible. Toutefois, l'indexation et la recherche peuvent être brièvement dégradées le temps qu'un nœud quitte et rejoigne le cluster.",
         "title": "Lancer la mise à niveau progressive d'OpenSearch ?",
-        "wait_for_green": "Après chaque nœud, la mise à niveau attend que le cluster revienne à l'état vert avant de continuer. Si cela prend trop de temps, elle se met en pause et attend que vous la repreniez."
+        "wait_for_green": "Après chaque nœud, la mise à niveau attend que le cluster revienne à l'état vert avant de continuer. Si cela prend trop de temps, elle se met en pause et attend que vous la repreniez.",
+        "each_node_with_versions_one": "{{count}} Data Node sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_many": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>."
       },
       "starting": "Démarrage..."
     },
