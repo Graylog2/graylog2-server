@@ -397,37 +397,164 @@
     "expiration_threshold_help": "在此時間內未回報的 Collector 將被永久移除。",
     "confirm": "確認設定"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "擷取輸入",
+    "none": "不存在 Collector 擷取輸入。在建立輸入之前，Collector 將無法傳送資料。",
+    "none_running": "已存在 Collector 擷取輸入，但目前沒有任何輸入在執行。Collector 將無法傳送資料。",
+    "name": "名稱",
+    "status": "狀態",
+    "bind_address": "繫結位址",
+    "port": "連接埠",
+    "manage": "管理"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "檔案",
+    "journald": "Journald",
+    "windows_event_log": "Windows 事件記錄檔",
+    "macos_unified_logging": "macOS 統一日誌"
+  },
+  "source_columns": {
+    "enabled": "已啟用"
+  },
+  "source_form": {
+    "max_poll_interval_error": "最大輪詢間隔至少必須為 1 秒。",
+    "max_log_age_error": "最大日誌年齡必須為 0 或正值。",
+    "read_mode_end": "從結尾開始（tail）",
+    "read_mode_beginning": "從開頭開始",
+    "file_paths": "檔案路徑",
+    "file_paths_help": "支援 Glob 萬用字元模式（例如 /var/log/*.log、/var/log/**/*.log）。Collector 會監看符合的檔案是否有新行。",
+    "read_mode": "讀取模式",
+    "read_mode_file_help": "從結尾開始：僅收集 Collector 啟動後的新行。從開頭開始：先收集所有既有行，再持續追蹤新增內容。",
+    "read_mode_journald_help": "從結尾開始：僅收集 Collector 啟動後的新項目。從開頭開始：先收集所有既有項目，再持續追蹤新增內容。",
+    "priority": "優先順序",
+    "priority_help": "要收集的最低嚴重性等級。例如，選擇 Error 也會收集 Critical、Alert 和 Emergency 項目。",
+    "priority_emerg": "Emergency",
+    "priority_alert": "Alert",
+    "priority_crit": "Critical",
+    "priority_err": "Error",
+    "priority_warning": "Warning",
+    "priority_notice": "Notice",
+    "priority_info": "Info",
+    "priority_debug": "Debug",
+    "match_pattern": "比對模式",
+    "match_pattern_help": "選填的 journald 比對運算式，用於依單元、程序等篩選項目。範例：_SYSTEMD_UNIT=nginx.service",
+    "channels": "頻道",
+    "channels_help": "以逗號分隔的頻道名稱（例如 Application、Security、System）",
+    "include_default_channels": "包含預設頻道",
+    "include_default_channels_help": "預設值為：{{channels}}",
+    "predicate": "述詞",
+    "predicate_help": "選填的 macOS 統一日誌篩選述詞，會傳遞給 <code>log</code> 指令。留空將收集系統中的所有日誌！目前不會收集 <code>info</code> 或 <code>debug</code> 等級，因為它們非常冗長且所含的有價值資訊極少。範例：<code>{{example}}</code>",
+    "max_poll_interval": "最大輪詢間隔",
+    "max_poll_interval_help": "Collector 檢查新日誌項目的頻率。必須至少為 1 秒。",
+    "max_log_age": "最大日誌年齡",
+    "max_log_age_help": "首次啟動時，回溯補齊日誌的時間範圍。設為 0 可停用回溯補齊。",
+    "edit_title": "編輯來源",
+    "new_title": "新增來源",
+    "description": "來源定義此 Fleet 中的 Collector 應收集哪些資料。每種來源類型對應不同的收集方式。",
+    "source_type": "來源類型",
+    "file_type_help": "從主機上的檔案收集日誌行。支援使用 Glob 模式比對多個檔案。",
+    "journald_type_help": "從 systemd journal 收集項目（僅限 Linux）。",
+    "windows_type_help": "從 Windows 事件檢視器頻道收集事件。",
+    "macos_type_help": "透過 <code>log</code> 指令從 macOS 統一日誌系統收集（僅限 macOS）。",
+    "enabled_help": "已停用的來源不會傳送至 Collector。可用於暫時停止收集，而無需移除來源。",
+    "update": "更新來源",
+    "create": "建立來源"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "載入近期活動失敗，狀態為",
+      "title": "無法載入近期活動"
+    },
+    "input_ids": {
+      "message": "載入 Collector 輸入 ID 失敗，狀態為",
+      "title": "無法載入 Collector 輸入 ID。"
+    },
+    "stats": {
+      "message": "載入 Collector 統計資料失敗，狀態為",
+      "title": "無法載入 Collector 統計資料。"
+    },
+    "config": {
+      "message": "載入 Collectors 設定失敗，狀態為",
+      "title": "無法載入 Collectors 設定。"
+    },
+    "enrollment_tokens": {
+      "message": "載入註冊權杖失敗，狀態為",
+      "title": "無法載入註冊權杖"
+    },
+    "pending_changes": {
+      "message": "載入待處理的變更失敗，狀態為",
+      "title": "無法載入待處理的變更"
+    },
+    "instances": {
+      "message": "載入執行個體失敗，狀態為",
+      "title": "無法載入執行個體"
+    },
+    "collector_instances": {
+      "message": "載入 Collector 執行個體失敗，狀態為",
+      "title": "無法載入 Collector 執行個體"
+    },
+    "fleets": {
+      "message": "載入 Fleet 失敗，狀態為",
+      "title": "無法載入 Fleet"
+    },
+    "fleet": {
+      "message": "載入 Fleet 失敗，狀態為",
+      "title": "無法載入 Fleet"
+    },
+    "fleet_stats": {
+      "message": "載入 Fleet 統計資料失敗，狀態為",
+      "title": "無法載入 Fleet 統計資料"
+    },
+    "sources": {
+      "message": "載入來源失敗，狀態為",
+      "title": "無法載入來源"
+    },
+    "input_details": {
+      "message": "載入 Collector 輸入詳細資訊失敗，狀態為：{{error}}",
+      "title": "無法載入 Collector 輸入詳細資訊。"
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "建立 Fleet 失敗：{{error}}",
+      "title": "無法建立 Fleet"
+    },
+    "update_fleet": {
+      "message": "更新 Fleet 失敗：{{error}}",
+      "title": "無法更新 Fleet"
+    },
+    "delete_fleet": {
+      "message": "刪除 Fleet 失敗：{{error}}",
+      "title": "無法刪除 Fleet"
+    },
+    "create_source": {
+      "message": "建立來源失敗：{{error}}",
+      "title": "無法建立來源"
+    },
+    "update_source": {
+      "message": "更新來源失敗：{{error}}",
+      "title": "無法更新來源"
+    },
+    "delete_source": {
+      "message": "刪除來源失敗：{{error}}",
+      "title": "無法刪除來源"
+    },
+    "create_enrollment_token": {
+      "message": "建立註冊權杖失敗：{{error}}",
+      "title": "無法建立註冊權杖"
+    },
+    "delete_enrollment_token": {
+      "message": "刪除註冊權杖失敗：{{error}}",
+      "title": "無法刪除註冊權杖"
+    },
+    "delete_enrollment_tokens": {
+      "message": "刪除註冊權杖失敗：{{error}}",
+      "title": "無法刪除註冊權杖"
+    },
+    "reassign_instances": {
+      "message": "重新指派執行個體失敗：{{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
