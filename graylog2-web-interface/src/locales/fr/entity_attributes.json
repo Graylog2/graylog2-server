@@ -98,5 +98,9 @@
   "Transport address": "Adresse de transport",
   "Triggered": "Déclenché",
   "Type": "Type",
-  "Usages": "Utilisations"
+  "Usages": "Utilisations",
+  "User ID": "ID utilisateur",
+  "Username": "Nom d'utilisateur",
+  "Version": "Version",
+  "id": "ID"
 }
