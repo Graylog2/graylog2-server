@@ -63,6 +63,7 @@ const SUT = (props: Partial<React.ComponentProps<typeof DataTableEntry>>) => (
     <tbody>
       <DataTableEntry
         index={1}
+        pinnedColumnIndexes={new Set()}
         columnPivots={columnPivots}
         columnPivotValues={columnPivotValues}
         fields={fields}
