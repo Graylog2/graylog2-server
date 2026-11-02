@@ -1,1 +1,275 @@
-{}
+{
+  "pages": {
+    "documentation_title": "Documentação dos Collectors",
+    "deployment": {
+      "title": "Implantar Collectors",
+      "description": "Execute o comando em quantos hosts quiser: eles se registram na fleet escolhida e aparecem conforme fazem check-in.",
+      "deploy_tab": "Implantar",
+      "tokens_tab": "Tokens de registro",
+      "tokens_description": "Os tokens autorizam novos Collectors a se registrarem em uma fleet. Excluir um token não afeta os Collectors já registrados."
+    },
+    "fleets": {
+      "document_title": "Fleets de Collectors",
+      "title": "Fleets",
+      "description": "Uma fleet é um grupo de collectors que compartilham a mesma configuração. Todos os collectors de uma fleet coletam dados das mesmas fontes. Use fleets para organizar collectors por ambiente, equipe ou finalidade."
+    },
+    "fleet_detail": {
+      "title": "Detalhes da Fleet"
+    },
+    "instances": {
+      "document_title": "Instâncias de Collectors",
+      "title": "Instâncias",
+      "description": "Uma instância de collector representa um processo de collector em execução em um host remoto. As instâncias se registram em uma fleet usando um token de registro e recebem automaticamente a configuração de fontes da fleet."
+    },
+    "onboarding": {
+      "title": "Integração de Collectors",
+      "description": "Status do seu collector recém-conectado.",
+      "load_error": "Não foi possível carregar a instância do collector: {{error}}",
+      "not_found": "Instância do collector não encontrada. Ela pode ter sido removida. Veja todas as <instancesLink>Instâncias</instancesLink>."
+    },
+    "overview": {
+      "title": "Visão geral dos Collectors",
+      "description": "Collectors são serviços leves implantados na sua infraestrutura para coletar logs e encaminhá-los para {{productName}}. Eles são organizados em fleets e configurados com fontes que definem quais dados coletar."
+    },
+    "settings": {
+      "title": "Configurações dos Collectors",
+      "description": "Configure os endpoints e as configurações de ciclo de vida dos collectors gerenciados. Os collectors se conectam a esses endpoints para receber atualizações de configuração e enviar os dados de log coletados."
+    }
+  },
+  "navigation": {
+    "overview": "Visão geral",
+    "fleets": "Fleets",
+    "instances": "Instâncias",
+    "deployment": "Implantação",
+    "settings": "Configurações"
+  },
+  "activity": {
+    "deleted_target": "[excluído]",
+    "by_actor": "por {{name}}",
+    "by_system": "pelo Sistema",
+    "config_changed": {
+      "fleet": "Configuração atualizada para a fleet <targetLink />",
+      "collector": "Configuração atualizada para o collector <targetLink />"
+    },
+    "ingest_config_changed": {
+      "fleet": "Configuração de ingestão atualizada para a fleet <targetLink />",
+      "collector": "Configuração de ingestão atualizada para o collector <targetLink />"
+    },
+    "restart": {
+      "fleet": "Reinicialização solicitada para a fleet <targetLink />",
+      "collector": "Reinicialização solicitada para o collector <targetLink />"
+    },
+    "discovery_run": {
+      "fleet": "Execução de descoberta iniciada para a fleet <targetLink />",
+      "collector": "Execução de descoberta iniciada para o collector <targetLink />"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> reatribuído"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> reatribuído à fleet <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "O collector será movido para esta fleet na próxima vez que fizer check-in.",
+    "moving_from": "(movendo de {{fleet}})",
+    "moving_from_removed": "(movendo de uma fleet removida)",
+    "removed_title": "Esta fleet foi excluída.",
+    "removed": "Fleet removida ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "Sincronização pendente: as alterações serão aplicadas no próximo check-in do collector",
+    "pending": "Sincronização pendente",
+    "in_sync_title": "Sincronizado: todas as alterações foram aplicadas",
+    "in_sync": "Sincronizado"
+  },
+  "instance_status": {
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "os": {
+    "unknown": "Desconhecido"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "Excluir tokens de registro",
+    "never": "Nunca",
+    "expired": "Expirado",
+    "human_name": "tokens de registro",
+    "delete_title": "Excluir token de registro",
+    "delete_confirm": "Tem certeza de que deseja excluir este token de registro? Novos Collectors não poderão se registrar usando este token. Os Collectors já registrados continuarão funcionando normalmente."
+  },
+  "deployment": {
+    "select_fleet_step": "Selecionar fleet",
+    "generate_token_step": "Gerar token",
+    "install_step": "Instalar o Collector",
+    "open_in_search": "Abrir na pesquisa",
+    "generate_token_first": "Gere um token acima para ver o comando de instalação.",
+    "copy_token_only": "Copiar apenas o token"
+  },
+  "enrolling_hosts": {
+    "receiving": "Recebendo",
+    "listening": "Aguardando…",
+    "title": "Registrando hosts",
+    "listening_subtitle": "aguardando…",
+    "view_all": "Ver todos em Instâncias",
+    "host": "Host",
+    "status": "Status",
+    "first_messages": "Primeiras mensagens",
+    "enrolled": "Registrado",
+    "actions": "Ações",
+    "hide_setup": "Ocultar configuração",
+    "view_setup": "Ver configuração",
+    "empty": "Os hosts que executarem o comando aparecem aqui conforme fazem check-in.",
+    "connection_problem": "Problemas para acessar o servidor. Tentando novamente automaticamente"
+  },
+  "token_step": {
+    "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> gerado - expira em <expiresAt />",
+    "summary_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> gerado - expira em <expiresAt /> - vinculado à fleet <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "Token <emphasis>{{tokenName}}</emphasis> gerado - não expira",
+    "summary_never_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> gerado - não expira - vinculado à fleet <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "Alterar token",
+    "short_lived": "Token de curta duração (expira em 1 dia)",
+    "custom": "Token personalizado",
+    "expiry_24_hours": "24 horas",
+    "expiry_7_days": "7 dias",
+    "expiry_30_days": "30 dias",
+    "expiry_never": "Sem expiração",
+    "name": "Nome",
+    "name_placeholder": "ex.: implantação em servidores web",
+    "custom_hint": "Tokens personalizados aparecem na aba Tokens de registro e podem ser revogados a qualquer momento.",
+    "no_permission": "Você não tem permissão para criar tokens de registro para esta fleet",
+    "generating": "Gerando...",
+    "generate": "Gerar token",
+    "select_fleet_first": "Selecione uma fleet acima primeiro."
+  },
+  "fleet_actions": {
+    "received_messages": "Mensagens recebidas",
+    "delete": "Excluir",
+    "delete_title": "Excluir fleet",
+    "delete_confirm": "Tem certeza de que deseja excluir a fleet <emphasis>{{fleetName}}</emphasis>? Suas configurações de fontes e tokens de registro serão removidos."
+  },
+  "fleet_form": {
+    "name_required": "O nome é obrigatório"
+  },
+  "fleet_settings": {},
+  "fleets": {},
+  "fleet_detail": {},
+  "instance_actions": {},
+  "reassign_fleet": {},
+  "instance_health": {},
+  "instance_drawer": {},
+  "overview": {},
+  "fleet_card": {},
+  "fleet_cards": {},
+  "recent_activity": {},
+  "collector_facts": {},
+  "connection_success": {},
+  "fleet_choice": {},
+  "ingest_endpoint": {},
+  "install_command": {},
+  "log_preview": {},
+  "next_steps": {},
+  "timeline": {},
+  "platform_picker": {},
+  "source_status": {},
+  "waiting_for_connection": {},
+  "settings": {},
+  "ingest_inputs": {},
+  "port_mismatch": {},
+  "source_types": {},
+  "source_columns": {},
+  "source_form": {},
+  "load_errors": {
+    "recent_activity": {},
+    "input_ids": {},
+    "stats": {},
+    "config": {},
+    "enrollment_tokens": {},
+    "pending_changes": {},
+    "instances": {},
+    "collector_instances": {},
+    "fleets": {},
+    "fleet": {},
+    "fleet_stats": {},
+    "sources": {},
+    "input_details": {}
+  },
+  "mutation_errors": {
+    "create_fleet": {},
+    "update_fleet": {},
+    "delete_fleet": {},
+    "create_source": {},
+    "update_source": {},
+    "delete_source": {},
+    "create_enrollment_token": {},
+    "delete_enrollment_token": {},
+    "delete_enrollment_tokens": {},
+    "reassign_instances": {},
+    "delete_instance": {},
+    "save_config": {},
+    "create_input": {},
+    "update_input": {}
+  },
+  "notifications": {},
+  "datanode": {
+    "compatibility_check": {},
+    "migration_steps_text": {},
+    "migration_welcome": {},
+    "migration_wizard": {},
+    "compatibility_status": {},
+    "in_place_migration": {},
+    "migration_data_nodes": {},
+    "manual_migration": {},
+    "stop_processing": {},
+    "journal_size_warning": {},
+    "journal_downtime": {},
+    "in_place_welcome": {},
+    "restart_graylog": {},
+    "in_place_migration_info": {},
+    "certificates_provisioning": {},
+    "jwt_authentication": {},
+    "reset_migration": {},
+    "migration_actions": {},
+    "force_start": {},
+    "rolling_upgrade_nodes": {
+      "node_status": {},
+      "state": {}
+    },
+    "opensearch_upgrade_info": {},
+    "start_upgrade": {
+      "full": {},
+      "rolling": {}
+    },
+    "opensearch_upgrade": {},
+    "client_certificate": {},
+    "cluster_health": {
+      "shard_replication_help": {},
+      "state_help": {}
+    },
+    "upgrade_method": {},
+    "upgrade_status": {},
+    "upgrade_nodes": {},
+    "data_node_actions": {},
+    "data_node_badge": {},
+    "data_node_status": {},
+    "data_node_logs": {},
+    "cluster_management": {},
+    "ca_configuration": {},
+    "ca_upload": {},
+    "ca_create": {},
+    "renewal_policy": {
+      "modes": {}
+    },
+    "details_page": {},
+    "pages": {},
+    "upgrade_page": {},
+    "migration_steps": {},
+    "migration_states": {},
+    "certificate_renewal": {
+      "renew": {},
+      "provision": {}
+    }
+  },
+  "use_collector_configurations_notifications": {},
+  "use_collectors_notifications": {}
+}
