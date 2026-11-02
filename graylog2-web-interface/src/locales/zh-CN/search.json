@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "执行搜索",
+    "perform_search_dirty": "执行搜索（上次搜索后有更改）"
+  },
+  "sidebar": {
+    "description": "描述",
+    "create": "创建",
+    "highlighting": "高亮",
+    "fields": "字段"
+  },
+  "empty_state": {
+    "no_widgets_search": "没有可用于可视化搜索结果的 Widget",
+    "no_widgets_dashboard": "此 Dashboard 还没有 Widget",
+    "create_widget_hint": "在左侧边栏的“创建”部分选择 Widget 类型，即可创建新的 Widget。",
+    "tips_title": "创建搜索和 Dashboard 的一些提示",
+    "tip_1": "从想要回答的<bold>问题</bold>开始，明确需要解决的问题。",
+    "tip_2": "<bold>限定</bold>数据范围，只保留想要查看的数据点。",
+    "tip_3": "<bold>可视化</bold>数据，看看它能否回答问题。",
+    "tip_4": "与同事<bold>共享</bold> Dashboard，并通过设置参数使其便于<bold>复用</bold>。"
+  },
+  "search_bar": {
+    "streams_placeholder": "选择搜索应包含的 Stream。若为空，则搜索所有 Stream。",
+    "refresh_human_name": "搜索",
+    "query_history_title": "打开查询历史",
+    "filters_label": "过滤器",
+    "filters_tooltip_title": "搜索过滤器",
+    "filters_enterprise_hint": "搜索过滤器和参数可在 Enterprise 版本中使用。",
+    "filters_hide_controls": "隐藏控件",
+    "scroll_hint": "滚动到搜索栏",
+    "query_placeholder": "在此输入搜索查询并按回车键。例如：(\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "已保存的搜索",
+    "save_search": "保存搜索",
+    "unsaved_changes": "未保存的更改",
+    "load_title": "加载之前保存的搜索",
+    "load": "加载",
+    "share_disabled": "只有已保存的搜索可以共享。",
+    "dropdown_aria_label": "打开搜索操作下拉菜单",
+    "edit_metadata": "编辑元数据",
+    "export_to_dashboard": "导出到 Dashboard",
+    "export": "导出",
+    "reset_search": "重置搜索",
+    "editing_modal_title": "编辑已保存的搜索",
+    "update_search": "更新搜索",
+    "share_description": "搜索用户或团队，将其添加为此已保存搜索的协作者。",
+    "save_success": "视图“{{title}}”保存成功！",
+    "save_error": "保存视图失败：{{error}}",
+    "delete_success": "已保存的搜索“{{title}}”删除成功！",
+    "delete_error": "删除已保存的搜索失败：{{error}}"
+  },
+  "save_form": {
+    "popover_title": "搜索名称",
+    "dirty_warning": "搜索参数（时间范围、Stream 或查询）有未确认的更改。现在保存将丢弃这些更改。如非本意，请先执行搜索以应用更改，再进行保存。",
+    "title_label": "标题",
+    "title_placeholder": "输入标题",
+    "share_description": "搜索用户或团队，将其添加为此搜索的协作者。",
+    "create_new": "新建",
+    "save_as": "另存为",
+    "create_new_title": "创建新搜索",
+    "save_as_title": "另存为新搜索",
+    "save": "保存",
+    "save_title": "保存搜索",
+    "cancel": "取消"
+  },
+  "results": {
+    "loading": "正在更新搜索结果..."
+  },
+  "sidebar_description": {
+    "execution": "执行",
+    "ad_hoc_info": "保存搜索或将其导出到 Dashboard，即可添加自定义摘要和描述。",
+    "edit_metadata_hint": "要为此{{viewType}}添加描述和摘要，请点击搜索栏中的 <icon/> 图标打开操作菜单，其中包含“编辑元数据”选项。",
+    "search_section": "搜索",
+    "no_summary": "此{{viewType}}没有摘要。",
+    "no_description": "此{{viewType}}没有描述。",
+    "no_query": "尚未执行任何查询。",
+    "query_executed_in": "查询执行耗时",
+    "effective_time_range": "实际时间范围",
+    "varies_per_widget": "因 Widget 而异",
+    "time_from": "开始",
+    "time_to": "结束",
+    "total_results": "结果总数"
+  },
+  "sidebar_create": {
+    "info": "使用以下选项为搜索添加聚合、日志视图（Enterprise 功能）或参数（Enterprise 功能）。",
+    "generic": "通用",
+    "predefined_aggregation": "预定义聚合",
+    "investigations": "Investigations",
+    "events": "事件"
+  },
+  "sidebar_highlighting": {
+    "description": "可以高亮显示搜索词和字段值。搜索查询结果的高亮可在服务器配置的 {{productName}} 中启用或禁用。点击任意字段值并选择“高亮此值”即可高亮该值。\n如果某个词或值有多条规则，则使用第一条匹配的规则。",
+    "active_highlights": "已启用的高亮",
+    "add_rule_title": "添加高亮规则",
+    "search_terms": "搜索词"
+  },
+  "save_view": {
+    "save": "保存",
+    "save_as": "另存为",
+    "save_as_new_dashboard_title": "另存为新 Dashboard",
+    "save_dashboard_title": "保存 Dashboard"
+  },
+  "undo_redo": {
+    "undo": "撤销",
+    "redo": "重做"
+  },
+  "time_range": {
+    "tab_relative": "相对",
+    "tab_absolute": "绝对",
+    "tab_keyword": "关键词",
+    "from_label": "开始：",
+    "until_label": "结束：",
+    "keyword_label": "关键词：",
+    "no_override": "不覆盖",
+    "now": "现在",
+    "all_time": "全部时间",
+    "ago": "前",
+    "range_ago": "{{time}} 前",
+    "range_length_placeholder": "选择时间长度",
+    "load_preset": "加载预设",
+    "no_available_presets": "没有可用的预设",
+    "loading": "加载中...",
+    "configure_presets": "配置预设",
+    "insert_current_date": "插入当前日期",
+    "from_hours_label": "从小时标签"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
