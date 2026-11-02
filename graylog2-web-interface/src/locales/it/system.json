@@ -291,28 +291,149 @@
     "cancel_confirm": "Sei sicuro di voler annullare il job di sistema \"{{info}}\"?",
     "on_node": "- su",
     "runtime": "durata: {{duration}}",
-    "cancel": "Annulla"
+    "cancel": "Annulla",
+    "acknowledge": "Conferma"
   },
-  "system_jobs_component": {},
-  "system_jobs_list": {},
-  "system_messages_component": {},
-  "system_messages_list": {},
-  "global_throughput": {},
-  "node_throughput": {},
-  "telemetry_debug_entry_row": {},
-  "telemetry_debug_overlay": {},
-  "cluster_configuration_page": {},
-  "configurations_page": {},
-  "enterprise_page": {},
-  "process_buffer_dump_page": {},
-  "show_metrics_page": {},
-  "node_page": {},
-  "system_logs_page": {},
-  "system_notifications_page": {},
-  "system_overview_page": {},
-  "thread_dump_page": {},
-  "notifications": {},
-  "use_cluster_overview_notifications": {},
-  "use_cluster_support_bundle_notifications": {},
+  "system_jobs_component": {
+    "title": "Job di sistema",
+    "description": "Un job di sistema è un'attività di lunga durata che un nodo server di {{productName}} esegue per motivi di manutenzione. Alcuni job forniscono informazioni sull'avanzamento o possono essere interrotti."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Nessun job di sistema attivo."
+  },
+  "system_messages_component": {
+    "title": "Messaggi di sistema",
+    "description": "I messaggi di sistema vengono generati dai nodi server di {{productName}} in determinati eventi che possono interessare gli amministratori di {{productName}}. Non è necessario intervenire attivamente su questi eventi, perché per ogni evento che richiede un'azione viene generata una notifica."
+  },
+  "system_messages_list": {
+    "timestamp": "Data e ora",
+    "node": "Nodo",
+    "message": "Messaggio"
+  },
+  "global_throughput": {
+    "aria_label": "Throughput: in entrata {{input}} / in uscita {{output}} msg/s",
+    "in": "in entrata",
+    "out": "in uscita"
+  },
+  "node_throughput": {
+    "loading": "Caricamento del throughput...",
+    "unable_to_load": "Impossibile caricare il throughput.",
+    "processing_long": "Elaborazione di <strong>{{totalIn}}</strong> msg/s in entrata e <strong>{{totalOut}}</strong> msg/s in uscita.",
+    "short": "In entrata {{totalIn}} / In uscita {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "Possibili PII: {{suspect}}",
+    "copy_as_json": "Copia evento come JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Debug telemetria",
+    "badge": "Debug telemetria: {{count}}",
+    "drawer_label": "Pannello di debug della telemetria",
+    "resize_label": "Ridimensiona il pannello di debug della telemetria",
+    "title": "Debug telemetria ({{count}})",
+    "filter_label": "Filtra eventi",
+    "filter_placeholder": "Filtra per nome evento o payload...",
+    "resume": "Riprendi",
+    "pause": "Metti in pausa",
+    "clear": "Cancella",
+    "export_session": "Esporta sessione",
+    "collapse": "Comprimi",
+    "no_events": "Nessun evento di telemetria registrato per ora: interagisci con l'app per vederli qui.",
+    "time": "Ora",
+    "event": "Evento",
+    "action": "Azione",
+    "status": "Stato"
+  },
+  "cluster_configuration_page": {
+    "title": "Configurazione del cluster",
+    "description": "Questa pagina fornisce una panoramica in tempo reale dei nodi del cluster. Puoi mettere in pausa l'elaborazione dei messaggi in qualsiasi momento. I process buffer non accettano nuovi messaggi finché non la riprendi. Se il journal dei messaggi è abilitato per un nodo, come avviene per impostazione predefinita, i messaggi in arrivo vengono salvati su disco anche quando l'elaborazione è disabilitata."
+  },
+  "configurations_page": {
+    "title": "Configurazioni",
+    "description": "In questa pagina puoi configurare le impostazioni di sistema per i diversi sottosistemi."
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Prova</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Scopri di più</productLink> sulle funzionalità di {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Dump del process buffer del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metriche del nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Tutti i nodi di {{productName}} forniscono un insieme di metriche interne per diagnosi, debug e monitoraggio. Puoi accedere a tutte le metriche anche tramite JMX."
+  },
+  "node_page": {
+    "title": "Nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Questa pagina mostra i dettagli di un nodo server di {{productName}} attivo e raggiungibile nel cluster.",
+    "leader_node": "Questo è il nodo leader.",
+    "not_leader_node": "Questo <em>non</em> è il nodo leader."
+  },
+  "system_logs_page": {
+    "title": "I log di sistema più recenti (limitati a {{limit}}) del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>",
+    "reload": "Ricarica",
+    "back": "Indietro",
+    "document_title": "Log di sistema del nodo {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Notifiche di sistema"
+  },
+  "system_overview_page": {
+    "title": "Panoramica del sistema"
+  },
+  "thread_dump_page": {
+    "title": "Thread dump del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Stato del load balancer modificato correttamente in '{{status}}' nel nodo '{{nodeId}}'",
+    "lb_change_failed": "Modifica dello stato del load balancer nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "lb_change_failed_title": "Impossibile modificare lo stato del load balancer in '{{status}}' nel nodo '{{nodeId}}'",
+    "processing_pause_success": "Elaborazione dei messaggi messa in pausa correttamente nel nodo '{{nodeId}}'",
+    "processing_pause_failed": "Messa in pausa dell'elaborazione dei messaggi nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "processing_pause_failed_title": "Impossibile mettere in pausa l'elaborazione dei messaggi nel nodo '{{nodeId}}'",
+    "processing_resume_success": "Elaborazione dei messaggi ripresa correttamente nel nodo '{{nodeId}}'",
+    "processing_resume_failed": "Ripresa dell'elaborazione dei messaggi nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "processing_resume_failed_title": "Impossibile riprendere l'elaborazione dei messaggi nel nodo '{{nodeId}}'",
+    "nothing_selected": "Nessuna notifica selezionata.",
+    "nothing_to_dismiss_title": "Nulla da ignorare",
+    "bulk_dismiss_failed": "Impossibile ignorare le notifiche. Riprova.",
+    "dismiss_failed": "Impossibile ignorare la notifica. Riprova.",
+    "dismiss_failed_title": "Ignorazione non riuscita",
+    "profiling_enabled": "Profilazione MongoDB attivata correttamente.",
+    "profiling_disabled": "Profilazione MongoDB disattivata correttamente.",
+    "profiling_enable_failed": "Attivazione della profilazione MongoDB non riuscita: {{error}}",
+    "profiling_disable_failed": "Disattivazione della profilazione MongoDB non riuscita: {{error}}",
+    "profiling_update_failed_title": "Impossibile aggiornare la profilazione MongoDB.",
+    "data_node_metrics_failed": "Caricamento delle metriche del Data Node \"{{hostname}}\" non riuscito",
+    "data_node_metrics_failed_title": "Impossibile caricare le metriche del Data Node.",
+    "graylog_node_metrics_failed": "Caricamento delle metriche del nodo Graylog non riuscito con stato",
+    "graylog_node_metrics_failed_title": "Impossibile caricare le metriche del nodo Graylog.",
+    "cluster_traffic_failed": "Caricamento del traffico del cluster non riuscito con stato",
+    "cluster_traffic_failed_title": "Impossibile caricare il traffico del cluster",
+    "journal_failed": "Impossibile ottenere le informazioni sul journal",
+    "system_jobs_failed": "Caricamento dei job di sistema non riuscito con stato",
+    "system_jobs_failed_title": "Impossibile caricare i job di sistema"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Recupero delle informazioni JVM per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "jvm_failed_title": "Impossibile ottenere le informazioni JVM",
+    "thread_dump_failed": "Recupero del thread dump per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "thread_dump_failed_title": "Impossibile ottenere il thread dump",
+    "process_buffer_dump_failed": "Recupero del dump del process buffer per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "process_buffer_dump_failed_title": "Impossibile ottenere il dump del process buffer",
+    "system_logs_failed": "Recupero dei messaggi di log di sistema per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "system_logs_failed_title": "Impossibile ottenere i messaggi di log di sistema",
+    "overview_failed": "Recupero della panoramica del cluster non riuscito: {{error}}",
+    "overview_failed_title": "Impossibile ottenere la panoramica del cluster"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Creazione del bundle di supporto non riuscita con stato: {{error}}",
+    "create_failed_title": "Impossibile creare il bundle di supporto."
+  },
   "use_plugin_list_notifications": {}
 }
