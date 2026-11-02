@@ -1,1 +1,11 @@
-{}
+{
+  "title": "証明書",
+  "certificate_list": "証明書の一覧",
+  "certificate_name": "名前",
+  "certificate_expiration": "有効期限",
+  "certificate_details": "詳細",
+  "certificate_status": "ステータス",
+  "certificate_active": "有効",
+  "certificate_expired": "期限切れ",
+  "certificate_revoked": "失効"
+}
