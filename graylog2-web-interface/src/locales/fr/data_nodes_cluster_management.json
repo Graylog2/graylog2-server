@@ -1,1 +1,5 @@
-{}
+{
+  "title": "Tableau de bord des Data Nodes",
+  "documentation_title": "Documentation des Data Nodes",
+  "description": "<0 /> Les Data Nodes offrent une meilleure intégration avec <0 /> et simplifient les futures mises à jour. Ils vous permettent d'indexer et de rechercher tous les messages de votre base de messages <0 />."
+}
