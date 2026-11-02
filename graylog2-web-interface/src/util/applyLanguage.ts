@@ -22,12 +22,15 @@ import 'moment/locale/fr';
 import 'moment/locale/pl';
 import 'moment/locale/pt-br';
 import 'moment/locale/zh-cn';
+import 'moment/locale/zh-tw';
+import 'moment/locale/ja';
 import 'numeral/locales/de';
 import 'numeral/locales/es';
 import 'numeral/locales/fr';
 import 'numeral/locales/pl';
 import 'numeral/locales/pt-br';
 import 'numeral/locales/chs';
+import 'numeral/locales/ja';
 
 import { changeLanguage } from 'i18n';
 import Store from 'logic/local-storage/Store';
@@ -47,9 +50,8 @@ const applyLanguage = async (language: string) => {
 
   const numeralLocale = NUMERAL_LOCALES[language] ?? language;
 
-  if (numeral.locales[numeralLocale]) {
-    numeral.locale(numeralLocale);
-  }
+  // languages without a numeral locale (e.g. zh-TW) use the default format instead of keeping the previous language's
+  numeral.locale(numeral.locales[numeralLocale] ? numeralLocale : DEFAULT_LANGUAGE);
 
   Store.set(LAST_LANGUAGE_KEY, language);
 };
