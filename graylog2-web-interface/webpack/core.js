@@ -134,7 +134,10 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
     resolve: {
       // you can now require('file') instead of require('file.coffee')
       extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
-      modules: [appPath, path.resolve(rootPath, 'node_modules'), path.resolve(rootPath, 'public')],
+      // The bare `node_modules` entry makes webpack walk up from the importing module like node does.
+      // Without it only the hoisted top-level copy is ever found, so nested versions kept apart on
+      // purpose get flattened into one, which can turn peer dependencies into require cycles.
+      modules: [appPath, 'node_modules', path.resolve(rootPath, 'node_modules'), path.resolve(rootPath, 'public')],
       alias: {
         '@graylog/server-api': path.resolve(webInterfaceRoot, 'target', 'api'),
       },
