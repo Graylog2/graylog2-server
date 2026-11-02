@@ -401,28 +401,147 @@
       "asn_fields": "Campos do banco de dados de ASN",
       "country_fields": "Campos do banco de dados de países",
       "city_fields": "Campos do banco de dados de cidades",
-      "city_additional_fields": "Além dos campos fornecidos pelo banco de dados de países, o banco de dados de cidades também inclui os seguintes campos:"
+      "city_additional_fields": "Além dos campos fornecidos pelo banco de dados de países, o banco de dados de cidades também inclui os seguintes campos:",
+      "complete_documentation": "Para a documentação completa dos campos, consulte a <docsLink>documentação para desenvolvedores</docsLink> da MaxMind"
     },
-    "database_types": {},
-    "field_set": {},
-    "summary": {}
+    "database_types": {
+      "asn": "Banco de dados de ASN",
+      "city": "Banco de dados de cidades",
+      "country": "Banco de dados de países",
+      "ipinfo_location": "Banco de dados de localização do IPinfo",
+      "ipinfo_asn": "Banco de dados de ASN do IPinfo"
+    },
+    "field_set": {
+      "file_path": "Caminho do arquivo",
+      "file_path_help": "O caminho para o arquivo do banco de dados.",
+      "database_type": "Tipo de banco de dados",
+      "database_type_help": "Selecione o tipo do arquivo do banco de dados",
+      "database_type_placeholder": "Selecione o tipo do arquivo do banco de dados",
+      "refresh_file": "Atualizar arquivo",
+      "refresh_file_help": "Se habilitado, o arquivo do banco de dados é verificado quanto a modificações e atualizado quando for alterado no disco."
+    },
+    "summary": {
+      "database_file_path": "Caminho do arquivo do banco de dados",
+      "database_type": "Tipo de banco de dados",
+      "check_interval": "Intervalo de verificação"
+    }
   },
-  "abs_geoip": {},
-  "gcs_geoip": {},
-  "geoip_resolver": {},
-  "links": {},
-  "quick_jump": {},
-  "scratchpad": {},
-  "extractor_actions": {},
-  "surrounding_search": {},
-  "support_sources": {},
-  "times_list": {},
-  "widget_visualization_not_found": {},
-  "telemetry": {},
-  "app_facade": {},
-  "suggest_reload": {},
-  "footer": {},
-  "notifications": {},
+  "abs_geoip": {
+    "container_name": "Nome do contêiner do Azure Blob",
+    "container_name_help": "O nome do seu contêiner do Azure Blob.",
+    "endpoint_url": "URL do endpoint do Azure Blob",
+    "endpoint_url_help": "A URL do endpoint do seu Azure Blob, necessária apenas se você quiser substituir o endpoint padrão.",
+    "account_name": "Nome da conta do Azure",
+    "account_name_placeholder": "nome-da-sua-conta",
+    "account_name_help": "O nome da sua conta de armazenamento do Azure.",
+    "account_key_reset": "Chave da conta do Azure",
+    "reset_password": "Redefinir senha",
+    "account_key": "Chave da conta do Azure",
+    "account_key_help": "A chave da conta da sua conta de armazenamento do Azure."
+  },
+  "gcs_geoip": {
+    "project_id": "ID do projeto do Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Configuração do processador de geolocalização",
+    "description": "O plugin Processador de geolocalização analisa todas as mensagens em busca de campos que contenham <bold>exclusivamente</bold> um endereço IP e coloca as informações de geolocalização (coordenadas, código ISO do país e nome da cidade) em campos diferentes. Leia mais na <docsLink>documentação</docsLink>.",
+    "enabled_summary": "Habilitado:",
+    "enforce_schema_summary": "Impor esquema padrão:",
+    "vendor_type_summary": "Tipo de fornecedor do banco de dados:",
+    "city_db_path_summary": "Caminho do banco de dados de cidades:",
+    "asn_db_path_summary": "Caminho do banco de dados de ASN:",
+    "refresh_interval_summary": "Intervalo de atualização do banco de dados:",
+    "pull_from_cloud_summary": "Obter arquivos do bucket de armazenamento em nuvem:",
+    "edit": "Editar configuração",
+    "modal_title": "Atualizar configuração do processador de geolocalização",
+    "enable_processor": "Habilitar processador de geolocalização",
+    "enforce_schema": "Impor esquema padrão",
+    "vendor_select": "Selecione o fornecedor do banco de dados GeoIP",
+    "city_db_path": "Caminho para o banco de dados de cidades",
+    "asn_db_path": "Caminho para o banco de dados de ASN",
+    "refresh_interval": "Intervalo de atualização do banco de dados",
+    "refresh_interval_help": "Intervalo em que os arquivos do banco de dados são verificados quanto a modificações. Alterações no disco são detectadas e atualizadas.",
+    "pull_from_cloud": "Obter arquivos do bucket de armazenamento em nuvem",
+    "select_cloud_storage": "Selecione o armazenamento em nuvem",
+    "update_configuration": "Atualizar configuração",
+    "updating_configuration": "Atualizando configuração..."
+  },
+  "links": {
+    "documentation": "documentação"
+  },
+  "quick_jump": {
+    "title": "Acesso rápido",
+    "open": "Abrir acesso rápido",
+    "search_placeholder": "Pesquisar páginas/dashboards/streams ...",
+    "intro": "Digite uma consulta de pesquisa para encontrar uma página, stream, dashboard, input ou outros itens.",
+    "intro_hint": "Para você começar mais rápido, abaixo está uma lista dos itens <bold>abertos recentemente</bold> e dos <bold>favoritos</bold>:",
+    "no_results": "Nenhum resultado encontrado. Tente outros termos de pesquisa.",
+    "recent": "Recentes"
+  },
+  "scratchpad": {
+    "title": "Bloco de notas",
+    "status_cleared": "Limpo.",
+    "status_auto_saved": "Salvo automaticamente.",
+    "got_it": "Entendi!",
+    "sensitive_warning": "Recomendamos que você <bold>não</bold> armazene informações confidenciais, como senhas, nesta área.",
+    "help_overlay": "Você pode usar este espaço para guardar anotações pessoais e outras informações, sem sair da janela do navegador. Por exemplo, guarde timestamps, IDs de usuário ou endereços IP necessários em diferentes investigações.",
+    "copy": "Copiar",
+    "clear": "Limpar",
+    "clear_confirm": "Isso vai limpar o conteúdo do seu Bloco de notas. Deseja continuar?"
+  },
+  "extractor_actions": {
+    "select_type": "Selecione o tipo de extrator",
+    "only_string_fields": "Os extratores só podem ser usados com campos de texto."
+  },
+  "surrounding_search": {
+    "button": "Exibir mensagens próximas"
+  },
+  "support_sources": {
+    "title": "Precisa de ajuda?",
+    "help_text": "Não hesite em consultar a comunidade do {{productName}} caso suas dúvidas não sejam respondidas na <docsLink>documentação</docsLink>.",
+    "community_support": "Suporte da comunidade",
+    "issue_tracker": "Rastreador de problemas",
+    "professional_support": "Suporte profissional"
+  },
+  "times_list": {
+    "title": "Configuração de horário",
+    "description": "Lidar com fusos horários pode ser confuso. Aqui você pode ver o fuso horário aplicado aos diferentes componentes do seu sistema. Você pode verificar as configurações de fuso horário de nós específicos do servidor {{productName}} na página de detalhes de cada um.",
+    "user": "Usuário <bold>{{username}}</bold>:",
+    "web_browser": "Seu navegador:",
+    "server": "Servidor {{productName}}:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Visualização do widget (<italic>{{widgetClassName}}</italic>) não encontrada. Parece que o plugin que fornece este widget não está carregado."
+  },
+  "telemetry": {
+    "title": "Telemetria",
+    "enable_label": "Habilitar telemetria",
+    "enabled_checkbox": "habilitada",
+    "update_preferences": "Atualizar preferências",
+    "update_button": "Atualizar telemetria",
+    "info_modal_title": "Ajude a melhorar o {{productName}}",
+    "ok": "OK",
+    "info": "Gostaríamos de coletar dados de uso anônimos para nos ajudar a priorizar melhorias e tornar o {{productName}} melhor no futuro.",
+    "no_personal_data": "Não coletamos dados pessoais, informações confidenciais nem conteúdos, como logs, das suas instâncias.",
+    "learn_more": "Saiba mais na nossa <privacyLink>Política de Privacidade</privacyLink>.",
+    "turn_off_profile": "Você pode desativar ou ativar a coleta de dados a qualquer momento <bold>no perfil do usuário</bold>.",
+    "turn_off_here": "Você pode desativar ou ativar a coleta de dados a qualquer momento aqui."
+  },
+  "app_facade": {
+    "preparing": "Estamos preparando a interface web para você..."
+  },
+  "suggest_reload": {
+    "title": "A versão do {{productName}} foi alterada",
+    "version_changed": "Sua versão do {{productName}} foi alterada de <bold>{{version}}</bold> para <bold>{{newVersion}}</bold>.",
+    "save_work": "Salve seu trabalho e recarregue a página para evitar erros.",
+    "reload_now": "Recarregar agora"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} em {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Falha no download com o status: {{error}}"
+  },
   "use_favorite_item_mutation_notifications": {},
   "use_entity_titles_notifications": {},
   "use_search_version_check_notifications": {}
