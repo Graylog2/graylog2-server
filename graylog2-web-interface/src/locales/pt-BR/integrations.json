@@ -503,7 +503,19 @@
   "tor_exit_node_adapter_summary": {
     "no_configuration": "Nenhuma configuração necessária"
   },
-  "whois_adapter_documentation": {},
-  "whois_adapter_field_set": {},
-  "whois_adapter_summary": {}
+  "whois_adapter_documentation": {
+    "intro": "O adaptador de dados de consulta de IP whois pode solicitar informações de propriedade de rede de um endereço IP.",
+    "configuration_title": "Configuração",
+    "connect_timeout_description": "O tempo limite de conexão do socket com o servidor whois, em milissegundos. Se você definir um valor alto, isso pode afetar o desempenho do processamento.",
+    "read_timeout_description": "O tempo limite de leitura da conexão do socket com o servidor whois, em milissegundos. Se você definir um valor alto, isso pode afetar o desempenho do processamento."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Tempo limite de conexão",
+    "connect_timeout_help": "Tempo limite de conexão do WHOIS, em milissegundos.",
+    "read_timeout_label": "Tempo limite de leitura",
+    "read_timeout_help": "Tempo limite de leitura da conexão do WHOIS, em milissegundos."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
 }
