@@ -19,6 +19,7 @@
   },
   "input_states": {
     "title": "{{title}} 的 Input 状态",
+    "count_other": "{{count}} 个{{state}}",
     "CREATED": "已创建",
     "INITIALIZED": "已初始化",
     "INVALID_CONFIGURATION": "配置无效",
@@ -368,16 +369,80 @@
       "no_messages_per_stream": "过去 24 小时内没有 Stream 接收到来自此 Input 的消息。",
       "stream": "Stream",
       "messages": "消息",
-      "network_io": "网络 I/O："
+      "network_io": "网络 I/O：",
+      "total_prefix": " （总计：",
+      "total_suffix": " ）",
+      "empty_messages_discarded": "已丢弃的空消息：{{value}}",
+      "no_node_metrics": "此节点没有可用的指标",
+      "no_input_metrics": "此 Input 没有可用的指标",
+      "show_details": "显示详细信息",
+      "hide_details": "隐藏详细信息"
     },
-    "actions": {}
+    "actions": {
+      "received_messages": "已接收的消息",
+      "input_diagnosis": "Input 诊断",
+      "exit_setup_mode": "退出设置模式",
+      "enter_setup_mode": "进入设置模式",
+      "show_metrics": "显示指标",
+      "delete_input": "删除 Input",
+      "delete_title": "删除 Input",
+      "delete_confirm": "您确定要删除 Input {{title}} 吗？"
+    }
   },
-  "dot_badge": {},
-  "use_input_notifications": {},
-  "use_input_details_notifications": {},
-  "use_input_metrics_notifications": {},
-  "use_input_state_summary_notifications": {},
-  "use_input_state_mutations_notifications": {},
-  "use_input_mutations_notifications": {},
-  "use_inputs_notifications": {}
+  "dot_badge": {
+    "problematic_inputs": "部分 Input 处于失败状态或设置模式。"
+  },
+  "use_input_notifications": {
+    "load_failed": "加载 Input 失败，状态：",
+    "load_failed_title": "无法加载 Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "加载 Input 详细信息失败，状态：",
+    "load_failed_title": "无法加载 Input 详细信息"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "加载 Input 指标失败，状态：",
+    "load_failed_title": "无法加载 Input 指标"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "加载 Input 状态摘要失败，状态：",
+    "load_failed_title": "无法加载 Input 状态摘要。"
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "启动 Input “{{title}}”时出错：{{error}}",
+    "start_failed_title": "无法启动 Input “{{title}}”",
+    "started_success": "Input 已成功启动。",
+    "stop_failed": "停止 Input “{{title}}”时出错：{{error}}",
+    "stop_failed_title": "无法停止 Input “{{title}}”",
+    "stopped_success": "Input 已成功停止。",
+    "setup_failed": "将 Input “{{title}}”切换到设置模式时出错：{{error}}",
+    "setup_failed_title": "无法将 Input “{{title}}”设置为设置模式",
+    "deleted_success": "Input 已成功删除。",
+    "success_title": "成功！"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "保存 Input 失败，状态：{{error}}",
+    "save_failed_title": "无法保存 Input",
+    "update_failed": "更新 Input 失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Input",
+    "delete_failed": "删除 Input 失败，状态：{{error}}",
+    "delete_failed_title": "无法删除 Input",
+    "created_success": "Input 已成功创建。",
+    "updated_success": "Input 已成功更新。",
+    "deleted_success": "Input 已成功删除。",
+    "success_title": "成功！"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input “{{title}}”已成功启动",
+    "launch_failed": "启动 Input “{{title}}”失败，状态：{{error}}",
+    "launch_failed_title": "无法启动 Input",
+    "updated_success": "Input “{{title}}”已成功更新",
+    "update_failed": "更新 Input “{{title}}”失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Input",
+    "deleted_success": "Input “{{title}}”已成功删除",
+    "delete_failed": "删除 Input “{{title}}”失败，状态：{{error}}",
+    "delete_failed_title": "无法删除 Input",
+    "fetch_failed": "获取 Input 失败，状态：{{error}}",
+    "fetch_failed_title": "无法获取 Input"
+  }
 }
