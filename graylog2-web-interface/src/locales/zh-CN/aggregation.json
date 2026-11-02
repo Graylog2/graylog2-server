@@ -15,7 +15,8 @@
     "color_hint": "颜色提示",
     "select_all_fields": "选择所有字段",
     "deselect_all_fields": "取消选择所有字段",
-    "field_required": "字段为必填项。"
+    "field_required": "字段为必填项。",
+    "must_be_greater_than_other": "必须大于 0。"
   },
   "wizard_grouping": {
     "settings": "设置",
@@ -115,24 +116,121 @@
     "axis_label_or_color": "至少需要为一个坐标轴定义标签或颜色。",
     "type_required": "类型为必填项。"
   },
-  "builder_empty": {},
-  "vis_types": {},
-  "vis_validation": {},
-  "vis_common": {
-    "interpolation_types": {},
-    "axis_types": {}
+  "builder_empty": {
+    "title": "空聚合",
+    "editing": "现在正在编辑组件。",
+    "add_metric_hint": "要查看结果，请至少添加一个指标。您可以通过添加行或列对数据进行分组。",
+    "preview_hint": "您可以点击“{{button}}”预览组件的搜索结果。",
+    "finish_hint": "完成时，点击“{{update}}”保存更改，点击“{{cancel}}”放弃更改。",
+    "edit_hint_interactive": "请<editButton>编辑</editButton>组件以在此处查看结果。",
+    "edit_hint": "请编辑组件以在此处查看结果。"
   },
-  "vis_heatmap": {},
-  "vis_worldmap": {},
+  "vis_types": {
+    "area_chart": "面积图",
+    "bar_chart": "柱状图",
+    "heatmap": "热力图",
+    "line_chart": "折线图",
+    "network_graph": "网络图",
+    "pie_chart": "饼图",
+    "sankey": "桑基图",
+    "scatter_plot": "散点图",
+    "single_number": "单个数值",
+    "world_map": "世界地图"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "面积图至少需要一个指标",
+    "bar_chart_requires_metric": "柱状图至少需要一个指标",
+    "line_chart_requires_metric": "折线图至少需要一个指标",
+    "pie_chart_requires_metric": "饼图至少需要一个指标",
+    "scatter_plot_requires_metric": "散点图至少需要一个指标",
+    "sankey_requires_groupings": "桑基图至少需要两个分组字段。",
+    "sankey_single_metric": "桑基图仅支持单个指标。",
+    "network_requires_groupings": "网络图至少需要两个分组字段。"
+  },
+  "vis_common": {
+    "interpolation": "插值",
+    "interpolation_types": {
+      "linear": "线性",
+      "step-after": "阶梯后",
+      "spline": "样条"
+    },
+    "axis_type": "坐标轴类型",
+    "axis_types": {
+      "linear": "线性",
+      "logarithmic": "对数"
+    },
+    "color_scale": "颜色比例",
+    "reverse_scale": "反转比例",
+    "show_axis_labels": "显示坐标轴标签",
+    "x_axis": "X 轴",
+    "y_axis_number": "Y 轴 - 数值",
+    "y_axis_percent": "Y 轴 - 百分比",
+    "y_axis_time": "Y 轴 - 时间",
+    "y_axis_size": "Y 轴 - 大小",
+    "color_hint": "颜色提示",
+    "legend_configuration": "{{label}} 的配置"
+  },
+  "vis_heatmap": {
+    "auto_scale": "自动缩放",
+    "min": "最小值",
+    "max": "最大值",
+    "use_smallest_as_default": "使用最小值作为默认值",
+    "default_value": "默认值"
+  },
+  "vis_worldmap": {
+    "zoom": "缩放",
+    "latitude": "纬度",
+    "longitude": "经度",
+    "name": "名称",
+    "coordinates": "坐标：",
+    "value": "值："
+  },
   "vis_bar": {
-    "modes": {},
-    "mode_help": {}
+    "mode": "模式",
+    "modes": {
+      "group": "分组",
+      "stack": "堆叠",
+      "relative": "相对",
+      "overlay": "叠加"
+    },
+    "mode_help": {
+      "group": "每个系列在图表中由各自的柱子表示。",
+      "stack": "所有系列相互堆叠，合并为一个柱子。",
+      "relative": "所有系列相互堆叠，合并为一个图表。但负值系列会放置在零值以下。",
+      "overlay": "所有系列以柱子的形式相互叠放。为了便于看清柱子，透明度降低至 75%。建议此选项用于不超过 3 个系列的情况。"
+    }
   },
   "vis_number": {
-    "trend_preferences": {},
-    "highlight_options": {}
+    "trend": "趋势",
+    "trend_description": "显示此数值的趋势信息。",
+    "trend_help_enabled": "如果用户启用趋势，当前值下方会显示一个单独的区块，通过图标以及当前值与前一个值之间的绝对差和相对差来指示变化方向。",
+    "trend_help_previous": "前一个值通过在后台执行两次搜索计算得出，两次搜索除时间范围外完全相同。第一次搜索的时间范围与此查询或此组件配置的时间范围相同，第二次搜索的时间范围长度相同，但向过去偏移一个时间范围长度。",
+    "trend_preference": "趋势偏好",
+    "trend_preferences": {
+      "LOWER": "较低",
+      "NEUTRAL": "中性",
+      "HIGHER": "较高"
+    },
+    "highlight": "高亮",
+    "highlight_options": {
+      "TREND_ONLY": "仅趋势信息",
+      "FULL_WIDGET": "整个组件"
+    },
+    "not_available": "N/A",
+    "trend_label": "趋势：{{absolute}}（{{relative}}），相比前一个值 {{previous}}",
+    "previous_value": "前一个值：{{previous}}"
   },
-  "vis_popover": {},
-  "vis_network": {},
-  "vis_sankey": {}
+  "vis_popover": {
+    "related_values": "相关值",
+    "data_points": "数据点",
+    "metric": "指标",
+    "groupings": "分组",
+    "back": "返回"
+  },
+  "vis_network": {
+    "no_connections": "没有可显示的连接。请调整搜索或分组以查看结果。"
+  },
+  "vis_sankey": {
+    "no_flows": "没有可显示的流。请调整搜索或分组以查看结果。"
+  }
 }
