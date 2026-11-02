@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "使用者名稱",
-    "first_name": "名字"
+    "first_name": "名字",
+    "last_name": "姓氏",
+    "full_name": "全名",
+    "email": "電子郵件地址",
+    "password": "密碼",
+    "repeat_password": "重複密碼",
+    "time_zone": "時區",
+    "sessions_timeout": "工作階段逾時",
+    "profile": "個人資料",
+    "settings": "設定",
+    "roles": "角色",
+    "assign_roles": "指派角色",
+    "selected_roles": "已選取的角色",
+    "teams": "團隊"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "使用者的名字。",
+    "last_name_help": "使用者的姓氏。",
+    "email_help": "使用者的電子郵件地址。",
+    "username_help": "選擇用於登入的唯一使用者名稱。",
+    "username_taken": "使用者名稱已被使用",
+    "passwords_mismatch": "密碼不符",
+    "time_zone_help": "請選擇您所在的時區，或保留預設值以使用瀏覽器的預設時區。",
+    "service_account": "服務帳戶",
+    "service_account_label": "此使用者為服務帳戶",
+    "service_account_help": "勾選後，此使用者將成為服務帳戶，無法登入網頁介面或編輯其設定（例如：API 權杖）。",
+    "service_account_confirm_title": "您確定嗎？",
+    "service_account_confirm": "將此使用者變更為服務帳戶後，該使用者將無法登入網頁介面或編輯其設定（例如：API 權杖）。是否要繼續？",
+    "global_timeout_message": "由於已啟用<timeoutLink>全域工作階段逾時</timeoutLink>，無法編輯使用者的工作階段逾時設定。"
+  },
+  "token_form": {
+    "token_name": "權杖名稱",
+    "placeholder": "此權杖的用途是什麼？",
+    "ttl_label": "權杖 TTL",
+    "ttl_invalid": "無效（最小值：1 分鐘）",
+    "creating": "建立中...",
+    "create": "建立權杖",
+    "ttl_help": "TTL 語法範例：60 秒為 PT60S，60 分鐘為 PT60M，24 小時為 PT24H，30 天為 P30D"
+  },
+  "permissions_info": {
+    "title": "授予權限",
+    "text": "可使用項目的 <shareLabel>共用</shareLabel> 按鈕設定 Stream 與儀表板等項目的權限授予。例如可在項目總覽頁面找到此按鈕。詳細資訊請參閱 <docsLink>說明文件</docsLink>。"
+  },
   "startpage": {
-    "types": {}
+    "label": "起始頁面",
+    "help": "選擇使用者登入後立即看到的頁面。僅能選擇使用者具有權限的項目。",
+    "select_type": "選擇類型",
+    "select_value": "選擇{{type, lowercase}}",
+    "entity": "項目",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "搜尋"
+    },
+    "new_search": "新搜尋",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "使用者缺少所設定頁面的權限"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "工作階段逾時",
+    "alert_title": "變更工作階段逾時設定",
+    "alert_text": "變更工作階段的逾時設定將登出使用者，並使其所有目前的工作階段失效。若您變更的是自己的使用者設定，儲存設定時將立即登出。在此情況下，請先儲存所有待處理的變更，再變更逾時設定。",
+    "never_label": "工作階段不會逾時",
+    "never_help": "勾選後，工作階段不會因閒置而逾時。",
+    "amount_placeholder": "逾時時間",
+    "help": "工作階段在經過此時間後自動結束，除非仍在使用中。",
+    "unit_label": "逾時單位",
+    "units": {
+      "seconds": "秒",
+      "minutes": "分鐘",
+      "hours": "小時",
+      "days": "天"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "用戶端位址",
+    "last_activity": "上次活動",
+    "logged_in": "已登入",
+    "enabled": "已啟用",
+    "auth_service_disabled": "驗證服務已停用，使用者無法登入",
+    "preferences": {
+      "title": "偏好設定",
+      "search_autocompletion": "搜尋自動完成",
+      "update_unfocused": "未聚焦時更新",
+      "pin_search_sidebar": "釘選搜尋側邊欄",
+      "pin_dashboard_sidebar": "釘選儀表板側邊欄",
+      "theme_mode": "主題模式",
+      "not_configured": "未設定",
+      "language": "語言"
+    },
+    "roles_none_selected": "找不到所選的角色。",
+    "settings": {
+      "timezone": "時區",
+      "startpage": "起始頁面",
+      "no_startpage": "未設定起始頁面",
+      "no_timeout": "工作階段不會逾時",
+      "globally_set": "（<configLink>全域設定</configLink>）"
+    },
+    "shared_entities": "共用項目"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "用於初次建立工作階段的用戶端位址，不一定是其目前的位址。",
+    "admin": {
+      "title": "系統管理員",
+      "description": "系統管理員只能在 {{productName}} 設定檔中編輯。"
+    },
+    "headers": {
+      "full_name": "全名",
+      "username": "使用者名稱",
+      "email": "電子郵件地址",
+      "client_address": "用戶端位址",
+      "enabled": "已啟用",
+      "role": "角色",
+      "actions": "操作"
+    },
+    "title": "使用者",
+    "found": "系統中找到 {{total}} 位已註冊的使用者。",
+    "none_found": "未找到任何使用者。",
+    "filter_label": "篩選使用者",
+    "actions": {
+      "edit_tokens_title": "編輯使用者 {{name}} 的權杖",
+      "edit_tokens": "編輯權杖",
+      "system_user_tooltip": "系統使用者只能在伺服器設定檔中修改。",
+      "system_user": "系統使用者",
+      "confirm_disable": "您確定要停用使用者 {{name}} 嗎？所有目前的工作階段都將被終止。",
+      "confirm_delete": "您確定要刪除使用者 {{name}} 嗎？",
+      "edit_title": "編輯使用者 {{name}}",
+      "edit": "編輯"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
