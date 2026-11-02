@@ -1,1 +1,158 @@
-{}
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "無法取得索引總覽",
+      "description": "無法取得索引總覽資訊。這通常表示連線至索引器時發生問題，<strong>請確認索引器正常運作，且可從 {{productName}} 連線</strong>。",
+      "journal_info": "訊息仍會儲存在日誌中，但在索引器再次可連線之前，無法搜尋這些訊息。"
+    },
+    "header": {
+      "index_set_title": "Index Set：{{title}}",
+      "documentation_link": "索引模型說明文件",
+      "edit_button": "編輯 Index Set",
+      "description": "這是此 Index Set 中目前納入搜尋與分析範圍的所有索引（訊息儲存區）總覽。"
+    },
+    "indices_info": {
+      "summary": "共管理 {{count}} 個索引，總計 {{messageCount}} 則訊息，目前寫入中的索引為 <i>{{currentTarget}}</i>。"
+    },
+    "document_title": "Index Set - {{title}}"
+  },
+  "indexers": {
+    "cluster_health": {
+      "title": "{{distribution}} 叢集",
+      "docs_open_search": "OpenSearch 設定說明文件",
+      "docs_elasticsearch": "Elasticsearch 設定說明文件",
+      "error": "無法取得 {{distribution}} 叢集健康狀態。擷取 {{distribution}} 叢集健康狀態失敗：{{message}}",
+      "status": "{{distribution}} 叢集 {{name}} 狀態為 {{status}}。",
+      "shards": "分片：{{active}} 個運作中、{{initializing}} 個初始化中、{{relocating}} 個搬移中、{{unassigned}} 個未指派，",
+      "what_does_this_mean": "這代表什麼？"
+    },
+    "failures": {
+      "none": "過去 24 小時內沒有失敗的索引嘗試。",
+      "show_errors": "顯示錯誤",
+      "title": "索引器失敗",
+      "docs": "索引器失敗說明文件",
+      "description": "每則未成功建立索引的訊息，都會記錄為索引器失敗。",
+      "none_hurray": "太好了！目前沒有任何索引器失敗。",
+      "timestamp": "時間戳記",
+      "index": "索引",
+      "letter_id": "Letter ID",
+      "error_message": "錯誤訊息"
+    },
+    "system_overview": {
+      "looking_for_failures": "正在搜尋索引失敗紀錄...",
+      "license_load_failed": "無法載入授權資訊",
+      "error_title": "錯誤"
+    }
+  },
+  "indices": {
+    "maintenance": {
+      "title": "維護",
+      "recalculate_all": "清理並重新計算所有索引範圍",
+      "check_versions": "檢查索引版本",
+      "confirm_recalculate_all": "這將清理並重新計算所有現有的索引範圍。是否要繼續？"
+    },
+    "closed_index": {
+      "info": "此索引已關閉，目前無法取得索引資訊，請重新開啟索引後再試一次。",
+      "reopen": "重新開啟索引",
+      "delete": "刪除索引",
+      "confirm_delete": "確定要刪除索引 {{indexName}} 嗎？"
+    },
+    "create_index_set": {
+      "submit": "建立 Index Set",
+      "submit_loading": "正在建立 Index Set..."
+    },
+    "incompatible_modal": {
+      "title": "索引版本",
+      "upgrade_blocked": "目前存在不相容的索引，因此無法將此叢集升級至 OpenSearch 3.x，因為這麼做將造成破壞性影響。",
+      "upgrade_path": "建議的升級路徑是使用提供的精靈，<migrationLink>從 OpenSearch 遷移至 Data Node</migrationLink>（<docsLink>說明文件</docsLink>），接著使用內建的 Data Node 升級自動化功能繼續進行。",
+      "opens_in_new_tab": " (在新分頁中開啟)",
+      "unsupported_direct_upgrade": "基於所涉風險，當存在不相容的索引時，{{productName}} 目前不支援從 OpenSearch 2.x 直接升級至 3.x。後續版本將新增此路徑的支援；若情況緊急，請與 {{productName}} 聯絡，洽談專業服務合作。",
+      "support_until": "OpenSearch 2.x 將支援至 2027 年 11 月。",
+      "info": "在搜尋後端可升級至下一個主要版本之前，所有以不相容的舊主要版本 OpenSearch 建立的索引，都必須先封存、刪除或重新索引。",
+      "close": "關閉"
+    },
+    "details": {
+      "confirm_recalculate": "確定要重新計算索引 {{indexName}} 的索引範圍嗎？",
+      "recalculate_failed": "無法為 {{indexName}} 建立開始重新計算索引範圍的工作",
+      "recalculate_failed_title": "為 {{indexName}} 啟動索引範圍重新計算時發生錯誤",
+      "confirm_delete": "確定要刪除索引 {{indexName}} 嗎？",
+      "active_write_index": "無法刪除目前寫入中的索引",
+      "recalculate": "重新計算索引範圍",
+      "delete": "刪除索引",
+      "stats": "{{segments}} 個區段、{{contexts}} 個開啟中的搜尋內容、{{deleted}} 則已刪除的訊息",
+      "primary_shard_operations": "主要分片操作",
+      "total_shard_operations": "分片操作總計"
+    },
+    "maintenance_strategies": {
+      "time_based_size_optimizing_help": "依時間最佳化大小的輪替策略會嘗試每天輪替索引。不過，為了讓索引大小保持最佳，它可以略過輪替，將分片大小維持在可接受的範圍內。最佳化可在已設定的保留期限最小／最大存活時間範圍內延後輪替。若索引存在時間超過最小與最大值之間的範圍，無論目前大小為何都會進行輪替。",
+      "max_retention_warning": "根據<b>輪替週期</b>與<b>索引數量上限</b>計算出的有效保留期間，不應大於管理員設定的<b>最長保留期間</b> <b>{{maxRetentionPeriod}}</b>。",
+      "deactivated": "{{name}} 策略已停用，請設定有效的保留策略。",
+      "summary_not_found": "找不到策略 {{strategy}} 的摘要！"
+    },
+    "range_summary": {
+      "none": "沒有可用的索引範圍。",
+      "recalculated": "範圍已於 <relativeTime /> 重新計算，耗時 {{ms}} 毫秒。"
+    },
+    "section": {
+      "indices": "索引：",
+      "shards": "分片：",
+      "total_size": "總大小："
+    }
+  },
+  "index_set_form": {
+    "configuration_information": "設定資訊",
+    "title_label": "標題",
+    "title_help": "Index Set 的描述性名稱。",
+    "description_label": "描述",
+    "description_help": "新增此 Index Set 的描述。",
+    "details": "詳細資訊",
+    "shards_label": "索引分片",
+    "shards_help": "此 Index Set 中每個索引使用的搜尋叢集分片數量。增加索引分片數量，可將目前寫入中的索引分散到多個搜尋節點，進而提升寫入此 Index Set 資料的速度。但增加索引分片數量可能降低搜尋效能，並增加索引的記憶體用量。此值不應高於搜尋節點數量。",
+    "replicas_label": "索引副本",
+    "replicas_help": "此 Index Set 中每個索引使用的搜尋叢集副本分片數量。新增副本分片可在平行讀取索引時（例如儀表板載入時）提升搜尋效能，也是高可用性與備份策略的一環。每組副本分片都會成倍增加索引的儲存需求與記憶體用量。此值不應高於搜尋節點數量，通常也不應高於 1。",
+    "max_segments_label": "區段數量上限",
+    "max_segments_help": "<em>進階選項。</em>最佳化（強制合併）後，每個搜尋叢集索引的區段數量上限。設定較高的值會降低索引最佳化的壓縮比率。",
+    "disable_optimization_label": "輪替後停用索引最佳化",
+    "disable_optimization_help": "<em>進階選項。</em>索引最佳化是在目前寫入中的索引完成輪替後進行的壓縮程序，可縮減索引在磁碟上的大小。它表現為搜尋叢集在索引輪替後執行的高 CPU 維護作業。壓縮索引可提升搜尋效能，並降低 Index Set 的儲存空間用量。",
+    "field_type_refresh_label": "欄位類型重新整理間隔",
+    "field_type_refresh_help": "<em>進階選項。</em>目前寫入中索引的欄位類型資訊更新頻率。將此值設定得較高，可稍微降低搜尋叢集負載並提升效能，但新資料訊息需要更長時間才能在 {{productName}} 中搜尋到。",
+    "field_type_profile": "欄位類型設定檔",
+    "important_note": "重要注意事項",
+    "important_note_text": "這些變更不會套用至現有的索引，只會套用至新建立的索引。若要立即將此設定套用至目前的 Index Set，請輪替索引。",
+    "save": "儲存",
+    "prefix_label": "索引前綴",
+    "prefix_help": "用於此 Index Set 所屬索引的<strong>唯一</strong>前綴。前綴必須以字母或數字開頭，且只能包含字母、數字、'_'、'-' 與 '+'。",
+    "prefix_error_empty": "索引前綴無效：不可為空白",
+    "prefix_error_start": "索引前綴無效：必須以字母或數字開頭",
+    "prefix_error_lower_case": "索引前綴無效：必須為小寫",
+    "prefix_error_chars": "索引前綴無效：只能包含字母、數字、'_'、'-' 與 '+'",
+    "analyzer_label": "分析器",
+    "analyzer_help": "此 Index Set 的分析器。",
+    "rotation_retention": "輪替與保留",
+    "segment_data_tiering": "Data Tiering",
+    "segment_legacy": "舊版（已棄用）",
+    "rotation_title": "索引輪替設定",
+    "rotation_description": "多個索引用來儲存文件，您可以設定策略，決定何時輪替目前寫入中的索引。",
+    "rotation_placeholder": "選擇輪替策略"
+  },
+  "deletion_form": {},
+  "set_details": {},
+  "profiles": {},
+  "field_types": {},
+  "templates": {},
+  "overview_table": {},
+  "index_summary": {},
+  "indices_configuration": {},
+  "shards": {},
+  "data_tiering": {},
+  "incompatible": {},
+  "strategies": {},
+  "pages": {},
+  "navigation": {},
+  "maintenance_dialog": {},
+  "hooks": {},
+  "notifications": {},
+  "use_index_set_stats_notifications": {},
+  "use_indexer_overview_notifications": {},
+  "use_indices_configuration_notifications": {}
+}
