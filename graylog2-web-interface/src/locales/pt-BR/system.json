@@ -182,7 +182,10 @@
   },
   "journal_state": {
     "loading": "Carregando métricas do journal...",
-    "unavailable": "Métricas do journal indisponíveis."
+    "unavailable": "Métricas do journal indisponíveis.",
+    "summary_one": "O journal contém <strong>{{messages}} mensagens não processadas</strong> em {{count}} segmento. <strong>{{appended}} mensagens</strong> anexadas e <strong>{{read}} mensagens</strong> lidas no último segundo.",
+    "summary_other": "O journal contém <strong>{{messages}} mensagens não processadas</strong> em {{count}} segmentos. <strong>{{appended}} mensagens</strong> anexadas e <strong>{{read}} mensagens</strong> lidas no último segundo.",
+    "summary_many": "O journal contém <strong>{{messages}} mensagens não processadas</strong> em {{count}} segmentos. <strong>{{appended}} mensagens</strong> anexadas e <strong>{{read}} mensagens</strong> lidas no último segundo."
   },
   "jvm_heap_usage": {
     "loading": "Carregando informações de uso do heap...",
@@ -197,6 +200,10 @@
     "configure_internal_logging": "Configurar log interno"
   },
   "node_overview": {
+    "plugins_installed_one": "{{count}} plugin instalado",
+    "plugins_installed_other": "{{count}} plugins instalados",
+    "inputs_running_one": "{{count}} input em execução neste nó",
+    "inputs_running_other": "{{count}} inputs em execução neste nó",
     "memory_heap_usage": "Uso de memória/heap",
     "buffers": "Buffers",
     "buffers_description": "Os buffers são criados para armazenar em cache pequenas quantidades de mensagens por um período muito curto (geralmente milissegundos) enquanto passam pelos diferentes processadores.",
@@ -209,7 +216,9 @@
     "rest_api": "API REST",
     "installed_plugins": "Plugins instalados",
     "manage_inputs": "Gerenciar inputs",
-    "available_input_types": "Tipos de input disponíveis"
+    "available_input_types": "Tipos de input disponíveis",
+    "plugins_installed_many": "{{count}} plugins instalados",
+    "inputs_running_many": "{{count}} inputs em execução neste nó"
   },
   "nodes_actions": {
     "details": "Detalhes",
@@ -229,7 +238,10 @@
     "recent_system_logs": "Obter mensagens recentes do log do sistema"
   },
   "nodes_list": {
-    "no_active_nodes": "Não há nós ativos."
+    "active_nodes_one": "Há {{count}} nó ativo",
+    "active_nodes_other": "Há {{count}} nós ativos",
+    "no_active_nodes": "Não há nós ativos.",
+    "active_nodes_many": "Há {{count}} nós ativos"
   },
   "plugins_data_table": {
     "loading": "Carregando plugins neste nó...",
@@ -364,7 +376,10 @@
   },
   "show_metrics_page": {
     "title": "Métricas do nó {{shortNodeId}} / {{hostname}}",
-    "description": "Todos os nós do {{productName}} fornecem um conjunto de métricas internas para diagnóstico, depuração e monitoramento. Observe que você também pode acessar todas as métricas via JMX."
+    "description": "Todos os nós do {{productName}} fornecem um conjunto de métricas internas para diagnóstico, depuração e monitoramento. Observe que você também pode acessar todas as métricas via JMX.",
+    "total_metrics_one": "Este nó está reportando um total de {{count}} métrica.",
+    "total_metrics_other": "Este nó está reportando um total de {{count}} métricas.",
+    "total_metrics_many": "Este nó está reportando um total de {{count}} métricas."
   },
   "node_page": {
     "title": "Nó {{shortNodeId}} / {{hostname}}",
@@ -433,7 +448,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "Falha ao criar o Bundle de suporte com o status: {{error}}",
-    "create_failed_title": "Não foi possível criar o Bundle de suporte."
+    "create_failed_title": "Não foi possível criar o Bundle de suporte.",
+    "delete_failed": "Falha ao excluir o Bundle de suporte com o status: {{error}}",
+    "delete_failed_title": "Não foi possível excluir o Bundle de suporte.",
+    "download_failed": "Falha ao baixar o Bundle de suporte com o status: {{error}}",
+    "download_failed_title": "Não foi possível baixar o Bundle de suporte.",
+    "load_list_failed": "Falha ao carregar a lista de Bundles de suporte com o status",
+    "load_list_failed_title": "Não foi possível carregar a lista de Bundles de suporte."
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Falha ao obter os plugins do nó \"{{nodeId}}\"",
+    "fetch_failed_title": "Não foi possível obter os plugins"
+  }
 }
