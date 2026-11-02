@@ -41,6 +41,12 @@ describe('translateApiError', () => {
     expect(translateApiError(undefined)).toBeUndefined();
   });
 
+  it('finds codes of the enterprise namespace', () => {
+    i18n.addResourceBundle('en', 'enterprise_server_errors', { 'enterprise.test.gone': 'Gone: {{id}}' }, true, true);
+
+    expect(translateApiError(error({ code: 'enterprise.test.gone', params: { id: 7 } }))).toBe('Gone: 7');
+  });
+
   it('follows the language', async () => {
     await i18n.changeLanguage('de');
 

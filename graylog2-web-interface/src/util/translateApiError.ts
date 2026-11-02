@@ -16,8 +16,15 @@
  */
 import i18n from 'i18n';
 
-const NAMESPACE = 'server_errors';
-const LOOKUP_OPTIONS = { ns: NAMESPACE, keySeparator: false, nsSeparator: false } as const;
+/** Namespaces searched for error codes, in this order. Plugins (e.g. enterprise) register their own, with prefixed codes. */
+const NAMESPACES = ['server_errors', 'enterprise_server_errors'];
+const LOOKUP_OPTIONS = { keySeparator: false, nsSeparator: false } as const;
+
+const translateCode = (code: string, params: Record<string, unknown>): string | undefined => {
+  const ns = NAMESPACES.find((namespace) => i18n.exists(code, { ns: namespace, ...LOOKUP_OPTIONS }));
+
+  return ns ? (i18n.t(code, { ...params, ns, ...LOOKUP_OPTIONS }) as string) : undefined;
+};
 
 type CodedBody = { code?: unknown; message?: unknown; params?: unknown };
 
@@ -39,24 +46,20 @@ const translateApiError = (error: unknown): string | undefined => {
   const body = bodyOf(error);
   const code = body?.code;
 
-  if (typeof code !== 'string' || !i18n.exists(code, LOOKUP_OPTIONS)) {
+  if (typeof code !== 'string') {
     return undefined;
   }
 
   const params = body?.params && typeof body.params === 'object' ? (body.params as Record<string, unknown>) : {};
 
-  return i18n.t(code, { ...params, ...LOOKUP_OPTIONS }) as string;
+  return translateCode(code, params);
 };
 
 type ErrorDetail = { code?: string; message?: string; params?: Record<string, unknown> };
 type ValidationResultBody = { errors?: Record<string, Array<string>>; error_details?: Record<string, Array<ErrorDetail>> };
 
 const translateDetail = (detail: ErrorDetail): string | undefined => {
-  if (typeof detail.code !== 'string' || !i18n.exists(detail.code, LOOKUP_OPTIONS)) {
-    return undefined;
-  }
-
-  return i18n.t(detail.code, { ...detail.params, ...LOOKUP_OPTIONS }) as string;
+  return typeof detail.code === 'string' ? translateCode(detail.code, detail.params ?? {}) : undefined;
 };
 
 /**
