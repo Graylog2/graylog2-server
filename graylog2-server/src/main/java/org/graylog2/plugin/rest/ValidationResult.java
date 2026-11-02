@@ -17,6 +17,7 @@
 package org.graylog2.plugin.rest;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -29,12 +30,34 @@ public class ValidationResult {
 
     private final Multimap<String, String> errors = ArrayListMultimap.create();
     private final Multimap<String, String> context = ArrayListMultimap.create();
+    private final Multimap<String, ErrorDetail> errorDetails = ArrayListMultimap.create();
+
+    /**
+     * Error code and placeholder values of an error, so that the web interface can show it in the language of the user.
+     * The message is the same English text which is in {@code errors}.
+     */
+    @JsonAutoDetect
+    public record ErrorDetail(@JsonProperty("code") String code,
+                              @JsonProperty("message") String message,
+                              @JsonProperty("params") Map<String, Object> params) {
+    }
 
 
     public ValidationResult addError(String fieldName, String error) {
         errors.put(fieldName, error);
         return this;
     }
+
+    /**
+     * Adds an error with a stable code. The English message is part of {@code errors} as before, the code and the
+     * parameters are additionally sent as {@code error_details}.
+     */
+    public ValidationResult addError(String fieldName, String code, String message, Map<String, Object> params) {
+        errors.put(fieldName, message);
+        errorDetails.put(fieldName, new ErrorDetail(code, message, Map.copyOf(params)));
+        return this;
+    }
+
     public ValidationResult addContext(String fieldName, Iterable<String> values) {
         context.putAll(fieldName, values);
         return this;
@@ -47,6 +70,7 @@ public class ValidationResult {
 
     public ValidationResult addAll(ValidationResult validationResult) {
         errors.putAll(validationResult.errors);
+        errorDetails.putAll(validationResult.errorDetails);
         context.putAll(validationResult.context);
         return this;
     }
@@ -59,6 +83,12 @@ public class ValidationResult {
     @JsonProperty("errors")
     public Map<String, Collection<String>> getErrors() {
         return errors.asMap();
+    }
+
+    @JsonProperty("error_details")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public Map<String, Collection<ErrorDetail>> getErrorDetails() {
+        return errorDetails.asMap();
     }
 
     @JsonProperty("error_context")
