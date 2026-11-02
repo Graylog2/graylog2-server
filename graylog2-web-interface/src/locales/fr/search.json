@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "Lancer la recherche",
+    "perform_search_dirty": "Lancer la recherche (des modifications ont été faites après la dernière exécution)"
+  },
+  "sidebar": {
+    "description": "Description",
+    "create": "Créer",
+    "highlighting": "Mise en évidence",
+    "fields": "Champs"
+  },
+  "empty_state": {
+    "no_widgets_search": "Aucun widget n'est défini pour visualiser le résultat de la recherche",
+    "no_widgets_dashboard": "Ce dashboard n'a pas encore de widget",
+    "create_widget_hint": "Créez un nouveau widget en sélectionnant un type de widget dans la section « Créer » de la barre latérale gauche.",
+    "tips_title": "Quelques conseils pour créer des recherches et des dashboards",
+    "tip_1": "Commencez par une <bold>question</bold> à laquelle vous souhaitez répondre. Définissez le problème que vous voulez résoudre.",
+    "tip_2": "<bold>Limitez</bold> les données aux seuls points de données que vous souhaitez voir.",
+    "tip_3": "<bold>Visualisez</bold> les données. Répondent-elles à votre question ?",
+    "tip_4": "<bold>Partagez</bold> le dashboard avec vos collègues. Préparez-le pour une <bold>réutilisation</bold> en utilisant des paramètres"
+  },
+  "search_bar": {
+    "streams_placeholder": "Sélectionnez les streams à inclure dans la recherche. La recherche porte sur tous les streams si aucun n'est sélectionné.",
+    "refresh_human_name": "Rechercher",
+    "query_history_title": "Ouvrir l'historique des requêtes",
+    "filters_label": "Filtres",
+    "filters_tooltip_title": "Filtres de recherche",
+    "filters_enterprise_hint": "Les filtres et paramètres de recherche sont disponibles dans la version Enterprise.",
+    "filters_hide_controls": "Masquer les commandes",
+    "scroll_hint": "Faire défiler jusqu'à la barre de recherche",
+    "query_placeholder": "Saisissez votre requête de recherche ici puis appuyez sur Entrée. Ex. : (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Recherche enregistrée",
+    "save_search": "Enregistrer la recherche",
+    "unsaved_changes": "Modifications non enregistrées",
+    "load_title": "Charger une recherche précédemment enregistrée",
+    "load": "Charger",
+    "share_disabled": "Seules les recherches enregistrées peuvent être partagées.",
+    "dropdown_aria_label": "Ouvrir le menu d'actions de recherche",
+    "edit_metadata": "Modifier les métadonnées",
+    "export_to_dashboard": "Exporter vers un dashboard",
+    "export": "Exporter",
+    "reset_search": "Réinitialiser la recherche",
+    "editing_modal_title": "Modification de la recherche enregistrée",
+    "update_search": "Mettre à jour la recherche",
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter comme collaborateur de cette recherche enregistrée.",
+    "save_success": "L'enregistrement de la vue « {{title}} » a réussi !",
+    "save_error": "Échec de l'enregistrement de la vue : {{error}}",
+    "delete_success": "La suppression de la recherche enregistrée « {{title}} » a réussi !",
+    "delete_error": "Échec de la suppression de la recherche enregistrée : {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Nom de la recherche",
+    "dirty_warning": "Des modifications non confirmées ont été apportées aux paramètres de recherche (plage de temps, streams ou requête). Enregistrer maintenant les supprimera. Si ce n'est pas intentionnel, exécutez la recherche pour appliquer vos modifications avant d'enregistrer.",
+    "title_label": "Titre",
+    "title_placeholder": "Saisissez un titre",
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter comme collaborateur de cette recherche.",
+    "create_new": "Créer une nouvelle",
+    "save_as": "Enregistrer sous",
+    "create_new_title": "Créer une nouvelle recherche",
+    "save_as_title": "Enregistrer sous une nouvelle recherche",
+    "save": "Enregistrer",
+    "save_title": "Enregistrer la recherche",
+    "cancel": "Annuler"
+  },
+  "results": {
+    "loading": "Mise à jour des résultats de recherche..."
+  },
+  "sidebar_description": {
+    "execution": "Exécution",
+    "ad_hoc_info": "Enregistrez la recherche ou exportez-la vers un dashboard pour ajouter un résumé et une description personnalisés.",
+    "edit_metadata_hint": "Pour ajouter une description et un résumé pour ce {{viewType}}, cliquez sur l'icône <icon/> dans la barre de recherche pour ouvrir son menu d'actions. Ce menu contient l'option « Modifier les métadonnées ».",
+    "search_section": "Recherche",
+    "no_summary": "Ce {{viewType}} n'a pas de résumé.",
+    "no_description": "Ce {{viewType}} n'a pas de description.",
+    "no_query": "Aucune requête exécutée pour le moment.",
+    "query_executed_in": "Requête exécutée en",
+    "effective_time_range": "Plage de temps effective",
+    "varies_per_widget": "Varie selon le widget",
+    "time_from": "Du",
+    "time_to": "Au",
+    "total_results": "Nombre total de résultats"
+  },
+  "sidebar_create": {
+    "info": "Utilisez les options suivantes pour ajouter une agrégation, une vue de logs (fonctionnalité Enterprise) ou des paramètres (fonctionnalité Enterprise) à votre recherche.",
+    "generic": "Générique",
+    "predefined_aggregation": "Agrégation prédéfinie",
+    "investigations": "Investigations",
+    "events": "Événements"
+  },
+  "sidebar_highlighting": {
+    "description": "Les termes de recherche et les valeurs de champs peuvent être mis en évidence. La mise en évidence de la requête de recherche dans les résultats peut être activée ou désactivée dans la configuration du serveur {{productName}}. Toute valeur de champ peut être mise en évidence en cliquant sur la valeur et en sélectionnant « Mettre cette valeur en évidence ».\nSi un terme ou une valeur possède plusieurs règles, la première règle correspondante est utilisée.",
+    "active_highlights": "Mises en évidence actives",
+    "add_rule_title": "Ajouter une règle de mise en évidence",
+    "search_terms": "Termes de recherche"
+  },
+  "save_view": {
+    "save": "Enregistrer",
+    "save_as": "Enregistrer sous",
+    "save_as_new_dashboard_title": "Enregistrer sous un nouveau dashboard",
+    "save_dashboard_title": "Enregistrer le dashboard"
+  },
+  "undo_redo": {
+    "undo": "Annuler",
+    "redo": "Rétablir"
+  },
+  "time_range": {
+    "tab_relative": "Relative",
+    "tab_absolute": "Absolue",
+    "tab_keyword": "Mot-clé",
+    "from_label": "Du :",
+    "until_label": "Au :",
+    "keyword_label": "Mot-clé :",
+    "no_override": "Aucune substitution",
+    "now": "Maintenant",
+    "all_time": "Toute la période",
+    "ago": "avant",
+    "range_ago": "il y a {{time}}",
+    "range_length_placeholder": "Sélectionnez une durée",
+    "load_preset": "Charger un préréglage",
+    "no_available_presets": "Aucun préréglage disponible",
+    "loading": "Chargement...",
+    "configure_presets": "Configurer les préréglages",
+    "insert_current_date": "Insérer la date actuelle",
+    "from_hours_label": "Depuis les heures"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
