@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "Nom d'utilisateur",
-    "first_name": "Prénom"
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "full_name": "Nom complet",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "repeat_password": "Répéter le mot de passe",
+    "time_zone": "Fuseau horaire",
+    "sessions_timeout": "Expiration des sessions",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "roles": "Rôles",
+    "assign_roles": "Attribuer des rôles",
+    "selected_roles": "Rôles sélectionnés",
+    "teams": "Équipes"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "Le prénom de l'utilisateur.",
+    "last_name_help": "Le nom de l'utilisateur.",
+    "email_help": "L'adresse e-mail de l'utilisateur.",
+    "username_help": "Choisissez un nom d'utilisateur unique, utilisé pour se connecter.",
+    "username_taken": "Ce nom d'utilisateur est déjà utilisé",
+    "passwords_mismatch": "Les mots de passe ne correspondent pas",
+    "time_zone_help": "Choisissez votre fuseau horaire local ou laissez-le tel quel pour utiliser celui du navigateur.",
+    "service_account": "Compte de service",
+    "service_account_label": "L'utilisateur est un compte de service",
+    "service_account_help": "Lorsque cette case est cochée, l'utilisateur devient un compte de service et ne pourra plus se connecter à l'interface web ni modifier ses paramètres (par exemple, jetons API).",
+    "service_account_confirm_title": "Êtes-vous sûr ?",
+    "service_account_confirm": "Transformer cet utilisateur en compte de service l'empêchera de se connecter à l'interface web et de modifier ses paramètres (par exemple, jetons API). Voulez-vous continuer ?",
+    "global_timeout_message": "L'expiration de session de l'utilisateur ne peut pas être modifiée, car le <timeoutLink>délai d'expiration global des sessions</timeoutLink> est activé."
+  },
+  "token_form": {
+    "token_name": "Nom du jeton",
+    "placeholder": "À quoi sert ce jeton ?",
+    "ttl_label": "Durée de vie du jeton (TTL)",
+    "ttl_invalid": "invalide (min : 1 minute)",
+    "creating": "Création en cours...",
+    "create": "Créer le jeton",
+    "ttl_help": "Exemples de syntaxe TTL : pour 60 secondes : PT60S, pour 60 minutes : PT60M, pour 24 heures : PT24H, pour 30 jours : P30D"
+  },
+  "permissions_info": {
+    "title": "Attribution des autorisations",
+    "text": "L'attribution d'autorisations pour un élément, comme un flux ou un tableau de bord, se configure à l'aide du bouton <shareLabel>Partager</shareLabel> de l'élément. Vous trouverez ce bouton, par exemple, sur la page de vue d'ensemble des éléments. En savoir plus dans la <docsLink>documentation</docsLink>."
+  },
   "startpage": {
-    "types": {}
+    "label": "Page d'accueil",
+    "help": "Sélectionnez la page que l'utilisateur voit juste après sa connexion. Seuls les éléments pour lesquels l'utilisateur dispose d'autorisations peuvent être sélectionnés.",
+    "select_type": "Sélectionner un type",
+    "select_value": "Sélectionner {{type, lowercase}}",
+    "entity": "élément",
+    "types": {
+      "dashboard": "Tableau de bord",
+      "stream": "Stream",
+      "search": "Recherche"
+    },
+    "new_search": "Nouvelle recherche",
+    "threat_coverage": "Couverture des menaces",
+    "missing_permission": "L'utilisateur n'a pas l'autorisation d'accéder à la page configurée"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "Expiration des sessions",
+    "alert_title": "Modification de l'expiration des sessions",
+    "alert_text": "La modification du délai d'expiration des sessions déconnectera l'utilisateur et invalidera toutes ses sessions en cours. Si vous modifiez ce paramètre pour votre propre compte, vous serez déconnecté au moment de l'enregistrement. Dans ce cas, pensez à enregistrer d'abord les modifications en attente avant de changer le délai d'expiration.",
+    "never_label": "Les sessions n'expirent jamais",
+    "never_help": "Lorsque cette case est cochée, les sessions n'expirent jamais en raison de l'inactivité.",
+    "amount_placeholder": "Durée d'expiration",
+    "help": "La session se termine automatiquement après cette durée, sauf si elle est activement utilisée.",
+    "unit_label": "Unité d'expiration",
+    "units": {
+      "seconds": "Secondes",
+      "minutes": "Minutes",
+      "hours": "Heures",
+      "days": "Jours"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "Adresse du client",
+    "last_activity": "Dernière activité",
+    "logged_in": "Connecté",
+    "enabled": "Activé",
+    "auth_service_disabled": "Le service d'authentification est désactivé, l'utilisateur ne peut pas se connecter",
+    "preferences": {
+      "title": "Préférences",
+      "search_autocompletion": "Saisie semi-automatique de la recherche",
+      "update_unfocused": "Mise à jour hors focus",
+      "pin_search_sidebar": "Épingler le panneau latéral de recherche",
+      "pin_dashboard_sidebar": "Épingler le panneau latéral des tableaux de bord",
+      "theme_mode": "Mode du thème",
+      "not_configured": "Non configuré",
+      "language": "Langue"
+    },
+    "roles_none_selected": "Aucun rôle sélectionné n'a été trouvé.",
+    "settings": {
+      "timezone": "Fuseau horaire",
+      "startpage": "Page d'accueil",
+      "no_startpage": "Aucune page d'accueil définie",
+      "no_timeout": "Les sessions n'expirent pas",
+      "globally_set": "(<configLink>défini globalement</configLink>)"
+    },
+    "shared_entities": "Éléments partagés"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "L'adresse du client utilisée pour établir la session initialement, qui n'est pas forcément son adresse actuelle.",
+    "admin": {
+      "title": "Administrateur système",
+      "description": "L'administrateur système ne peut être modifié que dans le fichier de configuration de {{productName}}."
+    },
+    "headers": {
+      "full_name": "Nom complet",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse e-mail",
+      "client_address": "Adresse du client",
+      "enabled": "Activé",
+      "role": "Rôle",
+      "actions": "Actions"
+    },
+    "title": "Utilisateurs",
+    "found": "{{total}} utilisateurs enregistrés trouvés sur le système.",
+    "none_found": "Aucun utilisateur n'a été trouvé.",
+    "filter_label": "Filtrer les utilisateurs",
+    "actions": {
+      "edit_tokens_title": "Modifier les jetons de l'utilisateur {{name}}",
+      "edit_tokens": "Modifier les jetons",
+      "system_user_tooltip": "Les utilisateurs système ne peuvent être modifiés que dans le fichier de configuration du serveur.",
+      "system_user": "Utilisateur système",
+      "confirm_disable": "Voulez-vous vraiment désactiver l'utilisateur {{name}} ? Toutes les sessions en cours seront interrompues.",
+      "confirm_delete": "Voulez-vous vraiment supprimer l'utilisateur {{name}} ?",
+      "edit_title": "Modifier l'utilisateur {{name}}",
+      "edit": "Modifier"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
