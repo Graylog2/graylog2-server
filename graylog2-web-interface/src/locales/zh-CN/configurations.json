@@ -117,6 +117,7 @@
     "auto_refresh_options": "自动刷新间隔选项",
     "auto_refresh_options_help": "将 <strong>自动刷新</strong> 间隔选择器的可用选项配置为 <strong>ISO8601 时长</strong>",
     "auto_refresh_options_title": "自动刷新间隔选项",
+    "cancel_after_seconds_other": "{{count}} 秒",
     "cancellation_timeout": "取消超时",
     "cancellation_timeout_description": "每个组件在此时间（秒）后将自动取消搜索执行。这可以减少执行的搜索数量并提高性能。",
     "default_auto_refresh_interval": "默认自动刷新间隔",
@@ -231,7 +232,20 @@
     "description": "欢迎页面可以显示消息、告警和事件计数组件，以及热门来源图表。在大型或繁忙的集群上，每次用户打开欢迎页面时，这些查询都会增加额外负载。如果希望避免此负载，请在下方禁用它们。组件将被隐藏，其查询也不会运行。",
     "enable_metrics": "启用欢迎页面指标",
     "enable_metrics_help": "禁用后，消息、告警和事件计数组件以及热门来源图表将从欢迎页面隐藏，其底层查询也不会运行。在大型或繁忙的集群上关闭此项可减少查询负载。",
-    "metrics": "欢迎页面指标"
+    "metrics": "欢迎页面指标",
+    "title": "欢迎页面",
+    "update_title": "更新欢迎页面配置"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "索引默认值配置已成功更新",
+    "index_defaults_failed_title": "索引默认值配置更新失败",
+    "update_success": "配置已成功更新",
+    "search_update_failed": "搜索配置更新失败：{{error}}",
+    "search_update_failed_title": "无法更新搜索配置：{{configType}}",
+    "allowlist_update_success": "URL 允许列表配置已成功更新",
+    "allowlist_update_failed": "URL 允许列表配置更新失败：{{error}}",
+    "allowlist_update_failed_title": "无法更新 URL 允许列表：{{configType}}",
+    "processors_update_failed": "消息处理器配置更新失败：{{error}}",
+    "processors_update_failed_title": "无法更新配置：{{configType}}"
+  }
 }
