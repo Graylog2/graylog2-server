@@ -553,32 +553,154 @@
       "title": "无法删除注册令牌"
     },
     "reassign_instances": {
-      "message": "重新分配实例失败：{{error}}"
+      "message": "重新分配实例失败：{{error}}",
+      "title": "无法重新分配实例"
     },
-    "delete_instance": {},
-    "save_config": {},
-    "create_input": {},
-    "update_input": {}
+    "delete_instance": {
+      "message": "删除实例失败：{{error}}",
+      "title": "无法删除实例"
+    },
+    "save_config": {
+      "message": "保存 Collectors 配置失败：{{error}}",
+      "title": "无法保存配置"
+    },
+    "create_input": {
+      "message": "创建 Collector 接收 Input 失败：{{error}}",
+      "title": "无法创建 Collector 接收 Input"
+    },
+    "update_input": {
+      "message": "更新 Collector 接收 Input 失败：{{error}}",
+      "title": "无法更新 Collector 接收 Input"
+    }
   },
-  "notifications": {},
+  "notifications": {
+    "success_title": "成功！",
+    "fleet_created": "Fleet “{{name}}” 已创建。",
+    "fleet_updated": "Fleet “{{name}}” 已更新。",
+    "fleet_deleted": "Fleet 已删除。",
+    "source_created": "数据源“{{name}}”已创建。",
+    "source_updated": "数据源“{{name}}”已更新。",
+    "source_deleted": "数据源已删除。",
+    "enrollment_token_deleted": "注册令牌已删除。",
+    "enrollment_tokens_deleted": "注册令牌已删除。",
+    "instances_reassigned": "实例已重新分配。",
+    "instance_deleted": "实例已删除。",
+    "config_saved": "Collectors 配置已保存。",
+    "input_created": "Collector 接收 Input 已创建。",
+    "input_moved": "Collector 接收 Input 已移至新端口。"
+  },
   "datanode": {
-    "compatibility_check": {},
-    "migration_steps_text": {},
-    "migration_welcome": {},
-    "migration_wizard": {},
-    "compatibility_status": {},
-    "in_place_migration": {},
-    "migration_data_nodes": {},
-    "manual_migration": {},
-    "stop_processing": {},
-    "journal_size_warning": {},
-    "journal_downtime": {},
-    "in_place_welcome": {},
-    "restart_graylog": {},
-    "in_place_migration_info": {},
-    "certificates_provisioning": {},
-    "jwt_authentication": {},
-    "reset_migration": {},
+    "compatibility_check": {
+      "compatible": "现有的 OpenSearch 数据可以迁移到 Data Node。",
+      "error": "检查兼容性时出错",
+      "incompatible": "现有的 OpenSearch 数据无法迁移到 Data Node。",
+      "loading": "正在加载兼容性检查结果...",
+      "title": "目录兼容性检查",
+      "version_incompatible": "您的 OpenSearch 集群与此 Data Node 版本不兼容，无法迁移。"
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "继续之前，请先创建证书续期策略。",
+      "finished": "迁移已完成！",
+      "ca_step_required": "继续之前，请先创建证书颁发机构（CA）。"
+    },
+    "migration_welcome": {
+      "earlier_deployments": "v5.2 之前的部署，或选择不随 Data Node 一起安装的部署，需要将消息数据库迁移到 Data Nodes。",
+      "incompatible_backend": "搜索后端不兼容。请升级到 OpenSearch 以使用迁移向导。",
+      "intro": "{{productName}} Data Node 是一个管理组件，用于配置和优化与 {{productName}} 配合使用的 OpenSearch，从而减少管理开销并简化后续升级。",
+      "more_information": "您可以在 Data Node 迁移<docsLink>文档</docsLink>中获取更多信息。",
+      "required_steps": "迁移到 Data Node 需要在操作系统、当前 OS/ES 集群以及配置文件中执行一些步骤。",
+      "title": "Data Nodes 迁移",
+      "tool_description": "此迁移工具将检查各组件的兼容性，并引导您将现有 OpenSearch 数据迁移到 Data Node。"
+    },
+    "migration_wizard": {
+      "loading": "正在加载 ..."
+    },
+    "compatibility_status": {
+      "creation_date": "创建日期",
+      "datanode_opensearch_version": "Datanode OpenSearch 版本",
+      "index_version": "索引版本",
+      "indices": "索引",
+      "opensearch_data_location": "OpenSearch 数据位置",
+      "shards": "分片"
+    },
+    "in_place_migration": {
+      "description": "按照以下步骤将现有的 OpenSearch 2.x 或 1.3.x 集群迁移到 Data Nodes。",
+      "title": "原地迁移"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "证书有效期至",
+      "hostname": "主机名",
+      "incompatible": "发现运行中的 Data Nodes 版本与您当前的 {{productName}} 版本不兼容。请确保 {{productName}} 和 Data Node 使用相同版本。",
+      "incompatible_title": "发现不兼容的 Data Nodes",
+      "loading": "正在加载 Data Nodes",
+      "looking": "正在查找 Data Nodes...",
+      "no_certificate": "无证书",
+      "none_found": "未找到任何 Data Nodes。",
+      "none_found_title": "未找到 Data Nodes",
+      "start_data_node": "请至少启动一个 Data Node 以继续迁移过程。您可以在<docsLink>文档</docsLink>中找到有关启动 Data Nodes 的更多信息。",
+      "status": "状态",
+      "transport_address": "传输地址",
+      "version": "版本",
+      "version_incompatible": "此版本与您当前的 {{productName}} 版本不兼容。"
+    },
+    "manual_migration": {
+      "migration_type": "迁移类型",
+      "migration_type_help": "您要执行的迁移类型。",
+      "select_migration_type": "选择迁移类型"
+    },
+    "stop_processing": {
+      "change_owner": "如果您通过将 Data Node 指向其数据目录来迁移现有的 OpenSearch 数据，请确保将数据目录的所有者更改为运行 Data Node 的用户（通常为 graylog-datanode），并重新设置正确的权限，例如通过运行",
+      "stop_cluster": "继续之前，请先停止您的 OpenSearch 集群。",
+      "stop_opensearch": "停止 OpenSearch",
+      "stopped": "{{productName}} 处理已停止。"
+    },
+    "journal_size_warning": {
+      "description": "请注意，迁移期间您必须停止 {{productName}} 节点上的处理，这将导致 Journal 增大。因此，您需要在 Journal 大小缩减步骤或更早之前增加 Journal 卷的大小。",
+      "title": "Journal 大小警告"
+    },
+    "journal_downtime": {
+      "current_size": "当前 Journal 大小为：<bold>{{size}} MB</bold>，当前 Journal 吞吐量为：<bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "估算 Journal 吞吐量时出错：{{message}}",
+      "increase_size": "因此您可能需要增加 Journal 卷的大小。",
+      "max_downtime": "当前将 {{productName}} 重新配置为指向 Data Node 的最长停机时间为：<bold>{{duration}}</bold>",
+      "processing_stops": "请注意，迁移期间您的 {{productName}} 节点将停止数据处理，这将导致 Journal 增大。",
+      "sufficient_size": "继续之前，请确保 Journal 卷的大小足够。",
+      "title": "Journal 停机大小警告"
+    },
+    "in_place_welcome": {
+      "description": "原地迁移会将现有集群的数据文件夹迁移到 Data Node 集群。",
+      "install": "开始前，请在之前设置中的每个 OS/ES 节点上安装 Data Node。您可以在<docsLink>此处</docsLink>找到有关下载和安装 Data Node 的更多信息。",
+      "title": "欢迎"
+    },
+    "restart_graylog": {
+      "almost_there": "即将完成！",
+      "example": "例如，",
+      "remove_hosts": "请从您的 <codeSnippet>server.conf</codeSnippet> 中删除 <codeSnippet>elasticsearch_hosts</codeSnippet> 这一行",
+      "restart": "完成后，请重启 {{productName}} 以完成迁移。",
+      "wait_for_available": "请等待所有 Data Nodes 变为“AVAILABLE”状态。如果它们在 1-2 分钟内仍未变为可用状态，请检查 Data Node 的日志。"
+    },
+    "in_place_migration_info": {
+      "configuration": "对于原地迁移，请确保 Data Nodes 在 <codeSnippet>datanode.conf</codeSnippet> 中的配置（特别是 <codeSnippet>opensearch_data_location</codeSnippet> 配置项）在每个节点上都指向正确的现有 OpenSearch 数据目录。",
+      "permissions": "迁移期间，Data Node 和 OpenSearch 的系统用户都需要能够访问并写入数据目录。为确保这一点，例如，您可以运行"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "证书颁发机构已成功配置。",
+      "finished": "Data Node 的配置已完成。",
+      "loading": "正在加载迁移状态。",
+      "provision_now": "您现在可以为 Data Nodes 配置证书。",
+      "provisioning": "正在配置证书"
+    },
+    "jwt_authentication": {
+      "add_snippet": "为此，请将以下代码片段添加到您的 <codeSnippet>opensearch-security/config.yml</codeSnippet> 中",
+      "description": "根据您保护现有集群的方式，需要对安全配置进行一些前期更改。我们使用 JWT 身份验证从 {{productName}} 访问 OpenSearch。在下一步中，您必须在现有 OpenSearch 集群中手动启用 JWT 身份验证，以确保可以在 Data Node 中访问数据。",
+      "replace_signing_key": "请使用 base64 编码后的 <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> 替换签名密钥。编码时，您可以运行",
+      "title": "JWT 身份验证"
+    },
+    "reset_migration": {
+      "button": "重置迁移",
+      "confirm": "确定要重置迁移吗？",
+      "failed": "重置迁移状态失败，状态码：{{error}}"
+    },
     "migration_actions": {},
     "force_start": {},
     "rolling_upgrade_nodes": {
