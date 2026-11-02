@@ -1,1 +1,56 @@
-{}
+{
+  "loading_inputs": "正在加载 Input...",
+  "no_inputs_available": "没有可用的 Input",
+  "message_input_label": "消息 Input",
+  "message_input_optional": "（可选）",
+  "message_input_help": "选择应分配给解析后消息的消息 Input ID。",
+  "message_input_aria_label": "消息 Input",
+  "select_input_placeholder": "选择 Input",
+  "forwarder_input_selection_label": "Forwarder Input 选择",
+  "forwarder_input_selection_optional": "（可选）",
+  "forwarder_input_selection_description": "从下方列表中选择一个 Input profile，然后选择一个 Input。",
+  "input_selection_legend": "Input 选择",
+  "input_selection_optional": "（可选）",
+  "select_input_type_label": "选择 Input 类型",
+  "select_input_type_optional": "（可选）",
+  "select_input_type_help": "选择用于加载消息的 Input 类型。",
+  "select_input_type_placeholder": "选择 Input 类型",
+  "server_input": "Server Input",
+  "forwarder_input": "Forwarder Input",
+  "load_raw_message_error_title": "无法加载原始消息",
+  "load_raw_message_error_description": "请确保所选编解码器及其配置正确。更多信息请查看服务器日志。",
+  "load_raw_message_failed_status": "加载原始消息失败，状态：{{error}}",
+  "loading_codec_types": "正在加载编解码器类型...",
+  "no_codecs_available": "没有可用的编解码器",
+  "raw_message_label": "原始消息",
+  "source_ip_address_label": "源 IP 地址",
+  "source_ip_address_optional": "（可选）",
+  "source_ip_address_help": "用作消息来源的远程 IP 地址。{{productName}} 默认将使用 {{defaultRemoteAddress}}。",
+  "codec_configuration_legend": "编解码器配置",
+  "message_codec_label": "消息编解码器",
+  "message_codec_help": "选择用于解码消息的编解码器。",
+  "select_codec_placeholder": "选择编解码器",
+  "load_message_button": "加载消息",
+  "loading_message_button": "正在加载消息...",
+  "tabs": {
+    "recent": "最近消息",
+    "message_id": "消息 ID",
+    "raw": "原始消息",
+    "message_id_description": "请在此表单中提供要加载的消息的 ID 和索引：",
+    "raw_description": "从文本加载消息，就像它是由日志源发送的一样。"
+  },
+  "recent": {
+    "load_message": "加载消息",
+    "server_description_selected": "点击“加载消息”以加载此 Input 在过去一小时内接收到的最新消息。",
+    "server_description": "从下方列表中选择一个 Input，然后点击“加载消息”以加载此 Input 在过去一小时内接收到的最新消息。",
+    "forwarder_description": "从下方列表中选择一个 Input profile，然后选择一个 Input 并点击“加载消息”，以加载此 Input 在过去一小时内接收到的最新消息。",
+    "invalid_input_selected": "选择了无效的 Input：{{inputId}}",
+    "invalid_input_title": "无法从无效的 Input {{inputId}} 加载消息",
+    "no_recent_message": "该 Input 未返回最近的消息。",
+    "input_type_select_label": "Input 类型选择"
+  },
+  "notifications": {
+    "codec_types_failed": "获取编解码器类型失败，状态为",
+    "codec_types_failed_title": "无法获取编解码器类型"
+  }
+}
