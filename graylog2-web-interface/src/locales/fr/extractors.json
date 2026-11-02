@@ -245,6 +245,8 @@
     "positions_failed": "Échec de la modification de l'ordre des extracteurs : {{error}}",
     "positions_failed_title": "Impossible de mettre à jour l'ordre des extracteurs",
     "import_success": "Résultats de l'import : {{successful}} extracteur(s) importé(s).",
-    "import_success_title": "Import réussi"
+    "import_success_title": "Import réussi",
+    "import_warning": "Résultats de l'import : {{successful}} extracteur(s) importé(s), {{failed}} erreur(s).",
+    "import_warning_title": "Import terminé"
   }
 }
