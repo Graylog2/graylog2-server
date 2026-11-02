@@ -133,32 +133,148 @@
     },
     "configuration_helper": {
       "filebeat_reference": "Filebeat 参考文档",
-      "nxlog_reference": "NXLog 参考手册"
+      "nxlog_reference": "NXLog 参考手册",
+      "reference_help": "我们提供 Collector 配置模板，帮助您快速开始。<lineBreak/>更多信息请参阅所用 Collector 的官方文档。",
+      "runtime_variables_help": "这些变量将由每个 Sidecar 的运行时信息填充",
+      "tab_reference": "参考",
+      "tab_runtime_variables": "运行时变量",
+      "tab_variables": "变量",
+      "title": "Collector 配置参考",
+      "variables_help": "使用变量可在多个配置之间共享文本片段。<lineBreak/>如果配置格式需要使用类似 <code>${foo}</code> 的字面量（不作为变量使用），则必须将其写为 <code>${'$'}{foo}</code>。",
+      "winlogbeat_reference": "Winlogbeat 参考文档"
     },
-    "configuration_tags_select": {},
-    "source_view_modal": {},
-    "configuration_variables_helper": {},
-    "edit_configuration_variable_modal": {},
-    "templates_helper": {}
+    "configuration_tags_select": {
+      "placeholder": "选择标签..."
+    },
+    "source_view_modal": {
+      "close": "关闭",
+      "empty_template": "<空模板>",
+      "error_fetching_configuration": "获取配置时出错：{{error}}",
+      "error_rendering_preview": "渲染预览时出错：{{error}}",
+      "title": "配置"
+    },
+    "configuration_variables_helper": {
+      "actions": "操作",
+      "close": "关闭",
+      "delete": "删除",
+      "delete_confirm_text": "确定要移除配置变量 <strong>{{name}}</strong> 吗？",
+      "delete_confirm_title": "删除配置变量？",
+      "description": "描述",
+      "error_delete_title": "删除配置变量 <strong>${user.{{name}}}</strong> 时出错",
+      "error_in_use": "无法删除此配置变量，因为它仍在使用中。请先从以下配置中移除该变量，然后重试。",
+      "name": "名称"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "创建",
+      "create_variable": "创建变量",
+      "content": "内容",
+      "content_help": "输入变量内容",
+      "description": "描述",
+      "description_help": "输入此变量的描述",
+      "edit": "编辑",
+      "edit_action": "编辑",
+      "name": "名称",
+      "name_help": "输入此变量的名称",
+      "optional": "（可选）",
+      "title": "{{action}}变量 ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "描述",
+      "name": "名称",
+      "node_id": "Sidecar 的 UUID。",
+      "node_name": "Sidecar 的名称，未设置时默认为主机名。",
+      "operating_system": "Sidecar 运行所在的操作系统名称，例如 <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "正在运行的 Sidecar 的版本号。",
+      "spool_dir": "每个配置独有的目录，可用于存储 Collector 数据。",
+      "tags": "为 Sidecar 设置的标签映射。可用于渲染条件配置片段，例如："
+    }
   },
   "configurations": {
-    "collector_list": {},
-    "collector_row": {},
-    "configuration_list": {},
-    "configuration_row": {}
+    "collector_list": {
+      "actions": "操作",
+      "create_collector": "创建日志 Collector",
+      "description": "管理可通过 Sidecar 和 Web 界面配置与监控的日志 Collector。",
+      "name": "名称",
+      "no_data": "没有可显示的日志 Collector，要不要创建一个？",
+      "operating_system": "操作系统",
+      "placeholder": "查找 Collector",
+      "title": "日志 Collector",
+      "total": "共 {{total}} 个"
+    },
+    "collector_row": {
+      "delete_confirm": "您即将删除 Collector “{{name}}”，确定要继续吗？",
+      "edit": "编辑"
+    },
+    "configuration_list": {
+      "actions": "操作",
+      "collector": "Collector",
+      "color": "颜色",
+      "configuration": "配置",
+      "create_configuration": "创建配置",
+      "description": "这些是可在 Collector 中使用的配置。请记得在管理页面将新配置应用到 Collector。",
+      "no_data": "没有可显示的配置，请尝试创建一个或更改查询条件。",
+      "placeholder": "查找配置",
+      "title": "配置",
+      "total": "共 {{total}} 个"
+    },
+    "configuration_row": {
+      "clone": "克隆",
+      "delete_confirm": "您即将删除配置 “{{name}}”，确定要继续吗？",
+      "edit": "编辑",
+      "unknown_collector": "未知 Collector"
+    }
   },
   "failure_tracking": {
     "list": {
-      "columns": {}
+      "columns": {
+        "collector": "Collector",
+        "error_message": "错误信息",
+        "last_seen": "最后出现时间",
+        "sidecar": "Sidecar",
+        "status": "状态",
+        "verbose_message": "详细信息"
+      },
+      "hide_inactive_sidecars": "隐藏未激活的 Sidecar",
+      "include_inactive_hint": "和/或点击“包含未激活的 Sidecar”",
+      "include_inactive_sidecars": "包含未激活的 Sidecar",
+      "no_failures": "没有出现故障的 Sidecar。",
+      "no_matching_sidecars": "没有符合搜索条件的故障 Sidecar。请尝试调整搜索过滤器：{{query}} {{inactiveHint}}"
     },
-    "rows": {}
+    "rows": {
+      "inactive_annotation": "（未激活）",
+      "show_more": "显示更多",
+      "sidecar_version": "v{{version}}"
+    }
   },
-  "basic_sidecar_user": {},
-  "sidecar_status_file_list": {},
+  "basic_sidecar_user": {
+    "load_failed": "加载 Sidecar 用户失败，状态：{{error}}",
+    "load_failed_title": "无法加载 Sidecar 用户"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "过滤文件"
+  },
   "sidecars": {
-    "sidecar_list": {},
-    "sidecar_row": {},
-    "sidecar_status": {},
+    "sidecar_list": {
+      "hide_inactive_sidecars": "隐藏未激活的 Sidecar",
+      "include_inactive_hint": "和/或点击“包含未激活的 Sidecar”",
+      "include_inactive_sidecars": "包含未激活的 Sidecar",
+      "last_seen": "最后出现时间",
+      "name": "名称",
+      "no_matching_sidecars": "没有符合搜索条件的 Sidecar。请尝试调整搜索过滤器{{inactiveHint}}。",
+      "no_sidecars": "没有已配置的 Sidecar。",
+      "node_id": "节点 ID",
+      "operating_system": "操作系统",
+      "sidecar_version": "Sidecar 版本",
+      "status": "状态"
+    },
+    "sidecar_row": {
+      "inactive_annotation": "（未激活）",
+      "manage_sidecar": "管理 Sidecar",
+      "show_messages": "显示消息"
+    },
+    "sidecar_status": {
+      "collector_running": "Collector 正在运行。"
+    },
     "verbose_message_modal": {}
   },
   "pages": {
