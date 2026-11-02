@@ -1,1 +1,150 @@
-{}
+{
+  "apply_parameter": {
+    "action": "操作",
+    "apply": "应用",
+    "choose": "选择...",
+    "choose_config_key": "选择配置键",
+    "clear": "清除",
+    "config_key": "配置键",
+    "create_parameter_first": "请先创建参数",
+    "no_parameter_of_type": "没有类型为 {{type}} 的参数",
+    "parameter": "参数"
+  },
+  "constraints": {
+    "fulfilled": "已满足",
+    "name": "名称",
+    "title": "约束",
+    "type": "类型",
+    "version": "版本"
+  },
+  "details": {
+    "description": "描述",
+    "entities": "条目：",
+    "id": "ID：",
+    "name": "名称：",
+    "parameters": "参数：",
+    "summary": "摘要：",
+    "title": "详情",
+    "url": "URL：",
+    "vendor": "供应商：",
+    "version": "版本："
+  },
+  "download": {
+    "download": "下载",
+    "info": "请右键单击下方的下载链接，然后选择“将链接另存为...”以下载 JSON 文件。",
+    "title": "下载内容包"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "参数",
+      "preview": "预览",
+      "selection": "内容选择"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "创建参数",
+    "default_value": "默认值",
+    "default_value_help": "如果参数不是可选的，请提供默认值。",
+    "description": "描述",
+    "description_help": "请说明将如何使用此参数。",
+    "description_required": "必须填写描述。",
+    "edit_title": "编辑参数",
+    "name": "名称",
+    "name_help": "此名称用作参数引用，不得包含空格。",
+    "name_invalid": "参数名称只能包含 A-Z、a-z、0-9 和 _",
+    "name_not_unique": "参数名称必须唯一。",
+    "name_required": "必须填写名称。",
+    "not_boolean": "这不是布尔值，必须为 true 或 false。",
+    "not_double": "这不是双精度浮点数。",
+    "not_integer": "这不是整数。",
+    "title": "标题",
+    "title_help": "为此内容包提供一个描述性标题。",
+    "title_required": "必须填写标题。",
+    "value_type": "值类型",
+    "value_type_help": "请选择参数的类型。"
+  },
+  "entities": {
+    "action": "操作",
+    "config_title": "条目配置",
+    "description": "描述",
+    "edit_title": "编辑",
+    "list_title": "条目列表",
+    "origin": "来源",
+    "origin_content_pack": "内容包",
+    "origin_server": "服务器",
+    "show": "显示",
+    "title": "标题",
+    "type": "类型",
+    "used_parameters": "已使用的参数"
+  },
+  "entity_config": {
+    "config_key": "配置键",
+    "parameter_type": "参数 ({{type}})",
+    "type": "类型",
+    "value": "值"
+  },
+  "entity_index": {
+    "load_failed": "加载条目索引失败，状态码为",
+    "load_failed_title": "无法加载条目索引"
+  },
+  "import": {
+    "error_message": "导入内容包时出错，请确保其为有效的 JSON 文件。更多信息请查看 {{productName}} 服务器日志。",
+    "error_title": "无法导入内容包",
+    "success_message": "内容包导入成功",
+    "success_named": "内容包“{{name}}”导入成功",
+    "success_title": "成功！"
+  },
+  "install": {
+    "comment": "安装备注",
+    "comment_help": "此备注将与内容包的安装记录一同保存，可用于说明安装原因。",
+    "configure_parameters": "配置参数：",
+    "needs_to_be_filled": "需要填写。",
+    "share_description": "搜索用户或团队，将其添加为此内容包条目的协作者。"
+  },
+  "install_entities": {
+    "installed": "已安装的条目",
+    "title": "标题",
+    "to_be_uninstalled": "待卸载的条目",
+    "type": "类型"
+  },
+  "install_view": {
+    "comment": "备注：",
+    "general_information": "常规信息",
+    "installed_at": "安装时间：",
+    "installed_by": "安装者："
+  },
+  "installations": {
+    "action": "操作",
+    "comment": "备注",
+    "uninstall": "卸载",
+    "version": "版本",
+    "view": "查看",
+    "view_title": "查看安装记录"
+  },
+  "list": {
+    "no_match": "未找到匹配的内容包",
+    "none_found": "未找到内容包。请创建或上传一个内容包"
+  },
+  "list_item": {
+    "create_new_version": "创建新版本",
+    "delete_all_versions": "删除所有版本",
+    "install": "安装",
+    "install_title": "安装内容包",
+    "latest_version": "最新版本：{{rev}}",
+    "show": "显示"
+  },
+  "notifications": {},
+  "overview": {},
+  "pages": {},
+  "parameter_list": {},
+  "parameters": {},
+  "preview": {},
+  "revisions": {},
+  "selection": {},
+  "show": {},
+  "status": {},
+  "upload": {},
+  "value_types": {},
+  "version_item": {},
+  "versions": {}
+}
