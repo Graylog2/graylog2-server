@@ -37,6 +37,8 @@
     "delete": "Excluir",
     "edit": "Editar",
     "filter_label": "Filtrar serviços",
+    "found_one": "Foi encontrado {{count}} serviço de autenticação configurado no sistema.",
+    "found_other": "Foram encontrados {{count}} serviços de autenticação configurados no sistema.",
     "headers": {
       "actions": "Ações",
       "default_roles": "Funções padrão",
@@ -45,7 +47,8 @@
     },
     "query_example": "Encontre backends com um título contendo LDAP:",
     "role_not_found": "Função não encontrada",
-    "title": "Serviços de autenticação configurados"
+    "title": "Serviços de autenticação configurados",
+    "found_many": "Foram encontrados {{count}} serviços de autenticação configurados no sistema."
   },
   "config_details": {
     "edit": "Editar",
@@ -141,17 +144,67 @@
   "synced_users": {
     "edit": "Editar",
     "filter_label": "Filtrar usuários",
+    "found_one": "Foi encontrado {{count}} usuário sincronizado.",
+    "found_other": "Foram encontrados {{count}} usuários sincronizados.",
     "headers": {
       "actions": "Ações",
       "full_name": "Nome completo",
-      "roles": "Funções"
+      "roles": "Funções",
+      "username": "Nome de usuário"
+    },
+    "none_found": "Nenhum usuário sincronizado foi encontrado.",
+    "role_not_found": "Função não encontrada",
+    "title": "Usuários sincronizados",
+    "found_many": "Foram encontrados {{count}} usuários sincronizados."
+  },
+  "trusted_header": {
+    "description": "Este autenticador permite fazer login de um usuário com base em um cabeçalho HTTP, sem nenhuma interação adicional.",
+    "enable_sso": "Ativar login único por meio de cabeçalho HTTP",
+    "enabled": "Ativado",
+    "title": "Autenticação por cabeçalho confiável",
+    "trusted_proxies_hint": "Configure a opção <code>trusted_proxies</code> no arquivo de configuração do servidor {{productName}}.",
+    "update_config": "Atualizar configuração",
+    "username_header": "Cabeçalho de nome de usuário",
+    "username_header_help": "Cabeçalho HTTP que contém o nome do usuário implicitamente confiável. (A correspondência do cabeçalho não diferencia maiúsculas de minúsculas)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Fuso horário do navegador",
+    "default_assignments_hint": "Alterar as atribuições padrão de função e fuso horário afetará apenas os novos usuários criados por meio de {{serviceTitle}}!",
+    "default_roles": "Funções padrão",
+    "default_user_time_zone": "Fuso horário padrão do usuário",
+    "email_attribute": "Atributo de e-mail",
+    "email_attributes": "Atributos de e-mail",
+    "full_name_attribute": "Atributo de nome completo",
+    "id_attribute": "Atributo de ID",
+    "name_attribute": "Atributo de nome",
+    "role_not_found": "Função não encontrada",
+    "search_base_dn": "DN base da pesquisa",
+    "search_pattern": "Padrão de pesquisa",
+    "search_roles": "Pesquisar funções",
+    "test_login_hint": "Recomendamos que você teste o login de um usuário no painel da barra lateral para verificar suas configurações.",
+    "title": "Sincronização de usuários"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Você realmente deseja remover a configuração de sincronização de grupos deste serviço de autenticação?",
+    "create_failed": "Falha ao criar o serviço de autenticação",
+    "edit_failed": "Falha ao editar o serviço de autenticação",
+    "finish_and_save": "Concluir e salvar serviço",
+    "finish_and_save_identity_service": "Concluir e salvar serviço de identidade",
+    "next_group_sync": "Próximo: sincronização de grupos",
+    "next_user_sync": "Próximo: sincronização de usuários",
+    "server_validation_error": "Erro de validação do servidor: {{errors}}",
+    "steps": {
+      "group_sync": "Sincronização de grupos (Opc.)",
+      "server_config": "Configuração do servidor",
+      "user_sync": "Sincronização de usuários"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "Editar serviço de autenticação - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "Falha ao carregar a configuração de autenticação por cabeçalho HTTP",
+    "update_success": "Configuração de autenticação por cabeçalho HTTP atualizada com sucesso",
+    "update_failed": "Falha ao atualizar a configuração de autenticação por cabeçalho HTTP com status: {{error}}"
+  }
 }
