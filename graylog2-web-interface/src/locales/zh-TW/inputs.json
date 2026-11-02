@@ -1,1 +1,163 @@
-{}
+{
+  "create_input": {
+    "select_input": "選擇 Input",
+    "launch_new": "啟動新的 Input",
+    "launch_new_type": "啟動新的 <type>{{type}}</type> Input",
+    "launch": "啟動 Input",
+    "no_inputs_available": "沒有可用的 Input"
+  },
+  "edit_input": {
+    "edit": "編輯 Input",
+    "editing": "正在編輯 Input {{title}}",
+    "update": "更新 Input"
+  },
+  "input_dropdown": {
+    "label": "伺服器 Input 選擇",
+    "select": "選擇 Input",
+    "unknown_type": "未知的 Input 類型",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "{{title}} 的 Input 狀態",
+    "CREATED": "已建立",
+    "INITIALIZED": "已初始化",
+    "INVALID_CONFIGURATION": "設定無效",
+    "STARTING": "啟動中",
+    "RUNNING": "執行中",
+    "FAILED": "失敗",
+    "FAILING": "失敗中",
+    "SETUP": "設定中",
+    "STOPPING": "停止中",
+    "STOPPED": "已停止",
+    "TERMINATED": "已終止"
+  },
+  "state_control": {
+    "set_up": "設定 Input",
+    "stopping": "停止中...",
+    "stop": "停止 Input",
+    "starting": "啟動中...",
+    "start": "啟動 Input"
+  },
+  "static_fields": {
+    "title": "靜態欄位",
+    "add": "新增靜態欄位",
+    "add_field": "新增欄位",
+    "add_success": "已成功將靜態欄位「{{field}}」新增至「{{input}}」",
+    "add_failed": "將靜態欄位新增至 Input 失敗：{{error}}",
+    "add_failed_title": "無法將靜態欄位新增至 Input「{{input}}」",
+    "remove_success": "已成功從「{{input}}」移除靜態欄位「{{field}}」",
+    "remove_failed": "從 Input 移除靜態欄位失敗：{{error}}",
+    "remove_failed_title": "無法從 Input「{{input}}」移除靜態欄位「{{field}}」",
+    "delete_title": "刪除靜態欄位",
+    "delete_confirm": "確定要從「{{input}}」移除靜態欄位「{{field}}」嗎？",
+    "description": "定義一個靜態欄位，會新增至透過此 Input 傳入的每則訊息。若訊息已有相同的鍵，則不會覆寫該欄位。鍵只能包含英數字元或底線，且不能是保留欄位。",
+    "field_name": "欄位名稱",
+    "field_name_title": "只能包含英數字元和底線。",
+    "field_value": "欄位值"
+  },
+  "notifications": {
+    "warning": "警告",
+    "failed": "Input 已失敗，在啟動之前不會接收流量。",
+    "setup": "處於設定模式的 Input 在啟動之前不會接收流量。",
+    "stopped": "已停止的 Input 在啟動之前不會接收流量。",
+    "show_failed": "顯示失敗的 Input",
+    "show_setup": "顯示處於設定模式的 Input",
+    "show_stopped": "顯示已停止的 Input"
+  },
+  "node_select": {
+    "node": "節點",
+    "node_help": "此 Input 應在哪個節點上啟動",
+    "select_node": "選擇節點",
+    "global": "全域",
+    "global_help": "此 Input 是否應在所有節點上啟動"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Input 文件",
+    "description": "{{productName}} 節點透過 Input 接收資料。您可以在此啟動或終止任意數量的 Input。",
+    "cloud_description": "{{productName}} 雲端透過 Input 接收資料。可選擇的 Input 類型很多，但只有部分可直接在雲端執行。您可以在此頁面啟動和終止它們。",
+    "cloud_forwarder_hint": "若在此頁面的可用 Input 清單中找不到某個 Input 類型，您可以在 <forwarderLink>Forwarder</forwarderLink> 上啟動該 Input。",
+    "back": "返回",
+    "diagnosis_title": "Input 診斷：{{name}}",
+    "diagnosis_description": "Input 診斷可用於測試 Input 和解析，而不會將任何資料寫入搜尋叢集。",
+    "tab_overview": "總覽",
+    "tab_rules": "規則",
+    "node_inputs_title": "節點 {{nodeId}} / {{hostname}} 的 Input",
+    "node_inputs_description": "{{productName}} 節點透過 Input 接收資料。在此頁面可以查看此特定節點上正在執行的 Input。",
+    "node_inputs_hint": "您可以在<inputsLink>這裡</inputsLink>於叢集上啟動和終止 Input。",
+    "local_inputs": "本機 Input",
+    "global_inputs": "全域 Input"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "此 Input 監聽於：",
+      "listening_on": "請注意，綁定位址必須指向 {{productName}} 服務。所選連接埠不得與每個節點上的其他 Input 發生連接埠衝突。請記得，單一節點上的本機 Input 可能與在所有節點上執行的全域 Input 衝突，導致該節點上的 Input 失敗。",
+      "listening_for_title": "此 Input 監聽的對象：",
+      "listening_for": "請注意，傳送至 TCP Input 的 UDP 流量，或傳送至 UDP Input 的 TCP 流量，會顯示為網路 I/O，但不會接收到任何訊息。",
+      "empty_messages_discarded_title": "已捨棄的空訊息：",
+      "empty_messages_discarded": "訊息內容長度為 0 的訊息會被 Input 捨棄。",
+      "network_io_title": "網路 I/O：",
+      "network_io": "請注意，此數值可用於偵測連線嘗試和 Input 的無效流量。",
+      "input_state": "處於執行中狀態的 Input 已準備好接收訊息。處於失敗或失敗中狀態的 Input 遇到了問題；請點擊下方按鈕查看相關的錯誤訊息。",
+      "message_error_at_input_title": "Input 的訊息錯誤：",
+      "message_error_at_input": "每種 Input 類型都預期接收特定格式的訊息。不符合此格式的訊息可能會被 Input 拒絕，在此情況下，它們不會進入處理階段。若要解決這些情況，請檢查正在傳送的訊息。更詳細的錯誤可在 {{productName}} 伺服器的 server.log 檔案中找到。",
+      "message_failed_to_process_title": "訊息處理失敗：",
+      "message_failed_to_process": "Extractor 和 Pipeline 可用於對訊息執行處理作業，例如解析出欄位。若 Pipeline 規則嘗試執行不合理的操作，或將訊息中欄位的屬性修改為與該欄位的資料類型或欄位長度限制衝突的格式，處理可能會失敗。以此方式處理失敗的訊息可在「Processing and Indexing Failures」Stream 中檢視。",
+      "message_failed_to_index_title": "訊息錯誤：",
+      "message_failed_to_index": "在搜尋叢集中，訊息只有在符合索引的結構描述時才能儲存至該索引。OpenSearch 中的每個欄位都有欄位類型和字元上限；若超過任一限制，訊息將無法建立索引。以此方式無法建立索引的訊息可在「Processing and Indexing Failures」Stream 中檢視。",
+      "received_message_count_by_stream": "使用此檢視來了解 Stream 和 Pipeline 規則如何導向此 Input 的訊息。一則訊息可能會被複製到多個 Stream；若因此導致該訊息儲存至多個索引，也會使授權用量倍增。此檢視有助於偵測此類重複。"
+    },
+    "node": {
+      "node_id": "節點 ID：",
+      "message": "訊息：",
+      "last_failed": "上次失敗：",
+      "state_label": "{{state}}：",
+      "state_nodes": "{{count}}/{{total}} 個節點",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "資訊",
+      "description": "Input 執行所在的位址。",
+      "input_title": "Input 標題：",
+      "input_type": "Input 類型：",
+      "running_on": "此 Input 執行於：",
+      "all_nodes": "所有 {{productName}} 節點",
+      "listening_on": "此 Input 監聽於："
+    },
+    "state": {},
+    "troubleshooting": {},
+    "received_traffic": {},
+    "message_count_by_stream": {},
+    "message_errors": {},
+    "rules": {},
+    "network_stats": {}
+  },
+  "setup_wizard": {
+    "steps": {},
+    "diagnosis_step": {},
+    "routing": {},
+    "start": {},
+    "progress": {
+      "loading": {},
+      "error": {},
+      "success": {}
+    },
+    "create_stream": {},
+    "input_in_use": {},
+    "index_set_alert": {}
+  },
+  "overview": {
+    "columns": {},
+    "cells": {},
+    "sections": {},
+    "actions": {}
+  },
+  "dot_badge": {},
+  "use_input_notifications": {},
+  "use_input_details_notifications": {},
+  "use_input_metrics_notifications": {},
+  "use_input_state_summary_notifications": {},
+  "use_input_state_mutations_notifications": {},
+  "use_input_mutations_notifications": {},
+  "use_inputs_notifications": {}
+}
