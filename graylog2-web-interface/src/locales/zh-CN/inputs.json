@@ -1,1 +1,163 @@
-{}
+{
+  "create_input": {
+    "select_input": "选择 Input",
+    "launch_new": "启动新 Input",
+    "launch_new_type": "启动新的 <type>{{type}}</type> Input",
+    "launch": "启动 Input",
+    "no_inputs_available": "没有可用的 Input"
+  },
+  "edit_input": {
+    "edit": "编辑 Input",
+    "editing": "正在编辑 Input {{title}}",
+    "update": "更新 Input"
+  },
+  "input_dropdown": {
+    "label": "服务器 Input 选择",
+    "select": "选择一个 Input",
+    "unknown_type": "未知的 Input 类型",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "{{title}} 的 Input 状态",
+    "CREATED": "已创建",
+    "INITIALIZED": "已初始化",
+    "INVALID_CONFIGURATION": "配置无效",
+    "STARTING": "正在启动",
+    "RUNNING": "运行中",
+    "FAILED": "失败",
+    "FAILING": "失败中",
+    "SETUP": "设置中",
+    "STOPPING": "正在停止",
+    "STOPPED": "已停止",
+    "TERMINATED": "已终止"
+  },
+  "state_control": {
+    "set_up": "设置 Input",
+    "stopping": "正在停止...",
+    "stop": "停止 Input",
+    "starting": "正在启动...",
+    "start": "启动 Input"
+  },
+  "static_fields": {
+    "title": "静态字段",
+    "add": "添加静态字段",
+    "add_field": "添加字段",
+    "add_success": "已成功将静态字段 '{{field}}' 添加到 '{{input}}'",
+    "add_failed": "向 Input 添加静态字段失败：{{error}}",
+    "add_failed_title": "无法向 Input '{{input}}' 添加静态字段",
+    "remove_success": "已成功从 '{{input}}' 中移除静态字段 '{{field}}'",
+    "remove_failed": "从 Input 移除静态字段失败：{{error}}",
+    "remove_failed_title": "无法从 Input '{{input}}' 中移除静态字段 '{{field}}'",
+    "delete_title": "删除静态字段",
+    "delete_confirm": "确定要从 '{{input}}' 中移除静态字段 '{{field}}' 吗？",
+    "description": "定义一个静态字段，它会被添加到通过此 Input 接收的每条消息中。如果消息已包含该键，则不会覆盖该字段。键只能包含字母数字字符或下划线，且不能是保留字段。",
+    "field_name": "字段名称",
+    "field_name_title": "只能包含字母数字字符和下划线。",
+    "field_value": "字段值"
+  },
+  "notifications": {
+    "warning": "警告",
+    "failed": "失败的 Input 将无法接收流量，直到启动为止。",
+    "setup": "处于设置模式的 Input 将无法接收流量，直到启动为止。",
+    "stopped": "已停止的 Input 将无法接收流量，直到启动为止。",
+    "show_failed": "显示失败的 Input",
+    "show_setup": "显示处于设置模式的 Input",
+    "show_stopped": "显示已停止的 Input"
+  },
+  "node_select": {
+    "node": "节点",
+    "node_help": "此 Input 应在哪个节点上启动",
+    "select_node": "选择节点",
+    "global": "全局",
+    "global_help": "此 Input 是否应在所有节点上启动"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Inputs 文档",
+    "description": "{{productName}} 节点通过 Input 接收数据。您可以在此启动或终止任意数量的 Input。",
+    "cloud_description": "{{productName}} Cloud 通过 Input 接收数据。可选择的 Input 类型众多，但只有部分可以直接在云端运行。您可以在此页面启动和终止它们。",
+    "cloud_forwarder_hint": "如果在此页面的可用 Input 列表中找不到某个 Input 类型，您可以在 <forwarderLink>Forwarder</forwarderLink> 上启动该 Input。",
+    "back": "返回",
+    "diagnosis_title": "Input 诊断：{{name}}",
+    "diagnosis_description": "Input 诊断可用于测试 Input 和解析，而无需将任何数据写入搜索集群。",
+    "tab_overview": "概览",
+    "tab_rules": "规则",
+    "node_inputs_title": "节点 {{nodeId}} / {{hostname}} 的 Inputs",
+    "node_inputs_description": "{{productName}} 节点通过 Input 接收数据。在此页面，您可以查看哪些 Input 正在该特定节点上运行。",
+    "node_inputs_hint": "您可以在<inputsLink>此处</inputsLink>启动和终止集群中的 Input。",
+    "local_inputs": "本地 Inputs",
+    "global_inputs": "全局 Inputs"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "此 Input 监听于：",
+      "listening_on": "请注意，绑定地址需要指向 {{productName}} 服务。所选端口不得与每个节点上的其他 Input 发生端口冲突。请记住，单个节点上的本地 Input 可能与在所有节点上运行的全局 Input 冲突，导致该节点上的 Input 失败。",
+      "listening_for_title": "此 Input 监听的内容：",
+      "listening_for": "请注意，发送到 TCP Input 的 UDP 流量，或发送到 UDP Input 的 TCP 流量，会显示为网络 I/O，但不会接收到任何消息。",
+      "empty_messages_discarded_title": "已丢弃的空消息：",
+      "empty_messages_discarded": "消息负载长度为 0 的消息将被 Input 丢弃。",
+      "network_io_title": "网络 I/O：",
+      "network_io": "请注意，此值可用于检测对 Input 的连接尝试和无效流量。",
+      "input_state": "处于运行状态的 Input 已准备好接收消息。处于失败或失败中状态的 Input 遇到了问题；请点击下方按钮查看相关的错误消息。",
+      "message_error_at_input_title": "Input 处的消息错误：",
+      "message_error_at_input": "每种 Input 类型都要求以特定格式接收消息。不符合该格式的消息可能会被 Input 拒绝，此时它们不会进入处理阶段。要解决这些问题，请检查正在发送的消息。更详细的错误信息可在 {{productName}} 服务器的 server.log 文件中找到。",
+      "message_failed_to_process_title": "消息处理失败：",
+      "message_failed_to_process": "提取器和流水线可用于对消息执行处理操作，例如解析字段。如果流水线规则尝试执行无意义的操作，或将字段的属性修改为与该字段的数据类型或字段长度限制相冲突的格式，则处理可能会失败。以这种方式处理失败的消息可以在 Processing and Indexing Failures 流中查看。",
+      "message_failed_to_index_title": "消息错误：",
+      "message_failed_to_index": "在搜索集群中，消息只有符合索引的 schema 才能保存到该索引中。OpenSearch 中的每个字段都有字段类型和字符限制；如果超出其中任何一项，消息将无法建立索引。以这种方式建立索引失败的消息可以在 Processing and Indexing Failures 流中查看。",
+      "received_message_count_by_stream": "使用此视图可以了解流和流水线规则将来自此 Input 的消息导向何处。一条消息可以被复制到多个流中；如果这导致消息被保存到多个索引中，也会使许可证用量成倍增加。此视图有助于发现这种重复。"
+    },
+    "node": {
+      "node_id": "节点 ID：",
+      "message": "消息：",
+      "last_failed": "上次失败：",
+      "state_label": "{{state}}：",
+      "state_nodes": "{{count}}/{{total}} 个节点",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "信息",
+      "description": "Input 运行所在的地址。",
+      "input_title": "Input 标题：",
+      "input_type": "Input 类型：",
+      "running_on": "此 Input 运行于：",
+      "all_nodes": "所有 {{productName}} 节点",
+      "listening_on": "此 Input 监听于："
+    },
+    "state": {},
+    "troubleshooting": {},
+    "received_traffic": {},
+    "message_count_by_stream": {},
+    "message_errors": {},
+    "rules": {},
+    "network_stats": {}
+  },
+  "setup_wizard": {
+    "steps": {},
+    "diagnosis_step": {},
+    "routing": {},
+    "start": {},
+    "progress": {
+      "loading": {},
+      "error": {},
+      "success": {}
+    },
+    "create_stream": {},
+    "input_in_use": {},
+    "index_set_alert": {}
+  },
+  "overview": {
+    "columns": {},
+    "cells": {},
+    "sections": {},
+    "actions": {}
+  },
+  "dot_badge": {},
+  "use_input_notifications": {},
+  "use_input_details_notifications": {},
+  "use_input_metrics_notifications": {},
+  "use_input_state_summary_notifications": {},
+  "use_input_state_mutations_notifications": {},
+  "use_input_mutations_notifications": {},
+  "use_inputs_notifications": {}
+}
