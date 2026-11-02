@@ -46,16 +46,19 @@ const useTableElements = ({
       title: 'Rules',
       content: renderExpandedRules,
       actions: renderExpandedRulesActions,
+      isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     destination_filters: {
       title: 'Filter Rules',
       content: (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
+      isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     outputs: {
       title: 'Outputs',
       content: (stream: Stream) => <ExpandedOutputsSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedOutputsActions stream={stream} />,
+      isAvailable: (stream: Stream) => stream.is_editable,
     },
     [METRIC_COLUMN_IDS.associatedInputs]: {
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],

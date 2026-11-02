@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { ExpandedSectionRenderers } from './types';
 
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
-import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
+const getAvailableSectionNames = <Entity>(
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined,
+  entity: Entity,
+) =>
+  Object.entries(expandedSectionRenderers ?? {})
+    .filter(([, { isAvailable }]) => isAvailable?.(entity) ?? true)
+    .map(([sectionName]) => sectionName);
 
-const expandedSections = {
-  overriddenProfile: {
-    title: 'Origin explanation',
-    content: ({ type, origin, fieldName }: IndexSetFieldType) => (
-      <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />
-    ),
-  },
-};
-
-export default expandedSections;
+export default getAvailableSectionNames;

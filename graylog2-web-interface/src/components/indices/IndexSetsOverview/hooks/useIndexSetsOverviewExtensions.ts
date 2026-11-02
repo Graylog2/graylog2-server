@@ -23,9 +23,17 @@ export type ExtensionColumnGroups = {
   configuration: Array<string>;
 };
 
+type TableElement = { attributes?: Array<Attribute>; backendAttributeIds?: Array<string> };
+
+const columnIdsOf = ({ attributes, backendAttributeIds }: TableElement): Array<string> => [
+  ...(attributes ?? []).map(({ id }) => id),
+  ...(backendAttributeIds ?? []),
+];
+
 const useIndexSetsOverviewExtensions = (): {
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
   attributes: Array<Attribute>;
+  columnIds: Array<string>;
   columnGroups: ExtensionColumnGroups;
 } => {
   const tableElements = usePluginEntities('components.indexSets.overview.tableElements');
@@ -35,10 +43,9 @@ const useIndexSetsOverviewExtensions = (): {
       tableElements.flatMap(({ columnRenderers }) => Object.entries(columnRenderers ?? {})),
     ),
     attributes: tableElements.flatMap(({ attributes }) => attributes ?? []),
+    columnIds: tableElements.flatMap(columnIdsOf),
     columnGroups: {
-      configuration: tableElements
-        .filter(({ group }) => group === 'configuration')
-        .flatMap(({ attributes }) => (attributes ?? []).map(({ id }) => id)),
+      configuration: tableElements.filter(({ group }) => group === 'configuration').flatMap(columnIdsOf),
     },
   };
 };

@@ -29,14 +29,17 @@ export const login = (username: string, password: string, host: string) =>
 
 // Plain request without error handler, as a 401 for it would otherwise trigger another logout.
 const terminateSession = () =>
-  new Builder('DELETE', qualifyUrl('/system/sessions/')).build().then(
-    (response: Response) => {
-      if (response.ok || response.status === 401) {
-        Session.endSession();
-      }
-    },
-    () => Session.endSession(),
-  ).then(() => Session.notifyLogout());
+  new Builder('DELETE', qualifyUrl('/system/sessions/'))
+    .build()
+    .then(
+      (response: Response) => {
+        if (response.ok || response.status === 401) {
+          Session.endSession();
+        }
+      },
+      () => Session.endSession(),
+    )
+    .then(() => Session.notifyLogout());
 
 Session.setLogoutHandler(terminateSession);
 
