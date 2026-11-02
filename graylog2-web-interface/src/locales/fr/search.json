@@ -387,25 +387,138 @@
     "highest_aria": "Indiquez la valeur maximale",
     "highest_label": "Valeur maximale",
     "highest_help": "La valeur maximale attendue dans le champ ou la série.",
-    "coloring": "Coloration"
+    "coloring": "Coloration",
+    "static_color": "Couleur unie",
+    "gradient": "Dégradé",
+    "must_be_selected": "Doit être sélectionné.",
+    "must_be_present": "Doit être renseigné.",
+    "must_be_number": "Doit être un nombre.",
+    "must_be_higher": "Doit être supérieur à la valeur minimale.",
+    "coloring_required": "La coloration est obligatoire",
+    "gradient_numeric_only": "Un dégradé ne peut être défini que pour les champs numériques."
   },
-  "highlighting_rule": {},
-  "change_field_type": {},
-  "value_actions": {},
+  "highlighting_rule": {
+    "edit": "Modifier cette règle de mise en évidence",
+    "remove": "Supprimer cette règle de mise en évidence",
+    "confirm_remove": "Voulez-vous vraiment supprimer cette mise en évidence ?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Autorisation manquante",
+    "no_permission_description": "Vous n'avez pas l'autorisation d'effectuer cette action",
+    "enterprise_plugin_required": "(<enterpriseLink>plugin Enterprise</enterpriseLink> requis)",
+    "modal_title": "Modifier le type du champ {{fieldName}}",
+    "impact_warning": "Modifier le type du champ <bold>{{fieldName}}</bold> peut avoir un impact important sur l'ingestion des futurs messages de logs. Si vous déclarez un champ avec un type incompatible avec les logs que vous ingérez, cela peut entraîner des erreurs d'ingestion.",
+    "failure_processing_hint": "Il est recommandé d'activer le <docsLink>Failure Processing</docsLink> et de surveiller de près le stream <failureStream/> par la suite.",
+    "select_field_type_for": "Sélectionner le type de champ pour {{fieldName}}",
+    "select_field_type_for_field": "Sélectionner le type de champ pour le champ",
+    "select_field_type": "Sélectionner le type de champ",
+    "select_index_sets": "Sélectionner les index sets cibles",
+    "index_sets_hint_with_type": "Par défaut, le type de champ <bold>{{type}}</bold> sera défini pour le champ <bold>{{fieldName}}</bold> dans tous les index sets du message ou de la recherche actuel. Vous pouvez choisir les index sets pour lesquels vous souhaitez effectuer cette modification.",
+    "index_sets_hint": "Par défaut, le type de champ sélectionné sera défini pour le champ <bold>{{fieldName}}</bold> dans tous les index sets du message ou de la recherche actuel. Vous pouvez choisir les index sets pour lesquels vous souhaitez effectuer cette modification.",
+    "select_rotation_strategy": "Sélectionner la stratégie de rotation",
+    "rotation_hint_type_field": "Pour voir et utiliser le type <bold>{{type}}</bold> comme type de champ pour <bold>{{fieldName}}</bold>, vous devez effectuer une rotation des index. Vous pouvez effectuer automatiquement la rotation des index concernés après l'envoi de ce formulaire, ou le faire manuellement plus tard.",
+    "rotation_hint_type": "Pour voir et utiliser le type <bold>{{type}}</bold> comme type de champ, vous devez effectuer une rotation des index. Vous pouvez effectuer automatiquement la rotation des index concernés après l'envoi de ce formulaire, ou le faire manuellement plus tard.",
+    "rotation_hint_field": "Pour voir et utiliser le type de champ sélectionné comme type de champ pour <bold>{{fieldName}}</bold>, vous devez effectuer une rotation des index. Vous pouvez effectuer automatiquement la rotation des index concernés après l'envoi de ce formulaire, ou le faire manuellement plus tard.",
+    "rotation_hint": "Pour voir et utiliser le type de champ sélectionné comme type de champ, vous devez effectuer une rotation des index. Vous pouvez effectuer automatiquement la rotation des index concernés après l'envoi de ce formulaire, ou le faire manuellement plus tard.",
+    "rotate_indices": "Effectuer la rotation des index concernés après la modification",
+    "changing": "Modification du type de champ...",
+    "change": "Modifier le type de champ",
+    "select_field": "Sélectionner le champ",
+    "select_field_placeholder": "Sélectionnez ou saisissez le champ",
+    "type_not_defined": "type non défini",
+    "previous_values": "(valeurs précédentes : {{values}})",
+    "load_index_field_types_failed": "Le chargement des types de champs d'index a échoué avec le statut",
+    "could_not_load_index_field_types": "Impossible de charger les types de champs d'index",
+    "load_field_type_options_failed": "Le chargement des options de type de champ a échoué avec le statut",
+    "could_not_load_field_type_options": "Impossible de charger les options de type de champ",
+    "load_field_types_failed": "Le chargement des types de {{field}} a échoué avec le statut",
+    "could_not_load_field_types": "Impossible de charger les types de champs",
+    "load_index_sets_failed": "Le chargement des index sets prenant en charge la modification du type de champ a échoué avec le statut",
+    "could_not_load_index_sets": "Impossible de charger les index sets prenant en charge la modification du type de champ",
+    "change_failed": "La modification du type de champ a échoué avec le statut : {{error}}",
+    "change_failed_title": "Impossible de modifier le type de champ",
+    "change_success": "Le type de champ a été modifié avec succès",
+    "success_title": "Succès !"
+  },
+  "value_actions": {
+    "select_extractor_type": "Sélectionner le type d'extracteur",
+    "exclude": "Exclure des résultats",
+    "add_to_query": "Ajouter à la requête",
+    "show_documents": "Afficher les documents pour cette valeur",
+    "create_extractor": "Créer un extracteur",
+    "highlight_value": "Mettre cette valeur en évidence",
+    "create_event_definition": "Créer une définition d'événement",
+    "copy_value": "Copier la valeur dans le presse-papiers"
+  },
   "create_event_definition": {
-    "sections": {},
-    "items": {},
+    "title": "Configurer une nouvelle définition d'événement",
+    "hide_details": "Masquer les détails de la stratégie",
+    "show_details": "Afficher les détails de la stratégie",
+    "continue": "Poursuivre la configuration",
+    "strategy_by": "Stratégie par :",
+    "description": "Description :",
+    "sections": {
+      "aggregation": "Paramètres d'agrégation",
+      "search": "Requête de recherche"
+    },
+    "items": {
+      "rowValuePath": "Requête depuis la ligne du tableau",
+      "columnValuePath": "Requête depuis la colonne du tableau",
+      "columnGroupBy": "Regrouper par valeurs de colonne",
+      "rowGroupBy": "Regrouper par valeurs de ligne",
+      "aggCondition": "Condition",
+      "queryWithReplacedParams": "Requête depuis la recherche",
+      "searchFilterQuery": "Requête depuis les filtres de recherche",
+      "streams": "Streams",
+      "searchWithinMs": "Rechercher dans les ms",
+      "lutParameters": "Paramètres de la table de correspondance",
+      "searchFromValue": "Requête depuis la valeur"
+    },
+    "item_label": "{{label}} : ",
     "strategies": {
-      "EXACT": {},
-      "ROW": {},
-      "COL": {},
-      "ALL": {},
-      "CUSTOM": {}
+      "EXACT": {
+        "label": "Exactement cette valeur",
+        "description": "La stratégie inclut toutes les requêtes de recherche, tous les filtres, etc. liés à la vue de recherche actuelle"
+      },
+      "ROW": {
+        "label": "N'importe lequel dans la ligne",
+        "description": "La stratégie inclut les pivots de ligne"
+      },
+      "COL": {
+        "label": "N'importe lequel dans la colonne",
+        "description": "La stratégie inclut les pivots de colonne"
+      },
+      "ALL": {
+        "label": "N'importe lequel dans le widget",
+        "description": "La stratégie inclut toutes les valeurs des pivots de ligne et de colonne liées à la valeur sélectionnée"
+      },
+      "CUSTOM": {
+        "label": "Personnalisée",
+        "description": "Vous pouvez sélectionner n'importe quelle partie de la recherche"
+      }
     }
   },
-  "view_errors": {},
-  "views_notifications": {},
-  "field_actions": {},
+  "view_errors": {
+    "something_went_wrong": "Une erreur s'est produite",
+    "unknown_error": "Une erreur inconnue s'est produite. Veuillez consulter le message suivant ainsi que le journal du serveur {{productName}} pour plus d'informations."
+  },
+  "views_notifications": {
+    "delete_view_failed": "La suppression de la vue {{title}} a échoué avec le statut : {{error}}",
+    "delete_view_failed_title": "Impossible de supprimer la vue",
+    "apply_widget_changes_failed": "L'application des modifications du widget a échoué avec le statut : {{error}}",
+    "load_message_failed": "Le chargement des informations du message a échoué avec le statut",
+    "could_not_load_message": "Impossible de charger les informations du message"
+  },
+  "field_actions": {
+    "chart": "Graphique",
+    "show_top_values": "Afficher les valeurs principales",
+    "statistics": "Statistiques",
+    "add_to_table": "Ajouter au tableau",
+    "remove_from_table": "Retirer du tableau",
+    "add_to_all_tables": "Ajouter à tous les tableaux",
+    "remove_from_all_tables": "Retirer de tous les tableaux",
+    "change_field_type": "Modifier le type de champ"
+  },
   "aggregation": {},
   "widget_creators": {},
   "message_details": {},
