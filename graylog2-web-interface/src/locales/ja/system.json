@@ -182,7 +182,8 @@
   },
   "journal_state": {
     "loading": "ジャーナルのメトリクスを読み込んでいます...",
-    "unavailable": "ジャーナルのメトリクスを利用できません。"
+    "unavailable": "ジャーナルのメトリクスを利用できません。",
+    "summary_other": "ジャーナルには、{{count}} 個のセグメントに<strong>{{messages}} 件の未処理メッセージ</strong>があります。直近1秒間に<strong>{{appended}} 件のメッセージ</strong>が追加され、<strong>{{read}} 件のメッセージ</strong>が読み取られました。"
   },
   "jvm_heap_usage": {
     "loading": "ヒープ使用状況の情報を読み込んでいます...",
@@ -197,6 +198,8 @@
     "configure_internal_logging": "内部ログを設定"
   },
   "node_overview": {
+    "plugins_installed_other": "インストール済みのプラグイン: {{count}} 件",
+    "inputs_running_other": "このノードで実行中のInput: {{count}} 件",
     "memory_heap_usage": "メモリ/ヒープ使用量",
     "buffers": "バッファー",
     "buffers_description": "バッファーは、メッセージが各プロセッサーを通過する際に、少量のメッセージを非常に短時間（通常はミリ秒単位）キャッシュするために設計されています。",
@@ -229,6 +232,7 @@
     "recent_system_logs": "最新のシステムログメッセージを取得"
   },
   "nodes_list": {
+    "active_nodes_other": "アクティブなノードは {{count}} 件あります",
     "no_active_nodes": "アクティブなノードはありません。"
   },
   "plugins_data_table": {
@@ -364,7 +368,8 @@
   },
   "show_metrics_page": {
     "title": "ノード {{shortNodeId}} / {{hostname}} のメトリクス",
-    "description": "すべての {{productName}} ノードは、診断、デバッグ、モニタリングのための内部メトリクスを提供しています。JMX経由でもすべてのメトリクスにアクセスできることに注意してください。"
+    "description": "すべての {{productName}} ノードは、診断、デバッグ、モニタリングのための内部メトリクスを提供しています。JMX経由でもすべてのメトリクスにアクセスできることに注意してください。",
+    "total_metrics_other": "このノードは合計 {{count}} 件のメトリクスを報告しています。"
   },
   "node_page": {
     "title": "ノード {{shortNodeId}} / {{hostname}}",
@@ -433,7 +438,16 @@
   },
   "use_cluster_support_bundle_notifications": {
     "create_failed": "サポートバンドルの作成がステータス {{error}} で失敗しました",
-    "create_failed_title": "サポートバンドルを作成できませんでした。"
+    "create_failed_title": "サポートバンドルを作成できませんでした。",
+    "delete_failed": "サポートバンドルの削除がステータス {{error}} で失敗しました",
+    "delete_failed_title": "サポートバンドルを削除できませんでした。",
+    "download_failed": "サポートバンドルのダウンロードがステータス {{error}} で失敗しました",
+    "download_failed_title": "サポートバンドルをダウンロードできませんでした。",
+    "load_list_failed": "サポートバンドルの一覧の読み込みがステータス付きで失敗しました",
+    "load_list_failed_title": "サポートバンドルの一覧を読み込めませんでした。"
   },
-  "use_plugin_list_notifications": {}
+  "use_plugin_list_notifications": {
+    "fetch_failed": "ノード \"{{nodeId}}\" のプラグインの取得に失敗しました",
+    "fetch_failed_title": "プラグインを取得できませんでした"
+  }
 }
