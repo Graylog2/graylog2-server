@@ -1,1 +1,177 @@
-{}
+{
+  "add_notification_form": {
+    "add": "Añadir notificación",
+    "choose": "Elige una notificación",
+    "create_new": "Crear nueva notificación...",
+    "help": "Selecciona una notificación para usar en las alertas de este tipo o crea una nueva que puedas usar después en otras alertas.",
+    "select": "Selecciona una notificación",
+    "title": "Añadir notificación"
+  },
+  "aggregation_form": {
+    "description": "Resume los mensajes de log que coinciden con el filtro definido arriba mediante una función. Opcionalmente, puedes agrupar los resultados del filtro por valores de campo idénticos.",
+    "group_by_example": "Supón que creaste un filtro con todos los intentos fallidos de inicio de sesión en tu red. Una alerta podría activarse cuando haya más de 5 intentos fallidos en total. Ahora, añade <code>username</code> como campo de agrupación y se activará una alerta <em>para cada <code>username</code></em> con más de 5 intentos fallidos de inicio de sesión.",
+    "group_by_help": "Selecciona campos para agrupar los resultados del filtro cuando tengan valores idénticos. <bold>Ejemplo:</bold>",
+    "title": "Agregación"
+  },
+  "bulk_actions": {
+    "delete": {
+      "error": "Se produjo un error al eliminar las definiciones de evento. {{error}}",
+      "title": "Eliminar definiciones de evento"
+    },
+    "disable": {
+      "error": "Se produjo un error al deshabilitar las definiciones de evento. {{error}}",
+      "title": "Deshabilitar definiciones de evento"
+    },
+    "disable_action": "Deshabilitar",
+    "enable": {
+      "error": "Se produjo un error al habilitar las definiciones de evento. {{error}}",
+      "title": "Habilitar definiciones de evento"
+    },
+    "enable_action": "Habilitar",
+    "success_title": "Éxito"
+  },
+  "condition_form": {
+    "available_conditions": "Condiciones disponibles",
+    "condition_type": "Tipo de condición",
+    "condition_type_help": "Elige el tipo de condición para este evento.",
+    "description": "Define cómo deben crearse los eventos de este tipo. Más adelante puedes usar esos eventos como entrada en otras condiciones, lo que permite crear condiciones potentes basadas en otras.",
+    "no_description": "No hay descripción disponible.",
+    "not_editable": "Las condiciones de este tipo de definición de evento no se pueden editar.",
+    "select_condition_type": "Selecciona un tipo de condición",
+    "title": "Condición de evento"
+  },
+  "condition_summary": {
+    "and": "Y",
+    "create_events": "Crear eventos para la definición",
+    "errors_found": "Se encontraron errores",
+    "hide_errors": "Ocultar errores",
+    "invalid": "La condición no es válida",
+    "no_condition": "No hay ninguna condición configurada",
+    "no_series": "No se ha seleccionado ninguna serie",
+    "or": "O",
+    "preview": "Vista previa:",
+    "show_errors": "Mostrar errores",
+    "title": "Resumen de la condición",
+    "valid": "La condición es válida"
+  },
+  "conditions": {
+    "add_expression": "Añadir expresión",
+    "add_group": "Añadir grupo",
+    "all": "todas las",
+    "any": "cualquiera de las",
+    "boolean_operator": "Operador booleano",
+    "boolean_operator_group": "Grupo de operador booleano {{level}}",
+    "delete_expression": "Eliminar expresión",
+    "global_boolean_operator": "Operador booleano global",
+    "if": "Si",
+    "is": "Es",
+    "messages_must_meet": "Los mensajes deben cumplir",
+    "of_the_following_rules": "siguientes reglas:",
+    "select_condition": "Selecciona una condición",
+    "select_field": "Selecciona un campo (opcional)",
+    "select_function": "Selecciona una función",
+    "select_percentile": "Selecciona un percentil",
+    "select_strategy": "Selecciona una estrategia (opcional)",
+    "threshold": "Umbral"
+  },
+  "definition_summary": {
+    "details": "Detalles",
+    "no_description": "No se ha indicado ninguna descripción",
+    "no_tags": "Sin etiquetas",
+    "no_title": "No se ha indicado ningún título",
+    "title": "Resumen del evento"
+  },
+  "details_form": {
+    "add_event_procedure": "Añadir procedimiento de evento",
+    "description": "Descripción",
+    "description_help": "Descripción más extensa de esta definición de evento.",
+    "no_event_procedures": "Esta definición de evento todavía no tiene procedimientos de evento.",
+    "no_remediation_steps": "No se han indicado pasos de corrección",
+    "optional": "(Opcional)",
+    "priority": "Prioridad",
+    "priority_help": "Elige la prioridad de los eventos creados a partir de esta definición.",
+    "remediation_steps": "Pasos de corrección",
+    "remediation_steps_help": "Pasos para corregir este evento. Se admite formato Markdown.",
+    "summary_template": "Plantilla de resumen del evento",
+    "summary_template_help": "Plantilla usada para generar los resúmenes de eventos y alertas.",
+    "title": "Detalles del evento",
+    "title_help": "Título de esta definición de evento.",
+    "title_label": "Título"
+  },
+  "event_key_help": {
+    "event_count": "Para controlar cuántos eventos crea una definición de <bold>Filtro y agregación</bold>, usa \"Crear eventos para la definición si...\" con \"El resultado de la agregación alcanza un umbral\" y configura los campos de \"Agrupar por campo(s)\".",
+    "example": "<bold>Ejemplo:</bold> dos definiciones, <em>Fallo de inicio de sesión</em> y <em>Escalada de privilegios</em>, ambas con la clave de evento <code>username</code>. Una correlación de las dos solo se activa cuando ambos eventos tienen el mismo username.",
+    "intro": "Las claves de evento son campos personalizados cuyos valores se combinan en la clave del evento (valores unidos con <code>|</code>). La clave identifica la entidad a la que se refiere un evento. No cambia el número de eventos que se crean.",
+    "where_it_matters": "<bold>Dónde importa la clave:</bold> la <bold>correlación de eventos</bold> solo coincide con los eventos de origen que comparten la misma clave y crea como máximo un evento por clave dentro de su ventana de búsqueda. Define las claves en las definiciones de evento que quieras correlacionar, no en la propia correlación."
+  },
+  "expanded_notifications": {
+    "description": "Notificaciones que se envían cuando se activa esta definición de evento.",
+    "loading": "Cargando notificaciones...",
+    "missing_permissions": "Faltan permisos de notificaciones para:"
+  },
+  "field_form": {
+    "add": "Añadir campo personalizado",
+    "data_type": "Tipo de dato del campo",
+    "data_type_string": "Cadena de texto",
+    "key_help": "Indica si este campo debe ser una clave y su orden.",
+    "more_about_keys": "Más información sobre las claves de evento",
+    "name": "Nombre",
+    "name_help": "Nombre de este campo.",
+    "provider_unavailable": "El proveedor seleccionado no está disponible.",
+    "select_value_source": "Selecciona el origen del valor",
+    "set_value_from": "Establecer valor desde",
+    "title_edit": "Campo personalizado \"{{fieldName}}\"",
+    "title_new": "Nuevo campo personalizado",
+    "update": "Actualizar campo personalizado",
+    "use_as_key": "Usar el campo como clave de evento",
+    "value_source_help": "Selecciona un origen para el valor de este campo."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {}
+  },
+  "fields_form": {},
+  "fields_list": {},
+  "filter_aggregation_form": {},
+  "filter_form": {},
+  "filter_preview": {},
+  "form_container": {},
+  "form_controls": {},
+  "hook_notifications": {},
+  "notification_list": {},
+  "notification_settings": {},
+  "notifications_form": {},
+  "overview": {},
+  "page": {},
+  "priorities": {},
+  "provider_summary": {},
+  "query_parameter_modal": {
+    "types": {}
+  },
+  "replay_search": {
+    "attributes": {}
+  },
+  "row_actions": {},
+  "scheduling": {},
+  "share": {},
+  "sidebar": {},
+  "status_cell": {},
+  "steps": {},
+  "summary": {
+    "condition_types": {}
+  },
+  "summary_renders": {},
+  "summary_template_help": {},
+  "tags_editor": {},
+  "template_preview": {},
+  "template_provider_form": {},
+  "types": {
+    "aggregation": {},
+    "system": {}
+  },
+  "validation": {},
+  "validation_summary": {},
+  "use_event_definition_notifications": {}
+}
