@@ -24,7 +24,13 @@
     "aria_label": "Seleziona il campo per l'ordinamento"
   },
   "fields_configuration": {
-    "add_field": "Aggiungi un campo"
+    "add_field": "Aggiungi un campo",
+    "hide_selected_one": "Nascondi {{count}} campo selezionato",
+    "hide_selected_other": "Nascondi {{count}} campi selezionati",
+    "show_selected_one": "Mostra {{count}} campo selezionato",
+    "show_selected_other": "Mostra {{count}} campi selezionati",
+    "hide_selected_many": "Nascondi {{count}} campi selezionati",
+    "show_selected_many": "Mostra {{count}} campi selezionati"
   },
   "move_widget": {
     "no_pages": "Nessuna pagina trovata",
@@ -137,16 +143,84 @@
     "select_direction": "Seleziona una direzione",
     "type": "Tipo",
     "add_column": "Aggiungi una colonna",
-    "configure_filter": "Configura un nuovo filtro"
+    "configure_filter": "Configura un nuovo filtro",
+    "edit_filter": "Modifica il filtro {{column}}",
+    "delete_filter": "Elimina il filtro {{column}}"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "Data singola",
+    "range": "Intervallo",
+    "select_single_date": "Seleziona tipo data singola",
+    "select_range": "Seleziona tipo intervallo",
+    "date_range": "Da {{from}} a {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "Azioni",
+    "loading": "Caricamento",
+    "decorated": "(decorato)",
+    "stopped_node": "nodo arrestato",
+    "cluster_node": "Nodo del cluster {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "Crea nuovo {{name}}",
+      "select_decorator": "Seleziona decoratore",
+      "none_configured": "Nessun decoratore configurato.",
+      "actions": "Azioni",
+      "edit": "Modifica",
+      "edit_named": "Modifica {{name}}",
+      "unknown_type": "Tipo di decoratore sconosciuto",
+      "create": "Crea",
+      "update": "Aggiorna",
+      "help_title": "Cosa sono i decoratori dei messaggi?",
+      "help_description": "I decoratori possono modificare al volo i messaggi mostrati nei risultati di ricerca. Queste modifiche non vengono salvate, ma mostrate solo nei risultati di ricerca. La configurazione dei decoratori viene salvata <strong>per stream</strong>.",
+      "help_order": "Usa trascina e rilascia per modificare l'ordine in cui vengono elaborati i decoratori.",
+      "help_docs": "Scopri di più sui decoratori dei messaggi nella <docsLink>documentazione</docsLink>."
+    },
+    "show_message_in_new_row": "Mostra il messaggio in una nuova riga"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "spaziatura",
+    "display_name": "Tabella dati",
+    "pinned_columns_title": "Colonne fissate",
+    "show_row_numbers_title": "Mostra numeri di riga"
+  },
+  "field_types": {
+    "missing_event_definition": "Definizione di evento mancante: {{id}}"
+  },
+  "export": {
+    "title_search": "Esporta tutti i risultati della ricerca",
+    "title_dashboard": "Esporta i risultati di ricerca della tabella dei messaggi",
+    "select_different_table": "Seleziona un'altra tabella dei messaggi",
+    "downloading": "Download in corso...",
+    "start_download": "Avvia download",
+    "settings_based_on": "Le impostazioni seguenti si basano sulla tabella dei messaggi: {{title}}",
+    "exporting_table": "Stai esportando i risultati di ricerca per la tabella dei messaggi: {{title}}",
+    "define_fields": "Definisci i campi per il tuo file.",
+    "decorated_fields_hint": "L'esportazione supporta i campi creati dai decoratori che fanno parte della tabella dei messaggi, ma al momento non compaiono nell'elenco dei campi. Se vuoi esportare un campo decorato, inserisci semplicemente il suo nome.",
+    "finish_hint": "Al termine della configurazione, fai clic su <quote>Avvia download</quote>.",
+    "fields_to_export": "Campi da esportare",
+    "messages_limit": "Limite di messaggi",
+    "limit_help": "I messaggi vengono caricati a blocchi. Se è definito un limite, vengono recuperati tutti i blocchi fino a quello in cui il limite viene raggiunto. Ciò significa che il numero totale di messaggi consegnati può essere superiore al limite definito.",
+    "search_contains_all": "L'esportazione conterrà tutti i messaggi della ricerca corrente.",
+    "search_select_table": "Seleziona una tabella dei messaggi per adottarne i campi. Potrai modificare tutte le impostazioni nel passaggio successivo.",
+    "dashboard_select_table": "Seleziona la tabella dei messaggi di cui vuoi esportare i risultati di ricerca. Potrai modificarne i campi nel passaggio successivo.",
+    "dashboard_equals_action": "Selezionare una tabella dei messaggi equivale a usare l'opzione \"Esporta in CSV\" nel menu azioni di una tabella dei messaggi.",
+    "select_message_table": "Seleziona tabella dei messaggi",
+    "no_message_table": "Devi creare un widget tabella dei messaggi per esportarne il risultato.",
+    "output_format": "Formato di output",
+    "untitled_view": "{{type}} senza titolo"
+  },
+  "enterprise_widgets": {
+    "message_list": "Elenco messaggi",
+    "results": "Risultati",
+    "events": "Eventi",
+    "text_markdown": "Testo/Markdown"
+  },
+  "comma_separated_values_csv": "Valori separati da virgola (CSV)",
+  "error_widget": {
+    "title": "Durante il recupero dei dati per questo widget si sono verificati i seguenti errori:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "Vuoi davvero eliminare questo decoratore?",
+    "unsaved_changes_confirm": "Hai modifiche non salvate nel modulo di configurazione. Questa azione le annullerà"
+  }
 }
