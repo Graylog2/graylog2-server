@@ -1,1 +1,200 @@
-{}
+{
+  "shared": {
+    "leader": "領導者",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "正在載入搜尋後端節點...",
+    "search_backend_unknown": "無法判定已設定的搜尋後端。",
+    "search_placeholder": "搜尋節點…",
+    "all_nodes": "所有節點",
+    "data_nodes": "資料節點",
+    "opensearch_nodes": "OpenSearch 節點",
+    "mongodb_nodes": "MongoDB 節點"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "記憶體",
+    "jvm": "JVM",
+    "indexing": "索引",
+    "storage": "儲存空間",
+    "buffers": "緩衝區",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "吞吐量"
+  },
+  "data_nodes_expandable": {
+    "title": "資料節點"
+  },
+  "indexing_metrics_cell": {
+    "docs": "文件數",
+    "latency": "延遲"
+  },
+  "node_actions": {
+    "thread_dump": "取得執行緒傾印",
+    "process_buffer_dump": "取得處理緩衝區傾印",
+    "metrics": "指標"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "暫停訊息處理",
+    "resume_message_processing": "恢復訊息處理",
+    "override_load_balancer_dead": "將負載平衡器狀態覆寫為 DEAD",
+    "override_load_balancer_alive": "將負載平衡器狀態覆寫為 ALIVE",
+    "local_message_inputs": "本機訊息輸入",
+    "recent_system_logs": "取得最近的系統日誌訊息",
+    "message_processing_title": "訊息處理",
+    "pause_confirm": "即將<b>暫停</b>節點 <b>{{nodeName}}</b> 的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將<b>恢復</b>節點 <b>{{nodeName}}</b> 的訊息處理，確定要繼續嗎？",
+    "load_balancer_title": "負載平衡器",
+    "load_balancer_confirm": "即將將節點 <b>{{nodeName}}</b> 的負載平衡器狀態變更為 <b>{{status}}</b>，確定要繼續嗎？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} 節點"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "負載平衡器 {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "訊息處理 {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB 節點"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB 效能分析可協助找出慢速查詢，並排除叢集節點之間的效能問題。",
+    "enabling_profiling": "正在啟用效能分析...",
+    "enable_confirm": "要在所有 MongoDB 節點上啟用 <b>Slow Ops</b> 效能分析（{{threshold}}）嗎？設定會立即生效且無需重新啟動，但除非在啟動時設定，否則重新啟動後會重設。"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch 節點"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "顯示{{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "負載（1 分鐘）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "叢集",
+    "cluster_id": "叢集 ID：",
+    "not_available": "無法使用",
+    "number_of_nodes": "節點數量："
+  },
+  "cluster_support_bundle_info": {
+    "description": "建立一個 zip 檔案，內含 Graylog 叢集的實用除錯資訊。",
+    "enterprise_customers": "Graylog Enterprise 客戶可將支援套件附加至支援工單，協助 Graylog 技術支援團隊分析並診斷問題。",
+    "examine_content": "分享前請先檢查套件內容，其中可能包含 IP 位址、主機名稱，甚至密碼等敏感資料！",
+    "paid_license_only": "只有付費授權的使用者才能使用 Graylog Enterprise 支援。您仍可將此檔案用於其他除錯用途。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "叢集支援套件",
+    "create": "建立支援套件",
+    "download": "下載",
+    "delete": "刪除",
+    "filename": "檔案名稱",
+    "size": "大小",
+    "no_bundles": "找不到任何支援套件。",
+    "delete_title": "刪除支援套件",
+    "delete_confirm": "確定要刪除 <strong>{{name}}</strong> 嗎？"
+  },
+  "log_level_metrics": {
+    "level": "等級：{{level}}",
+    "total_written": "寫入總數：",
+    "mean_rate": "平均速率：",
+    "one_minute_rate": "1 分鐘速率：",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "子系統：{{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "顯示日誌等級指標",
+    "hide_log_level_metrics": "隱藏日誌等級指標",
+    "total_log_messages": "總共寫入 <strong>{{throughput}} 則內部日誌訊息。</strong>"
+  },
+  "metric_details": {
+    "value": "值：",
+    "count": "計數：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "standard_deviation": "標準差：",
+    "percentile_95": "第 95 百分位數：",
+    "percentile_98": "第 98 百分位數：",
+    "percentile_99": "第 99 百分位數：",
+    "invalid_type": "無效的指標類型：{{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "總計：",
+    "events": "事件",
+    "one_minute_avg": "1 分鐘平均：",
+    "five_minute_avg": "5 分鐘平均：",
+    "fifteen_minute_avg": "15 分鐘平均："
+  },
+  "counter_rate": {
+    "calculating": "計算中...",
+    "total": "（總計 {{total}}）",
+    "per_second": "每秒"
+  },
+  "metric_container": {
+    "loading": "載入中..."
+  },
+  "metrics_component": {
+    "fetch_error": "無法從節點擷取指標：伺服器回傳 <em>{{responseMessage}}</em>，狀態碼為 {{status}}。",
+    "fetch_problem": "擷取節點指標時發生問題。",
+    "retry_in_background": "系統將在背景持續嘗試擷取。",
+    "fetch_error_last_metrics": "無法從節點擷取指標：伺服器回傳 <em>{{responseMessage}}</em>，狀態碼為 {{status}}。正在顯示最後可用的指標。",
+    "filter_placeholder": "輸入指標名稱以篩選…"
+  },
+  "metrics_list": {
+    "no_metrics": "沒有符合篩選條件的指標。請確認您使用的是有效的正規表示式"
+  },
+  "buffer_usage": {
+    "metrics": "指標",
+    "utilization": "<strong>{{usage}} 則訊息</strong>位於 {{title}} 中，使用率為 {{percentage}}。"
+  },
+  "input_types_data_table": {
+    "loading": "正在載入輸入類型..."
+  },
+  "journal_details": {},
+  "journal_state": {},
+  "jvm_heap_usage": {},
+  "node_list_item": {},
+  "node_maintenance_dropdown": {},
+  "node_overview": {},
+  "nodes_actions": {},
+  "nodes_list": {},
+  "plugins_data_table": {},
+  "rest_api_overview": {},
+  "system_information": {},
+  "system_overview_details": {},
+  "system_overview_summary": {},
+  "bulk_actions": {},
+  "system_notifications_table": {},
+  "actions_cell": {},
+  "title_cell": {},
+  "system_job": {},
+  "system_jobs_component": {},
+  "system_jobs_list": {},
+  "system_messages_component": {},
+  "system_messages_list": {},
+  "global_throughput": {},
+  "node_throughput": {},
+  "telemetry_debug_entry_row": {},
+  "telemetry_debug_overlay": {},
+  "cluster_configuration_page": {},
+  "configurations_page": {},
+  "enterprise_page": {},
+  "process_buffer_dump_page": {},
+  "show_metrics_page": {},
+  "node_page": {},
+  "system_logs_page": {},
+  "system_notifications_page": {},
+  "system_overview_page": {},
+  "thread_dump_page": {},
+  "notifications": {},
+  "use_cluster_overview_notifications": {},
+  "use_cluster_support_bundle_notifications": {},
+  "use_plugin_list_notifications": {}
+}
