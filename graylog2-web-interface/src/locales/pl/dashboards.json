@@ -1,0 +1,51 @@
+{
+  "human_name": "dashboardy",
+  "full_screen": {
+    "menu": "Pełny ekran",
+    "title": "Konfiguracja trybu pełnoekranowego",
+    "start": "Rozpocznij widok pełnoekranowy",
+    "refresh_interval": "Interwał odświeżania",
+    "refresh_interval_help": "Po ilu sekundach dashboard ma się odświeżyć?",
+    "tabs": "Karty",
+    "tabs_help": "Wybierz karty zapytań, które mają zostać uwzględnione w rotacji.",
+    "cycle_interval": "Interwał zmiany kart",
+    "cycle_interval_help": "Po ilu sekundach ma zostać wyświetlona następna karta?"
+  },
+  "properties": {
+    "title": "Tytuł",
+    "title_help": "Tytuł dashboardu.",
+    "summary": "Podsumowanie",
+    "summary_help": "Pomocne podsumowanie dashboardu.",
+    "description": "Opis",
+    "description_help": "Dłuższy, pomocny opis dashboardu i jego funkcjonalności."
+  },
+  "overview": {
+    "missing_requirements": "Brakujące wymagania",
+    "user_defined": "Zdefiniowane przez użytkownika",
+    "load_failed": "Ładowanie dashboardów nie powiodło się, status:",
+    "could_not_load": "Nie udało się załadować dashboardów"
+  },
+  "delete": {
+    "confirm": "Czy na pewno chcesz usunąć \"{{title}}\"?",
+    "success": "Usunięcie dashboardu \"{{title}}\" powiodło się!",
+    "success_title": "Sukces!",
+    "failed": "Usuwanie dashboardu nie powiodło się: {{error}}",
+    "failed_title": "Błąd!"
+  },
+  "bulk_delete": {
+    "confirm_one": "Czy na pewno chcesz usunąć {{count}} dashboard?",
+    "confirm_other": "Czy na pewno chcesz usunąć {{count}} dashboardu?",
+    "partial_failure_one": "Nie udało się usunąć {{failed}} z {{count}} wybranego dashboardu.",
+    "partial_failure_other": "Nie udało się usunąć {{failed}} z {{count}} wybranego dashboardu.",
+    "success_one": "Pomyślnie usunięto {{count}} dashboard.",
+    "success_other": "Pomyślnie usunięto {{count}} dashboardu.",
+    "success_title": "Sukces",
+    "failed": "Wystąpił błąd podczas usuwania dashboardów. {{error}}",
+    "confirm_few": "Czy na pewno chcesz usunąć {{count}} dashboardy?",
+    "confirm_many": "Czy na pewno chcesz usunąć {{count}} dashboardów?",
+    "partial_failure_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych dashboardów.",
+    "partial_failure_many": "Nie udało się usunąć {{failed}} z {{count}} wybranych dashboardów.",
+    "success_few": "Pomyślnie usunięto {{count}} dashboardy.",
+    "success_many": "Pomyślnie usunięto {{count}} dashboardów."
+  }
+}

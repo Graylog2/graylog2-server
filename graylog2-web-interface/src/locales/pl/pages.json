@@ -1,0 +1,63 @@
+{
+  "api_browser": {
+    "download_label": "Pobierz specyfikację OpenAPI:",
+    "fetch_failed": "Pobieranie specyfikacji API nie powiodło się!",
+    "loading": "Ładowanie specyfikacji API ...",
+    "loading_title": "Przeglądarka API – ładowanie specyfikacji API",
+    "select_format": "Wybierz format",
+    "title": "Przeglądarka API"
+  },
+  "configlet": {
+    "error": "Wystąpił błąd:"
+  },
+  "errors": {
+    "copy_error_details": "Skopiuj szczegóły błędu do schowka"
+  },
+  "keyboard_shortcuts": {
+    "description": "Lista wszystkich dostępnych skrótów klawiszowych",
+    "title": "Skróty klawiszowe"
+  },
+  "loading": {
+    "text": "Ładowanie, proszę czekać...",
+    "title": "Ładowanie..."
+  },
+  "not_found": {
+    "back_hint": "Możesz wrócić na <mainPageLink>stronę główną</mainPageLink> i przejść stamtąd dalej.",
+    "description": "Strona, której szukasz, nie istnieje (już).",
+    "title": "Nie znaleziono strony"
+  },
+  "runtime_error": {
+    "description_hint": "Możesz skorzystać z nawigacji, aby przejść do innych części produktu, odświeżyć stronę lub wysłać raport o błędzie.",
+    "description_intro": "Wygląda na to, że strona, na którą przejście zostało wykonane, zawierała błąd.",
+    "error_label": "Błąd:",
+    "show_less": "Pokaż mniej",
+    "show_more": "Pokaż więcej",
+    "title": "Coś poszło nie tak."
+  },
+  "server_unavailable": {
+    "document_title": "Serwer niedostępny",
+    "error_message": "Komunikat o błędzie",
+    "full_error_message": "Pełny komunikat o błędzie",
+    "intro": "Występują problemy z połączeniem z serwerem {{productName}} działającym pod adresem <serverAddress>{{address}}</serverAddress>. Sprawdź, czy serwer działa prawidłowo.",
+    "last_response": "To ostatnia odpowiedź otrzymana z serwera:",
+    "less_details": "Mniej szczegółów",
+    "modal_title": "Serwer jest obecnie niedostępny",
+    "more_details": "Więcej szczegółów",
+    "need_help": "Potrzebujesz pomocy? <helpLink>Możemy pomóc</helpLink>.",
+    "no_information": "Brak dostępnych informacji.",
+    "original_request": "Oryginalne żądanie",
+    "redirect_hint": "Po nawiązaniu połączenia z serwerem zostaniesz automatycznie przekierowany na poprzednią stronę.",
+    "status_code": "Kod statusu"
+  },
+  "show_message": {
+    "document_title": "Wiadomość {{messageId}} w {{index}}",
+    "not_found_description": "Nie znaleziono określonego indeksu lub wiadomości. Najprawdopodobniej indeks zawierający wskazaną wiadomość został usunięty. Pełny komunikat o błędzie:",
+    "not_found_title": "Nie znaleziono indeksu/wiadomości"
+  },
+  "unauthorized": {
+    "description_hint": "Skontaktuj się z administratorem i podaj szczegóły błędu.",
+    "description_intro": "Nie masz wymaganych uprawnień, aby wyświetlić ten zasób.",
+    "page_details": "Sprawdzenie uprawnień dla następującego żądania nie powiodło się,\npodczas próby dostępu do {{pathname}}.",
+    "title": "Brak uprawnień"
+  }
+}

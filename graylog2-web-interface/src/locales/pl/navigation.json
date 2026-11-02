@@ -1,0 +1,57 @@
+{
+  "main": {
+    "search": "Wyszukiwanie",
+    "streams": "Streamy",
+    "alerts": "Alerty",
+    "dashboards": "Dashboardy",
+    "system": "System",
+    "enterprise": "Enterprise",
+    "security": "Bezpieczeństwo"
+  },
+  "system": {
+    "overview": "Przegląd",
+    "configurations": "Konfiguracje",
+    "cluster_configuration": "Konfiguracja klastra",
+    "inputs": "Inputy",
+    "outputs": "Outputy",
+    "indices": "Indeksy",
+    "logging": "Logowanie",
+    "users_and_teams": "Użytkownicy i zespoły",
+    "roles": "Role",
+    "authentication": "Uwierzytelnianie",
+    "content_packs": "Pakiety treści",
+    "grok_patterns": "Wzorce Grok",
+    "lookup_tables": "Tabele wyszukiwania (Lookup Tables)",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors"
+  },
+  "security": {
+    "overview": "Przegląd",
+    "user_activity": "Aktywność użytkowników",
+    "host_activity": "Aktywność hostów",
+    "network_activity": "Aktywność sieciowa",
+    "anomalies": "Anomalie"
+  },
+  "help": {
+    "title": "Pomoc",
+    "documentation": "Dokumentacja",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Skróty klawiszowe",
+    "api_browser": "Przeglądarka API"
+  },
+  "user_menu": {
+    "title": "Menu użytkownika: {{name}}",
+    "language": "Język",
+    "show_profile": "Pokaż profil",
+    "edit_profile": "Edytuj profil",
+    "log_out": "Wyloguj się"
+  },
+  "shell": {
+    "welcome": "Witamy",
+    "main": "Główne",
+    "utility": "Narzędzia",
+    "toggle_navigation": "Przełącz nawigację",
+    "scratchpad": "Brudnopis"
+  }
+}

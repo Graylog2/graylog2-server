@@ -1,0 +1,623 @@
+{
+  "actions": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "submit": "Wyślij",
+    "delete": "Usuń",
+    "previous": "Poprzedni",
+    "next": "Następny",
+    "add": "Dodaj",
+    "edit": "Edytuj",
+    "preview": "Podgląd",
+    "close": "Zamknij",
+    "done": "Gotowe",
+    "filter": "Filtruj",
+    "reset": "Resetuj",
+    "reset_search": "Resetuj wyszukiwanie",
+    "more_actions": "Więcej akcji",
+    "sort": "Sortuj",
+    "clear_selection": "Wyczyść zaznaczenie",
+    "remove_item": "Usuń {{name}}"
+  },
+  "confirm_leave": {
+    "question": "Czy na pewno?"
+  },
+  "duration": {
+    "years_one": "{{count}} rok",
+    "years_other": "{{count}} roku",
+    "months_one": "{{count}} miesiąc",
+    "months_other": "{{count}} miesiąca",
+    "days_one": "{{count}} dzień",
+    "days_other": "{{count}} dnia",
+    "hours_one": "{{count}} godzina",
+    "hours_other": "{{count}} godziny",
+    "minutes_one": "{{count}} minuta",
+    "minutes_other": "{{count}} minuty",
+    "seconds_one": "{{count}} sekunda",
+    "seconds_other": "{{count}} sekundy",
+    "milliseconds_one": "{{count}} milisekunda",
+    "milliseconds_other": "{{count}} milisekundy",
+    "nanoseconds_one": "{{count}} nanosekunda",
+    "nanoseconds_other": "{{count}} nanosekundy",
+    "microseconds_one": "{{count}} mikrosekunda",
+    "microseconds_other": "{{count}} mikrosekundy",
+    "years_few": "{{count}} lata",
+    "years_many": "{{count}} lat",
+    "months_few": "{{count}} miesiące",
+    "months_many": "{{count}} miesięcy",
+    "days_few": "{{count}} dni",
+    "days_many": "{{count}} dni",
+    "hours_few": "{{count}} godziny",
+    "hours_many": "{{count}} godzin",
+    "minutes_few": "{{count}} minuty",
+    "minutes_many": "{{count}} minut",
+    "seconds_few": "{{count}} sekundy",
+    "seconds_many": "{{count}} sekund",
+    "milliseconds_few": "{{count}} milisekundy",
+    "milliseconds_many": "{{count}} milisekund",
+    "nanoseconds_few": "{{count}} nanosekundy",
+    "nanoseconds_many": "{{count}} nanosekund",
+    "microseconds_few": "{{count}} mikrosekundy",
+    "microseconds_many": "{{count}} mikrosekund"
+  },
+  "bulk_actions": {
+    "title": "Akcje zbiorcze",
+    "cancel": "Anuluj zaznaczenie"
+  },
+  "refresh": {
+    "not_updating": "Brak aktualizacji",
+    "every": "Co",
+    "pause": "Wstrzymaj odświeżanie",
+    "start": "Rozpocznij odświeżanie"
+  },
+  "create_entity": {
+    "title": "Utwórz {{entityName}}",
+    "submit": "Utwórz {{entityName, lowercase}}",
+    "submitting": "Tworzenie {{entityName, lowercase}}...",
+    "save_failed": "Zapisywanie nie powiodło się",
+    "unknown_error": "Wystąpił błąd. Spróbuj ponownie."
+  },
+  "key_value_table": {
+    "name": "Nazwa",
+    "value": "Wartość",
+    "actions": "Akcje"
+  },
+  "markdown_editor": {
+    "editor_title": "Edytor Markdown",
+    "preview_title": "Podgląd Markdown",
+    "expand_preview": "Rozwiń podgląd",
+    "expand_content": "Rozwiń zawartość"
+  },
+  "source_code_editor": {
+    "copy": "Kopiuj (Ctrl+C / ⌘C)",
+    "paste": "Wklej (Ctrl+V / ⌘V)",
+    "undo": "Cofnij (Ctrl+Z / ⌘Z)",
+    "redo": "Ponów (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Naciśnij Ctrl+V (⌘V w macOS) lub wybierz Edycja → Wklej, aby wkleić zawartość ze schowka."
+  },
+  "loading": "Ładowanie...",
+  "loading_long_wait": "To trwa nieco dłużej, proszę czekać...",
+  "errors": {
+    "runtime_error": "Błąd wykonania",
+    "unknown_error": "Nieznany błąd",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "Błąd pobierania danych",
+    "page_error_description": "Wystąpił problem z pobraniem danych potrzebnych do zbudowania tej strony, dlatego zamiast nich wyświetlamy ilustrację.",
+    "page_error_logs": "Sprawdź logi serwera {{productName}}, aby uzyskać więcej informacji."
+  },
+  "empty": {
+    "no_data": "Brak dostępnych danych.",
+    "no_entities": "Brak elementów.",
+    "nothing_here": "Wygląda na to, że na razie nic tu nie ma!",
+    "no_items": "Brak elementów do wyświetlenia",
+    "no_items_available": "Brak dostępnych elementów",
+    "no_items_found": "Nie znaleziono elementów do wyświetlenia.",
+    "filter_no_match": "Filtr nie pasuje do żadnych danych."
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "Podgląd",
+    "default": "Domyślny",
+    "optional": "(Opc.)"
+  },
+  "clipboard": {
+    "copied": "Skopiowano!"
+  },
+  "restricted_access": {
+    "view": "Nie masz uprawnień do przeglądania tego elementu ({{entityName}})."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Funkcja Enterprise",
+    "description": "Do korzystania z funkcji <bold>{{featureName}}</bold> wymagana jest <licenseLink>licencja Graylog Enterprise</licenseLink> oraz <docsLink>wtyczka Graylog Enterprise</docsLink>."
+  },
+  "pagination": {
+    "first": "Otwórz pierwszą stronę",
+    "previous": "Otwórz poprzednią stronę",
+    "next": "Otwórz następną stronę",
+    "last": "Otwórz ostatnią stronę",
+    "page": "Otwórz stronę {{page}}",
+    "active_page": "Aktywna strona"
+  },
+  "page_size": {
+    "rows_one": "{{count}} wiersz",
+    "rows_other": "{{count}} wiersza",
+    "configure": "Skonfiguruj rozmiar strony",
+    "show": "Pokaż <select/>",
+    "rows_few": "{{count}} wiersze",
+    "rows_many": "{{count}} wierszy"
+  },
+  "search_form": {
+    "placeholder": "Wpisz zapytanie wyszukiwania...",
+    "filter_placeholder": "Wpisz zapytanie, aby filtrować"
+  },
+  "select": {
+    "placeholder": "Wybierz...",
+    "no_options": "Brak opcji",
+    "loading": "Ładowanie...",
+    "loading_options": "Ładowanie opcji...",
+    "type_to_filter": "Wpisz, aby filtrować"
+  },
+  "entity_table": {
+    "selected_items_one": "Zaznaczono {{count}} element",
+    "selected_items_other": "Zaznaczono {{count}} elementu",
+    "columns": "Kolumny",
+    "configure_columns": "Skonfiguruj widoczne kolumny",
+    "reset_columns": "Zresetuj wszystkie kolumny",
+    "show_column": "Pokaż {{column}}",
+    "hide_column_named": "Ukryj {{column}}",
+    "show_label": "Pokaż",
+    "show_details": "Pokaż szczegóły",
+    "collapse_section": "Zwiń sekcję",
+    "toggle_column_actions": "Przełącz akcje kolumny {{column}}",
+    "sort_ascending": "Sortuj rosnąco",
+    "sort_descending": "Sortuj malejąco",
+    "sort_column_ascending": "Sortuj rosnąco według: {{column, lowercase}}",
+    "sort_column_descending": "Sortuj malejąco według: {{column, lowercase}}",
+    "hide_column": "Ukryj kolumnę",
+    "resize_column": "Zmień rozmiar kolumny {{column}}",
+    "slicing_by": "Podział według {{column}}",
+    "select_entity": "Zaznacz element",
+    "deselect_entity": "Odznacz element",
+    "select_all": "Zaznacz wszystkie widoczne elementy",
+    "deselect_all": "Odznacz wszystkie widoczne elementy",
+    "more": "Więcej",
+    "more_actions": "Więcej akcji",
+    "load_layout_failed": "Ładowanie preferencji układu dla widoku \"{{entityId}}\" nie powiodło się z błędem",
+    "update_layout_failed": "Aktualizacja preferencji układu tabeli nie powiodła się z błędem: {{error}}",
+    "search_placeholder": "Wyszukaj {{humanName}}",
+    "fetch_failed": "Pobieranie {{humanName}} nie powiodło się",
+    "fetch_failed_with_status": "Pobieranie {{humanName}} nie powiodło się, status:",
+    "could_not_retrieve": "Nie udało się pobrać: {{humanName}}",
+    "no_results": "Nie znaleziono: {{humanName}}.",
+    "selected_items_few": "Zaznaczono {{count}} elementy",
+    "selected_items_many": "Zaznaczono {{count}} elementów"
+  },
+  "slicing": {
+    "slice_by": "Podziel według",
+    "slice_by_values": "Podziel według wartości",
+    "no_slicing": "Bez podziału",
+    "unselect_slice": "Odznacz podział",
+    "sort_by": "Sortuj według {{option}}",
+    "filter": "Filtruj {{column}}",
+    "filter_slices": "Filtruj podziały",
+    "sort_ascending": "Sortuj rosnąco",
+    "sort_descending": "Sortuj malejąco",
+    "hide_empty": "Ukryj puste podziały ({{count}})",
+    "show_empty": "Pokaż puste podziały ({{count}})",
+    "hide_empty_title": "Ukryj puste podziały",
+    "show_empty_title": "Pokaż puste podziały",
+    "no_empty": "Puste podziały (0)",
+    "fetch_failed": "Błąd pobierania podziałów tabeli"
+  },
+  "filters": {
+    "filters": "Filtry",
+    "create_filter": "Utwórz filtr",
+    "change_value": "Zmień wartość filtra",
+    "delete_filter": "Usuń filtr",
+    "filter_ignored": "Filtr pominięty",
+    "slice_conflict": "Ten filtr jest pomijany, ponieważ dla tego atrybutu aktywny jest podział. Wyczyść podział, aby zastosować filtr.",
+    "single_filter_only": "Dla tego atrybutu można utworzyć tylko jeden filtr.",
+    "update_existing": "Jeśli chcesz zmienić wartość filtra, możesz zaktualizować istniejący.",
+    "create_attribute_filter": "Utwórz filtr: {{attribute, lowercase}}",
+    "edit_attribute_filter": "Edytuj filtr: {{attribute, lowercase}}",
+    "create_submit": "Utwórz filtr",
+    "update_submit": "Zaktualizuj filtr",
+    "value_placeholder": "Wpisz wartość do filtrowania",
+    "must_not_be_empty": "Pole nie może być puste.",
+    "search_attribute": "Wyszukaj {{attribute, lowercase}}",
+    "no_entities_found": "Nie znaleziono elementów",
+    "hold_shift": "Przytrzymaj Shift, aby zaznaczyć wiele",
+    "load_suggestions_failed": "Ładowanie sugestii dla filtra nie powiodło się, status:",
+    "could_not_load_suggestions": "Nie udało się wczytać sugestii filtra",
+    "load_titles_failed": "Ładowanie tytułów filtrów nie powiodło się, status:",
+    "could_not_load_titles": "Nie udało się wczytać tytułów filtrów",
+    "all_time": "Cały czas",
+    "now": "Teraz",
+    "now_lowercase": "teraz",
+    "relative_range": "od {{from}} do {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "nanosekundy",
+    "microseconds": "mikrosekundy",
+    "milliseconds": "milisekundy",
+    "seconds": "sekundy",
+    "minutes": "minuty",
+    "hours": "godziny",
+    "days": "dni",
+    "months": "miesiące",
+    "years": "lata"
+  },
+  "time": {
+    "never": "Nigdy",
+    "toggle_time": "Przełącz czas",
+    "time_unit_input": "Pole jednostki czasu",
+    "browser_time_zone": "Strefa czasowa przeglądarki",
+    "pick_time_zone": "Wybierz strefę czasową",
+    "unclassified_time_zones": "Nieklasyfikowane",
+    "default_locale": "Domyślne ustawienia regionalne",
+    "pick_locale": "Wybierz ustawienia regionalne"
+  },
+  "page_header": {
+    "experimental": "Eksperymentalne",
+    "legacy": "Przestarzałe",
+    "experimental_message": "Ta funkcja jest nowa i należy traktować ją jako eksperymentalną.",
+    "legacy_message": "Ta funkcja została wycofana i zostanie usunięta w przyszłej wersji."
+  },
+  "message": {
+    "collector_ingest": "Collector Ingest",
+    "deleted_input": "usunięty Input",
+    "received_by": "Odebrane przez",
+    "received_by_value": "<inputName/> na <node/>",
+    "filter_streams": "Filtruj Streamy",
+    "default_stream_not_testable": "Nie można testować domyślnego Streamu",
+    "no_streams": "Brak dostępnych Streamów",
+    "test_against_stream": "Testuj na Streamie",
+    "show_changes": "Pokaż zmiany",
+    "copy_id": "Kopiuj ID",
+    "copy_message": "Kopiuj wiadomość",
+    "not_stored": "Nie zapisano",
+    "timestamp": "Znacznik czasu",
+    "stored_in_index": "Zapisano w indeksie",
+    "not_stored_in_index": "Wiadomość nie jest zapisana",
+    "routed_into_streams": "Przekierowano do Streamów",
+    "edit_favorite_fields": "Edytuj ulubione pola",
+    "show_remaining_fields_one": "Pokaż {{count}} pozostałe pole",
+    "show_remaining_fields_other": "Pokaż {{count}} pozostałego pola",
+    "hide_remaining_fields_one": "Ukryj {{count}} pozostałe pole",
+    "hide_remaining_fields_other": "Ukryj {{count}} pozostałego pola",
+    "favorite_fields_configuration": "Konfiguracja ulubionych pól",
+    "favorite_fields_hint_one": "Ulubione pola będą widoczne we wszystkich Streamach, do których należy ta wiadomość, w tym w Streamie <streams/>, do którego jest przekierowana.",
+    "favorite_fields_hint_other": "Ulubione pola będą widoczne we wszystkich Streamach, do których należy ta wiadomość, w tym w Streamach <streams/>, do których jest przekierowana.",
+    "save_configuration": "Zapisz konfigurację",
+    "reset_to_default": "Przywróć domyślne",
+    "reset_to_default_title": "Przywróć domyślne pola: {{fields}}",
+    "favorite_fields": "Ulubione pola",
+    "remaining_fields": "Pozostałe pola",
+    "set_favorites_failed": "Ustawianie pól jako ulubionych nie powiodło się z błędem: {{error}}",
+    "set_favorites_failed_title": "Nie udało się ustawić pól jako ulubionych",
+    "add_favorite_failed": "Dodawanie pola do ulubionych nie powiodło się z błędem: {{error}}",
+    "add_favorite_failed_title": "Nie udało się dodać pola do ulubionych",
+    "remove_favorite_failed": "Usuwanie pola z ulubionych nie powiodło się z błędem: {{error}}",
+    "remove_favorite_failed_title": "Nie udało się usunąć pola z ulubionych",
+    "field_terms": "Wartości pola:",
+    "received_by_radio_value": "przez <inputName/> na Radio <node/>",
+    "show_remaining_fields_few": "Pokaż {{count}} pozostałe pola",
+    "show_remaining_fields_many": "Pokaż {{count}} pozostałych pól",
+    "hide_remaining_fields_few": "Ukryj {{count}} pozostałe pola",
+    "hide_remaining_fields_many": "Ukryj {{count}} pozostałych pól",
+    "favorite_fields_hint_few": "Ulubione pola będą widoczne we wszystkich Streamach, do których należy ta wiadomość, w tym w Streamach <streams/>, do których jest przekierowana.",
+    "favorite_fields_hint_many": "Ulubione pola będą widoczne we wszystkich Streamach, do których należy ta wiadomość, w tym w Streamach <streams/>, do których jest przekierowana."
+  },
+  "entity_types": {
+    "user": "użytkownik",
+    "team": "zespół",
+    "dashboard": "dashboard",
+    "event_definition": "definicja zdarzenia",
+    "notification": "powiadomienie",
+    "search": "wyszukiwanie",
+    "stream": "Stream",
+    "search_filter": "filtr wyszukiwania",
+    "report": "raport",
+    "role": "rola",
+    "output": "Output",
+    "sigma_rule": "reguła Sigma",
+    "event_procedure": "procedura zdarzeń",
+    "event_procedure_step": "krok procedury zdarzeń",
+    "collection": "kolekcja",
+    "collection_entities": "elementy kolekcji"
+  },
+  "marketplace_link": "Marketplace {{productName}}",
+  "chips_cell": {
+    "show_fewer": "Pokaż mniej",
+    "show_all": "Pokaż wszystkie",
+    "filter_by": "Filtruj według {{itemLabel}} \"{{value}}\""
+  },
+  "compact_pagination": {
+    "previous_page": "Poprzednia strona",
+    "select_page": "Wybierz stronę",
+    "next_page": "Następna strona",
+    "of_pages": "z {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Zaznacz element"
+  },
+  "traffic_graph": {
+    "days": "Dni",
+    "incoming": "Ruch przychodzący",
+    "outgoing": "Ruch wychodzący",
+    "last_days": "Ostatnie dni ({{days}}): {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Nieznany węzeł"
+  },
+  "markdown": {
+    "images_unsupported": "Obrazy nie są obsługiwane ze względów bezpieczeństwa. Aby włączyć dozwolone źródła, przejdź <configurationLink>tutaj</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Pokaż mniej",
+    "read_more": "Pokaż więcej"
+  },
+  "refresh_controls": {
+    "controls_label": "Elementy sterujące odświeżaniem: {{humanName}}",
+    "below_minimum": "Interwał <intervalDuration /> ({{interval}}) jest krótszy niż skonfigurowany minimalny interwał <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Wróć na górę"
+  },
+  "section": {
+    "toggle_section": "Przełącz sekcję: {{title, lowercase}}"
+  },
+  "selectable_list": {
+    "remove": "Usuń"
+  },
+  "share_menu_item": {
+    "share": "Udostępnij"
+  },
+  "status_icon": {
+    "yes": "Tak",
+    "no": "Nie"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Wybierz pole"
+  },
+  "query_helper": {
+    "title": "Pomoc dotycząca składni wyszukiwania",
+    "show_help": "Pokaż pomoc dotyczącą składni wyszukiwania",
+    "available_fields": "Dostępne pola wyszukiwania",
+    "field": "Pole",
+    "description": "Opis",
+    "examples": "Przykłady",
+    "example_description": "Znajdź wszystkie elementy typu {{entityName}}, których opis zawiera security:",
+    "example_id": "Znajdź element typu {{entityName}} o identyfikatorze 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Identyfikator elementu typu {{entityName}}, będący unikalnym odniesieniem.",
+      "title": "Tytuł elementu typu {{entityName}}.",
+      "name": "Nazwa elementu typu {{entityName}}.",
+      "description": "Krótki opis elementu typu {{entityName}}.",
+      "summary": "Długie podsumowanie elementu typu {{entityName}}."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Dodaj do listy dozwolonych URL",
+    "title": "Zaktualizuj konfigurację listy dozwolonych",
+    "submit": "Zaktualizuj konfigurację",
+    "urls": "Adresy URL na liście dozwolonych"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<zawartość przesłanego pliku>",
+    "no_configuration": "-- brak konfiguracji --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Cofnij resetowanie",
+    "remove": "Usuń",
+    "title": "Tytuł",
+    "optional": "opcjonalne"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Stworzony z myślą o zespołach IT Operations i inżynierii oprogramowania o ograniczonych zasobach, {{productName}} Enterprise oferuje liczne usprawnienia, dzięki którym można zaoszczędzić tysiące godzin rocznie na zbieraniu i analizie danych z logów w celu wykrywania przyczyn problemów z wydajnością, awariami i błędami.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Rozszerz możliwości {{productName}} Open’s w zakresie wykrywania, badania i reagowania na zagrożenia cyberbezpieczeństwa dzięki dashboardom i alertom dotyczącym bezpieczeństwa, silnikowi wykrywania anomalii AI/ML, integracjom z innymi narzędziami bezpieczeństwa, możliwościom SOAR oraz licznym funkcjom raportowania zgodności.",
+    "request_now": "Złóż wniosek"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "Wtyczka {{productName}} Enterprise",
+    "installed": "Zainstalowano: {{pluginName}}",
+    "not_installed": "Nie zainstalowano: {{pluginName}}",
+    "status": "Status modułów {{productName}} Enterprise w tym klastrze:"
+  },
+  "reported_error": {
+    "title": "Coś poszło nie tak",
+    "description": "Wystąpił nieznany błąd. Zapoznaj się z poniższym komunikatem oraz z logiem serwera {{productName}}, aby uzyskać więcej informacji."
+  },
+  "hotkeys": {
+    "or": "lub",
+    "title": "Skróty klawiszowe",
+    "view_all": "Wyświetl wszystkie skróty klawiszowe"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Panel boczny: {{title}}",
+    "sidebar_label_collapsed": "Panel boczny: {{title}} (zwinięty)",
+    "close": "Zamknij panel boczny",
+    "expand": "Rozwiń panel boczny",
+    "collapse": "Zwiń panel boczny",
+    "go_back": "Wstecz",
+    "go_back_label": "Wróć do poprzedniej zawartości",
+    "go_forward": "Dalej",
+    "go_forward_label": "Przejdź do następnej zawartości"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "Adapter danych GeoIP obsługuje odczyt baz danych GeoIP2 firmy MaxMind.",
+      "limitations_title": "Ograniczenia",
+      "limitations_supported": "Obecnie obsługiwane są bazy ASN, miast i krajów.",
+      "limitations_more": "Aby uzyskać wsparcie dla dodatkowych typów baz danych, skorzystaj z naszych kanałów wsparcia.",
+      "asn_fields": "Pola bazy ASN",
+      "country_fields": "Pola bazy krajów",
+      "city_fields": "Pola bazy miast",
+      "city_additional_fields": "Oprócz pól udostępnianych przez bazę krajów, baza miast zawiera także następujące pola:",
+      "complete_documentation": "Pełną dokumentację pól znajdziesz w <docsLink>dokumentacji dla deweloperów</docsLink> firmy MaxMind"
+    },
+    "database_types": {
+      "asn": "Baza ASN",
+      "city": "Baza miast",
+      "country": "Baza krajów",
+      "ipinfo_location": "Baza lokalizacji IPinfo",
+      "ipinfo_asn": "Baza ASN IPinfo"
+    },
+    "field_set": {
+      "file_path": "Ścieżka do pliku",
+      "file_path_help": "Ścieżka do pliku bazy danych.",
+      "database_type": "Typ bazy danych",
+      "database_type_help": "Wybierz typ pliku bazy danych",
+      "database_type_placeholder": "Wybierz typ pliku bazy danych",
+      "refresh_file": "Odświeżaj plik",
+      "refresh_file_help": "Jeśli opcja jest włączona, plik bazy danych jest sprawdzany pod kątem zmian i odświeżany, gdy zmieni się na dysku."
+    },
+    "summary": {
+      "database_file_path": "Ścieżka do pliku bazy danych",
+      "database_type": "Typ bazy danych",
+      "check_interval": "Interwał sprawdzania"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Nazwa kontenera Azure Blob",
+    "container_name_help": "Nazwa kontenera Azure Blob.",
+    "endpoint_url": "Adres URL punktu końcowego Azure Blob",
+    "endpoint_url_help": "Adres URL punktu końcowego Azure Blob. Wymagany tylko wtedy, gdy chcesz nadpisać domyślny punkt końcowy.",
+    "account_name": "Nazwa konta Azure",
+    "account_name_placeholder": "nazwa-konta",
+    "account_name_help": "Nazwa konta magazynu Azure.",
+    "account_key_reset": "Klucz konta Azure",
+    "reset_password": "Zresetuj hasło",
+    "account_key": "Klucz konta Azure",
+    "account_key_help": "Klucz konta magazynu Azure."
+  },
+  "gcs_geoip": {
+    "project_id": "Identyfikator projektu Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Konfiguracja procesora geolokalizacji",
+    "description": "Wtyczka procesora geolokalizacji skanuje wszystkie wiadomości w poszukiwaniu pól zawierających <bold>wyłącznie</bold> adres IP i umieszcza informacje o geolokalizacji (współrzędne, kod kraju ISO i nazwę miasta) w osobnych polach. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "enabled_summary": "Włączony:",
+    "enforce_schema_summary": "Wymuszaj domyślny schemat:",
+    "vendor_type_summary": "Typ dostawcy bazy danych:",
+    "city_db_path_summary": "Ścieżka do bazy miast:",
+    "asn_db_path_summary": "Ścieżka do bazy ASN:",
+    "refresh_interval_summary": "Interwał odświeżania bazy danych:",
+    "pull_from_cloud_summary": "Pobieraj pliki z zasobnika w chmurze:",
+    "edit": "Edytuj konfigurację",
+    "modal_title": "Zaktualizuj konfigurację procesora geolokalizacji",
+    "enable_processor": "Włącz procesor geolokalizacji",
+    "enforce_schema": "Wymuszaj domyślny schemat",
+    "vendor_select": "Wybierz dostawcę bazy GeoIP",
+    "city_db_path": "Ścieżka do bazy miast",
+    "asn_db_path": "Ścieżka do bazy ASN",
+    "refresh_interval": "Interwał odświeżania bazy danych",
+    "refresh_interval_help": "Interwał, w którym pliki bazy danych są sprawdzane pod kątem zmian; wykryte na dysku zmiany są odświeżane.",
+    "pull_from_cloud": "Pobieraj pliki z zasobnika w chmurze",
+    "select_cloud_storage": "Wybierz magazyn w chmurze",
+    "update_configuration": "Zaktualizuj konfigurację",
+    "updating_configuration": "Aktualizowanie konfiguracji..."
+  },
+  "links": {
+    "documentation": "dokumentacja"
+  },
+  "quick_jump": {
+    "title": "Szybkie przejście",
+    "open": "Otwórz szybkie przejście",
+    "search_placeholder": "Szukaj stron/dashboardów/Streamów ...",
+    "intro": "Wpisz zapytanie wyszukiwania, aby znaleźć stronę, Stream, dashboard, Input lub inny element.",
+    "intro_hint": "Aby ułatwić start, poniżej znajdziesz listę elementów <bold>ostatnio otwieranych</bold> i <bold>ulubionych</bold>:",
+    "no_results": "Nie znaleziono wyników wyszukiwania. Spróbuj użyć innych wyrażeń.",
+    "recent": "Ostatnie"
+  },
+  "scratchpad": {
+    "title": "Notatnik",
+    "status_cleared": "Wyczyszczono.",
+    "status_auto_saved": "Zapisano automatycznie.",
+    "got_it": "Rozumiem!",
+    "sensitive_warning": "Zalecamy, aby w tym miejscu <bold>nie</bold> przechowywać żadnych informacji poufnych, takich jak hasła.",
+    "help_overlay": "W tym miejscu możesz przechowywać osobiste notatki i inne informacje bez opuszczania okna przeglądarki. Na przykład możesz zapisywać znaczniki czasu, identyfikatory użytkowników lub adresy IP potrzebne podczas różnych analiz.",
+    "copy": "Kopiuj",
+    "clear": "Wyczyść",
+    "clear_confirm": "Spowoduje to wyczyszczenie zawartości notatnika. Czy chcesz kontynuować?"
+  },
+  "extractor_actions": {
+    "select_type": "Wybierz typ Extractora",
+    "only_string_fields": "Extractory mogą być używane wyłącznie z polami tekstowymi."
+  },
+  "surrounding_search": {
+    "button": "Pokaż otaczające wiadomości"
+  },
+  "support_sources": {
+    "title": "Potrzebujesz pomocy?",
+    "help_text": "Jeśli nie znajdziesz odpowiedzi w <docsLink>dokumentacji</docsLink>, skorzystaj ze społeczności {{productName}}.",
+    "community_support": "Wsparcie społeczności",
+    "issue_tracker": "Lista zgłoszeń",
+    "professional_support": "Wsparcie profesjonalne"
+  },
+  "times_list": {
+    "title": "Konfiguracja czasu",
+    "description": "Strefy czasowe mogą być mylące. Tutaj zobaczysz strefę czasową stosowaną w różnych komponentach systemu. Strefę czasową poszczególnych węzłów serwera {{productName}} sprawdzisz na ich stronach szczegółów.",
+    "user": "Użytkownik <bold>{{username}}</bold>:",
+    "web_browser": "Przeglądarka internetowa:",
+    "server": "Serwer {{productName}}:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Wizualizacja widgetu (<italic>{{widgetClassName}}</italic>) nie została znaleziona. Wygląda na to, że wtyczka dostarczająca ten widget nie jest załadowana."
+  },
+  "telemetry": {
+    "title": "Telemetria",
+    "enable_label": "Włącz telemetrię",
+    "enabled_checkbox": "włączona",
+    "update_preferences": "Zaktualizuj preferencje",
+    "update_button": "Zaktualizuj telemetrię",
+    "info_modal_title": "Pomóż nam ulepszać {{productName}}",
+    "ok": "OK",
+    "info": "Chcielibyśmy zbierać anonimowe dane o użytkowaniu, aby ustalać priorytety ulepszeń i w przyszłości sprawić, by {{productName}} działał lepiej.",
+    "no_personal_data": "Nie zbieramy danych osobowych, informacji poufnych ani treści, takich jak logi z instancji.",
+    "learn_more": "Więcej informacji znajdziesz w naszej <privacyLink>Polityce prywatności</privacyLink>.",
+    "turn_off_profile": "Zbieranie danych można wyłączyć lub włączyć w dowolnym momencie <bold>w profilu użytkownika</bold>.",
+    "turn_off_here": "Zbieranie danych można wyłączyć lub włączyć w dowolnym momencie tutaj."
+  },
+  "app_facade": {
+    "preparing": "Przygotowujemy dla Ciebie interfejs webowy..."
+  },
+  "suggest_reload": {
+    "title": "Zmieniono wersję {{productName}}",
+    "version_changed": "Wersja {{productName}} została zmieniona z <bold>{{version}}</bold> na <bold>{{newVersion}}</bold>.",
+    "save_work": "Zapisz pracę i przeładuj stronę, aby uniknąć błędów.",
+    "reload_now": "Przeładuj teraz"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} na {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Pobieranie nie powiodło się, status: {{error}}",
+    "download_failed_title": "Nie można pobrać pliku",
+    "export_failed": "Eksport nie powiódł się",
+    "export_widget_failed": "Eksport widgetu nie powiódł się",
+    "telemetry_update_failed": "Aktualizacja nie powiodła się: {{error}}",
+    "telemetry_update_failed_title": "Nie udało się zaktualizować ustawień telemetrii.",
+    "delete_property_confirm": "Czy na pewno chcesz usunąć właściwość '{{key}}'?",
+    "quick_jump_failed": "Pobieranie wyników wyszukiwania elementów nie powiodło się, status:",
+    "quick_jump_failed_title": "Nie udało się pobrać wyników wyszukiwania elementów."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Dodawanie elementu do ulubionych nie powiodło się, status: {{error}}",
+    "put_failed_title": "Nie udało się dodać elementu do ulubionych",
+    "delete_failed": "Usuwanie elementu z ulubionych nie powiodło się, status: {{error}}",
+    "delete_failed_title": "Nie udało się usunąć elementu z ulubionych"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Ładowanie tytułów elementów nie powiodło się, status:",
+    "load_failed_title": "Nie udało się wczytać tytułów elementów"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Nie udało się pobrać danych nadpisania"
+  }
+}

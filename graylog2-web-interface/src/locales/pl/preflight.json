@@ -1,0 +1,129 @@
+{
+  "navigation": {
+    "initial_setup": "Wstępna konfiguracja {{productName}}",
+    "get_help": "Uzyskaj pomoc",
+    "documentation": "Dokumentacja",
+    "changelogs": "Historia zmian",
+    "operations_changelogs": "Historia zmian Operations",
+    "support": "Wsparcie"
+  },
+  "setup": {
+    "welcome": "Witaj!",
+    "first_start": "Wygląda na to, że uruchamiasz {{productName}} po raz pierwszy i nie skonfigurowano jeszcze Data Node.",
+    "data_nodes_allow": "Data Nodes umożliwiają indeksowanie i przeszukiwanie wszystkich wiadomości w bazie wiadomości {{productName}}.",
+    "data_node_setup": "Możesz wdrożyć <dataNodeLink>{{productName}} Data Node</dataNodeLink> (zalecane) lub ręcznie skonfigurować węzeł <openSearchLink>OpenSearch</openSearchLink>. Aby ręcznie skonfigurować OpenSearch, musisz dostosować konfigurację {{productName}} i ponownie uruchomić serwer {{productName}}. Po ponownym uruchomieniu ta strona nie będzie się już wyświetlać.",
+    "data_nodes_title": "Data Nodes {{productName}}"
+  },
+  "data_nodes": {
+    "description": "{{productName}} Data Nodes zapewniają lepszą integrację z {{productName}} i upraszczają przyszłe aktualizacje. Gdy {{productName}} Data Node będzie uruchomiony i skonfigurujesz urząd certyfikacji, możesz wznowić uruchamianie.",
+    "registered": "Poniżej znajdują się obecnie zarejestrowane Data Nodes. Lista jest na bieżąco aktualizowana.",
+    "transport_address": "Adres transportowy",
+    "hostname": "Nazwa hosta",
+    "separator": " – ",
+    "none_found": "Nie znaleziono żadnych Data Nodes."
+  },
+  "waiting_for_startup": {
+    "title": "Konfiguracja zakończona pomyślnie",
+    "description": "Serwer {{productName}} jest w trakcie uruchamiania. W zależności od konfiguracji może to potrwać kilka minut. Ta strona zostanie automatycznie odświeżona, gdy serwer {{productName}} będzie osiągalny. Możesz też odświeżyć ją ręcznie, pamiętaj jednak, że później nie będzie ona już widoczna.",
+    "spinner": "Oczekiwanie na serwer {{productName}} ..."
+  },
+  "error_boundary": {
+    "title": "Coś poszło nie tak",
+    "description": "Wystąpił nieznany błąd. Zapoznaj się z poniższym komunikatem oraz logiem serwera {{productName}}, aby uzyskać więcej informacji."
+  },
+  "resume_startup": {
+    "button": "Wznów uruchamianie",
+    "confirm": "Czy na pewno chcesz wznowić uruchamianie bez działającego {{productName}} Data Node? Spowoduje to, że konfiguracja wróci do korzystania z instancji Opensearch na localhost:9200.",
+    "error": "Wznowienie uruchamiania nie powiodło się, błąd: {{error}}",
+    "error_title": "Nie udało się wznowić uruchamiania"
+  },
+  "restart_configuration": {
+    "confirm": "Czy na pewno chcesz ponownie uruchomić konfigurację? Wszystkie dotychczasowe zmiany zostaną usunięte.",
+    "restart": "uruchom ponownie",
+    "restarting": "ponowne uruchamianie..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "Konfigurację zawsze możesz <restartButton>uruchomić ponownie</restartButton>",
+    "fetch_error": "Wystąpił błąd podczas pobierania ({{entityName}}): {{message}}"
+  },
+  "entities": {
+    "data_nodes": "Data Nodes",
+    "certificate_authority": "urząd certyfikacji",
+    "renewal_policy": "polityka odnawiania"
+  },
+  "steps": {
+    "ca_configuration": "Konfiguracja urzędu certyfikacji",
+    "renewal_policy_configuration": "Konfiguracja polityki odnawiania",
+    "certificate_provisioning": "Przydzielanie certyfikatów dla Data Nodes",
+    "configuration_finished": "Zakończenie konfiguracji"
+  },
+  "ca_configuration": {
+    "title": "Konfiguracja urzędu certyfikacji",
+    "explanation_upload_or_create": "W tym pierwszym kroku możesz przesłać istniejący urząd certyfikacji lub utworzyć nowy.",
+    "explanation_provisioning": "Dzięki niemu łatwo przydzielimy certyfikaty Twoim Data Nodes.",
+    "create_tab": "Utwórz nowy CA",
+    "upload_tab": "Prześlij CA"
+  },
+  "ca_create": {
+    "description": "Tutaj możesz szybko utworzyć nowy urząd certyfikacji. Wystarczy kliknąć przycisk „Utwórz CA”. CA powinien być używany wyłącznie do zabezpieczania {{productName}} Data Nodes.",
+    "organization_name": "Nazwa organizacji",
+    "creating": "Tworzenie CA...",
+    "create": "Utwórz CA",
+    "success": "CA został utworzony pomyślnie",
+    "error": "Tworzenie CA nie powiodło się, błąd: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Tutaj możesz przesłać istniejący CA. Musisz przesłać pojedynczy plik zawierający klucz prywatny (zaszyfrowany lub niezaszyfrowany), certyfikat CA oraz ewentualne certyfikaty pośrednie. Plik może być w formacie PEM lub PKCS#12. Jeśli klucz prywatny jest zaszyfrowany, musisz także podać jego hasło.",
+    "certificate_authority": "Urząd certyfikacji",
+    "drop_hint": "Przeciągnij CA tutaj lub kliknij, aby wybrać plik",
+    "rejected": "Przesyłanie CA nie powiodło się",
+    "password": "Hasło",
+    "uploading": "Przesyłanie CA...",
+    "upload": "Prześlij CA",
+    "success": "CA został przesłany pomyślnie",
+    "error": "Przesyłanie CA nie powiodło się, błąd: {{error}}",
+    "validation_missing_file": "Prześlij plik.",
+    "validation_multiple_files": "Prześlij tylko jeden plik."
+  },
+  "certificate_provisioning": {
+    "title": "Przydzielanie certyfikatów",
+    "configured": "Urząd certyfikacji został skonfigurowany pomyślnie.",
+    "ready": "Możesz teraz przydzielić certyfikaty swoim Data Nodes.",
+    "data_node_required": "Przed przydzieleniem certyfikatu co najmniej jeden {{productName}} Data Node musi być uruchomiony.",
+    "started": "Przydzielanie certyfikatów rozpoczęto pomyślnie",
+    "error": "Rozpoczęcie przydzielania certyfikatów nie powiodło się, błąd: {{error}}",
+    "provisioning": "Przydzielanie certyfikatu...",
+    "provision": "Przydziel certyfikat i kontynuuj",
+    "skip": "Pomiń przydzielanie"
+  },
+  "renewal_policy": {
+    "title": "Konfiguracja polityki odnawiania",
+    "explanation_automatic": "W tym kroku możesz skonfigurować, czy certyfikaty zbliżające się do wygaśnięcia mają być odnawiane automatycznie.",
+    "explanation_manual": "Jeśli wybierzesz ręczne odnawianie, gdy zbliży się data wygaśnięcia, pojawi się powiadomienie systemowe wymagające potwierdzenia odnowienia.",
+    "policy": "Polityka odnawiania",
+    "select_policy": "Wybierz politykę odnawiania",
+    "automatic": "Automatyczna",
+    "manual": "Ręczna",
+    "certificate_lifetime": "Okres ważności certyfikatu",
+    "enter_lifetime": "Podaj okres ważności",
+    "select_unit": "Wybierz jednostkę",
+    "unit_hours": "Godzina(y)",
+    "unit_days": "Dzień(dni)",
+    "unit_months": "Miesiąc(e)",
+    "unit_years": "Rok(i)",
+    "min_lifetime": "Musi wynosić co najmniej {{duration}}",
+    "creating": "Tworzenie polityki...",
+    "create": "Utwórz politykę",
+    "success": "Polityka odnawiania została utworzona pomyślnie",
+    "error": "Tworzenie polityki odnawiania nie powiodło się, błąd: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "Twoje połączenie nie jest bezpieczne. Pamiętaj, że informacje zostaną wysłane do serwera w postaci niezaszyfrowanej.",
+    "maybe_not_secure": "Twoje połączenie może nie być bezpieczne. Pamiętaj, że informacje mogą zostać wysłane do serwera w postaci niezaszyfrowanej."
+  },
+  "configuration_finished": {
+    "title": "Konfiguracja zakończona",
+    "skipped_provisioning": "Konfiguracja została zakończona pomyślnie. Nadal możesz <goBackButton>wrócić</goBackButton>, aby przydzielić certyfikaty.",
+    "provisioned": "Przydzielanie certyfikatów zakończyło się pomyślnie, a wszystkie Data Nodes są zabezpieczone i osiągalne."
+  }
+}

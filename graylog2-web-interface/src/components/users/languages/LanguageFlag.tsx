@@ -61,6 +61,12 @@ const FLAGS: { [code in LanguageCode]: React.ReactNode } = {
       <rect x="40" width="20" height="30" fill="#EF4135" />
     </>
   ),
+  pl: (
+    <>
+      <rect width="60" height="15" fill="#FFFFFF" />
+      <rect y="15" width="60" height="15" fill="#DC143C" />
+    </>
+  ),
   'pt-BR': (
     <>
       <rect width="60" height="30" fill="#009C3B" />

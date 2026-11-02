@@ -1,0 +1,252 @@
+{
+  "extractors_of": "Extractory dla {{title}}",
+  "actions": "Akcje",
+  "import_extractors": "Importuj extractory",
+  "export_extractors": "Eksportuj extractory",
+  "documentation_title": "Dokumentacja extractorów",
+  "description": "Extractory są stosowane do każdej wiadomości odebranej przez ten Input. Służą do wydobywania i przekształcania danych tekstowych w pola, które później umożliwiają wygodne filtrowanie i analizę. Przykład: wydobycie kodu odpowiedzi HTTP z wiadomości logu, przekształcenie go w pole liczbowe i dołączenie do wiadomości jako {{field}}.",
+  "list_item": {
+    "subtitle_copy": "Próba wydobycia danych z <em>{{source}}</em> do <em>{{target}}</em>, z zachowaniem oryginału.",
+    "subtitle_cut": "Próba wydobycia danych z <em>{{source}}</em> do <em>{{target}}</em>, bez zachowania oryginału.",
+    "condition": "Warunek",
+    "condition_string": "Extractor zostanie uruchomiony tylko wtedy, gdy wiadomość zawiera ciąg <em>{{value}}</em>",
+    "condition_regex": "Extractor zostanie uruchomiony tylko wtedy, gdy wiadomość pasuje do wyrażenia regularnego <em>{{value}}</em>",
+    "confirm_delete": "Na pewno usunąć extractor \"{{title}}\"?",
+    "details": "Szczegóły",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "no_configuration": "Brak opcji konfiguracji",
+    "configuration": "Konfiguracja",
+    "converters": "Konwertery"
+  },
+  "metrics": {
+    "title": "Metryki",
+    "percentile_95": "95. percentyl:",
+    "percentile_98": "98. percentyl:",
+    "percentile_99": "99. percentyl:",
+    "std_dev": "Odchylenie standardowe:",
+    "mean": "Średnia:",
+    "minimum": "Minimum:",
+    "maximum": "Maksimum:",
+    "invocations": "Łącznie {{total}} wywołań od uruchomienia, średnie: {{oneMinute}}, {{fiveMinutes}}, {{fifteenMinutes}}.",
+    "hits_misses": "Trafienia: {{hits}}, chybienia: {{misses}}",
+    "no_messages": "Przez ten punkt nie przeszła jeszcze żadna wiadomość.",
+    "total_time": "Łączny czas",
+    "condition_time": "Czas warunku",
+    "execution_time": "Czas wykonania",
+    "converter_time": "Czas konwertera",
+    "microseconds": "{{value}} μs"
+  },
+  "edit": {
+    "condition_string_label": "Pole zawiera ciąg znaków",
+    "condition_string_help": "Wpisz ciąg znaków, który pole powinno zawierać, aby podjąć próbę wydobycia.",
+    "condition_regex_label": "Pole pasuje do wyrażenia regularnego",
+    "condition_regex_help": "Wpisz wyrażenie regularne, do którego pole powinno pasować, aby podjąć próbę wydobycia.",
+    "condition_matches": "Pasuje! Extractor zostałby uruchomiony na tym przykładzie.",
+    "condition_no_match": "Nie pasuje! Extractor nie zostałby uruchomiony.",
+    "try": "Testuj",
+    "condition_type_help": "Wydobywanie wyłącznie z wiadomości spełniających określony warunek pozwala uniknąć błędnych lub zbędnych wydobyć i może oszczędzać zasoby CPU.",
+    "cursor_strategy_help": "Czy kopiować, czy wycinać ze źródła? Funkcji wycinania nie można używać w standardowych polach, takich jak <em>message</em> i <em>source</em>.",
+    "target_field_help": "Wybierz nazwę pola, w którym zostanie zapisana wydobyta wartość. Może ona zawierać wyłącznie <b>znaki alfanumeryczne i znaki podkreślenia</b>. Przykład: <em>http_response_code</em>.",
+    "store_as_field": "Zapisz jako pole",
+    "example_message": "Przykładowa wiadomość",
+    "configuration": "Konfiguracja extractora",
+    "extractor_type": "Typ extractora",
+    "source_field": "Pole źródłowe",
+    "condition": "Warunek",
+    "condition_none": "Zawsze próbuj wydobyć",
+    "condition_string": "Próbuj wydobyć tylko wtedy, gdy pole zawiera ciąg znaków",
+    "condition_regex": "Próbuj wydobyć tylko wtedy, gdy pole pasuje do wyrażenia regularnego",
+    "extraction_strategy": "Strategia wydobycia",
+    "copy": "Kopiuj",
+    "cut": "Wytnij",
+    "title": "Nazwa extractora",
+    "title_help": "Opisowa nazwa tego extractora.",
+    "create": "Utwórz extractor",
+    "update": "Zaktualizuj extractor"
+  },
+  "converters": {
+    "csv_enable": "Dodaj kolumny CSV jako pola",
+    "csv_field_names": "Nazwy pól",
+    "csv_separator": "Znak separatora",
+    "csv_quote": "Znak cudzysłowu",
+    "csv_escape": "Znak ucieczki",
+    "csv_escape_help": "Znak używany do ucieczki znaków separatora i cudzysłowu.",
+    "csv_strict_quotes": "Używaj ścisłych cudzysłowów",
+    "csv_strict_quotes_help": "Ignoruj zawartość poza cudzysłowami.",
+    "csv_trim": "Usuń białe znaki na początku",
+    "date_enable": "Konwertuj na typ daty",
+    "date_format": "Ciąg formatu",
+    "time_zone": "Strefa czasowa",
+    "locale": "Ustawienia regionalne",
+    "flexdate_enable": "Elastyczne parsowanie daty",
+    "hash": "Utwórz skrót MD5 z wartości",
+    "ip_anonymizer": "Anonimizuj adresy IPv4, zastępując ostatni oktet",
+    "lookup_table_enable": "Konwertuj wartość za pomocą Lookup Table",
+    "lookup_table": "Lookup Table",
+    "lookup_table_placeholder": "Wybierz Lookup Table",
+    "lowercase": "Przekształć wartość na małe litery",
+    "numeric": "Konwertuj na wartość liczbową",
+    "split_and_count": "Podziel i policz",
+    "split_by": "Podziel według",
+    "syslog_pri_facility": "Konwertuj PRI na syslog facility",
+    "syslog_pri_level": "Konwertuj PRI na poziom syslog",
+    "tokenizer": "Dodaj pary Klucz=Wartość jako pola",
+    "uppercase": "Przekształć wartość na wielkie litery",
+    "csv_separator_help": "Na przykład <code>,</code>, <code>\\n</code> i <code>\\t</code> zostaną zamienione na pojedynczy znak.",
+    "date_format_help": "Format ciągu, w jakim zapisana jest data. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "time_zone_help": "Strefa czasowa stosowana do daty. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "locale_help": "Ustawienia regionalne używane podczas parsowania daty. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "lookup_table_help": "Lookup Table można utworzyć <lookupTablesLink>tutaj</lookupTablesLink>.",
+    "split_by_help": "Konwerter Podziel i policz dzieli wydobytą część według zdefiniowanego znaku i zapisuje liczbę tokenów jako pole. <strong>Przykład:</strong> <em>?fields=first_name,last_name,zip</em> podzielone według <em>,</em> daje wynik <em>3</em>. Tak zliczono żądane pola zapytania REST GET dotyczącego użytkownika."
+  },
+  "wizard": {
+    "title": "Dodaj extractor",
+    "description": "Zacznij od wczytania wiadomości, aby mieć przykład do pracy. Możesz wybrać ostatnio odebraną przez ten Input wiadomość lub ręcznie wskazać wiadomość po jej ID.",
+    "create": "Utwórz extractor"
+  },
+  "configuration": {
+    "preview": "Podgląd extractora",
+    "nothing_extracted": "Nic nie zostanie wydobyte",
+    "try_example": "Testuj na przykładzie"
+  },
+  "converters_editor": {
+    "not_supported": "Nie można dodawać konwerterów do extractorów typu <em>{{type}}</em>.",
+    "add_label": "Dodaj konwerter",
+    "add_help": "Dodaj konwertery, aby przekształcić wydobytą wartość.",
+    "select_placeholder": "Wybierz konwerter",
+    "add": "Dodaj"
+  },
+  "export": {
+    "json_title": "JSON extractorów",
+    "copy": "Kopiuj extractory"
+  },
+  "example_message": {
+    "not_loaded": "Nie udało się wczytać przykładu pola ‘{{field}}’. Przed aktualizacją nie można przetestować extractora."
+  },
+  "sort": {
+    "title": "Sortuj extractory dla <em>{{title}}</em>",
+    "description": "Przeciągnij i upuść extractory na liście, aby zmienić kolejność, w jakiej będą stosowane.",
+    "submit": "Zaktualizuj kolejność"
+  },
+  "list": {
+    "sort": "Sortuj extractory",
+    "title": "Skonfigurowane extractory",
+    "no_extractors": "Ten Input nie ma skonfigurowanych extractorów."
+  },
+  "import": {
+    "parse_error": "Wystąpił błąd podczas parsowania extractorów. Czy są w formacie JSON? {{error}}",
+    "parse_error_title": "Nie udało się zaimportować extractorów",
+    "submit": "Dodaj extractory do Inputa"
+  },
+  "message_loader": {
+    "load": "Wczytaj wiadomość",
+    "loading": "Wczytywanie wiadomości...",
+    "wrong_example": "Niewłaściwy przykład?",
+    "load_another": "Wczytaj inną wiadomość",
+    "message_id": "ID wiadomości",
+    "index": "Indeks"
+  },
+  "copy_input": {
+    "description": "Cały Input zostanie skopiowany bez zmian."
+  },
+  "grok": {
+    "error": "Nie udało się uruchomić wydobycia grok z powodu następującego błędu: {{error}}",
+    "no_match": "Nie udało się uruchomić wydobycia grok. Sprawdź parametry.",
+    "named_captures_only": "Tylko nazwane przechwycenia",
+    "named_captures_only_help": "Do wiadomości trafiają wyłącznie jawnie nazwane przechwycenia.",
+    "pattern": "Wzorzec grok"
+  },
+  "json": {
+    "flatten": "Spłaszcz struktury",
+    "flatten_help": "Określa, czy obiekty JSON mają zostać spłaszczone do jednego pola wiadomości, czy rozwinięte do wielu pól.",
+    "list_separator": "Separator elementów listy",
+    "list_separator_help": "Ciąg używany do łączenia elementów listy JSON.",
+    "key_separator": "Separator kluczy",
+    "key_separator_help": "Ciąg używany do łączenia kluczy zagnieżdżonego obiektu JSON (używany tylko, gdy obiekt <em>nie</em> jest spłaszczony).",
+    "kv_separator": "Separator klucz/wartość",
+    "kv_separator_help": "Ciąg używany podczas łączenia par klucz/wartość obiektu JSON (używany tylko, gdy obiekt jest spłaszczony).",
+    "key_prefix": "Prefiks klucza",
+    "key_prefix_help": "Tekst dopisywany na początku każdego klucza wydobytego z obiektu JSON.",
+    "replace_key_whitespace": "Zamień białe znaki w kluczach",
+    "replace_key_whitespace_help": "Klucze pól zawierające białe znaki zostaną odrzucone podczas zapisywania wydobytej wiadomości. Zaznacz to pole, aby zamienić białe znaki w kluczach JSON na inny znak.",
+    "key_whitespace_replacement": "Zamiana białych znaków w kluczach",
+    "key_whitespace_replacement_help": "Znak używany do zamiany białych znaków w kluczach wiadomości. Upewnij się, że znak zastępczy jest poprawny w Lucene, np. '-' lub '_'."
+  },
+  "lookup_table": {
+    "error": "Nie udało się uruchomić wyszukiwania w Lookup Table: {{error}}"
+  },
+  "regex": {
+    "no_match": "Wyrażenie regularne nie pasuje.",
+    "no_group": "Wyrażenie regularne nie zawiera grupy do wydobycia.",
+    "help": "Wyrażenie regularne używane do wydobycia. Używana jest pierwsza grupa dopasowania. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "label": "Wyrażenie regularne"
+  },
+  "regex_replace": {
+    "regex_help": "Wyrażenie regularne używane do wydobycia. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "replacement_help": "Tekst zastępujący dopasowany fragment. Dostępne opcje znajdziesz w dokumentacji API <matcherLink>Matcher</matcherLink>.",
+    "replacement": "Zamiennik",
+    "replace_all": "Zamień wszystkie wystąpienia wzorca",
+    "replace_all_help": "Określa, czy zamienić wszystkie wystąpienia wzorca, czy tylko pierwsze."
+  },
+  "split_and_index": {
+    "no_match": "Nie udało się uruchomić podziału i indeksowania. Sprawdź parametry.",
+    "split_by_help": "Znak, według którego ma nastąpić podział. <strong>Przykład:</strong> znak białej spacji podzieli <em>foo bar baz</em> na <em>[foo,bar,baz]</em>.",
+    "index_help": "Która część podzielonego ciągu ma zostać użyta? <strong>Przykład:</strong> <em>2</em> wybiera <em>bar</em> z <em>foo bar baz</em> przy podziale według białej spacji.",
+    "index": "Indeks docelowy"
+  },
+  "substring": {
+    "no_match": "Nie udało się uruchomić wydobycia podciągu. Sprawdź granice indeksów.",
+    "end_index_help": "Miejsce zakończenia wydobycia (wyłącznie). <strong>Przykład:</strong> <em>1,5</em> wycina <em>love</em> z ciągu <em>ilovelogs</em>.",
+    "begin_index": "Indeks początkowy",
+    "begin_index_help": "Pozycja znaku, od której rozpoczyna się wydobycie (włącznie).",
+    "end_index": "Indeks końcowy"
+  },
+  "pages": {
+    "new_title": "Nowy extractor dla Inputa {{title}}",
+    "new_header": "Nowy extractor dla Inputa <em>{{title}}</em>",
+    "edit_title": "Edytuj extractor {{title}}",
+    "edit_header": "Edytuj extractor <em>{{title}}</em> dla Inputa <em>{{inputTitle}}</em>",
+    "description": "Extractory są stosowane do każdej wiadomości odebranej przez Input. Służą do wydobywania i przekształcania danych tekstowych w pola, które później umożliwiają wygodne filtrowanie i analizę.",
+    "export_title": "Eksport extractorów {{title}}",
+    "export_header": "Eksport extractorów <em>{{title}}</em>",
+    "export_marketplace_prefix": "Extractory Inputa można wyeksportować do JSON, aby zaimportować je w innych konfiguracjach lub udostępnić w",
+    "import_title": "Import extractorów do {{title}}",
+    "import_header": "Import extractorów do <em>{{title}}</em>",
+    "import_description": "Wyeksportowane extractory można zaimportować do Inputa.",
+    "import_marketplace_prefix": "Potrzebny jest tylko eksport extractorów w formacie JSON z dowolnej innej konfiguracji {{productName}} lub z"
+  },
+  "tools_api": {
+    "details": "Szczegóły: {{error}}",
+    "natural_date_failed": "Ładowanie podglądu słowa kluczowego nie powiodło się, status: {{error}}",
+    "natural_date_failed_title": "Nie udało się załadować podglądu słowa kluczowego",
+    "grok_failed_title": "Nie udało się uruchomić wydobycia grok. Sprawdź parametry.",
+    "json_failed_title": "Nie udało się uruchomić wydobycia JSON. Sprawdź parametry.",
+    "regex_invalid_title": "Nie udało się zweryfikować wyrażenia regularnego. Upewnij się, że jest poprawne.",
+    "allowlist_check_title": "Nie udało się sprawdzić, czy adres URL znajduje się na liście dozwolonych.",
+    "regex_generate_title": "Nie udało się wygenerować wyrażenia regularnego.",
+    "regex_try_title": "Nie udało się przetestować wyrażenia regularnego. Upewnij się, że jest poprawne.",
+    "split_index_failed_title": "Nie udało się uruchomić podziału i indeksowania. Sprawdź parametry.",
+    "substring_failed_title": "Nie udało się uruchomić wydobycia podciągu. Sprawdź granice indeksów.",
+    "contains_string_failed_title": "Nie udało się sprawdzić, czy pole zawiera ciąg znaków",
+    "lookup_table_failed_title": "Nie udało się sprawdzić, czy Lookup Table tłumaczy ciąg znaków"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} został pomyślnie utworzony",
+    "create_failed": "Tworzenie extractora nie powiodło się: {{error}}",
+    "create_failed_title": "Nie udało się utworzyć extractora",
+    "updated_success": "Extractor \"{{title}}\" został pomyślnie zaktualizowany",
+    "update_failed": "Aktualizacja extractora nie powiodła się: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować extractora",
+    "deleted_success": "Extractor \"{{title}}\" został pomyślnie usunięty",
+    "delete_failed": "Usuwanie extractora nie powiodło się: {{error}}",
+    "delete_failed_title": "Nie udało się usunąć extractora {{title}}",
+    "positions_updated_success": "Kolejność extractorów została pomyślnie zaktualizowana",
+    "positions_failed": "Zmiana kolejności extractorów nie powiodła się: {{error}}",
+    "positions_failed_title": "Nie udało się zaktualizować kolejności extractorów",
+    "import_success": "Wyniki importu: liczba zaimportowanych extractorów: {{successful}}.",
+    "import_success_title": "Import zakończony pomyślnie",
+    "import_warning": "Wyniki importu: liczba zaimportowanych extractorów: {{successful}}, liczba błędów: {{failed}}.",
+    "import_warning_title": "Import zakończony"
+  }
+}

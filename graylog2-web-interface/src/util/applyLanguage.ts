@@ -19,11 +19,13 @@ import numeral from 'numeral';
 import 'moment/locale/de';
 import 'moment/locale/es';
 import 'moment/locale/fr';
+import 'moment/locale/pl';
 import 'moment/locale/pt-br';
 import 'moment/locale/zh-cn';
 import 'numeral/locales/de';
 import 'numeral/locales/es';
 import 'numeral/locales/fr';
+import 'numeral/locales/pl';
 import 'numeral/locales/pt-br';
 import 'numeral/locales/chs';
 

@@ -1,0 +1,13 @@
+{
+  "welcome": "Witamy w {{productName}}",
+  "username": "Nazwa użytkownika",
+  "password": "Hasło",
+  "sign_in": "Zaloguj się",
+  "signing_in": "Logowanie...",
+  "invalid_credentials": "Nieprawidłowe dane logowania. Sprawdź je i spróbuj ponownie.",
+  "server_error": "Błąd – serwer zwrócił: {{status}} – {{message}}",
+  "fallback_error_cloud": "Błąd podczas ładowania ekranu logowania. Skontaktuj się z opiekunem swojego konta {{productName}}.",
+  "fallback_error": "Błąd podczas logowania przez aktywną usługę uwierzytelniania. Sprawdź jej konfigurację lub skontaktuj się z opiekunem swojego konta {{productName}}. Szczegóły błędu:",
+  "login_with_default": "Zaloguj się domyślną metodą",
+  "login_with": "Zaloguj się przez {{method}}"
+}

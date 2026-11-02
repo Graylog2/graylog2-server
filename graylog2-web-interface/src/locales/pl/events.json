@@ -1,0 +1,147 @@
+{
+  "alerts_attributes": {
+    "additional_fields": "Dodatkowe pola",
+    "aggregation_time_range": "Zakres czasu agregacji",
+    "description": "Opis",
+    "event_definition": "Definicja zdarzenia",
+    "event_definition_type": "Typ definicji zdarzenia",
+    "event_procedures": "Procedury zdarzeń",
+    "group_by_fields": "Pola grupowania",
+    "id": "ID",
+    "key": "Klucz",
+    "message": "Wiadomość",
+    "priority": "Priorytet",
+    "tags": "Tagi",
+    "timestamp": "Znacznik czasu",
+    "type": "Typ"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "Automatyczne odświeżanie jest wyłączone podczas slicingu, aby uniknąć problemów z wydajnością.",
+    "auto_refresh_unavailable_title": "Automatyczne odświeżanie niedostępne",
+    "bulk_replay_search": "Odtwórz wyszukiwanie",
+    "collapse_metrics": "Zwiń metryki",
+    "details": "Szczegóły",
+    "expand_metrics": "Rozwiń metryki",
+    "histogram_failed": "Ładowanie histogramu zdarzeń nie powiodło się: {{error}}",
+    "metrics_title": "Metryki",
+    "no_additional_fields": "Do tego zdarzenia nie dodano żadnych dodatkowych pól.",
+    "no_further_details": "Brak dalszych szczegółów",
+    "no_group_by_fields": "Brak pól grupowania w tym zdarzeniu.",
+    "no_key": "Nie ustawiono klucza dla tego zdarzenia.",
+    "no_time_range": "Brak zakresu czasu",
+    "refresh_human_name": "Zdarzenia",
+    "replay_search": "Odtwórz wyszukiwanie"
+  },
+  "alerts_replay": {
+    "cannot_replay": "Nie można odtworzyć tego zdarzenia: {{reason}} Wybierz inne.",
+    "close_section": "Zamknij sekcję {{title}}",
+    "details_title": "Szczegóły alertu/zdarzenia",
+    "event_definition_details": "Szczegóły definicji zdarzenia",
+    "event_details": "Szczegóły zdarzenia",
+    "no_remediation_steps": "Brak kroków naprawczych",
+    "open_section": "Otwórz sekcję {{title}}",
+    "replay_details": "Szczegóły odtworzenia",
+    "replayed_search": "Odtworzone wyszukiwanie",
+    "system_event": "Zdarzenie jest zdarzeniem systemowym, dlatego nie ma przypisanego zapytania, strumienia ani zakresu czasu."
+  },
+  "alerts_types": {
+    "alert": "Alert",
+    "event": "Zdarzenie"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_one": "Czy na pewno chcesz usunąć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz usunąć {{count}} definicji zdarzenia?",
+      "error": "Wystąpił błąd podczas usuwania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się usunąć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "failed_other": "Nie udało się usunąć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "success_one": "{{count}} definicja zdarzenia została pomyślnie usunięta.",
+      "success_other": "{{count}} definicji zdarzenia zostało pomyślnie usunięte.",
+      "title": "Usuń definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz usunąć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz usunąć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "failed_many": "Nie udało się usunąć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "success_few": "{{count}} definicje zdarzeń zostały pomyślnie usunięte.",
+      "success_many": "{{count}} definicji zdarzeń zostało pomyślnie usuniętych."
+    },
+    "disable": {
+      "confirm_one": "Czy na pewno chcesz wyłączyć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz wyłączyć {{count}} definicji zdarzenia?",
+      "error": "Wystąpił błąd podczas wyłączania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się wyłączyć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "failed_other": "Nie udało się wyłączyć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "success_one": "{{count}} definicja zdarzenia została pomyślnie wyłączona.",
+      "success_other": "{{count}} definicji zdarzenia zostało pomyślnie wyłączone.",
+      "title": "Wyłącz definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz wyłączyć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz wyłączyć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się wyłączyć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "failed_many": "Nie udało się wyłączyć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "success_few": "{{count}} definicje zdarzeń zostały pomyślnie wyłączone.",
+      "success_many": "{{count}} definicji zdarzeń zostało pomyślnie wyłączonych."
+    },
+    "enable": {
+      "confirm_one": "Czy na pewno chcesz włączyć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz włączyć {{count}} definicji zdarzenia?",
+      "error": "Wystąpił błąd podczas włączania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się włączyć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "failed_other": "Nie udało się włączyć {{failed}} z {{count}} wybranej definicji zdarzenia.",
+      "success_one": "{{count}} definicja zdarzenia została pomyślnie włączona.",
+      "success_other": "{{count}} definicji zdarzenia zostało pomyślnie włączone.",
+      "title": "Włącz definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz włączyć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz włączyć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się włączyć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "failed_many": "Nie udało się włączyć {{failed}} z {{count}} wybranych definicji zdarzeń.",
+      "success_few": "{{count}} definicje zdarzeń zostały pomyślnie włączone.",
+      "success_many": "{{count}} definicji zdarzeń zostało pomyślnie włączonych."
+    },
+    "success_title": "Sukces"
+  },
+  "definitions_list": {
+    "disable": "Wyłącz",
+    "enable": "Włącz"
+  },
+  "definitions_page": {
+    "alerts_docs": "Dokumentacja alertów",
+    "copy_confirm": "Czy na pewno chcesz utworzyć kopię „{{title}}”?",
+    "copy_title": "Kopiuj definicję zdarzenia",
+    "create_multiple": "Utwórz definicje zdarzeń",
+    "description_alerts": "Definicje zdarzeń pozwalają tworzyć alerty na podstawie różnych warunków i wysyłać o nich powiadomienia.",
+    "description_events": "Definicje zdarzeń pozwalają tworzyć zdarzenia na podstawie różnych warunków i wysyłać o nich powiadomienia.",
+    "description_list": "Utwórz nowe definicje zdarzeń, które pozwolą wyszukiwać różne warunki i wysyłać o nich powiadomienia.",
+    "duplicate": "Duplikuj definicję zdarzenia",
+    "edit": "Edytuj definicję zdarzenia",
+    "edit_named": "Edytuj definicję zdarzenia „{{title}}”",
+    "file_import": "Utwórz definicje zdarzeń – import z pliku",
+    "git_import": "Utwórz definicje zdarzeń – import z Git",
+    "loading": "Ładowanie definicji zdarzenia...",
+    "new": "Nowa definicja zdarzenia",
+    "new_named": "Nowa definicja zdarzenia „{{title}}”",
+    "title": "Definicje zdarzeń",
+    "view": "Wyświetl definicję zdarzenia",
+    "view_named": "Wyświetl definicję zdarzenia „{{title}}”"
+  },
+  "alerts_page": {
+    "description": "Definiuj zdarzenia na podstawie różnych warunków. Dodaj powiadomienia do zdarzeń wymagających Twojej uwagi, aby tworzyć alerty.",
+    "documentation_title": "Dokumentacja alertów",
+    "title": "Alerty i zdarzenia"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Usunięto wszystkie zdarzenia z listy. Możesz wrócić, klikając <backButton>Wróć do zdarzeń</backButton>",
+    "all_reviewed": "Przejrzano wszystkie zdarzenia. Możesz teraz wybrać akcję zbiorczą do zastosowania do wszystkich poniższych zdarzeń.",
+    "list_description": "Poniższa lista zawiera wszystkie zdarzenia/alerty wybrane w poprzednim kroku. Pozwala przejrzeć odtworzone wyszukiwanie dla każdego z nich.",
+    "mark_not_reviewed": "Oznacz zdarzenie „{{id}}” jako nieprzejrzane",
+    "mark_reviewed": "Oznacz zdarzenie „{{id}}” jako przejrzane",
+    "remove_event": "Usuń zdarzenie „{{id}}” z listy",
+    "replay_search": "Odtwórz wyszukiwanie",
+    "review_progress": "Przejrzano {{completed}}/{{total}} zdarzeń.",
+    "show_selected": "Pokaż wybrane zdarzenia",
+    "unknown_message": "Nieznana"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Ładowanie zdarzenia lub alertu nie powiodło się, status: {{error}}",
+    "load_failed_title": "Nie udało się załadować zdarzenia lub alertu"
+  }
+}
