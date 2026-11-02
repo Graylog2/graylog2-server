@@ -553,32 +553,154 @@
       "title": "無法刪除註冊權杖"
     },
     "reassign_instances": {
-      "message": "重新指派執行個體失敗：{{error}}"
+      "message": "重新指派執行個體失敗：{{error}}",
+      "title": "無法重新指派執行個體"
     },
-    "delete_instance": {},
-    "save_config": {},
-    "create_input": {},
-    "update_input": {}
+    "delete_instance": {
+      "message": "刪除執行個體失敗：{{error}}",
+      "title": "無法刪除執行個體"
+    },
+    "save_config": {
+      "message": "儲存 Collectors 設定失敗：{{error}}",
+      "title": "無法儲存設定"
+    },
+    "create_input": {
+      "message": "建立 Collector 擷取輸入失敗：{{error}}",
+      "title": "無法建立 Collector 擷取輸入"
+    },
+    "update_input": {
+      "message": "更新 Collector 擷取輸入失敗：{{error}}",
+      "title": "無法更新 Collector 擷取輸入"
+    }
   },
-  "notifications": {},
+  "notifications": {
+    "success_title": "成功！",
+    "fleet_created": "已建立 Fleet「{{name}}」。",
+    "fleet_updated": "已更新 Fleet「{{name}}」。",
+    "fleet_deleted": "已刪除 Fleet。",
+    "source_created": "已建立來源「{{name}}」。",
+    "source_updated": "已更新來源「{{name}}」。",
+    "source_deleted": "已刪除來源。",
+    "enrollment_token_deleted": "已刪除註冊權杖。",
+    "enrollment_tokens_deleted": "已刪除註冊權杖。",
+    "instances_reassigned": "已重新指派執行個體。",
+    "instance_deleted": "已刪除執行個體。",
+    "config_saved": "已儲存 Collectors 設定。",
+    "input_created": "已建立 Collector 擷取輸入。",
+    "input_moved": "已將 Collector 擷取輸入移至新的連接埠。"
+  },
   "datanode": {
-    "compatibility_check": {},
-    "migration_steps_text": {},
-    "migration_welcome": {},
-    "migration_wizard": {},
-    "compatibility_status": {},
-    "in_place_migration": {},
-    "migration_data_nodes": {},
-    "manual_migration": {},
-    "stop_processing": {},
-    "journal_size_warning": {},
-    "journal_downtime": {},
-    "in_place_welcome": {},
-    "restart_graylog": {},
-    "in_place_migration_info": {},
-    "certificates_provisioning": {},
-    "jwt_authentication": {},
-    "reset_migration": {},
+    "compatibility_check": {
+      "compatible": "您現有的 OpenSearch 資料可以遷移至 Data Node。",
+      "error": "檢查相容性時發生錯誤",
+      "incompatible": "您現有的 OpenSearch 資料無法遷移至 Data Node。",
+      "loading": "正在載入相容性檢查結果...",
+      "title": "目錄相容性檢查",
+      "version_incompatible": "您的 OpenSearch 叢集與此 Data Node 版本不相容，因此無法遷移。"
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "請在繼續之前建立憑證更新政策。",
+      "finished": "遷移已完成！",
+      "ca_step_required": "請在繼續之前建立憑證授權單位。"
+    },
+    "migration_welcome": {
+      "earlier_deployments": "v5.2 之前的部署，或選擇不隨 Data Node 安裝的部署，需要將訊息資料庫遷移至 Data Node。",
+      "incompatible_backend": "搜尋後端不相容。請升級至 OpenSearch，才能使用遷移精靈。",
+      "intro": "{{productName}} Data Node 是一個管理元件，用於設定並最佳化 OpenSearch 以搭配 {{productName}} 使用，可減少管理負擔並簡化未來的更新。",
+      "more_information": "您可以在 Data Node 遷移<docsLink>文件</docsLink>中取得更多資訊。",
+      "required_steps": "遷移至 Data Node 需要在作業系統、目前的 OS/ES 叢集，以及設定檔中執行一些步驟。",
+      "title": "Data Node 遷移",
+      "tool_description": "此遷移工具將檢查您各元件的相容性，並引導您將現有的 OpenSearch 資料遷移至 Data Node。"
+    },
+    "migration_wizard": {
+      "loading": "載入中 ..."
+    },
+    "compatibility_status": {
+      "creation_date": "建立日期",
+      "datanode_opensearch_version": "Data Node 的 OpenSearch 版本",
+      "index_version": "索引版本",
+      "indices": "索引",
+      "opensearch_data_location": "OpenSearch 資料位置",
+      "shards": "分片"
+    },
+    "in_place_migration": {
+      "description": "請依照以下步驟，將現有的 OpenSearch 2.x 或 1.3.x 叢集遷移至 Data Node。",
+      "title": "原地遷移"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "憑證有效期限至",
+      "hostname": "主機名稱",
+      "incompatible": "有 Data Node 正在執行與您目前的 {{productName}} 版本不相容的版本。請確保 {{productName}} 與 Data Node 使用相同版本。",
+      "incompatible_title": "發現不相容的 Data Node",
+      "loading": "正在載入 Data Node",
+      "looking": "正在尋找 Data Node...",
+      "no_certificate": "沒有憑證",
+      "none_found": "找不到任何 Data Node。",
+      "none_found_title": "找不到 Data Node",
+      "start_data_node": "請至少啟動一個 Data Node 以繼續遷移程序。您可以在我們的<docsLink>文件</docsLink>中找到啟動 Data Node 的更多資訊。",
+      "status": "狀態",
+      "transport_address": "傳輸位址",
+      "version": "版本",
+      "version_incompatible": "此版本與您目前的 {{productName}} 版本不相容。"
+    },
+    "manual_migration": {
+      "migration_type": "遷移類型",
+      "migration_type_help": "您要執行的遷移類型。",
+      "select_migration_type": "選擇遷移類型"
+    },
+    "stop_processing": {
+      "change_owner": "若您是透過將 Data Node 指向現有 OpenSearch 資料目錄來遷移資料，請確保將資料目錄的擁有者變更為執行 Data Node 的使用者（通常為 graylog-datanode），並重設正確的權限，例如執行",
+      "stop_cluster": "請在繼續之前停止您的 OpenSearch 叢集。",
+      "stop_opensearch": "停止 OpenSearch",
+      "stopped": "{{productName}} 處理已停止。"
+    },
+    "journal_size_warning": {
+      "description": "請注意，遷移期間您必須停止 {{productName}} 節點的處理，這將導致日誌佇列（journal）增長。因此，您必須在「日誌佇列大小縮減」步驟或更早之前增加日誌佇列磁碟區的大小。",
+      "title": "日誌佇列大小警告"
+    },
+    "journal_downtime": {
+      "current_size": "您目前的日誌佇列大小為：<bold>{{size}} MB</bold>，目前的日誌佇列吞吐量為：<bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "估算日誌佇列吞吐量時發生錯誤：{{message}}",
+      "increase_size": "因此您可能需要增加日誌佇列磁碟區的大小。",
+      "max_downtime": "目前為了將 {{productName}} 重新設定為指向 Data Node 所允許的最長停機時間為：<bold>{{duration}}</bold>",
+      "processing_stops": "請注意，遷移期間您的 {{productName}} 節點將停止資料處理，這將導致日誌佇列增長。",
+      "sufficient_size": "繼續之前，請確認您的日誌佇列磁碟區大小足夠。",
+      "title": "日誌佇列停機時間大小警告"
+    },
+    "in_place_welcome": {
+      "description": "原地遷移會將您現有叢集的資料資料夾遷移至 Data Node 叢集。",
+      "install": "請先在您先前設定中的每個 OS/ES 節點上安裝 Data Node。您可以在<docsLink>這裡</docsLink>找到下載與安裝 Data Node 的更多資訊。",
+      "title": "歡迎"
+    },
+    "restart_graylog": {
+      "almost_there": "即將完成！",
+      "example": "例如：",
+      "remove_hosts": "請從您的 <codeSnippet>server.conf</codeSnippet> 中移除 <codeSnippet>elasticsearch_hosts</codeSnippet> 這一行",
+      "restart": "完成後，請重新啟動 {{productName}} 以完成遷移。",
+      "wait_for_available": "請等待所有 Data Node 變為「AVAILABLE」。若 1 到 2 分鐘內仍未變為可用狀態，請檢查 Data Node 的日誌。"
+    },
+    "in_place_migration_info": {
+      "configuration": "進行原地遷移時，請確保您的 Data Node 在 <codeSnippet>datanode.conf</codeSnippet> 中的設定正確，特別是 <codeSnippet>opensearch_data_location</codeSnippet> 設定選項，須在每個節點上指向正確的現有 OpenSearch 資料目錄。",
+      "permissions": "遷移期間，Data Node 與 OpenSearch 的系統使用者都需要能夠存取並寫入資料目錄。為確保這一點，您可以執行例如"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "憑證授權單位已成功設定。",
+      "finished": "Data Node 佈建已完成。",
+      "loading": "正在載入遷移狀態。",
+      "provision_now": "您現在可以為 Data Node 佈建憑證。",
+      "provisioning": "正在佈建憑證"
+    },
+    "jwt_authentication": {
+      "add_snippet": "若要執行此操作，請將以下片段新增至 <codeSnippet>opensearch-security/config.yml</codeSnippet>",
+      "description": "依您保護現有叢集的方式，可能需要先對安全性設定進行一些變更。我們使用 JWT 驗證從 {{productName}} 存取 OpenSearch。在下一步中，您必須在現有的 OpenSearch 叢集中手動啟用 JWT 驗證，以確保 Data Node 能夠存取資料。",
+      "replace_signing_key": "請以 base64 編碼將簽署金鑰替換為您的 <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet>。若要編碼，您可以執行",
+      "title": "JWT 驗證"
+    },
+    "reset_migration": {
+      "button": "重設遷移",
+      "confirm": "確定要重設遷移嗎？",
+      "failed": "重設遷移狀態失敗，狀態為：{{error}}"
+    },
     "migration_actions": {},
     "force_start": {},
     "rolling_upgrade_nodes": {
