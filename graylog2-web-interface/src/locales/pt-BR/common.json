@@ -248,36 +248,161 @@
     "add_favorite_failed_title": "Não foi possível adicionar o campo aos favoritos",
     "remove_favorite_failed": "Falha ao remover o campo dos favoritos com o erro: {{error}}",
     "remove_favorite_failed_title": "Não foi possível remover o campo dos favoritos",
-    "field_terms": "Termos do campo:"
+    "field_terms": "Termos do campo:",
+    "received_by_radio_value": "via <inputName/> no rádio <node/>"
   },
-  "entity_types": {},
-  "chips_cell": {},
-  "compact_pagination": {},
-  "expandable_checkbox_list_item": {},
-  "traffic_graph": {},
-  "link_to_node": {},
-  "markdown": {},
-  "public_notifications": {},
-  "refresh_controls": {},
-  "scroll_button": {},
-  "section": {},
-  "selectable_list": {},
-  "share_menu_item": {},
-  "status_icon": {},
-  "type_ahead_field_input": {},
+  "entity_types": {
+    "user": "usuário",
+    "team": "equipe",
+    "dashboard": "dashboard",
+    "event_definition": "definição de evento",
+    "notification": "notificação",
+    "search": "pesquisa",
+    "stream": "stream",
+    "search_filter": "filtro de pesquisa",
+    "report": "relatório",
+    "role": "função",
+    "output": "output",
+    "sigma_rule": "regra Sigma",
+    "event_procedure": "procedimento de evento",
+    "event_procedure_step": "etapa de procedimento de evento",
+    "collection": "coleção",
+    "collection_entities": "itens da coleção"
+  },
+  "marketplace_link": "o Marketplace do {{productName}}",
+  "chips_cell": {
+    "show_fewer": "Exibir menos",
+    "show_all": "Exibir todos",
+    "filter_by": "Filtrar por {{itemLabel}} \"{{value}}\""
+  },
+  "compact_pagination": {
+    "previous_page": "Página anterior",
+    "select_page": "Selecionar página",
+    "next_page": "Próxima página",
+    "of_pages": "de {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Selecionar item"
+  },
+  "traffic_graph": {
+    "days": "Dias",
+    "incoming": "Tráfego de entrada",
+    "outgoing": "Tráfego de saída",
+    "last_days": "Últimos {{days}} dias: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Nó desconhecido"
+  },
+  "markdown": {
+    "images_unsupported": "Imagens não são suportadas por motivos de segurança. Ative as fontes permitidas <configurationLink>aqui</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Ler menos",
+    "read_more": "Ler mais"
+  },
+  "refresh_controls": {
+    "controls_label": "Controles de atualização de {{humanName}}",
+    "below_minimum": "O intervalo de <intervalDuration /> ({{interval}}) está abaixo do intervalo mínimo configurado de <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Voltar ao topo"
+  },
+  "section": {
+    "toggle_section": "Alternar seção {{title, lowercase}}"
+  },
+  "selectable_list": {
+    "remove": "Remover"
+  },
+  "share_menu_item": {
+    "share": "Compartilhar"
+  },
+  "status_icon": {
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Selecionar campo"
+  },
   "query_helper": {
-    "common_fields": {}
+    "title": "Ajuda da sintaxe de pesquisa",
+    "show_help": "Exibir ajuda da sintaxe de pesquisa",
+    "available_fields": "Campos de pesquisa disponíveis",
+    "field": "Campo",
+    "description": "Descrição",
+    "examples": "Exemplos",
+    "example_description": "Encontre todos os {{entityName}} com descrição contendo security:",
+    "example_id": "Encontre um {{entityName}} com o ID 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "ID do {{entityName}}, que é uma referência única.",
+      "title": "Título do {{entityName}}.",
+      "name": "Nome do {{entityName}}.",
+      "description": "Descrição breve do {{entityName}}.",
+      "summary": "Resumo detalhado do {{entityName}}."
+    }
   },
-  "url_allow_list_modal": {},
-  "configuration_well": {},
-  "configuration_forms": {},
-  "enterprise_advertisement": {},
-  "plugin_list": {},
-  "reported_error": {},
-  "hotkeys": {},
-  "right_sidebar": {},
+  "url_allow_list_modal": {
+    "add": "Adicionar à lista de URLs permitidas",
+    "title": "Atualizar configuração da lista de URLs permitidas",
+    "submit": "Atualizar configuração",
+    "urls": "URLs permitidas"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- sem configuração --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Desfazer redefinição",
+    "remove": "Remover",
+    "title": "Título",
+    "optional": "opcional"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Projetado para atender às necessidades de equipes de Operações de TI e Engenharia de Software com recursos limitados, o {{productName}} Enterprise oferece diversos aprimoramentos de produtividade que economizam milhares de horas por ano na coleta e análise de dados de log para descobrir a causa raiz de problemas de desempenho, indisponibilidade e erros.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Amplie os recursos do {{productName}} Open para detectar, investigar e responder a ameaças de cibersegurança com dashboards e alertas específicos de segurança, mecanismo de detecção de anomalias com IA/ML, integrações com outras ferramentas de segurança, recursos de SOAR e diversos recursos de relatórios de conformidade.",
+    "request_now": "Solicitar agora"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "Plugin {{productName}} Enterprise",
+    "installed": "{{pluginName}} está instalado",
+    "not_installed": "{{pluginName}} não está instalado",
+    "status": "Este é o status dos módulos do {{productName}} Enterprise neste cluster:"
+  },
+  "reported_error": {
+    "title": "Algo deu errado",
+    "description": "Ocorreu um erro desconhecido. Consulte a mensagem a seguir e o log do servidor {{productName}} para mais informações."
+  },
+  "hotkeys": {
+    "or": "ou",
+    "title": "Atalhos de teclado",
+    "view_all": "Ver todos os atalhos de teclado"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Barra lateral {{title}}",
+    "sidebar_label_collapsed": "Barra lateral {{title}} (recolhida)",
+    "close": "Fechar barra lateral",
+    "expand": "Expandir barra lateral",
+    "collapse": "Recolher barra lateral",
+    "go_back": "Voltar",
+    "go_back_label": "Voltar ao conteúdo anterior",
+    "go_forward": "Avançar",
+    "go_forward_label": "Avançar para o próximo conteúdo"
+  },
   "maxmind_adapter": {
-    "documentation": {},
+    "documentation": {
+      "intro": "O adaptador de dados GeoIP oferece suporte à leitura dos bancos de dados GeoIP2 da MaxMind.",
+      "limitations_title": "Limitações",
+      "limitations_supported": "Atualmente, são suportados os bancos de dados de ASN, cidades e países.",
+      "limitations_more": "Para suporte a outros tipos de banco de dados, visite nossos canais de suporte.",
+      "asn_fields": "Campos do banco de dados de ASN",
+      "country_fields": "Campos do banco de dados de países",
+      "city_fields": "Campos do banco de dados de cidades",
+      "city_additional_fields": "Além dos campos fornecidos pelo banco de dados de países, o banco de dados de cidades também inclui os seguintes campos:"
+    },
     "database_types": {},
     "field_set": {},
     "summary": {}
