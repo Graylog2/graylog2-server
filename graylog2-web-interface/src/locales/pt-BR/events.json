@@ -69,14 +69,24 @@
       "failed_one": "{{failed}} de {{count}} event definition selecionada não pôde ser desativada.",
       "failed_other": "{{failed}} de {{count}} event definitions selecionadas não puderam ser desativadas.",
       "success_one": "{{count}} event definition foi desativada com sucesso.",
+      "success_other": "{{count}} event definitions foram desativadas com sucesso.",
       "title": "Desativar Event Definitions",
       "confirm_many": "Tem certeza de que deseja desativar {{count}} event definitions?",
       "failed_many": "{{failed}} de {{count}} event definitions selecionadas não puderam ser desativadas.",
       "success_many": "{{count}} event definitions foram desativadas com sucesso."
     },
     "enable": {
+      "confirm_one": "Tem certeza de que deseja ativar {{count}} event definition?",
+      "confirm_other": "Tem certeza de que deseja ativar {{count}} event definitions?",
       "error": "Ocorreu um erro ao ativar as event definitions. {{error}}",
-      "title": "Ativar Event Definitions"
+      "failed_one": "{{failed}} de {{count}} event definition selecionada não pôde ser ativada.",
+      "failed_other": "{{failed}} de {{count}} event definitions selecionadas não puderam ser ativadas.",
+      "success_one": "{{count}} event definition foi ativada com sucesso.",
+      "success_other": "{{count}} event definitions foram ativadas com sucesso.",
+      "title": "Ativar Event Definitions",
+      "confirm_many": "Tem certeza de que deseja ativar {{count}} event definitions?",
+      "failed_many": "{{failed}} de {{count}} event definitions selecionadas não puderam ser ativadas.",
+      "success_many": "{{count}} event definitions foram ativadas com sucesso."
     },
     "success_title": "Sucesso"
   },
