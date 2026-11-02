@@ -247,26 +247,140 @@
     "not_found_title": "イベント定義を取得できませんでした",
     "save_failed": "EventDefinition の保存に失敗しました。ステータス: {{error}}",
     "save_failed_title": "EventDefinition を保存できませんでした",
-    "update_failed": "イベント定義 \"{{title}}\" の更新に失敗しました。ステータス: {{error}}"
+    "update_failed": "イベント定義 \"{{title}}\" の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "イベント定義を更新できませんでした",
+    "update_success": "イベント定義 \"{{title}}\" を正常に更新しました。",
+    "update_success_title": "イベント定義を正常に更新しました"
   },
-  "notification_list": {},
-  "notification_settings": {},
-  "notifications_form": {},
-  "overview": {},
-  "page": {},
-  "priorities": {},
-  "provider_summary": {},
+  "notification_list": {
+    "no_notifications": "このイベントは、まだ通知をトリガーするように設定されていません。",
+    "not_found": "通知 <em>{{title}}</em> の情報が見つかりませんでした",
+    "notification": "通知",
+    "type": "種類"
+  },
+  "notification_settings": {
+    "grace_period": "猶予期間",
+    "grace_period_help": "アラートの通知は、発生するたびに送信されます。猶予期間を設定すると、次の通知を送信するまでの待機時間を制御できます。キーを持つイベントは、キーの値ごとに個別の猶予期間が適用されることに注意してください。",
+    "message_backlog": "メッセージの保留分",
+    "message_backlog_help": "通知に含めるメッセージの数です。",
+    "toggle_message_backlog": "メッセージの保留分を切り替え"
+  },
+  "notifications_form": {
+    "description": "このイベントは、確認が必要なほど重要ですか？通知を追加してアラートにしてください。",
+    "manage": "通知を管理"
+  },
+  "overview": {
+    "human_name": "イベント定義",
+    "user_defined": "ユーザー定義"
+  },
+  "page": {
+    "alerts_docs": "アラートのドキュメント",
+    "copy_confirm": "\"{{title}}\" のコピーを作成してもよろしいですか？",
+    "copy_title": "イベント定義をコピー",
+    "create_multiple": "イベント定義を作成",
+    "description_alerts": "イベント定義を使用すると、さまざまな条件からアラートを作成し、それらに対してアラートを発行できます。",
+    "description_events": "イベント定義を使用すると、さまざまな条件からイベントを作成し、それらに対してアラートを発行できます。",
+    "description_list": "さまざまな条件を検索し、それらに対してアラートを発行できる新しいイベント定義を作成します。",
+    "duplicate": "イベント定義を複製",
+    "edit": "イベント定義を編集",
+    "edit_named": "イベント定義 \"{{title}}\" を編集",
+    "file_import": "イベント定義を作成 - ファイルからインポート",
+    "git_import": "イベント定義を作成 - Git からインポート",
+    "loading": "イベント定義を読み込み中...",
+    "new": "新しいイベント定義",
+    "new_named": "新しいイベント定義 \"{{title}}\"",
+    "title": "イベント定義",
+    "view": "イベント定義を表示",
+    "view_named": "イベント定義 \"{{title}}\" を表示"
+  },
+  "priorities": {
+    "critical": "重大",
+    "high": "高",
+    "info": "情報",
+    "low": "低",
+    "medium": "中"
+  },
+  "provider_summary": {
+    "less_details": "詳細を縮小",
+    "lookup_table_key_field": "Lookup Table のキーフィールド",
+    "more_details": "詳細を表示",
+    "validate_template_values": "すべてのテンプレートの値が設定されていることを検証",
+    "value_source": "値のソース"
+  },
   "query_parameter_modal": {
-    "types": {}
+    "save": "保存",
+    "title": "クエリパラメーター \"{{name}}\" を宣言",
+    "type": "種類",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": ": 未宣言"
   },
   "replay_search": {
-    "attributes": {}
+    "attributes": {
+      "description": "説明",
+      "edited_after_event": "このイベントの発生後に、イベント定義 <definitionTitle>{{title}}</definitionTitle> が編集されました。一部の集計ウィジェットは、このイベントを正確に表していない可能性があります。",
+      "event_definition": "イベント定義",
+      "execute_every": "検索を次の間隔で実行",
+      "notifications": "通知",
+      "priority": "優先度",
+      "search_within": "次の期間内を検索",
+      "timestamp": "タイムスタンプ",
+      "updated_at": "イベント定義の更新日時"
+    },
+    "not_provided": "未指定",
+    "replay_link": "検索を再生"
   },
-  "row_actions": {},
-  "scheduling": {},
-  "share": {},
-  "sidebar": {},
-  "status_cell": {},
+  "row_actions": {
+    "delete_confirm": "\"{{title}}\" を削除してもよろしいですか？",
+    "delete_failed": "イベント定義 \"{{title}}\" の削除に失敗しました。ステータス: {{status}}",
+    "delete_failed_title": "イベント定義を削除できませんでした",
+    "delete_success": "イベント定義 \"{{title}}\" を正常に削除しました。",
+    "delete_success_title": "イベント定義を正常に削除しました",
+    "delete_title": "イベント定義を削除",
+    "disable": "無効化",
+    "disable_confirm": "\"{{title}}\" を無効化してもよろしいですか？",
+    "disable_title": "イベント定義を無効化",
+    "duplicate": "複製",
+    "edit": "編集",
+    "enable": "有効化",
+    "enable_confirm": "\"{{title}}\" を有効化してもよろしいですか？",
+    "enable_title": "イベント定義を有効化",
+    "entity_type_title": "イベント定義",
+    "share_description": "このイベント定義の共同編集者として追加するユーザーまたはチームを検索します。",
+    "system_cannot_be_deleted": "システムのイベント定義は削除できません",
+    "system_cannot_be_disabled": "システムのイベント定義は無効化できません"
+  },
+  "scheduling": {
+    "clear": "消去",
+    "clear_confirm": "\"{{title}}\" のキューに入っている通知を消去してもよろしいですか？",
+    "details": "{{title}} の詳細。",
+    "every": "{{duration}} ごと",
+    "last_execution": "前回の実行:",
+    "next_execution": "次回の実行:",
+    "next_time_range": "次の期間:",
+    "not_scheduled": "スケジュールされていません。",
+    "queued_notifications": "キューに入っている通知:",
+    "runs": "{{schedule}} に実行されます。",
+    "runs_searching_within": "{{schedule}} に実行され、直近 {{duration}} 以内を検索します。",
+    "status": "ステータス:"
+  },
+  "share": {
+    "collaborators": "共同編集者",
+    "description": "このイベント定義の共同編集者として追加するユーザーまたはチームを検索します。",
+    "no_collaborators": "このイベント定義には共同編集者がいません。"
+  },
+  "sidebar": {
+    "details_title": "定義の詳細"
+  },
+  "status_cell": {
+    "disable": "無効化",
+    "disable_confirm": "イベント定義 '{{title}}' を本当に無効化しますか？",
+    "disable_title": "イベント定義を無効化",
+    "disabled": "無効",
+    "enable": "有効化",
+    "enabled": "有効"
+  },
   "steps": {},
   "summary": {
     "condition_types": {}
