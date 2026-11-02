@@ -122,23 +122,135 @@
       "input_type": "Input 类型：",
       "running_on": "此 Input 运行于：",
       "all_nodes": "所有 {{productName}} 节点",
-      "listening_on": "此 Input 监听于："
+      "listening_on": "此 Input 监听于：",
+      "listening_on_value": "绑定地址 {{bindAddress}}，端口 {{port}}。",
+      "listening_for": "此 Input 监听："
     },
-    "state": {},
-    "troubleshooting": {},
-    "received_traffic": {},
-    "message_count_by_stream": {},
-    "message_errors": {},
-    "rules": {},
-    "network_stats": {}
+    "state": {
+      "title": "状态",
+      "description": "Input 配置运行的 {{productName}} 节点数量，以及其中正在运行的节点数量。如有节点未在运行，请点击查看相关错误消息。",
+      "failed_starts": "启动失败次数（最近 15 分钟）：",
+      "not_running": "Input 未在运行。"
+    },
+    "troubleshooting": {
+      "title": "故障排除",
+      "failed_title": "如果 Input 处于失败状态。",
+      "failed_message_field": "当 Input 在一个或多个 {{productName}} 节点上失败时，状态面板中的消息字段将显示简短的错误消息；完整的错误消息可在 {{productName}} 的 server.log 文件中找到。",
+      "failed_port": "如果 Input 配置使用的端口是特权端口（且 {{productName}} 并非以 root 身份运行），或该端口已被其他 Input 或应用程序占用，则 Input 将失败。",
+      "failed_route": "如果 Input 无法路由到指定的 IP，则 Input 将失败。",
+      "failed_internet": "需要互联网连接才能访问 API 的 Input，如果没有互联网连接或无法路由到该 API，则会失败。",
+      "failed_certificate": "如果 TCP Input 的证书无效或已过期，则 Input 将失败。",
+      "failed_external_api": "连接外部 API 的 Input（例如 Microsoft Azure Input）需要在数据源端进行配置更改，{{productName}} 才能收集日志。所需步骤会在该 Input 对应的文档子页面中详细说明。如果 {{productName}} 端或（如适用）API 所在端的配置有误，连接外部 API 的 Input 将失败。",
+      "no_messages_title": "如果 Input 已在所有节点上运行，但消息未到达 Input。",
+      "no_messages_network_io": "请检查“已接收流量”面板中的网络 I/O 字段。如果此处未显示任何流量，则表明存在连接问题。",
+      "no_messages_connectivity": "如果未显示任何流量，请先排查 {{productName}} 服务器与日志源之间的网络连接。可以通过运行 ping、telnet 或 tracert 命令来完成。",
+      "no_messages_external_api": "对于连接外部 API 的 Input，请检查 {{productName}} 的 server.log 文件，其中会完整记录身份验证失败的情况（登录信息无效，或无权在 API 上执行该操作）。",
+      "no_messages_format": "如果“已接收流量”面板的网络 I/O 字段显示有流量，但未收到任何消息，则表明消息的发送格式不适用于该 Input。",
+      "no_messages_protocol": "TCP Input 无法读取 UDP 流量，反之亦然。",
+      "no_messages_empty": "内容为空的消息将被丢弃。可通过“已丢弃的空消息”字段进行监控。",
+      "no_messages_listener": "Listener Input 只接受有限范围内的消息格式，可能无法读取其他格式的消息。出于故障排除的目的，Raw Text Input 的要求最为宽松。",
+      "message_errors_title": "如果 Input 已在所有节点上运行，消息也已到达 Input，但部分（或全部）消息显示为消息错误。",
+      "message_errors_failure_processing": "在已授权的 Enterprise 集群上，可以启用失败处理，以保存在各个阶段（Input、处理以及写入搜索集群）出错的消息，并附带失败详情，参见 failure_cause 和 failure_details 字段。转到“消息错误”面板并点击消息数量，即可检查各条失败的消息。"
+    },
+    "received_traffic": {
+      "title": "已接收流量",
+      "description": "已到达 Input 的消息和网络流量。注意：指标仅显示最近 15 分钟的数据。",
+      "total_messages": "Input 接收的消息总数：",
+      "events": "{{count}} 个事件",
+      "empty_messages": "已丢弃的空消息：",
+      "active_connections": "活动连接：",
+      "connections_value": "{{open}}（共 {{total}} 个）",
+      "network_io": "网络 I/O："
+    },
+    "message_count_by_stream": {
+      "title": "按 Stream 统计的已接收消息数",
+      "description": "最近 15 分钟内从此 Input 成功摄入的消息。点击 Stream 可查看其中的消息。",
+      "stream": "{{streamName}}：",
+      "none": "最近 15 分钟内，没有来自此 Input 的消息被路由到 Stream 中。"
+    },
+    "message_errors": {
+      "title": "消息错误",
+      "description": "消息可能在 Input 处、处理流水线中，或写入搜索集群（索引）时处理失败。",
+      "at_input": "Input 处的消息错误：",
+      "failed_to_process": "消息处理失败：",
+      "failed_to_index": "消息索引失败："
+    },
+    "rules": {
+      "pipeline_rules_title": "Input 出现在流水线规则中",
+      "pipeline_rules_description": "下方列出的流水线规则明确引用了此 Input（例如通过 from_input、from_forwarder_input，或匹配 gl2_source_input/gl2_forwarder_input）。",
+      "pipeline_rules_human_name": "流水线规则",
+      "pipeline_rules_search": "搜索流水线规则",
+      "stream_rules_title": "Input 出现在 Stream 规则中",
+      "stream_rules_description": "下方列出的 Stream 规则包含明确指向此 Input 的 match input 函数。注意：未显式使用 match input 函数、但可能捕获此 Input 消息的 Stream 规则不会被列出。",
+      "stream_rules_human_name": "Stream 规则",
+      "stream_rules_search": "搜索 Stream 规则",
+      "load_pipeline_rules_failed": "加载 Input 流水线规则失败，状态：",
+      "could_not_load_pipeline_rules": "无法加载 Input 流水线规则",
+      "load_stream_rules_failed": "加载 Input Stream 规则失败，状态：",
+      "could_not_load_stream_rules": "无法加载 Input Stream 规则"
+    },
+    "network_stats": {
+      "total_prefix": " （总计：",
+      "total_suffix": "）"
+    },
+    "show_received_messages": "显示已接收的消息",
+    "fetch_failed": "获取 Input 诊断信息失败，状态：",
+    "could_not_fetch": "无法获取 Input 诊断信息"
   },
   "setup_wizard": {
-    "steps": {},
-    "diagnosis_step": {},
-    "routing": {},
-    "start": {},
+    "title": "Input 设置向导",
+    "back": "返回",
+    "finish": "完成",
+    "steps": {
+      "routing": "路由",
+      "launch": "启动",
+      "diagnosis": "诊断"
+    },
+    "diagnosis_step": {
+      "description": "在不向搜索集群写入任何数据的情况下测试 Input 和解析。",
+      "go_to_diagnosis": "前往 Input 诊断"
+    },
+    "load_streams_failed": "加载 Stream 失败：{{error}}",
+    "load_input_references_failed": "加载 Input 引用失败：{{error}}",
+    "load_streams_by_index_set_failed": "按索引集加载 Stream 失败：{{error}}",
+    "routing": {
+      "connected_pipelines_title": "已连接到目标 Stream 的流水线",
+      "connected_pipelines": "建议在完成 Input 设置前检查这些流水线的影响。目标 Stream 已连接以下流水线：",
+      "select_destination": "选择一个目标 Stream，用于路由此 Input 的消息。",
+      "recommend_new_stream": "<strong>建议为每个新 Input 创建一个新的 Stream。</strong>这有助于将消息归类为基本的 schema。",
+      "default_stream_fallback": "未路由到任何 Stream 的消息将被路由到 <strong>Default Stream</strong>。",
+      "pipeline_rules_info": "本向导可以自动创建流水线规则，并将其附加到 <strong>Default Stream</strong>。这些规则将放置在系统管理的 Default Routing Pipeline 中，并会被自动重命名（或删除），以准确反映此 Input 的状态。",
+      "new_stream_heading": "路由到新 Stream",
+      "recommended": "推荐！",
+      "create_stream": "创建 Stream",
+      "existing_stream_heading": "路由到现有 Stream",
+      "select_stream": "选择 Stream",
+      "create_new_stream": "创建新 Stream",
+      "choose_existing_stream": "选择现有 Stream",
+      "existing_stream_selected": "已选择将此 Input 的消息路由到现有 Stream。",
+      "pipeline_rules_created": "按下 <strong>启动 Input</strong> 按钮时将创建流水线规则。",
+      "default_stream": "默认 Stream",
+      "remove_from_default": "从‘Default Stream’中移除匹配项",
+      "remove_from_default_help": "不要将匹配此 Stream 的消息分配到‘Default Stream’。"
+    },
+    "start": {
+      "description": "根据所做的配置设置并启动 Input。",
+      "rolling_back": "正在回滚 Input...",
+      "setting_up": "正在设置 Input...",
+      "not_ready": "Input 尚未准备好进行设置。请先完成前面的步骤。",
+      "start_input": "启动 Input",
+      "rollback_input": "回滚 Input",
+      "launch_diagnosis": "启动 Input 诊断"
+    },
     "progress": {
-      "loading": {},
+      "details": "详细信息：",
+      "loading": {
+        "create_stream": "正在创建 Stream...",
+        "create_stream_named": "正在创建 Stream “{{name}}”...",
+        "start_stream": "正在启动 Stream...",
+        "start_stream_named": "正在启动 Stream “{{name}}”...",
+        "create_pipeline": "正在创建流水线..."
+      },
       "error": {},
       "success": {}
     },
