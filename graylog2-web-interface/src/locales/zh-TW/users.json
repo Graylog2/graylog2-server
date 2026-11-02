@@ -410,18 +410,84 @@
       "confirm_disable": "您確定要停用使用者 {{name}} 嗎？所有目前的工作階段都將被終止。",
       "confirm_delete": "您確定要刪除使用者 {{name}} 嗎？",
       "edit_title": "編輯使用者 {{name}}",
-      "edit": "編輯"
+      "edit": "編輯",
+      "set_status_title": "設定 {{name}} 的新帳戶狀態",
+      "disable": "停用",
+      "enable": "啟用",
+      "delete_title": "刪除使用者 {{name}}"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "已登入",
+      "last_activity": "上次活動：{{activity}}",
+      "client_address": "用戶端位址：{{address}}",
+      "not_logged_in": "未登入"
+    },
+    "status": {
+      "user_is": "使用者{{status}}",
+      "auth_disabled": "（驗證服務已停用）",
+      "enabled": "已啟用",
+      "disabled": "已停用"
+    },
+    "query_example": "尋找電子郵件包含 example.com 的使用者：",
+    "fields": {
+      "full_name": "使用者的全名",
+      "username": "使用者的登入使用者名稱。",
+      "email": "使用者的電子郵件。"
+    },
+    "select_users": "選擇使用者..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "檢視詳細資料",
+    "edit_user": "編輯使用者",
+    "edit_tokens": "編輯權杖"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "權杖",
+    "human_name": "權杖",
+    "fields": {
+      "username": "權杖擁有者的使用者名稱",
+      "name": "權杖的名稱",
+      "created": "權杖的建立日期",
+      "last_access": "權杖最近一次被使用的時間",
+      "external_user": "權杖擁有者是否來自外部驗證後端",
+      "auth_backend": "使用者驗證後端。內部使用者不適用。"
+    },
+    "example_user": "尋找由指定使用者建立的權杖：",
+    "example_name": "依指定權杖名稱尋找權杖：",
+    "deleting_title": "正在刪除權杖",
+    "delete_confirm": "您即將刪除權杖「{{name}}」。您確定嗎？",
+    "delete": "刪除",
+    "user_not_found": "使用者不存在。",
+    "user_error_title": "權杖使用者錯誤",
+    "not_available": "不適用",
+    "delete_failed": "刪除權杖失敗：{{error}}",
+    "delete_failed_title": "無法刪除權杖",
+    "deleted": "權杖已成功刪除。",
+    "deleted_title": "成功！"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "使用者詳細資料",
+    "title_with_name": "使用者詳細資料 {{name}}",
+    "documentation_link_title": "權限說明文件",
+    "description": "個人資料、設定、團隊與角色等詳細資料的總覽。"
+  },
+  "password_rules": {
+    "min_length": "密碼長度至少必須為 {{minLength}} 個字元。",
+    "require_uppercase": "密碼必須至少包含一個大寫字母。",
+    "require_lowercase": "密碼必須至少包含一個小寫字母。",
+    "require_numbers": "密碼必須至少包含一個數字。",
+    "require_special_chars": "密碼必須至少包含以下其中一個特殊字元：{{characters}}"
+  },
+  "notifications": {
+    "save_success": "使用者偏好設定已成功儲存",
+    "save_failed": "儲存「{{userName}}」的偏好設定失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存使用者偏好設定",
+    "change_success": "您的起始頁面已成功變更",
+    "change_failed": "變更起始頁面失敗，錯誤：{{error}}",
+    "change_failed_title": "無法變更起始頁面"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "載入使用者 {{userId}} 失敗，狀態為",
+    "load_failed_title": "無法載入使用者 {{userId}}"
+  }
 }
