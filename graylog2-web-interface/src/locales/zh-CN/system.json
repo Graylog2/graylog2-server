@@ -155,26 +155,144 @@
     "utilization": "<strong>{{usage}} 条消息</strong>位于 {{title}} 中，利用率为 {{percentage}}。"
   },
   "input_types_data_table": {
-    "loading": "正在加载输入类型..."
+    "loading": "正在加载输入类型...",
+    "unavailable": "输入类型不可用。",
+    "documentation": "文档",
+    "name": "名称",
+    "type": "类型",
+    "filter": "过滤"
   },
-  "journal_details": {},
-  "journal_state": {},
-  "jvm_heap_usage": {},
-  "node_list_item": {},
-  "node_maintenance_dropdown": {},
-  "node_overview": {},
-  "nodes_actions": {},
-  "nodes_list": {},
-  "plugins_data_table": {},
-  "rest_api_overview": {},
-  "system_information": {},
-  "system_overview_details": {},
-  "system_overview_summary": {},
-  "bulk_actions": {},
-  "system_notifications_table": {},
-  "actions_cell": {},
-  "title_cell": {},
-  "system_job": {},
+  "journal_details": {
+    "loading": "正在加载 Journal 指标...",
+    "disabled": "此节点上已禁用磁盘 Journal。",
+    "unavailable": "Journal 指标不可用。",
+    "overcommitted": "<strong>警告！</strong>Journal 利用率已超过定义的最大大小。<overviewLink>点击此处</overviewLink>了解更多信息。",
+    "configuration": "配置",
+    "path": "路径：",
+    "earliest_entry": "最早条目：",
+    "maximum_size": "最大大小：",
+    "maximum_age": "最长保留时间：",
+    "flush_policy": "刷新策略：",
+    "flush_policy_value": "每 {{messages}} 条消息或每 {{duration}}",
+    "maximum_age_format": "d [天] h [小时] m [分钟]",
+    "flush_duration_format": "h [小时] m [分钟] s [秒]",
+    "utilization": "利用率",
+    "unprocessed_messages": "当前 Journal 中有 <strong>{{messages}} 条未处理消息</strong>，分布在 {{segments}} 个分段中。",
+    "appended_and_read": "过去一秒内已追加 <strong>{{appended}} 条消息</strong>，过去一秒内已读取 <strong>{{read}} 条消息</strong>。"
+  },
+  "journal_state": {
+    "loading": "正在加载 Journal 指标...",
+    "unavailable": "Journal 指标不可用。"
+  },
+  "jvm_heap_usage": {
+    "loading": "正在加载堆内存使用信息...",
+    "unavailable": "堆内存信息不可用。",
+    "usage": "JVM 正在使用 <usedBlob /><strong> {{used}}</strong>（共 <committedBlob /><strong> {{committed}}</strong> 堆空间），且不会尝试使用超过 <maxBlob /><strong> {{max}}</strong> 的内存"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "系统信息当前不可用。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "配置内部日志"
+  },
+  "node_overview": {
+    "memory_heap_usage": "内存/堆使用情况",
+    "buffers": "缓冲区",
+    "buffers_description": "缓冲区用于在消息经过各处理器时，短时间（通常为毫秒级）缓存少量消息。",
+    "input_buffer": "输入缓冲区",
+    "process_buffer": "处理缓冲区",
+    "output_buffer": "输出缓冲区",
+    "disk_journal": "磁盘 Journal",
+    "disk_journal_description": "传入的消息会写入磁盘 Journal，以确保服务器发生故障时消息安全保留。当某个输出的处理速度跟不上消息速率，或传入消息出现峰值时，Journal 也有助于维持正常运行。它还能防止内存过载，从而避免过长的垃圾回收暂停。",
+    "system": "系统",
+    "rest_api": "REST API",
+    "installed_plugins": "已安装的插件",
+    "manage_inputs": "管理输入",
+    "available_input_types": "可用的输入类型"
+  },
+  "nodes_actions": {
+    "details": "详情",
+    "metrics": "指标",
+    "more_actions": "更多操作",
+    "pause_message_processing": "暂停消息处理",
+    "resume_message_processing": "恢复消息处理",
+    "pause_confirm": "即将暂停此节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将恢复此节点上的消息处理，确定继续吗？",
+    "override_lb_status": "覆盖负载均衡器状态",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "即将把此节点的负载均衡器状态更改为 {{status}}，确定继续吗？",
+    "local_message_inputs": "本地消息输入",
+    "thread_dump": "获取线程转储",
+    "process_buffer_dump": "获取处理缓冲区转储",
+    "recent_system_logs": "获取最近的系统日志消息"
+  },
+  "nodes_list": {
+    "no_active_nodes": "没有活动节点。"
+  },
+  "plugins_data_table": {
+    "loading": "正在加载此节点上的插件...",
+    "no_plugins": "此节点未安装任何插件。",
+    "name": "名称",
+    "version": "版本",
+    "author": "作者",
+    "description": "描述",
+    "website": "网站",
+    "filter": "过滤"
+  },
+  "rest_api_overview": {
+    "transport_address": "传输地址：",
+    "last_seen": "最后在线时间："
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}，{{info}}",
+    "jvm_unavailable": "该节点的 JVM 信息不可用。",
+    "hostname": "主机名：",
+    "node_id": "节点 ID：",
+    "version": "版本：",
+    "version_codename": "{{version}}，代号 <em>{{codename}}</em>",
+    "jvm": "JVM：",
+    "time": "时间："
+  },
+  "system_overview_details": {
+    "pause_confirm": "即将暂停此节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将恢复此节点上的消息处理，确定继续吗？",
+    "what_does_this_mean": "这是什么意思？",
+    "lifecycle_state": "生命周期状态：<strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "已为负载均衡器标记为 <strong>{{status}}</strong>",
+    "pause_processing": "暂停处理",
+    "resume_processing": "恢复处理",
+    "not_processing": "节点<strong>未</strong>处理消息"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "当前生命周期状态：",
+    "message_processing": "消息处理：",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "lb_indication": "负载均衡器指示："
+  },
+  "bulk_actions": {
+    "dismiss": "忽略"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "忽略"
+  },
+  "title_cell": {
+    "show_full_message": "显示 {{title}} 的完整消息"
+  },
+  "system_job": {
+    "acknowledge_failed": "无法确认该任务",
+    "cancel_failed": "无法取消该任务",
+    "cancel_confirm": "确定要取消系统任务“{{info}}”吗？",
+    "on_node": "- 在",
+    "runtime": "运行时长：{{duration}}",
+    "cancel": "取消"
+  },
   "system_jobs_component": {},
   "system_jobs_list": {},
   "system_messages_component": {},
