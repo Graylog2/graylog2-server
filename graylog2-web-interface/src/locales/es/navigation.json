@@ -15,12 +15,12 @@
     "inputs": "Inputs",
     "outputs": "Outputs",
     "indices": "Índices",
-    "logging": "Registros",
+    "logging": "Registro",
     "users_and_teams": "Usuarios y equipos",
     "roles": "Roles",
     "authentication": "Autenticación",
     "content_packs": "Content Packs",
-    "grok_patterns": "Grok Patterns",
+    "grok_patterns": "Patrones Grok",
     "lookup_tables": "Lookup Tables",
     "pipelines": "Pipelines",
     "sidecars": "Sidecars",
@@ -51,7 +51,7 @@
     "welcome": "Bienvenido",
     "main": "Principal",
     "utility": "Utilidades",
-    "toggle_navigation": "Mostrar u ocultar navegación",
-    "scratchpad": "Bloc de notas"
+    "toggle_navigation": "Mostrar u ocultar la navegación",
+    "scratchpad": "Scratchpad"
   }
 }
