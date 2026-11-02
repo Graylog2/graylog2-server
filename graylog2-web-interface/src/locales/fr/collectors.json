@@ -49,7 +49,12 @@
     "by_system": "par le système",
     "config_changed": {
       "fleet": "Configuration mise à jour pour la flotte <targetLink />",
-      "collector": "Configuration mise à jour pour le collector <targetLink />"
+      "fleet_with_others_one": "Configuration mise à jour pour la flotte <targetLink /> et {{count}} autre flotte",
+      "fleet_with_others_other": "Configuration mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector": "Configuration mise à jour pour le collector <targetLink />",
+      "collector_with_others_one": "Configuration mise à jour pour le collector <targetLink /> et {{count}} autre collector",
+      "fleet_with_others_many": "Configuration mise à jour pour la flotte <targetLink /> et {{count}} autres flottes",
+      "collector_with_others_many": "Configuration mise à jour pour le collector <targetLink /> et {{count}} autres collectors"
     },
     "ingest_config_changed": {
       "fleet": "Configuration d'ingestion mise à jour pour la flotte <targetLink />",
@@ -955,17 +960,120 @@
       }
     },
     "details_page": {
-      "certificate_valid_until": "Certificat valable jusqu'au :"
+      "certificate_valid_until": "Certificat valable jusqu'au :",
+      "configuration_warnings": "Avertissements de configuration",
+      "datanode_version": "Version du Data Node :",
+      "details": "Détails :",
+      "error": "Erreur : {{message}}",
+      "hostname": "Nom d'hôte :",
+      "not_available": "N/D",
+      "status": "Statut :",
+      "title": "Data Nodes : {{hostname}}",
+      "transport_address": "Adresse de transport :"
     },
-    "pages": {},
-    "upgrade_page": {},
-    "migration_steps": {},
-    "migration_states": {},
+    "pages": {
+      "description": "Les Data Nodes {{productName}} offrent une meilleure intégration avec {{productName}} et simplifient les mises à jour futures. Ils vous permettent d'indexer et de rechercher tous les messages de votre base de messages {{productName}}.",
+      "upgrade_title": "Mise à niveau du Data Node",
+      "cluster_management_title": "Tableau de bord des Data Nodes",
+      "certificate_management_title": "Gestion des certificats",
+      "migration_title": "Migration vers le Data Node",
+      "documentation_title": "Documentation des Data Nodes"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Pour mettre à niveau vos Data Nodes manuellement, suivez les instructions de la <docsLink>documentation</docsLink>.",
+      "manual_upgrade_title": "Mise à niveau manuelle du Data Node",
+      "select_strategy": "Sélectionner la stratégie de mise à niveau",
+      "upgrade_data_node": "Mettre à niveau le Data Node",
+      "manual_upgrade_of_node": "Une fois la mise à niveau manuelle de <bold>{{node}}</bold> terminée sur le système, attendez qu'il se reconnecte et apparaisse dans le panneau <bold>Nœuds mis à niveau</bold>, puis cliquez sur <confirmButton><bold>Confirmer la mise à niveau</bold></confirmButton> et passez au nœud suivant.",
+      "manual_upgrade_of_data_node": "Une fois la mise à niveau manuelle de votre Data Node terminée sur le système, attendez qu'il se reconnecte et apparaisse dans le panneau <bold>Nœuds mis à niveau</bold>, puis cliquez sur <confirmButton><bold>Confirmer la mise à niveau</bold></confirmButton> et passez au nœud suivant."
+    },
+    "migration_steps": {
+      "ca_configuration": "Configurer une autorité de certification",
+      "renewal_policy_configuration": "Configurer une politique de renouvellement",
+      "compatibility_check": "Vérifier la compatibilité d'OpenSearch avec le Data Node",
+      "manual_migration_step": "Étapes de migration.",
+      "migration_finished": "Migration terminée"
+    },
+    "migration_states": {
+      "new": "Migration",
+      "migration_welcome_page": "Bienvenue",
+      "ca_creation_page": "Autorité de certification",
+      "renewal_policy_creation_page": "Politique de renouvellement des certificats",
+      "migration_selection_page": "Étapes de migration",
+      "rolling_upgrade_migration_welcome_page": "Bienvenue dans la migration sur place",
+      "ask_to_shutdown_old_cluster": "Arrêter l'ancien cluster",
+      "manually_remove_old_connection_string_from_config": "Supprimer la chaîne de connexion",
+      "message_processing_stop": "Arrêter le traitement des messages",
+      "replace_cluster": "Remplacer le cluster existant",
+      "restart_graylog": "Mettre à jour le fichier de configuration et redémarrer {{productName}}",
+      "directory_compatibility_check_page": "Vérification de compatibilité du répertoire",
+      "provision_rolling_upgrade_nodes_with_certificates": "Vue d'ensemble du provisionnement des certificats",
+      "provision_rolling_upgrade_nodes_running": "Provisionner le certificat du Data Node.",
+      "journal_size_downtime_warning": "Avertissement sur la durée d'arrêt liée à la taille du journal",
+      "failed": "Échec de la migration",
+      "finished": "Migration terminée"
+    },
     "certificate_renewal": {
-      "renew": {},
-      "provision": {}
+      "loading_failed": "Échec du chargement des Data Nodes, statut :",
+      "loading_failed_title": "Impossible de charger les Data Nodes",
+      "renew": {
+        "button": "Renouveler le certificat",
+        "button_loading": "Renouvellement du certificat",
+        "success": "Certificat renouvelé avec succès",
+        "failed": "Échec du renouvellement du certificat : {{error}}"
+      },
+      "provision": {
+        "button": "Provisionner le certificat",
+        "button_loading": "Provisionnement du certificat...",
+        "success": "Certificat provisionné avec succès",
+        "failed": "Échec du provisionnement du certificat : {{error}}"
+      },
+      "title": "Renouvellement et provisionnement des certificats",
+      "description": "Vous pouvez ici déclencher manuellement le renouvellement ou le provisionnement des certificats pour les Data Nodes {{productName}}. Le provisionnement manuel des certificats n'est nécessaire que si le mode de politique de renouvellement « Manuel » est configuré et que des Data Nodes ont été démarrés après le provisionnement initial des certificats.",
+      "transport_address": "Adresse de transport",
+      "hostname": "Nom d'hôte",
+      "valid_until": "valable jusqu'au {{relativeTime}}",
+      "no_data_nodes": "Aucun Data Node n'a été trouvé."
     }
   },
-  "use_collector_configurations_notifications": {},
-  "use_collectors_notifications": {}
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Échec de la récupération des configurations des collectors, statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les configurations",
+    "fetch_configuration_failed": "Échec de la récupération de la configuration, statut : {{error}}",
+    "configuration_not_found": "Impossible de trouver une configuration avec l'ID <{{configurationId}}>. Vérifiez qu'elle n'a pas été supprimée.",
+    "fetch_configuration_failed_title": "Impossible de récupérer la configuration",
+    "preview_failed": "Échec de la récupération de l'aperçu de la configuration, statut : {{error}}",
+    "preview_failed_title": "Impossible de récupérer l'aperçu",
+    "created_success": "Configuration créée avec succès",
+    "create_failed": "Échec de la création de la configuration, statut : {{error}}",
+    "create_failed_title": "Impossible d'enregistrer la configuration",
+    "updated_success": "Configuration mise à jour avec succès",
+    "update_failed": "Échec de la mise à jour de la configuration : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour la configuration {{name}}",
+    "copied_success": "Configuration \"{{name}}\" copiée avec succès",
+    "copy_failed": "Échec de l'enregistrement de la configuration \"{{name}}\", statut : {{error}}",
+    "copy_failed_title": "Impossible d'enregistrer la configuration",
+    "deleted_success": "Configuration \"{{name}}\" supprimée avec succès",
+    "delete_failed": "Échec de la suppression de la configuration : {{error}}",
+    "delete_failed_title": "Impossible de supprimer la configuration {{name}}",
+    "validate_failed": "Échec de la validation de la configuration \"{{name}}\", statut : {{error}}",
+    "validate_failed_title": "Impossible de valider la configuration"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Échec de la récupération des collectors, statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les collectors",
+    "not_found": "Impossible de trouver un collector avec l'ID <{{collectorId}}>. Vérifiez qu'il n'a pas été supprimé.",
+    "fetch_collector_failed": "Échec de la récupération du Collector, statut : {{error}}",
+    "fetch_collector_failed_title": "Impossible de récupérer le Collector",
+    "created_success": "Collector créé avec succès",
+    "updated_success": "Collector mis à jour avec succès",
+    "deleted_success": "Collector \"{{name}}\" supprimé avec succès",
+    "delete_failed": "Échec de la suppression du Collector : {{error}}",
+    "delete_failed_title": "Impossible de supprimer le Collector \"{{name}}\"",
+    "copied_success": "Collector \"{{name}}\" copié avec succès",
+    "copy_failed": "Échec de l'enregistrement du collector \"{{name}}\", statut : {{error}}",
+    "copy_failed_title": "Impossible d'enregistrer le Collector",
+    "validate_failed": "Échec de la validation du collector \"{{name}}\", statut : {{error}}",
+    "validate_failed_title": "Impossible de valider le collector"
+  }
 }
