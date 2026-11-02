@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "Nombre de usuario",
-    "first_name": "Nombre"
+    "first_name": "Nombre",
+    "last_name": "Apellidos",
+    "full_name": "Nombre completo",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "repeat_password": "Repetir contraseña",
+    "time_zone": "Zona horaria",
+    "sessions_timeout": "Tiempo de espera de sesión",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "roles": "Roles",
+    "assign_roles": "Asignar roles",
+    "selected_roles": "Roles seleccionados",
+    "teams": "Equipos"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "El nombre del usuario.",
+    "last_name_help": "Los apellidos del usuario.",
+    "email_help": "La dirección de correo electrónico del usuario.",
+    "username_help": "Elige un nombre de usuario único con el que iniciar sesión.",
+    "username_taken": "El nombre de usuario ya está en uso",
+    "passwords_mismatch": "Las contraseñas no coinciden",
+    "time_zone_help": "Elige tu zona horaria local o déjala como está para usar la del navegador.",
+    "service_account": "Cuenta de servicio",
+    "service_account_label": "El usuario es una cuenta de servicio",
+    "service_account_help": "Si se marca, el usuario pasa a ser una cuenta de servicio y no podrá iniciar sesión en la interfaz web ni editar su configuración (p. ej., tokens de API).",
+    "service_account_confirm_title": "¿Estás seguro?",
+    "service_account_confirm": "Convertir este usuario en una cuenta de servicio le impide iniciar sesión en la interfaz web y editar su configuración (p. ej., tokens de API). ¿Quieres continuar?",
+    "global_timeout_message": "El tiempo de espera de la sesión del usuario no se puede editar porque el <timeoutLink>tiempo de espera global de sesión</timeoutLink> está activado."
+  },
+  "token_form": {
+    "token_name": "Nombre del token",
+    "placeholder": "¿Para qué sirve este token?",
+    "ttl_label": "TTL del token",
+    "ttl_invalid": "no válido (mínimo: 1 minuto)",
+    "creating": "Creando...",
+    "create": "Crear token",
+    "ttl_help": "Ejemplos de sintaxis de TTL: para 60 segundos: PT60S, para 60 minutos: PT60M, para 24 horas: PT24H, para 30 días: P30D"
+  },
+  "permissions_info": {
+    "title": "Conceder permisos",
+    "text": "Los permisos para elementos como streams y dashboards se pueden configurar con el botón <shareLabel>Compartir</shareLabel> del elemento. Encontrarás el botón, por ejemplo, en la página de resumen de elementos. Más información en la <docsLink>documentación</docsLink>."
+  },
   "startpage": {
-    "types": {}
+    "label": "Página de inicio",
+    "help": "Selecciona la página que el usuario verá justo después de iniciar sesión. Solo se pueden seleccionar elementos en los que el usuario tenga permisos.",
+    "select_type": "Seleccionar tipo",
+    "select_value": "Seleccionar {{type, lowercase}}",
+    "entity": "elemento",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "Búsqueda"
+    },
+    "new_search": "Nueva búsqueda",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "El usuario no tiene permiso para la página configurada"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "Tiempo de espera de sesión",
+    "alert_title": "Cambiar el tiempo de espera de la sesión",
+    "alert_text": "Cambiar la configuración del tiempo de espera de las sesiones cerrará la sesión del usuario e invalidará todas sus sesiones actuales. Si cambias la configuración de tu propio usuario, se cerrará tu sesión en el momento de guardarla. En ese caso, guarda antes los cambios pendientes y después modifica el tiempo de espera.",
+    "never_label": "Las sesiones no caducan",
+    "never_help": "Si se marca, las sesiones nunca caducan por inactividad.",
+    "amount_placeholder": "Duración del tiempo de espera",
+    "help": "La sesión finaliza automáticamente después de este tiempo, a menos que se esté usando activamente.",
+    "unit_label": "Unidad del tiempo de espera",
+    "units": {
+      "seconds": "Segundos",
+      "minutes": "Minutos",
+      "hours": "Horas",
+      "days": "Días"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "Dirección del cliente",
+    "last_activity": "Última actividad",
+    "logged_in": "Sesión iniciada",
+    "enabled": "Activado",
+    "auth_service_disabled": "El servicio de autenticación está desactivado, por lo que el usuario no puede iniciar sesión",
+    "preferences": {
+      "title": "Preferencias",
+      "search_autocompletion": "Autocompletado de búsqueda",
+      "update_unfocused": "Actualizar sin foco",
+      "pin_search_sidebar": "Anclar panel lateral de búsqueda",
+      "pin_dashboard_sidebar": "Anclar panel lateral de Dashboard",
+      "theme_mode": "Modo de tema",
+      "not_configured": "Sin configurar",
+      "language": "Idioma"
+    },
+    "roles_none_selected": "No se han encontrado roles seleccionados.",
+    "settings": {
+      "timezone": "Zona horaria",
+      "startpage": "Página de inicio",
+      "no_startpage": "No hay página de inicio definida",
+      "no_timeout": "Las sesiones no caducan",
+      "globally_set": "(<configLink>definido globalmente</configLink>)"
+    },
+    "shared_entities": "Elementos compartidos"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "La dirección del cliente que se usó para iniciar la sesión, que no tiene por qué ser su dirección actual.",
+    "admin": {
+      "title": "Administrador del sistema",
+      "description": "El administrador del sistema solo se puede editar en el archivo de configuración de {{productName}}."
+    },
+    "headers": {
+      "full_name": "Nombre completo",
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "client_address": "Dirección del cliente",
+      "enabled": "Activado",
+      "role": "Rol",
+      "actions": "Acciones"
+    },
+    "title": "Usuarios",
+    "found": "Se han encontrado {{total}} usuarios registrados en el sistema.",
+    "none_found": "No se han encontrado usuarios.",
+    "filter_label": "Filtrar usuarios",
+    "actions": {
+      "edit_tokens_title": "Editar tokens del usuario {{name}}",
+      "edit_tokens": "Editar tokens",
+      "system_user_tooltip": "Los usuarios del sistema solo se pueden modificar en el archivo de configuración del servidor.",
+      "system_user": "Usuario del sistema",
+      "confirm_disable": "¿Seguro que quieres desactivar al usuario {{name}}? Se finalizarán todas sus sesiones actuales.",
+      "confirm_delete": "¿Seguro que quieres eliminar al usuario {{name}}?",
+      "edit_title": "Editar usuario {{name}}",
+      "edit": "Editar"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
