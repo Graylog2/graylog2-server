@@ -441,6 +441,7 @@
     "partial_summary": "{{succeeded}} réussi(s), {{failed}} échoué(s).",
     "partial_more": "...et {{count}} autre(s).",
     "all_failed_one": "{{count}} index a échoué.",
+    "all_failed_other": "{{count}} index ont échoué.",
     "delete": {
       "button": "Supprimer",
       "title": "Supprimer l'index",
@@ -479,7 +480,13 @@
         "button": "Supprimer",
         "title": "Supprimer les index incompatibles",
         "confirm": "Tout supprimer",
-        "error": "Impossible de tout supprimer."
+        "error": "Impossible de tout supprimer.",
+        "body_one": "Cette action supprimera {{count}} index incompatible.",
+        "body_many": "Cette action supprimera {{count}} index incompatibles.",
+        "body_other": "Cette action supprimera {{count}} index incompatibles.",
+        "success_one": "{{count}} index incompatible a été supprimé.",
+        "success_many": "{{count}} index incompatibles ont été supprimés.",
+        "success_other": "{{count}} index incompatibles ont été supprimés."
       },
       "delete_partial_title": "Certains index n'ont pas pu être supprimés",
       "delete_failure_title": "Impossible de supprimer les index",
@@ -487,22 +494,43 @@
         "button": "Réindexer les index système",
         "title": "Réindexer les index système",
         "confirm": "Tout réindexer",
-        "error": "Impossible de tout réindexer."
+        "error": "Impossible de tout réindexer.",
+        "body_one": "Cette action réindexera {{count}} index incompatible.",
+        "body_many": "Cette action réindexera {{count}} index incompatibles.",
+        "body_other": "Cette action réindexera {{count}} index incompatibles.",
+        "success_one": "La réindexation a démarré pour {{count}} index système.",
+        "success_many": "La réindexation a démarré pour {{count}} index système.",
+        "success_other": "La réindexation a démarré pour {{count}} index système."
       },
       "archive_delete": {
         "button": "Archiver et supprimer",
         "title": "Archiver et supprimer les index",
         "confirm": "Tout archiver et supprimer",
-        "error": "Impossible d'archiver et de supprimer tout."
+        "error": "Impossible d'archiver et de supprimer tout.",
+        "body_one": "Cette action archivera et supprimera {{count}} index incompatible.",
+        "body_many": "Cette action archivera et supprimera {{count}} index incompatibles.",
+        "body_other": "Cette action archivera et supprimera {{count}} index incompatibles.",
+        "success_one": "L'archivage et la suppression ont été lancés pour {{count}} index.",
+        "success_many": "L'archivage et la suppression ont été lancés pour {{count}} index.",
+        "success_other": "L'archivage et la suppression ont été lancés pour {{count}} index."
       },
       "rotate": {
         "button": "Effectuer la rotation des index d'écriture actifs",
         "title": "Effectuer la rotation des index d'écriture actifs",
         "confirm": "Effectuer la rotation de tous",
-        "error": "Impossible d'effectuer la rotation de tous."
+        "error": "Impossible d'effectuer la rotation de tous.",
+        "body_one": "Cette action effectuera la rotation de {{count}} index incompatible.",
+        "body_many": "Cette action effectuera la rotation de {{count}} index incompatibles.",
+        "body_other": "Cette action effectuera la rotation de {{count}} index incompatibles.",
+        "success_one": "La rotation de {{count}} index a été effectuée.",
+        "success_many": "La rotation de {{count}} index a été effectuée.",
+        "success_other": "La rotation de {{count}} index a été effectuée."
       },
       "rotate_partial_title": "Certains index n'ont pas pu faire l'objet d'une rotation",
-      "rotate_failure_title": "Impossible d'effectuer la rotation des index"
+      "rotate_failure_title": "Impossible d'effectuer la rotation des index",
+      "deleted_one": "{{count}} index a été supprimé.",
+      "deleted_many": "{{count}} index ont été supprimés.",
+      "deleted_other": "{{count}} index ont été supprimés."
     },
     "all_failed_many": "{{count}} index ont échoué."
   },
@@ -552,7 +580,10 @@
     "rotation_lifetime_error": "Il doit y avoir au moins 1 jour d'écart entre la durée de vie minimale et la durée de vie maximale.",
     "rotation_lifetime_help_minimum": "Nombre minimal de jours pendant lesquels les données de cet index sont conservées avant d'être soumises à la rétention.",
     "rotation_lifetime_help_range": "Nombre minimal / maximal de jours pendant lesquels les données de cet index sont conservées avant d'être soumises à la rétention.",
-    "rotation_lifetime_fixed_leeway": "Le nombre maximal de jours est {{max}}, car le nombre fixe de jours entre le minimum et le maximum est défini à {{leeway}}."
+    "rotation_lifetime_max_rotation_one": "La période de rotation maximale est fixée à {{count}} jour par l'administrateur.",
+    "rotation_lifetime_max_rotation_other": "La période de rotation maximale est fixée à {{count}} jours par l'administrateur.",
+    "rotation_lifetime_fixed_leeway": "Le nombre maximal de jours est {{max}}, car le nombre fixe de jours entre le minimum et le maximum est défini à {{leeway}}.",
+    "rotation_lifetime_max_rotation_many": "La période de rotation maximale est fixée à {{count}} jours par l'administrateur."
   },
   "pages": {
     "configure_index_set": "Configurer l'Index Set",
@@ -585,9 +616,12 @@
     "templates_default_info": "Définissez ici un modèle par défaut pour contrôler la configuration des Index Sets créés par les packs Illuminate.",
     "failures_title": "Échecs de l'indexeur",
     "failures_description": "Liste des tentatives d'indexation de messages ayant échoué. Un échec signifie qu'un message a bien été traité, mais que son écriture dans le cluster d'indexation a échoué. Notez que la liste est limitée à 50 Mo ; elle peut donc contenir de nombreux journaux d'échecs sans nécessairement reprendre tous ceux qui se sont produits.",
+    "failures_total_one": "Collection contenant un total de {{formattedCount}} échec de l'indexeur.",
+    "failures_total_other": "Collection contenant un total de {{formattedCount}} échecs de l'indexeur.",
     "indices_document_title": "Index et Index Sets",
     "indices_title": "Index et Index Sets",
-    "indices_description": "Un stream écrit les messages dans un Index Set, qui est une configuration de rétention, de sharding et de réplication des données stockées. En configurant des Index Sets, vous pouvez par exemple définir des durées de rétention différentes pour certains streams."
+    "indices_description": "Un stream écrit les messages dans un Index Set, qui est une configuration de rétention, de sharding et de réplication des données stockées. En configurant des Index Sets, vous pouvez par exemple définir des durées de rétention différentes pour certains streams.",
+    "failures_total_many": "Collection contenant un total de {{formattedCount}} échecs de l'indexeur."
   },
   "navigation": {
     "indices": "Index",
