@@ -1,1 +1,177 @@
-{}
+{
+  "add_notification_form": {
+    "add": "通知を追加",
+    "choose": "通知を選択",
+    "create_new": "新しい通知を作成...",
+    "help": "このアラートの種類で使用する通知を選択するか、後で他のアラートでも使用できる新しい通知を作成します。",
+    "select": "通知を選択",
+    "title": "通知を追加"
+  },
+  "aggregation_form": {
+    "description": "上で定義したフィルターに一致するログメッセージを、関数を使って集計します。必要に応じて、フィルター結果を同一のフィールド値でグループ化できます。",
+    "group_by_example": "ネットワーク内のすべてのログイン失敗を対象とするフィルターを作成したとします。全体でログイン失敗が5回を超えた場合にアラートをトリガーするには、<code>username</code> をグループ化フィールドとして追加します。すると、<em>各 <code>username</code></em> について、ログイン失敗が5回を超えるとアラートがトリガーされます。",
+    "group_by_help": "同一の値を持つ場合にフィルター結果をグループ化するフィールドを選択します。<bold>例:</bold>",
+    "title": "集計"
+  },
+  "bulk_actions": {
+    "delete": {
+      "error": "イベント定義の削除中にエラーが発生しました。{{error}}",
+      "title": "イベント定義を削除"
+    },
+    "disable": {
+      "error": "イベント定義の無効化中にエラーが発生しました。{{error}}",
+      "title": "イベント定義を無効化"
+    },
+    "disable_action": "無効化",
+    "enable": {
+      "error": "イベント定義の有効化中にエラーが発生しました。{{error}}",
+      "title": "イベント定義を有効化"
+    },
+    "enable_action": "有効化",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "利用可能な条件",
+    "condition_type": "条件の種類",
+    "condition_type_help": "このイベントの条件の種類を選択します。",
+    "description": "この種類のイベントがどのように作成されるかを定義します。後で、それらのイベントを他の条件の入力として使用でき、他の条件に基づく強力な条件を作成できます。",
+    "no_description": "説明はありません。",
+    "not_editable": "このイベント定義の種類の条件は編集できません。",
+    "select_condition_type": "条件の種類を選択",
+    "title": "イベント条件"
+  },
+  "condition_summary": {
+    "and": "AND",
+    "create_events": "定義のイベントを作成",
+    "errors_found": "エラーが見つかりました",
+    "hide_errors": "エラーを非表示",
+    "invalid": "条件が無効です",
+    "no_condition": "条件が設定されていません",
+    "no_series": "系列が選択されていません",
+    "or": "OR",
+    "preview": "プレビュー:",
+    "show_errors": "エラーを表示",
+    "title": "条件の概要",
+    "valid": "条件は有効です"
+  },
+  "conditions": {
+    "add_expression": "式を追加",
+    "add_group": "グループを追加",
+    "all": "すべて",
+    "any": "いずれか",
+    "boolean_operator": "ブール演算子",
+    "boolean_operator_group": "ブール演算子グループ {{level}}",
+    "delete_expression": "式を削除",
+    "global_boolean_operator": "全体のブール演算子",
+    "if": "条件",
+    "is": "次と一致",
+    "messages_must_meet": "メッセージは次のルールの",
+    "of_the_following_rules": "に一致する必要があります:",
+    "select_condition": "条件を選択",
+    "select_field": "フィールドを選択（任意）",
+    "select_function": "関数を選択",
+    "select_percentile": "パーセンタイルを選択",
+    "select_strategy": "戦略を選択（任意）",
+    "threshold": "しきい値"
+  },
+  "definition_summary": {
+    "details": "詳細",
+    "no_description": "説明がありません",
+    "no_tags": "タグなし",
+    "no_title": "タイトルがありません",
+    "title": "イベントの概要"
+  },
+  "details_form": {
+    "add_event_procedure": "イベント手順を追加",
+    "description": "説明",
+    "description_help": "このイベント定義の詳細な説明です。",
+    "no_event_procedures": "このイベント定義にはまだイベント手順がありません。",
+    "no_remediation_steps": "是正手順がありません",
+    "optional": "（任意）",
+    "priority": "優先度",
+    "priority_help": "この定義から作成されるイベントの優先度を選択します。",
+    "remediation_steps": "是正手順",
+    "remediation_steps_help": "このイベントを是正する手順です。Markdown 形式がサポートされています。",
+    "summary_template": "イベントの概要テンプレート",
+    "summary_template_help": "イベントとアラートの概要を生成するために使用されるテンプレートです。",
+    "title": "イベントの詳細",
+    "title_help": "このイベント定義のタイトルです。",
+    "title_label": "タイトル"
+  },
+  "event_key_help": {
+    "event_count": "<bold>フィルターと集計</bold>の定義で作成されるイベントの数を制御するには、「集計結果がしきい値に達した場合に定義のイベントを作成」を使用し、グループ化フィールドを設定します。",
+    "example": "<bold>例:</bold> 2つの定義、<em>ログイン失敗</em>と<em>権限昇格</em>があり、どちらもイベントキーは <code>username</code> です。両方のイベントが同じユーザー名を持つ場合にのみ、2つの相関が発生します。",
+    "intro": "イベントキーは、値が結合されてイベントのキーになるカスタムフィールドです（値は <code>|</code> で結合されます）。キーは、イベントが対象とするエンティティを識別します。作成されるイベントの数は変わりません。",
+    "where_it_matters": "<bold>キーが重要になる場合:</bold> <bold>イベント相関</bold>は、同じキーを共有するソースイベントとのみ一致し、検索期間内でキーごとに最大1つのイベントを作成します。キーは、相関そのものではなく、相関させたいイベント定義に設定してください。"
+  },
+  "expanded_notifications": {
+    "description": "このイベント定義がトリガーされたときに送信される通知です。",
+    "loading": "通知を読み込み中...",
+    "missing_permissions": "次の通知権限がありません:"
+  },
+  "field_form": {
+    "add": "カスタムフィールドを追加",
+    "data_type": "フィールドのデータ型",
+    "data_type_string": "文字列",
+    "key_help": "このフィールドをキーにするかどうか、およびその順序を示します。",
+    "more_about_keys": "イベントキーの詳細",
+    "name": "名前",
+    "name_help": "このフィールドの名前です。",
+    "provider_unavailable": "選択されたプロバイダーは利用できません。",
+    "select_value_source": "値のソースを選択",
+    "set_value_from": "値の取得元",
+    "title_edit": "カスタムフィールド \"{{fieldName}}\"",
+    "title_new": "新しいカスタムフィールド",
+    "update": "カスタムフィールドを更新",
+    "use_as_key": "フィールドをイベントキーとして使用",
+    "value_source_help": "このフィールドの値のソースを選択します。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {}
+  },
+  "fields_form": {},
+  "fields_list": {},
+  "filter_aggregation_form": {},
+  "filter_form": {},
+  "filter_preview": {},
+  "form_container": {},
+  "form_controls": {},
+  "hook_notifications": {},
+  "notification_list": {},
+  "notification_settings": {},
+  "notifications_form": {},
+  "overview": {},
+  "page": {},
+  "priorities": {},
+  "provider_summary": {},
+  "query_parameter_modal": {
+    "types": {}
+  },
+  "replay_search": {
+    "attributes": {}
+  },
+  "row_actions": {},
+  "scheduling": {},
+  "share": {},
+  "sidebar": {},
+  "status_cell": {},
+  "steps": {},
+  "summary": {
+    "condition_types": {}
+  },
+  "summary_renders": {},
+  "summary_template_help": {},
+  "tags_editor": {},
+  "template_preview": {},
+  "template_provider_form": {},
+  "types": {
+    "aggregation": {},
+    "system": {}
+  },
+  "validation": {},
+  "validation_summary": {},
+  "use_event_definition_notifications": {}
+}
