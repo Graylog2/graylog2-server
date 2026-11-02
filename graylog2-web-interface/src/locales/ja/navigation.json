@@ -1,1 +1,57 @@
-{}
+{
+  "main": {
+    "search": "検索",
+    "streams": "ストリーム",
+    "alerts": "アラート",
+    "dashboards": "ダッシュボード",
+    "system": "システム",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "概要",
+    "configurations": "設定",
+    "cluster_configuration": "クラスター設定",
+    "inputs": "入力",
+    "outputs": "出力",
+    "indices": "インデックス",
+    "logging": "ログ",
+    "users_and_teams": "ユーザーとチーム",
+    "roles": "ロール",
+    "authentication": "認証",
+    "content_packs": "コンテンツパック",
+    "grok_patterns": "Grok パターン",
+    "lookup_tables": "ルックアップテーブル",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors"
+  },
+  "security": {
+    "overview": "概要",
+    "user_activity": "ユーザーアクティビティ",
+    "host_activity": "ホストアクティビティ",
+    "network_activity": "ネットワークアクティビティ",
+    "anomalies": "異常"
+  },
+  "help": {
+    "title": "ヘルプ",
+    "documentation": "ドキュメント",
+    "design_system": "デザインシステム",
+    "keyboard_shortcuts": "キーボードショートカット",
+    "api_browser": "API ブラウザー"
+  },
+  "user_menu": {
+    "title": "{{name}} のユーザーメニュー",
+    "language": "言語",
+    "show_profile": "プロフィールを表示",
+    "edit_profile": "プロフィールを編集",
+    "log_out": "ログアウト"
+  },
+  "shell": {
+    "welcome": "ようこそ",
+    "main": "メイン",
+    "utility": "ユーティリティ",
+    "toggle_navigation": "ナビゲーションの切り替え",
+    "scratchpad": "スクラッチパッド"
+  }
+}
