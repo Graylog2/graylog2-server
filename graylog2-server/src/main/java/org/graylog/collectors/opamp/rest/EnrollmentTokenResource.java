@@ -32,7 +32,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -57,6 +56,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.SortOrder;
@@ -157,7 +158,7 @@ public class EnrollmentTokenResource extends RestResource {
         checkPermission(CollectorsPermissions.ENROLL_TOKEN_CREATE, request.fleetId());
 
         if (fleetService.get(request.fleetId()).isEmpty()) {
-            throw new BadRequestException("Fleet not found: " + request.fleetId());
+            throw new CodedBadRequestException("collectors.fleet_not_found", "Fleet not found: " + request.fleetId(), Map.of("fleetId", request.fleetId()));
         }
         final var user = getCurrentUser();
         final var creator = new EnrollmentTokenCreator(user.getId(), user.getName());
@@ -203,18 +204,18 @@ public class EnrollmentTokenResource extends RestResource {
     @NoAuditEvent("inline")
     public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
         if (!ObjectId.isValid(tokenId)) {
-            throw new BadRequestException("Invalid token ID format");
+            throw new CodedBadRequestException("collectors.token_id_invalid", "Invalid token ID format");
         }
 
         final Optional<EnrollmentTokenDTO> token = enrollmentTokenService.findOne(tokenId);
         if (token.isEmpty()) {
-            throw new NotFoundException("Enrollment token not found");
+            throw new CodedNotFoundException("collectors.token_not_found", "Enrollment token not found");
         }
         final EnrollmentTokenDTO dto = token.get();
         checkPermission(CollectorsPermissions.ENROLL_TOKEN_DELETE, dto.fleetId());
 
         if (!enrollmentTokenService.delete(tokenId)) {
-            throw new NotFoundException("Enrollment token not found");
+            throw new CodedNotFoundException("collectors.token_not_found", "Enrollment token not found");
         }
         auditEventSender.success(getAuditActor(), AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_DELETE, Map.of(
                 "tokenId", Objects.requireNonNull(dto.id()),
@@ -233,7 +234,7 @@ public class EnrollmentTokenResource extends RestResource {
             @RequestBody(description = "Token IDs to delete")
             @NotNull final BulkOperationRequest request) {
         if (request.entityIds() == null || request.entityIds().isEmpty()) {
-            throw new BadRequestException("No IDs provided in the request");
+            throw new CodedBadRequestException("collectors.no_ids", "No IDs provided in the request");
         }
         try (Stream<EnrollmentTokenDTO> stream = enrollmentTokenService.findByIds(request.entityIds())) {
             // we need to create the proper audit contexts for each delete event

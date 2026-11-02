@@ -26,7 +26,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -45,12 +44,14 @@ import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -197,7 +198,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     private ConfigurationVariable findVariableOrFail(String id) {
         final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
         if (configurationVariable == null) {
-            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.variable_not_found", "Could not find ConfigurationVariable <" + id + ">.", Map.of("id", id));
         }
         return configurationVariable;
     }

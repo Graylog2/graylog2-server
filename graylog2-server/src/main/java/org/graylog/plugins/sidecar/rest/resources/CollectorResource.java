@@ -60,6 +60,8 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
@@ -75,6 +77,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -128,7 +131,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
         final Collector collector = this.collectorService.find(id);
         if (collector == null) {
-            throw new NotFoundException("Cound not find collector <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.collector_not_found", "Cound not find collector <" + id + ">.", Map.of("id", id));
         }
 
         return collector;
@@ -264,7 +267,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                 .filter(configuration -> configuration.collectorId().equals(id))
                 .count();
         if (configurationsForCollector > 0) {
-            throw new BadRequestException("Collector still in use, cannot delete.");
+            throw new CodedBadRequestException("sidecar.collector_in_use", "Collector still in use, cannot delete.");
         }
 
         int deleted = collectorService.delete(id);

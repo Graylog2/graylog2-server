@@ -31,7 +31,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -62,6 +61,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.AttributeSortSpec;
@@ -284,7 +285,7 @@ public class CollectorInstancesResource extends RestResource {
             @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
         final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
         if (collector.isEmpty()) {
-            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+            throw new CodedNotFoundException("collectors.instance_not_found", f("Collector instance <%s> not found", instanceUid), Map.of("instanceUid", instanceUid));
         }
         final CollectorInstanceDTO dto = collector.get();
         // we scope instance read on the entire fleet, there's no sharing that makes sense per instance.
@@ -308,14 +309,14 @@ public class CollectorInstancesResource extends RestResource {
             @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
         final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
         if (collector.isEmpty()) {
-            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+            throw new CodedNotFoundException("collectors.instance_not_found", f("Collector instance <%s> not found", instanceUid), Map.of("instanceUid", instanceUid));
         }
         final CollectorInstanceDTO dto = collector.get();
         checkPermission(CollectorsPermissions.FLEET_INSTANCE_DELETE, dto.fleetId());
 
         final boolean deleted = collectorInstanceService.deleteByInstanceUid(instanceUid);
         if (!deleted) {
-            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+            throw new CodedNotFoundException("collectors.instance_not_found", f("Collector instance <%s> not found", instanceUid), Map.of("instanceUid", instanceUid));
         }
         auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_INSTANCE_DELETE, Map.of(
                 "instanceUid", instanceUid,
@@ -331,7 +332,7 @@ public class CollectorInstancesResource extends RestResource {
     public PendingChangesResponse instancePendingChanges(
             @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
         final var collector = collectorInstanceService.findByInstanceUid(instanceUid).orElseThrow(() ->
-                new NotFoundException(f("Collector instance <%s> not found", instanceUid)));
+                new CodedNotFoundException("collectors.instance_not_found", f("Collector instance <%s> not found", instanceUid), Map.of("instanceUid", instanceUid)));
 
         checkPermission(CollectorsPermissions.FLEET_READ, collector.fleetId());
 
@@ -359,7 +360,7 @@ public class CollectorInstancesResource extends RestResource {
         checkPermission(CollectorsPermissions.FLEET_READ, targetFleetId);
         checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, targetFleetId);
         if (instanceUids == null || instanceUids.isEmpty()) {
-            throw new BadRequestException("instance_uids must not be empty");
+            throw new CodedBadRequestException("collectors.instance_uids_empty", "instance_uids must not be empty");
         }
 
         if (instanceUids.size() > FleetTransactionLogService.MAX_BULK_TARGET_SIZE) {
@@ -367,7 +368,7 @@ public class CollectorInstancesResource extends RestResource {
         }
 
         if (fleetService.get(targetFleetId).isEmpty()) {
-            throw new NotFoundException(f("Target fleet <%s> not found", targetFleetId));
+            throw new CodedNotFoundException("collectors.target_fleet_not_found", f("Target fleet <%s> not found", targetFleetId), Map.of("targetFleetId", targetFleetId));
         }
 
         final Map<String, CollectorInstanceDTO> permittedInstances = collectorInstanceService.findByInstanceUids(instanceUids,
