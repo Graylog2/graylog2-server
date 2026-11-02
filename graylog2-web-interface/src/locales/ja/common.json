@@ -22,7 +22,17 @@
   "confirm_leave": {
     "question": "本当によろしいですか？"
   },
-  "duration": {},
+  "duration": {
+    "years_other": "{{count}} 年",
+    "months_other": "{{count}} か月",
+    "days_other": "{{count}} 日",
+    "hours_other": "{{count}} 時間",
+    "minutes_other": "{{count}} 分",
+    "seconds_other": "{{count}} 秒",
+    "milliseconds_other": "{{count}} ミリ秒",
+    "nanoseconds_other": "{{count}} ナノ秒",
+    "microseconds_other": "{{count}} マイクロ秒"
+  },
   "bulk_actions": {
     "title": "一括操作",
     "cancel": "選択をキャンセル"
@@ -102,6 +112,7 @@
     "active_page": "現在のページ"
   },
   "page_size": {
+    "rows_other": "{{count}} 行",
     "configure": "ページサイズを設定",
     "show": "<select/> 件を表示"
   },
@@ -117,6 +128,7 @@
     "type_to_filter": "入力してフィルター"
   },
   "entity_table": {
+    "selected_items_other": "{{count}} 件の項目を選択中",
     "columns": "列",
     "configure_columns": "表示する列を設定",
     "reset_columns": "すべての列をリセット",
@@ -236,7 +248,10 @@
     "not_stored_in_index": "メッセージは保存されていません",
     "routed_into_streams": "ストリームに振り分け済み",
     "edit_favorite_fields": "お気に入りフィールドを編集",
+    "show_remaining_fields_other": "残り {{count}} 個のフィールドを表示",
+    "hide_remaining_fields_other": "残り {{count}} 個のフィールドを非表示",
     "favorite_fields_configuration": "お気に入りフィールドの設定",
+    "favorite_fields_hint_other": "お気に入りのフィールドは、このメッセージが属するすべてのストリーム（このメッセージが振り分けられている <streams/> を含む）に表示されます。",
     "save_configuration": "設定を保存",
     "reset_to_default": "デフォルトにリセット",
     "reset_to_default_title": "デフォルトのフィールドにリセット: {{fields}}",
@@ -540,9 +555,27 @@
     "system_info": "{{productName}} {{version}}（{{hostname}} 上、{{jvmInfo}}）"
   },
   "notifications": {
-    "download_failed": "ダウンロードに失敗しました。ステータス: {{error}}"
+    "download_failed": "ダウンロードに失敗しました。ステータス: {{error}}",
+    "download_failed_title": "ダウンロードできません",
+    "export_failed": "エクスポートに失敗しました",
+    "export_widget_failed": "ウィジェットのエクスポートに失敗しました",
+    "telemetry_update_failed": "更新に失敗しました: {{error}}",
+    "telemetry_update_failed_title": "テレメトリーの設定を更新できませんでした。",
+    "delete_property_confirm": "プロパティ「{{key}}」を削除してもよろしいですか？",
+    "quick_jump_failed": "項目の検索結果の取得に次のステータスで失敗しました:",
+    "quick_jump_failed_title": "項目の検索結果を取得できませんでした。"
   },
-  "use_favorite_item_mutation_notifications": {},
-  "use_entity_titles_notifications": {},
-  "use_search_version_check_notifications": {}
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "項目をお気に入りに追加できませんでした。ステータス: {{error}}",
+    "put_failed_title": "項目をお気に入りに追加できませんでした",
+    "delete_failed": "項目をお気に入りから削除できませんでした。ステータス: {{error}}",
+    "delete_failed_title": "項目をお気に入りから削除できませんでした"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "項目のタイトルの読み込みに次のステータスで失敗しました:",
+    "load_failed_title": "項目のタイトルを読み込めませんでした"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "上書きデータを取得できませんでした"
+  }
 }
