@@ -239,28 +239,148 @@
     "stream_name_label": "Kinesis Stream 名稱",
     "stream_name_placeholder": "Stream 名稱",
     "stream_name_help": "1 至 128 個英數字元，以及底線 (_)、句點 (.) 與連字號 (-) 等特殊字元。",
-    "group_name_label": "CloudWatch 群組名稱"
+    "group_name_label": "CloudWatch 群組名稱",
+    "choose_group": "選擇 CloudWatch 群組",
+    "back_button": "返回 Stream 選擇"
   },
-  "aws_kinesis_setup_agree": {},
-  "aws_kinesis_setup_step": {},
-  "aws_kinesis_setup_steps": {},
-  "aws_kinesis_setup_modal": {},
-  "form_wrap": {},
-  "aws_skip_health_check": {},
-  "throttling_checkbox": {},
-  "grey_noise_adapter_documentation": {},
-  "grey_noise_adapter_field_set": {},
-  "grey_noise_adapter_summary": {},
-  "slack_notification_details": {},
-  "teams_notification_details": {},
-  "teams_notification_v2_details": {},
-  "slack_notification_form": {},
-  "event_procedure_checkbox": {},
-  "slack_notification_summary": {},
-  "teams_notification_summary": {},
-  "teams_notification_form": {},
-  "teams_notification_v2_form": {},
-  "pager_duty_notification_details": {},
+  "aws_kinesis_setup_agree": {
+    "description": "此自動設定將建立以下 AWS 資源。請點擊下方確認，表示您了解這些資源將會被建立，且您需自行負擔由此產生的任何 AWS 費用。若不再需要這些資源，您必須手動刪除所有資源。",
+    "step_stream": "建立具有 <strong>1</strong> 個 Shard 的 Kinesis Stream。",
+    "step_role": "建立 IAM 角色與政策，允許指定的 CloudWatch 群組 <strong>{{groupName}}</strong> 將日誌訊息發佈至 Kinesis Stream <strong>{{streamName}}</strong>",
+    "step_subscription": "建立 CloudWatch 訂閱，將日誌訊息發佈至 Kinesis Stream。"
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "等待中...",
+    "creating": "正在建立 {{label}}",
+    "create": "建立 {{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis Stream",
+    "policy_label": "訂閱政策",
+    "subscription_label": "訂閱"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "建立中...",
+    "close_button": "關閉",
+    "continue_button": "繼續設定",
+    "executing_title": "正在執行自動設定",
+    "agreement_title": "Kinesis 自動設定同意書",
+    "delayed_logs": "第一批訊息最多可能需要十分鐘才會抵達 Kinesis Stream。在 Stream 中出現訊息之前，後續步驟的 Kinesis 健康檢查將不會成功完成。更多資訊請參閱官方的 <cloudWatchLink>CloudWatch 訂閱</cloudWatchLink> 文件。",
+    "agree_button": "我同意！立即建立這些 AWS 資源。"
+  },
+  "form_wrap": {
+    "more_info": "更多資訊",
+    "additional_information": "其他資訊：",
+    "loading_button": "載入中...",
+    "submit_button": "提交"
+  },
+  "aws_skip_health_check": {
+    "title": "略過健康檢查",
+    "confirm_button": "確認",
+    "form_title": "選擇日誌類型並略過健康檢查",
+    "description": "若您確定新 <strong>{{streamName}}</strong> Stream 中的資料內容，請選擇下方選項以略過自動檢查。",
+    "input_type_label": "選擇 AWS Input 類型",
+    "choose_log_type": "選擇日誌類型"
+  },
+  "throttling_checkbox": {
+    "label": "啟用節流",
+    "help": "啟用後，在 {{productName}} 伺服器處理完目前的訊息負載之前，不會從此 Input 讀取新訊息。這通常適用於從檔案或 AMQP、Kafka 等訊息佇列系統讀取資料的 Input。若您會定期輪詢外部系統（例如透過 HTTP），通常應保持停用。"
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup 資料介接器會使用 <greynoiseLink>Greynoise API</greynoiseLink>，查詢指定金鑰的指標，並回傳 IP Quick Context 端點的值。請參閱 <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "使用者密碼",
+    "reset_token_button": "重設權杖",
+    "api_token_label": "API 權杖",
+    "undo_reset_button": "復原重設",
+    "api_token_help": "API 權杖。"
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API 權杖"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "頻道",
+    "custom_message_label": "自訂訊息範本",
+    "empty_body": "空白內文",
+    "include_event_procedure_label": "在電子郵件內文中包含事件程序",
+    "backlog_limit_label": "訊息積壓上限",
+    "user_name_label": "使用者名稱",
+    "include_title_label": "包含標題",
+    "notify_channel_label": "通知頻道",
+    "link_names_label": "連結名稱",
+    "icon_url_label": "圖示 URL",
+    "icon_emoji_label": "圖示表情符號",
+    "time_zone_label": "時區"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "自訂訊息範本",
+    "empty_body": "空白內文",
+    "backlog_limit_label": "訊息積壓上限",
+    "icon_url_label": "圖示 URL",
+    "time_zone_label": "時區"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "Adaptive Card 範本",
+    "backlog_limit_label": "訊息積壓上限"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "設定顏色",
+    "change_color_button": "變更顏色",
+    "color_help": "選擇此設定要使用的顏色。",
+    "custom_message_help": "將附加於警示標題下方的自訂訊息。更多詳細資訊請參閱 <docsLink/>。",
+    "docs_link_text": "文件",
+    "webhook_url_help": "Slack「Incoming Webhook」URL",
+    "channel_help": "Slack 的 #頻道名稱，或用於私訊的 @使用者",
+    "custom_message_label": "自訂訊息（選填）",
+    "time_zone_help": "用於通知內文中時間戳記的時區。",
+    "time_zone_label": "日期／時間值的時區",
+    "backlog_limit_label": "訊息積壓上限（選填）",
+    "backlog_limit_help": "限制作為 Slack 通知一部分發送的積壓訊息數量。設為 0 時，不會強制執行限制。",
+    "user_name_label": "使用者名稱（選填）",
+    "user_name_help": "Slack 中發送者的使用者名稱",
+    "include_title_help": "在通知中包含事件定義的標題與描述",
+    "notify_channel_help": "在訊息中加入 @channel，以通知頻道中的所有使用者",
+    "notify_here_label": "通知在線使用者",
+    "notify_here_help": "在訊息中加入 @here，以通知頻道中的在線使用者",
+    "link_names_help": "尋找並連結頻道名稱與使用者名稱",
+    "icon_url_label": "圖示 URL（選填）",
+    "icon_url_help": "用作此訊息圖示的圖片",
+    "icon_emoji_label": "圖示表情符號（選填）",
+    "icon_emoji_help": "用作此訊息圖示的表情符號（會覆寫圖示 URL）"
+  },
+  "event_procedure_checkbox": {
+    "label": "包含事件程序",
+    "help": "將事件定義之事件程序的格式化版本附加到通知內文末尾。"
+  },
+  "slack_notification_summary": {
+    "color_label": "顏色",
+    "custom_message_label": "自訂訊息",
+    "yes": "是",
+    "no": "否"
+  },
+  "teams_notification_summary": {
+    "color_label": "顏色",
+    "custom_message_label": "自訂訊息"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams「Incoming Webhook」URL",
+    "backlog_limit_help": "限制作為 Microsoft Teams 通知一部分發送的積壓訊息數量。設為 0 時，不會強制執行限制。"
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "要發佈至 Teams 的 Adaptive Card。更多詳細資訊請參閱 <docsLink/>。",
+    "backlog_toggle_aria_label": "啟用訊息積壓上限"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "路由金鑰（Routing Key）",
+    "incident_title_label": "事件標題",
+    "custom_incident_label": "自訂事件",
+    "key_prefix_label": "金鑰前綴",
+    "incident_key_label": "事件金鑰"
+  },
   "pager_duty_notification_form": {},
   "pager_duty_notification_summary": {},
   "threat_intel_plugin_config": {},
