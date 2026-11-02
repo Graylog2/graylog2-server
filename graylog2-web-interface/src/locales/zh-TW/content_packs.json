@@ -131,20 +131,119 @@
     "install": "安裝",
     "install_title": "安裝內容包",
     "latest_version": "最新版本：{{rev}}",
-    "show": "顯示"
+    "show": "顯示",
+    "update": "更新"
   },
-  "notifications": {},
-  "overview": {},
-  "pages": {},
-  "parameter_list": {},
-  "parameters": {},
-  "preview": {},
-  "revisions": {},
-  "selection": {},
-  "show": {},
-  "status": {},
-  "upload": {},
-  "value_types": {},
-  "version_item": {},
-  "versions": {}
+  "notifications": {
+    "error": "錯誤",
+    "success": "成功"
+  },
+  "overview": {
+    "button_text": "Content Packs",
+    "delete_confirmation": "您即將刪除此 Content Pack，確定要繼續嗎？",
+    "delete_error_message": "刪除 Content Pack 失敗：{{error}}",
+    "delete_success": "Content Pack 已成功刪除。",
+    "description": "Content Pack 可加快特定資料來源的設定流程。Content Pack 可包含 Input/Extractor、Stream 與 Dashboard。",
+    "install_error_message": "安裝 Content Pack 失敗，狀態：{{status}}。無法安裝 ID 為 {{id}} 的 Content Pack",
+    "install_success": "Content Pack 已成功安裝。",
+    "title": "Content Packs",
+    "marketplace_prefix": "在以下位置尋找更多 Content Pack："
+  },
+  "pages": {
+    "back_button": "Content Packs",
+    "create_title": "建立 Content Pack",
+    "description": "Content Pack 可加快特定資料來源的設定流程。Content Pack 可包含 Input/Extractor、Stream 與 Dashboard。",
+    "document_title": "Content Packs",
+    "edit_title": "編輯 Content Pack",
+    "marketplace_prefix": "在以下位置尋找更多 Content Pack："
+  },
+  "parameter_list": {
+    "action": "動作",
+    "default_value": "預設值",
+    "delete_parameter": "刪除參數",
+    "description": "描述",
+    "edit_modal": "編輯對話框",
+    "list_title": "參數清單",
+    "modal_title": "參數",
+    "name": "名稱",
+    "no_data": "若要在 Content Pack 中使用參數，請先建立參數，然後將其套用至項目。",
+    "still_in_use": "仍在使用中",
+    "title": "標題",
+    "used": "已使用",
+    "value_type": "值類型"
+  },
+  "parameters": {
+    "confirm_deletion": "確認刪除",
+    "delete_confirmation": "確定要刪除此參數：{{title}}？"
+  },
+  "preview": {
+    "create": "建立",
+    "create_and_download": "建立並下載"
+  },
+  "revisions": {
+    "fetch_error": "擷取 Content Pack 修訂版本時發生錯誤：{{error}}",
+    "fetch_error_title": "無法擷取 Content Pack"
+  },
+  "selection": {
+    "description": "描述",
+    "description_help": "請以 Markdown 格式提供 Content Pack 的詳細描述。",
+    "general_information": "一般資訊",
+    "must_be_filled": "必須填寫。",
+    "name": "名稱",
+    "name_help": "必填。請為此 Content Pack 提供描述性名稱。",
+    "no_pairs_hint": "此版本的 Content Pack 中的項目從未安裝，因此沒有可選取的已安裝項目。",
+    "select_entity": "請至少選取一個項目。",
+    "select_latest": "選取最新安裝的版本",
+    "select_older": "選取較舊的 Content Pack 版本",
+    "summary": "摘要",
+    "summary_help": "必填。請為 Content Pack 提供簡短摘要。",
+    "title": "Content Pack 選擇",
+    "url": "URL",
+    "url_help": "可在何處找到此 Content Pack，例如 GitHub 網址。",
+    "url_invalid": "URL 無效",
+    "url_protocol": "URL 必須以 http 或 https 開頭。",
+    "vendor": "供應商",
+    "vendor_help": "必填。請提供此 Content Pack 的作者及聯絡方式，例如名稱與電子郵件。",
+    "version_help": "對於每個項目，您可以選取最新安裝的版本（<latestIcon />）或較舊的 Content Pack 版本（<olderIcon />）。"
+  },
+  "show": {
+    "delete_revision_confirmation": "您即將刪除此 Content Pack 修訂版本，確定要繼續嗎？",
+    "delete_revision_error": "刪除 Content Pack 失敗：{{error}}",
+    "delete_revision_success": "Content Pack 修訂版本已成功刪除。",
+    "install_error": "安裝 Content Pack 失敗，狀態：{{status}}。無法安裝 ID 為 {{id}} 的 Content Pack",
+    "installations": "安裝紀錄",
+    "not_found": "找不到 ID 為 {{id}} 的 Content Pack，可能已被刪除。",
+    "server_error": "發生內部伺服器錯誤，請查看日誌檔以取得詳細資訊",
+    "uninstall_confirmation": "您確定要解除安裝此 Content Pack 嗎？",
+    "uninstall_error": "解除安裝 Content Pack 失敗，請查看日誌以取得詳細資訊。",
+    "uninstall_success": "Content Pack 已成功解除安裝。",
+    "versions": "版本"
+  },
+  "status": {
+    "edited": "已編輯",
+    "error": "錯誤",
+    "installed": "已安裝",
+    "updatable": "可更新"
+  },
+  "upload": {
+    "button": "上傳",
+    "choose_file": "選擇檔案",
+    "choose_file_help": "從磁碟選擇 Content Pack",
+    "title": "上傳 Content Pack"
+  },
+  "value_types": {
+    "boolean": "布林值",
+    "double": "雙精度浮點數",
+    "integer": "整數",
+    "string": "字串"
+  },
+  "version_item": {
+    "actions": "動作",
+    "create_from_revision": "從修訂版本建立新版本"
+  },
+  "versions": {
+    "action": "動作",
+    "revision": "修訂版本",
+    "select": "選取"
+  }
 }
