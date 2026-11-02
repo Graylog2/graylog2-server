@@ -1,1 +1,152 @@
-{}
+{
+  "copy_to_dashboard": {
+    "title": "将 Widget 复制到仪表盘",
+    "no_dashboards": "未找到仪表盘。",
+    "create_new": "创建新仪表盘"
+  },
+  "edit_message_list": {
+    "fields": "字段",
+    "message_preview": "消息预览",
+    "sorting": "排序",
+    "direction": "方向",
+    "decorators": "装饰器"
+  },
+  "widget_frame": {
+    "loading": "正在加载 Widget ..."
+  },
+  "export_widget": {
+    "export_all": "导出所有搜索结果",
+    "title": "导出 Widget",
+    "enterprise_explanation": "聚合 Widget 导出功能适用于 Enterprise 版本。此功能提供将数据导出为 CSV、JSON、YAML、XML 等常用文件格式的选项。"
+  },
+  "field_sort": {
+    "placeholder": "无：点击添加字段",
+    "aria_label": "选择用于排序的字段"
+  },
+  "fields_configuration": {
+    "add_field": "添加字段"
+  },
+  "move_widget": {
+    "no_pages": "未找到页面",
+    "copy": "复制 Widget",
+    "move": "移动 Widget",
+    "title": "选择目标页面",
+    "keep_copy": "在此页面保留副本",
+    "keep_copy_help": "启用“在页面上保留副本”后，Widget 将被复制到其他页面，而不是移动。"
+  },
+  "widget_edit": {
+    "update": "更新 Widget",
+    "updating": "正在更新 Widget..."
+  },
+  "execution_info": {
+    "executed_at": "执行时间：",
+    "executed_at_label": "执行时间",
+    "executed_in": "执行耗时：",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "实际时间范围：",
+    "from": "开始",
+    "to": "结束",
+    "from_label": "实际时间范围开始",
+    "to_label": "实际时间范围结束",
+    "total_results": "结果总数：",
+    "title": "执行信息",
+    "no_query_executed": "尚未执行查询。"
+  },
+  "selected_fields": {
+    "fields": "字段",
+    "edit_field": "编辑 {{field}} 字段",
+    "remove_field": "移除 {{field}} 字段"
+  },
+  "sort_direction": {
+    "ascending": "升序",
+    "descending": "降序",
+    "no_sorting": "未选择排序",
+    "select_direction": "点击选择方向"
+  },
+  "timerange_info": {
+    "global_override": "全局覆盖：{{timerange}}",
+    "effective_unavailable": "当前无法获取 Widget 的实际时间范围。",
+    "independent": "此 Widget 的结果与当前搜索无关。",
+    "all_time": "全部时间"
+  },
+  "unknown_widget": {
+    "title": "未知 Widget：{{type}}",
+    "cannot_render": "很抱歉，无法渲染此 Widget，因为我们不知道如何处理类型为 <strong>{{type}}</strong> 的 Widget。可能是由以下情况之一导致的：",
+    "missing_plugin": "此 Widget 由现已缺失的插件创建。",
+    "legacy_dashboard": "此 Widget 属于旧版仪表盘，由现已不再可用的插件创建。",
+    "what_to_do": "您可以怎么做？您可以重新加载该插件，联系原插件作者获取与当前版本 {{productName}} 兼容的插件，或者如果不再需要此 Widget，将其移除。",
+    "copy_config": "无论哪种情况，您都可以将 Widget 的配置复制到剪贴板："
+  },
+  "widget_actions": {
+    "open_dropdown": "打开操作下拉菜单",
+    "unfocus": "取消聚焦 Widget",
+    "focus": "聚焦此 Widget",
+    "edit": "编辑",
+    "duplicate": "复制",
+    "copy_to_dashboard": "复制到仪表盘",
+    "move_to_page": "移动到页面",
+    "copying": "正在复制 Widget...",
+    "copy": "复制 Widget",
+    "confirm_remove": "确定要移除 Widget “{{title}}” 吗？",
+    "compress_width": "缩小宽度",
+    "stretch_width": "拉伸宽度",
+    "replay_search": "重新执行搜索"
+  },
+  "widget_loading": {
+    "content": "正在加载 Widget 内容"
+  },
+  "widget_errors": {
+    "render_error": "渲染此 Widget 时发生以下错误："
+  },
+  "widget_header": {
+    "no_description": "未提供 Widget 描述",
+    "show_description": "显示 Widget 的描述",
+    "description_placeholder": "请为 Widget 添加有用的描述",
+    "drag_handle": "{{title}} 的拖动手柄"
+  },
+  "warm_tier": {
+    "info": "信息",
+    "loading_slow": "此 Widget 正在从 Warm Tier 检索数据，加载时间可能较长。"
+  },
+  "events_widget": {
+    "actions": "操作",
+    "replay_search": "重新执行搜索",
+    "view_details": "查看事件详情",
+    "toggle_actions": "切换事件操作",
+    "details_title": "事件详情",
+    "close": "关闭",
+    "unknown_visualization": "未知的 Widget 可视化类型 {{mode}}",
+    "mode_list": "列表",
+    "mode_count": "计数",
+    "visualization": "可视化",
+    "columns": "列",
+    "select_column": "选择新列",
+    "filter": "过滤",
+    "sorting": "排序",
+    "unknown_attribute": "未知",
+    "unknown_attribute_help": "此属性当前不可用，因为它需要有效的许可证。",
+    "select_event_definition": "选择事件定义",
+    "alert": "告警",
+    "event": "事件"
+  },
+  "overview_configuration": {
+    "remove_column": "移除 {{column}} 列",
+    "column": "列",
+    "select_column": "选择列",
+    "direction": "方向",
+    "select_direction": "选择方向",
+    "type": "类型",
+    "add_column": "添加列",
+    "configure_filter": "配置新过滤器"
+  },
+  "date_filter": {},
+  "message_table": {
+    "decorators": {}
+  },
+  "data_table": {},
+  "field_types": {},
+  "export": {},
+  "enterprise_widgets": {},
+  "error_widget": {},
+  "notifications": {}
+}
