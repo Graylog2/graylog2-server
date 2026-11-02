@@ -1,1 +1,182 @@
-{}
+{
+  "administration": {
+    "collectors_administration": {
+      "edit_configuration": "编辑配置",
+      "inactive": "未激活",
+      "no_collectors": "没有可显示的 Collector",
+      "no_compatible_collectors": "没有与 {{operatingSystem}} 兼容的 Collector",
+      "no_filter_matches": "没有 Collector 符合过滤条件",
+      "select_all": "全选"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "分配配置",
+      "cannot_change_configurations": "无法同时更改 {{collectors}} 个 Collector 的配置。",
+      "incompatible_collectors": "Collector 不兼容，请检查 Sidecar 配置。"
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Collector 状态",
+      "configuration": "配置",
+      "filter_by_collector": "按 Collector 过滤",
+      "filter_by_configuration": "按配置过滤",
+      "filter_by_os": "按操作系统过滤",
+      "filter_by_status": "按 Collector 状态过滤",
+      "os": "操作系统"
+    },
+    "configuration_modal": {
+      "add_configuration": "添加新配置",
+      "assigned_from_tags": "通过标签分配：{{tags}}",
+      "lock_info": "带有锁图标 <lockIcon/> 的 Collector 配置已通过标签分配，无法在此更改。",
+      "no_configurations": "所选 Collector 没有可用的配置。",
+      "remove": "移除 {{name}}",
+      "selected": "已选择 {{name}}",
+      "title": "编辑 <collectorName>{{name}}</collectorName> 配置",
+      "unknown_collector": "未知 Collector"
+    },
+    "configuration_summary": {
+      "confirm": "确定要对 <summaryText>{{summary}}</summaryText> 执行此操作吗？",
+      "title": "配置摘要"
+    },
+    "filters_summary": {
+      "clear_all": "全部清除",
+      "collector_on_os": "{{os}} 上的 {{name}}",
+      "filters": "过滤器"
+    },
+    "loading_collectors": "正在加载 Collector 列表...",
+    "process": {
+      "actions": {
+        "restart": "重启",
+        "start": "启动",
+        "stop": "停止"
+      },
+      "button": "进程管理",
+      "confirm": "确定要执行此操作吗？",
+      "no_effect": {
+        "restart": "在没有配置的情况下重启 Collector 不会产生任何效果。",
+        "start": "在没有配置的情况下启动 Collector 不会产生任何效果。",
+        "stop": "在没有配置的情况下停止 Collector 不会产生任何效果。"
+      },
+      "summary": {},
+      "summary_title": "进程操作摘要",
+      "title": "管理 Collector 进程",
+      "understood": "知道了，仍然继续",
+      "warning_text": "至少有一个所选 Collector 尚未配置。要启动新的 Collector，请为其分配配置，Sidecar 会为您启动进程。",
+      "warning_title": "未配置的 Collector"
+    }
+  },
+  "common": {
+    "clone_menu": {
+      "done": "完成",
+      "name": "名称",
+      "name_help": "为新 Collector 输入名称",
+      "title": "克隆"
+    },
+    "collector_indicator": {
+      "on_os": "在 {{operatingSystem}} 上"
+    },
+    "save": "保存",
+    "sidecar_search_form": {
+      "field_last_seen": "Sidecar 上次与 {{productName}} 通信的日期和时间",
+      "field_node_id": "Sidecar 的标识符",
+      "field_operating_system": "Sidecar 运行所在的操作系统",
+      "field_sidecar_version": "Sidecar 版本",
+      "field_status": "Sidecar 在列表中显示的状态，即 running、failing 或 unknown",
+      "last_seen_example": "查找自特定日期以来未通信的 Sidecar：",
+      "placeholder": "查找 Sidecar",
+      "status_example": "查找状态为 <code>failing</code> 或 <code>unknown</code> 的 Sidecar："
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "创建 Collector",
+      "default_template": "默认模板",
+      "default_template_help": "默认的 Collector 配置。",
+      "execute_parameters": "执行参数",
+      "execute_parameters_help": "采集器启动时使用的参数。<strong>%s 将被替换为配置文件的路径。</strong>",
+      "executable_path": "可执行文件路径",
+      "executable_path_help": "Collector 可执行文件的路径",
+      "name": "名称",
+      "name_help": "此 Collector 的名称",
+      "operating_system": "操作系统",
+      "operating_system_help": "选择此 Collector 适用的操作系统。",
+      "optional": "（可选）",
+      "process_management": "进程管理",
+      "service_type": "服务类型",
+      "service_type_exec": "前台执行",
+      "service_type_help": "选择此 Collector 适用的服务类型。",
+      "service_type_svc": "Windows 服务",
+      "update_collector": "更新 Collector",
+      "validation_parameters": "配置验证参数",
+      "validation_parameters_help": "用于验证配置文件的参数。<strong>%s 将被替换为配置文件的路径。</strong>"
+    },
+    "configuration_form": {
+      "change_color": "更改颜色",
+      "collector": "Collector",
+      "collector_help": "选择此配置适用的 Collector。",
+      "collector_in_use": "配置正在使用中，无法更改 Collector。请克隆该配置，以便使用其他 Collector 进行测试。",
+      "collector_on_os": "{{os}} 上的 {{name}}",
+      "collector_placeholder": "Collector",
+      "color": "配置颜色",
+      "color_help": "选择此配置使用的颜色。",
+      "create_configuration": "创建配置",
+      "name": "名称",
+      "name_help": "必填。此配置的名称",
+      "preview": "预览",
+      "tags": "配置分配标签",
+      "tags_help": "配置了匹配标签的 Sidecar 将自动接收此配置。",
+      "template": "配置",
+      "template_help": "必填。Collector 配置，更多信息请参阅快速参考。",
+      "template_required": "请填写配置字段。",
+      "unknown_collector": "未知 Collector",
+      "update_configuration": "更新配置",
+      "use_default_template_confirm": "是否要为所选配置使用默认模板？"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Filebeat 参考文档",
+      "nxlog_reference": "NXLog 参考手册"
+    },
+    "configuration_tags_select": {},
+    "source_view_modal": {},
+    "configuration_variables_helper": {},
+    "edit_configuration_variable_modal": {},
+    "templates_helper": {}
+  },
+  "configurations": {
+    "collector_list": {},
+    "collector_row": {},
+    "configuration_list": {},
+    "configuration_row": {}
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {}
+    },
+    "rows": {}
+  },
+  "basic_sidecar_user": {},
+  "sidecar_status_file_list": {},
+  "sidecars": {
+    "sidecar_list": {},
+    "sidecar_row": {},
+    "sidecar_status": {},
+    "verbose_message_modal": {}
+  },
+  "pages": {
+    "administration": {},
+    "configuration": {},
+    "edit_collector": {},
+    "edit_configuration": {},
+    "failure_tracking": {},
+    "new_collector": {},
+    "new_configuration": {},
+    "overview": {},
+    "status": {}
+  },
+  "notifications": {},
+  "use_sidecars_notifications": {},
+  "use_sidecars_administration_notifications": {
+    "requested": {},
+    "request_failed": {},
+    "request_failed_title": {}
+  }
+}
