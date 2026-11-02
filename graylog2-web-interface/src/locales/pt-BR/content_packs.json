@@ -1,1 +1,150 @@
-{}
+{
+  "apply_parameter": {
+    "action": "Ação",
+    "apply": "Aplicar",
+    "choose": "Escolher...",
+    "choose_config_key": "Escolher chave de configuração",
+    "clear": "Limpar",
+    "config_key": "Chave de configuração",
+    "create_parameter_first": "Crie um parâmetro primeiro",
+    "no_parameter_of_type": "Nenhum parâmetro do tipo {{type}}",
+    "parameter": "Parâmetro"
+  },
+  "constraints": {
+    "fulfilled": "Atendida",
+    "name": "Nome",
+    "title": "Restrições",
+    "type": "Tipo",
+    "version": "Versão"
+  },
+  "details": {
+    "description": "Descrição",
+    "entities": "Entidades:",
+    "id": "ID:",
+    "name": "Nome:",
+    "parameters": "Parâmetros:",
+    "summary": "Resumo:",
+    "title": "Detalhes",
+    "url": "URL:",
+    "vendor": "Fornecedor:",
+    "version": "Versão:"
+  },
+  "download": {
+    "download": "Baixar",
+    "info": "Clique com o botão direito no link de download abaixo e escolha \"Salvar link como...\" para baixar o arquivo JSON.",
+    "title": "Baixar pacote de conteúdo"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parâmetros",
+      "preview": "Pré-visualização",
+      "selection": "Seleção de conteúdo"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Criar parâmetro",
+    "default_value": "Valor padrão",
+    "default_value_help": "Informe um valor padrão caso o parâmetro não seja opcional.",
+    "description": "Descrição",
+    "description_help": "Informe uma descrição explicando o que será feito com este parâmetro.",
+    "description_required": "A descrição deve ser definida.",
+    "edit_title": "Editar parâmetro",
+    "name": "Nome",
+    "name_help": "Usado como referência do parâmetro e não pode conter espaços.",
+    "name_invalid": "O nome do parâmetro deve conter apenas A-Z, a-z, 0-9 e _",
+    "name_not_unique": "O nome do parâmetro deve ser único.",
+    "name_required": "O nome deve ser definido.",
+    "not_boolean": "Este não é um valor booleano. Deve ser true ou false.",
+    "not_double": "Este não é um valor double.",
+    "not_integer": "Este não é um valor inteiro.",
+    "title": "Título",
+    "title_help": "Informe um título descritivo para este pacote de conteúdo.",
+    "title_required": "O título deve ser definido.",
+    "value_type": "Tipo de valor",
+    "value_type_help": "Informe o tipo do parâmetro."
+  },
+  "entities": {
+    "action": "Ação",
+    "config_title": "Configuração da entidade",
+    "description": "Descrição",
+    "edit_title": "Editar",
+    "list_title": "Lista de entidades",
+    "origin": "Origem",
+    "origin_content_pack": "Pacote de conteúdo",
+    "origin_server": "Servidor",
+    "show": "Exibir",
+    "title": "Título",
+    "type": "Tipo",
+    "used_parameters": "Parâmetros utilizados"
+  },
+  "entity_config": {
+    "config_key": "Chave de configuração",
+    "parameter_type": "parâmetro ({{type}})",
+    "type": "Tipo",
+    "value": "Valor"
+  },
+  "entity_index": {
+    "load_failed": "Falha ao carregar o índice de entidades com o status",
+    "load_failed_title": "Não foi possível carregar o índice de entidades"
+  },
+  "import": {
+    "error_message": "Erro ao importar o pacote de conteúdo. Verifique se é um arquivo JSON válido. Consulte os logs do servidor {{productName}} para mais informações.",
+    "error_title": "Não foi possível importar o pacote de conteúdo",
+    "success_message": "Pacote de conteúdo importado com sucesso",
+    "success_named": "Pacote de conteúdo \"{{name}}\" importado com sucesso",
+    "success_title": "Sucesso!"
+  },
+  "install": {
+    "comment": "Comentário da instalação",
+    "comment_help": "Este comentário será armazenado junto com a instalação do pacote de conteúdo e pode ser usado para descrever o motivo desta instalação.",
+    "configure_parameters": "Configurar parâmetro(s):",
+    "needs_to_be_filled": "Precisa ser preenchido.",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador nas entidades deste pacote de conteúdo."
+  },
+  "install_entities": {
+    "installed": "Entidades instaladas",
+    "title": "Título",
+    "to_be_uninstalled": "Entidades a serem desinstaladas",
+    "type": "Tipo"
+  },
+  "install_view": {
+    "comment": "Comentário:",
+    "general_information": "Informações gerais",
+    "installed_at": "Instalado em:",
+    "installed_by": "Instalado por:"
+  },
+  "installations": {
+    "action": "Ação",
+    "comment": "Comentário",
+    "uninstall": "Desinstalar",
+    "version": "Versão",
+    "view": "Visualizar",
+    "view_title": "Visualizar instalação"
+  },
+  "list": {
+    "no_match": "Nenhum pacote de conteúdo correspondente foi encontrado",
+    "none_found": "Nenhum pacote de conteúdo encontrado. Crie ou envie um."
+  },
+  "list_item": {
+    "create_new_version": "Criar nova versão",
+    "delete_all_versions": "Excluir todas as versões",
+    "install": "Instalar",
+    "install_title": "Instalar pacote de conteúdo",
+    "latest_version": "Versão mais recente: {{rev}}",
+    "show": "Exibir"
+  },
+  "notifications": {},
+  "overview": {},
+  "pages": {},
+  "parameter_list": {},
+  "parameters": {},
+  "preview": {},
+  "revisions": {},
+  "selection": {},
+  "show": {},
+  "status": {},
+  "upload": {},
+  "value_types": {},
+  "version_item": {},
+  "versions": {}
+}
