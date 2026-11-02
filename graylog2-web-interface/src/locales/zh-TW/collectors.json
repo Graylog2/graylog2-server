@@ -821,27 +821,142 @@
       "certificate": "憑證",
       "copy_to_clipboard": "複製到剪貼簿",
       "private_key": "私密金鑰",
-      "view_principal": "主體："
+      "view_principal": "主體：",
+      "view_role": "角色：",
+      "generate": "產生用戶端憑證",
+      "description": "為第三方工具產生用戶端憑證",
+      "title": "用戶端憑證"
     },
     "cluster_health": {
-      "shard_replication_help": {},
-      "state_help": {}
+      "cluster_manager": "叢集管理員：",
+      "disabled": "已停用",
+      "enabled": "已啟用",
+      "nodes_summary": "{{total}}（{{outdated}} 個過時，{{upgraded}} 個已升級）",
+      "number_of_nodes": "節點數量：",
+      "number_of_shards": "分片數量：",
+      "server_version": "伺服器版本：",
+      "shard_replication": "分片複寫：",
+      "shard_replication_help": {
+        "confirm": "節點升級完成並點擊<emphasis><bold>確認升級</bold></emphasis>後，將重新啟用分片複寫，並重新配置因該節點升級而無法使用的所有分片。",
+        "force_disabled": "強制停用",
+        "force_enabled": "強制啟用",
+        "start": "點擊某個節點的<emphasis><bold>開始升級程序</bold></emphasis>後，分片配置將設為不複寫，讓 OpenSearch 僅使用可用的分片。"
+      },
+      "shards_summary": "{{active}} 個使用中，{{initializing}} 個初始化中，{{relocating}} 個遷移中，{{unassigned}} 個未指派",
+      "state_help": {
+        "green": "節點升級完成並點擊<emphasis>確認升級</emphasis>後，將重新啟用分片複寫，並重新配置因該節點升級而無法使用的所有分片，叢集將恢復為綠色狀態。",
+        "question": "滾動升級期間，我的叢集狀態會如何變化？",
+        "red": "紅色：若您使用的索引沒有複寫，且升級了承載這些索引分片的節點，叢集將進入紅色狀態，這些索引將無法寫入資料，也無法搜尋。",
+        "yellow": "黃色：開始升級某個節點後，分片配置將設為不複寫，讓 OpenSearch 僅使用可用的分片。"
+      }
     },
-    "upgrade_method": {},
-    "upgrade_status": {},
-    "upgrade_nodes": {},
-    "data_node_actions": {},
-    "data_node_badge": {},
-    "data_node_status": {},
-    "data_node_logs": {},
-    "cluster_management": {},
-    "ca_configuration": {},
-    "ca_upload": {},
-    "ca_create": {},
+    "upgrade_method": {
+      "cluster_restart": "叢集重新啟動",
+      "cluster_restart_description": "使用叢集重新啟動方式時，您會一次升級所有 Data Node。此期間，訊息會暫存於日誌佇列（journal），並在 Data Node 叢集恢復上線後處理。只要日誌佇列大小已依 Data Node 停機期間預期的訊息量設定，就不會遺失資料。",
+      "cluster_restart_less_than_three": "若您的 Data Node 叢集少於三個節點，叢集重新啟動是唯一可用的方式。",
+      "cluster_restart_three_or_more": "若您的 Data Node 叢集有三個或更多節點，您可以在考量日誌佇列大小與訊息吞吐量後，選擇使用叢集重新啟動方式。",
+      "rolling_upgrade": "滾動升級",
+      "rolling_upgrade_description": "滾動升級只能在執行中的 Data Node 叢集上進行，且需要<bold>三個或更多節點</bold>，幾乎不會造成停機。",
+      "rolling_upgrade_process": "Data Node 會被逐一停止，並就地升級。或者，也可以逐一停止 Data Node，並以執行新版本的主機取代。此程序期間，您仍可繼續對叢集建立索引與查詢資料。"
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "所有 Data Node 皆為最新版本。",
+      "checking": "正在檢查 OpenSearch 狀態...",
+      "error": "無法檢查 Data Node 內嵌的 OpenSearch 版本。",
+      "outdated": "Data Node 內嵌的 OpenSearch 不是最新版本。",
+      "up_to_date": "Data Node 內嵌的 OpenSearch 已是最新版本。",
+      "up_to_date_with_version": "Data Node 內嵌的 OpenSearch 已是最新版本<bold>（{{version}}）。</bold>",
+      "upgrading": "OpenSearch 滾動升級進行中。"
+    },
+    "upgrade_nodes": {
+      "manager": "管理員",
+      "no_outdated_nodes": "找不到過時的節點。",
+      "no_upgraded_nodes": "找不到已升級的節點。",
+      "outdated_nodes": "過時的節點",
+      "start_upgrade": "開始升級程序",
+      "upgraded": "已升級",
+      "upgraded_nodes": "已升級的節點"
+    },
+    "data_node_actions": {
+      "rejoin": "重新加入",
+      "remove": "移除",
+      "renew_certificate": "更新憑證",
+      "show_logs": "顯示日誌",
+      "start": "啟動",
+      "stop": "停止",
+      "rejoin_title": "重新加入 Data Node",
+      "rejoin_confirm": "確定要重新加入 Data Node「{{hostname}}」嗎？",
+      "remove_title": "移除 Data Node",
+      "remove_confirm": "確定要移除 Data Node「{{hostname}}」嗎？",
+      "stop_title": "停止 Data Node",
+      "stop_confirm": "確定要停止 Data Node「{{hostname}}」嗎？"
+    },
+    "data_node_badge": {
+      "short_node_id": "短節點 ID"
+    },
+    "data_node_status": {
+      "queued_for": "已排入 {{action}} 佇列"
+    },
+    "data_node_logs": {
+      "no_logs": "沒有日誌。",
+      "title": "{{hostname}} 日誌"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "顯示您的 Data Node 與受管理之 OpenSearch 叢集的效能指標。",
+      "teaser_license_warning": "請確認您擁有有效的授權並已設定 Data Node，才能查看 Data Node 與受管理之 OpenSearch 叢集的效能指標。"
+    },
+    "ca_configuration": {
+      "create_tab": "建立新的 CA",
+      "description_provision": "憑證授權單位將更輕鬆地為您的 Data Node 佈建與管理憑證。",
+      "description_upload_or_create": "在此步驟中，您可以上傳或建立新的憑證授權單位。",
+      "reusing_certificates": "若您現有的叢集使用憑證，預設情況下，這些憑證會在下一步佈建 Data Node 時，被 {{productName}} CA 與自動產生的憑證取代。若您想納入自己的 CA，可以上傳現有的憑證。詳情請參閱 <docsLink>{{productName}} Data Node - 入門指南</docsLink>。",
+      "reusing_certificates_title": "重複使用憑證",
+      "title": "設定憑證授權單位",
+      "upload_tab": "上傳 CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "憑證授權單位",
+      "dropzone": "將 CA 拖曳至此處，或點擊以選擇檔案",
+      "explanation": "您可以在此上傳現有的 CA。您需要上傳單一檔案，其中包含私密金鑰（已加密或未加密）、CA 憑證，以及任何中繼憑證。檔案可以是 PEM 或 PKCS#12 格式。若您的私密金鑰已加密，還需要提供其密碼。",
+      "failed": "CA 上傳失敗，錯誤訊息：{{error}}",
+      "password": "密碼",
+      "rejected": "CA 上傳失敗",
+      "submit": "上傳 CA",
+      "submitting": "正在上傳 CA...",
+      "success": "CA 已成功上傳"
+    },
+    "ca_create": {
+      "description": "點擊「建立 CA」按鈕，即可快速為您的 {{productName}} Data Node 建立新的憑證授權單位。",
+      "failed": "CA 建立失敗，錯誤訊息：{{error}}",
+      "organization_name": "組織名稱",
+      "submit": "建立 CA",
+      "submitting": "正在建立 CA...",
+      "success": "CA 已成功建立"
+    },
     "renewal_policy": {
-      "modes": {}
+      "certificate_lifetime": "憑證有效期：",
+      "certificate_lifetime_label": "憑證有效期",
+      "configure": "設定憑證更新政策",
+      "description": "偵測憑證到期及／或更新憑證時，將使用這些設定。",
+      "edit": "編輯設定",
+      "lifetime_explanation": "憑證有效期將用於決定新建立憑證的有效期長度。",
+      "mode_explanation": "將更新政策設為「自動」時，所有即將到期的憑證都會自動更新，無需使用者操作。設為「手動」時，當一或多個憑證即將到期，系統會建立通知，讓您確認是否更新。",
+      "renewal_mode": "更新模式：",
+      "renewal_mode_label": "憑證更新模式",
+      "select_mode": "選擇憑證更新模式",
+      "submit": "更新設定",
+      "submitting": "正在更新設定",
+      "title": "憑證更新政策設定",
+      "update_failed": "更新憑證更新政策時發生錯誤：{{error}}",
+      "update_failed_title": "無法更新憑證更新政策",
+      "modes": {
+        "automatic": "自動",
+        "manual": "手動"
+      }
     },
-    "details_page": {},
+    "details_page": {
+      "certificate_valid_until": "憑證有效期限至："
+    },
     "pages": {},
     "upgrade_page": {},
     "migration_steps": {},
