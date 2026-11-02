@@ -71,6 +71,9 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
@@ -216,12 +219,12 @@ public class UsersResource extends RestResource {
         // If a user has permissions to edit another user's profile, it should be able to see it.
         // Reader users always have permissions to edit their own profile.
         if (!isPermitted(USERS_EDIT, username)) {
-            throw new ForbiddenException("Not allowed to view user " + username);
+            throw new CodedForbiddenException("user.view_not_allowed", "Not allowed to view user " + username, Map.of("username", username));
         }
 
         final User user = userManagementService.load(username);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
+            throw new CodedNotFoundException("user.not_found", "Couldn't find user " + username, Map.of("username", username));
         }
         return returnSummary(userContext, user);
     }
@@ -243,7 +246,7 @@ public class UsersResource extends RestResource {
         // If a user has permissions to edit another user's profile, it should be able to see it.
         // Reader users always have permissions to edit their own profile.
         if (!isPermitted(USERS_EDIT, username)) {
-            throw new ForbiddenException("Not allowed to view userId " + userId);
+            throw new CodedForbiddenException("user.view_id_not_allowed", "Not allowed to view userId " + userId, Map.of("userId", userId));
         }
         return returnSummary(userContext, user);
     }
@@ -268,7 +271,7 @@ public class UsersResource extends RestResource {
 
         final User user = loadUserById(userId);
         if (!isPermitted(USERS_READ, user.getName())) {
-            throw new ForbiddenException("Not allowed to view userId " + userId);
+            throw new CodedForbiddenException("user.view_id_not_allowed", "Not allowed to view userId " + userId, Map.of("userId", userId));
         }
         return BasicUserResponse.builder()
                 .id(user.getId())
@@ -400,7 +403,7 @@ public class UsersResource extends RestResource {
             throw new BadRequestException(msg);
         }
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
-            throw new BadRequestException("Cannot assign Admin role to service account");
+            throw new CodedBadRequestException("user.service_account_admin_role", "Cannot assign Admin role to service account");
         }
         privilegeEscalationGuard.validatePermissionsAndRoles(cr, userContext);
         validatePasswordComplexity(cr.password());
@@ -554,7 +557,7 @@ public class UsersResource extends RestResource {
         final String username = user.getName();
         checkPermission(USERS_EDIT, username);
         if (user.isReadOnly()) {
-            throw new BadRequestException("Cannot modify readonly user " + username);
+            throw new CodedBadRequestException("user.read_only", "Cannot modify readonly user " + username, Map.of("username", username));
         }
 
         // We only allow setting a subset of the fields in ChangeUserRequest
@@ -634,11 +637,11 @@ public class UsersResource extends RestResource {
 
     private void validateAdminRoleNotGrantedToServiceAccount(ChangeUserRequest cr, User user) {
         if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
-            throw new BadRequestException("Cannot assign Admin role to service account");
+            throw new CodedBadRequestException("user.service_account_admin_role", "Cannot assign Admin role to service account");
         }
         if (cr.isServiceAccount() != null && cr.isServiceAccount()) {
             if (user.getRoleIds().contains(roleService.getAdminRoleObjectId())) {
-                throw new BadRequestException("Cannot make Admin into service account");
+                throw new CodedBadRequestException("user.admin_to_service_account", "Cannot make Admin into service account");
             }
         }
     }
@@ -656,7 +659,7 @@ public class UsersResource extends RestResource {
         checkPermission(USERS_EDIT, username);
 
         if (userManagementService.delete(username) == 0) {
-            throw new NotFoundException("Couldn't find user " + username);
+            throw new CodedNotFoundException("user.not_found", "Couldn't find user " + username, Map.of("username", username));
         }
     }
 
@@ -674,7 +677,7 @@ public class UsersResource extends RestResource {
         checkPermission(USERS_EDIT, user.getName());
 
         if (userManagementService.deleteById(userId) == 0) {
-            throw new NotFoundException("Couldn't find user " + userId);
+            throw new CodedNotFoundException("user.not_found_by_id", "Couldn't find user " + userId, Map.of("userId", userId));
         }
     }
 
@@ -694,7 +697,7 @@ public class UsersResource extends RestResource {
                                 @Context UserContext userContext) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
+            throw new CodedNotFoundException("user.not_found", "Couldn't find user " + username, Map.of("username", username));
         }
 
         privilegeEscalationGuard.validatePermissions(permissionRequest.permissions(), userContext);
@@ -718,7 +721,7 @@ public class UsersResource extends RestResource {
         checkPermission(USERS_EDIT, username);
 
         if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
+            throw new CodedNotFoundException("user.not_found", "Couldn't find user " + username, Map.of("username", username));
         }
 
         user.setPreferences(preferencesRequest.preferences());
@@ -738,7 +741,7 @@ public class UsersResource extends RestResource {
                                   @PathParam("username") String username) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
+            throw new CodedNotFoundException("user.not_found", "Couldn't find user " + username, Map.of("username", username));
         }
         user.setPermissions(Collections.emptyList());
         userManagementService.save(user);
@@ -764,7 +767,7 @@ public class UsersResource extends RestResource {
         final String username = user.getName();
 
         if (!getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":" + username)) {
-            throw new ForbiddenException("Not allowed to change password for user " + username);
+            throw new CodedForbiddenException("user.password_change_not_allowed", "Not allowed to change password for user " + username, Map.of("username", username));
         }
         if (user.isExternalUser()) {
             final String msg = "Cannot change password for external user.";
@@ -803,7 +806,7 @@ public class UsersResource extends RestResource {
             }
             terminateSessions(user);
         } else {
-            throw new BadRequestException("Old password is missing or incorrect.");
+            throw new CodedBadRequestException("user.old_password_incorrect", "Old password is missing or incorrect.");
         }
     }
 
@@ -821,7 +824,7 @@ public class UsersResource extends RestResource {
             @Context UserContext userContext) throws ValidationException {
 
         if (userId.equalsIgnoreCase(userContext.getUserId())) {
-            throw new BadRequestException("Users are not allowed to set their own status");
+            throw new CodedBadRequestException("user.own_status_not_allowed", "Users are not allowed to set their own status");
         }
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
@@ -846,7 +849,7 @@ public class UsersResource extends RestResource {
         final String username = user.getName();
 
         if (!isPermitted(USERS_TOKENLIST, username)) {
-            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+            throw new CodedForbiddenException("user.token_list_not_allowed", "Not allowed to list tokens for user " + username, Map.of("username", username));
         }
 
         final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
@@ -897,7 +900,7 @@ public class UsersResource extends RestResource {
                 .orElseGet(() -> accessTokenService.load(idOrToken));
 
         if (accessToken == null) {
-            throw new NotFoundException("Couldn't find access token for user.");
+            throw new CodedNotFoundException("user.token_not_found", "Couldn't find access token for user.");
         }
 
         if (!isPermitted(USERS_TOKENREMOVE, accessToken.getUserName())) {
@@ -910,7 +913,7 @@ public class UsersResource extends RestResource {
     private User loadUserById(String userId) {
         final User user = userManagementService.loadById(userId);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
+            throw new CodedNotFoundException("user.not_found_with_id", "Couldn't find user with ID <" + userId + ">", Map.of("userId", userId));
         }
         return user;
     }
