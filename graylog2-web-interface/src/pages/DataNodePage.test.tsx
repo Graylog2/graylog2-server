@@ -238,6 +238,18 @@ describe('DataNodePage configuration', () => {
       );
     });
 
+    it('trims spaced node roles before adding another role', async () => {
+      mockManagedConfigurationApi([managedConfigurationResponse({ node_roles: 'data, search' }, nodeId)]);
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      renderPage();
+      await screen.findByRole('combobox', { name: 'Node roles' });
+
+      await selectEvent.chooseOption('Node roles', 'Ingest');
+      await save();
+
+      expect(update).toHaveBeenCalledWith({ node_roles: 'data,search,ingest' }, nodeId);
+    });
+
     it('opens the category containing the first invalid field and focuses it on save', async () => {
       const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
       const update = jest.spyOn(managedConfigurationApi, 'update');

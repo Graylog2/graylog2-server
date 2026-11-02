@@ -24,7 +24,7 @@ import { Icon, Select, Tooltip } from 'components/common';
 import type { ConfigurationValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
 import { getQuantityUnitLabel } from './configurationQuantities';
-import { getConfigurationValueSource, getDisplayedConfigurationValue } from './configurationFields';
+import { getConfigurationValueSource, getDisplayedConfigurationValue, trimListEntries } from './configurationFields';
 
 const FieldDetail = styled.span`
   display: block;
@@ -144,7 +144,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           multi={type === 'list'}
           options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
           placeholder={placeholder}
-          value={value}
+          value={type === 'list' ? trimListEntries(value) : value}
           onChange={setValue}
           onBlur={onBlur}
           disabled={disabled}

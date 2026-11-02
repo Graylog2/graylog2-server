@@ -46,6 +46,12 @@ export const getDisplayedConfigurationValue = (
   draftValue: string | null | undefined,
 ) => (draftValue === null ? (parameter.node_value ?? undefined) : draftValue);
 
+export const trimListEntries = (value: string) =>
+  value
+    .split(',')
+    .map((entry) => entry.trim())
+    .join(',');
+
 export const getConfigurationValueSource = (
   parameter: ConfigurationParameter,
   draftValue: string | null | undefined,
