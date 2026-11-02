@@ -24,7 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { Collector } from 'components/sidecars/types';
 import i18n from 'i18n';
-import translateApiError from 'util/translateApiError';
+import translateApiError, { translateValidationResult } from 'util/translateApiError';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTORS_QUERY_KEY = ['collectors'] as const;
@@ -204,7 +204,7 @@ export const validateCollector = (collector: Collector): Promise<{ errors: { nam
       ),
   );
 
-  return promise;
+  return promise.then((validation) => translateValidationResult(validation));
 };
 
 export const useCollectorsAll = () =>

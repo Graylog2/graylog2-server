@@ -34,6 +34,7 @@ import type CancellablePromise from 'logic/rest/CancellablePromise';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import EventNotificationForm from './EventNotificationForm';
+import { translateValidationResult } from 'util/translateApiError';
 
 const initialValidation = {
   errors: {},
@@ -143,7 +144,7 @@ class EventNotificationFormContainer extends React.Component<
             const { body } = errorResponse.additional;
 
             if (errorResponse.status === 400 && body && body.failed) {
-              this.setState({ validation: body });
+              this.setState({ validation: translateValidationResult(body) });
               EventNotificationFormContainer.scrollToFirstError();
             }
           },
@@ -163,7 +164,7 @@ class EventNotificationFormContainer extends React.Component<
           const { body } = errorResponse.additional;
 
           if (errorResponse.status === 400 && body && body.failed) {
-            this.setState({ validation: body });
+            this.setState({ validation: translateValidationResult(body) });
             EventNotificationFormContainer.scrollToFirstError();
           }
         },
@@ -195,7 +196,7 @@ class EventNotificationFormContainer extends React.Component<
 
           if (errorResponse.status === 400 && body && body.failed) {
             testResult.message = i18n.t('test.validation_failed', { ns: 'event_notifications' });
-            this.setState({ validation: body });
+            this.setState({ validation: translateValidationResult(body) });
           } else {
             testResult.message =
               errorResponse.responseMessage || i18n.t('test.unknown_error', { ns: 'event_notifications' });

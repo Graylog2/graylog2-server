@@ -25,7 +25,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
 import i18n from 'i18n';
-import translateApiError from 'util/translateApiError';
+import translateApiError, { translateValidationResult } from 'util/translateApiError';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTOR_CONFIGURATIONS_QUERY_KEY = ['collector-configurations'] as const;
@@ -292,7 +292,7 @@ export const validateConfiguration = (
       ),
   );
 
-  return promise;
+  return promise.then((validation) => translateValidationResult(validation));
 };
 
 export const useAllCollectorConfigurations = () =>
