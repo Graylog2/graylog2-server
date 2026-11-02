@@ -401,28 +401,147 @@
       "asn_fields": "ASN 数据库字段",
       "country_fields": "国家数据库字段",
       "city_fields": "城市数据库字段",
-      "city_additional_fields": "除国家数据库提供的字段外，城市数据库还包含以下字段："
+      "city_additional_fields": "除国家数据库提供的字段外，城市数据库还包含以下字段：",
+      "complete_documentation": "有关字段的完整文档，请参阅 MaxMind 的<docsLink>开发者文档</docsLink>"
     },
-    "database_types": {},
-    "field_set": {},
-    "summary": {}
+    "database_types": {
+      "asn": "ASN 数据库",
+      "city": "城市数据库",
+      "country": "国家数据库",
+      "ipinfo_location": "IPinfo 位置数据库",
+      "ipinfo_asn": "IPinfo ASN 数据库"
+    },
+    "field_set": {
+      "file_path": "文件路径",
+      "file_path_help": "数据库文件的路径。",
+      "database_type": "数据库类型",
+      "database_type_help": "选择数据库文件的类型",
+      "database_type_placeholder": "选择数据库文件类型",
+      "refresh_file": "刷新文件",
+      "refresh_file_help": "启用后，将检查数据库文件是否有修改，并在磁盘上的文件发生变化时刷新。"
+    },
+    "summary": {
+      "database_file_path": "数据库文件路径",
+      "database_type": "数据库类型",
+      "check_interval": "检查间隔"
+    }
   },
-  "abs_geoip": {},
-  "gcs_geoip": {},
-  "geoip_resolver": {},
-  "links": {},
-  "quick_jump": {},
-  "scratchpad": {},
-  "extractor_actions": {},
-  "surrounding_search": {},
-  "support_sources": {},
-  "times_list": {},
-  "widget_visualization_not_found": {},
-  "telemetry": {},
-  "app_facade": {},
-  "suggest_reload": {},
-  "footer": {},
-  "notifications": {},
+  "abs_geoip": {
+    "container_name": "Azure Blob 容器名称",
+    "container_name_help": "您的 Azure Blob 容器名称。",
+    "endpoint_url": "Azure Blob 端点 URL",
+    "endpoint_url_help": "您的 Azure Blob 端点 URL，仅在需要覆盖默认端点时才需要填写。",
+    "account_name": "Azure 账户名称",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "您的 Azure 存储账户名称。",
+    "account_key_reset": "Azure 账户密钥",
+    "reset_password": "重置密码",
+    "account_key": "Azure 账户密钥",
+    "account_key_help": "您的 Azure 存储账户的账户密钥。"
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage 项目 ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor 配置",
+    "description": "Geo-Location Processor 插件会扫描所有消息，查找<bold>仅包含</bold> IP 地址的字段，并将其地理位置信息（坐标、ISO 国家代码和城市名称）写入其他字段。更多信息请参阅<docsLink>文档</docsLink>。",
+    "enabled_summary": "已启用：",
+    "enforce_schema_summary": "强制默认架构：",
+    "vendor_type_summary": "数据库供应商类型：",
+    "city_db_path_summary": "城市数据库路径：",
+    "asn_db_path_summary": "ASN 数据库路径：",
+    "refresh_interval_summary": "数据库刷新间隔：",
+    "pull_from_cloud_summary": "从云存储桶拉取文件：",
+    "edit": "编辑配置",
+    "modal_title": "更新 Geo-Location Processor 配置",
+    "enable_processor": "启用 Geo-Location 处理器",
+    "enforce_schema": "强制默认架构",
+    "vendor_select": "选择 GeoIP 数据库供应商",
+    "city_db_path": "城市数据库路径",
+    "asn_db_path": "ASN 数据库路径",
+    "refresh_interval": "数据库刷新间隔",
+    "refresh_interval_help": "检查数据库文件是否有修改的时间间隔，磁盘上的变更会被检测并刷新。",
+    "pull_from_cloud": "从云存储桶拉取文件",
+    "select_cloud_storage": "选择云存储",
+    "update_configuration": "更新配置",
+    "updating_configuration": "正在更新配置..."
+  },
+  "links": {
+    "documentation": "文档"
+  },
+  "quick_jump": {
+    "title": "快速跳转",
+    "open": "打开快速跳转",
+    "search_placeholder": "搜索页面/仪表盘/Streams ...",
+    "intro": "请输入搜索查询，以搜索页面、Stream、仪表盘、输入或其他条目。",
+    "intro_hint": "为方便您快速开始，下方列出了您<bold>最近打开</bold>和<bold>收藏</bold>的条目：",
+    "no_results": "未找到搜索结果，请尝试其他搜索词。",
+    "recent": "最近"
+  },
+  "scratchpad": {
+    "title": "草稿板",
+    "status_cleared": "已清除。",
+    "status_auto_saved": "已自动保存。",
+    "got_it": "知道了！",
+    "sensitive_warning": "我们建议您<bold>不要</bold>在此区域存储密码等任何敏感信息。",
+    "help_overlay": "您可以使用此区域存储个人笔记和其他信息，无需离开浏览器窗口。例如，可以存储调查中需要的时间戳、用户 ID 或 IP 地址。",
+    "copy": "复制",
+    "clear": "清除",
+    "clear_confirm": "此操作将清除草稿板中的内容，是否继续？"
+  },
+  "extractor_actions": {
+    "select_type": "选择提取器类型",
+    "only_string_fields": "提取器只能用于字符串字段。"
+  },
+  "surrounding_search": {
+    "button": "显示上下文消息"
+  },
+  "support_sources": {
+    "title": "需要帮助？",
+    "help_text": "如果您的问题未在<docsLink>文档</docsLink>中得到解答，请随时咨询 {{productName}} 社区。",
+    "community_support": "社区支持",
+    "issue_tracker": "问题跟踪",
+    "professional_support": "专业支持"
+  },
+  "times_list": {
+    "title": "时间配置",
+    "description": "处理时区可能会比较复杂。您可以在此查看系统各组件所应用的时区。如需查看特定 {{productName}} 服务器节点的时区设置，请前往其详情页面。",
+    "user": "用户 <bold>{{username}}</bold>：",
+    "web_browser": "您的 Web 浏览器：",
+    "server": "{{productName}} 服务器："
+  },
+  "widget_visualization_not_found": {
+    "description": "未找到 Widget 可视化（<italic>{{widgetClassName}}</italic>）。看起来提供此 Widget 的插件未加载。"
+  },
+  "telemetry": {
+    "title": "遥测",
+    "enable_label": "启用遥测",
+    "enabled_checkbox": "已启用",
+    "update_preferences": "更新偏好设置",
+    "update_button": "更新遥测设置",
+    "info_modal_title": "帮助我们改进 {{productName}}",
+    "ok": "确定",
+    "info": "我们希望收集匿名使用数据，以帮助我们确定改进优先级，并在未来让 {{productName}} 变得更好。",
+    "no_personal_data": "我们不会收集您实例中的个人数据、敏感信息或日志等内容。",
+    "learn_more": "更多信息请参阅我们的<privacyLink>隐私政策</privacyLink>。",
+    "turn_off_profile": "您可以随时在<bold>用户个人资料</bold>中开启或关闭数据收集。",
+    "turn_off_here": "您可以随时在此处开启或关闭数据收集。"
+  },
+  "app_facade": {
+    "preparing": "正在为您准备 Web 界面..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}} 版本已更改",
+    "version_changed": "您的 {{productName}} 版本已从 <bold>{{version}}</bold> 更改为 <bold>{{newVersion}}</bold>。",
+    "save_work": "请保存您的工作并重新加载页面，以避免出现错误。",
+    "reload_now": "立即重新加载"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}}，运行于 {{hostname}}（{{jvmInfo}}）"
+  },
+  "notifications": {
+    "download_failed": "下载失败，状态：{{error}}"
+  },
   "use_favorite_item_mutation_notifications": {},
   "use_entity_titles_notifications": {},
   "use_search_version_check_notifications": {}
