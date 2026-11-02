@@ -37,6 +37,8 @@
     "delete": "Eliminar",
     "edit": "Editar",
     "filter_label": "Filtrar servicios",
+    "found_one": "Se ha encontrado {{count}} servicio de autenticación configurado en el sistema.",
+    "found_other": "Se han encontrado {{count}} servicios de autenticación configurados en el sistema.",
     "headers": {
       "actions": "Acciones",
       "default_roles": "Roles predeterminados",
@@ -45,7 +47,8 @@
     },
     "query_example": "Buscar backends con un título que contenga LDAP:",
     "role_not_found": "Rol no encontrado",
-    "title": "Servicios de autenticación configurados"
+    "title": "Servicios de autenticación configurados",
+    "found_many": "Se han encontrado {{count}} servicios de autenticación configurados en el sistema."
   },
   "config_details": {
     "edit": "Editar",
@@ -141,17 +144,67 @@
   "synced_users": {
     "edit": "Editar",
     "filter_label": "Filtrar usuarios",
+    "found_one": "Se ha encontrado {{count}} usuario sincronizado.",
+    "found_other": "Se han encontrado {{count}} usuarios sincronizados.",
     "headers": {
       "actions": "Acciones",
       "full_name": "Nombre completo",
-      "roles": "Roles"
+      "roles": "Roles",
+      "username": "Nombre de usuario"
+    },
+    "none_found": "No se ha encontrado ningún usuario sincronizado.",
+    "role_not_found": "Rol no encontrado",
+    "title": "Usuarios sincronizados",
+    "found_many": "Se han encontrado {{count}} usuarios sincronizados."
+  },
+  "trusted_header": {
+    "description": "Este autenticador permite iniciar sesión a un usuario, basándose en una cabecera HTTP y sin más interacción.",
+    "enable_sso": "Habilitar el inicio de sesión único mediante cabecera HTTP",
+    "enabled": "Habilitado",
+    "title": "Autenticación mediante cabecera de confianza",
+    "trusted_proxies_hint": "Configura el ajuste <code>trusted_proxies</code> en el archivo de configuración del servidor de {{productName}}.",
+    "update_config": "Actualizar configuración",
+    "username_header": "Cabecera del nombre de usuario",
+    "username_header_help": "Cabecera HTTP que contiene el nombre del usuario, en el que se confía implícitamente. (La comparación de la cabecera no distingue mayúsculas de minúsculas)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Zona horaria del navegador",
+    "default_assignments_hint": "Cambiar los roles y la zona horaria predeterminados solo afectará a los nuevos usuarios creados mediante {{serviceTitle}}!",
+    "default_roles": "Roles predeterminados",
+    "default_user_time_zone": "Zona horaria predeterminada del usuario",
+    "email_attribute": "Atributo de correo electrónico",
+    "email_attributes": "Atributos de correo electrónico",
+    "full_name_attribute": "Atributo de nombre completo",
+    "id_attribute": "Atributo de ID",
+    "name_attribute": "Atributo de nombre",
+    "role_not_found": "Rol no encontrado",
+    "search_base_dn": "DN base de búsqueda",
+    "search_pattern": "Patrón de búsqueda",
+    "search_roles": "Buscar roles",
+    "test_login_hint": "Te recomendamos probar el inicio de sesión de tu usuario en el panel lateral para verificar la configuración.",
+    "title": "Sincronización de usuarios"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Realmente quieres eliminar la configuración de sincronización de grupos de este servicio de autenticación",
+    "create_failed": "Error al crear el servicio de autenticación",
+    "edit_failed": "Error al editar el servicio de autenticación",
+    "finish_and_save": "Finalizar y guardar servicio",
+    "finish_and_save_identity_service": "Finalizar y guardar servicio de identidad",
+    "next_group_sync": "Siguiente: sincronización de grupos",
+    "next_user_sync": "Siguiente: sincronización de usuarios",
+    "server_validation_error": "Error de validación del servidor: {{errors}}",
+    "steps": {
+      "group_sync": "Sincronización de grupos (Opc.)",
+      "server_config": "Configuración del servidor",
+      "user_sync": "Sincronización de usuarios"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "Editar servicio de autenticación - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "Error al cargar la configuración de autenticación mediante cabecera HTTP",
+    "update_success": "La configuración de autenticación mediante cabecera HTTP se ha actualizado correctamente",
+    "update_failed": "Error al actualizar la configuración de autenticación mediante cabecera HTTP con el estado: {{error}}"
+  }
 }
