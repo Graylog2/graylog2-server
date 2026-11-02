@@ -397,37 +397,164 @@
     "expiration_threshold_help": "在此时间内未报告的 Collectors 将被永久删除。",
     "confirm": "确认设置"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "接收 Inputs",
+    "none": "不存在 Collector 接收 Input。在创建 Input 之前，Collectors 将无法发送数据。",
+    "none_running": "存在 Collector 接收 Input，但目前没有正在运行的 Input。Collectors 将无法发送数据。",
+    "name": "名称",
+    "status": "状态",
+    "bind_address": "绑定地址",
+    "port": "端口",
+    "manage": "管理"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "文件",
+    "journald": "Journald",
+    "windows_event_log": "Windows 事件日志",
+    "macos_unified_logging": "macOS 统一日志"
+  },
+  "source_columns": {
+    "enabled": "已启用"
+  },
+  "source_form": {
+    "max_poll_interval_error": "最大轮询间隔至少为 1 秒。",
+    "max_log_age_error": "最长日志回溯时间必须为 0 或正数。",
+    "read_mode_end": "从末尾开始（tail）",
+    "read_mode_beginning": "从头开始",
+    "file_paths": "文件路径",
+    "file_paths_help": "支持 Glob 模式（例如 /var/log/*.log、/var/log/**/*.log）。Collector 会监视匹配的文件以获取新行。",
+    "read_mode": "读取模式",
+    "read_mode_file_help": "从末尾开始：仅收集 Collector 启动后的新行。从头开始：先收集所有现有行，然后继续跟踪。",
+    "read_mode_journald_help": "从末尾开始：仅收集 Collector 启动后的新条目。从头开始：先收集所有现有条目，然后继续跟踪。",
+    "priority": "优先级",
+    "priority_help": "要收集的最低严重级别。例如，选择 Error 时还会收集 Critical、Alert 和 Emergency 条目。",
+    "priority_emerg": "紧急",
+    "priority_alert": "警报",
+    "priority_crit": "严重",
+    "priority_err": "错误",
+    "priority_warning": "警告",
+    "priority_notice": "通知",
+    "priority_info": "信息",
+    "priority_debug": "调试",
+    "match_pattern": "匹配模式",
+    "match_pattern_help": "可选的 journald 匹配表达式，用于按单元、进程等过滤条目。示例：_SYSTEMD_UNIT=nginx.service",
+    "channels": "通道",
+    "channels_help": "以逗号分隔的通道名称（例如 Application、Security、System）",
+    "include_default_channels": "包含默认通道",
+    "include_default_channels_help": "默认通道为：{{channels}}",
+    "predicate": "谓词",
+    "predicate_help": "可选的 macOS 统一日志过滤谓词，将传递给 <code>log</code> 命令。留空将收集系统的所有日志！<code>info</code> 和 <code>debug</code> 级别目前不会收集，因为它们噪声很大且价值很低。示例：<code>{{example}}</code>",
+    "max_poll_interval": "最大轮询间隔",
+    "max_poll_interval_help": "Collector 检查新日志条目的频率。必须至少为 1 秒。",
+    "max_log_age": "最长日志回溯时间",
+    "max_log_age_help": "首次启动时，回溯补充日志的时间范围。设置为 0 可禁用回溯补充。",
+    "edit_title": "编辑数据源",
+    "new_title": "新建数据源",
+    "description": "数据源定义此 Fleet 中的 Collectors 应收集哪些数据。每种数据源类型对应不同的收集方式。",
+    "source_type": "数据源类型",
+    "file_type_help": "从主机上的文件收集日志行。支持使用 Glob 模式匹配多个文件。",
+    "journald_type_help": "从 systemd journal 收集条目（仅限 Linux）。",
+    "windows_type_help": "从 Windows 事件查看器通道收集事件。",
+    "macos_type_help": "通过 <code>log</code> 命令从 macOS 统一日志系统收集（仅限 macOS）。",
+    "enabled_help": "已禁用的数据源不会发送给 Collectors。可用于临时停止收集，而无需删除该数据源。",
+    "update": "更新数据源",
+    "create": "创建数据源"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "加载最近活动失败，状态码：",
+      "title": "无法加载最近活动"
+    },
+    "input_ids": {
+      "message": "加载 Collector Input ID 失败，状态码：",
+      "title": "无法加载 Collector Input ID。"
+    },
+    "stats": {
+      "message": "加载 Collector 统计信息失败，状态码：",
+      "title": "无法加载 Collector 统计信息。"
+    },
+    "config": {
+      "message": "加载 Collectors 配置失败，状态码：",
+      "title": "无法加载 Collectors 配置。"
+    },
+    "enrollment_tokens": {
+      "message": "加载注册令牌失败，状态码：",
+      "title": "无法加载注册令牌"
+    },
+    "pending_changes": {
+      "message": "加载待处理的更改失败，状态码：",
+      "title": "无法加载待处理的更改"
+    },
+    "instances": {
+      "message": "加载实例失败，状态码：",
+      "title": "无法加载实例"
+    },
+    "collector_instances": {
+      "message": "加载 Collector 实例失败，状态码：",
+      "title": "无法加载 Collector 实例"
+    },
+    "fleets": {
+      "message": "加载 Fleets 失败，状态码：",
+      "title": "无法加载 Fleets"
+    },
+    "fleet": {
+      "message": "加载 Fleet 失败，状态码：",
+      "title": "无法加载 Fleet"
+    },
+    "fleet_stats": {
+      "message": "加载 Fleet 统计信息失败，状态码：",
+      "title": "无法加载 Fleet 统计信息"
+    },
+    "sources": {
+      "message": "加载数据源失败，状态码：",
+      "title": "无法加载数据源"
+    },
+    "input_details": {
+      "message": "加载 Collector Input 详情失败，状态码：{{error}}",
+      "title": "无法加载 Collector Input 详情。"
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "创建 Fleet 失败：{{error}}",
+      "title": "无法创建 Fleet"
+    },
+    "update_fleet": {
+      "message": "更新 Fleet 失败：{{error}}",
+      "title": "无法更新 Fleet"
+    },
+    "delete_fleet": {
+      "message": "删除 Fleet 失败：{{error}}",
+      "title": "无法删除 Fleet"
+    },
+    "create_source": {
+      "message": "创建数据源失败：{{error}}",
+      "title": "无法创建数据源"
+    },
+    "update_source": {
+      "message": "更新数据源失败：{{error}}",
+      "title": "无法更新数据源"
+    },
+    "delete_source": {
+      "message": "删除数据源失败：{{error}}",
+      "title": "无法删除数据源"
+    },
+    "create_enrollment_token": {
+      "message": "创建注册令牌失败：{{error}}",
+      "title": "无法创建注册令牌"
+    },
+    "delete_enrollment_token": {
+      "message": "删除注册令牌失败：{{error}}",
+      "title": "无法删除注册令牌"
+    },
+    "delete_enrollment_tokens": {
+      "message": "删除注册令牌失败：{{error}}",
+      "title": "无法删除注册令牌"
+    },
+    "reassign_instances": {
+      "message": "重新分配实例失败：{{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
