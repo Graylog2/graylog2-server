@@ -136,36 +136,155 @@
       "search_placeholder": "搜索用户和团队",
       "collaborators": "协作者",
       "direct_collaborators": "直接协作者",
-      "shared_via_collections": "通过集合共享"
+      "shared_via_collections": "通过集合共享",
+      "update_sharing": "更新共享",
+      "modal_title": "共享{{entityType}}：<entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "已选择\"{{title}}\"，但从未将其添加为协作者。是否仍要继续？",
+      "confirm_not_added_unnamed": "已选择一个条目（未找到名称），但从未将其添加为协作者。是否仍要继续？"
     },
-    "grantees": {},
-    "roles_selector": {},
-    "shareable_url": {},
+    "grantees": {
+      "change_capability": "更改 {{title}} 的权限",
+      "remove_sharing": "移除 {{title}} 的共享",
+      "no_collaborators": "此{{entityType}}没有协作者。"
+    },
+    "roles_selector": {
+      "search_placeholder": "搜索角色",
+      "assign_role": "分配角色"
+    },
+    "shareable_url": {
+      "copy_title": "将参数复制到剪贴板",
+      "hint": "您以及任何有权查看的人都可以访问此链接。"
+    },
     "shared_entities": {
-      "headers": {}
+      "entity_type": "条目类型",
+      "filter_entity_types": "过滤条目类型",
+      "capability": "权限",
+      "filter_capabilities": "过滤权限",
+      "found": "找到 {{total}} 个与{{entityType}}共享的条目。",
+      "no_results": "未找到任何共享条目。",
+      "headers": {
+        "entity_name": "条目名称",
+        "entity_type": "条目类型",
+        "owner": "所有者",
+        "capability": "权限"
+      },
+      "query_example": "查找标题包含 security 的共享条目："
     },
-    "sharing_disabled": {},
-    "validation_error": {}
-  },
-  "roles": {
-    "profile": {},
-    "users": {},
-    "users_selector": {},
-    "actions": {},
-    "overview": {},
-    "navigation": {}
-  },
-  "security_teaser": {
-    "overview": {},
-    "anomalies": {},
-    "host_activity": {},
-    "network_activity": {},
-    "user_activity": {},
-    "demo": {
-      "items": {}
+    "sharing_disabled": {
+      "title": "无法共享",
+      "owners_only": "只有此{{type}}的所有者才能共享它。"
+    },
+    "validation_error": {
+      "ownerless": "移除以下所有者将导致该条目没有所有者："
     }
   },
-  "user_fields": {},
+  "roles": {
+    "profile": {
+      "title": "个人资料",
+      "name": "名称",
+      "description": "描述"
+    },
+    "teams": "团队",
+    "users": {
+      "title": "用户",
+      "none_selected": "未找到已选择的用户。",
+      "assign_users": "分配用户",
+      "selected_users": "已选用户",
+      "needs_reader_or_admin": "用户\"{{name}}\"至少需要 Reader 或 Admin 角色。"
+    },
+    "users_selector": {
+      "search_placeholder": "搜索用户",
+      "assign_user": "分配用户"
+    },
+    "actions": {
+      "edit_role_title": "编辑角色 {{name}}",
+      "delete_role_title": "删除角色 {{name}}",
+      "edit": "编辑",
+      "deleting": "正在删除",
+      "delete": "删除",
+      "confirm_delete": "您确定要删除角色\"{{name}}\"吗？",
+      "still_assigned": "该角色仍分配给 {{count}} 个用户。"
+    },
+    "overview": {
+      "title": "角色",
+      "found": "系统中找到 {{total}} 个角色。",
+      "none_found": "未找到任何角色。"
+    },
+    "query_example": "查找名称包含 manager 的角色：",
+    "navigation": {
+      "view_details": "查看详情",
+      "edit_role": "编辑角色"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "在\"概览\"选项卡中快速查找最关键的安全信息。",
+      "hotspot_1": "查找高级别告警、主要事件来源等信息，深入了解您的安全状况。",
+      "hotspot_2": "将鼠标悬停在本页面的提示上，即可了解 {{productName}} Security 功能的更多信息。",
+      "title": "概览"
+    },
+    "anomalies": {
+      "hotspot_0": "获取正在运行的异常检测概要，包括检测到的数量，以及与上一时间段的对比。",
+      "hotspot_1": "置信区间可以告诉您行为与正常情况的偏差程度。",
+      "hotspot_2": "系统提供针对不同类型异常的检测器，可快速查看哪些检测器正在生成告警。",
+      "hotspot_3": "识别在登录或安全事件中表现出异常行为的用户账户。",
+      "title": "异常"
+    },
+    "host_activity": {
+      "hotspot_0": "通过高、中、低级别告警数量及趋势信息，全面了解当前情况，判断今天是否属于正常工作状态。",
+      "hotspot_1": "快速识别生成高级别告警的主机，缩短平均修复时间（MTTR）。",
+      "hotspot_2": "查看哪些技术产生的登录次数最多。",
+      "hotspot_3": "当身份和访问控制更改来自异常机器时，发起调查。",
+      "hotspot_4": "按事件来源统计的消息数量可让您每日掌握数据中的常规模式，超出正常范围的峰值将触发调查，以查明原因。",
+      "title": "主机活动"
+    },
+    "network_activity": {
+      "hotspot_0": "即时查看网络中数据流量的峰值。",
+      "hotspot_1": "快速了解数据的来源和去向。",
+      "hotspot_2": "识别在网络中发送数据量最大的用户。",
+      "hotspot_3": "判断 DNS 查询结果中是否存在异常模式，例如某个错误代码突然出现在前 15 名列表中。",
+      "hotspot_4": "按事件来源列出生成 DNS 请求最多的前 15 个平台。",
+      "title": "网络活动"
+    },
+    "user_activity": {
+      "hotspot_0": "快速查看登录失败是否呈现值得关注的趋势。",
+      "hotspot_1": "按用户统计的登录成功和失败次数，有助于发现问题账户和异常活动。",
+      "hotspot_2": "这些是生成高级别告警最多的前 15 个用户账户！",
+      "hotspot_3": "您的环境中最常见的身份和访问控制更改有哪些？",
+      "hotspot_4": "了解最频繁的访问控制更改所针对的对象。",
+      "title": "用户活动"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "异常检测 AI",
+        "cloud_option": "云端选项",
+        "archiving": "归档",
+        "audit_logs_cloud": "{{productName}} Cloud 的审计日志",
+        "dynamic_lookup_tables": "动态查找表",
+        "advanced_alerting": "借助脚本实现高级告警",
+        "compliance_reporting": "合规报告",
+        "correlation_aggregation": "事件关联与聚合",
+        "threat_intel": "威胁情报集成",
+        "incident_workspaces": "事件调查工作区",
+        "prebuilt_parser_dashboards": "预构建的安全解析器和仪表板",
+        "sigma_rules": "Sigma 规则",
+        "parameterized_dashboards": "参数化仪表板",
+        "input_output_integrations": "Input 和 Output 集成",
+        "threat_management": "威胁管理",
+        "search_workflow": "搜索工作流、模板和过滤器",
+        "soar_integrations": "SOAR 集成"
+      },
+      "title": "Security 演示",
+      "banner_text": "如需了解更多信息或预约完整产品演示，请访问 {{productName}} 官方网站。",
+      "button": "{{productName}} Security",
+      "overview": "概览",
+      "description": "{{productName}} Security 旨在为 IT 团队革新网络安全，融合了 SIEM、安全分析、事件调查和异常检测等能力。使用我们的平台，您可以更高效地工作，更快地处理关键任务，并降低恶意行为者和基于凭证的攻击带来的风险。"
+    }
+  },
+  "user_fields": {
+    "username": "用户名",
+    "first_name": "名"
+  },
   "user_form": {},
   "token_form": {},
   "permissions_info": {},
