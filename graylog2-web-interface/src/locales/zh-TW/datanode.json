@@ -1,1 +1,93 @@
-{}
+{
+  "pages": {
+    "description": "{{productName}} Data Node 可與 {{productName}} 更緊密整合，並簡化未來的更新。它們可讓您為 {{productName}} 訊息資料庫中的所有訊息建立索引並進行搜尋。",
+    "documentation_title": "Data Node 文件",
+    "cluster_management_title": "Data Node 儀表板",
+    "certificate_management_title": "憑證管理",
+    "migration_title": "Data Node 遷移",
+    "upgrade_title": "Data Node 升級"
+  },
+  "details_page": {
+    "error": "錯誤：{{message}}",
+    "title": "Data Node：{{hostname}}",
+    "details": "詳細資訊：",
+    "hostname": "主機名稱：",
+    "transport_address": "傳輸位址：",
+    "status": "狀態：",
+    "not_available": "不適用",
+    "certificate_valid_until": "憑證有效期限至：",
+    "datanode_version": "Data Node 版本：",
+    "configuration_warnings": "設定警告"
+  },
+  "upgrade_status": {
+    "title": "升級狀態",
+    "message": "節點正在升級..."
+  },
+  "upgrade_complete": {
+    "title": "升級完成",
+    "message": "所有節點皆為最新版本。"
+  },
+  "data_node_notifications": {
+    "start_replication_success": "複寫已成功啟動。",
+    "start_replication_failure": "無法啟動複寫。",
+    "replication_in_progress": "複寫進行中...",
+    "replication_complete": "複寫完成。",
+    "replication_failed": "複寫失敗。",
+    "replication_error": "複寫錯誤：{{error}}",
+    "status_unknown": "未知狀態",
+    "loading_rolling_upgrade_failed": "載入 OpenSearch 滾動升級狀態失敗",
+    "loading_rolling_upgrade_failed_title": "無法載入 OpenSearch 滾動升級狀態",
+    "resume_rolling_upgrade_failed_title": "無法繼續 OpenSearch 滾動升級",
+    "resume_rolling_upgrade_success": "OpenSearch 滾動升級已繼續。",
+    "start_rolling_upgrade_failed_title": "無法啟動 OpenSearch 滾動升級",
+    "loading_versions_failed": "載入 OpenSearch 版本概覽失敗",
+    "loading_versions_failed_title": "無法載入 OpenSearch 版本概覽",
+    "loading_journal_estimate_failed": "載入 Data Node 遷移日誌大小估算值失敗",
+    "loading_journal_estimate_failed_title": "無法載入 Data Node 日誌大小估算值",
+    "bulk_remove_failed_title": "無法移除 Data Node。",
+    "bulk_remove_success_other": "已成功移除 {{count}} 個 Data Node。",
+    "bulk_start_failed_title": "無法啟動 Data Node。",
+    "bulk_start_success_other": "已成功啟動 {{count}} 個 Data Node。",
+    "bulk_stop_failed_title": "無法停止 Data Node。",
+    "bulk_stop_success_other": "已成功停止 {{count}} 個 Data Node。",
+    "loading_failed": "載入 Data Node 失敗，狀態為",
+    "loading_failed_title": "無法載入 Data Node。",
+    "rejoin_failed": "重新加入 Data Node 失敗，狀態為：{{status}}",
+    "rejoin_failed_title": "無法重新加入 Data Node。",
+    "rejoin_success": "Data Node「{{datanodeId}}」已成功重新加入。",
+    "remove_failed": "移除 Data Node 失敗，狀態為：{{status}}",
+    "remove_failed_title": "無法移除 Data Node。",
+    "remove_success": "Data Node「{{datanodeId}}」已成功移除。",
+    "renew_certificate_failed": "憑證更新失敗，錯誤：{{error}}",
+    "renew_certificate_success": "憑證已成功更新。",
+    "start_failed": "啟動 Data Node 失敗，狀態為：{{status}}",
+    "start_failed_title": "無法啟動 Data Node。",
+    "start_success": "Data Node「{{datanodeId}}」已成功啟動。",
+    "stop_failed": "停止 Data Node 失敗，狀態為：{{status}}",
+    "stop_failed_title": "無法停止 Data Node。",
+    "stop_success": "Data Node「{{datanodeId}}」已成功停止。",
+    "loading_node_failed": "載入 Data Node 失敗，狀態為",
+    "loading_node_failed_title": "無法載入 Data Node",
+    "loading_upgrade_status_failed": "載入 Data Node 升級狀態失敗",
+    "loading_upgrade_status_failed_title": "無法載入 Data Node 升級狀態",
+    "start_replication_failed": "啟動分片複寫失敗，狀態為：{{status}}",
+    "start_replication_failed_title": "無法啟動分片複寫。",
+    "stop_replication_failed": "停止分片複寫失敗，狀態為：{{status}}",
+    "stop_replication_failed_title": "無法停止分片複寫。",
+    "stop_replication_success": "分片複寫已成功停止",
+    "loading_stderr_failed": "載入 Data Node stderr 日誌失敗，狀態為",
+    "loading_stderr_failed_title": "無法載入 Data Node stderr 日誌",
+    "loading_stdout_failed": "載入 Data Node stdout 日誌失敗，狀態為",
+    "loading_stdout_failed_title": "無法載入 Data Node stdout 日誌"
+  },
+  "ca_upload": {
+    "file_required": "請上傳檔案。",
+    "single_file": "請僅上傳單一檔案。"
+  },
+  "notifications": {
+    "certificate_provisioned_success": "憑證已成功佈建",
+    "certificate_renewed_success": "憑證已成功更新",
+    "certificate_provisioning_failed": "憑證佈建失敗，錯誤：{{error}}",
+    "certificate_renewal_failed": "憑證更新失敗，錯誤：{{error}}"
+  }
+}
