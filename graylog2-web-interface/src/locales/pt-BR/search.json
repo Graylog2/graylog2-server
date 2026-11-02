@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "Executar pesquisa",
+    "perform_search_dirty": "Executar pesquisa (alterações feitas após a última execução)"
+  },
+  "sidebar": {
+    "description": "Descrição",
+    "create": "Criar",
+    "highlighting": "Destaque",
+    "fields": "Campos"
+  },
+  "empty_state": {
+    "no_widgets_search": "Não há widgets definidos para visualizar o resultado da pesquisa",
+    "no_widgets_dashboard": "Este dashboard ainda não tem widgets",
+    "create_widget_hint": "Crie um novo widget selecionando um tipo de widget na seção \"Criar\" da barra lateral esquerda.",
+    "tips_title": "Algumas dicas para criar pesquisas e dashboards",
+    "tip_1": "Comece com uma <bold>pergunta</bold> que você deseja responder. Defina o problema que você quer resolver.",
+    "tip_2": "<bold>Limite</bold> os dados apenas aos pontos de dados que você quer ver.",
+    "tip_3": "<bold>Visualize</bold> os dados. Eles respondem à sua pergunta?",
+    "tip_4": "<bold>Compartilhe</bold> o dashboard com seus colegas. Prepare-o para <bold>reutilização</bold> usando parâmetros"
+  },
+  "search_bar": {
+    "streams_placeholder": "Selecione os streams que a pesquisa deve incluir. Pesquisa em todos os streams se vazio.",
+    "refresh_human_name": "Pesquisar",
+    "query_history_title": "Abrir histórico de consultas",
+    "filters_label": "Filtros",
+    "filters_tooltip_title": "Filtros de pesquisa",
+    "filters_enterprise_hint": "Filtros e parâmetros de pesquisa estão disponíveis na versão Enterprise.",
+    "filters_hide_controls": "Ocultar controles",
+    "scroll_hint": "Rolar até a barra de pesquisa",
+    "query_placeholder": "Digite sua consulta de pesquisa aqui e pressione Enter. Ex.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Pesquisa salva",
+    "save_search": "Salvar pesquisa",
+    "unsaved_changes": "Alterações não salvas",
+    "load_title": "Carregar uma pesquisa salva anteriormente",
+    "load": "Carregar",
+    "share_disabled": "Somente pesquisas salvas podem ser compartilhadas.",
+    "dropdown_aria_label": "Abrir menu de ações da pesquisa",
+    "edit_metadata": "Editar metadados",
+    "export_to_dashboard": "Exportar para dashboard",
+    "export": "Exportar",
+    "reset_search": "Redefinir pesquisa",
+    "editing_modal_title": "Editando pesquisa salva",
+    "update_search": "Atualizar pesquisa",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta pesquisa salva.",
+    "save_success": "A visualização \"{{title}}\" foi salva com sucesso!",
+    "save_error": "Falha ao salvar a visualização: {{error}}",
+    "delete_success": "A pesquisa salva \"{{title}}\" foi excluída com sucesso!",
+    "delete_error": "Falha ao excluir a pesquisa salva: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Nome da pesquisa",
+    "dirty_warning": "Há alterações não confirmadas nos parâmetros da pesquisa (intervalo de tempo, streams ou consulta). Salvar agora as descartará. Se não for intencional, execute a pesquisa para aplicar suas alterações antes de salvar.",
+    "title_label": "Título",
+    "title_placeholder": "Digite o título",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta pesquisa.",
+    "create_new": "Criar nova",
+    "save_as": "Salvar como",
+    "create_new_title": "Criar nova pesquisa",
+    "save_as_title": "Salvar como nova pesquisa",
+    "save": "Salvar",
+    "save_title": "Salvar pesquisa",
+    "cancel": "Cancelar"
+  },
+  "results": {
+    "loading": "Atualizando resultados da pesquisa..."
+  },
+  "sidebar_description": {
+    "execution": "Execução",
+    "ad_hoc_info": "Salve a pesquisa ou exporte-a para um dashboard para adicionar um resumo e uma descrição personalizados.",
+    "edit_metadata_hint": "Para adicionar uma descrição e um resumo para este {{viewType}}, clique no ícone <icon/> na barra de pesquisa para abrir o menu de ações. O menu inclui a opção \"Editar metadados\".",
+    "search_section": "Pesquisa",
+    "no_summary": "Este {{viewType}} não tem resumo.",
+    "no_description": "Este {{viewType}} não tem descrição.",
+    "no_query": "Nenhuma consulta executada ainda.",
+    "query_executed_in": "Consulta executada em",
+    "effective_time_range": "Intervalo de tempo efetivo",
+    "varies_per_widget": "Varia por widget",
+    "time_from": "De",
+    "time_to": "Até",
+    "total_results": "Total de resultados"
+  },
+  "sidebar_create": {
+    "info": "Use as opções a seguir para adicionar uma agregação, uma visualização de logs (recurso Enterprise) ou parâmetros (recurso Enterprise) à sua pesquisa.",
+    "generic": "Genérico",
+    "predefined_aggregation": "Agregação predefinida",
+    "investigations": "Investigações",
+    "events": "Eventos"
+  },
+  "sidebar_highlighting": {
+    "description": "Termos de pesquisa e valores de campos podem ser destacados. O destaque da consulta de pesquisa nos resultados pode ser ativado/desativado na configuração do servidor {{productName}}. Qualquer valor de campo pode ser destacado clicando no valor e selecionando \"Destacar este valor\".\nSe um termo ou um valor tiver mais de uma regra, a primeira regra correspondente é usada.",
+    "active_highlights": "Destaques ativos",
+    "add_rule_title": "Adicionar regra de destaque",
+    "search_terms": "Termos de pesquisa"
+  },
+  "save_view": {
+    "save": "Salvar",
+    "save_as": "Salvar como",
+    "save_as_new_dashboard_title": "Salvar como novo dashboard",
+    "save_dashboard_title": "Salvar dashboard"
+  },
+  "undo_redo": {
+    "undo": "Desfazer",
+    "redo": "Refazer"
+  },
+  "time_range": {
+    "tab_relative": "Relativo",
+    "tab_absolute": "Absoluto",
+    "tab_keyword": "Palavra-chave",
+    "from_label": "De:",
+    "until_label": "Até:",
+    "keyword_label": "Palavra-chave:",
+    "no_override": "Sem substituição",
+    "now": "Agora",
+    "all_time": "Todo o período",
+    "ago": "atrás",
+    "range_ago": "{{time}} atrás",
+    "range_length_placeholder": "Selecione a duração do intervalo",
+    "load_preset": "Carregar predefinição",
+    "no_available_presets": "Nenhuma predefinição disponível",
+    "loading": "Carregando...",
+    "configure_presets": "Configurar predefinições",
+    "insert_current_date": "Inserir data atual",
+    "from_hours_label": "rótulo de horas (de)"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
