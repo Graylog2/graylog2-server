@@ -247,26 +247,140 @@
     "not_found_title": "无法获取 Event Definition",
     "save_failed": "保存 EventDefinition 失败，状态：{{error}}",
     "save_failed_title": "无法保存 EventDefinition",
-    "update_failed": "更新 Event Definition “{{title}}”失败，状态：{{error}}"
+    "update_failed": "更新 Event Definition “{{title}}”失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Event Definition",
+    "update_success": "Event Definition “{{title}}”已成功更新。",
+    "update_success_title": "Event Definition 更新成功"
   },
-  "notification_list": {},
-  "notification_settings": {},
-  "notifications_form": {},
-  "overview": {},
-  "page": {},
-  "priorities": {},
-  "provider_summary": {},
+  "notification_list": {
+    "no_notifications": "此事件尚未配置任何触发的通知。",
+    "not_found": "无法找到通知 <em>{{title}}</em> 的信息",
+    "notification": "通知",
+    "type": "类型"
+  },
+  "notification_settings": {
+    "grace_period": "宽限期",
+    "grace_period_help": "告警每次发生时都会发送通知。设置宽限期以控制再次发送通知前需要等待的时长。请注意，带有键的事件会为每个不同的键值设置一个宽限期。",
+    "message_backlog": "消息积压",
+    "message_backlog_help": "通知中包含的消息数量。",
+    "toggle_message_backlog": "切换消息积压"
+  },
+  "notifications_form": {
+    "description": "此事件是否重要到需要您关注？为其添加通知，即可将其设为告警。",
+    "manage": "管理通知"
+  },
+  "overview": {
+    "human_name": "Event Definitions",
+    "user_defined": "用户自定义"
+  },
+  "page": {
+    "alerts_docs": "告警文档",
+    "copy_confirm": "您确定要创建“{{title}}”的副本吗？",
+    "copy_title": "复制 Event Definition",
+    "create_multiple": "创建 Event Definitions",
+    "description_alerts": "Event Definitions 可让您基于不同条件创建告警并进行告警。",
+    "description_events": "Event Definitions 可让您基于不同条件创建事件并进行告警。",
+    "description_list": "创建新的 Event Definitions，以便搜索不同条件并对其进行告警。",
+    "duplicate": "复制 Event Definition",
+    "edit": "编辑 Event Definition",
+    "edit_named": "编辑 “{{title}}” Event Definition",
+    "file_import": "创建 Event Definitions - 文件导入",
+    "git_import": "创建 Event Definitions - Git 导入",
+    "loading": "正在加载 Event Definition...",
+    "new": "新建 Event Definition",
+    "new_named": "新建 Event Definition “{{title}}”",
+    "title": "Event Definitions",
+    "view": "查看 Event Definition",
+    "view_named": "查看 “{{title}}” Event Definition"
+  },
+  "priorities": {
+    "critical": "严重",
+    "high": "高",
+    "info": "信息",
+    "low": "低",
+    "medium": "中"
+  },
+  "provider_summary": {
+    "less_details": "收起详细信息",
+    "lookup_table_key_field": "Lookup Table 键字段",
+    "more_details": "更多详细信息",
+    "validate_template_values": "验证所有模板值均已设置",
+    "value_source": "值来源"
+  },
   "query_parameter_modal": {
-    "types": {}
+    "save": "保存",
+    "title": "声明查询参数 “{{name}}”",
+    "type": "类型",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": "：未声明"
   },
   "replay_search": {
-    "attributes": {}
+    "attributes": {
+      "description": "描述",
+      "edited_after_event": "此事件发生后，Event definition <definitionTitle>{{title}}</definitionTitle> 已被编辑。部分聚合组件可能无法代表此事件。",
+      "event_definition": "Event definition",
+      "execute_every": "执行搜索间隔",
+      "notifications": "通知",
+      "priority": "优先级",
+      "search_within": "搜索范围",
+      "timestamp": "时间戳",
+      "updated_at": "Event definition 更新时间"
+    },
+    "not_provided": "未提供",
+    "replay_link": "重放搜索"
   },
-  "row_actions": {},
-  "scheduling": {},
-  "share": {},
-  "sidebar": {},
-  "status_cell": {},
+  "row_actions": {
+    "delete_confirm": "您确定要删除“{{title}}”吗？",
+    "delete_failed": "删除 Event Definition “{{title}}”失败，状态：{{status}}",
+    "delete_failed_title": "无法删除 Event Definition",
+    "delete_success": "Event Definition “{{title}}”已成功删除。",
+    "delete_success_title": "Event Definition 删除成功",
+    "delete_title": "删除 Event Definition",
+    "disable": "禁用",
+    "disable_confirm": "您确定要禁用“{{title}}”吗？",
+    "disable_title": "禁用 Event Definition",
+    "duplicate": "复制",
+    "edit": "编辑",
+    "enable": "启用",
+    "enable_confirm": "您确定要启用“{{title}}”吗？",
+    "enable_title": "启用 Event Definition",
+    "entity_type_title": "Event Definition",
+    "share_description": "搜索用户或团队，将其添加为此 Event Definition 的协作者。",
+    "system_cannot_be_deleted": "系统 Event Definition 无法删除",
+    "system_cannot_be_disabled": "系统 Event Definition 无法禁用"
+  },
+  "scheduling": {
+    "clear": "清除",
+    "clear_confirm": "您确定要清除“{{title}}”的排队通知吗？",
+    "details": "{{title}} 详细信息。",
+    "every": "每 {{duration}}",
+    "last_execution": "上次执行：",
+    "next_execution": "下次执行：",
+    "next_time_range": "下一时间范围：",
+    "not_scheduled": "未调度。",
+    "queued_notifications": "排队的通知：",
+    "runs": "运行 {{schedule}}。",
+    "runs_searching_within": "运行 {{schedule}}，搜索最近 {{duration}}。",
+    "status": "状态："
+  },
+  "share": {
+    "collaborators": "协作者",
+    "description": "搜索用户或团队，将其添加为此 Event Definition 的协作者。",
+    "no_collaborators": "此 Event Definition 没有协作者。"
+  },
+  "sidebar": {
+    "details_title": "定义详情"
+  },
+  "status_cell": {
+    "disable": "禁用",
+    "disable_confirm": "您确定要禁用 Event Definition “{{title}}”吗？",
+    "disable_title": "禁用 Event Definition",
+    "disabled": "已禁用",
+    "enable": "启用",
+    "enabled": "已启用"
+  },
   "steps": {},
   "summary": {
     "condition_types": {}
