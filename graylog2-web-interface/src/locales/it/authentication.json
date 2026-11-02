@@ -37,6 +37,8 @@
     "delete": "Elimina",
     "edit": "Modifica",
     "filter_label": "Filtra servizi",
+    "found_one": "Trovato {{count}} servizio di autenticazione configurato nel sistema.",
+    "found_other": "Trovati {{count}} servizi di autenticazione configurati nel sistema.",
     "headers": {
       "actions": "Azioni",
       "default_roles": "Ruoli predefiniti",
@@ -45,7 +47,8 @@
     },
     "query_example": "Trova i servizi con un titolo che contiene LDAP:",
     "role_not_found": "Ruolo non trovato",
-    "title": "Servizi di autenticazione configurati"
+    "title": "Servizi di autenticazione configurati",
+    "found_many": "Trovati {{count}} servizi di autenticazione configurati nel sistema."
   },
   "config_details": {
     "edit": "Modifica",
@@ -141,17 +144,67 @@
   "synced_users": {
     "edit": "Modifica",
     "filter_label": "Filtra utenti",
+    "found_one": "Trovato {{count}} utente sincronizzato.",
+    "found_other": "Trovati {{count}} utenti sincronizzati.",
     "headers": {
       "actions": "Azioni",
       "full_name": "Nome completo",
-      "roles": "Ruoli"
+      "roles": "Ruoli",
+      "username": "Nome utente"
+    },
+    "none_found": "Non sono stati trovati utenti sincronizzati.",
+    "role_not_found": "Ruolo non trovato",
+    "title": "Utenti sincronizzati",
+    "found_many": "Trovati {{count}} utenti sincronizzati."
+  },
+  "trusted_header": {
+    "description": "Questo autenticatore consente di accedere a un utente in base a un header HTTP, senza ulteriori interazioni.",
+    "enable_sso": "Abilita single sign-on tramite header HTTP",
+    "enabled": "Abilitato",
+    "title": "Autenticazione tramite header attendibile",
+    "trusted_proxies_hint": "Configura l'impostazione <code>trusted_proxies</code> nel file di configurazione del server {{productName}}.",
+    "update_config": "Aggiorna configurazione",
+    "username_header": "Header del nome utente",
+    "username_header_help": "Header HTTP che contiene il nome utente implicitamente attendibile. (La corrispondenza dell'header non distingue tra maiuscole e minuscole)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Fuso orario del browser",
+    "default_assignments_hint": "La modifica del ruolo predefinito e del fuso orario predefinito influirà solo sui nuovi utenti creati tramite {{serviceTitle}}!",
+    "default_roles": "Ruoli predefiniti",
+    "default_user_time_zone": "Fuso orario predefinito dell'utente",
+    "email_attribute": "Attributo email",
+    "email_attributes": "Attributi email",
+    "full_name_attribute": "Attributo nome completo",
+    "id_attribute": "Attributo ID",
+    "name_attribute": "Attributo nome",
+    "role_not_found": "Ruolo non trovato",
+    "search_base_dn": "DN base di ricerca",
+    "search_pattern": "Modello di ricerca",
+    "search_roles": "Cerca ruoli",
+    "test_login_hint": "Ti consigliamo di testare l'accesso dell'utente nel pannello laterale per verificare le impostazioni.",
+    "title": "Sincronizzazione utenti"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Vuoi davvero rimuovere la configurazione di sincronizzazione dei gruppi per questo servizio di autenticazione?",
+    "create_failed": "Creazione del servizio di autenticazione non riuscita",
+    "edit_failed": "Modifica del servizio di autenticazione non riuscita",
+    "finish_and_save": "Fine e salva servizio",
+    "finish_and_save_identity_service": "Fine e salva servizio di identità",
+    "next_group_sync": "Avanti: sincronizzazione dei gruppi",
+    "next_user_sync": "Avanti: sincronizzazione utenti",
+    "server_validation_error": "Errore di convalida del server: {{errors}}",
+    "steps": {
+      "group_sync": "Sincronizzazione dei gruppi (facoltativo)",
+      "server_config": "Configurazione del server",
+      "user_sync": "Sincronizzazione utenti"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "Modifica servizio di autenticazione - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "Caricamento della configurazione dell'autenticazione tramite header HTTP non riuscito",
+    "update_success": "Configurazione dell'autenticazione tramite header HTTP aggiornata con successo",
+    "update_failed": "Aggiornamento della configurazione dell'autenticazione tramite header HTTP non riuscito con stato: {{error}}"
+  }
 }
