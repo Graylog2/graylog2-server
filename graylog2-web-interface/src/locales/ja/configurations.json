@@ -117,6 +117,7 @@
     "auto_refresh_options": "自動更新間隔のオプション",
     "auto_refresh_options_help": "<strong>自動更新</strong>間隔セレクターのオプションを<strong>ISO8601期間</strong>として設定します",
     "auto_refresh_options_title": "自動更新間隔のオプション",
+    "cancel_after_seconds_other": "{{count}}秒",
     "cancellation_timeout": "キャンセルタイムアウト",
     "cancellation_timeout_description": "ウィジェットごとに、検索の実行が自動的にキャンセルされるまでの時間（秒）です。実行される検索の数を抑え、パフォーマンスを向上させます。",
     "default_auto_refresh_interval": "デフォルトの自動更新間隔",
@@ -231,7 +232,20 @@
     "description": "ウェルカムページには、メッセージ、アラート、イベントの件数を示すウィジェットと、上位のソースのチャートを表示できます。大規模または負荷の高いクラスターでは、ユーザーがウェルカムページを開くたびにこれらのクエリにより追加の負荷がかかります。その負荷を避けたい場合は、以下で無効にしてください。ウィジェットは非表示になり、そのクエリは実行されません。",
     "enable_metrics": "ウェルカムページのメトリクスを有効化",
     "enable_metrics_help": "無効にすると、メッセージ、アラート、イベントの件数ウィジェットと上位のソースのチャートがウェルカムページから非表示になり、その基になるクエリは実行されません。大規模または負荷の高いクラスターでクエリの負荷を減らすには、これをオフにしてください。",
-    "metrics": "ウェルカムページのメトリクス"
+    "metrics": "ウェルカムページのメトリクス",
+    "title": "ウェルカムページ",
+    "update_title": "ウェルカムページの設定を更新"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "インデックスのデフォルト設定を正常に更新しました",
+    "index_defaults_failed_title": "インデックスのデフォルト設定の更新に失敗しました",
+    "update_success": "設定を正常に更新しました",
+    "search_update_failed": "検索設定の更新に失敗しました：{{error}}",
+    "search_update_failed_title": "検索設定を更新できませんでした：{{configType}}",
+    "allowlist_update_success": "URL許可リストの設定を正常に更新しました",
+    "allowlist_update_failed": "URL許可リストの設定の更新に失敗しました：{{error}}",
+    "allowlist_update_failed_title": "URL許可リストを更新できませんでした：{{configType}}",
+    "processors_update_failed": "メッセージプロセッサーの設定の更新に失敗しました：{{error}}",
+    "processors_update_failed_title": "設定を更新できませんでした：{{configType}}"
+  }
 }
