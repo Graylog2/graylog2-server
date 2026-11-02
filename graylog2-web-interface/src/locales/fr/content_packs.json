@@ -1,1 +1,150 @@
-{}
+{
+  "apply_parameter": {
+    "action": "Action",
+    "apply": "Appliquer",
+    "choose": "Choisir...",
+    "choose_config_key": "Choisir une clé de configuration",
+    "clear": "Effacer",
+    "config_key": "Clé de configuration",
+    "create_parameter_first": "Créez d'abord un paramètre",
+    "no_parameter_of_type": "Aucun paramètre de type {{type}}",
+    "parameter": "Paramètre"
+  },
+  "constraints": {
+    "fulfilled": "Satisfait",
+    "name": "Nom",
+    "title": "Contraintes",
+    "type": "Type",
+    "version": "Version"
+  },
+  "details": {
+    "description": "Description",
+    "entities": "Entités :",
+    "id": "ID :",
+    "name": "Nom :",
+    "parameters": "Paramètres :",
+    "summary": "Résumé :",
+    "title": "Détails",
+    "url": "URL :",
+    "vendor": "Éditeur :",
+    "version": "Version :"
+  },
+  "download": {
+    "download": "Télécharger",
+    "info": "Veuillez faire un clic droit sur le lien de téléchargement ci-dessous et choisir « Enregistrer la cible sous... » pour télécharger le fichier JSON.",
+    "title": "Télécharger le pack de contenu"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Paramètres",
+      "preview": "Aperçu",
+      "selection": "Sélection du contenu"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Créer un paramètre",
+    "default_value": "Valeur par défaut",
+    "default_value_help": "Indiquez une valeur par défaut si le paramètre n'est pas facultatif.",
+    "description": "Description",
+    "description_help": "Décrivez ce qui sera fait avec ce paramètre.",
+    "description_required": "La description doit être renseignée.",
+    "edit_title": "Modifier le paramètre",
+    "name": "Nom",
+    "name_help": "Ce nom sert de référence au paramètre et ne doit pas contenir d'espace.",
+    "name_invalid": "Le nom du paramètre ne doit contenir que les caractères A-Z, a-z, 0-9 et _",
+    "name_not_unique": "Le nom du paramètre doit être unique.",
+    "name_required": "Le nom doit être renseigné.",
+    "not_boolean": "Ce n'est pas une valeur booléenne. Elle doit être true ou false.",
+    "not_double": "Ce n'est pas une valeur décimale.",
+    "not_integer": "Ce n'est pas un nombre entier.",
+    "title": "Titre",
+    "title_help": "Indiquez un titre descriptif pour ce pack de contenu.",
+    "title_required": "Le titre doit être renseigné.",
+    "value_type": "Type de valeur",
+    "value_type_help": "Indiquez le type du paramètre."
+  },
+  "entities": {
+    "action": "Action",
+    "config_title": "Configuration de l'entité",
+    "description": "Description",
+    "edit_title": "Modifier",
+    "list_title": "Liste des entités",
+    "origin": "Origine",
+    "origin_content_pack": "Pack de contenu",
+    "origin_server": "Serveur",
+    "show": "Afficher",
+    "title": "Titre",
+    "type": "Type",
+    "used_parameters": "Paramètres utilisés"
+  },
+  "entity_config": {
+    "config_key": "Clé de configuration",
+    "parameter_type": "paramètre ({{type}})",
+    "type": "Type",
+    "value": "Valeur"
+  },
+  "entity_index": {
+    "load_failed": "Échec du chargement de l'index des entités, statut :",
+    "load_failed_title": "Impossible de charger l'index des entités"
+  },
+  "import": {
+    "error_message": "Erreur lors de l'importation du pack de contenu. Vérifiez qu'il s'agit d'un fichier JSON valide. Consultez les journaux de votre serveur {{productName}} pour plus d'informations.",
+    "error_title": "Impossible d'importer le pack de contenu",
+    "success_message": "Pack de contenu importé avec succès",
+    "success_named": "Pack de contenu « {{name}} » importé avec succès",
+    "success_title": "Succès !"
+  },
+  "install": {
+    "comment": "Commentaire d'installation",
+    "comment_help": "Ce commentaire sera enregistré avec l'installation du pack de contenu et peut servir à décrire la raison de cette installation.",
+    "configure_parameters": "Configurer le ou les paramètres :",
+    "needs_to_be_filled": "Doit être renseigné.",
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter en tant que collaborateur sur les entités de ce pack de contenu."
+  },
+  "install_entities": {
+    "installed": "Entités installées",
+    "title": "Titre",
+    "to_be_uninstalled": "Entités à désinstaller",
+    "type": "Type"
+  },
+  "install_view": {
+    "comment": "Commentaire :",
+    "general_information": "Informations générales",
+    "installed_at": "Installé le :",
+    "installed_by": "Installé par :"
+  },
+  "installations": {
+    "action": "Action",
+    "comment": "Commentaire",
+    "uninstall": "Désinstaller",
+    "version": "Version",
+    "view": "Afficher",
+    "view_title": "Afficher l'installation"
+  },
+  "list": {
+    "no_match": "Aucun pack de contenu correspondant n'a été trouvé",
+    "none_found": "Aucun pack de contenu trouvé. Veuillez en créer un ou en importer un"
+  },
+  "list_item": {
+    "create_new_version": "Créer une nouvelle version",
+    "delete_all_versions": "Supprimer toutes les versions",
+    "install": "Installer",
+    "install_title": "Installer le pack de contenu",
+    "latest_version": "Dernière version : {{rev}}",
+    "show": "Afficher"
+  },
+  "notifications": {},
+  "overview": {},
+  "pages": {},
+  "parameter_list": {},
+  "parameters": {},
+  "preview": {},
+  "revisions": {},
+  "selection": {},
+  "show": {},
+  "status": {},
+  "upload": {},
+  "value_types": {},
+  "version_item": {},
+  "versions": {}
+}
