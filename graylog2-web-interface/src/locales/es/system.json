@@ -291,28 +291,149 @@
     "cancel_confirm": "¿Seguro que quieres cancelar el trabajo del sistema «{{info}}»?",
     "on_node": "- en",
     "runtime": "tiempo de ejecución: {{duration}}",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "acknowledge": "Confirmar"
   },
-  "system_jobs_component": {},
-  "system_jobs_list": {},
-  "system_messages_component": {},
-  "system_messages_list": {},
-  "global_throughput": {},
-  "node_throughput": {},
-  "telemetry_debug_entry_row": {},
-  "telemetry_debug_overlay": {},
-  "cluster_configuration_page": {},
-  "configurations_page": {},
-  "enterprise_page": {},
-  "process_buffer_dump_page": {},
-  "show_metrics_page": {},
-  "node_page": {},
-  "system_logs_page": {},
-  "system_notifications_page": {},
-  "system_overview_page": {},
-  "thread_dump_page": {},
-  "notifications": {},
-  "use_cluster_overview_notifications": {},
-  "use_cluster_support_bundle_notifications": {},
+  "system_jobs_component": {
+    "title": "Trabajos del sistema",
+    "description": "Un trabajo del sistema es una tarea de larga duración que un nodo del servidor de {{productName}} ejecuta por motivos de mantenimiento. Algunos trabajos muestran información de progreso o se pueden detener."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "No hay trabajos del sistema activos."
+  },
+  "system_messages_component": {
+    "title": "Mensajes del sistema",
+    "description": "Los nodos del servidor de {{productName}} generan mensajes del sistema ante determinados eventos que pueden ser de interés para los administradores de {{productName}}. No necesitas actuar sobre los eventos que aparecen aquí, ya que se generarán notificaciones para cualquier evento que requiera una acción."
+  },
+  "system_messages_list": {
+    "timestamp": "Marca de tiempo",
+    "node": "Nodo",
+    "message": "Mensaje"
+  },
+  "global_throughput": {
+    "aria_label": "Rendimiento: entrada {{input}} / salida {{output}} msg/s",
+    "in": "entrada",
+    "out": "salida"
+  },
+  "node_throughput": {
+    "loading": "Cargando el rendimiento...",
+    "unable_to_load": "No se pudo cargar el rendimiento.",
+    "processing_long": "Procesando <strong>{{totalIn}}</strong> mensajes entrantes y <strong>{{totalOut}}</strong> mensajes salientes por segundo.",
+    "short": "Entrada {{totalIn}} / Salida {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "Posible dato personal: {{suspect}}",
+    "copy_as_json": "Copiar el evento como JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Depuración de telemetría",
+    "badge": "Depuración de telemetría: {{count}}",
+    "drawer_label": "Panel de depuración de telemetría",
+    "resize_label": "Redimensionar el panel de depuración de telemetría",
+    "title": "Depuración de telemetría ({{count}})",
+    "filter_label": "Filtrar eventos",
+    "filter_placeholder": "Filtrar por nombre de evento o contenido...",
+    "resume": "Reanudar",
+    "pause": "Pausar",
+    "clear": "Borrar",
+    "export_session": "Exportar sesión",
+    "collapse": "Contraer",
+    "no_events": "Aún no se ha registrado ningún evento de telemetría. Interactúa con la aplicación para verlos aquí.",
+    "time": "Hora",
+    "event": "Evento",
+    "action": "Acción",
+    "status": "Estado"
+  },
+  "cluster_configuration_page": {
+    "title": "Configuración del clúster",
+    "description": "Esta página ofrece una visión general en tiempo real de los nodos de tu clúster. Puedes pausar el procesamiento de mensajes en cualquier momento. Los búferes de procesamiento no aceptarán nuevos mensajes hasta que lo reanudes. Si el journal de mensajes está activado para un nodo, lo cual ocurre de forma predeterminada, los mensajes entrantes se guardarán en disco, incluso cuando el procesamiento esté desactivado."
+  },
+  "configurations_page": {
+    "title": "Configuraciones",
+    "description": "En esta página puedes configurar los ajustes del sistema de distintos subsistemas."
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Prueba</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Descubre más</productLink> sobre las funciones de {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Volcado del búfer de procesamiento del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Obtenido el <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Métricas del nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Todos los nodos de {{productName}} ofrecen un conjunto de métricas internas para diagnóstico, depuración y monitorización. Ten en cuenta que también puedes acceder a todas las métricas mediante JMX."
+  },
+  "node_page": {
+    "title": "Nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Esta página muestra los detalles de un nodo del servidor de {{productName}} que está activo y es accesible en tu clúster.",
+    "leader_node": "Este es el nodo líder.",
+    "not_leader_node": "Este <em>no</em> es el nodo líder."
+  },
+  "system_logs_page": {
+    "title": "Registros del sistema más recientes (limitados a {{limit}}) del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Obtenido el <0/>",
+    "reload": "Recargar",
+    "back": "Atrás",
+    "document_title": "Registros del sistema del nodo {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Notificaciones del sistema"
+  },
+  "system_overview_page": {
+    "title": "Vista general del sistema"
+  },
+  "thread_dump_page": {
+    "title": "Volcado de hilos del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Obtenido el <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "El estado del balanceador de carga se ha cambiado correctamente a '{{status}}' en el nodo '{{nodeId}}'",
+    "lb_change_failed": "Error al cambiar el estado del balanceador de carga en '{{nodeId}}': {{error}}",
+    "lb_change_failed_title": "No se pudo cambiar el estado del balanceador de carga a '{{status}}' en el nodo '{{nodeId}}'",
+    "processing_pause_success": "El procesamiento de mensajes se ha pausado correctamente en '{{nodeId}}'",
+    "processing_pause_failed": "Error al pausar el procesamiento de mensajes en '{{nodeId}}': {{error}}",
+    "processing_pause_failed_title": "No se pudo pausar el procesamiento de mensajes en el nodo '{{nodeId}}'",
+    "processing_resume_success": "El procesamiento de mensajes se ha reanudado correctamente en '{{nodeId}}'",
+    "processing_resume_failed": "Error al reanudar el procesamiento de mensajes en '{{nodeId}}': {{error}}",
+    "processing_resume_failed_title": "No se pudo reanudar el procesamiento de mensajes en el nodo '{{nodeId}}'",
+    "nothing_selected": "No hay notificaciones seleccionadas.",
+    "nothing_to_dismiss_title": "No hay nada que descartar",
+    "bulk_dismiss_failed": "No se pudieron descartar las notificaciones. Inténtalo de nuevo.",
+    "dismiss_failed": "No se pudo descartar la notificación. Inténtalo de nuevo.",
+    "dismiss_failed_title": "Error al descartar",
+    "profiling_enabled": "El perfilado de MongoDB se ha activado correctamente.",
+    "profiling_disabled": "El perfilado de MongoDB se ha desactivado correctamente.",
+    "profiling_enable_failed": "Error al activar el perfilado de MongoDB: {{error}}",
+    "profiling_disable_failed": "Error al desactivar el perfilado de MongoDB: {{error}}",
+    "profiling_update_failed_title": "No se pudo actualizar el perfilado de MongoDB.",
+    "data_node_metrics_failed": "Error al cargar las métricas del nodo de datos «{{hostname}}»",
+    "data_node_metrics_failed_title": "No se pudieron cargar las métricas de los nodos de datos.",
+    "graylog_node_metrics_failed": "Error al cargar las métricas del nodo de Graylog con el estado",
+    "graylog_node_metrics_failed_title": "No se pudieron cargar las métricas de los nodos de Graylog.",
+    "cluster_traffic_failed": "Error al cargar el tráfico del clúster con el estado",
+    "cluster_traffic_failed_title": "No se pudo cargar el tráfico del clúster",
+    "journal_failed": "No se pudo obtener la información del journal",
+    "system_jobs_failed": "Error al cargar los trabajos del sistema con el estado",
+    "system_jobs_failed_title": "No se pudieron cargar los trabajos del sistema"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Error al obtener la información de la JVM del nodo '{{nodeId}}': {{error}}",
+    "jvm_failed_title": "No se pudo obtener la información de la JVM",
+    "thread_dump_failed": "Error al obtener el volcado de hilos del nodo '{{nodeId}}': {{error}}",
+    "thread_dump_failed_title": "No se pudo obtener el volcado de hilos",
+    "process_buffer_dump_failed": "Error al obtener el volcado del búfer de procesamiento del nodo '{{nodeId}}': {{error}}",
+    "process_buffer_dump_failed_title": "No se pudo obtener el volcado del búfer de procesamiento",
+    "system_logs_failed": "Error al obtener los mensajes del registro del sistema del nodo '{{nodeId}}': {{error}}",
+    "system_logs_failed_title": "No se pudieron obtener los mensajes del registro del sistema",
+    "overview_failed": "Error al obtener la vista general del clúster: {{error}}",
+    "overview_failed_title": "No se pudo obtener la vista general del clúster"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Error al crear el paquete de soporte con el estado: {{error}}",
+    "create_failed_title": "No se pudo crear el paquete de soporte."
+  },
   "use_plugin_list_notifications": {}
 }
