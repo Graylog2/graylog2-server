@@ -1,1 +1,200 @@
-{}
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/D"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Caricamento dei nodi del backend di ricerca...",
+    "search_backend_unknown": "Impossibile determinare il backend di ricerca configurato.",
+    "search_placeholder": "Cerca nodi…",
+    "all_nodes": "Tutti i nodi",
+    "data_nodes": "Nodi dati",
+    "opensearch_nodes": "Nodi OpenSearch",
+    "mongodb_nodes": "Nodi MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Memoria",
+    "jvm": "JVM",
+    "indexing": "Indicizzazione",
+    "storage": "Archiviazione",
+    "buffers": "Buffer",
+    "journal": "Journal",
+    "data_lake_journal": "Journal del Data Lake",
+    "throughput": "Throughput"
+  },
+  "data_nodes_expandable": {
+    "title": "Nodi dati"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Documenti",
+    "latency": "Latenza"
+  },
+  "node_actions": {
+    "thread_dump": "Ottieni thread dump",
+    "process_buffer_dump": "Ottieni dump del process buffer",
+    "metrics": "Metriche"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Metti in pausa l'elaborazione dei messaggi",
+    "resume_message_processing": "Riprendi l'elaborazione dei messaggi",
+    "override_load_balancer_dead": "Sovrascrivi lo stato del load balancer in DEAD",
+    "override_load_balancer_alive": "Sovrascrivi lo stato del load balancer in ALIVE",
+    "local_message_inputs": "Input di messaggi locali",
+    "recent_system_logs": "Ottieni i messaggi di log di sistema recenti",
+    "message_processing_title": "Elaborazione dei messaggi",
+    "pause_confirm": "Stai per <b>mettere in pausa</b> l'elaborazione dei messaggi nel nodo <b>{{nodeName}}</b>. Sei sicuro?",
+    "resume_confirm": "Stai per <b>riprendere</b> l'elaborazione dei messaggi nel nodo <b>{{nodeName}}</b>. Sei sicuro?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "Stai per modificare lo stato del load balancer del nodo <b>{{nodeName}}</b> in <b>{{status}}</b>. Sei sicuro?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Nodi {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "Elaborazione dei messaggi {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Nodi MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "La profilazione di MongoDB aiuta a individuare le query lente e a risolvere i problemi di prestazioni sui nodi del cluster.",
+    "enabling_profiling": "Attivazione della profilazione...",
+    "enable_confirm": "Vuoi attivare la profilazione <b>Slow Ops</b> ({{threshold}}) su tutti i nodi MongoDB? Viene applicata subito senza riavvio, ma si reimposta dopo un riavvio se non è configurata all'avvio."
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Nodi OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Mostra {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Carico (1m)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "ID cluster:",
+    "not_available": "Non disponibile",
+    "number_of_nodes": "Numero di nodi:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Crea un file zip con informazioni utili per il debug del tuo cluster Graylog.",
+    "enterprise_customers": "I clienti Graylog Enterprise possono allegare i bundle al proprio ticket di supporto, così il team di supporto tecnico Graylog può analizzare e diagnosticare i problemi.",
+    "examine_content": "Controlla il contenuto del bundle prima di condividerlo. Potrebbe contenere dati sensibili come indirizzi IP, nomi host o persino password!",
+    "paid_license_only": "Solo gli utenti con una licenza a pagamento hanno diritto al supporto Graylog Enterprise. Puoi comunque usare questo file per altri scopi di debug."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Bundle di supporto del cluster",
+    "create": "Crea bundle di supporto",
+    "download": "Scarica",
+    "delete": "Elimina",
+    "filename": "Nome file",
+    "size": "Dimensione",
+    "no_bundles": "Nessun bundle di supporto trovato.",
+    "delete_title": "Elimina bundle di supporto",
+    "delete_confirm": "Sei sicuro di voler eliminare <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Livello: {{level}}",
+    "total_written": "Totale scritto:",
+    "mean_rate": "Frequenza media:",
+    "one_minute_rate": "Frequenza 1 min:",
+    "per_second": "/ secondo"
+  },
+  "logging_subsystem": {
+    "subsystem": "Sottosistema: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Mostra metriche dei livelli di log",
+    "hide_log_level_metrics": "Nascondi metriche dei livelli di log",
+    "total_log_messages": "Ha scritto un totale di <strong>{{throughput}} messaggi di log interni.</strong>"
+  },
+  "metric_details": {
+    "value": "Valore:",
+    "count": "Conteggio:",
+    "mean": "Media:",
+    "minimum": "Minimo:",
+    "maximum": "Massimo:",
+    "standard_deviation": "Deviazione standard:",
+    "percentile_95": "95° percentile:",
+    "percentile_98": "98° percentile:",
+    "percentile_99": "99° percentile:",
+    "invalid_type": "Tipo di metrica non valido: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Totale:",
+    "events": "eventi",
+    "one_minute_avg": "Media 1 minuto:",
+    "five_minute_avg": "Media 5 minuti:",
+    "fifteen_minute_avg": "Media 15 minuti:"
+  },
+  "counter_rate": {
+    "calculating": "Calcolo in corso...",
+    "total": "({{total}} in totale)",
+    "per_second": "al secondo"
+  },
+  "metric_container": {
+    "loading": "Caricamento..."
+  },
+  "metrics_component": {
+    "fetch_error": "Impossibile recuperare le metriche dal nodo: il server ha restituito <em>{{responseMessage}}</em> con codice di stato {{status}}.",
+    "fetch_problem": "Si è verificato un problema durante il recupero delle metriche del nodo.",
+    "retry_in_background": "I tentativi di recupero continueranno in background.",
+    "fetch_error_last_metrics": "Impossibile recuperare le metriche dal nodo: il server ha restituito <em>{{responseMessage}}</em> con codice di stato {{status}}. Vengono mostrate le ultime metriche disponibili.",
+    "filter_placeholder": "Digita il nome di una metrica da filtrare…"
+  },
+  "metrics_list": {
+    "no_metrics": "Nessuna metrica corrisponde al filtro indicato. Assicurati di usare un'espressione regolare valida"
+  },
+  "buffer_usage": {
+    "metrics": "Metriche",
+    "utilization": "<strong>{{usage}} messaggi</strong> in {{title}}, utilizzo al {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "Caricamento dei tipi di input..."
+  },
+  "journal_details": {},
+  "journal_state": {},
+  "jvm_heap_usage": {},
+  "node_list_item": {},
+  "node_maintenance_dropdown": {},
+  "node_overview": {},
+  "nodes_actions": {},
+  "nodes_list": {},
+  "plugins_data_table": {},
+  "rest_api_overview": {},
+  "system_information": {},
+  "system_overview_details": {},
+  "system_overview_summary": {},
+  "bulk_actions": {},
+  "system_notifications_table": {},
+  "actions_cell": {},
+  "title_cell": {},
+  "system_job": {},
+  "system_jobs_component": {},
+  "system_jobs_list": {},
+  "system_messages_component": {},
+  "system_messages_list": {},
+  "global_throughput": {},
+  "node_throughput": {},
+  "telemetry_debug_entry_row": {},
+  "telemetry_debug_overlay": {},
+  "cluster_configuration_page": {},
+  "configurations_page": {},
+  "enterprise_page": {},
+  "process_buffer_dump_page": {},
+  "show_metrics_page": {},
+  "node_page": {},
+  "system_logs_page": {},
+  "system_notifications_page": {},
+  "system_overview_page": {},
+  "thread_dump_page": {},
+  "notifications": {},
+  "use_cluster_overview_notifications": {},
+  "use_cluster_support_bundle_notifications": {},
+  "use_plugin_list_notifications": {}
+}
