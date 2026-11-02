@@ -10,6 +10,7 @@
   },
   "readme": "../README.md",
   "scripts": {
+    "i18n:check-server-fields": "python3 dev/i18n/extract-server-fields.py core --check",
     "start": "webpack serve -c webpack.bundled.ts",
     "start:preflight": "webpack serve -c webpack.preflight.ts",
     "build": "cross-env disable_plugins=true webpack --config webpack.bundled.ts",
