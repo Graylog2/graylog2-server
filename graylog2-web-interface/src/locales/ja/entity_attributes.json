@@ -98,5 +98,9 @@
   "Transport address": "トランスポートアドレス",
   "Triggered": "トリガー済み",
   "Type": "型",
-  "Usages": "使用状況"
+  "Usages": "使用状況",
+  "User ID": "ユーザーID",
+  "Username": "ユーザー名",
+  "Version": "バージョン",
+  "id": "ID"
 }
