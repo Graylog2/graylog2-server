@@ -1,1 +1,13 @@
-{}
+{
+  "welcome": "Benvenuto in {{productName}}",
+  "username": "Nome utente",
+  "password": "Password",
+  "sign_in": "Accedi",
+  "signing_in": "Accesso in corso...",
+  "invalid_credentials": "Credenziali non valide, verificale e riprova.",
+  "server_error": "Errore - il server ha restituito: {{status}} - {{message}}",
+  "fallback_error_cloud": "Errore durante il caricamento della schermata di accesso, contatta il tuo account manager di {{productName}}.",
+  "fallback_error": "Errore durante l'uso del servizio di autenticazione attivo per l'accesso. Verifica la sua configurazione o contatta il tuo account manager di {{productName}}. Dettagli dell'errore:",
+  "login_with_default": "Accedi con il metodo predefinito",
+  "login_with": "Accedi con {{method}}"
+}
