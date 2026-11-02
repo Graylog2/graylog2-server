@@ -239,28 +239,148 @@
     "stream_name_label": "Nom du stream Kinesis",
     "stream_name_placeholder": "Nom du stream",
     "stream_name_help": "1 à 128 caractères alphanumériques et les caractères spéciaux tiret bas (_), point (.) et tiret (-).",
-    "group_name_label": "Nom du groupe CloudWatch"
+    "group_name_label": "Nom du groupe CloudWatch",
+    "choose_group": "Choisir le groupe CloudWatch",
+    "back_button": "Retour à la sélection du stream"
   },
-  "aws_kinesis_setup_agree": {},
-  "aws_kinesis_setup_step": {},
-  "aws_kinesis_setup_steps": {},
-  "aws_kinesis_setup_modal": {},
-  "form_wrap": {},
-  "aws_skip_health_check": {},
-  "throttling_checkbox": {},
-  "grey_noise_adapter_documentation": {},
-  "grey_noise_adapter_field_set": {},
-  "grey_noise_adapter_summary": {},
-  "slack_notification_details": {},
-  "teams_notification_details": {},
-  "teams_notification_v2_details": {},
-  "slack_notification_form": {},
-  "event_procedure_checkbox": {},
-  "slack_notification_summary": {},
-  "teams_notification_summary": {},
-  "teams_notification_form": {},
-  "teams_notification_v2_form": {},
-  "pager_duty_notification_details": {},
+  "aws_kinesis_setup_agree": {
+    "description": "Cette configuration automatique créera les ressources AWS suivantes. Cliquez ci-dessous pour confirmer que vous comprenez que ces ressources seront créées et que vous êtes seul responsable des frais AWS qui en découlent. Notez que vous devez supprimer manuellement toutes les ressources si elles ne sont pas nécessaires.",
+    "step_stream": "Créer un stream Kinesis avec <strong>1</strong> shard.",
+    "step_role": "Créer un rôle et une politique IAM pour permettre au groupe CloudWatch <strong>{{groupName}}</strong> de publier des messages de journal dans le stream Kinesis <strong>{{streamName}}</strong>",
+    "step_subscription": "Créer un abonnement CloudWatch, qui publie les messages de journal dans le stream Kinesis."
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "En attente...",
+    "creating": "Création de {{label}}",
+    "create": "Créer {{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Stream Kinesis",
+    "policy_label": "Politique d'abonnement",
+    "subscription_label": "Abonnement"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "Création...",
+    "close_button": "Fermer",
+    "continue_button": "Continuer la configuration",
+    "executing_title": "Exécution de la configuration automatique",
+    "agreement_title": "Accord de configuration automatique de Kinesis",
+    "delayed_logs": "Les premiers messages peuvent mettre jusqu'à dix minutes à arriver dans le stream Kinesis. La vérification de l'état de Kinesis lors de l'étape suivante ne se terminera pas avec succès tant que des messages ne seront pas présents dans le stream. Consultez la <cloudWatchLink>documentation officielle sur les abonnements CloudWatch</cloudWatchLink> pour plus d'informations.",
+    "agree_button": "J'accepte ! Créer ces ressources AWS maintenant."
+  },
+  "form_wrap": {
+    "more_info": "Plus d'informations",
+    "additional_information": "Informations supplémentaires :",
+    "loading_button": "Chargement...",
+    "submit_button": "Envoyer"
+  },
+  "aws_skip_health_check": {
+    "title": "Ignorer la vérification de l'état",
+    "confirm_button": "Confirmer",
+    "form_title": "Choisir le type de journal et ignorer la vérification de l'état",
+    "description": "Si vous êtes sûr des données contenues dans votre nouveau stream <strong>{{streamName}}</strong>, choisissez l'option ci-dessous pour ignorer notre vérification automatique.",
+    "input_type_label": "Choisir le type d'entrée AWS",
+    "choose_log_type": "Choisir le type de journal"
+  },
+  "throttling_checkbox": {
+    "label": "Activer la limitation de débit",
+    "help": "Si cette option est activée, aucun nouveau message ne sera lu depuis cette entrée tant que le serveur {{productName}} n'aura pas rattrapé sa charge de messages. Cela est généralement utile pour les entrées lisant depuis des fichiers ou des systèmes de files de messages comme AMQP ou Kafka. Si vous interrogez régulièrement un système externe, par exemple via HTTP, vous souhaitez généralement laisser cette option désactivée."
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "L'adaptateur de données GreyNoise Quick IP Lookup utilise l'<greynoiseLink>API Greynoise</greynoiseLink> pour rechercher les indicateurs de la clé donnée et renvoie les valeurs du point de terminaison IP Quick Context. Consultez <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "Mot de passe utilisateur",
+    "reset_token_button": "Réinitialiser le jeton",
+    "api_token_label": "Jeton d'API",
+    "undo_reset_button": "Annuler la réinitialisation",
+    "api_token_help": "Le jeton d'API."
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "Jeton d'API"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "URL du webhook",
+    "channel_label": "Canal",
+    "custom_message_label": "Modèle de message personnalisé",
+    "empty_body": "Corps vide",
+    "include_event_procedure_label": "Inclure la procédure d'événement dans le corps de l'e-mail",
+    "backlog_limit_label": "Limite de l'arriéré de messages",
+    "user_name_label": "Nom d'utilisateur",
+    "include_title_label": "Inclure le titre",
+    "notify_channel_label": "Notifier le canal",
+    "link_names_label": "Lier les noms",
+    "icon_url_label": "URL de l'icône",
+    "icon_emoji_label": "Emoji d'icône",
+    "time_zone_label": "Fuseau horaire"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "URL du webhook",
+    "custom_message_label": "Modèle de message personnalisé",
+    "empty_body": "Corps vide",
+    "backlog_limit_label": "Limite de l'arriéré de messages",
+    "icon_url_label": "URL de l'icône",
+    "time_zone_label": "Fuseau horaire"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "URL du webhook",
+    "adaptive_card_label": "Modèle de carte adaptative",
+    "backlog_limit_label": "Limite de l'arriéré de messages"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "Couleur de la configuration",
+    "change_color_button": "Modifier la couleur",
+    "color_help": "Choisissez une couleur à utiliser pour cette configuration.",
+    "custom_message_help": "Message personnalisé à ajouter sous le titre de l'alerte. Consultez la <docsLink/> pour plus de détails.",
+    "docs_link_text": "documentation",
+    "webhook_url_help": "URL « Incoming Webhook » de Slack",
+    "channel_help": "Nom du canal Slack #canal ou @utilisateur pour un message direct",
+    "custom_message_label": "Message personnalisé (facultatif)",
+    "time_zone_help": "Fuseau horaire utilisé pour les horodatages dans le corps de la notification.",
+    "time_zone_label": "Fuseau horaire pour les valeurs de date et d'heure",
+    "backlog_limit_label": "Limite de l'arriéré de messages (facultatif)",
+    "backlog_limit_help": "Limite le nombre de messages en attente envoyés dans le cadre de la notification Slack. Si la valeur est 0, aucune limite ne sera appliquée.",
+    "user_name_label": "Nom d'utilisateur (facultatif)",
+    "user_name_help": "Nom d'utilisateur de l'expéditeur dans Slack",
+    "include_title_help": "Inclure le titre et la description de la définition d'événement dans la notification",
+    "notify_channel_help": "Notifier tous les utilisateurs du canal en ajoutant @channel au message",
+    "notify_here_label": "Notifier les utilisateurs présents",
+    "notify_here_help": "Notifier les utilisateurs actifs du canal en ajoutant @here au message",
+    "link_names_help": "Repérer et créer des liens vers les noms de canaux et d'utilisateurs",
+    "icon_url_label": "URL de l'icône (facultatif)",
+    "icon_url_help": "Image à utiliser comme icône de ce message",
+    "icon_emoji_label": "Emoji d'icône (facultatif)",
+    "icon_emoji_help": "Emoji à utiliser comme icône de ce message (remplace l'URL de l'icône)"
+  },
+  "event_procedure_checkbox": {
+    "label": "Inclure la procédure d'événement",
+    "help": "Ajouter une version mise en forme de la procédure d'événement de la définition d'événement à la fin du corps de la notification."
+  },
+  "slack_notification_summary": {
+    "color_label": "Couleur",
+    "custom_message_label": "Message personnalisé",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "teams_notification_summary": {
+    "color_label": "Couleur",
+    "custom_message_label": "Message personnalisé"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "URL « Incoming Webhook » de Teams",
+    "backlog_limit_help": "Limite le nombre de messages en attente envoyés dans le cadre de la notification Microsoft Teams. Si la valeur est 0, aucune limite ne sera appliquée."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Carte adaptative à publier dans Teams. Consultez la <docsLink/> pour plus de détails.",
+    "backlog_toggle_aria_label": "Activer la limite de l'arriéré de messages"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "Clé de routage",
+    "incident_title_label": "Titre de l'incident",
+    "custom_incident_label": "Incident personnalisé",
+    "key_prefix_label": "Préfixe de clé",
+    "incident_key_label": "Clé d'incident"
+  },
   "pager_duty_notification_form": {},
   "pager_duty_notification_summary": {},
   "threat_intel_plugin_config": {},
