@@ -251,19 +251,130 @@
     "false": "false"
   },
   "builder": {
-    "title": "規則建構器"
+    "title": "規則建構器",
+    "when": "當",
+    "and": "且",
+    "or": "或",
+    "then": "則",
+    "convert_title": "將規則建構器轉換為原始碼",
+    "convert": "轉換為原始碼",
+    "delete_condition": "刪除條件",
+    "delete_action": "刪除動作",
+    "delete_condition_confirm": "確定要刪除<blockName>條件 N°{{order}}</blockName>嗎？",
+    "delete_action_confirm": "確定要刪除<blockName>動作 N°{{order}}</blockName>嗎？"
   },
-  "helper": {},
-  "helper_table": {},
-  "simulator": {},
-  "simulation_changes": {},
-  "simulation_preview": {},
-  "simulation_trace": {},
-  "simulation_results": {},
-  "simulator_page": {},
-  "rule_notifications": {},
-  "page_navigation": {},
-  "pipeline_notifications": {},
+  "helper": {
+    "title": "規則快速參考",
+    "docs_hint": "閱讀<docsLink>完整文件</docsLink>，以進一步了解 Pipeline 規則的運作方式。",
+    "functions": "函式",
+    "example": "範例",
+    "functions_description": "以下為 Pipeline 規則中所有可用函式的清單。點選任一列即可查看該函式參數的詳細資訊。",
+    "filter_rules": "篩選規則",
+    "example_description": "想了解 Pipeline 規則的樣貌嗎？請參考以下範例："
+  },
+  "helper_table": {
+    "parameter": "參數",
+    "type": "類型",
+    "required": "必填",
+    "description": "描述",
+    "function": "函式"
+  },
+  "simulator": {
+    "no_streams_title": "找不到任何 Stream",
+    "no_streams": "Pipeline 會以 Stream 為運作對象，但系統目前沒有任何 Stream。請<streamsLink>建立 Stream</streamsLink>，之後再回到此處測試 Pipeline 處理新 Stream 中訊息的情況。",
+    "stream_help": "選取模擬時要使用的 Stream，預設為 <streamTitle>{{title}}</streamTitle> Stream。",
+    "load_message": "載入訊息",
+    "load_message_description": "建立一則範例訊息，用於模擬。<notice>不會變更任何實際訊息。所有動作都僅在下方提供的暫存輸入上進行模擬。</notice>",
+    "stream": "Stream"
+  },
+  "simulation_changes": {
+    "added_fields": "新增的欄位",
+    "removed_fields": "移除的欄位",
+    "mutated_fields": "已變更的欄位",
+    "dropped": "原始訊息在處理期間將被捨棄。",
+    "not_modified": "原始訊息在處理期間不會被修改。",
+    "original_changes": "原始訊息 <idSmall><idEm>{{id}}</idEm></idSmall> 中的變更",
+    "other_changes": "其他變更"
+  },
+  "simulation_preview": {
+    "dropped_title": "訊息將被捨棄",
+    "dropped": "Pipeline 處理器會捨棄此類訊息，亦即該訊息<notStored>將不會被儲存</notStored>，也無法用於搜尋、警示、Output 或儀表板。"
+  },
+  "simulation_trace": {
+    "microseconds": "μs"
+  },
+  "simulation_results": {
+    "changes_summary": "變更摘要",
+    "results_preview": "結果預覽",
+    "simulation_trace": "模擬追蹤",
+    "error_title": "模擬訊息處理時發生錯誤",
+    "error": "無法模擬 Stream <emphasis>{{stream}}</emphasis> 中訊息 <emphasis>{{id}}</emphasis> 的處理。<lineBreak />請嘗試重新載入該訊息，或改用其他訊息進行模擬。",
+    "original_message": "原始訊息",
+    "more_results": "更多結果",
+    "title": "模擬結果",
+    "simulating": "正在模擬訊息處理，請稍候。",
+    "results_description": "以下為處理已載入訊息的結果。處理耗時 {{took}} µs。"
+  },
+  "simulator_page": {
+    "title": "模擬處理",
+    "documentation_title": "Pipelines 文件",
+    "description": "訊息處理可能相當複雜。請使用此頁面，以目前的 Pipeline 與規則組合，模擬處理進入訊息的結果。"
+  },
+  "rule_notifications": {
+    "fetch_failed": "擷取規則失敗，狀態碼：{{error}}",
+    "fetch_failed_title": "無法取得處理規則",
+    "list_failed": "載入規則清單失敗，狀態碼：{{error}}",
+    "list_failed_title": "無法載入規則。",
+    "fetch_rule_failed": "擷取規則「{{id}}」失敗，狀態碼：{{error}}",
+    "fetch_rule_failed_title": "無法取得處理規則「{{id}}」",
+    "create_success": "規則「{{title}}」已成功建立",
+    "create_failed": "儲存規則「{{title}}」失敗，狀態碼：{{error}}",
+    "create_failed_title": "無法儲存處理規則「{{title}}」",
+    "update_success": "規則「{{title}}」已成功更新",
+    "update_failed": "更新規則「{{title}}」失敗，狀態碼：{{error}}",
+    "update_failed_title": "無法更新處理規則「{{title}}」",
+    "delete_success": "規則「{{title}}」已成功刪除",
+    "delete_failed": "刪除規則「{{title}}」失敗，狀態碼：{{error}}",
+    "delete_failed_title": "無法刪除處理規則「{{title}}」",
+    "metrics_load_failed": "無法載入規則指標設定：{{error}}",
+    "metrics_load_failed_title": "無法載入規則指標設定",
+    "metrics_update_success": "已成功更新規則指標設定",
+    "metrics_update_failed": "無法更新規則指標設定：{{error}}",
+    "metrics_update_failed_title": "無法更新規則指標設定",
+    "metadata_failed": "載入 Pipeline 規則中繼資料失敗，狀態碼",
+    "metadata_failed_title": "無法載入 Pipeline 規則中繼資料",
+    "deprecated_failed": "載入規則的已淘汰函式失敗，狀態碼",
+    "deprecated_failed_title": "無法載入規則中繼資料的已淘汰函式",
+    "builder_create_failed": "建立規則建構器規則失敗，狀態碼：{{error}}",
+    "builder_create_failed_title": "無法建立規則建構器規則。",
+    "builder_update_failed": "更新規則建構器規則失敗，狀態碼：{{error}}",
+    "builder_update_failed_title": "無法更新規則建構器規則。",
+    "builder_load_failed": "載入規則建構器規則失敗，狀態碼",
+    "builder_load_failed_title": "無法載入規則建構器規則。",
+    "builder_conditions_failed": "載入規則建構器條件清單失敗，狀態碼",
+    "builder_conditions_failed_title": "無法載入規則建構器條件清單。",
+    "builder_actions_failed": "載入規則建構器動作清單失敗，狀態碼",
+    "builder_actions_failed_title": "無法載入規則建構器動作清單。"
+  },
+  "page_navigation": {
+    "manage_pipelines": "管理 Pipelines",
+    "manage_rules": "管理規則",
+    "simulator": "模擬器"
+  },
+  "pipeline_notifications": {
+    "load_failed": "載入 Pipelines 失敗，狀態碼",
+    "load_failed_title": "無法載入 Pipelines",
+    "load_paginated_failed": "載入分頁 Pipelines 失敗，狀態碼",
+    "load_paginated_failed_title": "無法載入分頁 Pipelines",
+    "load_single_failed": "載入 Pipeline 失敗，狀態碼",
+    "load_single_failed_title": "無法載入 Pipeline",
+    "connections_failed": "擷取 Pipeline 連線失敗，狀態碼",
+    "connections_failed_title": "無法取得 Pipeline 連線",
+    "connections_updated": "已成功更新 Pipeline 連線",
+    "connections_update_failed": "更新 Pipeline 連線失敗，狀態碼：{{error}}",
+    "connections_update_failed_title": "無法更新 Pipeline 連線",
+    "create_failed": "建立 Pipeline 失敗，狀態碼：{{error}}"
+  },
   "connections_list": {},
   "rule_list": {
     "headers": {}
