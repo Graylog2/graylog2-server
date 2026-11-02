@@ -1,1 +1,157 @@
-{}
+{
+  "title": "Pipelines",
+  "overview_header_title": "Pipelines 概览",
+  "documentation_link_title": "Pipelines 文档",
+  "overview_description": "Pipelines 用于转换和处理来自 Stream 的消息。Pipeline 由多个阶段组成，每个阶段都会评估并应用规则。消息可以经过一个或多个阶段。",
+  "new_pipeline": "新建 Pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipelines 用于转换和处理来自 Stream 的消息。Pipeline 由多个阶段组成，每个阶段都会评估并应用规则。消息可以经过一个或多个阶段。\n每个阶段完成后，您可以决定匹配全部规则或任一规则的消息是否继续进入下一阶段。",
+  "rules_page_title": "Pipeline 规则",
+  "rules_page_header_title": "Pipeline 规则",
+  "rules_page_documentation_link": "Pipeline 规则文档",
+  "rules_page_description": "规则用于对消息进行更改。规则由条件和一组操作组成。条件会针对消息进行评估，条件满足时执行相应操作。",
+  "rules_delete_confirm": "您确定要删除规则 \"{{title}}\" 吗？",
+  "rule_details_new_title": "新建 Pipeline 规则",
+  "rule_details_title": "Pipeline 规则 {{title}}",
+  "rule_details_loading": "正在加载规则详情...",
+  "loading_rule": "正在加载规则",
+  "create_pipeline_rule": "创建 Pipeline 规则",
+  "pipeline_rule": "Pipeline 规则 <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "使用源代码编辑器",
+  "rule_is_managed_warning": "此规则由应用程序管理，您无法编辑。",
+  "switch_to_source_code_editor": "切换到源代码编辑器",
+  "switch_to_source_code_editor_confirm_text": "您即将离开此页面并前往源代码编辑器。",
+  "switch_to_source_code_editor_confirm_warning": "请确保没有未保存的更改。",
+  "pipeline_new": {
+    "description": "为新 Pipeline 设置名称和描述。保存更改后，您可以为其添加阶段。"
+  },
+  "processing_errors": {
+    "rate_suffix": "错误/秒",
+    "total": "(共 {{total}} 个)"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "您确定要删除 Pipeline \"{{title}}\" 吗？此操作无法撤销。",
+    "filter_label": "过滤 Pipeline",
+    "no_pipelines": "未找到 Pipeline",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "已连接的 Stream",
+      "processing_errors": "处理错误",
+      "pipeline_load": "Pipeline 负载（15 分钟）",
+      "processing_timeline": "处理时间线",
+      "actions": "操作"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "调试指标已启用",
+    "banner_text": "调试指标会增加消息处理的开销并提高内存占用。排查问题结束后请将其禁用。Pipeline 负载值以 15 分钟为窗口进行平滑处理，启用后可能需要几分钟才能稳定。",
+    "disable": "禁用调试指标",
+    "enable": "启用调试指标",
+    "help": "Pipeline 负载（15 分钟）显示集群中 Pipeline 规则执行时间的相对占比。启用调试指标以开始收集计时数据。启用后数值可能需要约 15 分钟才能显示，且收集过程会增加消息处理的开销。"
+  },
+  "pipeline": {
+    "not_connected": "此 Pipeline 当前未连接任何 Stream。需要将 Pipeline 连接到至少一个 Stream，才能处理传入的消息。如果您只打算通过装饰器转换搜索结果，则无需连接。",
+    "delete_stage_confirm": "您即将删除阶段 {{stage}}，确定要继续吗？",
+    "list_and": " 和 ",
+    "managed_1": "此 Pipeline 由系统管理，只能进行有限的编辑。",
+    "managed_2": "只能通过 Input 向导向此 Pipeline 添加 Pipeline 规则。",
+    "managed_3": "此 Pipeline 中的 Pipeline 规则会自动重命名，以反映对应 Input 名称的更改。",
+    "managed_4": "可以手动从此 Pipeline 中移除 Pipeline 规则，但不能手动添加。",
+    "connections_title": "Pipeline 连接",
+    "no_connections": "选择将由此 Pipeline 处理的 Stream。",
+    "stages_title": "Pipeline 阶段",
+    "stages_description": "阶段是需要按顺序运行的条件和操作组，提供必要的控制流，以决定是否继续运行 Pipeline 的其余部分。",
+    "no_rules_on_stage": "此阶段没有规则。"
+  },
+  "connections_form": {
+    "streams_help": "选择要连接到此 Pipeline 的 Stream，或在 <streamsLink>Streams 页面</streamsLink>中创建。",
+    "edit": "编辑连接",
+    "title": "编辑 <pipelineTitle>{{title}}</pipelineTitle> 的连接",
+    "submit": "更新连接",
+    "streams": "Stream"
+  },
+  "details": {
+    "title": "详情",
+    "title_label": "标题",
+    "description": "描述",
+    "created": "创建时间",
+    "last_modified": "最后修改时间",
+    "throughput": "当前吞吐量",
+    "throughput_suffix": "消息/秒"
+  },
+  "form": {
+    "title": "标题",
+    "title_help": "Pipeline 名称。",
+    "description": "描述",
+    "description_help": "Pipeline 描述。",
+    "add_button": "添加新 Pipeline",
+    "edit_button": "编辑 Pipeline 详情",
+    "add_title": "添加新 Pipeline {{title}}",
+    "edit_title": "编辑 Pipeline {{title}}",
+    "add_submit": "添加 Pipeline",
+    "update_submit": "更新 Pipeline",
+    "create_submit": "创建 Pipeline"
+  },
+  "list_item": {
+    "idle": "空闲",
+    "stage": "阶段 {{stage}}",
+    "loading": "正在加载 Pipeline...",
+    "managed": "由应用程序管理",
+    "throughput_prefix": "吞吐量：",
+    "throughput_suffix": "消息/秒",
+    "not_connected": "未连接",
+    "edit_aria": "编辑 Pipeline",
+    "edit": "编辑",
+    "delete_aria": "删除 Pipeline",
+    "delete": "删除"
+  },
+  "stage_rules": {
+    "invalid_rule": "规则 {{name}} 已被重命名或删除，此规则将被跳过。",
+    "throughput_suffix": "消息/秒",
+    "errors_suffix": "错误/秒",
+    "remove_title": "移除 {{title}}",
+    "removing": "正在移除...",
+    "remove": "移除",
+    "no_rules": "此阶段还没有规则。点击编辑以添加。",
+    "headers": {
+      "title": "标题",
+      "description": "描述",
+      "throughput": "吞吐量",
+      "errors": "错误",
+      "rule_load": "规则负载（15 分钟）",
+      "actions": "操作"
+    }
+  },
+  "stage": {},
+  "stage_form": {},
+  "used_in_pipelines": {},
+  "deprecation": {},
+  "rule_form": {},
+  "rule_list_entry": {},
+  "metrics_config": {},
+  "rule_simulation": {},
+  "convert_modal": {},
+  "block_display": {},
+  "block": {},
+  "builder_form": {},
+  "block_form": {},
+  "block_field": {},
+  "builder": {},
+  "helper": {},
+  "helper_table": {},
+  "simulator": {},
+  "simulation_changes": {},
+  "simulation_preview": {},
+  "simulation_trace": {},
+  "simulation_results": {},
+  "simulator_page": {},
+  "rule_notifications": {},
+  "page_navigation": {},
+  "pipeline_notifications": {},
+  "connections_list": {},
+  "rule_list": {
+    "headers": {}
+  },
+  "load_cell": {}
+}
