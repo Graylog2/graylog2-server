@@ -69,14 +69,24 @@
       "failed_one": "{{failed}} su {{count}} definizione di evento selezionata non è stata disattivata.",
       "failed_other": "{{failed}} su {{count}} definizioni di evento selezionate non sono state disattivate.",
       "success_one": "{{count}} definizione di evento è stata disattivata correttamente.",
+      "success_other": "{{count}} definizioni di evento sono state disattivate correttamente.",
       "title": "Disattiva definizioni di evento",
       "confirm_many": "Sei sicuro di voler disattivare {{count}} definizioni di evento?",
       "failed_many": "{{failed}} su {{count}} definizioni di evento selezionate non sono state disattivate.",
       "success_many": "{{count}} definizioni di evento sono state disattivate correttamente."
     },
     "enable": {
+      "confirm_one": "Sei sicuro di voler attivare {{count}} definizione di evento?",
+      "confirm_other": "Sei sicuro di voler attivare {{count}} definizioni di evento?",
       "error": "Si è verificato un errore durante l'attivazione delle definizioni di evento. {{error}}",
-      "title": "Attiva definizioni di evento"
+      "failed_one": "{{failed}} su {{count}} definizione di evento selezionata non è stata attivata.",
+      "failed_other": "{{failed}} su {{count}} definizioni di evento selezionate non sono state attivate.",
+      "success_one": "{{count}} definizione di evento è stata attivata correttamente.",
+      "success_other": "{{count}} definizioni di evento sono state attivate correttamente.",
+      "title": "Attiva definizioni di evento",
+      "confirm_many": "Sei sicuro di voler attivare {{count}} definizioni di evento?",
+      "failed_many": "{{failed}} su {{count}} definizioni di evento selezionate non sono state attivate.",
+      "success_many": "{{count}} definizioni di evento sono state attivate correttamente."
     },
     "success_title": "Operazione riuscita"
   },
