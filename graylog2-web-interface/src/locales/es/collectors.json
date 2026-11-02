@@ -553,32 +553,154 @@
       "title": "No se han podido eliminar los tokens de inscripción"
     },
     "reassign_instances": {
-      "message": "Error al reasignar las instancias: {{error}}"
+      "message": "Error al reasignar las instancias: {{error}}",
+      "title": "No se han podido reasignar las instancias"
     },
-    "delete_instance": {},
-    "save_config": {},
-    "create_input": {},
-    "update_input": {}
+    "delete_instance": {
+      "message": "Error al eliminar la instancia: {{error}}",
+      "title": "No se ha podido eliminar la instancia"
+    },
+    "save_config": {
+      "message": "Error al guardar la configuración de collectors: {{error}}",
+      "title": "No se ha podido guardar la configuración"
+    },
+    "create_input": {
+      "message": "Error al crear el input de ingesta de Collectors: {{error}}",
+      "title": "No se ha podido crear el input de ingesta de Collectors"
+    },
+    "update_input": {
+      "message": "Error al actualizar el input de ingesta de Collectors: {{error}}",
+      "title": "No se ha podido actualizar el input de ingesta de Collectors"
+    }
   },
-  "notifications": {},
+  "notifications": {
+    "success_title": "¡Correcto!",
+    "fleet_created": "El Fleet \"{{name}}\" se ha creado.",
+    "fleet_updated": "El Fleet \"{{name}}\" se ha actualizado.",
+    "fleet_deleted": "El Fleet se ha eliminado.",
+    "source_created": "La fuente \"{{name}}\" se ha creado.",
+    "source_updated": "La fuente \"{{name}}\" se ha actualizado.",
+    "source_deleted": "La fuente se ha eliminado.",
+    "enrollment_token_deleted": "El token de inscripción se ha eliminado.",
+    "enrollment_tokens_deleted": "Los tokens de inscripción se han eliminado.",
+    "instances_reassigned": "Las instancias se han reasignado.",
+    "instance_deleted": "La instancia se ha eliminado.",
+    "config_saved": "Configuración de collectors guardada.",
+    "input_created": "Input de ingesta de Collectors creado.",
+    "input_moved": "El input de ingesta de Collectors se ha movido al nuevo puerto."
+  },
   "datanode": {
-    "compatibility_check": {},
-    "migration_steps_text": {},
-    "migration_welcome": {},
-    "migration_wizard": {},
-    "compatibility_status": {},
-    "in_place_migration": {},
-    "migration_data_nodes": {},
-    "manual_migration": {},
-    "stop_processing": {},
-    "journal_size_warning": {},
-    "journal_downtime": {},
-    "in_place_welcome": {},
-    "restart_graylog": {},
-    "in_place_migration_info": {},
-    "certificates_provisioning": {},
-    "jwt_authentication": {},
-    "reset_migration": {},
+    "compatibility_check": {
+      "compatible": "Tus datos existentes de OpenSearch se pueden migrar a Data Node.",
+      "error": "Se ha producido un error al comprobar la compatibilidad",
+      "incompatible": "Tus datos existentes de OpenSearch no se pueden migrar a Data Node.",
+      "loading": "Cargando los resultados de la comprobación de compatibilidad...",
+      "title": "Comprobación de compatibilidad del directorio",
+      "version_incompatible": "Tu clúster de OpenSearch no se puede migrar a esta versión de Data Node porque no es compatible."
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "Crea una política de renovación de certificados antes de continuar.",
+      "finished": "¡La migración ha finalizado!",
+      "ca_step_required": "Crea una autoridad de certificación antes de continuar."
+    },
+    "migration_welcome": {
+      "earlier_deployments": "Las instalaciones anteriores a la v5.2, o las que optaron por no instalar un Data Node, necesitarán migrar las bases de datos de mensajes a Data Nodes.",
+      "incompatible_backend": "Backend de búsqueda incompatible. Actualiza a OpenSearch para poder usar el asistente de migración.",
+      "intro": "El Data Node de {{productName}} es un componente de gestión diseñado para configurar y optimizar OpenSearch para su uso con {{productName}}, lo que reduce la carga administrativa y simplifica las actualizaciones futuras.",
+      "more_information": "Puedes consultar más información sobre la migración a Data Node en la <docsLink>documentación</docsLink>.",
+      "required_steps": "La migración a Data Node requerirá realizar algunos pasos en el sistema operativo, dentro de tu clúster OS/ES actual y en tus archivos de configuración.",
+      "title": "Migración de Data Nodes",
+      "tool_description": "Esta herramienta de migración comprobará la compatibilidad de tus componentes y te guiará para migrar tus datos existentes de OpenSearch a un Data Node."
+    },
+    "migration_wizard": {
+      "loading": "Cargando..."
+    },
+    "compatibility_status": {
+      "creation_date": "Fecha de creación",
+      "datanode_opensearch_version": "Versión de OpenSearch del Data Node",
+      "index_version": "Versión del índice",
+      "indices": "Índices",
+      "opensearch_data_location": "Ubicación de los datos de OpenSearch",
+      "shards": "Shards"
+    },
+    "in_place_migration": {
+      "description": "Sigue estos pasos para migrar tu clúster existente de OpenSearch 2.x o 1.3.x a Data Nodes.",
+      "title": "Migración in situ"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "Certificado válido hasta",
+      "hostname": "Nombre de host",
+      "incompatible": "Hay Data Nodes en ejecución con versiones incompatibles con tu versión actual de {{productName}}. Asegúrate de usar la misma versión tanto de {{productName}} como de Data Node.",
+      "incompatible_title": "Se han encontrado Data Nodes incompatibles",
+      "loading": "Cargando Data Nodes",
+      "looking": "Buscando Data Nodes...",
+      "no_certificate": "Sin certificado",
+      "none_found": "No se ha encontrado ningún Data Node.",
+      "none_found_title": "No se han encontrado Data Nodes",
+      "start_data_node": "Inicia al menos un Data Node para continuar con el proceso de migración. Puedes encontrar más información sobre cómo iniciar Data Nodes en nuestra <docsLink>documentación</docsLink>.",
+      "status": "Estado",
+      "transport_address": "Dirección de transporte",
+      "version": "Versión",
+      "version_incompatible": "Esta versión es incompatible con tu versión actual de {{productName}}."
+    },
+    "manual_migration": {
+      "migration_type": "Tipo de migración",
+      "migration_type_help": "El tipo de migración que quieres realizar.",
+      "select_migration_type": "Selecciona el tipo de migración"
+    },
+    "stop_processing": {
+      "change_owner": "Si estás migrando datos existentes de OpenSearch apuntando el Data Node a su directorio de datos, asegúrate de cambiar el propietario del directorio de datos al usuario que ejecuta el Data Node (normalmente graylog-datanode) y restablece los permisos correctos, por ejemplo, ejecutando",
+      "stop_cluster": "Detén tu clúster de OpenSearch antes de continuar.",
+      "stop_opensearch": "Detener OpenSearch",
+      "stopped": "El procesamiento de {{productName}} está detenido."
+    },
+    "journal_size_warning": {
+      "description": "Ten en cuenta que durante la migración tendrás que detener el procesamiento en tu nodo de {{productName}}, lo que hará que el journal crezca de tamaño. Por tanto, tendrás que aumentar el tamaño del volumen del journal durante el paso de reducción del tamaño del journal o antes.",
+      "title": "Aviso de tamaño del journal"
+    },
+    "journal_downtime": {
+      "current_size": "El tamaño actual de tu journal es: <bold>{{size}} MB</bold> y su rendimiento actual es: <bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "Se ha producido un error al estimar el rendimiento de tu journal: {{message}}",
+      "increase_size": "Por tanto, es posible que necesites aumentar el tamaño del volumen del journal.",
+      "max_downtime": "El tiempo de inactividad máximo actual para reconfigurar {{productName}} y apuntar al Data Node es: <bold>{{duration}}</bold>",
+      "processing_stops": "Ten en cuenta que durante la migración el procesamiento de datos se detendrá en tu nodo de {{productName}}, lo que hará que el journal crezca de tamaño.",
+      "sufficient_size": "Asegúrate de que el tamaño del volumen del journal es suficiente antes de continuar.",
+      "title": "Aviso de tamaño por tiempo de inactividad del journal"
+    },
+    "in_place_welcome": {
+      "description": "Una migración in situ migrará la carpeta de datos de tu clúster existente a un clúster de Data Nodes.",
+      "install": "Para empezar, instala el Data Node en cada nodo OS/ES de tu configuración anterior. Puedes encontrar más información sobre cómo descargar e instalar el Data Node <docsLink>aquí</docsLink>.",
+      "title": "Bienvenido"
+    },
+    "restart_graylog": {
+      "almost_there": "¡Ya casi está!",
+      "example": "P. ej.,",
+      "remove_hosts": "Elimina la línea <codeSnippet>elasticsearch_hosts</codeSnippet> de tu <codeSnippet>server.conf</codeSnippet>",
+      "restart": "Cuando termines, reinicia {{productName}} para finalizar la migración.",
+      "wait_for_available": "Espera a que todos los data nodes pasen a 'AVAILABLE'. Revisa el log del data node si no se vuelven disponibles en 1 o 2 minutos."
+    },
+    "in_place_migration_info": {
+      "configuration": "En las migraciones in situ, asegúrate de que la configuración de tus Data Nodes en <codeSnippet>datanode.conf</codeSnippet>, en concreto la opción <codeSnippet>opensearch_data_location</codeSnippet>, apunta al directorio de datos de OpenSearch existente correcto en cada nodo.",
+      "permissions": "Durante la migración, tanto el usuario del sistema del Data Node como el de OpenSearch necesitarán poder acceder y escribir en el directorio de datos. Para garantizarlo, puedes ejecutar, por ejemplo,"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "La autoridad de certificación se ha configurado correctamente.",
+      "finished": "El aprovisionamiento del Data Node ha finalizado.",
+      "loading": "Cargando el estado de la migración.",
+      "provision_now": "Ya puedes aprovisionar certificados para tus Data Nodes.",
+      "provisioning": "Aprovisionando certificado"
+    },
+    "jwt_authentication": {
+      "add_snippet": "Para ello, añade el siguiente fragmento a tu <codeSnippet>opensearch-security/config.yml</codeSnippet>",
+      "description": "Según cómo hayas protegido tu clúster existente, es necesario realizar algunos cambios preliminares en la configuración de seguridad. Usamos la autenticación JWT para acceder a OpenSearch desde {{productName}}. En el siguiente paso, tendrás que habilitar manualmente la autenticación JWT en tu clúster de OpenSearch existente para asegurarte de que los datos son accesibles desde el Data Node.",
+      "replace_signing_key": "Sustituye la clave de firma por tu <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> codificada en base64. Para codificarla, puedes ejecutar",
+      "title": "Autenticación JWT"
+    },
+    "reset_migration": {
+      "button": "Restablecer migración",
+      "confirm": "¿Seguro que quieres restablecer la migración?",
+      "failed": "Error al restablecer el estado de la migración. Estado: {{error}}"
+    },
     "migration_actions": {},
     "force_start": {},
     "rolling_upgrade_nodes": {
