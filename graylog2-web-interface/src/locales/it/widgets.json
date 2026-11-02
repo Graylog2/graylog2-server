@@ -1,1 +1,152 @@
-{}
+{
+  "copy_to_dashboard": {
+    "title": "Copia widget nella dashboard",
+    "no_dashboards": "Nessuna dashboard trovata.",
+    "create_new": "Crea una nuova dashboard"
+  },
+  "edit_message_list": {
+    "fields": "Campi",
+    "message_preview": "Anteprima messaggio",
+    "sorting": "Ordinamento",
+    "direction": "Direzione",
+    "decorators": "Decoratori"
+  },
+  "widget_frame": {
+    "loading": "Caricamento widget ..."
+  },
+  "export_widget": {
+    "export_all": "Esporta tutti i risultati della ricerca",
+    "title": "Esporta widget",
+    "enterprise_explanation": "La funzione di esportazione dei widget di aggregazione è disponibile nella versione Enterprise. Questa funzione offre opzioni per esportare i dati in formati di file diffusi come CSV, JSON, YAML, XML, ecc."
+  },
+  "field_sort": {
+    "placeholder": "Nessuno: fai clic per aggiungere campi",
+    "aria_label": "Seleziona il campo per l'ordinamento"
+  },
+  "fields_configuration": {
+    "add_field": "Aggiungi un campo"
+  },
+  "move_widget": {
+    "no_pages": "Nessuna pagina trovata",
+    "copy": "Copia widget",
+    "move": "Sposta widget",
+    "title": "Scegli la pagina di destinazione",
+    "keep_copy": "Mantieni una copia su questa pagina",
+    "keep_copy_help": "Se 'Mantieni una copia sulla pagina' è attivo, il widget verrà copiato e non spostato su un'altra pagina"
+  },
+  "widget_edit": {
+    "update": "Aggiorna widget",
+    "updating": "Aggiornamento widget..."
+  },
+  "execution_info": {
+    "executed_at": "Eseguito alle:",
+    "executed_at_label": "Eseguito alle",
+    "executed_in": "Eseguito in:",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "Intervallo di tempo effettivo:",
+    "from": "Da",
+    "to": "A",
+    "from_label": "Intervallo di tempo effettivo da",
+    "to_label": "Intervallo di tempo effettivo a",
+    "total_results": "Risultati totali:",
+    "title": "Informazioni di esecuzione",
+    "no_query_executed": "Nessuna query ancora eseguita."
+  },
+  "selected_fields": {
+    "fields": "Campi",
+    "edit_field": "Modifica il campo {{field}}",
+    "remove_field": "Rimuovi il campo {{field}}"
+  },
+  "sort_direction": {
+    "ascending": "Crescente",
+    "descending": "Decrescente",
+    "no_sorting": "Nessun ordinamento selezionato",
+    "select_direction": "Fai clic per selezionare la direzione"
+  },
+  "timerange_info": {
+    "global_override": "Sovrascrittura globale: {{timerange}}",
+    "effective_unavailable": "L'intervallo di tempo effettivo del widget non è al momento disponibile.",
+    "independent": "Il risultato di questo widget è indipendente dalla ricerca corrente.",
+    "all_time": "Sempre"
+  },
+  "unknown_widget": {
+    "title": "Widget sconosciuto: {{type}}",
+    "cannot_render": "Purtroppo non siamo in grado di visualizzare questo widget, perché non sappiamo come gestire i widget di tipo <strong>{{type}}</strong>. Questo può dipendere da una delle seguenti situazioni:",
+    "missing_plugin": "Hai creato questo widget usando un plugin che ora non è più disponibile.",
+    "legacy_dashboard": "Questo widget faceva parte di una dashboard legacy ed è stato creato da un plugin che non è più disponibile.",
+    "what_to_do": "Cosa puoi fare? Puoi caricare di nuovo il plugin, contattare l'autore originale del plugin per una versione compatibile con la versione attuale di {{productName}}, oppure rimuovere il widget se non ti serve più.",
+    "copy_config": "In ogni caso, puoi copiare la configurazione del widget negli appunti:"
+  },
+  "widget_actions": {
+    "open_dropdown": "Apri il menu delle azioni",
+    "unfocus": "Rimuovi il focus dal widget",
+    "focus": "Metti a fuoco questo widget",
+    "edit": "Modifica",
+    "duplicate": "Duplica",
+    "copy_to_dashboard": "Copia nella dashboard",
+    "move_to_page": "Sposta nella pagina",
+    "copying": "Copia del widget...",
+    "copy": "Copia widget",
+    "confirm_remove": "Sei sicuro di voler rimuovere il widget \"{{title}}\"?",
+    "compress_width": "Riduci larghezza",
+    "stretch_width": "Allarga larghezza",
+    "replay_search": "Riesegui ricerca"
+  },
+  "widget_loading": {
+    "content": "Caricamento del contenuto del widget"
+  },
+  "widget_errors": {
+    "render_error": "Durante la visualizzazione di questo widget si è verificato il seguente errore:"
+  },
+  "widget_header": {
+    "no_description": "Nessuna descrizione del widget fornita",
+    "show_description": "Mostra la descrizione del widget",
+    "description_placeholder": "Aggiungi una descrizione utile al widget",
+    "drag_handle": "Maniglia di trascinamento per {{title}}"
+  },
+  "warm_tier": {
+    "info": "Info",
+    "loading_slow": "Questo widget sta recuperando dati dal Warm Tier e potrebbe impiegare più tempo a caricarsi."
+  },
+  "events_widget": {
+    "actions": "Azioni",
+    "replay_search": "Riesegui ricerca",
+    "view_details": "Visualizza dettagli evento",
+    "toggle_actions": "Mostra/nascondi azioni evento",
+    "details_title": "Dettagli evento",
+    "close": "Chiudi",
+    "unknown_visualization": "Tipo di visualizzazione widget sconosciuto {{mode}}",
+    "mode_list": "Elenco",
+    "mode_count": "Conteggio",
+    "visualization": "Visualizzazione",
+    "columns": "Colonne",
+    "select_column": "Seleziona una nuova colonna",
+    "filter": "Filtra",
+    "sorting": "Ordinamento",
+    "unknown_attribute": "Sconosciuto",
+    "unknown_attribute_help": "Questo attributo non è al momento disponibile, perché richiede una licenza valida.",
+    "select_event_definition": "Seleziona definizione di evento",
+    "alert": "Avviso",
+    "event": "Evento"
+  },
+  "overview_configuration": {
+    "remove_column": "Rimuovi la colonna {{column}}",
+    "column": "Colonna",
+    "select_column": "Seleziona una colonna",
+    "direction": "Direzione",
+    "select_direction": "Seleziona una direzione",
+    "type": "Tipo",
+    "add_column": "Aggiungi una colonna",
+    "configure_filter": "Configura un nuovo filtro"
+  },
+  "date_filter": {},
+  "message_table": {
+    "decorators": {}
+  },
+  "data_table": {},
+  "field_types": {},
+  "export": {},
+  "enterprise_widgets": {},
+  "error_widget": {},
+  "notifications": {}
+}
