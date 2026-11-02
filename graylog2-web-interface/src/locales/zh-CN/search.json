@@ -254,6 +254,7 @@
   },
   "field_charts_migration": {
     "title": "迁移现有搜索页面的图表",
+    "found_charts_other": "发现 {{count}} 个为旧版搜索创建的图表。是否要为当前搜索迁移这些图表？",
     "save_hint": "运行迁移并希望保留新创建的图表时，需要将当前搜索另存为新的 Dashboard。否则离开搜索页面时图表将丢失。",
     "migrate": "迁移",
     "discard": "丢弃图表"
@@ -337,6 +338,9 @@
   },
   "saved_searches": {
     "title": "已保存的搜索",
+    "confirm_bulk_delete_other": "确定要移除 {{count}} 个已保存的搜索吗？",
+    "bulk_delete_partial_other": "所选的 {{count}} 个已保存的搜索中，有 {{failed}} 个无法删除。",
+    "bulk_delete_success_other": "已成功删除 {{count}} 个已保存的搜索。",
     "success": "成功",
     "bulk_delete_error": "删除已保存的搜索时出错。{{error}}",
     "confirm_delete": "即将删除已保存的搜索“{{title}}”，确定吗？",
@@ -517,10 +521,34 @@
     "remove_from_table": "从表格中移除",
     "add_to_all_tables": "添加到所有表格",
     "remove_from_all_tables": "从所有表格中移除",
-    "change_field_type": "更改字段类型"
+    "change_field_type": "更改字段类型",
+    "copy_field_name": "复制字段名称到剪贴板",
+    "add_to_favorites": "将字段添加到收藏",
+    "remove_from_favorites": "从收藏中移除字段"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "按 {{fields}} 聚合 {{series}}",
+    "summary_only": "聚合 {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "消息计数",
+    "message_table": "消息表格",
+    "custom_aggregation": "自定义聚合",
+    "aggregation": "聚合",
+    "events_overview": "事件概览",
+    "text_markdown": "文本/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "已删除的 Input",
+    "timestamp": "时间戳",
+    "not_stored": "未存储",
+    "not_stored_message": "消息未存储",
+    "received_by": "接收方",
+    "stored_in_index": "存储于索引",
+    "routed_into_streams": "路由到 Stream"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch 将搜索结果限制为 {{limit}} 条消息。每页 {{pageSize}} 条消息时，可使用前 {{validPages}} 页。",
+    "confirm_delete_dashboard_page": "确定要删除此 Dashboard 页面吗？"
+  }
 }
