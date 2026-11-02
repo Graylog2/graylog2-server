@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "用户名",
-    "first_name": "名"
+    "first_name": "名",
+    "last_name": "姓",
+    "full_name": "全名",
+    "email": "电子邮件地址",
+    "password": "密码",
+    "repeat_password": "重复密码",
+    "time_zone": "时区",
+    "sessions_timeout": "会话超时",
+    "profile": "个人资料",
+    "settings": "设置",
+    "roles": "角色",
+    "assign_roles": "分配角色",
+    "selected_roles": "已选角色",
+    "teams": "团队"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "用户的名。",
+    "last_name_help": "用户的姓。",
+    "email_help": "用户的电子邮件地址。",
+    "username_help": "选择一个唯一的用户名，用于登录。",
+    "username_taken": "用户名已被占用",
+    "passwords_mismatch": "两次输入的密码不一致",
+    "time_zone_help": "选择您所在的本地时区，或保持不变以使用浏览器的默认时区。",
+    "service_account": "服务账户",
+    "service_account_label": "该用户为服务账户",
+    "service_account_help": "勾选后，该用户将成为服务账户，无法登录 Web 界面或编辑其设置（例如 API 令牌）。",
+    "service_account_confirm_title": "您确定吗？",
+    "service_account_confirm": "将此用户更改为服务账户后，该用户将无法登录 Web 界面或编辑其设置（例如 API 令牌）。是否继续？",
+    "global_timeout_message": "由于已启用<timeoutLink>全局会话超时</timeoutLink>，无法编辑用户会话超时时间。"
+  },
+  "token_form": {
+    "token_name": "令牌名称",
+    "placeholder": "此令牌用于什么？",
+    "ttl_label": "令牌 TTL",
+    "ttl_invalid": "无效（最小值：1 分钟）",
+    "creating": "正在创建...",
+    "create": "创建令牌",
+    "ttl_help": "TTL 语法示例：60 秒：PT60S，60 分钟：PT60M，24 小时：PT24H，30 天：P30D"
+  },
+  "permissions_info": {
+    "title": "授予权限",
+    "text": "可以使用条目的 <shareLabel>共享</shareLabel> 按钮为数据流和仪表板等条目授予权限。例如，您可以在条目概览页面上找到该按钮。更多信息请参阅<docsLink>文档</docsLink>。"
+  },
   "startpage": {
-    "types": {}
+    "label": "起始页",
+    "help": "选择用户登录后立即看到的页面。仅可选择用户具有权限的条目。",
+    "select_type": "选择类型",
+    "select_value": "选择{{type, lowercase}}",
+    "entity": "条目",
+    "types": {
+      "dashboard": "仪表板",
+      "stream": "数据流",
+      "search": "搜索"
+    },
+    "new_search": "新建搜索",
+    "threat_coverage": "威胁覆盖",
+    "missing_permission": "用户缺少对所配置页面的权限"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "会话超时",
+    "alert_title": "更改会话超时",
+    "alert_text": "更改会话超时设置将使用户退出登录，并使其所有当前会话失效。如果您正在更改自己用户的此设置，保存设置时将立即退出登录。在这种情况下，请先保存所有待处理的更改，再更改超时设置。",
+    "never_label": "会话永不超时",
+    "never_help": "勾选后，会话不会因不活动而超时。",
+    "amount_placeholder": "超时时长",
+    "help": "除非会话仍在活跃使用，否则将在此时长后自动结束。",
+    "unit_label": "超时单位",
+    "units": {
+      "seconds": "秒",
+      "minutes": "分钟",
+      "hours": "小时",
+      "days": "天"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "客户端地址",
+    "last_activity": "最后活动",
+    "logged_in": "已登录",
+    "enabled": "已启用",
+    "auth_service_disabled": "身份验证服务已禁用，该用户无法登录",
+    "preferences": {
+      "title": "偏好设置",
+      "search_autocompletion": "搜索自动补全",
+      "update_unfocused": "失去焦点时更新",
+      "pin_search_sidebar": "固定搜索侧边栏",
+      "pin_dashboard_sidebar": "固定仪表板侧边栏",
+      "theme_mode": "主题模式",
+      "not_configured": "未配置",
+      "language": "语言"
+    },
+    "roles_none_selected": "未找到已选择的角色。",
+    "settings": {
+      "timezone": "时区",
+      "startpage": "起始页",
+      "no_startpage": "未设置起始页",
+      "no_timeout": "会话不会超时",
+      "globally_set": "（<configLink>全局设置</configLink>）"
+    },
+    "shared_entities": "共享条目"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "最初用于建立会话的客户端地址，不一定是其当前地址。",
+    "admin": {
+      "title": "系统管理员",
+      "description": "系统管理员只能在 {{productName}} 配置文件中编辑。"
+    },
+    "headers": {
+      "full_name": "全名",
+      "username": "用户名",
+      "email": "电子邮件地址",
+      "client_address": "客户端地址",
+      "enabled": "已启用",
+      "role": "角色",
+      "actions": "操作"
+    },
+    "title": "用户",
+    "found": "系统中找到 {{total}} 个已注册用户。",
+    "none_found": "未找到任何用户。",
+    "filter_label": "过滤用户",
+    "actions": {
+      "edit_tokens_title": "编辑用户 {{name}} 的令牌",
+      "edit_tokens": "编辑令牌",
+      "system_user_tooltip": "系统用户只能在服务器配置文件中修改。",
+      "system_user": "系统用户",
+      "confirm_disable": "您确定要禁用用户 {{name}} 吗？所有当前会话都将被终止。",
+      "confirm_delete": "您确定要删除用户 {{name}} 吗？",
+      "edit_title": "编辑用户 {{name}}",
+      "edit": "编辑"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
