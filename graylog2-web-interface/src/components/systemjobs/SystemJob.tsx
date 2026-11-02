@@ -26,6 +26,7 @@ import { Button, Badge } from 'components/bootstrap';
 import type { BadgeColor } from 'components/bootstrap/Badge';
 import UserNotification from 'util/UserNotification';
 import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
+import translateApiError from 'util/translateApiError';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -98,7 +99,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
         queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
       })
       .catch((error) => {
-        UserNotification.error(error.responseMessage, t('system_job.acknowledge_failed'));
+        UserNotification.error(translateApiError(error) ?? error.responseMessage, t('system_job.acknowledge_failed'));
       });
   };
 
@@ -112,7 +113,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
           queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
         })
         .catch((error) => {
-          UserNotification.error(error.responseMessage, t('system_job.cancel_failed'));
+          UserNotification.error(translateApiError(error) ?? error.responseMessage, t('system_job.cancel_failed'));
         });
     }
   };

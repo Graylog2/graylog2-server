@@ -17,6 +17,7 @@
 import UserNotification from 'util/UserNotification';
 import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import translateApiError from 'util/translateApiError';
 
 type Notification = {
   title?: string;
@@ -39,7 +40,7 @@ const _displayErrorNotification = <T, Args extends Array<T>>(
   let errorMessage = String(error);
 
   if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
-    errorMessage = `${error.additional.body.message} - ${error.message}`;
+    errorMessage = `${translateApiError(error) ?? error.additional.body.message} - ${error.message}`;
   }
 
   const { message, title } = errorNotification(errorMessage, ...args);

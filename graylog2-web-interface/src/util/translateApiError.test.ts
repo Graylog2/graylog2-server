@@ -18,6 +18,7 @@ import i18n from 'i18n';
 import FetchError from 'logic/errors/FetchError';
 
 import translateApiError from './translateApiError';
+import extractErrorMessage from './extractErrorMessage';
 
 describe('translateApiError', () => {
   beforeAll(() => {
@@ -46,5 +47,14 @@ describe('translateApiError', () => {
     expect(translateApiError(error({ code: 'test.title_exists', params: { title: 'Foo' } }))).toBe('Titel "Foo" existiert');
 
     await i18n.changeLanguage('en');
+  });
+
+  it('is used by extractErrorMessage, which keeps the server message without translation', () => {
+    expect(extractErrorMessage(error({ code: 'test.title_exists', message: 'x', params: { title: 'Foo' } }))).toBe(
+      'Title "Foo" exists',
+    );
+    expect(extractErrorMessage(error({ code: 'test.unknown', message: 'English from server' }))).toBe(
+      'English from server',
+    );
   });
 });

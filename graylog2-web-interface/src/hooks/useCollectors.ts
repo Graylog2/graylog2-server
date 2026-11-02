@@ -24,6 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { Collector } from 'components/sidecars/types';
 import i18n from 'i18n';
+import translateApiError from 'util/translateApiError';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTORS_QUERY_KEY = ['collectors'] as const;
@@ -151,7 +152,7 @@ export const deleteCollector = (collector: Collector): Promise<unknown> => {
       UserNotification.error(
         i18n.t('use_collectors_notifications.delete_failed', {
           ns: 'collectors',
-          error: error.status === 400 ? error.responseMessage : error.message,
+          error: error.status === 400 ? (translateApiError(error) ?? error.responseMessage) : error.message,
         }),
         i18n.t('use_collectors_notifications.delete_failed_title', { ns: 'collectors', name: collector.name }),
       );

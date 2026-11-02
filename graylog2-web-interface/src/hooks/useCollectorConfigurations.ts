@@ -25,6 +25,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
 import i18n from 'i18n';
+import translateApiError from 'util/translateApiError';
 
 const SOURCE_URL = '/sidecar';
 export const COLLECTOR_CONFIGURATIONS_QUERY_KEY = ['collector-configurations'] as const;
@@ -172,7 +173,7 @@ export const createConfiguration = (configuration: Configuration): Promise<unkno
     (error) => {
       UserNotification.error(
         error.status === 400
-          ? error.responseMessage
+          ? (translateApiError(error) ?? error.responseMessage)
           : i18n.t('use_collector_configurations_notifications.create_failed', {
               ns: 'collectors',
               error: error.message,
@@ -198,7 +199,7 @@ export const updateConfiguration = (configuration: Configuration): Promise<unkno
       UserNotification.error(
         i18n.t('use_collector_configurations_notifications.update_failed', {
           ns: 'collectors',
-          error: error.status === 400 ? error.responseMessage : error.message,
+          error: error.status === 400 ? (translateApiError(error) ?? error.responseMessage) : error.message,
         }),
         i18n.t('use_collector_configurations_notifications.update_failed_title', {
           ns: 'collectors',
@@ -251,7 +252,7 @@ export const deleteConfiguration = (configuration: Configuration): Promise<unkno
       UserNotification.error(
         i18n.t('use_collector_configurations_notifications.delete_failed', {
           ns: 'collectors',
-          error: error.status === 400 ? error.responseMessage : error.message,
+          error: error.status === 400 ? (translateApiError(error) ?? error.responseMessage) : error.message,
         }),
         i18n.t('use_collector_configurations_notifications.delete_failed_title', {
           ns: 'collectors',

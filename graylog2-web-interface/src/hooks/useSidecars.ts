@@ -22,6 +22,7 @@ import { Sidecar } from '@graylog/server-api';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import translateApiError from 'util/translateApiError';
 import type { SidecarSummary, SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
 import i18n from 'i18n';
 
@@ -167,7 +168,7 @@ export const useSidecarsListPaginated = (opts: Partial<PaginationOptions>) =>
       fetchSidecarsList(opts).catch((error) => {
         UserNotification.error(
           error.status === 400
-            ? error.responseMessage
+            ? (translateApiError(error) ?? error.responseMessage)
             : i18n.t('use_sidecars_notifications.fetch_sidecars_failed', { ns: 'sidecars', error: error.message }),
           i18n.t('use_sidecars_notifications.fetch_sidecars_failed_title', { ns: 'sidecars' }),
         );

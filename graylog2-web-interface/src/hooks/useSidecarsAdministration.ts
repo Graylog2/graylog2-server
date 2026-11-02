@@ -19,6 +19,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SidecarAdministration } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import translateApiError from 'util/translateApiError';
 import type { SidecarSummary } from 'components/sidecars/types';
 import i18n from 'i18n';
 
@@ -63,7 +64,7 @@ const useSidecarsAdministration = ({ query = '', page = 1, pageSize = 50, filter
       fetchSidecarsAdministration({ query, page, pageSize, filters }).catch((error) => {
         UserNotification.error(
           error.status === 400
-            ? error.responseMessage
+            ? (translateApiError(error) ?? error.responseMessage)
             : i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed', {
                 ns: 'sidecars',
                 error: error.message,

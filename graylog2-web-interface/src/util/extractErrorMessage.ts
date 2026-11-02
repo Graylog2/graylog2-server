@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import FetchError from 'logic/errors/FetchError';
+import translateApiError from 'util/translateApiError';
 
 /**
  * Extract a user-readable message from an unknown thrown value.
@@ -26,7 +27,7 @@ import FetchError from 'logic/errors/FetchError';
  */
 export const extractErrorMessage = (error: unknown): string => {
   if (error instanceof FetchError) {
-    return error.responseMessage ?? error.message;
+    return translateApiError(error) ?? error.responseMessage ?? error.message;
   }
   if (error instanceof Error) {
     return error.message;
