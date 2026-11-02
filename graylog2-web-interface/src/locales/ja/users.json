@@ -136,36 +136,155 @@
       "search_placeholder": "ユーザーとチームを検索",
       "collaborators": "共同編集者",
       "direct_collaborators": "直接の共同編集者",
-      "shared_via_collections": "コレクション経由で共有"
+      "shared_via_collections": "コレクション経由で共有",
+      "update_sharing": "共有を更新",
+      "modal_title": "{{entityType}}の共有: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "「{{title}}」は選択されましたが、共同編集者として追加されていません。続行しますか？",
+      "confirm_not_added_unnamed": "項目（名前が見つかりません）は選択されましたが、共同編集者として追加されていません。続行しますか？"
     },
-    "grantees": {},
-    "roles_selector": {},
-    "shareable_url": {},
+    "grantees": {
+      "change_capability": "{{title}} の機能を変更",
+      "remove_sharing": "{{title}} の共有を解除",
+      "no_collaborators": "この{{entityType}}には共同編集者がいません。"
+    },
+    "roles_selector": {
+      "search_placeholder": "ロールを検索",
+      "assign_role": "ロールを割り当て"
+    },
+    "shareable_url": {
+      "copy_title": "パラメーターをクリップボードにコピー",
+      "hint": "あなたと、表示を許可されたユーザーはこのリンクにアクセスできます。"
+    },
     "shared_entities": {
-      "headers": {}
+      "entity_type": "項目タイプ",
+      "filter_entity_types": "項目タイプをフィルター",
+      "capability": "機能",
+      "filter_capabilities": "機能をフィルター",
+      "found": "{{entityType}}と共有されている項目が{{total}}件見つかりました。",
+      "no_results": "共有されている項目は見つかりませんでした。",
+      "headers": {
+        "entity_name": "項目名",
+        "entity_type": "項目タイプ",
+        "owner": "所有者",
+        "capability": "機能"
+      },
+      "query_example": "タイトルに security を含む共有項目を検索:"
     },
-    "sharing_disabled": {},
-    "validation_error": {}
-  },
-  "roles": {
-    "profile": {},
-    "users": {},
-    "users_selector": {},
-    "actions": {},
-    "overview": {},
-    "navigation": {}
-  },
-  "security_teaser": {
-    "overview": {},
-    "anomalies": {},
-    "host_activity": {},
-    "network_activity": {},
-    "user_activity": {},
-    "demo": {
-      "items": {}
+    "sharing_disabled": {
+      "title": "共有できません",
+      "owners_only": "この{{type}}を共有できるのは所有者のみです。"
+    },
+    "validation_error": {
+      "ownerless": "次の所有者を削除すると、項目の所有者がいなくなります:"
     }
   },
-  "user_fields": {},
+  "roles": {
+    "profile": {
+      "title": "プロフィール",
+      "name": "名前",
+      "description": "説明"
+    },
+    "teams": "チーム",
+    "users": {
+      "title": "ユーザー",
+      "none_selected": "選択されたユーザーは見つかりませんでした。",
+      "assign_users": "ユーザーを割り当て",
+      "selected_users": "選択されたユーザー",
+      "needs_reader_or_admin": "ユーザー「{{name}}」には、少なくとも Reader ロールまたは Admin ロールが必要です。"
+    },
+    "users_selector": {
+      "search_placeholder": "ユーザーを検索",
+      "assign_user": "ユーザーを割り当て"
+    },
+    "actions": {
+      "edit_role_title": "ロール {{name}} を編集",
+      "delete_role_title": "ロール {{name}} を削除",
+      "edit": "編集",
+      "deleting": "削除中",
+      "delete": "削除",
+      "confirm_delete": "ロール「{{name}}」を本当に削除しますか？",
+      "still_assigned": "このロールは、まだ{{count}}人のユーザーに割り当てられています。"
+    },
+    "overview": {
+      "title": "ロール",
+      "found": "システムで{{total}}件のロールが見つかりました。",
+      "none_found": "ロールは見つかりませんでした。"
+    },
+    "query_example": "名前に manager を含むロールを検索:",
+    "navigation": {
+      "view_details": "詳細を表示",
+      "edit_role": "ロールを編集"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "「概要」タブで、最も重要なセキュリティ情報をすばやく確認できます。",
+      "hotspot_1": "重大なアラートや主要なイベントソースなどを確認して、セキュリティの状況を把握できます。",
+      "hotspot_2": "このページのツールチップにカーソルを合わせると、{{productName}} Security の機能の詳細を確認できます",
+      "title": "概要"
+    },
+    "anomalies": {
+      "hotspot_0": "実行中の異常の概要、検出された件数、および前の期間との比較を確認できます。",
+      "hotspot_1": "信頼区間により、通常の動作からどの程度外れているかがわかります。",
+      "hotspot_2": "異常の検出器にはさまざまな種類があり、どれがアラートを生成しているかをすばやく確認できます。",
+      "hotspot_3": "ログオンやセキュリティイベントで、通常とは異なる動作をしているユーザーアカウントを特定できます。",
+      "title": "異常"
+    },
+    "host_activity": {
+      "hotspot_0": "重大、中、低のアラート件数と傾向情報の全体像を確認して、今日がいつも通りの業務日かどうかを把握できます . . . それとも違うのか。",
+      "hotspot_1": "どのホストが重大なアラートを生成しているかをすぐに特定し、MTTR を短縮できます。",
+      "hotspot_2": "最も多くのログオンを発生させているテクノロジーを確認できます。",
+      "hotspot_3": "想定外のマシンから ID およびアクセス制御の変更が行われた場合に、調査を開始できます。",
+      "hotspot_4": "イベントソース別のメッセージ件数から、データの日常的なパターンを確認できます。通常の範囲を超える急増は、原因を調査するきっかけになります。",
+      "title": "ホストのアクティビティ"
+    },
+    "network_activity": {
+      "hotspot_0": "ネットワーク全体のデータフローの急増を即座に確認できます。",
+      "hotspot_1": "データの送信元と送信先をすばやく確認できます。",
+      "hotspot_2": "ネットワーク上で最も多くのデータを送信しているユーザーを特定できます。",
+      "hotspot_3": "特定のエラーコードが上位15件のリストに突然現れるなど、DNS クエリ結果に通常と異なるパターンがないかを判断できます。 ",
+      "hotspot_4": "イベントソース別に DNS リクエストを生成している上位15のプラットフォームです。",
+      "title": "ネットワークのアクティビティ"
+    },
+    "user_activity": {
+      "hotspot_0": "ログオンの失敗に関する懸念すべき傾向を、すばやく確認できます。",
+      "hotspot_1": "ユーザーごとのログオンの成功と失敗から、問題のあるアカウントや異常なアクティビティを見つけられます。",
+      "hotspot_2": "重大なアラートを生成している上位15のユーザーアカウントです！",
+      "hotspot_3": "環境で最も多く行われている ID およびアクセス制御の変更は何ですか？",
+      "hotspot_4": "最も頻繁に行われるアクセス制御の変更の対象を把握できます。",
+      "title": "ユーザーのアクティビティ"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "Anomaly Detection AI",
+        "cloud_option": "Cloud Option",
+        "archiving": "アーカイブ",
+        "audit_logs_cloud": "{{productName}} Cloud 向けの監査ログ",
+        "dynamic_lookup_tables": "動的ルックアップテーブル",
+        "advanced_alerting": "スクリプトによる高度なアラート",
+        "compliance_reporting": "コンプライアンスレポート",
+        "correlation_aggregation": "相関と集約のイベント",
+        "threat_intel": "脅威インテリジェンスの統合",
+        "incident_workspaces": "インシデント調査ワークスペース",
+        "prebuilt_parser_dashboards": "事前構築済みのセキュリティパーサーとダッシュボード",
+        "sigma_rules": "Sigma Rules",
+        "parameterized_dashboards": "パラメーター付きダッシュボード",
+        "input_output_integrations": "インプットとアウトプットの統合",
+        "threat_management": "脅威管理",
+        "search_workflow": "検索ワークフロー、テンプレート、フィルター",
+        "soar_integrations": "SOAR 連携"
+      },
+      "title": "セキュリティのデモ",
+      "banner_text": "製品の詳細情報や製品の完全なデモの予約については、{{productName}} の Web サイトをご覧ください。",
+      "button": "{{productName}} Security",
+      "overview": "概要",
+      "description": "{{productName}} Security は、SIEM、セキュリティ分析、インシデント調査、異常検出の機能を組み合わせ、IT チームのサイバーセキュリティを刷新するために設計されています。当社のプラットフォームを使用すると、重要なタスクをより迅速に処理して効率よく作業し、悪意のある攻撃者や認証情報を狙った攻撃によるリスクを軽減できます。"
+    }
+  },
+  "user_fields": {
+    "username": "ユーザー名",
+    "first_name": "名"
+  },
   "user_form": {},
   "token_form": {},
   "permissions_info": {},
