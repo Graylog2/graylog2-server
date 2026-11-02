@@ -24,7 +24,9 @@
     "aria_label": "选择用于排序的字段"
   },
   "fields_configuration": {
-    "add_field": "添加字段"
+    "add_field": "添加字段",
+    "hide_selected_other": "隐藏 {{count}} 个所选字段",
+    "show_selected_other": "显示 {{count}} 个所选字段"
   },
   "move_widget": {
     "no_pages": "未找到页面",
@@ -137,16 +139,84 @@
     "select_direction": "选择方向",
     "type": "类型",
     "add_column": "添加列",
-    "configure_filter": "配置新过滤器"
+    "configure_filter": "配置新过滤器",
+    "edit_filter": "编辑 {{column}} 过滤器",
+    "delete_filter": "删除 {{column}} 过滤器"
   },
-  "date_filter": {},
+  "date_filter": {
+    "single_date": "单个日期",
+    "range": "范围",
+    "select_single_date": "选择单个日期类型",
+    "select_range": "选择范围类型",
+    "date_range": "{{from}} 至 {{to}}"
+  },
   "message_table": {
-    "decorators": {}
+    "actions": "操作",
+    "loading": "正在加载",
+    "decorated": "（已应用装饰器）",
+    "stopped_node": "已停止的节点",
+    "cluster_node": "集群节点 {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "创建新的 {{name}}",
+      "select_decorator": "选择装饰器",
+      "none_configured": "未配置装饰器。",
+      "actions": "操作",
+      "edit": "编辑",
+      "edit_named": "编辑 {{name}}",
+      "unknown_type": "未知的装饰器类型",
+      "create": "创建",
+      "update": "更新",
+      "help_title": "什么是消息装饰器？",
+      "help_description": "装饰器可以实时修改搜索结果中显示的消息。这些更改不会被保存，仅在搜索结果中显示。装饰器配置按<strong>每个数据流</strong>保存。",
+      "help_order": "拖放以调整装饰器的处理顺序。",
+      "help_docs": "在<docsLink>文档</docsLink>中阅读更多关于消息装饰器的内容。"
+    },
+    "show_message_in_new_row": "在新行中显示消息"
   },
-  "data_table": {},
-  "field_types": {},
-  "export": {},
-  "enterprise_widgets": {},
-  "error_widget": {},
-  "notifications": {}
+  "data_table": {
+    "spacer": "间隔",
+    "display_name": "数据表",
+    "pinned_columns_title": "固定列",
+    "show_row_numbers_title": "显示行号"
+  },
+  "field_types": {
+    "missing_event_definition": "缺少事件定义：{{id}}"
+  },
+  "export": {
+    "title_search": "导出所有搜索结果",
+    "title_dashboard": "导出消息表搜索结果",
+    "select_different_table": "选择其他消息表",
+    "downloading": "正在下载...",
+    "start_download": "开始下载",
+    "settings_based_on": "以下设置基于消息表：{{title}}",
+    "exporting_table": "您当前正在导出消息表 {{title}} 的搜索结果。",
+    "define_fields": "定义文件的字段。",
+    "decorated_fields_hint": "导出功能支持消息表中装饰器创建的字段，但这些字段目前不会出现在字段列表中。如需导出装饰后的字段，只需输入其名称。",
+    "finish_hint": "完成配置后，点击<quote>开始下载</quote>。",
+    "fields_to_export": "要导出的字段",
+    "messages_limit": "消息数量上限",
+    "limit_help": "消息是分块加载的。如果设置了上限，则会获取所有分块，直到达到上限所在的分块为止。因此，实际交付的消息总数可能高于设定的上限。",
+    "search_contains_all": "导出将包含当前搜索的所有消息。",
+    "search_select_table": "请选择一个消息表以采用其字段。您可以在下一步中调整所有设置。",
+    "dashboard_select_table": "请选择要导出搜索结果的消息表。您可以在下一步中调整其字段。",
+    "dashboard_equals_action": "选择消息表等同于在消息表操作菜单中使用“导出为 CSV”选项。",
+    "select_message_table": "选择消息表",
+    "no_message_table": "您需要创建一个消息表 Widget 才能导出其结果。",
+    "output_format": "输出格式",
+    "untitled_view": "未命名{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "消息列表",
+    "results": "结果",
+    "events": "事件",
+    "text_markdown": "文本/Markdown"
+  },
+  "comma_separated_values_csv": "逗号分隔值 (CSV)",
+  "error_widget": {
+    "title": "获取此 Widget 数据时发生以下错误："
+  },
+  "notifications": {
+    "delete_decorator_confirm": "确定要删除此装饰器吗？",
+    "unsaved_changes_confirm": "配置表单中有未保存的更改，此操作将撤销这些更改"
+  }
 }
