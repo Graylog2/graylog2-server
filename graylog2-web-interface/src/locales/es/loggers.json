@@ -1,1 +1,4 @@
-{}
+{
+  "title": "Registro",
+  "description": "Esta sección controla el registro de la arquitectura de Graylog y te permite cambiar los niveles de registro sobre la marcha. Ten en cuenta que los niveles de registro se restablecen a sus valores predeterminados después de reiniciar el servicio afectado."
+}
