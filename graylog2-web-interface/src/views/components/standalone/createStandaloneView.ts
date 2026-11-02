@@ -20,13 +20,14 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import createSearch from 'views/logic/slices/createSearch';
 import type Widget from 'views/logic/widgets/Widget';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import createSearch from 'views/logic/slices/createSearch';
 
 export const STANDALONE_QUERY_ID = 'standalone-query';
 
 // A dashboard view, so the widget's own query, time range and streams are used instead of the query's.
-const createStandaloneView = async (widget: Widget, title: string) => {
+const createStandaloneView = async (widget: Widget, title: string, searchExecutors: SearchExecutors) => {
   const query = Query.builder()
     .id(STANDALONE_QUERY_ID)
     .query(createElasticsearchQueryString())
@@ -46,7 +47,7 @@ const createStandaloneView = async (widget: Widget, title: string) => {
       .search(Search.create().toBuilder().queries([query]).build())
       .build(),
   );
-  const search = await createSearch(view.search);
+  const search = await (searchExecutors.createSearch ?? createSearch)(view.search);
 
   return view.toBuilder().search(search).build();
 };
