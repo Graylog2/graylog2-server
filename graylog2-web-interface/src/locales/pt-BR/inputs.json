@@ -122,23 +122,135 @@
       "input_type": "Tipo de Input:",
       "running_on": "Este Input está sendo executado em:",
       "all_nodes": "todos os nós do {{productName}}",
-      "listening_on": "Este Input está escutando em:"
+      "listening_on": "Este Input está escutando em:",
+      "listening_on_value": "Endereço de bind {{bindAddress}}, porta {{port}}.",
+      "listening_for": "Este Input está aguardando por:"
     },
-    "state": {},
-    "troubleshooting": {},
-    "received_traffic": {},
-    "message_count_by_stream": {},
-    "message_errors": {},
-    "rules": {},
-    "network_stats": {}
+    "state": {
+      "title": "Estado",
+      "description": "Número de nós do {{productName}} nos quais o Input está configurado para ser executado e em quantos ele está em execução. Se algum deles não estiver em execução, clique para ver as mensagens de erro associadas.",
+      "failed_starts": "Falhas ao iniciar (últimos 15 min):",
+      "not_running": "O Input não está em execução."
+    },
+    "troubleshooting": {
+      "title": "Solução de problemas",
+      "failed_title": "Se o Input estiver em estado de falha.",
+      "failed_message_field": "Quando um Input falha em um ou mais nós do {{productName}}, o campo Mensagem do painel Estado mostrará uma mensagem de erro curta; a mensagem de erro completa pode ser encontrada no arquivo server.log do {{productName}}.",
+      "failed_port": "Um input configurado para usar uma porta específica falhará se essa porta for privilegiada (e o {{productName}} não estiver sendo executado como root) ou se já estiver em uso por outro Input ou aplicação.",
+      "failed_route": "Um input falhará se não conseguir rotear para o IP especificado.",
+      "failed_internet": "Um input que exige conexão com a internet para se conectar a uma API falhará se não tiver conexão com a internet ou se não conseguir rotear até essa API.",
+      "failed_certificate": "Um input TCP falhará se tiver um certificado inválido ou expirado.",
+      "failed_external_api": "Inputs que se conectam a uma API externa (por exemplo, o Input do Microsoft Azure) exigem alterações de configuração na origem para que o {{productName}} possa coletar logs. As etapas necessárias estão detalhadas na subpágina de documentação correspondente a esse Input. Um input que se conecta a uma API externa falhará se estiver configurado incorretamente do lado do {{productName}} ou, quando aplicável, do lado que hospeda a API.",
+      "no_messages_title": "Se o Input estiver em execução em todos os nós, mas as mensagens não estiverem chegando ao Input.",
+      "no_messages_network_io": "Verifique o campo E/S de rede do painel Tráfego recebido. Se nenhum tráfego aparecer aqui, isso indica um problema de conectividade.",
+      "no_messages_connectivity": "Se nenhum tráfego aparecer, primeiro solucione a conectividade de rede entre o(s) servidor(es) do {{productName}} e a origem dos logs. Isso pode ser feito executando os comandos ping, telnet ou tracert.",
+      "no_messages_external_api": "Para Inputs que se conectam a uma API externa, verifique o arquivo server.log do {{productName}} - falhas de autenticação (logins inválidos ou permissões insuficientes para executar a ação na API) serão exibidas completas ali.",
+      "no_messages_format": "Se houver tráfego no campo E/S de rede do painel Tráfego recebido, mas nenhuma mensagem tiver sido recebida, isso indica que as mensagens não estão sendo enviadas em um formato apropriado para o Input.",
+      "no_messages_protocol": "Um input TCP não consegue ler tráfego UDP, e vice-versa.",
+      "no_messages_empty": "Uma mensagem sem conteúdo será descartada. Isso pode ser monitorado pelo campo Mensagens vazias descartadas.",
+      "no_messages_listener": "Inputs do tipo Listener esperam mensagens em uma faixa limitada de formatos e podem não conseguir ler mensagens em formatos estrangeiros. Para fins de solução de problemas, o Raw Text Input tem os requisitos mais permissivos.",
+      "message_errors_title": "Se o Input estiver em execução em todos os nós e as mensagens estiverem chegando ao Input, mas algumas (ou todas) aparecerem como Erros de mensagem.",
+      "message_errors_failure_processing": "Em clusters Enterprise licenciados, o Failure Processing pode ser ativado para permitir o armazenamento de mensagens com erro em cada etapa - input, processamento e gravação no cluster de pesquisa - junto com os detalhes da falha; veja os campos failure_cause e failure_details. Acesse o painel Erro de mensagem e clique na contagem de mensagens para examinar individualmente as mensagens com falha."
+    },
+    "received_traffic": {
+      "title": "Tráfego recebido",
+      "description": "Mensagens e tráfego de rede que chegaram ao input. Observação: as métricas mostram apenas os últimos 15 minutos.",
+      "total_messages": "Total de mensagens recebidas pelo Input:",
+      "events": "{{count}} eventos",
+      "empty_messages": "Mensagens vazias descartadas:",
+      "active_connections": "Conexões ativas:",
+      "connections_value": "{{open}}  ({{total}} no total)",
+      "network_io": "E/S de rede:"
+    },
+    "message_count_by_stream": {
+      "title": "Contagem de mensagens recebidas por Stream",
+      "description": "Mensagens ingeridas com sucesso por este Input nos últimos 15 minutos. Clique no Stream para inspecionar as mensagens.",
+      "stream": "{{streamName}}:",
+      "none": "Nenhuma mensagem deste Input foi direcionada para Streams nos últimos 15 minutos."
+    },
+    "message_errors": {
+      "title": "Erros de mensagem",
+      "description": "As mensagens podem falhar no processamento no Input, no pipeline de processamento ou ao serem indexadas no cluster de pesquisa.",
+      "at_input": "Erro de mensagem no Input:",
+      "failed_to_process": "Falha no processamento da mensagem:",
+      "failed_to_index": "Falha na indexação da mensagem:"
+    },
+    "rules": {
+      "pipeline_rules_title": "O Input aparece nas Regras de Pipeline",
+      "pipeline_rules_description": "As regras de pipeline detalhadas abaixo referenciam explicitamente este Input (por exemplo, por meio de from_input, from_forwarder_input ou de uma correspondência em gl2_source_input/gl2_forwarder_input).",
+      "pipeline_rules_human_name": "regras de pipeline",
+      "pipeline_rules_search": "Pesquisar regra de pipeline",
+      "stream_rules_title": "O Input aparece nas Regras de Stream",
+      "stream_rules_description": "As regras de stream detalhadas abaixo contêm uma função match input que direciona explicitamente este Input. Observe que regras de stream que possam capturar mensagens deste Input sem o uso explícito da função match input não serão listadas.",
+      "stream_rules_human_name": "regras de stream",
+      "stream_rules_search": "Pesquisar regra de stream",
+      "load_pipeline_rules_failed": "Falha ao carregar as regras de pipeline do input com o status",
+      "could_not_load_pipeline_rules": "Não foi possível carregar as regras de pipeline do input",
+      "load_stream_rules_failed": "Falha ao carregar as regras de stream do input com o status",
+      "could_not_load_stream_rules": "Não foi possível carregar as regras de stream do input"
+    },
+    "network_stats": {
+      "total_prefix": " (total: ",
+      "total_suffix": ")"
+    },
+    "show_received_messages": "Mostrar mensagens recebidas",
+    "fetch_failed": "Falha ao buscar os diagnósticos do Input com o status",
+    "could_not_fetch": "Não foi possível buscar os diagnósticos do Input"
   },
   "setup_wizard": {
-    "steps": {},
-    "diagnosis_step": {},
-    "routing": {},
-    "start": {},
+    "title": "Assistente de configuração de Input",
+    "back": "Voltar",
+    "finish": "Concluir",
+    "steps": {
+      "routing": "Roteamento",
+      "launch": "Iniciar",
+      "diagnosis": "Diagnóstico"
+    },
+    "diagnosis_step": {
+      "description": "Teste inputs e o parsing sem gravar dados no cluster de pesquisa.",
+      "go_to_diagnosis": "Ir para o Diagnóstico do Input"
+    },
+    "load_streams_failed": "Falha ao carregar os streams com o erro: {{error}}",
+    "load_input_references_failed": "Falha ao carregar as referências do input com o erro: {{error}}",
+    "load_streams_by_index_set_failed": "Falha ao carregar os streams por index set com o erro: {{error}}",
+    "routing": {
+      "connected_pipelines_title": "Pipelines conectados ao Stream de destino",
+      "connected_pipelines": "Recomendamos verificar o impacto desses pipelines antes de concluir a configuração do Input. O Stream de destino tem os seguintes Pipelines conectados a ele:",
+      "select_destination": "Selecione um Stream de destino para o qual rotear as mensagens deste input.",
+      "recommend_new_stream": "<strong>Recomendamos criar um novo stream para cada novo input.</strong> Isso ajudará a categorizar suas mensagens em um esquema básico.",
+      "default_stream_fallback": "Mensagens que não forem roteadas para nenhum Stream serão roteadas para o <strong>Default Stream</strong>.",
+      "pipeline_rules_info": "Regras de pipeline podem ser criadas automaticamente e anexadas ao <strong>Default Stream</strong> por este assistente. Essas regras serão colocadas no Default Routing Pipeline gerenciado pelo sistema e serão renomeadas automaticamente (ou excluídas) para refletir com precisão o estado deste Input.",
+      "new_stream_heading": "Rotear para um novo Stream",
+      "recommended": "Recomendado!",
+      "create_stream": "Criar Stream",
+      "existing_stream_heading": "Rotear para um Stream existente",
+      "select_stream": "Selecionar Stream",
+      "create_new_stream": "Criar novo Stream",
+      "choose_existing_stream": "Escolha um Stream existente",
+      "existing_stream_selected": "Roteamento das mensagens deste input para um Stream existente selecionado.",
+      "pipeline_rules_created": "As Regras de Pipeline serão criadas quando o botão <strong>Iniciar Input</strong> for pressionado.",
+      "default_stream": "Default Stream",
+      "remove_from_default": "Remover correspondências do ‘Default Stream’",
+      "remove_from_default_help": "Não atribuir ao ‘Default Stream’ as mensagens que correspondem a este stream."
+    },
+    "start": {
+      "description": "Configure e inicie o Input de acordo com a configuração feita.",
+      "rolling_back": "Revertendo Input...",
+      "setting_up": "Configurando Input...",
+      "not_ready": "Seu Input ainda não está pronto para ser configurado. Conclua as etapas anteriores.",
+      "start_input": "Iniciar Input",
+      "rollback_input": "Reverter Input",
+      "launch_diagnosis": "Iniciar Diagnóstico do Input"
+    },
     "progress": {
-      "loading": {},
+      "details": "Detalhes:",
+      "loading": {
+        "create_stream": "Criando Stream...",
+        "create_stream_named": "Criando Stream \"{{name}}\"...",
+        "start_stream": "Iniciando Stream...",
+        "start_stream_named": "Iniciando Stream \"{{name}}\"...",
+        "create_pipeline": "Criando Pipeline..."
+      },
       "error": {},
       "success": {}
     },
