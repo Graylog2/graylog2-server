@@ -117,6 +117,8 @@
     "auto_refresh_options": "Options d'intervalle d'actualisation automatique",
     "auto_refresh_options_help": "Configurez les options disponibles pour le sélecteur d'intervalle d'<strong>actualisation automatique</strong> au format <strong>durée ISO8601</strong>",
     "auto_refresh_options_title": "Options d'intervalle d'actualisation automatique",
+    "cancel_after_seconds_one": "{{count}} seconde",
+    "cancel_after_seconds_other": "{{count}} secondes",
     "cancellation_timeout": "Délai d'annulation",
     "cancellation_timeout_description": "Durée en secondes par widget au terme de laquelle l'exécution de la recherche sera automatiquement annulée. Cela limite le nombre de recherches exécutées et améliore les performances.",
     "default_auto_refresh_interval": "Intervalle d'actualisation automatique par défaut",
@@ -139,7 +141,8 @@
     "surrounding_time_range_options": "Options de plage de temps environnante",
     "time_range_presets": "Préréglages de plage de temps de recherche",
     "title": "Configuration de la recherche",
-    "update_title": "Mettre à jour la configuration de la recherche"
+    "update_title": "Mettre à jour la configuration de la recherche",
+    "cancel_after_seconds_many": "{{count}} secondes"
   },
   "shared": {
     "disabled": "désactivé",
@@ -231,7 +234,20 @@
     "description": "La page d'accueil peut afficher des widgets avec le nombre de messages, d'alertes et d'événements, ainsi qu'un graphique des principales sources. Sur les clusters volumineux ou très sollicités, ces requêtes ajoutent une charge supplémentaire à chaque ouverture de la page d'accueil. Désactivez-les ci-dessous si vous souhaitez éviter cette charge. Les widgets seront masqués et leurs requêtes ne seront pas exécutées.",
     "enable_metrics": "Activer les métriques de la page d'accueil",
     "enable_metrics_help": "Si désactivé, les widgets de comptage des messages, alertes et événements ainsi que le graphique des principales sources seront masqués de la page d'accueil, et leurs requêtes sous-jacentes ne seront pas exécutées. Désactivez cette option sur les clusters volumineux ou très sollicités pour réduire la charge des requêtes.",
-    "metrics": "Métriques de la page d'accueil"
+    "metrics": "Métriques de la page d'accueil",
+    "title": "Page d'accueil",
+    "update_title": "Mettre à jour la configuration de la page d'accueil"
   },
-  "notifications": {}
+  "notifications": {
+    "index_defaults_success": "Configuration des valeurs par défaut des index mise à jour avec succès",
+    "index_defaults_failed_title": "Échec de la mise à jour de la configuration des valeurs par défaut des index",
+    "update_success": "Configuration mise à jour avec succès",
+    "search_update_failed": "Échec de la mise à jour de la configuration de recherche : {{error}}",
+    "search_update_failed_title": "Impossible de mettre à jour la configuration de recherche : {{configType}}",
+    "allowlist_update_success": "Configuration de la liste d'autorisation d'URL mise à jour avec succès",
+    "allowlist_update_failed": "Échec de la mise à jour de la configuration de la liste d'autorisation d'URL : {{error}}",
+    "allowlist_update_failed_title": "Impossible de mettre à jour la liste d'autorisation d'URL : {{configType}}",
+    "processors_update_failed": "Échec de la mise à jour de la configuration des processeurs de messages : {{error}}",
+    "processors_update_failed_title": "Impossible de mettre à jour la configuration : {{configType}}"
+  }
 }
