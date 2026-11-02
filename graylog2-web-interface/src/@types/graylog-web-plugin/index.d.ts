@@ -287,7 +287,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexset_templates: 'create' | 'edit' | 'read';
     indexsets: 'create' | 'delete' | 'edit' | 'read';
     indexsets_field_restrictions: 'edit';
-    indices: 'read' | 'changestate' | 'failures';
+    indices: 'read' | 'changestate' | 'delete' | 'failures';
     input_types: 'create';
     inputs: 'create' | 'edit' | 'read' | 'terminate' | 'changestate';
     journal: 'read';

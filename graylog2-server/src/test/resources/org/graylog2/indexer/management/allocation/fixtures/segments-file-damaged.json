@@ -1,0 +1,63 @@
+{
+  "index" : "graylog_19",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "CLUSTER_RECOVERED",
+    "at" : "2026-10-06T15:31:22.292Z",
+    "last_allocation_status" : "no_valid_shard_copy"
+  },
+  "can_allocate" : "no_valid_shard_copy",
+  "allocate_explanation" : "cannot allocate because all found copies of the shard are either stale or corrupt",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "2svFqa49RO2JWKoEAwoX_g",
+      "node_name" : "os-dev-node-1",
+      "transport_address" : "10.40.2.171:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "Ubm6UZfJTACzIT7Ihle31Q",
+      "node_name" : "os-dev-node-2",
+      "transport_address" : "10.40.2.170:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.172:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : true,
+        "allocation_id" : "fECsaBuoSB2JZSpFzNimig",
+        "store_exception" : {
+          "type" : "corrupt_index_exception",
+          "reason" : "codec footer mismatch (file truncated?): actual footer=1600222580 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(MemorySegmentIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/iKELhPKbQG-6t_PiXac6DA/0/index/segments_4\")))",
+          "suppressed" : [
+            {
+              "type" : "e_o_f_exception",
+              "reason" : "read past EOF: MemorySegmentIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/iKELhPKbQG-6t_PiXac6DA/0/index/segments_4\")"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+
