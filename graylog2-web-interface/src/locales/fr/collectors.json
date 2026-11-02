@@ -1,1 +1,275 @@
-{}
+{
+  "pages": {
+    "documentation_title": "Documentation des Collectors",
+    "deployment": {
+      "title": "Déployer des Collectors",
+      "description": "Exécutez la commande sur autant d'hôtes que nécessaire : ils rejoignent la flotte choisie et apparaissent dès leur première connexion.",
+      "deploy_tab": "Déployer",
+      "tokens_tab": "Jetons d'enrôlement",
+      "tokens_description": "Les jetons autorisent les nouveaux Collectors à rejoindre une flotte. La suppression d'un jeton n'affecte pas les Collectors déjà enrôlés."
+    },
+    "fleets": {
+      "document_title": "Flottes de Collectors",
+      "title": "Flottes",
+      "description": "Une flotte est un groupe de collectors partageant la même configuration. Tous les collectors d'une flotte collectent des données depuis les mêmes sources. Utilisez les flottes pour organiser les collectors par environnement, équipe ou usage."
+    },
+    "fleet_detail": {
+      "title": "Détails de la flotte"
+    },
+    "instances": {
+      "document_title": "Instances de Collectors",
+      "title": "Instances",
+      "description": "Une instance de collector correspond à un processus collector en cours d'exécution sur un hôte distant. Les instances rejoignent une flotte à l'aide d'un jeton d'enrôlement et reçoivent automatiquement la configuration des sources de leur flotte."
+    },
+    "onboarding": {
+      "title": "Intégration des Collectors",
+      "description": "Statut de votre collector nouvellement connecté.",
+      "load_error": "Impossible de charger l'instance de collector : {{error}}",
+      "not_found": "Instance de collector introuvable. Elle a peut-être été supprimée — voir toutes les <instancesLink>Instances</instancesLink>."
+    },
+    "overview": {
+      "title": "Vue d'ensemble des Collectors",
+      "description": "Les Collectors sont des services légers déployés dans votre infrastructure pour collecter des logs et les transmettre à {{productName}}. Ils sont organisés en flottes et configurés avec des sources qui définissent les données à collecter."
+    },
+    "settings": {
+      "title": "Paramètres des Collectors",
+      "description": "Configurez les points de terminaison et les paramètres de cycle de vie des Collectors gérés. Les Collectors se connectent à ces points de terminaison pour recevoir les mises à jour de configuration et envoyer les données de logs collectées."
+    }
+  },
+  "navigation": {
+    "overview": "Vue d'ensemble",
+    "fleets": "Flottes",
+    "instances": "Instances",
+    "deployment": "Déploiement",
+    "settings": "Paramètres"
+  },
+  "activity": {
+    "deleted_target": "[supprimé]",
+    "by_actor": "par {{name}}",
+    "by_system": "par le système",
+    "config_changed": {
+      "fleet": "Configuration mise à jour pour la flotte <targetLink />",
+      "collector": "Configuration mise à jour pour le collector <targetLink />"
+    },
+    "ingest_config_changed": {
+      "fleet": "Configuration d'ingestion mise à jour pour la flotte <targetLink />",
+      "collector": "Configuration d'ingestion mise à jour pour le collector <targetLink />"
+    },
+    "restart": {
+      "fleet": "Redémarrage demandé pour la flotte <targetLink />",
+      "collector": "Redémarrage demandé pour le collector <targetLink />"
+    },
+    "discovery_run": {
+      "fleet": "Exécution de la découverte déclenchée pour la flotte <targetLink />",
+      "collector": "Exécution de la découverte déclenchée pour le collector <targetLink />"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> réaffecté"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> réaffecté à la flotte <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "Le collector rejoindra cette flotte lors de sa prochaine connexion.",
+    "moving_from": "(depuis {{fleet}})",
+    "moving_from_removed": "(depuis une flotte supprimée)",
+    "removed_title": "Cette flotte a été supprimée.",
+    "removed": "Flotte supprimée ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "Synchronisation en attente — les modifications seront appliquées à la prochaine connexion du collector",
+    "pending": "Synchronisation en attente",
+    "in_sync_title": "Synchronisé — toutes les modifications sont appliquées",
+    "in_sync": "Synchronisé"
+  },
+  "instance_status": {
+    "online": "En ligne",
+    "offline": "Hors ligne"
+  },
+  "os": {
+    "unknown": "Inconnu"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "Supprimer les jetons d'enrôlement",
+    "never": "Jamais",
+    "expired": "Expiré",
+    "human_name": "jetons d'enrôlement",
+    "delete_title": "Supprimer le jeton d'enrôlement",
+    "delete_confirm": "Voulez-vous vraiment supprimer ce jeton d'enrôlement ? Les nouveaux Collectors ne pourront plus s'enrôler avec ce jeton. Les Collectors déjà enrôlés continueront de fonctionner normalement."
+  },
+  "deployment": {
+    "select_fleet_step": "Sélectionner la flotte",
+    "generate_token_step": "Générer un jeton",
+    "install_step": "Installer le Collector",
+    "open_in_search": "Ouvrir dans la recherche",
+    "generate_token_first": "Générez un jeton ci-dessus pour afficher la commande d'installation.",
+    "copy_token_only": "Copier uniquement le jeton"
+  },
+  "enrolling_hosts": {
+    "receiving": "Réception",
+    "listening": "En écoute…",
+    "title": "Hôtes en cours d'enrôlement",
+    "listening_subtitle": "en écoute…",
+    "view_all": "Voir tout dans les Instances",
+    "host": "Hôte",
+    "status": "Statut",
+    "first_messages": "Premiers messages",
+    "enrolled": "Enrôlé",
+    "actions": "Actions",
+    "hide_setup": "Masquer la configuration",
+    "view_setup": "Voir la configuration",
+    "empty": "Les hôtes exécutant la commande apparaissent ici dès leur première connexion.",
+    "connection_problem": "Impossible de joindre le serveur — nouvelle tentative automatique"
+  },
+  "token_step": {
+    "summary_expires": "Jeton <emphasis>{{tokenName}}</emphasis> généré - expire <expiresAt />",
+    "summary_expires_with_fleet": "Jeton <emphasis>{{tokenName}}</emphasis> généré - expire <expiresAt /> - limité à la flotte <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "Jeton <emphasis>{{tokenName}}</emphasis> généré - n'expire jamais",
+    "summary_never_expires_with_fleet": "Jeton <emphasis>{{tokenName}}</emphasis> généré - n'expire jamais - limité à la flotte <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "Changer de jeton",
+    "short_lived": "Jeton de courte durée (expire dans 1 jour)",
+    "custom": "Jeton personnalisé",
+    "expiry_24_hours": "24 heures",
+    "expiry_7_days": "7 jours",
+    "expiry_30_days": "30 jours",
+    "expiry_never": "Sans expiration",
+    "name": "Nom",
+    "name_placeholder": "p. ex. déploiement web-servers",
+    "custom_hint": "Les jetons personnalisés apparaissent dans l'onglet Jetons d'enrôlement et peuvent être révoqués à tout moment.",
+    "no_permission": "Vous n'avez pas la permission de créer des jetons d'enrôlement pour cette flotte",
+    "generating": "Génération...",
+    "generate": "Générer le jeton",
+    "select_fleet_first": "Sélectionnez d'abord une flotte ci-dessus."
+  },
+  "fleet_actions": {
+    "received_messages": "Messages reçus",
+    "delete": "Supprimer",
+    "delete_title": "Supprimer la flotte",
+    "delete_confirm": "Voulez-vous vraiment supprimer la flotte <emphasis>{{fleetName}}</emphasis> ? Ses configurations de sources et ses jetons d'enrôlement seront supprimés."
+  },
+  "fleet_form": {
+    "name_required": "Le nom est obligatoire"
+  },
+  "fleet_settings": {},
+  "fleets": {},
+  "fleet_detail": {},
+  "instance_actions": {},
+  "reassign_fleet": {},
+  "instance_health": {},
+  "instance_drawer": {},
+  "overview": {},
+  "fleet_card": {},
+  "fleet_cards": {},
+  "recent_activity": {},
+  "collector_facts": {},
+  "connection_success": {},
+  "fleet_choice": {},
+  "ingest_endpoint": {},
+  "install_command": {},
+  "log_preview": {},
+  "next_steps": {},
+  "timeline": {},
+  "platform_picker": {},
+  "source_status": {},
+  "waiting_for_connection": {},
+  "settings": {},
+  "ingest_inputs": {},
+  "port_mismatch": {},
+  "source_types": {},
+  "source_columns": {},
+  "source_form": {},
+  "load_errors": {
+    "recent_activity": {},
+    "input_ids": {},
+    "stats": {},
+    "config": {},
+    "enrollment_tokens": {},
+    "pending_changes": {},
+    "instances": {},
+    "collector_instances": {},
+    "fleets": {},
+    "fleet": {},
+    "fleet_stats": {},
+    "sources": {},
+    "input_details": {}
+  },
+  "mutation_errors": {
+    "create_fleet": {},
+    "update_fleet": {},
+    "delete_fleet": {},
+    "create_source": {},
+    "update_source": {},
+    "delete_source": {},
+    "create_enrollment_token": {},
+    "delete_enrollment_token": {},
+    "delete_enrollment_tokens": {},
+    "reassign_instances": {},
+    "delete_instance": {},
+    "save_config": {},
+    "create_input": {},
+    "update_input": {}
+  },
+  "notifications": {},
+  "datanode": {
+    "compatibility_check": {},
+    "migration_steps_text": {},
+    "migration_welcome": {},
+    "migration_wizard": {},
+    "compatibility_status": {},
+    "in_place_migration": {},
+    "migration_data_nodes": {},
+    "manual_migration": {},
+    "stop_processing": {},
+    "journal_size_warning": {},
+    "journal_downtime": {},
+    "in_place_welcome": {},
+    "restart_graylog": {},
+    "in_place_migration_info": {},
+    "certificates_provisioning": {},
+    "jwt_authentication": {},
+    "reset_migration": {},
+    "migration_actions": {},
+    "force_start": {},
+    "rolling_upgrade_nodes": {
+      "node_status": {},
+      "state": {}
+    },
+    "opensearch_upgrade_info": {},
+    "start_upgrade": {
+      "full": {},
+      "rolling": {}
+    },
+    "opensearch_upgrade": {},
+    "client_certificate": {},
+    "cluster_health": {
+      "shard_replication_help": {},
+      "state_help": {}
+    },
+    "upgrade_method": {},
+    "upgrade_status": {},
+    "upgrade_nodes": {},
+    "data_node_actions": {},
+    "data_node_badge": {},
+    "data_node_status": {},
+    "data_node_logs": {},
+    "cluster_management": {},
+    "ca_configuration": {},
+    "ca_upload": {},
+    "ca_create": {},
+    "renewal_policy": {
+      "modes": {}
+    },
+    "details_page": {},
+    "pages": {},
+    "upgrade_page": {},
+    "migration_steps": {},
+    "migration_states": {},
+    "certificate_renewal": {
+      "renew": {},
+      "provision": {}
+    }
+  },
+  "use_collector_configurations_notifications": {},
+  "use_collectors_notifications": {}
+}
