@@ -133,32 +133,148 @@
     },
     "configuration_helper": {
       "filebeat_reference": "Filebeat 參考資料",
-      "nxlog_reference": "NXLog 參考手冊"
+      "nxlog_reference": "NXLog 參考手冊",
+      "reference_help": "我們提供 Collector 設定範本，協助您快速開始。<lineBreak/>如需更多資訊，請參閱您所使用 Collector 的官方文件。",
+      "runtime_variables_help": "這些變數會以各 Sidecar 的執行階段資訊填入。",
+      "tab_reference": "參考",
+      "tab_runtime_variables": "執行階段變數",
+      "tab_variables": "變數",
+      "title": "Collector 設定參考",
+      "variables_help": "使用變數可在多個設定之間共用文字片段。<lineBreak/>若設定格式需要使用不應作為變數的字面值，例如 <code>${foo}</code>，請改寫為 <code>${'$'}{foo}</code>。",
+      "winlogbeat_reference": "Winlogbeat 參考資料"
     },
-    "configuration_tags_select": {},
-    "source_view_modal": {},
-    "configuration_variables_helper": {},
-    "edit_configuration_variable_modal": {},
-    "templates_helper": {}
+    "configuration_tags_select": {
+      "placeholder": "選擇標籤..."
+    },
+    "source_view_modal": {
+      "close": "關閉",
+      "empty_template": "<empty template>",
+      "error_fetching_configuration": "取得設定時發生錯誤：{{error}}",
+      "error_rendering_preview": "轉譯預覽時發生錯誤：{{error}}",
+      "title": "設定"
+    },
+    "configuration_variables_helper": {
+      "actions": "操作",
+      "close": "關閉",
+      "delete": "刪除",
+      "delete_confirm_text": "您確定要移除設定變數 <strong>{{name}}</strong> 嗎？",
+      "delete_confirm_title": "刪除設定變數？",
+      "description": "說明",
+      "error_delete_title": "刪除設定變數 <strong>${user.{{name}}}</strong> 時發生錯誤",
+      "error_in_use": "無法刪除此設定變數，因為它仍在使用中。請先從以下設定中移除此變數，然後再試一次。",
+      "name": "名稱"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "建立",
+      "create_variable": "建立變數",
+      "content": "內容",
+      "content_help": "輸入變數內容",
+      "description": "說明",
+      "description_help": "輸入此變數的說明",
+      "edit": "編輯",
+      "edit_action": "編輯",
+      "name": "名稱",
+      "name_help": "輸入此變數的名稱",
+      "optional": "（選填）",
+      "title": "{{action}}變數 ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "說明",
+      "name": "名稱",
+      "node_id": "Sidecar 的 UUID。",
+      "node_name": "Sidecar 的名稱，若未設定則預設為主機名稱。",
+      "operating_system": "Sidecar 執行所在作業系統的名稱，例如 <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "執行中 Sidecar 的版本字串。",
+      "spool_dir": "每個設定專用的目錄，可用於儲存 Collector 資料。",
+      "tags": "Sidecar 所設定的標籤對應表。可用於轉譯條件式設定片段，例如："
+    }
   },
   "configurations": {
-    "collector_list": {},
-    "collector_row": {},
-    "configuration_list": {},
-    "configuration_row": {}
+    "collector_list": {
+      "actions": "操作",
+      "create_collector": "建立 Log Collector",
+      "description": "管理可透過 Sidecar 和 Web 介面設定與監控的 Log Collector。",
+      "name": "名稱",
+      "no_data": "沒有可顯示的 Log Collector，要不要建立一個？",
+      "operating_system": "作業系統",
+      "placeholder": "尋找 Collector",
+      "title": "Log Collector",
+      "total": "共 {{total}} 筆"
+    },
+    "collector_row": {
+      "delete_confirm": "您即將刪除 Collector「{{name}}」。確定要刪除嗎？",
+      "edit": "編輯"
+    },
+    "configuration_list": {
+      "actions": "操作",
+      "collector": "Collector",
+      "color": "顏色",
+      "configuration": "設定",
+      "create_configuration": "建立設定",
+      "description": "這些是可在 Collector 中使用的設定。請記得在管理頁面將新設定套用至 Collector。",
+      "no_data": "沒有可顯示的設定，請嘗試建立設定或變更查詢條件。",
+      "placeholder": "尋找設定",
+      "title": "設定",
+      "total": "共 {{total}} 筆"
+    },
+    "configuration_row": {
+      "clone": "複製",
+      "delete_confirm": "您即將刪除設定「{{name}}」。確定要刪除嗎？",
+      "edit": "編輯",
+      "unknown_collector": "未知的 Collector"
+    }
   },
   "failure_tracking": {
     "list": {
-      "columns": {}
+      "columns": {
+        "collector": "Collector",
+        "error_message": "錯誤訊息",
+        "last_seen": "最後通訊時間",
+        "sidecar": "Sidecar",
+        "status": "狀態",
+        "verbose_message": "詳細訊息"
+      },
+      "hide_inactive_sidecars": "隱藏非使用中的 Sidecar",
+      "include_inactive_hint": " 和/或點擊「包含非使用中的 Sidecar」",
+      "include_inactive_sidecars": "包含非使用中的 Sidecar",
+      "no_failures": "沒有發生失敗的 Sidecar。",
+      "no_matching_sidecars": "沒有符合搜尋條件且發生失敗的 Sidecar。請嘗試調整搜尋篩選條件：{{query}} {{inactiveHint}}"
     },
-    "rows": {}
+    "rows": {
+      "inactive_annotation": "（非使用中）",
+      "show_more": "顯示更多",
+      "sidecar_version": "v{{version}}"
+    }
   },
-  "basic_sidecar_user": {},
-  "sidecar_status_file_list": {},
+  "basic_sidecar_user": {
+    "load_failed": "載入 Sidecar 使用者失敗，狀態：{{error}}",
+    "load_failed_title": "無法載入 Sidecar 使用者"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "篩選檔案"
+  },
   "sidecars": {
-    "sidecar_list": {},
-    "sidecar_row": {},
-    "sidecar_status": {},
+    "sidecar_list": {
+      "hide_inactive_sidecars": "隱藏非使用中的 Sidecar",
+      "include_inactive_hint": " 和/或點擊「包含非使用中的 Sidecar」",
+      "include_inactive_sidecars": "包含非使用中的 Sidecar",
+      "last_seen": "最後通訊時間",
+      "name": "名稱",
+      "no_matching_sidecars": "沒有符合搜尋條件的 Sidecar。請嘗試調整搜尋篩選條件{{inactiveHint}}。",
+      "no_sidecars": "尚未設定任何 Sidecar。",
+      "node_id": "節點 ID",
+      "operating_system": "作業系統",
+      "sidecar_version": "Sidecar 版本",
+      "status": "狀態"
+    },
+    "sidecar_row": {
+      "inactive_annotation": "（非使用中）",
+      "manage_sidecar": "管理 Sidecar",
+      "show_messages": "顯示訊息"
+    },
+    "sidecar_status": {
+      "collector_running": "Collector 執行中。"
+    },
     "verbose_message_modal": {}
   },
   "pages": {
