@@ -254,9 +254,12 @@
   },
   "field_charts_migration": {
     "title": "Migrar gráficos existentes da página de pesquisa",
+    "found_charts_one": "Encontramos {{count}} gráfico criado para uma versão anterior da pesquisa. Deseja migrar este gráfico para a pesquisa atual?",
+    "found_charts_other": "Encontramos {{count}} gráficos criados para uma versão anterior da pesquisa. Deseja migrar esses gráficos para a pesquisa atual?",
     "save_hint": "Quando você executar a migração e quiser manter os gráficos recém-criados, será necessário salvar a pesquisa atual como um novo dashboard. Caso contrário, os gráficos serão perdidos ao sair da página de pesquisa.",
     "migrate": "Migrar",
-    "discard": "Descartar gráficos"
+    "discard": "Descartar gráficos",
+    "found_charts_many": "Encontramos {{count}} gráficos criados para uma versão anterior da pesquisa. Deseja migrar esses gráficos para a pesquisa atual?"
   },
   "query": {
     "contained_in_enterprise": "(incluído no <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
@@ -337,11 +340,20 @@
   },
   "saved_searches": {
     "title": "Pesquisas salvas",
+    "confirm_bulk_delete_one": "Você realmente deseja remover {{count}} pesquisa salva?",
+    "confirm_bulk_delete_other": "Você realmente deseja remover {{count}} pesquisas salvas?",
+    "bulk_delete_partial_one": "{{failed}} de {{count}} pesquisa salva selecionada não pôde ser excluída.",
+    "bulk_delete_partial_other": "{{failed}} de {{count}} pesquisas salvas selecionadas não puderam ser excluídas.",
+    "bulk_delete_success_one": "{{count}} pesquisa salva foi excluída com sucesso.",
+    "bulk_delete_success_other": "{{count}} pesquisas salvas foram excluídas com sucesso.",
     "success": "Sucesso",
     "bulk_delete_error": "Ocorreu um erro ao excluir as pesquisas salvas. {{error}}",
     "confirm_delete": "Você está prestes a excluir a pesquisa salva: \"{{title}}\". Tem certeza?",
     "delete_search": "Excluir pesquisa {{title}}",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "confirm_bulk_delete_many": "Você realmente deseja remover {{count}} pesquisas salvas?",
+    "bulk_delete_partial_many": "{{failed}} de {{count}} pesquisas salvas selecionadas não puderam ser excluídas.",
+    "bulk_delete_success_many": "{{count}} pesquisas salvas foram excluídas com sucesso."
   },
   "search_meta": {
     "buttons": "Botões de metadados da pesquisa"
@@ -517,10 +529,34 @@
     "remove_from_table": "Remover da tabela",
     "add_to_all_tables": "Adicionar a todas as tabelas",
     "remove_from_all_tables": "Remover de todas as tabelas",
-    "change_field_type": "Alterar tipo de campo"
+    "change_field_type": "Alterar tipo de campo",
+    "copy_field_name": "Copiar nome do campo para a área de transferência",
+    "add_to_favorites": "Adicionar campo aos favoritos",
+    "remove_from_favorites": "Remover campo dos favoritos"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "Agregando {{series}} por {{fields}}",
+    "summary_only": "Agregando {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Contagem de mensagens",
+    "message_table": "Tabela de mensagens",
+    "custom_aggregation": "Agregação personalizada",
+    "aggregation": "Agregação",
+    "events_overview": "Visão geral de eventos",
+    "text_markdown": "Texto/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "input excluído",
+    "timestamp": "Timestamp",
+    "not_stored": "Não armazenada",
+    "not_stored_message": "A mensagem não está armazenada",
+    "received_by": "Recebida por",
+    "stored_in_index": "Armazenada no índice",
+    "routed_into_streams": "Encaminhada para os streams"
+  },
+  "views_logic": {
+    "result_window_limit": "O Elasticsearch limita o resultado da pesquisa a {{limit}} mensagens. Com um tamanho de página de {{pageSize}} mensagens, você pode usar as primeiras {{validPages}} páginas.",
+    "confirm_delete_dashboard_page": "Você realmente deseja excluir esta página do dashboard?"
+  }
 }
