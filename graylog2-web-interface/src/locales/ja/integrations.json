@@ -503,7 +503,19 @@
   "tor_exit_node_adapter_summary": {
     "no_configuration": "設定は不要です"
   },
-  "whois_adapter_documentation": {},
-  "whois_adapter_field_set": {},
-  "whois_adapter_summary": {}
+  "whois_adapter_documentation": {
+    "intro": "whois IP ルックアップデータアダプターは、IP アドレスのネットワーク所有者情報を要求できます。",
+    "configuration_title": "設定",
+    "connect_timeout_description": "whois サーバーへのソケットの接続タイムアウト (ミリ秒) です。値を大きく設定すると、処理のパフォーマンスに影響する可能性があります。",
+    "read_timeout_description": "whois サーバーへのソケットの接続読み取りタイムアウト (ミリ秒) です。値を大きく設定すると、処理のパフォーマンスに影響する可能性があります。"
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "接続タイムアウト",
+    "connect_timeout_help": "WHOIS の接続タイムアウト (ミリ秒) です。",
+    "read_timeout_label": "読み取りタイムアウト",
+    "read_timeout_help": "WHOIS の接続読み取りタイムアウト (ミリ秒) です。"
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
 }
