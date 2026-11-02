@@ -245,6 +245,8 @@
     "positions_failed": "變更擷取器位置失敗：{{error}}",
     "positions_failed_title": "無法更新擷取器位置",
     "import_success": "匯入結果：已匯入 {{successful}} 個擷取器。",
-    "import_success_title": "匯入作業成功"
+    "import_success_title": "匯入作業成功",
+    "import_warning": "匯入結果：已匯入 {{successful}} 個擷取器，發生 {{failed}} 個錯誤。",
+    "import_warning_title": "匯入作業已完成"
   }
 }
