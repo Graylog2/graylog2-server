@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "Vue d'ensemble des utilisateurs",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Vue d'ensemble de tous les utilisateurs enregistrés."
+  },
+  "user_create": {
+    "title": "Créer un utilisateur",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Utilisez cette page pour créer de nouveaux utilisateurs pour l'interface web ou l'API REST.",
+    "submit_button": "Créer l'utilisateur",
+    "reader_role_description": "Accorde les autorisations de base à chaque utilisateur {{productName}} (intégré)",
+    "role_required": "Vous devez sélectionner au moins un des rôles <em>Reader</em> ou <em>Admin</em>.",
+    "failed_title": "Échec de la création de l'utilisateur",
+    "submit": "Créer l'utilisateur",
+    "submitting": "Création de l'utilisateur..."
+  },
+  "user_edit": {
+    "title": "Modifier l'utilisateur {{username}}",
+    "title_prefix": "Modifier l'utilisateur",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Vous pouvez modifier ici les informations et le mot de passe de l'utilisateur, ainsi que lui attribuer des rôles et des équipes.",
+    "segments": {
+      "profile": "Profil",
+      "preferences": "Préférences",
+      "teams_roles": "Équipes et rôles",
+      "shared_entities": "Éléments partagés"
+    },
+    "password": {
+      "new_password": "Nouveau mot de passe",
+      "repeat_password": "Répéter le mot de passe",
+      "old_password": "Ancien mot de passe",
+      "alert_title": "Modification du mot de passe",
+      "alert_text": "La modification du mot de passe déconnectera l'utilisateur et invalidera toutes ses sessions en cours. Si vous modifiez votre propre mot de passe, vous serez déconnecté juste après l'enregistrement. Dans ce cas, pensez à enregistrer d'abord les modifications en attente.",
+      "change": "Modifier le mot de passe"
+    },
+    "profile": {
+      "email": "E-mail",
+      "full_name": "Nom complet",
+      "update": "Mettre à jour le profil"
+    },
+    "profile_info": {
+      "title": "Prénom et nom",
+      "text": "Avec {{productName}} 4.1, nous avons ajouté des champs distincts pour le prénom et le nom. Ils doivent être renseignés avant que le profil de l'utilisateur puisse être enregistré."
+    },
+    "read_only": "L'utilisateur sélectionné {{fullName}} ne peut pas être modifié.",
+    "roles_required": "Les rôles doivent inclure au moins le rôle Admin ou Reader.",
+    "external": {
+      "title": "Utilisateur externe",
+      "text": "Cet utilisateur a été synchronisé depuis un serveur externe. Par conséquent, ni le profil ni le mot de passe ne peuvent être modifiés. Veuillez contacter votre administrateur pour plus d'informations."
+    },
+    "preferences": {
+      "language_help": "Langue de l'interface {{productName}}. Les traductions marquées Beta n'ont pas encore été relues.",
+      "enable_autocompletion": "Activer la saisie semi-automatique",
+      "search_sidebar": "Panneau latéral de recherche",
+      "dashboard_sidebar": "Panneau latéral des tableaux de bord",
+      "is_pinned": "Épinglé",
+      "search_sidebar_help": "Peut aussi être modifié à l'aide de l'icône d'épingle du panneau latéral de recherche",
+      "dashboard_sidebar_help": "Peut aussi être modifié à l'aide de l'icône d'épingle du panneau latéral des tableaux de bord",
+      "theme_mode_help": "Peut être modifié à l'aide du bouton de bascule dans le menu déroulant de l'utilisateur",
+      "update": "Mettre à jour les préférences"
+    },
+    "settings": {
+      "select_entity": "Veuillez sélectionner un élément.",
+      "update": "Mettre à jour les paramètres"
+    }
+  },
+  "roles_overview": {
+    "title": "Vue d'ensemble des rôles",
+    "documentation_link_title": "Documentation des autorisations",
+    "button_text": "Vue d'ensemble des rôles",
+    "description": "Vue d'ensemble de tous les rôles disponibles dans {{productName}}. Les rôles permettent d'accorder aux utilisateurs des capacités, comme la création de tableaux de bord ou de définitions d'événements.",
+    "alert_title": "Attribution des autorisations",
+    "alert_body_prefix": "Les rôles intégrés permettent d'accorder aux utilisateurs des capacités, comme la création de tableaux de bord ou la consultation du catalogue d'archives. En revanche, ils n'accordent pas d'autorisations sur un tableau de bord ou un flux spécifique, et il n'est pas possible de créer un rôle personnalisé. Les autorisations sur un élément spécifique s'accordent à l'aide de son bouton ",
+    "share_text": "Partager",
+    "alert_body_suffix": ". Vous trouverez ce bouton, par exemple, sur la page de vue d'ensemble des éléments. Pour accorder des autorisations sur un élément à plusieurs utilisateurs à la fois, vous pouvez utiliser des équipes. En savoir plus dans la ",
+    "documentation_text": "documentation"
+  },
+  "role_details": {
+    "title": "Détails du rôle {{name}}",
+    "title_prefix": "Détails du rôle",
+    "documentation_link_title": "Documentation des autorisations",
+    "button_text": "Vue d'ensemble des rôles",
+    "description": "Vue d'ensemble des informations telles que le nom, la description et les utilisateurs assignés."
+  },
+  "role_edit": {
+    "title": "Modifier le rôle {{name}}",
+    "title_prefix": "Modifier le rôle",
+    "documentation_link_title": "Documentation des autorisations",
+    "button_text": "Vue d'ensemble des rôles",
+    "description": "Vous pouvez attribuer le rôle à des utilisateurs."
+  },
+  "user_tokens_edit": {
+    "title": "Modifier les jetons de l'utilisateur {{username}}",
+    "title_prefix": "Modifier les jetons de l'utilisateur",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Vous pouvez créer de nouveaux jetons ou supprimer les anciens."
+  },
+  "token_management": {
+    "title": "Gestion des jetons",
+    "documentation_link_title": "Documentation des autorisations",
+    "description": "Vue d'ensemble des jetons d'accès configurés pour {{productName}}."
+  },
+  "token_list": {
+    "title": "Créer et modifier des jetons",
+    "token_created": "Jeton {{name}} créé !",
+    "token_created_description": "Voici votre nouveau jeton. Pensez à le copier maintenant, vous ne pourrez plus le revoir ensuite.",
+    "done_button": "Terminé",
+    "title_list": "Jetons",
+    "filter_label": "Filtre",
+    "no_tokens_to_display": "Aucun jeton à afficher.",
+    "no_tokens_match_filter": "Aucun jeton ne correspond au filtre.",
+    "column_name": "Nom du jeton",
+    "column_created": "Créé le",
+    "column_last_access": "Dernier accès",
+    "column_expires_at": "Expire le",
+    "column_actions": "Actions",
+    "never_used": "Jamais utilisé"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "Utilisateur",
+      "team": "Équipe",
+      "global": "Tout le monde",
+      "error": "Erreur"
+    },
+    "dependencies_warning": {
+      "title": "Des dépendances manquent pour l'ensemble actuel des collaborateurs",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> a besoin d'accès à",
+      "dependency": "{{type}} : <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Propriétaires :",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Ajouter un collaborateur",
+      "search_placeholder": "Rechercher des utilisateurs et des équipes",
+      "collaborators": "Collaborateurs",
+      "direct_collaborators": "Collaborateurs directs",
+      "shared_via_collections": "Partagé via des collections"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
