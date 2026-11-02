@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "使用者總覽",
+    "documentation_link_title": "權限說明文件",
+    "description": "所有已註冊使用者的總覽。"
+  },
+  "user_create": {
+    "title": "建立新使用者",
+    "documentation_link_title": "權限說明文件",
+    "description": "使用此頁面為網頁介面或 REST API 建立新使用者。",
+    "submit_button": "建立使用者",
+    "reader_role_description": "授予每位 {{productName}} 使用者基本權限（內建）",
+    "role_required": "您必須至少選擇 <em>Reader</em> 或 <em>Admin</em> 角色之一。",
+    "failed_title": "建立使用者失敗",
+    "submit": "建立使用者",
+    "submitting": "正在建立使用者..."
+  },
+  "user_edit": {
+    "title": "編輯使用者 {{username}}",
+    "title_prefix": "編輯使用者",
+    "documentation_link_title": "權限說明文件",
+    "description": "您可以在此變更使用者詳細資料與密碼，並指派角色與團隊。",
+    "segments": {
+      "profile": "個人資料",
+      "preferences": "偏好設定",
+      "teams_roles": "團隊與角色",
+      "shared_entities": "共用項目"
+    },
+    "password": {
+      "new_password": "新密碼",
+      "repeat_password": "重複密碼",
+      "old_password": "舊密碼",
+      "alert_title": "變更密碼",
+      "alert_text": "變更密碼將登出使用者，並使其所有目前的工作階段失效。若您變更自己的密碼，儲存後將立即登出。在此情況下，請先確認已儲存所有待處理的變更。",
+      "change": "變更密碼"
+    },
+    "profile": {
+      "email": "電子郵件",
+      "full_name": "全名",
+      "update": "更新個人資料"
+    },
+    "profile_info": {
+      "title": "名字與姓氏",
+      "text": "自 {{productName}} 4.1 起，我們新增了獨立的名字與姓氏欄位。必須填寫這些欄位，才能儲存使用者的個人資料。"
+    },
+    "read_only": "無法編輯所選的使用者 {{fullName}}。",
+    "roles_required": "角色至少必須包含 Admin 或 Reader 角色。",
+    "external": {
+      "title": "外部使用者",
+      "text": "此使用者已從外部伺服器同步，因此無法變更個人資料或密碼。如需更多資訊，請聯絡您的管理員。"
+    },
+    "preferences": {
+      "language_help": "{{productName}} 介面的語言。標示為 Beta 的翻譯尚未經過審查。",
+      "enable_autocompletion": "啟用自動完成",
+      "search_sidebar": "搜尋側邊欄",
+      "dashboard_sidebar": "儀表板側邊欄",
+      "is_pinned": "已釘選",
+      "search_sidebar_help": "也可以使用搜尋側邊欄的釘選圖示變更",
+      "dashboard_sidebar_help": "也可以使用儀表板側邊欄的釘選圖示變更",
+      "theme_mode_help": "可使用使用者下拉選單中的切換按鈕變更",
+      "update": "更新偏好設定"
+    },
+    "settings": {
+      "select_entity": "請選擇一個項目。",
+      "update": "更新設定"
+    }
+  },
+  "roles_overview": {
+    "title": "角色總覽",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "{{productName}} 中所有可用角色的總覽。角色可授予使用者功能權限，例如建立儀表板或事件定義。",
+    "alert_title": "授予權限",
+    "alert_body_prefix": "內建角色可授予使用者功能權限，例如建立儀表板或檢視封存目錄。但它們不會授予特定儀表板或 Stream 的權限，也無法建立自訂角色。若要授予特定項目的權限，可使用該項目的 ",
+    "share_text": "共用",
+    "alert_body_suffix": " 按鈕。例如可在項目總覽頁面找到此按鈕。若要同時為多位使用者授予某項目的權限，可以使用團隊。詳細資訊請參閱 ",
+    "documentation_text": "說明文件"
+  },
+  "role_details": {
+    "title": "角色詳細資料 {{name}}",
+    "title_prefix": "角色詳細資料",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "名稱、說明與已指派使用者等詳細資料的總覽。"
+  },
+  "role_edit": {
+    "title": "編輯角色 {{name}}",
+    "title_prefix": "編輯角色",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "您可以將此角色指派給使用者。"
+  },
+  "user_tokens_edit": {
+    "title": "編輯使用者 {{username}} 的權杖",
+    "title_prefix": "編輯使用者的權杖",
+    "documentation_link_title": "權限說明文件",
+    "description": "您可以建立新權杖或刪除舊權杖。"
+  },
+  "token_management": {
+    "title": "權杖管理",
+    "documentation_link_title": "權限說明文件",
+    "description": "為 {{productName}} 設定的存取權杖總覽。"
+  },
+  "token_list": {
+    "title": "建立與編輯權杖",
+    "token_created": "已建立權杖 {{name}}！",
+    "token_created_description": "這是您的新權杖。請立即複製，之後將無法再次查看。",
+    "done_button": "完成",
+    "title_list": "權杖",
+    "filter_label": "篩選",
+    "no_tokens_to_display": "沒有可顯示的權杖。",
+    "no_tokens_match_filter": "沒有符合篩選條件的權杖。",
+    "column_name": "權杖名稱",
+    "column_created": "建立時間",
+    "column_last_access": "上次存取",
+    "column_expires_at": "到期時間",
+    "column_actions": "操作",
+    "never_used": "從未使用"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "使用者",
+      "team": "團隊",
+      "global": "所有人",
+      "error": "錯誤"
+    },
+    "dependencies_warning": {
+      "title": "目前的協作者組合缺少相依項目",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> 需要存取下列項目",
+      "dependency": "{{type}}：<dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "擁有者：",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "新增協作者",
+      "search_placeholder": "搜尋使用者與團隊",
+      "collaborators": "協作者",
+      "direct_collaborators": "直接協作者",
+      "shared_via_collections": "透過集合共用"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
