@@ -47,6 +47,7 @@ import enPages from 'locales/en/pages.json';
 import enPipelines from 'locales/en/pipelines.json';
 import enPreflight from 'locales/en/preflight.json';
 import enSearch from 'locales/en/search.json';
+import enServerErrors from 'locales/en/server_errors.json';
 import enServerFields from 'locales/en/server_fields.json';
 import enSidecars from 'locales/en/sidecars.json';
 import enStreams from 'locales/en/streams.json';
@@ -179,6 +180,10 @@ registerTranslations('preflight', enPreflight, {
 
 registerTranslations('search', enSearch, {
   de: () => import(/* webpackChunkName: "translations-de-search" */ 'locales/de/search.json'),
+});
+
+registerTranslations('server_errors', enServerErrors, {
+  de: () => import(/* webpackChunkName: "translations-de-server-errors" */ 'locales/de/server_errors.json'),
 });
 
 registerTranslations('server_fields', enServerFields, {
