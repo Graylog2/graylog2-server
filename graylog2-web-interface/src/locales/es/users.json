@@ -136,36 +136,155 @@
       "search_placeholder": "Buscar usuarios y equipos",
       "collaborators": "Colaboradores",
       "direct_collaborators": "Colaboradores directos",
-      "shared_via_collections": "Compartido mediante colecciones"
+      "shared_via_collections": "Compartido mediante colecciones",
+      "update_sharing": "Actualizar permisos",
+      "modal_title": "Compartir {{entityType}}: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "Se ha seleccionado \"{{title}}\", pero nunca se añadió como colaborador. ¿Quieres continuar de todos modos?",
+      "confirm_not_added_unnamed": "Se ha seleccionado un elemento (nombre no encontrado), pero nunca se añadió como colaborador. ¿Quieres continuar de todos modos?"
     },
-    "grantees": {},
-    "roles_selector": {},
-    "shareable_url": {},
+    "grantees": {
+      "change_capability": "Cambiar la capacidad de {{title}}",
+      "remove_sharing": "Eliminar el uso compartido de {{title}}",
+      "no_collaborators": "Este {{entityType}} no tiene colaboradores."
+    },
+    "roles_selector": {
+      "search_placeholder": "Buscar roles",
+      "assign_role": "Asignar rol"
+    },
+    "shareable_url": {
+      "copy_title": "Copiar parámetro al portapapeles",
+      "hint": "Tú o cualquier persona autorizada para ver este enlace podrá acceder a él."
+    },
     "shared_entities": {
-      "headers": {}
+      "entity_type": "Tipo de elemento",
+      "filter_entity_types": "Filtrar tipos de elemento",
+      "capability": "Capacidad",
+      "filter_capabilities": "Filtrar capacidades",
+      "found": "Se han encontrado {{total}} elementos compartidos con {{entityType}}.",
+      "no_results": "No se han encontrado elementos compartidos.",
+      "headers": {
+        "entity_name": "Nombre del elemento",
+        "entity_type": "Tipo de elemento",
+        "owner": "Propietario",
+        "capability": "Capacidad"
+      },
+      "query_example": "Buscar elementos compartidos con un título que contenga security:"
     },
-    "sharing_disabled": {},
-    "validation_error": {}
-  },
-  "roles": {
-    "profile": {},
-    "users": {},
-    "users_selector": {},
-    "actions": {},
-    "overview": {},
-    "navigation": {}
-  },
-  "security_teaser": {
-    "overview": {},
-    "anomalies": {},
-    "host_activity": {},
-    "network_activity": {},
-    "user_activity": {},
-    "demo": {
-      "items": {}
+    "sharing_disabled": {
+      "title": "No es posible compartir",
+      "owners_only": "Solo los propietarios de este {{type}} pueden compartirlo."
+    },
+    "validation_error": {
+      "ownerless": "Si eliminas a los siguientes propietarios, el elemento se quedará sin propietario:"
     }
   },
-  "user_fields": {},
+  "roles": {
+    "profile": {
+      "title": "Perfil",
+      "name": "Nombre",
+      "description": "Descripción"
+    },
+    "teams": "Equipos",
+    "users": {
+      "title": "Usuarios",
+      "none_selected": "No se han encontrado usuarios seleccionados.",
+      "assign_users": "Asignar usuarios",
+      "selected_users": "Usuarios seleccionados",
+      "needs_reader_or_admin": "El usuario '{{name}}' necesita como mínimo el rol Reader o Admin."
+    },
+    "users_selector": {
+      "search_placeholder": "Buscar usuarios",
+      "assign_user": "Asignar usuario"
+    },
+    "actions": {
+      "edit_role_title": "Editar rol {{name}}",
+      "delete_role_title": "Eliminar rol {{name}}",
+      "edit": "Editar",
+      "deleting": "Eliminando",
+      "delete": "Eliminar",
+      "confirm_delete": "¿Seguro que quieres eliminar el rol \"{{name}}\"?",
+      "still_assigned": "Sigue asignado a {{count}} usuarios."
+    },
+    "overview": {
+      "title": "Roles",
+      "found": "Se han encontrado {{total}} roles en el sistema.",
+      "none_found": "No se han encontrado roles."
+    },
+    "query_example": "Buscar roles con un nombre que contenga manager:",
+    "navigation": {
+      "view_details": "Ver detalles",
+      "edit_role": "Editar rol"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "Encuentra rápidamente la información de seguridad más crítica en la pestaña Resumen.",
+      "hotspot_1": "Encuentra alertas altas, las principales fuentes de eventos y más información que te ayudará a conocer tu situación de seguridad.",
+      "hotspot_2": "Pasa el cursor sobre estas herramientas emergentes a lo largo de esta página para conocer más sobre las funciones de {{productName}} Security.",
+      "title": "Resumen"
+    },
+    "anomalies": {
+      "hotspot_0": "Consulta un resumen de las anomalías en ejecución, cuántas se han detectado y cómo se compara con el periodo anterior.",
+      "hotspot_1": "Los intervalos de confianza indican hasta qué punto el comportamiento se aleja de lo normal.",
+      "hotspot_2": "Hay detectores para distintos tipos de anomalías: mira rápidamente cuáles están generando alertas.",
+      "hotspot_3": "Identifica las cuentas de usuario con comportamientos inusuales para ellas en inicios de sesión o eventos de seguridad.",
+      "title": "Anomalías"
+    },
+    "host_activity": {
+      "hotspot_0": "Consulta una vista general de tus contadores de alertas altas, medias y bajas, con información de tendencias, para saber si es un día normal de trabajo . . . o no.",
+      "hotspot_1": "Identifica de inmediato qué hosts generan las alertas altas para reducir el MTTR.",
+      "hotspot_2": "Mira qué tecnología genera más inicios de sesión.",
+      "hotspot_3": "Inicia una investigación cuando los cambios en el control de identidad y acceso provengan de equipos inesperados.",
+      "hotspot_4": "Los recuentos de mensajes por fuente de eventos te ofrecen una vista diaria de los patrones habituales en los datos; los picos fuera de lo normal activarán investigaciones para averiguar el motivo.",
+      "title": "Actividad de hosts"
+    },
+    "network_activity": {
+      "hotspot_0": "Consulta al instante los picos en los flujos de datos de tu red.",
+      "hotspot_1": "Mira rápidamente de dónde proceden los datos y adónde van.",
+      "hotspot_2": "Identifica qué usuarios envían la mayor cantidad de datos por la red.",
+      "hotspot_3": "Determina si hay un patrón inusual en los resultados de consultas DNS, como un código de error que aparece de repente en la lista del Top 15. ",
+      "hotspot_4": "Las 15 plataformas principales que generan solicitudes DNS por fuente de eventos.",
+      "title": "Actividad de red"
+    },
+    "user_activity": {
+      "hotspot_0": "Mira rápidamente si hay tendencias preocupantes en los inicios de sesión fallidos.",
+      "hotspot_1": "Los inicios de sesión correctos y fallidos por usuario pueden ayudarte a detectar cuentas problemáticas y actividad inusual.",
+      "hotspot_2": "¡Estas son las 15 cuentas de usuario que generan más alertas altas!",
+      "hotspot_3": "¿Cuáles son los cambios más habituales en el control de identidad y acceso de tu entorno?",
+      "hotspot_4": "Conoce el objetivo de los cambios más frecuentes en el control de acceso.",
+      "title": "Actividad de usuarios"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "Anomaly Detection AI",
+        "cloud_option": "Cloud Option",
+        "archiving": "Archivado",
+        "audit_logs_cloud": "Registros de auditoría para {{productName}} Cloud",
+        "dynamic_lookup_tables": "Lookup Tables dinámicas",
+        "advanced_alerting": "Alertas avanzadas con scripting",
+        "compliance_reporting": "Informes de cumplimiento",
+        "correlation_aggregation": "Eventos de correlación y agregación",
+        "threat_intel": "Integraciones de inteligencia de amenazas",
+        "incident_workspaces": "Espacios de trabajo de Incident Investigation",
+        "prebuilt_parser_dashboards": "Parser y Dashboards de seguridad preconfigurados",
+        "sigma_rules": "Sigma Rules",
+        "parameterized_dashboards": "Dashboards parametrizados",
+        "input_output_integrations": "Integraciones de Input y Output",
+        "threat_management": "Gestión de amenazas",
+        "search_workflow": "Flujo de búsqueda, plantillas y filtros",
+        "soar_integrations": "Integraciones SOAR"
+      },
+      "title": "Demo de Security",
+      "banner_text": "Para más información y para reservar una demo completa del producto, visita el sitio web de {{productName}}.",
+      "button": "{{productName}} Security",
+      "overview": "RESUMEN",
+      "description": "{{productName}} Security está diseñado para revolucionar la ciberseguridad de los equipos de TI, ofreciendo las capacidades combinadas de SIEM, análisis de seguridad, investigación de incidentes y detección de anomalías. Con nuestra plataforma puedes trabajar de forma más eficiente, abordar tareas críticas con mayor rapidez y mitigar los riesgos causados por actores maliciosos y ataques basados en credenciales."
+    }
+  },
+  "user_fields": {
+    "username": "Nombre de usuario",
+    "first_name": "Nombre"
+  },
   "user_form": {},
   "token_form": {},
   "permissions_info": {},
