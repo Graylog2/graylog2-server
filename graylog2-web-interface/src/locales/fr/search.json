@@ -254,9 +254,12 @@
   },
   "field_charts_migration": {
     "title": "Migrer les graphiques de la page de recherche existante",
+    "found_charts_one": "Nous avons trouvé {{count}} graphique créé pour une version antérieure de la recherche. Voulez-vous migrer ce graphique pour la recherche actuelle ?",
+    "found_charts_other": "Nous avons trouvé {{count}} graphiques créés pour une version antérieure de la recherche. Voulez-vous migrer ces graphiques pour la recherche actuelle ?",
     "save_hint": "Une fois la migration exécutée et si vous souhaitez conserver les nouveaux graphiques, vous devrez enregistrer la recherche actuelle comme nouveau dashboard. Sinon, les graphiques seront perdus à la sortie de la page de recherche.",
     "migrate": "Migrer",
-    "discard": "Abandonner les graphiques"
+    "discard": "Abandonner les graphiques",
+    "found_charts_many": "Nous avons trouvé {{count}} graphiques créés pour une version antérieure de la recherche. Voulez-vous migrer ces graphiques pour la recherche actuelle ?"
   },
   "query": {
     "contained_in_enterprise": "(inclus dans <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
@@ -337,11 +340,20 @@
   },
   "saved_searches": {
     "title": "Recherches enregistrées",
+    "confirm_bulk_delete_one": "Voulez-vous vraiment supprimer {{count}} recherche enregistrée ?",
+    "confirm_bulk_delete_other": "Voulez-vous vraiment supprimer {{count}} recherches enregistrées ?",
+    "bulk_delete_partial_one": "{{failed}} recherche enregistrée sur {{count}} sélectionnée n'a pas pu être supprimée.",
+    "bulk_delete_partial_other": "{{failed}} recherches enregistrées sur {{count}} sélectionnées n'ont pas pu être supprimées.",
+    "bulk_delete_success_one": "{{count}} recherche enregistrée a été supprimée avec succès.",
+    "bulk_delete_success_other": "{{count}} recherches enregistrées ont été supprimées avec succès.",
     "success": "Succès",
     "bulk_delete_error": "Une erreur s'est produite lors de la suppression des recherches enregistrées. {{error}}",
     "confirm_delete": "Vous êtes sur le point de supprimer la recherche enregistrée : « {{title}} ». Confirmez-vous ?",
     "delete_search": "Supprimer la recherche {{title}}",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "confirm_bulk_delete_many": "Voulez-vous vraiment supprimer {{count}} recherches enregistrées ?",
+    "bulk_delete_partial_many": "{{failed}} recherches enregistrées sur {{count}} sélectionnées n'ont pas pu être supprimées.",
+    "bulk_delete_success_many": "{{count}} recherches enregistrées ont été supprimées avec succès."
   },
   "search_meta": {
     "buttons": "Boutons des métadonnées de recherche"
@@ -517,10 +529,34 @@
     "remove_from_table": "Retirer du tableau",
     "add_to_all_tables": "Ajouter à tous les tableaux",
     "remove_from_all_tables": "Retirer de tous les tableaux",
-    "change_field_type": "Modifier le type de champ"
+    "change_field_type": "Modifier le type de champ",
+    "copy_field_name": "Copier le nom du champ dans le presse-papiers",
+    "add_to_favorites": "Ajouter le champ aux favoris",
+    "remove_from_favorites": "Retirer le champ des favoris"
   },
-  "aggregation": {},
-  "widget_creators": {},
-  "message_details": {},
-  "views_logic": {}
+  "aggregation": {
+    "summary_by": "Agrégation de {{series}} par {{fields}}",
+    "summary_only": "Agrégation de {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Nombre de messages",
+    "message_table": "Tableau des messages",
+    "custom_aggregation": "Agrégation personnalisée",
+    "aggregation": "Agrégation",
+    "events_overview": "Vue d'ensemble des événements",
+    "text_markdown": "Texte/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "entrée supprimée",
+    "timestamp": "Horodatage",
+    "not_stored": "Non stocké",
+    "not_stored_message": "Le message n'est pas stocké",
+    "received_by": "Reçu par",
+    "stored_in_index": "Stocké dans l'index",
+    "routed_into_streams": "Routé vers les streams"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch limite le résultat de la recherche à {{limit}} messages. Avec une taille de page de {{pageSize}} messages, vous pouvez utiliser les {{validPages}} premières pages.",
+    "confirm_delete_dashboard_page": "Voulez-vous vraiment supprimer cette page de dashboard ?"
+  }
 }
