@@ -245,6 +245,8 @@
     "positions_failed": "エクストラクターの順序の変更に失敗しました: {{error}}",
     "positions_failed_title": "エクストラクターの順序を更新できませんでした",
     "import_success": "インポート結果: {{successful}} 件のエクストラクターをインポートしました。",
-    "import_success_title": "インポートが完了しました"
+    "import_success_title": "インポートが完了しました",
+    "import_warning": "インポート結果: {{successful}} 件のエクストラクターをインポートしました。エラーが {{failed}} 件あります。",
+    "import_warning_title": "インポートが完了しました"
   }
 }
