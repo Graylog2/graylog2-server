@@ -211,6 +211,8 @@ type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
 
+type EntityTypeTitle = { type: string; title: string };
+
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
@@ -489,6 +491,7 @@ declare module 'graylog-web-plugin/plugin' {
     'hooks.logout'?: Array<LogoutHook>;
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityTypeTitles?: Array<EntityTypeTitle>;
     entityCreators?: Array<EntityCreator>;
     'users.details.segments'?: Array<{
       value: string;
