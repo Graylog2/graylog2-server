@@ -410,18 +410,84 @@
       "confirm_disable": "ユーザー {{name}} を本当に無効にしますか？現在のすべてのセッションが終了します。",
       "confirm_delete": "ユーザー {{name}} を本当に削除しますか？",
       "edit_title": "ユーザー {{name}} を編集",
-      "edit": "編集"
+      "edit": "編集",
+      "set_status_title": "{{name}} のアカウントステータスを設定",
+      "disable": "無効にする",
+      "enable": "有効にする",
+      "delete_title": "ユーザー {{name}} を削除"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "ログイン済み",
+      "last_activity": "最終アクティビティ: {{activity}}",
+      "client_address": "クライアントアドレス: {{address}}",
+      "not_logged_in": "未ログイン"
+    },
+    "status": {
+      "user_is": "ユーザーは{{status}}です",
+      "auth_disabled": "（認証サービスが無効です）",
+      "enabled": "有効",
+      "disabled": "無効"
+    },
+    "query_example": "メールアドレスに example.com を含むユーザーを検索:",
+    "fields": {
+      "full_name": "ユーザーの氏名",
+      "username": "ユーザーのログイン用ユーザー名です。",
+      "email": "ユーザーのメールアドレスです。"
+    },
+    "select_users": "ユーザーを選択..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "詳細を表示",
+    "edit_user": "ユーザーを編集",
+    "edit_tokens": "トークンを編集"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "トークン",
+    "human_name": "トークン",
+    "fields": {
+      "username": "トークンの所有者のユーザー名",
+      "name": "トークンの名前",
+      "created": "トークンの作成日",
+      "last_access": "トークンが最後に使用された日時",
+      "external_user": "トークンの所有者は、外部認証バックエンドのユーザーですか",
+      "auth_backend": "ユーザー認証バックエンド。内部ユーザーの場合は N/A"
+    },
+    "example_user": "指定したユーザーが作成したトークンを検索:",
+    "example_name": "指定したトークン名でトークンを検索:",
+    "deleting_title": "トークンを削除中",
+    "delete_confirm": "トークン「{{name}}」を削除しようとしています。よろしいですか？",
+    "delete": "削除",
+    "user_not_found": "ユーザーが存在しません。",
+    "user_error_title": "トークンのユーザーエラー",
+    "not_available": "N/A",
+    "delete_failed": "トークンの削除に失敗しました: {{error}}",
+    "delete_failed_title": "トークンを削除できませんでした",
+    "deleted": "トークンが正常に削除されました。",
+    "deleted_title": "成功しました！"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "ユーザーの詳細",
+    "title_with_name": "ユーザーの詳細 {{name}}",
+    "documentation_link_title": "権限のドキュメント",
+    "description": "プロフィール情報、設定、チーム、ロールなどの詳細の概要です。"
+  },
+  "password_rules": {
+    "min_length": "パスワードは{{minLength}}文字以上にする必要があります。",
+    "require_uppercase": "パスワードには、大文字を少なくとも1文字含める必要があります。",
+    "require_lowercase": "パスワードには、小文字を少なくとも1文字含める必要があります。",
+    "require_numbers": "パスワードには、数字を少なくとも1文字含める必要があります。",
+    "require_special_chars": "パスワードには、次の記号のうち少なくとも1文字を含める必要があります: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "ユーザー設定が正常に保存されました",
+    "save_failed": "「{{userName}}」の設定の保存に失敗しました。ステータス: {{error}}",
+    "save_failed_title": "ユーザー設定を保存できませんでした",
+    "change_success": "スタートページが正常に変更されました",
+    "change_failed": "スタートページの変更に失敗しました。エラー: {{error}}",
+    "change_failed_title": "スタートページを変更できませんでした"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "ユーザー {{userId}} の読み込みに失敗しました。ステータス:",
+    "load_failed_title": "ユーザー {{userId}} を読み込めませんでした"
+  }
 }
