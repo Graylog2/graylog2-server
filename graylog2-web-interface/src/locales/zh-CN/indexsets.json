@@ -355,11 +355,132 @@
     "routing_title": "分片路由",
     "routing_description": "粗体分片为主分片，其他为副本。当主分片离开集群时，副本会自动被选举为主分片。大小和文档数仅反映主分片，不包括可能的副本重复。",
     "tooltip": "状态：<i>{{state}}</i>，位于 {{hostname}}（{{name}}）",
-    "seconds_short": "{{seconds}}s"
+    "seconds_short": "{{seconds}}s",
+    "shard_id": "S{{id}}"
   },
-  "data_tiering": {},
-  "incompatible": {},
-  "strategies": {},
+  "data_tiering": {
+    "max_days_label": "存储中的最长天数",
+    "max_days_help": "数据超过多少天后应被删除。",
+    "min_days_label": "存储中的最短天数",
+    "min_days_help": "数据至少应在存储中保留的天数。",
+    "archive_label": "删除前归档",
+    "archive_help": "删除此索引之前是否将其归档？",
+    "error_negative": "不允许使用负数。",
+    "error_min_smaller": "存储中的最短天数必须小于最长天数。",
+    "error_min_bigger_hot": "存储中的最短天数必须大于热层中的最短天数。",
+    "summary_rotation_strategy": "轮转策略：",
+    "summary_data_tiering": "数据分层",
+    "summary_max": "存储中的最长天数：",
+    "summary_min": "存储中的最短天数：",
+    "tooltip_min_storage": "存储中的最短天数",
+    "tooltip_min_hot_and_storage": "热层与存储中的最短天数",
+    "tooltip_min_hot": "热层中的最短天数"
+  },
+  "incompatible": {
+    "working": "处理中...",
+    "bulk_remaining": "如果某个索引失败，其余索引仍将继续处理。",
+    "opens_in_new_tab": " (在新标签页中打开)",
+    "archiving": "正在归档...",
+    "reindexing": "正在重新索引...",
+    "archive_failed": "归档失败",
+    "reindex_failed": "重新索引失败",
+    "archive_conflict": "另一个归档任务正在运行。该任务完成后才能启动新的归档任务。",
+    "archive_conflict_title": "归档任务正在运行",
+    "archive_unavailable": "归档功能不可用。",
+    "bulk_rotation_failed": "批量轮转请求失败。",
+    "cluster_jobs_failed": "加载集群任务失败",
+    "cluster_jobs_failed_title": "无法加载集群任务",
+    "badge_system": "系统",
+    "badge_managed": "托管",
+    "badge_foreign": "外部",
+    "badge_warm": "温层",
+    "badge_active_write_index": "活动写入索引",
+    "badge_archived": "已归档",
+    "version_unknown": "未知",
+    "human_name": "不兼容的索引",
+    "reindex_requires_data_node": "只有当 {{productName}} 连接的是 Data Node 搜索后端时，才能对系统索引进行重新索引。请先 <migrationLink>迁移到 Data Node</migrationLink>，再对其进行重新索引，然后升级到下一个 OpenSearch 主版本。",
+    "partial_summary": "{{succeeded}} 个成功，{{failed}} 个失败。",
+    "partial_more": "...以及另外 {{count}} 个。",
+    "delete": {
+      "button": "删除",
+      "title": "删除索引",
+      "confirm": "删除",
+      "body": "此操作将永久删除 <strong>{{indexName}}</strong>。",
+      "success": "索引 \"{{indexName}}\" 已删除。",
+      "error": "无法删除。"
+    },
+    "reindex": {
+      "button": "重新索引",
+      "title": "重新索引系统索引",
+      "confirm": "重新索引系统索引",
+      "body": "此操作将对 <strong>{{indexName}}</strong> 进行重新索引，使其可用于 OpenSearch 3。",
+      "success": "索引 \"{{indexName}}\" 已完成重新索引。",
+      "error": "无法重新索引系统索引。"
+    },
+    "rotate": {
+      "button": "轮转",
+      "title": "轮转活动写入索引",
+      "confirm": "轮转",
+      "body_active": "<strong>{{indexName}}</strong> 是其索引集的活动写入索引，仍在接收新消息。轮转将在当前 OpenSearch 版本上启动新的写入索引。",
+      "body_afterwards": "之后，<strong>{{indexName}}</strong> 可以被归档或删除。",
+      "success": "\"{{indexName}}\" 所属的索引集已完成轮转。该索引不再接收消息，现在可以归档或删除。",
+      "error": "无法轮转。"
+    },
+    "archive_delete": {
+      "button": "归档并删除",
+      "title": "归档并删除索引",
+      "confirm": "归档并删除",
+      "body": "此操作将为 <strong>{{indexName}}</strong> 创建归档，并在之后删除该索引。",
+      "success": "已启动 \"{{indexName}}\" 的归档并删除任务。",
+      "error": "无法归档并删除。"
+    },
+    "bulk": {
+      "delete": {
+        "button": "删除",
+        "title": "删除不兼容的索引",
+        "confirm": "全部删除",
+        "error": "无法删除全部。"
+      },
+      "delete_partial_title": "部分索引无法删除",
+      "delete_failure_title": "无法删除索引",
+      "reindex": {
+        "button": "重新索引系统索引",
+        "title": "重新索引系统索引",
+        "confirm": "全部重新索引",
+        "error": "无法重新索引全部。"
+      },
+      "archive_delete": {
+        "button": "归档并删除",
+        "title": "归档并删除索引",
+        "confirm": "全部归档并删除",
+        "error": "无法归档并删除全部。"
+      },
+      "rotate": {
+        "button": "轮转活动写入索引",
+        "title": "轮转活动写入索引",
+        "confirm": "全部轮转",
+        "error": "无法轮转全部。"
+      },
+      "rotate_partial_title": "部分索引无法轮转",
+      "rotate_failure_title": "无法轮转索引"
+    }
+  },
+  "strategies": {
+    "name_rotation_message_count": "索引消息数",
+    "name_rotation_size": "索引大小",
+    "name_rotation_time": "索引时间",
+    "name_rotation_time_size_optimizing": "索引时间大小优化",
+    "name_retention_delete": "删除索引",
+    "name_retention_close": "关闭索引",
+    "name_retention_noop": "不做任何操作",
+    "retention_max_indices_label": "最大索引数",
+    "retention_closing_help": "在<strong>关闭</strong>最旧索引之前保留的最大索引数",
+    "retention_deleting_help": "在<strong>删除</strong>最旧索引之前保留的最大索引数",
+    "retention_noop_help": "该保留策略不可配置，因为它不执行任何操作。",
+    "retention_summary_strategy": "索引保留策略：",
+    "retention_summary_close": "关闭",
+    "retention_summary_delete": "删除"
+  },
   "pages": {},
   "navigation": {},
   "maintenance_dialog": {},
