@@ -15,7 +15,8 @@
     "color_hint": "顏色提示",
     "select_all_fields": "選取所有欄位",
     "deselect_all_fields": "取消選取所有欄位",
-    "field_required": "必須填寫欄位。"
+    "field_required": "必須填寫欄位。",
+    "must_be_greater_than_other": "必須大於 0。"
   },
   "wizard_grouping": {
     "settings": "設定",
@@ -115,24 +116,121 @@
     "axis_label_or_color": "至少需為一個座標軸定義標籤或顏色。",
     "type_required": "必須選擇類型。"
   },
-  "builder_empty": {},
-  "vis_types": {},
-  "vis_validation": {},
-  "vis_common": {
-    "interpolation_types": {},
-    "axis_types": {}
+  "builder_empty": {
+    "title": "空白彙總",
+    "editing": "您目前正在編輯 Widget。",
+    "add_metric_hint": "若要查看結果，請至少新增一個指標。您可以新增列或欄來分組資料。",
+    "preview_hint": "您可以點選「{{button}}」來預覽 Widget 的搜尋結果。",
+    "finish_hint": "完成後，請點選「{{update}}」以儲存，或點選「{{cancel}}」以捨棄變更。",
+    "edit_hint_interactive": "請<editButton>編輯</editButton> Widget 以在此查看結果。",
+    "edit_hint": "請編輯 Widget 以在此查看結果。"
   },
-  "vis_heatmap": {},
-  "vis_worldmap": {},
+  "vis_types": {
+    "area_chart": "面積圖",
+    "bar_chart": "長條圖",
+    "heatmap": "熱度圖",
+    "line_chart": "折線圖",
+    "network_graph": "網路圖",
+    "pie_chart": "圓餅圖",
+    "sankey": "桑基圖",
+    "scatter_plot": "散佈圖",
+    "single_number": "單一數值",
+    "world_map": "世界地圖"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "面積圖至少需要一個指標",
+    "bar_chart_requires_metric": "長條圖至少需要一個指標",
+    "line_chart_requires_metric": "折線圖至少需要一個指標",
+    "pie_chart_requires_metric": "圓餅圖至少需要一個指標",
+    "scatter_plot_requires_metric": "散佈圖至少需要一個指標",
+    "sankey_requires_groupings": "桑基圖至少需要兩個分組欄位。",
+    "sankey_single_metric": "桑基圖僅支援單一指標。",
+    "network_requires_groupings": "網路圖至少需要兩個分組欄位。"
+  },
+  "vis_common": {
+    "interpolation": "內插方式",
+    "interpolation_types": {
+      "linear": "線性",
+      "step-after": "階梯後",
+      "spline": "平滑曲線"
+    },
+    "axis_type": "座標軸類型",
+    "axis_types": {
+      "linear": "線性",
+      "logarithmic": "對數"
+    },
+    "color_scale": "色彩刻度",
+    "reverse_scale": "反轉刻度",
+    "show_axis_labels": "顯示座標軸標籤",
+    "x_axis": "X 軸",
+    "y_axis_number": "Y 軸：數值",
+    "y_axis_percent": "Y 軸：百分比",
+    "y_axis_time": "Y 軸：時間",
+    "y_axis_size": "Y 軸：大小",
+    "color_hint": "顏色提示",
+    "legend_configuration": "{{label}} 的設定"
+  },
+  "vis_heatmap": {
+    "auto_scale": "自動刻度",
+    "min": "最小值",
+    "max": "最大值",
+    "use_smallest_as_default": "預設使用最小值",
+    "default_value": "預設值"
+  },
+  "vis_worldmap": {
+    "zoom": "縮放",
+    "latitude": "緯度",
+    "longitude": "經度",
+    "name": "名稱",
+    "coordinates": "座標：",
+    "value": "值："
+  },
   "vis_bar": {
-    "modes": {},
-    "mode_help": {}
+    "mode": "模式",
+    "modes": {
+      "group": "分組",
+      "stack": "堆疊",
+      "relative": "相對",
+      "overlay": "疊加"
+    },
+    "mode_help": {
+      "group": "每個系列在圖表中皆以獨立的長條表示。",
+      "stack": "所有系列彼此堆疊，形成單一長條。",
+      "relative": "所有系列彼此堆疊，形成單一圖表。但負值系列會放置於零以下。",
+      "overlay": "所有系列以長條彼此疊加放置。為了能看見各個長條，透明度會降低至 75%。建議此選項僅用於不超過 3 個系列的情況。"
+    }
   },
   "vis_number": {
-    "trend_preferences": {},
-    "highlight_options": {}
+    "trend": "趨勢",
+    "trend_description": "顯示此數值的趨勢資訊。",
+    "trend_help_enabled": "若使用者啟用趨勢，會在目前數值下方顯示獨立的方塊，以圖示標示變化方向，並顯示目前值與前一個值之間的絕對差異與相對差異。",
+    "trend_help_previous": "前一個值是透過在背景執行兩次完全相同的搜尋（僅時間範圍不同）計算而得。第一次搜尋的時間範圍與此搜尋／此 Widget 的設定相同，第二次搜尋則是使用相同的時間範圍長度，並往過去平移。",
+    "trend_preference": "趨勢偏好",
+    "trend_preferences": {
+      "LOWER": "較低",
+      "NEUTRAL": "中性",
+      "HIGHER": "較高"
+    },
+    "highlight": "突顯",
+    "highlight_options": {
+      "TREND_ONLY": "僅顯示趨勢資訊",
+      "FULL_WIDGET": "整個 Widget"
+    },
+    "not_available": "不適用",
+    "trend_label": "趨勢：{{absolute}}（{{relative}}），相較於前一個值 {{previous}}",
+    "previous_value": "前一個值：{{previous}}"
   },
-  "vis_popover": {},
-  "vis_network": {},
-  "vis_sankey": {}
+  "vis_popover": {
+    "related_values": "相關值",
+    "data_points": "資料點",
+    "metric": "指標",
+    "groupings": "分組",
+    "back": "返回"
+  },
+  "vis_network": {
+    "no_connections": "沒有可顯示的連線。請調整搜尋或分組以查看結果。"
+  },
+  "vis_sankey": {
+    "no_flows": "沒有可顯示的流量。請調整搜尋或分組以查看結果。"
+  }
 }
