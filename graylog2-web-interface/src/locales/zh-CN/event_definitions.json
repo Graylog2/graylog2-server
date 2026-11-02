@@ -15,16 +15,25 @@
   },
   "bulk_actions": {
     "delete": {
+      "confirm_other": "您确定要删除 {{count}} 个 Event Definitions 吗？",
       "error": "删除 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法删除。",
+      "success_other": "已成功删除 {{count}} 个 Event Definitions。",
       "title": "删除 Event Definitions"
     },
     "disable": {
+      "confirm_other": "您确定要禁用 {{count}} 个 Event Definitions 吗？",
       "error": "禁用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法禁用。",
+      "success_other": "已成功禁用 {{count}} 个 Event Definitions。",
       "title": "禁用 Event Definitions"
     },
     "disable_action": "禁用",
     "enable": {
+      "confirm_other": "您确定要启用 {{count}} 个 Event Definitions 吗？",
       "error": "启用 Event Definitions 时发生错误。{{error}}",
+      "failed_other": "所选的 {{count}} 个 Event Definitions 中有 {{failed}} 个无法启用。",
+      "success_other": "已成功启用 {{count}} 个 Event Definitions。",
       "title": "启用 Event Definitions"
     },
     "enable_action": "启用",
@@ -420,6 +429,7 @@
     "yes": "是"
   },
   "summary_renders": {
+    "backlog_included_other": "通知将包含 {{count}} 条消息",
     "backlog_none": "通知将不包含任何消息。",
     "condition_plugin_no_summary": "条件插件 <em>{{type}}</em> 未提供摘要。",
     "event_procedure_summary": "事件处理流程摘要",
@@ -466,8 +476,10 @@
     "aria_label": "Event Definition 标签",
     "duplicate": "标签“{{tag}}”已添加。",
     "help": "按 Enter 或 Tab 添加。标签会转换为小写并去除重复项。仅允许小写字母、数字、连字符、下划线和点。",
+    "invalid_characters_other": "标签 {{tags}} 包含无效字符。仅允许小写字母、数字、连字符、下划线和点。",
     "max_reached": "已达到最多 {{max}} 个标签。",
-    "placeholder": "例如 authentication, brute-force, compliance"
+    "placeholder": "例如 authentication, brute-force, compliance",
+    "too_long_other": "标签 {{tags}} 超过最大长度 {{max}} 个字符。"
   },
   "template_preview": {
     "aggregation": "在分组中设置的字段，保留其原始名称",
@@ -507,6 +519,7 @@
     "title": "发现一些错误！"
   },
   "use_event_definition_notifications": {
-    "load_failed": "加载 Event Definition 失败，状态：{{error}}"
+    "load_failed": "加载 Event Definition 失败，状态：{{error}}",
+    "load_failed_title": "无法加载 Event Definition"
   }
 }
