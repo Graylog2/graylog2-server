@@ -1,1 +1,158 @@
-{}
+{
+  "overview": {
+    "elasticsearch_unavailable": {
+      "title": "索引概览不可用",
+      "description": "无法获取索引概览信息。这通常意味着连接索引器时出现问题，<strong>请确保索引器可以从 {{productName}} 访问</strong>。",
+      "journal_info": "消息将继续存储在 journal 中，但在索引器恢复可访问之前无法进行搜索。"
+    },
+    "header": {
+      "index_set_title": "索引集：{{title}}",
+      "documentation_link": "索引模型文档",
+      "edit_button": "编辑索引集",
+      "description": "这里显示了当前纳入搜索和分析范围的该索引集中所有索引（消息存储）的概览。"
+    },
+    "indices_info": {
+      "summary": "共 {{count}} 个索引，总计管理 {{messageCount}} 条消息，当前写入活动索引为 <i>{{currentTarget}}</i>。"
+    },
+    "document_title": "索引集 - {{title}}"
+  },
+  "indexers": {
+    "cluster_health": {
+      "title": "{{distribution}} 集群",
+      "docs_open_search": "OpenSearch 设置文档",
+      "docs_elasticsearch": "Elasticsearch 设置文档",
+      "error": "无法获取 {{distribution}} 集群健康状态。获取 {{distribution}} 集群健康状态失败：{{message}}",
+      "status": "{{distribution}} 集群 {{name}} 状态为 {{status}}。",
+      "shards": "分片：{{active}} 个活动，{{initializing}} 个初始化中，{{relocating}} 个迁移中，{{unassigned}} 个未分配，",
+      "what_does_this_mean": "这是什么意思？"
+    },
+    "failures": {
+      "none": "过去 24 小时内没有索引失败的尝试。",
+      "show_errors": "显示错误",
+      "title": "索引器失败",
+      "docs": "索引器失败文档",
+      "description": "每条未成功索引的消息都会被记录为一次索引器失败。",
+      "none_hurray": "太好了！当前没有任何索引器失败。",
+      "timestamp": "时间戳",
+      "index": "索引",
+      "letter_id": "Letter ID",
+      "error_message": "错误信息"
+    },
+    "system_overview": {
+      "looking_for_failures": "正在查找索引失败...",
+      "license_load_failed": "无法加载许可证信息",
+      "error_title": "错误"
+    }
+  },
+  "indices": {
+    "maintenance": {
+      "title": "维护",
+      "recalculate_all": "清理并重新计算所有索引范围",
+      "check_versions": "检查索引版本",
+      "confirm_recalculate_all": "这将清理并重新计算所有现有的索引范围。是否继续？"
+    },
+    "closed_index": {
+      "info": "此索引已关闭。当前无法获取索引信息，请重新打开该索引后重试。",
+      "reopen": "重新打开索引",
+      "delete": "删除索引",
+      "confirm_delete": "确定要删除索引 {{indexName}} 吗？"
+    },
+    "create_index_set": {
+      "submit": "创建索引集",
+      "submit_loading": "正在创建索引集..."
+    },
+    "incompatible_modal": {
+      "title": "索引版本",
+      "upgrade_blocked": "存在不兼容的索引，目前无法将此集群升级到 OpenSearch 3.x，因为这样做将是破坏性操作。",
+      "upgrade_path": "推荐的升级路径是使用提供的向导 <migrationLink>从 OpenSearch 迁移到 Data Node</migrationLink>（<docsLink>文档</docsLink>），然后使用内置的 Data Node 升级自动化功能继续。",
+      "opens_in_new_tab": " (在新标签页中打开)",
+      "unsupported_direct_upgrade": "由于存在风险，当存在不兼容的索引时，{{productName}} 目前不支持从 OpenSearch 2.x 直接升级到 3.x。后续版本将增加对此路径的支持；如果情况紧急，请联系 {{productName}} 洽谈专业服务项目。",
+      "support_until": "OpenSearch 2.x 将维持支持至 2027 年 11 月。",
+      "info": "任何由旧的不兼容主版本 OpenSearch 创建的索引，都需要先归档、删除或重新索引，才能将搜索后端升级到下一个主版本。",
+      "close": "关闭"
+    },
+    "details": {
+      "confirm_recalculate": "确定要重新计算索引 {{indexName}} 的索引范围吗？",
+      "recalculate_failed": "无法为 {{indexName}} 创建索引范围重新计算任务",
+      "recalculate_failed_title": "启动 {{indexName}} 的索引范围重新计算时出错",
+      "confirm_delete": "确定要删除索引 {{indexName}} 吗？",
+      "active_write_index": "活动的写入索引无法删除",
+      "recalculate": "重新计算索引范围",
+      "delete": "删除索引",
+      "stats": "{{segments}} 个段，{{contexts}} 个打开的搜索上下文，{{deleted}} 条已删除消息",
+      "primary_shard_operations": "主分片操作",
+      "total_shard_operations": "分片操作总数"
+    },
+    "maintenance_strategies": {
+      "time_based_size_optimizing_help": "基于时间的大小优化轮转策略会尝试每天轮转索引。但为了获得大小合适的索引，它可能会跳过本次轮转，使分片大小保持在可接受范围内。该优化可以在配置的保留最短/最长生命周期范围内延迟轮转。如果索引的年龄超过最短与最长之间的范围，无论当前大小如何，都将进行轮转。",
+      "max_retention_warning": "根据<b>轮转周期</b>和<b>最大索引数</b>计算出的实际保留期限，不应超过管理员设置的<b>最大保留期限</b> <b>{{maxRetentionPeriod}}</b>。",
+      "deactivated": "{{name}} 策略已停用。请配置有效的保留策略。",
+      "summary_not_found": "未找到策略 {{strategy}} 的摘要！"
+    },
+    "range_summary": {
+      "none": "没有可用的索引范围。",
+      "recalculated": "索引范围已于 <relativeTime /> 重新计算，耗时 {{ms}} 毫秒。"
+    },
+    "section": {
+      "indices": "索引：",
+      "shards": "分片：",
+      "total_size": "总大小："
+    }
+  },
+  "index_set_form": {
+    "configuration_information": "配置信息",
+    "title_label": "标题",
+    "title_help": "索引集的描述性名称。",
+    "description_label": "描述",
+    "description_help": "添加此索引集的描述。",
+    "details": "详细信息",
+    "shards_label": "索引分片",
+    "shards_help": "此索引集中每个索引在搜索集群中使用的分片数量。增加索引分片可以将活动写入索引分布到多个搜索节点上，从而提高写入此索引集数据的速度。但增加索引分片可能降低搜索性能，并增加索引的内存占用。该值不应高于搜索节点的数量。",
+    "replicas_label": "索引副本",
+    "replicas_help": "此索引集中每个索引在搜索集群中使用的副本分片数量。添加副本分片可以提高并行读取索引时的搜索性能（如仪表盘查询），并且是高可用和备份策略的组成部分。每增加一组副本分片，都会成倍增加索引的存储需求和内存占用。该值不应高于搜索节点的数量，通常也不应高于 1。",
+    "max_segments_label": "最大段数",
+    "max_segments_help": "<em>高级选项。</em>优化（强制合并）后，每个搜索集群索引的最大段数。设置较高的值会降低索引优化的压缩率。",
+    "disable_optimization_label": "轮转后禁用索引优化",
+    "disable_optimization_help": "<em>高级选项。</em>索引优化是在活动索引轮转后执行的压缩过程，可减小索引在磁盘上的大小。它表现为搜索集群在索引轮转后执行的一项占用大量 CPU 的维护任务。压缩索引可以提高搜索性能并减少索引集的存储占用。",
+    "field_type_refresh_label": "字段类型刷新间隔",
+    "field_type_refresh_help": "<em>高级选项。</em>活动写入索引的字段类型信息的更新频率。将该值设置得更高可以略微降低搜索集群开销并提升性能，但新数据消息在 {{productName}} 中变得可搜索的时间会变长。",
+    "field_type_profile": "字段类型配置",
+    "important_note": "重要提示",
+    "important_note_text": "这些更改不会应用于任何现有索引，仅适用于新创建的索引。若要立即应用到当前索引集，请轮转索引。",
+    "save": "保存",
+    "prefix_label": "索引前缀",
+    "prefix_help": "用于此索引集所属索引的<strong>唯一</strong>前缀。前缀必须以字母或数字开头，且只能包含字母、数字、'_'、'-' 和 '+'。",
+    "prefix_error_empty": "无效的索引前缀：不能为空",
+    "prefix_error_start": "无效的索引前缀：必须以字母或数字开头",
+    "prefix_error_lower_case": "无效的索引前缀：必须为小写",
+    "prefix_error_chars": "无效的索引前缀：只能包含字母、数字、'_'、'-' 和 '+'",
+    "analyzer_label": "分析器",
+    "analyzer_help": "此索引集的分析器。",
+    "rotation_retention": "轮转与保留",
+    "segment_data_tiering": "数据分层",
+    "segment_legacy": "旧版（已弃用）",
+    "rotation_title": "索引轮转配置",
+    "rotation_description": "多个索引用于存储文档，您可以配置策略来决定何时轮转当前活动的写入索引。",
+    "rotation_placeholder": "选择轮转策略"
+  },
+  "deletion_form": {},
+  "set_details": {},
+  "profiles": {},
+  "field_types": {},
+  "templates": {},
+  "overview_table": {},
+  "index_summary": {},
+  "indices_configuration": {},
+  "shards": {},
+  "data_tiering": {},
+  "incompatible": {},
+  "strategies": {},
+  "pages": {},
+  "navigation": {},
+  "maintenance_dialog": {},
+  "hooks": {},
+  "notifications": {},
+  "use_index_set_stats_notifications": {},
+  "use_indexer_overview_notifications": {},
+  "use_indices_configuration_notifications": {}
+}
