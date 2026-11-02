@@ -821,27 +821,142 @@
       "certificate": "証明書",
       "copy_to_clipboard": "クリップボードにコピー",
       "private_key": "秘密鍵",
-      "view_principal": "プリンシパル："
+      "view_principal": "プリンシパル：",
+      "view_role": "ロール：",
+      "generate": "クライアント証明書を生成",
+      "description": "サードパーティツール用のクライアント証明書を生成します",
+      "title": "クライアント証明書"
     },
     "cluster_health": {
-      "shard_replication_help": {},
-      "state_help": {}
+      "cluster_manager": "クラスターマネージャー：",
+      "disabled": "無効",
+      "enabled": "有効",
+      "nodes_summary": "{{total}} （{{outdated}} 台が古い、{{upgraded}} 台がアップグレード済み）",
+      "number_of_nodes": "ノード数：",
+      "number_of_shards": "シャード数：",
+      "server_version": "サーバーバージョン：",
+      "shard_replication": "シャードレプリケーション：",
+      "shard_replication_help": {
+        "confirm": "ノードがアップグレードされた後に<emphasis><bold>アップグレードを確定</bold></emphasis>をクリックすると、シャードレプリケーションが再度有効になり、アップグレード中のノードが原因で利用できなかったすべてのシャードが再割り当てされます。",
+        "force_disabled": "強制的に無効",
+        "force_enabled": "強制的に有効",
+        "start": "ノードの<emphasis><bold>アップグレードプロセスを開始</bold></emphasis>をクリックすると、シャードの割り当てがレプリケーションなしに設定され、OpenSearch は利用可能なシャードのみを使用するようになります。"
+      },
+      "shards_summary": "{{active}} アクティブ、{{initializing}} 初期化中、{{relocating}} 再配置中、{{unassigned}} 未割り当て",
+      "state_help": {
+        "green": "ノードがアップグレードされた後に<emphasis>アップグレードを確定</emphasis>をクリックすると、シャードレプリケーションが再度有効になり、アップグレード中のノードが原因で利用できなかったすべてのシャードが再割り当てされ、クラスターは GREEN の状態に戻ります。",
+        "question": "ローリングアップグレード中、クラスターの状態はどのように変化しますか？",
+        "red": "RED - レプリケーションのないインデックスを使用していて、そのインデックスのシャードをホストしているノードをアップグレードすると、クラスターは red の状態になり、これらのインデックスへのデータの取り込みも、これらのインデックスからの検索もできなくなります。",
+        "yellow": "YELLOW - ノードのアップグレードを開始した後、OpenSearch が利用可能なシャードのみを使用できるように、シャードの割り当てがレプリケーションなしに設定されます。"
+      }
     },
-    "upgrade_method": {},
-    "upgrade_status": {},
-    "upgrade_nodes": {},
-    "data_node_actions": {},
-    "data_node_badge": {},
-    "data_node_status": {},
-    "data_node_logs": {},
-    "cluster_management": {},
-    "ca_configuration": {},
-    "ca_upload": {},
-    "ca_create": {},
+    "upgrade_method": {
+      "cluster_restart": "クラスターの再起動",
+      "cluster_restart_description": "クラスターの再起動方式を使用する場合、すべての Data Node を一度にアップグレードします。この間、メッセージはジャーナルにバッファリングされ、Data Node クラスターがオンラインに戻ると処理されます。Data Node の停止中に想定されるメッセージ量に合わせてジャーナルサイズが設定されていれば、データは失われません。",
+      "cluster_restart_less_than_three": "Data Node クラスターのノード数が 3 未満の場合、利用可能な方式はクラスターの再起動のみです。",
+      "cluster_restart_three_or_more": "Data Node クラスターのノード数が 3 以上の場合、ジャーナルサイズとメッセージのスループットを考慮したうえで、クラスターの再起動方式を選択できます。",
+      "rolling_upgrade": "ローリングアップグレード",
+      "rolling_upgrade_description": "ローリングアップグレードは、<bold>3 台以上のノード</bold>で実行中の Data Node クラスターでのみ実行でき、ダウンタイムはほぼありません。",
+      "rolling_upgrade_process": "各 Data Node は個別に停止され、その場でアップグレードされます。あるいは、新しいバージョンを実行しているホストで Data Node を 1 台ずつ停止して置き換えることもできます。この処理中も、クラスター内のデータのインデックス作成とクエリを続行できます。"
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "すべての Data Node は最新です。",
+      "checking": "OpenSearch の状態を確認中...",
+      "error": "Data Node の組み込み OpenSearch バージョンを確認できませんでした。",
+      "outdated": "Data Node の組み込み OpenSearch は最新ではありません。",
+      "up_to_date": "Data Node の組み込み OpenSearch は最新です。",
+      "up_to_date_with_version": "Data Node の組み込み OpenSearch は最新です <bold>({{version}})。</bold>",
+      "upgrading": "OpenSearch のローリングアップグレードが進行中です。"
+    },
+    "upgrade_nodes": {
+      "manager": "マネージャー",
+      "no_outdated_nodes": "古いノードは見つかりませんでした。",
+      "no_upgraded_nodes": "アップグレード済みのノードは見つかりませんでした。",
+      "outdated_nodes": "古いノード",
+      "start_upgrade": "アップグレードプロセスを開始",
+      "upgraded": "アップグレード済み",
+      "upgraded_nodes": "アップグレード済みのノード"
+    },
+    "data_node_actions": {
+      "rejoin": "再参加",
+      "remove": "削除",
+      "renew_certificate": "証明書を更新",
+      "show_logs": "ログを表示",
+      "start": "開始",
+      "stop": "停止",
+      "rejoin_title": "Data Node を再参加",
+      "rejoin_confirm": "Data Node \"{{hostname}}\" を再参加させてもよろしいですか？",
+      "remove_title": "Data Node を削除",
+      "remove_confirm": "Data Node \"{{hostname}}\" を削除してもよろしいですか？",
+      "stop_title": "Data Node を停止",
+      "stop_confirm": "Data Node \"{{hostname}}\" を停止してもよろしいですか？"
+    },
+    "data_node_badge": {
+      "short_node_id": "ノード ID（短縮）"
+    },
+    "data_node_status": {
+      "queued_for": "{{action}} のキューに登録済み"
+    },
+    "data_node_logs": {
+      "no_logs": "ログはありません。",
+      "title": "{{hostname}} のログ"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Data Node と管理対象の OpenSearch クラスターのパフォーマンスメトリクスを表示します。",
+      "teaser_license_warning": "Data Node と管理対象の OpenSearch クラスターのパフォーマンスメトリクスを表示するには、有効なライセンスと設定済みの Data Node があることを確認してください。"
+    },
+    "ca_configuration": {
+      "create_tab": "新しい CA を作成",
+      "description_provision": "証明機関が Data Node の証明書をより簡単にプロビジョニングおよび管理します。",
+      "description_upload_or_create": "この手順では、新しい証明機関をアップロードするか作成できます。",
+      "reusing_certificates": "既存のクラスターで証明書を使用している場合、デフォルトでは、次の手順で Data Node をプロビジョニングする際に、{{productName}} の CA と自動生成された証明書に置き換えられます。独自の CA を含める場合は、既存の証明書をアップロードできます。詳細は <docsLink>{{productName}} Data Node - はじめに</docsLink>を参照してください。",
+      "reusing_certificates_title": "証明書の再利用",
+      "title": "証明機関を設定",
+      "upload_tab": "CA をアップロード"
+    },
+    "ca_upload": {
+      "certificate_authority": "証明機関",
+      "dropzone": "CA をここにドラッグするか、クリックしてファイルを選択",
+      "explanation": "ここでは既存の CA をアップロードできます。秘密鍵（暗号化または非暗号化）、CA 証明書、および中間証明書をすべて含む 1 つのファイルをアップロードする必要があります。ファイルは PEM または PKCS#12 形式である必要があります。秘密鍵が暗号化されている場合は、そのパスワードも指定する必要があります。",
+      "failed": "CA のアップロードに失敗しました。エラー: {{error}}",
+      "password": "パスワード",
+      "rejected": "CA のアップロードに失敗しました",
+      "submit": "CA をアップロード",
+      "submitting": "CA をアップロード中...",
+      "success": "CA のアップロードに成功しました"
+    },
+    "ca_create": {
+      "description": "“Create CA” ボタンをクリックすると、{{productName}} Data Node 用の新しい証明機関をすばやく作成できます。",
+      "failed": "CA の作成に失敗しました。エラー: {{error}}",
+      "organization_name": "組織名",
+      "submit": "CA を作成",
+      "submitting": "CA を作成中...",
+      "success": "CA の作成に成功しました"
+    },
     "renewal_policy": {
-      "modes": {}
+      "certificate_lifetime": "証明書の有効期間：",
+      "certificate_lifetime_label": "証明書の有効期間",
+      "configure": "証明書の更新ポリシーを設定",
+      "description": "これらの設定は、証明書の期限切れを検出する際や、証明書を更新する際に使用されます。",
+      "edit": "設定を編集",
+      "lifetime_explanation": "証明書の有効期間は、新しく作成された証明書の有効期間の長さに使用されます。",
+      "mode_explanation": "更新ポリシーを「Automatic」に設定すると、ユーザーの操作なしに期限切れのすべての証明書が更新されます。「Manual」に設定すると、1 つ以上の証明書の期限が近づいたときにシステム通知が作成され、更新を確認できるようになります。",
+      "renewal_mode": "更新モード：",
+      "renewal_mode_label": "証明書の更新モード",
+      "select_mode": "証明書の更新モードを選択",
+      "submit": "設定を更新",
+      "submitting": "設定を更新中",
+      "title": "証明書の更新ポリシー設定",
+      "update_failed": "証明書の更新ポリシーの更新中にエラーが発生しました: {{error}}",
+      "update_failed_title": "証明書の更新ポリシーを更新できません",
+      "modes": {
+        "automatic": "自動",
+        "manual": "手動"
+      }
     },
-    "details_page": {},
+    "details_page": {
+      "certificate_valid_until": "証明書の有効期限："
+    },
     "pages": {},
     "upgrade_page": {},
     "migration_steps": {},
