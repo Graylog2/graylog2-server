@@ -699,21 +699,130 @@
     "reset_migration": {
       "button": "Restablecer migración",
       "confirm": "¿Seguro que quieres restablecer la migración?",
-      "failed": "Error al restablecer el estado de la migración. Estado: {{error}}"
+      "failed": "Error al restablecer el estado de la migración. Estado: {{error}}",
+      "failed_title": "No se ha podido restablecer el estado de la migración.",
+      "success": "El estado de la migración se ha restablecido correctamente."
     },
-    "migration_actions": {},
-    "force_start": {},
+    "migration_actions": {
+      "next": "Siguiente",
+      "show_renewal_policy_creation": "Configurar la política de renovación de certificados",
+      "show_migration_selection": "Ir a los pasos de la migración",
+      "run_directory_compatibility_check": "Ejecutar la comprobación de compatibilidad del directorio",
+      "provision_datanode_certificates": "Aprovisionar los Data Nodes con certificados"
+    },
+    "force_start": {
+      "confirm": "Iniciar de todos modos",
+      "description": "El backend indicó que las comprobaciones previas normales no se han superado.",
+      "submitting": "Iniciando...",
+      "title": "¿Iniciar la actualización de OpenSearch de todos modos?"
+    },
     "rolling_upgrade_nodes": {
-      "node_status": {},
-      "state": {}
+      "abort_requested": "Se ha solicitado la cancelación. La actualización se detendrá después del paso actual.",
+      "no_remaining_nodes": "No quedan nodos.",
+      "no_upgraded_nodes": "Todavía no hay nodos actualizados.",
+      "not_started": "Todavía no se ha iniciado ninguna actualización progresiva de OpenSearch.",
+      "title": "Actualización progresiva de OpenSearch",
+      "upgraded_heading": "Actualizados a la versión objetivo de OpenSearch",
+      "waiting_heading": "Esperando la actualización de OpenSearch",
+      "current": "actual",
+      "data_node": "Data Node",
+      "manager": "gestor",
+      "opensearch_version": "Versión de OpenSearch",
+      "status": "Estado",
+      "unknown": "Desconocido",
+      "node_status": {
+        "pending": "En espera",
+        "restarting": "Reiniciando",
+        "started": "Iniciado",
+        "completed": "Actualizado",
+        "failed": "Fallido",
+        "skipped": "Omitido"
+      },
+      "state": {
+        "preparing_cluster": "Preparando el clúster",
+        "selecting_next_node": "Seleccionando el siguiente nodo",
+        "upgrading_node": "Actualizando el nodo",
+        "waiting_node_joined": "Esperando a que el nodo se vuelva a unir",
+        "reenabling_allocation": "Reactivando la asignación",
+        "waiting_green": "Esperando a que el clúster esté en verde",
+        "paused_waiting_green": "En pausa, esperando a que el clúster esté en verde",
+        "finalizing": "Finalizando",
+        "completed": "Completada",
+        "aborted": "Cancelada",
+        "failed": "Fallida",
+        "in_progress": "En curso"
+      }
     },
-    "opensearch_upgrade_info": {},
+    "opensearch_upgrade_info": {
+      "current_version": "Versión actual de OpenSearch:",
+      "data_nodes": "Data Nodes:",
+      "data_nodes_summary": "{{total}} ({{available}} disponibles)",
+      "loading": "Cargando...",
+      "target_version": "Versión objetivo de OpenSearch:",
+      "unknown": "Desconocida"
+    },
     "start_upgrade": {
-      "full": {},
-      "rolling": {}
+      "full": {
+        "alert_title": "Hay menos de 3 Data Nodes: se trata de un reinicio completo, no progresivo",
+        "confirm": "Reiniciar",
+        "journal": "Mientras OpenSearch está apagado, los mensajes entrantes se acumulan en el journal de disco de cada nodo de {{productName}}. Si la interrupción supera el límite de tamaño o antigüedad del journal, la ingesta se detendrá y se pueden perder mensajes. Continúa solo si el journal tiene suficiente margen para el tiempo de inactividad previsto.",
+        "submitting": "Reiniciando...",
+        "title": "¿Reiniciar OpenSearch de los Data Nodes?",
+        "tolerate_downtime": "Continúa solo si puedes tolerar el tiempo de inactividad."
+      },
+      "no_rollback": "Una vez iniciada, no se puede revertir a la versión anterior.",
+      "rolling": {
+        "alert_title": "Esto reinicia cada Data Node, uno a uno",
+        "confirm": "Iniciar actualización progresiva",
+        "healthy_cluster": "Asegúrate de que el clúster esté en buen estado (verde) antes de continuar.",
+        "shard_allocation": "La asignación de shards se pausa durante cada reinicio, así que el clúster sigue disponible; sin embargo, la indexación y la búsqueda pueden verse ligeramente afectadas mientras un nodo sale y vuelve a unirse.",
+        "title": "¿Iniciar la actualización progresiva de OpenSearch?",
+        "wait_for_green": "Tras cada nodo, la actualización espera a que el clúster vuelva a estar en verde antes de continuar. Si tarda demasiado, se pausa y espera a que la reanudes."
+      },
+      "starting": "Iniciando..."
     },
-    "opensearch_upgrade": {},
-    "client_certificate": {},
+    "opensearch_upgrade": {
+      "already_up_to_date": "El OpenSearch integrado de los Data Nodes ya está actualizado.",
+      "automatic_upgrade": "Cada Data Node actualiza automáticamente su OpenSearch integrado a la versión objetivo.",
+      "backup": "Haz una copia de seguridad de MongoDB, del Data Node y del almacenamiento de Data Lake antes de actualizar para asegurar una ruta de reversión sin problemas.",
+      "before_upgrading": "Antes de actualizar",
+      "check_failed": "No se ha podido comprobar la disponibilidad de actualizaciones de OpenSearch.",
+      "full_restart": "Todos los Data Nodes deben reiniciarse para que la actualización surta efecto.",
+      "full_search_unavailable": "La búsqueda y la indexación no están disponibles mientras se reinician los Data Nodes.",
+      "incompatible_indices": "Índices incompatibles",
+      "old_indices_unreadable": "OpenSearch 3 no puede leer los índices creados con versiones anteriores a OpenSearch 2. Si estos índices permanecen durante la actualización, sus datos quedarán no disponibles.",
+      "resolve_indices_first": "Resuelve antes todos los índices incompatibles.",
+      "restarting": "Reiniciando...",
+      "resume": "Reanudar",
+      "resuming": "Reanudando...",
+      "rolling_restart": "Los Data Nodes se reinician uno a uno para minimizar el impacto.",
+      "rolling_search_impaired": "La funcionalidad de búsqueda puede verse afectada mientras se reinician los Data Nodes.",
+      "start_rolling_upgrade": "Iniciar actualización progresiva de OpenSearch",
+      "start_upgrade_and_restart": "Iniciar actualización de OpenSearch y reiniciar",
+      "starting_rolling_upgrade": "Iniciando la actualización progresiva de OpenSearch...",
+      "title": "Actualizar el OpenSearch integrado de los Data Nodes",
+      "upgrade_process": "Proceso de actualización",
+      "use_table": "Usa la tabla siguiente para reindexar los índices del sistema y archivar o eliminar los índices de datos antes de continuar."
+    },
+    "client_certificate": {
+      "certificate_lifetime": "Vigencia del certificado",
+      "close": "Cerrar",
+      "create_title": "Crear certificado de cliente",
+      "password": "Contraseña",
+      "principal": "Principal",
+      "principal_placeholder": "principal",
+      "role": "Rol",
+      "role_help": "Representa la asignación de roles de OpenSearch.",
+      "role_placeholder": "rol",
+      "submit": "Crear certificado",
+      "submitting": "Creando certificado...",
+      "unencrypted": "Sin cifrar",
+      "ca_certificate": "Certificado de la CA",
+      "certificate": "Certificado",
+      "copy_to_clipboard": "Copiar al portapapeles",
+      "private_key": "Clave privada",
+      "view_principal": "Principal:"
+    },
     "cluster_health": {
       "shard_replication_help": {},
       "state_help": {}
