@@ -122,23 +122,135 @@
       "input_type": "Input タイプ:",
       "running_on": "この Input の実行先:",
       "all_nodes": "すべての {{productName}} ノード",
-      "listening_on": "この Input の待ち受け先:"
+      "listening_on": "この Input の待ち受け先:",
+      "listening_on_value": "バインドアドレス {{bindAddress}}、ポート {{port}}。",
+      "listening_for": "この Input の受信対象:"
     },
-    "state": {},
-    "troubleshooting": {},
-    "received_traffic": {},
-    "message_count_by_stream": {},
-    "message_errors": {},
-    "rules": {},
-    "network_stats": {}
+    "state": {
+      "title": "状態",
+      "description": "Input が実行されるように設定されている {{productName}} ノードの数と、そのうち実行中のノードの数です。実行されていないノードがある場合は、クリックして関連するエラーメッセージを確認できます。",
+      "failed_starts": "起動の失敗 (直近 15 分):",
+      "not_running": "Input は実行されていません。"
+    },
+    "troubleshooting": {
+      "title": "トラブルシューティング",
+      "failed_title": "Input が失敗状態の場合。",
+      "failed_message_field": "Input が 1 つ以上の {{productName}} ノードで失敗すると、状態パネルのメッセージフィールドに短いエラーメッセージが表示されます。完全なエラーメッセージは {{productName}} の server.log ファイルで確認できます。",
+      "failed_port": "指定されたポートを使用するように設定された Input は、そのポートが特権ポートである場合 ({{productName}} が root として実行されていない場合)、または別の Input やアプリケーションがすでに使用している場合に失敗します。",
+      "failed_route": "指定された IP にルーティングできない場合、Input は失敗します。",
+      "failed_internet": "API に接続するためにインターネット接続が必要な Input は、インターネット接続がない場合、またはその API にルーティングできない場合に失敗します。",
+      "failed_certificate": "証明書が無効または期限切れの場合、TCP Input は失敗します。",
+      "failed_external_api": "外部 API に接続する Input (例: Microsoft Azure Input) では、{{productName}} がログを収集できるように、ソース側で設定を変更する必要があります。必要な手順は、該当する Input のドキュメントのサブページに記載されています。{{productName}} 側、または (該当する場合) API をホストする側で設定が誤っていると、外部 API に接続する Input は失敗します。",
+      "no_messages_title": "Input がすべてのノードで実行されているにもかかわらず、メッセージが Input に届いていない場合。",
+      "no_messages_network_io": "受信トラフィックパネルのネットワーク I/O フィールドを確認してください。ここにトラフィックが表示されない場合は、接続の問題が考えられます。",
+      "no_messages_connectivity": "トラフィックが表示されない場合は、まず {{productName}} サーバーとログソースの間のネットワーク接続をトラブルシューティングしてください。ping、telnet、tracert コマンドを実行して確認できます。",
+      "no_messages_external_api": "外部 API に接続する Input の場合は、{{productName}} の server.log ファイルを確認してください。認証の失敗 (無効なログイン情報、または API に対して操作を実行する権限がないこと) は、ここに詳細が出力されます。",
+      "no_messages_format": "受信トラフィックパネルのネットワーク I/O フィールドにトラフィックが表示されているのにメッセージが受信されていない場合は、Input に適していない形式でメッセージが送信されている可能性があります。",
+      "no_messages_protocol": "TCP Input は UDP トラフィックを読み取れず、その逆も同様です。",
+      "no_messages_empty": "内容のないメッセージは破棄されます。これは空のメッセージの破棄フィールドで監視できます。",
+      "no_messages_listener": "Listener Input は限られた範囲の形式のメッセージを想定しており、対応していない形式のメッセージを読み取れない場合があります。トラブルシューティングの目的では、Raw Text Input が最も制限の少ない要件です。",
+      "message_errors_title": "Input がすべてのノードで実行されており、メッセージも Input に届いているが、一部 (またはすべて) がメッセージエラーとして表示されている場合。",
+      "message_errors_failure_processing": "ライセンス付きの Enterprise クラスターでは、Failure Processing を有効にすると、入力、処理、検索クラスターへの書き込みの各段階でエラーになったメッセージを、失敗の詳細とともに保存できます。失敗の詳細は failure_cause および failure_details フィールドで確認できます。メッセージエラーパネルに移動し、メッセージ数をクリックすると、個々の失敗メッセージを確認できます。"
+    },
+    "received_traffic": {
+      "title": "受信トラフィック",
+      "description": "Input に到達したメッセージとネットワークトラフィックです。注: メトリクスは直近 15 分間のみを表示します。",
+      "total_messages": "Input が受信したメッセージの合計:",
+      "events": "{{count}} イベント",
+      "empty_messages": "空のメッセージの破棄:",
+      "active_connections": "アクティブな接続:",
+      "connections_value": "{{open}} (合計 {{total}})",
+      "network_io": "ネットワーク I/O:"
+    },
+    "message_count_by_stream": {
+      "title": "ストリーム別の受信メッセージ数",
+      "description": "直近 15 分間にこの Input から正常に取り込まれたメッセージです。ストリームをクリックするとメッセージを確認できます。",
+      "stream": "{{streamName}}:",
+      "none": "直近 15 分間にこの Input からのメッセージはストリームに振り分けられていません。"
+    },
+    "message_errors": {
+      "title": "メッセージエラー",
+      "description": "メッセージは、Input、処理パイプライン、または検索クラスターへのインデックス登録時に処理に失敗する場合があります。",
+      "at_input": "Input でのメッセージエラー:",
+      "failed_to_process": "メッセージの処理に失敗:",
+      "failed_to_index": "メッセージのインデックス登録に失敗:"
+    },
+    "rules": {
+      "pipeline_rules_title": "Input がパイプラインルールに含まれています",
+      "pipeline_rules_description": "以下のパイプラインルールは、この Input を明示的に参照しています (例: from_input、from_forwarder_input、または gl2_source_input/gl2_forwarder_input との一致による)。",
+      "pipeline_rules_human_name": "パイプラインルール",
+      "pipeline_rules_search": "パイプラインルールを検索",
+      "stream_rules_title": "Input がストリームルールに含まれています",
+      "stream_rules_description": "以下のストリームルールには、この Input を明示的に対象とする match input 関数が含まれています。match input 関数を明示的に使用せずに、この Input からメッセージを取り込む可能性のあるストリームルールは一覧に表示されません。",
+      "stream_rules_human_name": "ストリームルール",
+      "stream_rules_search": "ストリームルールを検索",
+      "load_pipeline_rules_failed": "Input のパイプラインルールの読み込みに失敗しました。ステータス:",
+      "could_not_load_pipeline_rules": "Input のパイプラインルールを読み込めませんでした",
+      "load_stream_rules_failed": "Input のストリームルールの読み込みに失敗しました。ステータス:",
+      "could_not_load_stream_rules": "Input のストリームルールを読み込めませんでした"
+    },
+    "network_stats": {
+      "total_prefix": " (合計: ",
+      "total_suffix": ")"
+    },
+    "show_received_messages": "受信したメッセージを表示",
+    "fetch_failed": "Input 診断の取得に失敗しました。ステータス:",
+    "could_not_fetch": "Input 診断を取得できませんでした"
   },
   "setup_wizard": {
-    "steps": {},
-    "diagnosis_step": {},
-    "routing": {},
-    "start": {},
+    "title": "Input セットアップウィザード",
+    "back": "戻る",
+    "finish": "完了",
+    "steps": {
+      "routing": "ルーティング",
+      "launch": "起動",
+      "diagnosis": "診断"
+    },
+    "diagnosis_step": {
+      "description": "検索クラスターにデータを書き込まずに Input とパースをテストします。",
+      "go_to_diagnosis": "Input 診断に移動"
+    },
+    "load_streams_failed": "ストリームの読み込みに失敗しました: {{error}}",
+    "load_input_references_failed": "Input 参照の読み込みに失敗しました: {{error}}",
+    "load_streams_by_index_set_failed": "インデックスセット別のストリームの読み込みに失敗しました: {{error}}",
+    "routing": {
+      "connected_pipelines_title": "ターゲットストリームに接続されている Pipeline",
+      "connected_pipelines": "Input セットアップを完了する前に、これらの影響を確認することをお勧めします。ターゲットストリームには、次の Pipeline が接続されています:",
+      "select_destination": "この Input からメッセージをルーティングする先のストリームを選択してください。",
+      "recommend_new_stream": "<strong>新しい Input ごとに新しいストリームを作成することをお勧めします。</strong> これにより、メッセージを基本的なスキーマに分類しやすくなります。",
+      "default_stream_fallback": "どのストリームにもルーティングされないメッセージは、<strong>Default Stream</strong> にルーティングされます。",
+      "pipeline_rules_info": "このウィザードでは、パイプラインルールを自動的に作成して <strong>Default Stream</strong> に関連付けることができます。これらのルールはシステム管理の Default Routing Pipeline に配置され、この Input の状態を正確に反映するように自動的に名前が変更される (または削除される) ようになります。",
+      "new_stream_heading": "新しいストリームにルーティング",
+      "recommended": "おすすめ!",
+      "create_stream": "ストリームを作成",
+      "existing_stream_heading": "既存のストリームにルーティング",
+      "select_stream": "ストリームを選択",
+      "create_new_stream": "新しいストリームを作成",
+      "choose_existing_stream": "既存のストリームを選択",
+      "existing_stream_selected": "この Input からのメッセージを既存のストリームにルーティングする設定が選択されています。",
+      "pipeline_rules_created": "<strong>Input を開始</strong> ボタンを押すと、パイプラインルールが作成されます。",
+      "default_stream": "Default Stream",
+      "remove_from_default": "「Default Stream」からの一致を削除",
+      "remove_from_default_help": "このストリームに一致するメッセージを「Default Stream」に割り当てないでください。"
+    },
+    "start": {
+      "description": "設定に従って Input をセットアップして起動します。",
+      "rolling_back": "Input をロールバックしています...",
+      "setting_up": "Input をセットアップしています...",
+      "not_ready": "Input はまだセットアップの準備ができていません。前の手順を完了してください。",
+      "start_input": "Input を開始",
+      "rollback_input": "Input をロールバック",
+      "launch_diagnosis": "Input 診断を起動"
+    },
     "progress": {
-      "loading": {},
+      "details": "詳細:",
+      "loading": {
+        "create_stream": "ストリームを作成しています...",
+        "create_stream_named": "ストリーム「{{name}}」を作成しています...",
+        "start_stream": "ストリームを開始しています...",
+        "start_stream_named": "ストリーム「{{name}}」を開始しています...",
+        "create_pipeline": "Pipeline を作成しています..."
+      },
       "error": {},
       "success": {}
     },
