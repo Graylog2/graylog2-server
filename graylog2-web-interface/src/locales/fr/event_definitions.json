@@ -381,20 +381,132 @@
     "enable": "Activer",
     "enabled": "Activée"
   },
-  "steps": {},
+  "steps": {
+    "additional_details": "Détails supplémentaires",
+    "condition": "Condition",
+    "notifications": "Notifications",
+    "share": "Partager",
+    "summary": "Récapitulatif"
+  },
   "summary": {
-    "condition_types": {}
+    "actions": "Actions",
+    "condition_invalid": "La condition n'est pas valide : {{errors}}",
+    "condition_types": {
+      "aggregation": "Agrégation",
+      "filter": "Filtre"
+    },
+    "create_events_if": "Créer des événements si",
+    "cron_description": "Description cron",
+    "cron_expression": "Expression cron",
+    "enable_scheduling": "Activer la planification",
+    "event_limit": "Limite d'événements",
+    "execute_every": "Exécuter la recherche toutes les",
+    "group_by": "Champ(s) de regroupement",
+    "missing_stream_permissions": "Autorisations de stream manquantes pour :",
+    "no": "non",
+    "no_cron_expression": "Erreur : aucune expression cron spécifiée !",
+    "no_filters": "Aucun filtre configuré",
+    "no_group_by": "Aucun regroupement configuré",
+    "no_streams": "Aucun stream sélectionné, la recherche porte sur tous les streams",
+    "search_filters": "Filtres de recherche",
+    "search_query": "Requête de recherche",
+    "search_within": "Rechercher dans les dernières",
+    "stream_categories": "Catégories de streams",
+    "streams": "Streams",
+    "time_zone": "Fuseau horaire",
+    "type": "Type",
+    "undeclared_parameters": "Des paramètres de requête non déclarés sont présents : {{parameters}}",
+    "use_cron": "Utiliser la planification cron",
+    "yes": "oui"
   },
-  "summary_renders": {},
-  "summary_template_help": {},
-  "tags_editor": {},
-  "template_preview": {},
-  "template_provider_form": {},
+  "summary_renders": {
+    "backlog_none": "Les notifications n'incluront aucun message.",
+    "condition_plugin_no_summary": "Le plugin de condition <em>{{type}}</em> ne fournit pas de récapitulatif.",
+    "event_procedure_summary": "Récapitulatif de la procédure d'événement",
+    "event_procedure_summary_unavailable": "Le composant de récapitulatif de la procédure d'événement n'est pas disponible.",
+    "fields": "Champs",
+    "grace_period_disabled": "Le délai de grâce est désactivé",
+    "grace_period_set": "Le délai de grâce est défini à {{duration}}",
+    "keys": "Clés",
+    "missing_notification_permissions": "Autorisations de notification manquantes pour :",
+    "no_event_procedures": "Cet événement ne possède aucune procédure d'événement.",
+    "no_field_value_provider": "Aucun fournisseur de valeur de champ configuré.",
+    "no_fields": "Aucun champ configuré pour les événements basés sur cette définition.",
+    "no_keys": "Aucune clé configurée pour les événements basés sur cette définition.",
+    "no_notifications": "Cet événement n'est configuré pour déclencher aucune notification.",
+    "no_remediation_steps": "Aucune étape de remédiation fournie",
+    "notification_not_found": "Impossible de trouver les informations de la notification <em>{{id}}</em>.",
+    "notification_plugin_no_summary": "Le plugin de notification <em>{{type}}</em> ne fournit pas de récapitulatif.",
+    "notifications": "Notifications",
+    "provider_plugin_no_summary": "Le plugin fournisseur <em>{{type}}</em> ne fournit pas de récapitulatif.",
+    "remediation_steps": "Étapes de remédiation",
+    "settings": "Paramètres"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Événements d'agrégation : valeurs de regroupement et résultats d'agrégation.",
+    "aggregation_example": "Agrégation du nombre de connexions échouées par utilisateur :",
+    "aggregation_example_template": "<userVariable></userVariable> a échoué à se connecter <countVariable></countVariable> fois",
+    "button_aria_label": "Afficher l'aide sur le modèle de résumé d'événement",
+    "button_title": "Aide sur le modèle de résumé",
+    "custom_fields": "Champs personnalisés",
+    "custom_fields_description": "Les champs personnalisés définis sur l'Event Definition sont disponibles sous <code>fields</code>.",
+    "event_definition_variables": "Variables de l'Event Definition",
+    "examples": "Exemples",
+    "filter_events": "Événements de filtre : champs du message de log d'origine.",
+    "filter_example": "Filtre sur un message de log spécifique :",
+    "filter_example_template": "Erreur sur <hostVariable></hostVariable> : <messageVariable></messageVariable>",
+    "group_by_field": "(champ de regroupement)",
+    "hostname": "(nom d'hôte)",
+    "intro": "Utilisez un modèle pour personnaliser la description affichée sur la page Alertes et événements lorsqu'un événement est créé. Les modèles utilisent la substitution <jmteLink>JMTE</jmteLink> : les variables sont placées entre <variable></variable>.",
+    "source_context": "Contexte source",
+    "source_context_description": "La variable <code>source</code> contient le contexte des données déclencheuses. Son contenu dépend du type d'Event Definition :",
+    "title": "Modèle de résumé d'événement"
+  },
+  "tags_editor": {
+    "aria_label": "Étiquettes de l'Event Definition",
+    "duplicate": "L'étiquette « {{tag}} » a déjà été ajoutée.",
+    "help": "Appuyez sur Entrée ou Tab pour ajouter. Les étiquettes sont converties en minuscules et dédupliquées. Seuls les lettres minuscules, chiffres, tirets, tirets bas et points sont autorisés.",
+    "max_reached": "Maximum de {{max}} étiquettes atteint.",
+    "placeholder": "ex. authentication, brute-force, compliance"
+  },
+  "template_preview": {
+    "aggregation": "Champs définis dans Group By avec leurs noms d'origine",
+    "aggregation_label": "Agrégation :",
+    "available_fields": "Les champs disponibles dans le modèle dépendent de la condition ayant créé l'événement :",
+    "correlation": "Tous les champs du dernier événement correspondant et non annulé",
+    "correlation_label": "Corrélation :",
+    "description": "Il est possible d'enrichir les événements générés avec des valeurs dynamiques. Vous pouvez accéder aux champs du contexte de l'événement avec <code>{{syntax}}</code>.",
+    "filter": "Tous les champs du message de log d'origine",
+    "filter_label": "Filtre :",
+    "title": "Champs disponibles dans le modèle"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Exclure les champs vides",
+    "exclude_empty_fields_help": "Cochez cette option pour omettre complètement le champ de l'événement lorsque le modèle produit une valeur vide. Lorsqu'elle n'est pas cochée, le champ est ajouté à l'événement avec une valeur vide. Toujours activée lorsque toutes les valeurs du modèle sont requises.",
+    "require_values": "Exiger que toutes les valeurs du modèle soient définies",
+    "require_values_help": "Cochez cette option pour vérifier que toutes les variables utilisées dans le modèle ont une valeur.",
+    "template": "Modèle",
+    "template_help": "Saisissez un texte littéral à attribuer à ce champ, ou utilisez la <jmteLink>syntaxe JMTE</jmteLink> pour ajouter une valeur dynamique."
+  },
   "types": {
-    "aggregation": {},
-    "system": {}
+    "aggregation": {
+      "description": "Créez des événements à partir de messages de log en les filtrant et (facultativement) en agrégeant leurs résultats pour correspondre à une condition donnée. Ces événements peuvent servir d'entrée pour une règle de corrélation.",
+      "title": "Filtre et agrégation"
+    },
+    "system": {
+      "description": "Event Definition intégrée utilisée par {{productName}} pour signaler les notifications système sous forme d'événements.",
+      "title": "Event Definition système"
+    }
   },
-  "validation": {},
-  "validation_summary": {},
-  "use_event_definition_notifications": {}
+  "validation": {
+    "cannot_be_empty": "Ne peut pas être vide",
+    "field_cannot_be_empty": "Le champ ne peut pas être vide.",
+    "field_positive_number": "Le champ doit être un nombre positif."
+  },
+  "validation_summary": {
+    "title": "Des erreurs ont été détectées !"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Échec du chargement de l'Event Definition, statut : {{error}}"
+  }
 }
