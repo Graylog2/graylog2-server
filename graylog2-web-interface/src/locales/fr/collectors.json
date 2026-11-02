@@ -271,20 +271,132 @@
     "no_match": "Aucune flotte ne correspond au filtre"
   },
   "recent_activity": {
-    "title": "Activité récente"
+    "title": "Activité récente",
+    "empty": "Aucune activité récente."
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Hôte",
+    "os": "OS",
+    "version": "Version",
+    "fleet": "Flotte",
+    "enrolled": "Enrôlé",
+    "last_seen": "Dernière activité",
+    "hide_attributes": "Masquer les attributs"
+  },
+  "connection_success": {
+    "offline": "Le collector s'est connecté une fois mais n'a plus envoyé de signal depuis <lastSeen />.",
+    "receiving": "Le collector est connecté et transmet des messages.",
+    "waiting": "Presque terminé — le collector est connecté et nous attendons ses premiers messages.",
+    "title": "Configuration de {{host}}",
+    "view_instances": "Voir les instances",
+    "check_again": "Vérifier à nouveau",
+    "log_preview": "Aperçu des logs",
+    "caption_messages": "Affichage des messages reçus depuis {{duration}}",
+    "caption_messages_checking": "Affichage des messages reçus depuis {{duration}} - vérification toutes les quelques secondes",
+    "caption_system": "Affichage des messages système du Collector reçus depuis {{duration}}",
+    "caption_system_checking": "Affichage des messages système du Collector reçus depuis {{duration}} - vérification toutes les quelques secondes"
+  },
+  "fleet_choice": {
+    "selected_heading": "Flotte de ce Collector",
+    "change": "Changer de flotte",
+    "heading": "Choisissez une flotte pour ce Collector",
+    "create_new": "Créer une nouvelle flotte",
+    "or": "ou",
+    "select_existing": "Sélectionner une flotte existante",
+    "select_existing_placeholder": "Sélectionner une flotte existante..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Configuration des Collectors...",
+    "confirm": "Confirmer le point de terminaison",
+    "create_input": "Créer l'input",
+    "save": "Enregistrer le point de terminaison",
+    "hostname": "Nom d'hôte externe",
+    "hostname_placeholder": "p. ex. otlp.example.com",
+    "port": "Port externe",
+    "cancel": "Annuler",
+    "reachability_hint": "Les Collectors envoient leurs logs à cette adresse. Elle doit être joignable depuis chaque hôte de Collector : un load balancer ou ce serveur.",
+    "confirm_title": "Confirmer la manière dont les Collectors envoient les données à ce cluster",
+    "change": "Modifier le point de terminaison",
+    "sending_to": "Les Collectors envoient les données à ce cluster via <endpoint />",
+    "no_input_title": "Aucun input d'ingestion n'existe",
+    "no_input": "Les Collectors peuvent s'enrôler, mais ne pourront pas envoyer de données tant qu'un input n'aura pas été créé.",
+    "not_running_title": "L'input d'ingestion sur <endpoint /> n'est pas démarré",
+    "not_running": "Les Collectors peuvent s'enrôler, mais ne pourront pas envoyer de données tant qu'un input ne sera pas démarré.",
+    "manage_input": "Gérer l'input"
+  },
+  "install_command": {
+    "title": "Exécutez ceci sur {{platform}}",
+    "copy": "Copier la commande",
+    "note_expires": "Télécharge et installe le collector, l'enrôle dans la flotte sélectionnée et démarre le service. Nécessite les privilèges administrateur. Le jeton expire dans {{duration}}.",
+    "note_never_expires": "Télécharge et installe le collector, l'enrôle dans la flotte sélectionnée et démarre le service. Nécessite les privilèges administrateur. Ce jeton n'expire jamais."
+  },
+  "log_preview": {
+    "unavailable": "Aperçu des logs indisponible — {{error}}",
+    "loading": "Chargement de l'aperçu des logs...",
+    "empty": "Aucun message pour le moment — vérification toutes les quelques secondes"
+  },
+  "next_steps": {
+    "explore": "Explorez vos données",
+    "explore_description": "Ouvrir la recherche filtrée sur ce collector",
+    "configure_sources": "Configurer les sources",
+    "configure_sources_description": "Ajouter ou ajuster les données collectées par cette flotte",
+    "manage_fleets": "Gérer les flottes",
+    "manage_fleets_description": "Déplacer ce collector vers une flotte définitive",
+    "install_another": "Installer un autre collector",
+    "install_another_description": "Reproduire cette configuration sur un autre hôte",
+    "offline_title": "Rétablir la connexion",
+    "check_service": "Vérifiez que le service du collector est en cours d'exécution sur l'hôte.",
+    "check_reachability": "Vérifiez que l'hôte peut joindre ce serveur {{productName}}.",
+    "check_logs": "Consultez les logs propres au collector dans l'aperçu ci-dessous pour détecter les erreurs de connexion.",
+    "title": "Prochaines étapes"
+  },
+  "timeline": {
+    "connection_lost": "Connexion perdue",
+    "last_heartbeat": "Dernier signal de vie <lastSeen />",
+    "first_messages": "Premiers messages",
+    "listening": "En écoute... généralement moins d'une minute",
+    "enrolled": "Enrôlé",
+    "enrolled_detail": "Enregistré avec un jeton d'enrôlement - <enrolledAt />",
+    "connected": "Connecté",
+    "connected_detail": "Signal de vie reçu - <lastSeen />",
+    "sources_configured": "Sources configurées"
+  },
+  "platform_picker": {
+    "title": "Premiers pas avec les Collectors",
+    "description": "Déployez des collectors légers dans votre infrastructure pour transmettre les logs à {{productName}}."
+  },
+  "source_status": {
+    "disabled": "Désactivée",
+    "not_applicable": "Non applicable sur {{os}}",
+    "unrecognised": "Type de source non reconnu",
+    "paused": "En pause — collector hors ligne",
+    "no_messages": "Aucun message pour le moment",
+    "waiting": "En attente des premiers messages...",
+    "title": "Sources de logs",
+    "no_sources": "Aucune source configurée pour cette flotte pour le moment."
+  },
+  "waiting_for_connection": {
+    "status": "En attente de connexion... {{seconds}} s"
+  },
+  "settings": {
+    "getting_started": "Premiers pas avec les Collectors",
+    "getting_started_cloud": "Les Collectors se connectent à un point de terminaison d'ingestion géré pour envoyer leurs données. Enregistrez les paramètres des collectors pour initialiser l'infrastructure des collectors. Une fois la configuration terminée, vous pourrez créer des flottes, ajouter des sources et déployer des collectors sur vos hôtes.",
+    "getting_started_self_managed": "Les Collectors ont besoin de points de terminaison d'ingestion pour recevoir les données collectées. Configurez le point de terminaison HTTP ci-dessous et enregistrez pour initialiser l'infrastructure des collectors. Une fois la configuration terminée, vous pourrez créer des flottes, ajouter des sources et déployer des collectors sur vos hôtes.",
+    "ingest_endpoint": "Point de terminaison d'ingestion",
+    "ingest_endpoint_cloud": "Le point de terminaison d'ingestion est géré par le système. Les Collectors s'y connectent automatiquement.",
+    "ingest_endpoint_help": "Les points de terminaison d'ingestion reçoivent les données de logs des collectors via OpenTelemetry (OTLP). Il s'agit de l'adresse externe transmise aux collectors gérés comme destination de leurs données. Elle doit aboutir à un input d'ingestion de collector en cours d'exécution, généralement l'adresse d'un load balancer ou du serveur lui-même.",
+    "hostname_help": "Le nom d'hôte ou l'adresse IP que les Collectors utiliseront pour se connecter. Doit être joignable depuis les hôtes de Collector.",
+    "create_input": "Créer l'input d'ingestion",
+    "lifecycle": "Cycle de vie des Collectors",
+    "offline_threshold": "Seuil de hors ligne",
+    "offline_threshold_help": "Les Collectors qui n'ont pas envoyé de signal dans ce délai sont affichés comme hors ligne.",
+    "default_visibility": "Visibilité par défaut",
+    "default_visibility_help": "Les Collectors qui n'ont pas envoyé de signal dans ce délai sont masqués dans la vue par défaut. Les utilisateurs peuvent modifier ou supprimer ce filtre dans le tableau des instances.",
+    "expiration_threshold": "Seuil d'expiration",
+    "expiration_threshold_help": "Les Collectors qui n'ont pas envoyé de signal dans ce délai sont supprimés définitivement.",
+    "confirm": "Confirmer les paramètres"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
