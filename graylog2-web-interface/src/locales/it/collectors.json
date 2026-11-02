@@ -53,26 +53,51 @@
       "fleet_with_others_other": "Configurazione aggiornata per la fleet <targetLink /> e per {{count}} altre fleet",
       "collector": "Configurazione aggiornata per il collector <targetLink />",
       "collector_with_others_one": "Configurazione aggiornata per il collector <targetLink /> e per {{count}} altro collector",
+      "collector_with_others_other": "Configurazione aggiornata per il collector <targetLink /> e per {{count}} altri collector",
       "fleet_with_others_many": "Configurazione aggiornata per la fleet <targetLink /> e per {{count}} altre fleet",
       "collector_with_others_many": "Configurazione aggiornata per il collector <targetLink /> e per {{count}} altri collector"
     },
     "ingest_config_changed": {
       "fleet": "Configurazione di ingestione aggiornata per la fleet <targetLink />",
-      "collector": "Configurazione di ingestione aggiornata per il collector <targetLink />"
+      "fleet_with_others_one": "Configurazione di ingestione aggiornata per la fleet <targetLink /> e per {{count}} altra fleet",
+      "fleet_with_others_other": "Configurazione di ingestione aggiornata per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector": "Configurazione di ingestione aggiornata per il collector <targetLink />",
+      "collector_with_others_one": "Configurazione di ingestione aggiornata per il collector <targetLink /> e per {{count}} altro collector",
+      "collector_with_others_other": "Configurazione di ingestione aggiornata per il collector <targetLink /> e per {{count}} altri collector",
+      "fleet_with_others_many": "Configurazione di ingestione aggiornata per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector_with_others_many": "Configurazione di ingestione aggiornata per il collector <targetLink /> e per {{count}} altri collector"
     },
     "restart": {
       "fleet": "Riavvio richiesto per la fleet <targetLink />",
-      "collector": "Riavvio richiesto per il collector <targetLink />"
+      "fleet_with_others_one": "Riavvio richiesto per la fleet <targetLink /> e per {{count}} altra fleet",
+      "fleet_with_others_other": "Riavvio richiesto per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector": "Riavvio richiesto per il collector <targetLink />",
+      "collector_with_others_one": "Riavvio richiesto per il collector <targetLink /> e per {{count}} altro collector",
+      "collector_with_others_other": "Riavvio richiesto per il collector <targetLink /> e per {{count}} altri collector",
+      "fleet_with_others_many": "Riavvio richiesto per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector_with_others_many": "Riavvio richiesto per il collector <targetLink /> e per {{count}} altri collector"
     },
     "discovery_run": {
       "fleet": "Scoperta avviata per la fleet <targetLink />",
-      "collector": "Scoperta avviata per il collector <targetLink />"
+      "fleet_with_others_one": "Scoperta avviata per la fleet <targetLink /> e per {{count}} altra fleet",
+      "fleet_with_others_other": "Scoperta avviata per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector": "Scoperta avviata per il collector <targetLink />",
+      "collector_with_others_one": "Scoperta avviata per il collector <targetLink /> e per {{count}} altro collector",
+      "collector_with_others_other": "Scoperta avviata per il collector <targetLink /> e per {{count}} altri collector",
+      "fleet_with_others_many": "Scoperta avviata per la fleet <targetLink /> e per {{count}} altre fleet",
+      "collector_with_others_many": "Scoperta avviata per il collector <targetLink /> e per {{count}} altri collector"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> riassegnato"
+      "collector": "Collector <targetLink /> riassegnato",
+      "collector_with_others_one": "Collector <targetLink /> e {{count}} altro collector riassegnati",
+      "collector_with_others_other": "Collector <targetLink /> e {{count}} altri collector riassegnati",
+      "collector_with_others_many": "Collector <targetLink /> e {{count}} altri collector riassegnati"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> riassegnato alla fleet <destinationLink />"
+      "collector": "Collector <targetLink /> riassegnato alla fleet <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> e {{count}} altro collector riassegnati alla fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> e {{count}} altri collector riassegnati alla fleet <destinationLink />",
+      "collector_with_others_many": "Collector <targetLink /> e {{count}} altri collector riassegnati alla fleet <destinationLink />"
     }
   },
   "fleet_reference": {
@@ -97,11 +122,14 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "Elimina token di registrazione",
+    "bulk_delete_confirm_one": "Sei sicuro di voler eliminare {{count}} token di registrazione? I nuovi Collector non potranno registrarsi usando il token eliminato.",
+    "bulk_delete_confirm_other": "Sei sicuro di voler eliminare {{count}} token di registrazione? I nuovi Collector non potranno registrarsi usando i token eliminati.",
     "never": "Mai",
     "expired": "Scaduto",
     "human_name": "token di registrazione",
     "delete_title": "Elimina token di registrazione",
-    "delete_confirm": "Sei sicuro di voler eliminare questo token di registrazione? I nuovi Collector non potranno registrarsi usando questo token. I Collector già registrati continueranno a funzionare normalmente."
+    "delete_confirm": "Sei sicuro di voler eliminare questo token di registrazione? I nuovi Collector non potranno registrarsi usando questo token. I Collector già registrati continueranno a funzionare normalmente.",
+    "bulk_delete_confirm_many": "Sei sicuro di voler eliminare {{count}} token di registrazione? I nuovi Collector non potranno registrarsi usando i token eliminati."
   },
   "deployment": {
     "select_fleet_step": "Seleziona fleet",
@@ -115,6 +143,8 @@
     "receiving": "Ricezione",
     "listening": "In ascolto…",
     "title": "Host in registrazione",
+    "connected_one": "{{count}} connesso · in ascolto di altri…",
+    "connected_other": "{{count}} connessi · in ascolto di altri…",
     "listening_subtitle": "in ascolto…",
     "view_all": "Mostra tutti in Istanze",
     "host": "Host",
@@ -125,7 +155,8 @@
     "hide_setup": "Nascondi configurazione",
     "view_setup": "Mostra configurazione",
     "empty": "Gli host che eseguono il comando compaiono qui non appena effettuano il check-in.",
-    "connection_problem": "Impossibile raggiungere il server: nuovo tentativo automatico in corso"
+    "connection_problem": "Impossibile raggiungere il server: nuovo tentativo automatico in corso",
+    "connected_many": "{{count}} connessi · in ascolto di altri…"
   },
   "token_step": {
     "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> generato - scade <expiresAt />",
@@ -150,8 +181,11 @@
   "fleet_actions": {
     "received_messages": "Messaggi ricevuti",
     "delete": "Elimina",
+    "delete_blocked_one": "Questa fleet ha {{count}} istanza assegnata. Riassegnala o eliminala prima di eliminare la fleet.",
+    "delete_blocked_other": "Questa fleet ha {{count}} istanze assegnate. Riassegnale o eliminale prima di eliminare la fleet.",
     "delete_title": "Elimina fleet",
-    "delete_confirm": "Sei sicuro di voler eliminare la fleet <emphasis>{{fleetName}}</emphasis>? Le sue configurazioni delle sorgenti e i token di registrazione verranno rimossi."
+    "delete_confirm": "Sei sicuro di voler eliminare la fleet <emphasis>{{fleetName}}</emphasis>? Le sue configurazioni delle sorgenti e i token di registrazione verranno rimossi.",
+    "delete_blocked_many": "Questa fleet ha {{count}} istanze assegnate. Riassegnale o eliminale prima di eliminare la fleet."
   },
   "fleet_form": {
     "name_required": "Il nome è obbligatorio",
@@ -211,9 +245,18 @@
   },
   "reassign_fleet": {
     "fleet_required": "La fleet è obbligatoria",
+    "title_one": "Riassegna {{count}} istanza alla fleet",
+    "title_other": "Riassegna {{count}} istanze alla fleet",
+    "no_other_fleet_one": "Non c'è un'altra fleet a cui assegnare questo Collector.",
+    "no_other_fleet_other": "Non c'è un'altra fleet a cui assegnare questi Collector.",
     "no_permission": "Non hai i permessi per assegnare Collector a qualsiasi altra fleet.",
     "select_placeholder": "Seleziona una fleet...",
-    "submitting": "Riassegnazione..."
+    "submit_one": "Riassegna istanza",
+    "submit_other": "Riassegna istanze",
+    "submitting": "Riassegnazione...",
+    "title_many": "Riassegna {{count}} istanze alla fleet",
+    "no_other_fleet_many": "Non c'è un'altra fleet a cui assegnare questi Collector.",
+    "submit_many": "Riassegna istanze"
   },
   "instance_health": {
     "title": "Stato di salute",
@@ -240,14 +283,20 @@
     "logs": "Log:",
     "messages": "Messaggi:",
     "attributes": "Attributi",
+    "active_sources_one": "Sorgenti attive ({{count}})",
+    "active_sources_other": "Sorgenti attive ({{count}})",
     "sources_inherited": "Le sorgenti sono ereditate dalla configurazione della fleet di questa istanza.",
     "no_sources": "Nessuna sorgente configurata per questa fleet. Aggiungi sorgenti nella pagina di dettaglio della fleet per iniziare a raccogliere dati.",
     "synchronization": "Sincronizzazione",
     "pending_load_error": "Impossibile caricare le modifiche in attesa. Riprova più tardi.",
     "queued_actions": "Le seguenti azioni sono in coda fino alla sincronizzazione del collector:",
     "hide_transactions": "Nascondi transazioni in coda",
+    "show_transactions_one": "Mostra transazioni in coda ({{count}})",
+    "show_transactions_other": "Mostra transazioni in coda ({{count}})",
     "changes_queued": "Le modifiche sono in coda e verranno applicate al prossimo check-in del collector.",
-    "all_applied": "Il collector ha applicato tutte le azioni in coda."
+    "all_applied": "Il collector ha applicato tutte le azioni in coda.",
+    "active_sources_many": "Sorgenti attive ({{count}})",
+    "show_transactions_many": "Mostra transazioni in coda ({{count}})"
   },
   "overview": {
     "stat_instances_help": "Processi Collector in esecuzione in tutte le fleet.",
@@ -266,7 +315,19 @@
     "healthy": "Tutte le istanze di questa fleet sono online",
     "degraded": "Alcune istanze di questa fleet sono offline",
     "down": "Tutte le istanze di questa fleet sono offline",
-    "empty": "Nessuna istanza di Collector si è ancora registrata in questa fleet"
+    "empty": "Nessuna istanza di Collector si è ancora registrata in questa fleet",
+    "instances_one": "istanza",
+    "instances_other": "istanze",
+    "online_one": "● {{count}} online",
+    "online_other": "● {{count}} online",
+    "offline_one": "● {{count}} offline",
+    "offline_other": "● {{count}} offline",
+    "sources_one": "{{count}} sorgente",
+    "sources_other": "{{count}} sorgenti",
+    "instances_many": "istanze",
+    "online_many": "● {{count}} online",
+    "offline_many": "● {{count}} offline",
+    "sources_many": "{{count}} sorgenti"
   },
   "fleet_cards": {
     "empty_title": "Nessuna fleet ancora",
@@ -287,7 +348,10 @@
     "fleet": "Fleet",
     "enrolled": "Registrato",
     "last_seen": "Ultimo contatto",
-    "hide_attributes": "Nascondi attributi"
+    "show_attributes_one": "Mostra tutti i {{count}} attributi",
+    "show_attributes_other": "Mostra tutti i {{count}} attributi",
+    "hide_attributes": "Nascondi attributi",
+    "show_attributes_many": "Mostra tutti i {{count}} attributi"
   },
   "connection_success": {
     "offline": "Il collector si è connesso una volta ma non invia dati dal <lastSeen />.",
@@ -360,18 +424,26 @@
     "connection_lost": "Connessione persa",
     "last_heartbeat": "Ultimo heartbeat <lastSeen />",
     "first_messages": "Primi messaggi",
+    "receiving_one": "In ricezione: {{count}} messaggio da {{duration}}",
+    "receiving_other": "In ricezione: {{count}} messaggi da {{duration}}",
     "listening": "In ascolto... di solito meno di un minuto",
     "enrolled": "Registrato",
     "enrolled_detail": "Registrato con un token di registrazione - <enrolledAt />",
     "connected": "Connesso",
     "connected_detail": "Heartbeat ricevuto - <lastSeen />",
-    "sources_configured": "Sorgenti configurate"
+    "sources_configured": "Sorgenti configurate",
+    "sources_detail_one": "{{count}} sorgente dalla fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} sorgenti dalla fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "receiving_many": "In ricezione: {{count}} messaggi da {{duration}}",
+    "sources_detail_many": "{{count}} sorgenti dalla fleet <fleetLink>{{fleetName}}</fleetLink>"
   },
   "platform_picker": {
     "title": "Inizia con i Collector",
     "description": "Distribuisci collector leggeri nella tua infrastruttura per inoltrare i log a {{productName}}."
   },
   "source_status": {
+    "messages_one": "{{formattedCount}} messaggio",
+    "messages_other": "{{formattedCount}} messaggi",
     "disabled": "Disabilitata",
     "not_applicable": "Non applicabile su {{os}}",
     "unrecognised": "Tipo di sorgente non riconosciuto",
@@ -379,7 +451,8 @@
     "no_messages": "Nessun messaggio ancora",
     "waiting": "In attesa dei primi messaggi...",
     "title": "Sorgenti dei log",
-    "no_sources": "Nessuna sorgente configurata per questa fleet."
+    "no_sources": "Nessuna sorgente configurata per questa fleet.",
+    "messages_many": "{{formattedCount}} messaggi"
   },
   "waiting_for_connection": {
     "status": "In attesa di connessione... {{seconds}}s"
@@ -405,14 +478,24 @@
   "ingest_inputs": {
     "title": "Input di ingestione",
     "none": "Non esiste alcun input di ingestione dei Collector. I Collector non potranno inviare dati finché non viene creato un input.",
+    "unreadable_one": "Esiste {{count}} input di ingestione dei Collector, ma non hai i permessi per visualizzarlo.",
+    "unreadable_other": "Esistono {{count}} input di ingestione dei Collector, ma non hai i permessi per visualizzarli.",
     "none_running": "Esistono input di ingestione dei Collector, ma nessuno è attualmente in esecuzione. I Collector non potranno inviare dati.",
     "name": "Nome",
     "status": "Stato",
     "bind_address": "Indirizzo di bind",
     "port": "Porta",
-    "manage": "Gestisci"
+    "manage": "Gestisci",
+    "additional_unreadable_one": "{{count}} input aggiuntivo non visibile per via dei permessi.",
+    "additional_unreadable_other": "{{count}} input aggiuntivi non visibili per via dei permessi.",
+    "unreadable_many": "Esistono {{count}} input di ingestione dei Collector, ma non hai i permessi per visualizzarli.",
+    "additional_unreadable_many": "{{count}} input aggiuntivi non visibili per via dei permessi."
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_one": "Esiste un input di ingestione dei Collector su una porta diversa: {{ports}}. Se la porta esterna è diversa da quella di un input, assicurati che la rete instradi correttamente il traffico.",
+    "message_other": "Esistono input di ingestione dei Collector su porte diverse: {{ports}}. Se la porta esterna è diversa da quella di un input, assicurati che la rete instradi correttamente il traffico.",
+    "message_many": "Esistono input di ingestione dei Collector su porte diverse: {{ports}}. Se la porta esterna è diversa da quella di un input, assicurati che la rete instradi correttamente il traffico."
+  },
   "source_types": {
     "file": "File",
     "journald": "Journald",
@@ -625,8 +708,14 @@
       "datanode_opensearch_version": "Versione di OpenSearch del Data Node",
       "index_version": "Versione dell'indice",
       "indices": "Indici",
+      "node_title_one": "Nodo: {{hostname}}, Versione: {{version}}, {{count}} indice",
+      "node_title_other": "Nodo: {{hostname}}, Versione: {{version}}, {{count}} indici",
       "opensearch_data_location": "Posizione dei dati di OpenSearch",
-      "shards": "Shard"
+      "shard_count_one": "{{count}} shard",
+      "shard_count_other": "{{count}} shard",
+      "shards": "Shard",
+      "node_title_many": "Nodo: {{hostname}}, Versione: {{version}}, {{count}} indici",
+      "shard_count_many": "{{count}} shard"
     },
     "in_place_migration": {
       "description": "Segui questi passaggi per migrare il cluster OpenSearch 2.x o 1.3.x esistente a Data Node.",
@@ -634,6 +723,8 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "Certificato valido fino al",
+      "found_one": "Data Node trovato: {{count}}",
+      "found_other": "Data Node trovati: {{count}}",
       "hostname": "Hostname",
       "incompatible": "Ci sono Data Node in esecuzione con versioni non compatibili con la tua versione attuale di {{productName}}. Assicurati di usare la stessa versione per {{productName}} e per il Data Node.",
       "incompatible_title": "Trovati Data Node non compatibili",
@@ -646,7 +737,8 @@
       "status": "Stato",
       "transport_address": "Indirizzo di trasporto",
       "version": "Versione",
-      "version_incompatible": "Questa versione non è compatibile con la tua versione attuale di {{productName}}."
+      "version_incompatible": "Questa versione non è compatibile con la tua versione attuale di {{productName}}.",
+      "found_many": "Data Node trovati: {{count}}"
     },
     "manual_migration": {
       "migration_type": "Tipo di migrazione",
@@ -773,7 +865,13 @@
         "journal": "Mentre OpenSearch è spento, i messaggi in arrivo si accumulano nel journal su disco di ogni nodo {{productName}}. Se l'interruzione supera il limite di dimensione o di età del journal, l'ingestione si blocca e i messaggi possono andare persi: procedi solo se il journal ha abbastanza spazio per il tempo di inattività previsto.",
         "submitting": "Riavvio...",
         "title": "Riavviare OpenSearch dei Data Node?",
-        "tolerate_downtime": "Procedi solo se puoi tollerare il tempo di inattività."
+        "tolerate_downtime": "Procedi solo se puoi tollerare il tempo di inattività.",
+        "restart_together_with_versions_one": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte.",
+        "restart_together_with_versions_other": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte.",
+        "restart_together_one": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch alla versione di destinazione, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte.",
+        "restart_together_other": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch alla versione di destinazione, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte.",
+        "restart_together_with_versions_many": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte.",
+        "restart_together_many": "Con meno di 3 Data Node, OpenSearch non può restare disponibile riavviando un nodo alla volta. Tutti i Data Node si riavviano insieme per passare OpenSearch alla versione di destinazione, quindi il backend di storage è <strong>non disponibile</strong> finché non hanno terminato: ricerca e indicizzazione vengono interrotte."
       },
       "no_rollback": "Una volta avviato, non è possibile tornare alla versione precedente.",
       "rolling": {
@@ -782,7 +880,10 @@
         "healthy_cluster": "Assicurati che il cluster sia integro (verde) prima di procedere.",
         "shard_allocation": "L'allocazione degli shard viene sospesa durante ogni riavvio, quindi il cluster resta disponibile, ma l'indicizzazione e la ricerca possono rallentare per un breve periodo mentre un nodo si disconnette e si ricollega.",
         "title": "Avviare l'aggiornamento progressivo di OpenSearch?",
-        "wait_for_green": "Dopo ogni nodo, l'aggiornamento attende che il cluster torni verde prima di continuare. Se l'attesa dura troppo, l'operazione si mette in pausa e attende che tu la riprenda."
+        "wait_for_green": "Dopo ogni nodo, l'aggiornamento attende che il cluster torni verde prima di continuare. Se l'attesa dura troppo, l'operazione si mette in pausa e attende che tu la riprenda.",
+        "each_node_with_versions_one": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_many": "Ognuno dei tuoi {{count}} Data Node verrà aggiornato e riavviato uno alla volta per passare il proprio OpenSearch integrato da <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>."
       },
       "starting": "Avvio..."
     },
