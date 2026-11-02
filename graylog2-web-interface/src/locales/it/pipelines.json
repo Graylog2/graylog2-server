@@ -54,6 +54,8 @@
     "not_connected": "Questa pipeline non è attualmente collegata ad alcuno stream. Devi collegare la pipeline ad almeno uno stream affinché elabori i messaggi in arrivo. Non è necessario se intendi usare questa pipeline solo per trasformare i risultati di ricerca tramite decorator.",
     "delete_stage_confirm": "Stai per eliminare lo stage {{stage}}, vuoi continuare?",
     "list_and": " e ",
+    "processing_streams_one": "Questa pipeline elabora i messaggi dello stream {{streams}}.",
+    "processing_streams_other": "Questa pipeline elabora i messaggi degli stream {{streams}}.",
     "managed_1": "Questa pipeline è gestita dal sistema e può essere modificata solo in parte.",
     "managed_2": "Alla pipeline possono essere aggiunte regole solo tramite l'Input Wizard.",
     "managed_3": "Le regole della pipeline contenute in questa pipeline verranno rinominate automaticamente per riflettere le modifiche al nome dell'input corrispondente.",
@@ -62,7 +64,8 @@
     "no_connections": "Seleziona gli stream che saranno elaborati da questa pipeline.",
     "stages_title": "Stage della pipeline",
     "stages_description": "Gli stage sono gruppi di condizioni e azioni che devono essere eseguiti in ordine e che determinano il flusso di controllo, ovvero se eseguire o meno il resto della pipeline.",
-    "no_rules_on_stage": "In questo stage non ci sono regole."
+    "no_rules_on_stage": "In questo stage non ci sono regole.",
+    "processing_streams_many": "Questa pipeline elabora i messaggi degli stream {{streams}}."
   },
   "connections_form": {
     "streams_help": "Seleziona gli stream che vuoi collegare a questa pipeline, oppure creane uno nella <streamsLink>pagina Stream</streamsLink>.",
@@ -124,6 +127,8 @@
     }
   },
   "stage": {
+    "contains_rules_one": "Contiene {{count}} regola",
+    "contains_rules_other": "Contiene {{count}} regole",
     "last_stage": "Non ci sono altri stage in questa pipeline. Una volta applicate le regole di questo stage, l'elaborazione della pipeline sarà terminata.",
     "continue_all": "I messaggi che soddisfano <matchText>tutte le regole</matchText> di questo stage proseguiranno allo stage successivo.",
     "continue_either": "I messaggi che soddisfano <matchText>almeno una regola</matchText> di questo stage proseguiranno allo stage successivo.",
@@ -131,7 +136,8 @@
     "continue_unknown": "I messaggi che soddisfano <matchText>SCONOSCIUTO</matchText> in questo stage proseguiranno allo stage successivo.",
     "title": "Stage {{stage}}",
     "remove_routing_rule_title": "Rimuovi regola di instradamento",
-    "remove_routing_rule_confirm": "Vuoi davvero rimuovere la regola di instradamento <ruleTitle>{{title}}</ruleTitle>?"
+    "remove_routing_rule_confirm": "Vuoi davvero rimuovere la regola di instradamento <ruleTitle>{{title}}</ruleTitle>?",
+    "contains_rules_many": "Contiene {{count}} regole"
   },
   "stage_form": {
     "rules_help": "Seleziona le regole valutate in questo stage, oppure creane una nella <rulesLink>pagina Regole della pipeline</rulesLink>.",
@@ -294,7 +300,10 @@
     "dropped": "Il messaggio originale verrebbe scartato durante l'elaborazione.",
     "not_modified": "Il messaggio originale non verrebbe modificato durante l'elaborazione.",
     "original_changes": "Modifiche al messaggio originale <idSmall><idEm>{{id}}</idEm></idSmall>",
-    "other_changes": "Altre modifiche"
+    "other_changes": "Altre modifiche",
+    "other_changes_description_one": "Verrebbe creato {{count}} messaggio. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederlo.",
+    "other_changes_description_other": "Verrebbero creati {{count}} messaggi. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederli.",
+    "other_changes_description_many": "Verrebbero creati {{count}} messaggi. Passa alla visualizzazione <previewOption>Anteprima dei risultati</previewOption> per vederli."
   },
   "simulation_preview": {
     "dropped_title": "Il messaggio verrebbe scartato",
@@ -373,11 +382,34 @@
     "connections_updated": "Collegamenti della pipeline aggiornati correttamente",
     "connections_update_failed": "Aggiornamento dei collegamenti della pipeline non riuscito con stato: {{error}}",
     "connections_update_failed_title": "Impossibile aggiornare i collegamenti della pipeline",
-    "create_failed": "Creazione della pipeline non riuscita con stato: {{error}}"
+    "create_failed": "Creazione della pipeline non riuscita con stato: {{error}}",
+    "create_failed_title": "Impossibile creare la pipeline",
+    "create_success": "Pipeline creata correttamente.",
+    "update_failed": "Aggiornamento della pipeline non riuscito con stato: {{error}}",
+    "update_failed_title": "Impossibile aggiornare la pipeline",
+    "update_success": "Pipeline aggiornata correttamente.",
+    "delete_failed": "Eliminazione della pipeline non riuscita con stato: {{error}}",
+    "delete_failed_title": "Impossibile eliminare la pipeline",
+    "delete_success": "Pipeline eliminata correttamente.",
+    "success_title": "Operazione riuscita!"
   },
-  "connections_list": {},
+  "connections_list": {
+    "not_connected": "Pipeline non collegata ad alcuno stream"
+  },
   "rule_list": {
-    "headers": {}
+    "headers": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "created": "Creata",
+      "last_modified": "Ultima modifica",
+      "throughput": "Throughput",
+      "errors": "Errori",
+      "pipeline_load": "Carico della pipeline (15m)",
+      "pipelines": "Pipeline",
+      "actions": "Azioni"
+    }
   },
-  "load_cell": {}
+  "load_cell": {
+    "error_tooltip": "Il Carico della pipeline non è disponibile: caricamento delle metriche di carico dell'elaborazione non riuscito."
+  }
 }
