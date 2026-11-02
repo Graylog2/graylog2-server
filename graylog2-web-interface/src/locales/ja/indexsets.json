@@ -36,7 +36,8 @@
       "timestamp": "タイムスタンプ",
       "index": "インデックス",
       "letter_id": "Letter ID",
-      "error_message": "エラーメッセージ"
+      "error_message": "エラーメッセージ",
+      "count_other": "過去 24 時間に {{formattedCount}} 件のインデックス作成の失敗がありました。"
     },
     "system_overview": {
       "looking_for_failures": "インデックスの失敗を検索しています...",
@@ -155,6 +156,7 @@
     "shards": "シャード:",
     "replicas": "レプリカ:",
     "field_type_refresh_interval": "フィールドタイプの更新間隔:",
+    "seconds_other": "{{count}} 秒",
     "field_type_profile": "フィールドタイププロファイル:",
     "not_set": "未設定"
   },
@@ -212,9 +214,12 @@
     "field_errors": "フィールドのエラー:",
     "profile_change_failed_title": "一部の Index Set でフィールドタイププロファイルの変更に失敗しました",
     "profile_details_failed": "このプロファイルの詳細を読み込めませんでした。",
+    "used_by_other": "{{count}} 個の Index Set ですでに使用されています。",
     "field": "フィールド",
     "type": "タイプ",
     "targets_title": "Index Set",
+    "targets_summary_other": "{{count}} 個の Index Set に適用されます。",
+    "targets_summary_excluding_other": "{{count}} 個の Index Set に適用され、{{skipped}} は除外されます。",
     "targets_index_set": "Index Set",
     "targets_status": "ステータス",
     "targets_note": "備考",
@@ -262,6 +267,8 @@
     "max_segments": "セグメントの最大数:",
     "optimization_after_rotation": "ローテーション後のインデックス最適化:",
     "field_type_refresh_interval": "フィールドタイプの更新間隔:",
+    "minutes_other": "{{count}} 分",
+    "seconds_other": "{{count}} 秒",
     "title_disabled": "{{title}}（無効）",
     "form_title_label": "テンプレートのタイトル",
     "form_title_help": "テンプレートのわかりやすいタイトルです",
@@ -299,6 +306,7 @@
     "hide_streams": "{{title}} の関連する Stream を非表示",
     "default": "デフォルト",
     "read_only": "読み取り専用",
+    "hidden_streams_other": "さらに {{count}} 個の Stream がこの Index Set にルーティングされていますが、閲覧する権限がありません。",
     "no_streams": "閲覧可能な Stream で、この Index Set にルーティングされているものはありません。",
     "streams_title": "タイトル",
     "streams_status": "ステータス",
@@ -336,7 +344,8 @@
     "empty": "インデックスにはメッセージが含まれていません。",
     "range_unknown": "インデックス範囲を利用できないため、インデックスの時間範囲は不明です。インデックス範囲を手動で再計算してください。",
     "hide_details": "詳細 / 操作を非表示",
-    "show_details": "詳細 / 操作を表示"
+    "show_details": "詳細 / 操作を表示",
+    "size_other": "（{{size}} / メッセージ {{formattedCount}} 件）"
   },
   "indices_configuration": {
     "not_writable": "Index Set は書き込み不可のため、インデックスのローテーションと保持の対象になりません。また、Stream に割り当てることもできません。",
@@ -344,6 +353,7 @@
     "configure_field_types": "インデックスのフィールドタイプを設定"
   },
   "shards": {
+    "ops_other": "{{formattedCount}} 件の操作",
     "took": "（所要時間 {{duration}}）",
     "index": "インデックス:",
     "flush": "フラッシュ:",
@@ -372,9 +382,12 @@
     "summary_data_tiering": "Data Tiering",
     "summary_max": "ストレージ内の最大:",
     "summary_min": "ストレージ内の最小:",
+    "days_other": "{{count}} 日",
     "tooltip_min_storage": "ストレージ内の最小日数",
     "tooltip_min_hot_and_storage": "Hot Tier およびストレージ内の最小日数",
-    "tooltip_min_hot": "Hot Tier 内の最小日数"
+    "tooltip_min_hot": "Hot Tier 内の最小日数",
+    "archived_deleted_after_other": "<strong>{{count}} 日</strong>後にアーカイブして削除",
+    "deleted_after_other": "<strong>{{count}} 日</strong>後に削除"
   },
   "incompatible": {
     "working": "処理中...",
@@ -401,6 +414,7 @@
     "reindex_requires_data_node": "システムインデックスの再インデックスは、{{productName}} が Data Node の検索バックエンドで動作している場合にのみ可能です。次の OpenSearch メジャーバージョンにアップグレードする前に、<migrationLink>Data Node に移行</migrationLink>してから再インデックスしてください。",
     "partial_summary": "{{succeeded}} 件成功、{{failed}} 件失敗。",
     "partial_more": "ほか {{count}} 件。",
+    "all_failed_other": "{{count}} 件のインデックスが失敗しました。",
     "delete": {
       "button": "削除",
       "title": "インデックスを削除",
@@ -439,7 +453,9 @@
         "button": "削除",
         "title": "互換性のないインデックスを削除",
         "confirm": "すべて削除",
-        "error": "すべてを削除できませんでした。"
+        "error": "すべてを削除できませんでした。",
+        "body_other": "互換性のないインデックス {{count}} 件を削除します。",
+        "success_other": "互換性のないインデックス {{count}} 件を削除しました。"
       },
       "delete_partial_title": "一部のインデックスを削除できませんでした",
       "delete_failure_title": "インデックスを削除できませんでした",
@@ -447,22 +463,29 @@
         "button": "システムインデックスを再インデックス",
         "title": "システムインデックスを再インデックス",
         "confirm": "すべて再インデックス",
-        "error": "すべてを再インデックスできませんでした。"
+        "error": "すべてを再インデックスできませんでした。",
+        "body_other": "互換性のないインデックス {{count}} 件を再インデックスします。",
+        "success_other": "{{count}} 件のシステムインデックスの再インデックスを開始しました。"
       },
       "archive_delete": {
         "button": "アーカイブして削除",
         "title": "インデックスをアーカイブして削除",
         "confirm": "すべてアーカイブして削除",
-        "error": "すべてをアーカイブして削除できませんでした。"
+        "error": "すべてをアーカイブして削除できませんでした。",
+        "body_other": "互換性のないインデックス {{count}} 件をアーカイブして削除します。",
+        "success_other": "{{count}} 件のインデックスのアーカイブと削除を開始しました。"
       },
       "rotate": {
         "button": "アクティブな書き込みインデックスをローテーション",
         "title": "アクティブな書き込みインデックスをローテーション",
         "confirm": "すべてローテーション",
-        "error": "すべてをローテーションできませんでした。"
+        "error": "すべてをローテーションできませんでした。",
+        "body_other": "互換性のないインデックス {{count}} 件をローテーションします。",
+        "success_other": "{{count}} 件のインデックスをローテーションしました。"
       },
       "rotate_partial_title": "一部のインデックスをローテーションできませんでした",
-      "rotate_failure_title": "インデックスをローテーションできませんでした"
+      "rotate_failure_title": "インデックスをローテーションできませんでした",
+      "deleted_other": "{{count}} 件のインデックスを削除しました。"
     }
   },
   "strategies": {
@@ -511,6 +534,7 @@
     "rotation_lifetime_error": "最小保持期間と最大保持期間の間には、少なくとも 1 日の差が必要です。",
     "rotation_lifetime_help_minimum": "このインデックス内のデータが保持される前に、最低限保存される日数です。",
     "rotation_lifetime_help_range": "このインデックス内のデータが保持される前に、保存される最小日数と最大日数です。",
+    "rotation_lifetime_max_rotation_other": "最大ローテーション期間は、管理者によって {{count}} 日に設定されています。",
     "rotation_lifetime_fixed_leeway": "最小と最大の間の日数が {{leeway}} に固定されているため、最大日数は {{max}} です。"
   },
   "pages": {
@@ -544,6 +568,7 @@
     "templates_default_info": "Illuminate パックによって作成される Index Set の設定を制御するため、ここでデフォルトのテンプレートを定義します。",
     "failures_title": "インデクサーの失敗",
     "failures_description": "インデックスへの書き込みに失敗したメッセージの一覧です。失敗とは、メッセージは正しく処理されたものの、インデクサークラスターへの書き込みに失敗したことを意味します。この一覧は 50 MB に制限されているため、多くの失敗ログが含まれますが、発生したすべての失敗が含まれるとは限りません。",
+    "failures_total_other": "合計 {{formattedCount}} 件のインデクサーの失敗を含むコレクションです。",
     "indices_document_title": "インデックスと Index Set",
     "indices_title": "インデックスと Index Set",
     "indices_description": "Stream は、保存データの保持、シャード分割、レプリケーションの設定である Index Set にメッセージを書き込みます。Index Set を設定することで、たとえば特定の Stream ごとに異なる保持期間を設けることができます。"
@@ -587,10 +612,73 @@
     "templates_search_placeholder": "Index Set テンプレートを検索",
     "field_types_human_name": "Index Set フィールドタイプ",
     "origin_explanation": "取得元の説明",
-    "category_counts_load_failed": "Index Set の件数の読み込みに失敗しました。ステータス"
+    "category_counts_load_failed": "Index Set の件数の読み込みに失敗しました。ステータス",
+    "category_counts_load_failed_title": "Index Set の件数を読み込めませんでした",
+    "template_create_failed": "Index Set テンプレートの作成に失敗しました。ステータス: {{error}}",
+    "template_create_failed_title": "Index Set テンプレートを作成できませんでした",
+    "template_create_success": "Index Set テンプレートを作成しました。",
+    "template_update_failed": "Index Set テンプレートの更新に失敗しました。ステータス: {{error}}",
+    "template_update_failed_title": "Index Set テンプレートを更新できませんでした",
+    "template_update_success": "Index Set テンプレートを更新しました。",
+    "template_default_failed": "テンプレートのデフォルト設定に失敗しました。ステータス: {{error}}",
+    "template_default_failed_title": "テンプレートをデフォルトに設定できませんでした",
+    "template_default_success": "テンプレートをデフォルトに設定しました。",
+    "template_delete_failed": "Index Set テンプレートの削除に失敗しました。ステータス: {{error}}",
+    "template_delete_failed_title": "Index Set テンプレートを削除できませんでした",
+    "template_delete_success": "Index Set テンプレートを削除しました。",
+    "templates_load_failed": "Index Set テンプレートの読み込みに失敗しました。ステータス",
+    "templates_load_failed_title": "Index Set テンプレートを読み込めませんでした",
+    "template_load_failed": "Index Set テンプレートの読み込みに失敗しました。ステータス",
+    "template_load_failed_title": "Index Set テンプレートを読み込めませんでした",
+    "built_in_templates_load_failed": "組み込みの Index Set テンプレートの読み込みに失敗しました。ステータス",
+    "built_in_templates_load_failed_title": "組み込みの Index Set テンプレートを読み込めませんでした",
+    "template_defaults_load_failed": "インデックスのデフォルトテンプレートの取得中にエラーが発生しました",
+    "index_set_load_failed": "ID {{indexSetId}} の Index Set の読み込みに失敗しました。ステータス",
+    "index_set_load_failed_title": "Index Set を読み込めませんでした",
+    "index_sets_list_load_failed": "Index Set の一覧の読み込みに失敗しました。ステータス",
+    "index_sets_list_load_failed_title": "Index Set の一覧を読み込めませんでした",
+    "ranges_recalculation_failed": "インデックス範囲の再計算を開始するジョブを作成できませんでした",
+    "ranges_recalculation_failed_title": "インデックス範囲の再計算の開始中にエラーが発生しました",
+    "cycle_deflector_failed": "Deflector のサイクルに失敗しました",
+    "field_types_load_failed": "インデックスのフィールドタイプの読み込みに失敗しました。ステータス",
+    "field_types_load_failed_title": "インデックスのフィールドタイプを読み込めませんでした",
+    "custom_field_type_remove_failed": "カスタムフィールドタイプの削除に失敗しました。ステータス: {{error}}",
+    "custom_field_type_remove_failed_title": "カスタムフィールドタイプを削除できませんでした",
+    "custom_field_type_removed": "カスタムフィールドタイプを削除しました",
+    "profile_set_failed": "Index Set プロファイルの設定に失敗しました。ステータス: {{error}}",
+    "profile_set_failed_title": "Index Set プロファイルを設定できませんでした",
+    "profile_set_success": "Index Set プロファイルを設定しました",
+    "profile_remove_failed": "インデックスからのプロファイルの削除に失敗しました。ステータス: {{error}}",
+    "profile_remove_failed_title": "インデックスからプロファイルを削除できませんでした",
+    "profile_removed": "インデックスからプロファイルを削除しました",
+    "failures_list_load_failed": "インデクサーの失敗の一覧の読み込みに失敗しました。ステータス",
+    "failures_list_load_failed_title": "インデクサーの失敗の一覧を読み込めませんでした",
+    "failures_count_load_failed": "インデクサーの失敗件数の読み込みに失敗しました。ステータス",
+    "failures_count_load_failed_title": "インデクサーの失敗件数を読み込めませんでした",
+    "indices_multiple_load_failed": "複数のインデックスの読み込みに失敗しました。ステータス",
+    "indices_multiple_load_failed_title": "複数のインデックスを読み込めませんでした"
   },
-  "notifications": {},
-  "use_index_set_stats_notifications": {},
-  "use_indexer_overview_notifications": {},
-  "use_indices_configuration_notifications": {}
+  "notifications": {
+    "create_success": "Index Set「{{title}}」を作成しました",
+    "create_failed": "Index Set「{{title}}」の作成に失敗しました。ステータス: {{error}}",
+    "create_failed_title": "Index Set を作成できませんでした。",
+    "update_success": "Index Set「{{title}}」を更新しました",
+    "update_failed": "Index Set「{{title}}」の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "Index Set を更新できませんでした。",
+    "success_title": "成功"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Index Set の統計情報の読み込みに失敗しました。ステータス",
+    "load_failed_title": "Index Set の統計情報を読み込めませんでした。"
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Index Set のインデクサーの概要の読み込みに失敗しました。ステータス",
+    "load_failed_title": "インデクサーの概要を読み込めませんでした。"
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "ローテーション戦略の取得に失敗しました",
+    "fetch_rotation_failed_title": "ローテーション戦略を取得できませんでした",
+    "fetch_retention_failed": "保持戦略の取得に失敗しました",
+    "fetch_retention_failed_title": "保持戦略を取得できませんでした"
+  }
 }
