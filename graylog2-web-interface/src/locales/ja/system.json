@@ -1,1 +1,200 @@
-{}
+{
+  "shared": {
+    "leader": "リーダー",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "検索バックエンドのノードを読み込んでいます...",
+    "search_backend_unknown": "設定されている検索バックエンドを特定できませんでした。",
+    "search_placeholder": "ノードを検索…",
+    "all_nodes": "すべてのノード",
+    "data_nodes": "データノード",
+    "opensearch_nodes": "OpenSearchノード",
+    "mongodb_nodes": "MongoDBノード"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "メモリ",
+    "jvm": "JVM",
+    "indexing": "インデックス作成",
+    "storage": "ストレージ",
+    "buffers": "バッファー",
+    "journal": "ジャーナル",
+    "data_lake_journal": "Data Lake ジャーナル",
+    "throughput": "スループット"
+  },
+  "data_nodes_expandable": {
+    "title": "データノード"
+  },
+  "indexing_metrics_cell": {
+    "docs": "ドキュメント",
+    "latency": "レイテンシー"
+  },
+  "node_actions": {
+    "thread_dump": "スレッドダンプを取得",
+    "process_buffer_dump": "プロセスバッファーのダンプを取得",
+    "metrics": "メトリクス"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "メッセージ処理を一時停止",
+    "resume_message_processing": "メッセージ処理を再開",
+    "override_load_balancer_dead": "ロードバランサーのステータスをDEADに上書き",
+    "override_load_balancer_alive": "ロードバランサーのステータスをALIVEに上書き",
+    "local_message_inputs": "ローカルのメッセージInput",
+    "recent_system_logs": "最新のシステムログメッセージを取得",
+    "message_processing_title": "メッセージ処理",
+    "pause_confirm": "<b>{{nodeName}}</b> ノードのメッセージ処理を<b>一時停止</b>しようとしています。よろしいですか？",
+    "resume_confirm": "<b>{{nodeName}}</b> ノードのメッセージ処理を<b>再開</b>しようとしています。よろしいですか？",
+    "load_balancer_title": "ロードバランサー",
+    "load_balancer_confirm": "<b>{{nodeName}}</b> ノードのロードバランサーのステータスを<b>{{status}}</b>に変更しようとしています。よろしいですか？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}}ノード"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "ロードバランサー {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "メッセージ処理 {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDBノード"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDBのプロファイリングは、クラスター内のノード全体で低速なクエリを特定し、パフォーマンスの問題を解決するのに役立ちます。",
+    "enabling_profiling": "プロファイリングを有効にしています...",
+    "enable_confirm": "すべてのMongoDBノードで<b>Slow Ops</b>のプロファイリング（{{threshold}}）を有効にしますか？再起動なしで直ちに適用されますが、起動時に設定しない限り再起動後にリセットされます。"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearchノード"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "{{title}}を表示"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "負荷（1分）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "クラスター",
+    "cluster_id": "クラスターID:",
+    "not_available": "利用不可",
+    "number_of_nodes": "ノード数:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Graylogクラスターのデバッグに役立つ情報を含むZIPファイルを作成します。",
+    "enterprise_customers": "Graylog Enterpriseのお客様は、バンドルをサポートチケットに添付できます。これにより、Graylogテクニカルサポートチームが問題の分析と診断を行いやすくなります。",
+    "examine_content": "共有する前にバンドルの内容を確認してください。IPアドレス、ホスト名、さらにはパスワードなどの機密データが含まれている可能性があります。",
+    "paid_license_only": "Graylog Enterpriseのサポートを利用できるのは有償ライセンスのユーザーのみです。ただし、このファイルはその他のデバッグ目的でご利用いただけます。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "クラスターサポートバンドル",
+    "create": "サポートバンドルを作成",
+    "download": "ダウンロード",
+    "delete": "削除",
+    "filename": "ファイル名",
+    "size": "サイズ",
+    "no_bundles": "サポートバンドルが見つかりません。",
+    "delete_title": "サポートバンドルを削除",
+    "delete_confirm": "<strong>{{name}}</strong> を削除してもよろしいですか？"
+  },
+  "log_level_metrics": {
+    "level": "レベル: {{level}}",
+    "total_written": "書き込み合計:",
+    "mean_rate": "平均レート:",
+    "one_minute_rate": "1分レート:",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "サブシステム: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "ログレベルのメトリクスを表示",
+    "hide_log_level_metrics": "ログレベルのメトリクスを非表示",
+    "total_log_messages": "内部ログメッセージを合計<strong>{{throughput}}件</strong>書き込みました。"
+  },
+  "metric_details": {
+    "value": "値:",
+    "count": "カウント:",
+    "mean": "平均:",
+    "minimum": "最小:",
+    "maximum": "最大:",
+    "standard_deviation": "標準偏差:",
+    "percentile_95": "95パーセンタイル:",
+    "percentile_98": "98パーセンタイル:",
+    "percentile_99": "99パーセンタイル:",
+    "invalid_type": "無効なメトリクスタイプ: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "合計:",
+    "events": "イベント",
+    "one_minute_avg": "1分平均:",
+    "five_minute_avg": "5分平均:",
+    "fifteen_minute_avg": "15分平均:"
+  },
+  "counter_rate": {
+    "calculating": "計算中...",
+    "total": "（合計 {{total}}）",
+    "per_second": "毎秒"
+  },
+  "metric_container": {
+    "loading": "読み込み中..."
+  },
+  "metrics_component": {
+    "fetch_error": "ノードからメトリクスを取得できませんでした。サーバーがステータスコード {{status}} で <em>{{responseMessage}}</em> を返しました。",
+    "fetch_problem": "ノードのメトリクスの取得中に問題が発生しました。",
+    "retry_in_background": "取得の再試行はバックグラウンドで続行されます。",
+    "fetch_error_last_metrics": "ノードからメトリクスを取得できませんでした。サーバーがステータスコード {{status}} で <em>{{responseMessage}}</em> を返しました。利用可能な最後のメトリクスを表示しています。",
+    "filter_placeholder": "フィルターするメトリクス名を入力…"
+  },
+  "metrics_list": {
+    "no_metrics": "指定したフィルターに一致するメトリクスがありません。有効な正規表現を使用してください"
+  },
+  "buffer_usage": {
+    "metrics": "メトリクス",
+    "utilization": "{{title}} に <strong>{{usage}} 件のメッセージ</strong>があり、{{percentage}} 使用されています。"
+  },
+  "input_types_data_table": {
+    "loading": "Inputタイプを読み込んでいます..."
+  },
+  "journal_details": {},
+  "journal_state": {},
+  "jvm_heap_usage": {},
+  "node_list_item": {},
+  "node_maintenance_dropdown": {},
+  "node_overview": {},
+  "nodes_actions": {},
+  "nodes_list": {},
+  "plugins_data_table": {},
+  "rest_api_overview": {},
+  "system_information": {},
+  "system_overview_details": {},
+  "system_overview_summary": {},
+  "bulk_actions": {},
+  "system_notifications_table": {},
+  "actions_cell": {},
+  "title_cell": {},
+  "system_job": {},
+  "system_jobs_component": {},
+  "system_jobs_list": {},
+  "system_messages_component": {},
+  "system_messages_list": {},
+  "global_throughput": {},
+  "node_throughput": {},
+  "telemetry_debug_entry_row": {},
+  "telemetry_debug_overlay": {},
+  "cluster_configuration_page": {},
+  "configurations_page": {},
+  "enterprise_page": {},
+  "process_buffer_dump_page": {},
+  "show_metrics_page": {},
+  "node_page": {},
+  "system_logs_page": {},
+  "system_notifications_page": {},
+  "system_overview_page": {},
+  "thread_dump_page": {},
+  "notifications": {},
+  "use_cluster_overview_notifications": {},
+  "use_cluster_support_bundle_notifications": {},
+  "use_plugin_list_notifications": {}
+}
