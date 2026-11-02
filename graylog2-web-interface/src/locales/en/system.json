@@ -450,5 +450,9 @@
     "download_failed_title": "Could not download the Support Bundle.",
     "load_list_failed": "Loading Support Bundle list failed with status",
     "load_list_failed_title": "Could not load Support Bundle list."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Getting plugins on node \"{{nodeId}}\" failed",
+    "fetch_failed_title": "Could not get plugins"
   }
 }

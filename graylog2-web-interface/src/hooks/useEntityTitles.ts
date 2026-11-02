@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SystemCatalog } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type EntityRef = { id: string; type: string };
 
@@ -41,8 +42,8 @@ const useEntityTitles = (
     queryFn: () =>
       defaultOnError(
         fetchEntityTitles(stableEntities),
-        'Loading entity titles failed with status',
-        'Could not load entity titles',
+        i18n.t('use_entity_titles_notifications.load_failed', { ns: 'common' }),
+        i18n.t('use_entity_titles_notifications.load_failed_title', { ns: 'common' }),
       ),
     enabled,
     placeholderData: keepPreviousData,

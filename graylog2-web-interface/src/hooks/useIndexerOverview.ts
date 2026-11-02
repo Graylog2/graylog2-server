@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { IndexerOverview as IndexerOverviewAPI } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type IndexRange = {
   index_name?: string;
@@ -77,8 +78,8 @@ const useIndexerOverview = (indexSetId: string) => {
     queryFn: () =>
       defaultOnError(
         fetchIndexerOverview(indexSetId),
-        `Loading indexer overview for index set failed with status`,
-        'Could not load indexer overview.',
+        i18n.t('use_indexer_overview_notifications.load_failed', { ns: 'indexsets' }),
+        i18n.t('use_indexer_overview_notifications.load_failed_title', { ns: 'indexsets' }),
       ),
 
     notifyOnChangeProps: ['data', 'error'],

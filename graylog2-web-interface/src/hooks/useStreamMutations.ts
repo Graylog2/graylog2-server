@@ -30,6 +30,7 @@ import {
   cloneStream as cloneStreamApi,
 } from 'api/streams';
 import type { CloneStreamRequest } from 'api/streams';
+import i18n from 'i18n';
 
 export type Stream = OriginalStream;
 
@@ -64,7 +65,7 @@ const useStreamMutations = () => {
       CurrentUserStore.reload();
     },
     onError: (errorThrown) => {
-      UserNotification.error(`Saving Stream failed with status: ${errorThrown}`, 'Could not save Stream');
+      UserNotification.error(i18n.t('use_stream_mutations_notifications.save_failed', { ns: 'streams', error: errorThrown }), i18n.t('use_stream_mutations_notifications.save_failed_title', { ns: 'streams' }));
     },
   });
 

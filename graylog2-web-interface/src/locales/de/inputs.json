@@ -392,5 +392,58 @@
   },
   "dot_badge": {
     "problematic_inputs": "Einige Inputs sind fehlgeschlagen oder im Setup-Modus."
+  },
+  "use_input_notifications": {
+    "load_failed": "Laden des Inputs fehlgeschlagen mit Status",
+    "load_failed_title": "Der Input konnte nicht geladen werden"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Laden der Input-Details fehlgeschlagen mit Status",
+    "load_failed_title": "Die Input-Details konnten nicht geladen werden"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Laden der Input-Metriken fehlgeschlagen mit Status",
+    "load_failed_title": "Die Input-Metriken konnten nicht geladen werden"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Laden der Zusammenfassung des Input-Status fehlgeschlagen mit Status",
+    "load_failed_title": "Die Zusammenfassung des Input-Status konnte nicht geladen werden."
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Fehler beim Starten des Inputs '{{title}}': {{error}}",
+    "start_failed_title": "Der Input '{{title}}' konnte nicht gestartet werden",
+    "started_success": "Input erfolgreich gestartet.",
+    "stop_failed": "Fehler beim Stoppen des Inputs '{{title}}': {{error}}",
+    "stop_failed_title": "Der Input '{{title}}' konnte nicht gestoppt werden",
+    "stopped_success": "Input erfolgreich gestoppt.",
+    "setup_failed": "Fehler beim Wechseln in den Setup-Modus für '{{title}}': {{error}}",
+    "setup_failed_title": "Der Input '{{title}}' konnte nicht in den Setup-Modus versetzt werden",
+    "deleted_success": "Input erfolgreich gelöscht.",
+    "success_title": "Erfolgreich!"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "Speichern des Inputs fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Der Input konnte nicht gespeichert werden",
+    "update_failed": "Aktualisieren des Inputs fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Der Input konnte nicht aktualisiert werden",
+    "delete_failed": "Löschen des Inputs fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Der Input konnte nicht gelöscht werden",
+    "created_success": "Input erfolgreich erstellt.",
+    "updated_success": "Input erfolgreich aktualisiert.",
+    "deleted_success": "Input erfolgreich gelöscht.",
+    "success_title": "Erfolgreich!"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input '{{title}}' erfolgreich gestartet",
+    "launch_failed": "Starten des Inputs '{{title}}' fehlgeschlagen mit Status: {{error}}",
+    "launch_failed_title": "Der Input konnte nicht gestartet werden",
+    "updated_success": "Input '{{title}}' erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren des Inputs '{{title}}' fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Der Input konnte nicht aktualisiert werden",
+    "deleted_success": "Input '{{title}}' erfolgreich gelöscht",
+    "delete_failed": "Löschen des Inputs '{{title}}' fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Der Input konnte nicht gelöscht werden",
+    "fetch_failed": "Abrufen der Inputs fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Die Inputs konnten nicht abgerufen werden"
   }
 }

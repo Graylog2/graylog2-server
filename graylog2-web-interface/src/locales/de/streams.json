@@ -464,5 +464,54 @@
     "output_terminated": "Output wurde beendet.",
     "output_remove_confirm": "Möchten Sie diesen Output wirklich aus dem Stream entfernen?",
     "success_title": "Erfolg"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "Speichern des Outputs \"{{title}}\" fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Der Output konnte nicht gespeichert werden",
+    "update_failed": "Aktualisieren des Outputs \"{{title}}\" fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Der Output konnte nicht aktualisiert werden",
+    "terminate_failed": "Beenden des Outputs fehlgeschlagen mit Status: {{error}}",
+    "terminate_failed_title": "Der Output konnte nicht beendet werden"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "Laden der Outputs fehlgeschlagen mit Status",
+    "load_failed_title": "Die Outputs konnten nicht geladen werden"
+  },
+  "use_stream_notifications": {
+    "load_failed": "Laden des Streams fehlgeschlagen mit Status",
+    "load_failed_title": "Der Stream konnte nicht geladen werden."
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "Laden der Stream-Metriken fehlgeschlagen mit Status",
+    "load_failed_title": "Die Stream-Metriken konnten nicht geladen werden"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "Laden der Stream-Outputs fehlgeschlagen mit Status",
+    "load_failed_title": "Die Stream-Outputs konnten nicht geladen werden"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "Speichern des Streams fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Der Stream konnte nicht gespeichert werden"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "Hinzufügen des Outputs zum Stream fehlgeschlagen mit Status: {{error}}",
+    "add_failed_title": "Der Output konnte nicht zum Stream hinzugefügt werden",
+    "remove_failed": "Entfernen des Outputs aus dem Stream fehlgeschlagen mit Status: {{error}}",
+    "remove_failed_title": "Der Output konnte nicht aus dem Stream entfernt werden",
+    "added_success": "Output erfolgreich zum Stream hinzugefügt.",
+    "removed_success": "Output erfolgreich aus dem Stream entfernt.",
+    "success_title": "Erfolgreich!"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "Erstellen der Stream-Regel fehlgeschlagen mit Status: {{error}}",
+    "create_failed_title": "Die Stream-Regel konnte nicht erstellt werden",
+    "update_failed": "Aktualisieren der Stream-Regel fehlgeschlagen mit Status: {{error}}",
+    "update_failed_title": "Die Stream-Regel konnte nicht aktualisiert werden",
+    "delete_failed": "Löschen der Stream-Regel fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Die Stream-Regel konnte nicht gelöscht werden"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "Abrufen der Liste der Stream-Regel-Inputs fehlgeschlagen mit Status: {{error}}",
+    "fetch_failed_title": "Die Stream-Regel-Inputs konnten nicht abgerufen werden"
   }
 }

@@ -485,5 +485,9 @@
     "change_success": "Ihre Startseite wurde erfolgreich geändert",
     "change_failed": "Ändern Ihrer Startseite fehlgeschlagen mit Fehler: {{error}}",
     "change_failed_title": "Ihre Startseite konnte nicht geändert werden"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Laden des Benutzers {{userId}} fehlgeschlagen mit Status",
+    "load_failed_title": "Der Benutzer {{userId}} konnte nicht geladen werden"
   }
 }

@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SystemInputsMetrics } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type InputMetricField = 'messages_per_stream' | 'extractor_count';
 
@@ -59,8 +60,8 @@ const useInputMetrics = (
     queryFn: () =>
       defaultOnError(
         fetchInputMetrics(stableIds, stableFields),
-        'Loading input metrics failed with status',
-        'Could not load input metrics',
+        i18n.t('use_input_metrics_notifications.load_failed', { ns: 'inputs' }),
+        i18n.t('use_input_metrics_notifications.load_failed_title', { ns: 'inputs' }),
       ),
     enabled,
     placeholderData: keepPreviousData,

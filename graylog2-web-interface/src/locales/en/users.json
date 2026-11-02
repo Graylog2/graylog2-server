@@ -485,5 +485,9 @@
     "change_success": "Your start page was changed successfully",
     "change_failed": "Changing your start page failed with error: {{error}}",
     "change_failed_title": "Could not change your start page"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Loading User {{userId}} failed with status",
+    "load_failed_title": "Could not load User {{userId}}"
   }
 }

@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Users } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 const BASIC_USER_QUERY_KEY = 'basic_user';
 
@@ -54,8 +55,8 @@ const useBasicUser = (
     queryFn: () =>
       defaultOnError(
         getUser({ id: userId }),
-        `Loading User ${userId} failed with status`,
-        `Could not load User ${userId}`,
+        i18n.t('use_basic_user_notifications.load_failed', { ns: 'users', userId }),
+        i18n.t('use_basic_user_notifications.load_failed_title', { ns: 'users', userId }),
       ),
     enabled,
   });

@@ -20,6 +20,7 @@ import { SystemIndexSets } from '@graylog/server-api';
 
 import type { IndexSetStats } from 'stores/indices/IndexSetsStore';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 const fetchIndexSetStats = (indexSetId: string): Promise<IndexSetStats> =>
   SystemIndexSets.indexSetStatistics(indexSetId);
@@ -31,8 +32,8 @@ const useIndexSetStats = (indexSetId: string) => {
     queryFn: () =>
       defaultOnError(
         fetchIndexSetStats(indexSetId),
-        'Loading index set stats failed with status',
-        'Could not load index set stats.',
+        i18n.t('use_index_set_stats_notifications.load_failed', { ns: 'indexsets' }),
+        i18n.t('use_index_set_stats_notifications.load_failed_title', { ns: 'indexsets' }),
       ),
 
     notifyOnChangeProps: ['data', 'error'],

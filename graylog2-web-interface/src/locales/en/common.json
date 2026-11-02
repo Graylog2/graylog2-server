@@ -583,5 +583,12 @@
     "put_failed_title": "Could not add item to favorites",
     "delete_failed": "Deleting item from favorites failed with status: {{error}}",
     "delete_failed_title": "Could not delete item from favorites"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Loading entity titles failed with status",
+    "load_failed_title": "Could not load entity titles"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Could not fetch override data"
   }
 }

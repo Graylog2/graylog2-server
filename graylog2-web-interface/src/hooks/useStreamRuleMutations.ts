@@ -20,6 +20,7 @@ import { StreamRules } from '@graylog/server-api';
 
 import type { StreamRule } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 type StreamRuleData = Pick<StreamRule, 'field' | 'type' | 'value' | 'inverted' | 'description'>;
 type StreamRuleMutationData = StreamRuleData & Partial<StreamRule>;
@@ -45,7 +46,7 @@ const useStreamRuleMutations = () => {
       StreamRules.create(streamId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(`Creating Stream Rule failed with status: ${error}`, 'Could not create Stream Rule');
+      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.create_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.create_failed_title', { ns: 'streams' }));
     },
   });
 
@@ -61,7 +62,7 @@ const useStreamRuleMutations = () => {
     }) => StreamRules.update(streamId, streamRuleId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(`Updating Stream Rule failed with status: ${error}`, 'Could not update Stream Rule');
+      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.update_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.update_failed_title', { ns: 'streams' }));
     },
   });
 
@@ -70,7 +71,7 @@ const useStreamRuleMutations = () => {
       StreamRules.remove(streamId, streamRuleId),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
-      UserNotification.error(`Deleting Stream Rule failed with status: ${error}`, 'Could not delete Stream Rule');
+      UserNotification.error(i18n.t('use_stream_rule_mutations_notifications.delete_failed', { ns: 'streams', error }), i18n.t('use_stream_rule_mutations_notifications.delete_failed_title', { ns: 'streams' }));
     },
   });
 

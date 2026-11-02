@@ -22,6 +22,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = (streamId: string) => [...KEY_PREFIX, streamId];
@@ -54,8 +55,8 @@ const useStreamOutputs = (
     queryFn: () =>
       defaultOnError(
         fetchStreamOutputs(streamId),
-        'Loading stream outputs failed with status',
-        'Could not load stream outputs',
+        i18n.t('use_stream_outputs_notifications.load_failed', { ns: 'streams' }),
+        i18n.t('use_stream_outputs_notifications.load_failed_title', { ns: 'streams' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

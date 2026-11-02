@@ -647,5 +647,19 @@
     "update_failed": "Updating index set '{{title}}' failed with status: {{error}}",
     "update_failed_title": "Could not update index set.",
     "success_title": "Success"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Loading index set stats failed with status",
+    "load_failed_title": "Could not load index set stats."
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Loading indexer overview for index set failed with status",
+    "load_failed_title": "Could not load indexer overview."
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "Fetching rotation strategies failed",
+    "fetch_rotation_failed_title": "Could not retrieve rotation strategies",
+    "fetch_retention_failed": "Fetching retention strategies failed",
+    "fetch_retention_failed_title": "Could not retrieve retention strategies"
   }
 }

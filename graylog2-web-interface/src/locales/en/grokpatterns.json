@@ -39,5 +39,19 @@
   "input_pattern_help": "The pattern which will match the log line e.g: '%{IP:client}' or '.*?'",
   "query_helper_field_pattern": "The pattern of the grok pattern",
   "query_helper_example": "Find grok patterns containing COMMON in the pattern:",
-  "query_helper_entity_name": "grok pattern"
+  "query_helper_entity_name": "grok pattern",
+  "use_grok_patterns_notifications": {
+    "load_failed": "Loading Grok patterns failed with status: {{error}}",
+    "load_failed_title": "Could not load Grok patterns",
+    "load_streams_failed": "Loading patterns failed with status: {{error}}",
+    "load_streams_failed_title": "Could not load streams",
+    "save_failed": "Saving Grok pattern \"{{name}}\" failed with status: {{error}}",
+    "save_failed_title": "Could not save Grok pattern",
+    "delete_failed": "Deleting Grok pattern \"{{name}}\" failed with status: {{error}}",
+    "delete_failed_title": "Could not delete Grok pattern",
+    "deleted_success": "Grok pattern \"{{name}}\" successfully deleted",
+    "created_success": "Grok pattern \"{{name}}\" successfully created",
+    "updated_success": "Grok pattern \"{{name}}\" successfully updated",
+    "import_failed": "Importing Grok pattern file failed with status: {{error}}"
+  }
 }

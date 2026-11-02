@@ -39,5 +39,19 @@
   "input_pattern_help": "Das Pattern, das die Logzeile treffen soll, z. B.: '%{IP:client}' oder '.*?'",
   "query_helper_field_pattern": "Das Pattern des Grok-Patterns",
   "query_helper_example": "Finde Grok-Patterns, die COMMON im Pattern enthalten:",
-  "query_helper_entity_name": "Grok-Pattern"
+  "query_helper_entity_name": "Grok-Pattern",
+  "use_grok_patterns_notifications": {
+    "load_failed": "Laden der Grok-Muster fehlgeschlagen mit Status: {{error}}",
+    "load_failed_title": "Die Grok-Muster konnten nicht geladen werden",
+    "load_streams_failed": "Laden der Muster fehlgeschlagen mit Status: {{error}}",
+    "load_streams_failed_title": "Die Streams konnten nicht geladen werden",
+    "save_failed": "Speichern des Grok-Musters \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Das Grok-Muster konnte nicht gespeichert werden",
+    "delete_failed": "Löschen des Grok-Musters \"{{name}}\" fehlgeschlagen mit Status: {{error}}",
+    "delete_failed_title": "Das Grok-Muster konnte nicht gelöscht werden",
+    "deleted_success": "Grok-Muster \"{{name}}\" erfolgreich gelöscht",
+    "created_success": "Grok-Muster \"{{name}}\" erfolgreich erstellt",
+    "updated_success": "Grok-Muster \"{{name}}\" erfolgreich aktualisiert",
+    "import_failed": "Importieren der Grok-Musterdatei fehlgeschlagen mit Status: {{error}}"
+  }
 }

@@ -22,6 +22,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { defaultOnError } from 'util/conditional/onError';
 
 import './types';
+import i18n from 'i18n';
 
 /**
  * Map of input-type discriminator → the extra fields that variant carries.
@@ -113,8 +114,8 @@ const useInputDetails = (
             return ids.length > 0 ? fetcher.fetchDetails(ids) : Promise.resolve([]);
           }),
         ).then((chunks) => chunks.flat()),
-        'Loading input details failed with status',
-        'Could not load input details',
+        i18n.t('use_input_details_notifications.load_failed', { ns: 'inputs' }),
+        i18n.t('use_input_details_notifications.load_failed_title', { ns: 'inputs' }),
       ),
     enabled,
     placeholderData: keepPreviousData,

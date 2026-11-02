@@ -586,5 +586,12 @@
     "put_failed_title": "Der Eintrag konnte nicht zu den Favoriten hinzugefügt werden",
     "delete_failed": "Entfernen des Eintrags aus den Favoriten fehlgeschlagen mit Status: {{error}}",
     "delete_failed_title": "Der Eintrag konnte nicht aus den Favoriten entfernt werden"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Laden der Titel der Einträge fehlgeschlagen mit Status",
+    "load_failed_title": "Die Titel der Einträge konnten nicht geladen werden"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Die Überschreibungsdaten konnten nicht abgerufen werden"
   }
 }

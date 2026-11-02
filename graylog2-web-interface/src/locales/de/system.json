@@ -450,5 +450,9 @@
     "download_failed_title": "Das Support Bundle konnte nicht heruntergeladen werden.",
     "load_list_failed": "Laden der Liste der Support Bundles fehlgeschlagen mit Status",
     "load_list_failed_title": "Die Liste der Support Bundles konnte nicht geladen werden."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Abrufen der Plugins auf Knoten \"{{nodeId}}\" fehlgeschlagen",
+    "fetch_failed_title": "Die Plugins konnten nicht abgerufen werden"
   }
 }

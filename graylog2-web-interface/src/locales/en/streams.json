@@ -464,5 +464,54 @@
     "output_terminated": "Output was terminated.",
     "output_remove_confirm": "Do you really want to remove this output from the stream?",
     "success_title": "Success"
+  },
+  "use_output_mutations_notifications": {
+    "save_failed": "Saving Output \"{{title}}\" failed with status: {{error}}",
+    "save_failed_title": "Could not save Output",
+    "update_failed": "Updating Output \"{{title}}\" failed with status: {{error}}",
+    "update_failed_title": "Could not update Output",
+    "terminate_failed": "Terminating output failed with status: {{error}}",
+    "terminate_failed_title": "Could not terminate output"
+  },
+  "use_outputs_notifications": {
+    "load_failed": "Loading outputs failed with status",
+    "load_failed_title": "Could not load outputs"
+  },
+  "use_stream_notifications": {
+    "load_failed": "Loading stream failed with status",
+    "load_failed_title": "Could not load stream."
+  },
+  "use_stream_metrics_notifications": {
+    "load_failed": "Loading stream metrics failed with status",
+    "load_failed_title": "Could not load stream metrics"
+  },
+  "use_stream_outputs_notifications": {
+    "load_failed": "Loading stream outputs failed with status",
+    "load_failed_title": "Could not load stream outputs"
+  },
+  "use_stream_mutations_notifications": {
+    "save_failed": "Saving Stream failed with status: {{error}}",
+    "save_failed_title": "Could not save Stream"
+  },
+  "use_stream_output_mutations_notifications": {
+    "add_failed": "Adding output to stream failed with status: {{error}}",
+    "add_failed_title": "Could not add output to stream",
+    "remove_failed": "Deleting output from stream failed with status: {{error}}",
+    "remove_failed_title": "Could not delete output from stream",
+    "added_success": "Output has been successfully added to Stream.",
+    "removed_success": "Output has been successfully removed from stream.",
+    "success_title": "Success!"
+  },
+  "use_stream_rule_mutations_notifications": {
+    "create_failed": "Creating Stream Rule failed with status: {{error}}",
+    "create_failed_title": "Could not create Stream Rule",
+    "update_failed": "Updating Stream Rule failed with status: {{error}}",
+    "update_failed_title": "Could not update Stream Rule",
+    "delete_failed": "Deleting Stream Rule failed with status: {{error}}",
+    "delete_failed_title": "Could not delete Stream Rule"
+  },
+  "use_stream_rules_inputs_notifications": {
+    "fetch_failed": "Fetching Stream Rule Inputs List failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve Stream Rule Inputs"
   }
 }

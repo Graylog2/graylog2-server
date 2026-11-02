@@ -24,6 +24,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 import InputsContext from 'contexts/InputsContext';
+import i18n from 'i18n';
 
 const SOURCE_URL = '/system/inputs';
 const INPUTS_QUERY_KEY = ['inputs', 'list'] as const;
@@ -37,10 +38,10 @@ export const createInput = (input: ConfiguredInput): Promise<{ id: string }> => 
 
   promise.then(
     () => {
-      UserNotification.success(`Input '${input.title}' launched successfully`);
+      UserNotification.success(i18n.t('use_inputs_notifications.launched_success', { ns: 'inputs', title: input.title }));
     },
     (error) => {
-      UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`, 'Could not launch input');
+      UserNotification.error(i18n.t('use_inputs_notifications.launch_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.launch_failed_title', { ns: 'inputs' }));
     },
   );
 
@@ -52,10 +53,10 @@ export const updateInput = (id: string, input: ConfiguredInput): Promise<void> =
 
   promise.then(
     () => {
-      UserNotification.success(`Input '${input.title}' updated successfully`);
+      UserNotification.success(i18n.t('use_inputs_notifications.updated_success', { ns: 'inputs', title: input.title }));
     },
     (error) => {
-      UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`, 'Could not update input');
+      UserNotification.error(i18n.t('use_inputs_notifications.update_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.update_failed_title', { ns: 'inputs' }));
     },
   );
 
@@ -67,10 +68,10 @@ export const deleteInput = (input: Input): Promise<void> => {
 
   promise.then(
     () => {
-      UserNotification.success(`Input '${input.title}' deleted successfully`);
+      UserNotification.success(i18n.t('use_inputs_notifications.deleted_success', { ns: 'inputs', title: input.title }));
     },
     (error) => {
-      UserNotification.error(`Deleting input '${input.title}' failed with status: ${error}`, 'Could not delete input');
+      UserNotification.error(i18n.t('use_inputs_notifications.delete_failed', { ns: 'inputs', title: input.title, error }), i18n.t('use_inputs_notifications.delete_failed_title', { ns: 'inputs' }));
     },
   );
 
@@ -92,7 +93,7 @@ const useInputsList = () =>
     queryKey: INPUTS_QUERY_KEY,
     queryFn: () =>
       fetchInputs().catch((error) => {
-        UserNotification.error(`Fetching Inputs failed with status: ${error}`, 'Could not retrieve Inputs');
+        UserNotification.error(i18n.t('use_inputs_notifications.fetch_failed', { ns: 'inputs', error }), i18n.t('use_inputs_notifications.fetch_failed_title', { ns: 'inputs' }));
 
         throw error;
       }),

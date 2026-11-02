@@ -19,6 +19,7 @@ import { SystemGrok } from '@graylog/server-api';
 import { fetchPlainText } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 export type GrokPattern = {
   id: string;
@@ -36,8 +37,8 @@ type GrokPatternTest = {
 export const loadGrokPatterns = (callback: (patterns: Array<GrokPattern>) => void) => {
   const failCallback = (error) => {
     UserNotification.error(
-      `Loading Grok patterns failed with status: ${error.message}`,
-      'Could not load Grok patterns',
+      i18n.t('use_grok_patterns_notifications.load_failed', { ns: 'grokpatterns', error: error.message }),
+      i18n.t('use_grok_patterns_notifications.load_failed_title', { ns: 'grokpatterns' }),
     );
   };
 
@@ -65,7 +66,7 @@ export const searchGrokPatternsPaginated = (page: number, perPage: number, query
       },
     }))
     .catch((errorThrown) => {
-      UserNotification.error(`Loading patterns failed with status: ${errorThrown}`, 'Could not load streams');
+      UserNotification.error(i18n.t('use_grok_patterns_notifications.load_streams_failed', { ns: 'grokpatterns', error: errorThrown }), i18n.t('use_grok_patterns_notifications.load_streams_failed_title', { ns: 'grokpatterns' }));
     });
 
 export const testGrokPattern = (
@@ -109,8 +110,8 @@ export const saveGrokPattern = (pattern: GrokPattern, callback: () => void) => {
     }
 
     UserNotification.error(
-      `Saving Grok pattern "${pattern.name}" failed with status: ${errorMessage}`,
-      'Could not save Grok pattern',
+      i18n.t('use_grok_patterns_notifications.save_failed', { ns: 'grokpatterns', name: pattern.name, error: errorMessage }),
+      i18n.t('use_grok_patterns_notifications.save_failed_title', { ns: 'grokpatterns' }),
     );
   };
 
@@ -128,8 +129,10 @@ export const saveGrokPattern = (pattern: GrokPattern, callback: () => void) => {
 
   (promise as Promise<any>).then((response) => {
     callback();
-    const action = pattern.id === '' ? 'created' : 'updated';
-    const message = `Grok pattern "${pattern.name}" successfully ${action}`;
+    const message =
+      pattern.id === ''
+        ? i18n.t('use_grok_patterns_notifications.created_success', { ns: 'grokpatterns', name: pattern.name })
+        : i18n.t('use_grok_patterns_notifications.updated_success', { ns: 'grokpatterns', name: pattern.name });
 
     UserNotification.success(message);
 
@@ -140,14 +143,14 @@ export const saveGrokPattern = (pattern: GrokPattern, callback: () => void) => {
 export const deleteGrokPattern = (pattern: GrokPattern, callback: () => void) => {
   const failCallback = (error) => {
     UserNotification.error(
-      `Deleting Grok pattern "${pattern.name}" failed with status: ${error.message}`,
-      'Could not delete Grok pattern',
+      i18n.t('use_grok_patterns_notifications.delete_failed', { ns: 'grokpatterns', name: pattern.name, error: error.message }),
+      i18n.t('use_grok_patterns_notifications.delete_failed_title', { ns: 'grokpatterns' }),
     );
   };
 
   SystemGrok.removePattern(pattern.id).then((response) => {
     callback();
-    UserNotification.success(`Grok pattern "${pattern.name}" successfully deleted`);
+    UserNotification.success(i18n.t('use_grok_patterns_notifications.deleted_success', { ns: 'grokpatterns', name: pattern.name }));
 
     return response;
   }, failCallback);
@@ -168,8 +171,8 @@ export const bulkImportGrokPatterns = (patterns: string, importStrategy: string)
     }
 
     UserNotification.error(
-      `Importing Grok pattern file failed with status: ${errorMessage}`,
-      'Could not load Grok patterns',
+      i18n.t('use_grok_patterns_notifications.import_failed', { ns: 'grokpatterns', error: errorMessage }),
+      i18n.t('use_grok_patterns_notifications.load_failed_title', { ns: 'grokpatterns' }),
     );
   };
 

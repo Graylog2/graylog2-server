@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { StreamsMetrics } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 // Known open-source fields. Plugins (e.g. the enterprise failure_count column) may contribute
 // additional field names via the `components.streams.overview.tableElements` extension, so the
@@ -76,8 +77,8 @@ const useStreamMetrics = (
     queryFn: () =>
       defaultOnError(
         fetchStreamMetrics(stableIds, stableFields),
-        'Loading stream metrics failed with status',
-        'Could not load stream metrics',
+        i18n.t('use_stream_metrics_notifications.load_failed', { ns: 'streams' }),
+        i18n.t('use_stream_metrics_notifications.load_failed_title', { ns: 'streams' }),
       ),
     enabled,
     placeholderData: keepPreviousData,

@@ -647,5 +647,19 @@
     "update_failed": "Aktualisieren des Index-Sets '{{title}}' fehlgeschlagen mit Status: {{error}}",
     "update_failed_title": "Index-Set konnte nicht aktualisiert werden.",
     "success_title": "Erfolg"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Laden der Statistiken des Index-Sets fehlgeschlagen mit Status",
+    "load_failed_title": "Die Statistiken des Index-Sets konnten nicht geladen werden."
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Laden der Indexer-Übersicht für das Index-Set fehlgeschlagen mit Status",
+    "load_failed_title": "Die Indexer-Übersicht konnte nicht geladen werden."
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "Abrufen der Rotationsstrategien fehlgeschlagen",
+    "fetch_rotation_failed_title": "Die Rotationsstrategien konnten nicht abgerufen werden",
+    "fetch_retention_failed": "Abrufen der Aufbewahrungsstrategien fehlgeschlagen",
+    "fetch_retention_failed_title": "Die Aufbewahrungsstrategien konnten nicht abgerufen werden"
   }
 }

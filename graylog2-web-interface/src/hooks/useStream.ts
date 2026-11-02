@@ -22,6 +22,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import type { Stream } from 'logic/streams/types';
 import type FetchError from 'logic/errors/FetchError';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 const fetchStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.get(streamId).url));
 
@@ -35,7 +36,7 @@ const useStream = (
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>({
     queryKey: ['stream', streamId],
-    queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load stream.'),
+    queryFn: () => defaultOnError(fetchStream(streamId), i18n.t('use_stream_notifications.load_failed', { ns: 'streams' }), i18n.t('use_stream_notifications.load_failed_title', { ns: 'streams' })),
     notifyOnChangeProps: ['data', 'error'],
   });
 

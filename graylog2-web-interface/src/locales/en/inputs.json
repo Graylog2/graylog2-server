@@ -392,5 +392,58 @@
   },
   "dot_badge": {
     "problematic_inputs": "Some inputs are in failed state or in setup mode."
+  },
+  "use_input_notifications": {
+    "load_failed": "Loading input failed with status",
+    "load_failed_title": "Could not load input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Loading input details failed with status",
+    "load_failed_title": "Could not load input details"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Loading input metrics failed with status",
+    "load_failed_title": "Could not load input metrics"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Loading input state summary failed with status",
+    "load_failed_title": "Could not load input state summary."
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Error starting input '{{title}}': {{error}}",
+    "start_failed_title": "Input '{{title}}' could not be started",
+    "started_success": "Input has been successfully started.",
+    "stop_failed": "Error stopping input '{{title}}': {{error}}",
+    "stop_failed_title": "Input '{{title}}' could not be stopped",
+    "stopped_success": "Input has been successfully stopped.",
+    "setup_failed": "Error entering setup mode '{{title}}': {{error}}",
+    "setup_failed_title": "Input '{{title}}' could not set to setup mode",
+    "deleted_success": "Input has been successfully deleted.",
+    "success_title": "Success!"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "Saving input failed with status: {{error}}",
+    "save_failed_title": "Could not save input",
+    "update_failed": "Updating input failed with status: {{error}}",
+    "update_failed_title": "Could not update input",
+    "delete_failed": "Deleting input failed with status: {{error}}",
+    "delete_failed_title": "Could not delete input",
+    "created_success": "Input has been successfully created.",
+    "updated_success": "Input has been successfully updated.",
+    "deleted_success": "Input has been successfully deleted.",
+    "success_title": "Success!"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input '{{title}}' launched successfully",
+    "launch_failed": "Launching input '{{title}}' failed with status: {{error}}",
+    "launch_failed_title": "Could not launch input",
+    "updated_success": "Input '{{title}}' updated successfully",
+    "update_failed": "Updating input '{{title}}' failed with status: {{error}}",
+    "update_failed_title": "Could not update input",
+    "deleted_success": "Input '{{title}}' deleted successfully",
+    "delete_failed": "Deleting input '{{title}}' failed with status: {{error}}",
+    "delete_failed_title": "Could not delete input",
+    "fetch_failed": "Fetching Inputs failed with status: {{error}}",
+    "fetch_failed_title": "Could not retrieve Inputs"
   }
 }

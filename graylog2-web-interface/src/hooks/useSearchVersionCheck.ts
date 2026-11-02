@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SystemSearchVersion } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 type VersionCheckType = {
   satisfied: boolean;
@@ -30,7 +31,7 @@ export const fetchSearchVersionCheck = ({ queryKey }): Promise<VersionCheckType>
 
   return defaultOnError(
     SystemSearchVersion.satisfiesVersion(distribution, version || undefined),
-    'Could not fetch override data',
+    i18n.t('use_search_version_check_notifications.fetch_failed_title', { ns: 'common' }),
   );
 };
 
@@ -39,7 +40,7 @@ const useSearchVersionCheck = (distribution: 'opensearch' | 'elasticsearch' | 'd
   const queryKey = [MAIN_KEY, { distribution, version: version ?? null }];
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: (args) => defaultOnError(fetchSearchVersionCheck(args), 'Could not fetch override data'),
+    queryFn: (args) => defaultOnError(fetchSearchVersionCheck(args), i18n.t('use_search_version_check_notifications.fetch_failed_title', { ns: 'common' })),
   });
 
   return {

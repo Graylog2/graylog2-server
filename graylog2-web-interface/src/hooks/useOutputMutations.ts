@@ -20,6 +20,7 @@ import { SystemOutputs } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import { KEY_PREFIX } from 'hooks/useOutputs';
+import i18n from 'i18n';
 
 const useOutputMutations = () => {
   const queryClient = useQueryClient();
@@ -33,7 +34,7 @@ const useOutputMutations = () => {
       SystemOutputs.create(output as any),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error, output) => {
-      UserNotification.error(`Saving Output "${output.title}" failed with status: ${error}`, 'Could not save Output');
+      UserNotification.error(i18n.t('use_output_mutations_notifications.save_failed', { ns: 'streams', title: output.title, error }), i18n.t('use_output_mutations_notifications.save_failed_title', { ns: 'streams' }));
     },
   });
 
@@ -42,7 +43,7 @@ const useOutputMutations = () => {
       SystemOutputs.update(outputId, deltas),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error, { title }) => {
-      UserNotification.error(`Updating Output "${title}" failed with status: ${error}`, 'Could not update Output');
+      UserNotification.error(i18n.t('use_output_mutations_notifications.update_failed', { ns: 'streams', title, error }), i18n.t('use_output_mutations_notifications.update_failed_title', { ns: 'streams' }));
     },
   });
 
@@ -50,7 +51,7 @@ const useOutputMutations = () => {
     mutationFn: (outputId: string) => SystemOutputs.remove(outputId),
     onSuccess: () => invalidateOutputQueries(),
     onError: (error: Error) => {
-      UserNotification.error(`Terminating output failed with status: ${error}`, 'Could not terminate output');
+      UserNotification.error(i18n.t('use_output_mutations_notifications.terminate_failed', { ns: 'streams', error }), i18n.t('use_output_mutations_notifications.terminate_failed_title', { ns: 'streams' }));
     },
   });
 
