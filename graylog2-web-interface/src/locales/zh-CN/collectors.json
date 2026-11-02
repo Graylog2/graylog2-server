@@ -62,17 +62,22 @@
     "restart": {
       "fleet": "已请求重启 Fleet <targetLink />",
       "fleet_with_others_other": "已请求重启 Fleet <targetLink /> 及其他 {{count}} 个 Fleet",
-      "collector": "已请求重启 Collector <targetLink />"
+      "collector": "已请求重启 Collector <targetLink />",
+      "collector_with_others_other": "已请求重启 Collector <targetLink /> 及其他 {{count}} 个 Collector"
     },
     "discovery_run": {
       "fleet": "已为 Fleet <targetLink /> 触发发现任务",
-      "collector": "已为 Collector <targetLink /> 触发发现任务"
+      "fleet_with_others_other": "已为 Fleet <targetLink /> 及其他 {{count}} 个 Fleet 触发发现任务",
+      "collector": "已为 Collector <targetLink /> 触发发现任务",
+      "collector_with_others_other": "已为 Collector <targetLink /> 及其他 {{count}} 个 Collector 触发发现任务"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> 已重新分配"
+      "collector": "Collector <targetLink /> 已重新分配",
+      "collector_with_others_other": "Collector <targetLink /> 及其他 {{count}} 个 Collector 已重新分配"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> 已重新分配到 Fleet <destinationLink />"
+      "collector": "Collector <targetLink /> 已重新分配到 Fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> 及其他 {{count}} 个 Collector 已重新分配到 Fleet <destinationLink />"
     }
   },
   "fleet_reference": {
@@ -97,6 +102,7 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "删除注册令牌",
+    "bulk_delete_confirm_other": "确定要删除 {{count}} 个注册令牌吗？新的 Collectors 将无法使用已删除的令牌注册。",
     "never": "从不",
     "expired": "已过期",
     "human_name": "注册令牌",
@@ -115,6 +121,7 @@
     "receiving": "接收中",
     "listening": "监听中…",
     "title": "正在注册的主机",
+    "connected_other": "已连接 {{count}} 个 · 继续监听中…",
     "listening_subtitle": "监听中…",
     "view_all": "在实例中查看全部",
     "host": "主机",
@@ -150,6 +157,7 @@
   "fleet_actions": {
     "received_messages": "接收的消息",
     "delete": "删除",
+    "delete_blocked_other": "此 Fleet 中有 {{count}} 个已分配的实例。请先重新分配或删除这些实例，然后再删除该 Fleet。",
     "delete_title": "删除 Fleet",
     "delete_confirm": "确定要删除 Fleet <emphasis>{{fleetName}}</emphasis> 吗？其数据源配置和注册令牌也将被删除。"
   },
@@ -211,8 +219,11 @@
   },
   "reassign_fleet": {
     "fleet_required": "必须选择 Fleet",
+    "title_other": "将 {{count}} 个实例重新分配到 Fleet",
+    "no_other_fleet_other": "没有其他可将这些 Collectors 分配到的 Fleet。",
     "no_permission": "您没有权限将 Collectors 分配到其他任何 Fleet。",
     "select_placeholder": "选择 Fleet...",
+    "submit_other": "重新分配实例",
     "submitting": "正在重新分配..."
   },
   "instance_health": {
@@ -240,12 +251,14 @@
     "logs": "日志：",
     "messages": "消息：",
     "attributes": "属性",
+    "active_sources_other": "活动数据源（{{count}}）",
     "sources_inherited": "数据源继承自此实例所属 Fleet 的配置。",
     "no_sources": "此 Fleet 尚未配置数据源。请在 Fleet 详情页面添加数据源以开始收集数据。",
     "synchronization": "同步",
     "pending_load_error": "无法加载待处理的更改，请稍后重试。",
     "queued_actions": "以下操作将排队，直到 Collector 完成同步：",
     "hide_transactions": "隐藏排队的事务",
+    "show_transactions_other": "显示排队的事务（{{count}}）",
     "changes_queued": "更改已排队，将在 Collector 下次签到时生效。",
     "all_applied": "Collector 已应用所有排队的操作。"
   },
@@ -266,7 +279,11 @@
     "healthy": "此 Fleet 中的所有实例均在线",
     "degraded": "此 Fleet 中有部分实例离线",
     "down": "此 Fleet 中的所有实例均离线",
-    "empty": "尚无 Collector 实例注册到此 Fleet"
+    "empty": "尚无 Collector 实例注册到此 Fleet",
+    "instances_other": "实例",
+    "online_other": "● {{count}} 在线",
+    "offline_other": "● {{count}} 离线",
+    "sources_other": "{{count}} 个数据源"
   },
   "fleet_cards": {
     "empty_title": "尚无 Fleet",
@@ -287,6 +304,7 @@
     "fleet": "Fleet",
     "enrolled": "注册时间",
     "last_seen": "最后在线",
+    "show_attributes_other": "显示全部 {{count}} 个属性",
     "hide_attributes": "隐藏属性"
   },
   "connection_success": {
@@ -360,18 +378,21 @@
     "connection_lost": "连接已断开",
     "last_heartbeat": "最后心跳 <lastSeen />",
     "first_messages": "首批消息",
+    "receiving_other": "正在接收 - 自 {{duration}} 以来收到 {{count}} 条消息",
     "listening": "正在监听...通常不到一分钟",
     "enrolled": "已注册",
     "enrolled_detail": "已使用注册令牌注册 - <enrolledAt />",
     "connected": "已连接",
     "connected_detail": "已收到心跳 - <lastSeen />",
-    "sources_configured": "数据源已配置"
+    "sources_configured": "数据源已配置",
+    "sources_detail_other": "来自 Fleet <fleetLink>{{fleetName}}</fleetLink> 的 {{count}} 个数据源"
   },
   "platform_picker": {
     "title": "开始使用 Collectors",
     "description": "在您的基础设施中部署轻量级 Collectors，将日志转发到 {{productName}}。"
   },
   "source_status": {
+    "messages_other": "{{formattedCount}} 条消息",
     "disabled": "已禁用",
     "not_applicable": "在 {{os}} 上不适用",
     "unrecognised": "无法识别的数据源类型",
@@ -405,14 +426,18 @@
   "ingest_inputs": {
     "title": "接收 Inputs",
     "none": "不存在 Collector 接收 Input。在创建 Input 之前，Collectors 将无法发送数据。",
+    "unreadable_other": "存在 {{count}} 个 Collector 接收 Input，但您没有查看权限。",
     "none_running": "存在 Collector 接收 Input，但目前没有正在运行的 Input。Collectors 将无法发送数据。",
     "name": "名称",
     "status": "状态",
     "bind_address": "绑定地址",
     "port": "端口",
-    "manage": "管理"
+    "manage": "管理",
+    "additional_unreadable_other": "另有 {{count}} 个 Input 因权限不足而不可见。"
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_other": "Collector 接收 Input 位于不同端口：{{ports}}。如果外部端口与某个 Input 端口不同，请确保网络正确转发流量。"
+  },
   "source_types": {
     "file": "文件",
     "journald": "Journald",
@@ -625,7 +650,9 @@
       "datanode_opensearch_version": "Datanode OpenSearch 版本",
       "index_version": "索引版本",
       "indices": "索引",
+      "node_title_other": "节点：{{hostname}}，版本：{{version}}，{{count}} 个索引",
       "opensearch_data_location": "OpenSearch 数据位置",
+      "shard_count_other": "{{count}} 个分片",
       "shards": "分片"
     },
     "in_place_migration": {
@@ -634,6 +661,7 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "证书有效期至",
+      "found_other": "已找到 Data Nodes：{{count}}",
       "hostname": "主机名",
       "incompatible": "发现运行中的 Data Nodes 版本与您当前的 {{productName}} 版本不兼容。请确保 {{productName}} 和 Data Node 使用相同版本。",
       "incompatible_title": "发现不兼容的 Data Nodes",
@@ -773,7 +801,9 @@
         "journal": "OpenSearch 停止期间，传入的消息会堆积在每个 {{productName}} 节点的磁盘 Journal 中。如果停机时间超过 Journal 的大小或时间限制，数据摄取将停滞，消息可能会丢失——仅当 Journal 的余量足以覆盖预期停机时间时才继续操作。",
         "submitting": "正在重启...",
         "title": "重启 Data Nodes 的 OpenSearch 吗？",
-        "tolerate_downtime": "仅当您能够承受停机时间时才继续。"
+        "tolerate_downtime": "仅当您能够承受停机时间时才继续。",
+        "restart_together_with_versions_other": "Data Node 少于 3 个时，无法通过逐个重启节点来保持 OpenSearch 可用。所有 Data Nodes 将一起重启，以将 OpenSearch 从 <strong>{{currentVersion}}</strong> 迁移到 <strong>{{targetVersion}}</strong>，因此在它们完成之前，存储后端将<strong>不可用</strong>——搜索和索引都会中断。",
+        "restart_together_other": "Data Node 少于 3 个时，无法通过逐个重启节点来保持 OpenSearch 可用。所有 Data Nodes 将一起重启，以将 OpenSearch 迁移到目标版本，因此在它们完成之前，存储后端将<strong>不可用</strong>——搜索和索引都会中断。"
       },
       "no_rollback": "启动后将无法回滚到之前的版本。",
       "rolling": {
@@ -782,7 +812,9 @@
         "healthy_cluster": "继续之前，请确保集群健康（green）。",
         "shard_allocation": "每次重启期间会暂停分片分配，因此集群保持可用——但节点离开并重新加入时，索引和搜索可能会短暂降级。",
         "title": "开始 OpenSearch 滚动升级吗？",
-        "wait_for_green": "每个节点升级后，升级过程会等待集群恢复为 green 后再继续。如果耗时过长，升级将暂停并等待您恢复。"
+        "wait_for_green": "每个节点升级后，升级过程会等待集群恢复为 green 后再继续。如果耗时过长，升级将暂停并等待您恢复。",
+        "each_node_with_versions_other": "您的 {{count}} 个 Data Nodes 将逐个升级并重启，以将其内置的 OpenSearch 从 <strong>{{currentVersion}}</strong> 迁移到 <strong>{{targetVersion}}</strong>。",
+        "each_node_other": "您的 {{count}} 个 Data Nodes 将逐个升级并重启，以将其内置的 OpenSearch 迁移到目标版本。"
       },
       "starting": "正在启动..."
     },
@@ -806,6 +838,7 @@
       "start_upgrade_and_restart": "开始 OpenSearch 升级并重启",
       "starting_rolling_upgrade": "正在开始 OpenSearch 滚动升级...",
       "title": "升级 Data Nodes 内置的 OpenSearch",
+      "unconfirmed_other": "在 {{count}} 个 Data Nodes 不可用期间，无法检查不兼容的索引和升级状态。所有 Data Nodes 恢复可用后，这些信息将再次显示。",
       "upgrade_process": "升级流程",
       "use_table": "在继续之前，请使用下表重新索引系统索引，并归档或删除数据索引。"
     },
@@ -869,6 +902,7 @@
       "checking": "正在检查 OpenSearch 状态...",
       "error": "无法检查 Data Nodes 内置的 OpenSearch 版本。",
       "outdated": "Data Nodes 内置的 OpenSearch 不是最新版本。",
+      "unconfirmed_other": "在 {{count}} 个 Data Nodes 不可用期间，无法确认 Data Nodes 内置的 OpenSearch 状态。",
       "up_to_date": "Data Nodes 内置的 OpenSearch 为最新版本。",
       "up_to_date_with_version": "Data Nodes 内置的 OpenSearch 为最新版本<bold>（{{version}}）。</bold>",
       "upgrading": "OpenSearch 滚动升级正在进行中。"
