@@ -15,17 +15,17 @@
   },
   "bulk_actions": {
     "delete": {
-      "error": "Se produjo un error al eliminar las definiciones de evento. {{error}}",
-      "title": "Eliminar definiciones de evento"
+      "error": "Se produjo un error al eliminar los Event Definitions. {{error}}",
+      "title": "Eliminar Event Definitions"
     },
     "disable": {
-      "error": "Se produjo un error al deshabilitar las definiciones de evento. {{error}}",
-      "title": "Deshabilitar definiciones de evento"
+      "error": "Se produjo un error al deshabilitar los Event Definitions. {{error}}",
+      "title": "Deshabilitar Event Definitions"
     },
     "disable_action": "Deshabilitar",
     "enable": {
-      "error": "Se produjo un error al habilitar las definiciones de evento. {{error}}",
-      "title": "Habilitar definiciones de evento"
+      "error": "Se produjo un error al habilitar los Event Definitions. {{error}}",
+      "title": "Habilitar Event Definitions"
     },
     "enable_action": "Habilitar",
     "success_title": "Éxito"
@@ -36,7 +36,7 @@
     "condition_type_help": "Elige el tipo de condición para este evento.",
     "description": "Define cómo deben crearse los eventos de este tipo. Más adelante puedes usar esos eventos como entrada en otras condiciones, lo que permite crear condiciones potentes basadas en otras.",
     "no_description": "No hay descripción disponible.",
-    "not_editable": "Las condiciones de este tipo de definición de evento no se pueden editar.",
+    "not_editable": "Las condiciones de este tipo de Event Definition no se pueden editar.",
     "select_condition_type": "Selecciona un tipo de condición",
     "title": "Condición de evento"
   },
@@ -84,18 +84,18 @@
   "details_form": {
     "add_event_procedure": "Añadir procedimiento de evento",
     "description": "Descripción",
-    "description_help": "Descripción más extensa de esta definición de evento.",
-    "no_event_procedures": "Esta definición de evento todavía no tiene procedimientos de evento.",
+    "description_help": "Descripción más extensa de este Event Definition.",
+    "no_event_procedures": "Este Event Definition todavía no tiene procedimientos de evento.",
     "no_remediation_steps": "No se han indicado pasos de corrección",
     "optional": "(Opcional)",
     "priority": "Prioridad",
-    "priority_help": "Elige la prioridad de los eventos creados a partir de esta definición.",
+    "priority_help": "Elige la prioridad de los eventos creados a partir de este Event Definition.",
     "remediation_steps": "Pasos de corrección",
     "remediation_steps_help": "Pasos para corregir este evento. Se admite formato Markdown.",
     "summary_template": "Plantilla de resumen del evento",
     "summary_template_help": "Plantilla usada para generar los resúmenes de eventos y alertas.",
     "title": "Detalles del evento",
-    "title_help": "Título de esta definición de evento.",
+    "title_help": "Título de este Event Definition.",
     "title_label": "Título"
   },
   "event_key_help": {
@@ -105,7 +105,7 @@
     "where_it_matters": "<bold>Dónde importa la clave:</bold> la <bold>correlación de eventos</bold> solo coincide con los eventos de origen que comparten la misma clave y crea como máximo un evento por clave dentro de su ventana de búsqueda. Define las claves en las definiciones de evento que quieras correlacionar, no en la propia correlación."
   },
   "expanded_notifications": {
-    "description": "Notificaciones que se envían cuando se activa esta definición de evento.",
+    "description": "Notificaciones que se envían cuando se activa este Event Definition.",
     "loading": "Cargando notificaciones...",
     "missing_permissions": "Faltan permisos de notificaciones para:"
   },
