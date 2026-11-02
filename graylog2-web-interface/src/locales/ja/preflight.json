@@ -1,1 +1,129 @@
-{}
+{
+  "navigation": {
+    "initial_setup": "{{productName}} 初期セットアップ",
+    "get_help": "ヘルプを取得",
+    "documentation": "ドキュメント",
+    "changelogs": "変更履歴",
+    "operations_changelogs": "Operations の変更履歴",
+    "support": "サポート"
+  },
+  "setup": {
+    "welcome": "ようこそ！",
+    "first_start": "{{productName}} を初めて起動し、データノードが設定されていないようです。",
+    "data_nodes_allow": "データノードを使用すると、{{productName}} のメッセージデータベース内のすべてのメッセージにインデックスを作成し、検索できます。",
+    "data_node_setup": "<dataNodeLink>{{productName}} データノード</dataNodeLink>を導入する（推奨）か、<openSearchLink>OpenSearch</openSearchLink>ノードを手動で設定できます。OpenSearch を手動で設定する場合は、{{productName}} の設定を調整し、{{productName}} サーバーを再起動する必要があります。再起動後、このページは表示されなくなります。",
+    "data_nodes_title": "{{productName}} データノード"
+  },
+  "data_nodes": {
+    "description": "{{productName}} データノードは {{productName}} とのより優れた統合を提供し、今後のアップデートを簡単にします。{{productName}} データノードが実行されていて、認証局を設定したら、起動を再開できます。",
+    "registered": "現在登録されているデータノードの一覧です。一覧は継続的に更新されます。",
+    "transport_address": "トランスポートアドレス",
+    "hostname": "ホスト名",
+    "separator": " – ",
+    "none_found": "データノードが見つかりませんでした。"
+  },
+  "waiting_for_startup": {
+    "title": "設定が完了しました",
+    "description": "{{productName}} サーバーを起動しています。環境によっては数分かかる場合があります。{{productName}} サーバーに接続できるようになると、このページは自動的に更新されます。いつでも手動で更新できますが、その後このページは表示されなくなりますのでご注意ください。",
+    "spinner": "{{productName}} サーバーを待機しています ..."
+  },
+  "error_boundary": {
+    "title": "問題が発生しました",
+    "description": "不明なエラーが発生しました。詳細については、次のメッセージと {{productName}} サーバーのログを確認してください。"
+  },
+  "resume_startup": {
+    "button": "起動を再開",
+    "confirm": "実行中の {{productName}} データノードがない状態で起動を再開してもよろしいですか？ この場合、設定は localhost:9200 上の OpenSearch インスタンスを使用する方式にフォールバックします。",
+    "error": "起動の再開に失敗しました。エラー: {{error}}",
+    "error_title": "起動を再開できませんでした"
+  },
+  "restart_configuration": {
+    "confirm": "設定を最初からやり直してもよろしいですか？ 以前の変更はすべて削除されます。",
+    "restart": "再開始",
+    "restarting": "再開始中..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "いつでも<restartButton>設定を最初からやり直す</restartButton>ことができます",
+    "fetch_error": "{{entityName}}の取得中にエラーが発生しました: {{message}}"
+  },
+  "entities": {
+    "data_nodes": "データノード",
+    "certificate_authority": "認証局",
+    "renewal_policy": "更新ポリシー"
+  },
+  "steps": {
+    "ca_configuration": "認証局を設定",
+    "renewal_policy_configuration": "更新ポリシーを設定",
+    "certificate_provisioning": "データノードの証明書をプロビジョニング",
+    "configuration_finished": "設定完了"
+  },
+  "ca_configuration": {
+    "title": "認証局を設定",
+    "explanation_upload_or_create": "この最初のステップでは、新しい認証局をアップロードするか作成できます。",
+    "explanation_provisioning": "これを使用して、データノードに証明書を簡単にプロビジョニングできます。",
+    "create_tab": "新しい CA を作成",
+    "upload_tab": "CA をアップロード"
+  },
+  "ca_create": {
+    "description": "ここでは新しい認証局をすばやく作成できます。「Create CA」ボタンをクリックするだけです。この CA は {{productName}} データノードの保護にのみ使用してください。",
+    "organization_name": "組織名",
+    "creating": "CA を作成しています...",
+    "create": "CA を作成",
+    "success": "CA を作成しました",
+    "error": "CA の作成に失敗しました。エラー: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "ここでは既存の CA をアップロードできます。秘密鍵（暗号化されているか否かを問わず）、CA 証明書、および中間証明書をすべて含む単一のファイルをアップロードする必要があります。ファイルは PEM 形式または PKCS#12 形式である必要があります。秘密鍵が暗号化されている場合は、そのパスワードも入力する必要があります。",
+    "certificate_authority": "認証局",
+    "drop_hint": "CA をここにドラッグするか、クリックしてファイルを選択",
+    "rejected": "CA のアップロードに失敗しました",
+    "password": "パスワード",
+    "uploading": "CA をアップロードしています...",
+    "upload": "CA をアップロード",
+    "success": "CA をアップロードしました",
+    "error": "CA のアップロードに失敗しました。エラー: {{error}}",
+    "validation_missing_file": "ファイルをアップロードしてください。",
+    "validation_multiple_files": "ファイルは 1 つだけアップロードしてください。"
+  },
+  "certificate_provisioning": {
+    "title": "証明書をプロビジョニング",
+    "configured": "認証局の設定が完了しました。",
+    "ready": "データノードの証明書をプロビジョニングできるようになりました。",
+    "data_node_required": "証明書をプロビジョニングする前に、少なくとも 1 つの {{productName}} データノードが実行されている必要があります。",
+    "started": "証明書のプロビジョニングを開始しました",
+    "error": "証明書のプロビジョニングの開始に失敗しました。エラー: {{error}}",
+    "provisioning": "証明書をプロビジョニングしています...",
+    "provision": "証明書をプロビジョニングして続行",
+    "skip": "プロビジョニングをスキップ"
+  },
+  "renewal_policy": {
+    "title": "更新ポリシーを設定",
+    "explanation_automatic": "このステップでは、有効期限が近い証明書を自動的に更新するかどうかを設定できます。",
+    "explanation_manual": "手動更新を選択すると、有効期限が近づいた際にシステム通知が表示され、更新の確認が求められます。",
+    "policy": "更新ポリシー",
+    "select_policy": "更新ポリシーを選択",
+    "automatic": "自動",
+    "manual": "手動",
+    "certificate_lifetime": "証明書の有効期間",
+    "enter_lifetime": "有効期間を入力",
+    "select_unit": "単位を選択",
+    "unit_hours": "時間",
+    "unit_days": "日",
+    "unit_months": "か月",
+    "unit_years": "年",
+    "min_lifetime": "{{duration}}以上である必要があります",
+    "creating": "ポリシーを作成しています...",
+    "create": "ポリシーを作成",
+    "success": "更新ポリシーを作成しました",
+    "error": "更新ポリシーの作成に失敗しました。エラー: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "接続は安全ではありません。情報は暗号化されずにサーバーへ送信されますのでご注意ください。",
+    "maybe_not_secure": "接続が安全ではない可能性があります。情報は暗号化されずにサーバーへ送信される可能性がありますのでご注意ください。"
+  },
+  "configuration_finished": {
+    "title": "設定が完了しました",
+    "skipped_provisioning": "設定が正常に完了しました。証明書のプロビジョニングを行うには、引き続き<goBackButton>戻る</goBackButton>ことができます。",
+    "provisioned": "プロビジョニングが成功し、すべてのデータノードが保護され、接続可能になりました。"
+  }
+}
