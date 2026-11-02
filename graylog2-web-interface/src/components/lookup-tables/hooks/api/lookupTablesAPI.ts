@@ -22,6 +22,7 @@ import PaginationURL from 'util/PaginationURL';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
+import { translateValidationResult } from 'util/translateApiError';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { LookupPreviewType } from 'components/lookup-tables/types';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
@@ -89,7 +90,7 @@ export const validateLookupTable = async (table: LookupTable) =>
     default_single_value_type: table.default_single_value_type ?? 'NULL',
     default_multi_value: table.default_multi_value ?? '',
     default_multi_value_type: table.default_multi_value_type ?? 'NULL',
-  });
+  }).then(translateValidationResult);
 
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
   ClusterLookupTable.performPurge(table.id, key);
@@ -118,7 +119,7 @@ export const fetchCache = async (idOrName: string): Promise<LookupTableCache> =>
 
 export const fetchCacheTypes = async () => SystemLookup.availableCacheTypes();
 
-export const validateCache = async (cache: LookupTableCache) => fetch('POST', _url('caches/validate'), cache);
+export const validateCache = async (cache: LookupTableCache) => fetch('POST', _url('caches/validate'), cache).then(translateValidationResult);
 
 export const createCache = async (payload: LookupTableCache) => fetch('POST', _url('caches'), payload);
 
@@ -150,7 +151,7 @@ export const updateDataAdapter = async (payload: LookupTableCache) =>
   fetch('PUT', _url(`adapters/${(payload as any).id}`), payload);
 
 export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
-  fetch('POST', _url('adapters/validate'), adapter);
+  fetch('POST', _url('adapters/validate'), adapter).then(translateValidationResult);
 
 export const deleteDataAdapter = async (adapterId: string) => SystemLookup.deleteAdapter(adapterId);
 

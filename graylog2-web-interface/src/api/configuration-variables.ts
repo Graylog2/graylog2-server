@@ -22,6 +22,7 @@ import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import { translateValidationResult } from 'util/translateApiError';
 
 const SOURCE_URL = '/sidecar/configuration_variables';
 
@@ -123,7 +124,7 @@ export const validateConfigurationVariable = (configurationVariable: { name?: st
     );
   });
 
-  return promise;
+  return promise.then((validation) => translateValidationResult(validation));
 };
 
 export const getConfigurationsForVariable = (configurationVariable: { id: string }) => {
