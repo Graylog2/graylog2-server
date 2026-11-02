@@ -37,6 +37,7 @@
     "delete": "删除",
     "edit": "编辑",
     "filter_label": "过滤服务",
+    "found_other": "系统上找到 {{count}} 个已配置的认证服务。",
     "headers": {
       "actions": "操作",
       "default_roles": "默认角色",
@@ -141,17 +142,65 @@
   "synced_users": {
     "edit": "编辑",
     "filter_label": "过滤用户",
+    "found_other": "找到 {{count}} 个同步的用户。",
     "headers": {
       "actions": "操作",
       "full_name": "全名",
-      "roles": "角色"
+      "roles": "角色",
+      "username": "用户名"
+    },
+    "none_found": "未找到同步的用户。",
+    "role_not_found": "未找到角色",
+    "title": "同步的用户"
+  },
+  "trusted_header": {
+    "description": "此认证器可让您基于 HTTP 标头登录用户，无需进一步交互。",
+    "enable_sso": "通过 HTTP 标头启用单点登录",
+    "enabled": "已启用",
+    "title": "受信任标头认证",
+    "trusted_proxies_hint": "请在 {{productName}} 服务器配置文件中配置 <code>trusted_proxies</code> 设置。",
+    "update_config": "更新配置",
+    "username_header": "用户名标头",
+    "username_header_help": "包含用户隐式受信任名称的 HTTP 标头。（标头匹配不区分大小写）"
+  },
+  "user_sync": {
+    "browser_time_zone": "浏览器时区",
+    "default_assignments_hint": "更改默认角色和时区分配仅会影响通过 {{serviceTitle}} 新创建的用户！",
+    "default_roles": "默认角色",
+    "default_user_time_zone": "默认用户时区",
+    "email_attribute": "电子邮件属性",
+    "email_attributes": "电子邮件属性",
+    "full_name_attribute": "全名属性",
+    "id_attribute": "ID 属性",
+    "name_attribute": "名称属性",
+    "role_not_found": "未找到角色",
+    "search_base_dn": "搜索基础 DN",
+    "search_pattern": "搜索模式",
+    "search_roles": "搜索角色",
+    "test_login_hint": "建议在侧边栏面板中测试用户登录，以验证您的设置。",
+    "title": "用户同步"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "您确定要移除此认证服务的组同步配置吗？",
+    "create_failed": "创建认证服务失败",
+    "edit_failed": "编辑认证服务失败",
+    "finish_and_save": "完成并保存服务",
+    "finish_and_save_identity_service": "完成并保存身份服务",
+    "next_group_sync": "下一步：组同步",
+    "next_user_sync": "下一步：用户同步",
+    "server_validation_error": "服务器验证错误：{{errors}}",
+    "steps": {
+      "group_sync": "组同步（可选）",
+      "server_config": "服务器配置",
+      "user_sync": "用户同步"
     }
   },
-  "trusted_header": {},
-  "user_sync": {},
-  "wizard": {
-    "steps": {}
+  "wizard_header": {
+    "edit_title": "编辑认证服务 - <emphasis>{{backendTitle}}</emphasis>"
   },
-  "wizard_header": {},
-  "http_header_notifications": {}
+  "http_header_notifications": {
+    "load_failed": "加载 HTTP 标头认证配置失败",
+    "update_success": "成功更新 HTTP 标头认证配置",
+    "update_failed": "更新 HTTP 标头认证配置失败，状态：{{error}}"
+  }
 }
