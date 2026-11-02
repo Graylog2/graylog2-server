@@ -1,1 +1,163 @@
-{}
+{
+  "create_input": {
+    "select_input": "Seleccionar entrada",
+    "launch_new": "Iniciar nueva entrada",
+    "launch_new_type": "Iniciar nueva entrada <type>{{type}}</type>",
+    "launch": "Iniciar entrada",
+    "no_inputs_available": "No hay entradas disponibles"
+  },
+  "edit_input": {
+    "edit": "Editar entrada",
+    "editing": "Editando la entrada {{title}}",
+    "update": "Actualizar entrada"
+  },
+  "input_dropdown": {
+    "label": "selección de entrada del servidor",
+    "select": "Selecciona una entrada",
+    "unknown_type": "Tipo de entrada desconocido",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "Estados de la entrada {{title}}",
+    "CREATED": "Creada",
+    "INITIALIZED": "Inicializada",
+    "INVALID_CONFIGURATION": "Configuración no válida",
+    "STARTING": "Iniciando",
+    "RUNNING": "En ejecución",
+    "FAILED": "Fallida",
+    "FAILING": "Fallando",
+    "SETUP": "Configuración",
+    "STOPPING": "Deteniendo",
+    "STOPPED": "Detenida",
+    "TERMINATED": "Terminada"
+  },
+  "state_control": {
+    "set_up": "Configurar entrada",
+    "stopping": "Deteniendo...",
+    "stop": "Detener entrada",
+    "starting": "Iniciando...",
+    "start": "Iniciar entrada"
+  },
+  "static_fields": {
+    "title": "Campos estáticos",
+    "add": "Añadir campo estático",
+    "add_field": "Añadir campo",
+    "add_success": "El campo estático '{{field}}' se ha añadido correctamente a '{{input}}'",
+    "add_failed": "No se pudo añadir el campo estático a la entrada: {{error}}",
+    "add_failed_title": "No se pudo añadir el campo estático a la entrada '{{input}}'",
+    "remove_success": "El campo estático '{{field}}' se ha eliminado correctamente de '{{input}}'",
+    "remove_failed": "No se pudo eliminar el campo estático de la entrada: {{error}}",
+    "remove_failed_title": "No se pudo eliminar el campo estático '{{field}}' de la entrada '{{input}}'",
+    "delete_title": "Eliminar campo estático",
+    "delete_confirm": "¿Seguro que quieres eliminar el campo estático '{{field}}' de '{{input}}'?",
+    "description": "Define un campo estático que se añade a cada mensaje que llega a través de esta entrada. El campo no se sobrescribe si el mensaje ya tiene esa clave. La clave solo puede contener caracteres alfanuméricos o guiones bajos y no puede ser un campo reservado.",
+    "field_name": "Nombre del campo",
+    "field_name_title": "Solo debe contener caracteres alfanuméricos y guiones bajos.",
+    "field_value": "Valor del campo"
+  },
+  "notifications": {
+    "warning": "Advertencia",
+    "failed": "Las entradas han fallado y no recibirán tráfico hasta que se inicien.",
+    "setup": "Las entradas que están en modo de configuración no recibirán tráfico hasta que se inicien.",
+    "stopped": "Las entradas detenidas no recibirán tráfico hasta que se inicien.",
+    "show_failed": "Mostrar entradas fallidas",
+    "show_setup": "Mostrar entradas en modo de configuración",
+    "show_stopped": "Mostrar entradas detenidas"
+  },
+  "node_select": {
+    "node": "Nodo",
+    "node_help": "En qué nodo debe iniciarse esta entrada",
+    "select_node": "Seleccionar nodo",
+    "global": "Global",
+    "global_help": "¿Debe iniciarse esta entrada en todos los nodos?"
+  },
+  "pages": {
+    "inputs": "Entradas",
+    "docs": "Documentación de entradas",
+    "description": "Los nodos de {{productName}} reciben datos a través de entradas. Inicia o termina todas las entradas que quieras desde aquí.",
+    "cloud_description": "La nube de {{productName}} recibe datos a través de entradas. Hay muchos tipos de entradas entre los que elegir, pero solo algunas pueden ejecutarse directamente en la nube. Puedes iniciarlas y terminarlas en esta página.",
+    "cloud_forwarder_hint": "Si falta un tipo de entrada en la lista de entradas disponibles de esta página, puedes iniciar la entrada en un <forwarderLink>Forwarder</forwarderLink>.",
+    "back": "Atrás",
+    "diagnosis_title": "Diagnóstico de entrada: {{name}}",
+    "diagnosis_description": "El diagnóstico de entradas sirve para probar entradas y el procesamiento sin escribir datos en el clúster de búsqueda.",
+    "tab_overview": "Resumen",
+    "tab_rules": "Reglas",
+    "node_inputs_title": "Entradas del nodo {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "Los nodos de {{productName}} reciben datos a través de entradas. En esta página puedes ver qué entradas se están ejecutando en este nodo concreto.",
+    "node_inputs_hint": "Puedes iniciar y terminar entradas en tu clúster <inputsLink>aquí</inputsLink>.",
+    "local_inputs": "Entradas locales",
+    "global_inputs": "Entradas globales"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "Esta entrada escucha en:",
+      "listening_on": "Ten en cuenta que la dirección de enlace debe apuntar al servicio de {{productName}}. Asimismo, el puerto seleccionado no debe entrar en conflicto con otra entrada de cada nodo. Recuerda que una entrada local en un único nodo puede entrar en conflicto con una entrada global que se ejecuta en todos los nodos, lo que puede hacer que la entrada falle en ese nodo.",
+      "listening_for_title": "Esta entrada escucha:",
+      "listening_for": "Ten en cuenta que el tráfico UDP enviado a una entrada TCP, o el tráfico TCP enviado a una entrada UDP, aparecerá como E/S de red, pero no se recibirá ningún mensaje.",
+      "empty_messages_discarded_title": "Mensajes vacíos descartados:",
+      "empty_messages_discarded": "La entrada descartará los mensajes cuya longitud de contenido sea 0.",
+      "network_io_title": "E/S de red:",
+      "network_io": "Ten en cuenta que este valor puede utilizarse para detectar intentos de conexión y tráfico no válido en una entrada.",
+      "input_state": "Una entrada en estado de ejecución está lista para recibir mensajes. Una entrada en estado fallido o fallando ha encontrado un problema; haz clic en el botón de abajo para ver el mensaje de error asociado.",
+      "message_error_at_input_title": "Error de mensaje en la entrada:",
+      "message_error_at_input": "Cada tipo de entrada espera recibir mensajes en un formato concreto. La entrada puede rechazar los mensajes que no cumplan este formato, en cuyo caso no pasarán al procesamiento. Para resolver estos casos, revisa los mensajes que se envían. Puedes encontrar errores más descriptivos en el archivo server.log de {{productName}}.",
+      "message_failed_to_process_title": "El mensaje no se pudo procesar:",
+      "message_failed_to_process": "Los extractores y los pipelines pueden usarse para realizar operaciones de procesamiento sobre los mensajes, como extraer campos. Una regla de pipeline que intente una operación sin sentido, o que modifique las propiedades de un campo a un formato que entre en conflicto con el tipo de datos o los límites de longitud de ese campo, puede fallar al procesarse. Los mensajes que fallan al procesarse de esta forma pueden revisarse en el stream Processing and Indexing Failures.",
+      "message_failed_to_index_title": "Errores de mensajes:",
+      "message_failed_to_index": "Dentro del clúster de búsqueda, un mensaje solo puede guardarse en un índice si cumple el esquema de ese índice. Cada campo de OpenSearch tiene un tipo de campo y un límite de caracteres; si se supera cualquiera de los dos, el mensaje no se podrá indexar. Los mensajes que no se indexan de esta forma pueden revisarse en el stream Processing and Indexing Failures.",
+      "received_message_count_by_stream": "Usa esta vista para entender hacia dónde dirigen los mensajes de esta entrada las reglas de streams y de pipelines. Un mensaje puede duplicarse en varios streams; si esto hace que el mensaje se guarde en más de un índice, también puede multiplicar el uso de la licencia. Esta vista puede ser útil para detectar esa duplicación."
+    },
+    "node": {
+      "node_id": "ID del nodo:",
+      "message": "Mensaje:",
+      "last_failed": "Último fallo:",
+      "state_label": "{{state}}:",
+      "state_nodes": "{{count}}/{{total}} nodos",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "Información",
+      "description": "La dirección en la que se ejecuta la entrada.",
+      "input_title": "Título de la entrada:",
+      "input_type": "Tipo de entrada:",
+      "running_on": "Esta entrada se ejecuta en:",
+      "all_nodes": "todos los nodos de {{productName}}",
+      "listening_on": "Esta entrada escucha en:"
+    },
+    "state": {},
+    "troubleshooting": {},
+    "received_traffic": {},
+    "message_count_by_stream": {},
+    "message_errors": {},
+    "rules": {},
+    "network_stats": {}
+  },
+  "setup_wizard": {
+    "steps": {},
+    "diagnosis_step": {},
+    "routing": {},
+    "start": {},
+    "progress": {
+      "loading": {},
+      "error": {},
+      "success": {}
+    },
+    "create_stream": {},
+    "input_in_use": {},
+    "index_set_alert": {}
+  },
+  "overview": {
+    "columns": {},
+    "cells": {},
+    "sections": {},
+    "actions": {}
+  },
+  "dot_badge": {},
+  "use_input_notifications": {},
+  "use_input_details_notifications": {},
+  "use_input_metrics_notifications": {},
+  "use_input_state_summary_notifications": {},
+  "use_input_state_mutations_notifications": {},
+  "use_input_mutations_notifications": {},
+  "use_inputs_notifications": {}
+}
