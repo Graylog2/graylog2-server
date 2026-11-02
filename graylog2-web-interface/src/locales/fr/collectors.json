@@ -883,7 +883,10 @@
         "wait_for_green": "Après chaque nœud, la mise à niveau attend que le cluster revienne à l'état vert avant de continuer. Si cela prend trop de temps, elle se met en pause et attend que vous la repreniez.",
         "each_node_with_versions_one": "{{count}} Data Node sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>.",
         "each_node_with_versions_other": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>.",
-        "each_node_with_versions_many": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>."
+        "each_node_one": "{{count}} Data Node sera mis à niveau et redémarré, un à la fois, pour passer son OpenSearch intégré à la version cible.",
+        "each_node_other": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour passer son OpenSearch intégré à la version cible.",
+        "each_node_with_versions_many": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour faire passer son OpenSearch intégré de <strong>{{currentVersion}}</strong> à <strong>{{targetVersion}}</strong>.",
+        "each_node_many": "Chacun de vos {{count}} Data Nodes sera mis à niveau et redémarré, un à la fois, pour passer son OpenSearch intégré à la version cible."
       },
       "starting": "Démarrage..."
     },
@@ -907,8 +910,11 @@
       "start_upgrade_and_restart": "Lancer la mise à niveau d'OpenSearch et redémarrer",
       "starting_rolling_upgrade": "Lancement de la mise à niveau progressive d'OpenSearch...",
       "title": "Mettre à niveau l'OpenSearch intégré aux Data Nodes",
+      "unconfirmed_one": "Les index incompatibles et l'état de la mise à niveau ne peuvent pas être vérifiés tant que {{count}} Data Node est indisponible. Ils s'afficheront à nouveau une fois tous les Data Nodes disponibles.",
+      "unconfirmed_other": "Les index incompatibles et l'état de la mise à niveau ne peuvent pas être vérifiés tant que {{count}} Data Nodes sont indisponibles. Ils s'afficheront à nouveau une fois tous les Data Nodes disponibles.",
       "upgrade_process": "Processus de mise à niveau",
-      "use_table": "Utilisez le tableau ci-dessous pour réindexer les index système et archiver ou supprimer les index de données avant de continuer."
+      "use_table": "Utilisez le tableau ci-dessous pour réindexer les index système et archiver ou supprimer les index de données avant de continuer.",
+      "unconfirmed_many": "Les index incompatibles et l'état de la mise à niveau ne peuvent pas être vérifiés tant que {{count}} Data Nodes sont indisponibles. Ils s'afficheront à nouveau une fois tous les Data Nodes disponibles."
     },
     "client_certificate": {
       "certificate_lifetime": "Durée de validité du certificat",
@@ -970,9 +976,12 @@
       "checking": "Vérification de l'état d'OpenSearch...",
       "error": "Impossible de vérifier la version d'OpenSearch intégrée aux Data Nodes.",
       "outdated": "L'OpenSearch intégré aux Data Nodes n'est pas à jour.",
+      "unconfirmed_one": "L'état de l'OpenSearch intégré aux Data Nodes ne peut pas être confirmé tant que {{count}} Data Node est indisponible.",
+      "unconfirmed_other": "L'état de l'OpenSearch intégré aux Data Nodes ne peut pas être confirmé tant que {{count}} Data Nodes sont indisponibles.",
       "up_to_date": "L'OpenSearch intégré aux Data Nodes est à jour.",
       "up_to_date_with_version": "L'OpenSearch intégré aux Data Nodes est à jour <bold>({{version}}).</bold>",
-      "upgrading": "La mise à niveau progressive d'OpenSearch est en cours."
+      "upgrading": "La mise à niveau progressive d'OpenSearch est en cours.",
+      "unconfirmed_many": "L'état de l'OpenSearch intégré aux Data Nodes ne peut pas être confirmé tant que {{count}} Data Nodes sont indisponibles."
     },
     "upgrade_nodes": {
       "manager": "manager",
