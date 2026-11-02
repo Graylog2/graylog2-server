@@ -240,32 +240,155 @@
       "invalid_date_format": "O formato deve ser: {{format}}.",
       "range_limit": "O intervalo está fora da duração limite.",
       "date_limit": "A data está fora da duração limite.",
-      "until_before_from": "A data \"Até\" deve vir depois da data \"De\"."
+      "until_before_from": "A data \"Até\" deve vir depois da data \"De\".",
+      "empty": "Não pode estar vazio.",
+      "keyword_empty": "A palavra-chave não pode estar vazia!",
+      "keyword_unparsable": "Não foi possível interpretar a palavra-chave"
     },
-    "view_type": {}
+    "remove_from_favorites": "Remover dos favoritos",
+    "add_to_favorites": "Adicionar aos favoritos",
+    "view_type": {
+      "search": "pesquisa",
+      "dashboard": "dashboard"
+    }
   },
-  "field_charts_migration": {},
-  "query": {},
-  "widget_query": {},
-  "editable_title": {},
-  "message_permalink": {},
-  "query_title": {},
-  "missing_requirements": {},
-  "view_header": {},
-  "execution": {},
-  "dashboards_page": {},
-  "search_filter_banner": {},
-  "widget_time_range": {},
-  "time_range_presets": {},
-  "move_range": {},
-  "query_validation": {},
-  "saved_searches": {},
-  "search_meta": {},
-  "save_view_notifications": {},
-  "sidebar_layout": {},
-  "search_result_overview": {},
-  "fields_overview": {},
-  "highlighting_color": {},
+  "field_charts_migration": {
+    "title": "Migrar gráficos existentes da página de pesquisa",
+    "save_hint": "Quando você executar a migração e quiser manter os gráficos recém-criados, será necessário salvar a pesquisa atual como um novo dashboard. Caso contrário, os gráficos serão perdidos ao sair da página de pesquisa.",
+    "migrate": "Migrar",
+    "discard": "Descartar gráficos"
+  },
+  "query": {
+    "contained_in_enterprise": "(incluído no <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "Você também pode consultar a <docsLink>documentação</docsLink> para saber mais sobre a criação de widgets."
+  },
+  "widget_query": {
+    "reset_global_filter": "Redefinir filtro global"
+  },
+  "editable_title": {
+    "edit": "Editar título",
+    "hint": "{{value}} - Clique duas vezes no título para editá-lo."
+  },
+  "message_permalink": {
+    "label": "Link permanente"
+  },
+  "query_title": {
+    "page_actions": "Ações da página",
+    "edit_title": "Editar título",
+    "duplicate": "Duplicar",
+    "copy_to_dashboard": "Copiar para dashboard",
+    "edit_modal_title": "Editando título da página do dashboard",
+    "update_title": "Atualizar título",
+    "title_help": "Digite um título útil para a página do dashboard. Ele tem no máximo 40 caracteres.",
+    "title": "Título"
+  },
+  "missing_requirements": {
+    "description_search": "Infelizmente, não é possível executar esta pesquisa. Ela usa os seguintes recursos, que não estão disponíveis:",
+    "description_dashboard": "Infelizmente, não é possível executar este dashboard. Ele usa os seguintes recursos, que não estão disponíveis:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - incluído em <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Voltar"
+  },
+  "view_header": {
+    "alerts_and_events": "Alertas e eventos",
+    "event_definitions": "Definições de evento",
+    "edit_search_metadata": "Editar metadados da pesquisa {{title}}",
+    "edit_dashboard_metadata": "Editar metadados do dashboard {{title}}",
+    "editing_search": "Editando pesquisa salva",
+    "editing_dashboard": "Editando dashboard salvo",
+    "save_search": "Salvar pesquisa",
+    "save_dashboard": "Salvar dashboard"
+  },
+  "execution": {
+    "not_executed": "Nenhuma consulta executada ainda."
+  },
+  "dashboards_page": {
+    "documentation": "Documentação de dashboards",
+    "description": "Use dashboards para criar visualizações específicas das suas mensagens. Crie um novo dashboard aqui e adicione com um clique qualquer gráfico criado em outras partes do aplicativo."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Filtros de pesquisa</italic> contêm sua própria consulta e estendem a consulta principal usando o operador <bold>AND</bold>.",
+    "explanation_saved": "Os filtros podem ser salvos separadamente e reutilizados em pesquisas salvas e dashboards. Atualizar um filtro salvo afetará automaticamente os resultados das pesquisas que incluem o filtro."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Redefinir substituição global"
+  },
+  "time_range_presets": {
+    "select_time_range": "Selecionar intervalo de tempo",
+    "open_preset_select": "Abrir seleção de predefinição de intervalo de tempo"
+  },
+  "move_range": {
+    "show_previous": "Mostrar anterior",
+    "show_previous_duration": "Mostrar {{duration}} anteriores",
+    "show_next": "Mostrar próximo",
+    "show_next_duration": "Mostrar próximos {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "Alternar aviso de validação",
+    "toggle_information": "Alternar informações de validação",
+    "toggle_error": "Alternar explicação do erro de validação",
+    "syntax_documentation": "Documentação da sintaxe da consulta de pesquisa",
+    "error_documentation": "Documentação de erros de consulta",
+    "status_warning": "Aviso",
+    "status_info": "Informação",
+    "status_error": "Erro",
+    "validation_failed": "Falha ao validar a consulta de pesquisa com o status: {{error}}",
+    "warm_tier_title": "Pesquisa no Warm Tier",
+    "warm_tier_message": "O intervalo de tempo selecionado inclui dados armazenados no Warm Tier, que podem demorar para ser recuperados. Dados mais antigos que o timestamp listado estão no Warm Tier para esse stream:"
+  },
+  "saved_searches": {
+    "title": "Pesquisas salvas",
+    "success": "Sucesso",
+    "bulk_delete_error": "Ocorreu um erro ao excluir as pesquisas salvas. {{error}}",
+    "confirm_delete": "Você está prestes a excluir a pesquisa salva: \"{{title}}\". Tem certeza?",
+    "delete_search": "Excluir pesquisa {{title}}",
+    "delete": "Excluir"
+  },
+  "search_meta": {
+    "buttons": "Botões de metadados da pesquisa"
+  },
+  "save_view_notifications": {
+    "success_title": "Sucesso!",
+    "error_title": "Erro!",
+    "plugin_initial_values_failed": "Ocorreu um erro ao coletar os valores iniciais do formulário da barra de pesquisa de um plugin",
+    "plugin_validation_preparation_failed": "Ocorreu um erro ao preparar a validação da barra de pesquisa de um plugin",
+    "plugin_validation_failed": "Ocorreu um erro ao validar os valores da barra de pesquisa de um plugin",
+    "plugin_submit_failed": "Ocorreu um erro ao executar um manipulador de envio de um plugin: {{error}}",
+    "load_saved_searches_failed": "Falha ao carregar pesquisas salvas com o status",
+    "could_not_load_saved_searches": "Não foi possível carregar as pesquisas salvas",
+    "load_minimum_refresh_interval_failed": "Falha ao carregar a configuração do sistema \"minimum_auto_refresh_interval\" com o status",
+    "could_not_load_configuration": "Não foi possível carregar a opção de configuração"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Exibir barra lateral como sobreposição",
+    "display_inline": "Exibir barra lateral em linha"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms às <timestamp/>",
+    "effective_from": "Intervalo de tempo efetivo, de",
+    "effective_to": "Intervalo de tempo efetivo, até"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Filtrar campos",
+    "reset": "Redefinir",
+    "list_fields": "Listar campos de <current>consulta atual</current>, <all>todos</all> ou <allReserved>todos, incluindo os reservados</allReserved>.",
+    "current_title": "Mostra os campos que ocorrem na sua consulta atual.",
+    "all_title": "Mostra todos os campos, exceto os reservados (gl2_*).",
+    "all_reserved_title": "Mostra todos os campos, incluindo os reservados (gl2_*).",
+    "no_field_information": "Nenhuma informação de campo disponível.",
+    "no_fields": "Nenhum campo para mostrar. Tente alterar o termo do filtro ou selecione um conjunto de campos diferente acima."
+  },
+  "highlighting_color": {
+    "color": "Cor",
+    "gradient_name": "Nome do gradiente",
+    "gradient_placeholder": "Selecione as cores do gradiente",
+    "lowest_placeholder": "Especifique o valor mínimo",
+    "lowest_label": "Valor mínimo",
+    "lowest_help": "O menor valor esperado no campo/série.",
+    "highest_aria": "Especifique o valor máximo",
+    "highest_label": "Valor máximo",
+    "highest_help": "O maior valor esperado no campo/série.",
+    "coloring": "Coloração"
+  },
   "highlighting_rule": {},
   "change_field_type": {},
   "value_actions": {},
