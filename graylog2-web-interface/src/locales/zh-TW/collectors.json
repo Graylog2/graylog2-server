@@ -49,14 +49,19 @@
     "by_system": "由系統",
     "config_changed": {
       "fleet": "已更新 Fleet <targetLink /> 的設定",
-      "collector": "已更新 Collector <targetLink /> 的設定"
+      "fleet_with_others_other": "已更新 Fleet <targetLink /> 及其他 {{count}} 個 Fleet 的設定",
+      "collector": "已更新 Collector <targetLink /> 的設定",
+      "collector_with_others_other": "已更新 Collector <targetLink /> 及其他 {{count}} 個 Collector 的設定"
     },
     "ingest_config_changed": {
       "fleet": "已更新 Fleet <targetLink /> 的擷取設定",
-      "collector": "已更新 Collector <targetLink /> 的擷取設定"
+      "fleet_with_others_other": "已更新 Fleet <targetLink /> 及其他 {{count}} 個 Fleet 的擷取設定",
+      "collector": "已更新 Collector <targetLink /> 的擷取設定",
+      "collector_with_others_other": "已更新 Collector <targetLink /> 及其他 {{count}} 個 Collector 的擷取設定"
     },
     "restart": {
       "fleet": "已要求重新啟動 Fleet <targetLink />",
+      "fleet_with_others_other": "已要求重新啟動 Fleet <targetLink /> 及其他 {{count}} 個 Fleet",
       "collector": "已要求重新啟動 Collector <targetLink />"
     },
     "discovery_run": {
@@ -955,17 +960,120 @@
       }
     },
     "details_page": {
-      "certificate_valid_until": "憑證有效期限至："
+      "certificate_valid_until": "憑證有效期限至：",
+      "configuration_warnings": "設定警告",
+      "datanode_version": "Data Node 版本：",
+      "details": "詳細資訊：",
+      "error": "錯誤：{{message}}",
+      "hostname": "主機名稱：",
+      "not_available": "無",
+      "status": "狀態：",
+      "title": "Data Node：{{hostname}}",
+      "transport_address": "傳輸位址："
     },
-    "pages": {},
-    "upgrade_page": {},
-    "migration_steps": {},
-    "migration_states": {},
+    "pages": {
+      "description": "{{productName}} Data Node 與 {{productName}} 的整合更佳，並簡化未來的更新。它們可讓您對 {{productName}} 訊息資料庫中的所有訊息建立索引並搜尋。",
+      "upgrade_title": "Data Node 升級",
+      "cluster_management_title": "Data Node 儀表板",
+      "certificate_management_title": "憑證管理",
+      "migration_title": "Data Node 遷移",
+      "documentation_title": "Data Node 文件"
+    },
+    "upgrade_page": {
+      "manual_instructions": "若要手動升級 Data Node，請依照<docsLink>文件</docsLink>中的說明操作。",
+      "manual_upgrade_title": "Data Node 手動升級",
+      "select_strategy": "選擇升級策略",
+      "upgrade_data_node": "升級 Data Node",
+      "manual_upgrade_of_node": "在系統上完成 <bold>{{node}}</bold> 的手動升級後，請等待其重新連線並出現在<bold>已升級的節點</bold>面板中，然後點擊<confirmButton><bold>確認升級</bold></confirmButton>，並繼續處理下一個節點。",
+      "manual_upgrade_of_data_node": "在系統上完成 Data Node 的手動升級後，請等待其重新連線並出現在<bold>已升級的節點</bold>面板中，然後點擊<confirmButton><bold>確認升級</bold></confirmButton>，並繼續處理下一個節點。"
+    },
+    "migration_steps": {
+      "ca_configuration": "設定憑證授權單位",
+      "renewal_policy_configuration": "設定更新政策",
+      "compatibility_check": "檢查 OpenSearch 與 Data Node 的相容性",
+      "manual_migration_step": "遷移步驟。",
+      "migration_finished": "遷移已完成"
+    },
+    "migration_states": {
+      "new": "遷移",
+      "migration_welcome_page": "歡迎",
+      "ca_creation_page": "憑證授權單位",
+      "renewal_policy_creation_page": "憑證更新政策",
+      "migration_selection_page": "遷移步驟",
+      "rolling_upgrade_migration_welcome_page": "歡迎使用原地遷移",
+      "ask_to_shutdown_old_cluster": "關閉舊叢集",
+      "manually_remove_old_connection_string_from_config": "移除連線字串",
+      "message_processing_stop": "停止訊息處理",
+      "replace_cluster": "取代現有叢集",
+      "restart_graylog": "更新設定檔並重新啟動 {{productName}}",
+      "directory_compatibility_check_page": "目錄相容性檢查",
+      "provision_rolling_upgrade_nodes_with_certificates": "憑證佈建總覽",
+      "provision_rolling_upgrade_nodes_running": "佈建 Data Node 的憑證。",
+      "journal_size_downtime_warning": "日誌佇列大小停機時間警告",
+      "failed": "遷移失敗",
+      "finished": "遷移已完成"
+    },
     "certificate_renewal": {
-      "renew": {},
-      "provision": {}
+      "loading_failed": "載入 Data Node 失敗，狀態為",
+      "loading_failed_title": "無法載入 Data Node",
+      "renew": {
+        "button": "更新憑證",
+        "button_loading": "正在更新憑證",
+        "success": "已成功更新憑證",
+        "failed": "憑證更新失敗，錯誤訊息：{{error}}"
+      },
+      "provision": {
+        "button": "佈建憑證",
+        "button_loading": "正在佈建憑證...",
+        "success": "已成功佈建憑證",
+        "failed": "憑證佈建失敗，錯誤訊息：{{error}}"
+      },
+      "title": "憑證更新與佈建",
+      "description": "您可以在此手動觸發 {{productName}} Data Node 的憑證更新或佈建。只有在更新政策模式設為「手動」，且 Data Node 是在初次憑證佈建後才啟動時，才需要手動佈建憑證。",
+      "transport_address": "傳輸位址",
+      "hostname": "主機名稱",
+      "valid_until": "有效期限至 {{relativeTime}}",
+      "no_data_nodes": "找不到任何 Data Node。"
     }
   },
-  "use_collector_configurations_notifications": {},
-  "use_collectors_notifications": {}
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "擷取 Collector 設定失敗，狀態為：{{error}}",
+    "fetch_failed_title": "無法取得設定",
+    "fetch_configuration_failed": "擷取設定失敗，狀態為：{{error}}",
+    "configuration_not_found": "找不到 ID 為 <{{configurationId}}> 的設定，請確認該設定未被刪除。",
+    "fetch_configuration_failed_title": "無法取得設定",
+    "preview_failed": "擷取設定預覽失敗，狀態為：{{error}}",
+    "preview_failed_title": "無法取得預覽",
+    "created_success": "已成功建立設定",
+    "create_failed": "建立設定失敗，狀態為：{{error}}",
+    "create_failed_title": "無法儲存設定",
+    "updated_success": "已成功更新設定",
+    "update_failed": "更新設定失敗：{{error}}",
+    "update_failed_title": "無法更新設定 {{name}}",
+    "copied_success": "已成功複製設定「{{name}}」",
+    "copy_failed": "儲存設定「{{name}}」失敗，狀態為：{{error}}",
+    "copy_failed_title": "無法儲存設定",
+    "deleted_success": "已成功刪除設定「{{name}}」",
+    "delete_failed": "刪除設定失敗：{{error}}",
+    "delete_failed_title": "無法刪除設定 {{name}}",
+    "validate_failed": "驗證設定「{{name}}」失敗，狀態為：{{error}}",
+    "validate_failed_title": "無法驗證設定"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "擷取 Collector 失敗，狀態為：{{error}}",
+    "fetch_failed_title": "無法取得 Collector",
+    "not_found": "找不到 ID 為 <{{collectorId}}> 的 Collector，請確認該 Collector 未被刪除。",
+    "fetch_collector_failed": "擷取 Collector 失敗，狀態為：{{error}}",
+    "fetch_collector_failed_title": "無法取得 Collector",
+    "created_success": "已成功建立 Collector",
+    "updated_success": "已成功更新 Collector",
+    "deleted_success": "已成功刪除 Collector「{{name}}」",
+    "delete_failed": "刪除 Collector 失敗：{{error}}",
+    "delete_failed_title": "無法刪除 Collector「{{name}}」",
+    "copied_success": "已成功複製 Collector「{{name}}」",
+    "copy_failed": "儲存 Collector「{{name}}」失敗，狀態為：{{error}}",
+    "copy_failed_title": "無法儲存 Collector",
+    "validate_failed": "驗證 Collector「{{name}}」失敗，狀態為：{{error}}",
+    "validate_failed_title": "無法驗證 Collector"
+  }
 }
