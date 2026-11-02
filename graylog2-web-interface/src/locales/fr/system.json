@@ -1,1 +1,463 @@
-{}
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/D"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Chargement des nœuds du backend de recherche...",
+    "search_backend_unknown": "Impossible de déterminer le backend de recherche configuré.",
+    "search_placeholder": "Rechercher des nœuds…",
+    "all_nodes": "Tous les nœuds",
+    "data_nodes": "Nœuds de données",
+    "opensearch_nodes": "Nœuds OpenSearch",
+    "mongodb_nodes": "Nœuds MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Mémoire",
+    "jvm": "JVM",
+    "indexing": "Indexation",
+    "storage": "Stockage",
+    "buffers": "Tampons",
+    "journal": "Journal",
+    "data_lake_journal": "Journal du Data Lake",
+    "throughput": "Débit"
+  },
+  "data_nodes_expandable": {
+    "title": "Nœuds de données"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Documents",
+    "latency": "Latence"
+  },
+  "node_actions": {
+    "thread_dump": "Obtenir le dump des threads",
+    "process_buffer_dump": "Obtenir le dump du tampon de traitement",
+    "metrics": "Métriques"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Suspendre le traitement des messages",
+    "resume_message_processing": "Reprendre le traitement des messages",
+    "override_load_balancer_dead": "Forcer le statut du load balancer à DEAD",
+    "override_load_balancer_alive": "Forcer le statut du load balancer à ALIVE",
+    "local_message_inputs": "Entrées de messages locales",
+    "recent_system_logs": "Obtenir les messages de journal système récents",
+    "message_processing_title": "Traitement des messages",
+    "pause_confirm": "Vous êtes sur le point de <b>suspendre</b> le traitement des messages sur le nœud <b>{{nodeName}}</b>. Êtes-vous sûr ?",
+    "resume_confirm": "Vous êtes sur le point de <b>reprendre</b> le traitement des messages sur le nœud <b>{{nodeName}}</b>. Êtes-vous sûr ?",
+    "load_balancer_title": "Load balancer",
+    "load_balancer_confirm": "Vous êtes sur le point de changer le statut du load balancer pour le nœud <b>{{nodeName}}</b> en <b>{{status}}</b>. Êtes-vous sûr ?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Nœuds {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}"
+  },
+  "processing_state_cell": {
+    "aria_label": "Traitement des messages {{status}}"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Nœuds MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "Le profilage MongoDB permet d'identifier les requêtes lentes et de résoudre les problèmes de performance sur l'ensemble des nœuds du cluster.",
+    "enabling_profiling": "Activation du profilage...",
+    "enable_confirm": "Activer le profilage <b>Slow Ops</b> ({{threshold}}) sur tous les nœuds MongoDB ? Il s'applique immédiatement sans redémarrage, mais est réinitialisé après un redémarrage, sauf s'il est configuré au démarrage."
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Nœuds OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Afficher {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Charge (1 min)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "ID du cluster :",
+    "not_available": "Non disponible",
+    "number_of_nodes": "Nombre de nœuds :"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Créez un fichier zip contenant des informations utiles au débogage de votre cluster Graylog.",
+    "enterprise_customers": "Les clients Graylog Enterprise peuvent joindre ces bundles à leur ticket de support, ce qui aide l'équipe du support technique Graylog à analyser et diagnostiquer les problèmes.",
+    "examine_content": "Veuillez examiner le contenu du bundle avant de le partager. Il peut contenir des données sensibles, comme des adresses IP, des noms d'hôtes, voire des mots de passe !",
+    "paid_license_only": "Seuls les utilisateurs disposant d'une licence payante ont droit au support Graylog Enterprise. Vous pouvez toutefois utiliser ce fichier à d'autres fins de débogage."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Bundle de support du cluster",
+    "create": "Créer un bundle de support",
+    "download": "Télécharger",
+    "delete": "Supprimer",
+    "filename": "Nom du fichier",
+    "size": "Taille",
+    "no_bundles": "Aucun bundle de support trouvé.",
+    "delete_title": "Supprimer le bundle de support",
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer <strong>{{name}}</strong> ?"
+  },
+  "log_level_metrics": {
+    "level": "Niveau : {{level}}",
+    "total_written": "Total écrit :",
+    "mean_rate": "Débit moyen :",
+    "one_minute_rate": "Débit sur 1 min :",
+    "per_second": "/ seconde"
+  },
+  "logging_subsystem": {
+    "subsystem": "Sous-système : {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Afficher les métriques des niveaux de log",
+    "hide_log_level_metrics": "Masquer les métriques des niveaux de log",
+    "total_log_messages": "A écrit un total de <strong>{{throughput}} messages de log internes.</strong>"
+  },
+  "metric_details": {
+    "value": "Valeur :",
+    "count": "Nombre :",
+    "mean": "Moyenne :",
+    "minimum": "Minimum :",
+    "maximum": "Maximum :",
+    "standard_deviation": "Écart type :",
+    "percentile_95": "95e percentile :",
+    "percentile_98": "98e percentile :",
+    "percentile_99": "99e percentile :",
+    "invalid_type": "Type de métrique invalide : {{type}}",
+    "microseconds": "µs"
+  },
+  "meter_details": {
+    "total": "Total :",
+    "events": "événements",
+    "one_minute_avg": "Moyenne sur 1 min :",
+    "five_minute_avg": "Moyenne sur 5 min :",
+    "fifteen_minute_avg": "Moyenne sur 15 min :"
+  },
+  "counter_rate": {
+    "calculating": "Calcul en cours...",
+    "total": "({{total}} au total)",
+    "per_second": "par seconde"
+  },
+  "metric_container": {
+    "loading": "Chargement..."
+  },
+  "metrics_component": {
+    "fetch_error": "Impossible de récupérer les métriques du nœud : le serveur a renvoyé <em>{{responseMessage}}</em> avec le code de statut {{status}}.",
+    "fetch_problem": "Un problème est survenu lors de la récupération des métriques du nœud.",
+    "retry_in_background": "Les tentatives de récupération se poursuivront en arrière-plan.",
+    "fetch_error_last_metrics": "Impossible de récupérer les métriques du nœud : le serveur a renvoyé <em>{{responseMessage}}</em> avec le code de statut {{status}}. Affichage des dernières métriques disponibles.",
+    "filter_placeholder": "Saisissez un nom de métrique pour filtrer…"
+  },
+  "metrics_list": {
+    "no_metrics": "Aucune métrique ne correspond au filtre donné. Veuillez vous assurer d'utiliser une expression régulière valide"
+  },
+  "buffer_usage": {
+    "metrics": "Métriques",
+    "utilization": "<strong>{{usage}} messages</strong> dans {{title}}, utilisés à {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "Chargement des types d'entrées...",
+    "unavailable": "Les types d'entrées ne sont pas disponibles.",
+    "documentation": "Documentation",
+    "name": "Nom",
+    "type": "Type",
+    "filter": "Filtrer"
+  },
+  "journal_details": {
+    "loading": "Chargement des métriques du journal...",
+    "disabled": "Le journal disque est désactivé sur ce nœud.",
+    "unavailable": "Métriques du journal indisponibles.",
+    "overcommitted": "<strong>Attention !</strong> L'utilisation du journal dépasse la taille maximale définie. <overviewLink>Cliquez ici</overviewLink> pour plus d'informations.",
+    "configuration": "Configuration",
+    "path": "Chemin :",
+    "earliest_entry": "Entrée la plus ancienne :",
+    "maximum_size": "Taille maximale :",
+    "maximum_age": "Âge maximal :",
+    "flush_policy": "Politique de vidage :",
+    "flush_policy_value": "Tous les {{messages}} messages ou {{duration}}",
+    "maximum_age_format": "d [jours] h [heures] m [minutes]",
+    "flush_duration_format": "h [heures] m [minutes] s [secondes]",
+    "utilization": "Utilisation",
+    "unprocessed_messages": "<strong>{{messages}} messages non traités</strong> se trouvent actuellement dans le journal, répartis sur {{segments}} segments.",
+    "appended_and_read": "<strong>{{appended}} messages</strong> ont été ajoutés au cours de la dernière seconde, <strong>{{read}} messages</strong> ont été lus au cours de la dernière seconde."
+  },
+  "journal_state": {
+    "loading": "Chargement des métriques du journal...",
+    "unavailable": "Métriques du journal indisponibles.",
+    "summary_one": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segment. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde.",
+    "summary_other": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segments. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde.",
+    "summary_many": "Le journal contient <strong>{{messages}} messages non traités</strong> dans {{count}} segments. <strong>{{appended}} messages</strong> ajoutés et <strong>{{read}} messages</strong> lus au cours de la dernière seconde."
+  },
+  "jvm_heap_usage": {
+    "loading": "Chargement des informations d'utilisation du heap...",
+    "unavailable": "Informations sur le heap indisponibles.",
+    "usage": "La JVM utilise <usedBlob /><strong> {{used}}</strong> sur <committedBlob /><strong> {{committed}}</strong> d'espace heap et n'essaiera pas d'en utiliser plus de <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Les informations système sont actuellement indisponibles."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Actions",
+    "configure_internal_logging": "Configurer la journalisation interne"
+  },
+  "node_overview": {
+    "plugins_installed_one": "{{count}} plugin installé",
+    "plugins_installed_other": "{{count}} plugins installés",
+    "inputs_running_one": "{{count}} entrée en cours d'exécution sur ce nœud",
+    "inputs_running_other": "{{count}} entrées en cours d'exécution sur ce nœud",
+    "memory_heap_usage": "Utilisation mémoire / heap",
+    "buffers": "Tampons",
+    "buffers_description": "Les tampons sont conçus pour mettre en cache de petites quantités de messages pendant une très courte durée (généralement quelques millisecondes) lors de leur passage dans les différents processeurs.",
+    "input_buffer": "Tampon d'entrée",
+    "process_buffer": "Tampon de traitement",
+    "output_buffer": "Tampon de sortie",
+    "disk_journal": "Journal disque",
+    "disk_journal_description": "Les messages entrants sont écrits dans le journal disque afin d'être conservés en sécurité en cas de défaillance du serveur. Le journal permet également de maintenir le fonctionnement lorsqu'une sortie est trop lente pour suivre le débit des messages, ou en cas de pic de messages entrants. Il évite ainsi de surcharger la mémoire et des pauses trop longues du ramasse-miettes.",
+    "system": "Système",
+    "rest_api": "API REST",
+    "installed_plugins": "Plugins installés",
+    "manage_inputs": "Gérer les entrées",
+    "available_input_types": "Types d'entrées disponibles",
+    "plugins_installed_many": "{{count}} plugins installés",
+    "inputs_running_many": "{{count}} entrées en cours d'exécution sur ce nœud"
+  },
+  "nodes_actions": {
+    "details": "Détails",
+    "metrics": "Métriques",
+    "more_actions": "Plus d'actions",
+    "pause_message_processing": "Suspendre le traitement des messages",
+    "resume_message_processing": "Reprendre le traitement des messages",
+    "pause_confirm": "Vous êtes sur le point de suspendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "resume_confirm": "Vous êtes sur le point de reprendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "override_lb_status": "Forcer le statut du LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Vous êtes sur le point de changer le statut du load balancer pour ce nœud en {{status}}. Êtes-vous sûr ?",
+    "local_message_inputs": "Entrées de messages locales",
+    "thread_dump": "Obtenir le dump des threads",
+    "process_buffer_dump": "Obtenir le dump du tampon de traitement",
+    "recent_system_logs": "Obtenir les messages de journal système récents"
+  },
+  "nodes_list": {
+    "active_nodes_one": "Il y a {{count}} nœud actif",
+    "active_nodes_other": "Il y a {{count}} nœuds actifs",
+    "no_active_nodes": "Aucun nœud actif.",
+    "active_nodes_many": "Il y a {{count}} nœuds actifs"
+  },
+  "plugins_data_table": {
+    "loading": "Chargement des plugins sur ce nœud...",
+    "no_plugins": "Ce nœud n'a aucun plugin installé.",
+    "name": "Nom",
+    "version": "Version",
+    "author": "Auteur",
+    "description": "Description",
+    "website": "Site web",
+    "filter": "Filtrer"
+  },
+  "rest_api_overview": {
+    "transport_address": "Adresse de transport :",
+    "last_seen": "Vu pour la dernière fois :"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "Les informations JVM de ce nœud sont indisponibles.",
+    "hostname": "Nom d'hôte :",
+    "node_id": "ID du nœud :",
+    "version": "Version :",
+    "version_codename": "{{version}}, nom de code <em>{{codename}}</em>",
+    "jvm": "JVM :",
+    "time": "Heure :"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Vous êtes sur le point de suspendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "resume_confirm": "Vous êtes sur le point de reprendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "what_does_this_mean": "Que signifie cela ?",
+    "lifecycle_state": "État du cycle de vie : <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Marqué comme <strong>{{status}}</strong> pour les load balancers",
+    "pause_processing": "Suspendre le traitement",
+    "resume_processing": "Reprendre le traitement",
+    "not_processing": "Le nœud <strong>ne traite pas</strong> de messages"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "État actuel du cycle de vie :",
+    "message_processing": "Traitement des messages :",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "lb_indication": "Indication du load balancer :"
+  },
+  "bulk_actions": {
+    "dismiss": "Ignorer"
+  },
+  "system_notifications_table": {
+    "title": "Notifications",
+    "human_name": "notifications"
+  },
+  "actions_cell": {
+    "dismiss": "Ignorer"
+  },
+  "title_cell": {
+    "show_full_message": "Afficher le message complet pour : {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Impossible d'accuser réception de la tâche",
+    "cancel_failed": "Impossible d'annuler la tâche",
+    "cancel_confirm": "Êtes-vous sûr de vouloir annuler la tâche système \"{{info}}\" ?",
+    "on_node": "- sur",
+    "runtime": "durée d'exécution : {{duration}}",
+    "cancel": "Annuler",
+    "acknowledge": "Accuser réception"
+  },
+  "system_jobs_component": {
+    "title": "Tâches système",
+    "description": "Une tâche système est une tâche de longue durée exécutée par un nœud serveur {{productName}} à des fins de maintenance. Certaines tâches fournissent des informations de progression ou peuvent être arrêtées."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Aucune tâche système active."
+  },
+  "system_messages_component": {
+    "title": "Messages système",
+    "description": "Les messages système sont générés par les nœuds serveur {{productName}} lors de certains événements susceptibles d'intéresser les administrateurs {{productName}}. Vous n'avez pas besoin d'agir sur ces événements, car des notifications seront créées pour tout événement nécessitant une action."
+  },
+  "system_messages_list": {
+    "timestamp": "Horodatage",
+    "node": "Nœud",
+    "message": "Message"
+  },
+  "global_throughput": {
+    "aria_label": "Débit : entrée {{input}} / sortie {{output}} msg/s",
+    "in": "entrée",
+    "out": "sortie"
+  },
+  "node_throughput": {
+    "loading": "Chargement du débit...",
+    "unable_to_load": "Impossible de charger le débit.",
+    "processing_long": "Traitement de <strong>{{totalIn}}</strong> messages entrants et <strong>{{totalOut}}</strong> messages sortants par seconde.",
+    "short": "Entrée {{totalIn}} / sortie {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}} ms)",
+    "pii_suspect": "Donnée personnelle suspectée : {{suspect}}",
+    "copy_as_json": "Copier l'événement au format JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Débogage de la télémétrie",
+    "badge": "Débogage de la télémétrie : {{count}}",
+    "drawer_label": "Panneau de débogage de la télémétrie",
+    "resize_label": "Redimensionner le panneau de débogage de la télémétrie",
+    "title": "Débogage de la télémétrie ({{count}})",
+    "filter_label": "Filtrer les événements",
+    "filter_placeholder": "Filtrer par nom d'événement ou contenu...",
+    "resume": "Reprendre",
+    "pause": "Suspendre",
+    "clear": "Effacer",
+    "export_session": "Exporter la session",
+    "collapse": "Réduire",
+    "no_events": "Aucun événement de télémétrie enregistré pour le moment. Interagissez avec l'application pour les voir ici.",
+    "time": "Heure",
+    "event": "Événement",
+    "action": "Action",
+    "status": "Statut"
+  },
+  "cluster_configuration_page": {
+    "title": "Configuration du cluster",
+    "description": "Cette page fournit une vue en temps réel des nœuds de votre cluster. Vous pouvez suspendre le traitement des messages à tout moment. Les tampons de traitement n'accepteront aucun nouveau message tant que vous ne l'aurez pas repris. Si le journal des messages est activé pour un nœud, ce qui est le cas par défaut, les messages entrants seront enregistrés sur disque, même lorsque le traitement est désactivé."
+  },
+  "configurations_page": {
+    "title": "Configurations",
+    "description": "Vous pouvez configurer ici les paramètres système des différents sous-systèmes."
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Essayez</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>En savoir plus</productLink> sur les fonctionnalités de {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Dump du tampon de traitement du nœud {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Généré le <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Métriques du nœud {{shortNodeId}} / {{hostname}}",
+    "description": "Tous les nœuds {{productName}} fournissent un ensemble de métriques internes pour le diagnostic, le débogage et la supervision. Notez que vous pouvez également accéder à toutes les métriques via JMX.",
+    "total_metrics_one": "Ce nœud remonte un total de {{count}} métrique.",
+    "total_metrics_other": "Ce nœud remonte un total de {{count}} métriques.",
+    "total_metrics_many": "Ce nœud remonte un total de {{count}} métriques."
+  },
+  "node_page": {
+    "title": "Nœud {{shortNodeId}} / {{hostname}}",
+    "description": "Cette page affiche les détails d'un nœud serveur {{productName}} actif et joignable dans votre cluster.",
+    "leader_node": "Il s'agit du nœud leader.",
+    "not_leader_node": "Il ne s'agit <em>pas</em> du nœud leader."
+  },
+  "system_logs_page": {
+    "title": "Les journaux système les plus récents (limités à {{limit}}) du nœud {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Généré le <0/>",
+    "reload": "Recharger",
+    "back": "Retour",
+    "document_title": "Journaux système du nœud {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Notifications système"
+  },
+  "system_overview_page": {
+    "title": "Vue d'ensemble du système"
+  },
+  "thread_dump_page": {
+    "title": "Dump des threads du nœud {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Généré le <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Le statut du load balancer a bien été changé en '{{status}}' sur le nœud '{{nodeId}}'",
+    "lb_change_failed": "Échec du changement de statut du load balancer sur '{{nodeId}}' : {{error}}",
+    "lb_change_failed_title": "Impossible de changer le statut du load balancer en '{{status}}' sur le nœud '{{nodeId}}'",
+    "processing_pause_success": "Traitement des messages suspendu avec succès sur '{{nodeId}}'",
+    "processing_pause_failed": "Échec de la suspension du traitement des messages sur '{{nodeId}}' : {{error}}",
+    "processing_pause_failed_title": "Impossible de suspendre le traitement des messages sur le nœud '{{nodeId}}'",
+    "processing_resume_success": "Traitement des messages repris avec succès sur '{{nodeId}}'",
+    "processing_resume_failed": "Échec de la reprise du traitement des messages sur '{{nodeId}}' : {{error}}",
+    "processing_resume_failed_title": "Impossible de reprendre le traitement des messages sur le nœud '{{nodeId}}'",
+    "nothing_selected": "Aucune notification sélectionnée.",
+    "nothing_to_dismiss_title": "Rien à ignorer",
+    "bulk_dismiss_failed": "Échec de l'ignorance des notifications. Veuillez réessayer.",
+    "dismiss_failed": "Échec de l'ignorance de la notification. Veuillez réessayer.",
+    "dismiss_failed_title": "Échec de l'action Ignorer",
+    "profiling_enabled": "Profilage MongoDB activé avec succès.",
+    "profiling_disabled": "Profilage MongoDB désactivé avec succès.",
+    "profiling_enable_failed": "Échec de l'activation du profilage MongoDB : {{error}}",
+    "profiling_disable_failed": "Échec de la désactivation du profilage MongoDB : {{error}}",
+    "profiling_update_failed_title": "Impossible de mettre à jour le profilage MongoDB.",
+    "data_node_metrics_failed": "Échec du chargement des métriques du nœud de données \"{{hostname}}\"",
+    "data_node_metrics_failed_title": "Impossible de charger les métriques des nœuds de données.",
+    "graylog_node_metrics_failed": "Échec du chargement des métriques du nœud Graylog, statut :",
+    "graylog_node_metrics_failed_title": "Impossible de charger les métriques du nœud Graylog.",
+    "cluster_traffic_failed": "Échec du chargement du trafic du cluster, statut :",
+    "cluster_traffic_failed_title": "Impossible de charger le trafic du cluster",
+    "journal_failed": "Impossible de récupérer les informations du journal",
+    "system_jobs_failed": "Échec du chargement des tâches système, statut :",
+    "system_jobs_failed_title": "Impossible de charger les tâches système"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Échec de la récupération des informations JVM du nœud '{{nodeId}}' : {{error}}",
+    "jvm_failed_title": "Impossible de récupérer les informations JVM",
+    "thread_dump_failed": "Échec de la récupération du dump des threads du nœud '{{nodeId}}' : {{error}}",
+    "thread_dump_failed_title": "Impossible de récupérer le dump des threads",
+    "process_buffer_dump_failed": "Échec de la récupération du dump du tampon de traitement du nœud '{{nodeId}}' : {{error}}",
+    "process_buffer_dump_failed_title": "Impossible de récupérer le dump du tampon de traitement",
+    "system_logs_failed": "Échec de la récupération des messages de journal système du nœud '{{nodeId}}' : {{error}}",
+    "system_logs_failed_title": "Impossible de récupérer les messages de journal système",
+    "overview_failed": "Échec de la récupération de la vue d'ensemble du cluster : {{error}}",
+    "overview_failed_title": "Impossible de récupérer la vue d'ensemble du cluster"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Échec de la création du bundle de support, statut : {{error}}",
+    "create_failed_title": "Impossible de créer le bundle de support.",
+    "delete_failed": "Échec de la suppression du bundle de support, statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer le bundle de support.",
+    "download_failed": "Échec du téléchargement du bundle de support, statut : {{error}}",
+    "download_failed_title": "Impossible de télécharger le bundle de support.",
+    "load_list_failed": "Échec du chargement de la liste des bundles de support, statut :",
+    "load_list_failed_title": "Impossible de charger la liste des bundles de support."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Échec de la récupération des plugins sur le nœud \"{{nodeId}}\"",
+    "fetch_failed_title": "Impossible de récupérer les plugins"
+  }
+}

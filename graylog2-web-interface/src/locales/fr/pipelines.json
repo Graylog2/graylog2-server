@@ -1,1 +1,415 @@
-{}
+{
+  "title": "Pipelines",
+  "overview_header_title": "Vue d'ensemble des pipelines",
+  "documentation_link_title": "Documentation des pipelines",
+  "overview_description": "Les pipelines vous permettent de transformer et de traiter les messages provenant des streams. Un pipeline se compose d'étapes dans lesquelles les règles sont évaluées et appliquées. Les messages peuvent traverser une ou plusieurs étapes.",
+  "new_pipeline": "Nouveau pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Les pipelines vous permettent de transformer et de traiter les messages provenant des streams. Un pipeline se compose d'étapes dans lesquelles les règles sont évaluées et appliquées. Les messages peuvent traverser une ou plusieurs étapes.\nUne fois chaque étape terminée, vous pouvez décider si les messages correspondant à toutes les règles ou à l'une d'entre elles passent à l'étape suivante.",
+  "rules_page_title": "Règles de pipeline",
+  "rules_page_header_title": "Règles de pipeline",
+  "rules_page_documentation_link": "Documentation des règles de pipeline",
+  "rules_page_description": "Les règles permettent d'appliquer des modifications aux messages. Une règle se compose d'une condition et d'une liste d'actions. La condition est évaluée sur un message, et les actions sont exécutées si la condition est remplie.",
+  "rules_delete_confirm": "Voulez-vous vraiment supprimer la règle \"{{title}}\" ?",
+  "rule_details_new_title": "Nouvelle règle de pipeline",
+  "rule_details_title": "Règle de pipeline {{title}}",
+  "rule_details_loading": "Chargement des détails de la règle...",
+  "loading_rule": "Chargement de la règle",
+  "create_pipeline_rule": "Créer une règle de pipeline",
+  "pipeline_rule": "Règle de pipeline <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "Utiliser l'éditeur de code source",
+  "rule_is_managed_warning": "Cette règle est gérée par Application. Vous ne pouvez pas la modifier.",
+  "switch_to_source_code_editor": "Passer à l'éditeur de code source",
+  "switch_to_source_code_editor_confirm_text": "Vous êtes sur le point de quitter cette page pour accéder à l'éditeur de code source.",
+  "switch_to_source_code_editor_confirm_warning": "Assurez-vous de ne pas avoir de modifications non enregistrées.",
+  "pipeline_new": {
+    "description": "Donnez un nom et une description au nouveau pipeline. Vous pourrez y ajouter des étapes lors de l'enregistrement des modifications."
+  },
+  "processing_errors": {
+    "rate_suffix": "erreurs/s",
+    "total": "({{total}} au total)"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "Voulez-vous vraiment supprimer le pipeline \"{{title}}\" ? Cette action est irréversible.",
+    "filter_label": "Filtrer les pipelines",
+    "no_pipelines": "Aucun pipeline trouvé",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "Connecté aux streams",
+      "processing_errors": "Erreurs de traitement",
+      "pipeline_load": "Charge du pipeline (15 min)",
+      "processing_timeline": "Chronologie du traitement",
+      "actions": "Actions"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "Les métriques de débogage sont activées",
+    "banner_text": "Les métriques de débogage augmentent la charge du traitement des messages et l'utilisation de la mémoire. Désactivez-les une fois le dépannage terminé. Les valeurs de charge du pipeline sont lissées sur une fenêtre de 15 minutes et peuvent mettre quelques minutes à se stabiliser après activation.",
+    "disable": "Désactiver les métriques de débogage",
+    "enable": "Activer les métriques de débogage",
+    "help": "La charge du pipeline (15 min) indique la part relative du temps d'exécution des règles de pipeline à l'échelle du cluster. Activez les métriques de débogage pour commencer à collecter les données de minuterie. Les valeurs peuvent mettre jusqu'à environ 15 minutes à apparaître après activation, et la collecte augmente la charge du traitement des messages."
+  },
+  "pipeline": {
+    "not_connected": "Ce pipeline n'est actuellement connecté à aucun stream. Vous devez le connecter à au moins un stream pour qu'il traite les messages entrants. Cela n'est pas nécessaire si vous prévoyez d'utiliser ce pipeline uniquement pour transformer les résultats de recherche à l'aide de décorateurs.",
+    "delete_stage_confirm": "Vous êtes sur le point de supprimer l'étape {{stage}}. Voulez-vous vraiment continuer ?",
+    "list_and": " et ",
+    "processing_streams_one": "Ce pipeline traite les messages du stream {{streams}}.",
+    "processing_streams_other": "Ce pipeline traite les messages des streams {{streams}}.",
+    "managed_1": "Ce pipeline est géré par le système et ne peut être modifié que de manière limitée.",
+    "managed_2": "Des règles de pipeline ne peuvent être ajoutées à ce pipeline que via l'assistant d'entrée.",
+    "managed_3": "Les règles de pipeline de ce pipeline seront automatiquement renommées pour refléter toute modification du nom de l'entrée correspondante.",
+    "managed_4": "Les règles de pipeline peuvent être supprimées manuellement de ce pipeline, mais pas ajoutées manuellement.",
+    "connections_title": "Connexions du pipeline",
+    "no_connections": "Sélectionnez les streams qui seront traités par ce pipeline.",
+    "stages_title": "Étapes du pipeline",
+    "stages_description": "Les étapes sont des groupes de conditions et d'actions qui doivent s'exécuter dans l'ordre et qui permettent de décider si le reste du pipeline doit être exécuté.",
+    "no_rules_on_stage": "Aucune règle dans cette étape.",
+    "processing_streams_many": "Ce pipeline traite les messages des streams {{streams}}."
+  },
+  "connections_form": {
+    "streams_help": "Sélectionnez les streams à connecter à ce pipeline, ou créez-en un sur la <streamsLink>page Streams</streamsLink>.",
+    "edit": "Modifier les connexions",
+    "title": "Modifier les connexions pour <pipelineTitle>{{title}}</pipelineTitle>",
+    "submit": "Mettre à jour les connexions",
+    "streams": "Streams"
+  },
+  "details": {
+    "title": "Détails",
+    "title_label": "Titre",
+    "description": "Description",
+    "created": "Créé",
+    "last_modified": "Dernière modification",
+    "throughput": "Débit actuel",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "Titre",
+    "title_help": "Nom du pipeline.",
+    "description": "Description",
+    "description_help": "Description du pipeline.",
+    "add_button": "Ajouter un nouveau pipeline",
+    "edit_button": "Modifier les détails du pipeline",
+    "add_title": "Ajouter le nouveau pipeline {{title}}",
+    "edit_title": "Modifier le pipeline {{title}}",
+    "add_submit": "Ajouter le pipeline",
+    "update_submit": "Mettre à jour le pipeline",
+    "create_submit": "Créer le pipeline"
+  },
+  "list_item": {
+    "idle": "Inactif",
+    "stage": "Étape {{stage}}",
+    "loading": "Chargement du pipeline...",
+    "managed": "Géré par Application",
+    "throughput_prefix": "Débit :",
+    "throughput_suffix": "msg/s",
+    "not_connected": "Non connecté",
+    "edit_aria": "Modifier le pipeline",
+    "edit": "Modifier",
+    "delete_aria": "Supprimer le pipeline",
+    "delete": "Supprimer"
+  },
+  "stage_rules": {
+    "invalid_rule": "La règle {{name}} a été renommée ou supprimée. Cette règle sera ignorée.",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "erreurs/s",
+    "remove_title": "Supprimer {{title}}",
+    "removing": "Suppression...",
+    "remove": "Supprimer",
+    "no_rules": "Cette étape ne contient pas encore de règles. Cliquez sur Modifier pour en ajouter.",
+    "headers": {
+      "title": "Titre",
+      "description": "Description",
+      "throughput": "Débit",
+      "errors": "Erreurs",
+      "rule_load": "Charge de la règle (15 min)",
+      "actions": "Actions"
+    }
+  },
+  "stage": {
+    "contains_rules_one": "Contient {{count}} règle",
+    "contains_rules_other": "Contient {{count}} règles",
+    "last_stage": "Il n'y a plus d'étapes dans ce pipeline. Une fois les règles de cette étape appliquées, le traitement du pipeline sera terminé.",
+    "continue_all": "Les messages satisfaisant <matchText>toutes les règles</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_either": "Les messages satisfaisant <matchText>au moins une règle</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_pass": "Les messages satisfaisant <matchText>aucune ou plusieurs règles</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_unknown": "Les messages satisfaisant <matchText>UNKNOWN</matchText> dans cette étape passeront à l'étape suivante.",
+    "title": "Étape {{stage}}",
+    "remove_routing_rule_title": "Supprimer la règle de routage",
+    "remove_routing_rule_confirm": "Voulez-vous vraiment supprimer la règle de routage <ruleTitle>{{title}}</ruleTitle> ?",
+    "contains_rules_many": "Contient {{count}} règles"
+  },
+  "stage_form": {
+    "rules_help": "Sélectionnez les règles évaluées à cette étape, ou créez-en une sur la <rulesLink>page Règles de pipeline</rulesLink>.",
+    "add_button": "Ajouter une nouvelle étape",
+    "add_title": "Ajouter la nouvelle étape {{stage}}",
+    "edit_title": "Modifier l'étape {{stage}}",
+    "add_submit": "Ajouter l'étape",
+    "update_submit": "Mettre à jour l'étape",
+    "stage": "Étape",
+    "stage_in_use": "Cette étape est déjà utilisée. Veuillez utiliser un autre numéro ou modifier l'étape existante.",
+    "stage_help": "Priorité de l'étape. Plus le numéro est petit, plus l'étape est exécutée tôt.",
+    "continue_when": "Poursuivre le traitement à l'étape suivante lorsque",
+    "match_all": "Toutes les règles de cette étape correspondent au message",
+    "match_any": "Au moins une des règles de cette étape correspond au message",
+    "match_pass": "Aucune ou plusieurs règles de cette étape correspondent",
+    "stage_rules": "Règles de l'étape"
+  },
+  "used_in_pipelines": {
+    "label": "Utilisée dans les pipelines",
+    "help": "Pipelines qui utilisent cette règle dans une ou plusieurs de leurs étapes.",
+    "none": "Cette règle n'est utilisée dans aucun pipeline."
+  },
+  "deprecation": {
+    "label": "Fonction obsolète",
+    "title_rule": "Cette règle contient au moins une fonction obsolète :",
+    "title_pipeline": "Ce pipeline contient au moins une fonction obsolète :"
+  },
+  "rule_form": {
+    "duplicate_title": "Le titre de règle \"{{title}}\" existe déjà !",
+    "title": "Titre",
+    "title_help": "Vous pouvez définir le titre de la règle dans sa source. Consultez la référence rapide pour plus d'informations.",
+    "leave_question": "Voulez-vous vraiment quitter cette page et perdre vos modifications ? Cette action est irréversible.",
+    "description": "Description",
+    "description_help": "Description de la règle (facultative).",
+    "source": "Source de la règle",
+    "source_help": "Source de la règle, consultez la référence rapide pour plus d'informations.",
+    "create_submit": "Créer la règle",
+    "update_close_submit": "Mettre à jour la règle et fermer",
+    "update": "Mettre à jour la règle"
+  },
+  "rule_list_entry": {
+    "edit": "Modifier",
+    "delete_title": "Supprimer la règle",
+    "delete": "Supprimer",
+    "managed": "Géré par Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "erreurs/s"
+  },
+  "metrics_config": {
+    "loading": "Chargement de la configuration des métriques...",
+    "title": "Configuration des métriques de règles",
+    "submit": "Mettre à jour la configuration",
+    "warning": "Les métriques de règles ne doivent être activées que pour déboguer un problème de performance, car leur collecte ralentit le traitement des messages et augmente l'utilisation de la mémoire.",
+    "enable": "Activer les métriques de règles",
+    "disable": "Désactiver les métriques de règles",
+    "pipeline_load_info": "L'activation de ces métriques ajoute une nouvelle colonne aux pages Pipeline et Règle de pipeline, appelée <columnName>Charge du pipeline</columnName>, qui affiche en pourcentage la part relative du temps de thread consommée par chacun de vos pipelines.",
+    "rule_load_info": "L'activation de ces métriques ajoute également une nouvelle colonne à la page Détails du pipeline, appelée <columnName>Charge de la règle</columnName>. Elle permet d'identifier les règles de pipeline les plus coûteuses dans le pipeline sélectionné."
+  },
+  "rule_simulation": {
+    "error_builder": "Impossible d'exécuter la simulation de règle. Veuillez corriger les erreurs de l'éditeur de règles.",
+    "placeholder_simple": "champ de message simple",
+    "invalid_json": "JSON invalide !",
+    "title": "Simulation de règle",
+    "optional": "(facultatif)",
+    "json": "JSON",
+    "key_value": "Clé-valeur",
+    "simple_message": "Message simple",
+    "input_title": "Champ de message simple, paires clé-valeur ou JSON",
+    "input_help": "Saisissez une chaîne normale pour simuler le champ de message, des paires clé-valeur, ou un JSON pour simuler le message entier.",
+    "run": "Exécuter la simulation de règle",
+    "reset": "Réinitialiser",
+    "conditions_output": "Sortie des conditions",
+    "actions_output": "Sortie des actions"
+  },
+  "convert_modal": {
+    "no_title": "<sans titre>",
+    "no_code": "<aucun code>",
+    "create_rule": "Créer une nouvelle règle à partir du code",
+    "copied": "Code source de la règle copié dans le presse-papiers !",
+    "copy_close": "Copier et fermer"
+  },
+  "block_display": {
+    "number": "Numéro",
+    "not": "Non",
+    "deprecated": "Obsolète",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "insert_above": "Insérer au-dessus",
+    "insert_below": "Insérer en dessous"
+  },
+  "block": {
+    "insert_title_above": "Insérer une nouvelle action au-dessus de l'action n°{{order}}",
+    "insert_title_below": "Insérer une nouvelle action en dessous de l'action n°{{order}}"
+  },
+  "builder_form": {
+    "title": "Titre",
+    "title_help": "Titre de la règle.",
+    "description": "Description",
+    "description_help": "Description de la règle (facultative)."
+  },
+  "block_form": {
+    "add_condition": "Ajouter une condition",
+    "add_action": "Ajouter une action",
+    "syntax_help": "Aide sur la syntaxe des fonctions",
+    "update": "Mettre à jour",
+    "add": "Ajouter"
+  },
+  "block_field": {
+    "no_dollar": "Les champs commençant par « $ » ne sont pas autorisés.",
+    "use_previous_output": "Utiliser la sortie des étapes précédentes",
+    "set_custom": "Définir {{name}} personnalisé",
+    "select_output": "Sélectionner une sortie dans la liste",
+    "output_from_step": "Sortie de l'étape {{step}} ({{name}})",
+    "type_not_found": "Aucune action précédente ne renvoie le type {{type}}",
+    "true": "vrai",
+    "false": "faux"
+  },
+  "builder": {
+    "title": "Éditeur de règles",
+    "when": "Quand",
+    "and": "et",
+    "or": "ou",
+    "then": "Alors",
+    "convert_title": "Convertir l'éditeur de règles en code source",
+    "convert": "Convertir en code source",
+    "delete_condition": "Supprimer la condition",
+    "delete_action": "Supprimer l'action",
+    "delete_condition_confirm": "Voulez-vous vraiment supprimer la <blockName>condition n° {{order}}</blockName> ?",
+    "delete_action_confirm": "Voulez-vous vraiment supprimer l'<blockName>action n° {{order}}</blockName> ?"
+  },
+  "helper": {
+    "title": "Référence rapide des règles",
+    "docs_hint": "Lisez la <docsLink>documentation complète</docsLink> pour mieux comprendre le fonctionnement des règles de pipeline.",
+    "functions": "Fonctions",
+    "example": "Exemple",
+    "functions_description": "Liste de toutes les fonctions disponibles dans les règles de pipeline. Cliquez sur une ligne pour afficher plus d'informations sur les paramètres de la fonction.",
+    "filter_rules": "Filtrer les règles",
+    "example_description": "Vous voulez voir à quoi ressemble une règle de pipeline ? Consultez cet exemple :"
+  },
+  "helper_table": {
+    "parameter": "Paramètre",
+    "type": "Type",
+    "required": "Obligatoire",
+    "description": "Description",
+    "function": "Fonction"
+  },
+  "simulator": {
+    "no_streams_title": "Aucun stream trouvé",
+    "no_streams": "Les pipelines agissent sur les streams, mais votre système n'en contient actuellement aucun. Veuillez <streamsLink>créer un stream</streamsLink> et revenir ici plus tard pour tester le traitement des messages de votre nouveau stream par les pipelines.",
+    "stream_help": "Sélectionnez un stream à utiliser pendant la simulation. Le stream <streamTitle>{{title}}</streamTitle> est utilisé par défaut.",
+    "load_message": "Charger un message",
+    "load_message_description": "Construisez un exemple de message qui sera utilisé dans la simulation. <notice>Aucun message réel ne sera modifié. Toutes les actions sont uniquement simulées sur l'entrée temporaire que vous fournissez ci-dessous.</notice>",
+    "stream": "Stream"
+  },
+  "simulation_changes": {
+    "added_fields": "Champs ajoutés",
+    "removed_fields": "Champs supprimés",
+    "mutated_fields": "Champs modifiés",
+    "dropped": "Le message d'origine serait supprimé pendant le traitement.",
+    "not_modified": "Le message d'origine ne serait pas modifié pendant le traitement.",
+    "original_changes": "Modifications du message d'origine <idSmall><idEm>{{id}}</idEm></idSmall>",
+    "other_changes": "Autres modifications",
+    "other_changes_description_one": "{{count}} message serait créé. Passez à l'option d'affichage <previewOption>Aperçu des résultats</previewOption> pour le voir.",
+    "other_changes_description_other": "{{count}} messages seraient créés. Passez à l'option d'affichage <previewOption>Aperçu des résultats</previewOption> pour les voir.",
+    "other_changes_description_many": "{{count}} messages seraient créés. Passez à l'option d'affichage <previewOption>Aperçu des résultats</previewOption> pour les voir."
+  },
+  "simulation_preview": {
+    "dropped_title": "Le message serait supprimé",
+    "dropped": "Le processeur de pipeline supprimerait un tel message. Cela signifie que le message <notStored>ne serait pas stocké</notStored> et ne serait pas disponible pour les recherches, les alertes, les sorties ou les tableaux de bord."
+  },
+  "simulation_trace": {
+    "microseconds": "µs"
+  },
+  "simulation_results": {
+    "changes_summary": "Résumé des modifications",
+    "results_preview": "Aperçu des résultats",
+    "simulation_trace": "Trace de simulation",
+    "error_title": "Erreur lors de la simulation du traitement du message",
+    "error": "Impossible de simuler le traitement du message <emphasis>{{id}}</emphasis> dans le stream <emphasis>{{stream}}</emphasis>.<lineBreak />Veuillez essayer de charger à nouveau le message, ou utiliser un autre message pour la simulation.",
+    "original_message": "Message d'origine",
+    "more_results": "Plus de résultats",
+    "title": "Résultats de la simulation",
+    "simulating": "Simulation du traitement du message, veuillez patienter un instant.",
+    "results_description": "Voici les résultats du traitement du message chargé. Le traitement a pris {{took}} µs."
+  },
+  "simulator_page": {
+    "title": "Simuler le traitement",
+    "documentation_title": "Documentation des pipelines",
+    "description": "Le traitement des messages peut être complexe. Utilisez cette page pour simuler le résultat du traitement d'un message entrant avec votre jeu actuel de pipelines et de règles."
+  },
+  "rule_notifications": {
+    "fetch_failed": "Échec de la récupération des règles, statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les règles de traitement",
+    "list_failed": "Échec du chargement de la liste des règles, statut : {{error}}",
+    "list_failed_title": "Impossible de charger les règles.",
+    "fetch_rule_failed": "Échec de la récupération de la règle \"{{id}}\", statut : {{error}}",
+    "fetch_rule_failed_title": "Impossible de récupérer la règle de traitement \"{{id}}\"",
+    "create_success": "Règle \"{{title}}\" créée avec succès",
+    "create_failed": "Échec de l'enregistrement de la règle \"{{title}}\", statut : {{error}}",
+    "create_failed_title": "Impossible d'enregistrer la règle de traitement \"{{title}}\"",
+    "update_success": "Règle \"{{title}}\" mise à jour avec succès",
+    "update_failed": "Échec de la mise à jour de la règle \"{{title}}\", statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour la règle de traitement \"{{title}}\"",
+    "delete_success": "La règle \"{{title}}\" a été supprimée avec succès",
+    "delete_failed": "Échec de la suppression de la règle \"{{title}}\", statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer la règle de traitement \"{{title}}\"",
+    "metrics_load_failed": "Impossible de charger la configuration des métriques de règles : {{error}}",
+    "metrics_load_failed_title": "Impossible de charger la configuration des métriques de règles",
+    "metrics_update_success": "Configuration des métriques de règles mise à jour avec succès",
+    "metrics_update_failed": "Impossible de mettre à jour la configuration des métriques de règles : {{error}}",
+    "metrics_update_failed_title": "Impossible de mettre à jour la configuration des métriques de règles",
+    "metadata_failed": "Échec du chargement des métadonnées des règles de pipeline, statut",
+    "metadata_failed_title": "Impossible de charger les métadonnées des règles de pipeline",
+    "deprecated_failed": "Échec du chargement des fonctions obsolètes de la règle, statut",
+    "deprecated_failed_title": "Impossible de charger les fonctions obsolètes des métadonnées de la règle",
+    "builder_create_failed": "Échec de la création de la règle de l'éditeur de règles, statut : {{error}}",
+    "builder_create_failed_title": "Impossible de créer la règle de l'éditeur de règles.",
+    "builder_update_failed": "Échec de la mise à jour de la règle de l'éditeur de règles, statut : {{error}}",
+    "builder_update_failed_title": "Impossible de mettre à jour la règle de l'éditeur de règles.",
+    "builder_load_failed": "Échec du chargement de la règle de l'éditeur de règles, statut",
+    "builder_load_failed_title": "Impossible de charger la règle de l'éditeur de règles.",
+    "builder_conditions_failed": "Échec du chargement de la liste des conditions de l'éditeur de règles, statut",
+    "builder_conditions_failed_title": "Impossible de charger la liste des conditions de l'éditeur de règles.",
+    "builder_actions_failed": "Échec du chargement de la liste des actions de l'éditeur de règles, statut",
+    "builder_actions_failed_title": "Impossible de charger la liste des actions de l'éditeur de règles."
+  },
+  "page_navigation": {
+    "manage_pipelines": "Gérer les pipelines",
+    "manage_rules": "Gérer les règles",
+    "simulator": "Simulateur"
+  },
+  "pipeline_notifications": {
+    "load_failed": "Échec du chargement des pipelines, statut",
+    "load_failed_title": "Impossible de charger les pipelines",
+    "load_paginated_failed": "Échec du chargement des pipelines paginés, statut",
+    "load_paginated_failed_title": "Impossible de charger les pipelines paginés",
+    "load_single_failed": "Échec du chargement du pipeline, statut",
+    "load_single_failed_title": "Impossible de charger le pipeline",
+    "connections_failed": "Échec de la récupération des connexions du pipeline, statut",
+    "connections_failed_title": "Impossible de récupérer les connexions du pipeline",
+    "connections_updated": "Connexions du pipeline mises à jour avec succès",
+    "connections_update_failed": "Échec de la mise à jour des connexions du pipeline, statut : {{error}}",
+    "connections_update_failed_title": "Impossible de mettre à jour les connexions du pipeline",
+    "create_failed": "Échec de la création du pipeline, statut : {{error}}",
+    "create_failed_title": "Impossible de créer le pipeline",
+    "create_success": "Le pipeline a été créé avec succès.",
+    "update_failed": "Échec de la mise à jour du pipeline, statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour le pipeline",
+    "update_success": "Le pipeline a été mis à jour avec succès.",
+    "delete_failed": "Échec de la suppression du pipeline, statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer le pipeline",
+    "delete_success": "Le pipeline a été supprimé avec succès.",
+    "success_title": "Succès !"
+  },
+  "connections_list": {
+    "not_connected": "Pipeline non connecté à un stream"
+  },
+  "rule_list": {
+    "headers": {
+      "title": "Titre",
+      "description": "Description",
+      "created": "Créé",
+      "last_modified": "Dernière modification",
+      "throughput": "Débit",
+      "errors": "Erreurs",
+      "pipeline_load": "Charge du pipeline (15 min)",
+      "pipelines": "Pipelines",
+      "actions": "Actions"
+    }
+  },
+  "load_cell": {
+    "error_tooltip": "La charge du pipeline est indisponible : le chargement des métriques de charge de traitement a échoué."
+  }
+}
