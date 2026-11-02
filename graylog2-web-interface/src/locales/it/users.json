@@ -410,18 +410,84 @@
       "confirm_disable": "Vuoi davvero disabilitare l'utente {{name}}? Tutte le sessioni attive verranno terminate.",
       "confirm_delete": "Vuoi davvero eliminare l'utente {{name}}?",
       "edit_title": "Modifica utente {{name}}",
-      "edit": "Modifica"
+      "edit": "Modifica",
+      "set_status_title": "Imposta nuovo stato dell'account per {{name}}",
+      "disable": "Disabilita",
+      "enable": "Abilita",
+      "delete_title": "Elimina utente {{name}}"
     },
-    "logged_in": {},
-    "status": {},
-    "fields": {}
+    "logged_in": {
+      "title": "Connesso",
+      "last_activity": "Ultima attività: {{activity}}",
+      "client_address": "Indirizzo client: {{address}}",
+      "not_logged_in": "Non connesso"
+    },
+    "status": {
+      "user_is": "L'utente è {{status}}",
+      "auth_disabled": " (il servizio di autenticazione è disabilitato)",
+      "enabled": "abilitato",
+      "disabled": "disabilitato"
+    },
+    "query_example": "Trova utenti con un'email che contiene example.com:",
+    "fields": {
+      "full_name": "Il nome completo di un utente",
+      "username": "Il nome utente con cui l'utente accede.",
+      "email": "L'email dell'utente."
+    },
+    "select_users": "Seleziona utente/i..."
   },
-  "user_navigation": {},
+  "user_navigation": {
+    "view_details": "Visualizza dettagli",
+    "edit_user": "Modifica utente",
+    "edit_tokens": "Modifica token"
+  },
   "token_admin": {
-    "fields": {}
+    "title": "Token",
+    "human_name": "token",
+    "fields": {
+      "username": "Il nome utente del proprietario del token",
+      "name": "Il nome del token",
+      "created": "La data di creazione del token",
+      "last_access": "L'ultima volta in cui il token è stato usato",
+      "external_user": "Il proprietario del token è un utente di un backend di autenticazione esterno?",
+      "auth_backend": "Il backend di autenticazione dell'utente. N/A per gli utenti interni"
+    },
+    "example_user": "Trova token creati da un determinato utente:",
+    "example_name": "Trova token in base a un determinato nome:",
+    "deleting_title": "Eliminazione del token",
+    "delete_confirm": "Stai per eliminare il token: \"{{name}}\". Sei sicuro?",
+    "delete": "Elimina",
+    "user_not_found": "L'utente non esiste.",
+    "user_error_title": "Errore utente del token",
+    "not_available": "N/A",
+    "delete_failed": "Eliminazione del token non riuscita: {{error}}",
+    "delete_failed_title": "Impossibile eliminare il token",
+    "deleted": "Il token è stato eliminato con successo.",
+    "deleted_title": "Operazione riuscita!"
   },
-  "user_details_page": {},
-  "password_rules": {},
-  "notifications": {},
-  "use_basic_user_notifications": {}
+  "user_details_page": {
+    "title": "Dettagli utente",
+    "title_with_name": "Dettagli utente {{name}}",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica di dettagli come informazioni del profilo, impostazioni, team e ruoli."
+  },
+  "password_rules": {
+    "min_length": "La password deve contenere almeno {{minLength}} caratteri.",
+    "require_uppercase": "La password deve contenere almeno una lettera maiuscola.",
+    "require_lowercase": "La password deve contenere almeno una lettera minuscola.",
+    "require_numbers": "La password deve contenere almeno un numero.",
+    "require_special_chars": "La password deve contenere almeno un carattere speciale tra: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Preferenze utente salvate con successo",
+    "save_failed": "Salvataggio delle preferenze per \"{{userName}}\" non riuscito con stato: {{error}}",
+    "save_failed_title": "Impossibile salvare le preferenze utente",
+    "change_success": "La tua pagina iniziale è stata modificata con successo",
+    "change_failed": "Modifica della tua pagina iniziale non riuscita con errore: {{error}}",
+    "change_failed_title": "Impossibile modificare la tua pagina iniziale"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Caricamento dell'utente {{userId}} non riuscito con stato",
+    "load_failed_title": "Impossibile caricare l'utente {{userId}}"
+  }
 }
