@@ -17,7 +17,7 @@
 import AppConfig from 'util/AppConfig';
 import { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
 
-export type LanguageCode = 'en' | 'de' | 'es' | 'fr' | 'pl' | 'pt-BR' | 'zh-CN' | 'zh-TW' | 'ja' | typeof PSEUDO_LANGUAGE;
+export type LanguageCode = 'en' | 'de' | 'es' | 'fr' | 'it' | 'pl' | 'pt-BR' | 'zh-CN' | 'zh-TW' | 'ja' | typeof PSEUDO_LANGUAGE;
 
 export type Language = {
   code: LanguageCode;
@@ -36,6 +36,7 @@ export const LANGUAGES: Array<Language> = [
   { code: 'de', name: 'Deutsch', beta: true },
   { code: 'es', name: 'Español', beta: true },
   { code: 'fr', name: 'Français', beta: true },
+  { code: 'it', name: 'Italiano', beta: true },
   { code: 'pl', name: 'Polski', beta: true },
   { code: 'pt-BR', name: 'Português (Brasil)', beta: true },
   { code: 'zh-CN', name: '简体中文', beta: true },

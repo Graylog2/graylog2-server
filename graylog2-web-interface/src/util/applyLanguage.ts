@@ -24,6 +24,7 @@ import 'moment/locale/pt-br';
 import 'moment/locale/zh-cn';
 import 'moment/locale/zh-tw';
 import 'moment/locale/ja';
+import 'moment/locale/it';
 import 'numeral/locales/de';
 import 'numeral/locales/es';
 import 'numeral/locales/fr';
@@ -31,6 +32,7 @@ import 'numeral/locales/pl';
 import 'numeral/locales/pt-br';
 import 'numeral/locales/chs';
 import 'numeral/locales/ja';
+import 'numeral/locales/it';
 
 import { changeLanguage } from 'i18n';
 import Store from 'logic/local-storage/Store';

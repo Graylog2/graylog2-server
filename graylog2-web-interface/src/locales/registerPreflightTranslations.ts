@@ -21,6 +21,7 @@ import enPreflight from 'locales/en/preflight.json';
 
 registerTranslations('preflight', enPreflight, {
   de: () => import(/* webpackChunkName: "translations-de-preflight" */ 'locales/de/preflight.json'),
+  it: () => import(/* webpackChunkName: "translations-it-preflight" */ 'locales/it/preflight.json'),
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-preflight" */ 'locales/zh-TW/preflight.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-preflight" */ 'locales/ja/preflight.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-preflight" */ 'locales/pl/preflight.json'),
