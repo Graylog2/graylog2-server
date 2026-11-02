@@ -1,1 +1,198 @@
-{}
+{
+  "users_overview": {
+    "title": "Resumen de usuarios",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Resumen de todos los usuarios registrados."
+  },
+  "user_create": {
+    "title": "Crear nuevo usuario",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Usa esta página para crear nuevos usuarios para la interfaz web o la API REST.",
+    "submit_button": "Crear usuario",
+    "reader_role_description": "Concede permisos básicos a todos los usuarios de {{productName}} (integrado)",
+    "role_required": "Debes seleccionar al menos uno de los roles <em>Reader</em> o <em>Admin</em>.",
+    "failed_title": "Error al crear el usuario",
+    "submit": "Crear usuario",
+    "submitting": "Creando usuario..."
+  },
+  "user_edit": {
+    "title": "Editar usuario {{username}}",
+    "title_prefix": "Editar usuario",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Aquí puedes cambiar los datos y la contraseña del usuario, y asignarle roles y equipos.",
+    "segments": {
+      "profile": "Perfil",
+      "preferences": "Preferencias",
+      "teams_roles": "Equipos y roles",
+      "shared_entities": "Elementos compartidos"
+    },
+    "password": {
+      "new_password": "Nueva contraseña",
+      "repeat_password": "Repetir contraseña",
+      "old_password": "Contraseña anterior",
+      "alert_title": "Cambiar la contraseña",
+      "alert_text": "Cambiar la contraseña cerrará la sesión del usuario e invalidará todas sus sesiones actuales. Si cambias tu propia contraseña, se cerrará tu sesión justo después de guardar. En ese caso, guarda antes los cambios pendientes.",
+      "change": "Cambiar contraseña"
+    },
+    "profile": {
+      "email": "Correo electrónico",
+      "full_name": "Nombre completo",
+      "update": "Actualizar perfil"
+    },
+    "profile_info": {
+      "title": "Nombre y apellidos",
+      "text": "Con {{productName}} 4.1 hemos añadido campos separados para el nombre y los apellidos. Deben rellenarse antes de poder guardar el perfil del usuario."
+    },
+    "read_only": "El usuario seleccionado {{fullName}} no se puede editar.",
+    "roles_required": "Los roles deben incluir como mínimo el rol Admin o Reader.",
+    "external": {
+      "title": "Usuario externo",
+      "text": "Este usuario se sincronizó desde un servidor externo, por lo que no se pueden cambiar ni el perfil ni la contraseña. Contacta con tu administrador para más información."
+    },
+    "preferences": {
+      "language_help": "Idioma de la interfaz de {{productName}}. Las traducciones marcadas como Beta todavía no han sido revisadas.",
+      "enable_autocompletion": "Activar autocompletado",
+      "search_sidebar": "Panel lateral de búsqueda",
+      "dashboard_sidebar": "Panel lateral de Dashboard",
+      "is_pinned": "Anclado",
+      "search_sidebar_help": "También se puede cambiar con el icono de anclaje del panel lateral de búsqueda",
+      "dashboard_sidebar_help": "También se puede cambiar con el icono de anclaje del panel lateral de Dashboard",
+      "theme_mode_help": "Se puede cambiar con el interruptor del menú desplegable de usuario",
+      "update": "Actualizar preferencias"
+    },
+    "settings": {
+      "select_entity": "Selecciona un elemento.",
+      "update": "Actualizar configuración"
+    }
+  },
+  "roles_overview": {
+    "title": "Resumen de roles",
+    "documentation_link_title": "Documentación de permisos",
+    "button_text": "Resumen de roles",
+    "description": "Resumen de todos los roles disponibles en {{productName}}. Los roles permiten conceder capacidades a los usuarios, como crear dashboards o definiciones de eventos.",
+    "alert_title": "Conceder permisos",
+    "alert_body_prefix": "Los roles integrados permiten conceder capacidades a los usuarios, como crear dashboards o ver el catálogo de archivo. Sin embargo, no conceden permisos sobre un dashboard o stream concreto. Tampoco es posible crear un rol propio. Para conceder permisos sobre un elemento concreto, usa su botón ",
+    "share_text": "Compartir",
+    "alert_body_suffix": " que encontrarás, por ejemplo, en la página de resumen de elementos. Si quieres conceder permisos sobre un elemento a varios usuarios a la vez, puedes usar equipos. Más información en la ",
+    "documentation_text": "documentación"
+  },
+  "role_details": {
+    "title": "Detalles del rol {{name}}",
+    "title_prefix": "Detalles del rol",
+    "documentation_link_title": "Documentación de permisos",
+    "button_text": "Resumen de roles",
+    "description": "Resumen de detalles como el nombre, la descripción y los usuarios asignados."
+  },
+  "role_edit": {
+    "title": "Editar rol {{name}}",
+    "title_prefix": "Editar rol",
+    "documentation_link_title": "Documentación de permisos",
+    "button_text": "Resumen de roles",
+    "description": "Puedes asignar el rol a usuarios."
+  },
+  "user_tokens_edit": {
+    "title": "Editar tokens del usuario {{username}}",
+    "title_prefix": "Editar tokens del usuario",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Puedes crear nuevos tokens o eliminar los antiguos."
+  },
+  "token_management": {
+    "title": "Gestión de tokens",
+    "documentation_link_title": "Documentación de permisos",
+    "description": "Resumen de los tokens de acceso configurados para {{productName}}."
+  },
+  "token_list": {
+    "title": "Crear y editar tokens",
+    "token_created": "¡Token {{name}} creado!",
+    "token_created_description": "Este es tu nuevo token. Asegúrate de copiarlo ahora, ya que no podrás volver a verlo.",
+    "done_button": "Hecho",
+    "title_list": "Tokens",
+    "filter_label": "Filtrar",
+    "no_tokens_to_display": "No hay tokens que mostrar.",
+    "no_tokens_match_filter": "Ningún token coincide con el filtro.",
+    "column_name": "Nombre del token",
+    "column_created": "Creado",
+    "column_last_access": "Último acceso",
+    "column_expires_at": "Caduca el",
+    "column_actions": "Acciones",
+    "never_used": "Nunca utilizado"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "Usuario",
+      "team": "Equipo",
+      "global": "Todos",
+      "error": "Error"
+    },
+    "dependencies_warning": {
+      "title": "Faltan dependencias para el conjunto actual de colaboradores",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> necesita acceso a",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Propietarios:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Añadir colaborador",
+      "search_placeholder": "Buscar usuarios y equipos",
+      "collaborators": "Colaboradores",
+      "direct_collaborators": "Colaboradores directos",
+      "shared_via_collections": "Compartido mediante colecciones"
+    },
+    "grantees": {},
+    "roles_selector": {},
+    "shareable_url": {},
+    "shared_entities": {
+      "headers": {}
+    },
+    "sharing_disabled": {},
+    "validation_error": {}
+  },
+  "roles": {
+    "profile": {},
+    "users": {},
+    "users_selector": {},
+    "actions": {},
+    "overview": {},
+    "navigation": {}
+  },
+  "security_teaser": {
+    "overview": {},
+    "anomalies": {},
+    "host_activity": {},
+    "network_activity": {},
+    "user_activity": {},
+    "demo": {
+      "items": {}
+    }
+  },
+  "user_fields": {},
+  "user_form": {},
+  "token_form": {},
+  "permissions_info": {},
+  "startpage": {
+    "types": {}
+  },
+  "timeout": {
+    "units": {}
+  },
+  "user_details": {
+    "preferences": {},
+    "settings": {}
+  },
+  "users_list": {
+    "admin": {},
+    "headers": {},
+    "actions": {},
+    "logged_in": {},
+    "status": {},
+    "fields": {}
+  },
+  "user_navigation": {},
+  "token_admin": {
+    "fields": {}
+  },
+  "user_details_page": {},
+  "password_rules": {},
+  "notifications": {},
+  "use_basic_user_notifications": {}
+}
