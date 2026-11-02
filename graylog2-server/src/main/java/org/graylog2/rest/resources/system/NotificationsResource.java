@@ -32,7 +32,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -53,6 +52,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationPaginationService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationSummaryDto;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.URIHelper;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.models.SortOrder;
@@ -68,6 +68,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
@@ -244,7 +245,7 @@ public class NotificationsResource extends RestResource {
     public void deleteNotificationById(@Parameter(name = "id") @PathParam("id") String id) {
         checkPermission(RestPermissions.NOTIFICATIONS_DELETE);
         if (!paginationService.deleteById(id)) {
-            throw new NotFoundException(f("Notification <%s> not found", id));
+            throw new CodedNotFoundException("notification.not_found", f("Notification <%s> not found", id), Map.of("id", id));
         }
     }
 
@@ -273,7 +274,7 @@ public class NotificationsResource extends RestResource {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final var notification = paginationService.findById(id)
-                .orElseThrow(() -> new NotFoundException(f("Notification <%s> not found", id)));
+                .orElseThrow(() -> new CodedNotFoundException("notification.not_found", f("Notification <%s> not found", id), Map.of("id", id)));
 
         final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.HTML, uriHelper);
         return TemplateRenderResponse.create(rendered.title, rendered.description);

@@ -60,6 +60,7 @@ import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackList;
@@ -159,7 +160,7 @@ public class ContentPackResource extends RestResource {
         Map<Integer, Set<ConstraintCheckResult>> constraintMap = contentPacks.stream()
                 .collect(Collectors.toMap(Revisioned::revision, contentPackService::checkConstraints));
         if (contentPackMap.size() <= 0) {
-            throw new NotFoundException("Content pack " + id + " not found!");
+            throw new CodedNotFoundException("content_pack.not_found", "Content pack " + id + " not found!", Map.of("id", id));
         }
 
         return ContentPackRevisions.create(contentPackMap, constraintMap);
@@ -183,7 +184,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
-                .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.revision_not_found", "Content pack " + id + " with revision " + revision + " not found!", Map.of("id", id, "revision", revision)));
         Set<ConstraintCheckResult> constraints = contentPackService.checkConstraints(contentPack);
         return ContentPackResponse.create(contentPack, constraints);
     }
@@ -206,7 +207,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
         ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
-                .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.revision_not_found", "Content pack " + id + " with revision " + revision + " not found!", Map.of("id", id, "revision", revision)));
         return contentPack;
     }
 
@@ -312,7 +313,7 @@ public class ContentPackResource extends RestResource {
         final var request = contentPackInstallationRequest.entity();
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
-                .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.revision_not_found", "Content pack " + id + " with revision " + revision + " not found!", Map.of("id", id, "revision", revision)));
         final ContentPackInstallation installation = contentPackService.installContentPack(
                 contentPack,
                 request.parameters(),
@@ -360,7 +361,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
         final ContentPackInstallation installation = contentPackInstallationPersistenceService.findById(new ObjectId(installationId))
-                .orElseThrow(() -> new NotFoundException("Couldn't find installation " + installationId));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.installation_not_found", "Couldn't find installation " + installationId, Map.of("installationId", installationId)));
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
                 .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
@@ -386,7 +387,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
         final ContentPackInstallation installation = contentPackInstallationPersistenceService.findById(new ObjectId(installationId))
-                .orElseThrow(() -> new NotFoundException("Couldn't find installation " + installationId));
+                .orElseThrow(() -> new CodedNotFoundException("content_pack.installation_not_found", "Couldn't find installation " + installationId, Map.of("installationId", installationId)));
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
                 .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));

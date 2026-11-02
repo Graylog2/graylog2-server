@@ -68,6 +68,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
@@ -84,6 +85,7 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -171,7 +173,7 @@ public class SessionsResource extends RestResource {
         if (createRequest.has(USERNAME)) {
             final User user = userService.load(createRequest.get(USERNAME).asText());
             if ((user != null) && user.isServiceAccount()) {
-                throw new BadRequestException("Cannot login with service account " + user.getName());
+                throw new CodedBadRequestException("session.service_account_login", "Cannot login with service account " + user.getName(), Map.of("username", user.getName()));
             }
         }
     }

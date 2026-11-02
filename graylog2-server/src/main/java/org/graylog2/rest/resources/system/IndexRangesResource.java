@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -47,6 +46,7 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -54,6 +54,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -111,7 +112,7 @@ public class IndexRangesResource extends RestResource {
             @Parameter(name = "index", description = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) throws NotFoundException {
         if (!indexSetRegistry.isManagedIndex(index)) {
-            throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
+            throw new CodedBadRequestException("index_range.not_managed", index + " is not a Graylog-managed Elasticsearch index.", Map.of("index", index));
         }
         checkPermission(RestPermissions.INDEXRANGES_READ, index);
 
@@ -183,7 +184,7 @@ public class IndexRangesResource extends RestResource {
             @Parameter(name = "index", description = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) {
         if (!indexSetRegistry.isManagedIndex(index)) {
-            throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
+            throw new CodedBadRequestException("index_range.not_managed", index + " is not a Graylog-managed Elasticsearch index.", Map.of("index", index));
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
 

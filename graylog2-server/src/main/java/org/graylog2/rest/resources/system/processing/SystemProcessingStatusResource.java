@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.processing.DBProcessingStatusService;
@@ -28,7 +29,6 @@ import org.graylog2.system.processing.ProcessingStatusRecorder;
 import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -61,6 +61,6 @@ public class SystemProcessingStatusResource extends RestResource {
     @Operation(summary = "Get persisted processing status summary from node")
     public ProcessingStatusSummary getPersistedStatus() {
         return dbService.get().map(ProcessingStatusSummary::of)
-                .orElseThrow(() -> new NotFoundException("No processing status persisted yet"));
+                .orElseThrow(() -> new CodedNotFoundException("processing_status.not_found", "No processing status persisted yet"));
     }
 }

@@ -48,6 +48,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
@@ -102,7 +103,7 @@ public class IndicesResource extends RestResource {
 
         return indices.getIndexStats(index)
                 .map(this::toIndexInfo)
-                .orElseThrow(() -> new NotFoundException("Index [" + index + "] not found."));
+                .orElseThrow(() -> new CodedNotFoundException("index.not_found", "Index [" + index + "] not found.", Map.of("index", index)));
     }
 
     @POST

@@ -31,7 +31,6 @@ import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -40,6 +39,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
 import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -106,7 +106,7 @@ public class RetentionStrategyResource extends RestResource {
     private RetentionStrategyDescription getRetentionStrategyDescription(@Parameter(name = "strategy", description = "The name of the retention strategy", required = true) @PathParam("strategy") @NotEmpty String strategyName) {
         final Provider<RetentionStrategy> provider = retentionStrategies.get(strategyName);
         if (provider == null) {
-            throw new NotFoundException("Couldn't find retention strategy for given type " + strategyName);
+            throw new CodedNotFoundException("retention_strategy.not_found", "Couldn't find retention strategy for given type " + strategyName, Map.of("type", strategyName));
         }
 
         final RetentionStrategy retentionStrategy = provider.get();

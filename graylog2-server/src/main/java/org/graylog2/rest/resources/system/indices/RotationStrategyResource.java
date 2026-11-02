@@ -28,7 +28,6 @@ import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -38,6 +37,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.indices.RotationStrategies;
 import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -103,7 +103,7 @@ public class RotationStrategyResource extends RestResource {
     private boolean isEnabledRotationStrategy(String strategyName) {
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
         if (provider == null) {
-            throw new NotFoundException("Couldn't find rotation strategy for given type " + strategyName);
+            throw new CodedNotFoundException("rotation_strategy.not_found", "Couldn't find rotation strategy for given type " + strategyName, Map.of("type", strategyName));
         }
         final RotationStrategy rotationStrategy = provider.get();
         return elasticsearchConfiguration.getEnabledRotationStrategies().contains(rotationStrategy.getStrategyName());
@@ -112,7 +112,7 @@ public class RotationStrategyResource extends RestResource {
     private RotationStrategyDescription getRotationStrategyDescription(String strategyName) {
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
         if (provider == null) {
-            throw new NotFoundException("Couldn't find rotation strategy for given type " + strategyName);
+            throw new CodedNotFoundException("rotation_strategy.not_found", "Couldn't find rotation strategy for given type " + strategyName, Map.of("type", strategyName));
         }
 
         final RotationStrategy rotationStrategy = provider.get();

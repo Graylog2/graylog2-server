@@ -39,6 +39,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.log4j.MemoryAppender;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
@@ -230,7 +231,7 @@ public class LoggersResource extends RestResource {
                              @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
-            throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
+            throw new CodedNotFoundException("logs.memory_appender_disabled", "Memory appender is disabled. Please refer to the example log4j.xml file.");
         }
 
         if (!(appender instanceof MemoryAppender memoryAppender)) {
