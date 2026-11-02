@@ -1,1 +1,198 @@
-{}
+{
+  "actions": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "submit": "提交",
+    "delete": "删除",
+    "previous": "上一个",
+    "next": "下一个",
+    "add": "添加",
+    "edit": "编辑",
+    "preview": "预览",
+    "close": "关闭",
+    "done": "完成",
+    "filter": "过滤",
+    "reset": "重置",
+    "reset_search": "重置搜索",
+    "more_actions": "更多操作",
+    "sort": "排序",
+    "clear_selection": "清除选择",
+    "remove_item": "移除 {{name}}"
+  },
+  "confirm_leave": {
+    "question": "您确定吗？"
+  },
+  "duration": {},
+  "bulk_actions": {
+    "title": "批量操作",
+    "cancel": "取消选择"
+  },
+  "refresh": {
+    "not_updating": "未更新",
+    "every": "每",
+    "pause": "暂停刷新",
+    "start": "开始刷新"
+  },
+  "create_entity": {
+    "title": "创建{{entityName}}",
+    "submit": "创建{{entityName, lowercase}}",
+    "submitting": "正在创建{{entityName, lowercase}}...",
+    "save_failed": "保存失败",
+    "unknown_error": "发生错误，请重试。"
+  },
+  "key_value_table": {
+    "name": "名称",
+    "value": "值",
+    "actions": "操作"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown 编辑器",
+    "preview_title": "Markdown 预览",
+    "expand_preview": "展开预览",
+    "expand_content": "展开内容"
+  },
+  "source_code_editor": {
+    "copy": "复制（Ctrl+C / ⌘C）",
+    "paste": "粘贴（Ctrl+V / ⌘V）",
+    "undo": "撤销（Ctrl+Z / ⌘Z）",
+    "redo": "重做（Ctrl+Shift+Z / ⌘⇧Z）",
+    "paste_hint": "按 Ctrl+V（macOS 上为 ⌘V）或选择“编辑” → “粘贴”，从剪贴板粘贴。"
+  },
+  "loading": "加载中...",
+  "loading_long_wait": "耗时稍长，请稍候...",
+  "errors": {
+    "runtime_error": "运行时错误",
+    "unknown_error": "未知错误",
+    "fetch_error": "{{message}}：{{error}}",
+    "page_error_title": "获取数据时出错",
+    "page_error_description": "获取构建此页面所需的部分数据时出现问题，因此改为显示此图片。",
+    "page_error_logs": "更多信息请查看您的 {{productName}} 服务器日志。"
+  },
+  "empty": {
+    "no_data": "暂无可用数据。",
+    "no_entities": "不存在任何条目。",
+    "nothing_here": "这里空空如也，暂时没有内容！",
+    "no_items": "没有可显示的条目",
+    "no_items_available": "没有可用条目",
+    "no_items_found": "未找到可显示的条目。",
+    "filter_no_match": "没有与过滤条件匹配的数据。"
+  },
+  "badges": {
+    "beta": "测试版",
+    "preview": "预览版",
+    "default": "默认",
+    "optional": "（可选）"
+  },
+  "clipboard": {
+    "copied": "已复制！"
+  },
+  "restricted_access": {
+    "view": "您没有查看此{{entityName}}的权限。"
+  },
+  "enterprise_plugin_not_found": {
+    "title": "企业版功能",
+    "description": "要使用<bold>{{featureName}}</bold>功能，您需要<licenseLink>Graylog Enterprise 许可证</licenseLink>和<docsLink>Graylog Enterprise 插件</docsLink>。"
+  },
+  "pagination": {
+    "first": "打开第一页",
+    "previous": "打开上一页",
+    "next": "打开下一页",
+    "last": "打开最后一页",
+    "page": "打开第 {{page}} 页",
+    "active_page": "当前页"
+  },
+  "page_size": {
+    "configure": "配置每页条数",
+    "show": "每页显示 <select/> 条"
+  },
+  "search_form": {
+    "placeholder": "输入搜索查询...",
+    "filter_placeholder": "输入查询以过滤"
+  },
+  "select": {
+    "placeholder": "请选择...",
+    "no_options": "无可选项",
+    "loading": "加载中...",
+    "loading_options": "正在加载选项...",
+    "type_to_filter": "输入以过滤"
+  },
+  "entity_table": {
+    "columns": "列",
+    "configure_columns": "配置可见列",
+    "reset_columns": "重置所有列",
+    "show_column": "显示{{column}}",
+    "hide_column_named": "隐藏{{column}}",
+    "show_label": "显示",
+    "show_details": "显示详情",
+    "collapse_section": "折叠部分",
+    "toggle_column_actions": "切换{{column}}操作",
+    "sort_ascending": "升序排序",
+    "sort_descending": "降序排序",
+    "sort_column_ascending": "按{{column, lowercase}}升序排序",
+    "sort_column_descending": "按{{column, lowercase}}降序排序",
+    "hide_column": "隐藏列",
+    "resize_column": "调整{{column}}列宽度",
+    "slicing_by": "按{{column}}分片",
+    "select_entity": "选择条目",
+    "deselect_entity": "取消选择条目",
+    "select_all": "选择所有可见条目",
+    "deselect_all": "取消选择所有可见条目"
+  },
+  "slicing": {},
+  "filters": {},
+  "time_units": {},
+  "time": {},
+  "page_header": {},
+  "message": {},
+  "entity_types": {},
+  "chips_cell": {},
+  "compact_pagination": {},
+  "expandable_checkbox_list_item": {},
+  "traffic_graph": {},
+  "link_to_node": {},
+  "markdown": {},
+  "public_notifications": {},
+  "refresh_controls": {},
+  "scroll_button": {},
+  "section": {},
+  "selectable_list": {},
+  "share_menu_item": {},
+  "status_icon": {},
+  "type_ahead_field_input": {},
+  "query_helper": {
+    "common_fields": {}
+  },
+  "url_allow_list_modal": {},
+  "configuration_well": {},
+  "configuration_forms": {},
+  "enterprise_advertisement": {},
+  "plugin_list": {},
+  "reported_error": {},
+  "hotkeys": {},
+  "right_sidebar": {},
+  "maxmind_adapter": {
+    "documentation": {},
+    "database_types": {},
+    "field_set": {},
+    "summary": {}
+  },
+  "abs_geoip": {},
+  "gcs_geoip": {},
+  "geoip_resolver": {},
+  "links": {},
+  "quick_jump": {},
+  "scratchpad": {},
+  "extractor_actions": {},
+  "surrounding_search": {},
+  "support_sources": {},
+  "times_list": {},
+  "widget_visualization_not_found": {},
+  "telemetry": {},
+  "app_facade": {},
+  "suggest_reload": {},
+  "footer": {},
+  "notifications": {},
+  "use_favorite_item_mutation_notifications": {},
+  "use_entity_titles_notifications": {},
+  "use_search_version_check_notifications": {}
+}
