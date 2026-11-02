@@ -283,25 +283,135 @@
   },
   "user_fields": {
     "username": "ユーザー名",
-    "first_name": "名"
+    "first_name": "名",
+    "last_name": "姓",
+    "full_name": "氏名",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "repeat_password": "パスワード（確認）",
+    "time_zone": "タイムゾーン",
+    "sessions_timeout": "セッションのタイムアウト",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "roles": "ロール",
+    "assign_roles": "ロールを割り当て",
+    "selected_roles": "選択されたロール",
+    "teams": "チーム"
   },
-  "user_form": {},
-  "token_form": {},
-  "permissions_info": {},
+  "user_form": {
+    "first_name_help": "ユーザーの名です。",
+    "last_name_help": "ユーザーの姓です。",
+    "email_help": "ユーザーのメールアドレスです。",
+    "username_help": "ログインに使用する一意のユーザー名を選択してください。",
+    "username_taken": "このユーザー名は既に使用されています",
+    "passwords_mismatch": "パスワードが一致しません",
+    "time_zone_help": "お使いの地域のタイムゾーンを選択するか、そのままにしてブラウザーの既定値を使用してください。",
+    "service_account": "サービスアカウント",
+    "service_account_label": "ユーザーはサービスアカウントです",
+    "service_account_help": "オンにすると、ユーザーはサービスアカウントになり、Webインターフェースへのログインや設定の編集ができなくなります。（例: API トークン）",
+    "service_account_confirm_title": "よろしいですか？",
+    "service_account_confirm": "このユーザーをサービスアカウントに変更すると、Webインターフェースへのログインや設定の編集ができなくなります。（例: API トークン）続行しますか？",
+    "global_timeout_message": "<timeoutLink>グローバルなセッションのタイムアウト</timeoutLink>が有効なため、ユーザーのセッションのタイムアウトは編集できません。"
+  },
+  "token_form": {
+    "token_name": "トークン名",
+    "placeholder": "このトークンの用途は何ですか？",
+    "ttl_label": "トークンの TTL",
+    "ttl_invalid": "無効です（最小: 1分）",
+    "creating": "作成中...",
+    "create": "トークンを作成",
+    "ttl_help": "TTL の構文の例: 60秒の場合: PT60S、60分の場合: PT60M、24時間の場合: PT24H、30日の場合: P30D"
+  },
+  "permissions_info": {
+    "title": "権限の付与",
+    "text": "ストリームやダッシュボードなどの項目に対する権限は、項目の <shareLabel>共有</shareLabel> ボタンから設定できます。このボタンは、たとえば項目の一覧ページにあります。詳細は <docsLink>ドキュメント</docsLink> をご覧ください。"
+  },
   "startpage": {
-    "types": {}
+    "label": "スタートページ",
+    "help": "ユーザーがログイン直後に表示するページを選択します。権限を持つ項目のみ選択できます。",
+    "select_type": "タイプを選択",
+    "select_value": "{{type, lowercase}}を選択",
+    "entity": "項目",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "検索"
+    },
+    "new_search": "新規検索",
+    "threat_coverage": "脅威カバレッジ",
+    "missing_permission": "設定されたページに対する権限がユーザーにありません"
   },
   "timeout": {
-    "units": {}
+    "sessions_label": "セッションのタイムアウト",
+    "alert_title": "セッションのタイムアウトの変更",
+    "alert_text": "セッションのタイムアウト設定を変更すると、ユーザーはログアウトされ、現在のすべてのセッションが無効になります。ご自身のユーザーの設定を変更する場合は、設定を保存した時点でログアウトされます。その場合は、タイムアウトを変更する前に、未保存の変更を保存してください。",
+    "never_label": "セッションがタイムアウトしない",
+    "never_help": "オンにすると、操作がない場合でもセッションがタイムアウトしなくなります。",
+    "amount_placeholder": "タイムアウトの時間",
+    "help": "アクティブに使用されていない限り、この時間が経過するとセッションは自動的に終了します。",
+    "unit_label": "タイムアウトの単位",
+    "units": {
+      "seconds": "秒",
+      "minutes": "分",
+      "hours": "時間",
+      "days": "日"
+    }
   },
   "user_details": {
-    "preferences": {},
-    "settings": {}
+    "client_address": "クライアントアドレス",
+    "last_activity": "最終アクティビティ",
+    "logged_in": "ログイン済み",
+    "enabled": "有効",
+    "auth_service_disabled": "認証サービスが無効になっているため、ユーザーはログインできません",
+    "preferences": {
+      "title": "設定",
+      "search_autocompletion": "検索の自動補完",
+      "update_unfocused": "フォーカスが外れている間も更新",
+      "pin_search_sidebar": "検索サイドバーをピン留め",
+      "pin_dashboard_sidebar": "ダッシュボードサイドバーをピン留め",
+      "theme_mode": "テーマモード",
+      "not_configured": "未設定",
+      "language": "言語"
+    },
+    "roles_none_selected": "選択されたロールは見つかりませんでした。",
+    "settings": {
+      "timezone": "タイムゾーン",
+      "startpage": "スタートページ",
+      "no_startpage": "スタートページが設定されていません",
+      "no_timeout": "セッションがタイムアウトしません",
+      "globally_set": "（<configLink>グローバルに設定</configLink>）"
+    },
+    "shared_entities": "共有項目"
   },
   "users_list": {
-    "admin": {},
-    "headers": {},
-    "actions": {},
+    "client_address_help": "セッションを最初に確立したクライアントのアドレスです。現在のアドレスとは限りません。",
+    "admin": {
+      "title": "システム管理者",
+      "description": "システム管理者は、{{productName}} の設定ファイルでのみ編集できます。"
+    },
+    "headers": {
+      "full_name": "氏名",
+      "username": "ユーザー名",
+      "email": "メールアドレス",
+      "client_address": "クライアントアドレス",
+      "enabled": "有効",
+      "role": "ロール",
+      "actions": "アクション"
+    },
+    "title": "ユーザー",
+    "found": "システムに登録されているユーザーが{{total}}人見つかりました。",
+    "none_found": "ユーザーは見つかりませんでした。",
+    "filter_label": "ユーザーをフィルター",
+    "actions": {
+      "edit_tokens_title": "ユーザー {{name}} のトークンを編集",
+      "edit_tokens": "トークンを編集",
+      "system_user_tooltip": "システムユーザーは、サーバーの設定ファイルでのみ変更できます。",
+      "system_user": "システムユーザー",
+      "confirm_disable": "ユーザー {{name}} を本当に無効にしますか？現在のすべてのセッションが終了します。",
+      "confirm_delete": "ユーザー {{name}} を本当に削除しますか？",
+      "edit_title": "ユーザー {{name}} を編集",
+      "edit": "編集"
+    },
     "logged_in": {},
     "status": {},
     "fields": {}
