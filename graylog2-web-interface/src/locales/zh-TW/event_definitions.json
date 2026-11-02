@@ -261,7 +261,7 @@
   "notification_settings": {
     "grace_period": "寬限期",
     "grace_period_help": "警示的通知會在每次發生時發送。設定寬限期可控制再次發送通知前需等待的時間。請注意，帶有鍵的事件，每個不同的鍵值都會有各自的寬限期。",
-    "message_backlog": "訊息積压",
+    "message_backlog": "訊息積壓",
     "message_backlog_help": "通知中要包含的訊息數量。",
     "toggle_message_backlog": "切換訊息積壓"
   },
