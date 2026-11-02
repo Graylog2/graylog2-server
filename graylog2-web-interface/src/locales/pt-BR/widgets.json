@@ -1,1 +1,152 @@
-{}
+{
+  "copy_to_dashboard": {
+    "title": "Copiar widget para o dashboard",
+    "no_dashboards": "Nenhum dashboard encontrado.",
+    "create_new": "Criar um novo dashboard"
+  },
+  "edit_message_list": {
+    "fields": "Campos",
+    "message_preview": "Pré-visualização da mensagem",
+    "sorting": "Ordenação",
+    "direction": "Direção",
+    "decorators": "Decoradores"
+  },
+  "widget_frame": {
+    "loading": "Carregando widget ..."
+  },
+  "export_widget": {
+    "export_all": "Exportar todos os resultados da pesquisa",
+    "title": "Exportar widget",
+    "enterprise_explanation": "O recurso de exportação de widgets de agregação está disponível na versão Enterprise. Este recurso oferece opções para exportar seus dados em formatos de arquivo populares, como CSV, JSON, YAML, XML etc."
+  },
+  "field_sort": {
+    "placeholder": "Nenhum: clique para adicionar campos",
+    "aria_label": "Selecionar campo para ordenação"
+  },
+  "fields_configuration": {
+    "add_field": "Adicionar um campo"
+  },
+  "move_widget": {
+    "no_pages": "Nenhuma página encontrada",
+    "copy": "Copiar widget",
+    "move": "Mover widget",
+    "title": "Escolher página de destino",
+    "keep_copy": "Manter cópia nesta página",
+    "keep_copy_help": "Quando 'Manter cópia nesta página' está ativado, o widget será copiado e não movido para outra página"
+  },
+  "widget_edit": {
+    "update": "Atualizar widget",
+    "updating": "Atualizando widget..."
+  },
+  "execution_info": {
+    "executed_at": "Executado em:",
+    "executed_at_label": "Executado em",
+    "executed_in": "Tempo de execução:",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "Intervalo de tempo efetivo:",
+    "from": "De",
+    "to": "Até",
+    "from_label": "Intervalo de tempo efetivo, início",
+    "to_label": "Intervalo de tempo efetivo, fim",
+    "total_results": "Total de resultados:",
+    "title": "Informações da execução",
+    "no_query_executed": "Nenhuma consulta executada ainda."
+  },
+  "selected_fields": {
+    "fields": "Campos",
+    "edit_field": "Editar campo {{field}}",
+    "remove_field": "Remover campo {{field}}"
+  },
+  "sort_direction": {
+    "ascending": "Crescente",
+    "descending": "Decrescente",
+    "no_sorting": "Nenhuma ordenação selecionada",
+    "select_direction": "Clique para selecionar a direção"
+  },
+  "timerange_info": {
+    "global_override": "Substituição global: {{timerange}}",
+    "effective_unavailable": "O intervalo de tempo efetivo do widget não está disponível no momento.",
+    "independent": "O resultado deste widget é independente da pesquisa atual.",
+    "all_time": "Todo o período"
+  },
+  "unknown_widget": {
+    "title": "Widget desconhecido: {{type}}",
+    "cannot_render": "Infelizmente não é possível renderizar este widget, pois não sabemos como lidar com widgets do tipo <strong>{{type}}</strong>. Isso pode ser causado por uma das seguintes situações:",
+    "missing_plugin": "Você criou este widget usando um plugin que não está mais disponível.",
+    "legacy_dashboard": "Este widget fazia parte de um dashboard legado e foi criado por um plugin que não está mais disponível.",
+    "what_to_do": "O que você pode fazer? Você pode carregar o plugin novamente, entrar em contato com o autor original do plugin para obter uma versão compatível com a versão atual do {{productName}} ou remover o widget, se não precisar mais dele.",
+    "copy_config": "De qualquer forma, você pode copiar a configuração do widget para a área de transferência:"
+  },
+  "widget_actions": {
+    "open_dropdown": "Abrir menu de ações",
+    "unfocus": "Remover foco do widget",
+    "focus": "Focar este widget",
+    "edit": "Editar",
+    "duplicate": "Duplicar",
+    "copy_to_dashboard": "Copiar para o dashboard",
+    "move_to_page": "Mover para a página",
+    "copying": "Copiando widget...",
+    "copy": "Copiar widget",
+    "confirm_remove": "Tem certeza de que deseja remover o widget \"{{title}}\"?",
+    "compress_width": "Reduzir largura",
+    "stretch_width": "Ampliar largura",
+    "replay_search": "Repetir pesquisa"
+  },
+  "widget_loading": {
+    "content": "Carregando conteúdo do widget"
+  },
+  "widget_errors": {
+    "render_error": "Ao renderizar este widget, ocorreu o seguinte erro:"
+  },
+  "widget_header": {
+    "no_description": "Nenhuma descrição do widget informada",
+    "show_description": "Exibir descrição do widget",
+    "description_placeholder": "Adicione uma descrição útil ao widget",
+    "drag_handle": "Alça de arrastar para {{title}}"
+  },
+  "warm_tier": {
+    "info": "Informações",
+    "loading_slow": "Este widget está recuperando dados do Warm Tier e pode demorar mais para carregar."
+  },
+  "events_widget": {
+    "actions": "Ações",
+    "replay_search": "Repetir pesquisa",
+    "view_details": "Ver detalhes do evento",
+    "toggle_actions": "Alternar ações do evento",
+    "details_title": "Detalhes do evento",
+    "close": "Fechar",
+    "unknown_visualization": "Tipo de visualização de widget desconhecido {{mode}}",
+    "mode_list": "Lista",
+    "mode_count": "Contagem",
+    "visualization": "Visualização",
+    "columns": "Colunas",
+    "select_column": "Selecione uma nova coluna",
+    "filter": "Filtro",
+    "sorting": "Ordenação",
+    "unknown_attribute": "Desconhecido",
+    "unknown_attribute_help": "Este atributo não está disponível no momento, pois requer uma licença válida.",
+    "select_event_definition": "Selecionar definição de evento",
+    "alert": "Alerta",
+    "event": "Evento"
+  },
+  "overview_configuration": {
+    "remove_column": "Remover coluna {{column}}",
+    "column": "Coluna",
+    "select_column": "Selecione uma coluna",
+    "direction": "Direção",
+    "select_direction": "Selecione uma direção",
+    "type": "Tipo",
+    "add_column": "Adicionar uma coluna",
+    "configure_filter": "Configurar um novo filtro"
+  },
+  "date_filter": {},
+  "message_table": {
+    "decorators": {}
+  },
+  "data_table": {},
+  "field_types": {},
+  "export": {},
+  "enterprise_widgets": {},
+  "error_widget": {},
+  "notifications": {}
+}
