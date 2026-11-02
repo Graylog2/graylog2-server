@@ -22,7 +22,35 @@
   "confirm_leave": {
     "question": "Tem certeza?"
   },
-  "duration": {},
+  "duration": {
+    "years_one": "{{count}} ano",
+    "years_other": "{{count}} anos",
+    "months_one": "{{count}} mês",
+    "months_other": "{{count}} meses",
+    "days_one": "{{count}} dia",
+    "days_other": "{{count}} dias",
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundos",
+    "milliseconds_one": "{{count}} milissegundo",
+    "milliseconds_other": "{{count}} milissegundos",
+    "nanoseconds_one": "{{count}} nanossegundo",
+    "nanoseconds_other": "{{count}} nanossegundos",
+    "microseconds_one": "{{count}} microssegundo",
+    "microseconds_other": "{{count}} microssegundos",
+    "years_many": "{{count}} anos",
+    "months_many": "{{count}} meses",
+    "days_many": "{{count}} dias",
+    "hours_many": "{{count}} horas",
+    "minutes_many": "{{count}} minutos",
+    "seconds_many": "{{count}} segundos",
+    "milliseconds_many": "{{count}} milissegundos",
+    "nanoseconds_many": "{{count}} nanossegundos",
+    "microseconds_many": "{{count}} microssegundos"
+  },
   "bulk_actions": {
     "title": "Ações em massa",
     "cancel": "Cancelar seleção"
@@ -102,8 +130,11 @@
     "active_page": "Página ativa"
   },
   "page_size": {
+    "rows_one": "{{count}} linha",
+    "rows_other": "{{count}} linhas",
     "configure": "Configurar tamanho da página",
-    "show": "Mostrar <select/>"
+    "show": "Mostrar <select/>",
+    "rows_many": "{{count}} linhas"
   },
   "search_form": {
     "placeholder": "Digite a consulta de pesquisa...",
@@ -117,6 +148,8 @@
     "type_to_filter": "Digite para filtrar"
   },
   "entity_table": {
+    "selected_items_one": "{{count}} item selecionado",
+    "selected_items_other": "{{count}} itens selecionados",
     "columns": "Colunas",
     "configure_columns": "Configurar colunas visíveis",
     "reset_columns": "Redefinir todas as colunas",
@@ -145,7 +178,8 @@
     "fetch_failed": "Falha ao buscar {{humanName}}",
     "fetch_failed_with_status": "Falha ao buscar {{humanName}} com o status",
     "could_not_retrieve": "Não foi possível recuperar {{humanName}}",
-    "no_results": "Nenhum(a) {{humanName}} foi encontrado(a)."
+    "no_results": "Nenhum(a) {{humanName}} foi encontrado(a).",
+    "selected_items_many": "{{count}} itens selecionados"
   },
   "slicing": {
     "slice_by": "Segmentar por",
@@ -236,7 +270,13 @@
     "not_stored_in_index": "A mensagem não está armazenada",
     "routed_into_streams": "Direcionada para streams",
     "edit_favorite_fields": "Editar campos favoritos",
+    "show_remaining_fields_one": "Exibir {{count}} campo restante",
+    "show_remaining_fields_other": "Exibir {{count}} campos restantes",
+    "hide_remaining_fields_one": "Ocultar {{count}} campo restante",
+    "hide_remaining_fields_other": "Ocultar {{count}} campos restantes",
     "favorite_fields_configuration": "Configuração dos campos favoritos",
+    "favorite_fields_hint_one": "Os campos favoritos aparecerão em todos os streams aos quais esta mensagem pertence, incluindo o stream <streams/> para o qual esta mensagem é direcionada.",
+    "favorite_fields_hint_other": "Os campos favoritos aparecerão em todos os streams aos quais esta mensagem pertence, incluindo os streams <streams/> para os quais esta mensagem é direcionada.",
     "save_configuration": "Salvar configuração",
     "reset_to_default": "Redefinir para o padrão",
     "reset_to_default_title": "Redefinir para os campos padrão: {{fields}}",
@@ -249,7 +289,10 @@
     "remove_favorite_failed": "Falha ao remover o campo dos favoritos com o erro: {{error}}",
     "remove_favorite_failed_title": "Não foi possível remover o campo dos favoritos",
     "field_terms": "Termos do campo:",
-    "received_by_radio_value": "via <inputName/> no rádio <node/>"
+    "received_by_radio_value": "via <inputName/> no rádio <node/>",
+    "show_remaining_fields_many": "Exibir {{count}} campos restantes",
+    "hide_remaining_fields_many": "Ocultar {{count}} campos restantes",
+    "favorite_fields_hint_many": "Os campos favoritos aparecerão em todos os streams aos quais esta mensagem pertence, incluindo os streams <streams/> para os quais esta mensagem é direcionada."
   },
   "entity_types": {
     "user": "usuário",
@@ -540,9 +583,27 @@
     "system_info": "{{productName}} {{version}} em {{hostname}} ({{jvmInfo}})"
   },
   "notifications": {
-    "download_failed": "Falha no download com o status: {{error}}"
+    "download_failed": "Falha no download com o status: {{error}}",
+    "download_failed_title": "Não foi possível baixar",
+    "export_failed": "Falha na exportação",
+    "export_widget_failed": "Falha na exportação do widget",
+    "telemetry_update_failed": "Falha na atualização: {{error}}",
+    "telemetry_update_failed_title": "Não foi possível atualizar as configurações de telemetria.",
+    "delete_property_confirm": "Tem certeza de que deseja excluir a propriedade '{{key}}'?",
+    "quick_jump_failed": "Falha ao buscar os resultados da pesquisa de itens com o status",
+    "quick_jump_failed_title": "Não foi possível buscar os resultados da pesquisa de itens."
   },
-  "use_favorite_item_mutation_notifications": {},
-  "use_entity_titles_notifications": {},
-  "use_search_version_check_notifications": {}
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Falha ao adicionar o item aos favoritos com o status: {{error}}",
+    "put_failed_title": "Não foi possível adicionar o item aos favoritos",
+    "delete_failed": "Falha ao remover o item dos favoritos com o status: {{error}}",
+    "delete_failed_title": "Não foi possível remover o item dos favoritos"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Falha ao carregar os títulos dos itens com o status",
+    "load_failed_title": "Não foi possível carregar os títulos dos itens"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Não foi possível buscar os dados de substituição"
+  }
 }
