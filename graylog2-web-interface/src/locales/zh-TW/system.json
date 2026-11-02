@@ -155,26 +155,144 @@
     "utilization": "<strong>{{usage}} 則訊息</strong>位於 {{title}} 中，使用率為 {{percentage}}。"
   },
   "input_types_data_table": {
-    "loading": "正在載入輸入類型..."
+    "loading": "正在載入輸入類型...",
+    "unavailable": "輸入類型無法使用。",
+    "documentation": "文件",
+    "name": "名稱",
+    "type": "類型",
+    "filter": "篩選"
   },
-  "journal_details": {},
-  "journal_state": {},
-  "jvm_heap_usage": {},
-  "node_list_item": {},
-  "node_maintenance_dropdown": {},
-  "node_overview": {},
-  "nodes_actions": {},
-  "nodes_list": {},
-  "plugins_data_table": {},
-  "rest_api_overview": {},
-  "system_information": {},
-  "system_overview_details": {},
-  "system_overview_summary": {},
-  "bulk_actions": {},
-  "system_notifications_table": {},
-  "actions_cell": {},
-  "title_cell": {},
-  "system_job": {},
+  "journal_details": {
+    "loading": "正在載入 Journal 指標...",
+    "disabled": "此節點已停用磁碟 Journal。",
+    "unavailable": "無法使用 Journal 指標。",
+    "overcommitted": "<strong>警告！</strong>Journal 使用率已超過定義的最大大小。<overviewLink>點擊此處</overviewLink>以取得更多資訊。",
+    "configuration": "設定",
+    "path": "路徑：",
+    "earliest_entry": "最早的項目：",
+    "maximum_size": "最大大小：",
+    "maximum_age": "最長保留時間：",
+    "flush_policy": "刷新原則：",
+    "flush_policy_value": "每 {{messages}} 則訊息或 {{duration}}",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
+    "utilization": "使用率",
+    "unprocessed_messages": "<strong>{{messages}} 則未處理的訊息</strong>目前位於 Journal 中，分布在 {{segments}} 個區段。",
+    "appended_and_read": "過去一秒內已寫入 <strong>{{appended}} 則訊息</strong>，已讀取 <strong>{{read}} 則訊息</strong>。"
+  },
+  "journal_state": {
+    "loading": "正在載入 Journal 指標...",
+    "unavailable": "無法使用 Journal 指標。"
+  },
+  "jvm_heap_usage": {
+    "loading": "正在載入堆積記憶體使用資訊...",
+    "unavailable": "無法取得堆積記憶體資訊。",
+    "usage": "JVM 目前使用 <usedBlob /><strong> {{used}}</strong> 的堆積空間（已提交 <committedBlob /><strong> {{committed}}</strong>），且不會嘗試使用超過 <maxBlob /><strong> {{max}}</strong> 的空間"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "目前無法取得系統資訊。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "設定內部日誌"
+  },
+  "node_overview": {
+    "memory_heap_usage": "記憶體 / 堆積使用量",
+    "buffers": "緩衝區",
+    "buffers_description": "緩衝區用於在訊息經過不同處理器時，以極短時間（通常為毫秒）暫存少量訊息。",
+    "input_buffer": "輸入緩衝區",
+    "process_buffer": "處理緩衝區",
+    "output_buffer": "輸出緩衝區",
+    "disk_journal": "磁碟 Journal",
+    "disk_journal_description": "傳入的訊息會寫入磁碟 Journal，以確保伺服器故障時訊息仍安全保存。當任何輸出的處理速度跟不上訊息速率，或傳入訊息出現高峰時，Journal 也有助於維持運作。它能確保記憶體不會過載，並藉此避免過長的垃圾回收暫停。",
+    "system": "系統",
+    "rest_api": "REST API",
+    "installed_plugins": "已安裝的外掛",
+    "manage_inputs": "管理輸入",
+    "available_input_types": "可用的輸入類型"
+  },
+  "nodes_actions": {
+    "details": "詳細資料",
+    "metrics": "指標",
+    "more_actions": "更多操作",
+    "pause_message_processing": "暫停訊息處理",
+    "resume_message_processing": "恢復訊息處理",
+    "pause_confirm": "即將暫停此節點的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將恢復此節點的訊息處理，確定要繼續嗎？",
+    "override_lb_status": "覆寫負載平衡器狀態",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "即將將此節點的負載平衡器狀態變更為 {{status}}，確定要繼續嗎？",
+    "local_message_inputs": "本機訊息輸入",
+    "thread_dump": "取得執行緒傾印",
+    "process_buffer_dump": "取得處理緩衝區傾印",
+    "recent_system_logs": "取得最近的系統日誌訊息"
+  },
+  "nodes_list": {
+    "no_active_nodes": "目前沒有任何作用中的節點。"
+  },
+  "plugins_data_table": {
+    "loading": "正在載入此節點上的外掛...",
+    "no_plugins": "此節點未安裝任何外掛。",
+    "name": "名稱",
+    "version": "版本",
+    "author": "作者",
+    "description": "描述",
+    "website": "網站",
+    "filter": "篩選"
+  },
+  "rest_api_overview": {
+    "transport_address": "傳輸位址：",
+    "last_seen": "最後上線時間："
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}，{{info}}",
+    "jvm_unavailable": "無法取得此節點的 JVM 資訊。",
+    "hostname": "主機名稱：",
+    "node_id": "節點 ID：",
+    "version": "版本：",
+    "version_codename": "{{version}}，代號 <em>{{codename}}</em>",
+    "jvm": "JVM：",
+    "time": "時間："
+  },
+  "system_overview_details": {
+    "pause_confirm": "即將暫停此節點的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將恢復此節點的訊息處理，確定要繼續嗎？",
+    "what_does_this_mean": "這代表什麼意思？",
+    "lifecycle_state": "生命週期狀態：<strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "已在負載平衡器中標記為 <strong>{{status}}</strong>",
+    "pause_processing": "暫停處理",
+    "resume_processing": "恢復處理",
+    "not_processing": "節點<strong>未</strong>處理訊息"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "目前生命週期狀態：",
+    "message_processing": "訊息處理：",
+    "enabled": "已啟用",
+    "disabled": "已停用",
+    "lb_indication": "負載平衡器指示："
+  },
+  "bulk_actions": {
+    "dismiss": "關閉"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "關閉"
+  },
+  "title_cell": {
+    "show_full_message": "顯示完整訊息：{{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "無法確認工作",
+    "cancel_failed": "無法取消工作",
+    "cancel_confirm": "確定要取消系統工作「{{info}}」嗎？",
+    "on_node": "- 位於",
+    "runtime": "執行時間：{{duration}}",
+    "cancel": "取消"
+  },
   "system_jobs_component": {},
   "system_jobs_list": {},
   "system_messages_component": {},
