@@ -28,6 +28,9 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidget from 'views/hooks/useWidget';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
+import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import syncSearchExecutors from 'views/logic/slices/syncSearchExecutors';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
 
@@ -63,16 +66,22 @@ const WidgetFromStore = ({ widgetId, children = undefined }: React.PropsWithChil
 type Props = React.PropsWithChildren<{
   widget: Widget;
   title: string;
+  searchExecutors?: SearchExecutors;
 }>;
 
 /**
  * Renders a single widget outside of a search or dashboard, in its own in-memory views store.
- * The store holds a temporary view that is never saved; only the search used for executing it is created.
+ * The store holds a temporary view that is never saved. By default its searches run unsaved as well.
  */
-const StandaloneWidgetProvider = ({ widget, title, children = undefined }: Props) => {
+const StandaloneWidgetProvider = ({
+  widget,
+  title,
+  searchExecutors = syncSearchExecutors,
+  children = undefined,
+}: Props) => {
   const { data: view } = useQuery({
-    queryKey: ['views', 'standalone-widget', widget, title],
-    queryFn: () => createStandaloneView(widget, title),
+    queryKey: ['views', 'standalone-widget', widget, title, searchExecutors],
+    queryFn: () => createStandaloneView(widget, title, searchExecutors),
     staleTime: Infinity,
     gcTime: 0,
   });
@@ -82,16 +91,18 @@ const StandaloneWidgetProvider = ({ widget, title, children = undefined }: Props
   }
 
   return (
-    <ViewsStoreProvider
-      view={view}
-      isNew={false}
-      initialQuery={STANDALONE_QUERY_ID}
-      executionState={SearchExecutionState.empty()}>
-      <AutoRefreshContext.Provider value={autoRefreshDisabled}>
-        <ExecuteOnMount />
-        <WidgetFromStore widgetId={widget.id}>{children}</WidgetFromStore>
-      </AutoRefreshContext.Provider>
-    </ViewsStoreProvider>
+    <SearchExecutorsContext.Provider value={searchExecutors}>
+      <ViewsStoreProvider
+        view={view}
+        isNew={false}
+        initialQuery={STANDALONE_QUERY_ID}
+        executionState={SearchExecutionState.empty()}>
+        <AutoRefreshContext.Provider value={autoRefreshDisabled}>
+          <ExecuteOnMount />
+          <WidgetFromStore widgetId={widget.id}>{children}</WidgetFromStore>
+        </AutoRefreshContext.Provider>
+      </ViewsStoreProvider>
+    </SearchExecutorsContext.Provider>
   );
 };
 
