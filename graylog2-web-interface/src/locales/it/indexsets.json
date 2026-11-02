@@ -36,7 +36,10 @@
       "timestamp": "Timestamp",
       "index": "Indice",
       "letter_id": "ID lettera",
-      "error_message": "Messaggio di errore"
+      "error_message": "Messaggio di errore",
+      "count_one": "C'è stato {{formattedCount}} tentativo di indicizzazione non riuscito nelle ultime 24 ore.",
+      "count_many": "Ci sono stati {{formattedCount}} tentativi di indicizzazione non riusciti nelle ultime 24 ore.",
+      "count_other": "Ci sono stati {{formattedCount}} tentativi di indicizzazione non riusciti nelle ultime 24 ore."
     },
     "system_overview": {
       "looking_for_failures": "Ricerca di errori di indicizzazione in corso...",
@@ -155,8 +158,11 @@
     "shards": "Shard:",
     "replicas": "Repliche:",
     "field_type_refresh_interval": "Intervallo di aggiornamento del tipo di campo:",
+    "seconds_one": "{{count}} secondo",
+    "seconds_other": "{{count}} secondi",
     "field_type_profile": "Profilo del tipo di campo:",
-    "not_set": "Non impostato"
+    "not_set": "Non impostato",
+    "seconds_many": "{{count}} secondi"
   },
   "profiles": {
     "create": "Crea profilo",
@@ -212,9 +218,15 @@
     "field_errors": "Errori dei campi:",
     "profile_change_failed_title": "Modifica del profilo del tipo di campo non riuscita per alcuni Index Set",
     "profile_details_failed": "Impossibile caricare i dettagli di questo profilo.",
+    "used_by_one": "Già usato da {{count}} Index Set.",
+    "used_by_other": "Già usato da {{count}} Index Set.",
     "field": "Campo",
     "type": "Tipo",
     "targets_title": "Index Set",
+    "targets_summary_one": "Si applica a {{count}} Index Set.",
+    "targets_summary_other": "Si applica a {{count}} Index Set.",
+    "targets_summary_excluding_one": "Si applica a {{count}} Index Set, esclude {{skipped}}.",
+    "targets_summary_excluding_other": "Si applica a {{count}} Index Set, esclude {{skipped}}.",
     "targets_index_set": "Index Set",
     "targets_status": "Stato",
     "targets_note": "Nota",
@@ -236,7 +248,10 @@
     "origin_profile": "Il tipo di campo <i>{{type}}</i> proviene dal profilo <profileLink>{{profileName}}</profileLink>. Sovrascrive le eventuali mappature della mappatura dell'indice del motore di ricerca, immediatamente (se l'indice è stato ruotato) oppure alla rotazione successiva.",
     "profile_config_info": "Con i <profilesLink>profili</profilesLink> del tipo di campo dell'Index Set puoi raggruppare tipi di campo personalizzati in profili. Puoi assegnare qualsiasi profilo a questo Index Set. Per vedere e usare l'impostazione del profilo per l'Index Set, devi ruotare gli indici.",
     "profile_config_label": "Profilo di mappatura del tipo di campo dell'indice (facoltativo)",
-    "profile_config_placeholder": "Seleziona il profilo del tipo di campo dell'indice"
+    "profile_config_placeholder": "Seleziona il profilo del tipo di campo dell'indice",
+    "used_by_many": "Già usato da {{count}} Index Set.",
+    "targets_summary_many": "Si applica a {{count}} Index Set.",
+    "targets_summary_excluding_many": "Si applica a {{count}} Index Set, esclude {{skipped}}."
   },
   "templates": {
     "create": "Crea template",
@@ -262,6 +277,10 @@
     "max_segments": "Numero massimo di segmenti:",
     "optimization_after_rotation": "Ottimizzazione dell'indice dopo la rotazione:",
     "field_type_refresh_interval": "Intervallo di aggiornamento del tipo di campo:",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minuti",
+    "seconds_one": "{{count}} secondo",
+    "seconds_other": "{{count}} secondi",
     "title_disabled": "{{title}} (disabilitato)",
     "form_title_label": "Titolo del template",
     "form_title_help": "Un titolo descrittivo del template",
@@ -273,7 +292,9 @@
     "error_shards_required": "Gli shard dell'indice sono obbligatori",
     "error_segments_required": "Il numero massimo di segmenti è obbligatorio",
     "error_retention_required": "Seleziona una strategia di conservazione",
-    "error_rotation_required": "Seleziona una strategia di rotazione"
+    "error_rotation_required": "Seleziona una strategia di rotazione",
+    "minutes_many": "{{count}} minuti",
+    "seconds_many": "{{count}} secondi"
   },
   "overview_table": {
     "field_type_refresh_interval": "Intervallo di aggiornamento del tipo di campo",
@@ -299,6 +320,8 @@
     "hide_streams": "Nascondi gli stream associati a {{title}}",
     "default": "Predefinito",
     "read_only": "Sola lettura",
+    "hidden_streams_one": "{{count}} altro stream è instradato verso questo Index Set, ma non hai il permesso di visualizzarlo.",
+    "hidden_streams_other": "Altri {{count}} stream sono instradati verso questo Index Set, ma non hai il permesso di visualizzarli.",
     "no_streams": "Nessuno degli stream che puoi visualizzare è instradato verso questo Index Set.",
     "streams_title": "Titolo",
     "streams_status": "Stato",
@@ -325,7 +348,8 @@
       "size_bytes": "Dimensione su disco",
       "deflector_health": "Deflector",
       "field_count": "Campi"
-    }
+    },
+    "hidden_streams_many": "Altri {{count}} stream sono instradati verso questo Index Set, ma non hai il permesso di visualizzarli."
   },
   "index_summary": {
     "label_active_write_index": "indice di scrittura attivo",
@@ -336,7 +360,10 @@
     "empty": "L'indice non contiene alcun messaggio.",
     "range_unknown": "L'intervallo di tempo dell'indice è sconosciuto, perché l'intervallo non è disponibile. Ricalcola manualmente gli intervalli degli indici.",
     "hide_details": "Nascondi dettagli / azioni",
-    "show_details": "Mostra dettagli / azioni"
+    "show_details": "Mostra dettagli / azioni",
+    "size_one": "({{size}} / {{formattedCount}} messaggio)",
+    "size_other": "({{size}} / {{formattedCount}} messaggi)",
+    "size_many": "({{size}} / {{formattedCount}} messaggi)"
   },
   "indices_configuration": {
     "not_writable": "L'Index Set non è scrivibile e non verrà incluso nella rotazione e nella conservazione degli indici. Inoltre non è possibile assegnarlo a uno stream.",
@@ -344,6 +371,8 @@
     "configure_field_types": "Configura i tipi di campo dell'indice"
   },
   "shards": {
+    "ops_one": "{{formattedCount}} operazione",
+    "ops_other": "{{formattedCount}} operazioni",
     "took": "(durata {{duration}})",
     "index": "Indice:",
     "flush": "Flush:",
@@ -356,7 +385,8 @@
     "routing_description": "Gli shard in grassetto sono primari, gli altri sono repliche. Quando i primari lasciano il cluster, le repliche vengono promosse automaticamente a primari. Dimensione e numero di documenti riflettono solo gli shard primari, senza considerare possibili duplicazioni nelle repliche.",
     "tooltip": "Stato: <i>{{state}}</i> su {{hostname}} ({{name}})",
     "seconds_short": "{{seconds}} s",
-    "shard_id": "S{{id}}"
+    "shard_id": "S{{id}}",
+    "ops_many": "{{formattedCount}} operazioni"
   },
   "data_tiering": {
     "max_days_label": "Giorni max. in archiviazione",
@@ -372,9 +402,18 @@
     "summary_data_tiering": "Data Tiering",
     "summary_max": "Max. in archiviazione:",
     "summary_min": "Min. in archiviazione:",
+    "days_one": "{{count}} giorno",
+    "days_other": "{{count}} giorni",
     "tooltip_min_storage": "Numero min. di giorni in archiviazione",
     "tooltip_min_hot_and_storage": "Numero min. di giorni nel Hot Tier e in archiviazione",
-    "tooltip_min_hot": "Numero min. di giorni nel Hot Tier"
+    "tooltip_min_hot": "Numero min. di giorni nel Hot Tier",
+    "archived_deleted_after_one": "Archiviato ed eliminato dopo <strong>{{count}} giorno</strong>",
+    "archived_deleted_after_other": "Archiviato ed eliminato dopo <strong>{{count}} giorni</strong>",
+    "deleted_after_one": "Eliminato dopo <strong>{{count}} giorno</strong>",
+    "deleted_after_other": "Eliminato dopo <strong>{{count}} giorni</strong>",
+    "days_many": "{{count}} giorni",
+    "archived_deleted_after_many": "Archiviato ed eliminato dopo <strong>{{count}} giorni</strong>",
+    "deleted_after_many": "Eliminato dopo <strong>{{count}} giorni</strong>"
   },
   "incompatible": {
     "working": "Operazione in corso...",
@@ -401,6 +440,7 @@
     "reindex_requires_data_node": "Gli indici di sistema possono essere reindicizzati solo quando {{productName}} è in esecuzione con un backend di ricerca Data Node. <migrationLink>Migra a Data Node</migrationLink> per reindicizzarli prima di aggiornare alla major successiva di OpenSearch.",
     "partial_summary": "{{succeeded}} riusciti, {{failed}} non riusciti.",
     "partial_more": "...e altri {{count}}.",
+    "all_failed_one": "{{count}} indice non riuscito.",
     "delete": {
       "button": "Elimina",
       "title": "Elimina indice",
@@ -463,7 +503,8 @@
       },
       "rotate_partial_title": "Alcuni indici non sono stati ruotati",
       "rotate_failure_title": "Impossibile ruotare gli indici"
-    }
+    },
+    "all_failed_many": "{{count}} indici non riusciti."
   },
   "strategies": {
     "name_rotation_message_count": "Numero di messaggi dell'indice",
@@ -587,10 +628,73 @@
     "templates_search_placeholder": "Cerca un template dell'Index Set",
     "field_types_human_name": "tipi di campo degli Index Set",
     "origin_explanation": "Spiegazione dell'origine",
-    "category_counts_load_failed": "Caricamento dei conteggi degli Index Set non riuscito con stato"
+    "category_counts_load_failed": "Caricamento dei conteggi degli Index Set non riuscito con stato",
+    "category_counts_load_failed_title": "Impossibile caricare i conteggi degli Index Set",
+    "template_create_failed": "Creazione del template dell'Index Set non riuscita con stato: {{error}}",
+    "template_create_failed_title": "Impossibile creare il template dell'Index Set",
+    "template_create_success": "Il template dell'Index Set è stato creato correttamente.",
+    "template_update_failed": "Aggiornamento del template dell'Index Set non riuscito con stato: {{error}}",
+    "template_update_failed_title": "Impossibile aggiornare il template dell'Index Set",
+    "template_update_success": "Il template dell'Index Set è stato aggiornato correttamente.",
+    "template_default_failed": "Impostazione del template come predefinito non riuscita con stato: {{error}}",
+    "template_default_failed_title": "Impossibile impostare il template come predefinito",
+    "template_default_success": "Il template è stato impostato correttamente come predefinito.",
+    "template_delete_failed": "Eliminazione del template dell'Index Set non riuscita con stato: {{error}}",
+    "template_delete_failed_title": "Impossibile eliminare il template dell'Index Set",
+    "template_delete_success": "Il template dell'Index Set è stato eliminato correttamente.",
+    "templates_load_failed": "Caricamento dei template degli Index Set non riuscito con stato",
+    "templates_load_failed_title": "Impossibile caricare i template degli Index Set",
+    "template_load_failed": "Caricamento del template dell'Index Set non riuscito con stato",
+    "template_load_failed_title": "Impossibile caricare il template dell'Index Set",
+    "built_in_templates_load_failed": "Caricamento dei template predefiniti degli Index Set non riuscito con stato",
+    "built_in_templates_load_failed_title": "Impossibile caricare i template predefiniti degli Index Set",
+    "template_defaults_load_failed": "Errore durante il recupero del template predefinito dell'indice",
+    "index_set_load_failed": "Caricamento dell'Index Set con ID: {{indexSetId}} non riuscito con stato",
+    "index_set_load_failed_title": "Impossibile caricare l'Index Set",
+    "index_sets_list_load_failed": "Caricamento dell'elenco degli Index Set non riuscito con stato",
+    "index_sets_list_load_failed_title": "Impossibile caricare l'elenco degli Index Set",
+    "ranges_recalculation_failed": "Impossibile creare un job per avviare il ricalcolo degli intervalli degli indici",
+    "ranges_recalculation_failed_title": "Errore nell'avvio del ricalcolo degli intervalli degli indici",
+    "cycle_deflector_failed": "Rotazione del deflector non riuscita",
+    "field_types_load_failed": "Caricamento dei tipi di campo dell'indice non riuscito con stato",
+    "field_types_load_failed_title": "Impossibile caricare i tipi di campo dell'indice",
+    "custom_field_type_remove_failed": "Rimozione del tipo di campo personalizzato non riuscita con stato: {{error}}",
+    "custom_field_type_remove_failed_title": "Impossibile rimuovere il tipo di campo personalizzato",
+    "custom_field_type_removed": "Tipo di campo personalizzato rimosso correttamente",
+    "profile_set_failed": "Impostazione del profilo dell'Index Set non riuscita con stato: {{error}}",
+    "profile_set_failed_title": "Impossibile impostare il profilo dell'Index Set",
+    "profile_set_success": "Profilo dell'Index Set impostato correttamente",
+    "profile_remove_failed": "Rimozione del profilo dall'indice non riuscita con stato: {{error}}",
+    "profile_remove_failed_title": "Impossibile rimuovere il profilo dall'indice",
+    "profile_removed": "Profilo rimosso dall'indice correttamente",
+    "failures_list_load_failed": "Caricamento dell'elenco degli errori dell'indexer non riuscito con stato",
+    "failures_list_load_failed_title": "Impossibile caricare l'elenco degli errori dell'indexer",
+    "failures_count_load_failed": "Caricamento del numero di errori dell'indexer non riuscito con stato",
+    "failures_count_load_failed_title": "Impossibile caricare il numero di errori dell'indexer",
+    "indices_multiple_load_failed": "Caricamento di più indici dell'indexer non riuscito con stato",
+    "indices_multiple_load_failed_title": "Impossibile caricare più indici dell'indexer"
   },
-  "notifications": {},
-  "use_index_set_stats_notifications": {},
-  "use_indexer_overview_notifications": {},
-  "use_indices_configuration_notifications": {}
+  "notifications": {
+    "create_success": "Index Set '{{title}}' creato correttamente",
+    "create_failed": "Creazione dell'Index Set '{{title}}' non riuscita con stato: {{error}}",
+    "create_failed_title": "Impossibile creare l'Index Set.",
+    "update_success": "Index Set '{{title}}' aggiornato correttamente",
+    "update_failed": "Aggiornamento dell'Index Set '{{title}}' non riuscito con stato: {{error}}",
+    "update_failed_title": "Impossibile aggiornare l'Index Set.",
+    "success_title": "Operazione riuscita"
+  },
+  "use_index_set_stats_notifications": {
+    "load_failed": "Caricamento delle statistiche dell'Index Set non riuscito con stato",
+    "load_failed_title": "Impossibile caricare le statistiche dell'Index Set."
+  },
+  "use_indexer_overview_notifications": {
+    "load_failed": "Caricamento della panoramica dell'indexer per l'Index Set non riuscito con stato",
+    "load_failed_title": "Impossibile caricare la panoramica dell'indexer."
+  },
+  "use_indices_configuration_notifications": {
+    "fetch_rotation_failed": "Recupero delle strategie di rotazione non riuscito",
+    "fetch_rotation_failed_title": "Impossibile recuperare le strategie di rotazione",
+    "fetch_retention_failed": "Recupero delle strategie di conservazione non riuscito",
+    "fetch_retention_failed_title": "Impossibile recuperare le strategie di conservazione"
+  }
 }
