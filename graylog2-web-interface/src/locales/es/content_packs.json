@@ -1,1 +1,150 @@
-{}
+{
+  "apply_parameter": {
+    "action": "Acción",
+    "apply": "Aplicar",
+    "choose": "Elegir...",
+    "choose_config_key": "Elegir clave de configuración",
+    "clear": "Borrar",
+    "config_key": "Clave de configuración",
+    "create_parameter_first": "Crea primero un parámetro",
+    "no_parameter_of_type": "No hay ningún parámetro del tipo {{type}}",
+    "parameter": "Parámetro"
+  },
+  "constraints": {
+    "fulfilled": "Cumplido",
+    "name": "Nombre",
+    "title": "Restricciones",
+    "type": "Tipo",
+    "version": "Versión"
+  },
+  "details": {
+    "description": "Descripción",
+    "entities": "Elementos:",
+    "id": "ID:",
+    "name": "Nombre:",
+    "parameters": "Parámetros:",
+    "summary": "Resumen:",
+    "title": "Detalles",
+    "url": "URL:",
+    "vendor": "Proveedor:",
+    "version": "Versión:"
+  },
+  "download": {
+    "download": "Descargar",
+    "info": "Haz clic derecho en el enlace de descarga de abajo y elige \"Guardar enlace como...\" para descargar el archivo JSON.",
+    "title": "Descargar Content Pack"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parámetros",
+      "preview": "Vista previa",
+      "selection": "Selección de contenido"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Crear parámetro",
+    "default_value": "Valor predeterminado",
+    "default_value_help": "Indica un valor predeterminado si el parámetro no es opcional.",
+    "description": "Descripción",
+    "description_help": "Describe qué se hará con este parámetro.",
+    "description_required": "Debes indicar una descripción.",
+    "edit_title": "Editar parámetro",
+    "name": "Nombre",
+    "name_help": "Se usa como referencia del parámetro y no debe contener espacios.",
+    "name_invalid": "El nombre del parámetro solo puede contener A-Z, a-z, 0-9 y _",
+    "name_not_unique": "El nombre del parámetro debe ser único.",
+    "name_required": "Debes indicar un nombre.",
+    "not_boolean": "Este valor no es booleano. Debe ser true o false.",
+    "not_double": "Este valor no es un número decimal.",
+    "not_integer": "Este valor no es un número entero.",
+    "title": "Título",
+    "title_help": "Indica un título descriptivo para este Content Pack.",
+    "title_required": "Debes indicar un título.",
+    "value_type": "Tipo de valor",
+    "value_type_help": "Indica el tipo del parámetro."
+  },
+  "entities": {
+    "action": "Acción",
+    "config_title": "Configuración del elemento",
+    "description": "Descripción",
+    "edit_title": "Editar",
+    "list_title": "Lista de elementos",
+    "origin": "Origen",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "Servidor",
+    "show": "Mostrar",
+    "title": "Título",
+    "type": "Tipo",
+    "used_parameters": "Parámetros utilizados"
+  },
+  "entity_config": {
+    "config_key": "Clave de configuración",
+    "parameter_type": "parámetro ({{type}})",
+    "type": "Tipo",
+    "value": "Valor"
+  },
+  "entity_index": {
+    "load_failed": "Error al cargar el índice de elementos. Estado:",
+    "load_failed_title": "No se pudo cargar el índice de elementos"
+  },
+  "import": {
+    "error_message": "Error al importar el Content Pack. Asegúrate de que sea un archivo JSON válido. Consulta los registros del servidor de {{productName}} para más información.",
+    "error_title": "No se pudo importar el Content Pack",
+    "success_message": "Content Pack importado correctamente",
+    "success_named": "El Content Pack \"{{name}}\" se ha importado correctamente",
+    "success_title": "¡Éxito!"
+  },
+  "install": {
+    "comment": "Comentario de instalación",
+    "comment_help": "Este comentario se guardará con la instalación del Content Pack y puede usarse para describir el motivo de la instalación.",
+    "configure_parameters": "Configurar parámetro(s):",
+    "needs_to_be_filled": "Debes completarlo.",
+    "share_description": "Busca un usuario o equipo para añadirlo como colaborador de los elementos de este Content Pack."
+  },
+  "install_entities": {
+    "installed": "Elementos instalados",
+    "title": "Título",
+    "to_be_uninstalled": "Elementos que se desinstalarán",
+    "type": "Tipo"
+  },
+  "install_view": {
+    "comment": "Comentario:",
+    "general_information": "Información general",
+    "installed_at": "Instalado el:",
+    "installed_by": "Instalado por:"
+  },
+  "installations": {
+    "action": "Acción",
+    "comment": "Comentario",
+    "uninstall": "Desinstalar",
+    "version": "Versión",
+    "view": "Ver",
+    "view_title": "Ver instalación"
+  },
+  "list": {
+    "no_match": "No se han encontrado Content Packs que coincidan",
+    "none_found": "No se han encontrado Content Packs. Crea o sube uno"
+  },
+  "list_item": {
+    "create_new_version": "Crear nueva versión",
+    "delete_all_versions": "Eliminar todas las versiones",
+    "install": "Instalar",
+    "install_title": "Instalar Content Pack",
+    "latest_version": "Última versión: {{rev}}",
+    "show": "Mostrar"
+  },
+  "notifications": {},
+  "overview": {},
+  "pages": {},
+  "parameter_list": {},
+  "parameters": {},
+  "preview": {},
+  "revisions": {},
+  "selection": {},
+  "show": {},
+  "status": {},
+  "upload": {},
+  "value_types": {},
+  "version_item": {},
+  "versions": {}
+}
