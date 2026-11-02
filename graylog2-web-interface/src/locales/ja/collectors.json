@@ -699,21 +699,130 @@
     "reset_migration": {
       "button": "移行をリセット",
       "confirm": "移行をリセットしてもよろしいですか？",
-      "failed": "移行の状態のリセットに失敗しました。ステータス: {{error}}"
+      "failed": "移行の状態のリセットに失敗しました。ステータス: {{error}}",
+      "failed_title": "移行の状態をリセットできませんでした。",
+      "success": "移行の状態のリセットに成功しました。"
     },
-    "migration_actions": {},
-    "force_start": {},
+    "migration_actions": {
+      "next": "次へ",
+      "show_renewal_policy_creation": "証明書の更新ポリシーを設定",
+      "show_migration_selection": "移行の手順に進む",
+      "run_directory_compatibility_check": "ディレクトリの互換性チェックを実行",
+      "provision_datanode_certificates": "Data Node に証明書をプロビジョニング"
+    },
+    "force_start": {
+      "confirm": "それでも開始",
+      "description": "通常の事前チェックに合格しなかったことをバックエンドが報告しました。",
+      "submitting": "開始中...",
+      "title": "それでも OpenSearch のアップグレードを開始しますか？"
+    },
     "rolling_upgrade_nodes": {
-      "node_status": {},
-      "state": {}
+      "abort_requested": "中止が要求されました。現在のステップの完了後にアップグレードが停止します。",
+      "no_remaining_nodes": "残りのノードはありません。",
+      "no_upgraded_nodes": "アップグレード済みのノードはまだありません。",
+      "not_started": "OpenSearch のローリングアップグレードはまだ開始されていません。",
+      "title": "OpenSearch のローリングアップグレード",
+      "upgraded_heading": "ターゲットの OpenSearch にアップグレード済み",
+      "waiting_heading": "OpenSearch のアップグレードを待機中",
+      "current": "現在",
+      "data_node": "Data Node",
+      "manager": "マネージャー",
+      "opensearch_version": "OpenSearch バージョン",
+      "status": "ステータス",
+      "unknown": "不明",
+      "node_status": {
+        "pending": "待機中",
+        "restarting": "再起動中",
+        "started": "開始済み",
+        "completed": "アップグレード済み",
+        "failed": "失敗",
+        "skipped": "スキップ"
+      },
+      "state": {
+        "preparing_cluster": "クラスターを準備中",
+        "selecting_next_node": "次のノードを選択中",
+        "upgrading_node": "ノードをアップグレード中",
+        "waiting_node_joined": "ノードの再参加を待機中",
+        "reenabling_allocation": "割り当てを再有効化中",
+        "waiting_green": "グリーンクラスターを待機中",
+        "paused_waiting_green": "グリーンクラスターの待機で一時停止中",
+        "finalizing": "最終処理中",
+        "completed": "完了",
+        "aborted": "中止されました",
+        "failed": "失敗",
+        "in_progress": "進行中"
+      }
     },
-    "opensearch_upgrade_info": {},
+    "opensearch_upgrade_info": {
+      "current_version": "現在の OpenSearch バージョン：",
+      "data_nodes": "Data Node：",
+      "data_nodes_summary": "{{total}} ({{available}} 台利用可能)",
+      "loading": "読み込み中...",
+      "target_version": "ターゲットの OpenSearch バージョン：",
+      "unknown": "不明"
+    },
     "start_upgrade": {
-      "full": {},
-      "rolling": {}
+      "full": {
+        "alert_title": "Data Node が 3 台未満です。これはローリング再起動ではなく、全体の再起動になります",
+        "confirm": "再起動",
+        "journal": "OpenSearch の停止中は、受信したメッセージが各 {{productName}} ノードのディスクジャーナルに蓄積されます。停止時間がジャーナルのサイズまたは保持期間の上限を超えると、取り込みが停止し、メッセージが失われる可能性があります。想定される停止時間に対してジャーナルに十分な余裕がある場合にのみ続行してください。",
+        "submitting": "再起動中...",
+        "title": "Data Node の OpenSearch を再起動しますか？",
+        "tolerate_downtime": "停止時間を許容できる場合にのみ続行してください。"
+      },
+      "no_rollback": "開始後は、以前のバージョンにロールバックできません。",
+      "rolling": {
+        "alert_title": "これにより、すべての Data Node が 1 台ずつ再起動されます",
+        "confirm": "ローリングアップグレードを開始",
+        "healthy_cluster": "続行する前に、クラスターが正常（グリーン）であることを確認してください。",
+        "shard_allocation": "各再起動中はシャードの割り当てが一時停止されるため、クラスターは利用可能な状態を維持します。ただし、ノードが離脱して再参加する間、インデックス作成と検索が一時的に低下する場合があります。",
+        "title": "OpenSearch のローリングアップグレードを開始しますか？",
+        "wait_for_green": "各ノードの後、アップグレードは続行する前にクラスターがグリーンに戻るのを待機します。時間がかかりすぎる場合は一時停止し、再開するまで待機します。"
+      },
+      "starting": "開始中..."
     },
-    "opensearch_upgrade": {},
-    "client_certificate": {},
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Node に組み込まれた OpenSearch は、すでに最新です。",
+      "automatic_upgrade": "各 Data Node は、組み込みの OpenSearch をターゲットバージョンに自動的にアップグレードします。",
+      "backup": "スムーズなロールバックの経路を確保するため、アップグレード前に MongoDB、Data Node、Data Lake のストレージをバックアップしてください。",
+      "before_upgrading": "アップグレード前",
+      "check_failed": "OpenSearch のアップグレードの可否を確認できませんでした。",
+      "full_restart": "アップグレードを有効にするには、すべての Data Node を再起動する必要があります。",
+      "full_search_unavailable": "Data Node の再起動中、検索とインデックス作成は利用できません。",
+      "incompatible_indices": "非互換のインデックス",
+      "old_indices_unreadable": "OpenSearch 3 は、OpenSearch 2 より前のバージョンで作成されたインデックスを読み取ることができません。アップグレード中にこれらのインデックスが残っている場合、そのデータは利用できなくなります。",
+      "resolve_indices_first": "先にすべての非互換のインデックスを解決してください。",
+      "restarting": "再起動中...",
+      "resume": "再開",
+      "resuming": "再開中...",
+      "rolling_restart": "影響を最小限に抑えるため、Data Node は 1 台ずつ再起動されます。",
+      "rolling_search_impaired": "Data Node の再起動中、検索機能が低下する場合があります。",
+      "start_rolling_upgrade": "OpenSearch のローリングアップグレードを開始",
+      "start_upgrade_and_restart": "OpenSearch のアップグレードを開始して再起動",
+      "starting_rolling_upgrade": "OpenSearch のローリングアップグレードを開始中...",
+      "title": "Data Node の組み込み OpenSearch をアップグレード",
+      "upgrade_process": "アップグレードの手順",
+      "use_table": "続行する前に、下の表を使用してシステムインデックスをリインデックスし、データインデックスをアーカイブまたは削除してください。"
+    },
+    "client_certificate": {
+      "certificate_lifetime": "証明書の有効期間",
+      "close": "閉じる",
+      "create_title": "クライアント証明書を作成",
+      "password": "パスワード",
+      "principal": "プリンシパル",
+      "principal_placeholder": "プリンシパル",
+      "role": "ロール",
+      "role_help": "OpenSearch のロールマッピングを表します。",
+      "role_placeholder": "ロール",
+      "submit": "証明書を作成",
+      "submitting": "証明書を作成中...",
+      "unencrypted": "暗号化なし",
+      "ca_certificate": "CA 証明書",
+      "certificate": "証明書",
+      "copy_to_clipboard": "クリップボードにコピー",
+      "private_key": "秘密鍵",
+      "view_principal": "プリンシパル："
+    },
     "cluster_health": {
       "shard_replication_help": {},
       "state_help": {}
