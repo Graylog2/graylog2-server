@@ -1,1 +1,48 @@
-{}
+{
+  "human_name": "tableaux de bord",
+  "full_screen": {
+    "menu": "Plein écran",
+    "title": "Configuration du plein écran",
+    "start": "Démarrer l'affichage en plein écran",
+    "refresh_interval": "Intervalle d'actualisation",
+    "refresh_interval_help": "Après combien de secondes le tableau de bord doit-il être actualisé ?",
+    "tabs": "Onglets",
+    "tabs_help": "Sélectionnez les onglets de requête à inclure dans la rotation.",
+    "cycle_interval": "Intervalle de changement d'onglet",
+    "cycle_interval_help": "Après combien de secondes le prochain onglet doit-il être affiché ?"
+  },
+  "properties": {
+    "title": "Titre",
+    "title_help": "Le titre du tableau de bord.",
+    "summary": "Résumé",
+    "summary_help": "Un résumé utile du tableau de bord.",
+    "description": "Description",
+    "description_help": "Une description plus détaillée et utile du tableau de bord et de ses fonctionnalités."
+  },
+  "overview": {
+    "missing_requirements": "Prérequis manquants",
+    "user_defined": "Définis par l'utilisateur",
+    "load_failed": "Échec du chargement des tableaux de bord avec le statut",
+    "could_not_load": "Impossible de charger les tableaux de bord"
+  },
+  "delete": {
+    "confirm": "Êtes-vous sûr de vouloir supprimer « {{title}} » ?",
+    "success": "La suppression du tableau de bord « {{title}} » a réussi !",
+    "success_title": "Succès !",
+    "failed": "Échec de la suppression du tableau de bord : {{error}}",
+    "failed_title": "Erreur !"
+  },
+  "bulk_delete": {
+    "confirm_one": "Voulez-vous vraiment supprimer {{count}} tableau de bord ?",
+    "confirm_other": "Voulez-vous vraiment supprimer {{count}} tableaux de bord ?",
+    "partial_failure_one": "{{failed}} sur {{count}} tableau de bord sélectionné n'a pas pu être supprimé.",
+    "partial_failure_other": "{{failed}} sur {{count}} tableaux de bord sélectionnés n'ont pas pu être supprimés.",
+    "success_one": "{{count}} tableau de bord a été supprimé avec succès.",
+    "success_other": "{{count}} tableaux de bord ont été supprimés avec succès.",
+    "success_title": "Succès",
+    "failed": "Une erreur s'est produite lors de la suppression des tableaux de bord. {{error}}",
+    "confirm_many": "Voulez-vous vraiment supprimer {{count}} tableaux de bord ?",
+    "partial_failure_many": "{{failed}} sur {{count}} tableaux de bord sélectionnés n'ont pas pu être supprimés.",
+    "success_many": "{{count}} tableaux de bord ont été supprimés avec succès."
+  }
+}
