@@ -54,6 +54,7 @@
     "not_connected": "このパイプラインは現在どのストリームにも接続されていません。受信メッセージを処理させるには、少なくとも1つのストリームに接続する必要があります。デコレーターを使って検索結果の変換のみに使用する場合は、接続は不要です。",
     "delete_stage_confirm": "ステージ {{stage}} を削除しようとしています。続行しますか？",
     "list_and": " および ",
+    "processing_streams_other": "このパイプラインは、ストリーム {{streams}} からのメッセージを処理しています。",
     "managed_1": "このパイプラインはシステムで管理されており、編集は一部に制限されています。",
     "managed_2": "パイプラインルールは、入力ウィザードを通してのみこのパイプラインに追加できます。",
     "managed_3": "このパイプラインのパイプラインルールは、対応する入力名の変更に合わせて自動的に名前が変更されます。",
@@ -124,6 +125,7 @@
     }
   },
   "stage": {
+    "contains_rules_other": "{{count}} 件のルールを含みます",
     "last_stage": "このパイプラインにはこれ以上ステージがありません。このステージのルールが適用されると、パイプラインの処理は完了します。",
     "continue_all": "このステージの<matchText>すべてのルール</matchText>に一致するメッセージは、次のステージに進みます。",
     "continue_either": "このステージの<matchText>少なくとも1つのルール</matchText>に一致するメッセージは、次のステージに進みます。",
@@ -294,7 +296,8 @@
     "dropped": "元のメッセージは、処理中に破棄されます。",
     "not_modified": "元のメッセージは、処理中に変更されません。",
     "original_changes": "元のメッセージ <idSmall><idEm>{{id}}</idEm></idSmall> の変更",
-    "other_changes": "その他の変更"
+    "other_changes": "その他の変更",
+    "other_changes_description_other": "{{count}} 件のメッセージが作成される予定です。<previewOption>結果のプレビュー</previewOption>の表示オプションに切り替えると確認できます。"
   },
   "simulation_preview": {
     "dropped_title": "メッセージは破棄されます",
@@ -373,11 +376,34 @@
     "connections_updated": "パイプラインの接続を更新しました",
     "connections_update_failed": "ステータス {{error}} でパイプラインの接続の更新に失敗しました",
     "connections_update_failed_title": "パイプラインの接続を更新できませんでした",
-    "create_failed": "ステータス {{error}} でパイプラインの作成に失敗しました"
+    "create_failed": "ステータス {{error}} でパイプラインの作成に失敗しました",
+    "create_failed_title": "パイプラインを作成できませんでした",
+    "create_success": "パイプラインを作成しました。",
+    "update_failed": "ステータス {{error}} でパイプラインの更新に失敗しました",
+    "update_failed_title": "パイプラインを更新できませんでした",
+    "update_success": "パイプラインを更新しました。",
+    "delete_failed": "ステータス {{error}} でパイプラインの削除に失敗しました",
+    "delete_failed_title": "パイプラインを削除できませんでした",
+    "delete_success": "パイプラインを削除しました。",
+    "success_title": "成功しました！"
   },
-  "connections_list": {},
+  "connections_list": {
+    "not_connected": "このパイプラインはどのストリームにも接続されていません"
+  },
   "rule_list": {
-    "headers": {}
+    "headers": {
+      "title": "タイトル",
+      "description": "説明",
+      "created": "作成日時",
+      "last_modified": "最終更新日時",
+      "throughput": "スループット",
+      "errors": "エラー",
+      "pipeline_load": "パイプライン負荷 (15m)",
+      "pipelines": "パイプライン",
+      "actions": "アクション"
+    }
   },
-  "load_cell": {}
+  "load_cell": {
+    "error_tooltip": "パイプライン負荷を利用できません。処理負荷のメトリクスを読み込めませんでした。"
+  }
 }
