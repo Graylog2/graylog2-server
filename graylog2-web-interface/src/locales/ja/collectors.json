@@ -62,17 +62,22 @@
     "restart": {
       "fleet": "フリート <targetLink /> の再起動が要求されました",
       "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの再起動が要求されました",
-      "collector": "Collector <targetLink /> の再起動が要求されました"
+      "collector": "Collector <targetLink /> の再起動が要求されました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の再起動が要求されました"
     },
     "discovery_run": {
       "fleet": "フリート <targetLink /> の検出実行がトリガーされました",
-      "collector": "Collector <targetLink /> の検出実行がトリガーされました"
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートで検出実行がトリガーされました",
+      "collector": "Collector <targetLink /> の検出実行がトリガーされました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector で検出実行がトリガーされました"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> が再割り当てされました"
+      "collector": "Collector <targetLink /> が再割り当てされました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector が再割り当てされました"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> がフリート <destinationLink /> に再割り当てされました"
+      "collector": "Collector <targetLink /> がフリート <destinationLink /> に再割り当てされました",
+      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector がフリート <destinationLink /> に再割り当てされました"
     }
   },
   "fleet_reference": {
@@ -97,6 +102,7 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "登録トークンを削除",
+    "bulk_delete_confirm_other": "{{count}} 件の登録トークンを削除してもよろしいですか？ 新しい Collectors は、削除されたトークンを使用して登録できなくなります。",
     "never": "なし",
     "expired": "期限切れ",
     "human_name": "登録トークン",
@@ -115,6 +121,7 @@
     "receiving": "受信中",
     "listening": "待機中…",
     "title": "登録中のホスト",
+    "connected_other": "{{count}} 件接続済み · 追加を待機中…",
     "listening_subtitle": "待機中…",
     "view_all": "インスタンスですべて表示",
     "host": "ホスト",
@@ -150,6 +157,7 @@
   "fleet_actions": {
     "received_messages": "受信したメッセージ",
     "delete": "削除",
+    "delete_blocked_other": "このフリートには {{count}} 件の割り当て済みインスタンスがあります。フリートを削除する前に、それらを再割り当てまたは削除してください。",
     "delete_title": "フリートを削除",
     "delete_confirm": "フリート <emphasis>{{fleetName}}</emphasis> を削除してもよろしいですか？ そのソース設定と登録トークンも削除されます。"
   },
@@ -211,8 +219,11 @@
   },
   "reassign_fleet": {
     "fleet_required": "フリートは必須です",
+    "title_other": "{{count}} 件のインスタンスをフリートに再割り当て",
+    "no_other_fleet_other": "これらの Collectors を割り当てられる他のフリートはありません。",
     "no_permission": "他のフリートに Collectors を割り当てる権限がありません。",
     "select_placeholder": "フリートを選択...",
+    "submit_other": "インスタンスを再割り当て",
     "submitting": "再割り当て中..."
   },
   "instance_health": {
@@ -240,12 +251,14 @@
     "logs": "ログ：",
     "messages": "メッセージ：",
     "attributes": "属性",
+    "active_sources_other": "アクティブなソース（{{count}}）",
     "sources_inherited": "ソースは、このインスタンスのフリート設定から継承されます。",
     "no_sources": "このフリートにはソースが設定されていません。データの収集を開始するには、フリートの詳細ページでソースを追加してください。",
     "synchronization": "同期",
     "pending_load_error": "保留中の変更を読み込めませんでした。しばらくしてから再試行してください。",
     "queued_actions": "次のアクションは、Collector が同期するまでキューに入れられます:",
     "hide_transactions": "キューに入ったトランザクションを非表示",
+    "show_transactions_other": "キューに入ったトランザクションを表示（{{count}}）",
     "changes_queued": "変更はキューに入れられ、Collector の次回チェックイン時に適用されます。",
     "all_applied": "Collector はキューに入ったすべてのアクションを適用しました。"
   },
@@ -266,7 +279,11 @@
     "healthy": "このフリートのすべてのインスタンスがオンラインです",
     "degraded": "このフリートの一部のインスタンスがオフラインです",
     "down": "このフリートのすべてのインスタンスがオフラインです",
-    "empty": "このフリートにはまだ Collector インスタンスが登録されていません"
+    "empty": "このフリートにはまだ Collector インスタンスが登録されていません",
+    "instances_other": "インスタンス",
+    "online_other": "● {{count}} 件オンライン",
+    "offline_other": "● {{count}} 件オフライン",
+    "sources_other": "{{count}} 件のソース"
   },
   "fleet_cards": {
     "empty_title": "フリートはまだありません",
@@ -287,6 +304,7 @@
     "fleet": "フリート",
     "enrolled": "登録日時",
     "last_seen": "最終確認",
+    "show_attributes_other": "すべての {{count}} 件の属性を表示",
     "hide_attributes": "属性を非表示"
   },
   "connection_success": {
@@ -360,18 +378,21 @@
     "connection_lost": "接続が失われました",
     "last_heartbeat": "最終ハートビート <lastSeen />",
     "first_messages": "最初のメッセージ",
+    "receiving_other": "受信中 - {{duration}} 以内に {{count}} 件のメッセージ",
     "listening": "待機中... 通常は1分以内です",
     "enrolled": "登録済み",
     "enrolled_detail": "登録トークンで登録されました - <enrolledAt />",
     "connected": "接続済み",
     "connected_detail": "ハートビートを受信しました - <lastSeen />",
-    "sources_configured": "ソースを設定済み"
+    "sources_configured": "ソースを設定済み",
+    "sources_detail_other": "フリート <fleetLink>{{fleetName}}</fleetLink> の {{count}} 件のソース"
   },
   "platform_picker": {
     "title": "Collectors を始める",
     "description": "インフラストラクチャ全体に軽量の Collectors をデプロイし、ログを {{productName}} に転送します。"
   },
   "source_status": {
+    "messages_other": "{{formattedCount}} 件のメッセージ",
     "disabled": "無効",
     "not_applicable": "{{os}} では対象外です",
     "unrecognised": "認識されないソースタイプです",
@@ -405,14 +426,18 @@
   "ingest_inputs": {
     "title": "取り込み入力",
     "none": "Collector の取り込み入力が存在しません。入力が作成されるまで、Collectors はデータを送信できません。",
+    "unreadable_other": "{{count}} 件の Collector の取り込み入力が存在しますが、それらを表示する権限がありません。",
     "none_running": "Collector の取り込み入力は存在しますが、現在実行中のものはありません。Collectors はデータを送信できません。",
     "name": "名前",
     "status": "ステータス",
     "bind_address": "バインドアドレス",
     "port": "ポート",
-    "manage": "管理"
+    "manage": "管理",
+    "additional_unreadable_other": "権限のため表示されない追加の入力が {{count}} 件あります。"
   },
-  "port_mismatch": {},
+  "port_mismatch": {
+    "message_other": "Collector の取り込み入力が異なるポート（{{ports}}）に存在します。外部ポートが入力のポートと異なる場合は、ネットワークがトラフィックを正しくルーティングしていることを確認してください。"
+  },
   "source_types": {
     "file": "ファイル",
     "journald": "Journald",
@@ -625,7 +650,9 @@
       "datanode_opensearch_version": "Data Node の OpenSearch バージョン",
       "index_version": "インデックスバージョン",
       "indices": "インデックス",
+      "node_title_other": "ノード: {{hostname}}、バージョン: {{version}}、{{count}} 件のインデックス",
       "opensearch_data_location": "OpenSearch データの場所",
+      "shard_count_other": "{{count}} 個のシャード",
       "shards": "シャード"
     },
     "in_place_migration": {
@@ -634,6 +661,7 @@
     },
     "migration_data_nodes": {
       "certificate_valid_until": "証明書の有効期限",
+      "found_other": "見つかった Data Node: {{count}}",
       "hostname": "ホスト名",
       "incompatible": "現在の {{productName}} バージョンと互換性のないバージョンで実行されている Data Node があります。{{productName}} と Data Node で同じバージョンを使用してください。",
       "incompatible_title": "互換性のない Data Node が見つかりました",
@@ -773,7 +801,9 @@
         "journal": "OpenSearch の停止中は、受信したメッセージが各 {{productName}} ノードのディスクジャーナルに蓄積されます。停止時間がジャーナルのサイズまたは保持期間の上限を超えると、取り込みが停止し、メッセージが失われる可能性があります。想定される停止時間に対してジャーナルに十分な余裕がある場合にのみ続行してください。",
         "submitting": "再起動中...",
         "title": "Data Node の OpenSearch を再起動しますか？",
-        "tolerate_downtime": "停止時間を許容できる場合にのみ続行してください。"
+        "tolerate_downtime": "停止時間を許容できる場合にのみ続行してください。",
+        "restart_together_with_versions_other": "Data Node が 3 台未満の場合、一度に 1 台ずつ再起動しても OpenSearch を利用可能な状態に保つことはできません。OpenSearch を <strong>{{currentVersion}}</strong> から <strong>{{targetVersion}}</strong> に移行するため、すべての Data Node が一緒に再起動します。完了するまでストレージバックエンドは<strong>利用できず</strong>、検索とインデックス作成が中断されます。",
+        "restart_together_other": "Data Node が 3 台未満の場合、一度に 1 台ずつ再起動しても OpenSearch を利用可能な状態に保つことはできません。OpenSearch をターゲットバージョンに移行するため、すべての Data Node が一緒に再起動します。完了するまでストレージバックエンドは<strong>利用できず</strong>、検索とインデックス作成が中断されます。"
       },
       "no_rollback": "開始後は、以前のバージョンにロールバックできません。",
       "rolling": {
@@ -782,7 +812,9 @@
         "healthy_cluster": "続行する前に、クラスターが正常（グリーン）であることを確認してください。",
         "shard_allocation": "各再起動中はシャードの割り当てが一時停止されるため、クラスターは利用可能な状態を維持します。ただし、ノードが離脱して再参加する間、インデックス作成と検索が一時的に低下する場合があります。",
         "title": "OpenSearch のローリングアップグレードを開始しますか？",
-        "wait_for_green": "各ノードの後、アップグレードは続行する前にクラスターがグリーンに戻るのを待機します。時間がかかりすぎる場合は一時停止し、再開するまで待機します。"
+        "wait_for_green": "各ノードの後、アップグレードは続行する前にクラスターがグリーンに戻るのを待機します。時間がかかりすぎる場合は一時停止し、再開するまで待機します。",
+        "each_node_with_versions_other": "{{count}} 台の Data Node はそれぞれ、組み込みの OpenSearch を <strong>{{currentVersion}}</strong> から <strong>{{targetVersion}}</strong> に移行するため、1 台ずつアップグレードおよび再起動されます。",
+        "each_node_other": "{{count}} 台の Data Node はそれぞれ、組み込みの OpenSearch をターゲットバージョンに移行するため、1 台ずつアップグレードおよび再起動されます。"
       },
       "starting": "開始中..."
     },
@@ -806,6 +838,7 @@
       "start_upgrade_and_restart": "OpenSearch のアップグレードを開始して再起動",
       "starting_rolling_upgrade": "OpenSearch のローリングアップグレードを開始中...",
       "title": "Data Node の組み込み OpenSearch をアップグレード",
+      "unconfirmed_other": "{{count}} 台の Data Node が利用できない間は、非互換のインデックスとアップグレードの状態を確認できません。すべての Data Node が利用可能になると、再度表示されます。",
       "upgrade_process": "アップグレードの手順",
       "use_table": "続行する前に、下の表を使用してシステムインデックスをリインデックスし、データインデックスをアーカイブまたは削除してください。"
     },
@@ -869,6 +902,7 @@
       "checking": "OpenSearch の状態を確認中...",
       "error": "Data Node の組み込み OpenSearch バージョンを確認できませんでした。",
       "outdated": "Data Node の組み込み OpenSearch は最新ではありません。",
+      "unconfirmed_other": "{{count}} 台の Data Node が利用できない間は、Data Node の組み込み OpenSearch の状態を確認できません。",
       "up_to_date": "Data Node の組み込み OpenSearch は最新です。",
       "up_to_date_with_version": "Data Node の組み込み OpenSearch は最新です <bold>({{version}})。</bold>",
       "upgrading": "OpenSearch のローリングアップグレードが進行中です。"
