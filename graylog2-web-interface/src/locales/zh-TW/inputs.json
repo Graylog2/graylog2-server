@@ -19,6 +19,7 @@
   },
   "input_states": {
     "title": "{{title}} 的 Input 狀態",
+    "count_other": "{{count}} 個 {{state}}",
     "CREATED": "已建立",
     "INITIALIZED": "已初始化",
     "INVALID_CONFIGURATION": "設定無效",
@@ -368,16 +369,80 @@
       "no_messages_per_stream": "過去 24 小時內，沒有 Stream 從此 Input 接收到訊息。",
       "stream": "Stream",
       "messages": "訊息",
-      "network_io": "網路 I/O： "
+      "network_io": "網路 I/O： ",
+      "total_prefix": " （總計：",
+      "total_suffix": " ）",
+      "empty_messages_discarded": "已捨棄的空訊息：{{value}}",
+      "no_node_metrics": "此節點沒有可用的指標",
+      "no_input_metrics": "此 Input 沒有可用的指標",
+      "show_details": "顯示詳細資訊",
+      "hide_details": "隱藏詳細資訊"
     },
-    "actions": {}
+    "actions": {
+      "received_messages": "接收的訊息",
+      "input_diagnosis": "Input 診斷",
+      "exit_setup_mode": "結束設定模式",
+      "enter_setup_mode": "進入設定模式",
+      "show_metrics": "顯示指標",
+      "delete_input": "刪除 Input",
+      "delete_title": "正在刪除 Input",
+      "delete_confirm": "確定要刪除 Input {{title}} 嗎？"
+    }
   },
-  "dot_badge": {},
-  "use_input_notifications": {},
-  "use_input_details_notifications": {},
-  "use_input_metrics_notifications": {},
-  "use_input_state_summary_notifications": {},
-  "use_input_state_mutations_notifications": {},
-  "use_input_mutations_notifications": {},
-  "use_inputs_notifications": {}
+  "dot_badge": {
+    "problematic_inputs": "部分 Input 處於失敗狀態或設定模式。"
+  },
+  "use_input_notifications": {
+    "load_failed": "載入 Input 失敗，狀態為",
+    "load_failed_title": "無法載入 Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "載入 Input 詳細資訊失敗，狀態為",
+    "load_failed_title": "無法載入 Input 詳細資訊"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "載入 Input 指標失敗，狀態為",
+    "load_failed_title": "無法載入 Input 指標"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "載入 Input 狀態摘要失敗，狀態為",
+    "load_failed_title": "無法載入 Input 狀態摘要。"
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "啟動 Input「{{title}}」時發生錯誤：{{error}}",
+    "start_failed_title": "無法啟動 Input「{{title}}」",
+    "started_success": "Input 已成功啟動。",
+    "stop_failed": "停止 Input「{{title}}」時發生錯誤：{{error}}",
+    "stop_failed_title": "無法停止 Input「{{title}}」",
+    "stopped_success": "Input 已成功停止。",
+    "setup_failed": "進入 Input「{{title}}」設定模式時發生錯誤：{{error}}",
+    "setup_failed_title": "無法將 Input「{{title}}」設為設定模式",
+    "deleted_success": "Input 已成功刪除。",
+    "success_title": "成功！"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "儲存 Input 失敗，狀態為：{{error}}",
+    "save_failed_title": "無法儲存 Input",
+    "update_failed": "更新 Input 失敗，狀態為：{{error}}",
+    "update_failed_title": "無法更新 Input",
+    "delete_failed": "刪除 Input 失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除 Input",
+    "created_success": "Input 已成功建立。",
+    "updated_success": "Input 已成功更新。",
+    "deleted_success": "Input 已成功刪除。",
+    "success_title": "成功！"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input「{{title}}」已成功啟動",
+    "launch_failed": "啟動 Input「{{title}}」失敗，狀態為：{{error}}",
+    "launch_failed_title": "無法啟動 Input",
+    "updated_success": "Input「{{title}}」已成功更新",
+    "update_failed": "更新 Input「{{title}}」失敗，狀態為：{{error}}",
+    "update_failed_title": "無法更新 Input",
+    "deleted_success": "Input「{{title}}」已成功刪除",
+    "delete_failed": "刪除 Input「{{title}}」失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除 Input",
+    "fetch_failed": "擷取 Input 失敗，狀態為：{{error}}",
+    "fetch_failed_title": "無法取得 Input"
+  }
 }
