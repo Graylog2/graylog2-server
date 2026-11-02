@@ -14,22 +14,41 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
-import useInputs from 'hooks/useInputs';
-import useNodeSummaries from 'hooks/useNodeSummaries';
+import { useInputTitleResolver, useNodeTitleResolver } from 'views/hooks/useInputAndNodeTitles';
 
-const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
+// Keys are only known when the mapper is called, so they are collected and resolved in the next render.
+const useSeenKeys = () => {
+  const [keys, setKeys] = useState<Array<string>>([]);
+  const seenKeys = useRef(new Set<string>());
+
+  // Runs after every render, as keys are collected during render. Only grows, so it settles.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (seenKeys.current.size > keys.length) {
+      setKeys([...seenKeys.current]);
+    }
+  });
+
+  const addKey = useCallback((key: string) => {
+    seenKeys.current.add(key);
+  }, []);
+
+  return [keys, addKey] as const;
+};
 
 const useMapKeys = (): KeyMapper => {
   const streams = useContext(StreamsContext);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((stream) => [stream.id, stream]) ?? []), [streams]);
-  const nodes = useNodeSummaries();
-  const inputs = useInputs();
+  const [nodeKeys, addNodeKey] = useSeenKeys();
+  const [inputKeys, addInputKey] = useSeenKeys();
+  const resolveNodeTitle = useNodeTitleResolver(nodeKeys);
+  const resolveInputTitle = useInputTitleResolver(inputKeys);
   const fieldTypes = useContext(FieldTypesContext);
   const currentFields = useMemo(() => fieldTypes?.currentQuery, [fieldTypes?.currentQuery]);
 
@@ -39,16 +58,20 @@ const useMapKeys = (): KeyMapper => {
 
       switch (fieldType?.type?.type) {
         case 'node':
-          return nodes?.[key] ? formatNode(nodes[key]) : key;
+          addNodeKey(String(key));
+
+          return resolveNodeTitle(String(key)) ?? key;
         case 'input':
-          return inputs?.[key]?.title ?? key;
+          addInputKey(String(key));
+
+          return resolveInputTitle(String(key)) ?? key;
         case 'streams':
           return streamsMap?.[key]?.title ?? key;
         default:
           return key;
       }
     },
-    [currentFields, inputs, nodes, streamsMap],
+    [addInputKey, addNodeKey, currentFields, resolveInputTitle, resolveNodeTitle, streamsMap],
   );
 };
 
