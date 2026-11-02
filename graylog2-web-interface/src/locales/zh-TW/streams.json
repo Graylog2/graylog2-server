@@ -128,22 +128,134 @@
       "saving": "正在儲存串流",
       "submit": "更新",
       "success_title": "成功",
-      "tooltip": "編輯 Index Set"
+      "tooltip": "編輯 Index Set",
+      "updated": "串流「{{title}}」的 Index Set 已成功更新。"
     },
-    "output_item": {},
-    "outputs": {},
-    "outputs_list": {},
-    "remove_output": {}
+    "output_item": {
+      "type": "（類型：{{type}}）"
+    },
+    "outputs": {
+      "count": "OUTPUTS {{count}}",
+      "title": "Outputs",
+      "toggle_aria": "切換 Output"
+    },
+    "outputs_list": {
+      "name": "名稱",
+      "none": "未定義任何 Output。"
+    },
+    "remove_output": {
+      "confirm": "確定要從串流中移除此 Output 嗎？",
+      "title": "移除 Output"
+    }
   },
-  "stream_details": {},
-  "stream_edit_page": {},
-  "stream_hooks": {},
-  "stream_modal": {},
-  "stream_outputs": {},
-  "stream_permission_error_page": {},
+  "stream_details": {
+    "back": "返回",
+    "connected_pipelines_human_name": "Pipelines",
+    "connected_pipelines_title": "來自其他串流的路由",
+    "data_routing": "資料路由",
+    "destination_description": "「目的地」頁面可讓您定義此串流中的訊息應路由至何處。一個串流可以有多個目的地。請注意，僅路由至 Data Lake 的訊息不會計入授權用量，除非之後被擷取。您可以針對各個目的地套用篩選器，以限制該目的地接收的訊息子集。",
+    "edit": "編輯",
+    "edit_modal_title": "編輯串流",
+    "heading": "串流：{{title}}",
+    "intake_description": "串流規則可用於直接從 Input 收集符合篩選條件的訊息子集並導入此串流。請注意，串流規則現已成為舊版功能，建議改用 Pipeline 規則來管理串流路由。",
+    "no_pipelines": "此串流未連接至任何 Pipeline。",
+    "pipeline_header": "Pipeline",
+    "processing_description": "Pipeline 可讓您轉換及處理來自串流的訊息。Pipeline 由多個階段組成，各階段會評估並套用規則。訊息可經過一個或多個階段。",
+    "processing_title": "Pipelines",
+    "rule_header": "規則",
+    "rules_info": "串流規則會在預設處理順序中優先生效，用於將 Input 的訊息導向串流。任何符合串流規則條件的訊息都會被導入此串流。",
+    "rules_title": "串流規則",
+    "segment_destinations": "3：目的地",
+    "segment_intake": "1：導入",
+    "segment_processing": "2：處理",
+    "success_title": "成功",
+    "throughput": "吞吐量",
+    "update_button": "更新串流",
+    "updated": "串流「{{title}}」已成功更新。",
+    "updating": "正在更新串流..."
+  },
+  "stream_edit_page": {
+    "default_stream_error": "無法編輯預設串流。",
+    "description": "此畫面專為輕鬆且便捷地建立及管理串流規則而設計。您可以在此查看已設定的串流規則對訊息比對的影響。",
+    "documentation_link_title": "串流文件",
+    "title": "串流 {{title}} 的規則",
+    "title_span": "串流「{{title}}」的規則"
+  },
+  "stream_hooks": {
+    "create_rule_failed": "建立串流 Output 篩選規則失敗，狀態：{{error}}",
+    "create_rule_failed_title": "無法建立串流 Output 篩選規則",
+    "create_rule_success": "已成功建立串流 Output 篩選規則。",
+    "delete_rule_failed": "刪除串流 Output 篩選規則失敗，狀態：{{error}}",
+    "delete_rule_failed_title": "無法刪除串流 Output 篩選規則",
+    "delete_rule_success": "已成功移除串流 Output 篩選規則。",
+    "load_connected_pipelines_failed": "載入已連接的 Pipelines 失敗，狀態為",
+    "load_connected_pipelines_failed_title": "無法載入已連接的 Pipelines",
+    "load_output_filters_failed": "載入串流 Output 篩選器失敗，狀態為",
+    "load_output_filters_failed_title": "無法載入串流 Output 篩選器",
+    "load_output_types_failed": "載入串流 Output 失敗，狀態為",
+    "load_output_types_failed_title": "無法載入串流 Output",
+    "load_rule_builder_failed": "載入串流 Output 篩選規則建構器條件清單失敗，狀態為",
+    "load_rule_builder_failed_title": "無法載入串流 Output 篩選規則建構器條件清單。",
+    "load_rule_types_failed": "載入串流規則類型失敗，狀態為",
+    "load_rule_types_failed_title": "無法載入串流規則類型",
+    "load_stream_failed": "載入串流失敗，狀態為",
+    "load_stream_failed_title": "無法載入串流",
+    "load_streams_failed": "載入串流失敗，狀態為",
+    "load_streams_failed_title": "無法載入串流",
+    "success_title": "成功！",
+    "update_rule_failed": "更新串流 Output 篩選規則失敗，狀態：{{error}}",
+    "update_rule_failed_title": "無法更新串流 Output 篩選規則",
+    "update_rule_success": "已成功更新串流 Output 篩選規則。"
+  },
+  "stream_modal": {
+    "description": "描述",
+    "description_help": "哪些類型的訊息會路由至此串流？",
+    "index_set_required": "必須選擇 Index Set",
+    "remove_matches_help": "不要將符合此串流的訊息指派至「預設串流」。",
+    "remove_matches_label": "從「預設串流」中移除符合項目",
+    "share_description": "搜尋使用者或團隊，以新增為此串流的協作者。",
+    "title": "標題",
+    "title_help": "新串流的描述性名稱",
+    "title_required": "必須填寫標題"
+  },
+  "stream_outputs": {
+    "description": "{{productName}} 節點可透過 Output 轉送串流中的訊息。您可以在此啟動或終止任意數量的 Output。您也可以重複使用已在執行中、供其他串流使用的 Output。所有已設定 Output 的全域檢視可在<outputsLink>此處</outputsLink>查看。",
+    "marketplace_prefix": "您可以在以下位置找到 Output 外掛程式：",
+    "removing_description": "<emphasis>移除</emphasis> Output 會將其從此串流中移除，但它仍會保留在可用 Output 清單中。<emphasis>全域</emphasis>刪除 Output 則會將其從此串流及所有其他串流中移除，並終止該 Output。您可以在<outputsLink>全域 Output 清單</outputsLink>中查看所有已定義 Output 的詳細資訊。",
+    "title": "串流 »{{streamTitle}}« 的 Output"
+  },
+  "stream_permission_error_page": {
+    "description_p1": "此資源包含您沒有權限存取的串流。",
+    "description_p2": "請聯絡您的管理員，並提供錯誤詳細資訊，其中包括您需要存取權限的串流清單。",
+    "error_details": "您需要以下 ID 串流的權限：{{ids}}。",
+    "title": "缺少串流權限"
+  },
   "stream_rules": {
-    "editor": {},
-    "human": {},
+    "create_button": "建立規則",
+    "created": "已成功建立串流規則。",
+    "creating": "正在建立規則...",
+    "delete_confirm": "確定要刪除此串流規則嗎？",
+    "delete_ok": "確定",
+    "delete_title": "刪除串流規則。",
+    "delete_tooltip": "刪除串流規則",
+    "deleted": "已成功刪除串流規則。",
+    "edit_title": "編輯串流規則",
+    "edit_tooltip": "編輯串流規則",
+    "editor": {
+      "add_rule": "新增串流規則",
+      "done": "完成！",
+      "load_message_hint": "請在上方的步驟 1 中載入一則訊息，以檢查它是否符合這些規則。",
+      "load_message_title": "1. 載入訊息以測試規則",
+      "manage_title": "2. 管理串流規則",
+      "would_match": "此訊息將會路由至此串流！",
+      "would_not_match": "此訊息不會路由至此串流。"
+    },
+    "human": {
+      "always_matches": "規則一律符合",
+      "deleted_input": "<deleted input>：{{value}}",
+      "empty": "<empty>",
+      "must": "<ruleField>{{field}}</ruleField> <mustPart>必須</mustPart>{{description}} <ruleValue>{{value}}</ruleValue>"
+    },
     "modal": {},
     "start_dialog": {}
   },
