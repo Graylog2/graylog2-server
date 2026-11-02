@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -29,7 +30,6 @@ import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -100,47 +100,66 @@ public class SupportBundleResourceIT {
         api.users().deleteUser(unprivilegedUser.username());
     }
 
+    /**
+     * Request spec for the default admin user. Dumps the Graylog (and search server) container logs on any
+     * response {@code >= 500}, and logs the request/response whenever a subsequent assertion fails, so that
+     * an unexpected 500 leaves enough information to diagnose it without having to reproduce it.
+     */
+    private static RequestSpecification req() {
+        return given()
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
+                .log().ifValidationFails();
+    }
+
+    private static RequestSpecification req(Users.User user) {
+        return given()
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.forUser(user).requestSpecification())
+                .log().ifValidationFails();
+    }
+
     // --- Manifest tests ---
 
     @FullBackendTest
     void getManifestReturnsLogfiles() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .get(MANIFEST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("entries.logfiles", notNullValue());
     }
 
     @FullBackendTest
     void getManifestContainsInMemoryLog() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .get(MANIFEST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("entries.logfiles.find { it.id == 'memory' }.name", equalTo("server.mem.log"));
     }
 
     @FullBackendTest
     void getManifestRequiresReadPermission() {
-        given()
-                .spec(api.forUser(unprivilegedUser).requestSpecification())
+        req(unprivilegedUser)
                 .when()
                 .get(MANIFEST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
     @FullBackendTest
     void getManifestAccessibleByReaderUser() {
-        given()
-                .spec(api.forUser(readerUser).requestSpecification())
+        req(readerUser)
                 .when()
                 .get(MANIFEST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("entries.logfiles", notNullValue());
     }
@@ -149,38 +168,38 @@ public class SupportBundleResourceIT {
 
     @FullBackendTest
     void getInMemoryLogFileReturnsContent() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("id", "memory")
                 .get(LOGFILE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .header("Content-Disposition", not(emptyOrNullString()));
     }
 
     @FullBackendTest
     void getLogFileWithUnknownIdReturns404() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("id", "nonexistent-log-id")
                 .get(LOGFILE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(404);
     }
 
     @FullBackendTest
     void getLogFileRequiresReadPermission() {
-        given()
-                .spec(api.forUser(unprivilegedUser).requestSpecification())
+        req(unprivilegedUser)
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("id", "memory")
                 .get(LOGFILE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
@@ -188,50 +207,50 @@ public class SupportBundleResourceIT {
 
     @FullBackendTest
     void buildBundleReturns202() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
     }
 
     @FullBackendTest
     void buildBundleRequiresCreatePermission() {
-        given()
-                .spec(api.forUser(readerUser).requestSpecification())
+        req(readerUser)
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
     @FullBackendTest
     void buildBundleRequiresPermissions() {
-        given()
-                .spec(api.forUser(unprivilegedUser).requestSpecification())
+        req(unprivilegedUser)
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
     @FullBackendTest
     void listBundlesAfterBuildReturnsNonEmptyList() {
         // Build a bundle first
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
         // List should contain at least one bundle
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("$", hasSize(greaterThan(0)))
                 .body("[0].file_name", not(emptyOrNullString()))
@@ -240,41 +259,41 @@ public class SupportBundleResourceIT {
 
     @FullBackendTest
     void listBundlesRequiresReadPermission() {
-        given()
-                .spec(api.forUser(unprivilegedUser).requestSpecification())
+        req(unprivilegedUser)
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
     @FullBackendTest
     void downloadBundleReturnsZipContent() {
         // Build a bundle
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
         // Get the filename from list
-        final String filename = given()
-                .spec(api.requestSpecification())
+        final String filename = req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("[0].file_name");
 
         // Download it
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("filename", filename)
                 .get(DOWNLOAD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .header("Content-Disposition", not(emptyOrNullString()));
     }
@@ -282,86 +301,86 @@ public class SupportBundleResourceIT {
     @FullBackendTest
     void downloadBundleRequiresReadPermission() {
         // Build a bundle first so we have a filename to attempt
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
-        final String filename = given()
-                .spec(api.requestSpecification())
+        final String filename = req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("[0].file_name");
 
-        given()
-                .spec(api.forUser(unprivilegedUser).requestSpecification())
+        req(unprivilegedUser)
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("filename", filename)
                 .get(DOWNLOAD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
     @FullBackendTest
     void deleteBundleReturns202() {
         // Build a bundle to delete
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
-        final String filename = given()
-                .spec(api.requestSpecification())
+        final String filename = req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("[0].file_name");
 
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .pathParam("filename", filename)
                 .delete(DELETE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
         // Verify it's gone
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .body("collect { it.file_name }", not(Matchers.hasItem(filename)));
     }
 
     @FullBackendTest
     void deleteNonExistentBundleReturns404() {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .pathParam("filename", "nonexistent-bundle.zip")
                 .delete(DELETE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(404);
     }
 
     @FullBackendTest
     void deleteBundleRequiresCreatePermission() {
-        given()
-                .spec(api.forUser(readerUser).requestSpecification())
+        req(readerUser)
                 .when()
                 .pathParam("filename", "any-bundle.zip")
                 .delete(DELETE_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(403);
     }
 
@@ -428,28 +447,28 @@ public class SupportBundleResourceIT {
     // --- Helpers ---
 
     private Map<String, byte[]> buildAndDownloadBundleEntries() throws IOException {
-        given()
-                .spec(api.requestSpecification())
+        req()
                 .when()
                 .post(BUILD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(202);
 
-        final String filename = given()
-                .spec(api.requestSpecification())
+        final String filename = req()
                 .when()
                 .get(LIST_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("[0].file_name");
 
-        final byte[] zipBytes = given()
-                .spec(api.requestSpecification())
+        final byte[] zipBytes = req()
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("filename", filename)
                 .get(DOWNLOAD_URL)
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().asByteArray();
 
