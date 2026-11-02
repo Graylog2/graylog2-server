@@ -245,6 +245,8 @@
     "positions_failed": "更改 Extractor 顺序失败：{{error}}",
     "positions_failed_title": "无法更新 Extractor 顺序",
     "import_success": "导入结果：已导入 {{successful}} 个 Extractor。",
-    "import_success_title": "导入操作成功"
+    "import_success_title": "导入操作成功",
+    "import_warning": "导入结果：已导入 {{successful}} 个 Extractor，出现 {{failed}} 个错误。",
+    "import_warning_title": "导入操作已完成"
   }
 }
