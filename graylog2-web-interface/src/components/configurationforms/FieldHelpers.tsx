@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { ConfigurationField } from 'components/configurationforms/types';
 
 export const hasAttribute = (array: Array<string>, attribute: string): boolean =>
   array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
 
 export const optionableLabel = (field: ConfigurationField): string =>
-  field.is_optional && field.type !== 'boolean' ? ` ${field.human_name} (optional)` : field.human_name;
+  field.is_optional && field.type !== 'boolean'
+    ? ` ${field.human_name} (${i18n.t('configuration_forms.optional', { ns: 'common' })})`
+    : field.human_name;
 
 export default {
   hasAttribute,

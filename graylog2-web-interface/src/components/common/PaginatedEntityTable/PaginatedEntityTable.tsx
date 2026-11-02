@@ -50,6 +50,7 @@ import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 import useAuthorizedAttributes from 'components/common/PaginatedEntityTable/hooks/useAuthorizedAttributes';
+import useServerText from 'util/serverText';
 import {
   ALPHABETICAL_SORT,
   defaultSortDirectionForMode,
@@ -242,12 +243,17 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     resetTableLayout,
   });
 
+  const serverText = useServerText();
+  // Titles of the attributes (columns) are sent by the server in English
+  const serverAttributes = useMemo(
+    () =>
+      (paginatedEntities?.attributes ?? []).map((attribute) => ({ ...attribute, title: serverText(attribute.title) })),
+    [paginatedEntities?.attributes, serverText],
+  );
+
   const columnSchemas = useMemo(
-    () => [
-      ...(paginatedEntities?.attributes ?? []),
-      ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
-    ],
-    [additionalAttributes, paginatedEntities?.attributes],
+    () => [...serverAttributes, ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute }))],
+    [additionalAttributes, serverAttributes],
   );
 
   const onSlicingPreferencesChange = useCallback(
@@ -270,7 +276,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [columnSchemas, searchParams.sliceCol, onChangeSlicingFilter, updateTableLayout],
   );
 
-  const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
+  const attributes = useAuthorizedAttributes(serverAttributes);
 
   const onPaginationChange = withoutURLParams
     ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })

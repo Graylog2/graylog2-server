@@ -388,7 +388,8 @@
   "configuration_forms": {
     "undo_reset": "Zurücksetzen rückgängig machen",
     "remove": "Entfernen",
-    "title": "Titel"
+    "title": "Titel",
+    "optional": "optional"
   },
   "enterprise_advertisement": {
     "enterprise_title": "{{productName}} Enterprise",

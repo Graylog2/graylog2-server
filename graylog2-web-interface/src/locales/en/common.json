@@ -385,7 +385,8 @@
   "configuration_forms": {
     "undo_reset": "Undo Reset",
     "remove": "Remove",
-    "title": "Title"
+    "title": "Title",
+    "optional": "optional"
   },
   "enterprise_advertisement": {
     "enterprise_title": "{{productName}} Enterprise",
