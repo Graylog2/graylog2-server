@@ -251,19 +251,130 @@
     "false": "false"
   },
   "builder": {
-    "title": "ルールビルダー"
+    "title": "ルールビルダー",
+    "when": "条件",
+    "and": "かつ",
+    "or": "または",
+    "then": "アクション",
+    "convert_title": "ルールビルダーをソースコードに変換",
+    "convert": "ソースコードに変換",
+    "delete_condition": "条件を削除",
+    "delete_action": "アクションを削除",
+    "delete_condition_confirm": "<blockName>条件 N°{{order}}</blockName> を本当に削除しますか？",
+    "delete_action_confirm": "<blockName>アクション N°{{order}}</blockName> を本当に削除しますか？"
   },
-  "helper": {},
-  "helper_table": {},
-  "simulator": {},
-  "simulation_changes": {},
-  "simulation_preview": {},
-  "simulation_trace": {},
-  "simulation_results": {},
-  "simulator_page": {},
-  "rule_notifications": {},
-  "page_navigation": {},
-  "pipeline_notifications": {},
+  "helper": {
+    "title": "ルールのクイックリファレンス",
+    "docs_hint": "パイプラインルールの仕組みをより深く理解するには、<docsLink>ドキュメント全体</docsLink>をお読みください。",
+    "functions": "関数",
+    "example": "例",
+    "functions_description": "パイプラインルールで使用できるすべての関数の一覧です。行をクリックすると、関数のパラメーターの詳細が表示されます。",
+    "filter_rules": "ルールをフィルター",
+    "example_description": "パイプラインルールがどのように見えるか確認しますか？次の例をご覧ください:"
+  },
+  "helper_table": {
+    "parameter": "パラメーター",
+    "type": "型",
+    "required": "必須",
+    "description": "説明",
+    "function": "関数"
+  },
+  "simulator": {
+    "no_streams_title": "ストリームが見つかりません",
+    "no_streams": "パイプラインはストリームに対して動作しますが、現在システムにストリームがありません。<streamsLink>ストリームを作成</streamsLink>してから、新しいストリームで受信メッセージを処理するパイプラインをテストするためにここに戻ってきてください。",
+    "stream_help": "シミュレーションで使用するストリームを選択してください。デフォルトでは <streamTitle>{{title}}</streamTitle> ストリームが使用されます。",
+    "load_message": "メッセージを読み込む",
+    "load_message_description": "シミュレーションで使用するサンプルメッセージを作成します。<notice>実際のメッセージは変更されません。すべてのアクションは、以下で入力する一時的な入力に対してのみシミュレートされます。</notice>",
+    "stream": "ストリーム"
+  },
+  "simulation_changes": {
+    "added_fields": "追加されたフィールド",
+    "removed_fields": "削除されたフィールド",
+    "mutated_fields": "変更されたフィールド",
+    "dropped": "元のメッセージは、処理中に破棄されます。",
+    "not_modified": "元のメッセージは、処理中に変更されません。",
+    "original_changes": "元のメッセージ <idSmall><idEm>{{id}}</idEm></idSmall> の変更",
+    "other_changes": "その他の変更"
+  },
+  "simulation_preview": {
+    "dropped_title": "メッセージは破棄されます",
+    "dropped": "パイプラインプロセッサーはこのようなメッセージを破棄します。つまり、メッセージは<notStored>保存されず</notStored>、検索、アラート、出力、ダッシュボードで利用できなくなります。"
+  },
+  "simulation_trace": {
+    "microseconds": "μs"
+  },
+  "simulation_results": {
+    "changes_summary": "変更の概要",
+    "results_preview": "結果のプレビュー",
+    "simulation_trace": "シミュレーションのトレース",
+    "error_title": "メッセージ処理のシミュレーションでエラーが発生しました",
+    "error": "ストリーム <emphasis>{{stream}}</emphasis> のメッセージ <emphasis>{{id}}</emphasis> の処理をシミュレートできませんでした。<lineBreak />メッセージを再度読み込むか、別のメッセージでシミュレーションしてください。",
+    "original_message": "元のメッセージ",
+    "more_results": "その他の結果",
+    "title": "シミュレーション結果",
+    "simulating": "メッセージ処理をシミュレートしています。しばらくお待ちください。",
+    "results_description": "これは、読み込んだメッセージの処理結果です。処理には {{took}} µs かかりました。"
+  },
+  "simulator_page": {
+    "title": "処理をシミュレート",
+    "documentation_title": "パイプラインのドキュメント",
+    "description": "メッセージの処理は複雑になることがあります。このページを使うと、現在のパイプラインとルールのセットを使って、受信メッセージの処理結果をシミュレートできます。"
+  },
+  "rule_notifications": {
+    "fetch_failed": "ステータス {{error}} でルールの取得に失敗しました",
+    "fetch_failed_title": "処理ルールを取得できませんでした",
+    "list_failed": "ステータス {{error}} でルール一覧の読み込みに失敗しました",
+    "list_failed_title": "ルールを読み込めませんでした。",
+    "fetch_rule_failed": "ステータス {{error}} でルール \"{{id}}\" の取得に失敗しました",
+    "fetch_rule_failed_title": "処理ルール \"{{id}}\" を取得できませんでした",
+    "create_success": "ルール \"{{title}}\" を作成しました",
+    "create_failed": "ステータス {{error}} でルール \"{{title}}\" の保存に失敗しました",
+    "create_failed_title": "処理ルール \"{{title}}\" を保存できませんでした",
+    "update_success": "ルール \"{{title}}\" を更新しました",
+    "update_failed": "ステータス {{error}} でルール \"{{title}}\" の更新に失敗しました",
+    "update_failed_title": "処理ルール \"{{title}}\" を更新できませんでした",
+    "delete_success": "ルール \"{{title}}\" を削除しました",
+    "delete_failed": "ステータス {{error}} でルール \"{{title}}\" の削除に失敗しました",
+    "delete_failed_title": "処理ルール \"{{title}}\" を削除できませんでした",
+    "metrics_load_failed": "ルールメトリクスの設定を読み込めませんでした: {{error}}",
+    "metrics_load_failed_title": "ルールメトリクスの設定を読み込めませんでした",
+    "metrics_update_success": "ルールメトリクスの設定を更新しました",
+    "metrics_update_failed": "ルールメトリクスの設定を更新できませんでした: {{error}}",
+    "metrics_update_failed_title": "ルールメトリクスの設定を更新できませんでした",
+    "metadata_failed": "ステータス付きでパイプラインルールのメタデータの読み込みに失敗しました",
+    "metadata_failed_title": "パイプラインルールのメタデータを読み込めませんでした",
+    "deprecated_failed": "ステータス付きでルールの非推奨の関数の読み込みに失敗しました",
+    "deprecated_failed_title": "ルールメタデータの非推奨の関数を読み込めませんでした",
+    "builder_create_failed": "ステータス {{error}} でルールビルダーのルールの作成に失敗しました",
+    "builder_create_failed_title": "ルールビルダーのルールを作成できませんでした。",
+    "builder_update_failed": "ステータス {{error}} でルールビルダーのルールの更新に失敗しました",
+    "builder_update_failed_title": "ルールビルダーのルールを更新できませんでした。",
+    "builder_load_failed": "ステータス付きでルールビルダーのルールの読み込みに失敗しました",
+    "builder_load_failed_title": "ルールビルダーのルールを読み込めませんでした。",
+    "builder_conditions_failed": "ステータス付きでルールビルダーの条件一覧の読み込みに失敗しました",
+    "builder_conditions_failed_title": "ルールビルダーの条件一覧を読み込めませんでした。",
+    "builder_actions_failed": "ステータス付きでルールビルダーのアクション一覧の読み込みに失敗しました",
+    "builder_actions_failed_title": "ルールビルダーのアクション一覧を読み込めませんでした。"
+  },
+  "page_navigation": {
+    "manage_pipelines": "パイプラインを管理",
+    "manage_rules": "ルールを管理",
+    "simulator": "シミュレーター"
+  },
+  "pipeline_notifications": {
+    "load_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_failed_title": "パイプラインを読み込めませんでした",
+    "load_paginated_failed": "ステータス付きでページ分割されたパイプラインの読み込みに失敗しました",
+    "load_paginated_failed_title": "ページ分割されたパイプラインを読み込めませんでした",
+    "load_single_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_single_failed_title": "パイプラインを読み込めませんでした",
+    "connections_failed": "ステータス付きでパイプラインの接続の取得に失敗しました",
+    "connections_failed_title": "パイプラインの接続を取得できませんでした",
+    "connections_updated": "パイプラインの接続を更新しました",
+    "connections_update_failed": "ステータス {{error}} でパイプラインの接続の更新に失敗しました",
+    "connections_update_failed_title": "パイプラインの接続を更新できませんでした",
+    "create_failed": "ステータス {{error}} でパイプラインの作成に失敗しました"
+  },
   "connections_list": {},
   "rule_list": {
     "headers": {}
