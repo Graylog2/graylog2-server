@@ -169,7 +169,7 @@ public class ClusterResource extends RestResource {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<ServerNodeDto> result = serverNodePaginatedService.searchPaginated(searchQuery, order.toBsonSort(sort), page, perPage);
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+                result.pagination().total(), sort, order, result.stream().toList(), attributes, settings);
     }
 
     @GET
