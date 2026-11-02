@@ -131,20 +131,119 @@
     "install": "インストール",
     "install_title": "コンテンツパックをインストール",
     "latest_version": "最新バージョン: {{rev}}",
-    "show": "表示"
+    "show": "表示",
+    "update": "更新"
   },
-  "notifications": {},
-  "overview": {},
-  "pages": {},
-  "parameter_list": {},
-  "parameters": {},
-  "preview": {},
-  "revisions": {},
-  "selection": {},
-  "show": {},
-  "status": {},
-  "upload": {},
-  "value_types": {},
-  "version_item": {},
-  "versions": {}
+  "notifications": {
+    "error": "エラー",
+    "success": "成功"
+  },
+  "overview": {
+    "button_text": "コンテンツパック",
+    "delete_confirmation": "このコンテンツパックを削除します。よろしいですか？",
+    "delete_error_message": "バンドルの削除に失敗しました: {{error}}",
+    "delete_success": "コンテンツパックを削除しました。",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、Stream、Dashboard を含めることができます。",
+    "install_error_message": "コンテンツパックのインストールに失敗しました。ステータス: {{status}}。ID {{id}} のコンテンツパックをインストールできませんでした",
+    "install_success": "コンテンツパックをインストールしました。",
+    "title": "コンテンツパック",
+    "marketplace_prefix": "その他のコンテンツパックは次で探せます:"
+  },
+  "pages": {
+    "back_button": "コンテンツパック",
+    "create_title": "コンテンツパックを作成",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、Stream、Dashboard を含めることができます。",
+    "document_title": "コンテンツパック",
+    "edit_title": "コンテンツパックを編集",
+    "marketplace_prefix": "その他のコンテンツパックは次で探せます:"
+  },
+  "parameter_list": {
+    "action": "操作",
+    "default_value": "デフォルト値",
+    "delete_parameter": "パラメーターを削除",
+    "description": "説明",
+    "edit_modal": "編集ダイアログ",
+    "list_title": "パラメーター一覧",
+    "modal_title": "パラメーター",
+    "name": "名前",
+    "no_data": "コンテンツパックでパラメーターを使用するには、まずパラメーターを作成し、項目に適用する必要があります。",
+    "still_in_use": "使用中",
+    "title": "タイトル",
+    "used": "使用中",
+    "value_type": "値のタイプ"
+  },
+  "parameters": {
+    "confirm_deletion": "削除の確認",
+    "delete_confirmation": "このパラメーター {{title}} を削除してもよろしいですか？"
+  },
+  "preview": {
+    "create": "作成",
+    "create_and_download": "作成してダウンロード"
+  },
+  "revisions": {
+    "fetch_error": "コンテンツパックのリビジョンの取得中にエラーが発生しました: {{error}}",
+    "fetch_error_title": "コンテンツパックを取得できません"
+  },
+  "selection": {
+    "description": "説明",
+    "description_help": "コンテンツパックの詳しい説明を Markdown で入力してください。",
+    "general_information": "一般情報",
+    "must_be_filled": "入力してください。",
+    "name": "名前",
+    "name_help": "必須です。このコンテンツパックをわかりやすく示す名前を入力してください。",
+    "no_pairs_hint": "このバージョンのコンテンツパックの項目はインストールされたことがないため、選択できるインストール済みの項目がありません。",
+    "select_entity": "少なくとも 1 つの項目を選択してください。",
+    "select_latest": "最新のインストール済みバージョンを選択",
+    "select_older": "古いコンテンツパックのバージョンを選択",
+    "summary": "概要",
+    "summary_help": "必須です。コンテンツパックの簡単な概要を入力してください。",
+    "title": "コンテンツパックの選択",
+    "url": "URL",
+    "url_help": "コンテンツパックの場所を入力してください。例: GitHub の URL",
+    "url_invalid": "無効な URL です",
+    "url_protocol": "http または https で始まる URL を使用してください。",
+    "vendor": "ベンダー",
+    "vendor_help": "必須です。このコンテンツパックの作成者と連絡先を入力してください。例: 名前とメールアドレス",
+    "version_help": "各項目について、最新のインストール済みバージョン（<latestIcon />）または古いコンテンツパックのバージョン（<olderIcon />）を選択できます。"
+  },
+  "show": {
+    "delete_revision_confirmation": "このコンテンツパックのリビジョンを削除しようとしています。よろしいですか？",
+    "delete_revision_error": "コンテンツパックの削除に失敗しました: {{error}}",
+    "delete_revision_success": "コンテンツパックのリビジョンを削除しました。",
+    "install_error": "コンテンツパックのインストールに失敗しました。ステータス: {{status}}。ID {{id}} のコンテンツパックをインストールできませんでした",
+    "installations": "インストール",
+    "not_found": "ID {{id}} のコンテンツパックが見つかりません。削除された可能性があります。",
+    "server_error": "内部サーバーエラーが発生しました。詳細はログファイルを確認してください",
+    "uninstall_confirmation": "このコンテンツパックを本当にアンインストールしますか？",
+    "uninstall_error": "コンテンツパックのアンインストールに失敗しました。詳細はログを確認してください。",
+    "uninstall_success": "コンテンツパックをアンインストールしました。",
+    "versions": "バージョン"
+  },
+  "status": {
+    "edited": "編集済み",
+    "error": "エラー",
+    "installed": "インストール済み",
+    "updatable": "更新可能"
+  },
+  "upload": {
+    "button": "アップロード",
+    "choose_file": "ファイルを選択",
+    "choose_file_help": "ディスクからコンテンツパックを選択",
+    "title": "コンテンツパックをアップロード"
+  },
+  "value_types": {
+    "boolean": "真偽値",
+    "double": "倍精度浮動小数点数",
+    "integer": "整数",
+    "string": "文字列"
+  },
+  "version_item": {
+    "actions": "操作",
+    "create_from_revision": "リビジョンから新規作成"
+  },
+  "versions": {
+    "action": "操作",
+    "revision": "リビジョン",
+    "select": "選択"
+  }
 }
