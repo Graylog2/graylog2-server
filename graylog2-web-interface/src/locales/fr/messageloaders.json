@@ -1,1 +1,56 @@
-{}
+{
+  "loading_inputs": "Chargement des inputs...",
+  "no_inputs_available": "Aucun input disponible",
+  "message_input_label": "Input de message",
+  "message_input_optional": "(facultatif)",
+  "message_input_help": "Sélectionnez l'ID de l'input de message à attribuer au message analysé.",
+  "message_input_aria_label": "Input de message",
+  "select_input_placeholder": "Sélectionner un input",
+  "forwarder_input_selection_label": "Sélection de l'input Forwarder",
+  "forwarder_input_selection_optional": "(facultatif)",
+  "forwarder_input_selection_description": "Sélectionnez un Input profile dans la liste ci-dessous, puis un input.",
+  "input_selection_legend": "Sélection de l'input",
+  "input_selection_optional": "(facultatif)",
+  "select_input_type_label": "Sélectionner un type d'input",
+  "select_input_type_optional": "(facultatif)",
+  "select_input_type_help": "Sélectionnez le type d'input depuis lequel vous voulez charger le message.",
+  "select_input_type_placeholder": "Sélectionner un type d'input",
+  "server_input": "Input serveur",
+  "forwarder_input": "Input Forwarder",
+  "load_raw_message_error_title": "Impossible de charger le message brut",
+  "load_raw_message_error_description": "Vérifiez que le codec sélectionné et sa configuration sont corrects. Consultez les journaux de votre serveur pour plus d'informations.",
+  "load_raw_message_failed_status": "Échec du chargement du message brut avec le statut : {{error}}",
+  "loading_codec_types": "Chargement des types de codec...",
+  "no_codecs_available": "Aucun codec disponible",
+  "raw_message_label": "Message brut",
+  "source_ip_address_label": "Adresse IP source",
+  "source_ip_address_optional": "(facultatif)",
+  "source_ip_address_help": "Adresse IP distante à utiliser comme source du message. {{productName}} utilisera {{defaultRemoteAddress}} par défaut.",
+  "codec_configuration_legend": "Configuration du codec",
+  "message_codec_label": "Codec du message",
+  "message_codec_help": "Sélectionnez le codec à utiliser pour décoder le message.",
+  "select_codec_placeholder": "Sélectionner un codec",
+  "load_message_button": "Charger le message",
+  "loading_message_button": "Chargement du message...",
+  "tabs": {
+    "recent": "Message récent",
+    "message_id": "ID du message",
+    "raw": "Message brut",
+    "message_id_description": "Veuillez indiquer l'ID et l'index du message à charger dans ce formulaire :",
+    "raw_description": "Chargez un message à partir d'un texte, comme s'il avait été envoyé par une source de logs."
+  },
+  "recent": {
+    "load_message": "Charger le message",
+    "server_description_selected": "Cliquez sur « Charger le message » pour charger le message le plus récent reçu par cet input au cours de la dernière heure.",
+    "server_description": "Sélectionnez un input dans la liste ci-dessous, puis cliquez sur « Charger le message » pour charger le message le plus récent reçu par cet input au cours de la dernière heure.",
+    "forwarder_description": "Sélectionnez un Input profile dans la liste ci-dessous, puis un input, et cliquez sur « Charger le message » pour charger le message le plus récent reçu par cet input au cours de la dernière heure.",
+    "invalid_input_selected": "Input invalide sélectionné : {{inputId}}",
+    "invalid_input_title": "Impossible de charger le message depuis l'input invalide {{inputId}}",
+    "no_recent_message": "L'input n'a renvoyé aucun message récent.",
+    "input_type_select_label": "sélection du type d'input"
+  },
+  "notifications": {
+    "codec_types_failed": "Échec de la récupération des types de codec avec le statut",
+    "codec_types_failed_title": "Impossible de récupérer les types de codec"
+  }
+}
