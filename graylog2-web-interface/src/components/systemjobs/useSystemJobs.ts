@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ClusterJobs } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
@@ -26,7 +27,11 @@ const useSystemJobs = () => {
   const { data: jobs } = useQuery({
     queryKey: SYSTEM_JOBS_QUERY_KEY,
     queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
+      defaultOnError(
+        ClusterJobs.list(),
+        i18n.t('notifications.system_jobs_failed', { ns: 'system' }),
+        i18n.t('notifications.system_jobs_failed_title', { ns: 'system' }),
+      ),
     refetchInterval: 2000,
   });
 

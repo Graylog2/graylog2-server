@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemCodecsTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { CodecTypes } from './Types';
@@ -29,8 +30,8 @@ const useCodecTypes = () => {
     queryFn: () =>
       defaultOnError(
         SystemCodecsTypes.getAll(),
-        'Fetching codec types failed with status',
-        'Could not retrieve codec types',
+        i18n.t('notifications.codec_types_failed', { ns: 'messageloaders' }),
+        i18n.t('notifications.codec_types_failed_title', { ns: 'messageloaders' }),
       ),
   });
 

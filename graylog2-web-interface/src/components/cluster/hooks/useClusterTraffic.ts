@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SystemClusterTraffic } from '@graylog/server-api';
 
 import type { Traffic } from 'components/cluster/types';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const useClusterTraffic = (days: number) => {
@@ -27,8 +28,8 @@ const useClusterTraffic = (days: number) => {
     queryFn: () =>
       defaultOnError(
         SystemClusterTraffic.get(days, false),
-        'Loading cluster traffic failed with status',
-        'Could not load cluster traffic',
+        i18n.t('notifications.cluster_traffic_failed', { ns: 'system' }),
+        i18n.t('notifications.cluster_traffic_failed_title', { ns: 'system' }),
       ),
     enabled: !!days,
     placeholderData: keepPreviousData,

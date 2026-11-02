@@ -70,6 +70,10 @@
     "rss_unavailable": "Unable to load RSS feed at the moment ! You can read more on <blogLink>Graylog</blogLink>.",
     "releases_unavailable": "Unable to load RSS feed at the moment ! You can read more on <releasesLink>Graylog.org</releasesLink>.",
     "update_failed": "Enabling content stream failed with status: {{error}}",
-    "update_failed_title": "Could not update content stream settings"
+    "update_failed_title": "Could not update content stream settings",
+    "load_config_failed": "Loading content stream config failed with status",
+    "load_config_failed_title": "Could not load content stream.",
+    "load_tags_failed": "Loading content stream tag failed with status",
+    "load_tags_failed_title": "Could not load content stream tags."
   }
 }

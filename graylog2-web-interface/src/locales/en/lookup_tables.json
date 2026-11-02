@@ -395,5 +395,24 @@
     "server_ips": "A comma-separated list of DNS server IP addresses and optional ports to use (eg. <code>192.168.1.1:5353, 192.168.1.244</code>). Leave this blank to use the DNS server defined for your local system. All requests use port 53 unless otherwise specified.",
     "server_ips_title": "DNS Server IP Addresses",
     "txt": "Returns a <code>multi_value</code> with all TXT records defined for the hostname. Input for this type must be a pure domain name (eg. <code>api.example.com</code>)."
+  },
+  "notifications": {
+    "lookup_table_created": "Lookup Table created successfully",
+    "lookup_table_updated": "Lookup Table updated successfully",
+    "key_purged": "Lookup table key purged successfully",
+    "table_purged": "Lookup table purged successfully",
+    "table_deleted": "Lookup table deleted successfully",
+    "cache_created": "Cache created successfully",
+    "cache_updated": "Cache updated successfully",
+    "cache_deleted": "Cache deleted successfully",
+    "adapter_created": "Data Adapter created successfully",
+    "adapter_updated": "Data Adapter updated successfully",
+    "adapter_deleted": "Data Adapter deleted successfully",
+    "fetch_lookup_table_failed": "Failed to fetch lookup table",
+    "fetch_preview_failed": "Failed to fetch lookup preview",
+    "fetch_caches_failed": "Failed to fetch all caches",
+    "fetch_cache_failed": "Failed to fetch cache",
+    "fetch_data_adapters_failed": "Failed to fetch all data adapters",
+    "fetch_data_adapter_failed": "Failed to fetch data adapter"
   }
 }

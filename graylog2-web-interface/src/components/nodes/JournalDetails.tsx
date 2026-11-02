@@ -24,6 +24,7 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { ClusterJournal } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { Link, Spinner, RelativeTime } from 'components/common';
 import { Row, Col, Alert } from 'components/bootstrap';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
@@ -57,7 +58,7 @@ const metricNames = {
 const metricValues = Object.values(metricNames);
 
 const fetchJournalInfo = (nodeId: string) =>
-  defaultOnError(ClusterJournal.get(nodeId), 'Could not get journal information');
+  defaultOnError(ClusterJournal.get(nodeId), i18n.t('notifications.journal_failed', { ns: 'system' }));
 
 const JournalDetails = ({ nodeId }: Props) => {
   const { t } = useTranslation('system');

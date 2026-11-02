@@ -395,5 +395,24 @@
     "server_ips": "Eine durch Kommas getrennte Liste von IP-Adressen der DNS-Server und optionalen Ports, die verwendet werden sollen (z. B. <code>192.168.1.1:5353, 192.168.1.244</code>). Lassen Sie dieses Feld leer, um den auf Ihrem lokalen System definierten DNS-Server zu verwenden. Alle Anfragen verwenden Port 53, sofern nicht anders angegeben.",
     "server_ips_title": "IP-Adressen der DNS-Server",
     "txt": "Gibt einen <code>multi_value</code> mit allen TXT-Records zurück, die für den Hostnamen definiert sind. Die Eingabe für diesen Typ muss ein reiner Domainname sein (z. B. <code>api.example.com</code>)."
+  },
+  "notifications": {
+    "lookup_table_created": "Lookup-Tabelle erfolgreich erstellt",
+    "lookup_table_updated": "Lookup-Tabelle erfolgreich aktualisiert",
+    "key_purged": "Schlüssel der Lookup-Tabelle erfolgreich geleert",
+    "table_purged": "Lookup-Tabelle erfolgreich geleert",
+    "table_deleted": "Lookup-Tabelle erfolgreich gelöscht",
+    "cache_created": "Cache erfolgreich erstellt",
+    "cache_updated": "Cache erfolgreich aktualisiert",
+    "cache_deleted": "Cache erfolgreich gelöscht",
+    "adapter_created": "Data Adapter erfolgreich erstellt",
+    "adapter_updated": "Data Adapter erfolgreich aktualisiert",
+    "adapter_deleted": "Data Adapter erfolgreich gelöscht",
+    "fetch_lookup_table_failed": "Lookup-Tabelle konnte nicht abgerufen werden",
+    "fetch_preview_failed": "Vorschau der Lookup-Tabelle konnte nicht abgerufen werden",
+    "fetch_caches_failed": "Alle Caches konnten nicht abgerufen werden",
+    "fetch_cache_failed": "Cache konnte nicht abgerufen werden",
+    "fetch_data_adapters_failed": "Alle Data Adapter konnten nicht abgerufen werden",
+    "fetch_data_adapter_failed": "Data Adapter konnte nicht abgerufen werden"
   }
 }

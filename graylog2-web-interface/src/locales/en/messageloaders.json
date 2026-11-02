@@ -48,5 +48,9 @@
     "invalid_input_title": "Could not load message from invalid Input {{inputId}}",
     "no_recent_message": "Input did not return a recent message.",
     "input_type_select_label": "input type select"
+  },
+  "notifications": {
+    "codec_types_failed": "Fetching codec types failed with status",
+    "codec_types_failed_title": "Could not retrieve codec types"
   }
 }

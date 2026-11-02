@@ -75,8 +75,8 @@ const useContentStreamSettings = (): {
     queryFn: () =>
       defaultOnError(
         getContentStreamUserSettings(currentUser.username),
-        'Loading content stream config failed with status',
-        'Could not load content stream.',
+        i18n.t('content_stream.load_config_failed', { ns: 'welcome' }),
+        i18n.t('content_stream.load_config_failed_title', { ns: 'welcome' }),
       ),
   });
   const {
@@ -90,8 +90,8 @@ const useContentStreamSettings = (): {
     queryFn: () =>
       defaultOnError(
         getContentStreamTags(),
-        'Loading content stream tag failed with status',
-        'Could not load content stream tags.',
+        i18n.t('content_stream.load_tags_failed', { ns: 'welcome' }),
+        i18n.t('content_stream.load_tags_failed_title', { ns: 'welcome' }),
       ),
   });
   const { mutateAsync: onSaveContentStreamSetting } = useMutation({

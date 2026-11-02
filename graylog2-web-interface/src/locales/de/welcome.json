@@ -70,6 +70,10 @@
     "rss_unavailable": "Der RSS-Feed kann gerade nicht geladen werden. Weitere Informationen finden Sie bei <blogLink>Graylog</blogLink>.",
     "releases_unavailable": "Der RSS-Feed kann gerade nicht geladen werden. Weitere Informationen finden Sie auf <releasesLink>Graylog.org</releasesLink>.",
     "update_failed": "Aktivieren des Content Streams fehlgeschlagen mit Status: {{error}}",
-    "update_failed_title": "Einstellungen des Content Streams konnten nicht aktualisiert werden"
+    "update_failed_title": "Einstellungen des Content Streams konnten nicht aktualisiert werden",
+    "load_config_failed": "Laden der Content-Stream-Konfiguration fehlgeschlagen mit Status",
+    "load_config_failed_title": "Content Stream konnte nicht geladen werden.",
+    "load_tags_failed": "Laden des Content-Stream-Tags fehlgeschlagen mit Status",
+    "load_tags_failed_title": "Content-Stream-Tags konnten nicht geladen werden."
   }
 }

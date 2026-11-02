@@ -17,6 +17,7 @@
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { Metric, NodeMetric } from 'types/metrics';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -83,8 +84,8 @@ const fetchMetrics = async (hostname: string) => {
   try {
     return await defaultOnError(
       fetch('POST', qualifyUrl(`/datanodes/${hostname}/rest/metrics/multiple`), { metrics: METRIC_NAMES_LIST }),
-      `Loading metrics for Data Node "${hostname}" failed`,
-      'Could not load Data Node metrics.',
+      i18n.t('notifications.data_node_metrics_failed', { ns: 'system', hostname }),
+      i18n.t('notifications.data_node_metrics_failed_title', { ns: 'system' }),
     );
   } catch (_error) {
     return undefined;

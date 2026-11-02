@@ -19,6 +19,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
 import type { Metric, NodeMetric } from 'types/metrics';
@@ -150,8 +151,8 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
       try {
         const response = await defaultOnError(
           fetch('POST', url, { metrics: METRIC_NAMES_LIST }),
-          'Loading Graylog node metrics failed with status',
-          'Could not load Graylog node metrics.',
+          i18n.t('notifications.graylog_node_metrics_failed', { ns: 'system' }),
+          i18n.t('notifications.graylog_node_metrics_failed_title', { ns: 'system' }),
         );
 
         return { nodeId, response };
