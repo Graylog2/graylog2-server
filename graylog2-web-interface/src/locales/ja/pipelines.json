@@ -123,21 +123,136 @@
       "actions": "アクション"
     }
   },
-  "stage": {},
-  "stage_form": {},
-  "used_in_pipelines": {},
-  "deprecation": {},
-  "rule_form": {},
-  "rule_list_entry": {},
-  "metrics_config": {},
-  "rule_simulation": {},
-  "convert_modal": {},
-  "block_display": {},
-  "block": {},
-  "builder_form": {},
-  "block_form": {},
-  "block_field": {},
-  "builder": {},
+  "stage": {
+    "last_stage": "このパイプラインにはこれ以上ステージがありません。このステージのルールが適用されると、パイプラインの処理は完了します。",
+    "continue_all": "このステージの<matchText>すべてのルール</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_either": "このステージの<matchText>少なくとも1つのルール</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_pass": "このステージの<matchText>いずれかのルール、またはルールなし</matchText>に一致するメッセージは、次のステージに進みます。",
+    "continue_unknown": "このステージの<matchText>UNKNOWN</matchText>に一致するメッセージは、次のステージに進みます。",
+    "title": "ステージ {{stage}}",
+    "remove_routing_rule_title": "ルーティングルールを削除",
+    "remove_routing_rule_confirm": "ルーティングルール <ruleTitle>{{title}}</ruleTitle> を本当に削除しますか？"
+  },
+  "stage_form": {
+    "rules_help": "このステージで評価するルールを選択するか、<rulesLink>パイプラインルールページ</rulesLink>で作成してください。",
+    "add_button": "新しいステージを追加",
+    "add_title": "新しいステージ {{stage}} を追加",
+    "edit_title": "ステージ {{stage}} を編集",
+    "add_submit": "ステージを追加",
+    "update_submit": "ステージを更新",
+    "stage": "ステージ",
+    "stage_in_use": "このステージ番号は既に使用されています。別の番号を使用するか、既存のステージを編集してください。",
+    "stage_help": "ステージの優先度です。番号が小さいほど先に実行されます。",
+    "continue_when": "次のステージへの処理を続行する条件",
+    "match_all": "このステージのすべてのルールがメッセージに一致する",
+    "match_any": "このステージのルールの少なくとも1つがメッセージに一致する",
+    "match_pass": "このステージのルールがいずれも一致しない、またはルールが1つ以上一致する",
+    "stage_rules": "ステージのルール"
+  },
+  "used_in_pipelines": {
+    "label": "使用中のパイプライン",
+    "help": "1つ以上のステージでこのルールを使用しているパイプラインです。",
+    "none": "このルールはどのパイプラインでも使用されていません。"
+  },
+  "deprecation": {
+    "label": "非推奨の関数",
+    "title_rule": "このルールには、少なくとも1つの非推奨の関数が含まれています:",
+    "title_pipeline": "このパイプラインには、少なくとも1つの非推奨の関数が含まれています:"
+  },
+  "rule_form": {
+    "duplicate_title": "ルールのタイトル「{{title}}」は既に存在します。",
+    "title": "タイトル",
+    "title_help": "ルールのソースでルールのタイトルを設定できます。詳細はクイックリファレンスをご覧ください。",
+    "leave_question": "このページを離れて変更を破棄しますか？この操作は取り消せません。",
+    "description": "説明",
+    "description_help": "ルールの説明です（任意）。",
+    "source": "ルールのソース",
+    "source_help": "ルールのソースです。詳細はクイックリファレンスをご覧ください。",
+    "create_submit": "ルールを作成",
+    "update_close_submit": "ルールを更新して閉じる",
+    "update": "ルールを更新"
+  },
+  "rule_list_entry": {
+    "edit": "編集",
+    "delete_title": "ルールを削除",
+    "delete": "削除",
+    "managed": "アプリケーションによって管理",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "errors/s"
+  },
+  "metrics_config": {
+    "loading": "メトリクス設定を読み込んでいます...",
+    "title": "ルールメトリクスの設定",
+    "submit": "設定を更新",
+    "warning": "ルールメトリクスは、パフォーマンスの問題をデバッグする場合にのみ有効にしてください。メトリクスを収集するとメッセージ処理が遅くなり、メモリー使用量が増えます。",
+    "enable": "ルールメトリクスを有効化",
+    "disable": "ルールメトリクスを無効化",
+    "pipeline_load_info": "これらのメトリクスを有効にすると、パイプラインとパイプラインルールのページに<columnName>パイプライン負荷</columnName>という新しい列が追加されます。この列には、どのパイプラインがスレッド時間を最も多く消費しているかを相対的に示す割合（%）が表示されます。",
+    "rule_load_info": "これらのメトリクスを有効にすると、パイプラインの詳細ページにも<columnName>ルール負荷</columnName>という新しい列が追加されます。これにより、選択したパイプライン内のどのパイプラインルールが最も高コストかを特定できます。"
+  },
+  "rule_simulation": {
+    "error_builder": "ルールのシミュレーションを実行できませんでした。ルールビルダーのエラーを修正してください。",
+    "placeholder_simple": "シンプルなメッセージフィールド",
+    "invalid_json": "無効なJSONです。",
+    "title": "ルールのシミュレーション",
+    "optional": "（任意）",
+    "json": "JSON",
+    "key_value": "キーと値",
+    "simple_message": "シンプルなメッセージ",
+    "input_title": "シンプルなメッセージフィールド、キーと値のペア、またはJSON",
+    "input_help": "メッセージフィールドをシミュレートする場合は通常の文字列を、メッセージ全体をシミュレートする場合はキーと値のペアまたはJSONを入力してください。",
+    "run": "ルールのシミュレーションを実行",
+    "reset": "リセット",
+    "conditions_output": "条件の出力",
+    "actions_output": "アクションの出力"
+  },
+  "convert_modal": {
+    "no_title": "<no title>",
+    "no_code": "<no code>",
+    "create_rule": "コードから新しいルールを作成",
+    "copied": "ルールのソースコードをクリップボードにコピーしました。",
+    "copy_close": "コピーして閉じる"
+  },
+  "block_display": {
+    "number": "番号",
+    "not": "否定",
+    "deprecated": "非推奨",
+    "edit": "編集",
+    "delete": "削除",
+    "duplicate": "複製",
+    "insert_above": "上に挿入",
+    "insert_below": "下に挿入"
+  },
+  "block": {
+    "insert_title_above": "アクション N°{{order}} の上に新しいアクションを挿入",
+    "insert_title_below": "アクション N°{{order}} の下に新しいアクションを挿入"
+  },
+  "builder_form": {
+    "title": "タイトル",
+    "title_help": "ルールのタイトルです。",
+    "description": "説明",
+    "description_help": "ルールの説明です（任意）。"
+  },
+  "block_form": {
+    "add_condition": "条件を追加",
+    "add_action": "アクションを追加",
+    "syntax_help": "関数の構文ヘルプ",
+    "update": "更新",
+    "add": "追加"
+  },
+  "block_field": {
+    "no_dollar": "「$」で始まるフィールドは使用できません。",
+    "use_previous_output": "前のステップの出力を使用",
+    "set_custom": "カスタム {{name}} を設定",
+    "select_output": "一覧から出力を選択",
+    "output_from_step": "ステップ {{step}} の出力（{{name}}）",
+    "type_not_found": "{{type}} 型を返す前のアクションはありません",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "ルールビルダー"
+  },
   "helper": {},
   "helper_table": {},
   "simulator": {},
