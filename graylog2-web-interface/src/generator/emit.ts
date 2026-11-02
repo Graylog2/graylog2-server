@@ -331,6 +331,7 @@ type TypeResult =
   | ReturnType<typeof emitEnumType>
   | ReturnType<typeof emitTypeLiteral>
   | ReturnType<typeof ts.factory.createTypeReferenceNode>
+  | ReturnType<typeof ts.factory.createUnionTypeNode>
   | undefined;
 
 function emitType(type: Type): TypeResult {
@@ -343,6 +344,8 @@ function emitType(type: Type): TypeResult {
       return emitTypeLiteral(type);
     case 'type_reference':
       return ts.factory.createTypeReferenceNode(type.name);
+    case 'union':
+      return ts.factory.createUnionTypeNode(type.options.map(emitType));
     default:
       assertUnreachable(type, 'Unexpected type');
   }
@@ -528,6 +531,8 @@ const referencedTypes = (type: Type): Array<string> => {
       return [];
     case 'array':
       return referencedTypes(type.items);
+    case 'union':
+      return type.options.flatMap(referencedTypes);
     default:
       assertUnreachable(type, 'Missing type.');
   }
