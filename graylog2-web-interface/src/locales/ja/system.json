@@ -155,26 +155,144 @@
     "utilization": "{{title}} に <strong>{{usage}} 件のメッセージ</strong>があり、{{percentage}} 使用されています。"
   },
   "input_types_data_table": {
-    "loading": "Inputタイプを読み込んでいます..."
+    "loading": "Inputタイプを読み込んでいます...",
+    "unavailable": "Inputタイプを利用できません。",
+    "documentation": "ドキュメント",
+    "name": "名前",
+    "type": "タイプ",
+    "filter": "フィルター"
   },
-  "journal_details": {},
-  "journal_state": {},
-  "jvm_heap_usage": {},
-  "node_list_item": {},
-  "node_maintenance_dropdown": {},
-  "node_overview": {},
-  "nodes_actions": {},
-  "nodes_list": {},
-  "plugins_data_table": {},
-  "rest_api_overview": {},
-  "system_information": {},
-  "system_overview_details": {},
-  "system_overview_summary": {},
-  "bulk_actions": {},
-  "system_notifications_table": {},
-  "actions_cell": {},
-  "title_cell": {},
-  "system_job": {},
+  "journal_details": {
+    "loading": "ジャーナルのメトリクスを読み込んでいます...",
+    "disabled": "このノードではディスクジャーナルが無効になっています。",
+    "unavailable": "ジャーナルのメトリクスを利用できません。",
+    "overcommitted": "<strong>警告！</strong>ジャーナルの使用率が定義された最大サイズを超えています。詳細は<overviewLink>こちらをクリック</overviewLink>してください。",
+    "configuration": "設定",
+    "path": "パス:",
+    "earliest_entry": "最も古いエントリー:",
+    "maximum_size": "最大サイズ:",
+    "maximum_age": "最大保持期間:",
+    "flush_policy": "フラッシュポリシー:",
+    "flush_policy_value": "{{messages}} 件ごと、または {{duration}} ごと",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
+    "utilization": "使用率",
+    "unprocessed_messages": "現在、ジャーナルに<strong>{{messages}} 件の未処理メッセージ</strong>があり、{{segments}} 個のセグメントに分かれています。",
+    "appended_and_read": "直近1秒間に<strong>{{appended}} 件のメッセージ</strong>が追加され、直近1秒間に<strong>{{read}} 件のメッセージ</strong>が読み取られました。"
+  },
+  "journal_state": {
+    "loading": "ジャーナルのメトリクスを読み込んでいます...",
+    "unavailable": "ジャーナルのメトリクスを利用できません。"
+  },
+  "jvm_heap_usage": {
+    "loading": "ヒープ使用状況の情報を読み込んでいます...",
+    "unavailable": "ヒープの情報を利用できません。",
+    "usage": "JVMは<committedBlob /><strong> {{committed}}</strong> のヒープ領域のうち<usedBlob /><strong> {{used}}</strong> を使用しており、<maxBlob /><strong> {{max}}</strong> を超えて使用しようとはしません"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "システム情報は現在利用できません。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "内部ログを設定"
+  },
+  "node_overview": {
+    "memory_heap_usage": "メモリ/ヒープ使用量",
+    "buffers": "バッファー",
+    "buffers_description": "バッファーは、メッセージが各プロセッサーを通過する際に、少量のメッセージを非常に短時間（通常はミリ秒単位）キャッシュするために設計されています。",
+    "input_buffer": "Inputバッファー",
+    "process_buffer": "処理バッファー",
+    "output_buffer": "Outputバッファー",
+    "disk_journal": "ディスクジャーナル",
+    "disk_journal_description": "受信メッセージは、サーバー障害時に安全に保持されるよう、ディスクジャーナルに書き込まれます。また、いずれかのOutputの処理が遅く、メッセージのレートに追いつけない場合や、受信メッセージがピークに達した場合にも機能を維持するのに役立ちます。これにより、メモリの過負荷を防ぎ、ガベージコレクションの一時停止が長くなりすぎるのを回避します。",
+    "system": "システム",
+    "rest_api": "REST API",
+    "installed_plugins": "インストール済みのプラグイン",
+    "manage_inputs": "Inputを管理",
+    "available_input_types": "利用可能なInputタイプ"
+  },
+  "nodes_actions": {
+    "details": "詳細",
+    "metrics": "メトリクス",
+    "more_actions": "その他の操作",
+    "pause_message_processing": "メッセージ処理を一時停止",
+    "resume_message_processing": "メッセージ処理を再開",
+    "pause_confirm": "このノードのメッセージ処理を一時停止しようとしています。よろしいですか？",
+    "resume_confirm": "このノードのメッセージ処理を再開しようとしています。よろしいですか？",
+    "override_lb_status": "LBステータスを上書き",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "このノードのロードバランサーのステータスを {{status}} に変更しようとしています。よろしいですか？",
+    "local_message_inputs": "ローカルのメッセージInput",
+    "thread_dump": "スレッドダンプを取得",
+    "process_buffer_dump": "処理バッファーのダンプを取得",
+    "recent_system_logs": "最新のシステムログメッセージを取得"
+  },
+  "nodes_list": {
+    "no_active_nodes": "アクティブなノードはありません。"
+  },
+  "plugins_data_table": {
+    "loading": "このノードのプラグインを読み込んでいます...",
+    "no_plugins": "このノードにはインストール済みのプラグインがありません。",
+    "name": "名前",
+    "version": "バージョン",
+    "author": "作成者",
+    "description": "説明",
+    "website": "Webサイト",
+    "filter": "フィルター"
+  },
+  "rest_api_overview": {
+    "transport_address": "トランスポートアドレス:",
+    "last_seen": "最終確認:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}、{{info}}",
+    "jvm_unavailable": "このノードのJVM情報を利用できません。",
+    "hostname": "ホスト名:",
+    "node_id": "ノードID:",
+    "version": "バージョン:",
+    "version_codename": "{{version}}、コードネーム <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "時刻:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "このノードのメッセージ処理を一時停止しようとしています。よろしいですか？",
+    "resume_confirm": "このノードのメッセージ処理を再開しようとしています。よろしいですか？",
+    "what_does_this_mean": "これは何を意味しますか？",
+    "lifecycle_state": "ライフサイクルの状態: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "ロードバランサー向けに <strong>{{status}}</strong> としてマークされています",
+    "pause_processing": "処理を一時停止",
+    "resume_processing": "処理を再開",
+    "not_processing": "ノードはメッセージを<strong>処理していません</strong>"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "現在のライフサイクルの状態:",
+    "message_processing": "メッセージ処理:",
+    "enabled": "有効",
+    "disabled": "無効",
+    "lb_indication": "ロードバランサーの表示:"
+  },
+  "bulk_actions": {
+    "dismiss": "閉じる"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "閉じる"
+  },
+  "title_cell": {
+    "show_full_message": "{{title}} の全文を表示"
+  },
+  "system_job": {
+    "acknowledge_failed": "ジョブを確認できませんでした",
+    "cancel_failed": "ジョブをキャンセルできませんでした",
+    "cancel_confirm": "システムジョブ \"{{info}}\" をキャンセルしてもよろしいですか？",
+    "on_node": "- ノード:",
+    "runtime": "実行時間: {{duration}}",
+    "cancel": "キャンセル"
+  },
   "system_jobs_component": {},
   "system_jobs_list": {},
   "system_messages_component": {},
