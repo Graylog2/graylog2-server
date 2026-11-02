@@ -387,25 +387,138 @@
     "highest_aria": "指定最高值",
     "highest_label": "最高值",
     "highest_help": "欄位／序列中預期的最高值。",
-    "coloring": "著色"
+    "coloring": "著色",
+    "static_color": "固定顏色",
+    "gradient": "漸層",
+    "must_be_selected": "必須選取。",
+    "must_be_present": "必須填寫。",
+    "must_be_number": "必須為數字。",
+    "must_be_higher": "必須高於最低值。",
+    "coloring_required": "必須選擇著色方式",
+    "gradient_numeric_only": "只能為數值欄位定義漸層。"
   },
-  "highlighting_rule": {},
-  "change_field_type": {},
-  "value_actions": {},
+  "highlighting_rule": {
+    "edit": "編輯此醒目提示規則",
+    "remove": "移除此醒目提示規則",
+    "confirm_remove": "您確定要移除此醒目提示嗎？"
+  },
+  "change_field_type": {
+    "no_permission_title": "沒有權限",
+    "no_permission_description": "您沒有執行此動作的權限",
+    "enterprise_plugin_required": "（需要 <enterpriseLink>Enterprise 外掛程式</enterpriseLink>）",
+    "modal_title": "變更 {{fieldName}} 欄位類型",
+    "impact_warning": "變更欄位 <bold>{{fieldName}}</bold> 的類型，可能會對後續日誌訊息的擷取造成重大影響。若您宣告的欄位類型與擷取的日誌不相容，可能會導致擷取錯誤。",
+    "failure_processing_hint": "建議啟用<docsLink>失敗處理</docsLink>，並在之後密切監控 <failureStream/> Stream。",
+    "select_field_type_for": "選取 {{fieldName}} 的欄位類型",
+    "select_field_type_for_field": "為欄位選取欄位類型",
+    "select_field_type": "選取欄位類型",
+    "select_index_sets": "選取目標索引集",
+    "index_sets_hint_with_type": "預設情況下，目前訊息／搜尋所有索引集中的 <bold>{{fieldName}}</bold> 欄位都會設定為 <bold>{{type}}</bold> 欄位類型。您可以選取要套用變更的索引集。",
+    "index_sets_hint": "預設情況下，目前訊息／搜尋所有索引集中的 <bold>{{fieldName}}</bold> 欄位都會設定為所選的欄位類型。您可以選取要套用變更的索引集。",
+    "select_rotation_strategy": "選取輪替策略",
+    "rotation_hint_type_field": "若要查看並將 <bold>{{type}}</bold> 用作 <bold>{{fieldName}}</bold> 的欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint_type": "若要查看並將 <bold>{{type}}</bold> 用作欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint_field": "若要查看並將所選欄位類型用作 <bold>{{fieldName}}</bold> 的欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint": "若要查看並將所選欄位類型用作欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotate_indices": "變更後輪替受影響的索引",
+    "changing": "正在變更欄位類型...",
+    "change": "變更欄位類型",
+    "select_field": "選取欄位",
+    "select_field_placeholder": "選取或輸入欄位",
+    "type_not_defined": "未定義類型",
+    "previous_values": "（先前的值：{{values}}）",
+    "load_index_field_types_failed": "載入索引欄位類型失敗，狀態為",
+    "could_not_load_index_field_types": "無法載入索引欄位類型",
+    "load_field_type_options_failed": "載入欄位類型選項失敗，狀態為",
+    "could_not_load_field_type_options": "無法載入欄位類型選項",
+    "load_field_types_failed": "載入 {{field}} 類型失敗，狀態為",
+    "could_not_load_field_types": "無法載入欄位類型",
+    "load_index_sets_failed": "載入支援欄位類型變更的索引集失敗，狀態為",
+    "could_not_load_index_sets": "無法載入支援欄位類型變更的索引集",
+    "change_failed": "變更欄位類型失敗，狀態：{{error}}",
+    "change_failed_title": "無法變更欄位類型",
+    "change_success": "欄位類型已成功變更",
+    "success_title": "成功！"
+  },
+  "value_actions": {
+    "select_extractor_type": "選取擷取器類型",
+    "exclude": "從結果中排除",
+    "add_to_query": "新增至查詢",
+    "show_documents": "顯示此值的文件",
+    "create_extractor": "建立擷取器",
+    "highlight_value": "醒目提示此值",
+    "create_event_definition": "建立事件定義",
+    "copy_value": "將值複製到剪貼簿"
+  },
   "create_event_definition": {
-    "sections": {},
-    "items": {},
+    "title": "設定新的事件定義",
+    "hide_details": "隱藏策略詳細資訊",
+    "show_details": "顯示策略詳細資訊",
+    "continue": "繼續設定",
+    "strategy_by": "策略依據：",
+    "description": "描述：",
+    "sections": {
+      "aggregation": "彙總設定",
+      "search": "搜尋查詢"
+    },
+    "items": {
+      "rowValuePath": "從表格列查詢",
+      "columnValuePath": "從表格欄查詢",
+      "columnGroupBy": "依欄值分組",
+      "rowGroupBy": "依列值分組",
+      "aggCondition": "條件",
+      "queryWithReplacedParams": "從搜尋查詢",
+      "searchFilterQuery": "從搜尋篩選器查詢",
+      "streams": "Stream",
+      "searchWithinMs": "在毫秒內搜尋",
+      "lutParameters": "查閱表參數",
+      "searchFromValue": "從值查詢"
+    },
+    "item_label": "{{label}}：",
     "strategies": {
-      "EXACT": {},
-      "ROW": {},
-      "COL": {},
-      "ALL": {},
-      "CUSTOM": {}
+      "EXACT": {
+        "label": "僅此值",
+        "description": "此策略包含與目前搜尋檢視相關的所有搜尋查詢、篩選器等"
+      },
+      "ROW": {
+        "label": "列中的任一值",
+        "description": "此策略包含列樞紐"
+      },
+      "COL": {
+        "label": "欄中的任一值",
+        "description": "此策略包含欄樞紐"
+      },
+      "ALL": {
+        "label": "Widget 中的任一值",
+        "description": "此策略包含與所選值相關的所有列與欄樞紐值"
+      },
+      "CUSTOM": {
+        "label": "自訂",
+        "description": "您可以選取任何搜尋部分"
+      }
     }
   },
-  "view_errors": {},
-  "views_notifications": {},
-  "field_actions": {},
+  "view_errors": {
+    "something_went_wrong": "發生錯誤",
+    "unknown_error": "發生未知錯誤。請參閱下列訊息以及 {{productName}} 伺服器日誌以取得更多資訊。"
+  },
+  "views_notifications": {
+    "delete_view_failed": "刪除檢視 {{title}} 失敗，狀態：{{error}}",
+    "delete_view_failed_title": "無法刪除檢視",
+    "apply_widget_changes_failed": "套用 Widget 變更失敗，狀態：{{error}}",
+    "load_message_failed": "載入訊息資訊失敗，狀態為",
+    "could_not_load_message": "無法載入訊息資訊"
+  },
+  "field_actions": {
+    "chart": "圖表",
+    "show_top_values": "顯示前幾名的值",
+    "statistics": "統計資料",
+    "add_to_table": "新增至表格",
+    "remove_from_table": "從表格移除",
+    "add_to_all_tables": "新增至所有表格",
+    "remove_from_all_tables": "從所有表格移除",
+    "change_field_type": "變更欄位類型"
+  },
   "aggregation": {},
   "widget_creators": {},
   "message_details": {},
