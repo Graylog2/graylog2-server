@@ -271,20 +271,132 @@
     "no_match": "Nessuna fleet corrisponde al filtro"
   },
   "recent_activity": {
-    "title": "Attività recente"
+    "title": "Attività recente",
+    "empty": "Nessuna attività recente."
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Host",
+    "os": "SO",
+    "version": "Versione",
+    "fleet": "Fleet",
+    "enrolled": "Registrato",
+    "last_seen": "Ultimo contatto",
+    "hide_attributes": "Nascondi attributi"
+  },
+  "connection_success": {
+    "offline": "Il collector si è connesso una volta ma non invia dati dal <lastSeen />.",
+    "receiving": "Il collector è connesso e sta inviando messaggi.",
+    "waiting": "Ci siamo quasi: il collector è connesso e siamo in attesa dei suoi primi messaggi.",
+    "title": "Configurazione di {{host}} in corso",
+    "view_instances": "Mostra istanze",
+    "check_again": "Controlla di nuovo",
+    "log_preview": "Anteprima dei log",
+    "caption_messages": "Messaggi ricevuti da {{duration}}",
+    "caption_messages_checking": "Messaggi ricevuti da {{duration}} - controllo ogni pochi secondi",
+    "caption_system": "Messaggi di sistema del Collector ricevuti da {{duration}}",
+    "caption_system_checking": "Messaggi di sistema del Collector ricevuti da {{duration}} - controllo ogni pochi secondi"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet per questo Collector",
+    "change": "Cambia fleet",
+    "heading": "Scegli una fleet per questo Collector",
+    "create_new": "Crea nuova fleet",
+    "or": "oppure",
+    "select_existing": "Seleziona una fleet esistente",
+    "select_existing_placeholder": "Seleziona una fleet esistente..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Configurazione dei Collector in corso...",
+    "confirm": "Conferma endpoint",
+    "create_input": "Crea input",
+    "save": "Salva endpoint",
+    "hostname": "Hostname esterno",
+    "hostname_placeholder": "es. otlp.example.com",
+    "port": "Porta esterna",
+    "cancel": "Annulla",
+    "reachability_hint": "I Collector inviano i log a questo indirizzo. Deve essere raggiungibile da ogni host dei Collector: un load balancer oppure questo server.",
+    "confirm_title": "Conferma come i Collector inviano i dati a questo cluster",
+    "change": "Cambia endpoint",
+    "sending_to": "I Collector inviano i dati a questo cluster all'indirizzo <endpoint />",
+    "no_input_title": "Nessun input di ingestione presente",
+    "no_input": "I Collector possono registrarsi, ma non potranno inviare dati finché non viene creato un input.",
+    "not_running_title": "L'input di ingestione su <endpoint /> non è in esecuzione",
+    "not_running": "I Collector possono registrarsi, ma non potranno inviare dati finché un input non è in esecuzione.",
+    "manage_input": "Gestisci input"
+  },
+  "install_command": {
+    "title": "Esegui questo comando su {{platform}}",
+    "copy": "Copia comando",
+    "note_expires": "Scarica e installa il collector, lo registra nella fleet selezionata e avvia il servizio. Richiede i privilegi di amministratore. Il token scade tra {{duration}}.",
+    "note_never_expires": "Scarica e installa il collector, lo registra nella fleet selezionata e avvia il servizio. Richiede i privilegi di amministratore. Questo token non scade mai."
+  },
+  "log_preview": {
+    "unavailable": "Anteprima dei log non disponibile: {{error}}",
+    "loading": "Caricamento dell'anteprima dei log...",
+    "empty": "Nessun messaggio ancora: controllo ogni pochi secondi"
+  },
+  "next_steps": {
+    "explore": "Esplora i tuoi dati",
+    "explore_description": "Apri la ricerca filtrata su questo collector",
+    "configure_sources": "Configura le sorgenti",
+    "configure_sources_description": "Aggiungi o modifica ciò che questa fleet raccoglie",
+    "manage_fleets": "Gestisci le fleet",
+    "manage_fleets_description": "Sposta questo collector in una fleet permanente",
+    "install_another": "Installa un altro collector",
+    "install_another_description": "Ripeti questa configurazione su un altro host",
+    "offline_title": "Riportalo online",
+    "check_service": "Verifica che il servizio del collector sia in esecuzione sull'host.",
+    "check_reachability": "Verifica che l'host possa raggiungere questo server {{productName}}.",
+    "check_logs": "Controlla nell'anteprima qui sotto i log del collector per eventuali errori di connessione.",
+    "title": "Passaggi successivi"
+  },
+  "timeline": {
+    "connection_lost": "Connessione persa",
+    "last_heartbeat": "Ultimo heartbeat <lastSeen />",
+    "first_messages": "Primi messaggi",
+    "listening": "In ascolto... di solito meno di un minuto",
+    "enrolled": "Registrato",
+    "enrolled_detail": "Registrato con un token di registrazione - <enrolledAt />",
+    "connected": "Connesso",
+    "connected_detail": "Heartbeat ricevuto - <lastSeen />",
+    "sources_configured": "Sorgenti configurate"
+  },
+  "platform_picker": {
+    "title": "Inizia con i Collector",
+    "description": "Distribuisci collector leggeri nella tua infrastruttura per inoltrare i log a {{productName}}."
+  },
+  "source_status": {
+    "disabled": "Disabilitata",
+    "not_applicable": "Non applicabile su {{os}}",
+    "unrecognised": "Tipo di sorgente non riconosciuto",
+    "paused": "In pausa: collector offline",
+    "no_messages": "Nessun messaggio ancora",
+    "waiting": "In attesa dei primi messaggi...",
+    "title": "Sorgenti dei log",
+    "no_sources": "Nessuna sorgente configurata per questa fleet."
+  },
+  "waiting_for_connection": {
+    "status": "In attesa di connessione... {{seconds}}s"
+  },
+  "settings": {
+    "getting_started": "Primi passi con i Collector",
+    "getting_started_cloud": "I Collector si connettono a un endpoint di ingestione gestito per inviare i propri dati. Salva le impostazioni dei collector per inizializzare l'infrastruttura. Al termine della configurazione potrai creare fleet, aggiungere sorgenti e distribuire i collector sui tuoi host.",
+    "getting_started_self_managed": "I Collector hanno bisogno di endpoint di ingestione per ricevere i dati raccolti. Configura l'endpoint HTTP qui sotto e salva per inizializzare l'infrastruttura dei collector. Al termine della configurazione potrai creare fleet, aggiungere sorgenti e distribuire i collector sui tuoi host.",
+    "ingest_endpoint": "Endpoint di ingestione",
+    "ingest_endpoint_cloud": "L'endpoint di ingestione è gestito dal sistema. I Collector si connettono qui automaticamente.",
+    "ingest_endpoint_help": "Gli endpoint di ingestione ricevono i dati di log dai collector tramite OpenTelemetry (OTLP). È l'indirizzo esterno inviato ai collector gestiti come destinazione dei dati. Deve instradare verso un input di ingestione del collector in esecuzione, di solito l'indirizzo di un load balancer o del server stesso.",
+    "hostname_help": "Il nome host o l'indirizzo IP che i Collector useranno per connettersi. Deve essere raggiungibile dagli host dei Collector.",
+    "create_input": "Crea input di ingestione",
+    "lifecycle": "Ciclo di vita dei Collector",
+    "offline_threshold": "Soglia di disconnessione",
+    "offline_threshold_help": "I Collector che non inviano dati entro questo tempo vengono mostrati come offline.",
+    "default_visibility": "Visibilità predefinita",
+    "default_visibility_help": "I Collector che non inviano dati entro questo tempo vengono nascosti dalla vista predefinita. Gli utenti possono modificare o rimuovere questo filtro nella tabella delle istanze.",
+    "expiration_threshold": "Soglia di scadenza",
+    "expiration_threshold_help": "I Collector che non inviano dati entro questo tempo vengono rimossi in modo permanente.",
+    "confirm": "Conferma impostazioni"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
