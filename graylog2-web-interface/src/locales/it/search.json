@@ -1,1 +1,182 @@
-{}
+{
+  "button": {
+    "perform_search": "Esegui ricerca",
+    "perform_search_dirty": "Esegui ricerca (modifiche apportate dopo l'ultima esecuzione)"
+  },
+  "sidebar": {
+    "description": "Descrizione",
+    "create": "Crea",
+    "highlighting": "Evidenziazione",
+    "fields": "Campi"
+  },
+  "empty_state": {
+    "no_widgets_search": "Non ci sono widget definiti per visualizzare il risultato della ricerca",
+    "no_widgets_dashboard": "Questa dashboard non ha ancora widget",
+    "create_widget_hint": "Crea un nuovo widget selezionando un tipo di widget nella sezione \"Crea\" della barra laterale sinistra.",
+    "tips_title": "Alcuni suggerimenti per creare ricerche e dashboard",
+    "tip_1": "Inizia con una <bold>domanda</bold> a cui vuoi rispondere. Definisci il problema che vuoi risolvere.",
+    "tip_2": "<bold>Limita</bold> i dati solo ai punti dati che vuoi vedere.",
+    "tip_3": "<bold>Visualizza</bold> i dati. Rispondono alla tua domanda?",
+    "tip_4": "<bold>Condividi</bold> la dashboard con i tuoi colleghi. Preparala per il <bold>riutilizzo</bold> usando i parametri"
+  },
+  "search_bar": {
+    "streams_placeholder": "Seleziona gli stream da includere nella ricerca. Se vuoto, cerca in tutti gli stream.",
+    "refresh_human_name": "Cerca",
+    "query_history_title": "Apri cronologia query",
+    "filters_label": "Filtri",
+    "filters_tooltip_title": "Filtri di ricerca",
+    "filters_enterprise_hint": "I filtri di ricerca e i parametri sono disponibili per la versione enterprise.",
+    "filters_hide_controls": "Nascondi controlli",
+    "scroll_hint": "Scorri fino alla barra di ricerca",
+    "query_placeholder": "Digita qui la tua query di ricerca e premi invio. Es.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Ricerca salvata",
+    "save_search": "Salva ricerca",
+    "unsaved_changes": "Modifiche non salvate",
+    "load_title": "Carica una ricerca salvata in precedenza",
+    "load": "Carica",
+    "share_disabled": "Solo le ricerche salvate possono essere condivise.",
+    "dropdown_aria_label": "Apri il menu delle azioni di ricerca",
+    "edit_metadata": "Modifica metadati",
+    "export_to_dashboard": "Esporta in dashboard",
+    "export": "Esporta",
+    "reset_search": "Reimposta ricerca",
+    "editing_modal_title": "Modifica ricerca salvata",
+    "update_search": "Aggiorna ricerca",
+    "share_description": "Cerca un utente o un team da aggiungere come collaboratore di questa ricerca salvata.",
+    "save_success": "Salvataggio della vista \"{{title}}\" riuscito!",
+    "save_error": "Salvataggio della vista non riuscito: {{error}}",
+    "delete_success": "Eliminazione della ricerca salvata \"{{title}}\" riuscita!",
+    "delete_error": "Eliminazione della ricerca salvata non riuscita: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Nome della ricerca",
+    "dirty_warning": "Ci sono modifiche non confermate ai parametri di ricerca (intervallo di tempo, stream o query). Salvando ora verranno scartate. Se non è intenzionale, esegui la ricerca per applicare le modifiche prima di salvare.",
+    "title_label": "Titolo",
+    "title_placeholder": "Inserisci titolo",
+    "share_description": "Cerca un utente o un team da aggiungere come collaboratore di questa ricerca.",
+    "create_new": "Crea nuova",
+    "save_as": "Salva come",
+    "create_new_title": "Crea nuova ricerca",
+    "save_as_title": "Salva come nuova ricerca",
+    "save": "Salva",
+    "save_title": "Salva ricerca",
+    "cancel": "Annulla"
+  },
+  "results": {
+    "loading": "Aggiornamento dei risultati di ricerca..."
+  },
+  "sidebar_description": {
+    "execution": "Esecuzione",
+    "ad_hoc_info": "Salva la ricerca o esportala in una dashboard per aggiungere un riepilogo e una descrizione personalizzati.",
+    "edit_metadata_hint": "Per aggiungere una descrizione e un riepilogo per questo {{viewType}}, fai clic sull'icona <icon/> nella barra di ricerca per aprire il suo menu azioni. Il menu include l'opzione \"Modifica metadati\".",
+    "search_section": "Ricerca",
+    "no_summary": "Questo {{viewType}} non ha un riepilogo.",
+    "no_description": "Questo {{viewType}} non ha una descrizione.",
+    "no_query": "Nessuna query eseguita finora.",
+    "query_executed_in": "Query eseguita in",
+    "effective_time_range": "Intervallo di tempo effettivo",
+    "varies_per_widget": "Varia per widget",
+    "time_from": "Da",
+    "time_to": "A",
+    "total_results": "Risultati totali"
+  },
+  "sidebar_create": {
+    "info": "Usa le seguenti opzioni per aggiungere un'aggregazione, una vista di log (funzionalità enterprise) o parametri (funzionalità enterprise) alla tua ricerca.",
+    "generic": "Generico",
+    "predefined_aggregation": "Aggregazione predefinita",
+    "investigations": "Investigations",
+    "events": "Eventi"
+  },
+  "sidebar_highlighting": {
+    "description": "I termini di ricerca e i valori dei campi possono essere evidenziati. L'evidenziazione della query di ricerca nei risultati può essere attivata o disattivata nella configurazione del server {{productName}}. Qualsiasi valore di un campo può essere evidenziato facendo clic sul valore e selezionando \"Evidenzia questo valore\".\nSe un termine o un valore ha più di una regola, viene usata la prima regola corrispondente.",
+    "active_highlights": "Evidenziazioni attive",
+    "add_rule_title": "Aggiungi regola di evidenziazione",
+    "search_terms": "Termini di ricerca"
+  },
+  "save_view": {
+    "save": "Salva",
+    "save_as": "Salva come",
+    "save_as_new_dashboard_title": "Salva come nuova dashboard",
+    "save_dashboard_title": "Salva dashboard"
+  },
+  "undo_redo": {
+    "undo": "Annulla",
+    "redo": "Ripeti"
+  },
+  "time_range": {
+    "tab_relative": "Relativo",
+    "tab_absolute": "Assoluto",
+    "tab_keyword": "Parola chiave",
+    "from_label": "Da:",
+    "until_label": "Fino a:",
+    "keyword_label": "Parola chiave:",
+    "no_override": "Nessuna sostituzione",
+    "now": "Ora",
+    "all_time": "Sempre",
+    "ago": "fa",
+    "range_ago": "{{time}} fa",
+    "range_length_placeholder": "Seleziona una durata",
+    "load_preset": "Carica preimpostazione",
+    "no_available_presets": "Nessuna preimpostazione disponibile",
+    "loading": "Caricamento...",
+    "configure_presets": "Configura preimpostazioni",
+    "insert_current_date": "Inserisci data corrente",
+    "from_hours_label": "da ore"
+  },
+  "execution_info": {},
+  "highlight_form": {},
+  "query_tabs": {},
+  "widget_creation": {},
+  "dashboard_actions": {},
+  "dashboard_search_bar": {},
+  "debug": {},
+  "common_views": {
+    "time_range_validation": {},
+    "view_type": {}
+  },
+  "field_charts_migration": {},
+  "query": {},
+  "widget_query": {},
+  "editable_title": {},
+  "message_permalink": {},
+  "query_title": {},
+  "missing_requirements": {},
+  "view_header": {},
+  "execution": {},
+  "dashboards_page": {},
+  "search_filter_banner": {},
+  "widget_time_range": {},
+  "time_range_presets": {},
+  "move_range": {},
+  "query_validation": {},
+  "saved_searches": {},
+  "search_meta": {},
+  "save_view_notifications": {},
+  "sidebar_layout": {},
+  "search_result_overview": {},
+  "fields_overview": {},
+  "highlighting_color": {},
+  "highlighting_rule": {},
+  "change_field_type": {},
+  "value_actions": {},
+  "create_event_definition": {
+    "sections": {},
+    "items": {},
+    "strategies": {
+      "EXACT": {},
+      "ROW": {},
+      "COL": {},
+      "ALL": {},
+      "CUSTOM": {}
+    }
+  },
+  "view_errors": {},
+  "views_notifications": {},
+  "field_actions": {},
+  "aggregation": {},
+  "widget_creators": {},
+  "message_details": {},
+  "views_logic": {}
+}
