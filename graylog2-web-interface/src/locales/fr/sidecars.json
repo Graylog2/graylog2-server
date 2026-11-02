@@ -6,7 +6,10 @@
       "no_collectors": "Aucun collecteur à afficher",
       "no_compatible_collectors": "Aucun collecteur compatible avec {{operatingSystem}}",
       "no_filter_matches": "Aucun collecteur ne correspond aux filtres",
-      "select_all": "Tout sélectionner"
+      "select_all": "Tout sélectionner",
+      "selected_one": "{{count}} sélectionné",
+      "selected_other": "{{count}} sélectionnés",
+      "selected_many": "{{count}} sélectionnés"
     },
     "collectors_administration_actions": {
       "assign_configurations": "Assigner des configurations",
@@ -30,12 +33,18 @@
       "no_configurations": "Aucune configuration disponible pour le collecteur de logs sélectionné.",
       "remove": "Retirer {{name}}",
       "selected": "{{name}} est sélectionné",
+      "sidecar_count_one": "{{count}} sidecar : ",
+      "sidecar_count_other": "{{count}} sidecars : ",
       "title": "Modifier les configurations de <collectorName>{{name}}</collectorName>",
-      "unknown_collector": "Collecteur inconnu"
+      "unknown_collector": "Collecteur inconnu",
+      "sidecar_count_many": "{{count}} sidecars : "
     },
     "configuration_summary": {
       "confirm": "Êtes-vous sûr de vouloir poursuivre cette action pour <summaryText>{{summary}}</summaryText> ?",
-      "title": "Récapitulatif de la configuration"
+      "sidecars_summary_one": "{{count}} sidecar",
+      "sidecars_summary_other": "{{count}} sidecars",
+      "title": "Récapitulatif de la configuration",
+      "sidecars_summary_many": "{{count}} sidecars"
     },
     "filters_summary": {
       "clear_all": "Tout effacer",
@@ -56,7 +65,17 @@
         "start": "Démarrer un collecteur sans configuration n'aura aucun effet.",
         "stop": "Arrêter un collecteur sans configuration n'aura aucun effet."
       },
-      "summary": {},
+      "summary": {
+        "restart_one": "Vous allez <action>redémarrer</action> les collecteurs de logs de ce sidecar :",
+        "restart_other": "Vous allez <action>redémarrer</action> les collecteurs de logs de ces sidecars :",
+        "start_one": "Vous allez <action>démarrer</action> les collecteurs de logs de ce sidecar :",
+        "start_other": "Vous allez <action>démarrer</action> les collecteurs de logs de ces sidecars :",
+        "stop_one": "Vous allez <action>arrêter</action> les collecteurs de logs de ce sidecar :",
+        "stop_other": "Vous allez <action>arrêter</action> les collecteurs de logs de ces sidecars :",
+        "restart_many": "Vous allez <action>redémarrer</action> les collecteurs de logs de ces sidecars :",
+        "start_many": "Vous allez <action>démarrer</action> les collecteurs de logs de ces sidecars :",
+        "stop_many": "Vous allez <action>arrêter</action> les collecteurs de logs de ces sidecars :"
+      },
       "summary_title": "Récapitulatif de l'action sur les processus",
       "title": "Gérer les processus des collecteurs",
       "understood": "Compris, continuer quand même",
@@ -273,26 +292,119 @@
       "show_messages": "Afficher les messages"
     },
     "sidecar_status": {
-      "collector_running": "Le collecteur est en cours d'exécution."
+      "collector_running": "Le collecteur est en cours d'exécution.",
+      "collector_unknown": "Le statut du collecteur est actuellement inconnu.",
+      "collectors_status_title": "Statut des collecteurs",
+      "collectors_status_unavailable": "Le statut des collecteurs n'est pas disponible pour le moment. Veuillez patienter un instant et vérifier que le sidecar est correctement connecté au serveur.",
+      "cpu_idle": "CPU inactif",
+      "ip_address": "Adresse IP",
+      "load": "Charge",
+      "log_files_title": "Fichiers de log",
+      "node_details_title": "Détails du nœud",
+      "node_details_unavailable": "Les détails du nœud ne sont pas disponibles pour le moment. Veuillez patienter un instant et vérifier que le sidecar est correctement connecté au serveur.",
+      "no_collectors": "Aucun collecteur n'est configuré sur ce sidecar.",
+      "no_status_received": "Statut des collecteurs non reçu. Définissez l'option <code>send_status: true</code> dans la configuration du sidecar pour afficher ces informations.",
+      "none": "Aucun",
+      "not_available": "Non disponible",
+      "operating_system": "Système d'exploitation",
+      "recently_modified": "Les fichiers modifiés récemment seront mis en évidence en bleu.",
+      "show_details": "Afficher les détails",
+      "volumes_75": "Volumes remplis à plus de 75 %"
     },
-    "verbose_message_modal": {}
+    "verbose_message_modal": {
+      "close": "Fermer",
+      "no_messages": "<aucun message>",
+      "title": "Détails de l'erreur pour <em>{{collectorName}}</em>"
+    }
   },
   "pages": {
-    "administration": {},
-    "configuration": {},
-    "edit_collector": {},
-    "edit_configuration": {},
-    "failure_tracking": {},
-    "new_collector": {},
-    "new_configuration": {},
-    "overview": {},
-    "status": {}
+    "administration": {
+      "description": "Les collecteurs peuvent transférer de manière fiable le contenu des fichiers de log ou du Windows EventLog de vos serveurs.",
+      "title": "Administration des collecteurs"
+    },
+    "configuration": {
+      "description": "Le Collector Sidecar s'exécute à côté de votre collecteur de logs préféré et le configure pour vous. Vous pouvez gérer ici les configurations des sidecars.",
+      "title": "Configuration des collecteurs"
+    },
+    "documentation_title": "Documentation du sidecar",
+    "edit_collector": {
+      "description": "Quelques mots sur les collecteurs de logs.",
+      "title": "Collecteur de logs"
+    },
+    "edit_configuration": {
+      "description": "Quelques mots sur les configurations de collecteur.",
+      "title": "Configuration de collecteur"
+    },
+    "failure_tracking": {
+      "description": "Le suivi des échecs des Sidecars fournit des informations utiles sur les causes des échecs, qui peuvent vous aider à réduire le temps de dépannage et à remettre vos collecteurs en ligne plus rapidement.",
+      "document_title": "Sidecars",
+      "title": "Suivi des échecs"
+    },
+    "new_collector": {
+      "description": "Quelques mots sur les collecteurs de logs.",
+      "title": "Nouveau collecteur de logs"
+    },
+    "new_configuration": {
+      "description": "Quelques mots sur les configurations de collecteur.",
+      "title": "Nouvelle configuration de collecteur"
+    },
+    "overview": {
+      "description": "Les sidecars peuvent transférer de manière fiable le contenu des fichiers de log ou du Windows EventLog de vos serveurs.",
+      "document_title": "Sidecars",
+      "title": "Vue d'ensemble des sidecars",
+      "token_hint": "Vous avez besoin d'un jeton API pour un sidecar ? <tokenLink>Créez ou réutilisez un jeton pour l'utilisateur <em>{{username}}</em></tokenLink>"
+    },
+    "status": {
+      "description": "Une vue d'ensemble de l'état du Sidecar.",
+      "document_title": "Statut du sidecar",
+      "document_title_named": "Statut du sidecar {{name}}",
+      "documentation_title": "Documentation des sidecars",
+      "title": "Statut du sidecar <em>{{name}}</em>"
+    }
   },
-  "notifications": {},
-  "use_sidecars_notifications": {},
+  "notifications": {
+    "fetch_failed": "Le chargement des variables de configuration a échoué avec le statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les variables de configuration",
+    "save_success_created": "La variable de configuration « {{name}} » a bien été créée",
+    "save_success_updated": "La variable de configuration « {{name}} » a bien été mise à jour",
+    "save_failed": "L'enregistrement de la variable « {{name}} » a échoué avec le statut : {{error}}",
+    "save_failed_title": "Impossible d'enregistrer la variable",
+    "delete_success": "La variable de configuration « {{name}} » a bien été supprimée",
+    "delete_failed": "La suppression de la variable « {{name}} » a échoué avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer la variable",
+    "validate_failed": "La validation de la variable « {{name}} » a échoué avec le statut : {{error}}",
+    "validate_failed_title": "Impossible de valider la variable",
+    "configurations_fetch_failed": "Le chargement des configurations de cette variable a échoué avec le statut : {{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "Le chargement du Sidecar a échoué avec le statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer le Sidecar",
+    "not_found": "Impossible de trouver un sidecar avec l'ID <{{sidecarId}}>, il était peut-être inactif depuis trop longtemps.",
+    "fetch_actions_failed": "Le chargement des actions du Sidecar a échoué avec le statut : {{error}}",
+    "fetch_actions_failed_title": "Impossible de récupérer les actions du Sidecar",
+    "restart_failed": "Le redémarrage du Sidecar a échoué avec le statut : {{error}}",
+    "restart_failed_title": "Impossible de redémarrer le Sidecar",
+    "configuration_change_requested": "Modification de configuration demandée pour {{amount}} collecteurs",
+    "fetch_sidecars_failed": "Le chargement des Sidecars a échoué avec le statut : {{error}}",
+    "fetch_sidecars_failed_title": "Impossible de récupérer les Sidecars"
+  },
   "use_sidecars_administration_notifications": {
-    "requested": {},
-    "request_failed": {},
-    "request_failed_title": {}
+    "fetch_sidecars_failed": "Le chargement des Sidecars a échoué avec le statut : {{error}}",
+    "fetch_sidecars_failed_title": "Impossible de récupérer les Sidecars",
+    "requested": {
+      "start": "Démarrage demandé pour {{amount}} collecteurs",
+      "restart": "Redémarrage demandé pour {{amount}} collecteurs",
+      "stop": "Arrêt demandé pour {{amount}} collecteurs"
+    },
+    "request_failed": {
+      "start": "La demande de démarrage a échoué avec le statut : {{error}}",
+      "restart": "La demande de redémarrage a échoué avec le statut : {{error}}",
+      "stop": "La demande d'arrêt a échoué avec le statut : {{error}}"
+    },
+    "request_failed_title": {
+      "start": "Impossible de démarrer les collecteurs",
+      "restart": "Impossible de redémarrer les collecteurs",
+      "stop": "Impossible d'arrêter les collecteurs"
+    }
   }
 }
