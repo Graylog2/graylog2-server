@@ -247,26 +247,140 @@
     "not_found_title": "Não foi possível recuperar a Event Definition",
     "save_failed": "Falha ao salvar EventDefinition com status: {{error}}",
     "save_failed_title": "Não foi possível salvar EventDefinition",
-    "update_failed": "Falha ao atualizar a Event Definition \"{{title}}\" com status: {{error}}"
+    "update_failed": "Falha ao atualizar a Event Definition \"{{title}}\" com status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar a Event Definition",
+    "update_success": "A Event Definition \"{{title}}\" foi atualizada com sucesso.",
+    "update_success_title": "Event Definition atualizada com sucesso"
   },
-  "notification_list": {},
-  "notification_settings": {},
-  "notifications_form": {},
-  "overview": {},
-  "page": {},
-  "priorities": {},
-  "provider_summary": {},
+  "notification_list": {
+    "no_notifications": "Este Evento ainda não está configurado para disparar Notificações.",
+    "not_found": "Não foi possível encontrar informações para a Notificação <em>{{title}}</em>",
+    "notification": "Notificação",
+    "type": "Tipo"
+  },
+  "notification_settings": {
+    "grace_period": "Período de carência",
+    "grace_period_help": "As notificações de alertas são enviadas toda vez que ocorrem. Defina um Período de carência para controlar por quanto tempo esperar antes de enviar as Notificações novamente. Observe que Eventos com chaves terão um Período de carência para cada valor de chave diferente.",
+    "message_backlog": "Backlog de mensagens",
+    "message_backlog_help": "Número de mensagens a serem incluídas nas Notificações.",
+    "toggle_message_backlog": "Alternar backlog de mensagens"
+  },
+  "notifications_form": {
+    "description": "Este Evento é importante o bastante para exigir sua atenção? Transforme-o em um Alerta adicionando Notificações a ele.",
+    "manage": "Gerenciar Notificações"
+  },
+  "overview": {
+    "human_name": "event definitions",
+    "user_defined": "Definido pelo usuário"
+  },
+  "page": {
+    "alerts_docs": "Documentação de alertas",
+    "copy_confirm": "Tem certeza de que deseja criar uma cópia de \"{{title}}\"?",
+    "copy_title": "Copiar Event Definition",
+    "create_multiple": "Criar Event Definitions",
+    "description_alerts": "As Event Definitions permitem criar Alertas a partir de diferentes Condições e disparar alertas com base neles.",
+    "description_events": "As Event Definitions permitem criar Eventos a partir de diferentes Condições e disparar alertas com base neles.",
+    "description_list": "Crie novas Event Definitions que permitirão pesquisar diferentes Condições e disparar alertas com base nelas.",
+    "duplicate": "Duplicar Event Definition",
+    "edit": "Editar Event Definition",
+    "edit_named": "Editar Event Definition \"{{title}}\"",
+    "file_import": "Criar Event Definitions - Importação de arquivo",
+    "git_import": "Criar Event Definitions - Importação do Git",
+    "loading": "Carregando Event Definition...",
+    "new": "Nova Event Definition",
+    "new_named": "Nova Event Definition \"{{title}}\"",
+    "title": "Event Definitions",
+    "view": "Visualizar Event Definition",
+    "view_named": "Visualizar Event Definition \"{{title}}\""
+  },
+  "priorities": {
+    "critical": "Crítica",
+    "high": "Alta",
+    "info": "Informativa",
+    "low": "Baixa",
+    "medium": "Média"
+  },
+  "provider_summary": {
+    "less_details": "Menos detalhes",
+    "lookup_table_key_field": "Campo de chave da Lookup Table",
+    "more_details": "Mais detalhes",
+    "validate_template_values": "Validar se todos os valores do Modelo estão definidos",
+    "value_source": "Origem do valor"
+  },
   "query_parameter_modal": {
-    "types": {}
+    "save": "Salvar",
+    "title": "Declarar parâmetro de consulta \"{{name}}\"",
+    "type": "Tipo",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": ": não declarado"
   },
   "replay_search": {
-    "attributes": {}
+    "attributes": {
+      "description": "Descrição",
+      "edited_after_event": "A Event Definition <definitionTitle>{{title}}</definitionTitle> foi editada depois que este evento ocorreu. Alguns widgets de agregação podem não ser representativos para este evento.",
+      "event_definition": "Event Definition",
+      "execute_every": "Executar pesquisa a cada",
+      "notifications": "Notificações",
+      "priority": "Prioridade",
+      "search_within": "Pesquisar nos últimos",
+      "timestamp": "Timestamp",
+      "updated_at": "Event Definition atualizada em"
+    },
+    "not_provided": "Não informado",
+    "replay_link": "Repetir pesquisa"
   },
-  "row_actions": {},
-  "scheduling": {},
-  "share": {},
-  "sidebar": {},
-  "status_cell": {},
+  "row_actions": {
+    "delete_confirm": "Tem certeza de que deseja excluir \"{{title}}\"?",
+    "delete_failed": "Falha ao excluir a Event Definition \"{{title}}\" com status: {{status}}",
+    "delete_failed_title": "Não foi possível excluir a Event Definition",
+    "delete_success": "A Event Definition \"{{title}}\" foi excluída com sucesso.",
+    "delete_success_title": "Event Definition excluída com sucesso",
+    "delete_title": "Excluir Event Definition",
+    "disable": "Desativar",
+    "disable_confirm": "Tem certeza de que deseja desativar \"{{title}}\"?",
+    "disable_title": "Desativar Event Definition",
+    "duplicate": "Duplicar",
+    "edit": "Editar",
+    "enable": "Ativar",
+    "enable_confirm": "Tem certeza de que deseja ativar \"{{title}}\"?",
+    "enable_title": "Ativar Event Definition",
+    "entity_type_title": "event definition",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta event definition.",
+    "system_cannot_be_deleted": "Uma Event Definition do sistema não pode ser excluída",
+    "system_cannot_be_disabled": "Uma Event Definition do sistema não pode ser desativada"
+  },
+  "scheduling": {
+    "clear": "limpar",
+    "clear_confirm": "Tem certeza de que deseja limpar as notificações na fila para \"{{title}}\"?",
+    "details": "Detalhes de {{title}}.",
+    "every": "a cada {{duration}}",
+    "last_execution": "Última execução:",
+    "next_execution": "Próxima execução:",
+    "next_time_range": "Próximo intervalo de tempo:",
+    "not_scheduled": "Não agendada.",
+    "queued_notifications": "Notificações na fila:",
+    "runs": "Executa {{schedule}}.",
+    "runs_searching_within": "Executa {{schedule}}, pesquisando nos últimos {{duration}}.",
+    "status": "Status:"
+  },
+  "share": {
+    "collaborators": "Colaboradores",
+    "description": "Pesquise um usuário ou equipe para adicionar como colaborador desta event definition.",
+    "no_collaborators": "Esta event definition não tem colaboradores."
+  },
+  "sidebar": {
+    "details_title": "Detalhes da definição"
+  },
+  "status_cell": {
+    "disable": "Desativar",
+    "disable_confirm": "Tem certeza de que deseja desativar a event definition '{{title}}'?",
+    "disable_title": "Desativar event definition",
+    "disabled": "Desativada",
+    "enable": "Ativar",
+    "enabled": "Ativada"
+  },
   "steps": {},
   "summary": {
     "condition_types": {}
