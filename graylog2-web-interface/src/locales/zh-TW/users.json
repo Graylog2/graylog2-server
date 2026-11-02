@@ -1,1 +1,493 @@
-{}
+{
+  "users_overview": {
+    "title": "使用者總覽",
+    "documentation_link_title": "權限說明文件",
+    "description": "所有已註冊使用者的總覽。"
+  },
+  "user_create": {
+    "title": "建立新使用者",
+    "documentation_link_title": "權限說明文件",
+    "description": "使用此頁面為網頁介面或 REST API 建立新使用者。",
+    "submit_button": "建立使用者",
+    "reader_role_description": "授予每位 {{productName}} 使用者基本權限（內建）",
+    "role_required": "您必須至少選擇 <em>Reader</em> 或 <em>Admin</em> 角色之一。",
+    "failed_title": "建立使用者失敗",
+    "submit": "建立使用者",
+    "submitting": "正在建立使用者..."
+  },
+  "user_edit": {
+    "title": "編輯使用者 {{username}}",
+    "title_prefix": "編輯使用者",
+    "documentation_link_title": "權限說明文件",
+    "description": "您可以在此變更使用者詳細資料與密碼，並指派角色與團隊。",
+    "segments": {
+      "profile": "個人資料",
+      "preferences": "偏好設定",
+      "teams_roles": "團隊與角色",
+      "shared_entities": "共用項目"
+    },
+    "password": {
+      "new_password": "新密碼",
+      "repeat_password": "重複密碼",
+      "old_password": "舊密碼",
+      "alert_title": "變更密碼",
+      "alert_text": "變更密碼將登出使用者，並使其所有目前的工作階段失效。若您變更自己的密碼，儲存後將立即登出。在此情況下，請先確認已儲存所有待處理的變更。",
+      "change": "變更密碼"
+    },
+    "profile": {
+      "email": "電子郵件",
+      "full_name": "全名",
+      "update": "更新個人資料"
+    },
+    "profile_info": {
+      "title": "名字與姓氏",
+      "text": "自 {{productName}} 4.1 起，我們新增了獨立的名字與姓氏欄位。必須填寫這些欄位，才能儲存使用者的個人資料。"
+    },
+    "read_only": "無法編輯所選的使用者 {{fullName}}。",
+    "roles_required": "角色至少必須包含 Admin 或 Reader 角色。",
+    "external": {
+      "title": "外部使用者",
+      "text": "此使用者已從外部伺服器同步，因此無法變更個人資料或密碼。如需更多資訊，請聯絡您的管理員。"
+    },
+    "preferences": {
+      "language_help": "{{productName}} 介面的語言。標示為 Beta 的翻譯尚未經過審查。",
+      "enable_autocompletion": "啟用自動完成",
+      "search_sidebar": "搜尋側邊欄",
+      "dashboard_sidebar": "儀表板側邊欄",
+      "is_pinned": "已釘選",
+      "search_sidebar_help": "也可以使用搜尋側邊欄的釘選圖示變更",
+      "dashboard_sidebar_help": "也可以使用儀表板側邊欄的釘選圖示變更",
+      "theme_mode_help": "可使用使用者下拉選單中的切換按鈕變更",
+      "update": "更新偏好設定"
+    },
+    "settings": {
+      "select_entity": "請選擇一個項目。",
+      "update": "更新設定"
+    }
+  },
+  "roles_overview": {
+    "title": "角色總覽",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "{{productName}} 中所有可用角色的總覽。角色可授予使用者功能權限，例如建立儀表板或事件定義。",
+    "alert_title": "授予權限",
+    "alert_body_prefix": "內建角色可授予使用者功能權限，例如建立儀表板或檢視封存目錄。但它們不會授予特定儀表板或 Stream 的權限，也無法建立自訂角色。若要授予特定項目的權限，可使用該項目的 ",
+    "share_text": "共用",
+    "alert_body_suffix": " 按鈕。例如可在項目總覽頁面找到此按鈕。若要同時為多位使用者授予某項目的權限，可以使用團隊。詳細資訊請參閱 ",
+    "documentation_text": "說明文件"
+  },
+  "role_details": {
+    "title": "角色詳細資料 {{name}}",
+    "title_prefix": "角色詳細資料",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "名稱、說明與已指派使用者等詳細資料的總覽。"
+  },
+  "role_edit": {
+    "title": "編輯角色 {{name}}",
+    "title_prefix": "編輯角色",
+    "documentation_link_title": "權限說明文件",
+    "button_text": "角色總覽",
+    "description": "您可以將此角色指派給使用者。"
+  },
+  "user_tokens_edit": {
+    "title": "編輯使用者 {{username}} 的權杖",
+    "title_prefix": "編輯使用者的權杖",
+    "documentation_link_title": "權限說明文件",
+    "description": "您可以建立新權杖或刪除舊權杖。"
+  },
+  "token_management": {
+    "title": "權杖管理",
+    "documentation_link_title": "權限說明文件",
+    "description": "為 {{productName}} 設定的存取權杖總覽。"
+  },
+  "token_list": {
+    "title": "建立與編輯權杖",
+    "token_created": "已建立權杖 {{name}}！",
+    "token_created_description": "這是您的新權杖。請立即複製，之後將無法再次查看。",
+    "done_button": "完成",
+    "title_list": "權杖",
+    "filter_label": "篩選",
+    "no_tokens_to_display": "沒有可顯示的權杖。",
+    "no_tokens_match_filter": "沒有符合篩選條件的權杖。",
+    "column_name": "權杖名稱",
+    "column_created": "建立時間",
+    "column_last_access": "上次存取",
+    "column_expires_at": "到期時間",
+    "column_actions": "操作",
+    "never_used": "從未使用"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "使用者",
+      "team": "團隊",
+      "global": "所有人",
+      "error": "錯誤"
+    },
+    "dependencies_warning": {
+      "title": "目前的協作者組合缺少相依項目",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> 需要存取下列項目",
+      "dependency": "{{type}}：<dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "擁有者：",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "新增協作者",
+      "search_placeholder": "搜尋使用者與團隊",
+      "collaborators": "協作者",
+      "direct_collaborators": "直接協作者",
+      "shared_via_collections": "透過集合共用",
+      "update_sharing": "更新共用設定",
+      "modal_title": "共用{{entityType}}：<entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "已選取「{{title}}」，但從未新增為協作者。您仍要繼續嗎？",
+      "confirm_not_added_unnamed": "已選取一個項目（找不到名稱），但從未新增為協作者。您仍要繼續嗎？"
+    },
+    "grantees": {
+      "change_capability": "變更 {{title}} 的權限",
+      "remove_sharing": "移除 {{title}} 的共用設定",
+      "no_collaborators": "此{{entityType}}沒有協作者。"
+    },
+    "roles_selector": {
+      "search_placeholder": "搜尋角色",
+      "assign_role": "指派角色"
+    },
+    "shareable_url": {
+      "copy_title": "將參數複製到剪貼簿",
+      "hint": "您或任何獲授權檢視的人都可以存取此連結。"
+    },
+    "shared_entities": {
+      "entity_type": "項目類型",
+      "filter_entity_types": "篩選項目類型",
+      "capability": "權限",
+      "filter_capabilities": "篩選權限",
+      "found": "找到 {{total}} 個與 {{entityType}} 共用的項目。",
+      "no_results": "未找到任何共用項目。",
+      "headers": {
+        "entity_name": "項目名稱",
+        "entity_type": "項目類型",
+        "owner": "擁有者",
+        "capability": "權限"
+      },
+      "query_example": "尋找標題包含 security 的共用項目："
+    },
+    "sharing_disabled": {
+      "title": "無法共用",
+      "owners_only": "只有此{{type}}的擁有者可以共用。"
+    },
+    "validation_error": {
+      "ownerless": "移除以下擁有者將使此項目沒有擁有者："
+    }
+  },
+  "roles": {
+    "profile": {
+      "title": "個人資料",
+      "name": "名稱",
+      "description": "說明"
+    },
+    "teams": "團隊",
+    "users": {
+      "title": "使用者",
+      "none_selected": "找不到所選的使用者。",
+      "assign_users": "指派使用者",
+      "selected_users": "已選取的使用者",
+      "needs_reader_or_admin": "使用者「{{name}}」至少需要 Reader 或 Admin 角色。"
+    },
+    "users_selector": {
+      "search_placeholder": "搜尋使用者",
+      "assign_user": "指派使用者"
+    },
+    "actions": {
+      "edit_role_title": "編輯角色 {{name}}",
+      "delete_role_title": "刪除角色 {{name}}",
+      "edit": "編輯",
+      "deleting": "刪除中",
+      "delete": "刪除",
+      "confirm_delete": "您確定要刪除角色「{{name}}」嗎？",
+      "still_assigned": "此角色仍指派給 {{count}} 位使用者。"
+    },
+    "overview": {
+      "title": "角色",
+      "found": "系統中找到 {{total}} 個角色。",
+      "none_found": "未找到任何角色。"
+    },
+    "query_example": "尋找名稱包含 manager 的角色：",
+    "navigation": {
+      "view_details": "檢視詳細資料",
+      "edit_role": "編輯角色"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "在「總覽」分頁中快速找到最關鍵的安全資訊。",
+      "hotspot_1": "找出高度警示、主要事件來源等資訊，深入了解您的安全狀況。",
+      "hotspot_2": "將滑鼠移至此頁面各處的提示工具上，即可進一步了解 {{productName}} Security 的功能。",
+      "title": "總覽"
+    },
+    "anomalies": {
+      "hotspot_0": "取得執行中異常的摘要、已偵測到的數量，以及與前一時段的比較結果。",
+      "hotspot_1": "信賴區間可告訴您行為與正常狀態的偏離程度。",
+      "hotspot_2": "不同類型的異常有各自的偵測器，可快速查看哪些偵測器正在產生警示。",
+      "hotspot_3": "找出登入或安全事件行為異於平常的使用者帳戶。",
+      "title": "異常"
+    },
+    "host_activity": {
+      "hotspot_0": "以趨勢資訊查看高、中、低警示數量的整體概況，判斷今天是否為正常的工作日 . . . 或並非如此。",
+      "hotspot_1": "立即找出產生高度警示的主機，以縮短平均修復時間（MTTR）。",
+      "hotspot_2": "查看哪些技術產生最多的登入次數。",
+      "hotspot_3": "當身分與存取控制變更來自非預期的機器時，立即啟動調查。",
+      "hotspot_4": "依事件來源統計訊息數量，讓您每日掌握資料中的規律模式；超出常態的激增將觸發調查，找出原因。",
+      "title": "主機活動"
+    },
+    "network_activity": {
+      "hotspot_0": "即時查看網路中資料流量的激增。",
+      "hotspot_1": "快速查看資料的來源與去向。",
+      "hotspot_2": "找出透過網路傳送最多資料的使用者。",
+      "hotspot_3": "判斷 DNS 查詢結果是否出現異常模式，例如某個錯誤代碼突然出現在前 15 名清單中。 ",
+      "hotspot_4": "依事件來源列出產生 DNS 請求最多的前 15 個平台。",
+      "title": "網路活動"
+    },
+    "user_activity": {
+      "hotspot_0": "快速查看登入失敗是否出現令人擔憂的趨勢。",
+      "hotspot_1": "依使用者統計登入成功與失敗次數，有助於找出問題帳戶與異常活動。",
+      "hotspot_2": "這些是產生最多高度警示的前 15 名使用者帳戶！",
+      "hotspot_3": "您的環境中最常見的身分與存取控制變更有哪些？",
+      "hotspot_4": "了解最常被變更存取控制的目標。",
+      "title": "使用者活動"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "Anomaly Detection AI",
+        "cloud_option": "Cloud Option",
+        "archiving": "封存",
+        "audit_logs_cloud": "{{productName}} Cloud 稽核日誌",
+        "dynamic_lookup_tables": "Dynamic Lookup Tables",
+        "advanced_alerting": "搭配腳本的進階警示",
+        "compliance_reporting": "合規報告",
+        "correlation_aggregation": "關聯與彙總事件",
+        "threat_intel": "威脅情報整合",
+        "incident_workspaces": "事件調查工作區",
+        "prebuilt_parser_dashboards": "預先建置的安全解析器與儀表板",
+        "sigma_rules": "Sigma Rules",
+        "parameterized_dashboards": "參數化儀表板",
+        "input_output_integrations": "Input 與 Output 整合",
+        "threat_management": "威脅管理",
+        "search_workflow": "搜尋工作流程、範本與篩選器",
+        "soar_integrations": "SOAR 整合"
+      },
+      "title": "Security 示範",
+      "banner_text": "如需更多資訊並預約完整示範，請造訪 {{productName}} 網站。",
+      "button": "{{productName}} Security",
+      "overview": "總覽",
+      "description": "{{productName}} Security 旨在為 IT 團隊革新網路安全，結合 SIEM、安全分析、事件調查與異常偵測等功能。使用我們的平台，您能更有效率地處理關鍵任務，並降低惡意行為者與憑證型攻擊所帶來的風險。"
+    }
+  },
+  "user_fields": {
+    "username": "使用者名稱",
+    "first_name": "名字",
+    "last_name": "姓氏",
+    "full_name": "全名",
+    "email": "電子郵件地址",
+    "password": "密碼",
+    "repeat_password": "重複密碼",
+    "time_zone": "時區",
+    "sessions_timeout": "工作階段逾時",
+    "profile": "個人資料",
+    "settings": "設定",
+    "roles": "角色",
+    "assign_roles": "指派角色",
+    "selected_roles": "已選取的角色",
+    "teams": "團隊"
+  },
+  "user_form": {
+    "first_name_help": "使用者的名字。",
+    "last_name_help": "使用者的姓氏。",
+    "email_help": "使用者的電子郵件地址。",
+    "username_help": "選擇用於登入的唯一使用者名稱。",
+    "username_taken": "使用者名稱已被使用",
+    "passwords_mismatch": "密碼不符",
+    "time_zone_help": "請選擇您所在的時區，或保留預設值以使用瀏覽器的預設時區。",
+    "service_account": "服務帳戶",
+    "service_account_label": "此使用者為服務帳戶",
+    "service_account_help": "勾選後，此使用者將成為服務帳戶，無法登入網頁介面或編輯其設定（例如：API 權杖）。",
+    "service_account_confirm_title": "您確定嗎？",
+    "service_account_confirm": "將此使用者變更為服務帳戶後，該使用者將無法登入網頁介面或編輯其設定（例如：API 權杖）。是否要繼續？",
+    "global_timeout_message": "由於已啟用<timeoutLink>全域工作階段逾時</timeoutLink>，無法編輯使用者的工作階段逾時設定。"
+  },
+  "token_form": {
+    "token_name": "權杖名稱",
+    "placeholder": "此權杖的用途是什麼？",
+    "ttl_label": "權杖 TTL",
+    "ttl_invalid": "無效（最小值：1 分鐘）",
+    "creating": "建立中...",
+    "create": "建立權杖",
+    "ttl_help": "TTL 語法範例：60 秒為 PT60S，60 分鐘為 PT60M，24 小時為 PT24H，30 天為 P30D"
+  },
+  "permissions_info": {
+    "title": "授予權限",
+    "text": "可使用項目的 <shareLabel>共用</shareLabel> 按鈕設定 Stream 與儀表板等項目的權限授予。例如可在項目總覽頁面找到此按鈕。詳細資訊請參閱 <docsLink>說明文件</docsLink>。"
+  },
+  "startpage": {
+    "label": "起始頁面",
+    "help": "選擇使用者登入後立即看到的頁面。僅能選擇使用者具有權限的項目。",
+    "select_type": "選擇類型",
+    "select_value": "選擇{{type, lowercase}}",
+    "entity": "項目",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "搜尋"
+    },
+    "new_search": "新搜尋",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "使用者缺少所設定頁面的權限"
+  },
+  "timeout": {
+    "sessions_label": "工作階段逾時",
+    "alert_title": "變更工作階段逾時設定",
+    "alert_text": "變更工作階段的逾時設定將登出使用者，並使其所有目前的工作階段失效。若您變更的是自己的使用者設定，儲存設定時將立即登出。在此情況下，請先儲存所有待處理的變更，再變更逾時設定。",
+    "never_label": "工作階段不會逾時",
+    "never_help": "勾選後，工作階段不會因閒置而逾時。",
+    "amount_placeholder": "逾時時間",
+    "help": "工作階段在經過此時間後自動結束，除非仍在使用中。",
+    "unit_label": "逾時單位",
+    "units": {
+      "seconds": "秒",
+      "minutes": "分鐘",
+      "hours": "小時",
+      "days": "天"
+    }
+  },
+  "user_details": {
+    "client_address": "用戶端位址",
+    "last_activity": "上次活動",
+    "logged_in": "已登入",
+    "enabled": "已啟用",
+    "auth_service_disabled": "驗證服務已停用，使用者無法登入",
+    "preferences": {
+      "title": "偏好設定",
+      "search_autocompletion": "搜尋自動完成",
+      "update_unfocused": "未聚焦時更新",
+      "pin_search_sidebar": "釘選搜尋側邊欄",
+      "pin_dashboard_sidebar": "釘選儀表板側邊欄",
+      "theme_mode": "主題模式",
+      "not_configured": "未設定",
+      "language": "語言"
+    },
+    "roles_none_selected": "找不到所選的角色。",
+    "settings": {
+      "timezone": "時區",
+      "startpage": "起始頁面",
+      "no_startpage": "未設定起始頁面",
+      "no_timeout": "工作階段不會逾時",
+      "globally_set": "（<configLink>全域設定</configLink>）"
+    },
+    "shared_entities": "共用項目"
+  },
+  "users_list": {
+    "client_address_help": "用於初次建立工作階段的用戶端位址，不一定是其目前的位址。",
+    "admin": {
+      "title": "系統管理員",
+      "description": "系統管理員只能在 {{productName}} 設定檔中編輯。"
+    },
+    "headers": {
+      "full_name": "全名",
+      "username": "使用者名稱",
+      "email": "電子郵件地址",
+      "client_address": "用戶端位址",
+      "enabled": "已啟用",
+      "role": "角色",
+      "actions": "操作"
+    },
+    "title": "使用者",
+    "found": "系統中找到 {{total}} 位已註冊的使用者。",
+    "none_found": "未找到任何使用者。",
+    "filter_label": "篩選使用者",
+    "actions": {
+      "edit_tokens_title": "編輯使用者 {{name}} 的權杖",
+      "edit_tokens": "編輯權杖",
+      "system_user_tooltip": "系統使用者只能在伺服器設定檔中修改。",
+      "system_user": "系統使用者",
+      "confirm_disable": "您確定要停用使用者 {{name}} 嗎？所有目前的工作階段都將被終止。",
+      "confirm_delete": "您確定要刪除使用者 {{name}} 嗎？",
+      "edit_title": "編輯使用者 {{name}}",
+      "edit": "編輯",
+      "set_status_title": "設定 {{name}} 的新帳戶狀態",
+      "disable": "停用",
+      "enable": "啟用",
+      "delete_title": "刪除使用者 {{name}}"
+    },
+    "logged_in": {
+      "title": "已登入",
+      "last_activity": "上次活動：{{activity}}",
+      "client_address": "用戶端位址：{{address}}",
+      "not_logged_in": "未登入"
+    },
+    "status": {
+      "user_is": "使用者{{status}}",
+      "auth_disabled": "（驗證服務已停用）",
+      "enabled": "已啟用",
+      "disabled": "已停用"
+    },
+    "query_example": "尋找電子郵件包含 example.com 的使用者：",
+    "fields": {
+      "full_name": "使用者的全名",
+      "username": "使用者的登入使用者名稱。",
+      "email": "使用者的電子郵件。"
+    },
+    "select_users": "選擇使用者..."
+  },
+  "user_navigation": {
+    "view_details": "檢視詳細資料",
+    "edit_user": "編輯使用者",
+    "edit_tokens": "編輯權杖"
+  },
+  "token_admin": {
+    "title": "權杖",
+    "human_name": "權杖",
+    "fields": {
+      "username": "權杖擁有者的使用者名稱",
+      "name": "權杖的名稱",
+      "created": "權杖的建立日期",
+      "last_access": "權杖最近一次被使用的時間",
+      "external_user": "權杖擁有者是否來自外部驗證後端",
+      "auth_backend": "使用者驗證後端。內部使用者不適用。"
+    },
+    "example_user": "尋找由指定使用者建立的權杖：",
+    "example_name": "依指定權杖名稱尋找權杖：",
+    "deleting_title": "正在刪除權杖",
+    "delete_confirm": "您即將刪除權杖「{{name}}」。您確定嗎？",
+    "delete": "刪除",
+    "user_not_found": "使用者不存在。",
+    "user_error_title": "權杖使用者錯誤",
+    "not_available": "不適用",
+    "delete_failed": "刪除權杖失敗：{{error}}",
+    "delete_failed_title": "無法刪除權杖",
+    "deleted": "權杖已成功刪除。",
+    "deleted_title": "成功！"
+  },
+  "user_details_page": {
+    "title": "使用者詳細資料",
+    "title_with_name": "使用者詳細資料 {{name}}",
+    "documentation_link_title": "權限說明文件",
+    "description": "個人資料、設定、團隊與角色等詳細資料的總覽。"
+  },
+  "password_rules": {
+    "min_length": "密碼長度至少必須為 {{minLength}} 個字元。",
+    "require_uppercase": "密碼必須至少包含一個大寫字母。",
+    "require_lowercase": "密碼必須至少包含一個小寫字母。",
+    "require_numbers": "密碼必須至少包含一個數字。",
+    "require_special_chars": "密碼必須至少包含以下其中一個特殊字元：{{characters}}"
+  },
+  "notifications": {
+    "save_success": "使用者偏好設定已成功儲存",
+    "save_failed": "儲存「{{userName}}」的偏好設定失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存使用者偏好設定",
+    "change_success": "您的起始頁面已成功變更",
+    "change_failed": "變更起始頁面失敗，錯誤：{{error}}",
+    "change_failed_title": "無法變更起始頁面"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "載入使用者 {{userId}} 失敗，狀態為",
+    "load_failed_title": "無法載入使用者 {{userId}}"
+  }
+}

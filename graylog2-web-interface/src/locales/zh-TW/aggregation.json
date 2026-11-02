@@ -1,1 +1,236 @@
-{}
+{
+  "wizard_common": {
+    "grouping": "分組",
+    "group_by": "分組依據",
+    "metric": "指標",
+    "metrics": "指標",
+    "sort": "排序",
+    "visualization": "視覺化",
+    "add": "新增",
+    "add_element": "新增元素",
+    "add_named": "新增{{element}}",
+    "remove_named": "移除{{element}}",
+    "update_preview": "更新預覽",
+    "updating_preview": "正在更新預覽...",
+    "color_hint": "顏色提示",
+    "select_all_fields": "選取所有欄位",
+    "deselect_all_fields": "取消選取所有欄位",
+    "field_required": "必須填寫欄位。",
+    "must_be_greater_than_other": "必須大於 0。"
+  },
+  "wizard_grouping": {
+    "settings": "設定",
+    "skip_empty_values": "略過空值",
+    "skip_empty_values_help": "啟用後，將略過不包含所設定欄位的訊息。",
+    "skip_empty_values_help_otherwise": "否則將建立「(空值)」分組。",
+    "limit": "上限",
+    "rollup_columns": "彙總欄位",
+    "rollup_columns_help": "啟用彙總時，將包含一個額外的列，用來加總各個子列。",
+    "direction": "方向",
+    "row": "列",
+    "column": "欄",
+    "fields": "欄位",
+    "add_field": "新增欄位",
+    "add_another_date_field": "新增另一個日期欄位",
+    "add_another_field": "新增另一個欄位",
+    "interval": "間隔",
+    "auto": "自動",
+    "interval_types": "間隔類型",
+    "auto_bucket_size": "自動分組大小",
+    "auto_bucket_size_help": "例如 1.5x。粒度越小，顯示的值<strong>越少</strong>；反之，粒度越大，顯示的值<strong>越多</strong>。",
+    "fixed_bucket_size": "固定分組大小",
+    "fixed_bucket_size_help": "例如 2 分鐘。此時間定義此時間戳記類型的分組大小。",
+    "scale": "{{scale}}x",
+    "scaling_required": "必須設定縮放比例。",
+    "scaling_range": "必須大於 0 且小於或等於 10。",
+    "value_required": "必須填寫值。",
+    "limit_required": "必須設定上限。"
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "秒",
+      "minutes": "分鐘",
+      "hours": "小時",
+      "days": "天",
+      "weeks": "週",
+      "months": "月"
+    },
+    "unit_settings": "{{field}} 單位設定",
+    "type": "類型",
+    "select_unit_type": "選擇單位類型",
+    "unit": "單位",
+    "unit_help": "用於計算圖表上顯示值的單位。",
+    "select_unit": "選擇單位",
+    "predefined_unit": "欄位 <bold>{{field}}</bold> 已設定單位 <bold>{{unit}}</bold>。變更此單位可能會導致圖表上的資料顯示不正確。",
+    "clear": "清除",
+    "ok": "確定"
+  },
+  "wizard_metric": {
+    "function": "函式",
+    "select_function": "選擇函式",
+    "field": "欄位",
+    "select_field": "選擇欄位",
+    "percentile": "百分位數",
+    "select_percentile": "選擇百分位數",
+    "strategy": "策略",
+    "select_strategy": "選擇策略",
+    "strategies": {
+      "COUNT": "文件計數",
+      "SUM": "欄位總和"
+    },
+    "name": "名稱",
+    "display_name_placeholder": "指定顯示名稱",
+    "show_thresholds": "顯示線條閾值",
+    "add_threshold": "新增閾值",
+    "threshold_title": "標題",
+    "threshold_name_placeholder": "指定閾值名稱",
+    "remove_threshold": "移除閾值",
+    "threshold_value": "值",
+    "threshold_value_placeholder": "指定閾值",
+    "value_unit": "值的單位為 {{unit}}",
+    "threshold_color": "閾值的顏色設定",
+    "function_required": "必須選擇函式。",
+    "field_required_for_function": "函式 {{function}} 必須指定欄位。",
+    "percentile_required": "必須設定百分位數。",
+    "name_unique": "名稱必須是唯一的。",
+    "threshold_value_required": "必須設定閾值。"
+  },
+  "wizard_sort": {
+    "field": "欄位",
+    "field_placeholder": "指定要排序的欄位或指標",
+    "select_field": "選擇排序欄位",
+    "direction": "方向",
+    "select_direction": "選擇排序方向",
+    "ascending": "遞增",
+    "descending": "遞減",
+    "direction_required": "必須選擇方向。",
+    "time_row_unsupported": "使用時間列分組的非資料表無法排序。"
+  },
+  "wizard_visualization": {
+    "type": "類型",
+    "select_type": "選擇視覺化類型",
+    "show_event_annotations": "顯示事件註解",
+    "help_for": "{{field}} 的說明",
+    "select_field": "選擇 {{field}}",
+    "color_for": "{{field}} 的顏色設定",
+    "axis_label_or_color": "至少需為一個座標軸定義標籤或顏色。",
+    "type_required": "必須選擇類型。"
+  },
+  "builder_empty": {
+    "title": "空白彙總",
+    "editing": "您目前正在編輯 Widget。",
+    "add_metric_hint": "若要查看結果，請至少新增一個指標。您可以新增列或欄來分組資料。",
+    "preview_hint": "您可以點選「{{button}}」來預覽 Widget 的搜尋結果。",
+    "finish_hint": "完成後，請點選「{{update}}」以儲存，或點選「{{cancel}}」以捨棄變更。",
+    "edit_hint_interactive": "請<editButton>編輯</editButton> Widget 以在此查看結果。",
+    "edit_hint": "請編輯 Widget 以在此查看結果。"
+  },
+  "vis_types": {
+    "area_chart": "面積圖",
+    "bar_chart": "長條圖",
+    "heatmap": "熱度圖",
+    "line_chart": "折線圖",
+    "network_graph": "網路圖",
+    "pie_chart": "圓餅圖",
+    "sankey": "桑基圖",
+    "scatter_plot": "散佈圖",
+    "single_number": "單一數值",
+    "world_map": "世界地圖"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "面積圖至少需要一個指標",
+    "bar_chart_requires_metric": "長條圖至少需要一個指標",
+    "line_chart_requires_metric": "折線圖至少需要一個指標",
+    "pie_chart_requires_metric": "圓餅圖至少需要一個指標",
+    "scatter_plot_requires_metric": "散佈圖至少需要一個指標",
+    "sankey_requires_groupings": "桑基圖至少需要兩個分組欄位。",
+    "sankey_single_metric": "桑基圖僅支援單一指標。",
+    "network_requires_groupings": "網路圖至少需要兩個分組欄位。"
+  },
+  "vis_common": {
+    "interpolation": "內插方式",
+    "interpolation_types": {
+      "linear": "線性",
+      "step-after": "階梯後",
+      "spline": "平滑曲線"
+    },
+    "axis_type": "座標軸類型",
+    "axis_types": {
+      "linear": "線性",
+      "logarithmic": "對數"
+    },
+    "color_scale": "色彩刻度",
+    "reverse_scale": "反轉刻度",
+    "show_axis_labels": "顯示座標軸標籤",
+    "x_axis": "X 軸",
+    "y_axis_number": "Y 軸：數值",
+    "y_axis_percent": "Y 軸：百分比",
+    "y_axis_time": "Y 軸：時間",
+    "y_axis_size": "Y 軸：大小",
+    "color_hint": "顏色提示",
+    "legend_configuration": "{{label}} 的設定"
+  },
+  "vis_heatmap": {
+    "auto_scale": "自動刻度",
+    "min": "最小值",
+    "max": "最大值",
+    "use_smallest_as_default": "預設使用最小值",
+    "default_value": "預設值"
+  },
+  "vis_worldmap": {
+    "zoom": "縮放",
+    "latitude": "緯度",
+    "longitude": "經度",
+    "name": "名稱",
+    "coordinates": "座標：",
+    "value": "值："
+  },
+  "vis_bar": {
+    "mode": "模式",
+    "modes": {
+      "group": "分組",
+      "stack": "堆疊",
+      "relative": "相對",
+      "overlay": "疊加"
+    },
+    "mode_help": {
+      "group": "每個系列在圖表中皆以獨立的長條表示。",
+      "stack": "所有系列彼此堆疊，形成單一長條。",
+      "relative": "所有系列彼此堆疊，形成單一圖表。但負值系列會放置於零以下。",
+      "overlay": "所有系列以長條彼此疊加放置。為了能看見各個長條，透明度會降低至 75%。建議此選項僅用於不超過 3 個系列的情況。"
+    }
+  },
+  "vis_number": {
+    "trend": "趨勢",
+    "trend_description": "顯示此數值的趨勢資訊。",
+    "trend_help_enabled": "若使用者啟用趨勢，會在目前數值下方顯示獨立的方塊，以圖示標示變化方向，並顯示目前值與前一個值之間的絕對差異與相對差異。",
+    "trend_help_previous": "前一個值是透過在背景執行兩次完全相同的搜尋（僅時間範圍不同）計算而得。第一次搜尋的時間範圍與此搜尋／此 Widget 的設定相同，第二次搜尋則是使用相同的時間範圍長度，並往過去平移。",
+    "trend_preference": "趨勢偏好",
+    "trend_preferences": {
+      "LOWER": "較低",
+      "NEUTRAL": "中性",
+      "HIGHER": "較高"
+    },
+    "highlight": "突顯",
+    "highlight_options": {
+      "TREND_ONLY": "僅顯示趨勢資訊",
+      "FULL_WIDGET": "整個 Widget"
+    },
+    "not_available": "不適用",
+    "trend_label": "趨勢：{{absolute}}（{{relative}}），相較於前一個值 {{previous}}",
+    "previous_value": "前一個值：{{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "相關值",
+    "data_points": "資料點",
+    "metric": "指標",
+    "groupings": "分組",
+    "back": "返回"
+  },
+  "vis_network": {
+    "no_connections": "沒有可顯示的連線。請調整搜尋或分組以查看結果。"
+  },
+  "vis_sankey": {
+    "no_flows": "沒有可顯示的流量。請調整搜尋或分組以查看結果。"
+  }
+}

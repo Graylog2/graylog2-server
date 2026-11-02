@@ -1,1 +1,206 @@
-{}
+{
+  "action_links": {
+    "create": "建立服務",
+    "edit_active": "編輯使用中的服務",
+    "view_active": "檢視使用中的服務"
+  },
+  "active_directory": {
+    "create_title": "建立 Active Directory 驗證服務",
+    "edit_title": "編輯 Active Directory 驗證服務",
+    "help": {
+      "system_user_dn": "用於與 Active Directory 伺服器進行初始連線的使用者名稱，例如 <code>ldapbind@some.domain</code>。<lineBreak/>此值必須與該使用者的 <code>userPrincipalName</code> 相符。",
+      "system_user_password": "用於與 Active Directory 伺服器進行初始連線的密碼。",
+      "user_full_name_attribute": "用於同步使用者全名的 Active Directory 屬性，例如 <code>displayName</code>。<lineBreak/>",
+      "user_name_attribute": "用於同步使用者名稱的 Active Directory 屬性，例如 <code>userPrincipalName</code>。<lineBreak/>若不確定要使用哪個屬性，請在側邊欄的 <emphasis>使用者登入測試</emphasis> 區段中載入測試使用者。",
+      "user_search_base": "要限制 Active Directory 搜尋查詢的基底樹狀結構，例如 <code>cn=users,dc=example,dc=com</code>。"
+    }
+  },
+  "active_page": {
+    "title": "使用中的驗證服務"
+  },
+  "authenticators": {
+    "description": "設定信任標頭驗證。",
+    "documentation_title": "驗證器文件",
+    "edit": "編輯驗證器",
+    "title": "驗證器詳細資料"
+  },
+  "backend_details_page": {
+    "edit_service": "編輯服務",
+    "title": "驗證服務詳細資料"
+  },
+  "backends_overview": {
+    "activate": "啟用",
+    "confirm_activate": "您確定要啟用驗證服務「{{title}}」",
+    "confirm_deactivate": "您確定要停用驗證服務「{{title}}」",
+    "confirm_delete": "您確定要刪除驗證服務「{{title}}」",
+    "deactivate": "停用",
+    "delete": "刪除",
+    "edit": "編輯",
+    "filter_label": "篩選服務",
+    "found_other": "系統上找到 {{count}} 個已設定的驗證服務。",
+    "headers": {
+      "actions": "動作",
+      "default_roles": "預設角色",
+      "description": "描述",
+      "title": "標題"
+    },
+    "query_example": "尋找標題包含 LDAP 的後端：",
+    "role_not_found": "找不到角色",
+    "title": "已設定的驗證服務"
+  },
+  "config_details": {
+    "edit": "編輯",
+    "group_sync_feature_name": "群組同步",
+    "group_sync_title": "群組同步"
+  },
+  "connection_test": {
+    "default_error": "發生錯誤",
+    "description": "使用「伺服器設定」步驟中定義的位址與憑證，在背景執行連線檢查。",
+    "submit": "測試伺服器連線",
+    "title": "伺服器連線檢查"
+  },
+  "create_page": {
+    "getting_started_title": "建立新的驗證服務",
+    "title": "建立驗證服務"
+  },
+  "directory_help": {
+    "default_roles": "同步使用者預設會取得的角色。所有使用者都需要 <code>Reader</code> 角色才能使用網頁介面",
+    "default_user_timezone": "為新使用者選擇預設時區。",
+    "user_search_pattern": "例如 <exampleCode>{{example}}</exampleCode>。字串 <code>{{placeholder}}</code> 將會被替換為輸入的使用者名稱。"
+  },
+  "getting_started": {
+    "description": "除了內建的驗證機制（例如內部使用者資料庫或 LDAP/Active Directory）之外，驗證服務也可以透過外掛程式擴充，以支援其他驗證機制。選擇驗證服務以建立新服務。",
+    "select_service": "選擇服務",
+    "submit": "開始使用"
+  },
+  "ldap": {
+    "create_title": "建立 LDAP 驗證服務",
+    "edit_title": "編輯 LDAP 驗證服務",
+    "help": {
+      "email_attributes": "用於使用者電子郵件地址的 LDAP 屬性，例如 <code>mail</code>。<lineBreak/>您可以指定多個屬性，輸入後按 <kbd>Tab</kbd> 或 <kbd>Enter</kbd> 以接受您的值。",
+      "system_user_dn": "用於與 LDAP 伺服器進行初始連線的使用者名稱，例如 <code>cn=admin,dc=example,dc=com</code>。視您的 LDAP 伺服器而定，此項可能為選填。",
+      "system_user_password": "用於與 LDAP 伺服器進行初始連線的密碼。",
+      "user_full_name_attribute": "用於同步使用者全名的 LDAP 屬性，例如 <code>cn</code>。<lineBreak/>",
+      "user_name_attribute": "用於同步使用者名稱的 LDAP 屬性，例如 <code>uid</code>。<lineBreak/>若不確定要使用哪個屬性，請在側邊欄的 <emphasis>使用者登入測試</emphasis> 區段中載入測試使用者。",
+      "user_search_base": "要限制 LDAP 搜尋查詢的基底樹狀結構，例如 <code>cn=users,dc=example,dc=com</code>。",
+      "user_unique_id_attribute": "用於同步使用者 ID 的 LDAP 屬性，例如 <code>entryUUID</code>。<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "透過載入指定使用者名稱的項目來驗證設定。若省略密碼，將不會進行驗證嘗試。",
+    "login_failed": "登入失敗",
+    "password": "密碼",
+    "submit": "測試使用者登入",
+    "title": "使用者登入測試",
+    "user_attribute": "使用者屬性",
+    "user_does_not_exist": "使用者不存在",
+    "username": "使用者名稱",
+    "value": "值"
+  },
+  "no_service_plugin": "未為類型「{{type}}」設定驗證服務外掛程式",
+  "no_service_plugin_for": "未為「{{type}}」設定驗證服務外掛程式",
+  "notifications": {
+    "create_failed": "建立驗證服務失敗，狀態：{{error}}",
+    "create_success": "驗證服務已成功建立。",
+    "error_title": "錯誤",
+    "success_title": "成功",
+    "update_failed": "更新驗證服務失敗，狀態：{{error}}",
+    "update_success": "驗證服務已成功更新。"
+  },
+  "overview_page": {
+    "no_active_backend": "目前沒有任何已設定的驗證服務處於使用中。",
+    "title": "所有驗證服務"
+  },
+  "page": {
+    "description": "設定此叢集的驗證服務。",
+    "documentation_title": "驗證文件"
+  },
+  "page_navigation": {
+    "authenticators": "驗證器",
+    "services": "驗證服務"
+  },
+  "server_config": {
+    "description_label": "描述",
+    "hostname": "主機名稱",
+    "port": "連接埠",
+    "reset_password": "重設密碼",
+    "server_address": "伺服器位址",
+    "system_password": "系統密碼",
+    "system_user_dn": "系統使用者 DN",
+    "system_username": "系統使用者名稱",
+    "title": "伺服器設定",
+    "title_label": "標題",
+    "transport_security": "傳輸安全性",
+    "transport_security_none": "無",
+    "undo_reset": "復原重設",
+    "verify_certificates": "驗證憑證"
+  },
+  "synced_teams": {
+    "feature_name": "團隊",
+    "title": "已同步的團隊"
+  },
+  "synced_users": {
+    "edit": "編輯",
+    "filter_label": "篩選使用者",
+    "found_other": "找到 {{count}} 個已同步的使用者。",
+    "headers": {
+      "actions": "動作",
+      "full_name": "全名",
+      "roles": "角色",
+      "username": "使用者名稱"
+    },
+    "none_found": "找不到已同步的使用者。",
+    "role_not_found": "找不到角色",
+    "title": "已同步的使用者"
+  },
+  "trusted_header": {
+    "description": "此驗證器可讓使用者透過 HTTP 標頭登入，無需其他互動。",
+    "enable_sso": "透過 HTTP 標頭啟用單一登入",
+    "enabled": "已啟用",
+    "title": "信任標頭驗證",
+    "trusted_proxies_hint": "請在 {{productName}} 伺服器設定檔中設定 <code>trusted_proxies</code> 設定。",
+    "update_config": "更新設定",
+    "username_header": "使用者名稱標頭",
+    "username_header_help": "包含使用者隱含信任名稱的 HTTP 標頭。（標頭比對不區分大小寫）"
+  },
+  "user_sync": {
+    "browser_time_zone": "瀏覽器時區",
+    "default_assignments_hint": "變更預設角色與時區設定，僅會影響透過 {{serviceTitle}} 新建立的使用者！",
+    "default_roles": "預設角色",
+    "default_user_time_zone": "預設使用者時區",
+    "email_attribute": "電子郵件屬性",
+    "email_attributes": "電子郵件屬性",
+    "full_name_attribute": "全名屬性",
+    "id_attribute": "ID 屬性",
+    "name_attribute": "名稱屬性",
+    "role_not_found": "找不到角色",
+    "search_base_dn": "搜尋基底 DN",
+    "search_pattern": "搜尋模式",
+    "search_roles": "搜尋角色",
+    "test_login_hint": "建議您在側邊欄面板中測試使用者登入，以驗證設定。",
+    "title": "使用者同步"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "您確定要移除此驗證服務的群組同步設定嗎？",
+    "create_failed": "建立驗證服務失敗",
+    "edit_failed": "編輯驗證服務失敗",
+    "finish_and_save": "完成並儲存服務",
+    "finish_and_save_identity_service": "完成並儲存身分服務",
+    "next_group_sync": "下一步：群組同步",
+    "next_user_sync": "下一步：使用者同步",
+    "server_validation_error": "伺服器驗證錯誤：{{errors}}",
+    "steps": {
+      "group_sync": "群組同步（選填）",
+      "server_config": "伺服器設定",
+      "user_sync": "使用者同步"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "編輯驗證服務 - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "載入 HTTP 標頭驗證設定失敗",
+    "update_success": "已成功更新 HTTP 標頭驗證設定",
+    "update_failed": "更新 HTTP 標頭驗證設定失敗，狀態：{{error}}"
+  }
+}

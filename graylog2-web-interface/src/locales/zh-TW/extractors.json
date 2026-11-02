@@ -1,1 +1,252 @@
-{}
+{
+  "extractors_of": "{{title}} 的擷取器",
+  "actions": "動作",
+  "import_extractors": "匯入擷取器",
+  "export_extractors": "匯出擷取器",
+  "documentation_title": "擷取器文件",
+  "description": "擷取器會套用於此輸入接收到的每則訊息。使用它們可將任何文字資料擷取並轉換為欄位，方便日後篩選與分析。範例：從記錄訊息中擷取 HTTP 回應代碼，將其轉換為數值欄位，並以 {{field}} 附加到訊息上。",
+  "list_item": {
+    "subtitle_copy": "嘗試將資料從 <em>{{source}}</em> 擷取至 <em>{{target}}</em>，保留原始內容。",
+    "subtitle_cut": "嘗試將資料從 <em>{{source}}</em> 擷取至 <em>{{target}}</em>，不保留原始內容。",
+    "condition": "條件",
+    "condition_string": "僅在訊息包含字串 <em>{{value}}</em> 時才會嘗試執行",
+    "condition_regex": "僅在訊息符合正規表示式 <em>{{value}}</em> 時才會嘗試執行",
+    "confirm_delete": "確定要移除擷取器「{{title}}」嗎？",
+    "details": "詳細資訊",
+    "edit": "編輯",
+    "delete": "刪除",
+    "no_configuration": "沒有設定選項",
+    "configuration": "設定",
+    "converters": "轉換器"
+  },
+  "metrics": {
+    "title": "指標",
+    "percentile_95": "第 95 百分位數：",
+    "percentile_98": "第 98 百分位數：",
+    "percentile_99": "第 99 百分位數：",
+    "std_dev": "標準差：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "invocations": "自啟動以來共執行 {{total}} 次，平均值：{{oneMinute}}、{{fiveMinutes}}、{{fifteenMinutes}}。",
+    "hits_misses": "{{hits}} 次命中，{{misses}} 次未命中",
+    "no_messages": "尚未有任何訊息經過此處。",
+    "total_time": "總時間",
+    "condition_time": "條件時間",
+    "execution_time": "執行時間",
+    "converter_time": "轉換器時間",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "欄位包含字串",
+    "condition_string_help": "輸入欄位應包含的字串，以便嘗試擷取。",
+    "condition_regex_label": "欄位符合正規表示式",
+    "condition_regex_help": "輸入欄位應符合的正規表示式，以便嘗試擷取。",
+    "condition_matches": "符合！擷取器將會對此範例執行。",
+    "condition_no_match": "不符合！擷取器將不會執行。",
+    "try": "試用",
+    "condition_type_help": "僅從符合特定條件的訊息中擷取，有助於避免錯誤或不必要的擷取，也能節省 CPU 資源。",
+    "cursor_strategy_help": "要複製還是剪下來源內容？標準欄位（例如 <em>message</em> 和 <em>source</em>）無法使用剪下功能。",
+    "target_field_help": "選擇用來儲存擷取值的欄位名稱。只能包含 <b>英數字元與底線</b>。範例：<em>http_response_code</em>。",
+    "store_as_field": "儲存為欄位",
+    "example_message": "範例訊息",
+    "configuration": "擷取器設定",
+    "extractor_type": "擷取器類型",
+    "source_field": "來源欄位",
+    "condition": "條件",
+    "condition_none": "一律嘗試擷取",
+    "condition_string": "僅在欄位包含字串時嘗試擷取",
+    "condition_regex": "僅在欄位符合正規表示式時嘗試擷取",
+    "extraction_strategy": "擷取策略",
+    "copy": "複製",
+    "cut": "剪下",
+    "title": "擷取器標題",
+    "title_help": "此擷取器的描述性名稱。",
+    "create": "建立擷取器",
+    "update": "更新擷取器"
+  },
+  "converters": {
+    "csv_enable": "將 CSV 欄位新增為欄位",
+    "csv_field_names": "欄位名稱",
+    "csv_separator": "分隔字元",
+    "csv_quote": "引號字元",
+    "csv_escape": "跳脫字元",
+    "csv_escape_help": "用於跳脫分隔字元與引號字元的字元。",
+    "csv_strict_quotes": "使用嚴格引號",
+    "csv_strict_quotes_help": "忽略引號以外的內容。",
+    "csv_trim": "修剪前置空白",
+    "date_enable": "轉換為日期類型",
+    "date_format": "格式字串",
+    "time_zone": "時區",
+    "locale": "地區設定",
+    "flexdate_enable": "彈性解析日期",
+    "hash": "從值建立 MD5 雜湊",
+    "ip_anonymizer": "以取代最後一個八位元組的方式匿名化 IPv4 位址",
+    "lookup_table_enable": "使用 Lookup Table 轉換值",
+    "lookup_table": "Lookup Table",
+    "lookup_table_placeholder": "選取 Lookup Table",
+    "lowercase": "將值轉換為小寫",
+    "numeric": "轉換為數值",
+    "split_and_count": "分割與計數",
+    "split_by": "依此分割",
+    "syslog_pri_facility": "將 PRI 轉換為 syslog 設施",
+    "syslog_pri_level": "將 PRI 轉換為 syslog 層級",
+    "tokenizer": "將鍵=值配對新增為欄位",
+    "uppercase": "將值轉換為大寫",
+    "csv_separator_help": "例如 <code>,</code>、<code>\\n</code> 與 <code>\\t</code> 會被轉換為單一字元。",
+    "date_format_help": "日期使用的字串格式。詳情請參閱<docsLink>文件</docsLink>。",
+    "time_zone_help": "套用於日期的時區。詳情請參閱<docsLink>文件</docsLink>。",
+    "locale_help": "解析日期時使用的地區設定。詳情請參閱<docsLink>文件</docsLink>。",
+    "lookup_table_help": "可在<lookupTablesLink>此處</lookupTablesLink>建立 Lookup Table。",
+    "split_by_help": "分割與計數轉換器會以指定字元分割擷取的部分，並將符號數量儲存為欄位。<strong>範例：</strong>以 <em>,</em> 分割 <em>?fields=first_name,last_name,zip</em> 的結果為 <em>3</em>。您剛剛計算了 GET 使用者 REST 請求中所要求的欄位數。"
+  },
+  "wizard": {
+    "title": "新增擷取器",
+    "description": "開始前請先載入一則訊息作為範例。您可以選擇載入此輸入最近接收的訊息，或依 ID 手動選取訊息。",
+    "create": "建立擷取器"
+  },
+  "configuration": {
+    "preview": "擷取器預覽",
+    "nothing_extracted": "不會擷取任何內容",
+    "try_example": "針對範例試用"
+  },
+  "converters_editor": {
+    "not_supported": "無法為 <em>{{type}}</em> 類型的擷取器新增轉換器。",
+    "add_label": "新增轉換器",
+    "add_help": "新增轉換器以轉換擷取的值。",
+    "select_placeholder": "選取轉換器",
+    "add": "新增"
+  },
+  "export": {
+    "json_title": "擷取器 JSON",
+    "copy": "複製擷取器"
+  },
+  "example_message": {
+    "not_loaded": "無法載入欄位「{{field}}」的範例。更新前無法測試擷取器。"
+  },
+  "sort": {
+    "title": "排序 <em>{{title}}</em> 的擷取器",
+    "description": "拖放清單中的擷取器，以變更套用的順序。",
+    "submit": "更新排序"
+  },
+  "list": {
+    "sort": "排序擷取器",
+    "title": "已設定的擷取器",
+    "no_extractors": "此輸入沒有已設定的擷取器。"
+  },
+  "import": {
+    "parse_error": "解析擷取器時發生錯誤。它們是否為 JSON 格式？{{error}}",
+    "parse_error_title": "無法匯入擷取器",
+    "submit": "將擷取器新增至輸入"
+  },
+  "message_loader": {
+    "load": "載入訊息",
+    "loading": "正在載入訊息...",
+    "wrong_example": "範例不正確？",
+    "load_another": "載入其他訊息",
+    "message_id": "訊息 ID",
+    "index": "索引"
+  },
+  "copy_input": {
+    "description": "將逐字複製整個輸入。"
+  },
+  "grok": {
+    "error": "無法執行 grok 擷取，錯誤如下：{{error}}",
+    "no_match": "無法執行 grok 擷取。請檢查您的參數。",
+    "named_captures_only": "僅限具名擷取",
+    "named_captures_only_help": "僅將明確命名的擷取放入訊息中。",
+    "pattern": "Grok 模式"
+  },
+  "json": {
+    "flatten": "展平結構",
+    "flatten_help": "是否將 JSON 物件展平為單一訊息欄位，或展開為多個欄位。",
+    "list_separator": "清單項目分隔符號",
+    "list_separator_help": "用於串接 JSON 清單項目的字串。",
+    "key_separator": "鍵分隔符號",
+    "key_separator_help": "用於串接巢狀 JSON 物件不同鍵的字串（僅在<em>未</em>展平時使用）。",
+    "kv_separator": "鍵/值分隔符號",
+    "kv_separator_help": "串接 JSON 物件鍵/值配對時使用的字串（僅在展平時使用）。",
+    "key_prefix": "鍵前綴",
+    "key_prefix_help": "要加在從 JSON 物件擷取的每個鍵前面的文字。",
+    "replace_key_whitespace": "取代鍵中的空白",
+    "replace_key_whitespace_help": "儲存擷取的訊息時，包含空白的欄位鍵會被捨棄。勾選此方塊可將 JSON 鍵中的空白取代為其他字元。",
+    "key_whitespace_replacement": "鍵空白取代字元",
+    "key_whitespace_replacement_help": "取代訊息鍵中空白時使用的字元。請確保取代字元在 Lucene 中有效，例如「-」或「_」。"
+  },
+  "lookup_table": {
+    "error": "無法執行 Lookup Table 查詢：{{error}}"
+  },
+  "regex": {
+    "no_match": "正規表示式不符合。",
+    "no_group": "正規表示式不包含任何可擷取的比對群組。",
+    "help": "用於擷取的正規表示式。使用第一個比對群組。詳情請參閱<docsLink>文件</docsLink>。",
+    "label": "正規表示式"
+  },
+  "regex_replace": {
+    "regex_help": "用於擷取的正規表示式。詳情請參閱<docsLink>文件</docsLink>。",
+    "replacement_help": "用於取代符合文字的內容。可用選項請參閱 <matcherLink>Matcher</matcherLink> API 文件。",
+    "replacement": "取代內容",
+    "replace_all": "取代模式的所有相符項目",
+    "replace_all_help": "是否取代指定模式的所有相符項目，或僅取代第一個相符項目。"
+  },
+  "split_and_index": {
+    "no_match": "無法執行分割與索引擷取。請檢查您的參數。",
+    "split_by_help": "要以哪個字元分割。<strong>範例：</strong>以空白字元分割 <em>foo bar baz</em> 會得到 <em>[foo,bar,baz]</em>。",
+    "index_help": "要使用分割字串的哪個部分？<strong>範例：</strong>以空白分割時，<em>2</em> 會選取 <em>foo bar baz</em> 中的 <em>bar</em>。",
+    "index": "目標索引"
+  },
+  "substring": {
+    "no_match": "無法執行子字串擷取。請檢查索引範圍。",
+    "end_index_help": "擷取的結束位置（不包含）。<strong>範例：</strong><em>1,5</em> 會從字串 <em>ilovelogs</em> 中截取 <em>love</em>。",
+    "begin_index": "起始索引",
+    "begin_index_help": "開始擷取的字元位置（包含）。",
+    "end_index": "結束索引"
+  },
+  "pages": {
+    "new_title": "為輸入 {{title}} 建立新擷取器",
+    "new_header": "為輸入 <em>{{title}}</em> 建立新擷取器",
+    "edit_title": "編輯擷取器 {{title}}",
+    "edit_header": "編輯輸入 <em>{{inputTitle}}</em> 的擷取器 <em>{{title}}</em>",
+    "description": "擷取器會套用於輸入接收的每則訊息。使用它們可將任何文字資料擷取並轉換為欄位，方便日後篩選與分析。",
+    "export_title": "匯出 {{title}} 的擷取器",
+    "export_header": "匯出 <em>{{title}}</em> 的擷取器",
+    "export_marketplace_prefix": "輸入的擷取器可匯出為 JSON，以便匯入其他設定或分享至",
+    "import_title": "將擷取器匯入 {{title}}",
+    "import_header": "將擷取器匯入 <em>{{title}}</em>",
+    "import_description": "已匯出的擷取器可匯入至輸入。",
+    "import_marketplace_prefix": "您只需要任何其他 {{productName}} 設定中的擷取器 JSON 匯出檔，或來自"
+  },
+  "tools_api": {
+    "details": "詳細資訊：{{error}}",
+    "natural_date_failed": "載入關鍵字預覽失敗，狀態：{{error}}",
+    "natural_date_failed_title": "無法載入關鍵字預覽",
+    "grok_failed_title": "無法執行 grok 擷取。請檢查您的參數。",
+    "json_failed_title": "無法執行 JSON 擷取。請檢查您的參數。",
+    "regex_invalid_title": "無法驗證正規表示式。請確認其有效。",
+    "allowlist_check_title": "無法確認 URL 是否在允許清單中。",
+    "regex_generate_title": "無法產生正規表示式。",
+    "regex_try_title": "無法試用正規表示式。請確認其有效。",
+    "split_index_failed_title": "無法執行分割與索引擷取。請檢查您的參數。",
+    "substring_failed_title": "無法執行子字串擷取。請檢查索引範圍。",
+    "contains_string_failed_title": "無法檢查欄位是否包含該字串",
+    "lookup_table_failed_title": "無法檢查 Lookup Table 是否能轉換該字串"
+  },
+  "use_extractors_notifications": {
+    "created_success": "擷取器 {{title}} 已成功建立",
+    "create_failed": "建立擷取器失敗：{{error}}",
+    "create_failed_title": "無法建立擷取器",
+    "updated_success": "擷取器「{{title}}」已成功更新",
+    "update_failed": "更新擷取器失敗：{{error}}",
+    "update_failed_title": "無法更新擷取器",
+    "deleted_success": "擷取器「{{title}}」已成功刪除",
+    "delete_failed": "刪除擷取器失敗：{{error}}",
+    "delete_failed_title": "無法刪除擷取器 {{title}}",
+    "positions_updated_success": "擷取器位置已成功更新",
+    "positions_failed": "變更擷取器位置失敗：{{error}}",
+    "positions_failed_title": "無法更新擷取器位置",
+    "import_success": "匯入結果：已匯入 {{successful}} 個擷取器。",
+    "import_success_title": "匯入作業成功",
+    "import_warning": "匯入結果：已匯入 {{successful}} 個擷取器，發生 {{failed}} 個錯誤。",
+    "import_warning_title": "匯入作業已完成"
+  }
+}
