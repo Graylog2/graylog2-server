@@ -155,26 +155,144 @@
     "utilization": "<strong>{{usage}} messages</strong> dans {{title}}, utilisés à {{percentage}}."
   },
   "input_types_data_table": {
-    "loading": "Chargement des types d'entrées..."
+    "loading": "Chargement des types d'entrées...",
+    "unavailable": "Les types d'entrées ne sont pas disponibles.",
+    "documentation": "Documentation",
+    "name": "Nom",
+    "type": "Type",
+    "filter": "Filtrer"
   },
-  "journal_details": {},
-  "journal_state": {},
-  "jvm_heap_usage": {},
-  "node_list_item": {},
-  "node_maintenance_dropdown": {},
-  "node_overview": {},
-  "nodes_actions": {},
-  "nodes_list": {},
-  "plugins_data_table": {},
-  "rest_api_overview": {},
-  "system_information": {},
-  "system_overview_details": {},
-  "system_overview_summary": {},
-  "bulk_actions": {},
-  "system_notifications_table": {},
-  "actions_cell": {},
-  "title_cell": {},
-  "system_job": {},
+  "journal_details": {
+    "loading": "Chargement des métriques du journal...",
+    "disabled": "Le journal disque est désactivé sur ce nœud.",
+    "unavailable": "Métriques du journal indisponibles.",
+    "overcommitted": "<strong>Attention !</strong> L'utilisation du journal dépasse la taille maximale définie. <overviewLink>Cliquez ici</overviewLink> pour plus d'informations.",
+    "configuration": "Configuration",
+    "path": "Chemin :",
+    "earliest_entry": "Entrée la plus ancienne :",
+    "maximum_size": "Taille maximale :",
+    "maximum_age": "Âge maximal :",
+    "flush_policy": "Politique de vidage :",
+    "flush_policy_value": "Tous les {{messages}} messages ou {{duration}}",
+    "maximum_age_format": "d [jours] h [heures] m [minutes]",
+    "flush_duration_format": "h [heures] m [minutes] s [secondes]",
+    "utilization": "Utilisation",
+    "unprocessed_messages": "<strong>{{messages}} messages non traités</strong> se trouvent actuellement dans le journal, répartis sur {{segments}} segments.",
+    "appended_and_read": "<strong>{{appended}} messages</strong> ont été ajoutés au cours de la dernière seconde, <strong>{{read}} messages</strong> ont été lus au cours de la dernière seconde."
+  },
+  "journal_state": {
+    "loading": "Chargement des métriques du journal...",
+    "unavailable": "Métriques du journal indisponibles."
+  },
+  "jvm_heap_usage": {
+    "loading": "Chargement des informations d'utilisation du heap...",
+    "unavailable": "Informations sur le heap indisponibles.",
+    "usage": "La JVM utilise <usedBlob /><strong> {{used}}</strong> sur <committedBlob /><strong> {{committed}}</strong> d'espace heap et n'essaiera pas d'en utiliser plus de <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Les informations système sont actuellement indisponibles."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Actions",
+    "configure_internal_logging": "Configurer la journalisation interne"
+  },
+  "node_overview": {
+    "memory_heap_usage": "Utilisation mémoire / heap",
+    "buffers": "Tampons",
+    "buffers_description": "Les tampons sont conçus pour mettre en cache de petites quantités de messages pendant une très courte durée (généralement quelques millisecondes) lors de leur passage dans les différents processeurs.",
+    "input_buffer": "Tampon d'entrée",
+    "process_buffer": "Tampon de traitement",
+    "output_buffer": "Tampon de sortie",
+    "disk_journal": "Journal disque",
+    "disk_journal_description": "Les messages entrants sont écrits dans le journal disque afin d'être conservés en sécurité en cas de défaillance du serveur. Le journal permet également de maintenir le fonctionnement lorsqu'une sortie est trop lente pour suivre le débit des messages, ou en cas de pic de messages entrants. Il évite ainsi de surcharger la mémoire et des pauses trop longues du ramasse-miettes.",
+    "system": "Système",
+    "rest_api": "API REST",
+    "installed_plugins": "Plugins installés",
+    "manage_inputs": "Gérer les entrées",
+    "available_input_types": "Types d'entrées disponibles"
+  },
+  "nodes_actions": {
+    "details": "Détails",
+    "metrics": "Métriques",
+    "more_actions": "Plus d'actions",
+    "pause_message_processing": "Suspendre le traitement des messages",
+    "resume_message_processing": "Reprendre le traitement des messages",
+    "pause_confirm": "Vous êtes sur le point de suspendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "resume_confirm": "Vous êtes sur le point de reprendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "override_lb_status": "Forcer le statut du LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Vous êtes sur le point de changer le statut du load balancer pour ce nœud en {{status}}. Êtes-vous sûr ?",
+    "local_message_inputs": "Entrées de messages locales",
+    "thread_dump": "Obtenir le dump des threads",
+    "process_buffer_dump": "Obtenir le dump du tampon de traitement",
+    "recent_system_logs": "Obtenir les messages de journal système récents"
+  },
+  "nodes_list": {
+    "no_active_nodes": "Aucun nœud actif."
+  },
+  "plugins_data_table": {
+    "loading": "Chargement des plugins sur ce nœud...",
+    "no_plugins": "Ce nœud n'a aucun plugin installé.",
+    "name": "Nom",
+    "version": "Version",
+    "author": "Auteur",
+    "description": "Description",
+    "website": "Site web",
+    "filter": "Filtrer"
+  },
+  "rest_api_overview": {
+    "transport_address": "Adresse de transport :",
+    "last_seen": "Vu pour la dernière fois :"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "Les informations JVM de ce nœud sont indisponibles.",
+    "hostname": "Nom d'hôte :",
+    "node_id": "ID du nœud :",
+    "version": "Version :",
+    "version_codename": "{{version}}, nom de code <em>{{codename}}</em>",
+    "jvm": "JVM :",
+    "time": "Heure :"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Vous êtes sur le point de suspendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "resume_confirm": "Vous êtes sur le point de reprendre le traitement des messages sur ce nœud. Êtes-vous sûr ?",
+    "what_does_this_mean": "Que signifie cela ?",
+    "lifecycle_state": "État du cycle de vie : <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Marqué comme <strong>{{status}}</strong> pour les load balancers",
+    "pause_processing": "Suspendre le traitement",
+    "resume_processing": "Reprendre le traitement",
+    "not_processing": "Le nœud <strong>ne traite pas</strong> de messages"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "État actuel du cycle de vie :",
+    "message_processing": "Traitement des messages :",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "lb_indication": "Indication du load balancer :"
+  },
+  "bulk_actions": {
+    "dismiss": "Ignorer"
+  },
+  "system_notifications_table": {
+    "title": "Notifications",
+    "human_name": "notifications"
+  },
+  "actions_cell": {
+    "dismiss": "Ignorer"
+  },
+  "title_cell": {
+    "show_full_message": "Afficher le message complet pour : {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Impossible d'accuser réception de la tâche",
+    "cancel_failed": "Impossible d'annuler la tâche",
+    "cancel_confirm": "Êtes-vous sûr de vouloir annuler la tâche système \"{{info}}\" ?",
+    "on_node": "- sur",
+    "runtime": "durée d'exécution : {{duration}}",
+    "cancel": "Annuler"
+  },
   "system_jobs_component": {},
   "system_jobs_list": {},
   "system_messages_component": {},
