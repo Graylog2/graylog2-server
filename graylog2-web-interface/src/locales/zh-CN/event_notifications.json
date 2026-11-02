@@ -227,7 +227,15 @@
     "load_failed_title": "无法加载事件通知"
   },
   "test": {
-    "success": "通知已成功执行。"
+    "success": "通知已成功执行。",
+    "validation_failed": "验证失败，请在继续之前修正表单中的所有错误。",
+    "unknown_error": "未知错误，请检查服务器日志。",
+    "unknown_error_product": "未知错误，请检查 {{productName}} 服务器日志。"
   },
-  "bulk": {}
+  "bulk": {
+    "delete_confirm_other": "确定要删除 {{count}} 个事件通知吗？",
+    "delete_failed_other": "在所选的 {{count}} 个事件通知中，有 {{failed}} 个无法删除。状态：{{status}}",
+    "delete_success_other": "已成功删除 {{count}} 个事件通知。",
+    "success_title": "成功"
+  }
 }
