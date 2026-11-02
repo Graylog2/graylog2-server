@@ -1,1 +1,128 @@
-{}
+{
+  "alerts_attributes": {
+    "additional_fields": "Champs supplémentaires",
+    "aggregation_time_range": "Plage de temps d'agrégation",
+    "description": "Description",
+    "event_definition": "Définition d'événement",
+    "event_definition_type": "Type de définition d'événement",
+    "event_procedures": "Procédures d'événement",
+    "group_by_fields": "Champs de regroupement",
+    "id": "ID",
+    "key": "Clé",
+    "message": "Message",
+    "priority": "Priorité",
+    "tags": "Étiquettes",
+    "timestamp": "Horodatage",
+    "type": "Type"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "L'actualisation automatique est désactivée pendant la segmentation afin d'éviter les problèmes de performance.",
+    "auto_refresh_unavailable_title": "Actualisation automatique indisponible",
+    "bulk_replay_search": "Rejouer la recherche",
+    "collapse_metrics": "Réduire les métriques",
+    "details": "Détails",
+    "expand_metrics": "Développer les métriques",
+    "histogram_failed": "Échec du chargement de l'histogramme des événements : {{error}}",
+    "metrics_title": "Métriques",
+    "no_additional_fields": "Aucun champ supplémentaire n'est ajouté à cet événement.",
+    "no_further_details": "Aucun autre détail",
+    "no_group_by_fields": "Aucun champ de regroupement sur cet événement.",
+    "no_key": "Aucune clé définie pour cet événement.",
+    "no_time_range": "Aucune plage de temps",
+    "refresh_human_name": "Événements",
+    "replay_search": "Rejouer la recherche"
+  },
+  "alerts_replay": {
+    "cannot_replay": "Impossible de rejouer cet événement : {{reason}} Veuillez en sélectionner un autre.",
+    "close_section": "Fermer la section {{title}}",
+    "details_title": "Détails de l'alerte/événement",
+    "event_definition_details": "Détails de la définition d'événement",
+    "event_details": "Détails de l'événement",
+    "no_remediation_steps": "Aucune étape de remédiation",
+    "open_section": "Ouvrir la section {{title}}",
+    "replay_details": "Détails du rejeu",
+    "replayed_search": "Recherche rejouée",
+    "system_event": "Cet événement est un événement système : il n'a pas de requête, de stream ni de plage de temps associés."
+  },
+  "alerts_types": {
+    "alert": "Alerte",
+    "event": "Événement"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_one": "Voulez-vous vraiment supprimer {{count}} définition d'événement ?",
+      "confirm_other": "Voulez-vous vraiment supprimer {{count}} définitions d'événement ?",
+      "error": "Une erreur s'est produite lors de la suppression des définitions d'événement. {{error}}",
+      "failed_one": "{{failed}} sur {{count}} définition d'événement sélectionnée n'a pas pu être supprimée.",
+      "failed_other": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être supprimées.",
+      "success_one": "{{count}} définition d'événement a été supprimée avec succès.",
+      "success_other": "{{count}} définitions d'événement ont été supprimées avec succès.",
+      "title": "Supprimer les définitions d'événement",
+      "confirm_many": "Voulez-vous vraiment supprimer {{count}} définitions d'événement ?",
+      "failed_many": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être supprimées.",
+      "success_many": "{{count}} définitions d'événement ont été supprimées avec succès."
+    },
+    "disable": {
+      "confirm_one": "Voulez-vous vraiment désactiver {{count}} définition d'événement ?",
+      "confirm_other": "Voulez-vous vraiment désactiver {{count}} définitions d'événement ?",
+      "error": "Une erreur s'est produite lors de la désactivation des définitions d'événement. {{error}}",
+      "failed_one": "{{failed}} sur {{count}} définition d'événement sélectionnée n'a pas pu être désactivée.",
+      "failed_other": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être désactivées.",
+      "success_one": "{{count}} définition d'événement a été désactivée avec succès.",
+      "title": "Désactiver les définitions d'événement",
+      "confirm_many": "Voulez-vous vraiment désactiver {{count}} définitions d'événement ?",
+      "failed_many": "{{failed}} sur {{count}} définitions d'événement sélectionnées n'ont pas pu être désactivées.",
+      "success_many": "{{count}} définitions d'événement ont été désactivées avec succès."
+    },
+    "enable": {
+      "error": "Une erreur s'est produite lors de l'activation des définitions d'événement. {{error}}",
+      "title": "Activer les définitions d'événement"
+    },
+    "success_title": "Succès"
+  },
+  "definitions_list": {
+    "disable": "Désactiver",
+    "enable": "Activer"
+  },
+  "definitions_page": {
+    "alerts_docs": "Documentation des alertes",
+    "copy_confirm": "Voulez-vous vraiment créer une copie de \"{{title}}\" ?",
+    "copy_title": "Copier la définition d'événement",
+    "create_multiple": "Créer des définitions d'événement",
+    "description_alerts": "Les définitions d'événement vous permettent de créer des alertes à partir de différentes conditions et de les signaler.",
+    "description_events": "Les définitions d'événement vous permettent de créer des événements à partir de différentes conditions et de les signaler.",
+    "description_list": "Créez de nouvelles définitions d'événement pour rechercher différentes conditions et déclencher des alertes.",
+    "duplicate": "Dupliquer la définition d'événement",
+    "edit": "Modifier la définition d'événement",
+    "edit_named": "Modifier la définition d'événement \"{{title}}\"",
+    "file_import": "Créer des définitions d'événement - Import de fichier",
+    "git_import": "Créer des définitions d'événement - Import Git",
+    "loading": "Chargement de la définition d'événement...",
+    "new": "Nouvelle définition d'événement",
+    "new_named": "Nouvelle définition d'événement \"{{title}}\"",
+    "title": "Définitions d'événement",
+    "view": "Afficher la définition d'événement",
+    "view_named": "Afficher la définition d'événement \"{{title}}\""
+  },
+  "alerts_page": {
+    "description": "Définissez des événements à travers différentes conditions. Ajoutez des notifications aux événements qui nécessitent votre attention pour créer des alertes.",
+    "documentation_title": "Documentation des alertes",
+    "title": "Alertes et événements"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Vous avez supprimé tous les événements de la liste. Vous pouvez revenir en cliquant sur <backButton>Retour aux événements</backButton>",
+    "all_reviewed": "Vous avez examiné tous les événements. Vous pouvez maintenant sélectionner une action groupée à appliquer à tous les événements listés ci-dessous.",
+    "list_description": "La liste suivante contient tous les événements/alertes que vous avez sélectionnés à l'étape précédente, afin que vous puissiez examiner la recherche rejouée pour chacun d'eux.",
+    "mark_not_reviewed": "Marquer l'événement \"{{id}}\" comme non examiné",
+    "mark_reviewed": "Marquer l'événement \"{{id}}\" comme examiné",
+    "remove_event": "Supprimer l'événement \"{{id}}\" de la liste",
+    "replay_search": "Rejouer la recherche",
+    "review_progress": "Examen de {{completed}}/{{total}} événements terminé.",
+    "show_selected": "Afficher les événements sélectionnés",
+    "unknown_message": "Inconnu"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Échec du chargement de l'événement ou de l'alerte, statut : {{error}}",
+    "load_failed_title": "Impossible de charger l'événement ou l'alerte"
+  }
+}
